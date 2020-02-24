@@ -416,7 +416,7 @@ static NSString* RMASN1ReadIA5SString(const uint8_t **pp, long omax)
     NSAssert(self.subscriptionExpirationDate != nil, @"The product %@ is not an auto-renewable subscription.", self.productIdentifier);
     
     if (self.cancellationDate) {
-        return NO; // TODO: How to test?
+        return NO;
     }
     
     BOOL ret = [self.purchaseDate compare:date] != NSOrderedDescending && [date compare:self.subscriptionExpirationDate] != NSOrderedDescending;

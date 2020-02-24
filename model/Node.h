@@ -80,7 +80,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)moveChild:(NSUInteger)from to:(NSUInteger)to;
 - (void)removeChild:(Node* _Nonnull)node; 
 
-- (Node* _Nonnull)cloneForHistory;
+- (Node*)clone;
+- (Node*)cloneForHistory;
+- (Node*)duplicate:(NSString*)newTitle; // NB: Must be added to parent to take effect
 
 - (void)sortChildren:(BOOL)ascending;
 
@@ -92,8 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate;
 
 - (void)restoreFromHistoricalNode:(Node*)historicalItem;
-
-- (Node*)duplicate:(NSString*)newTitle; // NB: Must be added to parent to take effect
 
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents;
 - (void)touchWithExplicitModifiedDate:(NSDate*)modDate touchParents:(BOOL)touchParents; // Used mostly for undo...

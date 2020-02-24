@@ -24,6 +24,7 @@
 #import "NSArray+Extensions.h"
 #import "BiometricsManager.h"
 #import "FavIconBulkViewController.h"
+#import "YubiManager.h"
 
 @interface SafeDetailsView ()
 
@@ -181,11 +182,15 @@
         scVc.mode = kCASGModeSetCredentials;
         scVc.initialFormat = self.viewModel.database.format;
         scVc.initialKeyFileUrl = self.viewModel.metadata.keyFileUrl;
+        scVc.initialYubiKeyConfig = self.viewModel.metadata.yubiKeyConfig;
         
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
-                    [self setCredentials:creds.password keyFileUrl:creds.keyFileUrl oneTimeKeyFileData:creds.oneTimeKeyFileData];
+                        [self setCredentials:creds.password
+                              keyFileUrl:creds.keyFileUrl
+                      oneTimeKeyFileData:creds.oneTimeKeyFileData
+                              yubiConfig:creds.yubiKeyConfig];
                 }
             }];
         };
@@ -196,61 +201,92 @@
     }
 }
 
-- (void)setCredentials:(NSString*)password keyFileUrl:(NSURL*)keyFileUrl oneTimeKeyFileData:(NSData*)oneTimeKeyFileData {
+- (void)setCredentials:(NSString*)password
+            keyFileUrl:(NSURL*)keyFileUrl
+    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
+    CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
+    
+    // Key File
+    
     if(keyFileUrl != nil || oneTimeKeyFileData != nil) {
         NSError* error;
-        self.viewModel.database.compositeKeyFactors.keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, self.viewModel.database.format, &error);
+        NSData* keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, self.viewModel.database.format, &error);
         
-        if(self.viewModel.database.compositeKeyFactors.keyFileDigest == nil) {
+        if(keyFileDigest == nil) {
             [Alerts error:self
                     title:NSLocalizedString(@"db_management_error_title_couldnt_change_credentials", @"Could not change credentials")
                     error:error];
             return;
         }
-    }
-    else {
-        self.viewModel.database.compositeKeyFactors.keyFileDigest = nil;
+        
+        newCkf.keyFileDigest = keyFileDigest;
     }
 
-    self.viewModel.database.compositeKeyFactors.password = password;
+    // Yubi Key
     
-    [self.viewModel update:NO handler:^(NSError *error) {
-        if (error == nil) {
-            if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
-                if(!oneTimeKeyFileData) {
-                    self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
-                    self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
-                    NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
-                }
-                else {
-                    // We can't support Convenience unlock with a one time key file...
-                    
-                    self.viewModel.metadata.convenienceMasterPassword = nil;
-                    self.viewModel.metadata.convenenienceYubikeySecret = nil;
-                    self.viewModel.metadata.isEnrolledForConvenience = NO;
-                }
-            }
-            
-            self.viewModel.metadata.keyFileUrl = keyFileUrl; 
-            [SafesList.sharedInstance update:self.viewModel.metadata];
+    if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
+        newCkf.yubiKeyCR = ^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+            [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
+        };
+    }
 
-            [ISMessages showCardAlertWithTitle:self.viewModel.database.format == kPasswordSafe ?
-             NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
-             NSLocalizedString(@"db_management_credentials_changed", @"Master Credentials Changed")
-                                       message:nil
-                                      duration:3.f
-                                   hideOnSwipe:YES
-                                     hideOnTap:YES
-                                     alertType:ISAlertTypeSuccess
-                                 alertPosition:ISAlertPositionTop
-                                       didHide:nil];
+    CompositeKeyFactors *rollbackCkf = [self.viewModel.database.compositeKeyFactors clone];
+    self.viewModel.database.compositeKeyFactors.password = newCkf.password;
+    self.viewModel.database.compositeKeyFactors.keyFileDigest = newCkf.keyFileDigest;
+    self.viewModel.database.compositeKeyFactors.yubiKeyCR = newCkf.yubiKeyCR;
+    
+    [self.viewModel update:NO
+                   handler:^(BOOL userCancelled, NSError * _Nullable error) {
+        if (userCancelled || error) {
+            // Rollback
+            self.viewModel.database.compositeKeyFactors.password = rollbackCkf.password;
+            self.viewModel.database.compositeKeyFactors.keyFileDigest = rollbackCkf.keyFileDigest;
+            self.viewModel.database.compositeKeyFactors.yubiKeyCR = rollbackCkf.yubiKeyCR;
+        
+            if (error) {
+                [Alerts error:self
+                        title:NSLocalizedString(@"db_management_couldnt_change_credentials", @"Could not change credentials")
+                        error:error];
+            }
         }
         else {
-            [Alerts error:self
-                    title:NSLocalizedString(@"db_management_couldnt_change_credentials", @"Could not change credentials")
-                    error:error];
+            [self onSuccessfulCredentialsChanged:keyFileUrl oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
         }
     }];
+}
+
+- (void)onSuccessfulCredentialsChanged:(NSURL*)keyFileUrl
+                    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+                            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
+    if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
+        if(!oneTimeKeyFileData) {
+            self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
+            self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
+            NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
+        }
+        else {
+            // We can't support Convenience unlock with a one time key file...
+            self.viewModel.metadata.convenienceMasterPassword = nil;
+            self.viewModel.metadata.convenenienceYubikeySecret = nil;
+            self.viewModel.metadata.isEnrolledForConvenience = NO;
+        }
+    }
+    
+    self.viewModel.metadata.keyFileUrl = keyFileUrl;
+    self.viewModel.metadata.yubiKeyConfig = yubiConfig;
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+
+    [ISMessages showCardAlertWithTitle:self.viewModel.database.format == kPasswordSafe ?
+     NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
+     NSLocalizedString(@"db_management_credentials_changed", @"Master Credentials Changed")
+                               message:nil
+                              duration:3.f
+                           hideOnSwipe:YES
+                             hideOnTap:YES
+                             alertType:ISAlertTypeSuccess
+                         alertPosition:ISAlertPositionTop
+                               didHide:nil];
 }
 
 - (IBAction)onSwitchBiometricUnlock:(id)sender {
@@ -351,7 +387,8 @@
     else {
         [self.viewModel enableAutoFill];
         
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database databaseUuid:self.viewModel.metadata.uuid];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                           databaseUuid:self.viewModel.metadata.uuid];
         
         [self.viewModel updateAutoFillCache:^{
             [self bindSettings];

@@ -40,13 +40,13 @@
             }
         }
         
-        NSError* error;
-        NSData* data = [[Kdbx4Database alloc] save:db error:&error];
-        
-        BOOL success = [data writeToFile:[NSString stringWithFormat:@"/Users/mark/Desktop/sample-%@g%d.kdbx", groupCount, entryCount]
-                                 options:kNilOptions error:&error];
-        
-        NSLog(@"Done %d - [%@]", success, error);
+        [[Kdbx4Database alloc] save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            BOOL success = [data writeToFile:[NSString stringWithFormat:@"/Users/mark/Desktop/sample-%@g%d.kdbx", groupCount, entryCount]
+                                     options:kNilOptions
+                                       error:&error];
+            
+            NSLog(@"Done %d - [%@]", success, error);
+        }];
     }
 }
 
@@ -64,12 +64,10 @@
         }
     }
     
-    NSError* error;
-    NSData* data = [[Kdbx4Database alloc] save:db error:&error];
-    
-    BOOL success = [data writeToFile:@"/Users/mark/Desktop/memory.kdbx" options:kNilOptions error:&error];
-    
-    NSLog(@"Done %d - [%@]", success, error);
+    [[Kdbx4Database alloc] save:db  completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        BOOL success = [data writeToFile:@"/Users/mark/Desktop/memory.kdbx" options:kNilOptions error:&error];
+        NSLog(@"Done %d - [%@]", success, error);
+    }];
 }
 
 @end

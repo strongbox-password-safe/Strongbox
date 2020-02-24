@@ -30,6 +30,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "BiometricsManager.h"
 #import "BookmarksHelper.h"
+#import "YubiManager.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -53,6 +54,8 @@
 @property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
 @property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
 @property NSString* yubikeySecret;
+@property YubiKeyHardwareConfiguration* yubiKeyConfiguration;
+
 @property BOOL biometricPreCleared; // App Lock has just authorized the user via Bio - No need to ask again
 
 @property UIDocumentPickerViewController *documentPicker;
@@ -253,7 +256,8 @@
                         oneTimeKeyFileData:nil
                                   readOnly:self.safe.readOnly
                          manualOpenOffline:self.manualOpenOfflineCache
-                             yubikeySecret:self.safe.convenenienceYubikeySecret];
+                             yubikeySecret:self.safe.convenenienceYubikeySecret
+                      yubikeyConfiguration:self.safe.yubiKeyConfig];
                 }
                 else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
                     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
@@ -302,18 +306,20 @@
     [self.viewController presentViewController:vc animated:YES completion:nil];
 }
 
--(void)performDuressAction {
+- (void)performDuressAction {
     if (self.safe.duressAction == kOpenDummy) {
         SafeMetaData* metadata = [DuressDummyStorageProvider.sharedInstance getSafeMetaData:self.safe.nickName filename:self.safe.fileName fileIdentifier:self.safe.fileIdentifier];
         
-        Model *viewModel = [[Model alloc] initWithSafeDatabase:DuressDummyStorageProvider.sharedInstance.database
-                                         originalDataForBackup:nil
-                                                      metaData:metadata
-                                               storageProvider:DuressDummyStorageProvider.sharedInstance
-                                                     cacheMode:NO
-                                                    isReadOnly:NO];
-        
-        self.completion(viewModel, nil);
+        [DuressDummyStorageProvider.sharedInstance database:^(DatabaseModel * _Nonnull model) {
+            Model *viewModel = [[Model alloc] initWithSafeDatabase:model
+                                             originalDataForBackup:nil
+                                                          metaData:metadata
+                                                   storageProvider:DuressDummyStorageProvider.sharedInstance
+                                                         cacheMode:NO
+                                                        isReadOnly:NO];
+            
+            self.completion(viewModel, nil);
+        }];
     }
     else if (self.safe.duressAction == kPresentError) {
         NSError *error = [Utils createNSError:NSLocalizedString(@"open_sequence_duress_technical_error_message", @"There was a technical error opening the database.") errorCode:-1729];
@@ -376,7 +382,7 @@
 }
 
 - (void)onBiometricAuthenticationDone:(BOOL)success
-                error:(NSError *)error {
+                                error:(NSError *)error {
     if (success) {
         if(![BiometricsManager.sharedInstance isBiometricDatabaseStateRecorded:self.isAutoFillOpen]) {
             [BiometricsManager.sharedInstance recordBiometricDatabaseState:self.isAutoFillOpen]; // Successful Auth and no good previous state recorded, record Biometrics database state now...
@@ -394,7 +400,8 @@
                 oneTimeKeyFileData:nil
                           readOnly:self.safe.readOnly
                  manualOpenOffline:self.manualOpenOfflineCache
-                     yubikeySecret:self.safe.convenenienceYubikeySecret];
+                     yubikeySecret:self.safe.convenenienceYubikeySecret
+              yubikeyConfiguration:self.safe.yubiKeyConfig];
         }
     }
     else {
@@ -477,6 +484,7 @@
     scVc.initialKeyFileUrl = self.safe.keyFileUrl;
     scVc.initialReadOnly = self.safe.readOnly;
     scVc.initialOfflineCache = self.manualOpenOfflineCache;
+    scVc.initialYubiKeyConfig = self.safe.yubiKeyConfig;
     
     // Less than perfect but helpful
     
@@ -507,7 +515,8 @@
                     oneTimeKeyFileData:creds.oneTimeKeyFileData
                               readOnly:creds.readOnly
                      manualOpenOffline:creds.offlineCache
-                         yubikeySecret:creds.yubiKeySecret];
+                         yubikeySecret:creds.yubiKeySecret
+                  yubikeyConfiguration:creds.yubiKeyConfig];
             }
             else {
                 self.completion(nil, nil);
@@ -525,7 +534,8 @@
       oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                 readOnly:(BOOL)readOnly
        manualOpenOffline:(BOOL)manualOpenOffline
-           yubikeySecret:(NSString*)yubikeySecret {
+           yubikeySecret:(NSString*)yubikeySecret
+    yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubikeyConfiguration {
     if(keyFileUrl || oneTimeKeyFileData) {
         NSError *error;
         self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
@@ -545,7 +555,6 @@
             }
 
             if(keyFileUrl && self.isAutoFillOpen) {
-                    // TODO: Move error messaging out of here
                     [Alerts error:self.viewController
                             title:NSLocalizedString(@"open_sequence_error_reading_key_file_autofill_context", @"Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences")
                             error:error
@@ -555,7 +564,6 @@
                     return;
             }
             else {
-                // TODO: Move error messaging out of here
                 [Alerts error:self.viewController
                         title:NSLocalizedString(@"open_sequence_error_reading_key_file", @"Error Reading Key File")
                         error:error
@@ -567,16 +575,22 @@
         }
     }
 
-    self.yubikeySecret = yubikeySecret;
-    if(yubikeySecret.length) {
-        readOnly = YES;
+    if(yubikeyConfiguration && yubikeyConfiguration.mode != kNoYubiKey) {
+        self.yubiKeyConfiguration = yubikeyConfiguration;
+    }
+    else { // Only use the secret workaround if we're not directly using an actual YubiKey
+        self.yubikeySecret = yubikeySecret;
     }
     
-    // Change in Read-Only or Key File Setting? Save
+    // Change in Read-Only or Key File Setting or Yubikey setting? Save
     
-    if(self.safe.readOnly != readOnly || ![self.safe.keyFileUrl isEqual:keyFileUrl]) {
+    if(self.safe.readOnly != readOnly ||
+       ![self.safe.keyFileUrl isEqual:keyFileUrl] ||
+       ![self.safe.yubiKeyConfig isEqual:yubikeyConfiguration]) {
         self.safe.readOnly = readOnly;
         self.safe.keyFileUrl = keyFileUrl;
+        self.safe.yubiKeyConfig = yubikeyConfiguration;
+        
         [SafesList.sharedInstance update:self.safe];
     }
     
@@ -676,18 +690,9 @@
     });
 }
 
-- (NSData*)getYubikeyResponse:(NSData*)database error:(NSError**)error {
-    NSData* challenge = [DatabaseModel getYubikeyChallenge:database error:error];
-    
-    if(!challenge || !self.yubikeySecret.length) {
-        return nil;
-    }
-    
-    //NSLog(@"Got Yubikey Challenge: [%@]", challenge);
-    
+- (NSData*)getDummyYubikeyResponse:(NSData*)challenge {
     NSData* yubikeySecretData = [Utils dataFromHexString:self.yubikeySecret];
     NSData* challengeResponse = hmacSha1(challenge, yubikeySecretData);
-    
     return challengeResponse;
 }
 
@@ -704,63 +709,152 @@
         return;
     }
     
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
-
     DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
     if (self.undigestedKeyFileData) {
         self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:self.undigestedKeyFileData checkForXml:format != kKeePass1];
     }
 
     // Yubikey?
-    
-    NSData* yubikeyResponse = self.yubikeySecret.length ? [self getYubikeyResponse:data error:&error] : nil;
-    if(error) {
-        NSLog(@"Yubikey secret provided but error getting challenge or response.");
-        [self openSafeWithDataDone:error
-                        openedSafe:nil
-                         cacheMode:cacheMode
-                          provider:provider
-                              data:data];
-        return;
+  
+    if (self.yubiKeyConfiguration && self.yubiKeyConfiguration != kNoYubiKey) {
+        [self unlockValidDatabaseWithAllCompositeKeyFactors:data
+                                                   provider:provider
+                                                  cacheMode:cacheMode
+                                                     format:format
+                                                  yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+            [self getYubiKeyChallengeResponse:challenge completion:completion];
+        }];
     }
-    
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        NSError *error;
-        DatabaseModel *openedSafe = nil;
+    else if (self.yubikeySecret.length) {
+        [self unlockValidDatabaseWithAllCompositeKeyFactors:data
+                                                   provider:provider
+                                                  cacheMode:cacheMode
+                                                     format:format
+                                                  yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+            NSData* yubikeyResponse = [self getDummyYubikeyResponse:challenge];
+            completion(NO, yubikeyResponse, nil);
+        }];
+    }
+    else {
+        [self unlockValidDatabaseWithAllCompositeKeyFactors:data provider:provider cacheMode:cacheMode format:format yubiKeyCR:nil];
+    }
+}
 
+- (void)getYubiKeyChallengeResponse:(NSData*)challenge completion:(YubiKeyCRResponseBlock)completion {
+#ifndef IS_APP_EXTENSION
+    if([Settings.sharedInstance isProOrFreeTrial]) {
+        [YubiManager.sharedInstance getResponse:self.yubiKeyConfiguration
+                                      challenge:challenge
+                                     completion:completion];
+    }
+    else {
+        NSString* loc = NSLocalizedString(@"open_sequence_yubikey_only_available_in_pro", @"YubiKey Unlock is only available in the Pro edition of Strongbox");
+        NSError* error = [Utils createNSError:loc errorCode:-1];
+        completion(NO, nil, error);
+    }
+#else
+    // FUTURE: Is this true for the 5Ci MFI?
+    NSString* loc = NSLocalizedString(@"open_sequence_cannot_use_yubikey_in_autofill_mode", @"YubiKey Unlock is not supported in Auto Fill mode");
+    NSError* error = [Utils createNSError:loc errorCode:-1];
+    completion(NO, nil, error);
+#endif
+}
+
+- (void)unlockValidDatabaseWithAllCompositeKeyFactors:(NSData *)data
+                                             provider:(id)provider
+                                            cacheMode:(BOOL)cacheMode
+                                               format:(DatabaseFormat)format
+                                            yubiKeyCR:(YubiKeyCRHandlerBlock)yubiKeyCR {
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
+
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword
                                                    keyFileDigest:self.keyFileDigest
-                                                 yubiKeyResponse:yubikeyResponse];
+                                                       yubiKeyCR:yubiKeyCR];
 
-        if(!self.isConvenienceUnlock && (format == kKeePass || format == kKeePass4) &&
-           self.masterPassword.length == 0 && (self.keyFileDigest || yubikeyResponse)) {
-            // KeePass 2 allows empty and nil/none... we need to try both to figure out what the user meant.
+        if(!self.isConvenienceUnlock &&
+           (format == kKeePass || format == kKeePass4) &&
+           self.masterPassword.length == 0 &&
+           (self.keyFileDigest || yubiKeyCR)) {
+            // KeePass 2 allows empty and nil/none...
+            // we need to try both to figure out what the user meant.
             // We will try empty first which is what will have come from the View Controller and then nil.
             
-            // self.masterPassword // Will be @""
-        
-            openedSafe = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
-            
-            if(openedSafe == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
-                cpf = [CompositeKeyFactors password:nil keyFileDigest:self.keyFileDigest yubiKeyResponse:yubikeyResponse];
-                openedSafe = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
-                
-                if(openedSafe) {
-                    self.masterPassword = nil;
-                }
+            // NB: We can't do this with Yubikey because it will require at least 2 scans, so we explicitly ask
+            // NB: self.masterPassword will be @"" initially just due to the way CASG handles things
+
+            if (!yubiKeyCR) { // Auto Figure it out
+                [DatabaseModel fromData:data
+                                    ckf:cpf
+                             completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+                    if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
+                        CompositeKeyFactors* ckf = [CompositeKeyFactors password:nil
+                                                                   keyFileDigest:self.keyFileDigest
+                                                                       yubiKeyCR:yubiKeyCR];
+                        
+                        // FUTURE: For Yubikey users this is an issue because they will be asked twice... maybe explicitly ask them if they mean nil or empty
+                        
+                        [DatabaseModel fromData:data
+                                            ckf:ckf
+                                     completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+                            if(model) {
+                                self.masterPassword = nil;
+                            }
+                            
+                            [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode provider:provider data:data error:error];
+                        }];
+                    }
+                    else {
+                        [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode provider:provider data:data error:error];
+                    }
+                }];
+            }
+            else { // YubiKey open - Just ask
+                [Alerts twoOptionsWithCancel:self.viewController
+                                       title:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
+                                     message:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
+                           defaultButtonText:NSLocalizedString(@"casg_question_option_empty", @"Empty Password")
+                            secondButtonText:NSLocalizedString(@"casg_question_option_none", @"No Password")
+                                      action:^(int response) {
+                    if(response == 0) {
+                        self.masterPassword = @"";
+                    }
+                    else if(response == 1) {
+                        self.masterPassword = nil;
+                    }
+                    
+                    cpf.password = self.masterPassword;
+                    [DatabaseModel fromData:data ckf:cpf completion:^(BOOL userCancelled, DatabaseModel* model, NSError* error) {
+                        [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode provider:provider data:data error:error];
+                    }];
+                }];
             }
         }
         else {
-            openedSafe = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
+            [DatabaseModel fromData:data
+                                ckf:cpf
+                         completion:^(BOOL userCancelled, DatabaseModel* model, NSError* error) {
+                [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode provider:provider data:data error:error];
+            }];
         }
+    });
+}
+
+- (void)onGotDatabaseModelFromData:(BOOL)userCancelled
+                             model:(DatabaseModel*)model
+                         cacheMode:(BOOL)cacheMode
+                          provider:(id)provider
+                              data:(NSData*)data
+                             error:(NSError*)error {
+    dispatch_async(dispatch_get_main_queue(), ^(void){
+        [SVProgressHUD dismiss];
         
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            [self openSafeWithDataDone:error
-                            openedSafe:openedSafe
-                             cacheMode:cacheMode
-                              provider:provider
-                                  data:data];
-        });
+        if (userCancelled) {
+            self.completion(nil, nil);
+        }
+        else {
+            [self openSafeWithDataDone:error openedSafe:model cacheMode:cacheMode provider:provider data:data];
+        }
     });
 }
 
@@ -779,7 +873,7 @@
             self.completion(nil, error);
             return;
         }
-        else if (error.code == kStrongboxErrorCodeIncorrectCredentials) { // TODO: This interpretation of the error blocks us from moving Alerts out of here...
+        else if (error.code == kStrongboxErrorCodeIncorrectCredentials) {
             if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
@@ -802,17 +896,13 @@
         }
         else {
             [Alerts error:self.viewController
-                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") error:error];
+                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                    error:error];
         }
         
         self.completion(nil, error);
     }
     else {
-        // SAFETY: Guarantee no writes with old yubikey response in some kind of unthinkable scenario when we have opened
-        // using the Yubikey secret workaround
-        
-        openedSafe.compositeKeyFactors.yubiKeyResponse = nil; // TODO: Eventually allow this when we allow writeable yubikey dbs
-
         BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
         BOOL pinPossible = !Settings.sharedInstance.disallowAllPinCodeOpens;
 
@@ -996,7 +1086,7 @@
                                                   metaData:self.safe
                                            storageProvider:cacheMode ? nil : provider // Guarantee nothing can be written!
                                                  cacheMode:cacheMode
-                                                isReadOnly:self.yubikeySecret.length];
+                                                isReadOnly:NO];
     
     viewModel.openedWithYubiKeySecret = self.yubikeySecret;
     

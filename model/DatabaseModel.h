@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseModel : NSObject
 
-+ (NSData *_Nullable)getYubikeyChallenge:(NSData *)candidate error:(NSError **)error;
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
 + (BOOL)isAutoFillLikelyToCrash:(NSData*)data;
@@ -21,15 +20,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
 
+
++ (void)fromData:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion;
+- (void)getAsData:(SaveCompletionBlock)completion;
+
+
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (instancetype)initNew:(CompositeKeyFactors*)compositeKeyFactors format:(DatabaseFormat)format;
-
-- (instancetype _Nullable )initExisting:(NSData *_Nonnull)data
-                    compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
-                                  error:(NSError *_Nonnull*_Nonnull)ppError;
-
-- (NSData* _Nullable)getAsData:(NSError*_Nonnull*_Nonnull)error;
+- (instancetype)initWithDatabase:(StrongboxDatabase*)database adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;

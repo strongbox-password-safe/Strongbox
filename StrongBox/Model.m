@@ -60,41 +60,43 @@
     return _isReadOnly;
 }
 
-- (void)update:(BOOL)isAutoFill handler:(void (^)(NSError * _Nullable))handler {
+- (void)update:(BOOL)isAutoFill handler:(void(^)(BOOL, NSError * _Nullable error))handler {
     if (!_cacheMode && !_isReadOnly) {
-        [self encrypt:^(NSData * _Nullable updatedSafeData, NSError * _Nullable error) {
-            if (updatedSafeData == nil) {
-                handler(error);
+        [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            if (userCancelled || data == nil || error) {
+                handler(userCancelled, error);
                 return;
             }
 
             if(self.lastSnapshot) { // Dummy Database => will be nil
                 if(![BackupsManager.sharedInstance writeBackup:self.lastSnapshot metadata:self.metadata]) {
-                    handler([Utils createNSError:NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!") errorCode:-1]);
+                    NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
+                    NSError* err = [Utils createNSError:em errorCode:-1];
+                    handler(NO, err);
                     return;
                 }
-                self.lastSnapshot = updatedSafeData;
+                self.lastSnapshot = data;
             }
                         
             [self->_storageProvider update:self.metadata
-                                      data:updatedSafeData
+                                      data:data
                                 isAutoFill:isAutoFill
                                 completion:^(NSError *error) {
                               if(!error) {
-                                  [self updateOfflineCacheWithData:updatedSafeData];
-                                  [self updateAutoFillCacheWithData:updatedSafeData];
+                                  [self updateOfflineCacheWithData:data];
+                                  [self updateAutoFillCacheWithData:data];
                                   [self updateAutoFillQuickTypeDatabase];
                               }
-                              handler(error);
+                              handler(NO, error);
                           }];
         }];
     }
     else {
         if(_isReadOnly) {
-            handler([Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
+            handler(NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
         }
         else {
-            handler([Utils createNSError:NSLocalizedString(@"model_error_offline_cannot_write", @"You are currently in offline mode. The database cannot be modified.") errorCode:-1]);
+            handler(NO, [Utils createNSError:NSLocalizedString(@"model_error_offline_cannot_write", @"You are currently in offline mode. The database cannot be modified.") errorCode:-1]);
         }
     }
 }
@@ -107,18 +109,15 @@
 
 - (void)updateAutoFillCache:(void (^_Nonnull)(void))handler {
     if (self.metadata.autoFillEnabled) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
-        {
-           NSError *error;
-           NSData *updatedSafeData = [self.database getAsData:&error];
-           
-           dispatch_async(dispatch_get_main_queue(), ^(void) {
-               if (updatedSafeData != nil) {
-                   [self saveAutoFillCacheFile:updatedSafeData safe:self.metadata];
-               }
-               
-               handler();
-           });
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+            [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    if (data != nil) {
+                        [self saveAutoFillCacheFile:data safe:self.metadata];
+                    }
+                    handler();
+                });
+            }];
         });
     }
 }
@@ -141,23 +140,21 @@
     [[SafesList sharedInstance] update:self.metadata];
 }
 
-- (void)updateOfflineCache:(void (^)(void))handler {
-    if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void)
-        {
-            NSError *error;
-            NSData *updatedSafeData = [self.database getAsData:&error];
-
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                if (updatedSafeData != nil && self->_metadata.offlineCacheEnabled) {
-                    [self saveOfflineCacheFile:updatedSafeData safe:self->_metadata];
-                }
-
-                handler();
-            });
-        });
-    }
-}
+//- (void)updateOfflineCache:(void (^)(void))handler {
+//    if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
+//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+//            [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+//                dispatch_async(dispatch_get_main_queue(), ^(void) {
+//                    if (data != nil) {
+//                        [self saveOfflineCacheFile:data safe:self->_metadata];
+//                    }
+//
+//                    handler();
+//                });
+//            }];
+//        });
+//    }
+//}
 
 - (void)updateOfflineCacheWithData:(NSData *)data {
     if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
@@ -246,18 +243,16 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
--(void)encrypt:(void (^)(NSData* data, NSError* error))completion {
+-(void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSError* error))completion {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        NSError* error;
-        NSData* ret = [self.database getAsData:&error];
-
-        dispatch_async(dispatch_get_main_queue(), ^(void){
-            [SVProgressHUD dismiss];
-
-            completion(ret, error);
-        });
+        [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                [SVProgressHUD dismiss];
+                completion(userCancelled, data, error);
+            });
+        }];
     });
 }
 

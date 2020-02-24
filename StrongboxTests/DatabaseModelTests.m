@@ -27,11 +27,10 @@
     NSData *data = [CommonTesting getDataFromBundleFile:@"xml-keyfile" ofType:@"kdbx"];
     XCTAssert(data);
     
-    NSError *error;
-    DatabaseModel* model = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:[CompositeKeyFactors password:nil keyFileDigest:digest] error:&error];
-    XCTAssert(model);
-    
-    NSLog(@"%@", model);
+    [DatabaseModel fromData:data ckf:[CompositeKeyFactors password:nil keyFileDigest:digest] completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+        XCTAssert(model);
+        NSLog(@"%@", model);
+    }];
 }
 
 @end

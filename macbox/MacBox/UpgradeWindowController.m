@@ -27,8 +27,7 @@
 
 static UpgradeWindowController *sharedInstance = nil;
 
-+ (void)show:(SKProduct*)product cancelDelay:(NSInteger)cancelDelay
-{
++ (void)show:(SKProduct*)product cancelDelay:(NSInteger)cancelDelay {
     if (!sharedInstance)
     {
         sharedInstance = [[UpgradeWindowController alloc] initWithWindowNibName:@"UpgradeWindowController"];
@@ -54,6 +53,12 @@ static UpgradeWindowController *sharedInstance = nil;
     }
     
     [self.window close];
+}
+
+- (void)cancel:(id)sender { // Pick up escape key
+    if (self.cancelDelay == 0) {
+        [self close];
+    }
 }
 
 - (void)windowDidLoad {

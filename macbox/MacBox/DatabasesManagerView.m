@@ -154,11 +154,14 @@ static DatabasesManagerView* sharedInstance;
 
     if([tableColumn.identifier isEqualToString:kColumnIdFileName]) {
         NSURL* url = [database valueForKey:kColumnIdFileUrl];
-        result.textField.stringValue = url.lastPathComponent;
+        NSString* loc = NSLocalizedString(@"generic_unknown", @"Unknown");
+        result.textField.stringValue = url && url.lastPathComponent ? url.lastPathComponent : loc;
     }
     else if([tableColumn.identifier isEqualToString:kColumnIdFilePath]) {
         NSURL* url = [database valueForKey:kColumnIdFileUrl];
-        result.textField.stringValue = url.URLByDeletingLastPathComponent.path;
+        NSString* loc = NSLocalizedString(@"generic_unknown", @"Unknown");
+        
+        result.textField.stringValue = url && url.URLByDeletingLastPathComponent.path ? url.URLByDeletingLastPathComponent.path : loc;
     }
     else if([tableColumn.identifier isEqualToString:kColumnIdStorageId]) {
         NSObject *obj = [database valueForKey:tableColumn.identifier];

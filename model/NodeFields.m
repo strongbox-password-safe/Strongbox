@@ -188,42 +188,30 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return ret;
 }
 
-- (NodeFields*)duplicate {
+- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneMetadataDates:(BOOL)cloneMetadataDates {
     NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username
                                                        url:self.url
                                                   password:self.password
                                                      notes:self.notes
                                                      email:self.email];
     
-    ret.passwordModified = self.passwordModified;
     ret.expires = self.expires;
-
-    // FUTURE: Optionally Copy Dates?
-    [ret setTouchProperties:NSDate.date modified:NSDate.date usageCount:@(0)];
-
     ret.locationChanged = self.locationChanged;
     ret.attachments = [self cloneAttachments];
     ret.mutableCustomFields = [self cloneCustomFields];
+        
+    if (cloneMetadataDates) {
+        ret.passwordModified = self.passwordModified;
+        ret.created = self.created;
+        [ret setTouchProperties:self.accessed modified:self.modified usageCount:self.usageCount];
+    }
     
-    return ret;
-}
-
-- (NodeFields *)cloneForHistory {
-    NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username url:self.url password:self.password notes:self.notes email:self.email];
-
-    ret.created = self.created;
-    ret.passwordModified = self.passwordModified;
-    ret.expires = self.expires;
-
-    [ret setTouchProperties:self.accessed modified:self.modified usageCount:self.usageCount];
-    
-    ret.locationChanged = self.locationChanged;
-    
-    ret.attachments = [self cloneAttachments];
-    ret.mutableCustomFields = [self cloneCustomFields];
-    
-    // Empty History
-    ret.keePassHistory = [NSMutableArray array];
+    if (clearHistory) {
+        ret.keePassHistory = [NSMutableArray array];
+    }
+    else {
+        ret.keePassHistory = self.keePassHistory.mutableCopy;
+    }
     
     return ret;
 }

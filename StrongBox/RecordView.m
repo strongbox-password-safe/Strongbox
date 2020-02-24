@@ -720,7 +720,7 @@ static const int kMinNotesCellHeight = 160;
         vc.model = self.record.fields.passwordHistory;
         vc.readOnly = self.readOnlyMode;
         
-        vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(NSError *)) {
+        vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(BOOL userCancelled, NSError *error)) {
             [self onPasswordHistoryChanged:changed onDone:onDone];
         };
     }
@@ -892,13 +892,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(NSError *))onDone {
+- (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(BOOL userCancelled, NSError *error))onDone {
     self.record.fields.passwordHistory = changed;
     [self.record touch:YES touchParents:YES];
 
-    [self sync:^(NSError *error) {
+    [self sync:^(BOOL userCancelled, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            onDone(error);
+            onDone(userCancelled, error);
         });
     }];
 }
@@ -913,8 +913,11 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
     [self.viewModel.database setNodeAttachments:node attachments:attachments];
     
-    [self sync:^(NSError *error) {
-        if (error != nil) {
+    [self sync:^(BOOL userCancelled, NSError *error) {
+        if (userCancelled) {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+        else if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];
@@ -942,8 +945,11 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         [node.fields setCustomField:field.key value:value];
     }
     
-    [self sync:^(NSError *error) {
-        if (error != nil) {
+    [self sync:^(BOOL userCancelled, NSError *error) {
+        if (userCancelled) {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+        else if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];
@@ -963,8 +969,11 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
     // Sync
     
-    [self sync:^(NSError *error) {
-        if (error != nil) {
+    [self sync:^(BOOL userCancelled, NSError *error) {
+        if (userCancelled) {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+        else if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];
@@ -989,8 +998,11 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     // Sync
     
-    [self sync:^(NSError *error) {
-        if (error != nil) {
+    [self sync:^(BOOL userCancelled, NSError *error) {
+        if (userCancelled) {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+        else if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];
@@ -1102,8 +1114,11 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     [self.record touch:YES touchParents:YES];
     
-    [self sync:^(NSError *error) {
-        if(error) {
+    [self sync:^(BOOL userCancelled, NSError *error) {
+        if (userCancelled) {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+        else if(error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [Alerts error:self title:@"Error While Saving" error:error];
             });
@@ -1130,12 +1145,15 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
     Node* originalNodeForHistory = [self.record cloneForHistory];
     
-    [self saveChanges:originalNodeForHistory completion:^(NSError *error) {
+    [self saveChanges:originalNodeForHistory completion:^(BOOL userCancelled, NSError *error) {
         self.navigationItem.leftBarButtonItem = self.navBack;
         self.editButtonItem.enabled = YES;
         self.navBack = nil;
-        
-        if (error != nil) {
+
+        if (userCancelled) {
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }
+        else if (error != nil) {
             [Alerts error:self title:@"Problem Saving" error:error completion:^{
                 [self.navigationController popToRootViewControllerAnimated:YES];
             }];
@@ -1148,7 +1166,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     }];
 }
 
-- (void)saveChanges:(Node*)originalNodeForHistory completion:(void (^)(NSError *))completion {
+- (void)saveChanges:(Node*)originalNodeForHistory completion:(void (^)(BOOL userCancelled, NSError* error))completion {
     [self.record touch:YES touchParents:YES];
 
     self.record.fields.notes = self.textViewNotes.text;
@@ -1214,8 +1232,8 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     [self sync:completion];
 }
 
-- (void)sync:(void (^)(NSError *))completion {
-    [self.viewModel update:NO handler:^(NSError *error) {
+- (void)sync:(void (^)(BOOL userCancelled, NSError * error))completion {
+    [self.viewModel update:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
         if(!error) {
             self.editingNewRecord = NO;
             self.userSelectedNewCustomIcon = nil;
@@ -1224,7 +1242,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         }
         
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            completion(error);
+            completion(userCancelled, error);
         });
     }];
 }

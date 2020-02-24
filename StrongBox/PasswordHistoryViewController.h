@@ -13,7 +13,7 @@
 
 @property (nonatomic, retain) PasswordHistory *model;
 
-@property (nonatomic, copy) void (^ saveFunction)(PasswordHistory *changed, void (^onDone)(NSError *));
+@property (nonatomic, copy) void (^ saveFunction)(PasswordHistory *changed, void (^onDone)(BOOL userCancelled, NSError *error));
 
 @property (weak, nonatomic) IBOutlet UISwitch *uiSwitchEnabled;
 @property (weak, nonatomic) IBOutlet UILabel *uiLabelPreviousPasswords;

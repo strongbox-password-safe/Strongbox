@@ -95,10 +95,9 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 }
 
 - (void)openDocument:(id)sender {
+//    NSLog(@"openDocument: document count = [%ld]", self.documents.count);
     if(self.documents.count == 0) { // Empty Launch...
-        if(!Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
-            [DatabasesManagerView show:NO];
-        }
+        [self performEmptyLaunchTasksIfNecessary];
     }
     else {
         [self originalOpenDocument:sender];
@@ -154,6 +153,41 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
         else {
             completion([Utils createNSError:@"Could not access security scope URL" errorCode:-1]);
         }
+    }
+}
+
+- (void)onAppStartup {
+//    NSLog(@"onAppStartup: document count = [%ld]", self.documents.count);
+    
+    if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
+       Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
+        [self openPrimaryDatabase];
+    }
+    else if(self.documents.count == 0) {
+        [DatabasesManagerView show:NO];
+    }
+}
+
+- (void)performEmptyLaunchTasksIfNecessary {
+//    NSLog(@"performEmptyLaunchTasks...");
+    
+    if(self.documents.count == 0) { // Empty Launch...
+//        NSLog(@"performEmptyLaunchTasks: document count = [%ld]", self.documents.count);
+        
+        if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
+           Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
+            [self openPrimaryDatabase];
+        }
+        else {
+            [DatabasesManagerView show:NO];
+        }
+    }
+}
+
+- (void)openPrimaryDatabase {
+    if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
+       Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
+        [self openDatabase:DatabasesManager.sharedInstance.snapshot.firstObject completion:^(NSError *error) { }];
     }
 }
 

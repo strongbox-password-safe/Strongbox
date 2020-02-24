@@ -66,8 +66,17 @@ static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
 static NSString* const kHideKeyFileNameOnLockScreen = @"hideKeyFileNameOnLockScreen";
 static NSString* const kDoNotRememberKeyFile = @"doNotRememberKeyFile";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
+static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 
 @implementation Settings
+
+- (BOOL)hasDoneProFamilyCheck {
+    return [self getBool:kHasDoneProFamilyCheck];
+}
+
+- (void)setHasDoneProFamilyCheck:(BOOL)hasDoneProFamilyCheck {
+    return [self setBool:kHasDoneProFamilyCheck value:hasDoneProFamilyCheck];
+}
 
 - (BOOL)allowEmptyOrNoPasswordEntry {
     return [self getBool:kAllowEmptyOrNoPasswordEntry];
@@ -286,7 +295,9 @@ static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEn
         return YES;
     }
     
-    return !([date timeIntervalSinceNow] < 0);
+    BOOL ret = !([date timeIntervalSinceNow] < 0);
+
+    return ret;
 }
 
 - (NSInteger)freeTrialDaysRemaining {
@@ -359,7 +370,7 @@ static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEn
 
     BOOL ret = TRUE;
     if(!autoSave) {
-        NSLog(@"No Autosave settings... defaulting to Yes");
+        //        NSLog(@"No Autosave settings... defaulting to Yes");
     }
     else {
         NSNumber* num = (NSNumber*)autoSave;

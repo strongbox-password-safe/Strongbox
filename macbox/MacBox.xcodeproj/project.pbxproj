@@ -14,6 +14,218 @@
 		4D0BD69923DF4205004C48BB /* DatabasePropertiesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BD69823DF4205004C48BB /* DatabasePropertiesController.m */; };
 		4D1E77D523AFD7FB007240FA /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */; };
 		4D1E77E223AFEBF4007240FA /* DownloadFavIcons.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */; };
+		4D1FFA6D2403030100B75EA2 /* SimpleXmlValueExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */; };
+		4D1FFA6E2403030100B75EA2 /* InnerRandomStreamFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE3219B481200C22CB4 /* InnerRandomStreamFactory.m */; };
+		4D1FFA6F2403030100B75EA2 /* CollectionViewHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF299822243CED70080F9DC /* CollectionViewHeader.m */; };
+		4D1FFA702403030100B75EA2 /* Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCD219B47DA00C22CB4 /* Binary.m */; };
+		4D1FFA712403030100B75EA2 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
+		4D1FFA722403030100B75EA2 /* VariantDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD2219B47DB00C22CB4 /* VariantDictionary.m */; };
+		4D1FFA732403030100B75EA2 /* DatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */; };
+		4D1FFA742403030100B75EA2 /* DatabaseAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CAA219B45F700C22CB4 /* DatabaseAttachment.m */; };
+		4D1FFA752403030100B75EA2 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5896224BFA7200013808 /* AesKdfCipher.m */; };
+		4D1FFA762403030100B75EA2 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347EB2074FA3F00148741 /* crypt_argchk.c */; };
+		4D1FFA772403030100B75EA2 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF408F21807A0200B69383 /* PwSafeMetadata.m */; };
+		4D1FFA782403030100B75EA2 /* MMcGACTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD38A225D12A300290488 /* MMcGACTextField.m */; };
+		4D1FFA792403030100B75EA2 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347E22074FA3500148741 /* Record.m */; };
+		4D1FFA7A2403030100B75EA2 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB1219B479800C22CB4 /* Kdb1Database.m */; };
+		4D1FFA7B2403030100B75EA2 /* WindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D92C8261F38A03500341A58 /* WindowController.m */; };
+		4D1FFA7C2403030100B75EA2 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */; };
+		4D1FFA7D2403030100B75EA2 /* NSURL+QueryItems.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */; };
+		4D1FFA7E2403030100B75EA2 /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DE2074FA3500148741 /* PasswordHistory.m */; };
+		4D1FFA7F2403030100B75EA2 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */; };
+		4D1FFA802403030100B75EA2 /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097121825106007BA1E7 /* Meta.m */; };
+		4D1FFA812403030100B75EA2 /* MacKeePassHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */; };
+		4D1FFA822403030100B75EA2 /* FavIconDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D88E6CD23A9190700A75D1F /* FavIconDownloader.m */; };
+		4D1FFA832403030100B75EA2 /* NSData+GZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87F8AB22304A04006A6320 /* NSData+GZIP.m */; };
+		4D1FFA842403030100B75EA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
+		4D1FFA852403030100B75EA2 /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
+		4D1FFA862403030100B75EA2 /* MacYubiKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */; };
+		4D1FFA872403030100B75EA2 /* KdbSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB7219B479800C22CB4 /* KdbSerialization.m */; };
+		4D1FFA882403030100B75EA2 /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097E21825107007BA1E7 /* XMLWriter.m */; };
+		4D1FFA892403030100B75EA2 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
+		4D1FFA8A2403030100B75EA2 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF348002074FA6C00148741 /* Node.m */; };
+		4D1FFA8B2403030100B75EA2 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F12074FA6B00148741 /* DatabaseModel.m */; };
+		4D1FFA8C2403030100B75EA2 /* OTPToken+Persistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B321F898460043DDC0 /* OTPToken+Persistence.m */; };
+		4D1FFA8D2403030100B75EA2 /* DatabasePropertiesController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BD69823DF4205004C48BB /* DatabasePropertiesController.m */; };
+		4D1FFA8E2403030100B75EA2 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097C21825107007BA1E7 /* Kdbx4Database.m */; };
+		4D1FFA8F2403030100B75EA2 /* MMcGACTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD390225D159200290488 /* MMcGACTextFieldCell.m */; };
+		4D1FFA902403030100B75EA2 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096521825104007BA1E7 /* AesCipher.m */; };
+		4D1FFA912403030100B75EA2 /* KdbGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB4219B479800C22CB4 /* KdbGroup.m */; };
+		4D1FFA922403030100B75EA2 /* DecryptionParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096B21825105007BA1E7 /* DecryptionParameters.m */; };
+		4D1FFA932403030100B75EA2 /* KeePassFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095D21825104007BA1E7 /* KeePassFile.m */; };
+		4D1FFA942403030100B75EA2 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
+		4D1FFA952403030100B75EA2 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9E219B44F200C22CB4 /* twofish.c */; };
+		4D1FFA962403030100B75EA2 /* KeePass2TagPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */; };
+		4D1FFA972403030100B75EA2 /* ref.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D22219B4B2900C22CB4 /* ref.c */; };
+		4D1FFA982403030100B75EA2 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CF6219B48D200C22CB4 /* KdbxSerializationCommon.m */; };
+		4D1FFA992403030100B75EA2 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */; };
+		4D1FFA9A2403030100B75EA2 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B521F898470043DDC0 /* OTPToken.m */; };
+		4D1FFA9B2403030100B75EA2 /* KdbSerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CBB219B479900C22CB4 /* KdbSerializationData.m */; };
+		4D1FFA9C2403030100B75EA2 /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D00219B48D300C22CB4 /* V3BinariesList.m */; };
+		4D1FFA9D2403030100B75EA2 /* DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA320750D1D009856E3 /* DatabaseMetadata.m */; };
+		4D1FFA9E2403030100B75EA2 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */; };
+		4D1FFA9F2403030100B75EA2 /* argon2.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D17219B4B2900C22CB4 /* argon2.c */; };
+		4D1FFAA02403030100B75EA2 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCC219B47DA00C22CB4 /* KeePass4DatabaseMetadata.m */; };
+		4D1FFAA12403030100B75EA2 /* FavIconResultTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */; };
+		4D1FFAA22403030100B75EA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
+		4D1FFAA32403030100B75EA2 /* NodeFileAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D08219B490100C22CB4 /* NodeFileAttachment.m */; };
+		4D1FFAA42403030100B75EA2 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4A32332D92900C2E084 /* XmlSerializer.m */; };
+		4D1FFAA52403030100B75EA2 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */; };
+		4D1FFAA62403030100B75EA2 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
+		4D1FFAA72403030100B75EA2 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
+		4D1FFAA82403030100B75EA2 /* KeePassCiphers.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CDE219B481200C22CB4 /* KeePassCiphers.m */; };
+		4D1FFAA92403030100B75EA2 /* CHCSVParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CAD219B474100C22CB4 /* CHCSVParser.m */; };
+		4D1FFAAA2403030100B75EA2 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DA2074FA3500148741 /* PasswordHistoryEntry.m */; };
+		4D1FFAAB2403030100B75EA2 /* KdbEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB6219B479800C22CB4 /* KdbEntry.m */; };
+		4D1FFAAC2403030100B75EA2 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D18219B4B2900C22CB4 /* core.c */; };
+		4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493522232A3200F48182 /* DAVRequests.m */; };
+		4D1FFAAE2403030100B75EA2 /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5E1F30DB7A00D68BFE /* Document.m */; };
+		4D1FFAAF2403030100B75EA2 /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DACA5BF23CCD40F00891366 /* SecretStore.m */; };
+		4D1FFAB02403030100B75EA2 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
+		4D1FFAB12403030100B75EA2 /* CryptoParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE8219B481200C22CB4 /* CryptoParameters.m */; };
+		4D1FFAB22403030100B75EA2 /* CustomIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CFD219B48D300C22CB4 /* CustomIcon.m */; };
+		4D1FFAB32403030100B75EA2 /* MacNodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */; };
+		4D1FFAB42403030100B75EA2 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
+		4D1FFAB52403030100B75EA2 /* CreateFormatAndSetCredentialsWizard.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */; };
+		4D1FFAB62403030100B75EA2 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099D21825134007BA1E7 /* KeePassDatabase.m */; };
+		4D1FFAB72403030100B75EA2 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */; };
+		4D1FFAB82403030100B75EA2 /* CustomIconsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */; };
+		4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D553B51219DD2CE00AA4BAB /* AttachmentItem.m */; };
+		4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493B22232A3200F48182 /* ISO8601DateFormatter.m */; };
+		4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */; };
+		4D1FFABC2403030100B75EA2 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F22074FA6B00148741 /* NodeFields.m */; };
+		4D1FFABD2403030100B75EA2 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
+		4D1FFABE2403030100B75EA2 /* String.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096221825104007BA1E7 /* String.m */; };
+		4D1FFABF2403030100B75EA2 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF522B523C8ABEF00CD948E /* ClipboardManager.m */; };
+		4D1FFAC02403030100B75EA2 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB8219B479900C22CB4 /* Kdb1DatabaseMetadata.m */; };
+		4D1FFAC12403030100B75EA2 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
+		4D1FFAC22403030100B75EA2 /* PredefinedKeePassIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */; };
+		4D1FFAC32403030100B75EA2 /* KdbxSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099B21825134007BA1E7 /* KdbxSerialization.m */; };
+		4D1FFAC42403030100B75EA2 /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492922232A3200F48182 /* DAVCredentials.m */; };
+		4D1FFAC52403030100B75EA2 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097921825107007BA1E7 /* KeePassGroup.m */; };
+		4D1FFAC62403030100B75EA2 /* ChaCha20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE7219B481200C22CB4 /* ChaCha20Stream.m */; };
+		4D1FFAC72403030100B75EA2 /* QRCodePresenterPopover.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF522BA23C8BBA900CD948E /* QRCodePresenterPopover.m */; };
+		4D1FFAC82403030100B75EA2 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5B1F30DB7A00D68BFE /* ViewController.m */; };
+		4D1FFAC92403030100B75EA2 /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493222232A3200F48182 /* DAVSession.m */; };
+		4D1FFACA2403030100B75EA2 /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
+		4D1FFACB2403030100B75EA2 /* RootXmlDomainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */; };
+		4D1FFACC2403030100B75EA2 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD2BAB8238BE44400513271 /* MMcG_MF_Base32Additions.m */; };
+		4D1FFACD2403030100B75EA2 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A121825161007BA1E7 /* Salsa20Stream.m */; };
+		4D1FFACE2403030100B75EA2 /* Kdbx4SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCB219B47DA00C22CB4 /* Kdbx4SerializationData.m */; };
+		4D1FFACF2403030100B75EA2 /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CFE219B48D300C22CB4 /* XmlProcessingContext.m */; };
+		4D1FFAD02403030100B75EA2 /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493122232A3200F48182 /* DAVBaseRequest.m */; };
+		4D1FFAD12403030100B75EA2 /* DatabasesManagerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559F9C20750C2C009856E3 /* DatabasesManagerView.m */; };
+		4D1FFAD22403030100B75EA2 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
+		4D1FFAD32403030100B75EA2 /* DAVListingParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493622232A3200F48182 /* DAVListingParser.m */; };
+		4D1FFAD42403030100B75EA2 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5422CBCCDE000954D0 /* PasswordMaker.m */; };
+		4D1FFAD52403030100B75EA2 /* TwoFishCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE6219B481200C22CB4 /* TwoFishCipher.m */; };
+		4D1FFAD62403030100B75EA2 /* CustomPasswordTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D553B48219DB2E400AA4BAB /* CustomPasswordTextField.m */; };
+		4D1FFAD72403030100B75EA2 /* KdfParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD1219B47DB00C22CB4 /* KdfParameters.m */; };
+		4D1FFAD82403030100B75EA2 /* AttachmentsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CFC219B48D300C22CB4 /* AttachmentsRationalizer.m */; };
+		4D1FFAD92403030100B75EA2 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */; };
+		4D1FFADA2403030100B75EA2 /* CompositeKeyFactors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */; };
+		4D1FFADB2403030100B75EA2 /* FavIconDownloadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8058A23A113EC001E742E /* FavIconDownloadOptions.m */; };
+		4D1FFADC2403030100B75EA2 /* thread.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D16219B4B2900C22CB4 /* thread.c */; };
+		4D1FFADD2403030100B75EA2 /* VariantObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD0219B47DB00C22CB4 /* VariantObject.m */; };
+		4D1FFADE2403030100B75EA2 /* encoding.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D1A219B4B2900C22CB4 /* encoding.c */; };
+		4D1FFADF2403030100B75EA2 /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493822232A3200F48182 /* NSDateRFC1123.m */; };
+		4D1FFAE02403030100B75EA2 /* NSAdvancedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */; };
+		4D1FFAE12403030100B75EA2 /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE5219B481200C22CB4 /* Keys.m */; };
+		4D1FFAE22403030100B75EA2 /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492722232A3200F48182 /* DAVResponseItem.m */; };
+		4D1FFAE32403030100B75EA2 /* CustomIconList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CF4219B48D200C22CB4 /* CustomIconList.m */; };
+		4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA6219B459A00C22CB4 /* AutoFillNewRecordSettings.m */; };
+		4D1FFAE52403030100B75EA2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F581F30DB7A00D68BFE /* main.m */; };
+		4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4972332D80A00C2E084 /* GZipInputStream.m */; };
+		4D1FFAE72403030100B75EA2 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
+		4D1FFAE82403030100B75EA2 /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493022232A3200F48182 /* DAVRequest.m */; };
+		4D1FFAE92403030100B75EA2 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
+		4D1FFAEA2403030100B75EA2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F551F30DB7A00D68BFE /* AppDelegate.m */; };
+		4D1FFAEB2403030100B75EA2 /* blake2b.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D1F219B4B2900C22CB4 /* blake2b.c */; };
+		4D1FFAEC2403030100B75EA2 /* AttachmentCollectionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC46D0B219EDCD800D6C462 /* AttachmentCollectionView.m */; };
+		4D1FFAED2403030100B75EA2 /* Times.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095621825103007BA1E7 /* Times.m */; };
+		4D1FFAEE2403030100B75EA2 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AF21F898460043DDC0 /* OTPToken+Serialization.m */; };
+		4D1FFAEF2403030100B75EA2 /* SprCompilation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD383225CFE2F00290488 /* SprCompilation.m */; };
+		4D1FFAF02403030100B75EA2 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5895224BFA7200013808 /* StringValue.m */; };
+		4D1FFAF12403030100B75EA2 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D22DA3D22609CBB00561AF7 /* MBProgressHUD.m */; };
+		4D1FFAF22403030100B75EA2 /* KeePassPredefinedIcons.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */; };
+		4D1FFAF32403030100B75EA2 /* ChaCha20Cipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE1219B481200C22CB4 /* ChaCha20Cipher.m */; };
+		4D1FFAF42403030100B75EA2 /* CustomFieldTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */; };
+		4D1FFAF52403030100B75EA2 /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB702232C0F200E109F9 /* History.m */; };
+		4D1FFAF62403030100B75EA2 /* NodeDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643B9E23B65075000C383A /* NodeDetailsViewController.m */; };
+		4D1FFAF72403030100B75EA2 /* Argon2KdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CC3219B47DA00C22CB4 /* Argon2KdfCipher.m */; };
+		4D1FFAF82403030100B75EA2 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
+		4D1FFAF92403030100B75EA2 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF40092180726700B69383 /* BasicOrderedDictionary.m */; };
+		4D1FFAFA2403030100B75EA2 /* V3Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CF9219B48D200C22CB4 /* V3Binary.m */; };
+		4D1FFAFB2403030100B75EA2 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347E02074FA3500148741 /* Field.m */; };
+		4D1FFAFC2403030100B75EA2 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096E21825105007BA1E7 /* Root.m */; };
+		4D1FFAFD2403030100B75EA2 /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
+		4D1FFAFE2403030100B75EA2 /* MMcGACTextViewEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD38D225D156D00290488 /* MMcGACTextViewEditor.m */; };
+		4D1FFAFF2403030100B75EA2 /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
+		4D1FFB002403030100B75EA2 /* DatabasesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA0219B458A00C22CB4 /* DatabasesManager.m */; };
+		4D1FFB012403030100B75EA2 /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DD2074FA3500148741 /* Group.m */; };
+		4D1FFB022403030100B75EA2 /* Kdbx4Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CC4219B47DA00C22CB4 /* Kdbx4Serialization.m */; };
+		4D1FFB032403030100B75EA2 /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095F21825104007BA1E7 /* SerializationData.m */; };
+		4D1FFB042403030100B75EA2 /* PwSafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DC2074FA3500148741 /* PwSafeDatabase.m */; };
+		4D1FFB052403030100B75EA2 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */; };
+		4D1FFB062403030100B75EA2 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
+		4D1FFB072403030100B75EA2 /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492622232A3200F48182 /* DAVRequestGroup.m */; };
+		4D1FFB082403030100B75EA2 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
+		4D1FFB092403030100B75EA2 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B221F898460043DDC0 /* OTPTokenType.m */; };
+		4D1FFB0A2403030100B75EA2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */; };
+		4D1FFB0B2403030100B75EA2 /* BiometricIdHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA3219B458B00C22CB4 /* BiometricIdHelper.m */; };
+		4D1FFB0C2403030100B75EA2 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */; };
+		4D1FFB0D2403030100B75EA2 /* SerializationPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4A00392312CC5400B69E09 /* SerializationPackage.m */; };
+		4D1FFB0F2403030100B75EA2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
+		4D1FFB102403030100B75EA2 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A323FCA3320004B309 /* libjson.a */; };
+		4D1FFB112403030100B75EA2 /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */; };
+		4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */; };
+		4D1FFB132403030100B75EA2 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A223FCA3320004B309 /* libykpers-1.a */; };
+		4D1FFB142403030100B75EA2 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
+		4D1FFB152403030100B75EA2 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A123FCA3320004B309 /* libyubikey.a */; };
+		4D1FFB162403030100B75EA2 /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A023FCA3320004B309 /* libjson-c.a */; };
+		4D1FFB182403030100B75EA2 /* PreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A023A116D5001E742E /* PreferencesWindowController.xib */; };
+		4D1FFB192403030100B75EA2 /* CheckboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805D423A1176E001E742E /* CheckboxCell.xib */; };
+		4D1FFB1A2403030100B75EA2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
+		4D1FFB1B2403030100B75EA2 /* catalan-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6322CBCE0C000954D0 /* catalan-diceware.wordlist.utf8.txt */; };
+		4D1FFB1C2403030100B75EA2 /* MacKeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */; };
+		4D1FFB1D2403030100B75EA2 /* CollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805BA23A1173D001E742E /* CollectionViewHeader.xib */; };
+		4D1FFB1E2403030100B75EA2 /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A623A116E3001E742E /* UpgradeWindowController.xib */; };
+		4D1FFB1F2403030100B75EA2 /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
+		4D1FFB202403030100B75EA2 /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */; };
+		4D1FFB212403030100B75EA2 /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
+		4D1FFB222403030100B75EA2 /* SelectPredefinedIconController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805B523A1170E001E742E /* SelectPredefinedIconController.xib */; };
+		4D1FFB232403030100B75EA2 /* AttachmentItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805C623A11752001E742E /* AttachmentItem.xib */; };
+		4D1FFB242403030100B75EA2 /* star_trek_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */; };
+		4D1FFB252403030100B75EA2 /* swedish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6022CBCE0C000954D0 /* swedish-diceware.wordlist.utf8.txt */; };
+		4D1FFB262403030100B75EA2 /* google-10000-english-usa-no-swears-medium.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6522CBCE0C000954D0 /* google-10000-english-usa-no-swears-medium.txt */; };
+		4D1FFB272403030100B75EA2 /* PredefinedKeePassIcon.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805C123A11749001E742E /* PredefinedKeePassIcon.xib */; };
+		4D1FFB282403030100B75EA2 /* eff_short_wordlist_2_0.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6822CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt */; };
+		4D1FFB292403030100B75EA2 /* eff_short_wordlist_1.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6722CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt */; };
+		4D1FFB2A2403030100B75EA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F601F30DB7A00D68BFE /* Assets.xcassets */; };
+		4D1FFB2B2403030100B75EA2 /* QRCodePresenter.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF522B723C8BACE00CD948E /* QRCodePresenter.storyboard */; };
+		4D1FFB2C2403030100B75EA2 /* japanese-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6622CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt */; };
+		4D1FFB2D2403030100B75EA2 /* DownloadFavIcons.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D1E77E423AFEBF4007240FA /* DownloadFavIcons.storyboard */; };
+		4D1FFB2E2403030100B75EA2 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D4A003B231317A900B69E09 /* Localizable.strings */; };
+		4D1FFB2F2403030100B75EA2 /* starwars_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058E23A11492001E742E /* starwars_8k_2018.utf8.txt */; };
+		4D1FFB302403030100B75EA2 /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805AF23A11702001E742E /* ProgressWindow.xib */; };
+		4D1FFB312403030100B75EA2 /* gameofthrones_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */; };
+		4D1FFB322403030100B75EA2 /* german-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5D22CBCE0C000954D0 /* german-diceware.wordlist.utf8.txt */; };
+		4D1FFB332403030100B75EA2 /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */; };
+		4D1FFB342403030100B75EA2 /* formatV3.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF2216136D10054C8D0 /* formatV3.txt */; };
+		4D1FFB352403030100B75EA2 /* polish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6122CBCE0C000954D0 /* polish-diceware.wordlist.utf8.txt */; };
+		4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A923A116E9001E742E /* ChangeMasterPasswordWindowController.xib */; };
+		4D1FFB372403030100B75EA2 /* formatV4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF3216136D10054C8D0 /* formatV4.txt */; };
+		4D1FFB382403030100B75EA2 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
+		4D1FFB392403030100B75EA2 /* CustomFieldTableCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805C923A11756001E742E /* CustomFieldTableCellView.xib */; };
+		4D1FFB3A2403030100B75EA2 /* beale.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6A22CBCE0D000954D0 /* beale.wordlist.utf8.txt */; };
+		4D1FFB3B2403030100B75EA2 /* dutch-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6422CBCE0C000954D0 /* dutch-diceware.wordlist.utf8.txt */; };
+		4D1FFB3C2403030100B75EA2 /* french-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6222CBCE0C000954D0 /* french-diceware.wordlist.utf8.txt */; };
+		4D1FFB3D2403030100B75EA2 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F621F30DB7A00D68BFE /* Main.storyboard */; };
+		4D1FFB3E2403030100B75EA2 /* eff_large_wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5F22CBCE0C000954D0 /* eff_large_wordlist.utf8.txt */; };
+		4D1FFB3F2403030100B75EA2 /* NodeDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B08623BFB8AA00BAD0D2 /* NodeDetails.storyboard */; };
+		4D1FFB402403030100B75EA2 /* SafesMetaDataViewer.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A323A116DD001E742E /* SafesMetaDataViewer.xib */; };
+		4D1FFB412403030100B75EA2 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
+		4D1FFB442403030100B75EA2 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		4D216F5522CBCCDE000954D0 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5422CBCCDE000954D0 /* PasswordMaker.m */; };
 		4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */; };
 		4D216F6B22CBCE0D000954D0 /* securedrop.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5C22CBCE0C000954D0 /* securedrop.wordlist.utf8.txt */; };
@@ -101,6 +313,11 @@
 		4D55A56F23D743C40057CBA8 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */; };
 		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
 		4D59DA57224D3C5100D1D6E4 /* CustomFieldTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */; };
+		4D59E20723FCA15A0004B309 /* MacYubiKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */; };
+		4D59E2A423FCA3320004B309 /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A023FCA3320004B309 /* libjson-c.a */; };
+		4D59E2A523FCA3320004B309 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A123FCA3320004B309 /* libyubikey.a */; };
+		4D59E2A623FCA3320004B309 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A223FCA3320004B309 /* libykpers-1.a */; };
+		4D59E2A723FCA3320004B309 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A323FCA3320004B309 /* libjson.a */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643B9E23B65075000C383A /* NodeDetailsViewController.m */; };
@@ -229,6 +446,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		4D1FFB432403030100B75EA2 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4D1FFB442403030100B75EA2 /* FavIcon.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4D8354C7238908AB00E264E0 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -257,6 +485,8 @@
 		4D1E77D323AFD7FB007240FA /* CustomIconsRationalizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomIconsRationalizer.h; path = ../model/CustomIconsRationalizer.h; sourceTree = "<group>"; };
 		4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomIconsRationalizer.m; path = ../model/CustomIconsRationalizer.m; sourceTree = "<group>"; };
 		4D1E77E323AFEBF4007240FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DownloadFavIcons.storyboard; sourceTree = "<group>"; };
+		4D1FFB482403030100B75EA2 /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4D1FFB492403030100B75EA2 /* Mac-Outright-Pro-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Mac-Outright-Pro-Info.plist"; path = "/Users/mark/dev/strongbox/macbox/Mac-Outright-Pro-Info.plist"; sourceTree = "<absolute>"; };
 		4D216F5322CBCCDE000954D0 /* PasswordMaker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PasswordMaker.h; path = ../model/PasswordMaker.h; sourceTree = "<group>"; };
 		4D216F5422CBCCDE000954D0 /* PasswordMaker.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordMaker.m; path = ../model/PasswordMaker.m; sourceTree = "<group>"; };
 		4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationConfig.m; path = ../model/PasswordGenerationConfig.m; sourceTree = "<group>"; };
@@ -445,6 +675,47 @@
 		4D58A45A207368B10061E046 /* PreferencesWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PreferencesWindowController.m; path = MacBox/PreferencesWindowController.m; sourceTree = "<group>"; };
 		4D59DA55224D3C5100D1D6E4 /* CustomFieldTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldTableCellView.h; path = MacBox/CustomFieldTableCellView.h; sourceTree = "<group>"; };
 		4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomFieldTableCellView.m; path = MacBox/CustomFieldTableCellView.m; sourceTree = "<group>"; };
+		4D59E20523FCA15A0004B309 /* MacYubiKeyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacYubiKeyManager.h; sourceTree = "<group>"; };
+		4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacYubiKeyManager.m; sourceTree = "<group>"; };
+		4D59E26123FCA22E0004B309 /* printbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = printbuf.h; sourceTree = "<group>"; };
+		4D59E26223FCA22E0004B309 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
+		4D59E26323FCA22E0004B309 /* json_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_util.h; sourceTree = "<group>"; };
+		4D59E26423FCA22E0004B309 /* json_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_config.h; sourceTree = "<group>"; };
+		4D59E26523FCA22E0004B309 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
+		4D59E26623FCA22E0004B309 /* json_c_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_c_version.h; sourceTree = "<group>"; };
+		4D59E26723FCA22E0004B309 /* json_object_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_private.h; sourceTree = "<group>"; };
+		4D59E26823FCA22E0004B309 /* arraylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arraylist.h; sourceTree = "<group>"; };
+		4D59E26923FCA22E0004B309 /* linkhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linkhash.h; sourceTree = "<group>"; };
+		4D59E26A23FCA22E0004B309 /* json_tokener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_tokener.h; sourceTree = "<group>"; };
+		4D59E26B23FCA22E0004B309 /* json_object_iterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_iterator.h; sourceTree = "<group>"; };
+		4D59E26C23FCA22E0004B309 /* json_inttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_inttypes.h; sourceTree = "<group>"; };
+		4D59E26D23FCA22E0004B309 /* bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bits.h; sourceTree = "<group>"; };
+		4D59E26E23FCA22E0004B309 /* json_object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object.h; sourceTree = "<group>"; };
+		4D59E27023FCA22E0004B309 /* ykpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykpers.h; sourceTree = "<group>"; };
+		4D59E27123FCA22E0004B309 /* ykpbkdf2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykpbkdf2.h; sourceTree = "<group>"; };
+		4D59E27223FCA22E0004B309 /* ykstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykstatus.h; sourceTree = "<group>"; };
+		4D59E27323FCA22E0004B309 /* ykpers-version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ykpers-version.h"; sourceTree = "<group>"; };
+		4D59E27423FCA22E0004B309 /* ykdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykdef.h; sourceTree = "<group>"; };
+		4D59E27523FCA22E0004B309 /* ykcore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykcore.h; sourceTree = "<group>"; };
+		4D59E27623FCA22E0004B309 /* yubikey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yubikey.h; sourceTree = "<group>"; };
+		4D59E27823FCA22E0004B309 /* printbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = printbuf.h; sourceTree = "<group>"; };
+		4D59E27923FCA22E0004B309 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
+		4D59E27A23FCA22E0004B309 /* json_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_util.h; sourceTree = "<group>"; };
+		4D59E27B23FCA22E0004B309 /* json_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_config.h; sourceTree = "<group>"; };
+		4D59E27C23FCA22E0004B309 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
+		4D59E27D23FCA22E0004B309 /* json_c_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_c_version.h; sourceTree = "<group>"; };
+		4D59E27E23FCA22E0004B309 /* json_object_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_private.h; sourceTree = "<group>"; };
+		4D59E27F23FCA22E0004B309 /* arraylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arraylist.h; sourceTree = "<group>"; };
+		4D59E28023FCA22E0004B309 /* linkhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linkhash.h; sourceTree = "<group>"; };
+		4D59E28123FCA22E0004B309 /* json_tokener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_tokener.h; sourceTree = "<group>"; };
+		4D59E28223FCA22E0004B309 /* json_object_iterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_iterator.h; sourceTree = "<group>"; };
+		4D59E28323FCA22E0004B309 /* json_inttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_inttypes.h; sourceTree = "<group>"; };
+		4D59E28423FCA22E0004B309 /* bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bits.h; sourceTree = "<group>"; };
+		4D59E28523FCA22E0004B309 /* json_object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object.h; sourceTree = "<group>"; };
+		4D59E2A023FCA3320004B309 /* libjson-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libjson-c.a"; sourceTree = "<group>"; };
+		4D59E2A123FCA3320004B309 /* libyubikey.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libyubikey.a; sourceTree = "<group>"; };
+		4D59E2A223FCA3320004B309 /* libykpers-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libykpers-1.a"; sourceTree = "<group>"; };
+		4D59E2A323FCA3320004B309 /* libjson.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjson.a; sourceTree = "<group>"; };
 		4D5AE1E81F432BBC000A34D7 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = MacBox/Settings.h; sourceTree = "<group>"; };
 		4D5AE1E91F432BBC000A34D7 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = MacBox/Settings.m; sourceTree = "<group>"; };
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
@@ -470,6 +741,22 @@
 		4D87F8AC22304A04006A6320 /* NSData+GZIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+GZIP.h"; path = "../lib/GZIP/NSData+GZIP.h"; sourceTree = "<group>"; };
 		4D88E6CC23A9190700A75D1F /* FavIconDownloader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconDownloader.h; path = MacBox/FavIconDownloader.h; sourceTree = "<group>"; };
 		4D88E6CD23A9190700A75D1F /* FavIconDownloader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconDownloader.m; path = MacBox/FavIconDownloader.m; sourceTree = "<group>"; };
+		4D8B370023FAD61000A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		4D8B370123FAD61000A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
+		4D8B370223FAD61000A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		4D8B370323FAD61000A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
+		4D8B370423FAD61000A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
+		4D8B370523FAD61100A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
+		4D8B370623FAD61100A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		4D8B370723FAD61100A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
+		4D8B370823FAD61100A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D8B370923FAD61100A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D8B370A23FAD61100A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
+		4D8B370B23FAD61200A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
+		4D8B370C23FAD61200A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
+		4D8B370D23FAD61200A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
+		4D8B370E23FAD61200A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
+		4D8B370F23FAD61200A81725 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
 		4D8DE9AA21F898460043DDC0 /* OTPToken+Persistence.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "OTPToken+Persistence.h"; path = "../lib/OneTimePassword/OTPToken+Persistence.h"; sourceTree = "<group>"; };
 		4D8DE9AB21F898460043DDC0 /* NSURL+QueryItems.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSURL+QueryItems.m"; path = "../lib/OneTimePassword/NSURL+QueryItems.m"; sourceTree = "<group>"; };
 		4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "OTPToken+Generation.m"; path = "../lib/OneTimePassword/OTPToken+Generation.m"; sourceTree = "<group>"; };
@@ -487,6 +774,23 @@
 		4D8DE9B921F898470043DDC0 /* NSURL+QueryItems.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSURL+QueryItems.h"; path = "../lib/OneTimePassword/NSURL+QueryItems.h"; sourceTree = "<group>"; };
 		4D92C8251F38A03500341A58 /* WindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WindowController.h; path = MacBox/WindowController.h; sourceTree = "<group>"; };
 		4D92C8261F38A03500341A58 /* WindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WindowController.m; path = MacBox/WindowController.m; sourceTree = "<group>"; };
+		4D95482624004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		4D95482724004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Main.strings; sourceTree = "<group>"; };
+		4D95482824004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		4D95482924004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
+		4D95482A24004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
+		4D95482B24004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
+		4D95482C24004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		4D95482D24004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
+		4D95482E24004F5E008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		4D95482F24004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		4D95483024004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
+		4D95483124004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
+		4D95483224004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
+		4D95483324004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
+		4D95483424004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
+		4D95483524004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
+		4D95483624004F5F008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = ../StrongBox/it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4D9903C62237BFDA002C10EE /* MacNodeIconHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MacNodeIconHelper.h; path = MacBox/MacNodeIconHelper.h; sourceTree = "<group>"; };
 		4D9903C72237BFDA002C10EE /* MacNodeIconHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MacNodeIconHelper.m; path = MacBox/MacNodeIconHelper.m; sourceTree = "<group>"; };
 		4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BaseXmlDomainObjectHandler.h; path = ../model/keepass/BaseXmlDomainObjectHandler.h; sourceTree = "<group>"; };
@@ -534,6 +838,7 @@
 		4D9E09A121825161007BA1E7 /* Salsa20Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Salsa20Stream.m; path = ../model/keepass/Salsa20Stream.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4DACA5BF23CCD40F00891366 /* SecretStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStore.m; path = ../model/SecretStore.m; sourceTree = "<group>"; };
+		4DAF56EA240181480026282C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = ../StrongBox/es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableImageView.h; path = MacBox/ClickableImageView.h; sourceTree = "<group>"; };
 		4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClickableImageView.m; path = MacBox/ClickableImageView.m; sourceTree = "<group>"; };
 		4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectPredefinedIconController.h; path = MacBox/SelectPredefinedIconController.h; sourceTree = "<group>"; };
@@ -724,6 +1029,21 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4D1FFB0E2403030100B75EA2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D1FFB0F2403030100B75EA2 /* StoreKit.framework in Frameworks */,
+				4D1FFB102403030100B75EA2 /* libjson.a in Frameworks */,
+				4D1FFB112403030100B75EA2 /* Pods_Strongbox.framework in Frameworks */,
+				4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */,
+				4D1FFB132403030100B75EA2 /* libykpers-1.a in Frameworks */,
+				4D1FFB142403030100B75EA2 /* FavIcon.framework in Frameworks */,
+				4D1FFB152403030100B75EA2 /* libyubikey.a in Frameworks */,
+				4D1FFB162403030100B75EA2 /* libjson-c.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4D29663221AD7318009B7936 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -736,9 +1056,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */,
+				4D59E2A723FCA3320004B309 /* libjson.a in Frameworks */,
 				059A8E323BB4461DEF4E6FAB /* Pods_Strongbox.framework in Frameworks */,
 				4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */,
+				4D59E2A623FCA3320004B309 /* libykpers-1.a in Frameworks */,
 				4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */,
+				4D59E2A523FCA3320004B309 /* libyubikey.a in Frameworks */,
+				4D59E2A423FCA3320004B309 /* libjson-c.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1065,6 +1389,95 @@
 			name = View;
 			sourceTree = "<group>";
 		};
+		4D59E25F23FCA22E0004B309 /* yubikey */ = {
+			isa = PBXGroup;
+			children = (
+				4D59E29F23FCA3320004B309 /* lib */,
+				4D59E2A823FCA36D0004B309 /* include */,
+				4D59E20523FCA15A0004B309 /* MacYubiKeyManager.h */,
+				4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */,
+			);
+			name = yubikey;
+			path = include/yubikey;
+			sourceTree = "<group>";
+		};
+		4D59E26023FCA22E0004B309 /* json-c */ = {
+			isa = PBXGroup;
+			children = (
+				4D59E26123FCA22E0004B309 /* printbuf.h */,
+				4D59E26223FCA22E0004B309 /* debug.h */,
+				4D59E26323FCA22E0004B309 /* json_util.h */,
+				4D59E26423FCA22E0004B309 /* json_config.h */,
+				4D59E26523FCA22E0004B309 /* json.h */,
+				4D59E26623FCA22E0004B309 /* json_c_version.h */,
+				4D59E26723FCA22E0004B309 /* json_object_private.h */,
+				4D59E26823FCA22E0004B309 /* arraylist.h */,
+				4D59E26923FCA22E0004B309 /* linkhash.h */,
+				4D59E26A23FCA22E0004B309 /* json_tokener.h */,
+				4D59E26B23FCA22E0004B309 /* json_object_iterator.h */,
+				4D59E26C23FCA22E0004B309 /* json_inttypes.h */,
+				4D59E26D23FCA22E0004B309 /* bits.h */,
+				4D59E26E23FCA22E0004B309 /* json_object.h */,
+			);
+			path = "json-c";
+			sourceTree = "<group>";
+		};
+		4D59E26F23FCA22E0004B309 /* ykpers-1 */ = {
+			isa = PBXGroup;
+			children = (
+				4D59E27023FCA22E0004B309 /* ykpers.h */,
+				4D59E27123FCA22E0004B309 /* ykpbkdf2.h */,
+				4D59E27223FCA22E0004B309 /* ykstatus.h */,
+				4D59E27323FCA22E0004B309 /* ykpers-version.h */,
+				4D59E27423FCA22E0004B309 /* ykdef.h */,
+				4D59E27523FCA22E0004B309 /* ykcore.h */,
+			);
+			path = "ykpers-1";
+			sourceTree = "<group>";
+		};
+		4D59E27723FCA22E0004B309 /* json */ = {
+			isa = PBXGroup;
+			children = (
+				4D59E27823FCA22E0004B309 /* printbuf.h */,
+				4D59E27923FCA22E0004B309 /* debug.h */,
+				4D59E27A23FCA22E0004B309 /* json_util.h */,
+				4D59E27B23FCA22E0004B309 /* json_config.h */,
+				4D59E27C23FCA22E0004B309 /* json.h */,
+				4D59E27D23FCA22E0004B309 /* json_c_version.h */,
+				4D59E27E23FCA22E0004B309 /* json_object_private.h */,
+				4D59E27F23FCA22E0004B309 /* arraylist.h */,
+				4D59E28023FCA22E0004B309 /* linkhash.h */,
+				4D59E28123FCA22E0004B309 /* json_tokener.h */,
+				4D59E28223FCA22E0004B309 /* json_object_iterator.h */,
+				4D59E28323FCA22E0004B309 /* json_inttypes.h */,
+				4D59E28423FCA22E0004B309 /* bits.h */,
+				4D59E28523FCA22E0004B309 /* json_object.h */,
+			);
+			path = json;
+			sourceTree = "<group>";
+		};
+		4D59E29F23FCA3320004B309 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				4D59E2A023FCA3320004B309 /* libjson-c.a */,
+				4D59E2A123FCA3320004B309 /* libyubikey.a */,
+				4D59E2A223FCA3320004B309 /* libykpers-1.a */,
+				4D59E2A323FCA3320004B309 /* libjson.a */,
+			);
+			path = lib;
+			sourceTree = SOURCE_ROOT;
+		};
+		4D59E2A823FCA36D0004B309 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				4D59E27623FCA22E0004B309 /* yubikey.h */,
+				4D59E26023FCA22E0004B309 /* json-c */,
+				4D59E26F23FCA22E0004B309 /* ykpers-1 */,
+				4D59E27723FCA22E0004B309 /* json */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
 		4D643BA023B67D48000C383A /* KeePass History */ = {
 			isa = PBXGroup;
 			children = (
@@ -1126,8 +1539,6 @@
 		4D88E6D123A924D100A75D1F /* Databases Manager */ = {
 			isa = PBXGroup;
 			children = (
-				4DCA65AD1F4B45800078B962 /* DocumentController.h */,
-				4DCA65AE1F4B45800078B962 /* DocumentController.m */,
 				4DC805A323A116DD001E742E /* SafesMetaDataViewer.xib */,
 				4D559F9B20750C2C009856E3 /* DatabasesManagerView.h */,
 				4D559F9C20750C2C009856E3 /* DatabasesManagerView.m */,
@@ -1394,11 +1805,16 @@
 			isa = PBXGroup;
 			children = (
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
+				4D1FFB492403030100B75EA2 /* Mac-Outright-Pro-Info.plist */,
+				4DF59F651F30DB7A00D68BFE /* Info.plist */,
+				4D524D2B219B503F00C22CB4 /* View */,
+				4D59E25F23FCA22E0004B309 /* yubikey */,
+				4DCA65AD1F4B45800078B962 /* DocumentController.h */,
+				4DCA65AE1F4B45800078B962 /* DocumentController.m */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
 				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,
 				4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */,
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
-				4D524D2B219B503F00C22CB4 /* View */,
 				4D55A56D23D743C40057CBA8 /* BookmarksHelper.h */,
 				4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */,
 				4D832A9923CE2AC000A7885E /* SecretStore.h */,
@@ -1424,7 +1840,6 @@
 				4D92C8251F38A03500341A58 /* WindowController.h */,
 				4D92C8261F38A03500341A58 /* WindowController.m */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
-				4DF59F651F30DB7A00D68BFE /* Info.plist */,
 				4D216F5922CBCD73000954D0 /* Password Generation */,
 				4DFC06D5226467AA00A4254A /* libs */,
 				4D9E0948218250F6007BA1E7 /* KeePass */,
@@ -1446,6 +1861,7 @@
 			children = (
 				4DF59F511F30DB7A00D68BFE /* Strongbox.app */,
 				4D29663521AD7318009B7936 /* MB1Tests.xctest */,
+				4D1FFB482403030100B75EA2 /* Strongbox.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1486,6 +1902,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4D1FFA6A2403030100B75EA2 /* Strongbox-Outright-Pro */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4D1FFB452403030100B75EA2 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro" */;
+			buildPhases = (
+				4D1FFA6B2403030100B75EA2 /* [CP] Check Pods Manifest.lock */,
+				4D1FFA6C2403030100B75EA2 /* Sources */,
+				4D1FFB0E2403030100B75EA2 /* Frameworks */,
+				4D1FFB172403030100B75EA2 /* Resources */,
+				4D1FFB422403030100B75EA2 /* [CP] Embed Pods Frameworks */,
+				4D1FFB432403030100B75EA2 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Strongbox-Outright-Pro";
+			productName = MacBox;
+			productReference = 4D1FFB482403030100B75EA2 /* Strongbox.app */;
+			productType = "com.apple.product-type.application";
+		};
 		4D29663421AD7318009B7936 /* MB1Tests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4D29663C21AD7318009B7936 /* Build configuration list for PBXNativeTarget "MB1Tests" */;
@@ -1534,6 +1970,10 @@
 				LastUpgradeCheck = 1120;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
+					4D1FFA6A2403030100B75EA2 = {
+						DevelopmentTeam = 4326J8XDF2;
+						ProvisioningStyle = Automatic;
+					};
 					4D29663421AD7318009B7936 = {
 						CreatedOnToolsVersion = 10.1;
 						DevelopmentTeam = 4326J8XDF2;
@@ -1571,6 +2011,8 @@
 				ru,
 				sv,
 				"zh-Hans",
+				es,
+				it,
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
 			productRefGroup = 4DF59F521F30DB7A00D68BFE /* Products */;
@@ -1579,11 +2021,61 @@
 			targets = (
 				4DF59F501F30DB7A00D68BFE /* Strongbox */,
 				4D29663421AD7318009B7936 /* MB1Tests */,
+				4D1FFA6A2403030100B75EA2 /* Strongbox-Outright-Pro */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		4D1FFB172403030100B75EA2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D1FFB182403030100B75EA2 /* PreferencesWindowController.xib in Resources */,
+				4D1FFB192403030100B75EA2 /* CheckboxCell.xib in Resources */,
+				4D1FFB1A2403030100B75EA2 /* harrypotter_8k_2018.utf8.txt in Resources */,
+				4D1FFB1B2403030100B75EA2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB1C2403030100B75EA2 /* MacKeePassHistory.storyboard in Resources */,
+				4D1FFB1D2403030100B75EA2 /* CollectionViewHeader.xib in Resources */,
+				4D1FFB1E2403030100B75EA2 /* UpgradeWindowController.xib in Resources */,
+				4D1FFB1F2403030100B75EA2 /* diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB202403030100B75EA2 /* DatabaseProperties.storyboard in Resources */,
+				4D1FFB212403030100B75EA2 /* italian-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB222403030100B75EA2 /* SelectPredefinedIconController.xib in Resources */,
+				4D1FFB232403030100B75EA2 /* AttachmentItem.xib in Resources */,
+				4D1FFB242403030100B75EA2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				4D1FFB252403030100B75EA2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB262403030100B75EA2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
+				4D1FFB272403030100B75EA2 /* PredefinedKeePassIcon.xib in Resources */,
+				4D1FFB282403030100B75EA2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
+				4D1FFB292403030100B75EA2 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				4D1FFB2A2403030100B75EA2 /* Assets.xcassets in Resources */,
+				4D1FFB2B2403030100B75EA2 /* QRCodePresenter.storyboard in Resources */,
+				4D1FFB2C2403030100B75EA2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB2D2403030100B75EA2 /* DownloadFavIcons.storyboard in Resources */,
+				4D1FFB2E2403030100B75EA2 /* Localizable.strings in Resources */,
+				4D1FFB2F2403030100B75EA2 /* starwars_8k_2018.utf8.txt in Resources */,
+				4D1FFB302403030100B75EA2 /* ProgressWindow.xib in Resources */,
+				4D1FFB312403030100B75EA2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
+				4D1FFB322403030100B75EA2 /* german-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB332403030100B75EA2 /* FavIconResultTableCell.xib in Resources */,
+				4D1FFB342403030100B75EA2 /* formatV3.txt in Resources */,
+				4D1FFB352403030100B75EA2 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */,
+				4D1FFB372403030100B75EA2 /* formatV4.txt in Resources */,
+				4D1FFB382403030100B75EA2 /* securedrop.wordlist.utf8.txt in Resources */,
+				4D1FFB392403030100B75EA2 /* CustomFieldTableCellView.xib in Resources */,
+				4D1FFB3A2403030100B75EA2 /* beale.wordlist.utf8.txt in Resources */,
+				4D1FFB3B2403030100B75EA2 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB3C2403030100B75EA2 /* french-diceware.wordlist.utf8.txt in Resources */,
+				4D1FFB3D2403030100B75EA2 /* Main.storyboard in Resources */,
+				4D1FFB3E2403030100B75EA2 /* eff_large_wordlist.utf8.txt in Resources */,
+				4D1FFB3F2403030100B75EA2 /* NodeDetails.storyboard in Resources */,
+				4D1FFB402403030100B75EA2 /* SafesMetaDataViewer.xib in Resources */,
+				4D1FFB412403030100B75EA2 /* Credits.rtf in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4D29663321AD7318009B7936 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1643,6 +2135,46 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		4D1FFA6B2403030100B75EA2 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Strongbox-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		4D1FFB422403030100B75EA2 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/KissXML-macOS/KissXML.framework",
+				"${BUILT_PRODUCTS_DIR}/SAMKeychain/SAMKeychain.framework",
+				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SAMKeychain.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		B9829F49E8DC84BA018303E5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1686,6 +2218,174 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		4D1FFA6C2403030100B75EA2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4D1FFA6D2403030100B75EA2 /* SimpleXmlValueExtractor.m in Sources */,
+				4D1FFA6E2403030100B75EA2 /* InnerRandomStreamFactory.m in Sources */,
+				4D1FFA6F2403030100B75EA2 /* CollectionViewHeader.m in Sources */,
+				4D1FFA702403030100B75EA2 /* Binary.m in Sources */,
+				4D1FFA712403030100B75EA2 /* Entry.m in Sources */,
+				4D1FFA722403030100B75EA2 /* VariantDictionary.m in Sources */,
+				4D1FFA732403030100B75EA2 /* DatabasePreferences.m in Sources */,
+				4D1FFA742403030100B75EA2 /* DatabaseAttachment.m in Sources */,
+				4D1FFA752403030100B75EA2 /* AesKdfCipher.m in Sources */,
+				4D1FFA762403030100B75EA2 /* crypt_argchk.c in Sources */,
+				4D1FFA772403030100B75EA2 /* PwSafeMetadata.m in Sources */,
+				4D1FFA782403030100B75EA2 /* MMcGACTextField.m in Sources */,
+				4D1FFA792403030100B75EA2 /* Record.m in Sources */,
+				4D1FFA7A2403030100B75EA2 /* Kdb1Database.m in Sources */,
+				4D1FFA7B2403030100B75EA2 /* WindowController.m in Sources */,
+				4D1FFA7C2403030100B75EA2 /* OTPToken+Generation.m in Sources */,
+				4D1FFA7D2403030100B75EA2 /* NSURL+QueryItems.m in Sources */,
+				4D1FFA7E2403030100B75EA2 /* PasswordHistory.m in Sources */,
+				4D1FFA7F2403030100B75EA2 /* BookmarksHelper.m in Sources */,
+				4D1FFA802403030100B75EA2 /* Meta.m in Sources */,
+				4D1FFA812403030100B75EA2 /* MacKeePassHistoryViewController.m in Sources */,
+				4D1FFA822403030100B75EA2 /* FavIconDownloader.m in Sources */,
+				4D1FFA832403030100B75EA2 /* NSData+GZIP.m in Sources */,
+				4D1FFA842403030100B75EA2 /* SelectPredefinedIconController.m in Sources */,
+				4D1FFA852403030100B75EA2 /* ViewModel.m in Sources */,
+				4D1FFA862403030100B75EA2 /* MacYubiKeyManager.m in Sources */,
+				4D1FFA872403030100B75EA2 /* KdbSerialization.m in Sources */,
+				4D1FFA882403030100B75EA2 /* XMLWriter.m in Sources */,
+				4D1FFA892403030100B75EA2 /* StrongboxDatabase.m in Sources */,
+				4D1FFA8A2403030100B75EA2 /* Node.m in Sources */,
+				4D1FFA8B2403030100B75EA2 /* DatabaseModel.m in Sources */,
+				4D1FFA8C2403030100B75EA2 /* OTPToken+Persistence.m in Sources */,
+				4D1FFA8D2403030100B75EA2 /* DatabasePropertiesController.m in Sources */,
+				4D1FFA8E2403030100B75EA2 /* Kdbx4Database.m in Sources */,
+				4D1FFA8F2403030100B75EA2 /* MMcGACTextFieldCell.m in Sources */,
+				4D1FFA902403030100B75EA2 /* AesCipher.m in Sources */,
+				4D1FFA912403030100B75EA2 /* KdbGroup.m in Sources */,
+				4D1FFA922403030100B75EA2 /* DecryptionParameters.m in Sources */,
+				4D1FFA932403030100B75EA2 /* KeePassFile.m in Sources */,
+				4D1FFA942403030100B75EA2 /* UpgradeWindowController.m in Sources */,
+				4D1FFA952403030100B75EA2 /* twofish.c in Sources */,
+				4D1FFA962403030100B75EA2 /* KeePass2TagPackage.m in Sources */,
+				4D1FFA972403030100B75EA2 /* ref.c in Sources */,
+				4D1FFA982403030100B75EA2 /* KdbxSerializationCommon.m in Sources */,
+				4D1FFA992403030100B75EA2 /* NSDictionary+Extensions.m in Sources */,
+				4D1FFA9A2403030100B75EA2 /* OTPToken.m in Sources */,
+				4D1FFA9B2403030100B75EA2 /* KdbSerializationData.m in Sources */,
+				4D1FFA9C2403030100B75EA2 /* V3BinariesList.m in Sources */,
+				4D1FFA9D2403030100B75EA2 /* DatabaseMetadata.m in Sources */,
+				4D1FFA9E2403030100B75EA2 /* BaseXmlDomainObjectHandler.m in Sources */,
+				4D1FFA9F2403030100B75EA2 /* argon2.c in Sources */,
+				4D1FFAA02403030100B75EA2 /* KeePass4DatabaseMetadata.m in Sources */,
+				4D1FFAA12403030100B75EA2 /* FavIconResultTableCellView.m in Sources */,
+				4D1FFAA22403030100B75EA2 /* ClickableImageView.m in Sources */,
+				4D1FFAA32403030100B75EA2 /* NodeFileAttachment.m in Sources */,
+				4D1FFAA42403030100B75EA2 /* XmlSerializer.m in Sources */,
+				4D1FFAA52403030100B75EA2 /* KeePassDatabaseMetadata.m in Sources */,
+				4D1FFAA62403030100B75EA2 /* CustomField.m in Sources */,
+				4D1FFAA72403030100B75EA2 /* NSCheckboxTableCellView.m in Sources */,
+				4D1FFAA82403030100B75EA2 /* KeePassCiphers.m in Sources */,
+				4D1FFAA92403030100B75EA2 /* CHCSVParser.m in Sources */,
+				4D1FFAAA2403030100B75EA2 /* PasswordHistoryEntry.m in Sources */,
+				4D1FFAAB2403030100B75EA2 /* KdbEntry.m in Sources */,
+				4D1FFAAC2403030100B75EA2 /* core.c in Sources */,
+				4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */,
+				4D1FFAAE2403030100B75EA2 /* Document.m in Sources */,
+				4D1FFAAF2403030100B75EA2 /* SecretStore.m in Sources */,
+				4D1FFAB02403030100B75EA2 /* Alerts.m in Sources */,
+				4D1FFAB12403030100B75EA2 /* CryptoParameters.m in Sources */,
+				4D1FFAB22403030100B75EA2 /* CustomIcon.m in Sources */,
+				4D1FFAB32403030100B75EA2 /* MacNodeIconHelper.m in Sources */,
+				4D1FFAB42403030100B75EA2 /* UiAttachment.m in Sources */,
+				4D1FFAB52403030100B75EA2 /* CreateFormatAndSetCredentialsWizard.m in Sources */,
+				4D1FFAB62403030100B75EA2 /* KeePassDatabase.m in Sources */,
+				4D1FFAB72403030100B75EA2 /* PwSafeSerialization.m in Sources */,
+				4D1FFAB82403030100B75EA2 /* CustomIconsRationalizer.m in Sources */,
+				4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */,
+				4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */,
+				4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */,
+				4D1FFABC2403030100B75EA2 /* NodeFields.m in Sources */,
+				4D1FFABD2403030100B75EA2 /* Utils.m in Sources */,
+				4D1FFABE2403030100B75EA2 /* String.m in Sources */,
+				4D1FFABF2403030100B75EA2 /* ClipboardManager.m in Sources */,
+				4D1FFAC02403030100B75EA2 /* Kdb1DatabaseMetadata.m in Sources */,
+				4D1FFAC12403030100B75EA2 /* FavIconManager.m in Sources */,
+				4D1FFAC22403030100B75EA2 /* PredefinedKeePassIcon.m in Sources */,
+				4D1FFAC32403030100B75EA2 /* KdbxSerialization.m in Sources */,
+				4D1FFAC42403030100B75EA2 /* DAVCredentials.m in Sources */,
+				4D1FFAC52403030100B75EA2 /* KeePassGroup.m in Sources */,
+				4D1FFAC62403030100B75EA2 /* ChaCha20Stream.m in Sources */,
+				4D1FFAC72403030100B75EA2 /* QRCodePresenterPopover.m in Sources */,
+				4D1FFAC82403030100B75EA2 /* ViewController.m in Sources */,
+				4D1FFAC92403030100B75EA2 /* DAVSession.m in Sources */,
+				4D1FFACA2403030100B75EA2 /* Csv.m in Sources */,
+				4D1FFACB2403030100B75EA2 /* RootXmlDomainObject.m in Sources */,
+				4D1FFACC2403030100B75EA2 /* MMcG_MF_Base32Additions.m in Sources */,
+				4D1FFACD2403030100B75EA2 /* Salsa20Stream.m in Sources */,
+				4D1FFACE2403030100B75EA2 /* Kdbx4SerializationData.m in Sources */,
+				4D1FFACF2403030100B75EA2 /* XmlProcessingContext.m in Sources */,
+				4D1FFAD02403030100B75EA2 /* DAVBaseRequest.m in Sources */,
+				4D1FFAD12403030100B75EA2 /* DatabasesManagerView.m in Sources */,
+				4D1FFAD22403030100B75EA2 /* KeyFileParser.m in Sources */,
+				4D1FFAD32403030100B75EA2 /* DAVListingParser.m in Sources */,
+				4D1FFAD42403030100B75EA2 /* PasswordMaker.m in Sources */,
+				4D1FFAD52403030100B75EA2 /* TwoFishCipher.m in Sources */,
+				4D1FFAD62403030100B75EA2 /* CustomPasswordTextField.m in Sources */,
+				4D1FFAD72403030100B75EA2 /* KdfParameters.m in Sources */,
+				4D1FFAD82403030100B75EA2 /* AttachmentsRationalizer.m in Sources */,
+				4D1FFAD92403030100B75EA2 /* PasswordGenerationConfig.m in Sources */,
+				4D1FFADA2403030100B75EA2 /* CompositeKeyFactors.m in Sources */,
+				4D1FFADB2403030100B75EA2 /* FavIconDownloadOptions.m in Sources */,
+				4D1FFADC2403030100B75EA2 /* thread.c in Sources */,
+				4D1FFADD2403030100B75EA2 /* VariantObject.m in Sources */,
+				4D1FFADE2403030100B75EA2 /* encoding.c in Sources */,
+				4D1FFADF2403030100B75EA2 /* NSDateRFC1123.m in Sources */,
+				4D1FFAE02403030100B75EA2 /* NSAdvancedTextField.m in Sources */,
+				4D1FFAE12403030100B75EA2 /* Keys.m in Sources */,
+				4D1FFAE22403030100B75EA2 /* DAVResponseItem.m in Sources */,
+				4D1FFAE32403030100B75EA2 /* CustomIconList.m in Sources */,
+				4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */,
+				4D1FFAE52403030100B75EA2 /* main.m in Sources */,
+				4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */,
+				4D1FFAE72403030100B75EA2 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				4D1FFAE82403030100B75EA2 /* DAVRequest.m in Sources */,
+				4D1FFAE92403030100B75EA2 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
+				4D1FFAEA2403030100B75EA2 /* AppDelegate.m in Sources */,
+				4D1FFAEB2403030100B75EA2 /* blake2b.c in Sources */,
+				4D1FFAEC2403030100B75EA2 /* AttachmentCollectionView.m in Sources */,
+				4D1FFAED2403030100B75EA2 /* Times.m in Sources */,
+				4D1FFAEE2403030100B75EA2 /* OTPToken+Serialization.m in Sources */,
+				4D1FFAEF2403030100B75EA2 /* SprCompilation.m in Sources */,
+				4D1FFAF02403030100B75EA2 /* StringValue.m in Sources */,
+				4D1FFAF12403030100B75EA2 /* MBProgressHUD.m in Sources */,
+				4D1FFAF22403030100B75EA2 /* KeePassPredefinedIcons.m in Sources */,
+				4D1FFAF32403030100B75EA2 /* ChaCha20Cipher.m in Sources */,
+				4D1FFAF42403030100B75EA2 /* CustomFieldTableCellView.m in Sources */,
+				4D1FFAF52403030100B75EA2 /* History.m in Sources */,
+				4D1FFAF62403030100B75EA2 /* NodeDetailsViewController.m in Sources */,
+				4D1FFAF72403030100B75EA2 /* Argon2KdfCipher.m in Sources */,
+				4D1FFAF82403030100B75EA2 /* DocumentController.m in Sources */,
+				4D1FFAF92403030100B75EA2 /* BasicOrderedDictionary.m in Sources */,
+				4D1FFAFA2403030100B75EA2 /* V3Binary.m in Sources */,
+				4D1FFAFB2403030100B75EA2 /* Field.m in Sources */,
+				4D1FFAFC2403030100B75EA2 /* Root.m in Sources */,
+				4D1FFAFD2403030100B75EA2 /* ProgressWindow.m in Sources */,
+				4D1FFAFE2403030100B75EA2 /* MMcGACTextViewEditor.m in Sources */,
+				4D1FFAFF2403030100B75EA2 /* NSArray+Extensions.m in Sources */,
+				4D1FFB002403030100B75EA2 /* DatabasesManager.m in Sources */,
+				4D1FFB012403030100B75EA2 /* Group.m in Sources */,
+				4D1FFB022403030100B75EA2 /* Kdbx4Serialization.m in Sources */,
+				4D1FFB032403030100B75EA2 /* SerializationData.m in Sources */,
+				4D1FFB042403030100B75EA2 /* PwSafeDatabase.m in Sources */,
+				4D1FFB052403030100B75EA2 /* KeePassXmlParser.m in Sources */,
+				4D1FFB062403030100B75EA2 /* PreferencesWindowController.m in Sources */,
+				4D1FFB072403030100B75EA2 /* DAVRequestGroup.m in Sources */,
+				4D1FFB082403030100B75EA2 /* Settings.m in Sources */,
+				4D1FFB092403030100B75EA2 /* OTPTokenType.m in Sources */,
+				4D1FFB0A2403030100B75EA2 /* NSUUID+Zero.m in Sources */,
+				4D1FFB0B2403030100B75EA2 /* BiometricIdHelper.m in Sources */,
+				4D1FFB0C2403030100B75EA2 /* OTPAlgorithm.m in Sources */,
+				4D1FFB0D2403030100B75EA2 /* SerializationPackage.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4D29663121AD7318009B7936 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1724,6 +2424,7 @@
 				4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */,
 				4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
+				4D59E20723FCA15A0004B309 /* MacYubiKeyManager.m in Sources */,
 				4D524CBF219B479900C22CB4 /* KdbSerialization.m in Sources */,
 				4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */,
 				4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */,
@@ -1883,6 +2584,8 @@
 				4D40B07623BFB5B000BAD0D2 /* uk */,
 				4D27CC4923C737DF00DF06ED /* sv */,
 				4DD8D56F23CC9D4000E7F57B /* zh-Hans */,
+				4D8B370823FAD61100A81725 /* es */,
+				4D95482E24004F5E008D2BE1 /* it */,
 			);
 			name = DownloadFavIcons.storyboard;
 			path = MacBox;
@@ -1898,6 +2601,8 @@
 				4D40B08323BFB86A00BAD0D2 /* uk */,
 				4D27CC4D23C737DF00DF06ED /* sv */,
 				4DD8D57023CC9D4000E7F57B /* zh-Hans */,
+				4D8B370923FAD61100A81725 /* es */,
+				4D95482F24004F5F008D2BE1 /* it */,
 			);
 			name = MacKeePassHistory.storyboard;
 			path = MacBox;
@@ -1913,6 +2618,8 @@
 				4D40B09023BFB8BD00BAD0D2 /* uk */,
 				4D27CC4A23C737DF00DF06ED /* sv */,
 				4DD8D56923CC9D3F00E7F57B /* zh-Hans */,
+				4D8B370223FAD61000A81725 /* es */,
+				4D95482824004F5E008D2BE1 /* it */,
 			);
 			name = NodeDetails.storyboard;
 			path = MacBox;
@@ -1928,6 +2635,8 @@
 				4DEEE26A23C73EF6007BBFFE /* ru */,
 				4DEEE26B23C73EF9007BBFFE /* uk */,
 				4DD8D57723CC9D4000E7F57B /* zh-Hans */,
+				4D95483624004F5F008D2BE1 /* it */,
+				4DAF56EA240181480026282C /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1942,6 +2651,8 @@
 				4D68256423E498E9002DC4FB /* ru */,
 				4D68256623E498EA002DC4FB /* sv */,
 				4D68256823E498EA002DC4FB /* uk */,
+				4D8B370023FAD61000A81725 /* es */,
+				4D95482624004F5E008D2BE1 /* it */,
 			);
 			name = DatabaseProperties.storyboard;
 			path = MacBox;
@@ -1957,6 +2668,8 @@
 				4DE68C7123A53260007C445C /* ru */,
 				4D27CC4823C737DF00DF06ED /* sv */,
 				4DD8D56E23CC9D4000E7F57B /* zh-Hans */,
+				4D8B370723FAD61100A81725 /* es */,
+				4D95482D24004F5E008D2BE1 /* it */,
 			);
 			name = PreferencesWindowController.xib;
 			path = MacBox;
@@ -1972,6 +2685,8 @@
 				4DE68C7223A53260007C445C /* ru */,
 				4D27CC4E23C737DF00DF06ED /* sv */,
 				4DD8D57123CC9D4000E7F57B /* zh-Hans */,
+				4D8B370A23FAD61100A81725 /* es */,
+				4D95483024004F5F008D2BE1 /* it */,
 			);
 			name = SafesMetaDataViewer.xib;
 			path = MacBox;
@@ -1987,6 +2702,8 @@
 				4DE68C7323A53260007C445C /* ru */,
 				4D27CC5223C737E000DF06ED /* sv */,
 				4DD8D57523CC9D4000E7F57B /* zh-Hans */,
+				4D8B370E23FAD61200A81725 /* es */,
+				4D95483424004F5F008D2BE1 /* it */,
 			);
 			name = UpgradeWindowController.xib;
 			path = MacBox;
@@ -2002,6 +2719,8 @@
 				4DE68C7423A53260007C445C /* ru */,
 				4D27CC4723C737DF00DF06ED /* sv */,
 				4DD8D56D23CC9D4000E7F57B /* zh-Hans */,
+				4D8B370623FAD61100A81725 /* es */,
+				4D95482C24004F5E008D2BE1 /* it */,
 			);
 			name = ChangeMasterPasswordWindowController.xib;
 			path = MacBox;
@@ -2017,6 +2736,8 @@
 				4DE68C7823A53261007C445C /* ru */,
 				4D27CC4F23C737DF00DF06ED /* sv */,
 				4DD8D57223CC9D4000E7F57B /* zh-Hans */,
+				4D8B370B23FAD61200A81725 /* es */,
+				4D95483124004F5F008D2BE1 /* it */,
 			);
 			name = ProgressWindow.xib;
 			path = MacBox;
@@ -2032,6 +2753,8 @@
 				4DE68C7B23A53261007C445C /* ru */,
 				4D27CC4523C737DE00DF06ED /* sv */,
 				4DD8D56C23CC9D3F00E7F57B /* zh-Hans */,
+				4D8B370523FAD61100A81725 /* es */,
+				4D95482B24004F5E008D2BE1 /* it */,
 			);
 			name = SelectPredefinedIconController.xib;
 			path = MacBox;
@@ -2041,6 +2764,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DC805B923A1173D001E742E /* Base */,
+				4D8B370D23FAD61200A81725 /* es */,
+				4D95483324004F5F008D2BE1 /* it */,
 			);
 			name = CollectionViewHeader.xib;
 			path = MacBox;
@@ -2056,6 +2781,8 @@
 				4DE68C7923A53261007C445C /* ru */,
 				4D27CC5023C737DF00DF06ED /* sv */,
 				4DD8D57323CC9D4000E7F57B /* zh-Hans */,
+				4D8B370C23FAD61200A81725 /* es */,
+				4D95483224004F5F008D2BE1 /* it */,
 			);
 			name = PredefinedKeePassIcon.xib;
 			path = MacBox;
@@ -2065,6 +2792,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DC805C523A11752001E742E /* Base */,
+				4D8B370423FAD61000A81725 /* es */,
+				4D95482A24004F5E008D2BE1 /* it */,
 			);
 			name = AttachmentItem.xib;
 			path = MacBox;
@@ -2074,6 +2803,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DC805C823A11756001E742E /* Base */,
+				4D8B370323FAD61000A81725 /* es */,
+				4D95482924004F5E008D2BE1 /* it */,
 			);
 			name = CustomFieldTableCellView.xib;
 			path = MacBox;
@@ -2083,6 +2814,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				4DC805D323A1176E001E742E /* Base */,
+				4D8B370F23FAD61200A81725 /* es */,
+				4D95483524004F5F008D2BE1 /* it */,
 			);
 			name = CheckboxCell.xib;
 			path = MacBox;
@@ -2098,6 +2831,8 @@
 				4DE68C7023A53260007C445C /* ru */,
 				4D27CC4623C737DE00DF06ED /* sv */,
 				4DD8D56823CC9D3F00E7F57B /* zh-Hans */,
+				4D8B370123FAD61000A81725 /* es */,
+				4D95482724004F5E008D2BE1 /* it */,
 			);
 			name = Main.storyboard;
 			path = MacBox;
@@ -2106,6 +2841,60 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		4D1FFB462403030100B75EA2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8226BDC94F5CC4BFEC5DB819 /* Pods-Strongbox.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
+				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2693;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/include/yubikey/lib",
+					"$(PROJECT_DIR)/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.12.19;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
+				PRODUCT_NAME = Strongbox;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Debug;
+		};
+		4D1FFB472403030100B75EA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8C4527BC2C332744D4401E3D /* Pods-Strongbox.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
+				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2693;
+				DEVELOPMENT_TEAM = 4326J8XDF2;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/include/yubikey/lib",
+					"$(PROJECT_DIR)/lib",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MARKETING_VERSION = 1.12.19;
+				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
+				PRODUCT_NAME = Strongbox;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+			};
+			name = Release;
+		};
 		4D29663D21AD7318009B7936 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2268,13 +3057,18 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2668;
+				CURRENT_PROJECT_VERSION = 2693;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/include/yubikey/lib",
+					"$(PROJECT_DIR)/lib",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.6;
+				MARKETING_VERSION = 1.12.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2290,13 +3084,18 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2668;
+				CURRENT_PROJECT_VERSION = 2693;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/include/yubikey/lib",
+					"$(PROJECT_DIR)/lib",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.6;
+				MARKETING_VERSION = 1.12.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2306,6 +3105,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4D1FFB452403030100B75EA2 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4D1FFB462403030100B75EA2 /* Debug */,
+				4D1FFB472403030100B75EA2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		4D29663C21AD7318009B7936 /* Build configuration list for PBXNativeTarget "MB1Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

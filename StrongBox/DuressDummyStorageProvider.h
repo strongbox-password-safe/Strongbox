@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (SafeMetaData *_Nullable)getSafeMetaData:(NSString *)nickName filename:(NSString*)filename fileIdentifier:(NSString*)fileIdentifier;
 
-@property (nonatomic, nonnull, readonly) DatabaseModel* database;
+- (void)database:(void(^)(DatabaseModel* model))completion;
 
 @end
 

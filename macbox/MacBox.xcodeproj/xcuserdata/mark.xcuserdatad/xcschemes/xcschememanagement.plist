@@ -4,10 +4,15 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
+		<key>MacBox-Outright-Pro.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>5</integer>
+		</dict>
 		<key>MacBox.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>0</integer>
 		</dict>
 		<key>MacUnitTests.xcscheme_^#shared#^_</key>
 		<dict>
@@ -22,6 +27,11 @@
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
+		<key>4D1FFA6A2403030100B75EA2</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
 		<key>4DE92B701F49D0AA00282D98</key>
 		<dict>
 			<key>primary</key>

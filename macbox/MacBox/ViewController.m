@@ -131,12 +131,19 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property (weak) IBOutlet NSPopUpButton *keyFilePopup;
 @property NSString* selectedKeyFileBookmark;
 
+
+
+@property (weak) IBOutlet NSTextField *labelYubiKey;
+@property (weak) IBOutlet NSPopUpButton *yubiKeyPopup;
+@property (weak) IBOutlet NSButton *checkboxAllowEmpty;
+@property (weak) IBOutlet NSButton *upgradeButton;
+
 @end
 
 static NSImage* kStrongBox256Image;
 
 @implementation ViewController
-                        
+
 + (void)initialize {
     if(self == [ViewController class]) {
         kStrongBox256Image = [NSImage imageNamed:@"StrongBox-256x256"];
@@ -1330,6 +1337,7 @@ static NSImage* kStrongBox256Image;
 
 - (IBAction)onEnterMasterPassword:(id)sender {
     if(![self manualCredentialsAreValid]) {
+        [Alerts info:@"Invalid Credentials" window:self.view.window]; // TODO: Officially place this
         return;
     }
     
@@ -1532,6 +1540,10 @@ static NSImage* kStrongBox256Image;
                 });
             }];
         });
+    }
+    else {
+        [Alerts info:@"Model is not set! This should never happen. Please contact support@strongboxsafe.com."
+              window:self.view.window];
     }
 }
 
@@ -3604,6 +3616,24 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (void)bindLockScreenUi {
+    self.checkboxAllowEmpty.state = Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSOnState : NSOffState;
+    
+    self.upgradeButton.hidden = Settings.sharedInstance.fullVersion;
+    
+    if (!Settings.sharedInstance.fullVersion && !Settings.sharedInstance.freeTrial) {
+        NSMutableAttributedString *attrTitle = [[NSMutableAttributedString alloc] initWithString:self.upgradeButton.title];
+        NSUInteger len = [attrTitle length];
+        NSRange range = NSMakeRange(0, len);
+        [attrTitle addAttribute:NSForegroundColorAttributeName value:NSColor.systemRedColor range:range];
+        [attrTitle addAttribute:NSFontAttributeName value:[NSFont boldSystemFontOfSize:NSFont.systemFontSize] range:range];
+
+        [attrTitle fixAttributesInRange:range];
+        [self.upgradeButton setAttributedTitle:attrTitle];
+    }
+    
+    self.labelYubiKey.hidden = YES;
+    self.yubiKeyPopup.hidden = YES;
+    
     BOOL enabled = [self manualCredentialsAreValid];
 
     [self.buttonUnlockWithPassword setEnabled:enabled];
@@ -3649,6 +3679,17 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     else {
         self.buttonUnlockWithTouchId.hidden = YES;
     }
+}
+
+- (IBAction)onAllowEmptyChanged:(id)sender {
+    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.checkboxAllowEmpty.state == NSOnState;
+    
+    [self bindLockScreenUi];
+}
+
+- (IBAction)onUpgrade:(id)sender {
+    AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
+    [appDelegate showUpgradeModal:0];
 }
 
 @end

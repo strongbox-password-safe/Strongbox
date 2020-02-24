@@ -92,21 +92,24 @@
         [AddNewSafeHelper createNewExpressDatabase:self
                                               name:self.name
                                           password:self.password
-                                        completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
-                                            if(error) {
-                                                [Alerts error:self
-                                                        title:NSLocalizedString(@"welcome_vc_error_creating", @"Error Creating Database")
-                                                        error:error
-                                                   completion:^{
-                                                    self.onDone(NO, nil);
-                                                }];
-                                            }
-                                            else {
-                                                self.database = metadata;
-                                                [SafesList.sharedInstance addWithDuplicateCheck:self.database];
-                                                [self performSegueWithIdentifier:@"segueToDone" sender:nil];
-                                            }
-                                        }];
+                                        completion:^(BOOL userCancelled, SafeMetaData* metadata, NSError* error) {
+            if (userCancelled) {
+                self.onDone(NO, nil);
+            }
+            else if(error) {
+                    [Alerts error:self
+                            title:NSLocalizedString(@"welcome_vc_error_creating", @"Error Creating Database")
+                            error:error
+                       completion:^{
+                        self.onDone(NO, nil);
+                    }];
+                }
+                else {
+                    self.database = metadata;
+                    [SafesList.sharedInstance addWithDuplicateCheck:self.database];
+                    [self performSegueWithIdentifier:@"segueToDone" sender:nil];
+                }
+            }];
     }
 }
 

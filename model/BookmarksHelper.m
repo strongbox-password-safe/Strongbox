@@ -30,26 +30,21 @@
         options |= NSURLBookmarkCreationWithSecurityScope;
     #endif
 
-    if ([url startAccessingSecurityScopedResource]) {
-        NSData *bookmark = [url bookmarkDataWithOptions:options
+    [url startAccessingSecurityScopedResource]; // MMcG: Do not check return here explicitly because it will fail if the URL was not generated from a bookmark - i.e. if it was just passed in by the system - This is fine we will continue and successfully generate a bookmark (or not).
+
+    NSData *bookmark = [url bookmarkDataWithOptions:options
                          includingResourceValuesForKeys:nil
                                           relativeToURL:nil
                                                   error:error];
 
-        [url stopAccessingSecurityScopedResource];
+    [url stopAccessingSecurityScopedResource];
 
-        if (!bookmark) {
-            NSLog(@"Error while creating bookmark for URL (%@): %@", url, *error);
-            return nil;
-        }
-
-        return bookmark;
-    }
-    else {
-        *error = [Utils createNSError:@"Error while trying to start accessing security scoped resource" errorCode:-1];
-        NSLog(@"Error while trying to start accessing security scoped resource (%@)", url);
+    if (!bookmark) {
+        NSLog(@"Error while creating bookmark for URL (%@): %@", url, *error);
         return nil;
     }
+
+    return bookmark;
 }
 
 + (NSString *)getBookmarkFromUrl:(NSURL *)url readOnly:(BOOL)readOnly error:(NSError *_Nonnull*)error {
@@ -82,7 +77,6 @@
 
 + (NSURL *)getUrlFromBookmarkData:(NSData *)bookmark readOnly:(BOOL)readOnly updatedBookmark:(NSData * _Nonnull __autoreleasing *)updatedBookmark error:(NSError * _Nonnull __autoreleasing *)error {
     NSURLBookmarkResolutionOptions options = kNilOptions;
-    //     NSURLBookmarkResolutionOptions options = NSURLBookmarkResolutionWithoutUI; // TODO: I'm not sure this is actually right - worth testing soon... iOS only
     #if !TARGET_OS_IPHONE
         options |= NSURLBookmarkResolutionWithSecurityScope;
     #endif

@@ -24,29 +24,7 @@
 
 @implementation DatabaseModel
 
-+ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError **)error  {
-    if(candidate == nil) {
-        return nil;
-    }
-    
-    NSError* validityError;
-    if([PwSafeDatabase isAValidSafe:candidate error:&validityError]) {
-        return nil; // NOT Supported
-    }
-    else if ([KeePassDatabase isAValidSafe:candidate error:&validityError]) {
-        return [KeePassDatabase getYubikeyChallenge:candidate error:error];
-    }
-    else if([Kdbx4Database isAValidSafe:candidate error:&validityError]) {
-        return [Kdbx4Database getYubikeyChallenge:candidate error:error];
-    }
-    else if([Kdb1Database isAValidSafe:candidate error:&validityError]) {
-        return nil;  // NOT Supported
-    }
-    
-    return nil;
-}
-
-+ (BOOL)    isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
++ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
     if(candidate == nil) {
         if(error) {
             *error = [Utils createNSError:@"Database Data is Nil" errorCode:-1];
@@ -193,6 +171,46 @@
     return nil;
 }
 
++ (void)fromData:(NSData *)data
+             ckf:(CompositeKeyFactors *)ckf
+      completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion {
+    if(data == nil) {
+        completion(NO, nil, nil);
+        return;
+    }
+    
+    NSError* err;
+    id<AbstractDatabaseFormatAdaptor> adaptor;
+    if([PwSafeDatabase isAValidSafe:data error:&err]) {
+        adaptor = [[PwSafeDatabase alloc] init];
+    }
+    else if([KeePassDatabase isAValidSafe:data error:&err]) {
+        adaptor = [[KeePassDatabase alloc] init];
+    }
+    else if([Kdbx4Database isAValidSafe:data error:&err]) {
+        adaptor = [[Kdbx4Database alloc] init];
+    }
+    else if([Kdb1Database isAValidSafe:data error:&err]) {
+        adaptor = [[Kdb1Database alloc] init];
+    }
+    else {
+        completion(NO, nil, err);
+        return;
+    }
+
+    [adaptor open:data
+              ckf:ckf
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        if(userCancelled || database == nil || error) {
+            completion(userCancelled, nil ,error);
+        }
+        else {
+            DatabaseModel* model = [[DatabaseModel alloc] initWithDatabase:database adaptor:adaptor];
+            completion(NO, model, nil);
+        }
+    }];
+}
+
 - (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors format:(DatabaseFormat)format {
     if(self = [super init]) {
         self.adaptor = [DatabaseModel getAdaptor:format];
@@ -214,42 +232,19 @@
     return self;
 }
 
-- (instancetype)initExisting:(NSData *)data compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors error:(NSError **)ppError {
+- (instancetype)initWithDatabase:(StrongboxDatabase*)database adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor {
     if(self = [super init]) {
-        if(data == nil) {
-            return nil;
-        }
-        
-        if([PwSafeDatabase isAValidSafe:data error:ppError]) {
-            self.adaptor = [[PwSafeDatabase alloc] init];
-        }
-        else if([KeePassDatabase isAValidSafe:data error:ppError]) {
-            self.adaptor = [[KeePassDatabase alloc] init];
-        }
-        else if([Kdbx4Database isAValidSafe:data error:ppError]) {
-            self.adaptor = [[Kdbx4Database alloc] init];
-        }
-        else if([Kdb1Database isAValidSafe:data error:ppError]) {
-            self.adaptor = [[Kdb1Database alloc] init];
-        }
-        else {
-            return nil;
-        }
-
-        self.theSafe = [self.adaptor open:data compositeKeyFactors:compositeKeyFactors error:ppError];
-        
-        if (self.theSafe == nil) {
-            return nil;
-        }
+        self.theSafe = database;
+        self.adaptor = adaptor;
     }
     
     return self;
 }
-
-- (NSData*)getAsData:(NSError**)error {
+    
+- (void)getAsData:(SaveCompletionBlock)completion {
     [self.theSafe performPreSerializationTidy]; // Tidy up attachments, custom icons, trim history
     
-    return [self.adaptor save:self.theSafe error:error];
+    [self.adaptor save:self.theSafe completion:completion];
 }
 
 - (void)addSampleGroupAndRecordToRoot {

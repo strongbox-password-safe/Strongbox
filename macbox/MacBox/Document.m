@@ -84,7 +84,7 @@
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
     [self unblockUserInteraction];
-    return [self.model getPasswordDatabaseAsData:outError];
+    return [self getDataFromModel:self.model error:outError];
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
@@ -98,7 +98,7 @@
             return NO;
         }
 
-        DatabaseModel* db = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:self.credentialsForUnlock error:&error];
+        DatabaseModel *db = [self getModelFromData:data error:&error];
         
         if(!db) {
             if(outError != nil) {
@@ -125,6 +125,8 @@
     }
     else {
         self.model = [[ViewModel alloc] initLocked:self];
+        NSLog(@"Model initialized [%@]", self.model);
+        
         // Make Window Controllers will get called, which will now instantiate the ViewController... once that's done
         // we will call resetModel with the above
     }
@@ -230,5 +232,51 @@
 - (void)setDatabaseMetadata:(id)databaseMetadata {
     [self.model setDatabaseMetadata:databaseMetadata];
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Synchronous Wrappers using dispatch groups
+
+- (NSData*)getDataFromModel:(ViewModel*)model error:(NSError **)outError {
+    __block NSData *ret = nil;
+    __block NSError *retError = nil;
+    
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+
+    [self.model getPasswordDatabaseAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        // NSLog(@"[%@][%@] dataOfType: Got Data...", [NSThread currentThread], NSThread.mainThread);
+        ret = data;
+        retError = error;
+        dispatch_group_leave(group);
+    }];
+    
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+    
+    *outError = retError;
+    return ret;
+}
+
+- (DatabaseModel*)getModelFromData:(NSData*)data error:(NSError **)outError {
+    __block DatabaseModel* db = nil;
+    __block NSError* retError = nil;
+
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+    
+    [DatabaseModel fromData:data
+                        ckf:self.credentialsForUnlock
+                 completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+        // NSLog(@"[%@][%@] readFromData: Completion...", [NSThread currentThread], NSThread.mainThread);
+        db = model;
+        retError = error;
+        dispatch_group_leave(group);
+    }];
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    *outError = retError;
+    return db;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @end

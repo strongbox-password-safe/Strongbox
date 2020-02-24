@@ -14,7 +14,7 @@
 		<key>StrongBox.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>0</integer>
+			<integer>4</integer>
 		</dict>
 		<key>Strongbox Auto Fill.xcscheme</key>
 		<dict>
@@ -24,12 +24,12 @@
 		<key>Strongbox-Auto-Fill-Family.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>32</integer>
+			<integer>1</integer>
 		</dict>
 		<key>Strongbox-iOS-Family.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>31</integer>
+			<integer>3</integer>
 		</dict>
 		<key>Strongbox.xcscheme</key>
 		<dict>

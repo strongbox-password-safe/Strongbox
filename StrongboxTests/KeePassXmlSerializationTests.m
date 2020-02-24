@@ -32,23 +32,22 @@
     NSString *path = [bundle pathForResource:@"generic" ofType:@"kdbx"];
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
-    NSError* error;
-    //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    SerializationData* data = [KdbxSerialization deserialize:safeData compositeKeyFactors:cpf ppError:&error];
-    
-    if(!data) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssert(data != nil);
+    [KdbxSerialization deserialize:safeData
+               compositeKeyFactors:cpf
+                        completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
+        if(!data) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssert(data != nil);
 
-    NSLog(@"%@", data);
-    //NSLog(@"%@", data.xml);
-    
-    XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
-    XCTAssertEqualObjects(data.rootXmlObject.keePassFile.meta.generator, @"MacPass");
+        NSLog(@"%@", data);
+        //NSLog(@"%@", data.xml);
+        
+        XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
+        XCTAssertEqualObjects(data.rootXmlObject.keePassFile.meta.generator, @"MacPass");
+    }];
 }
 
 - (void)testDeserializeNonGzippedFile {
@@ -56,60 +55,39 @@
     NSString *path = [bundle pathForResource:@"generic-non-gzipped" ofType:@"kdbx"];
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
-    NSError* error;
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    SerializationData* data = [KdbxSerialization deserialize:safeData compositeKeyFactors:cpf ppError:&error];
-    
-    if(!data) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssert(data != nil);
-    
-    NSLog(@"%@", data);
-    //NSLog(@"%@", data.xml);
-    XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
+    [KdbxSerialization deserialize:safeData
+               compositeKeyFactors:cpf
+                        completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
+        if(!data) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssert(data != nil);
+        
+        NSLog(@"%@", data);
+        //NSLog(@"%@", data.xml);
+        XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
+    }];
 }
-//
-//- (void)testDeserializeDesktopFileToXml {
-//    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Desktop/Database.kdbx"];
-//
-//    NSError* error;
-//    //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-//
-//    SerializationData* data = [KdbxSerialization deserialize:safeData password:@"a" ppError:&error];
-//
-//    if(!data) {
-//        NSLog(@"%@", error);
-//    }
-//
-//    XCTAssert(data != nil);
-//
-//    NSLog(@"%@", data);
-//    NSLog(@"%@", data.xml);
-//    XCTAssert([data.xml hasPrefix:@"<?xml"]);
-//
-//    [[NSFileManager defaultManager] createFileAtPath:@"/Users/mark/Desktop/Database.xml" contents:[data.xml dataUsingEncoding:NSUTF8StringEncoding] attributes:nil];
-//}
 
 - (void)testDeserializeGoogleDriveFileToXml {
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/Database.kdbx"];
     
-    NSError* error;
-    //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    Kdbx4SerializationData* data = [Kdbx4Serialization deserialize:safeData compositeKey:cpf ppError:&error];
-    
-    if(!data) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssert(data != nil);
-    
-    NSLog(@"%@", data);
+    [Kdbx4Serialization deserialize:safeData
+                compositeKeyFactors:cpf
+                         completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable data, NSError * _Nullable error) {
+        if(!data) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssert(data != nil);
+        
+        NSLog(@"%@", data);
+    }];
 }
 
 - (void)testDeserializeFileWithBinariesAndCustomFields {
@@ -117,21 +95,20 @@
     NSString *path = [bundle pathForResource:@"Database" ofType:@"kdbx"];
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
-    NSError* error;
-    //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    SerializationData* data = [KdbxSerialization deserialize:safeData compositeKeyFactors:cpf ppError:&error];
-    
-    if(!data) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssert(data != nil);
-    
-    NSLog(@"%@", data);
-    //NSLog(@"%@", data.xml);
-    XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
+    [KdbxSerialization deserialize:safeData
+                                         compositeKeyFactors:cpf
+                                                  completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
+        if(!data) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssert(data != nil);
+        
+        NSLog(@"%@", data);
+        //NSLog(@"%@", data.xml);
+        XCTAssertEqual(data.rootXmlObject.keePassFile.root.rootGroup.groups.count, 6);
+    }];
 }
 
 @end

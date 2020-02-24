@@ -22,12 +22,12 @@
 - (void)testGoogleDriveSafeWithHistory {
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/favicon-test2.kdbx"];
     
-    NSError* error;
-    //Kdbx4Database *db = [[Kdbx4Database alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
-    StrongboxDatabase* db = [[[Kdbx4Database alloc] init] open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
-    NSLog(@"%@", db);
-    
-    XCTAssertNotNil(db);
+    [[[Kdbx4Database alloc] init] open:safeData
+                                   ckf:[CompositeKeyFactors password:@"a"]
+                            completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        NSLog(@"%@", db);
+        XCTAssertNotNil(db);
+    }];
 }
 
 @end

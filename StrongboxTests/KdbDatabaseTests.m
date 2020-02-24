@@ -33,12 +33,12 @@
         }
         
         id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-        StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
-        
-        XCTAssertNotNil(db);
-        
-        NSLog(@"%@", db);
-        NSLog(@"=============================================================================================================");
+        [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+            XCTAssertNotNil(db);
+            
+            NSLog(@"%@", db);
+            NSLog(@"=============================================================================================================");
+        }];
     }
 }
 
@@ -46,53 +46,53 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database-1" ofType:@"kdb"];
     XCTAssert(blob);
     
-    NSError* error;
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-1"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
-    
-    XCTAssertNotNil(db);
-    
-    NSLog(@"%@", db);
+    [adaptor open:blob
+              ckf:[CompositeKeyFactors password:password]
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNotNil(db);
+        NSLog(@"%@", db);
+    }];
 }
 
 - (void)testTwoFish {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database-twofish" ofType:@"kdb"];
     XCTAssert(blob);
     
-    NSError* error;
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-twofish"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
     
-    XCTAssertNotNil(db);
-    
-    NSLog(@"%@", db);
+    [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNotNil(db);
+        NSLog(@"%@", db);
+    }];
 }
 
 - (void)testAesRw {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database-1" ofType:@"kdb"];
     XCTAssert(blob);
     
-    NSError* error;
     NSString* password = [CommonTesting.testKdbFilesAndPasswords objectForKey:@"Database-1"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
     
-    XCTAssertNotNil(db);
-    
-    NSLog(@"BEFORE: %@", db);
-    
-    //db.masterPassword = @"ladder";
-    NSData* rec = [adaptor save:db error:&error];
-
-    StrongboxDatabase *b = [adaptor open:rec compositeKeyFactors:[CompositeKeyFactors password:db.compositeKeyFactors.password] error:&error];
-    NSLog(@"AFTER: %@", b);
-    
-    XCTAssertNotNil(b);
+    [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNotNil(db);
+        
+        NSLog(@"BEFORE: %@", db);
+        
+        //db.masterPassword = @"ladder";
+        
+        [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable rec, NSError * _Nullable error) {
+            [adaptor open:rec ckf:[CompositeKeyFactors password:db.compositeKeyFactors.password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+                NSLog(@"AFTER: %@", b);
+                XCTAssertNotNil(b);
+            }];
+        }];
+    }];
 }
 
 @end

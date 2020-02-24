@@ -76,8 +76,12 @@ viewController:(UIViewController *)viewController
     return [self readWithProviderData:nil viewController:viewController completion:completion];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completionHandler {
-    completionHandler([self getData], nil);
+- (void)readWithProviderData:(NSObject *)providerData
+              viewController:(UIViewController *)viewController
+                  completion:(void (^)(NSData *, NSError *))completionHandler {
+    [self getData:^(NSData *data) {
+        completionHandler(data, nil);
+    }];
 }
 
 - (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
@@ -85,42 +89,45 @@ viewController:(UIViewController *)viewController
     completion(nil);
 }
 
-- (DatabaseModel *)database {
-    NSData* data = [self getData];
-    NSError *error;
-    
-    CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
-    DatabaseModel* model = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
-    
-    if(!model || error != nil) {
-        // For some reason we can't open the duress database... reset it - probably because someone changed the password
-        [self setData:nil];
-        data = [self getData];
-        model = [[DatabaseModel alloc] initExisting:data compositeKeyFactors:cpf error:&error];
-    }
-    
-    return model;
+- (void)database:(void(^)(DatabaseModel* model))completion {
+    [self getData:^(NSData *data) {
+        CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
+        
+        [DatabaseModel fromData:data
+                            ckf:cpf
+                     completion:^(BOOL userCancelled, DatabaseModel * model, NSError * error) {
+            if(!model || error != nil) {
+                // For some reason we can't open the duress database... reset it - probably because someone changed the password
+                [self setData:nil];
+                [self database:completion];
+            }
+            else {
+                completion(model);
+            }
+        }];
+    }];
 }
 
-- (NSData*)getData {
+- (void)getData:(void(^)(NSData* data))completion {
     NSUserDefaults* defaults = [Settings.sharedInstance getUserDefaults]; // FUTURE: Not an ideal place for data storage
-    
     NSData* data = [defaults objectForKey:@"dd-safe"];
-    
     if(!data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
         DatabaseModel* model = [[DatabaseModel alloc] initNew:cpf format:kKeePass];
-        NSError* error;
-        data = [model getAsData:&error];
-        [self setData:data];
+        [model getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            [self setData:data];
+            completion(data);
+        }];
     }
-    
-    return data;
+    else {
+        completion(data);
+    }
 }
 
 - (void)setData:(NSData*)data {
     NSUserDefaults* defaults = [Settings.sharedInstance getUserDefaults];
     [defaults setObject:data forKey:@"dd-safe"];
+    [defaults synchronize];
 }
 
 @end

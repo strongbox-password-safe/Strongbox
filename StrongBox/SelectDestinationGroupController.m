@@ -8,6 +8,7 @@
 
 #import "SelectDestinationGroupController.h"
 #import "Alerts.h"
+#import "Utils.h"
 
 @implementation SelectDestinationGroupController {
     NSArray<Node*> *_items;
@@ -75,25 +76,15 @@
     for(Node* itemToMove in self.itemsToMove) {
         if(![itemToMove changeParent:self.currentGroup allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe]) {
             NSLog(@"Error Changing Parents.");
-            [Alerts warn:self
-                   title:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving")
-                 message:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving")
-              completion:^{
-                self.onDone();
-            }];
+            NSError* error = [Utils createNSError:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving") errorCode:-1];
+            self.onDone(NO, error);
             return;
         }
     }
 
-    [self.viewModel update:NO handler:^(NSError *error) {
-        if (error) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"moveentry_vc_error_saving", @"Error Saving")
-                    error:error];
-        }
-
+    [self.viewModel update:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will crash BrowseSafeView dismiss.
-            self.onDone();
+            self.onDone(userCancelled, error);
         });
     }];
 }

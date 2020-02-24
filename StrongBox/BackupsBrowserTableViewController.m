@@ -9,7 +9,6 @@
 #import "BackupsBrowserTableViewController.h"
 #import "BackupsManager.h"
 #import "Utils.h"
-#import "OpenSafeSequenceHelper.h"
 #import "Alerts.h"
 #import "ExportOptionsTableViewController.h"
 #import "LocalDeviceStorageProvider.h"

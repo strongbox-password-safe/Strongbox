@@ -12,6 +12,8 @@
 #import "DatabaseModel.h"
 #import "AbstractDatabaseMetadata.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface Model : NSObject
 
 @property (nonatomic, readonly, nonnull) SafeMetaData *metadata;
@@ -33,12 +35,11 @@
                                       cacheMode:(BOOL)usingOfflineCache
                                      isReadOnly:(BOOL)isReadOnly NS_DESIGNATED_INITIALIZER;
 
-- (void)update:(BOOL)isAutoFill handler:(void (^_Nonnull)(NSError * _Nullable error))handler;
+- (void)update:(BOOL)isAutoFill handler:(void (^)(BOOL userCancelled, NSError*_Nullable error))handler;
 
-// Offline Cache Stuff
+// Cache Stuff
 
 - (void)updateOfflineCacheWithData:(NSData *_Nonnull)data;
-- (void)updateOfflineCache:(void (^_Nonnull)(void))handler;
 
 - (void)updateAutoFillCacheWithData:(NSData *_Nonnull)data;
 - (void)updateAutoFillCache:(void (^_Nonnull)(void))handler;
@@ -51,9 +52,12 @@
 - (BOOL)deleteItem:(Node *_Nonnull)child;
 - (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
--(void)encrypt:(void (^_Nullable)(NSData* _Nullable data, NSError* _Nullable error))completion;
+-(void)encrypt:(void (^)(BOOL userCancelled, NSData*_Nullable data, NSError*_Nullable error))completion;
+
 - (NSString *_Nonnull)generatePassword;
 
 - (void)updateAutoFillQuickTypeDatabase;
      
 @end
+
+NS_ASSUME_NONNULL_END

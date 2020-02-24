@@ -106,7 +106,6 @@
 @property (weak) IBOutlet NSButton *scanCommonFiles;
 @property (weak) IBOutlet NSButton *checkboxHideKeyFileName;
 @property (weak) IBOutlet NSButton *checkboxDoNotRememberKeyFile;
-@property (weak) IBOutlet NSButton *checkboxAllowEmptyPassword;
 
 @end
 
@@ -217,8 +216,6 @@
     
     self.checkboxHideKeyFileName.state = Settings.sharedInstance.hideKeyFileNameOnLockScreen ? NSOnState : NSOffState;
     self.checkboxDoNotRememberKeyFile.state = Settings.sharedInstance.doNotRememberKeyFile ? NSOnState : NSOffState;
-
-    self.checkboxAllowEmptyPassword.state = Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -258,8 +255,6 @@
     
     Settings.sharedInstance.hideKeyFileNameOnLockScreen = self.checkboxHideKeyFileName.state ==  NSOnState;
     Settings.sharedInstance.doNotRememberKeyFile = self.checkboxDoNotRememberKeyFile.state ==  NSOnState;
-
-    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.checkboxAllowEmptyPassword.state == NSOnState;
 
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];

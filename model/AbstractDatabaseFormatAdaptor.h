@@ -23,16 +23,21 @@ typedef NS_ENUM (NSInteger, DatabaseFormat) {
     kFormatUnknown,
 };
 
+typedef void (^OpenCompletionBlock)(BOOL userCancelled, StrongboxDatabase*_Nullable database, NSError*_Nullable error);
+typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSData*_Nullable data, NSError*_Nullable error);
+
 @protocol AbstractDatabaseFormatAdaptor <NSObject>
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
 + (NSString *)fileExtension;
-+ (NSData *_Nullable)getYubikeyChallenge:(NSData *)candidate error:(NSError**)error;
 
-- (StrongboxDatabase*)create:(CompositeKeyFactors*)compositeKeyFactors;
-- (nullable StrongboxDatabase*)open:(NSData*)data compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors error:(NSError **)error;
+- (StrongboxDatabase*)create:(CompositeKeyFactors*)ckf;
 
-- (nullable NSData*)save:(StrongboxDatabase*)database error:(NSError**)error;
+- (void)open:(NSData*)data
+         ckf:(CompositeKeyFactors*)ckf
+  completion:(OpenCompletionBlock)completion;
+
+- (void)save:(StrongboxDatabase*)database completion:(SaveCompletionBlock)completion;
 
 
 @property (nonatomic, readonly) DatabaseFormat format;

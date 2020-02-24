@@ -1015,9 +1015,18 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.currentGroup = self.viewModel.database.rootGroup;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
-        vc.onDone = ^{
+        vc.onDone = ^(BOOL userCancelled, NSError *error) {
             [self dismissViewControllerAnimated:YES completion:^{
-                [self refreshItems];
+                if (userCancelled) {
+                    [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE: Be more graceful and revert nicely
+                }
+                else if (error) {
+                    NSString* title = NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving");
+                    [Alerts error:self title:title error:error];
+                }
+                else {
+                    [self refreshItems];
+                }
             }];
         };
     }
@@ -1222,20 +1231,27 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)saveChangesToSafeAndRefreshView {
     [self refreshItems];
     
-    [self.viewModel update:NO handler:^(NSError *error) {
+    [self.viewModel update:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            if(self.isEditing) {
-                [self setEditing:NO animated:YES];
+            if (userCancelled) {
+                [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully
             }
-            
-            [self refreshItems];
-            
-            [self updateSplitViewDetailsView:nil editMode:NO];
-            
-            if (error) {
+            else if (error) {
                 [Alerts error:self
                         title:NSLocalizedString(@"browse_vc_error_saving", @"Error Saving")
-                        error:error];
+                        error:error
+                   completion:^{
+                    [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully
+                }];
+            }
+            else {
+                if(self.isEditing) {
+                    [self setEditing:NO animated:YES];
+                }
+                
+                [self refreshItems];
+                
+                [self updateSplitViewDetailsView:nil editMode:NO];
             }
         });
     }];

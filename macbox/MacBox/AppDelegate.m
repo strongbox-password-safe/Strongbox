@@ -19,27 +19,26 @@
 #import "ViewController.h"
 #import "DatabasesManager.h"
 #import <SAMKeychain/SAMKeychain.h> // TODO: Remove in April 2020 after migrations...
+#import "MacYubiKeyManager.h"
+
 //#import "DAVKit.h"
 
-//#define kIapFullVersionStoreId @"com.markmcguill.strongbox.test.consumable"
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
 
 NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";
 NSString* const kDragAndDropInternalUti = @"com.markmcguill.strongbox.drag.and.drop.internal.uti";
 NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.drop.external.uti";
 
+static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.mac.pro";
+
 static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
-//static const NSInteger kTopLevelMenuItemTagFile = 1111;
-//static const NSInteger kTopLevelMenuItemTagEdit = 1112;
 static const NSInteger kTopLevelMenuItemTagView = 1113;
-//static const NSInteger kTopLevelMenuItemTagDatabase = 1114;
 
 @interface AppDelegate ()
 
 @property (strong) IBOutlet NSMenu *systemTraymenu;
 @property NSStatusItem* statusItem;
 
-//@property (nonatomic) BOOL applicationHasFinishedLaunching;
 @property (nonatomic, strong) SKProductsRequest *productsRequest;
 @property (nonatomic, strong) NSArray<SKProduct *> *validProducts;
 @property (strong, nonatomic) UpgradeWindowController *upgradeWindowController;
@@ -69,6 +68,8 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self removeUnwantedMenuItems];
     
+    [self initializeProFamilyEdition];
+
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
@@ -102,11 +103,25 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     // Auto Open Primary...
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if(DatabasesManager.sharedInstance.snapshot.count > 0 && Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
-            DocumentController* dc = NSDocumentController.sharedDocumentController;
-            [dc openDatabase:DatabasesManager.sharedInstance.snapshot.firstObject completion:^(NSError *error) { }];
-        }
+        DocumentController* dc = NSDocumentController.sharedDocumentController;
+        [dc onAppStartup];
+        
+//        [MacYubiKeyManager.sharedInstance doIt];
     });
+}
+
+- (void)initializeProFamilyEdition {
+    if(!Settings.sharedInstance.hasDoneProFamilyCheck && [self isProFamilyEdition]) {
+        NSLog(@"Initial launch of Pro/Family Edition... setting Pro");
+        [Settings.sharedInstance setFullVersion:YES];
+    }
+    
+    Settings.sharedInstance.hasDoneProFamilyCheck = YES;
+}
+
+- (BOOL)isProFamilyEdition {
+    NSString* bundleId = [Utils getAppBundleId];
+    return [bundleId isEqualToString:kProFamilyEditionBundleId];
 }
 
 - (void)showHideSystemStatusBarIcon {
@@ -134,6 +149,15 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     [NSApp arrangeInFront:sender];
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:sender];
     [NSApp activateIgnoringOtherApps:YES];
+    
+    for(NSWindow* win in [NSApp windows]) { // Unminiturize any windows
+        if([win isMiniaturized]) {
+            [win deminiaturize:self];
+        }
+    }
+
+    DocumentController* dc = NSDocumentController.sharedDocumentController;
+    [dc performEmptyLaunchTasksIfNecessary];
 }
 
 - (void)performMigrations {
@@ -203,6 +227,8 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
+//    NSLog(@"Activated!");
+
     if(self.autoLockWorkBlock) {
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
@@ -210,28 +236,27 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 //    ViewController* viewController = [self getActiveViewController];
 //    if(viewController) { // && !BiometricIdHelper.sharedInstance.biometricsInProgress) {
-//        NSLog(@"Activated!");
 ////        [viewController autoPromptForTouchIdIfDesired];
 //    }
 }
 
-//- (ViewController*)getActiveViewController {
-//    if(NSApplication.sharedApplication.keyWindow) {
-//        NSWindow *window = NSApplication.sharedApplication.keyWindow;
-//        NSDocument* doc = [NSDocumentController.sharedDocumentController documentForWindow:window];
-//        
-//        if(doc && doc.windowControllers.count) {
-//            NSWindowController* windowController = [doc.windowControllers firstObject];
-//            NSViewController* vc = windowController.contentViewController;
-//            
-//            if(vc && [vc isKindOfClass:ViewController.class]) {
-//                return (ViewController*)vc;
-//            }
-//        }
-//    }
-//    
-//    return nil;
-//}
+- (ViewController*)getActiveViewController {
+    if(NSApplication.sharedApplication.keyWindow) {
+        NSWindow *window = NSApplication.sharedApplication.keyWindow;
+        NSDocument* doc = [NSDocumentController.sharedDocumentController documentForWindow:window];
+        
+        if(doc && doc.windowControllers.count) {
+            NSWindowController* windowController = [doc.windowControllers firstObject];
+            NSViewController* vc = windowController.contentViewController;
+            
+            if(vc && [vc isKindOfClass:ViewController.class]) {
+                return (ViewController*)vc;
+            }
+        }
+    }
+    
+    return nil;
+}
 
 - (void)applicationDidResignActive:(NSNotification *)notification {
     NSInteger timeout = [[Settings sharedInstance] autoLockTimeoutSeconds];

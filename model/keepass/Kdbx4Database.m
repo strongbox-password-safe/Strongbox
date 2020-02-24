@@ -25,10 +25,6 @@ static const BOOL kLogVerbose = NO;
 
 @implementation Kdbx4Database
 
-+ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError **)error {
-    return [Kdbx4Serialization getYubikeyChallenge:candidate error:error];
-}
-
 + (NSString *)fileExtension {
     return @"kdbx";
 }
@@ -45,7 +41,7 @@ static const BOOL kLogVerbose = NO;
     return keePass2SignatureAndVersionMatch(candidate, kKdbx4MajorVersionNumber, kKdbx4MinorVersionNumber, error);
 }
 
-- (StrongboxDatabase *)create:(CompositeKeyFactors *)compositeKeyFactors {
+- (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
     Node* rootGroup = [[Node alloc] initAsRoot:nil];
     
     NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
@@ -57,35 +53,35 @@ static const BOOL kLogVerbose = NO;
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
     
-    return [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:compositeKeyFactors];
+    return [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
 }
 
-- (StrongboxDatabase *)open:(NSData *)data compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors error:(NSError **)error {
-    Kdbx4SerializationData *serializationData = [Kdbx4Serialization deserialize:data compositeKey:compositeKeyFactors ppError:error];
-    
-    if(serializationData == nil) {
-        NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", *error);
-        return nil;
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+    [Kdbx4Serialization deserialize:data
+                compositeKeyFactors:ckf
+                         completion:^(BOOL userCancelled, Kdbx4SerializationData* serializationData, NSError* error) {
+    if(userCancelled || serializationData == nil || serializationData.rootXmlObject == nil || error) {
+        if(error) {
+            NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", error);
+        }
+        completion(userCancelled, nil, error);
+        return;
     }
-    
-    RootXmlDomainObject* xmlObject = serializationData.rootXmlObject;
-    if(xmlObject == nil) {
-        NSLog(@"Error in parseKeePassXml: [%@]", *error);
-        return nil;
-    }
-    
-    // 3. Convert the Xml Model to the Strongbox Model
+            
+    // Convert the Xml Model to the Strongbox Model
     
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(xmlObject);
-    Node* rootGroup = [adaptor toModel:rootXmlGroup error:error];
+    KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(serializationData.rootXmlObject);
     
+    NSError* err;
+    Node* rootGroup = [adaptor toModel:rootXmlGroup error:&err];
     if(rootGroup == nil) {
-        NSLog(@"Error converting Xml model to Strongbox model: [%@]", *error);
-        return nil;
+        NSLog(@"Error converting Xml model to Strongbox model: [%@]", err);
+        completion(NO, nil, err);
+        return;
     }
     
-    Meta* xmlMeta = xmlObject.keePassFile ? xmlObject.keePassFile.meta : nil;
+    Meta* xmlMeta = serializationData.rootXmlObject.keePassFile ? serializationData.rootXmlObject.keePassFile.meta : nil;
     NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
     
     // Metadata
@@ -114,10 +110,10 @@ static const BOOL kLogVerbose = NO;
     metadata.version = serializationData.fileVersion;
     
     StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
-                                                                 metadata:metadata
-                                                      compositeKeyFactors:compositeKeyFactors
-                                                              attachments:serializationData.attachments
-                                                              customIcons:customIcons];
+                                                                    metadata:metadata
+                                                        compositeKeyFactors:ckf
+                                                                attachments:serializationData.attachments
+                                                                customIcons:customIcons];
 
     KeePass2TagPackage* tag = [[KeePass2TagPackage alloc] init];
     tag.unknownHeaders = serializationData.extraUnknownHeaders;
@@ -125,46 +121,46 @@ static const BOOL kLogVerbose = NO;
     
     ret.adaptorTag = tag;
     
-    return ret;
+    completion(NO, ret, nil);
+}];
 }
 
-- (NSData *)save:(StrongboxDatabase *)database error:(NSError **)error {
-    if(!database.compositeKeyFactors.password && !database.compositeKeyFactors.keyFileDigest) {
-        if(error) {
-            *error = [Utils createNSError:@"Master Password not set." errorCode:-3];
-        }
-        
-        return nil;
+- (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
+    if(!database.compositeKeyFactors.password &&
+       !database.compositeKeyFactors.keyFileDigest &&
+       !database.compositeKeyFactors.yubiKeyCR) {
+        NSError *error = [Utils createNSError:@"A least one composite key factor is required to encrypt database." errorCode:-3];
+        completion(NO, nil, error);
+        return;
     }
 
     KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
     Meta* originalMeta = tag ? tag.originalMeta : nil;
     
-    // 1. From Strongbox to Xml Model
+    // From Strongbox to Xml Model
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
+    
+    NSError* error;
     RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
                                                                         customIcons:database.customIcons
                                                                        originalMeta:originalMeta
                                                                             context:[XmlProcessingContext standardV4Context]
-                                                                              error:error];
+                                                                              error:&error];
     
     if(!rootXmlDocument) {
         NSLog(@"Could not convert Database to Xml Model.");
-        if(error) {
-            *error = [Utils createNSError:@"Could not convert Database to Xml Model." errorCode:-4];
-        }
-        
-        return nil;
+        error = [Utils createNSError:@"Could not convert Database to Xml Model." errorCode:-4];
+        completion(NO, nil, error);
+        return;
     }
     
-    // 3. Metadata
+    // Metadata
     
     rootXmlDocument.keePassFile.meta.headerHash = nil; // Do not serialize this, we do not calculate it
-    
     KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)database.metadata;
     
-    // 4. Write Back any changed Metadata
+    // Write Back any changed Metadata
     
     rootXmlDocument.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
     rootXmlDocument.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
@@ -172,7 +168,7 @@ static const BOOL kLogVerbose = NO;
     rootXmlDocument.keePassFile.meta.historyMaxItems = metadata.historyMaxItems;
     rootXmlDocument.keePassFile.meta.historyMaxSize = metadata.historyMaxSize;
     
-    // 5. From Xml Model to Xml String (including inner stream encryption)
+    // From Xml Model to Xml String (including inner stream encryption)
     
     id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
                                                                                     key:nil // Auto generated new key
@@ -185,19 +181,16 @@ static const BOOL kLogVerbose = NO;
     NSString *xml = xmlSerializer.xml;
     if(!xml || !writeXmlOk) {
         NSLog(@"Could not serialize Xml to Document.:\n%@", xml);
-        
-        if(error) {
-            *error = [Utils createNSError:@"Could not serialize Xml to Document." errorCode:-5];
-        }
-        
-        return nil;
+        error = [Utils createNSError:@"Could not serialize Xml to Document." errorCode:-5];
+        completion(NO, nil, error);
+        return;
     }
     
     if(kLogVerbose) {
         NSLog(@"Serializing XML Document:\n%@", xml);
     }
     
-    // 3. KDBX serialize this Xml Document...
+    // KDBX serialize this Xml Document...
 
     NSDictionary* unknownHeaders = tag ? tag.unknownHeaders : @{ };
     
@@ -212,19 +205,21 @@ static const BOOL kLogVerbose = NO;
     serializationData.cipherUuid = metadata.cipherUuid;
     serializationData.attachments = database.attachments;
     
-    NSData *data = [Kdbx4Serialization serialize:serializationData xml:xml compositeKey:database.compositeKeyFactors ppError:error];
-    
-    if(!data) {
-        NSLog(@"Could not serialize Document to KDBX.");
-
-        if(error) {
-            *error = [Utils createNSError:@"Could not serialize Document to KDBX." errorCode:-6];
+    [Kdbx4Serialization serialize:serializationData
+                              xml:xml
+                              ckf:database.compositeKeyFactors
+                       completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if (userCancelled) {
+            completion(userCancelled, nil, nil);
         }
-
-        return nil;
-    }
-
-    return data;
+        else if (!data || error) {
+            NSLog(@"Could not serialize Document to KDBX.");
+            completion(NO, nil, error);
+        }
+        else {
+            completion(NO, data, nil);
+        }
+    }];
 }
 
 static KeePassGroup *getExistingRootKeePassGroup(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {

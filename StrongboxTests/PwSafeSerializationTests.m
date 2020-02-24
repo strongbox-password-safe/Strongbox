@@ -20,19 +20,17 @@
     NSString *path = [bundle pathForResource:@"simple-unit-test-strongbox" ofType:@"dat"];
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
-    NSError *error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
-
-    StrongboxDatabase *db = [adaptor open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
-
-    if(!db) {
-        NSLog(@"ERROR: %@", error);
-        return;
-    }
-    
-    XCTAssertNotNil(db);
-    
-    NSLog(@"%@", db);
+    [adaptor open:safeData ckf:[CompositeKeyFactors password:@"a"]  completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        if(!db) {
+            NSLog(@"ERROR: %@", error);
+            return;
+        }
+        
+        XCTAssertNotNil(db);
+        
+        NSLog(@"%@", db);
+    }];
 }
 
 - (void)testLargeMemoryConsumption {
@@ -40,18 +38,18 @@
     NSString *path = [bundle pathForResource:@"pwsafe-mem-consumption" ofType:@"psafe3"];
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
-    NSError *error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"M1cr0s0ft"] error:&error];
     
-    if(!db) {
-        NSLog(@"ERROR: %@", error);
-        return;
-    }
-    
-    XCTAssertNotNil(db);
-    
-    NSLog(@"%@", db); // [db getDiagnosticDumpString:YES]);
+    [adaptor open:safeData ckf:[CompositeKeyFactors password:@"M1cr0s0ft"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        if(!db) {
+            NSLog(@"ERROR: %@", error);
+            return;
+        }
+        
+        XCTAssertNotNil(db);
+        
+        NSLog(@"%@", db); // [db getDiagnosticDumpString:YES]);
+    }];
 }
 
 @end

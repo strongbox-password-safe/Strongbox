@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4DC4E17023488BAE000743C4"
-               BuildableName = "Strongbox Auto Fill Family.appex"
-               BlueprintName = "Strongbox Auto Fill Family"
+               BuildableName = "Strongbox-Auto-Fill-Family.appex"
+               BlueprintName = "Strongbox-Auto-Fill-Family"
                ReferencedContainer = "container:Strongbox.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -54,8 +54,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DC4E17023488BAE000743C4"
-            BuildableName = "Strongbox Auto Fill Family.appex"
-            BlueprintName = "Strongbox Auto Fill Family"
+            BuildableName = "Strongbox-Auto-Fill-Family.appex"
+            BlueprintName = "Strongbox-Auto-Fill-Family"
             ReferencedContainer = "container:Strongbox.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

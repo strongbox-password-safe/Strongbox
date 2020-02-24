@@ -44,7 +44,7 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
 
-- (NSData*_Nullable)getPasswordDatabaseAsData:(NSError**)error;
+- (void)getPasswordDatabaseAsData:(SaveCompletionBlock)completion;
 
 - (BOOL)setItemTitle:(Node* )item title:(NSString* )title;
 - (void)setItemUsername:(Node*)item username:(NSString*)username;

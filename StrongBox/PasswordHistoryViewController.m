@@ -70,14 +70,20 @@
 }
 
 - (void)save {
-    self.saveFunction(self.model, ^(NSError *error) {
-        if (error) {
+    self.saveFunction(self.model, ^(BOOL userCancelled, NSError *error) {
+        if (userCancelled) {
+            [self dismissViewControllerAnimated:YES completion:nil];
+        }
+        else if (error) {
             [Alerts error:self
                     title:NSLocalizedString(@"pw_history_vc_error_problem_saving", @"Problem Saving Database")
                     error:error];
+            
+            [self dismissViewControllerAnimated:YES completion:nil];
         }
-        
-        [self bindToModel];
+        else {
+            [self bindToModel];
+        }
     });
 }
 

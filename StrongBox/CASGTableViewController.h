@@ -10,6 +10,7 @@
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "StaticDataTableViewController.h"
 #import "CASGParams.h"
+#import "YubiKeyHardwareConfiguration.h"
 
 typedef NS_ENUM (unsigned int, CASGMode) {
     kCASGModeCreate ,
@@ -30,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSDate* offlineCacheDate;
 @property BOOL initialOfflineCache;
 @property BOOL initialReadOnly;
+@property YubiKeyHardwareConfiguration* initialYubiKeyConfig;
 
 @property BOOL autoDetectedKeyFileUrl;
 @property NSString* initialName;

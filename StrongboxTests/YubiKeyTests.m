@@ -16,7 +16,7 @@
 @implementation YubiKeyTests
 
 - (void)testExample {
-    [YubiManager.sharedInstance doIt];
+//    [YubiManager.sharedInstance doIt];
 }
 
 @end

@@ -100,6 +100,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL doNotRememberKeyFile;
 @property BOOL allowEmptyOrNoPasswordEntry;
 
+@property BOOL hasDoneProFamilyCheck;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

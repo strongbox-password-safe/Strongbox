@@ -14,6 +14,7 @@
 #import "BrowseTapAction.h"
 #import "BrowseSortField.h"
 #import "BrowseItemSubtitleField.h"
+#import "YubiKeyHardwareConfiguration.h"
 
 @interface SafeMetaData : NSObject
 
@@ -92,7 +93,7 @@
 @property BOOL showPasswordByDefaultOnEditScreen;
 @property BOOL alwaysUseCacheForAutoFill; // Some users want this...
 
-/////
+///
 
 @property NSNumber *autoLockTimeoutSeconds;
 
@@ -107,6 +108,8 @@
 @property BOOL makeBackups;
 
 @property BOOL hideTotpCustomFieldsInViewMode;
+
+@property YubiKeyHardwareConfiguration* yubiKeyConfig;
 
 @end
 

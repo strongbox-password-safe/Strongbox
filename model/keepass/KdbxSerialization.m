@@ -55,23 +55,6 @@ static BOOL kLogVerbose = NO;
 
 @implementation KdbxSerialization
 
-+ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError * _Nullable __autoreleasing *)error {
-    size_t offset;
-    NSDictionary *headerEntries = getHeaderEntries3((uint8_t*)candidate.bytes, candidate.length, &offset);
-    if(!headerEntries) {
-        NSLog(@"Error getting header entries. Possibly missing header entry.");
-        
-        if (error != nil) {
-            *error = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-3];
-        }
-        return nil;
-    }
-    
-    DecryptionParameters * decryptionParameters = getDecryptionParameters(headerEntries);
-    
-    return decryptionParameters.masterSeed;
-}
-
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
     return keePass2SignatureAndVersionMatch(candidate, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber, error);
 }
@@ -86,9 +69,7 @@ static BOOL kLogVerbose = NO;
     return self;
 }
 
-- (NSString *)stage1Serialize:(CompositeKeyFactors *)compositeKeyFactors error:(NSError * _Nullable __autoreleasing *)error {
-    // 1. File Header
-    
+- (void)stage1Serialize:(CompositeKeyFactors *)compositeKeyFactors completion:(SerializeCompletionBlock)completion {
     KeepassFileHeader header = getNewFileHeader(self.serializationData.fileVersion);
     [self.headerData appendBytes:&header length:SIZE_OF_KEEPASS_HEADER];
     
@@ -98,17 +79,36 @@ static BOOL kLogVerbose = NO;
     NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);
     NSData* transformKey = getAesTransformKey(compositeKey, transformSeed, self.serializationData.transformRounds);
     NSData* masterSeed = getRandomData(kMasterSeedLength);
-    self.masterKey = getMaster(masterSeed, transformKey, compositeKeyFactors.yubiKeyResponse);
     
+    if(compositeKeyFactors.yubiKeyCR) {
+        NSData* challenge = masterSeed;
+        compositeKeyFactors.yubiKeyCR(challenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {
+            if(userCancelled || !response || error) {
+                completion(userCancelled, nil, error);
+            }
+            else {
+                self.masterKey = getMaster(masterSeed, transformKey, response);
+                [self stage1point5Serialize:compositeKey transformSeed:transformSeed masterSeed:masterSeed completion:completion];
+            }
+        });
+    }
+    else {
+        self.masterKey = getMaster(masterSeed, transformKey, nil);
+        [self stage1point5Serialize:compositeKey transformSeed:transformSeed masterSeed:masterSeed completion:completion];
+    }
+}
+
+- (void)stage1point5Serialize:(NSData*)compositeKey
+                transformSeed:(NSData*)transformSeed
+                   masterSeed:(NSData*)masterSeed
+                   completion:(SerializeCompletionBlock)completion {
     id<Cipher> cipher = getCipher(self.serializationData.cipherId);
     if(!cipher) {
         NSString *message=[NSString stringWithFormat:@"Unknown Cipher ID: [%@]. Do not know how to decrypt.", [self.serializationData.cipherId UUIDString]];
         
-        if (error) {
-            *error = [Utils createNSError:message errorCode:-5];
-        }
-        
-        return nil;
+        NSError *error = [Utils createNSError:message errorCode:-5];
+        completion(NO, nil, error);
+        return;
     }
 
     self.encryptionIv = [cipher generateIv];
@@ -144,7 +144,9 @@ static BOOL kLogVerbose = NO;
     NSMutableData* hashData = [[NSMutableData alloc] initWithLength:CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(self.headerData.bytes, (int)self.headerData.length, hashData.mutableBytes);
     
-    return [hashData base64EncodedStringWithOptions:kNilOptions];
+    NSString* ret = [hashData base64EncodedStringWithOptions:kNilOptions];
+    
+    completion(NO, ret, nil);
 }
 
 - (NSData *)stage2Serialize:(NSString *)xml error:(NSError **)error {
@@ -181,18 +183,16 @@ static BOOL kLogVerbose = NO;
     return ret;
 }
 
-+ (SerializationData *)deserialize:(NSData *)safeData
-               compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
-                           ppError:(NSError * _Nullable __autoreleasing *)ppError {
++ (void)deserialize:(NSData *)safeData
+compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+         completion:(DeserializeCompletionBlock)completion {
     size_t offset;
-    NSDictionary *headerEntries = getHeaderEntries3((uint8_t*)safeData.bytes, safeData.length, &offset);
+    NSDictionary<NSNumber *,NSObject *> *headerEntries = getHeaderEntries3((uint8_t*)safeData.bytes, safeData.length, &offset);
     if(!headerEntries) {
         NSLog(@"Error getting header entries. Possibly missing header entry.");
-        
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-3];
-        }
-        return nil;
+        NSError *error = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-3];
+        completion(NO, nil, error);
+        return;
     }
     
     DecryptionParameters * decryptionParameters = getDecryptionParameters(headerEntries);
@@ -202,8 +202,31 @@ static BOOL kLogVerbose = NO;
     
     NSData* compositeKey = getCompositeKey(compositeKeyFactors);
     NSData* transformKey = getAesTransformKey(compositeKey, decryptionParameters.transformSeed, decryptionParameters.transformRounds);
-    NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, compositeKeyFactors.yubiKeyResponse);
     
+    if (compositeKeyFactors.yubiKeyCR) {
+        NSData* challenge = decryptionParameters.masterSeed;
+        compositeKeyFactors.yubiKeyCR(challenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {
+            if(userCancelled || error != nil) {
+                completion(userCancelled, nil, error);
+            }
+            else {
+                NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, response);
+                [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey completion:completion];
+            }
+        });
+    }
+    else {
+        NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, nil);
+        [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey completion:completion];
+    }
+}
+
++ (void)deserializeStage2:(NSData *)safeData
+                   offset:(size_t)offset
+            headerEntries:(NSDictionary<NSNumber *,NSObject *> *)headerEntries
+     decryptionParameters:(DecryptionParameters*)decryptionParameters
+                masterKey:(NSData*)masterKey
+               completion:(DeserializeCompletionBlock)completion {
     // Hash Header for corruption check
     
     NSMutableData* headerHash = [[NSMutableData alloc] initWithLength:CC_SHA256_DIGEST_LENGTH];
@@ -221,32 +244,25 @@ static BOOL kLogVerbose = NO;
     
     if(!cipher) {
         NSString *message=[NSString stringWithFormat:@"Unknown Cipher ID: [%@]. Do not know how to decrypt.", [decryptionParameters.cipherId UUIDString]];
-        
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:message errorCode:-5];
-        }
-        
-        return nil;
+        NSError *error = [Utils createNSError:message errorCode:-5];
+        completion(NO, nil, error);
+        return;
     }
     
     NSData *decrypted = [cipher decrypt:dataIn iv:decryptionParameters.encryptionIv key:masterKey];
     if(decrypted == nil) {
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Could not decrypt using provided parameters" errorCode:-1];
-        }
-        
-        return nil;
+        NSError *error = [Utils createNSError:@"Could not decrypt using provided parameters" errorCode:-1];
+        completion(NO, nil, error);
+        return;
     }
 
     // Verify Start Stream - This checks the correct passphrase/keyfile has been used (or we've done something very wrong in the decryption process :/)
     
     NSData *actualStartStream = [decrypted subdataWithRange:NSMakeRange(0, decryptionParameters.streamStartBytes.length)];
     if(![decryptionParameters.streamStartBytes isEqualToData:actualStartStream]) {
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
-        }
-        
-        return nil;
+        NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
+        completion(NO, nil, error);
+        return;
     }
     
     // Deblockify
@@ -254,23 +270,23 @@ static BOOL kLogVerbose = NO;
     NSData* deblockified = deblockify((uint8_t*)&decrypted.bytes[decryptionParameters.streamStartBytes.length]);
     
     if(!deblockified) {
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Could not find next block in unordered blocks list. Cannot deblockify" errorCode:-6];
-        }
-        
-        return nil;
+        NSError *error = [Utils createNSError:@"Could not find next block in unordered blocks list. Cannot deblockify" errorCode:-6];
+        completion(NO, nil, error);
+        return;
     }
     
     BOOL compressed = decryptionParameters.compressionFlags == kGzipCompressionFlag;
+    NSError* error;
     RootXmlDomainObject *rootXmlObject = [KdbxSerialization readXml:compressed
                                                              source:deblockified
                                                 innerRandomStreamId:decryptionParameters.innerRandomStreamId
                                                  protectedStreamKey:decryptionParameters.protectedStreamKey
-                                                              error:ppError];
+                                                              error:&error];
 
     if(rootXmlObject == nil) {
-        NSLog(@"Could not parse XML: [%@]", *ppError);
-        return nil;
+        NSLog(@"Could not parse XML: [%@]", error);
+        completion(NO, nil, error);
+        return;
     }
     
     SerializationData* ret = [[SerializationData alloc] init];
@@ -286,7 +302,7 @@ static BOOL kLogVerbose = NO;
     ret.rootXmlObject = rootXmlObject;
     ret.cipherId = decryptionParameters.cipherId;
     
-    return ret;
+    completion(NO, ret, nil);
 }
 
 + (RootXmlDomainObject*)readXml:(BOOL)compressed

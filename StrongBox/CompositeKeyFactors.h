@@ -10,24 +10,26 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-//typedef void (^YubiKeyCRResponseBlock)(NSData* response);
-//typedef void (^YubiKeyCRHandlerBlock)(NSData* challenge, YubiKeyCRResponseBlock completion);
+typedef void (^YubiKeyCRResponseBlock)(BOOL userCancelled, NSData*_Nullable response, NSError*_Nullable error);
+typedef void (^YubiKeyCRHandlerBlock)(NSData* challenge, YubiKeyCRResponseBlock completion);
 
 @interface CompositeKeyFactors : NSObject
 
 + (instancetype)password:(NSString*_Nullable)password;
 + (instancetype)password:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest;
-+ (instancetype)password:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest yubiKeyResponse:(NSData* _Nullable)yubiKeyResponse;
++ (instancetype)password:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest yubiKeyCR:(YubiKeyCRHandlerBlock _Nullable)yubiKeyCR;
 
 - (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initWithPassword:(NSString*_Nullable)password;
 - (instancetype)initWithPassword:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest;
-- (instancetype)initWithPassword:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest yubiKeyResponse:(NSData* _Nullable)yubiKeyResponse NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPassword:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest yubiKeyCR:(YubiKeyCRHandlerBlock _Nullable)yubiKeyCR NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)clone;
 
 @property (nullable, nonatomic) NSString* password;
 @property (nullable, nonatomic) NSData* keyFileDigest;
-@property (nullable, nonatomic) NSData* yubiKeyResponse; // Actually used to unlock / decrypt
+@property (nullable, copy) YubiKeyCRHandlerBlock yubiKeyCR;
 
 @end
 

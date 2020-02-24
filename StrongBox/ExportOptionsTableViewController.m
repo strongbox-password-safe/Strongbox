@@ -114,8 +114,11 @@
 
 - (void)exportEncryptedSafeByEmail {
     if(!self.backupMode) {
-        [self.viewModel encrypt:^(NSData * _Nullable safeData, NSError * _Nullable error) {
-            if(!safeData) {
+        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            if (userCancelled) {
+                return;
+            }
+            else if(!data) {
                 [Alerts error:self
                         title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
                         error:error];
@@ -126,7 +129,10 @@
             NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
             NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName, appendExtension];
             
-            [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:safeData nickname:self.viewModel.metadata.nickName];
+            [self composeEmail:attachmentName
+                      mimeType:@"application/octet-stream"
+                          data:data
+                      nickname:self.viewModel.metadata.nickName];
         }];
     }
     else {
@@ -184,15 +190,16 @@
         [self onFilesGotData:self.encrypted  metadata:self.metadata];
     }
     else {
-        [self.viewModel encrypt:^(NSData * _Nullable data, NSError * _Nullable err) {
-            if(!data) {
+        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            if (userCancelled) { }
+            else if (!data) {
                 [Alerts error:self
                         title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
-                        error:err];
-                return;
+                        error:error];
             }
-            
-            [self onFilesGotData:data metadata:self.viewModel.metadata];
+            else {
+                [self onFilesGotData:data metadata:self.viewModel.metadata];
+            }
         }];
     }
 }

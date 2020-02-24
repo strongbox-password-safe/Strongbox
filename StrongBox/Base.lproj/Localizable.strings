@@ -594,8 +594,8 @@
 /* Username Copied */
 "item_details_username_copied" = "Username Copied";
 
-/* Item History */
-"item_details_item_history" = "Item History";
+/* Entry History */
+"item_details_item_history" = "Entry History";
 
 /* New Custom Field... */
 "item_details_new_custom_field_button" = "New Custom Field...";
@@ -699,8 +699,8 @@
 /* Auto Lock Database Delay */
 "prefs_vc_auto_lock_database_delay" = "Auto Lock Database Delay";
 
-/* This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure? */
-"prefs_vc_clear_biometrics_yesno_message" = "This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure?";
+/* This will clear all securely stored master passwords (for all databases) used by biometric unlock. Are you sure? */
+"prefs_vc_clear_biometrics_yesno_message" = "This will clear all securely stored master passwords (for all databases) used by biometric unlock. Are you sure?";
 
 /* Clear Biometrics */
 "prefs_vc_clear_biometrics_yesno_title" = "Clear Biometrics";
@@ -708,8 +708,8 @@
 /* Clear Clipboard Delay */
 "prefs_vc_clear_clipboard_delay" = "Clear Clipboard Delay";
 
-/* This will clear any existing databases with stored Master Credentials that are backed by PIN Codes */
-"prefs_vc_clear_pin_codes_yesno_message" = "This will clear any existing databases with stored Master Credentials that are backed by PIN Codes";
+/* This will clear all securely stored master passwords (for all databases) used for PIN Code unlock. Are you sure? */
+"prefs_vc_clear_pin_codes_yesno_message" = "This will clear all securely stored master passwords (for all databases) used for PIN Code unlock. Are you sure?";
 
 /* Clear PIN Codes */
 "prefs_vc_clear_pin_codes_yesno_title" = "Clear PIN Codes";
@@ -1067,8 +1067,8 @@
    There was an error reading the Key File */
 "key_files_vc_error_reading" = "Error Reading";
 
-/* There was an importing the Key File (does it already exist?) */
-"key_files_vc_error_importing" = "There was an importing the Key File (does it already exist?)";
+/* There was an error importing the Key File (does it already exist?) */
+"key_files_vc_error_importing" = "There was an error importing the Key File (does it already exist?)";
 
 /* File Already Exists */
 "key_files_vc_error_file_already_exists_title" = "File Already Exists";
@@ -1086,7 +1086,7 @@
 "key_files_vc_remove_after_import_title" = "Remove After Import";
 
 /* Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing? */
-"key_files_vc_remove_after_import_message" = "Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing?";
+"key_files_vc_remove_after_import_message" = "Do you want to remove the key file from the local Documents folder after import? This will mean it is not visible in iOS Files or accessible via iTunes File Sharing.";
 
 /* Yes, Remove Local Copy */
 "key_files_vc_remove_after_import_option_yes" = "Yes, Remove Local Copy";
@@ -1432,7 +1432,7 @@
 "key_files_vc_no_key_file" = "No Key File";
 
 /* The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled. */
-"open_sequence_problem_opening_convenience_incorrect_message" = "The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled.";
+"open_sequence_problem_opening_convenience_incorrect_message" = "The stored convenience password or other composite key factors (key file/Yubikey) were incorrect for this database. Convenience Unlock has been Disabled.";
 
 /* Incorrect Credentials */
 "open_sequence_problem_opening_incorrect_credentials_title" = "Incorrect Credentials";
@@ -1899,16 +1899,16 @@
 /* Message to display when device is offline and has no IP address in Local HTTP Transfer - Select Storage -> Transfer over Local Network */
 "transfer_local_network_network_unavailable_message" = "It seem's like you're offline?";
 
-/* Title of info dialog about Family Sharing upgrade */
-"upgrade_family_sharing_info_title" = "Family Sharing";
+/* Title of info dialog about Apple Family Sharing upgrade */
+"upgrade_family_sharing_info_title" = "Apple Family Sharing";
 
-/* A message about how you will need to download/purchase a separate App for Family Sharing to work */
-"upgrade_family_sharing_info_message" = "To benefit from Family Sharing you need to have 'Apple Family Sharing' setup for your family. Then you should purchase the separate Family Sharing Edition of Strongbox.\nTap OK to view this edition on the App Store";
+/* A message about how you will need to download/purchase a separate App for Apple Family Sharing to work */
+"upgrade_family_sharing_info_message" = "To benefit from Apple Family Sharing you need to have 'Apple Family Sharing' setup for your family. Then you should purchase the separate Family Sharing Edition of Strongbox.\nTap OK to view this edition on the App Store";
 
-/* Need Family Sharing? */
-"upgrade_family_sharing_button_title" = "Need Family Sharing?";
+/* Need Apple Family Sharing? */
+"upgrade_family_sharing_button_title" = "Need Apple Family Sharing?";
 
-/* Need Family Sharing? */
+/* Need Apple Family Sharing? */
 "upgrade_family_sharing_button_subtitle" = "Tap for more info...";
 
 /* Select your preferred generated field title. */
@@ -2820,3 +2820,34 @@
 
 /* Touch ID/Watch Unlock (Pro Only) */
 "mac_unlock_screen_button_title_convenience_unlock_pro_only" = "Touch ID/Watch Unlock (Pro Only)";
+
+/* Configure... */
+"casg_yubikey_configure_action" = "Configure...";
+
+/* NFC */
+"casg_yubikey_configured_nfc" = "NFC";
+
+/* Slot 1 */
+"casg_yubikey_configured_slot1" = "Slot 1";
+
+/* Slot 2 */
+"casg_yubikey_configured_slot2" = "Slot 2";
+
+/* YubiKey Unlock is not supported in Auto Fill mode */
+"open_sequence_cannot_use_yubikey_in_autofill_mode" = "YubiKey Unlock is not supported in Auto Fill mode";
+
+/* YubiKey Unlock is only available in the Pro edition of Strongbox */
+"open_sequence_yubikey_only_available_in_pro" = "YubiKey Unlock is only available in the Pro edition of Strongbox";
+
+/* NFC Yubikey (Pro Edition Only) */
+"yubikey_config_section_header_nfc_pro_only" = "NFC Yubikey (Pro Edition Only)";
+
+/* NFC (Pro Edition Only) */
+"casg_yubikey_configured_nfc_disabled_pro_only" = "NFC Disabled (Pro Edition Only)";
+
+/* Yubikey (Pro Edition Only) */
+"casg_section_header_yubikey_pro_only" = "Yubikey (Pro Edition Only)";
+
+/* Unknown (Translators Note: Used when generally when something can't be determined, e.g. The URL or file name of a database, or the type of storage provider used, or the format of a newly opened database etc.)*/
+"generic_unknown" = "Unknown";
+

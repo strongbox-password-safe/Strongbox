@@ -25,43 +25,46 @@
 
         NSData *blob = [CommonTesting getDataFromBundleFile:file ofType:@"kdbx"];
         
-        NSError* error;
         NSString* password = [CommonTesting.testKdbxFilesAndPasswords objectForKey:file];
         
         id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-        StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
-        XCTAssertNotNil(db);
+        
+        [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+            XCTAssertNotNil(database);
 
-        NSLog(@"%@", db);
-        NSLog(@"=============================================================================================================");
+            NSLog(@"%@", database);
+            NSLog(@"=============================================================================================================");
+        }];
     }
 }
 
 - (void)testInitExistingWithATestFile {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"a" ofType:@"kdbx"];
-    NSError* error;
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
-    XCTAssertNotNil(db);
-    
-    NSLog(@"%@", db);
+    [adaptor open:blob
+              ckf:[CompositeKeyFactors password:@"a"]
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNotNil(db);
+        
+        NSLog(@"%@", db);
 
-    XCTAssert(db.rootGroup.childGroups.count == 1);
-    XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:@"General"]);
-    XCTAssert([[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:5].title isEqualToString:@"New Group"]);
-    XCTAssert([[[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:5].childRecords objectAtIndex:0].fields.password isEqualToString:@"ladder"]);
+        XCTAssert(db.rootGroup.childGroups.count == 1);
+        XCTAssert([[db.rootGroup.childGroups objectAtIndex:0].title isEqualToString:@"General"]);
+        XCTAssert([[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:5].title isEqualToString:@"New Group"]);
+        XCTAssert([[[[db.rootGroup.childGroups objectAtIndex:0].childGroups objectAtIndex:5].childRecords objectAtIndex:0].fields.password isEqualToString:@"ladder"]);
+    }];
 }
 
 - (void)testInitExistingWithCustomAndBinariesFile {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database" ofType:@"kdbx"];
-    NSError* error;
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
-    XCTAssertNotNil(db);
+    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        XCTAssertNotNil(database);
+    }];
 }
 
 - (void)testInitExistingWithGoogleDriveSafe {
@@ -71,11 +74,11 @@
     XCTAssertNotNil(safeData);
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:safeData compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
-    NSLog(@"%@", db);
-    
-    XCTAssertNotNil(db);
+    [adaptor open:safeData ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        NSLog(@"%@", database);
+        XCTAssertNotNil(database);
+    }];
 }
 
 - (void)testInitNew {
@@ -101,63 +104,66 @@
     XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
     XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
 
-    NSError* error;
-    NSData* data = [adaptor save:db error:&error];
+    [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if(error) {
+           NSLog(@"%@", error);
+        }
 
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
- 
-    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNotNil(b);
- 
-    NSLog(@"%@", b);
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
 
-    metadata = b.metadata;
-    XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
+        [adaptor open:data
+                  ckf:[CompositeKeyFactors password:@"password"]
+           completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+            if(error) {
+               NSLog(@"%@", error);
+            }
+
+            XCTAssertNotNil(database);
+
+            NSLog(@"%@", database);
+
+            KeePassDatabaseMetadata *metadata = database.metadata;
+            XCTAssert([[database.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
+            XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+            XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
+        }];
+    }];
 }
 
 - (void)testChaCha20OuterEnc {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database-ChCha20-AesKdf" ofType:@"kdbx"];
     
-    NSError* error;
     NSString* password = [CommonTesting.testKdbxFilesAndPasswords objectForKey:@"Database-ChCha20-AesKdf"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
     
-    XCTAssertNotNil(db);
+    [adaptor open:blob
+              ckf:[CompositeKeyFactors password:password]
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNotNil(db);
 
-    NSLog(@"================================================ Serializing =======================================================================");
+        NSLog(@"================================================ Serializing =======================================================================");
 
-    NSData* data = [adaptor save:db error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
+        [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            if(error) {
+                NSLog(@"%@", error);
+            }
+            
+            XCTAssertNil(error);
+            XCTAssertNotNil(data);
 
-    NSLog(@"================================================ Deserializing =======================================================================");
+            NSLog(@"================================================ Deserializing =======================================================================");
 
-    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
+            [adaptor open:data ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+                if(error) {
+                    NSLog(@"%@", error);
+                }
 
-    XCTAssertNotNil(b);
+                XCTAssertNotNil(b);
+            }];
+        }];
+    }];
 }
 
 - (void)testOpenSaveOpenWithAllKdbxTestFiles {
@@ -167,35 +173,33 @@
         
         NSData *blob = [CommonTesting getDataFromBundleFile:file ofType:@"kdbx"];
         
-        NSError* error;
         NSString* password = [CommonTesting.testKdbxFilesAndPasswords objectForKey:file];
         
         id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-        StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
         
-        XCTAssertNotNil(db);
-        
-        //NSLog(@"%@", db);
+        [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+            XCTAssertNotNil(db);
+            
+            //NSLog(@"%@", db);
         NSLog(@"=============================================================================================================");
-    
-        NSData* data = [adaptor save:db error:&error];
         
-        if(error) {
-            NSLog(@"%@", error);
-        }
-        
-        XCTAssertNil(error);
-        XCTAssertNotNil(data);
-        
-        StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:password] error:&error];
-        
-        if(error) {
-            NSLog(@"%@", error);
-        }
-        
-        XCTAssertNotNil(b);
-        
-        //NSLog(@"%@", b);
+            [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+                if(error) {
+                    NSLog(@"%@", error);
+                }
+                
+                XCTAssertNil(error);
+                XCTAssertNotNil(data);
+                
+                [adaptor open:data ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+                    if(error) {
+                        NSLog(@"%@", error);
+                    }
+                    
+                    XCTAssertNotNil(b);
+                }];
+            }];
+        }];
     }
 }
 
@@ -211,19 +215,18 @@
         [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode allowDuplicateGroupTitles:YES];
     }
     
-    NSError* error;
-    NSData* data = [adaptor save:db error:&error];
-    
-    if(error) {
+    [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if(error) {
+            NSLog(@"%@", error);
+        }
+
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+
+        //    [data writeToFile:@"/Users/mark/Desktop/large.kdbx" options:kNilOptions error:&error];
+
         NSLog(@"%@", error);
-    }
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-    
-//    [data writeToFile:@"/Users/mark/Desktop/large.kdbx" options:kNilOptions error:&error];
-    
-    NSLog(@"%@", error);
+    }];
 }
 
 - (void)testDbModifyWithEscapeCharacterGetAsDataAndReOpenSafeIsTheSame {
@@ -248,33 +251,32 @@
     
     [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode allowDuplicateGroupTitles:YES];
     
-    NSError* error;
-    NSData* data = [adaptor save:db error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-    
-    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNotNil(b);
-    
-    NSLog(@"%@", b);
+    [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if(error) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
 
-    
-    metadata = b.metadata;
-    XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
+        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"]
+           completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+            if(error) {
+                NSLog(@"%@", error);
+            }
+            
+            XCTAssertNotNil(b);
+            
+            NSLog(@"%@", b);
 
-    XCTAssertEqualObjects([[[b.rootGroup.childGroups objectAtIndex:0] childRecords] objectAtIndex:0].title, escape);
+            KeePassDatabaseMetadata* metadata = b.metadata;
+            XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
+            XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+            XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
+
+            XCTAssertEqualObjects([[[b.rootGroup.childGroups objectAtIndex:0] childRecords] objectAtIndex:0].title, escape);
+        }];
+    }];
 }
 
 - (void)testSmallNewDbWithPasswordGetAsDataAndReOpenSafeIsTheSame {
@@ -301,101 +303,102 @@
      
      //NSLog(@"BEFORE: %@", db);
     
-    NSError* error;
-    NSData* data = [adaptor save:db error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-    
-    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNotNil(b);
-    
-    //NSLog(@"AFTER: %@", b);
-    
-    XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
-    
-    metadata = b.metadata;
-    XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
-    XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
-    
-    Node* bKeePassRoot = b.rootGroup.childGroups[0];
-    Node* bRecord = bKeePassRoot.childRecords[0];
-    
-    XCTAssert([bRecord.title isEqualToString:@"Title"]);
-    XCTAssert(bRecord.fields.email.length == 0); // Email is ditched by KeePass
-    
-    XCTAssert([bRecord.fields.username isEqualToString:@"username"]);
-    XCTAssert([bRecord.fields.url isEqualToString:@"url"]);
-    XCTAssert([bRecord.fields.notes isEqualToString:@"notes"]);
-    XCTAssert([bRecord.fields.password isEqualToString:@"ladder"]);
-    
-    XCTAssert(bRecord.fields.attachments.count == 2);
-    
-    XCTAssert([bRecord.fields.attachments[0].filename isEqualToString:@"attachment1.txt"]);
-    XCTAssert([bRecord.fields.attachments[1].filename isEqualToString:@"attachment2.txt"]);
-    XCTAssert(bRecord.fields.attachments[0].index == 0);
-    XCTAssert(bRecord.fields.attachments[1].index == 1);
-    
-    XCTAssert(b.attachments.count == 2);
-    XCTAssert([b.attachments[0].data isEqualToData:data1]);
-    XCTAssert([b.attachments[1].data isEqualToData:data2]);
+    [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if(error) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+        
+        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+            if(error) {
+                NSLog(@"%@", error);
+            }
+            
+            XCTAssertNotNil(b);
+            
+            //NSLog(@"AFTER: %@", b);
+            
+            XCTAssert([[b.rootGroup.childGroups objectAtIndex:0].title isEqualToString:kDefaultRootGroupName]);
+            
+            KeePassDatabaseMetadata* metadata = b.metadata;
+            XCTAssert([metadata.generator isEqualToString:@"Strongbox"]);
+            XCTAssert(metadata.compressionFlags == kGzipCompressionFlag);
+            
+            Node* bKeePassRoot = b.rootGroup.childGroups[0];
+            Node* bRecord = bKeePassRoot.childRecords[0];
+            
+            XCTAssert([bRecord.title isEqualToString:@"Title"]);
+            XCTAssert(bRecord.fields.email.length == 0); // Email is ditched by KeePass
+            
+            XCTAssert([bRecord.fields.username isEqualToString:@"username"]);
+            XCTAssert([bRecord.fields.url isEqualToString:@"url"]);
+            XCTAssert([bRecord.fields.notes isEqualToString:@"notes"]);
+            XCTAssert([bRecord.fields.password isEqualToString:@"ladder"]);
+            
+            XCTAssert(bRecord.fields.attachments.count == 2);
+            
+            XCTAssert([bRecord.fields.attachments[0].filename isEqualToString:@"attachment1.txt"]);
+            XCTAssert([bRecord.fields.attachments[1].filename isEqualToString:@"attachment2.txt"]);
+            XCTAssert(bRecord.fields.attachments[0].index == 0);
+            XCTAssert(bRecord.fields.attachments[1].index == 1);
+            
+            XCTAssert(b.attachments.count == 2);
+            XCTAssert([b.attachments[0].data isEqualToData:data1]);
+            XCTAssert([b.attachments[1].data isEqualToData:data2]);
+
+        }];
+    }];
 }
 
 - (void)testKdbxTwoFishOuterAesKdf {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"TwoFish-with-AesKdf" ofType:@"kdbx"];
     
-    NSError* error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
-    XCTAssertNotNil(db);
-    
-    NSLog(@"%@", db);
-    
-    Node* testNode = db.rootGroup.childGroups[0].childRecords[0];
-    XCTAssert(testNode);
-    XCTAssert([testNode.title isEqualToString:@"New Entry"]);
-    XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
-    XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
+    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNotNil(db);
+        
+        NSLog(@"%@", db);
+        
+        Node* testNode = db.rootGroup.childGroups[0].childRecords[0];
+        XCTAssert(testNode);
+        XCTAssert([testNode.title isEqualToString:@"New Entry"]);
+        XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
+        XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
+    }];
 }
 
 - (void)testKdbxTwoFishOuterAesKdfReadAndWrite {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"TwoFish-with-AesKdf" ofType:@"kdbx"];
-    
-    NSError* error;
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
     
-    XCTAssertNotNil(db);
-    
-    //NSLog(@"BEFORE: %@", db);
+    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"]
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNotNil(db);
+        
+        //NSLog(@"BEFORE: %@", db);
 
-    Node* testNode = db.rootGroup.childGroups[0].childRecords[0];
-    
-    XCTAssert(testNode);
-    XCTAssert([testNode.title isEqualToString:@"New Entry"]);
-    XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
-    XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
+        Node* testNode = db.rootGroup.childGroups[0].childRecords[0];
+        
+        XCTAssert(testNode);
+        XCTAssert([testNode.title isEqualToString:@"New Entry"]);
+        XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
+        XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
 
-    [testNode setTitle:@"New Entry13333576hg-6sqIXJVO;Q" allowDuplicateGroupTitles:YES];
-    
-    NSData* d = [adaptor save:db error:&error]; // [db getAsData:&error];
-    StrongboxDatabase *b = [adaptor open:d compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
-    
-    testNode = b.rootGroup.childGroups[0].childRecords[0];
-    XCTAssert(testNode);
-    XCTAssert([testNode.title isEqualToString:@"New Entry13333576hg-6sqIXJVO;Q"]);
-    XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
-    XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
+        [testNode setTitle:@"New Entry13333576hg-6sqIXJVO;Q" allowDuplicateGroupTitles:YES];
+        
+        [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable d, NSError * _Nullable error) {
+            [adaptor open:d ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+                Node* testNode = b.rootGroup.childGroups[0].childRecords[0];
+                XCTAssert(testNode);
+                XCTAssert([testNode.title isEqualToString:@"New Entry13333576hg-6sqIXJVO;Q"]);
+                XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
+                XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
+            }];
+        }];
+    }];
 }
 
 - (void)testTwoFishEncDec {
@@ -431,15 +434,18 @@
 
 - (void)testRwBinariesFileCompress {
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database" ofType:@"kdbx"];
-    NSError* error;
-    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    StrongboxDatabase *db = [adaptor open:blob compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
-    
-    NSData* b = [adaptor save:db error:&error];
 
-    StrongboxDatabase *a = [adaptor open:b compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     
-    XCTAssertNotNil(a);
+    [adaptor open:blob
+              ckf:[CompositeKeyFactors password:@"a"]
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        [adaptor save:database completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            [adaptor open:data ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable a, NSError * _Nullable error) {
+                XCTAssertNotNil(a);
+            }];
+        }];
+    }];
 }
 
 - (void)testDbMaxHistorySettings {
@@ -456,31 +462,29 @@
     metadata.historyMaxItems = @(2412);
     
     //
-    
-    
-    NSError* error;
-    NSData* data = [adaptor save:db error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-    
-    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNotNil(b);
-    
-    NSLog(@"%@", b);
 
-    
-    metadata = b.metadata;
-    XCTAssert(metadata.historyMaxItems.intValue == 2412);
+    [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if(error) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+        
+        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+            if(error) {
+                NSLog(@"%@", error);
+            }
+            
+            XCTAssertNotNil(b);
+            
+            NSLog(@"%@", b);
+
+            
+            KeePassDatabaseMetadata* metadata = b.metadata;
+            XCTAssert(metadata.historyMaxItems.intValue == 2412);
+        }];
+    }];
 }
 
 - (void)testDbMaxHistorySettings4 {
@@ -499,29 +503,27 @@
     //
     
     
-    NSError* error;
-    NSData* data = [adaptor save:db error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(data);
-    
-    StrongboxDatabase *b = [adaptor open:data compositeKeyFactors:[CompositeKeyFactors password:@"password"] error:&error];
-    
-    if(error) {
-        NSLog(@"%@", error);
-    }
-    
-    XCTAssertNotNil(b);
-    
-    NSLog(@"%@", b);
-
-    
-    metadata = b.metadata;
-    XCTAssert(metadata.historyMaxItems.intValue == 2412);
+    [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if(error) {
+            NSLog(@"%@", error);
+        }
+        
+        XCTAssertNil(error);
+        XCTAssertNotNil(data);
+        
+        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+            if(error) {
+                NSLog(@"%@", error);
+            }
+            
+            XCTAssertNotNil(b);
+            
+            NSLog(@"%@", b);
+            
+            KeePassDatabaseMetadata* metadata = b.metadata;
+            XCTAssert(metadata.historyMaxItems.intValue == 2412);
+        }];
+    }];
 }
 
 @end

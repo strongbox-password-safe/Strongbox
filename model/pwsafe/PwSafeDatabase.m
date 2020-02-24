@@ -27,33 +27,32 @@
     return [PwSafeSerialization isAValidSafe:candidate error:error];
 }
 
-- (StrongboxDatabase *)create:(CompositeKeyFactors *)compositeKeyFactors {
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[[PwSafeMetadata alloc] init] compositeKeyFactors:compositeKeyFactors];
+- (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[[PwSafeMetadata alloc] init] compositeKeyFactors:ckf];
     
     [self defaultLastUpdateFieldsToNow:(PwSafeMetadata*)ret.metadata];
     
     return ret;
 }
 
-- (StrongboxDatabase *)open:(NSData *)data compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors error:(NSError **)error {
-    if (![PwSafeDatabase isAValidSafe:data error:error]) {
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+    NSError* error;
+    if (![PwSafeDatabase isAValidSafe:data error:&error]) {
         NSLog(@"Not a valid safe!");
-        
-        if (error != nil) {
-            *error = [Utils createNSError:@"This is not a valid Password Safe 3 File (Invalid Format)." errorCode:-1];
-        }
-        
-        return nil;
+        error = [Utils createNSError:@"This is not a valid Password Safe 3 File (Invalid Format)." errorCode:-1];
+        completion(NO, nil, error);
+        return;
     }
 
     NSMutableArray<Field*> *headerFields;
     NSArray<Record*> *records = [self decryptSafe:data
-                                         password:compositeKeyFactors.password
+                                         password:ckf.password
                                           headers:&headerFields
-                                            error:error];
+                                            error:&error];
 
     if(!records) {
-        return nil;
+        completion(NO, nil, error);
+        return;
     }
     
     // Records and Groups
@@ -61,10 +60,9 @@
     Node* rootGroup = [self buildModel:records headers:headerFields];
     if(!rootGroup) {
         NSLog(@"Could not build model from records and headers?!");
-        if (error != nil) {
-            *error = [Utils createNSError:@"Could not parse this Password Safe File." errorCode:-1];
-        }
-        return nil;
+        error = [Utils createNSError:@"Could not parse this Password Safe File." errorCode:-1];
+        completion(NO, nil, error);
+        return;
     }
     
     PwSafeMetadata* metadata = [[PwSafeMetadata alloc] initWithVersion:[self getVersion:headerFields]];
@@ -72,19 +70,17 @@
 
     [self syncLastUpdateFieldsFromHeaders:metadata headers:headerFields];
     
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:compositeKeyFactors];
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
     ret.adaptorTag = headerFields;
 
-    return ret;
+    completion(NO, ret, nil);
 }
 
-- (NSData *)save:(StrongboxDatabase *)database error:(NSError **)error {
+- (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
     if(!database.compositeKeyFactors.password) {
-        if(error) {
-            *error = [Utils createNSError:@"Master Password not set." errorCode:-3];
-        }
-        
-        return nil;
+        NSError* error = [Utils createNSError:@"Master Password not set." errorCode:-3];
+        completion(NO, nil, error);
+        return;
     }
     
     PwSafeMetadata* metadata = (PwSafeMetadata*)database.metadata;
@@ -138,7 +134,7 @@
     NSData *hmac = [PwSafeSerialization calculateRFC2104Hmac:hmacData key:L];
     [ret appendData:hmac];
     
-    return ret;
+    completion(NO, ret, nil);
 }
 
 + (NSData *_Nullable)getYubikeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {

@@ -156,7 +156,7 @@
 }
 
 - (BOOL)receiptHasProEntitlements {
-    BOOL lifetime = [[RMAppReceipt bundleReceipt] containsInAppPurchaseOfProductIdentifier:kIapProId]; // TODO: What about cancellation?
+    BOOL lifetime = [[RMAppReceipt bundleReceipt] containsInAppPurchaseOfProductIdentifier:kIapProId]; // What about cancellation?
     
     NSDate* now = [NSDate date];
     BOOL monthly = [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];

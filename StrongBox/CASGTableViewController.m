@@ -14,6 +14,8 @@
 #import "Utils.h"
 #import "Settings.h"
 #import "Alerts.h"
+#import "YubiKeyConfigurationController.h"
+#import "YubiManager.h"
 
 @interface CASGTableViewController () <UITextFieldDelegate>
 
@@ -30,6 +32,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellOpenOffline;
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 @property (weak, nonatomic) IBOutlet UISwitch *switchOpenOffline;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellYubiKey;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowEmpty;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowEmpty;
@@ -41,6 +44,8 @@
 @property (nullable) NSString* selectedPassword;
 @property (nullable) NSURL* selectedKeyFileUrl;
 @property (nullable) NSData* selectedOneTimeKeyFileData;
+@property (nullable) YubiKeyHardwareConfiguration* selectedYubiKeyConfig;
+
 @property DatabaseFormat selectedFormat;
 @property BOOL userHasChangedNameAtLeastOnce;
 
@@ -56,6 +61,8 @@
     self.selectedName = self.initialName;
     self.selectedFormat = self.initialFormat;
     self.selectedKeyFileUrl = self.initialKeyFileUrl;
+    self.selectedYubiKeyConfig = self.initialYubiKeyConfig;
+    
     self.switchReadOnly.on = self.initialReadOnly;
     self.switchOpenOffline.on = self.initialOfflineCache;
     
@@ -82,9 +89,8 @@
     }
     else if(self.mode == kCASGModeGetCredentials) {
         [self setTitle:NSLocalizedString(@"casg_unlock_action", @"Unlock")];
-        [self.buttonDone setTitle:nil];
+        [self.buttonDone setTitle:NSLocalizedString(@"casg_unlock_action", @"Unlock")];
         [self.buttonDone setAccessibilityLabel:NSLocalizedString(@"casg_unlock_action", @"Unlock")];
-        [self.buttonDone setImage:[UIImage imageNamed:@"unlock"]];
     }
     else if(self.mode == kCASGModeRenameDatabase) {
         [self setTitle:NSLocalizedString(@"casg_rename_database_action", @"Rename Database")];
@@ -117,6 +123,7 @@
     [self bindAdvanced];
     [self bindFormat];
     [self bindKeyFile];
+    [self bindYubiKey];
     [self bindPasswordFields];
     [self bindTableView]; // Show / Hide Key File if password safe selected!
     [self validateUi];
@@ -129,7 +136,7 @@
     self.textFieldPassword.placeholder =
         (self.mode == kCASGModeGetCredentials || Settings.sharedInstance.allowEmptyOrNoPasswordEntry) ?
             NSLocalizedString(@"casg_text_field_placeholder_password", @"Password") :
-    NSLocalizedString(@"casg_text_field_placeholder_password_required", @"Password (Required)");
+            NSLocalizedString(@"casg_text_field_placeholder_password_required", @"Password (Required)");
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -156,6 +163,10 @@
     self.onDone(NO, nil);
 }
 
+- (BOOL)yubiKeyIsSet {
+    return self.selectedYubiKeyConfig != nil && self.selectedYubiKeyConfig.mode != kNoYubiKey;
+}
+
 - (BOOL)keyFileIsSet {
     return self.selectedOneTimeKeyFileData != nil || self.selectedKeyFileUrl != nil;
 }
@@ -174,7 +185,7 @@
     if(self.selectedFormat == kKeePass1 && [self keyFileIsSet]) {
         self.selectedPassword = nil; // Cannot ever have empty password in KeePass 1
     }
-    else if([self keyFileIsSet] && (self.mode != kCASGModeGetCredentials)) {
+    else if(([self keyFileIsSet]|| [self yubiKeyIsSet]) && (self.mode != kCASGModeGetCredentials)) {
         // Must be KeePass 2 can have empty or none in this situation - Get mode will auto figure this out, but for set/create we need to ask
         [self askAboutEmptyOrNonePasswordAndContinue];
         return;
@@ -212,6 +223,7 @@
     creds.readOnly = self.switchReadOnly.on;
     creds.offlineCache = self.switchOpenOffline.on;
     creds.yubiKeySecret = self.textFieldYubikeySecret.text;
+    creds.yubiKeyConfig = self.selectedYubiKeyConfig;
     
     self.onDone(YES, creds);
 }
@@ -224,6 +236,7 @@
 
     if(self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
         [self cell:self.cellKeyFile setHidden:YES];
+        [self cell:self.cellYubiKey setHidden:YES];
         [self cell:self.cellFormat setHidden:YES];
         [self cell:self.cellPassword setHidden:YES];
         [self cell:self.cellConfirmPassword setHidden:YES];
@@ -236,17 +249,21 @@
         [self cell:self.cellDatabaseName setHidden:!(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
         [self cell:self.cellConfirmPassword setHidden:(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
         [self cell:self.cellKeyFile setHidden:self.mode == kCASGModeCreateExpress || self.selectedFormat == kPasswordSafe];
+        
+        [self cell:self.cellYubiKey setHidden:self.mode == kCASGModeCreateExpress || ![self yubiKeyAvailable:self.selectedFormat]];
+        
         [self cell:self.cellFormat setHidden:self.mode == kCASGModeCreateExpress];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
         [self cell:self.cellYubiKeySecret setHidden:YES];
         
-        [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
+        [self cell:self.cellAllowEmpty setHidden:self.mode == kCASGModeCreateExpress || !showAllowEmpty];
     }
     else if(self.mode == kCASGModeSetCredentials) {
         [self cell:self.cellDatabaseName setHidden:YES];
         [self cell:self.cellFormat setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
+        [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
         [self cell:self.cellYubiKeySecret setHidden:YES];
@@ -259,7 +276,7 @@
         [self cell:self.cellFormat setHidden:YES];
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
-        
+        [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
         [self cell:self.cellYubiKeySecret setHidden:!Settings.sharedInstance.showYubikeySecretWorkaroundField ||
                                                      self.initialFormat == kPasswordSafe ||
                                                      self.initialFormat == kKeePass1];
@@ -292,6 +309,15 @@
                 self.autoDetectedKeyFileUrl = NO;
                 [self bindUi];
             }
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToYubiKeyConfiguration"]) {
+        YubiKeyConfigurationController* vc = (YubiKeyConfigurationController*)segue.destinationViewController;
+        
+        vc.initialConfiguration = self.selectedYubiKeyConfig;
+        vc.onDone = ^(YubiKeyHardwareConfiguration * _Nonnull config) {
+            self.selectedYubiKeyConfig = config;
+            [self bindUi];
         };
     }
 }
@@ -330,7 +356,7 @@
     }
     else {
         self.cellKeyFile.textLabel.text = NSLocalizedString(@"casg_key_file_select_action", @"Select...");
-        self.cellKeyFile.imageView.image = nil;
+        self.cellKeyFile.imageView.image = [UIImage imageNamed:@"key"];
         self.cellKeyFile.detailTextLabel.text = nil;
     }
 }
@@ -522,10 +548,10 @@
 }
 
 - (BOOL)canGet {
-    BOOL formatAllowsEmptyOrNone =   self.initialFormat == kKeePass4 ||
-                        self.initialFormat == kKeePass ||
-                        self.initialFormat == kFormatUnknown ||
-                        (self.initialFormat == kKeePass1 && [self keyFileIsSet]);
+    BOOL formatAllowsEmptyOrNone =  self.initialFormat == kKeePass4 ||
+                                    self.initialFormat == kKeePass ||
+                                    self.initialFormat == kFormatUnknown ||
+                                    (self.initialFormat == kKeePass1 && [self keyFileIsSet]);
     
     return self.textFieldPassword.text.length || (formatAllowsEmptyOrNone && Settings.sharedInstance.allowEmptyOrNoPasswordEntry);
 }
@@ -565,6 +591,50 @@
 
 - (void)bindAdvanced {
     self.switchAllowEmpty.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+}
+
+- (void)bindYubiKey {
+    if(self.selectedYubiKeyConfig != nil && self.selectedYubiKeyConfig.mode != kNone) {
+        self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
+            NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
+            NSLocalizedString(@"casg_yubikey_configured_nfc_disabled_pro_only", @"NFC Disabled (Pro Edition Only)");
+        self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+
+        self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
+            NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
+        self.cellYubiKey.detailTextLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+
+        self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];
+    }
+    else {
+        self.cellYubiKey.textLabel.text = NSLocalizedString(@"casg_yubikey_configure_action", @"Configure...");
+        self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];
+        self.cellYubiKey.detailTextLabel.text = nil;
+    }
+}
+
+- (BOOL)yubiKeyAvailable:(DatabaseFormat)format {
+    return [self deviceSupportsYubiKey] && [self formatSupportsYubiKey:format];
+}
+
+- (BOOL)deviceSupportsYubiKey {
+#ifndef IS_APP_EXTENSION
+    return [YubiManager.sharedInstance yubiKeySupportedOnDevice];
+#else
+    return NO;
+#endif
+}
+
+- (BOOL)formatSupportsYubiKey:(DatabaseFormat)format {
+    return format == kKeePass || format == kKeePass4;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
+    if (section == 3 && !Settings.sharedInstance.isProOrFreeTrial) {
+        return NSLocalizedString(@"casg_section_header_yubikey_pro_only", @"Yubikey (Pro Edition Only)");
+    }
+    
+    return [super tableView:tableView titleForHeaderInSection:section];
 }
 
 @end

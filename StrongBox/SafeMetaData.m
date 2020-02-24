@@ -186,6 +186,8 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     
     [encoder encodeBool:self.hideTotpCustomFieldsInViewMode forKey:@"hideTotpCustomFieldsInViewMode"];
     [encoder encodeBool:self.hideIconInBrowse forKey:@"hideIconInBrowse"];
+    
+    [encoder encodeObject:self.yubiKeyConfig forKey:@"yubiKeyConfig"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -199,7 +201,6 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.isTouchIdEnabled = [decoder decodeBoolForKey:@"isTouchIdEnabled"];
         self.isEnrolledForConvenience = [decoder decodeBoolForKey:@"isEnrolledForTouchId"];
         
-//        self.offlineCacheEnabled = [decoder decodeBoolForKey:@"offlineCacheEnabled"];
         self.offlineCacheAvailable = [decoder decodeBoolForKey:@"offlineCacheAvailable"];
         self.hasUnresolvedConflicts = [decoder decodeBoolForKey:@"hasUnresolvedConflicts"];
         
@@ -362,6 +363,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         
         if([decoder containsValueForKey:@"hideIconInBrowse"]) {
             self.hideIconInBrowse = [decoder decodeBoolForKey:@"hideIconInBrowse"];
+        }
+        
+        if([decoder containsValueForKey:@"yubiKeyConfig"]) {
+            self.yubiKeyConfig = [decoder decodeObjectForKey:@"yubiKeyConfig"];
         }
     }
     

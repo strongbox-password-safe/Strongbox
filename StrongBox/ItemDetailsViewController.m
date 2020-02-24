@@ -46,15 +46,12 @@
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 
 //+ (NSArray<NSNumber*>*)defaultCollapsedSections - Remember to change this if you change the below sections
-static BOOL const kSeparateSectionForCustomFields = NO; // TODO: Remove and cleanup?
-
 static NSInteger const kSimpleFieldsSectionIdx = 0;
 static NSInteger const kNotesSectionIdx = 1;
-static NSInteger const kCustomFieldsSectionIdx = 2;
-static NSInteger const kAttachmentsSectionIdx = 3;
-static NSInteger const kMetadataSectionIdx = 4;
-static NSInteger const kOtherSectionIdx = 5;
-static NSInteger const kSectionCount = 6;
+static NSInteger const kAttachmentsSectionIdx = 2;
+static NSInteger const kMetadataSectionIdx = 3;
+static NSInteger const kOtherSectionIdx = 4;
+static NSInteger const kSectionCount = 5;
 
 static NSInteger const kRowTitleAndIcon = 0;
 static NSInteger const kRowUsername = 1;
@@ -354,15 +351,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
     if(self.editing) {
         if (showAddCustomFieldRow) {
-            if(kSeparateSectionForCustomFields) {
-                [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kCustomFieldsSectionIdx]]
-                                  withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
-            else {
-                NSUInteger addCustomFieldIdx = self.model.customFields.count + kSimpleRowCount;
-                [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx inSection:kSimpleFieldsSectionIdx]]
-                withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
+            NSUInteger addCustomFieldIdx = self.model.customFields.count + kSimpleRowCount;
+            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx inSection:kSimpleFieldsSectionIdx]]
+            withRowAnimation:UITableViewRowAnimationAutomatic];
         }
         
         [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kAttachmentsSectionIdx]]
@@ -373,14 +364,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }
     else {
         if (showAddCustomFieldRow) {
-            if(kSeparateSectionForCustomFields) {
-                [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kCustomFieldsSectionIdx]]
-                                      withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
-            else {
-                [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx inSection:kSimpleFieldsSectionIdx]]
-                                      withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
+            [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:addCustomFieldIdx
+                                                                        inSection:kSimpleFieldsSectionIdx]]
+                                  withRowAnimation:UITableViewRowAnimationAutomatic];
         }
         
         [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:kAttachmentsSectionIdx]]
@@ -394,29 +380,31 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
     
-    [self.tableView performBatchUpdates:^{
-        [self prepareTableViewForEditing];
-    } completion:^(BOOL finished) {
-        if(self.isEditing) {
-            self.preEditModelClone = [self.model clone];
-            UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]];
-            [cell becomeFirstResponder];
-        }
-        else {
-            if(self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone]) {
-                self.urlJustChanged = ![self.model.url isEqualToString:self.preEditModelClone.url];
-                self.preEditModelClone = nil;
-                [self saveChanges];
-                return; // We will perform below changes when saving is done...
+    if (@available(iOS 11.0, *)) { // Silence Warnings
+        [self.tableView performBatchUpdates:^{
+            [self prepareTableViewForEditing];
+        } completion:^(BOOL finished) {
+            if(self.isEditing) {
+                self.preEditModelClone = [self.model clone];
+                UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]];
+                [cell becomeFirstResponder];
             }
             else {
-                NSLog(@"No changes detected... switching back to view mode...");
+                if(self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone]) {
+                    self.urlJustChanged = ![self.model.url isEqualToString:self.preEditModelClone.url];
+                    self.preEditModelClone = nil;
+                    [self saveChanges];
+                    return; // We will perform below changes when saving is done...
+                }
+                else {
+                    NSLog(@"No changes detected... switching back to view mode...");
+                }
+                self.preEditModelClone = nil;
             }
-            self.preEditModelClone = nil;
-        }
-        
-        [self bindNavBar];
-    }];
+            
+            [self bindNavBar];
+        }];
+    }
 }
 
 #pragma mark - Table view data source
@@ -452,9 +440,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
     else if (indexPath.section == kNotesSectionIdx) {
         return [self getNotesCell:indexPath];
     }
-    else if(indexPath.section == kCustomFieldsSectionIdx) {
-        return [self getCustomFieldCell:indexPath];
-    }
     else if (indexPath.section == kAttachmentsSectionIdx) {
         return [self getAttachmentCell:indexPath];
     }
@@ -480,9 +465,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
     if(section == kSimpleFieldsSectionIdx) {
         return nil; // nil to hide
     }
-    else if (section == kCustomFieldsSectionIdx) {
-        return NSLocalizedString(@"item_details_section_header_custom_fields", @"Custom Fields");
-    }
     else if (section == kNotesSectionIdx) {
         return NSLocalizedString(@"item_details_section_header_notes", @"Notes");
     }
@@ -503,10 +485,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if(section == kSimpleFieldsSectionIdx) {
         BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4);
-        return kSimpleRowCount + (!kSeparateSectionForCustomFields ? self.model.customFields.count + (showAddCustomFieldRow ? 1 : 0) : 0);
-    }
-    else if (section == kCustomFieldsSectionIdx) {
-        return kSeparateSectionForCustomFields ? self.model.customFields.count + (self.editing ? 1 : 0) : 0;
+        return kSimpleRowCount + (self.model.customFields.count + (showAddCustomFieldRow ? 1 : 0));
     }
     else if (section == kNotesSectionIdx) {
         return 1;
@@ -587,24 +566,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
     }
 #ifndef IS_APP_EXTENSION
-    else if(indexPath.section == kCustomFieldsSectionIdx) {
-        if (self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1) {
-            return 0;
-        }
-        
-        NSUInteger idx = indexPath.row;
-        if(idx < self.model.customFields.count) {
-            CustomFieldViewModel* f = self.model.customFields[idx];
-            if (!f.protected && !f.value.length && shouldHideEmpty) { // Hide empty unprotected custom row in view mode
-                return 0;
-            }
-        
-            BOOL shouldHideTotpFields = self.databaseModel.metadata.hideTotpCustomFieldsInViewMode && !self.editing;
-            if (shouldHideTotpFields && [NodeFields isTotpCustomFieldKey:f.key]) {
-                return 0;
-            }
-        }
-    }
     else if(indexPath.section == kAttachmentsSectionIdx && self.databaseModel.database.format == kPasswordSafe) {
         return 0;
     }
@@ -615,10 +576,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
         return 0;
     }
 #else
-    if(indexPath.section == kCustomFieldsSectionIdx
-       || indexPath.section == kAttachmentsSectionIdx
-       || indexPath.section == kMetadataSectionIdx
-       || indexPath.section == kOtherSectionIdx) {
+    if (indexPath.section == kAttachmentsSectionIdx ||
+        indexPath.section == kMetadataSectionIdx ||
+        indexPath.section == kOtherSectionIdx) {
         return 0;
     }
 #endif
@@ -636,21 +596,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
         return 0;
     }
 #ifndef IS_APP_EXTENSION
-    else if(section == kCustomFieldsSectionIdx) {
-        if(self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1 || !kSeparateSectionForCustomFields || (!self.editing && self.model.customFields.count == 0)) {
-            return 0;
-        }
-        
-        BOOL shouldHideTotpFields = self.databaseModel.metadata.hideTotpCustomFieldsInViewMode && !self.editing;
-
-        if(shouldHideTotpFields) {
-            if(!self.editing && [self.model.customFields allMatch:^BOOL(CustomFieldViewModel * _Nonnull obj) {
-                return [NodeFields isTotpCustomFieldKey:obj.key];
-            }]) {
-                return 0;
-            }
-        }
-    }
     else if(section == kAttachmentsSectionIdx) {
         if(self.databaseModel.database.format == kPasswordSafe || (!self.editing && self.model.attachments.count == 0)) {
             return 0;
@@ -663,10 +608,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
         return 0;
     }
 #else // TODO: Why hide?
-    if(section == kCustomFieldsSectionIdx
-       || section == kAttachmentsSectionIdx
-       || section == kMetadataSectionIdx
-       || section == kOtherSectionIdx) {
+    if (section == kAttachmentsSectionIdx ||
+        section == kMetadataSectionIdx ||
+        section == kOtherSectionIdx) {
         return 0;
     }
 #endif
@@ -688,9 +632,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }
     else if(indexPath.section == kNotesSectionIdx || indexPath.section == kMetadataSectionIdx || indexPath.section == kOtherSectionIdx) {
         return UITableViewCellEditingStyleNone;
-    }
-    else if(indexPath.section == kCustomFieldsSectionIdx) {
-        return (indexPath.row == self.model.customFields.count) ? UITableViewCellEditingStyleInsert : UITableViewCellEditingStyleDelete;
     }
     else if(indexPath.section == kAttachmentsSectionIdx) {
         return (indexPath.row == 0) ? UITableViewCellEditingStyleInsert : UITableViewCellEditingStyleDelete;
@@ -718,12 +659,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        if(indexPath.section == kCustomFieldsSectionIdx && indexPath.row < self.model.customFields.count) {
-            [self.model removeCustomFieldAtIndex:indexPath.row];
-            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self onModelEdited];
-        }
-        else if(indexPath.section == kAttachmentsSectionIdx && indexPath.row > 0) {
+        if(indexPath.section == kAttachmentsSectionIdx && indexPath.row > 0) {
             [self.model removeAttachmentAtIndex:indexPath.row - 1];
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
             [self onModelEdited];
@@ -741,10 +677,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
     }
     else if (editingStyle == UITableViewCellEditingStyleInsert) {
-        if(indexPath.section == kCustomFieldsSectionIdx && indexPath.row == self.model.customFields.count) {
-            [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:nil];
-        }
-        else if(indexPath.section == kSimpleFieldsSectionIdx && indexPath.row == self.model.customFields.count + kSimpleRowCount) {
+        if(indexPath.section == kSimpleFieldsSectionIdx && indexPath.row == self.model.customFields.count + kSimpleRowCount) {
             [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:nil];
         }
         else if(indexPath.section == kSimpleFieldsSectionIdx && indexPath.row == kRowTotp) {
@@ -758,11 +691,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(self.editing) {
-        if(indexPath.section == kCustomFieldsSectionIdx) {
-            CustomFieldViewModel* customField = indexPath.row == self.model.customFields.count ? nil : self.model.customFields[indexPath.row];
-            [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:customField];
-        }
-        else if(indexPath.section == kAttachmentsSectionIdx) {
+        if(indexPath.section == kAttachmentsSectionIdx) {
             if(indexPath.row == 0) {
                 [self promptToAddAttachment];
             }
@@ -823,11 +752,6 @@ static NSString* const kEditDateCell = @"EditDateCell";
         else if(indexPath.section == kNotesSectionIdx) {
             // NOP - Handled by the Text Field
         }
-        else if(indexPath.section == kCustomFieldsSectionIdx) {
-            CustomFieldViewModel* customField = self.model.customFields[indexPath.row];
-            [self copyToClipboard:customField.value
-                          message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), customField.key]];
-        }
         else if(indexPath.section == kOtherSectionIdx && indexPath.row == 0) {
             [self performSegueWithIdentifier:self.databaseModel.database.format == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
         }
@@ -871,12 +795,14 @@ static NSString* const kEditDateCell = @"EditDateCell";
     NSLog(@"Adding new Attachment: [%@]", attachment);
     
     NSUInteger idx = [self.model insertAttachment:attachment];
-    [self.tableView performBatchUpdates:^{
-        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + 1 inSection:kAttachmentsSectionIdx]] // +1 because we're in edit mode
-                              withRowAnimation:UITableViewRowAnimationAutomatic];
-    } completion:^(BOOL finished) {
-        [self onModelEdited];
-    }];
+    if (@available(iOS 11.0, *)) { // Silence Warnings
+        [self.tableView performBatchUpdates:^{
+            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + 1 inSection:kAttachmentsSectionIdx]] // +1 because we're in edit mode
+                                  withRowAnimation:UITableViewRowAnimationAutomatic];
+        } completion:^(BOOL finished) {
+            [self onModelEdited];
+        }];
+    }
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
@@ -933,8 +859,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
         PasswordHistoryViewController *vc = segue.destinationViewController;
         vc.model = self.item.fields.passwordHistory;
         vc.readOnly = self.readOnly;
-
-        vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(NSError *)) {
+        vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(BOOL userCancelled, NSError *error)) {
             [self onPasswordHistoryChanged:changed onDone:onDone];
         };
     }
@@ -975,28 +900,21 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }
     
     NSUInteger idx = [self.model insertCustomField:field];
-    [self.tableView performBatchUpdates:^{
-        if(kSeparateSectionForCustomFields) {
-            if(oldIdx != -1) {
-                [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIdx inSection:kCustomFieldsSectionIdx]]
+    if (@available(iOS 11.0, *)) { // Silence Warnings
+        [self.tableView performBatchUpdates:^{
+           if(oldIdx != -1) {
+                [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIdx + kSimpleRowCount
+                                                                            inSection:kSimpleFieldsSectionIdx]]
                                       withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
+           }
             
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx inSection:kCustomFieldsSectionIdx]]
+            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + kSimpleRowCount
+                                                                        inSection:kSimpleFieldsSectionIdx]]
                                   withRowAnimation:UITableViewRowAnimationAutomatic];
-        }
-        else {
-            if(oldIdx != -1) {
-                [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:oldIdx + kSimpleRowCount inSection:kSimpleFieldsSectionIdx]]
-                                      withRowAnimation:UITableViewRowAnimationAutomatic];
-            }
-            
-            [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + kSimpleRowCount inSection:kSimpleFieldsSectionIdx]]
-                                  withRowAnimation:UITableViewRowAnimationAutomatic];
-        }
-    } completion:^(BOOL finished) {
-        [self onModelEdited];
-    }];
+        } completion:^(BOOL finished) {
+            [self onModelEdited];
+        }];
+    }
 }
 
 - (void)onDeleteHistoryItem:(Node*)historicalNode {
@@ -1007,12 +925,16 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
     // Sync
     
-    [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
-        if (error != nil) {
+    [self.databaseModel update:self.isAutoFillContext
+                       handler:^(BOOL userCancelled, NSError * _Nullable error) {
+        if(userCancelled) {
+            [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
+        }
+        else if (error != nil) {
             [Alerts error:self
                     title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
                     error:error completion:^{
-                [self.navigationController popToRootViewControllerAnimated:YES];
+                [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
             }];
             NSLog(@"%@", error);
         }
@@ -1027,6 +949,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
 - (void)onRestoreFromHistoryNode:(Node*)historicalNode {
     Node* clonedOriginalNodeForHistory = [self.item cloneForHistory];
+    // FUTURE: This could be a template for graceful revert on error or user cancel
     [self addHistoricalNode:clonedOriginalNodeForHistory];
     
     // Make Changes
@@ -1039,13 +962,16 @@ static NSString* const kEditDateCell = @"EditDateCell";
     
     // Sync
     
-    [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
-        if (error != nil) {
+    [self.databaseModel update:self.isAutoFillContext handler:^(BOOL userCancelled, NSError * _Nullable error) {
+        if(userCancelled) {
+            [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
+        }
+        else if (error != nil) {
             [Alerts error:self
                     title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
                     error:error
                completion:^{
-                [self.navigationController popToRootViewControllerAnimated:YES];
+                [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
             }];
             NSLog(@"%@", error);
         }
@@ -1059,16 +985,17 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }];
 }
 
-- (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(NSError *))onDone {
+- (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(BOOL userCancelled, NSError *error))onDone {
     self.item.fields.passwordHistory = changed;
     [self.item touch:YES touchParents:YES];
     
     [self performFullReload];
     
-    [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
+    [self.databaseModel update:self.isAutoFillContext
+                       handler:^(BOOL userCancelled, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            onDone(error);
-            if(self.onChanged) {
+            onDone(userCancelled, error);
+            if (!userCancelled && !error && self.onChanged) {
                 self.onChanged();
             }
         });
@@ -1300,63 +1227,66 @@ static NSString* const kEditDateCell = @"EditDateCell";
     return ret;
 }
 
+- (void)applyModelChangesToNodeItem {
+     if (self.createNewItem) {
+         self.item.fields.created = [[NSDate alloc] init];
+         [self.parentGroup addChild:self.item allowDuplicateGroupTitles:NO];
+     }
+     else { // Add History Entry for this change if appropriate...
+         Node* originalNodeForHistory = [self.item cloneForHistory];
+         [self addHistoricalNode:originalNodeForHistory];
+     }
+     
+     [self.item touch:YES touchParents:YES];
+     
+     [self.item setTitle:self.model.title allowDuplicateGroupTitles:NO];
+     
+     self.item.fields.username = self.model.username;
+     self.item.fields.password = self.model.password;
+     self.item.fields.url = self.model.url;
+     self.item.fields.email = self.model.email;
+     self.item.fields.notes = self.model.notes;
+     self.item.fields.expires = self.model.expires;
+     
+     // Custom Fields - Must be done before TOTP as otherwise it will be removed!
+     
+     [self.item.fields removeAllCustomFields];
+     for (CustomFieldViewModel *field in self.model.customFields) {
+         StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
+         [self.item.fields setCustomField:field.key value:value];
+     }
+
+     // TOTP
+    
+     if([OTPToken areDifferent:self.item.fields.otpToken b:self.model.totp]) {
+         [self.item.fields clearTotp]; // Clears any custom fields and notes fields (Password Safe)
+         
+         if(self.model.totp != nil) {
+             [self.item.fields setTotp:self.model.totp
+                      appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
+         }
+     }
+     
+     // Attachments
+     
+     [self.databaseModel.database setNodeAttachments:self.item attachments:self.model.attachments];
+}
+
 - (void)saveChanges {
-    if (self.createNewItem) {
-        self.item.fields.created = [[NSDate alloc] init];
-        [self.parentGroup addChild:self.item allowDuplicateGroupTitles:NO];
-    }
-    else { // Add History Entry for this change if appropriate...
-        Node* originalNodeForHistory = [self.item cloneForHistory];
-        [self addHistoricalNode:originalNodeForHistory];
-    }
+    Node* preSaveCloneOfItem = [self.item clone];
     
-    [self.item touch:YES touchParents:YES];
+    [self applyModelChangesToNodeItem];
     
-    [self.item setTitle:self.model.title allowDuplicateGroupTitles:NO];
-    
-    self.item.fields.username = self.model.username;
-    self.item.fields.password = self.model.password;
-    self.item.fields.url = self.model.url;
-    self.item.fields.email = self.model.email;
-    self.item.fields.notes = self.model.notes;
-    self.item.fields.expires = self.model.expires;
-    
-    // Custom Fields - Must be done before TOTP as otherwise it will be removed!
-    
-    [self.item.fields removeAllCustomFields];
-    for (CustomFieldViewModel *field in self.model.customFields) {
-        StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
-        [self.item.fields setCustomField:field.key value:value];
-    }
-
-    // TOTP
-   
-    if([OTPToken areDifferent:self.item.fields.otpToken b:self.model.totp]) {
-        [self.item.fields clearTotp]; // Clears any custom fields and notes fields (Password Safe)
-        
-        if(self.model.totp != nil) {
-            [self.item.fields setTotp:self.model.totp
-                     appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
-        }
-    }
-    
-    // Attachments
-    
-    [self.databaseModel.database setNodeAttachments:self.item attachments:self.model.attachments];
-    
-    // Custom Icon
-    // NB: addition must be done after node has been added to parent, because otherwise the custom icon rationalizer
-    // will pick up the new custom icon as a bad reference (not on a node within the root group)...
-
     [self disableUi];
     
     NSLog(@"SAVE: Processing Icon for Save...");
     [self processIconBeforeSave:^{ // This is behind a completion because we might go out and download the FavIcon which is async...
         NSLog(@"SAVE: Icon processed for Save...");
-        [self.databaseModel update:self.isAutoFillContext handler:^(NSError *error) {
-            NSLog(@"SAVE: Storage Provider Update Done [%@]...", error);
+        [self.databaseModel update:self.isAutoFillContext
+                           handler:^(BOOL userCancelled, NSError * _Nullable error) {
+            NSLog(@"SAVE: Storage Provider Update Done [%d-%@]...", userCancelled, error);
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self onSaveChangesDone:error];
+                [self onSaveChangesDone:userCancelled preSaveCloneOfItem:preSaveCloneOfItem error:error];
             });
         }];
     }];
@@ -1380,38 +1310,80 @@ static NSString* const kEditDateCell = @"EditDateCell";
     [self.coverView removeFromSuperview];
 }
 
-- (void)onSaveChangesDone:(NSError*)error {
-    [self enableUi];
+- (void)resetNodeItemTo:(Node*)preSaveCloneOfItem {
+    if (self.createNewItem) {
+        [self.parentGroup removeChild:self.item];
+    }
+    else {
+        self.item.fields.keePassHistory = preSaveCloneOfItem.fields.keePassHistory;
+    }
+
+    [self.item touchWithExplicitModifiedDate:preSaveCloneOfItem.fields.modified touchParents:YES];
+     
+    [self.item setTitle:preSaveCloneOfItem.title allowDuplicateGroupTitles:NO];
+
+    self.item.fields.username = preSaveCloneOfItem.fields.username;
+    self.item.fields.password = preSaveCloneOfItem.fields.password;
+    self.item.fields.url = preSaveCloneOfItem.fields.url;
+    self.item.fields.email = preSaveCloneOfItem.fields.email;
+    self.item.fields.notes = preSaveCloneOfItem.fields.notes;
+    self.item.fields.expires = preSaveCloneOfItem.fields.expires;
+
+    // FUTURE: There's a problem here with rationalization :( - This needs more work... perhaps use the ViewModel class
+    // from the Mac version?
     
-    if (error != nil) { // TODO: This may not be correct for Split View
-        [Alerts error:self
-                title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
-                error:error
-           completion:^{
-            [self.navigationController popToRootViewControllerAnimated:YES];
-        }];
+    self.item.fields.customFields = preSaveCloneOfItem.fields.customFields;
+    self.item.fields.attachments = preSaveCloneOfItem.fields.attachments;
+}
+
+- (void)onSaveChangesDone:(BOOL)userCancelled preSaveCloneOfItem:(Node*)preSaveCloneOfItem error:(NSError*)error {
+    if(userCancelled) {
+        if (error != nil) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
+                    error:error
+               completion:^{
+                [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE: Revert gracefully
+            }];
+        }
+        else {
+            [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE: Revert gracefully
+        }
+        return;
+
+        // [self resetNodeItemTo:preSaveCloneOfItem];
+        // FUTURE: Any way to just leave it in editing mode with all the model changes?
+        // self.model = [self modelFromItem:self.item];
     }
     else {
         self.createNewItem = NO;
         self.model = [self modelFromItem:self.item];
     }
     
-    [self.tableView performBatchUpdates:^{
-        [self prepareTableViewForEditing];
-    } completion:^(BOOL finished) {
-        [self bindNavBar];
-
-        if(self.onChanged) {
-            self.onChanged();
-        }
-        
+    [self enableUi];
+    
+    if (@available(iOS 11.0, *)) { // Silence Warnings
+        [self.tableView performBatchUpdates:^{
+            [self prepareTableViewForEditing];
+        } completion:^(BOOL finished) {
+            [self bindNavBar];
+            
+            if(self.onChanged) {
+                self.onChanged();
+            }
+            
 #ifdef IS_APP_EXTENSION
-        [self.autoFillRootViewController onCredentialSelected:self.item.fields.username password:self.item.fields.password];
+            [self.autoFillRootViewController onCredentialSelected:self.item.fields.username password:self.item.fields.password];
 #endif
-    }];
+        }];
+    }
 }
 
 - (void)processIconBeforeSave:(void (^)(void))completion {
+    // Custom Icon
+    // NB: addition must be done after node has been added to parent, because otherwise the custom icon rationalizer
+    // will pick up the new custom icon as a bad reference (not on a node within the root group)...
+
     if(self.iconExplicitlyChanged) {
         if(self.model.icon.customImage) {
             NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
@@ -1700,7 +1672,7 @@ showGenerateButton:YES];
 }
 
 - (UITableViewCell*)getCustomFieldCell:(NSIndexPath*)indexPath {
-    NSUInteger virtualRow = kSeparateSectionForCustomFields ? indexPath.row : indexPath.row - kSimpleRowCount;
+    NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
     
     if(self.editing && virtualRow == self.model.customFields.count) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
@@ -1890,11 +1862,6 @@ showGenerateButton:YES];
     }
     else if (indexPath.section == kNotesSectionIdx) {
         [self showLargeText:self.model.notes];
-    }
-    else if (indexPath.section == kCustomFieldsSectionIdx) {
-        NSUInteger idx = indexPath.row;
-        CustomFieldViewModel* field = self.model.customFields[idx];
-        [self showLargeText:field.value];
     }
 }
 

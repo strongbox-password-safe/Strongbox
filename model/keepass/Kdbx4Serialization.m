@@ -55,25 +55,25 @@ static const BOOL kLogVerbose = NO;
 
 @implementation Kdbx4Serialization
 
-+ (NSData *)getYubikeyChallenge:(NSData *)candidate error:(NSError * _Nullable __autoreleasing *)error {
-    CryptoParameters* cp = [Kdbx4Serialization getCryptoParams:candidate];
-    
-    id<KeyDerivationCipher> kdf = getKeyDerivationCipher(cp.kdfParameters, error);
++ (NSData *)getYubikeyChallenge:(KdfParameters *)kdfParameters error:(NSError * _Nullable __autoreleasing *)error {
+//    CryptoParameters* cp = [Kdbx4Serialization getCryptoParams:candidate];
+//
+    id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters, error);
     
     if(!kdf) {
-        NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", cp.kdfParameters);
+        NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", kdfParameters);
         return nil;
     }
     
     return kdf.transformSeed;
 }
 
-+ (NSData *)serialize:(Kdbx4SerializationData *)serializationData
-                  xml:(NSString*)xml
-         compositeKey:(CompositeKeyFactors *)compositeKey
-              ppError:(NSError **)ppError {
++ (void)serialize:(Kdbx4SerializationData *)serializationData
+              xml:(NSString *)xml
+              ckf:(CompositeKeyFactors *)ckf
+       completion:(Serialize4CompletionBlock)completion {
     if(kLogVerbose) {
-        NSLog(@"Serializing with [%@] and password [%@]", serializationData, compositeKey);
+        NSLog(@"Serializing with [%@] and password [%@]", serializationData, ckf);
     }
     
     // 1. File Header
@@ -90,24 +90,50 @@ static const BOOL kLogVerbose = NO;
     
     if(!cipher) {
         NSLog(@"Could not get Cipher %@", serializationData.cipherUuid.UUIDString);
-        if(ppError) {
-            *ppError = [Utils createNSError:@"Could not get appropriate Cipher." errorCode:-1];
-        }
-        return nil;
+        NSError* error = [Utils createNSError:@"Could not get appropriate Cipher." errorCode:-1];
+        completion(NO, nil, error);
+        return;
     }
     
-    Keys *keys = getKeys(compositeKey, serializationData.kdfParameters, masterSeed, ppError);
-    
-    //NSLog(@"SERIALIZE KEYS: [%@]", keys);
-    
-    if(!keys) {
-        NSLog(@"Could not get Keys.");
-        if(ppError) {
-            *ppError = [Utils createNSError:@"Could not determine appropriate keys." errorCode:-1];
-        }
-        return nil;
+    NSError* error;
+    NSData* yubiKeyChallenge = [Kdbx4Serialization getYubikeyChallenge:serializationData.kdfParameters error:&error];
+    if(error) {
+        completion(NO, nil, error);
+        return;
     }
+    
+    [Kdbx4Serialization getKeys:yubiKeyChallenge
+            compositeKeyFactors:ckf
+                  kdfParameters:serializationData.kdfParameters
+                     masterSeed:masterSeed
+                     completion:^(BOOL userCancelled, Keys * _Nullable keys, NSError * _Nullable error) {
+        if(userCancelled || error || keys == nil) {
+            if(!keys && !userCancelled) {
+                NSLog(@"Could not get Keys.");
+                error = [Utils createNSError:@"Could not determine appropriate keys." errorCode:-1];
+            }
+            completion(userCancelled, nil, error);
+        }
+        else {
+            [Kdbx4Serialization stage2Serialize:keys
+                                            xml:xml
+                                     headerData:headerData
+                              serializationData:serializationData
+                                         cipher:cipher
+                                     masterSeed:masterSeed
+                                     completion:completion];
+        }
+    }];
+}
 
++ (void)stage2Serialize:(Keys*)keys
+                    xml:(NSString *)xml
+             headerData:(NSMutableData*)headerData
+      serializationData:(Kdbx4SerializationData *)serializationData
+                 cipher:(id<Cipher>)cipher
+             masterSeed:(NSData*)masterSeed
+             completion:(Serialize4CompletionBlock)completion {
+    //NSLog(@"SERIALIZE KEYS: [%@]", keys);
     NSData* encryptionIv = [cipher generateIv];
     
     if(kLogVerbose) {
@@ -166,7 +192,7 @@ static const BOOL kLogVerbose = NO;
     
     [ret appendData:encrypted];
     
-    return ret;
+    completion(NO, ret, nil);
 }
 
 + (CryptoParameters*)getCryptoParams:(NSData*)safeData {
@@ -179,47 +205,71 @@ static const BOOL kLogVerbose = NO;
     return [[CryptoParameters alloc] initFromHeaders:headerEntries];
 }
 
-+ (Kdbx4SerializationData *)deserialize:(NSData*)safeData compositeKey:(CompositeKeyFactors*)compositeKey ppError:(NSError**)ppError  {
++ (void)deserialize:(NSData*)safeData
+compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+         completion:(Deserialize4CompletionBlock)completion {
     size_t endOfHeadersOffset;
     NSDictionary<NSNumber*, NSObject*> *headerEntries = getHeaderEntries((uint8_t*)safeData.bytes, safeData.length, &endOfHeadersOffset);
     
     if(!headerEntries){
         NSLog(@"Error getting header entries. Possibly missing header entry.");
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-1];
-        }
-        return nil;
+        NSError* error = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-1];
+        completion(NO, nil, error);
+        return;
     }
 
     CryptoParameters *cryptoParams = [[CryptoParameters alloc] initFromHeaders:headerEntries];
     if (!cryptoParams) {
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Could not get all required Crypto parameters. Cannot open." errorCode:-2];
-        }
-        return nil;
+        NSError *error = [Utils createNSError:@"Could not get all required Crypto parameters. Cannot open." errorCode:-2];
+        completion(NO, nil, error);
+        return;
+    }
+        
+    NSError* error;
+    NSData* yubiKeyChallenge = [Kdbx4Serialization getYubikeyChallenge:cryptoParams.kdfParameters error:&error];
+    if(error) {
+        completion(NO, nil, error);
+        return;
     }
     
-    Keys *keys = getKeys(compositeKey, cryptoParams.kdfParameters, cryptoParams.masterSeed, ppError);
+    [Kdbx4Serialization getKeys:yubiKeyChallenge
+            compositeKeyFactors:compositeKeyFactors
+                  kdfParameters:cryptoParams.kdfParameters
+                     masterSeed:cryptoParams.masterSeed
+                     completion:^(BOOL userCancelled, Keys * _Nullable keys, NSError * _Nullable error) {
+        if(userCancelled || error || keys == nil) {
+            completion(userCancelled, nil, error);
+        }
+        else {
+            [Kdbx4Serialization stage2Deserialize:safeData
+                                             keys:keys
+                               endOfHeadersOffset:endOfHeadersOffset
+                                    headerEntries:headerEntries
+                                     cryptoParams:cryptoParams
+                                       completion:completion];
+        }
+    }];
+}
+
++ (void)stage2Deserialize:(NSData*)safeData
+                     keys:(Keys*)keys
+       endOfHeadersOffset:(size_t)endOfHeadersOffset
+            headerEntries:(NSDictionary<NSNumber*, NSObject*> *)headerEntries
+             cryptoParams:(CryptoParameters*)cryptoParams
+               completion:(Deserialize4CompletionBlock)completion {
     //NSLog(@"DESERIALIZE KEYS: [%@]", keys);
 
-    if (!keys) {
-        return nil;
-    }
-    
     if(!checkHeaderHash(safeData, endOfHeadersOffset)) {
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Actual Header HMAC or Hash does not match expected. Header has been corrupted." errorCode:-3];
-        }
-        
-        return nil;
+        NSError* error = [Utils createNSError:@"Actual Header HMAC or Hash does not match expected. Header has been corrupted." errorCode:-3];
+        completion(NO, nil, error);
+        return;
     }
 
     if(!checkHeaderHmac(safeData, endOfHeadersOffset, keys.hmacKey)) {
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key)" errorCode:kStrongboxErrorCodeIncorrectCredentials];
-        }
-        
-        return nil;
+        NSError* error = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key)"
+                                    errorCode:kStrongboxErrorCodeIncorrectCredentials];
+        completion(NO, nil, error);
+        return;
     }
     
     uint8_t *eof = (uint8_t*)safeData.bytes + safeData.length;
@@ -230,17 +280,18 @@ static const BOOL kLogVerbose = NO;
 
     NSData* decrypted = decryptBlocks(blockHeader, keys, cryptoParams, eof);
     if(!decrypted){
-        if (ppError != nil) {
-            *ppError = [Utils createNSError:@"Could not decrypt this database, either due to corruption or unknown Cipher." errorCode:-4];
-        }
-
-        return nil;
+        NSError* error = [Utils createNSError:@"Could not decrypt this database, either due to corruption or unknown Cipher."
+                                    errorCode:-4];
+        completion(NO, nil, error);
+        return;
     }
     
-    Kdbx4SerializationData* ret = readDecrypted(decrypted, cryptoParams.compressionFlags == 1, ppError);
+    NSError* error;
+    Kdbx4SerializationData* ret = readDecrypted(decrypted, cryptoParams.compressionFlags == 1, &error);
     if(ret == nil) {
-        NSLog(@"Could not read decrypted! [%@]", *ppError);
-        return nil;
+        NSLog(@"Could not read decrypted! [%@]", error);
+        completion(NO, nil, error);
+        return;
     }
     
     if(kLogVerbose) {
@@ -257,7 +308,7 @@ static const BOOL kLogVerbose = NO;
     ret.extraUnknownHeaders = getUnknownHeaders(headerEntries);
     ret.cipherUuid = cryptoParams.cipherUuid;
     
-    return ret;
+    completion(NO, ret, nil);
 }
 
 NSData* getHeadersData(NSDictionary<NSNumber*, NSData*>* headers) {
@@ -483,26 +534,43 @@ static NSData* decryptBlocks(HmacBlockHeader *blockHeader, Keys *keys, CryptoPar
     return [cipher decrypt:dec iv:cryptoParams.iv key:keys.masterKey];
 }
 
-static Keys* getKeys(CompositeKeyFactors *compositeKey, KdfParameters *kdfParameters, NSData* masterSeed, NSError** error) {
-    id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters, error);
+typedef void (^GetKeysCompletionBlock)(BOOL userCancelled, Keys*_Nullable keys, NSError*_Nullable error);
+
++ (void)getKeys:(NSData*)yubiKeyChallenge
+compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+  kdfParameters:(KdfParameters *)kdfParameters
+     masterSeed:(NSData*)masterSeed
+     completion:(GetKeysCompletionBlock)completion {
+    NSError* error;
+    id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters, &error);
 
     if(!kdf) {
         NSLog(@"Could not create KDF Cipher with KDFPARAMS: [%@]", kdfParameters);
-        return nil;
+        completion(NO, nil, error);
+        return;
     }
 
-    Keys *ret = [[Keys alloc] init];
+    [Kdbx4Serialization getCompositeKey:yubiKeyChallenge
+                    compositeKeyFactors:compositeKeyFactors
+                             completion:^(BOOL userCancelled, NSData * _Nullable compositeKey, NSError * _Nullable error) {
+        if (userCancelled || error) {
+            completion(userCancelled, nil, error);
+        }
+        else {
+            Keys *ret = [[Keys alloc] init];
 
-    ret.compositeKey = getCompositeKey(compositeKey);
-    ret.transformKey = [kdf deriveKey:ret.compositeKey];
-    ret.masterKey = getMasterKey(masterSeed, ret.transformKey);
+            ret.compositeKey = compositeKey;
+            ret.transformKey = [kdf deriveKey:ret.compositeKey];
+            ret.masterKey = getMasterKey(masterSeed, ret.transformKey);
 
-    // FUTURE: Need to handle different size master keys for different ciphers...
-    // Code in KdbxFile.cs ComputeKeys provides example.
-    
-    ret.hmacKey = getHmacKey(masterSeed, ret.transformKey);
+            // FUTURE: Need to handle different size master keys for different ciphers...
+            // Code in KdbxFile.cs ComputeKeys provides example.
+            
+            ret.hmacKey = getHmacKey(masterSeed, ret.transformKey);
 
-    return ret;
+            completion(NO, ret, nil);
+        }
+    }];
 }
 
 static BOOL checkHeaderHash(NSData* safeData, size_t offset) {
@@ -698,36 +766,56 @@ static NSDictionary<NSNumber *,NSObject *>* getHeaderEntries(uint8_t * const buf
     return YES;
 }
 
-static NSData *getCompositeKey(CompositeKeyFactors* compositeKeyFactors) {
+typedef void (^GetCompositeKeyCompletionBlock)(BOOL userCancelled, NSData*_Nullable compositeKey, NSError*_Nullable error);
+
++ (void)getCompositeKey:(NSData*)yubiKeyChallenge
+    compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+             completion:(GetCompositeKeyCompletionBlock)completion {
     NSData *hashedPassword = compositeKeyFactors.password != nil ? sha256([compositeKeyFactors.password dataUsingEncoding:NSUTF8StringEncoding]) : nil;
     
-    // Concatenate together in one big sha256...
-    
+    if(compositeKeyFactors.yubiKeyCR) {
+        compositeKeyFactors.yubiKeyCR(yubiKeyChallenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {
+            if(userCancelled || error) {
+                completion(userCancelled, nil, error);
+            }
+            else {
+                NSMutableArray* factors = @[].mutableCopy;
+
+                if (hashedPassword) [factors addObject:hashedPassword];
+                if (compositeKeyFactors.keyFileDigest) [factors addObject:compositeKeyFactors.keyFileDigest];
+                
+                [factors addObject:sha256(response)];
+
+                [Kdbx4Serialization completeWithCKFs:factors completion:completion];
+            }
+        });
+    }
+    else {
+        NSMutableArray* factors = @[].mutableCopy;
+
+        if (hashedPassword) [factors addObject:hashedPassword];
+        if (compositeKeyFactors.keyFileDigest) [factors addObject:compositeKeyFactors.keyFileDigest];
+           
+        [Kdbx4Serialization completeWithCKFs:factors completion:completion];
+    }
+}
+
++ (void)completeWithCKFs:(NSArray<NSData*>*)factors completion:(GetCompositeKeyCompletionBlock)completion {
     NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
     CC_SHA256_CTX context;
     CC_SHA256_Init(&context);
     
-    if(hashedPassword) {
-        CC_SHA256_Update(&context, hashedPassword.bytes, (CC_LONG)hashedPassword.length);
+    for (NSData* factor in factors) {
+        CC_SHA256_Update(&context, factor.bytes, (CC_LONG)factor.length);
     }
-    
-    if(compositeKeyFactors.keyFileDigest) {
-        CC_SHA256_Update(&context, compositeKeyFactors.keyFileDigest.bytes, (CC_LONG)compositeKeyFactors.keyFileDigest.length);
-    }
-    
-    if(compositeKeyFactors.yubiKeyResponse) {
-        //NSLog(@"YUBI: Adding YubiKey Challenge Response to Composite Key");
-        NSData *hashed = sha256(compositeKeyFactors.yubiKeyResponse);
-        CC_SHA256_Update(&context, hashed.bytes, (CC_LONG)hashed.length);
-    }
-    
+
     CC_SHA256_Final(compositeKey.mutableBytes, &context);
     
     if(kLogVerbose) {
         NSLog(@"COMPOSITE KEY: %@", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
     }
-    
-    return compositeKey;
+
+    completion(NO, compositeKey, nil);
 }
 
 @end

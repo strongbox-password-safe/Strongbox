@@ -38,12 +38,11 @@
         }
     }
     
-    NSError* error;
-    NSData* largeDb = [[Kdbx4Database alloc] save:db error:&error];
-    
-    BOOL success = [largeDb writeToFile:[NSString stringWithFormat:@"/Users/mark/Desktop/large-%d-%d-%d.kdbx", groupCount, subGroupCount, entryCount]
-                             options:kNilOptions error:&error];
-    NSLog(@"Done: %d [%@]", success, error);
+    [[Kdbx4Database alloc] save:db completion:^(BOOL userCancelled, NSData * _Nullable largeDb, NSError * _Nullable error) {
+        BOOL success = [largeDb writeToFile:[NSString stringWithFormat:@"/Users/mark/Desktop/large-%d-%d-%d.kdbx", groupCount, subGroupCount, entryCount]
+                                 options:kNilOptions error:&error];
+        NSLog(@"Done: %d [%@]", success, error);
+    }];
 }
 
 - (void)testReadLarge {
@@ -51,12 +50,11 @@
 
     XCTAssertNotNil(largeDb);
     
-    NSError* error;
-    StrongboxDatabase *db = [[Kdbx4Database alloc] open:largeDb compositeKeyFactors:[CompositeKeyFactors password:@"a"] error:&error];
-    
-    XCTAssertNil(error);
-    XCTAssertNotNil(db);
-    NSLog(@"Done... [%@]", error);
+    [[Kdbx4Database alloc] open:largeDb ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(db);
+        NSLog(@"Done... [%@]", error);
+    }];
 }
 
 - (Node*)createSampleEntry:(int)index parentGroup:(Node*)parentGroup {
@@ -68,7 +66,7 @@
     
     Node* childEntry = [[Node alloc] initAsRecord:@(index).stringValue parent:parentGroup fields:fields uuid:nil];
     
-    // TODO: Add Custom Fields, Dates, Attachments, Expiry, Icons, Custom Icons, etc
+    // FUTURE: Add Custom Fields, Dates, Attachments, Expiry, Icons, Custom Icons, etc
     
     return childEntry;
 }

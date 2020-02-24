@@ -47,7 +47,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return [self initUnlockedWithDatabase:document database:nil selectedItem:nil];
 }
 
-- (instancetype)initUnlockedWithDatabase:(Document *)document database:(DatabaseModel*)database selectedItem:(NSString*)selectedItem {
+- (instancetype)initUnlockedWithDatabase:(Document *)document
+                                database:(DatabaseModel*)database
+                            selectedItem:(NSString*)selectedItem {
     if (self = [super init]) {
         _document = document;
         self.passwordDatabase = database;
@@ -127,19 +129,19 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     if(!self.locked) {
         return !(self.passwordDatabase.compositeKeyFactors.password == nil &&
                  self.passwordDatabase.compositeKeyFactors.keyFileDigest == nil &&
-                 self.passwordDatabase.compositeKeyFactors.yubiKeyResponse == nil);
+                 self.passwordDatabase.compositeKeyFactors.yubiKeyCR == nil);
     }
     
     return NO;
 }
 
-- (NSData*)getPasswordDatabaseAsData:(NSError**)error {
+- (void)getPasswordDatabaseAsData:(SaveCompletionBlock)completion {
     if (self.locked) {
         NSLog(@"Attempt to get safe data while locked?");
-        return nil;
+        completion(NO, nil, nil);
     }
     
-    return [self.passwordDatabase getAsData:error];
+    [self.passwordDatabase getAsData:completion];
 }
 
 - (NSURL*)fileUrl {

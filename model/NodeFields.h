@@ -49,8 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NodeFields *)deserialize:(NSDictionary *)dict;
 - (NSDictionary*)serialize:(SerializationPackage*)serialization;
 
-- (NodeFields*)duplicate;
-- (NodeFields *)cloneForHistory;
+- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneMetadataDates:(BOOL)cloneMetadataDates;
 
 - (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;
 - (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;

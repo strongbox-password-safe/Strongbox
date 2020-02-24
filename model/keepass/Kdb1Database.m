@@ -60,23 +60,22 @@ static const BOOL kLogVerbose = NO;
     return ret;
 }
 
-- (StrongboxDatabase *)open:(NSData *)data
-        compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
-                      error:(NSError * _Nullable __autoreleasing *)error {
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+    NSError* error;
     KdbSerializationData *serializationData = [KdbSerialization deserialize:data
-                                                                   password:compositeKeyFactors.password
-                                                              keyFileDigest:compositeKeyFactors.keyFileDigest
-                                                                    ppError:error];
+                                                                   password:ckf.password
+                                                              keyFileDigest:ckf.keyFileDigest
+                                                                    ppError:&error];
     
     if(serializationData == nil) {
-        NSLog(@"Error getting Decrypting KDB binary: [%@]", *error);
-        return nil;
+        NSLog(@"Error getting Decrypting KDB binary: [%@]", error);
+        completion(NO, nil, error);
+        return;
     }
 
     if(kLogVerbose) {
         NSLog(@"KdbSerializationData = [%@]", serializationData);
     }
-
 
     NSArray<DatabaseAttachment*>* attachments;
     Node* rootGroup = [self buildStrongboxModel:serializationData attachments:&attachments];
@@ -95,20 +94,19 @@ static const BOOL kLogVerbose = NO;
 
     StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
                                                                  metadata:metadata
-                                                      compositeKeyFactors:compositeKeyFactors
+                                                      compositeKeyFactors:ckf
                                                               attachments:attachments];
     ret.adaptorTag = serializationData.metaEntries;
     
-    return ret;
+    completion(NO, ret, nil);
 }
 
-- (NSData *)save:(StrongboxDatabase *)database error:(NSError**)error {
-    if(!database.compositeKeyFactors.password.length && !database.compositeKeyFactors.keyFileDigest) { // KeePass 1 does not allow empty Password
-        if(error) {
-            *error = [Utils createNSError:@"Master Password or Key File not set." errorCode:-3];
-        }
-        
-        return nil;
+- (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
+    if(!database.compositeKeyFactors.password.length && !database.compositeKeyFactors.keyFileDigest) {
+        // KeePass 1 does not allow empty Password
+        NSError* error = [Utils createNSError:@"Master Password or Key File not set." errorCode:-3];
+        completion(NO, nil, error);
+        return;
     }
     
     KdbSerializationData *serializationData = [[KdbSerializationData alloc] init];
@@ -135,10 +133,13 @@ static const BOOL kLogVerbose = NO;
         [serializationData.metaEntries addObjectsFromArray:metaEntries];
     }
     
-    return [KdbSerialization serialize:serializationData
+    NSError* error;
+    NSData* ret = [KdbSerialization serialize:serializationData
                               password:database.compositeKeyFactors.password
                          keyFileDigest:database.compositeKeyFactors.keyFileDigest
-                               ppError:error];
+                               ppError:&error];
+    
+    completion(NO, ret, error);
 }
 
 + (NSData *_Nullable)getYubikeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {

@@ -16,7 +16,7 @@
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "4DC4E01323488BAA000743C4"
                BuildableName = "Strongbox.app"
-               BlueprintName = "Strongbox-iOS Family"
+               BlueprintName = "Strongbox-iOS-Family"
                ReferencedContainer = "container:Strongbox.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,7 +46,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DC4E01323488BAA000743C4"
             BuildableName = "Strongbox.app"
-            BlueprintName = "Strongbox-iOS Family"
+            BlueprintName = "Strongbox-iOS-Family"
             ReferencedContainer = "container:Strongbox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,7 +63,7 @@
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "4DC4E01323488BAA000743C4"
             BuildableName = "Strongbox.app"
-            BlueprintName = "Strongbox-iOS Family"
+            BlueprintName = "Strongbox-iOS-Family"
             ReferencedContainer = "container:Strongbox.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

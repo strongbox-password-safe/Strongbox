@@ -42,6 +42,7 @@
 #import "ProUpgradeIAPManager.h"
 #import "BiometricsManager.h"
 #import "BookmarksHelper.h"
+#import "YubiManager.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -1156,6 +1157,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                  password:credentials.password
                                       url:credentials.keyFileUrl
                            onceOffKeyFile:credentials.oneTimeKeyFileData
+                            yubiKeyConfig:credentials.yubiKeyConfig
                                    format:credentials.format];
         }
     }
@@ -1212,22 +1214,29 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                        password:(NSString*)password
                             url:(NSURL*)url
                  onceOffKeyFile:(NSData*)onceOffKeyFile
+                  yubiKeyConfig:(YubiKeyHardwareConfiguration*)yubiKeyConfig
                          format:(DatabaseFormat)format {
     [AddNewSafeHelper createNewDatabase:self
                                    name:name
                                password:password
                              keyFileUrl:url
                      onceOffKeyFileData:onceOffKeyFile
+                          yubiKeyConfig:yubiKeyConfig
                           storageParams:storageParams
                                  format:format
-                             completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
-                                 if(error || !metadata) {
-                                     [Alerts error:self title:NSLocalizedString(@"safes_vc_error_creating_database", @"Error Title: Error creating database") error:error];
-                                 }
-                                 else {
-                                     [self addDatabaseWithiCloudRaceCheck:metadata];
-                                 }
-                             }];
+                             completion:^(BOOL userCancelled, SafeMetaData * _Nullable metadata, NSError * _Nullable error) {
+        if (userCancelled) {
+            // NOP?
+        }
+        else if (error || !metadata) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"safes_vc_error_creating_database", @"Error Title: Error creating database")
+                    error:error];
+        }
+        else {
+            [self addDatabaseWithiCloudRaceCheck:metadata];
+        }
+    }];
 }
 
 - (void)onCreateNewExpressDatabaseDone:(NSString*)name
@@ -1235,15 +1244,21 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [AddNewSafeHelper createNewExpressDatabase:self
                                           name:name
                                       password:password
-                                    completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
-                                        if(error || !metadata) {
-                                            [Alerts error:self title:NSLocalizedString(@"safes_vc_error_creating_database", @"Error Title: Error while creating database") error:error];
-                                        }
-                                        else {
-                                            metadata = [self addDatabaseWithiCloudRaceCheck:metadata];
-                                            [self performSegueWithIdentifier:@"segueToCreateExpressDone" sender:@{@"database" : metadata, @"password" : password} ];
-                                        }
-                         }];
+                                    completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
+        if (userCancelled) {
+            // NOP
+        }
+        else if(error || !metadata) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"safes_vc_error_creating_database", @"Error Title: Error while creating database")
+                    error:error];
+        }
+        else {
+            metadata = [self addDatabaseWithiCloudRaceCheck:metadata];
+            [self performSegueWithIdentifier:@"segueToCreateExpressDone"
+                                      sender:@{@"database" : metadata, @"password" : password }];
+        }
+    }];
 }
 
 - (SafeMetaData*)addDatabaseWithiCloudRaceCheck:(SafeMetaData*)metadata {

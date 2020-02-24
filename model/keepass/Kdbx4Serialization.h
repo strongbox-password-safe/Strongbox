@@ -13,18 +13,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Kdbx4Serialization : NSObject
+typedef void (^Deserialize4CompletionBlock)(BOOL userCancelled, Kdbx4SerializationData *_Nullable serializationData, NSError*_Nullable error);
+typedef void (^Serialize4CompletionBlock)(BOOL userCancelled, NSData *_Nullable data, NSError*_Nullable error);
 
-+ (NSData *_Nullable)getYubikeyChallenge:(NSData *)candidate error:(NSError **)error;
+@interface Kdbx4Serialization : NSObject
 
 + (nullable CryptoParameters*)getCryptoParams:(NSData*)safeData; // Used to test AutoFill crash likelyhood without full decrypt
 
-+ (nullable Kdbx4SerializationData*)deserialize:(NSData*)safeData compositeKey:(CompositeKeyFactors*)compositeKey ppError:(NSError**)ppError;
++ (void)deserialize:(NSData*)safeData
+compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+         completion:(Deserialize4CompletionBlock)completion;
 
-+ (nullable NSData*)serialize:(Kdbx4SerializationData*)serializationData
-                          xml:(NSString*)xml
-                 compositeKey:(CompositeKeyFactors*)compositeKey
-                      ppError:(NSError**)ppError;
++ (void)serialize:(Kdbx4SerializationData*)serializationData
+              xml:(NSString*)xml
+              ckf:(CompositeKeyFactors*)ckf
+       completion:(Serialize4CompletionBlock)completion;
 
 @end
 
