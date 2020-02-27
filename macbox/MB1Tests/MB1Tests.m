@@ -18,7 +18,7 @@
 - (void)testEmpty {
     DatabaseMetadata* metadata = [[DatabaseMetadata alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileUrl:[NSURL URLWithString:@""] storageInfo:@""];
     
-    metadata.touchIdPassword = @"";
+    [metadata resetConveniencePasswordWithCurrentConfiguration:@""];
     
     XCTAssertNotNil(metadata.touchIdPassword);
     XCTAssert(metadata.touchIdPassword.length == 0);
@@ -27,7 +27,7 @@
 - (void)testNil {
     DatabaseMetadata* metadata = [[DatabaseMetadata alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileUrl:[NSURL URLWithString:@""] storageInfo:@""];
 
-    metadata.touchIdPassword = nil;
+    [metadata resetConveniencePasswordWithCurrentConfiguration:nil];
     
     XCTAssertNil(metadata.touchIdPassword);
 }
@@ -35,7 +35,7 @@
 - (void)testSomething {
     DatabaseMetadata* metadata = [[DatabaseMetadata alloc] initWithNickName:@"Hello" storageProvider:kLocalDevice fileUrl:[NSURL URLWithString:@""] storageInfo:@""];
 
-    metadata.touchIdPassword = @"Something";
+    [metadata resetConveniencePasswordWithCurrentConfiguration:@"Something"];
     
     XCTAssert([metadata.touchIdPassword isEqualToString:@"Something"]);
 }

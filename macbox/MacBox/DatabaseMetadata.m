@@ -109,6 +109,7 @@ const NSInteger kDefaultPasswordExpiryHours = 14 * 24; // 2 weeks
     [encoder encodeBool:self.hasPromptedForTouchIdEnrol forKey:@"hasPromptedForTouchIdEnrol"];
     [encoder encodeInteger:self.touchIdPasswordExpiryPeriodHours forKey:@"touchIdPasswordExpiryPeriodHours"];
     [encoder encodeBool:self.isTouchIdEnrolled forKey:@"isTouchIdEnrolled"];
+    [encoder encodeObject:self.yubiKeyConfiguration forKey:@"yubiKeyConfiguration"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -133,6 +134,10 @@ const NSInteger kDefaultPasswordExpiryHours = 14 * 24; // 2 weeks
         }
         else {
             self.isTouchIdEnrolled = self.touchIdPassword != nil;
+        }
+        
+        if ([decoder containsValueForKey:@"yubiKeyConfiguration"]) {
+            self.yubiKeyConfiguration = [decoder decodeObjectForKey:@"yubiKeyConfiguration"];
         }
     }
     

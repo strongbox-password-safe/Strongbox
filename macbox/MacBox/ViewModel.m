@@ -169,8 +169,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    CompositeKeyFactors* original = [CompositeKeyFactors password:self.passwordDatabase.compositeKeyFactors.password
-                                                    keyFileDigest:self.passwordDatabase.compositeKeyFactors.keyFileDigest];
+    CompositeKeyFactors* original = [self.passwordDatabase.compositeKeyFactors clone];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setCompositeKeyFactors:original];
     
@@ -179,6 +178,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     self.passwordDatabase.compositeKeyFactors.password = compositeKeyFactors.password;
     self.passwordDatabase.compositeKeyFactors.keyFileDigest = compositeKeyFactors.keyFileDigest;
+    self.passwordDatabase.compositeKeyFactors.yubiKeyCR = compositeKeyFactors.yubiKeyCR;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

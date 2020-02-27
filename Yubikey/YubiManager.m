@@ -59,7 +59,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
 }
 
 - (BOOL)yubiKeySupportedOnDevice {
-    return NO; // TODO: When We get approval - YubiKitDeviceCapabilities.supportsISO7816NFCTags;
+    return YubiKitDeviceCapabilities.supportsISO7816NFCTags;
 }
 
 - (void)getResponse:(YubiKeyHardwareConfiguration*)configuration

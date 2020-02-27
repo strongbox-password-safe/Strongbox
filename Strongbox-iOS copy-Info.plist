@@ -122,6 +122,8 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+	<key>NFCReaderUsageDescription</key>
+	<string>Strongbox needs access to NFC to communicate with your YubiKey.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -353,6 +355,14 @@
 			<key>UTTypeIdentifier</key>
 			<string>com.keepassium.kdb</string>
 		</dict>
+	</array>
+	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
+	<array>
+		<string>A000000527471117</string>
+		<string>A0000006472F0001</string>
+		<string>A0000005272101</string>
+		<string>A000000308</string>
+		<string>A000000527200101</string>
 	</array>
 </dict>
 </plist>

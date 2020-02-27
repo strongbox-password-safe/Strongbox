@@ -39,6 +39,7 @@
 #import "ClipboardManager.h"
 #import "BookmarksHelper.h"
 #import "DatabasePropertiesController.h"
+#import "MacYubiKeyManager.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -131,12 +132,16 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property (weak) IBOutlet NSPopUpButton *keyFilePopup;
 @property NSString* selectedKeyFileBookmark;
 
-
-
 @property (weak) IBOutlet NSTextField *labelYubiKey;
 @property (weak) IBOutlet NSPopUpButton *yubiKeyPopup;
 @property (weak) IBOutlet NSButton *checkboxAllowEmpty;
 @property (weak) IBOutlet NSButton *upgradeButton;
+
+@property YubiKeyConfiguration *selectedYubiKeyConfiguration;
+
+@property BOOL currentYubiKeySlot1IsBlocking;
+@property BOOL currentYubiKeySlot2IsBlocking;
+@property NSString* currentYubiKeySerial;
 
 @end
 
@@ -646,6 +651,7 @@ static NSImage* kStrongBox256Image;
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
         
         self.selectedKeyFileBookmark = self.model ? self.model.databaseMetadata.keyFileBookmark : nil;
+        self.selectedYubiKeyConfiguration = self.model ? self.model.databaseMetadata.yubiKeyConfiguration : nil;
         
         [self bindLockScreenUi];
     }
@@ -1303,10 +1309,12 @@ static NSImage* kStrongBox256Image;
 
 - (void)showProgressModal:(NSString*)operationDescription {
     [self hideProgressModal];
-    
-    self.progressWindow = [[ProgressWindow alloc] initWithWindowNibName:@"ProgressWindow"];
-    self.progressWindow.operationDescription = operationDescription;
-    [self.view.window beginSheet:self.progressWindow.window  completionHandler:nil];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.progressWindow = [[ProgressWindow alloc] initWithWindowNibName:@"ProgressWindow"];
+        self.progressWindow.operationDescription = operationDescription;
+        [self.view.window beginSheet:self.progressWindow.window  completionHandler:nil];
+    });
 }
 
 - (void)hideProgressModal {
@@ -1337,7 +1345,6 @@ static NSImage* kStrongBox256Image;
 
 - (IBAction)onEnterMasterPassword:(id)sender {
     if(![self manualCredentialsAreValid]) {
-        [Alerts info:@"Invalid Credentials" window:self.view.window]; // TODO: Officially place this
         return;
     }
     
@@ -1365,7 +1372,7 @@ static NSImage* kStrongBox256Image;
 
 - (void)continueManualUnlockWithPassword:(NSString*_Nullable)password {
     NSError* error;
-    NSData* keyFileDigest = [self getSelectedKeyFileDigest:&error];
+    CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:password error:&error];
 
     if(error) {
         [Alerts error:NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not read the key file.")
@@ -1373,11 +1380,37 @@ static NSImage* kStrongBox256Image;
                window:self.view.window];
         return;
     }
-    
-    CompositeKeyFactors* ckf = [CompositeKeyFactors password:password
-                                               keyFileDigest:keyFileDigest];
-    
+
     [self reloadAndUnlock:ckf isBiometricOpen:NO];
+}
+
+- (CompositeKeyFactors*)getCompositeKeyFactorsWithSelectedUiFactors:(NSString*)password error:(NSError**)error {
+    NSData* keyFileDigest = [self getSelectedKeyFileDigest:error];
+
+    if(*error) {
+        return nil;
+    }
+        
+    if (self.selectedYubiKeyConfiguration == nil) {
+        return [CompositeKeyFactors password:password
+                              keyFileDigest:keyFileDigest];
+    }
+    else {
+        NSWindow* windowHint = self.view.window; // Do here as must be called on Main Thread...
+
+        NSInteger slot = self.selectedYubiKeyConfiguration.slot;
+        BOOL blocking = slot == 1 ? self.currentYubiKeySlot1IsBlocking : self.currentYubiKeySlot2IsBlocking;
+
+        return [CompositeKeyFactors password:password
+                              keyFileDigest:keyFileDigest
+                                  yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+            [MacYubiKeyManager.sharedInstance compositeKeyFactorCr:challenge
+                                                        windowHint:windowHint
+                                                              slot:slot
+                                                    slotIsBlocking:blocking
+                                                        completion:completion];
+        }];
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1422,20 +1455,18 @@ static NSImage* kStrongBox256Image;
                 self.lastAutoPromptForTouchIdThrottle = NSDate.date;
 
                 if(success) {
-                    NSError* error;
-                    NSData* keyFileDigest = [self getSelectedKeyFileDigest:&error];
+                    DatabaseMetadata* metaData = self.model.databaseMetadata;
 
-                    if(error) {
+                    NSError* err;
+                    CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:metaData.touchIdPassword
+                                                                                           error:&err];
+
+                    if(err) {
                         [Alerts error:NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not read the key file.")
                                 error:error
                                window:self.view.window];
                         return;
                     }
-
-                    DatabaseMetadata* metaData = self.model.databaseMetadata;
-                    
-                    CompositeKeyFactors* ckf = [CompositeKeyFactors password:metaData.touchIdPassword
-                                                               keyFileDigest:keyFileDigest];
 
                     [self reloadAndUnlock:ckf isBiometricOpen:YES];
                 }
@@ -1576,6 +1607,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         // Record Key File if one was used...
         
         self.model.databaseMetadata.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
+        
+        self.model.databaseMetadata.yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+        
         [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
     }
     else {
@@ -1716,19 +1750,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
     DatabaseMetadata* metadata = self.model.databaseMetadata;
     
-    if(self.changeMasterPassword.keyFileUrl && !Settings.sharedInstance.doNotRememberKeyFile) {
-        NSError* error;
-        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.changeMasterPassword.keyFileUrl readOnly:YES error:&error];
-        if(bookmark) {
-            metadata.keyFileBookmark = bookmark;
-        }
-        else {
-            NSLog(@"Could not set key file bookmark for url... [%@]", error);
-        }
+    if(self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile) {
+        metadata.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
     }
     else {
         metadata.keyFileBookmark = nil;
     }
+    metadata.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
     
     [metadata resetConveniencePasswordWithCurrentConfiguration:ckf.password];
     
@@ -1740,14 +1768,26 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         dispatch_async(dispatch_get_main_queue(), ^{
             self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
             
-            NSString* loc = new ? NSLocalizedString(@"mac_please_set_master_credentials", @"Please Enter the Master Credentials for this Database") : NSLocalizedString(@"mac_change_master_credentials", @"Change Master Credentials");
+            NSString* loc = new ?
+            NSLocalizedString(@"mac_please_set_master_credentials", @"Please Enter the Master Credentials for this Database") :
+            NSLocalizedString(@"mac_change_master_credentials", @"Change Master Credentials");
             
             self.changeMasterPassword.titleText = loc;
-            self.changeMasterPassword.databaseFormat = self.model.format;
+            self.changeMasterPassword.initialDatabaseFormat = self.model.format;
+            self.changeMasterPassword.initialYubiKeyConfiguration = self.model.databaseMetadata.yubiKeyConfiguration;
+            self.changeMasterPassword.initialKeyFileBookmark = self.model.databaseMetadata.keyFileBookmark;
             
-            [self.view.window beginSheet:self.changeMasterPassword.window  completionHandler:^(NSModalResponse returnCode) {
+            [self.view.window beginSheet:self.changeMasterPassword.window
+                       completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
-                    [self changeMasterCredentials:self.changeMasterPassword.confirmedCompositeKeyFactors];
+                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelected:self.view.window];
+                    if (ckf) {
+                        [self changeMasterCredentials:ckf];
+                    }
+                    else {
+                        NSString* loc = NSLocalizedString(@"mac_error_could_not_generate_composite_key", @"Could not generate Composite Key");
+                        [Alerts info:loc window:self.view.window];
+                    }
                 }
                 
                 if(completion) {
@@ -3612,12 +3652,12 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 
 - (IBAction)controlTextDidChange:(NSSecureTextField *)obj {
 //    NSLog(@"controlTextDidChange");
-    [self bindLockScreenUi];
+    BOOL enabled = [self manualCredentialsAreValid];
+    [self.buttonUnlockWithPassword setEnabled:enabled];
 }
 
 - (void)bindLockScreenUi {
     self.checkboxAllowEmpty.state = Settings.sharedInstance.allowEmptyOrNoPasswordEntry ? NSOnState : NSOffState;
-    
     self.upgradeButton.hidden = Settings.sharedInstance.fullVersion;
     
     if (!Settings.sharedInstance.fullVersion && !Settings.sharedInstance.freeTrial) {
@@ -3631,16 +3671,14 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         [self.upgradeButton setAttributedTitle:attrTitle];
     }
     
-    self.labelYubiKey.hidden = YES;
-    self.yubiKeyPopup.hidden = YES;
-    
     BOOL enabled = [self manualCredentialsAreValid];
-
     [self.buttonUnlockWithPassword setEnabled:enabled];
         
     [self bindBiometricButtonsOnLockScreen];
         
     [self refreshKeyFileDropdown];
+    
+    [self bindYubikeyOnLockScreen];
 }
 
 - (void)bindBiometricButtonsOnLockScreen {
@@ -3690,6 +3728,130 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 - (IBAction)onUpgrade:(id)sender {
     AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
     [appDelegate showUpgradeModal:0];
+}
+            
+- (void)bindYubikeyOnLockScreen {
+    self.currentYubiKeySerial = nil;
+    self.currentYubiKeySlot1IsBlocking = NO;
+    self.currentYubiKeySlot2IsBlocking = NO;
+    
+    //    NSLog(@"Binding: [selectedYubiKeyConfiguration = [%@]]", self.selectedYubiKeyConfiguration);
+
+    [self.yubiKeyPopup.menu removeAllItems];
+
+    NSString* loc = NSLocalizedString(@"generic_refreshing_ellipsis", @"Refreshing...");
+    [self.yubiKeyPopup.menu addItemWithTitle:loc
+                                      action:nil
+                               keyEquivalent:@""];
+    self.yubiKeyPopup.enabled = NO;
+    
+    [MacYubiKeyManager.sharedInstance getAvailableYubikey:^(YubiKeyData * _Nonnull yk) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onGotAvailableYubiKey:yk];
+        });}];
+}
+
+- (void)onGotAvailableYubiKey:(YubiKeyData*)yk {
+    self.currentYubiKeySerial = yk.serial;
+    self.currentYubiKeySlot1IsBlocking = yk.slot1CrStatus == YubiKeySlotCrStatusSupportedBlocking;
+    self.currentYubiKeySlot2IsBlocking = yk.slot2CrStatus == YubiKeySlotCrStatusSupportedBlocking;
+    
+    [self.yubiKeyPopup.menu removeAllItems];
+
+    if (!Settings.sharedInstance.fullVersion && !Settings.sharedInstance.freeTrial) {
+        NSString* loc = NSLocalizedString(@"mac_lock_screen_yubikey_popup_menu_yubico_pro_only", @"YubiKey (Pro Only)");
+        
+        [self.yubiKeyPopup.menu addItemWithTitle:loc
+                                          action:nil
+                                   keyEquivalent:@""];
+
+        [self.yubiKeyPopup selectItemAtIndex:0];
+        return;
+    }
+    
+    // Always have option to select None...
+    
+    NSString* loc = NSLocalizedString(@"generic_none", @"None");
+    NSMenuItem* noneMenuItem = [self.yubiKeyPopup.menu addItemWithTitle:loc
+                                                                 action:@selector(onSelectNoYubiKey)
+                                                          keyEquivalent:@""];
+
+    NSMenuItem* slot1MenuItem;
+    NSMenuItem* slot2MenuItem;
+    
+    // Available Slots...
+    
+    BOOL availableSlots = NO;
+    NSString* loc1 = NSLocalizedString(@"mac_yubikey_slot_n_touch_required_fmt", @"Yubikey Slot %ld (Touch Required)");
+    NSString* loc2 = NSLocalizedString(@"mac_yubikey_slot_n_fmt", @"Yubikey Slot %ld");
+
+    if ( [self yubiKeyCrIsSupported:yk.slot1CrStatus] ) {
+        NSString* loc = self.currentYubiKeySlot1IsBlocking ? loc1 : loc2;
+        NSString* locFmt = [NSString stringWithFormat:loc, 1];
+        slot1MenuItem = [self.yubiKeyPopup.menu addItemWithTitle:locFmt
+                                                          action:@selector(onSelectYubikeySlot1)
+                                                   keyEquivalent:@""];
+        availableSlots = YES;
+    }
+    
+    if ( [self yubiKeyCrIsSupported:yk.slot2CrStatus] ) {
+        NSString* loc = self.currentYubiKeySlot2IsBlocking ? loc1 : loc2;
+        NSString* locFmt = [NSString stringWithFormat:loc, 2];
+        
+        slot2MenuItem = [self.yubiKeyPopup.menu addItemWithTitle:locFmt
+                                                          action:@selector(onSelectYubikeySlot2)
+                                                   keyEquivalent:@""];
+        availableSlots = YES;
+    }
+    
+    BOOL selectedItem = NO;
+
+    if (availableSlots) {
+        if (self.selectedYubiKeyConfiguration && ([self.selectedYubiKeyConfiguration.deviceSerial isEqualToString:yk.serial])) {
+            // Matching Device!
+            
+            YubiKeySlotCrStatus slotStatus = self.selectedYubiKeyConfiguration.slot == 1 ? yk.slot1CrStatus : yk.slot2CrStatus;
+            
+            if ([self yubiKeyCrIsSupported:slotStatus]) {
+                // Select Slot
+                if (self.selectedYubiKeyConfiguration.slot == 1 && slot1MenuItem) {
+                    [self.yubiKeyPopup selectItem:slot1MenuItem];
+                    selectedItem = YES;
+                }
+                else if (self.selectedYubiKeyConfiguration.slot == 2 && slot2MenuItem){
+                    [self.yubiKeyPopup selectItem:slot2MenuItem];
+                    selectedItem = YES;
+                }
+            }
+        }
+    }
+    
+    if (!selectedItem) { // Auto Select 'None'
+        [self.yubiKeyPopup selectItem:noneMenuItem];
+        self.selectedYubiKeyConfiguration = nil;
+    }
+    
+    self.yubiKeyPopup.enabled = YES;
+}
+
+- (BOOL)yubiKeyCrIsSupported:(YubiKeySlotCrStatus)status {
+    return status == YubiKeySlotCrStatusSupportedBlocking || status == YubiKeySlotCrStatusSupportedNonBlocking;
+}
+
+- (void)onSelectNoYubiKey {
+    self.selectedYubiKeyConfiguration = nil;
+}
+
+- (void)onSelectYubikeySlot1 {
+    self.selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
+    self.selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
+    self.selectedYubiKeyConfiguration.slot = 1;
+}
+
+- (void)onSelectYubikeySlot2 {
+    self.selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
+    self.selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
+    self.selectedYubiKeyConfiguration.slot = 2;
 }
 
 @end

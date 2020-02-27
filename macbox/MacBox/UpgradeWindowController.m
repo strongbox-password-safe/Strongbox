@@ -376,4 +376,9 @@ updatedTransactions:(NSArray *)transactions {
     }
 }
 
+- (IBAction)onAppleFamilySharing:(id)sender {
+    [[NSWorkspace sharedWorkspace] openURL:
+    [NSURL URLWithString:@"macappstore://apps.apple.com/gb/app/strongbox-family-sharing/id1500040999?mt=12"]];
+}
+
 @end

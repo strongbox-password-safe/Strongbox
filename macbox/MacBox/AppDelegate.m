@@ -19,7 +19,6 @@
 #import "ViewController.h"
 #import "DatabasesManager.h"
 #import <SAMKeychain/SAMKeychain.h> // TODO: Remove in April 2020 after migrations...
-#import "MacYubiKeyManager.h"
 
 //#import "DAVKit.h"
 
@@ -105,8 +104,6 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         DocumentController* dc = NSDocumentController.sharedDocumentController;
         [dc onAppStartup];
-        
-//        [MacYubiKeyManager.sharedInstance doIt];
     });
 }
 

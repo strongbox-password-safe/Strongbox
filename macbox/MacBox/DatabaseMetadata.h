@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "StorageProvider.h"
 #import "SecretStore.h"
+#import "YubiKeyConfiguration.h"
 
 extern const NSInteger kDefaultPasswordExpiryHours;
 
@@ -28,6 +29,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property (nonatomic, strong, readonly) NSString* touchIdPassword;
 @property (nonatomic, strong) NSString* keyFileBookmark;
+@property (nonatomic, strong) YubiKeyConfiguration* yubiKeyConfiguration;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
 @property (nonatomic) BOOL isTouchIdEnrolled;

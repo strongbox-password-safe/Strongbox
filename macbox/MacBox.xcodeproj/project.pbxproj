@@ -319,11 +319,16 @@
 		4D59E2A623FCA3320004B309 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A223FCA3320004B309 /* libykpers-1.a */; };
 		4D59E2A723FCA3320004B309 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A323FCA3320004B309 /* libjson.a */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
+		4D5C21932406F8FE0003A61A /* PressYubiKeyWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643B9E23B65075000C383A /* NodeDetailsViewController.m */; };
 		4D643BA623B67E18000C383A /* MacKeePassHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */; };
 		4D68255823E498D7002DC4FB /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */; };
 		4D6EB45E23DF26910045C8D5 /* DatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */; };
+		4D70345A2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */; };
+		4D70345B2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */; };
+		4D788CF82404761E007BD8D6 /* YubiKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D788CF72404761E007BD8D6 /* YubiKeyData.m */; };
+		4D788CF92404761E007BD8D6 /* YubiKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D788CF72404761E007BD8D6 /* YubiKeyData.m */; };
 		4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
 		4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
 		4D8354C6238908AB00E264E0 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -400,6 +405,9 @@
 		4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
+		4DCC991424074EBF00B7DAB2 /* PressYubiKeyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */; };
+		4DCC992924074EDC00B7DAB2 /* PressYubiKeyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */; };
+		4DCC992C24074F9000B7DAB2 /* PressYubiKeyWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */; };
 		4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
 		4DD2BAB9238BE44400513271 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD2BAB8238BE44400513271 /* MMcG_MF_Base32Additions.m */; };
 		4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */; };
@@ -718,6 +726,8 @@
 		4D59E2A323FCA3320004B309 /* libjson.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjson.a; sourceTree = "<group>"; };
 		4D5AE1E81F432BBC000A34D7 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = MacBox/Settings.h; sourceTree = "<group>"; };
 		4D5AE1E91F432BBC000A34D7 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = MacBox/Settings.m; sourceTree = "<group>"; };
+		4D5C21902406F8FE0003A61A /* PressYubiKeyWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PressYubiKeyWindow.h; path = MacBox/PressYubiKeyWindow.h; sourceTree = SOURCE_ROOT; };
+		4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PressYubiKeyWindow.m; path = MacBox/PressYubiKeyWindow.m; sourceTree = SOURCE_ROOT; };
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeWindowController.m; path = MacBox/UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D643B9D23B65075000C383A /* NodeDetailsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeDetailsViewController.h; path = MacBox/NodeDetailsViewController.h; sourceTree = "<group>"; };
@@ -733,6 +743,10 @@
 		4D68256823E498EA002DC4FB /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		4D6EB45C23DF26910045C8D5 /* DatabasePreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabasePreferences.h; path = MacBox/DatabasePreferences.h; sourceTree = "<group>"; };
 		4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasePreferences.m; path = MacBox/DatabasePreferences.m; sourceTree = "<group>"; };
+		4D7034582405B20200F4F41E /* YubiKeyConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YubiKeyConfiguration.h; path = MacBox/YubiKeyConfiguration.h; sourceTree = SOURCE_ROOT; };
+		4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = YubiKeyConfiguration.m; path = MacBox/YubiKeyConfiguration.m; sourceTree = SOURCE_ROOT; };
+		4D788CF62404761E007BD8D6 /* YubiKeyData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YubiKeyData.h; sourceTree = SOURCE_ROOT; };
+		4D788CF72404761E007BD8D6 /* YubiKeyData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YubiKeyData.m; sourceTree = SOURCE_ROOT; };
 		4D832A9923CE2AC000A7885E /* SecretStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SecretStore.h; path = ../model/SecretStore.h; sourceTree = "<group>"; };
 		4D8354C12389086E00E264E0 /* FavIconManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconManager.h; path = ../model/FavIconManager.h; sourceTree = "<group>"; };
 		4D8354C22389086E00E264E0 /* FavIconManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconManager.m; path = ../model/FavIconManager.m; sourceTree = "<group>"; };
@@ -907,6 +921,15 @@
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DocumentController.h; path = MacBox/DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DocumentController.m; path = MacBox/DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = MacBox/Credits.rtf; sourceTree = "<group>"; };
+		4DCC991524074EBF00B7DAB2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PressYubiKeyWindow.xib; sourceTree = "<group>"; };
+		4DCC991A24074ECE00B7DAB2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PressYubiKeyWindow.strings"; sourceTree = "<group>"; };
+		4DCC991C24074ED000B7DAB2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		4DCC991E24074ED100B7DAB2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		4DCC992024074ED100B7DAB2 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		4DCC992224074ED200B7DAB2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		4DCC992424074ED300B7DAB2 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		4DCC992624074ED400B7DAB2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		4DCC992824074ED500B7DAB2 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
 		4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NSCheckboxTableCellView.h; path = MacBox/NSCheckboxTableCellView.h; sourceTree = "<group>"; };
 		4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NSCheckboxTableCellView.m; path = MacBox/NSCheckboxTableCellView.m; sourceTree = "<group>"; };
 		4DD2BAB7238BE44400513271 /* MMcG_MF_Base32Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMcG_MF_Base32Additions.h; path = ../lib/Base32/MMcG_MF_Base32Additions.h; sourceTree = "<group>"; };
@@ -1360,6 +1383,8 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4DAE28C724073089003D9221 /* Upgrade */,
+				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4D6EB45923DF23750045C8D5 /* Database Properties */,
 				4DE2CA3E23C38B5E00F76255 /* Main */,
 				4D14A13B224D211400C71ABF /* Node Details */,
@@ -1382,23 +1407,27 @@
 				4DC805BA23A1173D001E742E /* CollectionViewHeader.xib */,
 				4DF299812243CED70080F9DC /* CollectionViewHeader.h */,
 				4DF299822243CED70080F9DC /* CollectionViewHeader.m */,
-				4DC805A623A116E3001E742E /* UpgradeWindowController.xib */,
-				4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */,
-				4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */,
 			);
 			name = View;
 			sourceTree = "<group>";
 		};
-		4D59E25F23FCA22E0004B309 /* yubikey */ = {
+		4D59E25F23FCA22E0004B309 /* YubiKey */ = {
 			isa = PBXGroup;
 			children = (
 				4D59E29F23FCA3320004B309 /* lib */,
 				4D59E2A823FCA36D0004B309 /* include */,
 				4D59E20523FCA15A0004B309 /* MacYubiKeyManager.h */,
 				4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */,
+				4D788CF62404761E007BD8D6 /* YubiKeyData.h */,
+				4D788CF72404761E007BD8D6 /* YubiKeyData.m */,
+				4D7034582405B20200F4F41E /* YubiKeyConfiguration.h */,
+				4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */,
+				4D5C21902406F8FE0003A61A /* PressYubiKeyWindow.h */,
+				4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */,
+				4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */,
 			);
-			name = yubikey;
-			path = include/yubikey;
+			name = YubiKey;
+			path = include/YubiKey;
 			sourceTree = "<group>";
 		};
 		4D59E26023FCA22E0004B309 /* json-c */ = {
@@ -1599,6 +1628,16 @@
 				4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */,
 			);
 			name = KeePass;
+			sourceTree = "<group>";
+		};
+		4DAE28C724073089003D9221 /* Upgrade */ = {
+			isa = PBXGroup;
+			children = (
+				4DC805A623A116E3001E742E /* UpgradeWindowController.xib */,
+				4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */,
+				4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */,
+			);
+			name = Upgrade;
 			sourceTree = "<group>";
 		};
 		4DBF492322232A1100F48182 /* DAVKit */ = {
@@ -1807,14 +1846,13 @@
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
 				4D1FFB492403030100B75EA2 /* Mac-Outright-Pro-Info.plist */,
 				4DF59F651F30DB7A00D68BFE /* Info.plist */,
+				4D59E25F23FCA22E0004B309 /* YubiKey */,
 				4D524D2B219B503F00C22CB4 /* View */,
-				4D59E25F23FCA22E0004B309 /* yubikey */,
 				4DCA65AD1F4B45800078B962 /* DocumentController.h */,
 				4DCA65AE1F4B45800078B962 /* DocumentController.m */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
 				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,
 				4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */,
-				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4D55A56D23D743C40057CBA8 /* BookmarksHelper.h */,
 				4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */,
 				4D832A9923CE2AC000A7885E /* SecretStore.h */,
@@ -1967,7 +2005,7 @@
 			isa = PBXProject;
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Original;
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
 					4D1FFA6A2403030100B75EA2 = {
@@ -2032,6 +2070,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1FFB182403030100B75EA2 /* PreferencesWindowController.xib in Resources */,
+				4DCC992924074EDC00B7DAB2 /* PressYubiKeyWindow.xib in Resources */,
 				4D1FFB192403030100B75EA2 /* CheckboxCell.xib in Resources */,
 				4D1FFB1A2403030100B75EA2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4D1FFB1B2403030100B75EA2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
@@ -2088,6 +2127,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DC8059E23A116D5001E742E /* PreferencesWindowController.xib in Resources */,
+				4DCC991424074EBF00B7DAB2 /* PressYubiKeyWindow.xib in Resources */,
 				4DC805D223A1176E001E742E /* CheckboxCell.xib in Resources */,
 				4DC8059123A11493001E742E /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
@@ -2272,6 +2312,7 @@
 				4D1FFA9C2403030100B75EA2 /* V3BinariesList.m in Sources */,
 				4D1FFA9D2403030100B75EA2 /* DatabaseMetadata.m in Sources */,
 				4D1FFA9E2403030100B75EA2 /* BaseXmlDomainObjectHandler.m in Sources */,
+				4D788CF92404761E007BD8D6 /* YubiKeyData.m in Sources */,
 				4D1FFA9F2403030100B75EA2 /* argon2.c in Sources */,
 				4D1FFAA02403030100B75EA2 /* KeePass4DatabaseMetadata.m in Sources */,
 				4D1FFAA12403030100B75EA2 /* FavIconResultTableCellView.m in Sources */,
@@ -2285,6 +2326,7 @@
 				4D1FFAA92403030100B75EA2 /* CHCSVParser.m in Sources */,
 				4D1FFAAA2403030100B75EA2 /* PasswordHistoryEntry.m in Sources */,
 				4D1FFAAB2403030100B75EA2 /* KdbEntry.m in Sources */,
+				4D70345B2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */,
 				4D1FFAAC2403030100B75EA2 /* core.c in Sources */,
 				4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */,
 				4D1FFAAE2403030100B75EA2 /* Document.m in Sources */,
@@ -2298,6 +2340,7 @@
 				4D1FFAB62403030100B75EA2 /* KeePassDatabase.m in Sources */,
 				4D1FFAB72403030100B75EA2 /* PwSafeSerialization.m in Sources */,
 				4D1FFAB82403030100B75EA2 /* CustomIconsRationalizer.m in Sources */,
+				4DCC992C24074F9000B7DAB2 /* PressYubiKeyWindow.m in Sources */,
 				4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */,
 				4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */,
 				4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */,
@@ -2449,6 +2492,7 @@
 				4D524D07219B48D300C22CB4 /* V3BinariesList.m in Sources */,
 				4D559FA520750D1D009856E3 /* DatabaseMetadata.m in Sources */,
 				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
+				4D788CF82404761E007BD8D6 /* YubiKeyData.m in Sources */,
 				4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */,
 				4D524CD6219B47DB00C22CB4 /* KeePass4DatabaseMetadata.m in Sources */,
 				4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */,
@@ -2462,6 +2506,7 @@
 				4D524CAE219B474200C22CB4 /* CHCSVParser.m in Sources */,
 				4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */,
 				4D524CBE219B479900C22CB4 /* KdbEntry.m in Sources */,
+				4D70345A2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */,
 				4D524D25219B4B2A00C22CB4 /* core.c in Sources */,
 				4DBF494322232A3200F48182 /* DAVRequests.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
@@ -2475,6 +2520,7 @@
 				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */,
 				4D1E77D523AFD7FB007240FA /* CustomIconsRationalizer.m in Sources */,
+				4D5C21932406F8FE0003A61A /* PressYubiKeyWindow.m in Sources */,
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
 				4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */,
 				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
@@ -2821,6 +2867,23 @@
 			path = MacBox;
 			sourceTree = "<group>";
 		};
+		4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4DCC991524074EBF00B7DAB2 /* Base */,
+				4DCC991A24074ECE00B7DAB2 /* zh-Hans */,
+				4DCC991C24074ED000B7DAB2 /* fr */,
+				4DCC991E24074ED100B7DAB2 /* de */,
+				4DCC992024074ED100B7DAB2 /* it */,
+				4DCC992224074ED200B7DAB2 /* ru */,
+				4DCC992424074ED300B7DAB2 /* es */,
+				4DCC992624074ED400B7DAB2 /* sv */,
+				4DCC992824074ED500B7DAB2 /* uk */,
+			);
+			name = PressYubiKeyWindow.xib;
+			path = MacBox;
+			sourceTree = SOURCE_ROOT;
+		};
 		4DF59F621F30DB7A00D68BFE /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -2850,18 +2913,17 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2693;
+				CURRENT_PROJECT_VERSION = 2694;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/include/yubikey/lib",
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.19;
+				MARKETING_VERSION = 1.13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2877,18 +2939,17 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2693;
+				CURRENT_PROJECT_VERSION = 2694;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/include/yubikey/lib",
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.19;
+				MARKETING_VERSION = 1.13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2991,6 +3052,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/include/yubikey/**";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -3042,6 +3104,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/include/yubikey/**";
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
@@ -3057,18 +3120,17 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2693;
+				CURRENT_PROJECT_VERSION = 2694;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/include/yubikey/lib",
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.19;
+				MARKETING_VERSION = 1.13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3084,18 +3146,17 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2693;
+				CURRENT_PROJECT_VERSION = 2694;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/include/yubikey/lib",
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.12.19;
+				MARKETING_VERSION = 1.13.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

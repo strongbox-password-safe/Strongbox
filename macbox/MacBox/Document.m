@@ -23,7 +23,6 @@
 
 @property (strong, nonatomic) ViewModel* model;
 @property WindowController* windowController;
-@property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *masterPasswordWindowController;
 
 @property CompositeKeyFactors* credentialsForUnlock;
 @property NSString *selectedItemForUnlock;

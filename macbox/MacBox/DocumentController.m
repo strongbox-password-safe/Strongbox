@@ -34,7 +34,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     
     NSString* loc = NSLocalizedString(@"mac_please_enter_master_credentials_for_this_database", @"Please Enter the Master Credentials for this Database");
     wizard.titleText = loc;
-    wizard.databaseFormat = kKeePass4;
+    wizard.initialDatabaseFormat = kKeePass4;
     wizard.createSafeWizardMode = YES;
     
     NSModalResponse returnCode = [NSApp runModalForWindow:wizard.window];
@@ -54,7 +54,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     NSString* loc4 = NSLocalizedString(@"mac_save_new_db_message",  @"You must save this new database before you can use it");
     panel.message = loc4;
     
-    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:wizard.databaseFormat];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:wizard.selectedDatabaseFormat];
     
     NSString* loc5 = NSLocalizedString(@"mac_untitled_database_filename_fmt", @"Untitled.%@");
     panel.nameFieldStringValue = [NSString stringWithFormat:loc5, adaptor.fileExtension ];
@@ -64,28 +64,26 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     if (modalCode == NSModalResponseOK) {
         NSURL *URL = [panel URL];
 
-        Document *document = [[Document alloc] initWithCredentials:wizard.databaseFormat
-                                               compositeKeyFactors:wizard.confirmedCompositeKeyFactors];
+        CompositeKeyFactors* ckf = [wizard generateCkfFromSelected:nil];
+        
+        Document *document = [[Document alloc] initWithCredentials:wizard.selectedDatabaseFormat
+                                               compositeKeyFactors:ckf];
 
-        [document saveToURL:URL ofType:kStrongboxPasswordDatabaseDocumentType forSaveOperation:NSSaveOperation completionHandler:^(NSError * _Nullable errorOrNil) {
+        [document saveToURL:URL
+                     ofType:kStrongboxPasswordDatabaseDocumentType
+           forSaveOperation:NSSaveOperation
+          completionHandler:^(NSError * _Nullable errorOrNil) {
             if(errorOrNil) {
                 return;
             }
 
             DatabaseMetadata* database = [DatabasesManager.sharedInstance addOrGet:URL];
-            if(wizard.keyFileUrl) {
-                NSError* error;
-                NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:wizard.keyFileUrl readOnly:YES error:&error];
-                
-                if(bookmark) {
-                    database.keyFileBookmark = bookmark;
-                    [DatabasesManager.sharedInstance update:database];
-                }
-                else {
-                    NSLog(@"Error getting bookmark for new db: [%@]", error);
-                }
-            }
             
+            database.keyFileBookmark = wizard.selectedKeyFileBookmark;
+            database.yubiKeyConfiguration = wizard.selectedYubiKeyConfiguration;
+            
+            [DatabasesManager.sharedInstance update:database];
+        
             [self addDocument:document];
             [document setDatabaseMetadata:database];
             [document makeWindowControllers];

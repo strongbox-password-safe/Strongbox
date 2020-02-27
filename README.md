@@ -5,7 +5,7 @@ A Personal Password Manager for iOS & OSX that can be found on the Apple App Sto
 
 https://apps.apple.com/app/strongbox-password-safe/id897283731
 
-Strongbox supports the open source Password Safe (version 3) and KeePass file formats (KeePass 1 and 2, i.e. KDB, KDBX (3.1 and 4)). Strongbox uses open source encryption algoritms likes TwoFish, Argon2d, ChaCha20, Aes, Salsa20 and various other cryptographic techniques (SHA256s, HMACs, CSPRNGs) to store groups and entries, containing various secrets, mostly designed around password storage. You can also store File Attachments in KeePass format safes.
+Strongbox supports the open source Password Safe (version 3) and KeePass file formats (KeePass 1 and 2, i.e. KDB, KDBX (3.1 and 4)). Strongbox uses open source encryption algoritms likes TwoFish, Argon2d, ChaCha20, Aes, Salsa20 and various other cryptographic techniques (SHA256s, HMACs, CSPRNGs) to store groups and entries, containing various secrets, mostly designed around password storage. You can also store File Attachments in KeePass format safes. YubiKey is also supported!
 
 # License Notes
 This software provided here on Github is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project. Copyright/Ownership is held by Mark McGuill. Strongbox is licensed to Apple under a different license which is compatible with the App Store.
@@ -56,6 +56,7 @@ Big thank you to all the localization contributors
 - Chinese - GY & Attis
 - French - Charles-Ivan Chesneau
 - German - @Slummi
+- Italian - Marco Ermini
 - Russian - Wishes to remain anonymous
 - Spanish - Wishes to remain anonymous
 - Swedish - Jari Häkkinen

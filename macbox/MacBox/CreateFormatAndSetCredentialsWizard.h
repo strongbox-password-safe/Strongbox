@@ -9,36 +9,27 @@
 #import <Cocoa/Cocoa.h>
 #import "NSAdvancedTextField.h"
 #import "AbstractDatabaseFormatAdaptor.h"
+#import "YubiKeyConfiguration.h"
 
 @interface CreateFormatAndSetCredentialsWizard : NSWindowController
 
-@property (nonatomic, readonly) CompositeKeyFactors* confirmedCompositeKeyFactors;
-@property NSURL* keyFileUrl;
+// Initial Properties
 
 @property (nonatomic) NSString* titleText;
-@property DatabaseFormat databaseFormat;
-
-@property (weak) IBOutlet NSTabView *tabView;
 @property BOOL createSafeWizardMode;
 
-//
+@property DatabaseFormat initialDatabaseFormat;
+@property NSString* initialKeyFileBookmark;
+@property YubiKeyConfiguration *initialYubiKeyConfiguration;
 
-@property (weak) IBOutlet NSSecureTextField *textFieldNew;
-@property (weak) IBOutlet NSSecureTextField *textFieldConfirm;
-@property (weak) IBOutlet NSButton *buttonOk;
-@property (weak) IBOutlet NSButton *buttonCancel;
+// Return Properties
 
-@property (weak) IBOutlet NSAdvancedTextField *labelPasswordsMatch;
-@property (weak) IBOutlet NSTextField *textFieldTitle;
+@property (nonatomic, readonly) DatabaseFormat selectedDatabaseFormat;
 
-@property (weak) IBOutlet NSButton *checkboxUseAPassword;
-@property (weak) IBOutlet NSButton *checkboxUseAKeyFile;
-@property (weak) IBOutlet NSButton *buttonBrowse;
-@property (weak) IBOutlet NSTextField *labelKeyFilePath;
+@property (nonatomic, readonly) NSString* selectedPassword;
+@property (nonatomic, readonly) NSString* selectedKeyFileBookmark;
+@property (nonatomic, readonly) YubiKeyConfiguration* selectedYubiKeyConfiguration;
 
-@property (weak) IBOutlet NSButton *formatPasswordSafe;
-@property (weak) IBOutlet NSButton *formatKeePass2Advanced;
-@property (weak) IBOutlet NSButton *formatKeePass2Standard;
-@property (weak) IBOutlet NSButton *formatKeePass1;
+- (CompositeKeyFactors*)generateCkfFromSelected:(NSWindow*)yubiKeyPressWindowHint;
 
 @end
