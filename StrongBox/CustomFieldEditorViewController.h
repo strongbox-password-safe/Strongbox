@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) CustomFieldViewModel* customField;
 @property (nonatomic, copy, nullable) void (^onDone)(CustomFieldViewModel* field);
 @property NSSet<NSString*> *customFieldsKeySet;
+@property BOOL colorizeValue;
 
 @end
 

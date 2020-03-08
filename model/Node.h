@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
                                 parent:(Node* _Nonnull)parent
-             allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles
+             keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
                                   uuid:(NSUUID*_Nullable)uuid;
 
 - (nonnull instancetype)initAsRecord:(NSString *_Nonnull)title
@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (Node *_Nullable)deserialize:(NSDictionary *)dict
                         parent:(Node*)parent
-     allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
+     keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                          error:(NSError**)error;
 
 - (NSDictionary *)serialize:(SerializationPackage*)serialization; // Serializes this node and all children (all fields) - This can be used interprocess - for duplications/copy/paste - drag & drop
@@ -70,12 +70,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)getSerializationId:(BOOL)groupCanUseUuid; // This is an ID which should hopefully remain the same across saves
 
 - (BOOL)contains:(Node*)test;
-- (BOOL)setTitle:(NSString*_Nonnull)title allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
-- (BOOL)validateAddChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
-- (BOOL)addChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+- (BOOL)setTitle:(NSString*_Nonnull)title keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+- (BOOL)validateAddChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+- (BOOL)addChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 
-- (BOOL)validateChangeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
-- (BOOL)changeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+- (BOOL)validateChangeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+- (BOOL)changeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 
 - (void)moveChild:(NSUInteger)from to:(NSUInteger)to;
 - (void)removeChild:(Node* _Nonnull)node; 

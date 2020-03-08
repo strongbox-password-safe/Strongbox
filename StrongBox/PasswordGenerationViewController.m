@@ -15,6 +15,7 @@
 #import "Alerts.h"
 #import "FontManager.h"
 #import "ClipboardManager.h"
+#import "ColoredStringHelper.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -149,9 +150,16 @@
 }
 
 - (void)refreshGenerated {
-    self.sample1.textLabel.text = [self getSamplePassword];
-    self.sample2.textLabel.text = [self getSamplePassword];
-    self.sample3.textLabel.text = [self getSamplePassword];
+    BOOL dark = NO;
+    if (@available(iOS 12.0, *)) {
+        dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+    }
+    
+    BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+    
+    self.sample1.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
+    self.sample2.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
+    self.sample3.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
 }
 
 - (NSString*)getSamplePassword {

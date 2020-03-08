@@ -84,7 +84,7 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 - (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
 - (void)clearTotp:(Node *)item;
 
-- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles;
+- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 - (BOOL)addNewRecord:(Node *)parentGroup;
 - (void)addNewGroup:(Node *)parentGroup title:(NSString*)title;
 

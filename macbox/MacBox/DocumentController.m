@@ -106,51 +106,55 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     return [super openDocument:sender];
 }
 
-- (void)openDatabase:(DatabaseMetadata *)database {
-    [self openDatabase:database completion:^(NSError *error) {
-        if(error) {
-            [DatabasesManagerView show:NO];
-        }
-    }];
-}
+//- (void)openDatabase:(DatabaseMetadata *)database {
+//    [self openDatabase:database completion:^(NSError *error) {
+//        if(error) {
+//            [DatabasesManagerView show:NO];
+//        }
+//    }];
+//}
 
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     if(database.storageProvider == kLocalDevice) {
-        NSError *error = nil;
-        NSString* updatedBookmark;
-        NSURL* url = [BookmarksHelper getUrlFromBookmark:database.storageInfo readOnly:NO updatedBookmark:&updatedBookmark error:&error];
+        NSURL* url = database.fileUrl;
         
-        if(url == nil) {
-            completion(error);
-            return;
-        }
-        
-        // URL / Bookmark may have changed...
-        
-        if (updatedBookmark) {
-            database.storageInfo = updatedBookmark;
-        }
-        database.fileUrl = url;
-        [DatabasesManager.sharedInstance update:database];
-        
-        BOOL access = [url startAccessingSecurityScopedResource];
-        
-        if(access) {
-            [self openDocumentWithContentsOfURL:url
-                                        display:YES
-                              completionHandler:^(NSDocument * _Nullable document,
-                                                 BOOL documentWasAlreadyOpen,
-                                                 NSError * _Nullable error) {
-                if(error) {
-                    NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
-                }
+        if (database.storageInfo != nil) {
+            NSError *error = nil;
+            NSString* updatedBookmark;
+            url = [BookmarksHelper getUrlFromBookmark:database.storageInfo
+                                                    readOnly:NO
+                                             updatedBookmark:&updatedBookmark
+                                                       error:&error];
+            
+            if(url == nil) {
+                NSLog(@"WARN: Could not resolve bookmark for database... will try the saved fileUrl...");
+            }
+            else {
+                // URL / Bookmark may have changed...
                 
-                completion(error);
-            }];
+                if (updatedBookmark) {
+                    database.storageInfo = updatedBookmark;
+                }
+                database.fileUrl = url;
+                [DatabasesManager.sharedInstance update:database];
+            }
         }
         else {
-            completion([Utils createNSError:@"Could not access security scope URL" errorCode:-1]);
+            NSLog(@"WARN: Storage info/Bookmark unavailable! Falling back solely on fileURL");
         }
+        
+        [url startAccessingSecurityScopedResource];
+        [self openDocumentWithContentsOfURL:url
+                                    display:YES
+                          completionHandler:^(NSDocument * _Nullable document,
+                                             BOOL documentWasAlreadyOpen,
+                                             NSError * _Nullable error) {
+            if(error) {
+                NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
+            }
+            
+            completion(error);
+        }];
     }
 }
 

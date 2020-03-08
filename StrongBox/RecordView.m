@@ -1171,14 +1171,14 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
     self.record.fields.notes = self.textViewNotes.text;
     self.record.fields.password = trim(self.textFieldPassword.text);
-    [self.record setTitle:trim(self.textFieldTitle.text) allowDuplicateGroupTitles:NO];
+    [self.record setTitle:trim(self.textFieldTitle.text) keePassGroupTitleRules:NO];
     self.record.fields.url = trim(self.textFieldUrl.text);
     self.record.fields.username = trim(self.textFieldUsername.text);
     self.record.fields.email = trim(self.textFieldEmail.text);
     
     if (self.editingNewRecord) {
         self.record.fields.created = [[NSDate alloc] init];
-        [self.parentGroup addChild:self.record allowDuplicateGroupTitles:NO];
+        [self.parentGroup addChild:self.record keePassGroupTitleRules:NO];
     }
     else { // Add History Entry for this change if appropriate...
         [self addHistoricalNode:originalNodeForHistory];

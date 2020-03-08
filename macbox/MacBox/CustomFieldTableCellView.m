@@ -8,6 +8,7 @@
 
 #import "CustomFieldTableCellView.h"
 #import "Settings.h"
+#import "ColoredStringHelper.h"
 
 @interface CustomFieldTableCellView ()
 
@@ -61,13 +62,29 @@
         [self.buttonShowHide setImage:[NSImage imageNamed:@"show"]];
     }
     else {
-        self.labelText.stringValue = self.val;
         [self.labelText setLineBreakMode:NSLineBreakByWordWrapping];
+    
+        self.labelText.font = self.protected ? [NSFont fontWithName:Settings.sharedInstance.easyReadFontName size:13.0f] : [NSFont systemFontOfSize:13.0f];
+
+        if (self.protected && Settings.sharedInstance.colorizePasswords) {
+            NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+            BOOL dark = ([osxMode isEqualToString:@"Dark"]);
+            BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+            
+            self.labelText.attributedStringValue = [ColoredStringHelper getColorizedAttributedString:self.val
+                                                                                            colorize:YES
+                                                                                            darkMode:dark
+                                                                                          colorBlind:colorBlind
+                                                                                                font:self.labelText.font];
+        }
+        else {
+            self.labelText.stringValue = self.val;
+            self.labelText.textColor = nil;
+        }
+        
         [self.buttonShowHide setImage:[NSImage imageNamed:@"hide"]];
     }
-    
-    self.labelText.font = self.protected ? [NSFont fontWithName:Settings.sharedInstance.easyReadFontName size:13.0f] : [NSFont systemFontOfSize:13.0f];
-    
+        
     self.buttonShowHide.hidden = !self.protected;
 }
 

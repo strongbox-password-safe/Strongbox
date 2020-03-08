@@ -66,15 +66,22 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
 
 - (instancetype _Nullable )initAsGroup:(NSString *_Nonnull)title
                                 parent:(Node* _Nonnull)parent
-             allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles
+                keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
                                   uuid:(NSUUID*)uuid {
-    if(![title length]) {
-        NSLog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
-        return nil;
+    if (keePassGroupTitleRules) {
+        if (!title) {
+            title = @""; // Possible for empty groups in KeePass - particular when entries are selectively exported to a new database :(
+        }
     }
-
+    else {
+        if(![title length]) {
+            NSLog(@"Cannot create group with empty title. [%@-%@]", parent.title, title);
+            return nil;
+        }
+    }
+    
     for (Node* child in parent.children) {
-        if (child.isGroup && !allowDuplicateGroupTitles && [child.title isEqualToString:title]) {
+        if (child.isGroup && !keePassGroupTitleRules && [child.title isEqualToString:title]) {
             NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
             return nil;
         }
@@ -120,7 +127,7 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
 
 + (Node *)deserialize:(NSDictionary *)dict
                parent:(Node*)parent
-allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
+keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                 error:(NSError**)error {
     NSDictionary *nodeFieldsDict = dict[@"fields"];
     NSString *title = dict[@"title"];
@@ -133,7 +140,7 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     
     Node* ret;
     if(isGroup.boolValue) {
-        ret = [[Node alloc] initAsGroup:title parent:parent allowDuplicateGroupTitles:allowDuplicateGroupTitle uuid:nil];
+        ret = [[Node alloc] initAsGroup:title parent:parent keePassGroupTitleRules:allowDuplicateGroupTitle uuid:nil];
         
         if(!ret) {
             NSString* errorFormat = NSLocalizedString(@"node_serialization_error_duplicate_group_title_fmt", @"Error message indicating that these item(s) cannot be deserialized to this database because they contain two groups with the same title.");
@@ -152,13 +159,13 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     ret.customIconUuid = [[NSUUID alloc] initWithUUIDString:customIconUuid];
     
     for (NSDictionary* child in children) {
-        Node* childNode = [Node deserialize:child parent:ret allowDuplicateGroupTitles:allowDuplicateGroupTitle error:error];
+        Node* childNode = [Node deserialize:child parent:ret keePassGroupTitleRules:allowDuplicateGroupTitle error:error];
         if(!childNode) {
             return nil;
         }
         
         // Error Check not necessary as done in deserialization above
-        [ret addChild:childNode allowDuplicateGroupTitles:allowDuplicateGroupTitle];
+        [ret addChild:childNode keePassGroupTitleRules:allowDuplicateGroupTitle];
     }
     
     return ret;
@@ -297,15 +304,22 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     }] : [NSArray array];
 }
 
-- (BOOL)setTitle:(NSString*_Nonnull)title allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
-    if(![title length]) {
-        NSLog(@"setTitle: Cannot have empty title.");
-        return NO;
+- (BOOL)setTitle:(NSString*_Nonnull)title keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    if (keePassGroupTitleRules) {
+        if (!title) {
+            title = @""; // Possible for empty groups in KeePass - particular when entries are selectively exported to a new database :(
+        }
+    }
+    else {
+        if(![title length]) {
+            NSLog(@"setTitle: Cannot have empty title.");
+            return NO;
+        }
     }
     
     if(self.isGroup) {
         for (Node* child in self.parent.children) {
-            if (child.isGroup && !allowDuplicateGroupTitles && [child.title isEqualToString:title]) {
+            if (child.isGroup && !keePassGroupTitleRules && [child.title isEqualToString:title]) {
                 NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", self.parent.title, title);
                 return NO;
             }
@@ -317,14 +331,14 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     return YES;
 }
 
-- (BOOL)validateAddChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
+- (BOOL)validateAddChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     if(!node) {
         return NO;
     }
     
     if(node.isGroup) {
         for (Node* child in self.children) {
-            if (child.isGroup && !allowDuplicateGroupTitles && [child.title isEqualToString:node.title]) {
+            if (child.isGroup && !keePassGroupTitleRules && [child.title isEqualToString:node.title]) {
                 NSLog(@"Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
                 return NO;
             }
@@ -337,8 +351,8 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     return YES;
 }
 
-- (BOOL)addChild:(Node* _Nonnull)node allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
-    if(![self validateAddChild:node allowDuplicateGroupTitles:allowDuplicateGroupTitles]) {
+- (BOOL)addChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    if(![self validateAddChild:node keePassGroupTitleRules:keePassGroupTitleRules]) {
         return NO;
     }
 
@@ -368,14 +382,14 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     _mutableChildren = [[_mutableChildren sortedArrayUsingComparator:ascending ? finderStyleNodeComparator : reverseFinderStyleNodeComparator] mutableCopy];
 }
 
-- (BOOL)validateChangeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
+- (BOOL)validateChangeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     return  parent != self &&
             self.parent != parent &&
-            ![parent isChildOf:self] && [parent validateAddChild:self allowDuplicateGroupTitles:allowDuplicateGroupTitles];
+            ![parent isChildOf:self] && [parent validateAddChild:self keePassGroupTitleRules:keePassGroupTitleRules];
 }
 
-- (BOOL)changeParent:(Node*)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
-    if(![self validateChangeParent:parent allowDuplicateGroupTitles:allowDuplicateGroupTitles]) {
+- (BOOL)changeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    if(![self validateChangeParent:parent keePassGroupTitleRules:keePassGroupTitleRules]) {
         return NO;
     }
     
@@ -383,7 +397,7 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
     
     _parent = parent;
     
-    if([parent addChild:self allowDuplicateGroupTitles:allowDuplicateGroupTitles]) {
+    if([parent addChild:self keePassGroupTitleRules:keePassGroupTitleRules]) {
         return YES;
     }
     
@@ -513,7 +527,7 @@ allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitle
 }
 
 - (void)restoreFromHistoricalNode:(Node *)historicalItem {
-    [self setTitle:historicalItem.title allowDuplicateGroupTitles:YES];
+    [self setTitle:historicalItem.title keePassGroupTitleRules:YES];
     self.iconId = historicalItem.iconId;
     self.customIconUuid = historicalItem.customIconUuid;
     self.fields.username = historicalItem.fields.username;

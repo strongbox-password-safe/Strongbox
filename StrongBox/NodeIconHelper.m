@@ -24,7 +24,7 @@ static UIColor *kSandyFolderColor;
         kDefaultRecordImage = [UIImage imageNamed:@"document"];
         kKeePassIconSet = getKeePassIconSet();
         kKeePassiOS13SFIconSet = getKeePassiOS13SFIconSet();
-        kSandyFolderColor = UIColorFromRGB(0xFAB805);
+        kSandyFolderColor = ColorFromRGB(0xFAB805);
     }
 }
 

@@ -13,8 +13,9 @@
 #import "AppDelegate.h"
 #import "Utils.h"
 #import "NSCheckboxTableCellView.h"
+#import "ColoredStringHelper.h"
 
-@interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate>
+@interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate, NSWindowDelegate>
 
 @property (weak) IBOutlet NSButton *checkboxShowTotpCodes;
 @property (weak) IBOutlet NSButton *checkboxShowRecycleBinInBrowse;
@@ -106,6 +107,9 @@
 @property (weak) IBOutlet NSButton *scanCommonFiles;
 @property (weak) IBOutlet NSButton *checkboxHideKeyFileName;
 @property (weak) IBOutlet NSButton *checkboxDoNotRememberKeyFile;
+
+@property (weak) IBOutlet NSButton *colorizePasswords;
+@property (weak) IBOutlet NSButton *useColorBlindPalette;
 
 @end
 
@@ -216,6 +220,9 @@
     
     self.checkboxHideKeyFileName.state = Settings.sharedInstance.hideKeyFileNameOnLockScreen ? NSOnState : NSOffState;
     self.checkboxDoNotRememberKeyFile.state = Settings.sharedInstance.doNotRememberKeyFile ? NSOnState : NSOffState;
+    
+    self.colorizePasswords.state = Settings.sharedInstance.colorizePasswords ? NSOnState : NSOffState;
+    self.useColorBlindPalette.state = Settings.sharedInstance.colorizeUseColorBlindPalette ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -256,6 +263,9 @@
     Settings.sharedInstance.hideKeyFileNameOnLockScreen = self.checkboxHideKeyFileName.state ==  NSOnState;
     Settings.sharedInstance.doNotRememberKeyFile = self.checkboxDoNotRememberKeyFile.state ==  NSOnState;
 
+    Settings.sharedInstance.colorizePasswords = self.colorizePasswords.state == NSOnState;
+    Settings.sharedInstance.colorizeUseColorBlindPalette = self.useColorBlindPalette.state == NSOnState;
+    
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
@@ -603,7 +613,27 @@
 
 -(void)refreshSamplePassword {
     NSString* sample = [PasswordMaker.sharedInstance generateForConfig:Settings.sharedInstance.passwordGenerationConfig];
-    self.labelSamplePassword.stringValue = sample ? sample : @"<Could not Generate>";
+      
+    sample = sample ? sample : @"<Could not Generate>";
+    
+    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+    BOOL dark = ([osxMode isEqualToString:@"Dark"]);
+    BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+    
+    NSAttributedString* str = [ColoredStringHelper getColorizedAttributedString:sample
+                                                                       colorize:Settings.sharedInstance.colorizePasswords
+                                                                       darkMode:dark
+                                                                     colorBlind:colorBlind
+                                                                           font:self.labelSamplePassword.font];
+    
+    NSMutableAttributedString *mut = [[NSMutableAttributedString alloc] initWithAttributedString:str];
+
+    NSMutableParagraphStyle *paragraphStyle = NSMutableParagraphStyle.new;
+    paragraphStyle.alignment = NSTextAlignmentCenter;
+
+    [mut addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(0, sample.length)];
+    
+    self.labelSamplePassword.attributedStringValue = mut.copy;
 }
 
 - (int)autoFillModeToSegmentIndex:(AutoFillMode)mode {

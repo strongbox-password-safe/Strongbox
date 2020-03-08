@@ -205,10 +205,10 @@
 // Operations
 
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title {
-    BOOL allowDuplicateGroupTitles = self.database.format != kPasswordSafe;
+    BOOL keePassGroupTitleRules = self.database.format != kPasswordSafe;
     
-    Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup allowDuplicateGroupTitles:allowDuplicateGroupTitles uuid:nil];
-    if([parentGroup addChild:newGroup allowDuplicateGroupTitles:allowDuplicateGroupTitles]) {
+    Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup keePassGroupTitleRules:keePassGroupTitleRules uuid:nil];
+    if([parentGroup addChild:newGroup keePassGroupTitleRules:keePassGroupTitleRules]) {
         return newGroup;
     }
 
@@ -233,7 +233,7 @@
             [self.database createNewRecycleBinNode];
         }
         
-        return [child changeParent:self.database.recycleBinNode allowDuplicateGroupTitles:YES];
+        return [child changeParent:self.database.recycleBinNode keePassGroupTitleRules:YES];
     }
     else {
         [child.parent removeChild:child];

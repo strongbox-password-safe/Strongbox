@@ -40,9 +40,9 @@
     if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
         rootGroupName = kDefaultRootGroupName;
     }
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
     
-    [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
+    [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
     
     KeePassDatabaseMetadata* metadata = [[KeePassDatabaseMetadata alloc] init];
     

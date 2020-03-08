@@ -231,9 +231,12 @@ NSString* getStorageProviderName(StorageProvider sp) {
         if(error) {
            [DatabasesManager.sharedInstance remove:database.uuid];
 
-           NSString* loc = NSLocalizedString(@"mac_problem_opening_db", @"There was a problem opening this file. It will be removed from your databases.");
+           NSString* loc = NSLocalizedString(@"mac_problem_opening_db",
+                                             @"There was a problem opening this file. It will be removed from your databases.");
 
-           [Alerts error:loc error:error window:self.window completion:^{
+           [Alerts error:loc error:error
+                  window:self.window
+              completion:^{
                 [self refresh];
            }];
         }

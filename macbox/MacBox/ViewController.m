@@ -40,6 +40,7 @@
 #import "BookmarksHelper.h"
 #import "DatabasePropertiesController.h"
 #import "MacYubiKeyManager.h"
+#import "ColoredStringHelper.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -192,7 +193,7 @@ static NSImage* kStrongBox256Image;
 
 - (void)setModelFromMainThread:(ViewModel *)model {
     [self stopObservingModelChanges];
-    [self closeAllDetailsWindows];
+    [self closeAllDetailsWindows:nil];
         
     self.model = model;
 
@@ -231,19 +232,32 @@ static NSImage* kStrongBox256Image;
 
     [self stopRefreshOtpTimer];
 
-    [self closeAllDetailsWindows];
+    [self closeAllDetailsWindows:nil];
 }
 
-- (void)closeAllDetailsWindows {
+- (void)closeAllDetailsWindows:(void (^)(void))completion {
     // Copy as race condition of windows closing and calling into us will lead to crash
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        NSArray<NodeDetailsViewController*>* vcs = [self.detailsViewControllers.allValues copy];
 
-    NSArray<NodeDetailsViewController*>* vcs = [self.detailsViewControllers.allValues copy];
-        
-    for (NodeDetailsViewController *vc in vcs) {
-        [vc close];
-    }
+        dispatch_group_t group = dispatch_group_create();
 
-    [self.detailsViewControllers removeAllObjects];
+        for (NodeDetailsViewController *vc in vcs) {
+            dispatch_group_enter(group);
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [vc closeWithCompletion:^{
+                    dispatch_group_leave(group);
+                }];
+            });
+        }
+
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+        [self.detailsViewControllers removeAllObjects];
+        if(completion) {
+            completion();
+        }
+    });
 }
 
 - (IBAction)onViewItemDetails:(id)sender {
@@ -643,7 +657,7 @@ static NSImage* kStrongBox256Image;
 
 - (void)bindToModel {
     [self stopObservingModelChanges];
-    [self closeAllDetailsWindows];
+    [self closeAllDetailsWindows:nil];
     
     self.itemsCache = nil; // Clear items cache
     
@@ -759,7 +773,21 @@ static NSImage* kStrongBox256Image;
 
         //NSLog(@"Setting Text fields");
         self.labelTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
-        self.labelPassword.stringValue = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        
+        NSString* pw = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+        
+        BOOL colorize = Settings.sharedInstance.colorizePasswords;
+        
+        NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+        BOOL dark = ([osxMode isEqualToString:@"Dark"]);
+        BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+        
+        self.labelPassword.attributedStringValue = [ColoredStringHelper getColorizedAttributedString:pw
+                                                                                            colorize:colorize
+                                                                                            darkMode:dark
+                                                                                          colorBlind:colorBlind
+                                                                                                    font:self.labelPassword.font];
+        
         self.labelUrl.stringValue = [self maybeDereference:it.fields.url node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
         self.labelUsername.stringValue = [self maybeDereference:it.fields.username node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
         self.labelEmail.stringValue = it.fields.email;
@@ -1717,14 +1745,14 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (IBAction)lockSafeContinuation:(id)sender {
     NSString* sid = [self selectedItemSerializationId];
-    [self closeAllDetailsWindows];
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self.model lock:sid];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self onLockDone];
+    [self closeAllDetailsWindows:^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self.model lock:sid];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self onLockDone];
+            });
         });
-    });
+    }];
 }
 
 - (void)onLockDone {
@@ -2307,14 +2335,14 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     DatabaseFormat sourceFormat = sourceFormatNum.integerValue;
     NSArray<NSDictionary*>* serializedNodes = serialized[@"nodes"];
     
-    BOOL allowDuplicateGroupTitles = self.model.format != kPasswordSafe;
+    BOOL keePassGroupTitleRules = self.model.format != kPasswordSafe;
     
     // Rebuild Node Hierarchy
     
     NSMutableArray<Node*>* nodes = @[].mutableCopy;
     NSError* err;
     for (NSDictionary* obj in serializedNodes) {
-        Node* n = [Node deserialize:obj parent:destinationItem allowDuplicateGroupTitles:allowDuplicateGroupTitles error:&err];
+        Node* n = [Node deserialize:obj parent:destinationItem keePassGroupTitleRules:keePassGroupTitleRules error:&err];
         
         if(!n) {
             [Alerts error:err window:self.view.window];
@@ -2596,9 +2624,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     // Add Items to our Model...
     
-    BOOL allowDuplicateGroupTitles = self.model.format != kPasswordSafe;
+    BOOL keePassGroupTitleRules = self.model.format != kPasswordSafe;
     
-    BOOL success = [self.model addChildren:nodes parent:destinationItem allowDuplicateGroupTitles:allowDuplicateGroupTitles];
+    BOOL success = [self.model addChildren:nodes parent:destinationItem keePassGroupTitleRules:keePassGroupTitleRules];
     
     if(!success) {
         [Alerts info:@"Could Not Paste"
@@ -3533,7 +3561,9 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     if(database && database.keyFileBookmark) {
         NSString* updatedBookmark = nil;
         NSError* error;
-        configuredUrl = [BookmarksHelper getUrlFromBookmark:database.keyFileBookmark readOnly:YES updatedBookmark:&updatedBookmark error:&error];
+        configuredUrl = [BookmarksHelper getUrlFromBookmark:database.keyFileBookmark
+                                                   readOnly:YES updatedBookmark:&updatedBookmark
+                                                      error:&error];
             
         if(!configuredUrl) {
             NSLog(@"getUrlFromBookmark: [%@]", error);

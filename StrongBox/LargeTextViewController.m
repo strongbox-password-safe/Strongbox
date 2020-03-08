@@ -8,6 +8,8 @@
 
 #import "LargeTextViewController.h"
 #import "FontManager.h"
+#import "ColoredStringHelper.h"
+#import "Settings.h"
 
 @interface LargeTextViewController ()
 
@@ -27,8 +29,23 @@
     [self.labelLargeText addGestureRecognizer:tapGestureRecognizer];
     self.labelLargeText.userInteractionEnabled = YES;
 
-    self.labelLargeText.font = FontManager.sharedInstance.easyReadFontForTotp;
-    self.labelLargeText.text = self.string;
+    if (!self.colorize) {
+        self.labelLargeText.font = FontManager.sharedInstance.easyReadFontForTotp;
+        self.labelLargeText.text = self.string;
+    }
+    else {
+        BOOL dark = NO;
+        if (@available(iOS 12.0, *)) {
+            dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+        }
+        BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+    
+        self.labelLargeText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.string
+                                                                                      colorize:YES
+                                                                                      darkMode:dark
+                                                                                    colorBlind:colorBlind font:FontManager.sharedInstance.easyReadFontForTotp];
+        
+    }
 }
 
 - (void)labelTapped {

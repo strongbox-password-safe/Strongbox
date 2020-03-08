@@ -428,7 +428,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                    [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
                                }
                                
-                               [item setTitle:text allowDuplicateGroupTitles:self.viewModel.database.format != kPasswordSafe];
+                               [item setTitle:text keePassGroupTitleRules:self.viewModel.database.format != kPasswordSafe];
                                
                                [item touch:YES touchParents:YES];
 
@@ -631,7 +631,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     [item touch:NO touchParents:YES];
 
-    [item.parent addChild:dupe allowDuplicateGroupTitles:NO];
+    [item.parent addChild:dupe keePassGroupTitleRules:NO];
 
     [self saveChangesToSafeAndRefreshView];
 }

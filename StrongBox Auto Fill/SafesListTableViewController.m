@@ -92,16 +92,16 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    [[self getInitialViewController] cancel:nil];
+    [[self getInitialViewController] exitWithUserCancelled];
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapView:(UIView *)view {
-    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
+    [[self getInitialViewController] exitWithUserCancelled];
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button
 {
-    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
+    [[self getInitialViewController] exitWithUserCancelled];
 }
 
 - (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
@@ -176,11 +176,11 @@
     
     NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellTopSubtitle];
     NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle1];
-    NSString* subtitle2 = @""; // [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle2];
+    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle2];
     
     
     UIImage* databaseIcon = nil;
-    if(Settings.sharedInstance.showDatabaseIcon) {
+    if (Settings.sharedInstance.showDatabaseIcon) {
         // Manual Icons for unsupported/uncompilable providers in App Extension
         if(database.storageProvider == kOneDrive) {
             databaseIcon = [UIImage imageNamed:@"one-drive-icon-only-32x32"];
@@ -196,7 +196,7 @@
     
     // If we can't do live show auto fill cache date in subtitle 2
     
-    if(disabled) {
+    if (disabled) {
         databaseIcon = Settings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
         subtitle2 = database.autoFillEnabled ?
         NSLocalizedString(@"autofill_safes_vc_item_subtitle_no_cache_yet", @"[No Auto Fill Cache File Yet]") :
@@ -273,6 +273,7 @@
 - (void)openDatabase:(SafeMetaData*)safe {
     BOOL useAutoFillCache = ![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe];
     
+    Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
                                           openAutoFillCache:useAutoFillCache
@@ -281,11 +282,13 @@
                                      manualOpenOfflineCache:NO
                                 biometricAuthenticationDone:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
-                                                          if(model) {
-                                                              [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
-                                                          }
-                                                          [self refreshSafes]; // Duress may have removed one
-                                                      }];
+        Settings.sharedInstance.autoFillExitedCleanly = YES;
+        
+          if(model) {
+              [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
+          }
+          [self refreshSafes]; // Duress may have removed one
+      }];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

@@ -18,6 +18,7 @@ extern NSString *const CustomFieldCellHeightChanged;
 @property NSString* value;
 @property BOOL hidden;
 @property BOOL isHideable;
+@property BOOL colorize;
 
 @end
 

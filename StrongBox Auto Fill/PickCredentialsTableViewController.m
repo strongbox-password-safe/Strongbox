@@ -163,7 +163,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self.rootViewController cancel:nil];
+    [self.rootViewController exitWithUserCancelled];
 }
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
@@ -578,7 +578,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         
         //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, record);
         
-        [self.rootViewController onCredentialSelected:user password:password];
+        [self.rootViewController exitWithCredential:user password:password];
     }
     else {
         NSLog(@"WARN: DidSelectRow with no Record?!");

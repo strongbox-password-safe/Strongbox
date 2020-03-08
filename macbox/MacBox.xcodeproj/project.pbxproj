@@ -254,6 +254,7 @@
 		4D2CB4A42332D92900C2E084 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4A32332D92900C2E084 /* XmlSerializer.m */; };
 		4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */; };
 		4D2CB7EA23D1BD05000A9ABC /* SecretStoreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB7E923D1BD05000A9ABC /* SecretStoreTests.m */; };
+		4D3587A824104AF100318688 /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3587A724104AF100318688 /* ColoredStringHelper.m */; };
 		4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */; };
 		4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */; };
 		4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */; };
@@ -264,6 +265,8 @@
 		4D4A003D231317A900B69E09 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D4A003B231317A900B69E09 /* Localizable.strings */; };
 		4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */; };
 		4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
+		4D50321D2412C36100766489 /* ClickableSecureTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D50321C2412C36100766489 /* ClickableSecureTextField.m */; };
+		4D50321E2412C36800766489 /* ClickableSecureTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D50321C2412C36100766489 /* ClickableSecureTextField.m */; };
 		4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */; };
 		4D524C9F219B44F300C22CB4 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9E219B44F200C22CB4 /* twofish.c */; };
 		4D524CA4219B458B00C22CB4 /* DatabasesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA0219B458A00C22CB4 /* DatabasesManager.m */; };
@@ -410,6 +413,7 @@
 		4DCC992C24074F9000B7DAB2 /* PressYubiKeyWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */; };
 		4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
 		4DD2BAB9238BE44400513271 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD2BAB8238BE44400513271 /* MMcG_MF_Base32Additions.m */; };
+		4DD7840A2412CE6C00E45D1C /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3587A724104AF100318688 /* ColoredStringHelper.m */; };
 		4DDA015A2242A1B300C7F0E2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */; };
 		4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
 		4DE0CB712232C0F200E109F9 /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE0CB702232C0F200E109F9 /* History.m */; };
@@ -554,6 +558,8 @@
 		4D2CB4A22332D92900C2E084 /* XmlSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlSerializer.h; path = ../model/keepass/XmlSerializer.h; sourceTree = "<group>"; };
 		4D2CB4A32332D92900C2E084 /* XmlSerializer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlSerializer.m; path = ../model/keepass/XmlSerializer.m; sourceTree = "<group>"; };
 		4D2CB7E923D1BD05000A9ABC /* SecretStoreTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStoreTests.m; path = ../../StrongboxTests/SecretStoreTests.m; sourceTree = "<group>"; };
+		4D3587A624104AF100318688 /* ColoredStringHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ColoredStringHelper.h; path = ../StrongBox/ColoredStringHelper.h; sourceTree = "<group>"; };
+		4D3587A724104AF100318688 /* ColoredStringHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ColoredStringHelper.m; path = ../StrongBox/ColoredStringHelper.m; sourceTree = "<group>"; };
 		4D3F18FF23AD26B8008A58AF /* FavIconResultTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = FavIconResultTableCell.xib; path = MacBox/FavIconResultTableCell.xib; sourceTree = "<group>"; };
 		4D3F190123AE5A2E008A58AF /* FavIconResultTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FavIconResultTableCellView.h; sourceTree = "<group>"; };
 		4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FavIconResultTableCellView.m; sourceTree = "<group>"; };
@@ -583,6 +589,8 @@
 		4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePass2TagPackage.m; path = ../model/keepass/KeePass2TagPackage.m; sourceTree = "<group>"; };
 		4D4DFC091F3B135000BE1C2D /* ViewModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewModel.h; path = MacBox/ViewModel.h; sourceTree = "<group>"; };
 		4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewModel.m; path = MacBox/ViewModel.m; sourceTree = "<group>"; };
+		4D50321B2412C36100766489 /* ClickableSecureTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableSecureTextField.h; path = MacBox/ClickableSecureTextField.h; sourceTree = "<group>"; };
+		4D50321C2412C36100766489 /* ClickableSecureTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClickableSecureTextField.m; path = MacBox/ClickableSecureTextField.m; sourceTree = "<group>"; };
 		4D524C9B219B44BE00C22CB4 /* PwSafeSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeSerialization.h; path = ../model/pwsafe/PwSafeSerialization.h; sourceTree = "<group>"; };
 		4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeSerialization.m; path = ../model/pwsafe/PwSafeSerialization.m; sourceTree = "<group>"; };
 		4D524C9E219B44F200C22CB4 /* twofish.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = twofish.c; path = ../model/pwsafe/twofish/twofish.c; sourceTree = "<group>"; };
@@ -1779,6 +1787,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D3587A624104AF100318688 /* ColoredStringHelper.h */,
+				4D3587A724104AF100318688 /* ColoredStringHelper.m */,
 				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
 				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
 				4D2CB4A22332D92900C2E084 /* XmlSerializer.h */,
@@ -1843,9 +1853,12 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4D50321B2412C36100766489 /* ClickableSecureTextField.h */,
+				4D50321C2412C36100766489 /* ClickableSecureTextField.m */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
 				4D1FFB492403030100B75EA2 /* Mac-Outright-Pro-Info.plist */,
 				4DF59F651F30DB7A00D68BFE /* Info.plist */,
+				4DF347EF2074FA5A00148741 /* Model */,
 				4D59E25F23FCA22E0004B309 /* YubiKey */,
 				4D524D2B219B503F00C22CB4 /* View */,
 				4DCA65AD1F4B45800078B962 /* DocumentController.h */,
@@ -1881,7 +1894,6 @@
 				4D216F5922CBCD73000954D0 /* Password Generation */,
 				4DFC06D5226467AA00A4254A /* libs */,
 				4D9E0948218250F6007BA1E7 /* KeePass */,
-				4DF347EF2074FA5A00148741 /* Model */,
 				4DF347D52074FA1D00148741 /* PwSafe */,
 				4D2965F721AD6B4B009B7936 /* MacboxTests */,
 				4D29660621AD6EFB009B7936 /* MacUnitTests */,
@@ -2295,6 +2307,7 @@
 				4D1FFA8B2403030100B75EA2 /* DatabaseModel.m in Sources */,
 				4D1FFA8C2403030100B75EA2 /* OTPToken+Persistence.m in Sources */,
 				4D1FFA8D2403030100B75EA2 /* DatabasePropertiesController.m in Sources */,
+				4D50321E2412C36800766489 /* ClickableSecureTextField.m in Sources */,
 				4D1FFA8E2403030100B75EA2 /* Kdbx4Database.m in Sources */,
 				4D1FFA8F2403030100B75EA2 /* MMcGACTextFieldCell.m in Sources */,
 				4D1FFA902403030100B75EA2 /* AesCipher.m in Sources */,
@@ -2344,6 +2357,7 @@
 				4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */,
 				4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */,
 				4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */,
+				4DD7840A2412CE6C00E45D1C /* ColoredStringHelper.m in Sources */,
 				4D1FFABC2403030100B75EA2 /* NodeFields.m in Sources */,
 				4D1FFABD2403030100B75EA2 /* Utils.m in Sources */,
 				4D1FFABE2403030100B75EA2 /* String.m in Sources */,
@@ -2458,6 +2472,7 @@
 				4D524CBC219B479900C22CB4 /* Kdb1Database.m in Sources */,
 				4D92C8271F38A03500341A58 /* WindowController.m in Sources */,
 				4D8DE9BB21F898470043DDC0 /* OTPToken+Generation.m in Sources */,
+				4D3587A824104AF100318688 /* ColoredStringHelper.m in Sources */,
 				4D8DE9BA21F898470043DDC0 /* NSURL+QueryItems.m in Sources */,
 				4DF347E82074FA3500148741 /* PasswordHistory.m in Sources */,
 				4D55A56F23D743C40057CBA8 /* BookmarksHelper.m in Sources */,
@@ -2588,6 +2603,7 @@
 				4DFF400C2180726700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4D524D03219B48D300C22CB4 /* V3Binary.m in Sources */,
 				4DF347E92074FA3500148741 /* Field.m in Sources */,
+				4D50321D2412C36100766489 /* ClickableSecureTextField.m in Sources */,
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
 				4DBFD38E225D156D00290488 /* MMcGACTextViewEditor.m in Sources */,
@@ -2923,7 +2939,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.0;
+				MARKETING_VERSION = 1.13.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2949,7 +2965,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.0;
+				MARKETING_VERSION = 1.13.3;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

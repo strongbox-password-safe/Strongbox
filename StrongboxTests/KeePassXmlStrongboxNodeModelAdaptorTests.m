@@ -228,7 +228,7 @@
     Node* strongboxModel = [adaptor toModel:origRootGroupCopy2 error:&error];
     
     Node* e = [[strongboxModel.children objectAtIndex:0].children objectAtIndex:0];
-    [e setTitle:@"Changed!" allowDuplicateGroupTitles:YES];
+    [e setTitle:@"Changed!" keePassGroupTitleRules:YES];
     // Strongbox Model to Xml Model
     
     adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
@@ -255,7 +255,7 @@
     Node* strongboxModel = [adaptor toModel:origRootGroupCopy2 error:&error];
     
     Node* e = [[strongboxModel.children objectAtIndex:0].children objectAtIndex:0];
-    [e setTitle:@"Mark's New Title" allowDuplicateGroupTitles:YES];
+    [e setTitle:@"Mark's New Title" keePassGroupTitleRules:YES];
 
     // Strongbox Model to Xml Model
     

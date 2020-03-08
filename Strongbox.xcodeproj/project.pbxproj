@@ -363,6 +363,26 @@
 		4D48C6F022AD186D002B502E /* ItemDetailsPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D48C6EF22AD186D002B502E /* ItemDetailsPreferencesViewController.m */; };
 		4D4ACAE622A1275700D486B0 /* CASGTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */; };
 		4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
+		4D4D3FAC2409CA7C0056A7E2 /* Foo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */; };
+		4D4D3FAD2409CA7C0056A7E2 /* Foo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */; };
+		4D4D3FAE2409CA7C0056A7E2 /* Foo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */; };
+		4D4D3FAF2409CA7C0056A7E2 /* Foo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */; };
+		4D4D3FCF2409CD980056A7E2 /* MFIKeyInteractionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FCC2409CD980056A7E2 /* MFIKeyInteractionViewController.swift */; };
+		4D4D3FD02409CD990056A7E2 /* MFIKeyInteractionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FCC2409CD980056A7E2 /* MFIKeyInteractionViewController.swift */; };
+		4D4D3FD12409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D4D3FCD2409CD980056A7E2 /* MFIKeyActionSheetView.xib */; };
+		4D4D3FD22409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D4D3FCD2409CD980056A7E2 /* MFIKeyActionSheetView.xib */; };
+		4D4D3FD32409CD990056A7E2 /* MFIKeyActionSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FCE2409CD980056A7E2 /* MFIKeyActionSheetView.swift */; };
+		4D4D3FD42409CD990056A7E2 /* MFIKeyActionSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FCE2409CD980056A7E2 /* MFIKeyActionSheetView.swift */; };
+		4D4D3FD62409CDAC0056A7E2 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FD52409CDAC0056A7E2 /* RootViewController.swift */; };
+		4D4D3FD72409CDAC0056A7E2 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FD52409CDAC0056A7E2 /* RootViewController.swift */; };
+		4D4D3FDA2409CDC80056A7E2 /* NamedColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FD82409CDC80056A7E2 /* NamedColors.swift */; };
+		4D4D3FDB2409CDC80056A7E2 /* NamedColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FD82409CDC80056A7E2 /* NamedColors.swift */; };
+		4D4D3FDC2409CDC80056A7E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D4D3FD92409CDC80056A7E2 /* Assets.xcassets */; };
+		4D4D3FDD2409CDC80056A7E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D4D3FD92409CDC80056A7E2 /* Assets.xcassets */; };
+		4D4D3FE02409CE1C0056A7E2 /* ProgressHudView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FDE2409CE1B0056A7E2 /* ProgressHudView.swift */; };
+		4D4D3FE12409CE1C0056A7E2 /* ProgressHudView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D3FDE2409CE1B0056A7E2 /* ProgressHudView.swift */; };
+		4D4D3FE22409CE1C0056A7E2 /* ProgressHudView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D4D3FDF2409CE1B0056A7E2 /* ProgressHudView.xib */; };
+		4D4D3FE32409CE1C0056A7E2 /* ProgressHudView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D4D3FDF2409CE1B0056A7E2 /* ProgressHudView.xib */; };
 		4D4D6B57222EF3E80056514E /* RMStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D6AF6222EF3E80056514E /* RMStore.m */; };
 		4D4F184C2165125B00578F0E /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4F184B2165125B00578F0E /* NSArray+Extensions.m */; };
 		4D51ED7F229ABDC4002B05A7 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D51ED7E229ABDC4002B05A7 /* AudioToolbox.framework */; };
@@ -1379,6 +1399,10 @@
 		4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
 		4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */; };
 		4DFA67E522C80824000FC012 /* PasswordMakerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA67E422C80824000FC012 /* PasswordMakerTests.m */; };
+		4DFD46D2240DC217001F1209 /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
+		4DFD46D3240DC217001F1209 /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
+		4DFD46D4240DC217001F1209 /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
+		4DFD46D5240DC217001F1209 /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */; };
 		4DFF34C4238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */; };
 		4DFF34C5238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */; };
 		4DFF34C6238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */; };
@@ -1824,6 +1848,10 @@
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StorageBrowserTableViewController.m; path = StrongBox/StorageBrowserTableViewController.m; sourceTree = "<group>"; };
 		4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageBrowserItem.h; path = StrongBox/StorageBrowserItem.h; sourceTree = "<group>"; };
 		4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StorageBrowserItem.m; path = StrongBox/StorageBrowserItem.m; sourceTree = "<group>"; };
+		4D42A94B2409BE0C00F16DBC /* Strongbox-iOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-iOS-Bridging-Header.h"; sourceTree = "<group>"; };
+		4D42A94C2409BE0C00F16DBC /* Strongbox-Auto-Fill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Auto-Fill-Bridging-Header.h"; sourceTree = "<group>"; };
+		4D42A94D2409BE0C00F16DBC /* Strongbox-iOS-Family-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-iOS-Family-Bridging-Header.h"; sourceTree = "<group>"; };
+		4D42A94E2409BE0C00F16DBC /* Strongbox-Auto-Fill-Family-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Auto-Fill-Family-Bridging-Header.h"; sourceTree = "<group>"; };
 		4D446807216CE02C00F6358D /* Csv.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Csv.h; path = model/Csv.h; sourceTree = SOURCE_ROOT; };
 		4D446808216CE02C00F6358D /* Csv.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Csv.m; path = model/Csv.m; sourceTree = SOURCE_ROOT; };
 		4D44982F23926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconSelectFromMultipleFavIconsTableViewController.h; path = StrongBox/FavIconSelectFromMultipleFavIconsTableViewController.h; sourceTree = "<group>"; };
@@ -1920,6 +1948,15 @@
 		4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CASGTableViewController.m; path = StrongBox/CASGTableViewController.m; sourceTree = "<group>"; };
 		4D4C49021EDEC0B900EB857D /* RecordView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RecordView.h; path = StrongBox/RecordView.h; sourceTree = "<group>"; };
 		4D4C49031EDEC0B900EB857D /* RecordView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RecordView.m; path = StrongBox/RecordView.m; sourceTree = "<group>"; };
+		4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Foo.swift; sourceTree = "<group>"; };
+		4D4D3FCC2409CD980056A7E2 /* MFIKeyInteractionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MFIKeyInteractionViewController.swift; sourceTree = "<group>"; };
+		4D4D3FCD2409CD980056A7E2 /* MFIKeyActionSheetView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MFIKeyActionSheetView.xib; sourceTree = "<group>"; };
+		4D4D3FCE2409CD980056A7E2 /* MFIKeyActionSheetView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MFIKeyActionSheetView.swift; sourceTree = "<group>"; };
+		4D4D3FD52409CDAC0056A7E2 /* RootViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
+		4D4D3FD82409CDC80056A7E2 /* NamedColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NamedColors.swift; sourceTree = "<group>"; };
+		4D4D3FD92409CDC80056A7E2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4D4D3FDE2409CE1B0056A7E2 /* ProgressHudView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressHudView.swift; sourceTree = "<group>"; };
+		4D4D3FDF2409CE1B0056A7E2 /* ProgressHudView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProgressHudView.xib; sourceTree = "<group>"; };
 		4D4D6AF5222EF3E80056514E /* RMStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RMStore.h; path = lib/RMStore/RMStore/RMStore.h; sourceTree = "<group>"; };
 		4D4D6AF6222EF3E80056514E /* RMStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RMStore.m; path = lib/RMStore/RMStore/RMStore.m; sourceTree = "<group>"; };
 		4D4F184A2165125B00578F0E /* NSArray+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSArray+Extensions.h"; path = "model/NSArray+Extensions.h"; sourceTree = SOURCE_ROOT; };
@@ -2429,7 +2466,6 @@
 		4DB7D51E229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AdvancedPreferencesTableViewController.h; path = StrongBox/AdvancedPreferencesTableViewController.h; sourceTree = "<group>"; };
 		4DB7D51F229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AdvancedPreferencesTableViewController.m; path = StrongBox/AdvancedPreferencesTableViewController.m; sourceTree = "<group>"; };
 		4DBBDE3523EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YubiKeyHardwareConfiguration.m; sourceTree = "<group>"; };
-		4DBBF18123A2992100071EAC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Preferences.strings; sourceTree = "<group>"; };
 		4DBC7A482279DC1600CA534D /* CollapsibleTableViewHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CollapsibleTableViewHeader.h; path = StrongBox/CollapsibleTableViewHeader.h; sourceTree = "<group>"; };
 		4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CollapsibleTableViewHeader.m; path = StrongBox/CollapsibleTableViewHeader.m; sourceTree = "<group>"; };
 		4DBE5B311C8356C700C310BC /* Strongbox.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strongbox.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2633,6 +2669,8 @@
 		4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PasswordGenerationViewController.h; path = StrongBox/PasswordGenerationViewController.h; sourceTree = "<group>"; };
 		4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PasswordGenerationViewController.m; path = StrongBox/PasswordGenerationViewController.m; sourceTree = "<group>"; };
 		4DFA67E422C80824000FC012 /* PasswordMakerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PasswordMakerTests.m; sourceTree = "<group>"; };
+		4DFD46D0240DC217001F1209 /* ColoredStringHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ColoredStringHelper.h; path = StrongBox/ColoredStringHelper.h; sourceTree = "<group>"; };
+		4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ColoredStringHelper.m; path = StrongBox/ColoredStringHelper.m; sourceTree = "<group>"; };
 		4DFF34C2238E75B800BEB941 /* FavIconDownloadResultsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconDownloadResultsViewController.h; path = StrongBox/FavIconDownloadResultsViewController.h; sourceTree = "<group>"; };
 		4DFF34C3238E75B800BEB941 /* FavIconDownloadResultsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconDownloadResultsViewController.m; path = StrongBox/FavIconDownloadResultsViewController.m; sourceTree = "<group>"; };
 		4DFF3FFE2180622F00B69383 /* PwSafeModelTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeModelTests.m; path = StrongboxTests/PwSafeModelTests.m; sourceTree = "<group>"; };
@@ -3250,6 +3288,7 @@
 		4D333F1123EE0504009F487D /* Yubikey */ = {
 			isa = PBXGroup;
 			children = (
+				4D4D3FAA2409CA660056A7E2 /* SharedUI */,
 				4D2561AD233FEAEA00179B84 /* YubiManager.h */,
 				4D2561AE233FEAEA00179B84 /* YubiManager.m */,
 				4D333F1223EE0E55009F487D /* YubiKeyHardwareConfiguration.h */,
@@ -3346,6 +3385,26 @@
 			path = StrongBox/About;
 			sourceTree = "<group>";
 		};
+		4D4D3FAA2409CA660056A7E2 /* SharedUI */ = {
+			isa = PBXGroup;
+			children = (
+				4D4D3FD92409CDC80056A7E2 /* Assets.xcassets */,
+				4D4D3FD82409CDC80056A7E2 /* NamedColors.swift */,
+				4D4D3FCE2409CD980056A7E2 /* MFIKeyActionSheetView.swift */,
+				4D4D3FCD2409CD980056A7E2 /* MFIKeyActionSheetView.xib */,
+				4D4D3FCC2409CD980056A7E2 /* MFIKeyInteractionViewController.swift */,
+				4D4D3FD52409CDAC0056A7E2 /* RootViewController.swift */,
+				4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */,
+				4D4D3FDE2409CE1B0056A7E2 /* ProgressHudView.swift */,
+				4D4D3FDF2409CE1B0056A7E2 /* ProgressHudView.xib */,
+				4D42A94B2409BE0C00F16DBC /* Strongbox-iOS-Bridging-Header.h */,
+				4D42A94C2409BE0C00F16DBC /* Strongbox-Auto-Fill-Bridging-Header.h */,
+				4D42A94D2409BE0C00F16DBC /* Strongbox-iOS-Family-Bridging-Header.h */,
+				4D42A94E2409BE0C00F16DBC /* Strongbox-Auto-Fill-Family-Bridging-Header.h */,
+			);
+			name = SharedUI;
+			sourceTree = "<group>";
+		};
 		4D4D6AF4222EF3D80056514E /* RMStore */ = {
 			isa = PBXGroup;
 			children = (
@@ -3428,6 +3487,7 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4DE48A57216F54A300C9C991 /* Auto-Fill-Extension */,
 				4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */,
 				4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */,
@@ -3450,6 +3510,8 @@
 				4DE2688E22A65C8B00A1D158 /* Password Generation */,
 				4D06943622083E2000FB826C /* Upgrade */,
 				4D0835DE2284770900CA7405 /* Select Icon */,
+				4DFD46D0240DC217001F1209 /* ColoredStringHelper.h */,
+				4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -4089,9 +4151,9 @@
 				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				4D18855F2170DE90001AE6B0 /* OpenSafeSequenceHelper.h */,
 				4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */,
+				4D78AC231FB1E22C00A68A92 /* Model */,
 				4D62D6941C85F2B50051E13B /* UI */,
 				4D333F1123EE0504009F487D /* Yubikey */,
-				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
@@ -4104,7 +4166,6 @@
 				4D78AC251FB1E24D00A68A92 /* Keepass */,
 				4D62D6961C85F35E0051E13B /* StorageProviders */,
 				4D326EA1223032C800DCD8C7 /* Libraries */,
-				4D78AC231FB1E22C00A68A92 /* Model */,
 				4D25E8EC2175F4CE00ACF108 /* Tests */,
 				4DBE5B341C8356C700C310BC /* Supporting Files */,
 				4D2962AC223171BA0082897D /* misc */,
@@ -4523,7 +4584,7 @@
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Original;
 				LastSwiftUpdateCheck = 1000;
-				LastUpgradeCheck = 1120;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
 					4D25E8EA2175F4CD00ACF108 = {
@@ -4535,6 +4596,7 @@
 					4DBE5B301C8356C700C310BC = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = 4326J8XDF2;
+						LastSwiftMigration = 1130;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -4556,15 +4618,18 @@
 					};
 					4DC4E01323488BAA000743C4 = {
 						DevelopmentTeam = 4326J8XDF2;
+						LastSwiftMigration = 1130;
 						ProvisioningStyle = Automatic;
 					};
 					4DC4E17023488BAE000743C4 = {
 						DevelopmentTeam = 4326J8XDF2;
+						LastSwiftMigration = 1130;
 						ProvisioningStyle = Automatic;
 					};
 					4DE48A54216F54A300C9C991 = {
 						CreatedOnToolsVersion = 10.0;
 						DevelopmentTeam = 4326J8XDF2;
+						LastSwiftMigration = 1130;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
@@ -4696,9 +4761,12 @@
 				4D36B0C222C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4D770F97230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
+				4D4D3FE22409CE1C0056A7E2 /* ProgressHudView.xib in Resources */,
 				4DE2689722A665A400A1D158 /* RecordView.storyboard in Resources */,
 				4D36B0B622C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				4DE7F0E422F89D610095F51F /* SelectKeyFile.storyboard in Resources */,
+				4D4D3FD12409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
+				4D4D3FDC2409CDC80056A7E2 /* Assets.xcassets in Resources */,
 				4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4DE7F0EB22F89D6F0095F51F /* PinEntry.storyboard in Resources */,
@@ -4775,9 +4843,12 @@
 				4DC4E13623488BAA000743C4 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E13723488BAA000743C4 /* IconsCollectionViewController.xib in Resources */,
 				4DC4E13823488BAA000743C4 /* apple.cer in Resources */,
+				4D4D3FE32409CE1C0056A7E2 /* ProgressHudView.xib in Resources */,
 				4DC4E13923488BAA000743C4 /* RecordView.storyboard in Resources */,
 				4DC4E13A23488BAA000743C4 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E13B23488BAA000743C4 /* SelectKeyFile.storyboard in Resources */,
+				4D4D3FD22409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
+				4D4D3FDD2409CDC80056A7E2 /* Assets.xcassets in Resources */,
 				4DC4E13C23488BAA000743C4 /* BrowseItemTotpCell.xib in Resources */,
 				4DC4E13D23488BAA000743C4 /* Images.xcassets in Resources */,
 				4DC4E13E23488BAA000743C4 /* PinEntry.storyboard in Resources */,
@@ -5321,6 +5392,7 @@
 				4D8C148C2074F5F800CE9CAE /* PwSafeSerialization.m in Sources */,
 				4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
+				4D4D3FAC2409CA7C0056A7E2 /* Foo.swift in Sources */,
 				4DAE98C42270B4E200A811C4 /* ItemDetailsModel.m in Sources */,
 				4DE18BBA22F09A3F007D902D /* DatabaseCell.m in Sources */,
 				4DEDF7DB22AA7F9800EFA5C9 /* ProExplanationViewController.m in Sources */,
@@ -5335,6 +5407,7 @@
 				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
 				4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
+				4D4D3FD62409CDAC0056A7E2 /* RootViewController.swift in Sources */,
 				4DDF7C9D225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				4D78AC311FB1E27700A68A92 /* Utils.m in Sources */,
 				4DBBDE3623EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
@@ -5343,10 +5416,12 @@
 				4D3169A722DE33AF003FAD3F /* CompositeKeyFactors.m in Sources */,
 				4D5B1EA72194AAAF00ECAF0D /* KdbEntry.m in Sources */,
 				4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */,
+				4D4D3FD32409CD990056A7E2 /* MFIKeyActionSheetView.swift in Sources */,
 				4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */,
 				4D6B5052238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4D4D6B57222EF3E80056514E /* RMStore.m in Sources */,
 				4D7F5A3B236013D2003ED785 /* LargeTextViewController.m in Sources */,
+				4DFD46D2240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				4D3E149521832C1500A41CA0 /* core.c in Sources */,
 				4D2561AF233FEAEA00179B84 /* YubiManager.m in Sources */,
 				4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -5431,6 +5506,7 @@
 				4DC66F39229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D832A9523CE226800A7885E /* SecretStore.m in Sources */,
+				4D4D3FDA2409CDC80056A7E2 /* NamedColors.swift in Sources */,
 				4D1F5809233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */,
@@ -5495,6 +5571,7 @@
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
 				4D4767072179013900C4358F /* RootXmlDomainObject.m in Sources */,
 				4D0835D1228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
+				4D4D3FE02409CE1C0056A7E2 /* ProgressHudView.swift in Sources */,
 				4D5F5B8B218B5A7000A0739A /* FileAttachmentsViewControllerTableViewController.m in Sources */,
 				4D08B5C3234C9613003D1953 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				4D4C49041EDEC0B900EB857D /* RecordView.m in Sources */,
@@ -5515,6 +5592,7 @@
 				4D792A6F222EF46A00250086 /* RMStoreAppReceiptVerifier.m in Sources */,
 				4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */,
 				4DD755EB232F084900758824 /* ExportOptionsTableViewController.m in Sources */,
+				4D4D3FCF2409CD980056A7E2 /* MFIKeyInteractionViewController.swift in Sources */,
 				4D8C147D2074F5D100CE9CAE /* CHCSVParser.m in Sources */,
 				4DAE98BA2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
 				4DC3F83323215A58002BDEF7 /* SimpleXmlValueExtractor.m in Sources */,
@@ -5613,6 +5691,7 @@
 				4DC4E04823488BAA000743C4 /* PwSafeSerialization.m in Sources */,
 				4DC4E04923488BAA000743C4 /* PasswordGenerationViewController.m in Sources */,
 				4DC4E04A23488BAA000743C4 /* VariantDictionary.m in Sources */,
+				4D4D3FAE2409CA7C0056A7E2 /* Foo.swift in Sources */,
 				4DC4E04B23488BAA000743C4 /* ItemDetailsModel.m in Sources */,
 				4DC4E04C23488BAA000743C4 /* DatabaseCell.m in Sources */,
 				4DC4E04D23488BAA000743C4 /* ProExplanationViewController.m in Sources */,
@@ -5627,6 +5706,7 @@
 				4DC4E05523488BAA000743C4 /* SelectItemTableViewController.m in Sources */,
 				4DC4E05623488BAA000743C4 /* Kdbx4Database.m in Sources */,
 				4DC4E05723488BAA000743C4 /* Node.m in Sources */,
+				4D4D3FD72409CDAC0056A7E2 /* RootViewController.swift in Sources */,
 				4DC4E05823488BAA000743C4 /* NSDictionary+Extensions.m in Sources */,
 				4DC4E05923488BAA000743C4 /* Utils.m in Sources */,
 				4DBBDE3823EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
@@ -5635,10 +5715,12 @@
 				4DC4E05C23488BAA000743C4 /* CompositeKeyFactors.m in Sources */,
 				4DC4E05D23488BAA000743C4 /* KdbEntry.m in Sources */,
 				4DC4E05E23488BAA000743C4 /* DuressDummyStorageProvider.m in Sources */,
+				4D4D3FD42409CD990056A7E2 /* MFIKeyActionSheetView.swift in Sources */,
 				4DC4E05F23488BAA000743C4 /* FileManager.m in Sources */,
 				4D6B5054238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4DC4E06023488BAA000743C4 /* RMStore.m in Sources */,
 				4D7F5A3D236013D2003ED785 /* LargeTextViewController.m in Sources */,
+				4DFD46D4240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				4DC4E06123488BAA000743C4 /* core.c in Sources */,
 				4DC4E06223488BAA000743C4 /* YubiManager.m in Sources */,
 				4DC4E06323488BAA000743C4 /* RMStoreUserDefaultsPersistence.m in Sources */,
@@ -5723,6 +5805,7 @@
 				4DC4E0A923488BAA000743C4 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4DC4E0AA23488BAA000743C4 /* KeePassDatabase.m in Sources */,
 				4D832A9723CE226800A7885E /* SecretStore.m in Sources */,
+				4D4D3FDB2409CDC80056A7E2 /* NamedColors.swift in Sources */,
 				4DC4E0AB23488BAA000743C4 /* BackupsTableViewController.m in Sources */,
 				4DC4E0AC23488BAA000743C4 /* SelectDestinationGroupController.m in Sources */,
 				4DC4E0AD23488BAA000743C4 /* IconViewCell.m in Sources */,
@@ -5787,6 +5870,7 @@
 				4DC4E0E123488BAA000743C4 /* BrowseSafeView.m in Sources */,
 				4DC4E0E223488BAA000743C4 /* RootXmlDomainObject.m in Sources */,
 				4DC4E0E323488BAA000743C4 /* WebDAVConfigurationViewController.m in Sources */,
+				4D4D3FE12409CE1C0056A7E2 /* ProgressHudView.swift in Sources */,
 				4DC4E0E423488BAA000743C4 /* FileAttachmentsViewControllerTableViewController.m in Sources */,
 				4D08B5C4234C9613003D1953 /* GCDWebServerURLEncodedFormRequest.m in Sources */,
 				4DC4E0E523488BAA000743C4 /* RecordView.m in Sources */,
@@ -5807,6 +5891,7 @@
 				4DC4E0F223488BAA000743C4 /* RMStoreAppReceiptVerifier.m in Sources */,
 				4DC4E0F323488BAA000743C4 /* iCloudSafesCoordinator.m in Sources */,
 				4DC4E0F423488BAA000743C4 /* ExportOptionsTableViewController.m in Sources */,
+				4D4D3FD02409CD990056A7E2 /* MFIKeyInteractionViewController.swift in Sources */,
 				4DC4E0F523488BAA000743C4 /* CHCSVParser.m in Sources */,
 				4DC4E0F623488BAA000743C4 /* EditAttachmentCell.m in Sources */,
 				4DC4E0F723488BAA000743C4 /* SimpleXmlValueExtractor.m in Sources */,
@@ -5901,6 +5986,7 @@
 				4DC4E19D23488BAE000743C4 /* DatabaseCell.m in Sources */,
 				4DC4E19E23488BAE000743C4 /* AesKdfCipher.m in Sources */,
 				4DC4E19F23488BAE000743C4 /* OTPToken+Generation.m in Sources */,
+				4DFD46D5240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				4DC4E1A023488BAE000743C4 /* AutoFillManager.m in Sources */,
 				4DC4E1A123488BAE000743C4 /* ClipboardManager.m in Sources */,
 				4DC4E1A223488BAE000743C4 /* Kdb1Database.m in Sources */,
@@ -5915,6 +6001,7 @@
 				4DC4E1AA23488BAE000743C4 /* PasswordGenerationViewController.m in Sources */,
 				4D832A9823CE226800A7885E /* SecretStore.m in Sources */,
 				4DC4E1AB23488BAE000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
+				4D4D3FAF2409CA7C0056A7E2 /* Foo.swift in Sources */,
 				4DC96912238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4DC4E1AC23488BAE000743C4 /* regdom.c in Sources */,
 				4DC4E1AD23488BAE000743C4 /* DecryptionParameters.m in Sources */,
@@ -6123,6 +6210,7 @@
 				4DE18BBB22F09A3F007D902D /* DatabaseCell.m in Sources */,
 				4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */,
+				4DFD46D3240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D2CB4922332CBE400C2E084 /* ClipboardManager.m in Sources */,
 				4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */,
@@ -6137,6 +6225,7 @@
 				4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
 				4D832A9623CE226800A7885E /* SecretStore.m in Sources */,
 				4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
+				4D4D3FAD2409CA7C0056A7E2 /* Foo.swift in Sources */,
 				4DC96910238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4D3652152184A24700A56519 /* regdom.c in Sources */,
 				4D4766F32178C82B00C4358F /* DecryptionParameters.m in Sources */,
@@ -6792,7 +6881,6 @@
 				4D51F0BF233BE5D900F5BB3D /* ru */,
 				4D4695C523878E4C009D3BC7 /* uk */,
 				4D4695E423878E71009D3BC7 /* fr */,
-				4DBBF18123A2992100071EAC /* en */,
 				4D27CC6723C7384800DF06ED /* sv */,
 				4DD8D58D23CC9F2300E7F57B /* zh-Hans */,
 				4D8B36F523FAD4B000A81725 /* es */,
@@ -6857,6 +6945,7 @@
 		4D25E8F22175F4CE00ACF108 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -6884,6 +6973,7 @@
 		4D25E8F32175F4CE00ACF108 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -7010,6 +7100,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = PwSafeModel;
 				VALIDATE_PRODUCT = YES;
@@ -7023,11 +7114,13 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -7047,7 +7140,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7098,6 +7191,9 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 				VERSIONING_SYSTEM = "";
@@ -7110,11 +7206,13 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2019";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -7134,7 +7232,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7185,6 +7283,8 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 				VERSIONING_SYSTEM = "";
@@ -7197,11 +7297,13 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -7221,7 +7323,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7264,6 +7366,9 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -7276,11 +7381,13 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Pro-Family";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Strongbox/Strongbox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
@@ -7300,7 +7407,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7343,6 +7450,8 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-iOS-Family-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -7356,6 +7465,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -7363,7 +7473,8 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7382,7 +7493,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -7418,6 +7529,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -7430,6 +7544,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -7437,7 +7552,8 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7456,7 +7572,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7490,6 +7606,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Family-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -7499,10 +7617,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = A68DD626305D5F20944A3A29 /* Pods-common-ios-Strongbox Auto Fill.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -7510,7 +7629,8 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7535,7 +7655,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -7571,6 +7691,9 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 			};
@@ -7580,10 +7703,11 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FF91E5B75A1A9424D1BF9ADD /* Pods-common-ios-Strongbox Auto Fill.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
@@ -7591,7 +7715,8 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2814;
+				CURRENT_PROJECT_VERSION = 2830;
+				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -7616,7 +7741,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.46.1;
+				MARKETING_VERSION = 1.47.1;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7650,6 +7775,8 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Yubikey/Strongbox-Auto-Fill-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				USER_HEADER_SEARCH_PATHS = "";
 			};

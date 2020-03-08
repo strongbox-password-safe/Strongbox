@@ -9,6 +9,8 @@
 #import "GenericKeyValueTableViewCell.h"
 #import "FontManager.h"
 #import "ItemDetailsViewController.h"
+#import "ColoredStringHelper.h"
+#import "Settings.h"
 
 @interface GenericKeyValueTableViewCell ()
 
@@ -25,6 +27,7 @@
 @property NSString* value;
 @property UIImage* rightButtonImage;
 @property BOOL showGenerateButton;
+@property BOOL colorizeValue;
 
 @end
 
@@ -112,7 +115,7 @@
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont showGenerateButton:(BOOL)showGenerateButton {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:showGenerateButton];
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:showGenerateButton colorizeValue:NO];
 }
 
 
@@ -121,7 +124,7 @@
 }
 
 - (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:NO];
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:NO colorizeValue:NO];
 }
 
 - (void)setKey:(NSString*)key
@@ -139,10 +142,13 @@ suggestionProvider:nil
  useEasyReadFont:useEasyReadFont
 rightButtonImage:nil
        concealed:NO
-showGenerateButton:NO];
+showGenerateButton:NO colorizeValue:NO];
 }
 
-- (void)setConfidentialKey:(NSString *)key value:(NSString *)value concealed:(BOOL)concealed {
+- (void)setConfidentialKey:(NSString *)key
+                     value:(NSString *)value
+                 concealed:(BOOL)concealed
+                  colorize:(BOOL)colorize {
     // Only for viewing - special cells required for edit...
         
     UIImage* image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
@@ -156,7 +162,8 @@ suggestionProvider:nil
     useEasyReadFont:YES
     rightButtonImage:image
        concealed:concealed
-showGenerateButton:NO];
+showGenerateButton:NO
+     colorizeValue:colorize];
 }
 
 - (void)setKey:(NSString*)key
@@ -168,7 +175,8 @@ showGenerateButton:NO];
     useEasyReadFont:(BOOL)useEasyReadFont
  rightButtonImage:(UIImage*)rightButtonImage
      concealed:(BOOL)concealed
-showGenerateButton:(BOOL)showGenerateButton {
+showGenerateButton:(BOOL)showGenerateButton
+colorizeValue:(BOOL)colorizeValue {
     [self bindKey:key];
         
     self.selectAllOnEdit = selectAllOnEdit;
@@ -184,6 +192,8 @@ showGenerateButton:(BOOL)showGenerateButton {
     [self bindRightButton];
 
     self.concealed = concealed;
+    self.colorizeValue = colorizeValue;
+    
     self.value = value;
     [self bindValue:formatAsUrl suggestionProvider:suggestionProvider editing:editing key:key];
     
@@ -202,7 +212,10 @@ showGenerateButton:(BOOL)showGenerateButton {
     self.keyLabel.accessibilityLabel = key;
 }
 
-- (void)bindValue:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider editing:(BOOL)editing key:(NSString*)key {
+- (void)bindValue:(BOOL)formatAsUrl
+suggestionProvider:(SuggestionProvider)suggestionProvider
+          editing:(BOOL)editing
+              key:(NSString*)key {
     self.valueText.enabled = editing;
     self.valueText.suggestionProvider = suggestionProvider;
 
@@ -240,22 +253,43 @@ showGenerateButton:(BOOL)showGenerateButton {
         self.valueLabel.font = FontManager.sharedInstance.caption1Font;
     }
     else {
-        self.valueText.text = self.value;
-        self.valueLabel.text = self.value;
-        self.valueText.accessibilityLabel = nil; //[key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
-        self.valueLabel.accessibilityLabel = nil; //[key stringByAppendingString:NSLocalizedString(@"generic_kv_cell_value_text_accessibility label_fmt", @" Text Field")];
-
-        if (@available(iOS 13.0, *)) {
-            self.valueText.textColor = UIColor.labelColor;
-            self.valueLabel.textColor = UIColor.labelColor;
+        self.valueText.accessibilityLabel = nil;
+        self.valueLabel.accessibilityLabel = nil;
+        
+        if (self.colorizeValue) {
+            BOOL dark = NO;
+            if (@available(iOS 12.0, *)) {
+                dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
+            }
+            BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+            
+            self.valueText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.value
+                                                                                     colorize:self.colorizeValue
+                                                                                     darkMode:dark
+                                                                                   colorBlind:colorBlind
+                                                                                         font:self.configuredValueFont];
+            
+            self.valueLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:self.value
+                                                                                      colorize:self.colorizeValue
+                                                                                      darkMode:dark
+                                                                                    colorBlind:colorBlind
+                                                                                          font:self.configuredValueFont];
         }
         else {
-            self.valueText.textColor = UIColor.darkTextColor;
-            self.valueLabel.textColor = UIColor.darkTextColor;
+            self.valueText.text = self.value;
+            self.valueLabel.text = self.value;
+            self.valueText.font = self.configuredValueFont;
+            self.valueLabel.font = self.configuredValueFont;
+            
+            if (@available(iOS 13.0, *)) {
+                self.valueText.textColor = UIColor.labelColor;
+                self.valueLabel.textColor = UIColor.labelColor;
+            }
+            else {
+                self.valueText.textColor = UIColor.darkTextColor;
+                self.valueLabel.textColor = UIColor.darkTextColor;
+            }
         }
-        
-        self.valueText.font = self.configuredValueFont;
-        self.valueLabel.font = self.configuredValueFont;
     }
 }
 

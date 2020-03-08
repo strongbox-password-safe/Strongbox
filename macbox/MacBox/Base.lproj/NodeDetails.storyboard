@@ -233,9 +233,17 @@
                                                 <customView translatesAutoresizingMaskIntoConstraints="NO" id="9QW-1e-Bnd" userLabel="Password Entry">
                                                     <rect key="frame" x="100" y="530" width="352" height="24"/>
                                                     <subviews>
-                                                        <secureTextField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rC6-Cf-rei" userLabel="Password Secure Text Field" customClass="KSPasswordField">
+                                                        <textField hidden="YES" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Jub-SE-Fjb" userLabel="Password Text Field">
                                                             <rect key="frame" x="0.0" y="2" width="324" height="20"/>
-                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Password" drawsBackground="YES" usesSingleLineMode="YES" id="DUe-am-hIT">
+                                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" title="Password" placeholderString="Username" drawsBackground="YES" id="EiE-6V-Slu">
+                                                                <font key="font" size="13" name="Menlo-Regular"/>
+                                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                            </textFieldCell>
+                                                        </textField>
+                                                        <secureTextField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rC6-Cf-rei" userLabel="Password Secure Text Field" customClass="ClickableSecureTextField">
+                                                            <rect key="frame" x="0.0" y="2" width="324" height="20"/>
+                                                            <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" borderStyle="bezel" title="abc12345" placeholderString="Password" drawsBackground="YES" usesSingleLineMode="YES" id="DUe-am-hIT">
                                                                 <font key="font" size="13" name="Menlo-Regular"/>
                                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -258,10 +266,14 @@
                                                     </subviews>
                                                     <constraints>
                                                         <constraint firstItem="ngT-6Z-l4g" firstAttribute="leading" secondItem="rC6-Cf-rei" secondAttribute="trailing" constant="4" id="1I7-gg-qBn"/>
+                                                        <constraint firstItem="Jub-SE-Fjb" firstAttribute="bottom" secondItem="rC6-Cf-rei" secondAttribute="bottom" id="9KY-Zu-YhV"/>
                                                         <constraint firstItem="ngT-6Z-l4g" firstAttribute="top" secondItem="9QW-1e-Bnd" secondAttribute="top" id="Dkb-Ju-RTB"/>
                                                         <constraint firstAttribute="bottom" secondItem="ngT-6Z-l4g" secondAttribute="bottom" id="F5d-eN-Eks"/>
                                                         <constraint firstItem="rC6-Cf-rei" firstAttribute="leading" secondItem="9QW-1e-Bnd" secondAttribute="leading" id="NG2-t9-UFe"/>
                                                         <constraint firstAttribute="trailing" secondItem="ngT-6Z-l4g" secondAttribute="trailing" id="ZC8-Eo-ybe"/>
+                                                        <constraint firstItem="Jub-SE-Fjb" firstAttribute="top" secondItem="rC6-Cf-rei" secondAttribute="top" id="cQr-fF-1UU"/>
+                                                        <constraint firstItem="Jub-SE-Fjb" firstAttribute="trailing" secondItem="rC6-Cf-rei" secondAttribute="trailing" id="nRO-OV-ZBS"/>
+                                                        <constraint firstItem="Jub-SE-Fjb" firstAttribute="leading" secondItem="rC6-Cf-rei" secondAttribute="leading" id="w5d-Fb-wet"/>
                                                         <constraint firstItem="rC6-Cf-rei" firstAttribute="centerY" secondItem="ngT-6Z-l4g" secondAttribute="centerY" id="wkY-YW-Lri"/>
                                                     </constraints>
                                                 </customView>
@@ -386,15 +398,15 @@
                                                                 <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2mq-44-xpi">
                                                                     <rect key="frame" x="0.0" y="0.0" width="460" height="197"/>
                                                                     <clipView key="contentView" drawsBackground="NO" copiesOnScroll="NO" id="TA6-fh-KrX">
-                                                                        <rect key="frame" x="1" y="1" width="443" height="195"/>
+                                                                        <rect key="frame" x="1" y="1" width="458" height="195"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" spellingCorrection="YES" smartInsertDelete="YES" id="ho0-Ua-AJc">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="443" height="195"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="458" height="195"/>
                                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                                 <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                                                                <size key="minSize" width="443" height="195"/>
+                                                                                <size key="minSize" width="458" height="195"/>
                                                                                 <size key="maxSize" width="607" height="10000000"/>
                                                                                 <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                                                             </textView>
@@ -408,7 +420,7 @@
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </scroller>
                                                                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="BYP-zO-bMM">
-                                                                        <rect key="frame" x="444" y="1" width="15" height="195"/>
+                                                                        <rect key="frame" x="443" y="1" width="16" height="195"/>
                                                                         <autoresizingMask key="autoresizingMask"/>
                                                                     </scroller>
                                                                 </scrollView>
@@ -624,6 +636,7 @@
                                                 <constraint firstItem="hw8-io-OPV" firstAttribute="leading" secondItem="jo6-4f-1xh" secondAttribute="leading" id="kAR-Dm-d6g"/>
                                                 <constraint firstItem="aYK-Tp-67l" firstAttribute="leading" secondItem="Irb-wz-rX0" secondAttribute="trailing" constant="8" id="l16-gL-GRZ"/>
                                                 <constraint firstItem="Vhv-HN-wws" firstAttribute="leading" secondItem="fdj-oP-As8" secondAttribute="leading" id="l2S-Ao-Wwz"/>
+                                                <constraint firstItem="8ob-0I-l2b" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="9Pe-9E-po9" secondAttribute="trailing" constant="8" symbolic="YES" id="oQi-MO-6b1"/>
                                                 <constraint firstItem="mk8-r2-7zy" firstAttribute="leading" secondItem="fzQ-Y2-jWP" secondAttribute="trailing" constant="8" id="p80-0e-9g0"/>
                                                 <constraint firstItem="8Y4-j2-TER" firstAttribute="top" secondItem="RQH-qa-LwY" secondAttribute="bottom" constant="20" id="qJ0-dO-RSx"/>
                                                 <constraint firstItem="9QW-1e-Bnd" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="0Zp-Rc-N6q" secondAttribute="trailing" constant="8" symbolic="YES" id="s3d-gl-AEb"/>
@@ -638,17 +651,17 @@
                                         </view>
                                     </tabViewItem>
                                     <tabViewItem label="Custom Fields" identifier="" id="BGN-G1-a8l">
-                                        <view key="view" misplaced="YES" id="KaT-Ja-CRc">
-                                            <rect key="frame" x="10" y="33" width="485" height="245"/>
+                                        <view key="view" id="KaT-Ja-CRc">
+                                            <rect key="frame" x="10" y="33" width="485" height="120"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <subviews>
                                                 <scrollView autohidesScrollers="YES" horizontalLineScroll="22" horizontalPageScroll="10" verticalLineScroll="22" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wIU-TB-kXC">
                                                     <rect key="frame" x="20" y="20" width="445" height="58"/>
-                                                    <clipView key="contentView" drawsBackground="NO" id="hcI-Br-PQh">
+                                                    <clipView key="contentView" ambiguous="YES" drawsBackground="NO" id="hcI-Br-PQh">
                                                         <rect key="frame" x="1" y="0.0" width="443" height="57"/>
-                                                        <autoresizingMask key="autoresizingMask"/>
+                                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <subviews>
-                                                            <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" usesAutomaticRowHeights="YES" headerView="GNI-4C-9Z1" viewBased="YES" id="Wrt-wl-uuY">
+                                                            <tableView verticalHuggingPriority="750" ambiguous="YES" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" multipleSelection="NO" autosaveColumns="NO" typeSelect="NO" usesAutomaticRowHeights="YES" headerView="GNI-4C-9Z1" viewBased="YES" id="Wrt-wl-uuY">
                                                                 <rect key="frame" x="0.0" y="0.0" width="443" height="32"/>
                                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                 <size key="intercellSpacing" width="5" height="5"/>
@@ -891,6 +904,7 @@
                         <outlet property="buttonSettings" destination="4qj-2G-rWN" id="T9N-zg-b9a"/>
                         <outlet property="checkboxExpires" destination="8ob-0I-l2b" id="hDC-zE-poM"/>
                         <outlet property="comboGroup" destination="Cn3-FH-TYO" id="IQG-sq-kNh"/>
+                        <outlet property="concealedPasswordField" destination="rC6-Cf-rei" id="n1L-yl-jk5"/>
                         <outlet property="customFieldsContextMenu" destination="tCO-9y-hT7" id="yut-kb-7bf"/>
                         <outlet property="datePickerExpires" destination="jz4-Hb-lwH" id="tPZ-KI-GSc"/>
                         <outlet property="emailRow" destination="cyv-Dr-1bz" id="v71-8u-sYi"/>
@@ -901,10 +915,10 @@
                         <outlet property="labelModified" destination="sqH-Ta-laM" id="iki-ME-J52"/>
                         <outlet property="labelTotp" destination="hw8-io-OPV" id="1N1-Lx-tbV"/>
                         <outlet property="progressTotp" destination="Qvm-W5-Jdz" id="YUr-LZ-x6J"/>
+                        <outlet property="revealedPasswordField" destination="Jub-SE-Fjb" id="9Xy-Nt-eDm"/>
                         <outlet property="tabView" destination="esh-rE-AVc" id="tyQ-hb-8WR"/>
                         <outlet property="tableViewCustomFields" destination="Wrt-wl-uuY" id="FvE-Xt-6In"/>
                         <outlet property="textFieldEmail" destination="c6V-qs-vMm" id="E2K-1i-B5O"/>
-                        <outlet property="textFieldPassword" destination="rC6-Cf-rei" id="B1N-nx-AdT"/>
                         <outlet property="textFieldTitle" destination="fzQ-Y2-jWP" id="Haj-v8-2da"/>
                         <outlet property="textFieldUrl" destination="jo6-4f-1xh" id="prQ-4j-OQm"/>
                         <outlet property="textFieldUsername" destination="hIL-M6-8OB" id="gsa-pX-7dp"/>

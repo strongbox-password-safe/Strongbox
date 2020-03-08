@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ln1-Rl-vEb">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ln1-Rl-vEb">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15510"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -658,7 +658,7 @@
                                 <attributedString key="attributedText">
                                     <fragment content="Testing">
                                         <attributes>
-                                            <font key="NSFont" metaFont="controlContent" size="11"/>
+                                            <font key="NSFont" metaFont="message" size="11"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -986,7 +986,7 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="HIU-iF-9nx" userLabel="Show All Files in Key Files Local">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="HIU-iF-9nx" userLabel="Allow Clipboard Handoff">
                                         <rect key="frame" x="0.0" y="419" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HIU-iF-9nx" id="xsf-Vl-gtb">
@@ -1013,6 +1013,36 @@
                                                 <constraint firstItem="2AQ-TK-Aer" firstAttribute="bottom" secondItem="xsf-Vl-gtb" secondAttribute="bottomMargin" id="gLv-cE-PiO"/>
                                                 <constraint firstItem="7ik-ek-3YY" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="2AQ-TK-Aer" secondAttribute="trailing" constant="8" symbolic="YES" id="gQr-HW-muE"/>
                                                 <constraint firstItem="2AQ-TK-Aer" firstAttribute="centerY" secondItem="7ik-ek-3YY" secondAttribute="centerY" id="oLg-Ls-0cU"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Cca-ff-gxA" userLabel="Use Color Blind Palette for Passwords">
+                                        <rect key="frame" x="0.0" y="463" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Cca-ff-gxA" id="m7Z-SN-Vj7">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Use Color Blind Palette for Passwords" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lha-oo-sGv">
+                                                    <rect key="frame" x="20" y="11" width="287.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="fQJ-uY-SEH">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="eiy-V3-ugy"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="fQJ-uY-SEH" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="lha-oo-sGv" secondAttribute="trailing" constant="8" symbolic="YES" id="AqR-ys-hAz"/>
+                                                <constraint firstItem="lha-oo-sGv" firstAttribute="bottom" secondItem="m7Z-SN-Vj7" secondAttribute="bottomMargin" id="CH5-an-XlQ"/>
+                                                <constraint firstItem="lha-oo-sGv" firstAttribute="top" secondItem="m7Z-SN-Vj7" secondAttribute="topMargin" id="JBE-64-QJV"/>
+                                                <constraint firstItem="lha-oo-sGv" firstAttribute="centerY" secondItem="fQJ-uY-SEH" secondAttribute="centerY" id="O1a-6B-m7d"/>
+                                                <constraint firstItem="lha-oo-sGv" firstAttribute="leading" secondItem="m7Z-SN-Vj7" secondAttribute="leading" constant="20" id="ZUU-e6-iXp"/>
+                                                <constraint firstItem="fQJ-uY-SEH" firstAttribute="trailing" secondItem="m7Z-SN-Vj7" secondAttribute="trailing" constant="-20" id="j11-0x-1Hb"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -1045,6 +1075,7 @@
                         <outlet property="switchHideKeyFileName" destination="G1j-ld-CDQ" id="Ca0-EJ-krQ"/>
                         <outlet property="switchShowAllFilesInKeyFilesLocal" destination="NUW-RD-8sG" id="eS2-52-5yN"/>
                         <outlet property="switchShowYubikeySecretWorkaround" destination="wGm-bI-fp3" id="rcC-7N-efl"/>
+                        <outlet property="switchUseColorBlindPalette" destination="fQJ-uY-SEH" id="9pG-Ud-fOY"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hAm-UX-ANu" userLabel="First Responder" sceneMemberID="firstResponder"/>

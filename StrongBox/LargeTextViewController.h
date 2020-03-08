@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface LargeTextViewController : UIViewController
 
 @property NSString* string;
+@property BOOL colorize;
 
 @end
 

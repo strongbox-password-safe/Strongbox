@@ -257,10 +257,10 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 
     Node* sampleFolder = [[Node alloc] initAsGroup:NSLocalizedString(@"model_sample_group_title", @"Sample Group")
                                             parent:parent
-                         allowDuplicateGroupTitles:YES
+                         keePassGroupTitleRules:YES
                                               uuid:nil];
     
-    [parent addChild:sampleFolder allowDuplicateGroupTitles:NO];
+    [parent addChild:sampleFolder keePassGroupTitleRules:NO];
     
     NodeFields *fields = [[NodeFields alloc] initWithUsername:NSLocalizedString(@"model_sample_entry_username", @"username")
                                                           url:@"https://strongboxsafe.com"
@@ -272,7 +272,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
                                                   parent:sampleFolder
                                                   fields:fields
                                                     uuid:nil]
-      allowDuplicateGroupTitles:NO];
+      keePassGroupTitleRules:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

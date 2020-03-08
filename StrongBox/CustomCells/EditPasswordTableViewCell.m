@@ -12,6 +12,7 @@
 #import "PasswordMaker.h"
 #import "FontManager.h"
 #import "Settings.h"
+#import "ColoredStringHelper.h"
 
 @interface EditPasswordTableViewCell () <UITextViewDelegate>
 
@@ -54,6 +55,13 @@
     [self setPassword:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
 }
 
+- (IBAction)onAlternativeGenerate:(id)sender {
+    [PasswordMaker.sharedInstance promptWithSuggestions:self.parentVc
+                                                 action:^(NSString * _Nonnull response) {
+        [self setPassword:response];
+    }];
+}
+
 - (IBAction)onSettings:(id)sender {
     if(self.onPasswordSettings) {
         self.onPasswordSettings();
@@ -65,21 +73,28 @@
 }
 
 - (void)setPassword:(NSString *)password {
-//    NSLog(@"EditPasswordCell: setPassword");
-    
-    self.valueTextView.text = password;
-
-    if(self.onPasswordEdited) {
-        self.onPasswordEdited(self.password);
+    BOOL dark = NO;
+    if (@available(iOS 12.0, *)) {
+        dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
     }
-
-    [self.valueTextView layoutSubviews];
-    [[NSNotificationCenter defaultCenter] postNotificationName:CellHeightsChangedNotification object:self];
+    BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+    
+    self.valueTextView.attributedText = [ColoredStringHelper getColorizedAttributedString:password
+                                                                                 colorize:self.colorize
+                                                                                 darkMode:dark
+                                                                               colorBlind:colorBlind
+                                                                                     font:self.valueTextView.font];
+    
+    [self notifyChangedAndLayout];
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-//    NSLog(@"EditPasswordCell: textViewDidChange");
-    
+    [self notifyChangedAndLayout];
+}
+
+- (void)notifyChangedAndLayout {
+    NSLog(@"EditPasswordCell: notifyChangedAndLayout");
+      
     if(self.onPasswordEdited) {
         self.onPasswordEdited(self.password);
     }
@@ -89,13 +104,28 @@
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    // Filter new lines and tabs
-    
     NSMutableCharacterSet *set = [[NSCharacterSet newlineCharacterSet] mutableCopy];
     [set formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"\t"]];
 
+    // Filter new lines and tabs
+    
     if( [text rangeOfCharacterFromSet:set].location == NSNotFound ) {
-        return YES;
+        // Remember Cursor Position...
+        
+        UITextPosition *beginning = textView.beginningOfDocument;
+        UITextPosition *cursorLocation = [textView positionFromPosition:beginning offset:(range.location + text.length)];
+
+        // Change our password - this updates the textview and colorizes and notifies listeners...
+        
+        self.password = [textView.text stringByReplacingCharactersInRange:range withString:text];
+
+        // Reset Cursor
+        
+        if(cursorLocation) {
+            [textView setSelectedTextRange:[textView textRangeFromPosition:cursorLocation toPosition:cursorLocation]];
+        }
+
+        return NO;
     }
     
     return NO;

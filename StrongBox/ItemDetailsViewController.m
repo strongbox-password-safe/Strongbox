@@ -843,7 +843,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
     else if([segue.identifier isEqualToString:@"segueToCustomFieldEditor"]) {
         UINavigationController *nav = segue.destinationViewController;
         CustomFieldEditorViewController* vc = (CustomFieldEditorViewController*)[nav topViewController];
-        
+
+        vc.colorizeValue = self.databaseModel.metadata.colorizePasswords;
         vc.customFieldsKeySet = [NSSet setWithArray:[self.model.customFields map:^id _Nonnull(CustomFieldViewModel * _Nonnull obj, NSUInteger idx) {
             return obj.key;
         }]];
@@ -886,7 +887,11 @@ static NSString* const kEditDateCell = @"EditDateCell";
     }
     else if ([segue.identifier isEqualToString:@"segueToLargeView"]) {
         LargeTextViewController* vc = segue.destinationViewController;
-        vc.string = sender;
+        // @{ @"text" : text, @"colorize" : @(colorize) }
+        
+        NSDictionary* d = sender;
+        vc.string = d[@"text"];
+        vc.colorize = ((NSNumber*)(d[@"colorize"])).boolValue;
     }
 }
 
@@ -1230,7 +1235,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 - (void)applyModelChangesToNodeItem {
      if (self.createNewItem) {
          self.item.fields.created = [[NSDate alloc] init];
-         [self.parentGroup addChild:self.item allowDuplicateGroupTitles:NO];
+         [self.parentGroup addChild:self.item keePassGroupTitleRules:NO];
      }
      else { // Add History Entry for this change if appropriate...
          Node* originalNodeForHistory = [self.item cloneForHistory];
@@ -1239,7 +1244,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
      
      [self.item touch:YES touchParents:YES];
      
-     [self.item setTitle:self.model.title allowDuplicateGroupTitles:NO];
+     [self.item setTitle:self.model.title keePassGroupTitleRules:NO];
      
      self.item.fields.username = self.model.username;
      self.item.fields.password = self.model.password;
@@ -1320,7 +1325,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 
     [self.item touchWithExplicitModifiedDate:preSaveCloneOfItem.fields.modified touchParents:YES];
      
-    [self.item setTitle:preSaveCloneOfItem.title allowDuplicateGroupTitles:NO];
+    [self.item setTitle:preSaveCloneOfItem.title keePassGroupTitleRules:NO];
 
     self.item.fields.username = preSaveCloneOfItem.fields.username;
     self.item.fields.password = preSaveCloneOfItem.fields.password;
@@ -1373,7 +1378,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
             }
             
 #ifdef IS_APP_EXTENSION
-            [self.autoFillRootViewController onCredentialSelected:self.item.fields.username password:self.item.fields.password];
+            [self.autoFillRootViewController exitWithCredential:self.item.fields.username
+                                                       password:self.item.fields.password];
 #endif
         }];
     }
@@ -1499,7 +1505,7 @@ showGenerateButton:YES];
     __weak GenericKeyValueTableViewCell* weakCell = cell;
     
     cell.onGenerate = ^{
-        [PasswordMaker.sharedInstance promptWithSuggestions:self usernames:YES action:^(NSString * _Nonnull response) {
+        [PasswordMaker.sharedInstance promptWithUsernameSuggestions:self action:^(NSString * _Nonnull response) {
             [weakCell pokeValue:response];
         }];
     };
@@ -1511,6 +1517,8 @@ showGenerateButton:YES];
     if(self.editing) {
         EditPasswordTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditPasswordCellId forIndexPath:indexPath];
         
+        cell.colorize = self.databaseModel.metadata.colorizePasswords;
+        cell.parentVc = self;
         cell.password = self.model.password;
         cell.onPasswordEdited = ^(NSString * _Nonnull password) {
             self.model.password = trim(password);
@@ -1532,7 +1540,8 @@ showGenerateButton:YES];
         
         [cell setConfidentialKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
                            value:[self maybeDereference:self.model.password]
-                       concealed:self.passwordConcealedInUi];
+                       concealed:self.passwordConcealedInUi
+                        colorize:self.databaseModel.metadata.colorizePasswords];
         
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
@@ -1689,7 +1698,10 @@ showGenerateButton:YES];
         CustomFieldViewModel* cf = self.model.customFields[idx];
 
         if(cf.protected && !self.editing) {
-            [cell setConfidentialKey:cf.key value:cf.value concealed:cf.concealedInUI];
+            [cell setConfidentialKey:cf.key
+                               value:cf.value
+                           concealed:cf.concealedInUI
+                            colorize:self.databaseModel.metadata.colorizePasswords];
 
             __weak GenericKeyValueTableViewCell* weakCell = cell;
             cell.onRightButton = ^{
@@ -1843,31 +1855,31 @@ showGenerateButton:YES];
 
     if(indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowUsername) {
-            [self showLargeText:self.model.username];
+            [self showLargeText:self.model.username colorize:NO];
         }
         else if(indexPath.row == kRowPassword) {
-            [self showLargeText:self.model.password];
+            [self showLargeText:self.model.password colorize:self.databaseModel.metadata.colorizePasswords];
         }
         else if(indexPath.row == kRowURL) {
-            [self showLargeText:self.model.url];
+            [self showLargeText:self.model.url colorize:NO];
         }
         else if (indexPath.row == kRowEmail) {
-            [self showLargeText:self.model.email];
+            [self showLargeText:self.model.email colorize:NO];
         }
         else if (indexPath.row >= kSimpleRowCount) { // Custom Field
             NSUInteger idx = indexPath.row - kSimpleRowCount;
             CustomFieldViewModel* field = self.model.customFields[idx];
-            [self showLargeText:field.value];
+            [self showLargeText:field.value colorize:field.protected && self.databaseModel.metadata.colorizePasswords];
         }
     }
     else if (indexPath.section == kNotesSectionIdx) {
-        [self showLargeText:self.model.notes];
+        [self showLargeText:self.model.notes colorize:NO];
     }
 }
 
-- (void)showLargeText:(NSString*)text {
+- (void)showLargeText:(NSString*)text colorize:(BOOL)colorize {
     if (text) {
-        [self performSegueWithIdentifier:@"segueToLargeView" sender:text];
+        [self performSegueWithIdentifier:@"segueToLargeView" sender:@{ @"text" : text, @"colorize" : @(colorize) }];
     }
 }
 

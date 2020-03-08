@@ -58,8 +58,8 @@
           rootGroupName = kDefaultRootGroupName;
         }
 
-        Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootNode allowDuplicateGroupTitles:YES uuid:nil];
-        [rootNode addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
+        Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootNode keePassGroupTitleRules:YES uuid:nil];
+        [rootNode addChild:keePassRootGroup keePassGroupTitleRules:YES];
     }
     
     return rootNode;
@@ -158,7 +158,7 @@
 }
 
 - (BOOL)buildGroup:(KeePassGroup*)group parentNode:(Node*)parentNode {
-    Node* groupNode = [[Node alloc] initAsGroup:group.name parent:parentNode allowDuplicateGroupTitles:YES uuid:group.uuid];
+    Node* groupNode = [[Node alloc] initAsGroup:group.name parent:parentNode keePassGroupTitleRules:YES uuid:group.uuid];
     
     if(group.customIcon) groupNode.customIconUuid = group.customIcon;
     if(group.icon != nil) groupNode.iconId = group.icon;
@@ -179,10 +179,10 @@
             return NO;
         }
         
-        [groupNode addChild:entryNode allowDuplicateGroupTitles:YES];
+        [groupNode addChild:entryNode keePassGroupTitleRules:YES];
     }
     
-    [parentNode addChild:groupNode allowDuplicateGroupTitles:YES];
+    [parentNode addChild:groupNode keePassGroupTitleRules:YES];
 
     groupNode.linkedData = group.unmanagedChildren;
 

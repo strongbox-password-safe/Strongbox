@@ -52,8 +52,19 @@
     return [bookmark base64EncodedStringWithOptions:kNilOptions];
 }
 
-+ (NSURL *)getUrlFromBookmark:(NSString *)bookmarkInB64 readOnly:(BOOL)readOnly updatedBookmark:(NSString *_Nonnull*)updatedBookmark error:(NSError *_Nonnull*)error {
-    NSData* bookmarkData = [[NSData alloc] initWithBase64EncodedString:bookmarkInB64 options:kNilOptions];
++ (NSURL *)getUrlFromBookmark:(NSString *)bookmarkInB64
+                     readOnly:(BOOL)readOnly
+              updatedBookmark:(NSString *_Nonnull*)updatedBookmark
+                        error:(NSError *_Nonnull*)error {
+    if(bookmarkInB64 == nil) {
+        if(error) {
+            *error = [Utils createNSError:@"Could not decode bookmark." errorCode:-1];
+        }
+        return nil;
+    }
+
+    NSData* bookmarkData = [[NSData alloc] initWithBase64EncodedString:bookmarkInB64
+                                                               options:NSDataBase64DecodingIgnoreUnknownCharacters];
     if(bookmarkData == nil) {
         if(error) {
             *error = [Utils createNSError:@"Could not decode bookmark." errorCode:-1];

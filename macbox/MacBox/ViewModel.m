@@ -59,8 +59,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
             _databaseMetadata = [DatabasesManager.sharedInstance addOrGet:self.document.fileURL];
             
             if(self.databaseMetadata == nil) {
-                NSLog(@"Could not add or get metadata for [%@]", document.fileURL);
-                return nil;
+                NSLog(@"WARN: Could not add or get metadata for [%@]", document.fileURL);
             }
         }
     }
@@ -201,8 +200,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title
-{
+- (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title {
     return [self setItemTitle:item title:title modified:nil];
 }
 
@@ -282,7 +280,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSDate* oldModified = item.fields.modified;
     
     Node* cloneForHistory = [item cloneForHistory];
-    if([item setTitle:title allowDuplicateGroupTitles:self.format != kPasswordSafe]) {
+    if([item setTitle:title keePassGroupTitleRules:self.format != kPasswordSafe]) {
         [self touchAndModify:item modDate:modified];
         
         if(self.document.undoManager.isUndoing) {
@@ -886,9 +884,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     });
 }
 
-- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent allowDuplicateGroupTitles:(BOOL)allowDuplicateGroupTitles {
+- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     for (Node* child in children) {
-        if(![parent validateAddChild:child allowDuplicateGroupTitles:YES]) {
+        if(![parent validateAddChild:child keePassGroupTitleRules:YES]) {
             return NO;
         }
     }
@@ -952,7 +950,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
     Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields uuid:nil];
     
-    if(![parentGroup validateAddChild:record allowDuplicateGroupTitles:YES]) {
+    if(![parentGroup validateAddChild:record keePassGroupTitleRules:YES]) {
         return NO;
     }
     
@@ -966,8 +964,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     BOOL success = NO;
     Node* newGroup;
     do {
-        newGroup = [[Node alloc] initAsGroup:title parent:parentGroup allowDuplicateGroupTitles:self.format != kPasswordSafe uuid:nil];
-        success =  newGroup && [parentGroup validateAddChild:newGroup allowDuplicateGroupTitles:self.format != kPasswordSafe];
+        newGroup = [[Node alloc] initAsGroup:title parent:parentGroup keePassGroupTitleRules:self.format != kPasswordSafe uuid:nil];
+        success =  newGroup && [parentGroup validateAddChild:newGroup keePassGroupTitleRules:self.format != kPasswordSafe];
         i++;
         title = [NSString stringWithFormat:@"%@ %ld", title, i];
     } while (!success);
@@ -976,7 +974,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)addItem:(Node*)item parent:(Node*)parent newItemCreated:(BOOL)newItemCreated {
-    [parent addChild:item allowDuplicateGroupTitles:YES];
+    [parent addChild:item keePassGroupTitleRules:YES];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
     if(!self.document.undoManager.isUndoing) {
@@ -1031,7 +1029,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node isRecycleOp:(BOOL)isRecycleOp {
-    if(![node validateChangeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe]) {
+    if(![node validateChangeParent:parent keePassGroupTitleRules:self.format != kPasswordSafe]) {
         return NO;
     }
 
@@ -1045,7 +1043,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
     [self.document.undoManager setActionName:loc];
     
-    BOOL ret = [node changeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe];
+    BOOL ret = [node changeParent:parent keePassGroupTitleRules:self.format != kPasswordSafe];
 
     dispatch_async(dispatch_get_main_queue(), ^{
         self.onChangeParent(node);
@@ -1098,7 +1096,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
-    return [node validateChangeParent:parent allowDuplicateGroupTitles:self.format != kPasswordSafe];
+    return [node validateChangeParent:parent keePassGroupTitleRules:self.format != kPasswordSafe];
 }
 
 - (NSString*)getSmartFillTitle {

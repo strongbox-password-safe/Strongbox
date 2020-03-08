@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy) void (^onPasswordEdited)(NSString* password);
 @property (nonatomic, copy) void (^onPasswordSettings)(void);
 @property BOOL showGenerationSettings;
+@property BOOL colorize;
+@property UIViewController* parentVc;
 
 @end
 

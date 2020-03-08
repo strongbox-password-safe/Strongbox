@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SafesListTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
 
 @property (nonatomic) CredentialProviderViewController *rootViewController;
+@property BOOL lastRunGood;
 
 @end
 

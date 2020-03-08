@@ -54,7 +54,17 @@ informativeText:(NSString*)informativeText
     }];
 }
 
-+ (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion {
++ (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText
+       window:(NSWindow*)window
+   completion:(void (^)(BOOL yesNo))completion {
+    [Alerts yesNo:messageText informativeText:informativeText window:window disableEscapeKey:NO completion:completion];
+}
+
++ (void)yesNo:(NSString *)messageText
+informativeText:(NSString*)informativeText
+       window:(NSWindow*)window
+disableEscapeKey:(BOOL)disableEscapeKey
+   completion:(void (^)(BOOL yesNo))completion {
     NSAlert *alert = [[NSAlert alloc] init];
     
     if (informativeText) [alert setInformativeText:informativeText];
@@ -67,7 +77,10 @@ informativeText:(NSString*)informativeText
     NSString* loc2 = NSLocalizedString(@"alerts_yes", @"Yes");
     [alert addButtonWithTitle:loc2];
     
-    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
+    if (!disableEscapeKey) {
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
+    }
+    
     [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; // ENTER
     
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {

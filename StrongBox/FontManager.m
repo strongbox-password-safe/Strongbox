@@ -10,6 +10,7 @@
 #import "Settings.h"
 
 static NSString* const kEasyReadFontName = @"Menlo";
+static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
 
 @implementation FontManager
 
@@ -45,12 +46,20 @@ static NSString* const kEasyReadFontName = @"Menlo";
     _easyReadFontForTotp = [UIFont fontWithName:kEasyReadFontName size:30.0];
 
     UIFont* customFont = [UIFont fontWithName:kEasyReadFontName size:UIFont.labelFontSize];
+    UIFont* customBoldFont = [UIFont fontWithName:kEasyReadBoldFontName size:UIFont.labelFontSize];
+    
+//    NSLog(@"%@", [UIFont fontNamesForFamilyName:@"Menlo"]);
+    
+    
     if (@available(iOS 11.0, *)) {
         _easyReadFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customFont];
+        _easyReadBoldFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customBoldFont];
+
         _easyReadFontForLargeTextView = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleLargeTitle] scaledFontForFont:customFont];
 
     } else {
         _easyReadFont = customFont;
+        _easyReadBoldFont = customBoldFont;
         _easyReadFontForLargeTextView = _easyReadFontForTotp;
     }
     

@@ -36,6 +36,7 @@ static NSString* const kAmbiguous = @"{}[]()/\\'\"`~,;:.<>";
 
 const static NSDictionary<NSString*, NSString*> *l33tMap;
 const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
+const static NSArray<NSString*> *kEmailDomains;
 
 + (void)initialize {
     if(self == [PasswordMaker class]) {
@@ -80,6 +81,27 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
                             @"S" : @"5",
                             @"T" : @"7",
                             @"Z" : @"2",};
+            
+            kEmailDomains = @[
+                 @"aol.com",
+                 @"att.net",
+                 @"comcast.net",
+                 @"facebook.com",
+                 @"gmail.com",
+                 @"gmx.com",
+                 @"googlemail.com",
+                 @"google.com",
+                 @"hotmail.com",
+                 @"hotmail.co.uk",
+                 @"mac.com",
+                 @"me.com",
+                 @"mail.com",
+                 @"msn.com",
+                 @"live.com",
+                 @"sbcglobal.net",
+                 @"verizon.net",
+                 @"yahoo.com",
+                 @"yahoo.co.uk"];
         });
     }
 }
@@ -110,8 +132,20 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
 //}
 
 #if TARGET_OS_IPHONE
+    
+- (void)promptWithUsernameSuggestions:(UIViewController *)viewController
+                               action:(void (^)(NSString * _Nonnull))action {
+    [self promptWithSuggestions:viewController usernamesOnly:YES action:action];
+}
 
-- (void)promptWithSuggestions:(UIViewController *)viewController usernames:(BOOL)usernames action:(void (^)(NSString * _Nonnull))action {
+- (void)promptWithSuggestions:(UIViewController *)viewController
+                       action:(void (^)(NSString * _Nonnull))action {
+    [self promptWithSuggestions:viewController usernamesOnly:NO action:action];
+}
+
+- (void)promptWithSuggestions:(UIViewController *)viewController
+                usernamesOnly:(BOOL)usernamesOnly
+                       action:(void (^)(NSString * _Nonnull))action {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString* title = NSLocalizedString(@"select_generated_field_title", @"Select your preferred generated field title.");
         NSString* message = NSLocalizedString(@"select_generated_field_message", @"Select your preferred generated field message.");
@@ -124,16 +158,23 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
         PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
         NSMutableArray* suggestions = [NSMutableArray arrayWithCapacity:3];
         
-        if(usernames) {
-            [suggestions addObject:[self generateUsername]];
-            [suggestions addObject:[self generateUsername]];
-            [suggestions addObject:[self generateUsername]];
+        if(usernamesOnly) {
+            [suggestions addObject:[self generateUsername].lowercaseString];
+            [suggestions addObject:[self generateName]];
+            [suggestions addObject:[self getFirstName]];
+            [suggestions addObject:[self generateEmail]];
+            [suggestions addObject:[self generateRandomWord]];
         }
         else {
-            [suggestions addObject:[self generateForConfigOrDefault:config]];
-            [suggestions addObject:[self generateForConfigOrDefault:config]];
             config.algorithm = config.algorithm == kBasic ? kXkcd : kBasic; // Alternate method
             [suggestions addObject:[self generateForConfigOrDefault:config]];
+            [suggestions addObject:[self generateUsername].lowercaseString];
+
+            uint32_t randomInt = arc4random();
+            [suggestions addObject:@(randomInt).stringValue];
+            
+            [suggestions addObject:[self generateEmail]];
+            [suggestions addObject:[self generateRandomWord]];
         }
         
         UIAlertAction *firstSuggestion = [UIAlertAction actionWithTitle:suggestions[0]
@@ -148,6 +189,23 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) { action(suggestions[2]); }];
         
+        UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:suggestions[3]
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) { action(suggestions[3]); }];
+        
+        UIAlertAction *fifthAction = [UIAlertAction actionWithTitle:suggestions[4]
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) { action(suggestions[4]); }];
+
+        NSString* loc = NSLocalizedString(@"password_generation_regenerate_ellipsis", @"Regenerate...");
+        
+        UIAlertAction *regenAction = [UIAlertAction actionWithTitle:loc
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) {
+            [self promptWithSuggestions:viewController usernamesOnly:usernamesOnly action:action];
+        }];
+        [regenAction setValue:UIColor.systemGreenColor forKey:@"titleTextColor"];
+
         UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { }];
@@ -155,6 +213,10 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
         [alertController addAction:firstSuggestion];
         [alertController addAction:secondAction];
         [alertController addAction:thirdAction];
+        [alertController addAction:fourthAction];
+        [alertController addAction:fifthAction];
+        [alertController addAction:regenAction];
+
         [alertController addAction:cancelAction];
             
         [viewController presentViewController:alertController animated:YES completion:nil];
@@ -163,16 +225,51 @@ const static NSDictionary<NSString*, NSString*> *l3ssl33tMap;
 
 #endif
 
+- (NSString*)generateName {
+    NSString* firstName = [self getFirstName];
+
+    NSInteger sindex = arc4random_uniform((u_int32_t)self.surnamesCache.count);
+
+    return [NSString stringWithFormat:@"%@ %@", firstName, self.surnamesCache[sindex]];
+}
+
 - (NSString*)generateUsername {
+    NSString* firstName = [self getFirstName];
+
+    NSInteger sindex = arc4random_uniform((u_int32_t)self.surnamesCache.count);
+    return [NSString stringWithFormat:@"%@.%@", firstName, self.surnamesCache[sindex]];
+}
+
+- (NSString*)getFirstName {
     if(!self.firstNamesCache) {
         self.firstNamesCache = [self loadWordsForList:@"first.names.us"];
         self.surnamesCache = [self loadWordsForList:@"surnames.us"];
     }
-    
+
     NSInteger findex = arc4random_uniform((u_int32_t)self.firstNamesCache.count);
-    NSInteger sindex = arc4random_uniform((u_int32_t)self.surnamesCache.count);
+    return self.firstNamesCache[findex];
+}
+
+- (NSString*)getEmailDomain {
+    uint32_t index = arc4random_uniform((uint32_t)kEmailDomains.count);
+    return kEmailDomains[index];
+}
+
+- (NSString*)generateEmail {
+    NSString* userNumber = @(arc4random_uniform(1000)).stringValue;
+    NSString* user = [self getFirstName].lowercaseString;
+    NSString* mailProviderDomain = [self getEmailDomain];
     
-    return [NSString stringWithFormat:@"%@.%@", self.firstNamesCache[findex], self.surnamesCache[sindex]];
+    return [NSString stringWithFormat:@"%@%@@%@", user, userNumber, mailProviderDomain];
+}
+
+- (NSString*)generateRandomWord {
+    PasswordGenerationConfig *config = PasswordGenerationConfig.defaults;
+    
+    config.wordCount = 1;
+    config.algorithm = kXkcd;
+    
+    return [self generateDicewareForConfig:config].lowercaseString;
 }
 
 - (NSString *)generateForConfigOrDefault:(PasswordGenerationConfig *)config {

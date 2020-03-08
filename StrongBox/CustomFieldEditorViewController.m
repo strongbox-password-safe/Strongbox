@@ -227,7 +227,8 @@ const static NSSet<NSString*> *keePassReservedNames;
 }
 
 - (IBAction)onGenerate:(id)sender {
-    [PasswordMaker.sharedInstance promptWithSuggestions:self usernames:NO action:^(NSString * _Nonnull response) {
+    [PasswordMaker.sharedInstance promptWithSuggestions:self
+                                                 action:^(NSString * _Nonnull response) {
         self.textView.text = response;
     }];
 }

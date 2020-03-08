@@ -150,8 +150,8 @@
     
 
     Node* node = [[Node alloc] initAsRoot:nil];
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node allowDuplicateGroupTitles:YES uuid:nil];
-    [node addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node keePassGroupTitleRules:YES uuid:nil];
+    [node addChild:keePassRootGroup keePassGroupTitleRules:YES];
 
     NSError *error;
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
@@ -181,15 +181,15 @@
     XmlStrongBoxModelAdaptor *adaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     
     Node* node = [[Node alloc] initAsRoot:nil];
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node allowDuplicateGroupTitles:YES uuid:nil];
-    [node addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node keePassGroupTitleRules:YES uuid:nil];
+    [node addChild:keePassRootGroup keePassGroupTitleRules:YES];
     
-    Node* fooGroup = [[Node alloc] initAsGroup:@"Foo-Group" parent:keePassRootGroup allowDuplicateGroupTitles:YES uuid:nil];
-    [keePassRootGroup addChild:fooGroup allowDuplicateGroupTitles:YES];
+    Node* fooGroup = [[Node alloc] initAsGroup:@"Foo-Group" parent:keePassRootGroup keePassGroupTitleRules:YES uuid:nil];
+    [keePassRootGroup addChild:fooGroup keePassGroupTitleRules:YES];
     
     NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username" url:@"url" password:@"secret" notes:@"" email:@""];
     Node* barEntry = [[Node alloc] initAsRecord:@"Bar-Entry" parent:keePassRootGroup fields:fields uuid:nil];
-    [keePassRootGroup addChild:barEntry allowDuplicateGroupTitles:YES];
+    [keePassRootGroup addChild:barEntry keePassGroupTitleRules:YES];
     
     NSError *error;
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
@@ -232,14 +232,14 @@
     
     // Nodes
     
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node allowDuplicateGroupTitles:YES uuid:nil];
-    [node addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:kDefaultRootGroupName parent:node keePassGroupTitleRules:YES uuid:nil];
+    [node addChild:keePassRootGroup keePassGroupTitleRules:YES];
     
     NodeFields *fields = [[NodeFields alloc] init];
     [fields.attachments addObject:nodeAttachment];
     
     Node* nodeWithAttachment = [[Node alloc] initAsRecord:@"Attachments" parent:keePassRootGroup fields:fields uuid:nil];
-    [keePassRootGroup addChild:nodeWithAttachment allowDuplicateGroupTitles:YES];
+    [keePassRootGroup addChild:nodeWithAttachment keePassGroupTitleRules:YES];
     
     
     NSError *error;

@@ -212,7 +212,7 @@
     for(int i=0;i<1000;i++) {
         NodeFields *fields = [[NodeFields alloc] init];
         Node *childNode = [[Node alloc] initAsRecord:[NSString stringWithFormat:@"Title %d", i] parent:[db.rootGroup.childGroups objectAtIndex:0] fields:fields uuid:nil];
-        [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode allowDuplicateGroupTitles:YES];
+        [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode keePassGroupTitleRules:YES];
     }
     
     [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
@@ -249,7 +249,7 @@
                                           fields:fields
                                             uuid:nil];
     
-    [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode allowDuplicateGroupTitles:YES];
+    [[db.rootGroup.childGroups objectAtIndex:0] addChild:childNode keePassGroupTitleRules:YES];
     
     [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
         if(error) {
@@ -296,7 +296,7 @@
     NodeFields *fields = [[NodeFields alloc] initWithUsername:@"username" url:@"url" password:@"ladder" notes:@"notes" email:@"email"];
     
     Node* record = [[Node alloc] initAsRecord:@"Title" parent:keePassRoot fields:fields uuid:nil];
-    [keePassRoot addChild:record allowDuplicateGroupTitles:YES];
+    [keePassRoot addChild:record keePassGroupTitleRules:YES];
     
     [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment1.txt" data:data1]];
     [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment2.txt" data:data2]];
@@ -387,7 +387,7 @@
         XCTAssert([testNode.fields.username isEqualToString:@"mmyf"]);
         XCTAssert([testNode.fields.password isEqualToString:@"bbgh"]);
 
-        [testNode setTitle:@"New Entry13333576hg-6sqIXJVO;Q" allowDuplicateGroupTitles:YES];
+        [testNode setTitle:@"New Entry13333576hg-6sqIXJVO;Q" keePassGroupTitleRules:YES];
         
         [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable d, NSError * _Nullable error) {
             [adaptor open:d ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {

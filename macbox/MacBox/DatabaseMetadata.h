@@ -11,6 +11,8 @@
 #import "SecretStore.h"
 #import "YubiKeyConfiguration.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 extern const NSInteger kDefaultPasswordExpiryHours;
 
 @interface DatabaseMetadata : NSObject
@@ -23,12 +25,12 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property (nonatomic, strong) NSString *uuid;
 @property (nonatomic, strong) NSString *nickName;
-@property (nonatomic, strong) NSURL *fileUrl;
-@property (nonatomic, strong) NSString *storageInfo;
+@property (nonatomic, strong) NSURL *fileUrl; // This is really the primary key - at least at the moment
+@property (nonatomic, strong, nullable) NSString *storageInfo; // This is extra info for accessing the file - usually a bookmark
 @property (nonatomic) StorageProvider storageProvider;
 
 @property (nonatomic, strong, readonly) NSString* touchIdPassword;
-@property (nonatomic, strong) NSString* keyFileBookmark;
+@property (nonatomic, strong, nullable) NSString* keyFileBookmark;
 @property (nonatomic, strong) YubiKeyConfiguration* yubiKeyConfiguration;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
@@ -40,6 +42,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 - (NSDate*)getConveniencePasswordExpiryDate;
     
 - (NSString*)getConveniencePassword:(BOOL*)expired;
-- (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*)password;
+- (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*_Nullable)password; // null to clear
 
 @end
+
+NS_ASSUME_NONNULL_END

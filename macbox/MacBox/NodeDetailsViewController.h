@@ -13,14 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeDetailsViewController : NSViewController
 
-- (void)close;
-
 @property Node* node;
 @property ViewModel* model;
 @property BOOL newEntry;
 @property BOOL historical;
 
 @property (nullable) dispatch_block_t onClosed;
+
+- (void)closeWithCompletion:(nullable void (^)(void))completion;
 
 @end
 

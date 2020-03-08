@@ -111,5 +111,7 @@
 
 @property YubiKeyHardwareConfiguration* yubiKeyConfig;
 
+@property BOOL colorizePasswords;
+
 @end
 

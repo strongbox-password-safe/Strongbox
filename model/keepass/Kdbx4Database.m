@@ -48,8 +48,8 @@ static const BOOL kLogVerbose = NO;
     if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
       rootGroupName = kDefaultRootGroupName;
     }
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
-    [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
+    [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
     

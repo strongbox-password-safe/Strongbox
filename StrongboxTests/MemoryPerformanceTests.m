@@ -28,12 +28,13 @@
     for(int i=0;i<groupCount;i++) {
         for(int k=0;k<subGroupCount;k++) {
             NSString* groupName = [NSString stringWithFormat:@"Group-%d.%d", i, k];
-            Node* childGroup = [[Node alloc] initAsGroup:groupName parent:keePassRoot allowDuplicateGroupTitles:NO uuid:nil];
-            [keePassRoot addChild:childGroup allowDuplicateGroupTitles:NO];
+            Node* childGroup = [[Node alloc] initAsGroup:groupName parent:keePassRoot keePassGroupTitleRules:NO uuid:nil];
+            
+            [keePassRoot addChild:childGroup keePassGroupTitleRules:NO];
             
             for (int j = 0; j < entryCount; j++) {
                 Node* childEntry = [self createSampleEntry:j parentGroup:childGroup];
-                [childGroup addChild:childEntry allowDuplicateGroupTitles:YES];
+                [childGroup addChild:childEntry keePassGroupTitleRules:YES];
             }
         }
     }

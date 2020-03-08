@@ -26,6 +26,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
 @property (weak, nonatomic) IBOutlet UISwitch *switchDetectOffline;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowClipboardHandoff;
+@property (weak, nonatomic) IBOutlet UISwitch *switchUseColorBlindPalette;
 
 @end
 
@@ -65,6 +66,7 @@
     Settings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
     Settings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
     Settings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
+    Settings.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
     
     if(Settings.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
@@ -83,6 +85,7 @@
     self.switchShowYubikeySecretWorkaround.on = Settings.sharedInstance.showYubikeySecretWorkaroundField;
     self.switchDetectOffline.on = Settings.sharedInstance.monitorInternetConnectivity;
     self.switchAllowClipboardHandoff.on = Settings.sharedInstance.clipboardHandoff;
+    self.switchUseColorBlindPalette.on = Settings.sharedInstance.colorizeUseColorBlindPalette;
 }
 
 - (void)bindAllowPinCodeOpen {

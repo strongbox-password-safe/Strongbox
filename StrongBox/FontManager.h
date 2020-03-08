@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 @property (readonly) UIFont* easyReadFont;
+@property (readonly) UIFont* easyReadBoldFont;
 @property (readonly) UIFont* easyReadFontForTotp;
 @property (readonly) UIFont* easyReadFontForLargeTextView;
 @property (readonly) UIFont* regularFont;

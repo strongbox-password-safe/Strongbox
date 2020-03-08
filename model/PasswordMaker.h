@@ -23,7 +23,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)generateForConfigOrDefault:(PasswordGenerationConfig*)config;
 
 #if TARGET_OS_IPHONE
-- (void)promptWithSuggestions:(UIViewController*)viewController usernames:(BOOL)usernames action:(void (^)(NSString *response))action;
+
+- (void)promptWithUsernameSuggestions:(UIViewController*)viewController action:(void (^)(NSString *response))action;
+- (void)promptWithSuggestions:(UIViewController*)viewController action:(void (^)(NSString *response))action;
+
 #endif
 
 - (NSString*)generateUsername;

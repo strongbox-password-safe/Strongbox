@@ -162,24 +162,23 @@ static NSString* kDatabasesDefaultsKey = @"databases";
 - (DatabaseMetadata*)addOrGet:(NSURL *)url {
     DatabaseMetadata *safe = [self getDatabaseByFileUrl:url];
     if(safe) {
-//        NSLog(@"Database is already in Databases List... Not Adding");
         return safe;
     }
     
     NSError* error;
     NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url readOnly:NO error:&error];
-    if(!fileIdentifier) {
-        NSLog(@"getBookmarkFromUrl: [%@]", error);
-        return nil;
-    }
     
+    if(!fileIdentifier) {
+        NSLog(@"Could not get Bookmark for this database will continue without... [%@]", error);
+    }
+
     safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
                                       storageProvider:kLocalDevice
                                               fileUrl:url
                                           storageInfo:fileIdentifier];
-    
+
     [DatabasesManager.sharedInstance add:safe];
-    
+
     return safe;
 }
 

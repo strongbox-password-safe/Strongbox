@@ -17,8 +17,9 @@ API_AVAILABLE(ios(12.0))
 - (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers;
-- (IBAction)cancel:(id)sender;
-- (void)onCredentialSelected:(NSString*)username password:(NSString*)password;
+
+- (void)exitWithUserCancelled;
+- (void)exitWithCredential:(NSString*)username password:(NSString*)password;
 
 void showWelcomeMessageIfAppropriate(UIViewController *vc);
 

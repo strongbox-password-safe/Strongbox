@@ -14,6 +14,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNoYubiKey;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNfcSlot1;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellNfcSlot2;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellMfiSlot1;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellMfiSlot2;
 
 @property YubiKeyHardwareConfiguration* currentConfig;
 
@@ -30,6 +32,11 @@
         self.currentConfig.mode = kNoYubiKey;
     }
     
+    if (!Settings.sharedInstance.mfiYubiKeyEnabled) {
+        [self.cellMfiSlot1 setHidden:YES];
+        [self.cellMfiSlot2 setHidden:YES];
+    }
+    
     [self bindUi];
 }
 
@@ -40,15 +47,29 @@
 
     self.cellNfcSlot2.accessoryType = (self.currentConfig != nil && self.currentConfig.mode == kNfc && self.currentConfig.slot == kSlot2) ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     
+    self.cellMfiSlot1.accessoryType = (self.currentConfig != nil && self.currentConfig.mode == kMfi && self.currentConfig.slot == kSlot1) ?  UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+
+    self.cellMfiSlot2.accessoryType = (self.currentConfig != nil && self.currentConfig.mode == kMfi && self.currentConfig.slot == kSlot2) ?  UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+
     self.cellNfcSlot1.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
     self.cellNfcSlot2.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
     self.cellNfcSlot1.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
     self.cellNfcSlot2.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
+
+    self.cellMfiSlot1.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
+    self.cellMfiSlot2.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
+    self.cellMfiSlot1.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
+    self.cellMfiSlot2.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     if(section == 1 && !Settings.sharedInstance.isProOrFreeTrial) {
         return NSLocalizedString(@"yubikey_config_section_header_nfc_pro_only", @"NFC Yubikey (Pro Edition Only)");
+    }
+    else if (section == 2) {
+        if(!Settings.sharedInstance.mfiYubiKeyEnabled) {
+            return nil;
+        }
     }
     
     return [super tableView:tableView titleForHeaderInSection:section];
@@ -68,7 +89,15 @@
         self.currentConfig.mode = kNfc;
         self.currentConfig.slot = kSlot2;
     }
-    
+    else if (cell == self.cellMfiSlot1) {
+        self.currentConfig.mode = kMfi;
+        self.currentConfig.slot = kSlot1;
+    }
+    else if (cell == self.cellMfiSlot2) {
+        self.currentConfig.mode = kMfi;
+        self.currentConfig.slot = kSlot2;
+    }
+
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     [self bindUi];

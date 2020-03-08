@@ -21,6 +21,12 @@
 + (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
 + (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
 
++ (void)yesNo:(NSString *)messageText
+informativeText:(NSString*)informativeText
+       window:(NSWindow*)window
+disableEscapeKey:(BOOL)disableEscapeKey
+   completion:(void (^)(BOOL yesNo))completion;
+
 + (void)twoOptionsWithCancel:(NSString *)messageText
              informativeText:(NSString*)informativeText
            option1AndDefault:(NSString*)option1AndDefault

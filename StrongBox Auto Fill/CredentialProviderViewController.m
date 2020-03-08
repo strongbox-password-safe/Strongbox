@@ -26,7 +26,7 @@
 
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
-@property (nonatomic, strong) UINavigationController* safesList;
+@property (nonatomic, strong) UINavigationController* databasesListNavController;
 @property (nonatomic, strong) NSArray<ASCredentialServiceIdentifier *> * serviceIdentifiers;
 
 @property BOOL quickTypeMode;
@@ -47,14 +47,23 @@
 
 -(void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     NSLog(@"provideCredentialWithoutUserInteractionForIdentity: [%@]", credentialIdentity);
-    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain
-                                                                      code:ASExtensionErrorCodeUserInteractionRequired
-                                                                  userInfo:nil]];
+    [self exitWithUserInteractionRequired];
 }
 
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
-    self.quickTypeMode = YES;
-    
+    BOOL lastRunGood = [self enterWithLastCrashCheck:YES];
+
+    if (!lastRunGood) {
+        [self showLastRunCrashedMessage:^{
+            [self initializeQuickType:credentialIdentity];
+        }];
+    }
+    else {
+        [self initializeQuickType:credentialIdentity];
+    }
+}
+
+- (void)initializeQuickType:(ASPasswordCredentialIdentity *)credentialIdentity {
     QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
     NSLog(@"prepareInterfaceToProvideCredentialForIdentity: [%@] => Found: [%@]", credentialIdentity, identifier);
     
@@ -68,6 +77,7 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 BOOL useAutoFillCache = ![self liveAutoFillIsPossibleWithSafe:safe];
 
+                Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
                 [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                                    safe:safe
                                                       openAutoFillCache:useAutoFillCache
@@ -76,6 +86,8 @@
                                                  manualOpenOfflineCache:NO
                                             biometricAuthenticationDone:NO
                                                              completion:^(Model * _Nullable model, NSError * _Nullable error) {
+                    Settings.sharedInstance.autoFillExitedCleanly = YES;
+
                                                                  NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
                     if(model) {
                         [self onOpenedQuickType:model identifier:identifier];
@@ -88,7 +100,7 @@
                                 title:NSLocalizedString(@"cred_vc_error_opening_title", @"Strongbox: Error Opening Database")
                                 error:error
                            completion:^{
-                            [self.extensionContext cancelRequestWithError:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
+                            [self exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
                         }];
                     }
                 }];
@@ -101,16 +113,18 @@
                    title:@"Strongbox: Unknown Database"
                  message:@"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill."
               completion:^{
-                [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
+                [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
             }];
         }
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
-        [Alerts info:self title:@"Strongbox: Error Locating Entry" message:@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
+        [Alerts info:self
+               title:@"Strongbox: Error Locating Entry"
+             message:@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
             
-            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find this record in Strongbox any longer." errorCode:-1]];
+            [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this record in Strongbox any longer." errorCode:-1]];
         }];
     }
 }
@@ -126,8 +140,6 @@
         
         //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, node);
 
-        ASPasswordCredential *cred = [[ASPasswordCredential alloc] initWithUser:user password:password];
-        
         // Copy TOTP code if configured to do so...
         
         if(node.fields.otpToken) {
@@ -138,13 +150,15 @@
             }
         }
         
-        [self.extensionContext completeRequestWithSelectedCredential:cred completionHandler:nil];
+        [self exitWithCredential:user password:password];
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
-        [Alerts info:self title:@"Strongbox: Error Locating This Record" message:@"Strongbox could not find this record in the database any longer. It is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
-            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"Could not find record in database" errorCode:-1]];
+        [Alerts info:self title:@"Strongbox: Error Locating This Record"
+             message:@"Strongbox could not find this record in the database any longer. It is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill."
+          completion:^{
+            [self exitWithErrorOccurred:[Utils createNSError:@"Could not find record in database" errorCode:-1]];
         }];
     }
 }
@@ -152,12 +166,15 @@
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"prepareCredentialListForServiceIdentifiers = %@", serviceIdentifiers);
     self.serviceIdentifiers = serviceIdentifiers;
-    self.quickTypeMode = NO;
     
+    BOOL lastRunGood = [self enterWithLastCrashCheck:NO];
+
     UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainInterface" bundle:nil];
+    self.databasesListNavController = [mainStoryboard instantiateViewControllerWithIdentifier:@"SafesListNavigationController"];
+    SafesListTableViewController* databasesList = ((SafesListTableViewController*)(self.databasesListNavController.topViewController));
     
-    self.safesList = [mainStoryboard instantiateViewControllerWithIdentifier:@"SafesListNavigationController"];
-    ((SafesListTableViewController*)(self.safesList.topViewController)).rootViewController = self;
+    databasesList.rootViewController = self;
+    databasesList.lastRunGood = lastRunGood;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -173,14 +190,24 @@
         [self dismissViewControllerAnimated:NO completion:nil];
     }
     
-    if(!self.safesList) {
+    if(!self.databasesListNavController) {
         [Alerts warn:self title:@"Error" message:@"There was an error loading the Safes List View. Please mail support@strongboxsafe.com to inform the developer." completion:^{
-            [self.extensionContext cancelRequestWithError:[Utils createNSError:@"There was an error loading the Safes List View" errorCode:-1]];
+            [self exitWithErrorOccurred:[Utils createNSError:@"There was an error loading the Safes List View" errorCode:-1]];
         }];
     }
     else {
-        self.safesList.presentationController.delegate = self;
-        [self presentViewController:self.safesList animated:NO completion:nil];
+        SafesListTableViewController* databasesList = ((SafesListTableViewController*)(self.databasesListNavController.topViewController));
+
+        self.databasesListNavController.presentationController.delegate = self;
+
+        if(!databasesList.lastRunGood) {
+            [self showLastRunCrashedMessage:^{
+                [self presentViewController:self.databasesListNavController animated:NO completion:nil];
+            }];
+        }
+        else {
+            [self presentViewController:self.databasesListNavController animated:NO completion:nil];
+        }
     }
 }
 
@@ -232,17 +259,6 @@
     return self.serviceIdentifiers;
 }
 
-- (IBAction)cancel:(id)sender
-{
-    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
-}
-
-- (void)onCredentialSelected:(NSString*)username password:(NSString*)password
-{
-    ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
-    [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
-}
-
 void showWelcomeMessageIfAppropriate(UIViewController *vc) { 
     if(!Settings.sharedInstance.hasShownAutoFillLaunchWelcome) {
         Settings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
@@ -254,6 +270,70 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
          "In these cases, Strongbox can use a cache... Enjoy Strongbox Auto Fill!\n-Mark")];
     }
 }
+
+- (IBAction)cancel:(id)sender {
+    [self exitWithUserCancelled];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// All Entry/Exits through these 4 points...
+
+- (BOOL)enterWithLastCrashCheck:(BOOL)quickType {
+    NSLog(@"Auto-Fill Entered - Quick Type Mode = [%d]", quickType);
+    
+    self.quickTypeMode = quickType;
+    
+    BOOL lastRunGood = Settings.sharedInstance.autoFillExitedCleanly;
+    
+    // MMcG: Don't do this here as iOS can and does regularly terminate the extension without notice
+    // in normal situations. Only do this immediately before Database Open/Unlock
+    //
+    //    Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
+
+    if(!lastRunGood) {
+        NSLog(@"Last run of Auto Fill did not exit cleanly! Warn User that a crash occurred...");
+    }
+    
+    return lastRunGood;
+}
+
+- (void)showLastRunCrashedMessage:(void (^)(void))completion {
+    NSString* title = NSLocalizedString(@"autofill_did_not_close_cleanly_title", @"Auto Fill Crash Occurred");
+    NSString* message = NSLocalizedString(@"autofill_did_not_close_cleanly_message", @"It looks like the last time you used Auto Fill you had a crash. This is usually due to a memory limitation. Please check your database file size and your Argon2 memory settings (should be <= 64MB).");
+
+    [Alerts info:self title:title message:message completion:completion];
+}
+
+- (void)exitWithUserCancelled {
+    NSLog(@"EXIT: User Cancelled");
+    Settings.sharedInstance.autoFillExitedCleanly = YES;
+    
+    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
+}
+
+- (void)exitWithUserInteractionRequired {
+    NSLog(@"EXIT: User Interaction Required");
+    [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain
+                                                                      code:ASExtensionErrorCodeUserInteractionRequired
+                                                                  userInfo:nil]];
+}
+
+- (void)exitWithErrorOccurred:(NSError*)error {
+    NSLog(@"EXIT: Error Occured [%@]", error);
+    Settings.sharedInstance.autoFillExitedCleanly = YES; // Still a clean exit - no crash
+    
+    [self.extensionContext cancelRequestWithError:error];
+}
+
+- (void)exitWithCredential:(NSString*)username password:(NSString*)password {
+    NSLog(@"EXIT: Success");
+    Settings.sharedInstance.autoFillExitedCleanly = YES;
+    
+    ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
+    [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //- (void)didReceiveMemoryWarning {
 //    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");

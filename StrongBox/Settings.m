@@ -73,6 +73,8 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
 static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
+static NSString* const kAutoFillExitedCleanly = @"autoFillExitedCleanly";
+static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 
 @implementation Settings
 
@@ -102,6 +104,26 @@ static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)mfiYubiKeyEnabled {
+    return NO; // TODO:
+}
+
+- (BOOL)colorizeUseColorBlindPalette {
+    return [self getBool:kColorizeUseColorBlindPalette];
+}
+
+- (void)setColorizeUseColorBlindPalette:(BOOL)colorizeUseColorBlindPalette {
+    [self setBool:kColorizeUseColorBlindPalette value:colorizeUseColorBlindPalette];
+}
+
+- (BOOL)autoFillExitedCleanly {
+    return [self getBool:kAutoFillExitedCleanly fallback:YES];
+}
+
+- (void)setAutoFillExitedCleanly:(BOOL)autoFillExitedCleanly {
+    return [self setBool:kAutoFillExitedCleanly value:autoFillExitedCleanly];
+}
 
 - (BOOL)migratedToNewSecretStore {
     return [self getBool:kMigratedToNewSecretStore];

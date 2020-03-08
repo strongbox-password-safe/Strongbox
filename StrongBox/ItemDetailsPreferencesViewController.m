@@ -17,6 +17,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowEmptyFields;
 @property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpCustom;
+@property (weak, nonatomic) IBOutlet UISwitch *switchColorizePasswords;
 
 @end
 
@@ -41,8 +42,7 @@
     self.database.showEmptyFieldsInDetailsView = self.switchShowEmptyFields.on;
     self.database.easyReadFontForAll = self.easyReadFontForAll.on;
     self.database.hideTotpCustomFieldsInViewMode = !self.switchShowTotpCustom.on;
-    
-    NSLog(@"easyReadFontForAll: %d", self.database.easyReadFontForAll);
+    self.database.colorizePasswords = self.switchColorizePasswords.on;
     
     [SafesList.sharedInstance update:self.database];
     
@@ -57,7 +57,8 @@
     self.switchShowEmptyFields.on = self.database.showEmptyFieldsInDetailsView;
     self.easyReadFontForAll.on = self.database.easyReadFontForAll;
     self.switchShowTotpCustom.on = !self.database.hideTotpCustomFieldsInViewMode;
-
+    self.switchColorizePasswords.on = self.database.colorizePasswords;
+    
     NSLog(@"easyReadFontForAll: %d", self.database.easyReadFontForAll);
 }
 

@@ -44,10 +44,6 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.autoFillEnabled = YES;
         self.likelyFormat = kFormatUnknown;
         self.browseViewType = kBrowseViewTypeHierarchy;
-        self.tapAction = kBrowseTapActionOpenDetails;
-        self.doubleTapAction = kBrowseTapActionCopyUsername;
-        self.tripleTapAction = kBrowseTapActionCopyTotp;
-        self.longPressTapAction = kBrowseTapActionCopyPassword;
         self.browseSortField = kBrowseSortFieldTitle;
         self.browseSortOrderDescending = NO;
         self.browseSortFoldersSeparately = YES;
@@ -77,6 +73,13 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.maxBackupKeepCount = 10;
         self.hideTotpCustomFieldsInViewMode = YES;
         self.hideIconInBrowse = NO;
+        
+        self.tapAction = kBrowseTapActionOpenDetails;
+        self.doubleTapAction = kBrowseTapActionCopyPassword;
+        self.tripleTapAction = kBrowseTapActionCopyTotp;
+        self.longPressTapAction = kBrowseTapActionCopyUsername;
+
+        self.colorizePasswords = YES;
     }
     
     return self;
@@ -91,13 +94,6 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
-
-        // Brand New Databases let's use these defaults;
-        
-        self.tapAction = kBrowseTapActionOpenDetails;
-        self.doubleTapAction = kBrowseTapActionCopyPassword;
-        self.tripleTapAction = kBrowseTapActionCopyTotp;
-        self.longPressTapAction = kBrowseTapActionCopyUsername;
     }
     
     return self;
@@ -188,6 +184,8 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     [encoder encodeBool:self.hideIconInBrowse forKey:@"hideIconInBrowse"];
     
     [encoder encodeObject:self.yubiKeyConfig forKey:@"yubiKeyConfig"];
+    
+    [encoder encodeBool:self.colorizePasswords forKey:@"colorizePasswords"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -367,6 +365,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         
         if([decoder containsValueForKey:@"yubiKeyConfig"]) {
             self.yubiKeyConfig = [decoder decodeObjectForKey:@"yubiKeyConfig"];
+        }
+        
+        if([decoder containsValueForKey:@"colorizePasswords"]) {
+            self.colorizePasswords = [decoder decodeBoolForKey:@"colorizePasswords"];
         }
     }
     

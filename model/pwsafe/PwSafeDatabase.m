@@ -173,7 +173,7 @@
 
         for(Record* record in recordsForThisGroup) {
             Node* recordNode = [self createNodeFromExistingRecord:record parent:group];
-            [group addChild:recordNode allowDuplicateGroupTitles:YES];
+            [group addChild:recordNode keePassGroupTitleRules:YES];
         }
     }
     
@@ -230,8 +230,8 @@
         Node* foo = [node getChildGroupWithTitle:component];
         
         if(!foo) {
-            foo = [[Node alloc] initAsGroup:component parent:node allowDuplicateGroupTitles:NO uuid:nil];
-            if(![node addChild:foo allowDuplicateGroupTitles:NO]) {
+            foo = [[Node alloc] initAsGroup:component parent:node keePassGroupTitleRules:NO uuid:nil];
+            if(![node addChild:foo keePassGroupTitleRules:NO]) {
                 NSLog(@"Problem adding child group [%@] to node [%@]", component, node.title);
                 return nil;
             }

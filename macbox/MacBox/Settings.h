@@ -102,6 +102,9 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL hasDoneProFamilyCheck;
 
+@property BOOL colorizePasswords;
+@property BOOL colorizeUseColorBlindPalette;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

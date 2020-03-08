@@ -17,7 +17,7 @@
 
 - (void)testExample {
     int entryCount = 100;
-    NSArray* groupCounts = @[@(25),@(50),@(75),@(100),@(150),@(300),@(500)];
+    NSArray* groupCounts = @[@(75)];
     
     for (NSNumber* groupCount in groupCounts) {
         StrongboxDatabase *db = [[Kdbx4Database alloc] create:[CompositeKeyFactors password:@"a"]];
@@ -25,8 +25,8 @@
         Node* keePassRoot = db.rootGroup.children.firstObject;
     
         for(int i=0;i<groupCount.intValue;i++) {
-            Node* childGroup = [[Node alloc] initAsGroup:@(i).stringValue parent:keePassRoot allowDuplicateGroupTitles:NO uuid:nil];
-            [keePassRoot addChild:childGroup allowDuplicateGroupTitles:NO];
+            Node* childGroup = [[Node alloc] initAsGroup:@(i).stringValue parent:keePassRoot keePassGroupTitleRules:NO uuid:nil];
+            [keePassRoot addChild:childGroup keePassGroupTitleRules:NO];
             
             for (int j = 0; j < entryCount; j++) {
                 NodeFields *fields = [[NodeFields alloc] initWithUsername:[NSString stringWithFormat:@"user-%d", j]
@@ -36,7 +36,7 @@
                                                                     email:[NSString stringWithFormat:@"mark-%d@gmail.com", j]];
                 
                 Node* childEntry = [[Node alloc] initAsRecord:@(j).stringValue parent:childGroup fields:fields uuid:nil];
-                [childGroup addChild:childEntry allowDuplicateGroupTitles:YES];
+                [childGroup addChild:childEntry keePassGroupTitleRules:YES];
             }
         }
         
@@ -55,12 +55,12 @@
     
     Node* keePassRoot = db.rootGroup.children.firstObject;
     for(int i=0;i<75;i++) {
-        Node* childGroup = [[Node alloc] initAsGroup:@(i).stringValue parent:keePassRoot allowDuplicateGroupTitles:NO uuid:nil];
-        [keePassRoot addChild:childGroup allowDuplicateGroupTitles:NO];
+        Node* childGroup = [[Node alloc] initAsGroup:@(i).stringValue parent:keePassRoot keePassGroupTitleRules:NO uuid:nil];
+        [keePassRoot addChild:childGroup keePassGroupTitleRules:NO];
         
         for (int j = 0; j < 100; j++) {
             Node* childEntry = [[Node alloc] initAsRecord:@(j).stringValue parent:childGroup];
-            [childGroup addChild:childEntry allowDuplicateGroupTitles:YES];
+            [childGroup addChild:childEntry keePassGroupTitleRules:YES];
         }
     }
     

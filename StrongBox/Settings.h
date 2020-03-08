@@ -115,6 +115,12 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 @property BOOL migratedToNewSecretStore;
 
+@property BOOL autoFillExitedCleanly;
+
+@property (readonly) BOOL mfiYubiKeyEnabled;
+
+@property BOOL colorizeUseColorBlindPalette;
+
 NS_ASSUME_NONNULL_END
 
 @end

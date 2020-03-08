@@ -174,15 +174,21 @@ typedef NS_ENUM(NSInteger, YubiKeyChallengeResponseResult) {
                                               allowBlocking:(BOOL)allowBlocking
                                                   challenge:(NSData*)challenge
                                                    response:(NSData**)response {
-    // Seems to be the acceptable block size... truncation of response and padding of challenge done below
+    // Some people program the Yubikey with Fixed Length "Fixed 64 byte input" and others with "Variable Input"
+    // To cover both cases the KeePassXC model appears to be to always send 64 bytes with extraneous bytes above
+    // and beyond the actual challenge padded PKCS#7 style-ish... MMcG - 1-Mar-2020
+
+    const NSInteger kChallengeSize = 64;
+    const NSInteger padLen = kChallengeSize - challenge.length;
+
+    uint8_t challengeBuffer[kChallengeSize];
+    for(int i=0;i<kChallengeSize;i++) {
+        challengeBuffer[i] = padLen;
+    }
+    [challenge getBytes:challengeBuffer length:challenge.length];
     
     const int kResponseSize = 64;
-    const int kChallengeSize = 64;
-
     uint8_t responseBuffer[kResponseSize] = {0};
-    uint8_t challengeBuffer[kChallengeSize] = {0};
-    
-    [challenge getBytes:challengeBuffer length:64];
 
     int result = yk_challenge_response(key,
                                        (slot == 1) ? SLOT_CHAL_HMAC1 : SLOT_CHAL_HMAC2,

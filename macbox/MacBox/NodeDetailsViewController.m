@@ -29,6 +29,8 @@
 #import "ClipboardManager.h"
 #import "QRCodePresenterPopover.h"
 #import "OTPToken+Serialization.h"
+#import "ColoredStringHelper.h"
+#import "ClickableSecureTextField.h"
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -51,7 +53,6 @@
 @property (weak) IBOutlet MMcGACTextField *textFieldUsername;
 @property (weak) IBOutlet MMcGACTextField *textFieldUrl;
 @property (weak) IBOutlet MMcGACTextField *textFieldEmail;
-@property (weak) IBOutlet KSPasswordField *textFieldPassword;
 @property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
 @property (weak) IBOutlet ClickableImageView *imageViewIcon;
 @property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
@@ -86,6 +87,12 @@
 
 @property BOOL hasLoaded;
 
+@property dispatch_block_t onSaveCompletion;
+
+@property (weak) IBOutlet NSTextField *revealedPasswordField;
+@property (weak) IBOutlet ClickableSecureTextField *concealedPasswordField;
+@property BOOL passwordIsRevealed;
+
 @end
 
 @implementation NodeDetailsViewController
@@ -94,8 +101,159 @@ static NSString* trimField(NSTextField* textField) {
     return [Utils trim:textField.stringValue];
 }
 
-- (void)close {
-    [self cancel:nil];
+- (void)cancel:(id)sender { // Pick up escape key
+    [self closeWithCompletion:nil];
+}
+
+- (void)closeWithCompletion:(void (^)(void))completion {
+    if(self.newEntry) { // New Entry just save
+        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+        [self setModelForEditField:self.currentlyEditingUIControl];
+        [self.view.window close];
+        [self onWindowClosed];
+        if (completion) {
+            completion();
+        }
+    }
+    else if([self shouldPromptToSaveSimpleChanges]) {
+        [self promptToSaveSimpleUIChangesBeforeClose:completion];
+    }
+    else {
+        [self.view.window close];
+        if (completion) {
+            completion();
+        }
+    }
+}
+
+- (BOOL)shouldPromptToSaveSimpleChanges {
+    BOOL changes = NO;
+    
+    if(self.tabView.selectedTabViewItem == self.tabView.tabViewItems[0]) { // Simple Tab
+        if(self.currentlyEditingUIControl == self.textFieldTitle) {
+            if(![self.node.title isEqualToString:trimField(self.textFieldTitle)]) {
+                changes = YES;
+            }
+        }
+        else if(self.currentlyEditingUIControl == self.textFieldUsername) {
+            if(![self.node.fields.username isEqualToString:trimField(self.textFieldUsername)]) {
+                changes = YES;
+            }
+        }
+        else if(self.currentlyEditingUIControl == self.textFieldEmail){
+            if(![self.node.fields.email isEqualToString:trimField(self.textFieldEmail)]) {
+                changes = YES;
+            }
+        }
+        else if(self.currentlyEditingUIControl == self.textFieldUrl){
+            if(![self.node.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
+                changes = YES;
+            }
+        }
+        else if(self.currentlyEditingUIControl == self.revealedPasswordField){
+            if(![self.node.fields.password isEqualToString:trimField(self.revealedPasswordField)]) {
+                changes = YES;
+            }
+        }
+        else if(self.currentlyEditingUIControl == self.textViewNotes) {
+            NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
+            if(![self.node.fields.notes isEqualToString:updated]) {
+                changes = YES;
+            }
+        }
+    }
+    
+    return changes;
+}
+
+- (BOOL)windowShouldClose:(NSWindow *)sender {
+    if([self shouldPromptToSaveSimpleChanges]) {
+        [self promptToSaveSimpleUIChangesBeforeClose:nil];
+        return NO;
+    }
+    else {
+        return YES;
+    }
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+    [self onWindowClosed];
+}
+
+- (void)onWindowClosed {
+    if(self.timerRefreshOtp) {
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+
+    [self stopObservingModelChanges];
+    
+    if(self.onClosed) {
+        self.onClosed(); // Allows parent VC to remove reference to this
+    }
+}
+
+- (void)promptToSaveSimpleUIChangesBeforeClose:(void (^)(void))completion {
+    NSString* loc = NSLocalizedString(@"mac_node_details_save_changes", @"Save Changes?");
+    NSString* loc2 = NSLocalizedString(@"mac_node_details_unsaved_changes_save", @"There are unsaved changes present. Would you like to save those before exiting?");
+
+    NSString* message = loc;
+    NSString* informative = loc2;
+
+    [Alerts yesNo:message
+  informativeText:informative
+           window:self.view.window
+ disableEscapeKey:YES
+       completion:^(BOOL yesNo) {
+        if(self.newEntry) {
+            if(yesNo) {
+                [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                [self setModelForEditField:self.currentlyEditingUIControl];
+                [self.view.window close];
+                [self onWindowClosed];
+
+                if (completion) {
+                    [self save:completion];
+                }
+            }
+            else {
+                // Delete New Entry if discarding changes
+                
+                [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                [self.model deleteItem:self.node];
+                [self.view.window close];
+                [self onWindowClosed];
+
+                if (completion) {
+                    completion();
+                }
+            }
+        }
+        else {
+            if(yesNo) {
+                [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                [self setModelForEditField:self.currentlyEditingUIControl];
+                [self.view.window close];
+                [self onWindowClosed];
+                
+                if (completion) {
+                    [self save:completion];
+                }
+            }
+            else {
+                [self.view.window close];
+                [self onWindowClosed];
+                
+                if (completion) {
+                    completion();
+                }
+            }
+        }
+    }];
+}
+
+- (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window {
+   return self.model.document.undoManager;
 }
 
 - (void)doInitialSetup {
@@ -112,6 +270,8 @@ static NSString* trimField(NSTextField* textField) {
     [self.view.window makeFirstResponder:self.newEntry ? self.textFieldTitle : self.imageViewIcon]; // Take focus off Title so that edits require some effort...
 
     [self updateTitle];
+    
+    [self.view.window setFrameAutosaveName:self.node.uuid.UUIDString]; // Remember window sizing
 }
 
 - (void)updateTitle {
@@ -140,133 +300,6 @@ static NSString* trimField(NSTextField* textField) {
     [super viewDidAppear];
     [self.view.window setLevel:Settings.sharedInstance.doNotFloatDetailsWindowOnTop ? NSNormalWindowLevel : NSFloatingWindowLevel];
     [self.view.window setHidesOnDeactivate:YES];
-}
-
-- (NSUndoManager *)windowWillReturnUndoManager:(NSWindow *)window {
-   return self.model.document.undoManager;
-}
-
-- (void)promptToSaveSimpleUIChangesBeforeClose {
-    NSString* loc = NSLocalizedString(@"mac_node_details_save_changes", @"Save Changes?");
-    NSString* loc2 = NSLocalizedString(@"mac_node_details_unsaved_changes_save", @"There are unsaved changes present. Would you like to save those before exiting?");
-
-    NSString* message = loc;
-    NSString* informative = loc2;
-
-    [Alerts yesNo:message
-  informativeText:informative
-            window:self.view.window
-       completion:^(BOOL yesNo) {
-               if(self.newEntry) {
-                   if(yesNo) {
-                       [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-                       [self setModelForEditField:self.currentlyEditingUIControl];
-                       [self.view.window close];
-                       [self onWindowClosed];
-                   }
-                   else {
-                       // Delete New Entry if discarding changes
-                       [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-                       [self.model deleteItem:self.node];
-                       [self.view.window close];
-                       [self onWindowClosed];
-                   }
-               }
-               else {
-                   if(yesNo) {
-                       [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-                       [self setModelForEditField:self.currentlyEditingUIControl];
-                       [self.view.window close];
-                       [self onWindowClosed];
-                   }
-                   else {
-                       [self.view.window close];
-                       [self onWindowClosed];
-                   }
-               }
-           }];
-}
-
-- (void)cancel:(id)sender { // Pick up escape key
-    if(self.newEntry) { // New Entry just sav
-        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-        [self setModelForEditField:self.currentlyEditingUIControl];
-        [self.view.window close];
-        [self onWindowClosed];
-    }
-    else if([self shouldPromptToSaveSimpleChanges]) {
-        [self promptToSaveSimpleUIChangesBeforeClose];
-    }
-    else {
-        [self.view.window close];
-    }
-}
-
-- (BOOL)shouldPromptToSaveSimpleChanges {
-    BOOL changes = NO;
-    
-    if(self.tabView.selectedTabViewItem == self.tabView.tabViewItems[0]) { // Simple Tab
-        if(self.currentlyEditingUIControl == self.textFieldTitle) {
-            if(![self.node.title isEqualToString:trimField(self.textFieldTitle)]) {
-                changes = YES;
-            }
-        }
-        else if(self.currentlyEditingUIControl == self.textFieldUsername) {
-            if(![self.node.fields.username isEqualToString:trimField(self.textFieldUsername)]) {
-                changes = YES;
-            }
-        }
-        else if(self.currentlyEditingUIControl == self.textFieldEmail){
-            if(![self.node.fields.email isEqualToString:trimField(self.textFieldEmail)]) {
-                changes = YES;
-            }
-        }
-        else if(self.currentlyEditingUIControl == self.textFieldUrl){
-            if(![self.node.fields.url isEqualToString:trimField(self.textFieldUrl)]) {
-                changes = YES;
-            }
-        }
-        else if(self.currentlyEditingUIControl == self.textFieldPassword){
-            if(![self.node.fields.password isEqualToString:trimField(self.textFieldPassword)]) {
-                changes = YES;
-            }
-        }
-        else if(self.currentlyEditingUIControl == self.textViewNotes) {
-            NSString *updated = [NSString stringWithString:self.textViewNotes.textStorage.string];
-            if(![self.node.fields.notes isEqualToString:updated]) {
-                changes = YES;
-            }
-        }
-    }
-    
-    return changes;
-}
-
-- (BOOL)windowShouldClose:(NSWindow *)sender {
-    if([self shouldPromptToSaveSimpleChanges]) {
-        [self promptToSaveSimpleUIChangesBeforeClose];
-        return NO;
-    }
-    else {
-        return YES;
-    }
-}
-
-- (void)windowWillClose:(NSNotification *)notification {
-    [self onWindowClosed];
-}
-
-- (void)onWindowClosed {
-    if(self.timerRefreshOtp) {
-        [self.timerRefreshOtp invalidate];
-        self.timerRefreshOtp = nil;
-    }
-
-    [self stopObservingModelChanges];
-    
-    if(self.onClosed) {
-        self.onClosed(); // Allows parent VC to remove reference to this
-    }
 }
 
 - (void)observeModelChanges {
@@ -310,9 +343,12 @@ static NSString* trimField(NSTextField* textField) {
             [self.model setItemUrl:self.node url:trimField(self.textFieldUrl)];
         }
     }
-    else if(obj == self.textFieldPassword){
-        if(![self.node.fields.password isEqualToString:trimField(self.textFieldPassword)]) {
-            [self.model setItemPassword:self.node password:trimField(self.textFieldPassword)];
+    else if(obj == self.revealedPasswordField){
+        if(![self.node.fields.password isEqualToString:trimField(self.revealedPasswordField)]) {
+            [self.model setItemPassword:self.node password:trimField(self.revealedPasswordField)];
+        }
+        else {
+            [self bindRevealedPassword]; // Do this anyway so we get the nice Colorized Password
         }
     }
     else if(obj == self.textViewNotes) {
@@ -368,7 +404,7 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)setupSimpleUI {
     self.textFieldTitle.delegate = self;
-    self.textFieldPassword.delegate = self;
+    self.revealedPasswordField.delegate = self;
     self.textViewNotes.delegate = self;
     
     // MMcG: Cannot set delegate on these as it is used to do AutoComplete...
@@ -397,15 +433,24 @@ static NSString* trimField(NSTextField* textField) {
         [self setModelForEditField:self.textFieldEmail];
     };
 
-    self.textFieldPassword.showsText = Settings.sharedInstance.alwaysShowPassword;
+    self.passwordIsRevealed = Settings.sharedInstance.alwaysShowPassword;
+    
+    self.concealedPasswordField.onClick = ^{
+        [self revealPassword];
+    };
     
     self.imageViewShowHidePassword.clickable = YES;
-    self.imageViewShowHidePassword.image = [NSImage imageNamed:self.textFieldPassword.showsText ? @"hide" : @"show"];
+    self.imageViewShowHidePassword.image = [NSImage imageNamed:self.passwordIsRevealed ? @"hide" : @"show"];
 
     self.imageViewShowHidePassword.onClick = ^{
-        [self.textFieldPassword toggleTextShown:nil];
-        self.imageViewShowHidePassword.image = [NSImage imageNamed:self.textFieldPassword.showsText ? @"hide" : @"show"];
+        if (self.passwordIsRevealed) {
+            [self.revealedPasswordField resignFirstResponder];
+        }
+        [self toggleRevealConcealPassword];
+        self.imageViewShowHidePassword.image = [NSImage imageNamed:self.passwordIsRevealed ? @"hide" : @"show"];
     };
+    
+    [self bindRevealedConcealedPassword];
     
     //
     
@@ -430,6 +475,21 @@ static NSString* trimField(NSTextField* textField) {
     self.comboGroup.delegate = self; // Do This after the select - so we don't see it as a user effected change!
 }
 
+- (void)revealPassword {
+    self.passwordIsRevealed = YES;
+    [self bindRevealedConcealedPassword];
+}
+
+- (void)toggleRevealConcealPassword {
+    self.passwordIsRevealed = !self.passwordIsRevealed;
+    [self bindRevealedConcealedPassword];
+}
+
+- (void)bindRevealedConcealedPassword {
+    self.revealedPasswordField.hidden = !self.passwordIsRevealed;
+    self.concealedPasswordField.hidden = self.passwordIsRevealed;
+}
+
 - (void)bindUiToNode {
     [self bindUiToCustomFields];
     [self bindUiToSimpleFields];
@@ -450,7 +510,9 @@ static NSString* trimField(NSTextField* textField) {
     
     self.textFieldTitle.stringValue = self.node.title;
     self.textFieldUsername.stringValue = self.node.fields.username;
-    self.textFieldPassword.stringValue = self.node.fields.password;
+    
+    [self bindRevealedPassword];
+    
     self.textFieldEmail.stringValue = self.node.fields.email;
     self.textFieldUrl.stringValue = self.node.fields.url;
     self.textViewNotes.string = self.node.fields.notes;
@@ -466,7 +528,7 @@ static NSString* trimField(NSTextField* textField) {
     self.imageViewIcon.clickable = self.model.format != kPasswordSafe && !self.historical;
     self.textFieldTitle.enabled = !self.historical;
     self.textFieldUsername.enabled = !self.historical;
-    self.textFieldPassword.enabled = !self.historical;
+    self.revealedPasswordField.enabled = !self.historical;
     self.textFieldEmail.enabled = !self.historical;
     self.textFieldUrl.enabled = !self.historical;
     self.textViewNotes.editable = !self.historical;
@@ -484,6 +546,18 @@ static NSString* trimField(NSTextField* textField) {
     [self validateTitleAndIndicateValidityInUI];
     
     [self initializeTotp];
+}
+
+- (void)bindRevealedPassword {
+    NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
+    BOOL dark = ([osxMode isEqualToString:@"Dark"]);
+    BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+    
+    self.revealedPasswordField.attributedStringValue = [ColoredStringHelper getColorizedAttributedString:self.node.fields.password
+                                                                                                colorize:Settings.sharedInstance.colorizePasswords
+                                                                                                darkMode:dark
+                                                                                              colorBlind:colorBlind
+                                                                                                    font:self.revealedPasswordField.font];
 }
 
 - (void)initializeTotp {
@@ -1233,7 +1307,9 @@ static NSString* trimField(NSTextField* textField) {
     [self.view.window makeFirstResponder:self.imageViewIcon]; // text doesn't change unless we do this!
     
     [self.model setItemPassword:self.node password:[self.model generatePassword]];
-    self.textFieldPassword.showsText = YES;
+
+    self.passwordIsRevealed = YES;
+    [self bindRevealedConcealedPassword];
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
@@ -1427,9 +1503,19 @@ static NSString* trimField(NSTextField* textField) {
 - (IBAction)saveDocument:(id)sender {
     // Save Current State as is...
     [self setModelForEditField:self.currentlyEditingUIControl];
+    [self save:nil];
+}
+
+- (void)save:(void (^)(void))completion {
+    self.onSaveCompletion = completion;
     [self.model.document saveDocumentWithDelegate:self didSaveSelector:@selector(onSaveDone) contextInfo:nil];
 }
 
-- (void)onSaveDone { }
+- (void)onSaveDone {
+    if (self.onSaveCompletion) {
+        self.onSaveCompletion();
+        self.onSaveCompletion = nil;
+    }
+}
 
 @end

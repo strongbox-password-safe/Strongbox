@@ -67,8 +67,26 @@ static NSString* const kHideKeyFileNameOnLockScreen = @"hideKeyFileNameOnLockScr
 static NSString* const kDoNotRememberKeyFile = @"doNotRememberKeyFile";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
 static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
+static NSString* const kColorizePasswords = @"colorizePasswords";
+static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 
 @implementation Settings
+
+- (BOOL)colorizeUseColorBlindPalette {
+    return [self getBool:kColorizeUseColorBlindPalette];
+}
+
+- (void)setColorizeUseColorBlindPalette:(BOOL)colorizeUseColorBlindPalette {
+    [self setBool:kColorizeUseColorBlindPalette value:colorizeUseColorBlindPalette];
+}
+
+- (BOOL)colorizePasswords {
+    return [self getBool:kColorizePasswords fallback:YES];
+}
+
+- (void)setColorizePasswords:(BOOL)colorizePasswords {
+    [self setBool:kColorizePasswords value:colorizePasswords];
+}
 
 - (BOOL)hasDoneProFamilyCheck {
     return [self getBool:kHasDoneProFamilyCheck];

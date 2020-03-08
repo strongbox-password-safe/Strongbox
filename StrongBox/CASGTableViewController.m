@@ -595,10 +595,18 @@
 
 - (void)bindYubiKey {
     if(self.selectedYubiKeyConfig != nil && self.selectedYubiKeyConfig.mode != kNone) {
-        self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
-            NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
-            NSLocalizedString(@"casg_yubikey_configured_nfc_disabled_pro_only", @"NFC Disabled (Pro Edition Only)");
-        self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+        if (self.selectedYubiKeyConfig.mode == kMfi) {
+            self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
+                NSLocalizedString(@"casg_yubikey_configured_mfi", @"Lightning") :
+                NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
+            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+        }
+        else {
+            self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
+                NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
+                NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
+            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+        }
 
         self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
             NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
@@ -621,6 +629,7 @@
 #ifndef IS_APP_EXTENSION
     return [YubiManager.sharedInstance yubiKeySupportedOnDevice];
 #else
+    // Is MFI Supported in Auto Fill - Yubikey library isn't compatible with App Extensions :/
     return NO;
 #endif
 }

@@ -47,7 +47,11 @@
 
 - (void)bindUi {
     self.textFieldDatabaseName.stringValue = self.model.databaseMetadata.nickName;
-    self.textFieldPath.stringValue = [BookmarksHelper getExpressUrlFromBookmark:self.model.databaseMetadata.storageInfo].path;
+    
+    NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:self.model.databaseMetadata.storageInfo];
+
+    self.textFieldPath.stringValue = url ? url.path : NSLocalizedString(@"generic_unknown", @"Unknown");
+    
     self.textFieldKeyFile.stringValue = self.model.databaseMetadata.keyFileBookmark ?
         [BookmarksHelper getExpressUrlFromBookmark:self.model.databaseMetadata.keyFileBookmark].absoluteString :
         NSLocalizedString(@"mac_key_file_none", @"None");

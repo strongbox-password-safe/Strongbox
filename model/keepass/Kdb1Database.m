@@ -42,8 +42,8 @@ static const BOOL kLogVerbose = NO;
     if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
       rootGroupName = kDefaultRootGroupName;
     }
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup allowDuplicateGroupTitles:YES uuid:nil];
-    [rootGroup addChild:keePassRootGroup allowDuplicateGroupTitles:YES];
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
+    [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
 }
 
 - (StrongboxDatabase *)create:(CompositeKeyFactors *)compositeKeyFactors {
@@ -215,11 +215,6 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         ret.binaryData = attachments[theAttachment.index].data;
     }
     
-    if(record.linkedData) {
-        KdbEntry* previous = (KdbEntry*)record.linkedData;
-        ret.expired = previous.expired;
-    }
-    
     return ret;
 }
 
@@ -272,11 +267,11 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
             currentLevel = group.level;
         }
         
-        Node* node = [[Node alloc] initAsGroup:group.name parent:parentNode allowDuplicateGroupTitles:YES uuid:nil];
+        Node* node = [[Node alloc] initAsGroup:group.name parent:parentNode keePassGroupTitleRules:YES uuid:nil];
         node.iconId = group.imageId;
         
         node.linkedData = group;
-        [parentNode addChild:node allowDuplicateGroupTitles:YES];
+        [parentNode addChild:node keePassGroupTitleRules:YES];
         
         // Add Entries/Records for this group
         
@@ -289,7 +284,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         }];
         
         for (Node* childEntry in childEntries) {
-            [node addChild:childEntry allowDuplicateGroupTitles:YES];
+            [node addChild:childEntry keePassGroupTitleRules:YES];
         }
         
         lastNode = node;
@@ -327,7 +322,6 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     }
     
     Node* ret = [[Node alloc] initAsRecord:entry.title parent:parent fields:fields uuid:entry.uuid];
-    ret.linkedData = entry;
     ret.iconId = entry.imageId;
     
     return ret;
