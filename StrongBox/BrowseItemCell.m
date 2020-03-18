@@ -119,7 +119,13 @@
 
 - (void)setFlags:(BOOL)pinned hasAttachments:(BOOL)hasAttachments {
     if(pinned) {
-        self.imageFlag1.image = pinned ? [UIImage imageNamed:@"pin"] : nil;
+        if (@available(iOS 13.0, *)) {
+            self.imageFlag1.image = [UIImage systemImageNamed:@"pin"];
+        }
+        else {
+            self.imageFlag1.image = pinned ? [UIImage imageNamed:@"pin"] : nil;
+        }
+        
         self.imageFlag1.hidden = !pinned;
         self.imageFlag2.image = hasAttachments ? [UIImage imageNamed:@"attach"] : nil;
         self.imageFlag2.hidden = !hasAttachments;

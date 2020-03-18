@@ -92,7 +92,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
 
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
-    UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
+    UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
     
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
     NSString* subtitle = [searcher getBrowseItemSubtitle:node];

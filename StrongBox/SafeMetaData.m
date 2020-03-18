@@ -12,28 +12,6 @@
 #import "FileManager.h"
 #import "ItemDetailsViewController.h"
 
-static NSString* const kShowPasswordByDefaultOnEditScreen = @"showPasswordByDefaultOnEditScreen";
-static NSString* const kHideTotp = @"hideTotp";
-static NSString* const kHideTotpInBrowse = @"hideTotpInBrowse";
-static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
-static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
-static NSString* const kTryDownloadFavIconForNewRecord = @"tryDownloadFavIconForNewRecord";
-static NSString* const kViewDereferencedFields = @"viewDereferencedFields";
-static NSString* const kSearchDereferencedFields = @"searchDereferencedFields";
-static NSString* const kHideEmptyFieldsInDetailsView = @"hideEmptyFieldsInDetailsView";
-static NSString* const kCollapsedSections = @"collapsedSections";
-static NSString* const kEasyReadFontForAll = @"easyReadFontForAll";
-static NSString* const kShowChildCountOnFolderInBrowse = @"showChildCountOnFolderInBrowse";
-static NSString* const kShowFlagsInBrowse = @"showFlagsInBrowse";
-static NSString* const kImmediateSearchOnBrowse = @"immediateSearchOnBrowse";
-static NSString* const kBrowseItemSubtitleField = @"browseItemSubtitleField";
-static NSString* const kBrowseSortField = @"browseSortField";
-static NSString* const kBrowseSortOrderDescending = @"browseSortOrderDescending";
-static NSString* const kBrowseSortFoldersSeparately = @"browseSortFoldersSeparately";
-static NSString* const kUiDoNotSortKeePassNodesInBrowseView = @"uiDoNotSortKeePassNodesInBrowseView";
-static NSString* const kShowUsernameInBrowse = @"showUsernameInBrowse"; // DEAD
-static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1BackupGroupInSearchResults";
-
 @implementation SafeMetaData
 
 - (instancetype)init {
@@ -80,6 +58,7 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.longPressTapAction = kBrowseTapActionCopyUsername;
 
         self.colorizePasswords = YES;
+        self.keePassIconSet = kKeePassIconSetClassic;
     }
     
     return self;
@@ -94,6 +73,8 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
+        
+        self.keePassIconSet = kKeePassIconSetSfSymbols; // TODO: Make this default for everyone if soft launch is received well
     }
     
     return self;
@@ -182,10 +163,9 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
     
     [encoder encodeBool:self.hideTotpCustomFieldsInViewMode forKey:@"hideTotpCustomFieldsInViewMode"];
     [encoder encodeBool:self.hideIconInBrowse forKey:@"hideIconInBrowse"];
-    
     [encoder encodeObject:self.yubiKeyConfig forKey:@"yubiKeyConfig"];
-    
     [encoder encodeBool:self.colorizePasswords forKey:@"colorizePasswords"];
+    [encoder encodeInteger:self.keePassIconSet forKey:@"keePassIconSet"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -369,6 +349,10 @@ static NSString* const kShowKeePass1BackupGroupInSearchResults = @"showKeePass1B
         
         if([decoder containsValueForKey:@"colorizePasswords"]) {
             self.colorizePasswords = [decoder decodeBoolForKey:@"colorizePasswords"];
+        }
+        
+        if([decoder containsValueForKey:@"keePassIconSet"]) {
+            self.keePassIconSet = [decoder decodeIntegerForKey:@"keePassIconSet"];
         }
     }
     

@@ -1019,7 +1019,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
     return [NodeIconHelper getIconForNode:NO
                            customIconUuid:self.model.icon.customUuid
                                    iconId:self.model.icon.index
-                                 database:self.databaseModel.database];
+                                    model:self.databaseModel];
 }
 
 #ifndef IS_APP_EXTENSION
@@ -1033,6 +1033,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
                     node:self.item
                  urlOverride:urlHint
                   format:self.databaseModel.database.format
+          keePassIconSet:self.databaseModel.metadata.keePassIconSet
                    completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nullable selected) {
     
                   if(goNoGo) {
@@ -1699,7 +1700,7 @@ showGenerateButton:YES];
 
         if(cf.protected && !self.editing) {
             [cell setConfidentialKey:cf.key
-                               value:cf.value
+                               value:[self maybeDereference:cf.value]
                            concealed:cf.concealedInUI
                             colorize:self.databaseModel.metadata.colorizePasswords];
 
@@ -1710,7 +1711,8 @@ showGenerateButton:YES];
             };
         }
         else {
-            [cell setKey:cf.key value:cf.value editing:NO useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+            NSString* value = [self maybeDereference:cf.value];
+            [cell setKey:cf.key value:value editing:NO useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
         }

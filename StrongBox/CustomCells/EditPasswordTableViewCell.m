@@ -93,7 +93,7 @@
 }
 
 - (void)notifyChangedAndLayout {
-    NSLog(@"EditPasswordCell: notifyChangedAndLayout");
+//    NSLog(@"EditPasswordCell: notifyChangedAndLayout");
       
     if(self.onPasswordEdited) {
         self.onPasswordEdited(self.password);

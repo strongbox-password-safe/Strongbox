@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "FavIconBulkViewController.h"
+#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,11 +18,13 @@ typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, NSNumber* _Nullable userS
 
 - (void)changeIcon:(UIViewController *)viewController
               node:(Node* _Nonnull)node
-           urlOverride:(NSString* _Nullable)urlHint
+       urlOverride:(NSString* _Nullable)urlOverride
             format:(DatabaseFormat)format
+    keePassIconSet:(KeePassIconSet)keePassIconSet
         completion:(ChangeIconCompletionBlock)completion;
 
-- (void)expressDownloadBestFavIcon:(NSString*)urlOverride completion:(void (^)(UIImage * _Nullable))completion;
+- (void)expressDownloadBestFavIcon:(NSString*)urlOverride
+                        completion:(void (^)(UIImage * _Nullable))completion;
 
 @property NSDictionary<NSUUID*, NSData*>* customIcons;
 

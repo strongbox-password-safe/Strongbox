@@ -249,7 +249,7 @@
     NSMutableSet *existing = [NSMutableSet set];
     for (SafeMetaData* safe in localSafes) {
         LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:safe];
-        if(!identifier.sharedStorage) {
+        if(identifier && !identifier.sharedStorage) {
             [existing addObject:identifier.filename];
         }
     }
@@ -358,7 +358,7 @@
 
 - (NSURL*)getFileUrl:(SafeMetaData*)safeMetaData {
     LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:safeMetaData];
-    return [self getFileUrl:identifier.sharedStorage filename:identifier.filename];
+    return identifier ? [self getFileUrl:identifier.sharedStorage filename:identifier.filename] : nil;
 }
 
 - (NSURL*)getFileUrl:(BOOL)sharedStorage filename:(NSString*)filename {

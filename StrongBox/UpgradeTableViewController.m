@@ -16,8 +16,8 @@
 static NSString* const kFontNameNoneBold =  @"Futura";
 static NSString* const kFontName =  @"Futura-Bold";
 
+// TODO: Delete me soon?
 @interface UpgradeTableViewController () <SKStoreProductViewControllerDelegate>
-
 
 @property (nonatomic, strong) NSDictionary* titleAttributes;
 @property (nonatomic, strong) NSDictionary* subtitleAttributes;
@@ -63,6 +63,10 @@ static NSString* const kFontName =  @"Futura-Bold";
                                            selector:@selector(onProStatusChanged:)
                                                name:kProStatusChangedNotificationKey
                                              object:nil];
+//    
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [self performSegueWithIdentifier:@"segueToNewUpgrade" sender:nil];
+//    });
 }
 
 - (void)onProStatusChanged:(id)param {
@@ -357,7 +361,7 @@ static NSString* const kFontName =  @"Futura-Bold";
     return product.price;
 }
 
-int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyPrice, int numberOfMonths) {
+static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* monthlyPrice, int numberOfMonths) {
     NSDecimalNumber* div = [NSDecimalNumber decimalNumberWithMantissa:numberOfMonths exponent:0 isNegative:NO];
     NSDecimalNumber* monthlyCalculatedPrice = [price decimalNumberByDividingBy:div];
 

@@ -311,9 +311,17 @@ viewController:(UIViewController *)viewController
         request.data = data;
         request.delegate = self;
         request.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+
             completion(error);
         };
         
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+        });
+
         [session enqueueRequest:request];
     }];
 }

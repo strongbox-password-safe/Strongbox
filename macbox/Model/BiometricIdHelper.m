@@ -11,10 +11,6 @@
 #import "Utils.h"
 #import "Settings.h"
 
-@interface BiometricIdHelper ()
-
-@end
-
 @implementation BiometricIdHelper
 
 + (instancetype)sharedInstance {
@@ -26,6 +22,14 @@
     });
     return sharedInstance;
 }
+
+//- (instancetype)init {
+//    self = [super init];
+//    if (self) {
+//        self.dummyMode = NO; 
+//    }
+//    return self;
+//}
 
 - (BOOL)biometricIdAvailable {
     if(self.dummyMode) {
@@ -40,7 +44,7 @@
         
         BOOL ret = [localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError];
         
-//        NSLog(@"DEBUG: Biometric available: [%d][%@]", ret, authError);
+        NSLog(@"DEBUG: Biometric available: [%d][%@]", ret, authError);
         
         return ret;
     }

@@ -1140,6 +1140,15 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         BackupsTableViewController* vc = (BackupsTableViewController*)nav.topViewController;
         vc.metadata = (SafeMetaData*)sender;
     }
+    else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
+        UIViewController* vc = segue.destinationViewController;
+        if (@available(iOS 13.0, *)) {
+            if (!Settings.sharedInstance.isFreeTrial) {
+                vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                vc.modalInPresentation = YES;
+            }
+        }
+    }
 }
 
 - (void)onCreateOrAddDialogDismissedSuccessfully:(SelectedStorageParameters*)storageParams

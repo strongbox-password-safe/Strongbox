@@ -9,20 +9,23 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "Node.h"
-#import "DatabaseModel.h"
+#import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeIconHelper : NSObject
 
-+ (UIImage*)getIconForNode:(Node*)vm database:(DatabaseModel*)database;
++ (UIImage*)getIconForNode:(Node*)vm model:(Model*)model;
+
 + (UIImage *)getIconForNode:(BOOL)isGroup
              customIconUuid:(NSUUID*)customIconUuid
                      iconId:(NSNumber*)iconId
-                   database:(DatabaseModel *)database;
+                   model:(Model *)model;
 
 + (UIColor*)folderTintColor;
-+ (NSArray<UIImage*>*)iconSet;
+
++ (NSArray<UIImage*>*)iconSet:(KeePassIconSet)iconSet;
+
 + (nullable UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
 
 @end

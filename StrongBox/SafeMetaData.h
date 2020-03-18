@@ -16,6 +16,13 @@
 #import "BrowseItemSubtitleField.h"
 #import "YubiKeyHardwareConfiguration.h"
 
+typedef NS_ENUM (NSInteger, KeePassIconSet) {
+    kKeePassIconSetClassic,
+    kKeePassIconSetSfSymbols,
+};
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface SafeMetaData : NSObject
 
 - (instancetype)initWithNickName:(NSString *)nickName
@@ -35,13 +42,13 @@
 
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
-@property (nonatomic, strong) NSString* convenienceMasterPassword;
-@property (nonatomic, strong) NSString* convenenienceYubikeySecret;
+@property (nonatomic, strong, nullable) NSString* convenienceMasterPassword;
+@property (nonatomic, strong, nullable) NSString* convenenienceYubikeySecret;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
 
-@property (nonatomic, strong) NSString* conveniencePin;
-@property (nonatomic, strong) NSString* duressPin;
+@property (nonatomic, strong, nullable) NSString* conveniencePin;
+@property (nonatomic, strong, nullable) NSString* duressPin;
 @property (nonatomic) DuressAction duressAction;
 @property (nonatomic) int failedPinAttempts;
 
@@ -67,6 +74,7 @@
 // Migrate from Global Settings - 23-Jun-2019
 
 // Browse View
+
 @property BrowseSortField browseSortField;
 @property BOOL browseSortOrderDescending;
 @property BOOL browseSortFoldersSeparately;
@@ -101,7 +109,7 @@
 @property BOOL showQuickViewNearlyExpired;
 @property BOOL showQuickViewExpired;
 
-@property NSArray<NSString*>* favourites;
+@property (nullable) NSArray<NSString*>* favourites;
 
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
@@ -113,5 +121,8 @@
 
 @property BOOL colorizePasswords;
 
+@property KeePassIconSet keePassIconSet;
+
 @end
 
+NS_ASSUME_NONNULL_END

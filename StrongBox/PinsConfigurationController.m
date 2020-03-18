@@ -182,7 +182,7 @@
             if(response == kOk) {
                 NSString* otherPin = duressPin ? self.viewModel.metadata.conveniencePin : self.viewModel.metadata.duressPin;
                 
-                if(!(otherPin != nil && [pin isEqualToString:otherPin])) {
+                if(otherPin == nil || (![pin isEqualToString:otherPin] && pin.length == otherPin.length)) {
                     if(duressPin) {
                         self.viewModel.metadata.duressPin = pin;
                     }

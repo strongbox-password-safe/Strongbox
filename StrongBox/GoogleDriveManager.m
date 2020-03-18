@@ -272,7 +272,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
                                                         uploadParameters:uploadParameters];
 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD showWithStatus:@"Syncing..."];
+                    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
                 });
                 
                 [self.driveService executeQuery:query

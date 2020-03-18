@@ -786,7 +786,7 @@ static NSImage* kStrongBox256Image;
                                                                                             colorize:colorize
                                                                                             darkMode:dark
                                                                                           colorBlind:colorBlind
-                                                                                                    font:self.labelPassword.font];
+                                                                                                font:self.labelPassword.font];
         
         self.labelUrl.stringValue = [self maybeDereference:it.fields.url node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
         self.labelUsername.stringValue = [self maybeDereference:it.fields.username node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
@@ -1968,7 +1968,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)copyCustomField:(CustomField*)field {
-    [ClipboardManager.sharedInstance copyConcealedString:field.value];
+    Node* it = [self getCurrentSelectedItem];
+    NSString* derefed = [self maybeDereference:field.value node:it maybe:YES];
+
+    [ClipboardManager.sharedInstance copyConcealedString:derefed];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
     [self showPopupToastNotification:[NSString stringWithFormat:loc, field.key, NSLocalizedString(@"generic_fieldname_custom_field", @"Custom Field")]];
@@ -3153,9 +3156,12 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         else {
             CustomFieldTableCellView* cell = [self.customFieldsTable makeViewWithIdentifier:cellId owner:nil];
             
-            cell.value = field.value;
-            cell.protected = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-            cell.valueHidden = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); // Initially Hide the Value if it is protected
+            Node* it = [self getCurrentSelectedItem];
+            NSString* derefed = [self maybeDereference:field.value node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
+            
+            cell.value = derefed;
+            cell.protected = field.protected && !(derefed.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
+            cell.valueHidden = field.protected && !(derefed.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); // Initially Hide the Value if it is protected
             
             return cell;
         }

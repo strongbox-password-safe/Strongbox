@@ -74,7 +74,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self killOtpTimer];
 }
 
--(void)viewDidDisappear:(BOOL)animated {
+- (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     
     if(self.isMovingFromParentViewController) { // Kill
@@ -415,6 +415,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onRenameItem:(NSIndexPath * _Nonnull)indexPath {
+    [self onRenameItem:indexPath completion:nil];
+}
+
+- (void)onRenameItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
     Node *item = [self getNodeFromIndexPath:indexPath];
     
     [Alerts OkCancelWithTextField:self
@@ -422,22 +426,30 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                             title:NSLocalizedString(@"browse_vc_rename_item", @"Rename Item")
                           message:NSLocalizedString(@"browse_vc_rename_item_enter_title", @"Please enter a new title for this item")
                        completion:^(NSString *text, BOOL response) {
-                           if(response && [text length]) {
-                               if(!item.isGroup) {
-                                   Node* originalNodeForHistory = [item cloneForHistory];
-                                   [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
-                               }
-                               
-                               [item setTitle:text keePassGroupTitleRules:self.viewModel.database.format != kPasswordSafe];
-                               
-                               [item touch:YES touchParents:YES];
+        if(response && [text length]) {
+            if(!item.isGroup) {
+                Node* originalNodeForHistory = [item cloneForHistory];
+                [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+            }
 
-                               [self saveChangesToSafeAndRefreshView];
-                           }
-                       }];
+            [item setTitle:text keePassGroupTitleRules:self.viewModel.database.format != kPasswordSafe];
+
+            [item touch:YES touchParents:YES];
+
+            [self saveChangesToSafeAndRefreshView];
+        }
+        
+        if(completion) {
+            completion(response);
+        }
+    }];
 }
 
 - (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath {
+    [self onDeleteSingleItem:indexPath completion:nil];
+}
+
+- (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
     Node *item = [self getNodeFromIndexPath:indexPath];
     BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
 
@@ -447,26 +459,33 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                    NSLocalizedString(@"browse_vc_are_you_sure_recycle_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?") :
                    NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"), [self dereference:item.title node:item]]
            action:^(BOOL response) {
-               if (response) {
-                   if(![self.viewModel deleteItem:item]) {
-                       [Alerts warn:self
-                              title:NSLocalizedString(@"browse_vc_delete_failed", @"Delete Failed")
-                            message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
-                   }
-                   else {
-                       // Also Unpin
-                       
-                       if([self isPinned:item]) {
-                           [self togglePinEntry:item];
-                       }
+                if (response) {
+                    if(![self.viewModel deleteItem:item]) {
+                        [Alerts warn:self
+                               title:NSLocalizedString(@"browse_vc_delete_failed", @"Delete Failed")
+                             message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
+                    }
+                    else {
+                        if([self isPinned:item]) {
+                            // Also Unpin
+                            [self togglePinEntry:item];
+                        }
 
-                       [self saveChangesToSafeAndRefreshView];
-                   }
-               }
+                        [self saveChangesToSafeAndRefreshView];
+                    }
+                }
+                
+                if (completion) {
+                    completion(response);
+                }
            }];
 }
 
 - (void)onSetIconForItem:(NSIndexPath * _Nonnull)indexPath {
+    [self onSetIconForItem:indexPath completion:nil];
+}
+
+- (void)onSetIconForItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
     Node *item = [self getNodeFromIndexPath:indexPath];
     
     self.sni = [[SetNodeIconUiHelper alloc] init];
@@ -476,6 +495,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                     node:item
              urlOverride:nil
                   format:self.viewModel.database.format
+          keePassIconSet:self.viewModel.metadata.keePassIconSet
               completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nonnull selected) {
         if(goNoGo) {
             if (selected) {
@@ -507,6 +527,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             
             [self saveChangesToSafeAndRefreshView];
         }
+        
+        if(completion) {
+            completion(goNoGo);
+        }
     }];
 }
     
@@ -537,6 +561,143 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
     NSData *data = UIImagePNGRepresentation(image);
     [self.viewModel.database setNodeCustomIcon:item data:data rationalize:YES];
+}
+
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath  API_AVAILABLE(ios(11.0)){
+    return [self getModernSlideActions:indexPath];
+}
+
+- (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath  API_AVAILABLE(ios(11.0)) {
+    return [self getModernSlideActions:indexPath];
+}
+
+- (UIContextualAction*)getRemoveAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
+    UIContextualAction *removeAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive
+                                                                               title:NSLocalizedString(@"browse_vc_action_delete", @"Delete")
+                                                                             handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self onDeleteSingleItem:indexPath completion:completionHandler];
+    }];
+
+    if (@available(iOS 13.0, *)) {
+        removeAction.image = [UIImage systemImageNamed:@"trash"];
+    }
+    else {
+        removeAction.image = [UIImage imageNamed:@"trash"];
+    }
+    removeAction.backgroundColor = UIColor.redColor;
+    
+    return removeAction;
+}
+
+- (UIContextualAction*)getRenameAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
+    UIContextualAction *renameAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
+                                                                               title:NSLocalizedString(@"browse_vc_action_rename", @"Rename")
+                                                                             handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self onRenameItem:indexPath completion:completionHandler];
+    }];
+
+    if (@available(iOS 13.0, *)) {
+        renameAction.image = [UIImage systemImageNamed:@"pencil"];
+    }
+    else {
+        renameAction.image = [UIImage imageNamed:@"pencil"];
+    }
+    renameAction.backgroundColor = UIColor.blueColor;
+    
+    return renameAction;
+}
+
+- (UIContextualAction*)getSetIconAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
+    Node *item = [self getNodeFromIndexPath:indexPath];
+    
+    UIContextualAction *setIconAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
+                                                                               title:item.isGroup ? NSLocalizedString(@"browse_vc_action_set_icons", @"Icons...") :
+                                                                                                    NSLocalizedString(@"browse_vc_action_set_icon", @"Set Icon")
+                                                                             handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self onSetIconForItem:indexPath completion:completionHandler];
+    }];
+
+    if (@available(iOS 13.0, *)) {
+        setIconAction.image = [UIImage systemImageNamed:@"photo"];
+    }
+    else {
+        setIconAction.image = [UIImage imageNamed:@"picture"];
+    }
+
+    setIconAction.backgroundColor = UIColor.orangeColor;
+
+    return setIconAction;
+}
+
+- (UIContextualAction*)getDuplicateItemAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
+    Node *item = [self getNodeFromIndexPath:indexPath];
+    
+    UIContextualAction *duplicateItemAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
+                                                                               title:NSLocalizedString(@"browse_vc_action_duplicate", @"Duplicate")
+                                                                             handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self duplicateItem:item completion:completionHandler];
+    }];
+
+    if (@available(iOS 13.0, *)) {
+        duplicateItemAction.image = [UIImage systemImageNamed:@"plus.square.on.square"];
+    }
+    else {
+        duplicateItemAction.image = [UIImage imageNamed:@"duplicate"];
+    }
+
+    duplicateItemAction.backgroundColor = UIColor.purpleColor;
+
+    return duplicateItemAction;
+}
+
+- (UIContextualAction*)getPinAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
+    Node *item = [self getNodeFromIndexPath:indexPath];
+    
+    BOOL pinned = [self isPinned:item];
+    
+    UIContextualAction *pinAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
+                                                                               title:pinned ?
+                                                                                                           NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") :
+                                                                                                           NSLocalizedString(@"browse_vc_action_pin", @"Pin")
+                                                                             handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self togglePinEntry:item];
+        completionHandler(YES);
+    }];
+
+    if (@available(iOS 13.0, *)) {
+        pinAction.image = [UIImage systemImageNamed:pinned ? @"pin.slash" : @"pin"];
+    }
+    else {
+        pinAction.image = [UIImage imageNamed:pinned ? @"pin-un" : @"pin"];
+    }
+
+    pinAction.backgroundColor = UIColor.magentaColor;
+
+    return pinAction;
+}
+
+- (UISwipeActionsConfiguration *)getModernSlideActions:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)) {
+    UIContextualAction* removeAction = [self getRemoveAction:indexPath];
+    UIContextualAction* renameAction = [self getRenameAction:indexPath];
+    UIContextualAction* setIconAction = [self getSetIconAction:indexPath];
+    UIContextualAction* duplicateItemAction = [self getDuplicateItemAction:indexPath];
+    UIContextualAction* pinAction = [self getPinAction:indexPath];
+        
+    if(!self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly) {
+        Node *item = [self getNodeFromIndexPath:indexPath];
+        if(item.isGroup) {
+            return self.viewModel.database.format != kPasswordSafe ?    [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, setIconAction, pinAction]] :
+                                                                        [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, pinAction]];
+        }
+        else {
+            return [UISwipeActionsConfiguration configurationWithActions:@[removeAction, duplicateItemAction, setIconAction, pinAction]];
+        }
+    }
+    else {
+        return [UISwipeActionsConfiguration configurationWithActions:@[pinAction]];
+    }
+
+    return [UISwipeActionsConfiguration configurationWithActions:@[removeAction]];
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -585,7 +746,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
         }
         else {
-            return @[removeAction, duplicateItemAction, setIconAction, pinAction]; // TODO: Icons instead of text!
+            return @[removeAction, duplicateItemAction, setIconAction, pinAction];
         }
     }
     else {
@@ -627,13 +788,33 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 -(void)duplicateItem:(Node*)item {
-    Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
-    
-    [item touch:NO touchParents:YES];
+    [self duplicateItem:item completion:nil];
+}
 
-    [item.parent addChild:dupe keePassGroupTitleRules:NO];
+-(void)duplicateItem:(Node*)item completion:(void (^)(BOOL actionPerformed))completion {
+    [Alerts yesNo:self
+            title:NSLocalizedString(@"browse_vc_duplicate_prompt_title", @"Duplicate Item?")
+          message:NSLocalizedString(@"browse_vc_duplicate_prompt_message", @"Are you sure you want to duplicate this item?")
+           action:^(BOOL response) {
+        if(response) {
+            Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
+            
+            [item touch:NO touchParents:YES];
 
-    [self saveChangesToSafeAndRefreshView];
+            [item.parent addChild:dupe keePassGroupTitleRules:NO];
+
+            [self saveChangesToSafeAndRefreshView];
+            
+            if(completion) {
+                completion(response);
+            }
+        }
+        else {
+            if(completion) {
+                completion(response);
+            }
+        }
+    }];
 }
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
@@ -856,7 +1037,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (UITableViewCell*)getTableViewCellFromNode:(Node*)node indexPath:(NSIndexPath*)indexPath {
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
-    UIImage* icon = [NodeIconHelper getIconForNode:node database:self.viewModel.database];
+    UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
 
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
 
@@ -1070,6 +1251,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             self.viewModel.metadata.browseSortFoldersSeparately = foldersSeparately;
             [self refreshItems];
         };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
+        UIViewController* vc = segue.destinationViewController;
+        if (@available(iOS 13.0, *)) {
+            if (!Settings.sharedInstance.isFreeTrial) {
+                vc.modalPresentationStyle = UIModalPresentationFullScreen;
+                vc.modalInPresentation = YES;
+            }
+        }
     }
 }
 

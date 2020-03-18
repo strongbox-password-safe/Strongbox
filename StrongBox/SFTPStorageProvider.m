@@ -175,15 +175,16 @@ viewController:(UIViewController *)viewController
             return;
         }
         
-          dispatch_async(dispatch_get_main_queue(), ^{
-              [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-          });
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+        });
                           
         NSData* data = [sftp contentsAtPath:foo.filePath];
-          dispatch_async(dispatch_get_main_queue(), ^{
-              [SVProgressHUD dismiss];
-          });
-             
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+     
         if(!data) {
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
             completionHandler(nil, error);
@@ -198,6 +199,7 @@ viewController:(UIViewController *)viewController
 
 - (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
+    
     [self connectAndAuthenticate:providerData.sFtpConfiguration
                   viewController:nil
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
@@ -205,12 +207,24 @@ viewController:(UIViewController *)viewController
             completion(error);
             return;
         }
-        
-        
+    
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+        });
+
         if(![sftp writeContents:data toFileAtPath:providerData.filePath progress:nil]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
             completion(error);
             return;
+        }
+        else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
         }
         
         [sftp disconnect];

@@ -50,10 +50,17 @@
         
         NSString* errorSummary = @"Invalid Database. Debug Info:\n";
         
-        errorSummary = [errorSummary stringByAppendingFormat:@"PFX: [%@]\n", [Utils hexadecimalString:prefixBytes]];
-        errorSummary = [errorSummary stringByAppendingFormat:@"PWS: [%@]\n", pw.localizedDescription];
-        errorSummary = [errorSummary stringByAppendingFormat:@"KP:[%@]-[%@]\n", k1.localizedDescription, k2.localizedDescription];
-        errorSummary = [errorSummary stringByAppendingFormat:@"KP1: [%@]\n", k3.localizedDescription];
+        NSString* prefix = [Utils hexadecimalString:prefixBytes];
+        
+        if([prefix hasPrefix:@"004D534D414D415250435259"]) { // MSMAMARPCRY - https://github.com/strongbox-password-safe/Strongbox/issues/303
+            errorSummary = @"It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.";
+        }
+        else {
+            errorSummary = [errorSummary stringByAppendingFormat:@"PFX: [%@]\n", prefix];
+            errorSummary = [errorSummary stringByAppendingFormat:@"PWS: [%@]\n", pw.localizedDescription];
+            errorSummary = [errorSummary stringByAppendingFormat:@"KP:[%@]-[%@]\n", k1.localizedDescription, k2.localizedDescription];
+            errorSummary = [errorSummary stringByAppendingFormat:@"KP1: [%@]\n", k3.localizedDescription];
+        }
         
         *error = [Utils createNSError:errorSummary errorCode:-1];
     }
@@ -629,8 +636,9 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
         if (self.format == kKeePass4 || self.format == kKeePass) {
             for (NSString* key in node.fields.customFields.allKeys) {
                 NSString* value = node.fields.customFields[key].value;
+                NSString* derefed = [self maybeDeref:value node:node maybe:dereference];
                 
-                if ([key localizedCaseInsensitiveContainsString:searchText] || [value localizedCaseInsensitiveContainsString:searchText]) {
+                if ([key localizedCaseInsensitiveContainsString:searchText] || [derefed localizedCaseInsensitiveContainsString:searchText]) {
                     return YES;
                 }
             }

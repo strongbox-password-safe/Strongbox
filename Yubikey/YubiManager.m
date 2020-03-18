@@ -352,7 +352,9 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
     // Some people program the Yubikey with Fixed Length "Fixed 64 byte input" and others with "Variable Input"
     // To cover both cases the KeePassXC model appears to be to always send 64 bytes with extraneous bytes above
     // and beyond the actual challenge padded PKCS#7 style-ish... MMcG - 1-Mar-2020
-    
+    //
+    // Further Reading: https://github.com/Yubico/yubikey-personalization-gui/issues/86
+
     const NSInteger kChallengeSize = 64;
     const NSInteger paddingLengthAndCharacter = kChallengeSize - self.challenge.length;
     uint8_t challengeBuffer[kChallengeSize];

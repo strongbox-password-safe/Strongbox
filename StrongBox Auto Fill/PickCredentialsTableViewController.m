@@ -303,7 +303,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
     
     NSString* title = self.model.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
-    UIImage* icon = [NodeIconHelper getIconForNode:node database:self.model.database];
+    UIImage* icon = [NodeIconHelper getIconForNode:node model:self.model];
     NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
     
     if(node.isGroup) {

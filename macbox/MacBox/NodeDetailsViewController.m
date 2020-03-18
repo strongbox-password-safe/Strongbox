@@ -850,7 +850,9 @@ static NSString* trimField(NSTextField* textField) {
     
     CustomField *field = self.customFields[row];
     
-    [ClipboardManager.sharedInstance copyConcealedString:field.value];
+    NSString* str = [self.model dereference:field.value node:self.node];
+    
+    [ClipboardManager.sharedInstance copyConcealedString:str];
 }
 
 - (IBAction)onDeleteCustomField:(id)sender {
@@ -1315,7 +1317,7 @@ static NSString* trimField(NSTextField* textField) {
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     SEL theAction = [menuItem action];
     
-    NSLog(@"validateMenuItem [%@]", NSStringFromSelector(theAction));
+//    NSLog(@"validateMenuItem [%@]", NSStringFromSelector(theAction));
 
     if(theAction == @selector(onAddCustomField:) ||
        theAction == @selector(onRemoveCustomField:) ||

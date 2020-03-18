@@ -51,6 +51,9 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowNearlyExpired;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowSpecialExpired;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellIconSet;
+@property (weak, nonatomic) IBOutlet UILabel *labelIconSet;
+
 @end
 
 @implementation BrowsePreferencesTableViewController
@@ -69,6 +72,7 @@
     [self cell:self.cellShowRecycleBinInSearch setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellDereference setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellDerefenceDuringSearch setHidden:self.format != kKeePass && self.format != kKeePass4];
+    [self cell:self.cellIconSet setHidden:self.format == kPasswordSafe];
     
     [self reloadDataAnimated:NO];
 }
@@ -139,6 +143,8 @@
     self.switchShowNearlyExpired.on = self.databaseMetaData.showQuickViewNearlyExpired;
     self.switchShowFavourites.on = self.databaseMetaData.showQuickViewFavourites;
     self.switchShowSpecialExpired.on = self.databaseMetaData.showQuickViewExpired;
+    
+    self.labelIconSet.text = [BrowsePreferencesTableViewController getIconSetName:self.databaseMetaData.keePassIconSet];
 }
 
 - (NSString*)getTapActionString:(BrowseTapAction)action {
@@ -181,9 +187,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
+        
     if (cell == self.cellBrowseItemSubtitle) {
         [self onChangeBrowseItemSubtitle];
     }
@@ -193,7 +197,46 @@
     else if (cell == self.cellSingleTapAction || cell == self.cellDoubleTapAction || cell == self.cellTripleTapAction || cell == self.cellLongPressAction) {
         [self onChangeTapAction:cell];
     }
+    else if (cell == self.cellIconSet) {
+        [self onChangeIconSet];
+    }
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
 
+- (void)onChangeIconSet {
+    NSArray<NSNumber*>* options = @[@(kKeePassIconSetClassic),
+                                    @(kKeePassIconSetSfSymbols)];
+    
+    NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return [BrowsePreferencesTableViewController getIconSetName:(KeePassIconSet)obj.integerValue];
+    }];
+    
+    KeePassIconSet current = self.databaseMetaData.keePassIconSet;
+    
+    NSInteger currentIndex = [options indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.integerValue == current;
+    }];
+    
+    [self promptForString:NSLocalizedString(@"browse_prefs_icon_set", @"Icon Set")
+                  options:optionStrings
+             currentIndex:currentIndex
+               completion:^(BOOL success, NSInteger selectedIdx) {
+                   if (success) {
+                       self.databaseMetaData.keePassIconSet = (KeePassIconSet)options[selectedIdx].integerValue;
+                       [SafesList.sharedInstance update:self.databaseMetaData];
+                   }
+                   
+                   [self bindPreferences];
+                   self.onPreferencesChanged();
+               }];
+
+}
+
++ (NSString*)getIconSetName:(KeePassIconSet)iconSet {
+    return iconSet == kKeePassIconSetClassic ?
+        NSLocalizedString(@"keepass_icon_set_classic", @"Classic") :
+        NSLocalizedString(@"keepass_icon_set_sf_symbols", @"SF Symbols (iOS 13+)");
 }
 
 - (void)onChangeTapAction:(UITableViewCell*)cell {

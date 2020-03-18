@@ -347,11 +347,10 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     // Find Start of XML
     
     NSInteger xmlMarker = findXmlMarker(chnk, read);
-    
     if(xmlMarker != 0) {
         NSLog(@"WARN: Found XML marker starting at offset: %ld", (long)xmlMarker);
     }
-    
+
     if(xmlMarker > 0) {
         read -= xmlMarker;
 
@@ -362,11 +361,8 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         memcpy(chnk, tmp, read);
     }
     else if (xmlMarker < 0) {
-        NSLog(@"Could not find start of XML");
-        if (error) {
-           *error = [Utils createNSError:@"Could not find start of XML" errorCode:-1];
-        }
-        return nil;
+        NSLog(@"Could not find start of XML! Will try parse anyway...");
+        // MMcG: Continue trying to read - could just be missing header...
     }
     
     // Parse XML
@@ -404,7 +400,10 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     if(err != XML_ERR_OK) {
         NSLog(@"XML Error: %d", err);
         if (error) {
-            *error = [Utils createNSError:@"Error reading Final XML" errorCode:err];
+            NSData* foo = [NSData dataWithBytes:chnk length:20];
+            NSString* hex = [Utils hexadecimalString:foo];
+            *error = [Utils createNSError:[NSString stringWithFormat:@"Error reading Final XML Hex = [%@]", hex]
+                                errorCode:err];
         }
         return nil;
     }
@@ -412,7 +411,20 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     xmlFreeParserCtxt(ctxt);
     free(my_handler);
     
-    return parser.rootElement;
+    RootXmlDomainObject* ret = parser.rootElement;
+
+    if(ret == nil && xmlMarker != 0) {
+        // Could not parse and xmlMarker wasn't found... Set error
+        
+        if (error) {
+            NSData* foo = [NSData dataWithBytes:chnk length:20];
+            NSString* hex = [Utils hexadecimalString:foo];
+           *error = [Utils createNSError:[NSString stringWithFormat:@"Could not find any valid XML. Hex = [%@]", hex]
+                               errorCode:-1];
+        }
+    }
+    
+    return ret;
 }
 
 void startElement(void *ctx, const xmlChar *fullname, const xmlChar **atts) {
@@ -455,20 +467,30 @@ void characters (void *ctx, const xmlChar *ch, int len) {
 
 static char* const marker = "<?xml";
 static NSUInteger const kMarkerSize = 5;
-static NSUInteger const kScanLengthForXmlMarker = 64;
 
 NSInteger findXmlMarker(uint8_t* chars, NSUInteger length) {
-    NSInteger offset = 0;
+    uint8_t* ptr = memmem(chars, length, marker, kMarkerSize);
     
-    while(offset < length && offset < kScanLengthForXmlMarker) {
-        if(memcmp(&chars[offset], marker, kMarkerSize) == 0) {
-            return offset;
-        }
-        offset++;
+    if(ptr) {
+        return ptr - chars;
     }
-    
-    return -1;
+    else {
+        return -1;
+    }
 }
+
+//
+//    NSInteger offset = 0;
+//
+//    while(offset < length && offset < kScanLengthForXmlMarker) {
+//        if(memcmp(&chars[offset], marker, kMarkerSize) == 0) {
+//            return offset;
+//        }
+//        offset++;
+//    }
+//
+//    return -1;
+//}
 
 //BOOL xmlNeedsCleanup(NSString* foo) {
 //    return (![foo hasPrefix:kXmlPrefix]);

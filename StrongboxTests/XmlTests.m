@@ -37,6 +37,22 @@
     XCTAssertNotNil(rootObject);
 }
 
+- (void)testNoXmlPrefix {
+    NSString * xml = @"<Group />";
+    
+    RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXml:xml];
+    
+    XCTAssertNotNil(rootObject);
+}
+
+- (void)testNoXml {
+    NSString * xml = @"rubbish";
+    
+    RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXml:xml];
+    
+    XCTAssertNil(rootObject);
+}
+
 - (void)testEmptyRecycleBinValues {
     NSString * xml = [CommonTesting getXmlFromBundleFile:@"empty-recycle-bin-values"];
     XCTAssertNotNil(xml);

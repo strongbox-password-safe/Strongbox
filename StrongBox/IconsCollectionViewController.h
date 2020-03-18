@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) void (^onDone)(BOOL response, NSInteger selectedIndex, NSUUID*_Nullable selectedCustomIconId);
 @property NSDictionary<NSUUID*, NSData*>* customIcons;
+@property KeePassIconSet iconSet;
 
 @end
 

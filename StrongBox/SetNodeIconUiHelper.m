@@ -27,9 +27,10 @@
 @implementation SetNodeIconUiHelper
 
 - (void)changeIcon:(UIViewController *)viewController
-              node:(Node*_Nonnull)node
-       urlOverride:(NSString*)urlOverride
+              node:(Node *)node
+       urlOverride:(NSString *)urlOverride
             format:(DatabaseFormat)format
+    keePassIconSet:(KeePassIconSet)keePassIconSet
         completion:(ChangeIconCompletionBlock)completion {
     self.viewController = viewController;
     self.completionBlock = completion;
@@ -40,7 +41,7 @@
         return;
     }
     if(format == kKeePass1) {
-        [self presentKeePassAndDatabaseIconSets];
+        [self presentKeePassAndDatabaseIconSets:keePassIconSet];
     }
     else {
         BOOL favIconPossible = node ? (node.isGroup || [NSURL URLWithString:node.fields.url] != nil) : [self smartDetermineUrlFromHint:urlOverride] != nil;
@@ -59,7 +60,7 @@
             UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:
                                             NSLocalizedString(@"set_icon_vc_icon_source_keepass_set", @"KeePass & Database Icon Set")
                                                                     style:UIAlertActionStyleDefault
-                                                                  handler:^(UIAlertAction *a) { [self presentKeePassAndDatabaseIconSets]; }];
+                                                                  handler:^(UIAlertAction *a) { [self presentKeePassAndDatabaseIconSets:keePassIconSet]; }];
             
             UIAlertAction *secondAction = [UIAlertAction actionWithTitle:
                                            NSLocalizedString(@"add_attachment_vc_prompt_source_option_files", @"Files")
@@ -115,7 +116,7 @@
                  thirdButtonText:NSLocalizedString(@"generic_cancel", @"Cancel")
                           action:^(int response) {
                    if(response == 0) {
-                       [self presentKeePassAndDatabaseIconSets];
+                       [self presentKeePassAndDatabaseIconSets:keePassIconSet];
                    }
                    else if(response == 1) {
                        [self presentCustomIconImagePicker];
@@ -235,8 +236,9 @@
     return url;
 }
 
-- (void)presentKeePassAndDatabaseIconSets {
+- (void)presentKeePassAndDatabaseIconSets:(KeePassIconSet)iconSet {
     IconsCollectionViewController* vc = [[IconsCollectionViewController alloc] init];
+    vc.iconSet = iconSet;
     vc.customIcons = self.customIcons;
     vc.modalPresentationStyle = UIModalPresentationFormSheet;
     

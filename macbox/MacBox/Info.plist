@@ -44,9 +44,13 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.13.4</string>
+	<string>1.13.6</string>
 	<key>CFBundleVersion</key>
-	<string>2703</string>
+	<string>2900</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<true/>
+	<key>ITSEncryptionExportComplianceCode</key>
+	<string>b6cfe3a3-cc2b-46f5-98ce-5ea8996562cf</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
 	<key>LSMinimumSystemVersion</key>

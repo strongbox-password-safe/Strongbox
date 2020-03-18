@@ -73,6 +73,7 @@ static const int kMinNotesCellHeight = 160;
                     node:self.record
                  urlOverride:urlHint
                   format:self.viewModel.database.format
+          keePassIconSet:self.viewModel.metadata.keePassIconSet
               completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nullable selected) {
         //NSLog(@"completion: %d - %@-%@", goNoGo, userSelectedNewIconIndex, userSelectedNewCustomIcon);
         if(goNoGo) {
@@ -88,10 +89,10 @@ static const int kMinNotesCellHeight = 160;
             }
             else if(self.userSelectedNewIconIndex) {
                 if(self.userSelectedNewIconIndex.intValue == -1) {
-                    self.imageViewIcon.image = [NodeIconHelper iconSet][0]; // Default
+                    self.imageViewIcon.image = [NodeIconHelper iconSet:self.viewModel.metadata.keePassIconSet][0]; // Default
                 }
                 else {
-                    self.imageViewIcon.image = [NodeIconHelper iconSet][self.userSelectedNewIconIndex.intValue];
+                    self.imageViewIcon.image = [NodeIconHelper iconSet:self.viewModel.metadata.keePassIconSet][self.userSelectedNewIconIndex.intValue];
                 }
             }
             
@@ -412,7 +413,7 @@ static const int kMinNotesCellHeight = 160;
     
     // Icon
     
-    UIImage* icon = [NodeIconHelper getIconForNode:self.record database:self.viewModel.database];
+    UIImage* icon = [NodeIconHelper getIconForNode:self.record model:self.viewModel];
     [self.imageViewIcon setImage:icon];
 }
 
