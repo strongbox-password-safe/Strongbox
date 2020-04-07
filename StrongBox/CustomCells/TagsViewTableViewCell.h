@@ -1,0 +1,23 @@
+//
+//  TagsViewTableViewCell.h
+//  Strongbox
+//
+//  Created by Mark on 27/03/2020.
+//  Copyright © 2020 Mark McGuill. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface TagsViewTableViewCell : UITableViewCell
+
+- (void)setModel:(BOOL)readOnly
+            tags:(NSArray<NSString*>*)tags
+ useEasyReadFont:(BOOL)useEasyReadFont
+           onAdd:(void(^)(NSString* tag))onAdd
+        onRemove:(void(^)(NSString* tag))onRemove;
+
+@end
+
+NS_ASSUME_NONNULL_END
