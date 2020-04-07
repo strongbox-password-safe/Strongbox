@@ -519,6 +519,35 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
     return data;
 }
 
++ (UIImage *)getQrCode:(NSString *)string pointSize:(NSUInteger)pointSize {
+    CIImage *input = [self createQRForString:string];
+
+    NSUInteger kImageViewSize = pointSize * UIScreen.mainScreen.scale;
+    CGFloat scale = kImageViewSize / input.extent.size.width;
+
+    NSLog(@"Scaling by %f (image size = %lu)", scale, (unsigned long)kImageViewSize);
+
+    CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
+
+    CIImage *qrCode = [input imageByApplyingTransform:transform];
+
+    return [UIImage imageWithCIImage:qrCode
+                               scale:[UIScreen mainScreen].scale
+                         orientation:UIImageOrientationUp];
+}
+
++ (CIImage *)createQRForString:(NSString *)qrString {
+    NSData *stringData = [qrString dataUsingEncoding:NSISOLatin1StringEncoding];
+    CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
+    
+    // Set the message content and error-correction level
+    
+    [qrFilter setValue:stringData forKey:@"inputMessage"];
+    [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
+
+    return qrFilter.outputImage;
+}
+
 #endif
 
 NSString* localizedYesOrNoFromBool(BOOL george) {

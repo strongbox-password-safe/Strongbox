@@ -186,17 +186,23 @@
     NSString *aboutString;
     if([[Settings sharedInstance] isPro]) {
         aboutString = [NSString stringWithFormat:
-                       NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"Pro Version %@"), [Utils getAppVersion]];
+                       NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@"), [Utils getAppVersion]];
     }
     else {
-        if([[Settings sharedInstance] isFreeTrial]) {
-            aboutString = [NSString stringWithFormat:
-                           NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt", @"Pro Version %@ (Trial - %ld days left)"),
-                           [Utils getAppVersion], (long)[[Settings sharedInstance] getFreeTrialDaysRemaining]];
+        if(Settings.sharedInstance.hasOptedInToFreeTrial) {
+            if([[Settings sharedInstance] isFreeTrial]) {
+                aboutString = [NSString stringWithFormat:
+                               NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt", @"About Strongbox %@ (Pro Trial - %ld days left)"),
+                               [Utils getAppVersion], (long)Settings.sharedInstance.freeTrialDaysLeft];
+            }
+            else {
+                aboutString = [NSString stringWithFormat:
+                               NSLocalizedString(@"prefs_vc_app_version_info_free_fmt", @"About Strongbox %@ (Free version - Please Upgrade)"), [Utils getAppVersion]];
+            }
         }
         else {
             aboutString = [NSString stringWithFormat:
-                           NSLocalizedString(@"prefs_vc_app_version_info_free_fmt", @"Lite Version %@ (Please Upgrade)"), [Utils getAppVersion]];
+                           NSLocalizedString(@"prefs_vc_app_version_info_free_fmt", @"About Strongbox %@ (Free version - Please Upgrade)"), [Utils getAppVersion]];
         }
     }
     

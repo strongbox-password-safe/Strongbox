@@ -29,18 +29,20 @@
 #import "PasswordHistoryViewController.h"
 #import "CollapsibleTableViewHeader.h"
 #import "BrowseSafeView.h"
-#import "ItemDetailsPreferencesViewController.h"
 #import "EditDateCell.h"
 #import "PasswordGenerationViewController.h"
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
 #import "LargeTextViewController.h"
 #import "PasswordMaker.h"
+#import "TagsViewTableViewCell.h"
 
 #ifndef IS_APP_EXTENSION
+
 #import "ISMessages/ISMessages.h"
 #import "SetNodeIconUiHelper.h"
 #import "QRCodeScannerViewController.h"
+
 #endif
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
@@ -58,9 +60,10 @@ static NSInteger const kRowUsername = 1;
 static NSInteger const kRowPassword = 2;
 static NSInteger const kRowURL = 3;
 static NSInteger const kRowEmail = 4;
-static NSInteger const kRowExpires = 5;
-static NSInteger const kRowTotp = 6;
-static NSInteger const kSimpleRowCount = 7;
+static NSInteger const kRowTags = 5;
+static NSInteger const kRowExpires = 6;
+static NSInteger const kRowTotp = 7;
+static NSInteger const kSimpleRowCount = 8;
 
 static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 static NSString* const kEditPasswordCellId = @"EditPasswordCell";
@@ -71,6 +74,7 @@ static NSString* const kViewAttachmentCellId = @"ViewAttachmentCell";
 static NSString* const kIconTableCell = @"IconTableCell";
 static NSString* const kTotpCell = @"TotpCell";
 static NSString* const kEditDateCell = @"EditDateCell";
+static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -198,7 +202,18 @@ static NSString* const kEditDateCell = @"EditDateCell";
         [self setEditing:YES animated:YES];
     }
     
-//    [UIView setAnimationsEnabled:YES];
+    [self listenToNotifications];
+}
+
+- (void)listenToNotifications {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseViewPreferencesChanged:)
+                                               name:kDatabaseViewPreferencesChangedNotificationKey
+                                             object:nil];
+}
+
+- (void)onDatabaseViewPreferencesChanged:(id)param {
+    [self performFullReload];
 }
 
 - (void)setupTableview {
@@ -211,7 +226,8 @@ static NSString* const kEditDateCell = @"EditDateCell";
     [self.tableView registerNib:[UINib nibWithNibName:kViewAttachmentCellId bundle:nil] forCellReuseIdentifier:kViewAttachmentCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kTotpCell bundle:nil] forCellReuseIdentifier:kTotpCell];
     [self.tableView registerNib:[UINib nibWithNibName:kEditDateCell bundle:nil] forCellReuseIdentifier:kEditDateCell];
-    
+    [self.tableView registerNib:[UINib nibWithNibName:kTagsViewCellId bundle:nil] forCellReuseIdentifier:kTagsViewCellId];
+
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.tableFooterView = [UIView new];
@@ -432,6 +448,9 @@ static NSString* const kEditDateCell = @"EditDateCell";
         else if (indexPath.row == kRowExpires) {
             return [self getExpiresCell:indexPath];
         }
+        else if (indexPath.row == kRowTags) {
+            return [self getTagsCell:indexPath];
+        }
         else {
             // Custom Field
             return [self getCustomFieldCell:indexPath];
@@ -537,6 +556,11 @@ static NSString* const kEditDateCell = @"EditDateCell";
         }
         else if(indexPath.row == kRowExpires) {
             if(self.model.expires == nil && shouldHideEmpty) {
+                return 0;
+            }
+        }
+        else if(indexPath.row == kRowTags) {
+            if(self.model.tags.count == 0 && shouldHideEmpty) {
                 return 0;
             }
         }
@@ -832,15 +856,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if([segue.identifier isEqualToString:@"segueToViewPreferences"]) {
-        UINavigationController *nav = segue.destinationViewController;
-        ItemDetailsPreferencesViewController* vc = (ItemDetailsPreferencesViewController*)nav.topViewController;
-        vc.database = self.databaseModel.metadata;
-        vc.onPreferencesChanged = ^{
-            [self performFullReload];
-        };
-    }
-    else if([segue.identifier isEqualToString:@"segueToCustomFieldEditor"]) {
+    if([segue.identifier isEqualToString:@"segueToCustomFieldEditor"]) {
         UINavigationController *nav = segue.destinationViewController;
         CustomFieldEditorViewController* vc = (CustomFieldEditorViewController*)[nav topViewController];
 
@@ -1223,6 +1239,7 @@ static NSString* const kEditDateCell = @"EditDateCell";
                                                               notes:item.fields.notes
                                                               email:item.fields.email
                                                             expires:item.fields.expires
+                                                               tags:item.fields.tags
                                                                totp:item.fields.otpToken
                                                                icon:iconModel
                                                        customFields:customFieldModels
@@ -1234,48 +1251,53 @@ static NSString* const kEditDateCell = @"EditDateCell";
 }
 
 - (void)applyModelChangesToNodeItem {
-     if (self.createNewItem) {
-         self.item.fields.created = [[NSDate alloc] init];
-         [self.parentGroup addChild:self.item keePassGroupTitleRules:NO];
-     }
-     else { // Add History Entry for this change if appropriate...
-         Node* originalNodeForHistory = [self.item cloneForHistory];
-         [self addHistoricalNode:originalNodeForHistory];
-     }
-     
-     [self.item touch:YES touchParents:YES];
-     
-     [self.item setTitle:self.model.title keePassGroupTitleRules:NO];
-     
-     self.item.fields.username = self.model.username;
-     self.item.fields.password = self.model.password;
-     self.item.fields.url = self.model.url;
-     self.item.fields.email = self.model.email;
-     self.item.fields.notes = self.model.notes;
-     self.item.fields.expires = self.model.expires;
-     
-     // Custom Fields - Must be done before TOTP as otherwise it will be removed!
-     
-     [self.item.fields removeAllCustomFields];
-     for (CustomFieldViewModel *field in self.model.customFields) {
-         StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
-         [self.item.fields setCustomField:field.key value:value];
-     }
+    if (self.createNewItem) {
+        self.item.fields.created = [[NSDate alloc] init];
+        [self.parentGroup addChild:self.item keePassGroupTitleRules:NO];
+    }
+    else { // Add History Entry for this change if appropriate...
+        Node* originalNodeForHistory = [self.item cloneForHistory];
+        [self addHistoricalNode:originalNodeForHistory];
+    }
 
-     // TOTP
+    [self.item touch:YES touchParents:YES];
+
+    [self.item setTitle:self.model.title keePassGroupTitleRules:NO];
+
+    self.item.fields.username = self.model.username;
+    self.item.fields.password = self.model.password;
+    self.item.fields.url = self.model.url;
+    self.item.fields.email = self.model.email;
+    self.item.fields.notes = self.model.notes;
+    self.item.fields.expires = self.model.expires;
+
+    // Custom Fields - Must be done before TOTP as otherwise it will be removed!
+
+    [self.item.fields removeAllCustomFields];
+    for (CustomFieldViewModel *field in self.model.customFields) {
+        StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
+        [self.item.fields setCustomField:field.key value:value];
+    }
+
+    // TOTP
+
+    if([OTPToken areDifferent:self.item.fields.otpToken b:self.model.totp]) {
+        [self.item.fields clearTotp]; // Clears any custom fields and notes fields (Password Safe)
+
+        if(self.model.totp != nil) {
+            [self.item.fields setTotp:self.model.totp
+                     appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
+        }
+    }
+
+    // Attachments
+
+    [self.databaseModel.database setNodeAttachments:self.item attachments:self.model.attachments];
+
+    // Tags
     
-     if([OTPToken areDifferent:self.item.fields.otpToken b:self.model.totp]) {
-         [self.item.fields clearTotp]; // Clears any custom fields and notes fields (Password Safe)
-         
-         if(self.model.totp != nil) {
-             [self.item.fields setTotp:self.model.totp
-                      appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
-         }
-     }
-     
-     // Attachments
-     
-     [self.databaseModel.database setNodeAttachments:self.item attachments:self.model.attachments];
+    [self.item.fields.tags removeAllObjects];
+    [self.item.fields.tags addObjectsFromArray:self.model.tags];
 }
 
 - (void)saveChanges {
@@ -1514,6 +1536,33 @@ showGenerateButton:YES];
     return cell;
 }
 
+- (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
+    TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
+
+    [cell setModel:!self.editing
+              tags:self.model.tags
+   useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
+             onAdd:^(NSString * _Nonnull tag) {
+                [self.model addTag:trim(tag)];
+                [self onModelEdited];
+            }
+          onRemove:^(NSString * _Nonnull tag) {
+                [self.model removeTag:trim(tag)];
+                [self onModelEdited];
+            }];
+
+    // FUTURE:
+//suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
+//            NSArray<NSString*>* matches = [[[self.databaseModel.database.tagSet allObjects] filter:^BOOL(NSString * obj) {
+//                return [obj hasPrefix:text];
+//            }] sortedArrayUsingComparator:finderStringComparator];
+//
+//            return matches.firstObject;
+//        }
+
+    return cell;
+}
+
 - (UITableViewCell*)getPasswordCell:(NSIndexPath*)indexPath { 
     if(self.editing) {
         EditPasswordTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditPasswordCellId forIndexPath:indexPath];
@@ -1554,7 +1603,7 @@ showGenerateButton:YES];
     }
 }
 
-- (UITableViewCell*)getTotpCell:(NSIndexPath*)indexPath {
+- (UITableViewCell*)getTotpCell:(NSIndexPath*)indexPath {   
     if(self.editing && !self.model.totp) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         cell.labelText.text = NSLocalizedString(@"item_details_setup_totp", @"Setup TOTP...");
@@ -1702,7 +1751,7 @@ showGenerateButton:YES];
             [cell setConfidentialKey:cf.key
                                value:[self maybeDereference:cf.value]
                            concealed:cf.concealedInUI
-                            colorize:self.databaseModel.metadata.colorizePasswords];
+                            colorize:self.databaseModel.metadata.colorizeProtectedCustomFields];
 
             __weak GenericKeyValueTableViewCell* weakCell = cell;
             cell.onRightButton = ^{

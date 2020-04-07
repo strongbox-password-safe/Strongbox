@@ -80,8 +80,6 @@ extern NSString* const kCustomFieldsColumn;
 
 @property PasswordGenerationConfig *passwordGenerationConfig;
 
-@property BOOL migratedToNewSecretStore;
-
 @property BOOL autoOpenFirstDatabaseOnEmptyLaunch;
 
 @property BOOL autoPromptForTouchIdOnActivate;

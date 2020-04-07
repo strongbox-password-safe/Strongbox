@@ -79,12 +79,6 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     return self.items.count;
 }
 
-- (BOOL)isPinned:(Node*)item { // TODO: We need this to be part of the model somehow...
-    NSMutableSet<NSString*>* favs = [NSMutableSet setWithArray:self.viewModel.metadata.favourites];
-    NSString* sid = [item getSerializationId:self.viewModel.database.format != kPasswordSafe];
-    return [favs containsObject:sid];
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node* node = self.items[indexPath.row];
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
@@ -103,7 +97,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
            subtitle:subtitle
                icon:icon
       groupLocation:groupLocation
-             pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+             pinned:self.viewModel.metadata.showFlagsInBrowse ? [self.viewModel isPinned:node] : NO
      hasAttachments:self.viewModel.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
             expired:node.expired
            otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
@@ -176,7 +170,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
             }
         }];
     }];
-    restoreAction.backgroundColor = UIColor.blueColor;
+    restoreAction.backgroundColor = UIColor.systemBlueColor;
     
     return @[removeAction, restoreAction];
 }

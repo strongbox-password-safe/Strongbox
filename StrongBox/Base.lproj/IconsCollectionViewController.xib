@@ -53,6 +53,7 @@
             <constraints>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="6fG-XC-Kw4" secondAttribute="trailing" constant="16" id="C2f-tT-psZ"/>
                 <constraint firstItem="Auy-hb-ZOc" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="KAr-W9-GbY"/>
+                <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Auy-hb-ZOc" secondAttribute="trailing" id="Kre-zh-pXA"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="trailing" secondItem="a4O-Vn-GMY" secondAttribute="trailing" constant="16" id="LJa-gg-2f5"/>
                 <constraint firstItem="Auy-hb-ZOc" firstAttribute="top" secondItem="Q5M-cg-NOt" secondAttribute="top" constant="8" id="Pn2-Tg-PeJ"/>
                 <constraint firstItem="Q5M-cg-NOt" firstAttribute="bottom" secondItem="kCY-nc-B0L" secondAttribute="bottom" constant="20" id="QSg-SN-Uex"/>
@@ -60,6 +61,7 @@
                 <constraint firstItem="6fG-XC-Kw4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="kCY-nc-B0L" secondAttribute="trailing" constant="8" symbolic="YES" id="ShG-Ye-YDi"/>
                 <constraint firstItem="a4O-Vn-GMY" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="16" id="dmu-5s-l0c"/>
                 <constraint firstItem="6fG-XC-Kw4" firstAttribute="top" secondItem="a4O-Vn-GMY" secondAttribute="bottom" constant="8" id="ks1-qA-6YD"/>
+                <constraint firstItem="Auy-hb-ZOc" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Q5M-cg-NOt" secondAttribute="leading" id="lfQ-u9-im8"/>
                 <constraint firstItem="a4O-Vn-GMY" firstAttribute="top" secondItem="Auy-hb-ZOc" secondAttribute="bottom" constant="8" id="nPd-N8-Sao"/>
                 <constraint firstItem="kCY-nc-B0L" firstAttribute="leading" secondItem="Q5M-cg-NOt" secondAttribute="leading" constant="16" id="q5j-sZ-ENO"/>
             </constraints>

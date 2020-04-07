@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
                         notes:(NSString*)notes
                         email:(NSString*)email
                       expires:(NSDate*_Nullable)expires
+                         tags:(NSSet<NSString*>*_Nullable)tags
                          totp:(OTPToken*_Nullable)totp
                          icon:(SetIconModel*)icon
                  customFields:(NSArray<CustomFieldViewModel*>*)customFields
@@ -57,7 +58,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSArray<CustomFieldViewModel*> *customFields;
 @property (readonly) NSArray<UiAttachment*> *attachments;
 @property (readonly) NSArray<ItemMetadataEntry*> *metadata;
-@property BOOL hasHistory; 
+
+- (void)addTag:(NSString*)tag;
+- (void)removeTag:(NSString*)tag;
+@property (readonly) NSArray<NSString*> *tags;
+
+@property BOOL hasHistory;
 
 @end
 

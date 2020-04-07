@@ -18,6 +18,7 @@ typedef NS_ENUM (unsigned int, BrowseItemSubtitleField) {
     kBrowseItemSubtitleModified,
     kBrowseItemSubtitleCreated,
     kBrowseItemSubtitleNotes,
+    kBrowseItemSubtitleTags,
 };
 
 #endif /* BrowseItemSubtitleField_h */

@@ -421,7 +421,7 @@ static NSString* RMASN1ReadIA5SString(const uint8_t **pp, long omax)
     
     BOOL ret = [self.purchaseDate compare:date] != NSOrderedDescending && [date compare:self.subscriptionExpirationDate] != NSOrderedDescending;
 
-    NSLog(@"[%@] -> Active for date: %@ => %d", self.productIdentifier, self.subscriptionExpirationDate, ret);
+    //NSLog(@"[%@] -> Active for date: %@ => %d", self.productIdentifier, self.subscriptionExpirationDate, ret);
     
     return ret;
 }

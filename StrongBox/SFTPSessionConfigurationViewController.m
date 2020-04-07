@@ -76,14 +76,14 @@
     
     if(!host.length) {
         self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_enter_host", @"Please Enter a Host");
-        self.labelValidation.textColor = [UIColor redColor];
+        self.labelValidation.textColor = [UIColor systemRedColor];
         self.buttonConnect.enabled = NO;
         return;
     }
     
     if(self.switchUsePrivateKey.on && self.privateKey.length == 0) {
         self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_select_private_key", @"Select a Private Key...");
-        self.labelValidation.textColor = [UIColor redColor];
+        self.labelValidation.textColor = [UIColor systemRedColor];
         self.buttonConnect.enabled = NO;
         return;
     }

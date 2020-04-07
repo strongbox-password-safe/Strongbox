@@ -14,6 +14,7 @@ typedef NS_ENUM (unsigned int, SearchScope) {
     kSearchScopeUsername,
     kSearchScopePassword,
     kSearchScopeUrl,
+    kSearchScopeTags,
     kSearchScopeAll,
 };
 

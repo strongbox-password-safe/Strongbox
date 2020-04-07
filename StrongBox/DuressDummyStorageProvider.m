@@ -109,7 +109,7 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)getData:(void(^)(NSData* data))completion {
-    NSUserDefaults* defaults = [Settings.sharedInstance getUserDefaults]; // FUTURE: Not an ideal place for data storage
+    NSUserDefaults* defaults = [Settings.sharedInstance getSharedAppGroupDefaults]; // FUTURE: Not an ideal place for data storage
     NSData* data = [defaults objectForKey:@"dd-safe"];
     if(!data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
@@ -125,7 +125,7 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)setData:(NSData*)data {
-    NSUserDefaults* defaults = [Settings.sharedInstance getUserDefaults];
+    NSUserDefaults* defaults = [Settings.sharedInstance getSharedAppGroupDefaults];
     [defaults setObject:data forKey:@"dd-safe"];
     [defaults synchronize];
 }

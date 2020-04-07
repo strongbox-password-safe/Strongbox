@@ -65,7 +65,7 @@
     
     if(!(urlHost && urlHost.scheme && urlHost.host)) {
         self.labelValidation.text = NSLocalizedString(@"webdav_vc_validation_url_invalid", @"URL Invalid");
-        self.labelValidation.textColor = [UIColor redColor];
+        self.labelValidation.textColor = [UIColor systemRedColor];
         self.buttonConnect.enabled = NO;
         return;
     }

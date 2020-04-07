@@ -9,12 +9,12 @@
 #import "ItemDetailsModel.h"
 #import "Utils.h"
 #import "OTPToken+Serialization.h"
-//#import "OTPToken+Generation.h"
 
 @interface ItemDetailsModel()
 
 @property NSMutableArray<CustomFieldViewModel*>* mutableCustomFields;
 @property NSMutableArray<UiAttachment*>* mutableAttachments;
+@property NSMutableSet<NSString*>* mutableTags;
 
 @end
 
@@ -27,6 +27,7 @@
                         notes:(NSString *)notes
                         email:(NSString *)email
                       expires:(NSDate*)expires
+                         tags:(NSSet<NSString*>*)tags
                          totp:(OTPToken *)totp
                          icon:(SetIconModel*)icon
                  customFields:(NSArray<CustomFieldViewModel *> *)customFields
@@ -41,6 +42,7 @@
         self.url = url;
         self.email = email;
         self.expires = expires;
+        self.mutableTags = tags ? tags.mutableCopy : [NSMutableSet set];
         self.notes = notes;
         self.icon = icon;
         self.mutableCustomFields = customFields ? [[customFields sortedArrayUsingComparator:customFieldKeyComparator] mutableCopy] : [NSMutableArray array];
@@ -62,6 +64,7 @@
                                                                 notes:self.notes
                                                                 email:self.email
                                                               expires:self.expires
+                                                                 tags:self.mutableTags
                                                                  totp:self.totp
                                                                  icon:self.icon
                                                          customFields:self.customFields
@@ -92,6 +95,12 @@
     // Expiry
     
     if(!((self.expires == nil && other.expires == nil) || (self.expires && other.expires && [self.expires isEqual:other.expires]))) {
+        return YES;
+    }
+    
+    // Tags
+    
+    if (![self.mutableTags isEqualToSet:other.mutableTags]) {
         return YES;
     }
     
@@ -183,6 +192,18 @@
     return idx;
 }
 
+- (void)addTag:(NSString*)tag {
+    [self.mutableTags addObject:tag];
+}
+
+- (void)removeTag:(NSString*)tag {
+    [self.mutableTags removeObject:tag];
+}
+
+- (NSArray<NSString*>*)tags {
+    return [self.mutableTags.allObjects sortedArrayUsingComparator:finderStringComparator];
+}
+
 - (NSArray<UiAttachment *> *)attachments {
     return self.mutableAttachments;
 }
@@ -236,6 +257,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
                                                               notes:notes
                                                               email:@"markmc@gmail.com"
                                                             expires:nil
+                                                               tags:nil
                                                                totp:token
                                                                icon:[SetIconModel setIconModelWith:@(12) customUuid:nil customImage:nil]
                                                        customFields:@[ c1, c2, c3]

@@ -125,7 +125,7 @@
 - (void)validateUi {
     BOOL enabled = [self passwordIsValid];
     self.buttonCreate.enabled = enabled;
-    self.buttonCreate.backgroundColor = enabled ? UIColor.blueColor : UIColor.lightGrayColor;
+    self.buttonCreate.backgroundColor = enabled ? UIColor.systemBlueColor : UIColor.lightGrayColor;
 }
 
 - (BOOL)passwordIsValid {

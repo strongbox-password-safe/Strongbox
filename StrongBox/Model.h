@@ -52,6 +52,10 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)deleteItem:(Node *_Nonnull)child;
 - (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
+- (BOOL)isPinned:(Node*)item;
+- (void)togglePin:(Node*)item;
+@property (readonly) NSSet<NSString*>* pinnedSet;
+
 -(void)encrypt:(void (^)(BOOL userCancelled, NSData*_Nullable data, NSError*_Nullable error))completion;
 
 - (NSString *_Nonnull)generatePassword;

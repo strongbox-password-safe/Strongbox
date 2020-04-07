@@ -29,6 +29,8 @@ static NSString* const kEntryElementName = @"Entry";
 static NSString* const kNameElementName = @"Name";
 static NSString* const kIconIdElementName = @"IconID";
 static NSString* const kCustomIconUuidElementName = @"CustomIconUUID";
+static NSString* const kTagsElementName = @"Tags";
+
 static NSString* const kUuidElementName = @"UUID";
 static NSString* const kTimesElementName = @"Times";
 static NSString* const kGeneratorElementName = @"Generator";

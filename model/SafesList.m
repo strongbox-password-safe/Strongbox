@@ -41,12 +41,12 @@ NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChan
     return self;
 }
 
-static NSUserDefaults* getUserDefaults() {
-    return [Settings.sharedInstance getUserDefaults];
+static NSUserDefaults* getSharedAppGroupDefaults() {
+    return [Settings.sharedInstance getSharedAppGroupDefaults];
 }
 
 - (NSMutableArray<SafeMetaData*>*)load {
-    NSUserDefaults * defaults = getUserDefaults();
+    NSUserDefaults * defaults = getSharedAppGroupDefaults();
     NSData *encodedObject = [defaults objectForKey:kSafesList];
     
     if(encodedObject == nil) {
@@ -59,7 +59,7 @@ static NSUserDefaults* getUserDefaults() {
 
 - (void)serialize {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.data];
-    NSUserDefaults * defaults = getUserDefaults();
+    NSUserDefaults * defaults = getSharedAppGroupDefaults();
     [defaults setObject:encodedObject forKey:kSafesList];
     [defaults synchronize];
     

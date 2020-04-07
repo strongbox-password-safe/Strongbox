@@ -120,6 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property YubiKeyHardwareConfiguration* yubiKeyConfig;
 
 @property BOOL colorizePasswords;
+@property BOOL colorizeProtectedCustomFields;
 
 @property KeePassIconSet keePassIconSet;
 

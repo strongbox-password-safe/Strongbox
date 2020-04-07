@@ -10,10 +10,13 @@
 #import "FontManager.h"
 #import "ColoredStringHelper.h"
 #import "Settings.h"
+#import "Utils.h"
 
 @interface LargeTextViewController ()
 
 @property (weak, nonatomic) IBOutlet UILabel *labelLargeText;
+@property (weak, nonatomic) IBOutlet UIImageView *qrCodeImageView;
+@property (weak, nonatomic) IBOutlet UIButton *buttonShowQrCode;
 
 @end
 
@@ -22,6 +25,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    if (@available(iOS 13.0, *)) {
+        [self.buttonShowQrCode setTitleColor:UIColor.labelColor forState:UIControlStateNormal];
+    }
+       
+    UIImage* img = [Utils getQrCode:self.string pointSize:self.qrCodeImageView.frame.size.width];
+    self.qrCodeImageView.image = img;
+    self.qrCodeImageView.hidden = NO;
+    
     UITapGestureRecognizer *tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(labelTapped)];
     
     tapGestureRecognizer.numberOfTapsRequired = 1;
@@ -44,12 +55,18 @@
                                                                                       colorize:YES
                                                                                       darkMode:dark
                                                                                     colorBlind:colorBlind font:FontManager.sharedInstance.easyReadFontForTotp];
-        
     }
 }
 
-- (void)labelTapped {
+- (IBAction)onDismiss:(id)sender {
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)labelTapped {
+}
+
+- (IBAction)onShowQrCode:(id)sender {
+    self.qrCodeImageView.hidden = !self.qrCodeImageView.hidden;
 }
 
 @end

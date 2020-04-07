@@ -396,7 +396,7 @@
 "browse_vc_rename_item_enter_title" = "Please enter a new title for this item";
 
 /* All Fields */
-"browse_vc_search_scope_all" = "All Fields";
+"browse_vc_search_scope_all" = "All";
 
 /* Sort Items By Title? */
 "browse_vc_sort_by_title" = "Sort Items By Title?";
@@ -688,13 +688,13 @@
 "prefs_vc_app_lock_delay" = "App Lock Delay";
 
 /* Lite Version %@ (Please Upgrade) */
-"prefs_vc_app_version_info_free_fmt" = "Lite Version %@ (Please Upgrade)";
+"prefs_vc_app_version_info_free_fmt" = "About Strongbox %@ (Free version - Please Upgrade)";
 
 /* Pro Version %@ */
-"prefs_vc_app_version_info_pro_fmt" = "Pro Version %@";
+"prefs_vc_app_version_info_pro_fmt" = "About Strongbox Pro %@";
 
 /* Pro Version %@ (Trial - %ld days left) */
-"prefs_vc_app_version_info_pro_trial_fmt" = "Pro Version %@ (Trial - %ld days left)";
+"prefs_vc_app_version_info_pro_trial_fmt" = "About Strongbox %@ (Pro Trial - %ld days left)";
 
 /* Auto Lock Database Delay */
 "prefs_vc_auto_lock_database_delay" = "Auto Lock Database Delay";
@@ -821,12 +821,6 @@
 
 /* 3 Months */
 "upgrade_vc_2monthly_subscription_title" = "3 Months";
-
-/* Hi! You're currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark */
-"upgrade_vc_developer_msg_free_trial_fmt" = "Hi! You are currently trying out the Pro version of Strongbox. I hope you really like it and find it useful! Your trial of this Pro version will end in %ld days and you will start to use the free version which is missing a few nifty features. You can find out more below.\nI was wondering if you would consider upgrading? By doing so you help to support an independent app developer. I love working on this app and your support allows me to keep doing so. Thanks in advance!\n-Mark";
-
-/* Hi! You're currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance! -Mark */
-"upgrade_vc_developer_msg_trial_expired" = "Hi! You are currently on the Free version of Strongbox. I was wondering if you would consider upgrading? By doing so you help to support an independent app developer and you will also get all the Pro features listed below. As an added bonus you will never see this annoying bloody upgrade screen again! I love working on this app and your contribution allows me to keep doing so. Thanks in advance!\n-Mark";
 
 /* Problem Purchasing */
 "upgrade_vc_error_purchasing" = "Problem Purchasing";
@@ -2960,3 +2954,33 @@
 
 /* Are you sure you want to duplicate this item? */
 "browse_vc_duplicate_prompt_message" = "Are you sure you want to duplicate this item?";
+
+/* It looks like your database is encrypted by Microsoft InTune probably due to corporate policy. */
+"error_database_is_encrypted_ms_intune" = "It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.";
+
+/* Add Entry... */
+"browse_add_entry_button_title" = "Add Entry...";
+
+/* Add Group... */
+"browse_add_group_button_title" = "Add Group...";
+
+/* Tags */
+"browse_vc_search_scope_tags" = "Tags";
+
+/* Tags */
+"browse_prefs_item_subtitle_tags" = "Tags";
+
+/* Tags */
+"item_details_username_field_tags" = "Tags";
+
+/* 90 Day Trial */
+"upgrade_vc_start_your_free_trial" = "90 Day Trial";
+
+/* Free Trial - No subscription or commitment required!" */
+"upgrade_vc_start_your_free_trial_subtitle" = "Try all Pro features (No subscription, uses a Free In App Purchase to start)";
+
+/* Free */
+"upgrade_vc_start_your_free_trial_price_free" = "Free";
+
+/* Upgrade (Free Trial Available) */
+"safes_vc_upgrade_info_trial_available_button_title" = "Upgrade (Free Trial Available)";

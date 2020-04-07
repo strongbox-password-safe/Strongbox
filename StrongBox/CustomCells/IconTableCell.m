@@ -149,7 +149,7 @@
     }
     
     if(self.titleLabel.text.length == 0) {
-        self.horizontalLine.backgroundColor = UIColor.redColor;
+        self.horizontalLine.backgroundColor = UIColor.systemRedColor;
         self.titleLabel.placeholder = [NSString stringWithFormat:NSLocalizedString(@"generic_kv_cell_value_empty_value_validation_fmt", @"%@ (Required)"),
                                        NSLocalizedString(@"generic_fieldname_title", @"Title")];
     }

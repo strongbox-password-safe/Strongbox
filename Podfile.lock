@@ -7,9 +7,9 @@ PODS:
   - AppAuth/ExternalUserAgent (1.3.0)
   - Base32 (1.1.2)
   - DZNEmptyDataSet (1.8.1)
-  - GoogleAPIClientForREST/Core (1.3.10):
+  - GoogleAPIClientForREST/Core (1.3.11):
     - GTMSessionFetcher (>= 1.1.7)
-  - GoogleAPIClientForREST/Drive (1.3.10):
+  - GoogleAPIClientForREST/Drive (1.3.11):
     - GoogleAPIClientForREST/Core
     - GTMSessionFetcher (>= 1.1.7)
   - GoogleSignIn (5.0.2):
@@ -25,7 +25,6 @@ PODS:
   - GTMSessionFetcher/Full (1.3.1):
     - GTMSessionFetcher/Core (= 1.3.1)
   - ISMessages (1.3.1)
-  - JNKeychain (0.1.4)
   - KissXML (5.3.1):
     - KissXML/All (= 5.3.1)
   - KissXML/Additions (5.3.1):
@@ -57,21 +56,18 @@ PODS:
   - OneDriveSDK/OneDriveCoreSDK (1.3.0):
     - OneDriveSDK/Common
   - Reachability (3.2)
-  - SAMKeychain (1.5.3)
 
 DEPENDENCIES:
   - DZNEmptyDataSet
   - GoogleAPIClientForREST/Drive
   - GoogleSignIn
   - ISMessages
-  - JNKeychain
   - KissXML
   - libsodium
   - MTBBarcodeScanner
   - ObjectiveDropboxOfficial
   - OneDriveSDK
   - Reachability
-  - SAMKeychain
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -84,34 +80,30 @@ SPEC REPOS:
     - GTMAppAuth
     - GTMSessionFetcher
     - ISMessages
-    - JNKeychain
     - KissXML
     - libsodium
     - MTBBarcodeScanner
     - ObjectiveDropboxOfficial
     - OneDriveSDK
     - Reachability
-    - SAMKeychain
 
 SPEC CHECKSUMS:
   ADAL: f2eb2158b9bcd2c8416ff2d026c176b98ea6651f
   AppAuth: 73574f3013a1e65b9601a3ddc8b3158cce68c09d
   Base32: 163c298644d184e89ca4e00a996bad6bf5166390
   DZNEmptyDataSet: 9525833b9e68ac21c30253e1d3d7076cc828eaa7
-  GoogleAPIClientForREST: 4acfffd77f1c3c8741b6be9eaed0e603278efbde
+  GoogleAPIClientForREST: 0f19a8280dfe6471f76016645d26eb5dae305101
   GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
   GTMAppAuth: 4deac854479704f348309e7b66189e604cf5e01e
   GTMSessionFetcher: cea130bbfe5a7edc8d06d3f0d17288c32ffe9925
   ISMessages: 562cddc3e960359de95f934a4e5c4e1f4ea6fd7d
-  JNKeychain: fb6cc9ec95959ba46cd95d0ee6f7a05e41da9f42
   KissXML: 5c8e0f2e8b9f071d3e1ae123dec3eb5da615c10c
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   ObjectiveDropboxOfficial: 19a4913d4d52fba035d41f40da71df0d6b303327
   OneDriveSDK: 90ab8781f0992c37d96b68cc340585f5cf36701f
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
-  SAMKeychain: 483e1c9f32984d50ca961e26818a534283b4cd5c
 
-PODFILE CHECKSUM: d673eccbbc6347fea72e77b485b7cffe91b05b35
+PODFILE CHECKSUM: e7fde055a0383c46f7a690b7b5b72af00d1bdca6
 
 COCOAPODS: 1.5.3

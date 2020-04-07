@@ -127,6 +127,9 @@
     else if (scope == kSearchScopeUrl) {
         [self searchUrl:searchNodes searchText:searchText dereference:dereference];
     }
+    else if (scope == kSearchScopeTags) {
+        [self searchTags:searchNodes searchText:searchText];
+    }
     else {
         [self searchAllFields:searchNodes searchText:searchText dereference:dereference];
     }
@@ -153,6 +156,12 @@
 - (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
         return [self.database isUrlMatches:searchText node:node dereference:dereference];
+    }];
+}
+
+- (void)searchTags:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText {
+    [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
+        return [self.database isTagsMatches:searchText node:node];
     }];
 }
 
@@ -309,10 +318,18 @@
         case kBrowseItemSubtitleNotes:
             return self.metadata.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;
             break;
+        case kBrowseItemSubtitleTags:
+            return sortedTagsString(node);
+            break;
         default:
             return @"";
             break;
     }
+}
+
+NSString* sortedTagsString(Node* node) {
+    NSArray<NSString*> *sortedTags = [node.fields.tags.allObjects sortedArrayUsingComparator:finderStringComparator];
+    return [sortedTags componentsJoinedByString:@", "];
 }
 
 @end

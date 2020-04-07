@@ -6,7 +6,6 @@ target 'Strongbox' do
     use_frameworks!
 
     pod 'KissXML'   
-    pod 'SAMKeychain'
     pod 'libsodium'
 end
 
@@ -15,7 +14,6 @@ abstract_target 'common-ios' do
     platform :ios, '10.0'
     use_frameworks!
 
-    pod 'JNKeychain'
     pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
     pod 'Reachability'
@@ -32,7 +30,7 @@ abstract_target 'common-ios' do
         pod 'GoogleSignIn'
     end
 
-    target 'Strongbox-iOS Family' do
+    target 'Strongbox-iOS-Family' do
         use_frameworks!
 
         pod 'ISMessages'
@@ -42,11 +40,11 @@ abstract_target 'common-ios' do
         pod 'GoogleSignIn'
     end
 
-   target 'Strongbox Auto Fill' do
+   target 'Strongbox-Auto-Fill' do
 
    end
 
-   target 'Strongbox Auto Fill Family' do
+   target 'Strongbox-Auto-Fill-Family' do
 
    end
 end

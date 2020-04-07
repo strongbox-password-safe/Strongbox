@@ -10,6 +10,8 @@
 #import "KeePassDatabase.h"
 #import "History.h"
 #import "SimpleXmlValueExtractor.h"
+#import "NSArray+Extensions.h"
+#import "Utils.h"
 
 @interface Entry ()
 
@@ -48,6 +50,7 @@ const static NSSet<NSString*> *wellKnownKeys;
         self.history = [[History alloc] initWithXmlElementName:kHistoryElementName context:context];
         self.strings = [NSMutableDictionary dictionary];
         self.binaries = [NSMutableArray array];
+        self.tags = [NSMutableSet set];
         self.icon = nil;
         self.customIcon = nil;
     }
@@ -102,6 +105,23 @@ const static NSSet<NSString*> *wellKnownKeys;
         self.customIcon = [SimpleXmlValueExtractor getUuid:completedObject];
         return YES;
     }
+    else if([withXmlElementName isEqualToString:kTagsElementName]) {
+        NSString* tagsString = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        
+        NSArray<NSString*>* tags = [tagsString componentsSeparatedByString:@";"]; // how do you get a semi-colon into a tag? You do not...
+        
+        NSArray<NSString*>* trimmed = [tags map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+            return [Utils trim:obj];
+        }];
+        
+        NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+            return obj.length > 0;
+        }];
+        
+        [self.tags addObjectsFromArray:filtered];
+        
+        return YES;
+    }
 
     return NO;
 }
@@ -154,6 +174,19 @@ const static NSSet<NSString*> *wellKnownKeys;
     
     if(self.history && self.history.entries && self.history.entries.count) {
         [self.history writeXml:serializer];
+    }
+    
+    if (self.tags && self.tags.count) {
+        NSArray<NSString*>* trimmed = [self.tags.allObjects map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+            return [Utils trim:obj];
+        }];
+        
+        NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+            return obj.length > 0;
+        }];
+
+        NSString* str = [[NSSet setWithArray:filtered].allObjects componentsJoinedByString:@";"];
+        [serializer writeElement:kTagsElementName text:str];
     }
     
     if(![super writeUnmanagedChildren:serializer]) {
@@ -298,6 +331,9 @@ const static NSSet<NSString*> *wellKnownKeys;
         return NO;
     }
     if (![self.history isEqual:other.history]) {
+        return NO;
+    }
+    if (![self.tags isEqualToSet:other.tags]) {
         return NO;
     }
     

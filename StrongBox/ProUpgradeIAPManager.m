@@ -15,11 +15,21 @@
 #import "RMAppReceipt.h"
 #import "Alerts.h"
 
+static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.pro";
+
+static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
+static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.monthly";
+static NSString* const k3Monthly =  @"com.strongbox.markmcguill.upgrade.pro.3monthly";
+static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
+static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial";
+//kTestConsumable @"com.markmcguill.strongbox.testconsumable"
+
 @interface ProUpgradeIAPManager ()
 
 @property (nonatomic) UpgradeManagerState readyState;
 @property (nonatomic, strong) NSDictionary<NSString*, SKProduct *> *products;
 @property (nonatomic) RMStoreAppReceiptVerifier* receiptVerifier;
+@property (readonly, nullable) SKProduct* freeTrialProduct;
 
 @end
 
@@ -88,7 +98,7 @@
     NSLog(@"Performing Scheduled Check of Entitlements...");
     
     if(Settings.sharedInstance.numberOfEntitlementCheckFails < 10) {
-        [self checkReceiptAndProEntitlements:vc];
+        [self checkReceiptForTrialAndProEntitlements:vc];
     }
     else {
         // For now - we will warn and ask to message support so we can handle this gracefully if someone is struggling...
@@ -100,7 +110,7 @@
     }
 }
 
-- (void)checkReceiptAndProEntitlements:(UIViewController*)vc { // Don't want to do a refresh if we're launching...
+- (void)checkReceiptForTrialAndProEntitlements:(UIViewController*)vc { // Don't want to do a refresh if we're launching...
     Settings.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
     
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
@@ -129,6 +139,16 @@
 
 - (void)checkVerifiedReceiptIsEntitledToPro:(UIViewController*)vc {
     Settings.sharedInstance.numberOfEntitlementCheckFails = 0;
+    
+    NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
+    if(freeTrialPurchaseDate && !Settings.sharedInstance.hasOptedInToFreeTrial) {
+        NSLog(@"Found Free Trial Purchase: [%@] - Setting free trial end date accordingly", freeTrialPurchaseDate);
+        NSDate* endDate = [Settings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
+        Settings.sharedInstance.freeTrialEnd = endDate;
+
+        // This should update the main screen
+        [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
+    }
     
     if ([ProUpgradeIAPManager isProFamilyEdition]) {
         NSLog(@"Upgrading App to Pro as Receipt is Good and this is the Pro Family edition...");
@@ -172,7 +192,7 @@
     self.readyState = kWaitingOnAppStoreProducts;
     self.products = @{};
 
-    NSSet *products = [NSSet setWithArray:@[kIapProId, kMonthly, kYearly]];
+    NSSet *products = [NSSet setWithArray:@[kIapProId, kMonthly, kYearly, kIapFreeTrial]];
     
     [[RMStore defaultStore] requestProducts:products success:^(NSArray *products, NSArray *invalidProductIdentifiers) {
         self.products = [NSMutableDictionary dictionary];
@@ -205,7 +225,11 @@
     [RMStore.defaultStore restoreTransactionsOnSuccess:^(NSArray *transactions) {
         NSLog(@"Restore Done Successfully: [%@]", transactions);
 
-        [self checkReceiptAndProEntitlements:nil];
+        for (SKPaymentTransaction* pt in transactions) {
+            NSLog(@"%@-%@", pt.originalTransaction.payment.productIdentifier, pt.originalTransaction.transactionDate);
+        }
+        
+        [self checkReceiptForTrialAndProEntitlements:nil];
         
         completion(nil);
     } failure:^(NSError *error) {
@@ -213,16 +237,17 @@
     }];
 }
 
-- (void)purchase:(NSString *)productId completion:(PurchaseCompletionBlock)completion {
+- (void)purchaseAndCheckReceipts:(SKProduct *)product completion:(PurchaseCompletionBlock)completion {
     if(![SKPaymentQueue canMakePayments]) {
         completion([Utils createNSError:NSLocalizedString(@"upgrade_mgr_purchases_are_disabled", @"Purchases are disabled on your device.") errorCode:-1]);
         return;
     }
     
-    [[RMStore defaultStore] addPayment:productId success:^(SKPaymentTransaction *transaction) {
+    [[RMStore defaultStore] addPayment:product.productIdentifier
+                               success:^(SKPaymentTransaction *transaction) {
         NSLog(@"Product purchased: [%@]", transaction);
         
-        [self checkReceiptAndProEntitlements:nil];
+        [self checkReceiptForTrialAndProEntitlements:nil];
 
         completion(nil);
     } failure:^(SKPaymentTransaction *transaction, NSError *error) {
@@ -231,10 +256,72 @@
     }];
 }
 
-static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.pro";
 + (BOOL)isProFamilyEdition {
     NSString* bundleId = [Utils getAppBundleId];
     return [bundleId isEqualToString:kProFamilyEditionBundleId];
+}
+
+//
+
+- (BOOL)hasPurchasedFreeTrial {
+    return self.freeTrialPurchaseDate != nil;
+}
+
+- (NSDate*)freeTrialPurchaseDate {
+    if (RMAppReceipt.bundleReceipt == nil) {
+        NSLog(@"bundleReceipt = nil");
+        return nil;
+    }
+
+
+    RMAppReceiptIAP *freeTrialIap = [RMAppReceipt.bundleReceipt.inAppPurchases firstOrDefault:^BOOL(RMAppReceiptIAP *iap) {
+        return [iap.productIdentifier isEqualToString:kIapFreeTrial];
+    }];
+    
+    if (freeTrialIap) {
+        NSDate* date = freeTrialIap.originalPurchaseDate;
+        NSLog(@"Date vs Orig: [%@] vs [%@]", date, freeTrialIap.originalPurchaseDate);
+        
+        if (date) {
+            return date;
+        }
+        else {
+            NSLog(@"Could not determine Free Trial Purchase date...");
+            return nil;
+        }
+    }
+    else {
+        NSLog(@"No Free Trial Purchase Found...");
+        return nil;
+    }
+}
+
+- (void)startFreeTrial:(PurchaseCompletionBlock)completion {
+    if (self.freeTrialProduct) {
+        [self purchaseAndCheckReceipts:self.freeTrialProduct completion:completion];
+    }
+    else {
+        NSLog(@"Free Trial product unavailable");
+        completion([Utils createNSError:@"Free Trial product unavailable" errorCode:-2345]);
+    }
+}
+
+//
+
+- (SKProduct *)monthlyProduct {
+    return self.availableProducts[kMonthly];
+}
+
+- (SKProduct *)yearlyProduct {
+    return self.availableProducts[kYearly];
+}
+
+- (SKProduct *)lifeTimeProduct {
+    return self.availableProducts[kIapProId];
+}
+
+- (SKProduct *)freeTrialProduct {
+    return self.availableProducts[kIapFreeTrial];
 }
 
 @end

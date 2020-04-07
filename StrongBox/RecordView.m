@@ -25,7 +25,6 @@
 #import "Utils.h"
 #import "SetNodeIconUiHelper.h"
 #import "KeePassHistoryController.h"
-#import "ItemDetailsPreferencesViewController.h"
 #import "PasswordGenerationViewController.h"
 #import "ClipboardManager.h"
 
@@ -54,7 +53,6 @@ static const int kMinNotesCellHeight = 160;
 @property UIBarButtonItem *navBack;
 @property (strong) SetNodeIconUiHelper* sni; // Required: Or Delegate does not work!
 @property (readonly) BOOL readOnlyMode;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
 
 @end
 
@@ -212,7 +210,7 @@ static const int kMinNotesCellHeight = 160;
     self.imageViewIcon.layer.borderWidth = 1.0f;
     self.imageViewIcon.layer.masksToBounds = YES;
     self.imageViewIcon.layer.cornerRadius = 5;
-    self.imageViewIcon.layer.borderColor = [UIColor blueColor].CGColor;
+    self.imageViewIcon.layer.borderColor = [UIColor systemBlueColor].CGColor;
     
     [self.textFieldTitle addTarget:self
                             action:@selector(textViewDidChange:)
@@ -364,6 +362,19 @@ static const int kMinNotesCellHeight = 160;
         self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.readOnlyMode);
         [self enableDisableUiForEditing];
     }
+
+    [self listenToNotifications];
+}
+
+- (void)listenToNotifications {
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseViewPreferencesChanged:)
+                                               name:kDatabaseViewPreferencesChangedNotificationKey
+                                             object:nil];
+}
+
+- (void)onDatabaseViewPreferencesChanged:(id)param {
+    [self bindUiToRecord];
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
@@ -536,8 +547,6 @@ static const int kMinNotesCellHeight = 160;
     // Password Generation Settings
     
     self.buttonPasswordGenerationSettings.hidden = !self.isEditing;
-    
-    self.buttonViewPreferences.enabled = !self.editing;
 }
 
 - (void)setTitleTextFieldUIValidationIndicator {
@@ -708,15 +717,7 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqual:@"segueToViewPreferences"]) {
-        UINavigationController *nav = segue.destinationViewController;
-        ItemDetailsPreferencesViewController* vc = (ItemDetailsPreferencesViewController*)nav.topViewController;
-        vc.database = self.viewModel.metadata;
-        vc.onPreferencesChanged = ^{
-            [self bindUiToRecord];
-        };
-    }
-    else if ([segue.identifier isEqual:@"segueToPasswordHistory"] && (self.record != nil)) {
+    if ([segue.identifier isEqual:@"segueToPasswordHistory"] && (self.record != nil)) {
         PasswordHistoryViewController *vc = segue.destinationViewController;
         vc.model = self.record.fields.passwordHistory;
         vc.readOnly = self.readOnlyMode;

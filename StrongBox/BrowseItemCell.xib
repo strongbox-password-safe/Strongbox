@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15702" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15704"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -84,7 +84,7 @@
                                         <rect key="frame" x="0.0" y="76" width="509" height="76"/>
                                         <subviews>
                                             <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="751" insetsLayoutMarginsFromSafeArea="NO" text="Username" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Sdj-yB-8Z9">
-                                                <rect key="frame" x="0.0" y="0.0" width="94.5" height="76"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="90.5" height="76"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -104,7 +104,7 @@
                                             <constraint firstItem="Sdj-yB-8Z9" firstAttribute="leading" secondItem="Oup-O8-WjN" secondAttribute="leading" id="UDw-DJ-FLA"/>
                                             <constraint firstAttribute="bottom" secondItem="Sdj-yB-8Z9" secondAttribute="bottom" id="s7I-TX-AOL"/>
                                             <constraint firstAttribute="bottom" secondItem="CDz-fz-R1L" secondAttribute="bottom" id="tlv-6L-9la"/>
-                                            <constraint firstItem="CDz-fz-R1L" firstAttribute="leading" secondItem="Sdj-yB-8Z9" secondAttribute="trailing" id="uhF-WN-FhY"/>
+                                            <constraint firstItem="CDz-fz-R1L" firstAttribute="leading" secondItem="Sdj-yB-8Z9" secondAttribute="trailing" constant="4" id="uhF-WN-FhY"/>
                                         </constraints>
                                     </view>
                                 </subviews>

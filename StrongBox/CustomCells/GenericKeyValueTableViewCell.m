@@ -314,7 +314,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     
     if(self.showUiValidationOnEmpty) {
         if(self.valueText.text.length == 0) {
-            self.horizontalLine.backgroundColor = UIColor.redColor;
+            self.horizontalLine.backgroundColor = UIColor.systemRedColor;
             self.valueText.placeholder = [NSString stringWithFormat:NSLocalizedString(@"generic_kv_cell_value_empty_value_validation_fmt", @"%@ (Required)"), self.keyLabel.text];
         }
         else {

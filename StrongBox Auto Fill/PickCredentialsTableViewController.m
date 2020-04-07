@@ -75,7 +75,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
           NSLocalizedString(@"pick_creds_vc_search_scope_username", @"Username"),
           NSLocalizedString(@"pick_creds_vc_search_scope_password", @"Password"),
           NSLocalizedString(@"pick_creds_vc_search_scope_url", @"URL"),
-          NSLocalizedString(@"pick_creds_vc_search_scope_all_fields", @"All Fields")];
+          NSLocalizedString(@"browse_vc_search_scope_tags", @"Tags"),
+          NSLocalizedString(@"pick_creds_vc_search_scope_all_fields", @"All")];
     
     self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
     
@@ -292,12 +293,6 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     return [self getDataSource].count;
 }
 
-- (BOOL)isPinned:(Node*)item { // TODO: We need this to be part of the model somehow...
-    NSMutableSet<NSString*>* favs = [NSMutableSet setWithArray:self.model.metadata.favourites];
-    NSString* sid = [item getSerializationId:self.model.database.format != kPasswordSafe];
-    return [favs containsObject:sid];
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
     BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
@@ -316,7 +311,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
             childCount:childCount
                 italic:italic
          groupLocation:groupLocation
-                pinned:self.model.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+                pinned:self.model.metadata.showFlagsInBrowse ? [self.model isPinned:node] : NO
               hideIcon:self.model.metadata.hideIconInBrowse];
     }
     else {
@@ -328,7 +323,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
                subtitle:subtitle
                    icon:icon
           groupLocation:groupLocation
-                 pinned:self.model.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+                 pinned:self.model.metadata.showFlagsInBrowse ? [self.model isPinned:node] : NO
          hasAttachments:self.model.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
                 expired:node.expired
                otpToken:node.fields.otpToken
@@ -415,8 +410,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
     NSDictionary *attributes = @{
-                                 NSFontAttributeName: [UIFont systemFontOfSize:16.0f],
-                                 NSForegroundColorAttributeName: [UIColor blueColor]
+                                 NSFontAttributeName : [UIFont systemFontOfSize:16.0f],
+                                 NSForegroundColorAttributeName : UIColor.systemBlueColor
                                  };
     
     return [[NSAttributedString alloc] initWithString:NSLocalizedString(@"pick_creds_vc_create_new_button_title", @"Create New Record...")

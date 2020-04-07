@@ -95,7 +95,7 @@
 - (void)validateUi {
     BOOL enabled = [self nameIsValid];
     self.nextButton.enabled = enabled;
-    self.nextButton.backgroundColor = enabled ? UIColor.blueColor : UIColor.lightGrayColor;
+    self.nextButton.backgroundColor = enabled ? UIColor.systemBlueColor : UIColor.lightGrayColor;
 }
 
 - (BOOL)nameIsValid {

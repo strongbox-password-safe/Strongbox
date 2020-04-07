@@ -21,26 +21,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kProStatusChangedNotificationKey;
 extern NSString* const kCentralUpdateOtpUiNotification;
-
+extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 
 @interface Settings : NSObject
 
 + (Settings *)sharedInstance;
 
-- (NSUserDefaults*_Nullable)getUserDefaults;
+@property (readonly) NSString* appGroupName;
+- (NSUserDefaults*_Nullable)getSharedAppGroupDefaults;
 
-- (void)setHavePromptedAboutFreeTrial:(BOOL)value;
-- (BOOL)isHavePromptedAboutFreeTrial;
 - (BOOL)isProOrFreeTrial;
-
 - (BOOL)isPro;
 - (void)setPro:(BOOL)value;
-
 - (BOOL)isFreeTrial;
-- (NSInteger)getFreeTrialDaysRemaining;
 
-- (NSDate*)getEndFreeTrialDate;
-- (void)setEndFreeTrialDate:(NSDate*)value;
+- (BOOL)hasOptedInToFreeTrial;
+@property (readonly) NSInteger freeTrialDaysLeft;
+@property NSDate *freeTrialEnd;
+
+- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
+
+@property (nullable) NSDate* lastEntitlementCheckAttempt;
+@property NSUInteger numberOfEntitlementCheckFails;
 
 - (void)resetLaunchCount;
 - (NSInteger)getLaunchCount;
@@ -48,17 +50,13 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 
 - (NSString*)getFlagsStringForDiagnostics;
 
-@property (nonatomic) BOOL neverShowForMacAppMessage;
-
 @property (nonatomic) BOOL iCloudOn;
 @property (nonatomic) BOOL iCloudWasOn;
 @property (nonatomic) BOOL iCloudPrompted;
 @property (nonatomic) BOOL iCloudAvailable;
-@property (nonatomic) BOOL safesMigratedToNewSystem;
 
 @property (nonatomic) NSDate* installDate;
 @property (nonatomic, readonly) NSInteger daysInstalled;
-
 - (void)clearInstallDate;
 
 @property (nonatomic) BOOL disallowAllPinCodeOpens;
@@ -66,15 +64,11 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
 @property (nonatomic) BOOL showKeePassCreateSafeOptions;
 @property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
-@property (nonatomic) BOOL hasShownKeePassBetaWarning;
 
 @property (nonatomic) BOOL hideTips;
 
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
-
-@property (nullable) NSDate* lastEntitlementCheckAttempt;
-@property NSUInteger numberOfEntitlementCheckFails;
 
 @property BOOL instantPinUnlocking;
 @property BOOL haveWarnedAboutAutoFillCrash;
@@ -89,8 +83,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property BOOL allowEmptyOrNoPasswordEntry;
 
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
-
-@property (readonly) NSString* appGroupName;
 
 @property BOOL showYubikeySecretWorkaroundField;
 
@@ -112,8 +104,6 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 @property FavIconDownloadOptions *favIconDownloadOptions;
 
 @property BOOL clipboardHandoff;
-
-@property BOOL migratedToNewSecretStore;
 
 @property BOOL autoFillExitedCleanly;
 

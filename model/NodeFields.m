@@ -79,6 +79,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         self.attachments = [NSMutableArray array];
         self.mutableCustomFields = [NSMutableDictionary dictionary];
         self.keePassHistory = [NSMutableArray array];
+        self.tags = [NSMutableSet set];
     }
     
     return self;
@@ -116,12 +117,15 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     NSArray<NSDictionary*>* attachments = dict[@"attachments"];
     NSArray<NSDictionary*>* customFields = dict[@"customFields"];
 
+    NSSet<NSString*>* tags = dict[@"tags"]; // TODO: Tags - Test
+
     NodeFields* ret = [[NodeFields alloc] initWithUsername:username
                                                        url:url
                                                   password:password
                                                      notes:notes
                                                      email:email];
 
+    ret.tags = tags.mutableCopy;
     ret.passwordModified = passwordModified != nil ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
     ret.expires = expires != nil ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
 //    ret.locationChanged = locationChanged ? [NSDate dateWithTimeIntervalSince1970:locationChanged.unsignedIntegerValue] : nil;
@@ -185,6 +189,8 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     ret[@"customFields"] = customFields;
     
+    ret[@"tags"] = self.tags; // TODO: Test Tags on mac?
+    
     return ret;
 }
 
@@ -199,7 +205,8 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     ret.locationChanged = self.locationChanged;
     ret.attachments = [self cloneAttachments];
     ret.mutableCustomFields = [self cloneCustomFields];
-        
+    ret.tags = self.tags.mutableCopy;
+    
     if (cloneMetadataDates) {
         ret.passwordModified = self.passwordModified;
         ret.created = self.created;

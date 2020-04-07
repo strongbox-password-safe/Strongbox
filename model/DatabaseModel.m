@@ -14,6 +14,7 @@
 #import "Kdbx4Serialization.h"
 #import "KeePassCiphers.h"
 #import "KissXML.h"
+#import "NSArray+Extensions.h"
 
 @interface DatabaseModel ()
 
@@ -53,7 +54,9 @@
         NSString* prefix = [Utils hexadecimalString:prefixBytes];
         
         if([prefix hasPrefix:@"004D534D414D415250435259"]) { // MSMAMARPCRY - https://github.com/strongbox-password-safe/Strongbox/issues/303
-            errorSummary = @"It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.";
+            NSString* loc = NSLocalizedString(@"error_database_is_encrypted_ms_intune", @"It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.");
+            
+            errorSummary = loc;
         }
         else {
             errorSummary = [errorSummary stringByAppendingFormat:@"PFX: [%@]\n", prefix];
@@ -264,7 +267,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
 
     Node* sampleFolder = [[Node alloc] initAsGroup:NSLocalizedString(@"model_sample_group_title", @"Sample Group")
                                             parent:parent
-                         keePassGroupTitleRules:YES
+                            keePassGroupTitleRules:YES
                                               uuid:nil];
     
     [parent addChild:sampleFolder keePassGroupTitleRules:NO];
@@ -279,7 +282,7 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
                                                   parent:sampleFolder
                                                   fields:fields
                                                     uuid:nil]
-      keePassGroupTitleRules:NO];
+                                keePassGroupTitleRules:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -501,6 +504,22 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return bag;
 }
 
+- (NSSet<NSString*> *)tagSet {
+    NSArray<NSString*>* allTags = [self.activeRecords flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.fields.tags.allObjects;
+    }];
+
+    NSArray<NSString*>* trimmed = [allTags map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        return [Utils trim:obj];
+    }];
+
+    NSArray* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+        return obj.length > 0;
+    }];
+
+    return [NSSet setWithArray:filtered];
+}
+
 - (NSSet<NSString*> *)emailSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
@@ -598,6 +617,12 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return [foo localizedCaseInsensitiveContainsString:searchText];
 }
 
+- (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node {
+    return [node.fields.tags.allObjects anyMatch:^BOOL(NSString * _Nonnull obj) {
+        return [obj localizedCaseInsensitiveContainsString:searchText];
+    }];
+}
+
 - (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
     if([foo localizedCaseInsensitiveContainsString:searchText]) {
@@ -634,6 +659,16 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     }
     else {
         if (self.format == kKeePass4 || self.format == kKeePass) {
+            // Tags
+            
+            for (NSString* tag in node.fields.tags) {
+                if ([tag localizedCaseInsensitiveContainsString:searchText]) {
+                    return YES;
+                }
+            }
+
+            // Custom Fields
+            
             for (NSString* key in node.fields.customFields.allKeys) {
                 NSString* value = node.fields.customFields[key].value;
                 NSString* derefed = [self maybeDeref:value node:node maybe:dereference];

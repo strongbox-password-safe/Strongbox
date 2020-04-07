@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		010081483D01AD9ACEF16525 /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */; };
 		059A8E323BB4461DEF4E6FAB /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */; };
 		4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* Alerts.m */; };
 		4D0835A6228472D200CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
@@ -177,7 +178,6 @@
 		4D1FFB0D2403030100B75EA2 /* SerializationPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4A00392312CC5400B69E09 /* SerializationPackage.m */; };
 		4D1FFB0F2403030100B75EA2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
 		4D1FFB102403030100B75EA2 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A323FCA3320004B309 /* libjson.a */; };
-		4D1FFB112403030100B75EA2 /* Pods_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */; };
 		4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */; };
 		4D1FFB132403030100B75EA2 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A223FCA3320004B309 /* libykpers-1.a */; };
 		4D1FFB142403030100B75EA2 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
@@ -484,6 +484,8 @@
 
 /* Begin PBXFileReference section */
 		0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.release.xcconfig"; sourceTree = "<group>"; };
+		16E4979B89A05E87EE4710DA /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
+		25312FC61159071EEA97749B /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		4D00B1F61F3DB03300D7560B /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Alerts.h; path = MacBox/Alerts.h; sourceTree = "<group>"; };
 		4D00B1F71F3DB03300D7560B /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Alerts.m; path = MacBox/Alerts.m; sourceTree = "<group>"; };
 		4D01BA2B22BD31F00044226F /* SearchScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchScope.h; path = ../model/SearchScope.h; sourceTree = "<group>"; };
@@ -1052,8 +1054,6 @@
 		4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractDatabaseMetadata.h; path = ../model/AbstractDatabaseMetadata.h; sourceTree = "<group>"; };
 		4DFF408E21807A0200B69383 /* PwSafeMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeMetadata.h; path = ../model/pwsafe/PwSafeMetadata.h; sourceTree = "<group>"; };
 		4DFF408F21807A0200B69383 /* PwSafeMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeMetadata.m; path = ../model/pwsafe/PwSafeMetadata.m; sourceTree = "<group>"; };
-		8226BDC94F5CC4BFEC5DB819 /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
-		8C4527BC2C332744D4401E3D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 		963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5775E930C35CCA891076DB8 /* Pods_Macbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Macbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1066,7 +1066,6 @@
 			files = (
 				4D1FFB0F2403030100B75EA2 /* StoreKit.framework in Frameworks */,
 				4D1FFB102403030100B75EA2 /* libjson.a in Frameworks */,
-				4D1FFB112403030100B75EA2 /* Pods_Strongbox.framework in Frameworks */,
 				4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */,
 				4D1FFB132403030100B75EA2 /* libykpers-1.a in Frameworks */,
 				4D1FFB142403030100B75EA2 /* FavIcon.framework in Frameworks */,
@@ -1094,6 +1093,7 @@
 				4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */,
 				4D59E2A523FCA3320004B309 /* libyubikey.a in Frameworks */,
 				4D59E2A423FCA3320004B309 /* libjson-c.a in Frameworks */,
+				010081483D01AD9ACEF16525 /* Pods_Strongbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1943,8 +1943,8 @@
 			children = (
 				F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */,
 				0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */,
-				8226BDC94F5CC4BFEC5DB819 /* Pods-Strongbox.debug.xcconfig */,
-				8C4527BC2C332744D4401E3D /* Pods-Strongbox.release.xcconfig */,
+				25312FC61159071EEA97749B /* Pods-Strongbox.debug.xcconfig */,
+				16E4979B89A05E87EE4710DA /* Pods-Strongbox.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -1956,11 +1956,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4D1FFB452403030100B75EA2 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro" */;
 			buildPhases = (
-				4D1FFA6B2403030100B75EA2 /* [CP] Check Pods Manifest.lock */,
 				4D1FFA6C2403030100B75EA2 /* Sources */,
 				4D1FFB0E2403030100B75EA2 /* Frameworks */,
 				4D1FFB172403030100B75EA2 /* Resources */,
-				4D1FFB422403030100B75EA2 /* [CP] Embed Pods Frameworks */,
 				4D1FFB432403030100B75EA2 /* Embed Frameworks */,
 			);
 			buildRules = (
@@ -2187,46 +2185,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4D1FFA6B2403030100B75EA2 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-Strongbox-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4D1FFB422403030100B75EA2 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/KissXML-macOS/KissXML.framework",
-				"${BUILT_PRODUCTS_DIR}/SAMKeychain/SAMKeychain.framework",
-				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SAMKeychain.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		B9829F49E8DC84BA018303E5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2253,13 +2211,11 @@
 			inputPaths = (
 				"${SRCROOT}/../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KissXML-macOS/KissXML.framework",
-				"${BUILT_PRODUCTS_DIR}/SAMKeychain/SAMKeychain.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SAMKeychain.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2922,7 +2878,6 @@
 /* Begin XCBuildConfiguration section */
 		4D1FFB462403030100B75EA2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8226BDC94F5CC4BFEC5DB819 /* Pods-Strongbox.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
@@ -2948,7 +2903,6 @@
 		};
 		4D1FFB472403030100B75EA2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8C4527BC2C332744D4401E3D /* Pods-Strongbox.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
@@ -3129,7 +3083,7 @@
 		};
 		4DF59F691F30DB7A00D68BFE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8226BDC94F5CC4BFEC5DB819 /* Pods-Strongbox.debug.xcconfig */;
+			baseConfigurationReference = 25312FC61159071EEA97749B /* Pods-Strongbox.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
@@ -3155,7 +3109,7 @@
 		};
 		4DF59F6A1F30DB7A00D68BFE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8C4527BC2C332744D4401E3D /* Pods-Strongbox.release.xcconfig */;
+			baseConfigurationReference = 16E4979B89A05E87EE4710DA /* Pods-Strongbox.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;

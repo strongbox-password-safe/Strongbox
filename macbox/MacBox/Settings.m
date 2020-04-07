@@ -62,7 +62,7 @@ static NSString* const kAllowWatchUnlock = @"allowWatchUnlock";
 static NSString* const kShowAttachmentsOnQuickViewPanel = @"showAttachmentsOnQuickViewPanel";
 static NSString* const kShowAttachmentImagePreviewsOnQuickViewPanel = @"showAttachmentImagePreviewsOnQuickViewPanel";
 static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmediatelyInOutline";
-static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
+
 static NSString* const kHideKeyFileNameOnLockScreen = @"hideKeyFileNameOnLockScreen";
 static NSString* const kDoNotRememberKeyFile = @"doNotRememberKeyFile";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
@@ -118,14 +118,6 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 
 - (void)setDoNotRememberKeyFile:(BOOL)doNotRememberKeyFile {
     [self setBool:kDoNotRememberKeyFile value:doNotRememberKeyFile];
-}
-
-- (BOOL)migratedToNewSecretStore {
-    return [self getBool:kMigratedToNewSecretStore];
-}
-
-- (void)setMigratedToNewSecretStore:(BOOL)migratedToNewSecretStore {
-    return [self setBool:kMigratedToNewSecretStore value:migratedToNewSecretStore];
 }
 
 - (BOOL)showPasswordImmediatelyInOutline {

@@ -38,6 +38,9 @@
 
     self.contentView.alpha = 1.0f;
     
+    self.iconImageView.hidden = YES;
+    self.iconImageView.image = nil;
+        
     [self setFlags:NO hasAttachments:NO];
     
     [self stopObservingOtpUpdateTimer];
@@ -64,7 +67,7 @@
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
     
-    self.iconImageView.image = icon;
+    self.iconImageView.image = hideIcon ? nil : icon;
     self.iconImageView.tintColor = tintColor;
     self.iconImageView.hidden = hideIcon;
     
@@ -95,7 +98,7 @@
     self.titleLabel.text = title;
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
     
-    self.iconImageView.image = icon;
+    self.iconImageView.image = hideIcon ? nil :icon;
     self.iconImageView.tintColor = nil;
     self.iconImageView.hidden = hideIcon;
     
@@ -157,7 +160,7 @@
         uint64_t remainingSeconds = self.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.otpToken.period);
         self.otpLabel.text = [NSString stringWithFormat:@"%@", self.otpToken.password];
         
-        self.otpLabel.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : UIColor.systemBlueColor;
+        self.otpLabel.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.systemBlueColor;
     
         self.otpLabel.alpha = 1;
         

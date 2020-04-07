@@ -128,6 +128,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             
             if(url == nil) {
                 NSLog(@"WARN: Could not resolve bookmark for database... will try the saved fileUrl...");
+                url = database.fileUrl;
             }
             else {
                 // URL / Bookmark may have changed...

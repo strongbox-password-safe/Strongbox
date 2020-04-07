@@ -26,7 +26,7 @@
 #import "CASGTableViewController.h"
 #import "PreferencesTableViewController.h"
 #import "FontManager.h"
-#import "WelcomeViewController.h"
+#import "WelcomeAddDatabaseViewController.h"
 #import "WelcomeCreateDoneViewController.h"
 #import "NSArray+Extensions.h"
 #import "FileManager.h"
@@ -43,6 +43,7 @@
 #import "BiometricsManager.h"
 #import "BookmarksHelper.h"
 #import "YubiManager.h"
+#import "WelcomeFreemiumViewController.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -79,9 +80,55 @@
     
     [self listenToNotifications];
     
+    [self setFreeTrialEndDateBasedOnIapPurchase]; // Update Free Trial Date
+
     if([Settings.sharedInstance getLaunchCount] == 1) {
+        [self doFirstLaunchTasks];
+    }
+}
+
+- (void)doFirstLaunchTasks {
+    if (Settings.sharedInstance.isProOrFreeTrial) {
+        NSLog(@"New User is already Pro or in Free Trial... Standard Onboarding");
         [self startOnboarding];
     }
+    else { // Only if not pro, free trial and no free trial purchase do we prompt to Opt-In to free trial...
+        NSLog(@"New User is not pro or in a free trial... Prompt for free trial opt in");
+
+        [self promptToOptInToFreeTrial];
+    }
+}
+
+- (void)promptToOptInToFreeTrial {
+    [self performSegueWithIdentifier:@"segueToFreemiumOnboarding" sender:nil];
+}
+
+- (void)onOptInToFreeTrialPromptDone:(BOOL)purchasedOrRestoredFreeTrial {
+    if (purchasedOrRestoredFreeTrial) {
+        NSLog(@"Successful Restoration or Free Trial Purchase!");
+        [self setFreeTrialEndDateBasedOnIapPurchase];
+        [self bindProOrFreeTrialUi];
+    }
+    
+    // Standard Onboarding...
+    
+    [self performSegueWithIdentifier:@"segueToWelcome" sender:nil];
+}
+
+- (void)setFreeTrialEndDateBasedOnIapPurchase {
+    NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
+    if (freeTrialPurchaseDate) {
+        NSLog(@"setFreeTrialEndDateBasedOnIapPurchase: [%@]", freeTrialPurchaseDate);
+        NSDate* endDate = [Settings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
+        Settings.sharedInstance.freeTrialEnd = endDate;
+    }
+    else {
+        NSLog(@"setFreeTrialEndDateBasedOnIapPurchase: No Free Trial purchase found.");
+    }
+}
+
+- (void)startOnboarding {
+    [self performSegueWithIdentifier:@"segueToWelcome" sender:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -403,16 +450,6 @@
 
 - (void)continueAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
     NSLog(@"continueAppActivationTasks...");
-
-    if(![[Settings sharedInstance] isPro]) {
-        if(![[Settings sharedInstance] isHavePromptedAboutFreeTrial]) {
-            if([Settings.sharedInstance getLaunchCount] > 5 || Settings.sharedInstance.daysInstalled > 2) {
-                [self performSegueWithIdentifier:@"segueToProExplanation" sender:nil];
-                [[Settings sharedInstance] setHavePromptedAboutFreeTrial:YES];
-                return;
-            }
-        }
-    }
     
     if([self isVisibleViewController]) {
         [self openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
@@ -551,10 +588,6 @@
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {
     [self startOnboarding];
-}
-
-- (void)startOnboarding {
-    [self performSegueWithIdentifier:@"segueToWelcome" sender:nil];
 }
 
 - (BOOL)isReasonablyNewUser {
@@ -736,7 +769,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self showDatabaseMoreActions:indexPath];
     }];
-    moreActions.backgroundColor = [UIColor blueColor];
+    moreActions.backgroundColor = [UIColor systemBlueColor];
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL offlineOption = safe.offlineCacheEnabled && safe.offlineCacheAvailable;
@@ -1077,34 +1110,21 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     else if ([segue.identifier isEqualToString:@"segueToWelcome"]) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
-        WelcomeViewController* vc = (WelcomeViewController*)nav.topViewController;
+        
+        WelcomeAddDatabaseViewController* vc = (WelcomeAddDatabaseViewController*)nav.topViewController;
         vc.onDone = ^(BOOL addExisting, SafeMetaData * _Nonnull databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
-                if(addExisting) {
-                    // Here we can check if the user enabled iCloud and we've found an existing database and ask if they
-                    // want to continue adding the database...
-            
-                    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                            if([SafesList.sharedInstance getSafesOfProvider:kiCloud].count) {
-                                [Alerts twoOptionsWithCancel:self
-                                                       title:NSLocalizedString(@"safes_vc_found_icloud_database", @"Informational message title - found an iCloud Database")
-                                                     message:NSLocalizedString(@"safes_vc_use_icloud_or_continue", @"question message, use iCloud database or select a different one")
-                                           defaultButtonText:NSLocalizedString(@"safes_vc_use_this_icloud_database", @"One of the options in response to prompt - Use this iCloud database")
-                                            secondButtonText:NSLocalizedString(@"safes_vc_add_another", @"Second option - Select another database")
-                                                      action:^(int response) {
-                                                          if(response == 1) {
-                                                              [self onAddExistingSafe];
-                                                          }
-                                                      }];
-                            }
-                            else {
-                                [self onAddExistingSafe];
-                            }
-                    });
-                }
-                else if(databaseToOpen) {
-                    [self openDatabase:databaseToOpen offline:NO userJustCompletedBiometricAuthentication:NO];
-                }
+                [self onOnboardingDoneWithAddDatabase:addExisting databaseToOpen:databaseToOpen];
+            }];
+        };
+    }
+    else if ([segue.identifier isEqualToString:@"segueToFreemiumOnboarding"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        
+        WelcomeFreemiumViewController* vc = (WelcomeFreemiumViewController*)nav.topViewController;
+        vc.onDone = ^(BOOL purchasedOrRestoredFreeTrial) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                [self onOptInToFreeTrialPromptDone:purchasedOrRestoredFreeTrial];
             }];
         };
     }
@@ -1148,6 +1168,35 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                 vc.modalInPresentation = YES;
             }
         }
+    }
+}
+
+- (void)onOnboardingDoneWithAddDatabase:(BOOL)addExisting
+                         databaseToOpen:(SafeMetaData*)databaseToOpen {
+    if(addExisting) {
+        // Here we can check if the user enabled iCloud and we've found an existing database and ask if they
+        // want to continue adding the database...
+
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                if([SafesList.sharedInstance getSafesOfProvider:kiCloud].count) {
+                    [Alerts twoOptionsWithCancel:self
+                                           title:NSLocalizedString(@"safes_vc_found_icloud_database", @"Informational message title - found an iCloud Database")
+                                         message:NSLocalizedString(@"safes_vc_use_icloud_or_continue", @"question message, use iCloud database or select a different one")
+                               defaultButtonText:NSLocalizedString(@"safes_vc_use_this_icloud_database", @"One of the options in response to prompt - Use this iCloud database")
+                                secondButtonText:NSLocalizedString(@"safes_vc_add_another", @"Second option - Select another database")
+                                          action:^(int response) {
+                                              if(response == 1) {
+                                                  [self onAddExistingSafe];
+                                              }
+                                          }];
+                }
+                else {
+                    [self onAddExistingSafe];
+                }
+        });
+    }
+    else if(databaseToOpen) {
+        [self openDatabase:databaseToOpen offline:NO userJustCompletedBiometricAuthentication:NO];
     }
 }
 
@@ -1436,24 +1485,33 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [self.buttonUpgrade setEnabled:YES];
     
         NSString *upgradeButtonTitle;
-        if([[Settings sharedInstance] isFreeTrial]) {
-            NSInteger daysLeft = [[Settings sharedInstance] getFreeTrialDaysRemaining];
-            
-            if(daysLeft > 30) {
-                upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title", @"Upgrade Button Title - Upgrade Info")];
+
+        if (Settings.sharedInstance.hasOptedInToFreeTrial) {
+            if([[Settings sharedInstance] isFreeTrial]) {
+                NSInteger daysLeft = Settings.sharedInstance.freeTrialDaysLeft;
+                
+                if(daysLeft > 30) {
+                    upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title", @"Upgrade Button Title - Upgrade Info")];
+                }
+                else {
+                    upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title_days_remaining", @"Upgrade Button Title with Days remaining of pro trial version"),
+                                      (long)daysLeft];
+                }
+                
+                if(daysLeft < 10) {
+                    [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
+                }
             }
             else {
-                upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title_days_remaining", @"Upgrade Button Title with Days remaining of pro trial version"),
-                                  (long)daysLeft];
-            }
-            
-            if(daysLeft < 10) {
-                [self.buttonUpgrade setTintColor: [UIColor redColor]];
+                upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Upgrade Button Title asking to Please Upgrade");
+                [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
             }
         }
         else {
-            upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_button_title_please_upgrade", @"Upgrade Button Title asking to Please Upgrade");
-            [self.buttonUpgrade setTintColor: [UIColor redColor]];
+            upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Upgrade Button Title - Upgrade Info");
+            if (Settings.sharedInstance.daysInstalled > 60) {
+                [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
+            }
         }
         
         [self.buttonUpgrade setTitle:upgradeButtonTitle];

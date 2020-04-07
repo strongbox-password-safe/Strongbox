@@ -351,7 +351,7 @@
         else {
             self.cellKeyFile.textLabel.text = NSLocalizedString(@"casg_key_file_select_action", @"Select...");
             self.cellKeyFile.detailTextLabel.text = NSLocalizedString(@"casg_key_file_configured_but_not_found", @"Configured Key File Not Found");
-            self.cellKeyFile.detailTextLabel.textColor = UIColor.redColor;
+            self.cellKeyFile.detailTextLabel.textColor = UIColor.systemRedColor;
         }
     }
     else {
@@ -526,7 +526,7 @@
     if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         BOOL uiNameValid = self.textFieldName.text.length == 0 || [self nameIsValid];
 
-        [self.cellDatabaseName setTintColor:uiNameValid ? nil : UIColor.redColor];
+        [self.cellDatabaseName setTintColor:uiNameValid ? nil : UIColor.systemRedColor];
         self.cellDatabaseName.accessoryView = uiNameValid ? nil : [[UIImageView alloc] initWithImage: [UIImage imageNamed:@"cancel"]];
 
         self.buttonDone.enabled = [self canCreate];
@@ -534,7 +534,7 @@
     else if(self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
         BOOL uiNameValid = !self.userHasChangedNameAtLeastOnce || self.textFieldName.text.length == 0 || [self nameIsValid];
         
-        [self.cellDatabaseName setTintColor:uiNameValid ? nil : UIColor.redColor];
+        [self.cellDatabaseName setTintColor:uiNameValid ? nil : UIColor.systemRedColor];
         self.cellDatabaseName.accessoryView = uiNameValid ? nil : [[UIImageView alloc] initWithImage: [UIImage imageNamed:@"cancel"]];
 
         self.buttonDone.enabled = [self nameIsValid];
@@ -599,18 +599,18 @@
             self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
                 NSLocalizedString(@"casg_yubikey_configured_mfi", @"Lightning") :
                 NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
         }
         else {
             self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
                 NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
                 NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
         }
 
         self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
             NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
-        self.cellYubiKey.detailTextLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.redColor;
+        self.cellYubiKey.detailTextLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
 
         self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];
     }

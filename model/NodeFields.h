@@ -41,6 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable, readonly) NSNumber *usageCount;
 
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
+
+@property (nonatomic, strong, nonnull) NSMutableSet<NSString*> *tags;
+
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
 @property NSMutableArray<Node*> *keePassHistory;
 

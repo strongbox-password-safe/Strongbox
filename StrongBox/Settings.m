@@ -13,23 +13,20 @@
 static const NSInteger kDefaultClearClipboardTimeout = 90;
 
 static NSString* const kLaunchCountKey = @"launchCount";
-static NSString* const kPromptedForReview = @"newPromptedForReview";
+
 static NSString* const kIsProKey = @"isPro";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
-static NSString* const kPromptedForCopyPasswordGesture = @"promptedForCopyPasswordGesture";
 
-static NSString* const kIsHavePromptedAboutFreeTrial = @"isHavePromptedAboutFreeTrial";
-static NSString* const kNeverShowForMacAppMessage = @"neverShowForMacAppMessage";
 static NSString* const kiCloudOn = @"iCloudOn";
 static NSString* const kiCloudWasOn = @"iCloudWasOn";
 static NSString* const kiCloudPrompted = @"iCloudPrompted";
-static NSString* const kSafesMigratedToNewSystem = @"safesMigratedToNewSystem";
+
 static NSString* const kInstallDate = @"installDate";
 static NSString* const kDisallowBiometricId = @"disallowBiometricId";
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
 static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunchWelcome";
-static NSString* const kHasShownKeePassBetaWarning = @"hasShownKeePassBetaWarning";
+
 static NSString* const kHideTips = @"hideTips";
 static NSString* const kDisallowAllPinCodeOpens = @"disallowAllPinCodeOpens";
 
@@ -55,8 +52,10 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
+NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
+
 static NSString* cachedAppGroupName;
 
 static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
@@ -72,7 +71,7 @@ static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectiv
 static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
-static NSString* const kMigratedToNewSecretStore = @"migratedToNewSecretStore";
+
 static NSString* const kAutoFillExitedCleanly = @"autoFillExitedCleanly";
 static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 
@@ -99,14 +98,68 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     return sharedInstance;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 - (NSString *)appGroupName {
     return cachedAppGroupName;
+}
+
+- (NSUserDefaults*)getSharedAppGroupDefaults {
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
+    
+    if(defaults == nil) {
+        NSLog(@"ERROR: Could not get NSUserDefaults for Suite Name: [%@]", self.appGroupName);
+    }
+    
+    return defaults;
+}
+
+- (NSString*)getString:(NSString*)key {
+    return [self getString:key fallback:nil];
+}
+
+- (NSString*)getString:(NSString*)key fallback:(NSString*)fallback {
+    NSString* obj = [[self getSharedAppGroupDefaults] objectForKey:key];
+    return obj != nil ? obj : fallback;
+}
+
+- (void)setString:(NSString*)key value:(NSString*)value {
+    [[self getSharedAppGroupDefaults] setObject:value forKey:key];
+    [[self getSharedAppGroupDefaults] synchronize];
+}
+
+- (BOOL)getBool:(NSString*)key {
+    return [self getBool:key fallback:NO];
+}
+
+- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
+    NSNumber* obj = [[self getSharedAppGroupDefaults] objectForKey:key];
+    return obj != nil ? obj.boolValue : fallback;
+}
+
+- (void)setBool:(NSString*)key value:(BOOL)value {
+    [[self getSharedAppGroupDefaults] setBool:value forKey:key];
+    [[self getSharedAppGroupDefaults] synchronize];
+}
+
+- (NSInteger)getInteger:(NSString*)key {
+    return [[self getSharedAppGroupDefaults] integerForKey:key];
+}
+
+- (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
+    NSNumber* obj = [[self getSharedAppGroupDefaults] objectForKey:key];
+    return obj != nil ? obj.integerValue : fallback;
+}
+
+- (void)setInteger:(NSString*)key value:(NSInteger)value {
+    [[self getSharedAppGroupDefaults] setInteger:value forKey:key];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)mfiYubiKeyEnabled {
-    return NO; // TODO:
+    return YES;
 }
 
 - (BOOL)colorizeUseColorBlindPalette {
@@ -125,14 +178,6 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     return [self setBool:kAutoFillExitedCleanly value:autoFillExitedCleanly];
 }
 
-- (BOOL)migratedToNewSecretStore {
-    return [self getBool:kMigratedToNewSecretStore];
-}
-
-- (void)setMigratedToNewSecretStore:(BOOL)migratedToNewSecretStore {
-    [self setBool:kMigratedToNewSecretStore value:migratedToNewSecretStore];
-}
-
 - (BOOL)clipboardHandoff {
     return [self getBool:kClipboardHandoff];
 }
@@ -142,7 +187,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (FavIconDownloadOptions *)favIconDownloadOptions {
-    NSUserDefaults *defaults = [self getUserDefaults];
+    NSUserDefaults *defaults = [self getSharedAppGroupDefaults];
     NSData *encodedObject = [defaults objectForKey:kFavIconDownloadOptions];
 
     if(encodedObject == nil) {
@@ -156,7 +201,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 
 - (void)setFavIconDownloadOptions:(FavIconDownloadOptions *)favIconDownloadOptions {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:favIconDownloadOptions];
-    NSUserDefaults *defaults = [self getUserDefaults];
+    NSUserDefaults *defaults = [self getSharedAppGroupDefaults];
     [defaults setObject:encodedObject forKey:kFavIconDownloadOptions];
     [defaults synchronize];
 }
@@ -242,7 +287,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (PasswordGenerationConfig *)passwordGenerationConfig {
-    NSUserDefaults *defaults = [self getUserDefaults];
+    NSUserDefaults *defaults = [self getSharedAppGroupDefaults];
     NSData *encodedObject = [defaults objectForKey:kPasswordGenerationConfig];
     
     if(encodedObject == nil) {
@@ -256,76 +301,9 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 
 - (void)setPasswordGenerationConfig:(PasswordGenerationConfig *)passwordGenerationConfig {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationConfig];
-    NSUserDefaults *defaults = [self getUserDefaults];
+    NSUserDefaults *defaults = [self getSharedAppGroupDefaults];
     [defaults setObject:encodedObject forKey:kPasswordGenerationConfig];
     [defaults synchronize];
-}
-
-- (NSUserDefaults*)getUserDefaults {
-    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:self.appGroupName];
-    
-    if(defaults == nil) {
-        NSLog(@"ERROR: Could not get NSUserDefaults for Suite Name: [%@]", self.appGroupName);
-    }
-    
-    return defaults;
-}
-
-- (NSString*)getString:(NSString*)key {
-    return [self getString:key fallback:nil];
-}
-
-- (NSString*)getString:(NSString*)key fallback:(NSString*)fallback {
-    NSString* obj = [[self getUserDefaults] objectForKey:key];
-    return obj != nil ? obj : fallback;
-}
-
-- (void)setString:(NSString*)key value:(NSString*)value {
-    [[self getUserDefaults] setObject:value forKey:key];
-    [[self getUserDefaults] synchronize];
-}
-
-//
-
-- (BOOL)getBool:(NSString*)key {
-    return [self getBool:key fallback:NO];
-}
-
-- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
-    NSNumber* obj = [[self getUserDefaults] objectForKey:key];
-    return obj != nil ? obj.boolValue : fallback;
-}
-
-- (void)setBool:(NSString*)key value:(BOOL)value {
-    [[self getUserDefaults] setBool:value forKey:key];
-    [[self getUserDefaults] synchronize];
-}
-
-//
-
-- (NSInteger)getInteger:(NSString*)key {
-    return [[self getUserDefaults] integerForKey:key];
-}
-
-- (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
-    NSNumber* obj = [[self getUserDefaults] objectForKey:key];
-    return obj != nil ? obj.integerValue : fallback;
-}
-
-- (void)setInteger:(NSString*)key value:(NSInteger)value {
-    [[self getUserDefaults] setInteger:value forKey:key];
-    [[self getUserDefaults] synchronize];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (BOOL)hasShownKeePassBetaWarning {
-    return [[self getUserDefaults] boolForKey:kHasShownKeePassBetaWarning];
-}
-
-- (void)setHasShownKeePassBetaWarning:(BOOL)hasShownKeePassBetaWarning {
-    [[self getUserDefaults] setBool:hasShownKeePassBetaWarning forKey:kHasShownKeePassBetaWarning];
-    [[self getUserDefaults] synchronize];
 }
 
 - (BOOL)isProOrFreeTrial
@@ -334,7 +312,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (void)setPro:(BOOL)value {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     [userDefaults setBool:value forKey:kIsProKey];
     
@@ -345,63 +323,40 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 
 - (BOOL)isPro
 {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     return [userDefaults boolForKey:kIsProKey];
 }
 
-- (void)setHavePromptedAboutFreeTrial:(BOOL)value {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    [userDefaults setBool:value forKey:kIsHavePromptedAboutFreeTrial];
-    
-    [userDefaults synchronize];
+- (BOOL)hasOptedInToFreeTrial {
+    return self.freeTrialEnd != nil;
 }
 
-- (BOOL)isHavePromptedAboutFreeTrial {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    return [userDefaults boolForKey:kIsHavePromptedAboutFreeTrial];
-}
-
-- (BOOL)isFreeTrial
-{
-    NSDate* date = [self getEndFreeTrialDate];
+- (BOOL)isFreeTrial {
+    NSDate* date = self.freeTrialEnd;
     
     if(date == nil) {
-        //NSLog(@"No Free Trial date set yet. Not in free trial.");
+        NSLog(@"No Free Trial date set yet. Not in free trial. User has not opted in to Free Trial.");
         return NO;
     }
     
     BOOL freeTrial = !([date timeIntervalSinceNow] < 0);
     
-    //NSLog(@"Free trial: %d Date: %@", freeTrial, date);
+    NSLog(@"Free trial: %d Date: %@ - days remaining = [%ld]", freeTrial, date, (long)self.freeTrialDaysLeft);
     
     return freeTrial;
 }
 
-- (NSDate*)getEndFreeTrialDate {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from {
+    NSCalendar *cal = [NSCalendar currentCalendar];
+
+    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:90 toDate:from options:0];
     
-    //[userDefaults removeObjectForKey:kEndFreeTrialDate];
-    
-    return [userDefaults objectForKey:kEndFreeTrialDate];
+    return date;
 }
 
-- (void)setEndFreeTrialDate:(NSDate*)value {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    [userDefaults setObject:value forKey:kEndFreeTrialDate];
-
-    NSLog(@"Set Free trial end date to %@", value);
-
-    [userDefaults synchronize];
-}
-
-- (NSInteger)getFreeTrialDaysRemaining {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    NSDate* date = [userDefaults objectForKey:kEndFreeTrialDate];
+- (NSInteger)freeTrialDaysLeft {
+    NSDate* date = self.freeTrialEnd;
     
     if(date == nil) {
         return -1;
@@ -416,22 +371,40 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     
     NSInteger days = [components day];
     
-    return days;
+    return days + 1;
+}
+
+- (NSDate *)freeTrialEnd {
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
+    
+    //[userDefaults removeObjectForKey:kEndFreeTrialDate];
+    
+    return [userDefaults objectForKey:kEndFreeTrialDate];
+}
+
+- (void)setFreeTrialEnd:(NSDate *)freeTrialEnd {
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
+    
+    [userDefaults setObject:freeTrialEnd forKey:kEndFreeTrialDate];
+
+    NSLog(@"Set Free trial end date to %@", freeTrialEnd);
+
+    [userDefaults synchronize];
 }
 
 - (NSDate*)installDate {
-    return [[self getUserDefaults] objectForKey:kInstallDate];
+    return [[self getSharedAppGroupDefaults] objectForKey:kInstallDate];
 }
 
 - (void)setInstallDate:(NSDate *)installDate {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     [userDefaults setObject:installDate forKey:kInstallDate];
     [userDefaults synchronize];
 }
 
 - (void)clearInstallDate {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     [userDefaults removeObjectForKey:kInstallDate];
     [userDefaults synchronize];
@@ -458,7 +431,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 
 - (NSInteger)getLaunchCount
 {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     NSInteger launchCount = [userDefaults integerForKey:kLaunchCountKey];
     
@@ -466,7 +439,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (void)resetLaunchCount {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     [userDefaults removeObjectForKey:kLaunchCountKey];
     
@@ -480,116 +453,66 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     
     NSLog(@"Application has been launched %ld times", (long)launchCount);
     
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     [userDefaults setInteger:launchCount forKey:kLaunchCountKey];
     
     [userDefaults synchronize];
 }
 
-- (NSInteger)isUserHasBeenPromptedForReview {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
- 
-    return [userDefaults integerForKey:kPromptedForReview];
-}
-
-- (void)setUserHasBeenPromptedForReview:(NSInteger)value {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    [userDefaults setInteger:value forKey:kPromptedForReview];
-
-    [userDefaults synchronize];
-}
-
-- (BOOL)isHasPromptedForCopyPasswordGesture {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-
-    return [userDefaults boolForKey:kPromptedForCopyPasswordGesture];
-}
-
-- (void)setHasPromptedForCopyPasswordGesture:(BOOL)value {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
-    
-    [userDefaults setBool:value forKey:kPromptedForCopyPasswordGesture];
-
-    [userDefaults synchronize];
-}
-
-- (void)setNeverShowForMacAppMessage:(BOOL)neverShowForMacAppMessage {
-    [[self getUserDefaults] setBool:neverShowForMacAppMessage forKey:kNeverShowForMacAppMessage];
-    
-    [[self getUserDefaults] synchronize];
-}
-
-- (BOOL)neverShowForMacAppMessage {
-    return [[self getUserDefaults] boolForKey:kNeverShowForMacAppMessage];
-}
-
-
 - (BOOL)iCloudOn {
-    return [[self getUserDefaults] boolForKey:kiCloudOn];
+    return [[self getSharedAppGroupDefaults] boolForKey:kiCloudOn];
 }
 
 - (void)setICloudOn:(BOOL)iCloudOn {
-    [[self getUserDefaults] setBool:iCloudOn forKey:kiCloudOn];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:iCloudOn forKey:kiCloudOn];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)iCloudWasOn {
-    return [[self getUserDefaults] boolForKey:kiCloudWasOn];
+    return [[self getSharedAppGroupDefaults] boolForKey:kiCloudWasOn];
 }
 
 -(void)setICloudWasOn:(BOOL)iCloudWasOn {
-    [[self getUserDefaults] setBool:iCloudWasOn forKey:kiCloudWasOn];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:iCloudWasOn forKey:kiCloudWasOn];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)iCloudPrompted {
-    return [[self getUserDefaults] boolForKey:kiCloudPrompted];
+    return [[self getSharedAppGroupDefaults] boolForKey:kiCloudPrompted];
 }
 
 - (void)setICloudPrompted:(BOOL)iCloudPrompted {
-    [[self getUserDefaults] setBool:iCloudPrompted forKey:kiCloudPrompted];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:iCloudPrompted forKey:kiCloudPrompted];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 //
 
 - (NSString*)getFlagsStringForDiagnostics {
-    return [NSString stringWithFormat:@"[%d%d%d%d[%ld]%ld%d%d%d%d%d%d]",
-    self.isHavePromptedAboutFreeTrial,
-    self.isProOrFreeTrial,
-    self.isPro,
-    self.isFreeTrial,
-    (long)self.getLaunchCount,
-    (long)self.isUserHasBeenPromptedForReview,
-    self.isHasPromptedForCopyPasswordGesture,
-    self.neverShowForMacAppMessage,
-    self.iCloudOn,
-    self.iCloudWasOn,
-    self.iCloudPrompted,
-    self.iCloudAvailable];
-}
-
-- (BOOL)safesMigratedToNewSystem {
-    return [[self getUserDefaults] boolForKey:kSafesMigratedToNewSystem];
-}
-
-- (void)setSafesMigratedToNewSystem:(BOOL)safesMigratedToNewSystem {
-    [[self getUserDefaults] setBool:safesMigratedToNewSystem forKey:kSafesMigratedToNewSystem];
-    [[self getUserDefaults] synchronize];
+    return [NSString stringWithFormat:@"[%d[%ld]%d%d%d[%ld]%d%d%d%d]",
+            self.hasOptedInToFreeTrial,
+            (long)self.freeTrialDaysLeft,
+            self.isProOrFreeTrial,
+            self.isPro,
+            self.isFreeTrial,
+            (long)self.getLaunchCount,
+            self.iCloudOn,
+            self.iCloudWasOn,
+            self.iCloudPrompted,
+            self.iCloudAvailable];
 }
 
 - (BOOL)disallowAllBiometricId {
-    return [[self getUserDefaults] boolForKey:kDisallowBiometricId];
+    return [[self getSharedAppGroupDefaults] boolForKey:kDisallowBiometricId];
 }
 
 - (void)setDisallowAllBiometricId:(BOOL)disallowAllBiometricId {
-    [[self getUserDefaults] setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:disallowAllBiometricId forKey:kDisallowBiometricId];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
-    NSData *data = [[self getUserDefaults] objectForKey:kAutoFillNewRecordSettings];
+    NSData *data = [[self getSharedAppGroupDefaults] objectForKey:kAutoFillNewRecordSettings];
     
     if(data) {
         return (AutoFillNewRecordSettings *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -601,44 +524,44 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 - (void)setAutoFillNewRecordSettings:(AutoFillNewRecordSettings *)autoFillNewRecordSettings {
     NSData *encoded = [NSKeyedArchiver archivedDataWithRootObject:autoFillNewRecordSettings];
     
-    [[self getUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)showKeePassCreateSafeOptions {
-    return [[self getUserDefaults] boolForKey:kShowKeePassCreateSafeOptions];
+    return [[self getSharedAppGroupDefaults] boolForKey:kShowKeePassCreateSafeOptions];
 }
 
 - (void)setShowKeePassCreateSafeOptions:(BOOL)showKeePassCreateSafeOptions {
-    [[self getUserDefaults] setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)hasShownAutoFillLaunchWelcome {
-    return [[self getUserDefaults] boolForKey:kHasShownAutoFillLaunchWelcome];
+    return [[self getSharedAppGroupDefaults] boolForKey:kHasShownAutoFillLaunchWelcome];
 }
 
 - (void)setHasShownAutoFillLaunchWelcome:(BOOL)hasShownAutoFillLaunchWelcome {
-    [[self getUserDefaults] setBool:hasShownAutoFillLaunchWelcome forKey:kHasShownAutoFillLaunchWelcome];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:hasShownAutoFillLaunchWelcome forKey:kHasShownAutoFillLaunchWelcome];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)hideTips {
-    return [[self getUserDefaults] boolForKey:kHideTips];
+    return [[self getSharedAppGroupDefaults] boolForKey:kHideTips];
 }
 
 - (void)setHideTips:(BOOL)hideTips {
-    [[self getUserDefaults] setBool:hideTips forKey:kHideTips];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:hideTips forKey:kHideTips];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)disallowAllPinCodeOpens {
-    return [[self getUserDefaults] boolForKey:kDisallowAllPinCodeOpens];
+    return [[self getSharedAppGroupDefaults] boolForKey:kDisallowAllPinCodeOpens];
 }
 
 - (void)setDisallowAllPinCodeOpens:(BOOL)disallowAllPinCodeOpens {
-    [[self getUserDefaults] setBool:disallowAllPinCodeOpens forKey:kDisallowAllPinCodeOpens];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setBool:disallowAllPinCodeOpens forKey:kDisallowAllPinCodeOpens];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)clearClipboardEnabled {
@@ -665,7 +588,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (NSDate *)lastEntitlementCheckAttempt {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     //[userDefaults removeObjectForKey:kEndFreeTrialDate];
     
@@ -673,7 +596,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (void)setLastEntitlementCheckAttempt:(NSDate *)lastEntitlementCheckAttempt {
-    NSUserDefaults *userDefaults = [self getUserDefaults];
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     [userDefaults setObject:lastEntitlementCheckAttempt forKey:kLastEntitlementCheckAttempt];
     
@@ -681,14 +604,14 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (NSUInteger)numberOfEntitlementCheckFails {
-    NSInteger ret =  [[self getUserDefaults] integerForKey:kNumberOfEntitlementCheckFails];
+    NSInteger ret =  [[self getSharedAppGroupDefaults] integerForKey:kNumberOfEntitlementCheckFails];
     return ret;
 }
 
 
 - (void)setNumberOfEntitlementCheckFails:(NSUInteger)numberOfEntitlementCheckFails {
-    [[self getUserDefaults] setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -712,49 +635,49 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (AppLockMode)appLockMode {
-    return [[self getUserDefaults] integerForKey:kAppLockMode];
+    return [[self getSharedAppGroupDefaults] integerForKey:kAppLockMode];
 }
 
 - (void)setAppLockMode:(AppLockMode)appLockMode {
-    [[self getUserDefaults] setInteger:appLockMode forKey:kAppLockMode];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setInteger:appLockMode forKey:kAppLockMode];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (NSString *)appLockPin {
-    return [[self getUserDefaults] objectForKey:kAppLockPin];
+    return [[self getSharedAppGroupDefaults] objectForKey:kAppLockPin];
 }
 
 -(void)setAppLockPin:(NSString *)appLockPin {
-    [[self getUserDefaults] setObject:appLockPin forKey:kAppLockPin];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setObject:appLockPin forKey:kAppLockPin];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (NSInteger)appLockDelay {
-    NSInteger ret =  [[self getUserDefaults] integerForKey:kAppLockDelay];
+    NSInteger ret =  [[self getSharedAppGroupDefaults] integerForKey:kAppLockDelay];
     return ret;
 }
 
 -(void)setAppLockDelay:(NSInteger)appLockDelay {
-    [[self getUserDefaults] setInteger:appLockDelay forKey:kAppLockDelay];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setInteger:appLockDelay forKey:kAppLockDelay];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (NSInteger)deleteDataAfterFailedUnlockCount {
-    return [[self getUserDefaults] integerForKey:kDeleteDataAfterFailedUnlockCount];
+    return [[self getSharedAppGroupDefaults] integerForKey:kDeleteDataAfterFailedUnlockCount];
 }
 
 - (void)setDeleteDataAfterFailedUnlockCount:(NSInteger)deleteDataAfterFailedUnlockCount {
-    [[self getUserDefaults] setInteger:deleteDataAfterFailedUnlockCount forKey:kDeleteDataAfterFailedUnlockCount];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setInteger:deleteDataAfterFailedUnlockCount forKey:kDeleteDataAfterFailedUnlockCount];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (NSUInteger)failedUnlockAttempts {
-    return [[self getUserDefaults] integerForKey:kFailedUnlockAttempts];
+    return [[self getSharedAppGroupDefaults] integerForKey:kFailedUnlockAttempts];
 }
 
 - (void)setFailedUnlockAttempts:(NSUInteger)failedUnlockAttempts {
-    [[self getUserDefaults] setInteger:failedUnlockAttempts forKey:kFailedUnlockAttempts];
-    [[self getUserDefaults] synchronize];
+    [[self getSharedAppGroupDefaults] setInteger:failedUnlockAttempts forKey:kFailedUnlockAttempts];
+    [[self getSharedAppGroupDefaults] synchronize];
 }
 
 - (BOOL)appLockAppliesToPreferences {

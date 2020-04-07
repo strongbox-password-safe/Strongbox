@@ -66,16 +66,19 @@
         self.labelOtp.text = [NSString stringWithFormat:@"%@", self.otpToken.password];
         
         if (@available(iOS 13.0, *)) {
-            self.labelOtp.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : UIColor.labelColor;
+            self.labelOtp.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.labelColor;
         }
         else {
-            self.labelOtp.textColor = (remainingSeconds < 5) ? [UIColor redColor] : (remainingSeconds < 9) ? [UIColor orangeColor] : [UIColor blueColor];
+            self.labelOtp.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.systemBlueColor;
         }
         
         self.labelOtp.alpha = 1;
         
         if(remainingSeconds < 16) {
-            [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
+            [UIView animateWithDuration:0.45
+                                  delay:0.0
+                                options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse
+                             animations:^{
                 self.labelOtp.alpha = 0.5;
             } completion:nil];
         }

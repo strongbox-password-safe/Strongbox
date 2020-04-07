@@ -123,14 +123,14 @@
     UITableViewRowAction *editAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Edit" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self editItem:indexPath];
     }];
-    editAction.backgroundColor = UIColor.blueColor;
+    editAction.backgroundColor = UIColor.systemBlueColor;
     
     UITableViewRowAction *toggleProtectAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:item.protected ? @"Unprotect" : @"Protect" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         item.protected = !item.protected;
         self.dirty = YES;
         [self refresh];
     }];
-    toggleProtectAction.backgroundColor = UIColor.orangeColor;
+    toggleProtectAction.backgroundColor = UIColor.systemOrangeColor;
     
     return @[removeAction, editAction, toggleProtectAction];
 }

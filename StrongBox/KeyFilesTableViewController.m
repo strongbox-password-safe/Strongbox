@@ -404,7 +404,7 @@
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self importLocalFile:indexPath];
     }];
-    importAction.backgroundColor = UIColor.blueColor;
+    importAction.backgroundColor = UIColor.systemBlueColor;
     
     return indexPath.section == 2 ? @[removeAction, importAction] : @[removeAction];
 }

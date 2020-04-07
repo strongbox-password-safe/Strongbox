@@ -18,8 +18,6 @@
 #import "BiometricIdHelper.h"
 #import "ViewController.h"
 #import "DatabasesManager.h"
-#import <SAMKeychain/SAMKeychain.h> // TODO: Remove in April 2020 after migrations...
-
 //#import "DAVKit.h"
 
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
@@ -158,60 +156,6 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)performMigrations {
-    if(!Settings.sharedInstance.migratedToNewSecretStore) {
-        [self migrateToNewSecretStore];
-    }
-}
-
-- (void)migrateToNewSecretStore {
-    Settings.sharedInstance.migratedToNewSecretStore = YES;
-
-    // Fail Safe: First unenrol anyone enrolled - so in case of failure we will ask them to re-enrol naturally..
-    
-    NSMutableArray<DatabaseMetadata*>* enrolled = @[].mutableCopy;
-    for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
-        if(database.isTouchIdEnabled) {
-            if(database.hasPromptedForTouchIdEnrol) {
-                [enrolled addObject:database];
-                database.hasPromptedForTouchIdEnrol = NO;
-                [DatabasesManager.sharedInstance update:database];
-            }
-        }
-    }
-    
-    // Could Crash on Mac 10.11 beyond this point... but that will only happen once...
-    
-    static NSString* const kKeychainService = @"Strongbox";
-
-    for (DatabaseMetadata* database in enrolled) {
-        NSLog(@"Migrating Convenience Unlock enabled database [%@]", database.nickName);
-    
-        // Password
-        
-        NSError *error;
-        NSData * ret = [SAMKeychain passwordDataForService:kKeychainService account:database.uuid error:&error];
-        if(ret) {
-            NSString* password = [[NSString alloc] initWithData:ret encoding:NSUTF8StringEncoding];
-            [database resetConveniencePasswordWithCurrentConfiguration:password];
-        }
-        
-        // Restore Enrolled Prompted Status
-        
-        database.hasPromptedForTouchIdEnrol = YES;
-        [DatabasesManager.sharedInstance update:database];
-    }
-    
-    // Clean up old SAM Keychain records
-    
-    NSArray<NSDictionary<NSString*, id>*>* accounts = [SAMKeychain accountsForService:kKeychainService];
-    for (NSDictionary<NSString*, id>* account in accounts) {
-        NSString* acc = account[kSAMKeychainAccountKey];
-        if(acc) {
-            //NSString* pw = [SAMKeychain passwordForService:kKeychainService account:acc];
-            NSLog(@"Found old account: [%@]", acc);
-            [SAMKeychain deletePasswordForService:kKeychainService account:acc];
-        }
-    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {

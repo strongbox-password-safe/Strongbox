@@ -1424,18 +1424,14 @@ static NSString* trimField(NSTextField* textField) {
 #pragma mark - QR Code Generator
 
 - (CIImage *)createQRForString:(NSString *)qrString {
-    NSData *stringData = [qrString dataUsingEncoding:NSUTF8StringEncoding];
+    NSData *stringData = [qrString dataUsingEncoding:NSISOLatin1StringEncoding];
 
-    // Create the filter
-    
     CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
     
     // Set the message content and error-correction level
     
     [qrFilter setValue:stringData forKey:@"inputMessage"];
     [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
-
-    // Send the image back
     
     return qrFilter.outputImage;
 }
@@ -1450,6 +1446,8 @@ static NSString* trimField(NSTextField* textField) {
 
     // NSLog(@"Scaling by %f to %f pixels", scale, size);
 
+    //CGAffineTransform transform = CGAffineTransformMakeScale(5.0f, 5.0f); // Scale by 5 times along both dimensions CIImage *output = [image imageByApplyingTransform: transform];
+    
     CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
 
     CIImage *qrCode = [input imageByApplyingTransform:transform];

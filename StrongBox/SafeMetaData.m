@@ -58,7 +58,7 @@
         self.longPressTapAction = kBrowseTapActionCopyUsername;
 
         self.colorizePasswords = YES;
-        self.keePassIconSet = kKeePassIconSetClassic;
+        self.keePassIconSet = kKeePassIconSetSfSymbols;
     }
     
     return self;
@@ -73,8 +73,6 @@
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
-        
-        self.keePassIconSet = kKeePassIconSetSfSymbols; // TODO: Make this default for everyone if soft launch is received well
     }
     
     return self;
@@ -166,6 +164,7 @@
     [encoder encodeObject:self.yubiKeyConfig forKey:@"yubiKeyConfig"];
     [encoder encodeBool:self.colorizePasswords forKey:@"colorizePasswords"];
     [encoder encodeInteger:self.keePassIconSet forKey:@"keePassIconSet"];
+    [encoder encodeBool:self.colorizeProtectedCustomFields forKey:@"colorizeProtectedCustomFields"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -353,6 +352,10 @@
         
         if([decoder containsValueForKey:@"keePassIconSet"]) {
             self.keePassIconSet = [decoder decodeIntegerForKey:@"keePassIconSet"];
+        }
+        
+        if([decoder containsValueForKey:@"colorizeProtectedCustomFields"]) {
+            self.colorizeProtectedCustomFields = [decoder decodeBoolForKey:@"colorizeProtectedCustomFields"];
         }
     }
     

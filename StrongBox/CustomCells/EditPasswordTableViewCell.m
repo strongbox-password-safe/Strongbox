@@ -127,6 +127,11 @@
 
         return NO;
     }
+//    else if ([text isEqualToString:@"\t"]) {
+//        NSLog(@"tab...");
+//        [textView resignFirstResponder];
+//        [textView.nextResponder becomeFirstResponder];
+//    }
     
     return NO;
 }

@@ -69,7 +69,7 @@
         }
         
         self.labelUnlockAttemptsRemaining.hidden = NO;
-        self.labelUnlockAttemptsRemaining.textColor = UIColor.redColor;
+        self.labelUnlockAttemptsRemaining.textColor = UIColor.systemRedColor;
     }
     else {
         self.labelUnlockAttemptsRemaining.hidden = YES;

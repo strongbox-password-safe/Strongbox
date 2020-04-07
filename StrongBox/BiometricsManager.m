@@ -177,6 +177,21 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
     return biometricIdName;
 }
 
+- (BOOL)isFaceId {
+    if (@available(iOS 11.0, *)) {
+        NSError* error;
+        LAContext *localAuthContext = [[LAContext alloc] init];
+        
+        if([localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error]) {
+            if (localAuthContext.biometryType == LABiometryTypeFaceID ) {
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
+}
+
 - (BOOL)requestBiometricId:(NSString*)reason
                 completion:(void(^)(BOOL success, NSError * __nullable error))completion {
     return [self requestBiometricId:reason fallbackTitle:nil completion:completion];

@@ -13,7 +13,7 @@
 #import "Alerts.h"
 #import <ISMessages/ISMessages.h>
 #import "Settings.h"
-#import "SafeDetailsView.h"
+#import "DatabaseOperations.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
 #import "NodeIconHelper.h"
@@ -28,6 +28,7 @@
 #import "DatabaseSearchAndSorter.h"
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
+#import "DatabasePreferencesController.h"
 
 const NSUInteger kSectionIdxPinned = 0;
 const NSUInteger kSectionIdxNearlyExpired = 1;
@@ -62,8 +63,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property BOOL hasAlreadyAppeared;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonViewPreferences;
-
 @property NSTimer* timerRefreshOtp;
 
 @end
@@ -142,15 +141,35 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [self maybeShowNagScreen];
     }
     
-    NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
-    [rightBarButtons insertObject:self.editButtonItem atIndex:0];
-    self.navigationItem.rightBarButtonItems = rightBarButtons;
+    // Add an edit button to the top right
+    
+    if (self.navigationItem.rightBarButtonItems) {
+        NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
+        [rightBarButtons insertObject:self.editButtonItem atIndex:0];
+        self.navigationItem.rightBarButtonItems = rightBarButtons;
+    }
+    else {
+        self.navigationItem.rightBarButtonItem = self.editButtonItem;
+    }
     
     [self refreshItems];
-    
+        
+    [self listenToNotifications];
+}
+
+- (void)listenToNotifications {
     if(self.splitViewController) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showDetailTargetDidChange:) name:UIViewControllerShowDetailTargetDidChangeNotification object:self.splitViewController];
     }
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseViewPreferencesChanged:)
+                                               name:kDatabaseViewPreferencesChangedNotificationKey
+                                             object:nil];
+}
+
+- (void)onDatabaseViewPreferencesChanged:(id)param {
+    [self refreshItems];
 }
 
 - (void)maybeShowNagScreen {
@@ -159,7 +178,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
 
     NSInteger percentageChanceOfShowing;
-    NSInteger freeTrialDays = [Settings.sharedInstance getFreeTrialDaysRemaining];
+    NSInteger freeTrialDays = Settings.sharedInstance.freeTrialDaysLeft; // TODO: What if user has not opted in? If install date > 60 -> nag
 
     if(freeTrialDays > 40) {
         NSLog(@"More than 40 days left in free trial... not showing Nag Screen");
@@ -231,9 +250,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)enableDisableToolbarButtons {
     BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
     
-    self.buttonAddRecord.enabled = !ro && !self.isEditing && self.currentGroup.childRecordsAllowed;
+    self.buttonAddRecord.enabled = !ro && !self.isEditing;
     self.buttonSafeSettings.enabled = !self.isEditing;
-    self.buttonViewPreferences.enabled = !self.isEditing;
     
     self.buttonMove.enabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
     self.buttonDelete.enabled = !ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0;
@@ -244,14 +262,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-desc" : @"sort-asc"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-desc" : @"sort-asc"];
     
     [self.buttonSortItems setImage:sortImage];
-    
-    self.buttonAddGroup.enabled = !ro && !self.isEditing;
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animate {
     [super setEditing:editing animated:animate];
     
-    NSLog(@"setEditing: %d", editing);
+//    NSLog(@"setEditing: %d", editing);
     
     [self enableDisableToolbarButtons];
     
@@ -291,7 +307,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                                           NSLocalizedString(@"browse_vc_search_scope_username", @"Username"),
                                                           NSLocalizedString(@"browse_vc_search_scope_password", @"Password"),
                                                           NSLocalizedString(@"browse_vc_search_scope_url", @"URL"),
-                                                          NSLocalizedString(@"browse_vc_search_scope_all", @"All Fields")];
+                                                          NSLocalizedString(@"browse_vc_search_scope_tags", @"Tags"),
+                                                          NSLocalizedString(@"browse_vc_search_scope_all", @"All")];
     self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
 }
 
@@ -466,7 +483,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                              message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
                     }
                     else {
-                        if([self isPinned:item]) {
+                        if([self.viewModel isPinned:item]) {
                             // Also Unpin
                             [self togglePinEntry:item];
                         }
@@ -584,7 +601,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else {
         removeAction.image = [UIImage imageNamed:@"trash"];
     }
-    removeAction.backgroundColor = UIColor.redColor;
+    removeAction.backgroundColor = UIColor.systemRedColor;
     
     return removeAction;
 }
@@ -602,7 +619,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else {
         renameAction.image = [UIImage imageNamed:@"pencil"];
     }
-    renameAction.backgroundColor = UIColor.blueColor;
+    renameAction.backgroundColor = UIColor.systemBlueColor;
     
     return renameAction;
 }
@@ -624,7 +641,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         setIconAction.image = [UIImage imageNamed:@"picture"];
     }
 
-    setIconAction.backgroundColor = UIColor.orangeColor;
+    setIconAction.backgroundColor = UIColor.systemOrangeColor;
 
     return setIconAction;
 }
@@ -645,7 +662,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         duplicateItemAction.image = [UIImage imageNamed:@"duplicate"];
     }
 
-    duplicateItemAction.backgroundColor = UIColor.purpleColor;
+    duplicateItemAction.backgroundColor = UIColor.systemPurpleColor;
 
     return duplicateItemAction;
 }
@@ -653,7 +670,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (UIContextualAction*)getPinAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
     Node *item = [self getNodeFromIndexPath:indexPath];
     
-    BOOL pinned = [self isPinned:item];
+    BOOL pinned = [self.viewModel isPinned:item];
     
     UIContextualAction *pinAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
                                                                                title:pinned ?
@@ -714,7 +731,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onRenameItem:indexPath];
     }];
-    renameAction.backgroundColor = UIColor.blueColor;
+    renameAction.backgroundColor = UIColor.systemBlueColor;
     
     UITableViewRowAction *setIconAction =
         [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
@@ -723,17 +740,17 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onSetIconForItem:indexPath];
     }];
-    setIconAction.backgroundColor = UIColor.orangeColor;
+    setIconAction.backgroundColor = UIColor.systemOrangeColor;
 
     UITableViewRowAction *duplicateItemAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                                    title:NSLocalizedString(@"browse_vc_action_duplicate", @"Duplicate")
                                                                                  handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self duplicateItem:item];
     }];
-    duplicateItemAction.backgroundColor = UIColor.purpleColor;
+    duplicateItemAction.backgroundColor = UIColor.systemPurpleColor;
     
     UITableViewRowAction *pinAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                         title:[self isPinned:item] ?
+                                                                         title:[self.viewModel isPinned:item] ?
                                        NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") :
                                        NSLocalizedString(@"browse_vc_action_pin", @"Pin")
                                                                                  handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
@@ -754,36 +771,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
 }
 
-- (BOOL)isPinned:(Node*)item {
-    NSMutableSet<NSString*>* favs = [NSMutableSet setWithArray:self.viewModel.metadata.favourites];
-    NSString* sid = [item getSerializationId:self.viewModel.database.format != kPasswordSafe];
-    return [favs containsObject:sid];
-}
-
 - (void)togglePinEntry:(Node*)item {
-    NSMutableSet<NSString*>* favs = [NSMutableSet setWithArray:self.viewModel.metadata.favourites];
-    NSString* sid = [item getSerializationId:self.viewModel.database.format != kPasswordSafe];
-
-    if([self isPinned:item]) {
-        [favs removeObject:sid];
-    }
-    else {
-        [favs addObject:sid];
-    }
-    
-    // Trim - by search DB and mapping back...
-    
-    NSArray<Node*>* pinned = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        NSString* sid = [node getSerializationId:self.viewModel.database.format != kPasswordSafe];
-        return [favs containsObject:sid];
-    }];
-    NSArray<NSString*>* trimmed = [pinned map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [obj getSerializationId:self.viewModel.database.format != kPasswordSafe];
-    }];
-    
-    self.viewModel.metadata.favourites = trimmed;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-    
+    [self.viewModel togglePin:item];
     [self refreshItems];
 }
 
@@ -844,13 +833,14 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 // Data Sources
 
 - (NSArray<Node*>*)loadPinnedItems {
-    if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.metadata.favourites.count) {
+    if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.pinnedSet.count) {
         return @[];
     }
     
-    NSSet<NSString*>* set = [NSSet setWithArray:self.viewModel.metadata.favourites];
+    NSSet<NSString*> *set = self.viewModel.pinnedSet;
     
-    NSArray<Node*>* pinned = [self.viewModel.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+    NSArray<Node*>* pinned = [self.viewModel.database.rootGroup filterChildren:YES
+                                                                     predicate:^BOOL(Node * _Nonnull node) {
         NSString* sid = [node getSerializationId:self.viewModel.database.format != kPasswordSafe];
         return [set containsObject:sid];
     }];
@@ -1021,8 +1011,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             self.viewModel.metadata.showQuickViewNearlyExpired ||
             self.viewModel.metadata.showQuickViewExpired) {
             NSUInteger countRows = [self getQuickViewRowCount];
-            
-//            NSString* standardViewName = [BrowsePreferencesTableViewController getBrowseViewTypeName:self.viewModel.metadata.browseViewType];
             return countRows ? NSLocalizedString(@"browse_vc_section_title_standard_view", @"Standard View Sections Header") : nil;
         }
     }
@@ -1052,7 +1040,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else {
         BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
-        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
+        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @""; // [node.fields.tags.allObjects componentsJoinedByString:@", "];
 
         if(node.isGroup) {
             BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
@@ -1065,7 +1053,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                     italic:italic
              groupLocation:groupLocation
                  tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil
-                    pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+                    pinned:self.viewModel.metadata.showFlagsInBrowse ? [self.viewModel isPinned:node] : NO
                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }
         else {
@@ -1075,7 +1063,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                    subtitle:subtitle
                        icon:icon
               groupLocation:groupLocation
-                     pinned:self.viewModel.metadata.showFlagsInBrowse ? [self isPinned:node] : NO
+                     pinned:self.viewModel.metadata.showFlagsInBrowse ? [self.viewModel isPinned:node] : NO
              hasAttachments:self.viewModel.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
                     expired:node.expired
                    otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
@@ -1091,6 +1079,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(self.viewModel.metadata.doubleTapAction == kBrowseTapActionNone && self.viewModel.metadata.tripleTapAction == kBrowseTapActionNone) { // No need for timer or delay if no double/triple tap actions...
+        NSLog(@"Expediting Single Tap action as no double/triple tap actions set");
+        [self handleSingleTap:indexPath];
+        return;
+    }
+    
     if(self.tapCount == 2 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]) {
         [self.tapTimer invalidate];
         self.tapTimer = nil;
@@ -1105,9 +1099,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
     }
     else if(self.tapCount == 0) {
-        //This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
+        // This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
         self.tapCount = self.tapCount + 1;
         self.tappedIndexPath = indexPath;
+        NSLog(@"Got tap... waiting...");
         self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
     }
     else if(![self.tappedIndexPath isEqual:indexPath]){
@@ -1211,10 +1206,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             }];
         };
     }
-    else if ([segue.identifier isEqualToString:@"segueToSafeSettings"])
-    {
+    else if ([segue.identifier isEqualToString:@"segueToPreferencesAndManagement"]) {
         UINavigationController* nav = segue.destinationViewController;
-        SafeDetailsView *vc = (SafeDetailsView *)nav.topViewController;
+        
+        DatabasePreferencesController *vc = (DatabasePreferencesController*)nav.topViewController;
         vc.viewModel = self.viewModel;
         vc.onDatabaseBulkIconUpdate = ^(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
             for(Node* node in self.viewModel.database.activeRecords) {
@@ -1223,18 +1218,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                     [self setCustomIcon:node image:img];
                 }
             }
-            
-            [self saveChangesToSafeAndRefreshView]; // TODO: This is called from SafeDetailsView do we need a spinner?
-        };
-    }
-    else if([segue.identifier isEqualToString:@"segueToViewSettings"]) {
-        UINavigationController* nav = segue.destinationViewController;
-        BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)nav.topViewController;
-        vc.format = self.viewModel.database.format;
-        vc.databaseMetaData = self.viewModel.metadata;
-        
-        vc.onPreferencesChanged = ^{
-            [self refreshItems];
+            [self saveChangesToSafeAndRefreshView];
         };
     }
     else if([segue.identifier isEqualToString:@"segueToSortOrder"]){
@@ -1265,7 +1249,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (IBAction)onAddGroup:(id)sender {
+- (IBAction)onDatabasePreferences:(id)sender {
+    [self performSegueWithIdentifier:@"segueToPreferencesAndManagement" sender:nil];
+}
+
+- (void)onAddGroup {
     [Alerts OkCancelWithTextField:self
              textFieldPlaceHolder:NSLocalizedString(@"browse_vc_group_name", @"Group Name")
                             title:NSLocalizedString(@"browse_vc_enter_group_name", @"Enter Group Name")
@@ -1284,8 +1272,24 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                        }];
 }
 
-- (IBAction)onAddRecord:(id)sender {
-    [self showEntry:nil editImmediately:YES];
+- (IBAction)onAddItem:(id)sender {
+    NSString* locEntry = NSLocalizedString(@"browse_add_entry_button_title", @"Add Entry...");
+    NSString* locGroup = NSLocalizedString(@"browse_add_group_button_title", @"Add Group...");
+    
+    NSArray* options = self.currentGroup.childRecordsAllowed ? @[locGroup, locEntry] : @[locGroup];
+    
+    [Alerts actionSheet:self
+              barButton:self.buttonAddRecord
+                  title:@"Would you like to add an entry or a group?"
+           buttonTitles:options
+             completion:^(int response) {
+        if (response == 1) {
+            [self onAddGroup];
+        }
+        else if (response == 2) {
+            [self showEntry:nil editImmediately:YES];
+        }
+    }];
 }
 
 - (void)editEntry:(Node*)item {
@@ -1387,7 +1391,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                            
                             // Also Unpin
                            
-                           if([self isPinned:item]) {
+                           if([self.viewModel isPinned:item]) {
                                [self togglePinEntry:item];
                            }
                        }
@@ -1688,10 +1692,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (IBAction)onViewPreferences:(id)sender {
-    [self performSegueWithIdentifier:@"segueToViewSettings" sender:nil];
-}
 
 - (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
     NSString *text = @"";

@@ -30,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isBiometricDatabaseStateHasChanged:(BOOL)autoFill;
 - (void)clearBiometricRecordedDatabaseState;
 
+- (BOOL)isFaceId;
+
 @end
 
 NS_ASSUME_NONNULL_END

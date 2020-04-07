@@ -62,6 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull urlSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull passwordSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull tagSet;
 
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
 @property (nonatomic, readonly) NSString* _Nonnull mostPopularEmail;
@@ -82,6 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
+- (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node;
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 

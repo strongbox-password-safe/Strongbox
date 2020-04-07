@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) Times* times;
 @property (nonatomic) NSMutableArray<Binary*> *binaries;
 @property (nonatomic) History* history;
+@property (nonatomic) NSMutableSet<NSString*> *tags;
 
 @property (nonatomic, nullable) NSNumber* icon;
 @property (nonatomic, nullable) NSUUID* customIcon;

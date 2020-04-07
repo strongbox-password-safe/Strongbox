@@ -14,10 +14,12 @@
 #import "CacheManager.h"
 #import "PasswordMaker.h"
 #import "BackupsManager.h"
+#import "NSArray+Extensions.h"
 
 @interface Model ()
 
 @property (nonnull) NSData* lastSnapshot;
+@property NSSet<NSString*> *cachedPinned;
 
 @end
 
@@ -40,7 +42,8 @@
         _storageProvider = provider;
         _cacheMode = cacheMode;
         _isReadOnly = isReadOnly || metaData.readOnly;
-
+        _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
+        
         return self;
     }
     else {
@@ -239,6 +242,50 @@
         [child.parent removeChild:child];
         return YES;
     }
+}
+
+// Pinned or Not?
+
+- (NSSet<NSString*>*)pinnedSet {
+    return self.cachedPinned;
+}
+
+- (BOOL)isPinned:(Node*)item {
+    if(self.cachedPinned.count == 0) {
+        return NO;
+    }
+    
+    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+    
+    return [self.cachedPinned containsObject:sid];
+}
+
+- (void)togglePin:(Node*)item {
+    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+
+    NSMutableSet<NSString*>* favs = self.cachedPinned.mutableCopy;
+    
+    if([self isPinned:item]) {
+        [favs removeObject:sid];
+    }
+    else {
+        [favs addObject:sid];
+    }
+    
+    // Trim - by search DB and mapping back...
+    
+    NSArray<Node*>* pinned = [self.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        NSString* sid = [node getSerializationId:self.database.format != kPasswordSafe];
+        return [favs containsObject:sid];
+    }];
+    
+    NSArray<NSString*>* trimmed = [pinned map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return [obj getSerializationId:self.database.format != kPasswordSafe];
+    }];
+    self.cachedPinned = [NSSet setWithArray:trimmed];
+
+    self.metadata.favourites = trimmed;
+    [SafesList.sharedInstance update:self.metadata];
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

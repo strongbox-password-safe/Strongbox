@@ -10,6 +10,7 @@
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
 #import "SafesList.h"
+#import "Settings.h"
 
 @interface BrowsePreferencesTableViewController ()
 
@@ -53,6 +54,15 @@
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellIconSet;
 @property (weak, nonatomic) IBOutlet UILabel *labelIconSet;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowTotp;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFavIcon;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowPasswordOnDetails;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowEmptyFields;
+@property (weak, nonatomic) IBOutlet UISwitch *easyReadFontForAll;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpCustom;
+@property (weak, nonatomic) IBOutlet UISwitch *switchColorizePasswords;
+@property (weak, nonatomic) IBOutlet UISwitch *switchColorizeProtectedCustomFields;
 
 @end
 
@@ -100,10 +110,26 @@
     self.databaseMetaData.showQuickViewFavourites = self.switchShowFavourites.on;
     self.databaseMetaData.showQuickViewExpired = self.switchShowSpecialExpired.on;
     
+    NSLog(@"Item Details Preferences Changed: [%@]", sender);
+    
+    self.databaseMetaData.tryDownloadFavIconForNewRecord = self.switchAutoFavIcon.on;
+    self.databaseMetaData.showPasswordByDefaultOnEditScreen = self.switchShowPasswordOnDetails.on;
+    self.databaseMetaData.hideTotp = !self.switchShowTotp.on;
+    self.databaseMetaData.showEmptyFieldsInDetailsView = self.switchShowEmptyFields.on;
+    self.databaseMetaData.easyReadFontForAll = self.easyReadFontForAll.on;
+    self.databaseMetaData.hideTotpCustomFieldsInViewMode = !self.switchShowTotpCustom.on;
+    self.databaseMetaData.colorizePasswords = self.switchColorizePasswords.on;
+    self.databaseMetaData.colorizeProtectedCustomFields = self.switchColorizeProtectedCustomFields.on;
+    
     [SafesList.sharedInstance update:self.databaseMetaData];
     
     [self bindPreferences];
-    self.onPreferencesChanged();
+
+    [self notifyDatabaseViewPreferencesChanged];
+}
+
+- (void)notifyDatabaseViewPreferencesChanged {
+    [[NSNotificationCenter defaultCenter] postNotificationName:kDatabaseViewPreferencesChangedNotificationKey object:nil];
 }
 
 - (void)bindPreferences {
@@ -145,6 +171,16 @@
     self.switchShowSpecialExpired.on = self.databaseMetaData.showQuickViewExpired;
     
     self.labelIconSet.text = [BrowsePreferencesTableViewController getIconSetName:self.databaseMetaData.keePassIconSet];
+    
+    self.switchAutoFavIcon.on = self.databaseMetaData.tryDownloadFavIconForNewRecord;
+    self.switchShowPasswordOnDetails.on = self.databaseMetaData.showPasswordByDefaultOnEditScreen;
+    self.switchShowTotp.on = !self.databaseMetaData.hideTotp;
+    self.switchShowEmptyFields.on = self.databaseMetaData.showEmptyFieldsInDetailsView;
+    self.easyReadFontForAll.on = self.databaseMetaData.easyReadFontForAll;
+    self.switchShowTotpCustom.on = !self.databaseMetaData.hideTotpCustomFieldsInViewMode;
+    
+    self.switchColorizePasswords.on = self.databaseMetaData.colorizePasswords;
+    self.switchColorizeProtectedCustomFields.on = self.databaseMetaData.colorizeProtectedCustomFields;
 }
 
 - (NSString*)getTapActionString:(BrowseTapAction)action {
@@ -222,15 +258,14 @@
                   options:optionStrings
              currentIndex:currentIndex
                completion:^(BOOL success, NSInteger selectedIdx) {
-                   if (success) {
-                       self.databaseMetaData.keePassIconSet = (KeePassIconSet)options[selectedIdx].integerValue;
-                       [SafesList.sharedInstance update:self.databaseMetaData];
-                   }
-                   
-                   [self bindPreferences];
-                   self.onPreferencesChanged();
-               }];
+        if (success) {
+           self.databaseMetaData.keePassIconSet = (KeePassIconSet)options[selectedIdx].integerValue;
+           [SafesList.sharedInstance update:self.databaseMetaData];
+        }
 
+        [self bindPreferences];
+        [self notifyDatabaseViewPreferencesChanged];
+    }];
 }
 
 + (NSString*)getIconSetName:(KeePassIconSet)iconSet {
@@ -310,7 +345,7 @@
                    }
                    
                    [self bindPreferences];
-                   self.onPreferencesChanged();
+                   [self notifyDatabaseViewPreferencesChanged];
                }];
 }
 
@@ -339,7 +374,7 @@
                    }
                    
                    [self bindPreferences];
-                   self.onPreferencesChanged();
+                   [self notifyDatabaseViewPreferencesChanged];
                }];
 }
 
@@ -368,7 +403,8 @@
           @(kBrowseItemSubtitleUrl),
           @(kBrowseItemSubtitleNotes),
           @(kBrowseItemSubtitleCreated),
-          @(kBrowseItemSubtitleModified)] :
+          @(kBrowseItemSubtitleModified),
+          @(kBrowseItemSubtitleTags)] :
     
             @[@(kBrowseItemSubtitleNoField),
               @(kBrowseItemSubtitleUsername),
@@ -401,7 +437,7 @@
                    }
                    
                    [self bindPreferences];
-                   self.onPreferencesChanged();
+                   [self notifyDatabaseViewPreferencesChanged];
                }];
 }
 
@@ -431,6 +467,9 @@
         case kBrowseItemSubtitleCreated:
             return NSLocalizedString(@"browse_prefs_item_subtitle_date_created", @"Date Created");
             break;
+        case kBrowseItemSubtitleTags:
+                return NSLocalizedString(@"browse_prefs_item_subtitle_tags", @"Tags");
+                break;
         default:
             return @"<Unknown>";
             break;

@@ -94,48 +94,48 @@
     return ret;
 }
 
-- (Entry*)buildXmlEntry:(Node*)entry stripHistory:(BOOL)stripHistory {
+- (Entry*)buildXmlEntry:(Node*)node stripHistory:(BOOL)stripHistory {
     Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
   
-    NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)entry.linkedData;
+    NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)node.linkedData;
     if(unmanagedChildren) {
         for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
             [ret addUnknownChildObject:unmanagedChild];
         }
     }
     
-    ret.uuid = entry.uuid;
-    ret.icon = entry.iconId;
-    ret.customIcon = entry.customIconUuid;
+    ret.uuid = node.uuid;
+    ret.icon = node.iconId;
+    ret.customIcon = node.customIconUuid;
 
     // Times
     
-    ret.times.lastAccessTime = entry.fields.accessed;
-    ret.times.lastModificationTime = entry.fields.modified;
-    ret.times.creationTime = entry.fields.created;
-    ret.times.expiryTime = entry.fields.expires;
-    ret.times.expires = entry.fields.expires != nil;
-    ret.times.usageCount = entry.fields.usageCount;
-    ret.times.locationChangedTime = entry.fields.locationChanged;
+    ret.times.lastAccessTime = node.fields.accessed;
+    ret.times.lastModificationTime = node.fields.modified;
+    ret.times.creationTime = node.fields.created;
+    ret.times.expiryTime = node.fields.expires;
+    ret.times.expires = node.fields.expires != nil;
+    ret.times.usageCount = node.fields.usageCount;
+    ret.times.locationChangedTime = node.fields.locationChanged;
     
     // Strings
     
     [ret removeAllStrings];
-    for (NSString* key in entry.fields.customFields.allKeys) {
-        StringValue* value = entry.fields.customFields[key];
+    for (NSString* key in node.fields.customFields.allKeys) {
+        StringValue* value = node.fields.customFields[key];
         [ret setString:key value:value.value protected:value.protected];
     }
 
-    ret.title = entry.title;
-    ret.username = entry.fields.username;
-    ret.password = entry.fields.password;
-    ret.url = entry.fields.url;
-    ret.notes = entry.fields.notes;
+    ret.title = node.title;
+    ret.username = node.fields.username;
+    ret.password = node.fields.password;
+    ret.url = node.fields.url;
+    ret.notes = node.fields.notes;
     
     // Binaries
     
     [ret.binaries removeAllObjects];
-    for (NodeFileAttachment *attachment in entry.fields.attachments) {
+    for (NodeFileAttachment *attachment in node.fields.attachments) {
         Binary *xmlBinary = [[Binary alloc] initWithContext:self.xmlParsingContext];
         
         xmlBinary.filename = attachment.filename;
@@ -148,11 +148,13 @@
  
     [ret.history.entries removeAllObjects];
     if(!stripHistory) {
-        for(Node* historicalNode in entry.fields.keePassHistory) {
+        for(Node* historicalNode in node.fields.keePassHistory) {
             Entry* historicalEntry = [self buildXmlEntry:historicalNode stripHistory:YES]; // Just in case we have accidentally left history on a historical entry itself...
             [ret.history.entries addObject:historicalEntry];
         }
     }
+    
+    ret.tags = node.fields.tags;
     
     return ret;
 }
@@ -211,6 +213,10 @@
         
         [fields.attachments addObject:attachment];
     }
+    
+    // Tags
+    
+    fields.tags = childEntry.tags;
     
     // Custom Fields
     

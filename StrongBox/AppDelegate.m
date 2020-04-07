@@ -27,11 +27,6 @@
 #import "iCloudSafesCoordinator.h"
 #import "SecretStore.h"
 
-// TODO: Remove in after 17 April or So Once migration done
-#import "SFTPStorageProvider.h"
-#import "WebDAVStorageProvider.h"
-#import "JNKeychain.h"
-
 @interface AppDelegate ()
 
 @property NSDate* appLaunchTime;
@@ -60,7 +55,7 @@
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
-    
+        
     [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
         
     // NSLog(@"XXXXX - Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
@@ -91,95 +86,6 @@
 }
 
 - (void)performMigrations {    
-    if(!Settings.sharedInstance.migratedToNewSecretStore) {
-        [self migrateToNewSecretStore];
-    }
-}
-
-- (void)migrateToNewSecretStore {
-    NSLog(@"Migrating to new Secret Store...");
-
-    NSArray<SafeMetaData*>* databases = SafesList.sharedInstance.snapshot;
-    
-    for (SafeMetaData* database in databases) {
-        NSString* conveniencePassword = [JNKeychain loadValueForKey:database.uuid];
-        
-        if(conveniencePassword) {
-            NSLog(@"Migrated Convenience Password for [%@]", database.nickName);
-            [SecretStore.sharedInstance setSecureObject:conveniencePassword forIdentifier:database.uuid];
-        }
-        
-        NSString* yubikeySecretKeyKey = [NSString stringWithFormat:@"%@-yubikey-secret", database.uuid];
-        NSString* yubikeySecretKey = [JNKeychain loadValueForKey:yubikeySecretKeyKey];
-        if(yubikeySecretKey) {
-            NSLog(@"Migrated Yubikey Secret for [%@]", database.nickName);
-            [SecretStore.sharedInstance setSecureObject:yubikeySecretKey forIdentifier:yubikeySecretKeyKey];
-        }
-        
-        
-        NSString* favouritesKey = [NSString stringWithFormat:@"%@-favourites", database.uuid];
-        NSArray<NSString *> * favourites = [JNKeychain loadValueForKey:favouritesKey];
-        if(favourites) {
-            NSLog(@"Migrated Favourites for [%@]", database.nickName);
-            [SecretStore.sharedInstance setSecureObject:favourites forIdentifier:favouritesKey];
-        }
-        
-        
-        NSString* conveniencePinKey = [NSString stringWithFormat:@"%@-convenience-pin", database.uuid];
-        NSString* conveniencePin = [JNKeychain loadValueForKey:conveniencePinKey];
-        if(conveniencePin) {
-            NSLog(@"Migrated Convenience PIN for [%@]", database.nickName);
-            [SecretStore.sharedInstance setSecureObject:conveniencePin forIdentifier:conveniencePinKey];
-        }
-        
-        
-        NSString* duressPinKey = [NSString stringWithFormat:@"%@-duress-pin", database.uuid];
-        NSString* duressPin = [JNKeychain loadValueForKey:duressPinKey];
-        if(duressPin) {
-            NSLog(@"Migrated Duress PIN for [%@]", database.nickName);
-            [SecretStore.sharedInstance setSecureObject:duressPin forIdentifier:duressPinKey];
-        }
-        
-        // SFTP
-        
-        if(database.storageProvider == kSFTP) {
-            NSLog(@"Migrated SFTP Config for [%@]", database.nickName);
-            
-            SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
-            SFTPSessionConfiguration *config = pd.sFtpConfiguration;
-            
-            NSString* sftpPasswordKey = [config getKeyChainKey:@"password"];
-            NSString* sftpPassword = [JNKeychain loadValueForKey:sftpPasswordKey];
-            
-            NSString* sftpPrivateKeyKey = [config getKeyChainKey:@"privateKey"];
-            NSString* sftpPrivateKey = [JNKeychain loadValueForKey:sftpPrivateKeyKey];
-
-            NSString* sftpPublicKeyKey = [config getKeyChainKey:@"publicKey"];
-            NSString* sftpPublicKey = [JNKeychain loadValueForKey:sftpPublicKeyKey];
-
-            config.password = sftpPassword;
-            config.privateKey = sftpPrivateKey;
-            config.publicKey = sftpPublicKey;
-        }
-        
-        // WebDAV
-    
-        if(database.storageProvider == kWebDAV) {
-            NSLog(@"Migrated WebDAV Config for [%@]", database.nickName);
-            
-            WebDAVProviderData *pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
-            WebDAVSessionConfiguration* config = pd.sessionConfiguration;
-        
-            NSString* webDavPasswordKey = [config getKeyChainKey:@"password"];
-            NSString* webDavPassword = [JNKeychain loadValueForKey:webDavPasswordKey];
-            
-            config.password = webDavPassword;
-        }
-    }
-    
-    Settings.sharedInstance.migratedToNewSecretStore = YES;
-    
-    NSLog(@"Migrating to new Secret Store Done...");
 }
 
 - (void)cleanupInbox:(NSDictionary *)launchOptions {
@@ -196,12 +102,6 @@
     
     if(Settings.sharedInstance.installDate == nil) {
         Settings.sharedInstance.installDate = [NSDate date];
-    }
-    
-    if([Settings.sharedInstance getEndFreeTrialDate] == nil) {
-        NSCalendar *cal = [NSCalendar currentCalendar];
-        NSDate *date = [cal dateByAddingUnit:NSCalendarUnitMonth value:3 toDate:[NSDate date] options:0];
-        [Settings.sharedInstance setEndFreeTrialDate:date];
     }
     
     self.appLaunchTime = [NSDate date];

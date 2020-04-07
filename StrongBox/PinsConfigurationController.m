@@ -87,17 +87,17 @@
     if(self.viewModel.metadata.storageProvider == kLocalDevice) {
         self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_delete_database", @"Delete Database");
         self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_delete_database_local_permanent", @"Local Device database will be permanently deleted.");
-        self.labelRemoveDatabaseWarning.textColor = [UIColor redColor];
+        self.labelRemoveDatabaseWarning.textColor = [UIColor systemRedColor];
     }
     else if(self.viewModel.metadata.storageProvider == kiCloud) {
         self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_delete_database", @"Delete Database");
         self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_delete_database_icloud_permanent", @"iCloud database will be permanently deleted from iCloud.");
-        self.labelRemoveDatabaseWarning.textColor = [UIColor redColor];
+        self.labelRemoveDatabaseWarning.textColor = [UIColor systemRedColor];
     }
     else {
         self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_remove_database", @"Remove Database from Strongbox");
         self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_remove_database_warning", @"NB: Database file will remain on remote storage.");
-        self.labelRemoveDatabaseWarning.textColor = [UIColor orangeColor];
+        self.labelRemoveDatabaseWarning.textColor = [UIColor systemOrangeColor];
     }
     
     if(!Settings.sharedInstance.isProOrFreeTrial) {

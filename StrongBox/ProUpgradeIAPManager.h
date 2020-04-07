@@ -11,12 +11,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
-static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.monthly";
-static NSString* const k3Monthly =  @"com.strongbox.markmcguill.upgrade.pro.3monthly";
-static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
-//kTestConsumable @"com.markmcguill.strongbox.testconsumable"
-
 typedef NS_ENUM (unsigned int, UpgradeManagerState) {
     kInitial,
     kWaitingOnAppStoreProducts,
@@ -38,10 +32,21 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 - (void)initialize;
 - (void)restorePrevious:(RestoreCompletionBlock)completion;
-- (void)purchase:(NSString*)productId completion:(PurchaseCompletionBlock)completion;
+
+@property (readonly, nullable) SKProduct* monthlyProduct;
+@property (readonly, nullable) SKProduct* yearlyProduct;
+@property (readonly, nullable) SKProduct* lifeTimeProduct;
+
+- (void)purchaseAndCheckReceipts:(SKProduct*)product completion:(PurchaseCompletionBlock)completion;
+
 - (void)performScheduledProEntitlementsCheckIfAppropriate:(UIViewController*)vc;
 
 + (BOOL)isProFamilyEdition;
+
+- (void)startFreeTrial:(PurchaseCompletionBlock)completion;
+
+@property (readonly) BOOL hasPurchasedFreeTrial;
+@property (readonly) NSDate* freeTrialPurchaseDate;
 
 @end
 

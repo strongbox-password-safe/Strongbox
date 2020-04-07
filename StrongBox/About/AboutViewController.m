@@ -10,11 +10,13 @@
 #import "DebugHelper.h"
 #import "ClipboardManager.h"
 #import "Alerts.h"
+#import "Settings.h"
 
 @interface AboutViewController ()
 
 @property (weak, nonatomic) IBOutlet UITextView *debugTextView;
 @property (weak, nonatomic) IBOutlet UITextView *aboutTextView;
+@property (weak, nonatomic) IBOutlet UIButton *upgradeOptions;
 
 @end
 
@@ -67,6 +69,10 @@
 
 - (IBAction)onDone:(id)sender {
     self.onDone();
+}
+
+- (IBAction)onUpgradeOptions:(id)sender {
+    [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
 }
 
 @end

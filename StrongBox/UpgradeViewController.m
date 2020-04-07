@@ -37,6 +37,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *freeTrialExpiryIndicator;
 @property (weak, nonatomic) IBOutlet UILabel *upgradeForFeaturesSubLabel;
 
+@property (weak, nonatomic) IBOutlet UIView *viewFreeTrialInfo;
+@property (weak, nonatomic) IBOutlet UIView *buttonStartFreeTrial;
+@property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialTitle;
+@property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubtitle;
+@property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubSubTitle;
+
 @end
 
 const static NSUInteger kFamilySharingProductId = 1481853033;
@@ -72,6 +78,7 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     self.buttonViewYearly.layer.cornerRadius = kRadius;
     self.buttonViewLifeTime.layer.cornerRadius = kRadius;
     self.buttonViewFamilySharing.layer.cornerRadius = kRadius;
+    self.buttonStartFreeTrial.layer.cornerRadius = kRadius;
     
     UITapGestureRecognizer *m = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                         action:@selector(onMonthly)];
@@ -89,44 +96,61 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
                                                                         action:@selector(onFamilySharing)];
     [self.buttonViewFamilySharing addGestureRecognizer:f];
 
+    UITapGestureRecognizer *trial = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                            action:@selector(onStartFreeTrial)];
+    [self.buttonStartFreeTrial addGestureRecognizer:trial];
+
     // Developer Message...
 
     [self bindDeveloperMessage];
 
     [self bindFreeTrialInfo];
-
-    [self bindUpgradeForFeaturesSubLabel];
-}
-
-- (void)bindUpgradeForFeaturesSubLabel {
-    NSString* loc = NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock");
-    NSString* biometricUnlockFeature = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
-
-    NSString* loc2 = NSLocalizedString(@"upgrade_vc_enjoy_features_by_upgrading_fmt", @"Enjoy %@ and other Pro features by Upgrading!");
-    NSString* localized = [NSString stringWithFormat:loc2, biometricUnlockFeature];
-
-    self.upgradeForFeaturesSubLabel.text = localized;
 }
 
 - (void)bindFreeTrialInfo {
-    NSInteger daysRemaining = [Settings.sharedInstance getFreeTrialDaysRemaining];
-    
-    if (Settings.sharedInstance.isFreeTrial) {
-        NSString* loc = NSLocalizedString(@"upgrade_vc_you_have_n_days_remaining_fmt", @"You have %ld days left in your Pro trial");
-        self.freeTrialExpiryIndicator.text = [NSString stringWithFormat:loc, daysRemaining];
-    }
-    else {
-        NSString* loc = NSLocalizedString(@"upgrade_vc_your_free_trial_expired", @"Your free trial of Strongbox Pro has expired.");
-        self.freeTrialExpiryIndicator.text = loc;
-    }
+    if (Settings.sharedInstance.freeTrialEnd) {
+        self.buttonStartFreeTrial.hidden = YES;
+        self.viewFreeTrialInfo.hidden = NO;
+        
+        NSInteger daysRemaining = Settings.sharedInstance.freeTrialDaysLeft;
 
-    if (daysRemaining < 28) {
-        if (daysRemaining < 14) {
-            self.freeTrialExpiryIndicator.textColor = UIColor.systemRedColor;
+        if (Settings.sharedInstance.isFreeTrial) {
+            NSString* loc = NSLocalizedString(@"upgrade_vc_you_have_n_days_remaining_fmt", @"You have %ld days left in your Pro trial");
+            self.freeTrialExpiryIndicator.text = [NSString stringWithFormat:loc, daysRemaining];
         }
         else {
-            self.freeTrialExpiryIndicator.textColor = UIColor.systemOrangeColor;
+            NSString* loc = NSLocalizedString(@"upgrade_vc_your_free_trial_expired", @"Your free trial of Strongbox Pro has expired.");
+            self.freeTrialExpiryIndicator.text = loc;
         }
+
+        if (daysRemaining < 28) {
+            if (daysRemaining < 14) {
+                self.freeTrialExpiryIndicator.textColor = UIColor.systemRedColor;
+            }
+            else {
+                self.freeTrialExpiryIndicator.textColor = UIColor.systemOrangeColor;
+            }
+        }
+        
+        NSString* loc = NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock");
+        NSString* biometricUnlockFeature = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
+
+        NSString* loc2 = NSLocalizedString(@"upgrade_vc_enjoy_features_by_upgrading_fmt", @"Enjoy %@ and other Pro features by Upgrading!");
+        NSString* localized = [NSString stringWithFormat:loc2, biometricUnlockFeature];
+
+        self.upgradeForFeaturesSubLabel.text = localized;
+    }
+    else {
+        self.buttonStartFreeTrial.hidden = NO;
+        self.viewFreeTrialInfo.hidden = YES;
+        
+        NSString* loc = NSLocalizedString(@"upgrade_vc_start_your_free_trial", @"90 Day Trial");
+        NSString* loc2 = NSLocalizedString(@"upgrade_vc_start_your_free_trial_price_free", @"Free");
+        NSString* loc3 = NSLocalizedString(@"upgrade_vc_start_your_free_trial_subtitle", @"No subscription or commitment required!");
+
+        self.buttonStartFreeTrialTitle.text = loc;
+        self.buttonStartFreeTrialSubtitle.text = loc2;
+        self.buttonStartFreeTrialSubSubTitle.text = loc3;
     }
 }
 
@@ -157,7 +181,7 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     self.monthlyPrice.text = NSLocalizedString(@"generic_loading", @"Loading...");
     self.buttonViewMonthly.userInteractionEnabled = NO;
     
-    SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[kMonthly];
+    SKProduct* product = ProUpgradeIAPManager.sharedInstance.monthlyProduct;
     if(state == kReady && product) {
         NSString * priceText = [self getPriceTextFromProduct:product];
         NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_fmt", @"%@ / month"), priceText];
@@ -178,9 +202,9 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     self.yearlyBonusLabel.text = @"";
     self.buttonViewYearly.userInteractionEnabled = NO;
     
-    SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[kYearly];
+    SKProduct* product = ProUpgradeIAPManager.sharedInstance.yearlyProduct;
     if(state == kReady && product) {
-        SKProduct* monthlyProduct = ProUpgradeIAPManager.sharedInstance.availableProducts[kMonthly];
+        SKProduct* monthlyProduct = ProUpgradeIAPManager.sharedInstance.monthlyProduct;
         
         NSString * bonusText;
         if(monthlyProduct) {
@@ -209,7 +233,7 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     self.buttonViewLifeTime.userInteractionEnabled = NO;
     self.lifeTimeBonusLabel.text = @"";
     
-    SKProduct* product = ProUpgradeIAPManager.sharedInstance.availableProducts[kIapProId];
+    SKProduct* product = ProUpgradeIAPManager.sharedInstance.lifeTimeProduct;
     if(state == kReady && product) {
         NSString * priceText = [self getPriceTextFromProduct:product];
         self.lifeTimePrice.text = priceText;
@@ -277,18 +301,15 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
 }
 
 - (void)onMonthly {
-    NSLog(@"Monthly");
-    [self purchase:kMonthly];
+    [self purchase:ProUpgradeIAPManager.sharedInstance.monthlyProduct];
 }
 
 - (void)onYearly {
-    NSLog(@"onYearly");
-    [self purchase:kYearly];
+    [self purchase:ProUpgradeIAPManager.sharedInstance.yearlyProduct];
 }
 
 - (void)onLifeTime {
-    NSLog(@"onLifeTime");
-    [self purchase:kIapProId];
+    [self purchase:ProUpgradeIAPManager.sharedInstance.lifeTimeProduct];
 }
 
 - (void)onFamilySharing {
@@ -314,6 +335,8 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
     [self enableButtons:NO];
     [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
     
+    BOOL optedInToFreeTrial = Settings.sharedInstance.hasOptedInToFreeTrial;
+    
     [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self enableButtons:YES];
@@ -325,7 +348,9 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
                         error:error];
             }
             else {
-                if(!Settings.sharedInstance.isPro) {
+                BOOL freeTrialStarted = Settings.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
+                
+                if(!Settings.sharedInstance.isPro && !freeTrialStarted) {
                     [Alerts info:self
                            title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
                          message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
@@ -341,8 +366,8 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
     }];
 }
 
-- (void)purchase:(NSString*)productId {
-    if(ProUpgradeIAPManager.sharedInstance.state != kReady || ProUpgradeIAPManager.sharedInstance.availableProducts[productId] == nil) {
+- (void)purchase:(SKProduct*)product {
+    if(ProUpgradeIAPManager.sharedInstance.state != kReady || product == nil) {
         [Alerts warn:self
                title:NSLocalizedString(@"upgrade_vc_product_error_title", @"Product Error")
              message:NSLocalizedString(@"upgrade_vc_product_error_message", @"Could not access Upgrade Products on App Store. Please try again later.")];
@@ -351,7 +376,7 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
         [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_purchasing", @"Purchasing...")];
         [self enableButtons:NO];
 
-        [ProUpgradeIAPManager.sharedInstance purchase:productId completion:^(NSError * _Nullable error) {
+        [ProUpgradeIAPManager.sharedInstance purchaseAndCheckReceipts:product completion:^(NSError * _Nullable error) {
             [self enableButtons:YES];
             [SVProgressHUD dismiss];
 
@@ -376,6 +401,7 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
     self.buttonViewYearly.userInteractionEnabled = enable;
     self.buttonViewLifeTime.userInteractionEnabled = enable;
     self.buttonViewFamilySharing.userInteractionEnabled = enable;
+    self.buttonStartFreeTrial.userInteractionEnabled = enable;
     self.buttonRestorePrevious.enabled = enable;
 }
 
@@ -402,6 +428,23 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
 
 - (void)productViewControllerDidFinish:(SKStoreProductViewController *)viewController {
     [viewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)onStartFreeTrial {
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"Loading...")];
+    [self enableButtons:NO];
+    
+    [ProUpgradeIAPManager.sharedInstance startFreeTrial:^(NSError * _Nullable error) {
+        [self enableButtons:YES];
+        [SVProgressHUD dismiss];
+
+        if (!error) {
+            [self dismiss];
+        }
+        else {
+            [Alerts error:self title:@"Could not start Free Trial" error:error completion:nil];
+        }
+    }];
 }
 
 @end

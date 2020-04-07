@@ -1,45 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14868" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Poa-XB-9Qu">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Poa-XB-9Qu">
     <device id="retina6_5" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Welcome-->
+        <!--Let's get started...-->
         <scene sceneID="yaq-3o-lDm">
             <objects>
-                <viewController title="Welcome" extendedLayoutIncludesOpaqueBars="YES" modalPresentationStyle="formSheet" hidesBottomBarWhenPushed="YES" id="n1n-7g-yga" customClass="WelcomeViewController" sceneMemberID="viewController">
+                <viewController title="Welcome" extendedLayoutIncludesOpaqueBars="YES" modalPresentationStyle="formSheet" hidesBottomBarWhenPushed="YES" id="n1n-7g-yga" userLabel="Let's get started..." customClass="WelcomeAddDatabaseViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="yJs-yi-Gy1">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dxd-7M-Dtr">
-                                <rect key="frame" x="20" y="213.33333333333337" width="374" height="380"/>
+                                <rect key="frame" x="20" y="214.33333333333334" width="374" height="377.66666666666663"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Welcome" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="maz-SI-Mfw" userLabel="Heading">
-                                        <rect key="frame" x="0.0" y="0.0" width="374" height="43"/>
-                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="36"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Getting Started" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="maz-SI-Mfw" userLabel="Heading">
+                                        <rect key="frame" x="0.0" y="0.0" width="374" height="40.666666666666664"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="Strongbox stores all your secrets and passwords inside an encrypted database" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NwP-5P-0Bq" userLabel="Message">
-                                        <rect key="frame" x="0.0" y="50.999999999999972" width="374" height="42.333333333333343"/>
+                                        <rect key="frame" x="0.0" y="48.666666666666657" width="374" height="42.333333333333343"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="748" text="Let's get you started with your first database" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="oK0-Zj-23i" userLabel="Message">
-                                        <rect key="frame" x="0.0" y="123.33333333333333" width="374" height="20.333333333333329"/>
+                                        <rect key="frame" x="0.0" y="120.99999999999996" width="374" height="20.333333333333329"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nuz-n2-EMf">
-                                        <rect key="frame" x="62" y="173.66666666666666" width="250" height="55"/>
-                                        <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <rect key="frame" x="62" y="171.33333333333334" width="250" height="55"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="MSu-3s-nJg"/>
                                             <constraint firstAttribute="height" constant="55" id="OxJ-GI-DZ2"/>
@@ -53,14 +53,14 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="747" text="or" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lad-AY-Nvo" userLabel="Message">
-                                        <rect key="frame" x="179" y="240.66666666666666" width="16" height="20.333333333333343"/>
+                                        <rect key="frame" x="179" y="238.33333333333334" width="16" height="20.333333333333343"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cff-Dr-iGY">
-                                        <rect key="frame" x="62" y="273" width="250" height="55"/>
-                                        <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <rect key="frame" x="62" y="270.66666666666663" width="250" height="55"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="55" id="PiO-q5-ruY"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="fc8-4V-IvF"/>
@@ -74,10 +74,10 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NM1-ie-t5q">
-                                        <rect key="frame" x="158.66666666666666" y="348" width="57" height="32"/>
+                                        <rect key="frame" x="158.66666666666666" y="345.66666666666663" width="57" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <state key="normal" title="Dismiss">
-                                            <color key="titleColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
                                             <action selector="onDismiss:" destination="n1n-7g-yga" eventType="touchUpInside" id="h57-ra-weQ"/>
@@ -133,7 +133,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SJO-B6-LkR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="555" y="98"/>
+            <point key="canvasLocation" x="-468" y="102"/>
         </scene>
         <!--Use iCloud?-->
         <scene sceneID="TAe-je-7XW">
@@ -144,29 +144,29 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eA3-ey-Ilg">
-                                <rect key="frame" x="20" y="202.33333333333337" width="374" height="402"/>
+                                <rect key="frame" x="20" y="203.33333333333334" width="374" height="399.66666666666663"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Use iCloud?" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jZz-Dg-Hqg" userLabel="Heading">
-                                        <rect key="frame" x="0.0" y="0.0" width="374" height="43"/>
-                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="36"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="374" height="40.666666666666664"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" text="iCloud is available on this device, would you like to enable it for Strongbox?" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dBe-kT-Zyp" userLabel="Message">
-                                        <rect key="frame" x="0.0" y="51" width="374" height="42.333333333333343"/>
+                                        <rect key="frame" x="0.0" y="48.666666666666657" width="374" height="42.333333333333343"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="748" text="You can use iCloud to make your databases available across all your devices seamlessly." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IR2-ja-Yf3" userLabel="Message">
-                                        <rect key="frame" x="0.0" y="123.33333333333333" width="374" height="42.333333333333329"/>
+                                        <rect key="frame" x="0.0" y="120.99999999999996" width="374" height="42.333333333333329"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WTP-2R-oTB">
-                                        <rect key="frame" x="62" y="195.66666666666666" width="250" height="55"/>
-                                        <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <rect key="frame" x="62" y="193.33333333333334" width="250" height="55"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="55" id="3OI-in-dw6"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="ugs-cP-cBv"/>
@@ -180,14 +180,14 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="747" text="or" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="puR-8j-GRT" userLabel="Message">
-                                        <rect key="frame" x="179" y="262.66666666666663" width="16" height="20.333333333333314"/>
+                                        <rect key="frame" x="179" y="260.33333333333337" width="16" height="20.333333333333314"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dbL-uP-DgX">
-                                        <rect key="frame" x="62" y="295" width="250" height="55"/>
-                                        <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <rect key="frame" x="62" y="292.66666666666663" width="250" height="55"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="55" id="YAY-Vb-Xnc"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="oTy-if-ncy"/>
@@ -201,10 +201,10 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RUg-zZ-USW">
-                                        <rect key="frame" x="158.66666666666666" y="370" width="57" height="32"/>
+                                        <rect key="frame" x="158.66666666666666" y="367.66666666666663" width="57" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <state key="normal" title="Dismiss">
-                                            <color key="titleColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
                                             <action selector="onDismiss:" destination="eS1-EV-xF2" eventType="touchUpInside" id="lSb-AC-rf1"/>
@@ -253,7 +253,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="V0L-R9-Xrc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1441" y="98"/>
+            <point key="canvasLocation" x="746" y="-23"/>
         </scene>
         <!--Create Database-->
         <scene sceneID="tJD-h8-uSf">
@@ -264,34 +264,34 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ggk-1l-ury" customClass="TPKeyboardAvoidingScrollView">
-                                <rect key="frame" x="0.0" y="88" width="414" height="808"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="852"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vyN-Sg-eGd">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="341.33333333333331"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="346"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Database Name" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Sc-Ok-s6h" userLabel="Heading">
-                                                <rect key="frame" x="20" y="20" width="374" height="36"/>
+                                                <rect key="frame" x="20" y="19.999999999999996" width="374" height="40.666666666666657"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="OK, let's create your new database. First, let's give it a name. Something simple and friendly will do." textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YKw-3t-93B" userLabel="Name Hint">
-                                                <rect key="frame" x="20" y="76" width="374" height="64.333333333333314"/>
+                                                <rect key="frame" x="20" y="80.666666666666686" width="374" height="64.333333333333314"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Database Name (Required)" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="icq-UO-xAd">
-                                                <rect key="frame" x="20" y="160.33333333333334" width="374" height="44"/>
+                                                <rect key="frame" x="20" y="165" width="374" height="44"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="44" id="eKP-ay-oW9"/>
                                                 </constraints>
-                                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                 <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Emm-l7-8le" userLabel="Create Button">
-                                                <rect key="frame" x="82" y="234.33333333333331" width="250" height="55"/>
-                                                <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <rect key="frame" x="82" y="239" width="250" height="55"/>
+                                                <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="55" id="lXI-LY-48S"/>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="yPD-2X-fUR"/>
@@ -306,10 +306,10 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wBK-OF-IEY">
-                                                <rect key="frame" x="178.66666666666666" y="309.33333333333331" width="57" height="32"/>
+                                                <rect key="frame" x="178.66666666666666" y="314" width="57" height="32"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                                 <state key="normal" title="Dismiss">
-                                                    <color key="titleColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="onDismiss:" destination="JIT-YM-MTv" eventType="touchUpInside" id="A3j-rC-DvG"/>
@@ -382,19 +382,19 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3hN-8c-Iys" customClass="TPKeyboardAvoidingScrollView">
-                                <rect key="frame" x="0.0" y="88" width="414" height="725"/>
+                                <rect key="frame" x="0.0" y="44" width="414" height="769"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nbY-4r-107">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="451.33333333333331"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="456"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Master Password" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HFu-c5-YPy" userLabel="Heading">
-                                                <rect key="frame" x="20" y="20" width="374" height="36"/>
+                                                <rect key="frame" x="20" y="19.999999999999996" width="374" height="40.666666666666657"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="justified" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ibj-Uq-3zn" userLabel="Password Hint">
-                                                <rect key="frame" x="20" y="76.000000000000014" width="374" height="174.33333333333337"/>
+                                                <rect key="frame" x="20" y="80.666666666666671" width="374" height="174.33333333333331"/>
                                                 <string key="text">Great! Now we need a strong master password to protect all your secrets.   You must always remember this, it is the only way to unlock your database.
 
 You will have the chance to print this password out on the next screen for emergencies.</string>
@@ -403,16 +403,16 @@ You will have the chance to print this password out on the next screen for emerg
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password (Required)" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="nhg-yK-eKQ">
-                                                <rect key="frame" x="20" y="270.33333333333331" width="374" height="44"/>
+                                                <rect key="frame" x="20" y="275" width="374" height="44"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="44" id="Ll7-u1-3ea"/>
                                                 </constraints>
-                                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                 <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CeT-uY-c3o" userLabel="Create Button">
-                                                <rect key="frame" x="82" y="344.33333333333331" width="250" height="55"/>
-                                                <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <rect key="frame" x="82" y="349" width="250" height="55"/>
+                                                <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="55" id="67h-Fd-zqX"/>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="gms-E4-vDV"/>
@@ -427,10 +427,10 @@ You will have the chance to print this password out on the next screen for emerg
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qLz-La-osG">
-                                                <rect key="frame" x="178.66666666666666" y="419.33333333333331" width="57" height="32"/>
+                                                <rect key="frame" x="178.66666666666666" y="424" width="57" height="32"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                                 <state key="normal" title="Dismiss">
-                                                    <color key="titleColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="onDismiss:" destination="n1n-7g-yga" eventType="touchUpInside" id="azU-ER-SOO"/>
@@ -499,16 +499,16 @@ You will have the chance to print this password out on the next screen for emerg
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hDB-qH-zSJ">
-                                <rect key="frame" x="20" y="181.33333333333334" width="374" height="443.66666666666663"/>
+                                <rect key="frame" x="20" y="182.66666666666666" width="374" height="441.33333333333337"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="You're All Set!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ocd-gC-bRp" userLabel="Heading">
-                                        <rect key="frame" x="0.0" y="0.0" width="374" height="43"/>
-                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="36"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="374" height="40.666666666666664"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="XkY-eg-GFU">
-                                        <rect key="frame" x="0.0" y="62.999999999999986" width="374" height="206.66666666666663"/>
+                                        <rect key="frame" x="0.0" y="60.666666666666671" width="374" height="206.66666666666663"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="748" text="Your Database is now ready to go" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5KW-aF-8Kx" userLabel="First Message">
                                                 <rect key="frame" x="59.333333333333329" y="0.0" width="255.66666666666669" height="20.333333333333332"/>
@@ -526,18 +526,18 @@ You will have the chance to print this password out on the next screen for emerg
                                         </subviews>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4av-wA-ATn">
-                                        <rect key="frame" x="60" y="370.66666666666663" width="254" height="33"/>
+                                        <rect key="frame" x="60" y="368.33333333333337" width="254" height="33"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <state key="normal" title="Print Emergency Password Sheet">
-                                            <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </state>
                                         <connections>
                                             <action selector="onPrintMasterPassword:" destination="jC3-mb-M4m" eventType="touchUpInside" id="YKU-dD-gwd"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ich-NG-HwE" userLabel="Create Button">
-                                        <rect key="frame" x="62" y="299.66666666666663" width="250" height="55"/>
-                                        <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <rect key="frame" x="62" y="297.33333333333337" width="250" height="55"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="DSG-Yd-OZX"/>
                                             <constraint firstAttribute="height" constant="55" id="bZr-DQ-dbn"/>
@@ -553,9 +553,11 @@ You will have the chance to print this password out on the next screen for emerg
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rc5-qF-ste">
-                                        <rect key="frame" x="117.66666666666666" y="411.66666666666663" width="138.99999999999997" height="32"/>
+                                        <rect key="frame" x="117.66666666666666" y="409.33333333333337" width="138.99999999999997" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
-                                        <state key="normal" title="View All Databases"/>
+                                        <state key="normal" title="View All Databases">
+                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
                                         <connections>
                                             <action selector="onDismiss:" destination="n1n-7g-yga" eventType="touchUpInside" id="vzV-Cr-ZUX"/>
                                             <action selector="onViewAllDatabases:" destination="jC3-mb-M4m" eventType="touchUpInside" id="hRs-kj-FF0"/>
@@ -602,28 +604,27 @@ You will have the chance to print this password out on the next screen for emerg
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="sB3-Sv-4Zc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3883" y="98"/>
+            <point key="canvasLocation" x="4186" y="98"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Tlt-Za-Zi8">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="formSheet" id="Poa-XB-9Qu" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="formSheet" navigationBarHidden="YES" id="Poa-XB-9Qu" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="6ld-6o-cb6">
-                        <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="n1n-7g-yga" kind="relationship" relationship="rootViewController" id="dLC-ja-0bC"/>
+                        <segue destination="n1n-7g-yga" kind="relationship" relationship="rootViewController" id="1tb-1d-aXr"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="AGO-nd-0gm" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-435" y="98"/>
+            <point key="canvasLocation" x="-1357" y="98"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="E5F-62-0vl"/>
+        <segue reference="xDs-2z-Iqv"/>
     </inferredMetricsTieBreakers>
 </document>
