@@ -69,7 +69,14 @@
                         fileName:(NSString*)fileName
                   fileIdentifier:(NSString*)fileIdentifier {
     if(self = [self init]) {
-        self.nickName = nickName;
+        if(!nickName.length) {
+            NSLog(@"WARNWARN: No Nick Name set... auto generating.");
+            self.nickName = NSUUID.UUID.UUIDString;
+        }
+        else {
+            self.nickName = nickName;
+        }
+        
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
@@ -171,6 +178,11 @@
     if((self = [self init])) {
         self.uuid = [decoder decodeObjectForKey:@"uuid"];
         self.nickName = [decoder decodeObjectForKey:@"nickName"];
+        if(!self.nickName.length) {
+            NSLog(@"WARNWARN: No Nick Name set... auto generating.");
+            self.nickName = NSUUID.UUID.UUIDString;
+        }
+        
         self.fileName = [decoder decodeObjectForKey:@"fileName"];
         self.fileIdentifier = [decoder decodeObjectForKey:@"fileIdentifier"];
         self.storageProvider = (int)[decoder decodeIntegerForKey:@"storageProvider"];

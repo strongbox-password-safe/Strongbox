@@ -29,6 +29,7 @@
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
 #import "DatabasePreferencesController.h"
+#import "ExportOptionsTableViewController.h"
 
 const NSUInteger kSectionIdxPinned = 0;
 const NSUInteger kSectionIdxNearlyExpired = 1;
@@ -64,6 +65,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
 @property NSTimer* timerRefreshOtp;
+
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *exportBarButton;
 
 @end
 
@@ -157,6 +160,51 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self listenToNotifications];
 }
 
+- (IBAction)onExport:(id)sender {
+    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if (userCancelled) { }
+        else if (!data) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
+                    error:error];
+        }
+        else {
+            [self onShareWithData:data];
+        }
+    }];
+}
+
+- (void)onShareWithData:(NSData*)data {
+    NSString* filename = self.viewModel.metadata.fileName;
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    
+    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
+    [data writeToFile:f atomically:YES];
+    
+    NSURL* url = [NSURL fileURLWithPath:f];
+        
+    NSArray *activityItems = @[filename, url, self];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+    
+    // Required for iPad...
+
+    activityViewController.popoverPresentationController.barButtonItem = self.exportBarButton;
+
+    //    activityViewController.popoverPresentationController.sourceView = self.view;
+    //    activityViewController.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds),0,0);
+    //    activityViewController.popoverPresentationController.permittedArrowDirections = 0L; // Don't show the arrow as it's not really anchored
+    
+    [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+        NSError *errorBlock;
+        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
+            NSLog(@"error deleting file %@", errorBlock);
+            return;
+        }
+    }];
+    
+    [self presentViewController:activityViewController animated:YES completion:nil];
+}
+
 - (void)listenToNotifications {
     if(self.splitViewController) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showDetailTargetDidChange:) name:UIViewControllerShowDetailTargetDidChangeNotification object:self.splitViewController];
@@ -178,10 +226,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
 
     NSInteger percentageChanceOfShowing;
-    NSInteger freeTrialDays = Settings.sharedInstance.freeTrialDaysLeft; // TODO: What if user has not opted in? If install date > 60 -> nag
-
-    if(freeTrialDays > 40) {
-        NSLog(@"More than 40 days left in free trial... not showing Nag Screen");
+    NSInteger daysInstalled = Settings.sharedInstance.daysInstalled;
+    
+    if(daysInstalled < 60) {
+        NSLog(@"Less than 60 days installed... not showing Nag Screen");
         return;
     }
     else if(Settings.sharedInstance.isFreeTrial) {
@@ -192,8 +240,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
 
     NSInteger random = arc4random_uniform(100);
-
-    //NSLog(@"Random: %ld", (long)random);
 
     if(random < percentageChanceOfShowing) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -1239,7 +1285,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
         if (@available(iOS 13.0, *)) {
-            if (!Settings.sharedInstance.isFreeTrial) {
+            if (Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.modalInPresentation = YES;
             }
@@ -1280,7 +1326,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     [Alerts actionSheet:self
               barButton:self.buttonAddRecord
-                  title:@"Would you like to add an entry or a group?"
+                  title:NSLocalizedString(@"browse_add_group_or_entry_question", @"Would you like to add an entry or a group?")
            buttonTitles:options
              completion:^(int response) {
         if (response == 1) {

@@ -118,3 +118,4 @@ I use many different libraries in the app here are just a few:
 - Diceware Wordlists: (https://github.com/micahflee/passphrases)
 - GCDWebServer (https://github.com/swisspol/GCDWebServer)
 - NameDatabases (https://github.com/smashew/NameDatabases)
+- WSTagsField (https://github.com/whitesmith/WSTagsField)

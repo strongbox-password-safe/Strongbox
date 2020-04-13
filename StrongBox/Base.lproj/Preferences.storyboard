@@ -644,30 +644,30 @@
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Debug Info" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8qK-rT-Mfx">
-                                <rect key="frame" x="20" y="130" width="88" height="21"/>
+                                <rect key="frame" x="20" y="108" width="88" height="21"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" editable="NO" text="Debug Info" translatesAutoresizingMaskIntoConstraints="NO" id="JkH-Oi-xgJ" userLabel="Debug">
-                                <rect key="frame" x="20" y="159" width="374" height="329.5"/>
+                                <rect key="frame" x="20" y="137" width="374" height="340.5"/>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleFootnote"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="About" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="YSc-AW-zP2">
-                                <rect key="frame" x="20" y="504.5" width="49" height="20.5"/>
+                                <rect key="frame" x="20" y="493.5" width="49" height="20.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="top" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Y8A-xb-KEy" userLabel="About">
-                                <rect key="frame" x="20" y="533" width="374" height="329"/>
+                                <rect key="frame" x="20" y="522" width="374" height="340"/>
                                 <attributedString key="attributedText">
                                     <fragment content="Testing">
                                         <attributes>
-                                            <font key="NSFont" metaFont="message" size="11"/>
+                                            <font key="NSFont" metaFont="label" size="11"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -676,7 +676,7 @@
                                 <dataDetectorType key="dataDetectorTypes" link="YES"/>
                             </textView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aid-15-B7W">
-                                <rect key="frame" x="356" y="124.5" width="38" height="32"/>
+                                <rect key="frame" x="356" y="102.5" width="38" height="32"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                 <state key="normal" title="Copy"/>
                                 <connections>
@@ -684,9 +684,9 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5aN-6u-YFz">
-                                <rect key="frame" x="125" y="88" width="164" height="32"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
-                                <state key="normal" title="View Upgrade Options"/>
+                                <rect key="frame" x="272" y="490" width="122" height="27"/>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                <state key="normal" title="Change My License..."/>
                                 <connections>
                                     <action selector="onUpgradeOptions:" destination="Rqc-tQ-fje" eventType="touchUpInside" id="r2P-ee-XFB"/>
                                 </connections>
@@ -698,20 +698,21 @@
                             <constraint firstItem="YSc-AW-zP2" firstAttribute="top" secondItem="JkH-Oi-xgJ" secondAttribute="bottom" constant="16" id="1dy-hH-iF1"/>
                             <constraint firstItem="Y8A-xb-KEy" firstAttribute="top" secondItem="YSc-AW-zP2" secondAttribute="bottom" constant="8" id="30j-l2-jFa"/>
                             <constraint firstItem="Y8A-xb-KEy" firstAttribute="height" secondItem="JkH-Oi-xgJ" secondAttribute="height" id="41X-Ap-k9G"/>
-                            <constraint firstItem="8qK-rT-Mfx" firstAttribute="top" secondItem="5aN-6u-YFz" secondAttribute="bottom" constant="10" id="4Fm-WD-6Hc"/>
                             <constraint firstItem="Y8A-xb-KEy" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="9Hk-iS-6zE"/>
                             <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" secondItem="JkH-Oi-xgJ" secondAttribute="trailing" constant="20" id="ABo-0H-DhR"/>
                             <constraint firstItem="JkH-Oi-xgJ" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="AOA-3D-WbP"/>
-                            <constraint firstItem="5aN-6u-YFz" firstAttribute="centerX" secondItem="eMq-Ul-uUJ" secondAttribute="centerX" id="EiJ-WI-87k"/>
+                            <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" secondItem="5aN-6u-YFz" secondAttribute="trailing" constant="20" id="AqH-J8-OVZ"/>
                             <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="YSc-AW-zP2" secondAttribute="trailing" symbolic="YES" id="HKN-Z0-Rkr"/>
                             <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="8qK-rT-Mfx" secondAttribute="trailing" symbolic="YES" id="QSw-gn-TDf"/>
                             <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" secondItem="aid-15-B7W" secondAttribute="trailing" constant="20" id="R8L-Gt-bhh"/>
+                            <constraint firstItem="8qK-rT-Mfx" firstAttribute="top" secondItem="feb-qC-Hxq" secondAttribute="top" constant="20" id="RBY-KW-5Be"/>
                             <constraint firstItem="YSc-AW-zP2" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="UcA-a1-OTl"/>
                             <constraint firstItem="aid-15-B7W" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="8qK-rT-Mfx" secondAttribute="trailing" constant="8" symbolic="YES" id="ZVa-oN-hNa"/>
+                            <constraint firstItem="5aN-6u-YFz" firstAttribute="centerY" secondItem="YSc-AW-zP2" secondAttribute="centerY" id="c0K-eO-EeD"/>
+                            <constraint firstItem="5aN-6u-YFz" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="YSc-AW-zP2" secondAttribute="trailing" constant="8" symbolic="YES" id="djo-O3-qKs"/>
                             <constraint firstItem="JkH-Oi-xgJ" firstAttribute="top" secondItem="8qK-rT-Mfx" secondAttribute="bottom" constant="8" id="dlZ-L9-f4s"/>
                             <constraint firstItem="8qK-rT-Mfx" firstAttribute="centerY" secondItem="aid-15-B7W" secondAttribute="centerY" id="jWo-HI-QVF"/>
                             <constraint firstItem="feb-qC-Hxq" firstAttribute="trailing" secondItem="Y8A-xb-KEy" secondAttribute="trailing" constant="20" id="qrB-OY-C3q"/>
-                            <constraint firstItem="5aN-6u-YFz" firstAttribute="top" secondItem="feb-qC-Hxq" secondAttribute="top" id="rd1-Wk-8UR"/>
                             <constraint firstItem="8qK-rT-Mfx" firstAttribute="leading" secondItem="feb-qC-Hxq" secondAttribute="leading" constant="20" id="s1E-7X-VIw"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="feb-qC-Hxq"/>

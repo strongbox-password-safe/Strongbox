@@ -45,7 +45,7 @@
     [self initializeProFamilyEdition];
     
     [self performMigrations];
-
+        
     // Do not backup local safes, caches or key files
 
     [FileManager.sharedInstance excludeDirectoriesFromBackup];
@@ -77,12 +77,10 @@
 }
 
 - (void)initializeProFamilyEdition {
-    if(!Settings.sharedInstance.hasDoneProFamilyCheck && [ProUpgradeIAPManager isProFamilyEdition]) {
-        NSLog(@"Initial launch of Pro Family Edition... setting Pro");
+    if([ProUpgradeIAPManager isProFamilyEdition]) {
+        NSLog(@"Pro Family Edition... setting Pro");
         [Settings.sharedInstance setPro:YES];
     }
-    
-    Settings.sharedInstance.hasDoneProFamilyCheck = YES;
 }
 
 - (void)performMigrations {    
@@ -111,7 +109,7 @@
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-    //NSLog(@"openURL: [%@] => [%@]", options, url);
+//    NSLog(@"openURL: [%@] => [%@]", options, url);
     
     if ([url.absoluteString hasPrefix:@"db"]) {
         DBOAuthResult *authResult = [DBClientsManager handleRedirectURL:url];

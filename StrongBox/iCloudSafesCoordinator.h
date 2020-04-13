@@ -10,6 +10,8 @@
 #import "SafeStorageProvider.h"
 #import "AppleICloudOrLocalSafeFile.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface iCloudSafesCoordinator : NSObject
 
 + (instancetype)sharedInstance;
@@ -25,4 +27,8 @@
 - (void)migrateLocalToiCloud:(void (^)(BOOL show)) completion;
 - (void)migrateiCloudToLocal:(void (^)(BOOL show)) completion;
 
+@property (nullable, readonly) NSURL* iCloudDocumentsFolder;
+
 @end
+
+NS_ASSUME_NONNULL_END

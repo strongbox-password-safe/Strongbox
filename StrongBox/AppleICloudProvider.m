@@ -217,8 +217,13 @@ suggestedFilename:nil
 //    NSURL *url = [NSURL URLWithString:safeMetaData.fileIdentifier];
 //    NSURL *ubiq = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
 //    NSURL *ubiquitousPackage = [ubiq URLByAppendingPathComponent:safeMetaData.fileName];
+    
     NSURL * url = [self getFullICloudURLWithFileName:safeMetaData.fileName];
+    
+    [self deleteICloudUrl:url safeMetaData:safeMetaData secondAttempt:NO completion:completion];
+}
 
+- (void)deleteICloudUrl:(NSURL*)url safeMetaData:(SafeMetaData*)safeMetaData secondAttempt:(BOOL)secondAttempt completion:(void (^)(NSError *error))completion {
     // Wrap in file coordinator
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSFileCoordinator* fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
@@ -229,10 +234,16 @@ suggestedFilename:nil
                                              NSFileManager* fileManager = [[NSFileManager alloc] init];
                                              NSError *error2;
                                              [fileManager removeItemAtURL:writingURL error:&error2];
-                                             if(completion) {
-                                                 completion(error2);
-                                             }
-                                         }];
+            if(error2 && !secondAttempt) { // Try to delete by fileIdentifier if fileName failed... could be in a subdirectory
+                NSURL* urlSecondAttempt = [NSURL URLWithString:safeMetaData.fileIdentifier];
+                [self deleteICloudUrl:urlSecondAttempt safeMetaData:safeMetaData secondAttempt:YES completion:completion];
+            }
+            else {
+                 if(completion) {
+                     completion(error2);
+                 }
+            }
+        }];
     });
 }
 

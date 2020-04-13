@@ -35,6 +35,8 @@ extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 - (void)setPro:(BOOL)value;
 - (BOOL)isFreeTrial;
 
+@property (readonly) BOOL freeTrialHasBeenOptedInAndExpired;
+
 - (BOOL)hasOptedInToFreeTrial;
 @property (readonly) NSInteger freeTrialDaysLeft;
 @property NSDate *freeTrialEnd;
@@ -96,8 +98,6 @@ extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 @property DatabaseCellSubtitleField databaseCellSubtitle2;
 
 @property BOOL monitorInternetConnectivity;
-
-@property BOOL hasDoneProFamilyCheck;
 
 @property BOOL suppressPrivacyScreen; // Used by Biometric Auth and Google Drive to suppress privacy screen which interferes with their operation
 

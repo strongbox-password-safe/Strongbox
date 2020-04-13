@@ -20,6 +20,8 @@
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "FileManager.h"
+#import "FilesAppUrlBookmarkProvider.h"
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
@@ -52,32 +54,31 @@
     WebDAVStorageProvider* webDavProvider = [[WebDAVStorageProvider alloc] init];
     webDavProvider.maintainSessionForListings = YES;
     
-    if(self.existing) {
-        self.providers = @[[GoogleDriveStorageProvider sharedInstance],
-                           [DropboxV2StorageProvider sharedInstance],
-                           [OneDriveStorageProvider sharedInstance],
-                           webDavProvider,
-                           sftpProviderWithFastListing];
+    NSMutableArray<id<SafeStorageProvider>>* sp = @[GoogleDriveStorageProvider.sharedInstance,
+                                                    DropboxV2StorageProvider.sharedInstance,
+                                                    OneDriveStorageProvider.sharedInstance,
+                                                    webDavProvider,
+                                                    sftpProviderWithFastListing].mutableCopy;
+    
+    // iCloud on Top if available
+    
+    if ([Settings sharedInstance].iCloudOn) {
+        [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
-    else {
-        if ([Settings sharedInstance].iCloudOn) {
-            self.providers = @[[AppleICloudProvider sharedInstance],
-                               [GoogleDriveStorageProvider sharedInstance],
-                               [DropboxV2StorageProvider sharedInstance],
-                               [OneDriveStorageProvider sharedInstance],
-                               webDavProvider,
-                               sftpProviderWithFastListing,
-                               [LocalDeviceStorageProvider sharedInstance]];
-        }
-        else {
-            self.providers = @[[GoogleDriveStorageProvider sharedInstance],
-                               [DropboxV2StorageProvider sharedInstance],
-                               [OneDriveStorageProvider sharedInstance],
-                               webDavProvider,
-                               sftpProviderWithFastListing,
-                               [LocalDeviceStorageProvider sharedInstance]];
-        }
+    
+    // iOS Files on iOS 11+ option at bottom near Local Device
+    
+    if (@available(iOS 11.0, *)) {
+        [sp addObject:FilesAppUrlBookmarkProvider.sharedInstance];
     }
+    
+    // Local Device for Create New
+    
+    if (!self.existing) {
+        [sp addObject:LocalDeviceStorageProvider.sharedInstance];
+    }
+    
+    self.providers = sp.copy;
     
     self.tableView.tableFooterView = [UIView new];
 }
@@ -87,7 +88,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.providers.count + (self.existing ? 3 : 0);
+    return self.providers.count + (self.existing ? 2 : 0);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -98,18 +99,20 @@
         cell.image.image =  [UIImage imageNamed:@"Disconnect-32x32"];
     }
     else if(indexPath.row == self.providers.count + 1) {
-        cell.text.text = NSLocalizedString(@"sspc_ios_files_storage_location", @"Files...");
-        cell.image.image =  [UIImage imageNamed:@"ios11-files-app-icon"];
-    }
-    else if(indexPath.row == self.providers.count + 2) {
         cell.text.text = NSLocalizedString(@"sspc_local_network_storage_location", @"Transfer Over Local Network");
         cell.image.image =  [UIImage imageNamed:@"wifi"];
     }
     else {
         id<SafeStorageProvider> provider = [self.providers objectAtIndex:indexPath.row];
 
-        cell.text.text = provider.displayName;
-        cell.image.image = [UIImage imageNamed:provider.icon];
+        if (provider.storageId == kFilesAppUrlBookmark) {
+            cell.text.text = NSLocalizedString(@"sspc_ios_files_storage_location", @"Files...");
+            cell.image.image =  [UIImage imageNamed:@"folder"];
+        }
+        else {
+            cell.text.text = provider.displayName;
+            cell.image.image = [UIImage imageNamed:provider.icon];
+        }
     }
     
     return cell;
@@ -120,14 +123,20 @@
         [self initiateManualImportFromUrl];
     }
     else if(indexPath.row == self.providers.count + 1) {
-        [self onAddThroughFilesApp];
-    }
-    else if(indexPath.row == self.providers.count + 2) {
         [self onAddThroughLocalNetworkServer];
     }
     else {
         id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
-        if (provider.storageId == kLocalDevice && !self.existing) {
+        
+        if (provider.storageId == kFilesAppUrlBookmark) {
+            if (self.existing) {
+                [self onAddThroughFilesApp];
+            }
+            else {
+                [self onCreateThroughFilesApp];
+            }
+        }
+        else if (provider.storageId == kLocalDevice && !self.existing) {
             [Alerts yesNo:self
                     title:NSLocalizedString(@"sspc_local_device_storage_warning_title", @"Local Device Database Caveat")
                   message:NSLocalizedString(@"sspc_local_device_storage_warning_message", @"Since a local database is only stored on this device, any loss of this device will lead to the loss of all passwords stored within this database. You may want to consider using a cloud storage provider, such as the ones supported by Strongbox to avoid catastrophic data loss.\n\nWould you still like to proceed with creating a local device database?")
@@ -165,6 +174,10 @@
                        }];
 }
 
+- (void)onCreateThroughFilesApp {
+    self.onDone([SelectedStorageParameters parametersForFilesApp:nil withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
+}
+
 - (void)onAddThroughFilesApp {
     UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
     vc.delegate = self;
@@ -179,7 +192,7 @@
     
     NSURL* url = [urls objectAtIndex:0];
     
-    self.onDone([SelectedStorageParameters parametersForFilesApp:url]);
+    self.onDone([SelectedStorageParameters parametersForFilesApp:url withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
 }
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {

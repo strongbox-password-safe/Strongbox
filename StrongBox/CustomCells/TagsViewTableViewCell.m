@@ -16,7 +16,7 @@
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
 
-@interface TagsViewTableViewCell ()
+@interface TagsViewTableViewCell () <UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet WSTagsField *tagsField;
 @property (weak, nonatomic) IBOutlet UILabel *labelTags;
@@ -41,6 +41,13 @@
 
     self.tagsField.contentInset = UIEdgeInsetsMake(2, 2, 2, 2);
     self.tagsField.layoutMargins = UIEdgeInsetsMake(2, 6, 2, 6);
+    
+    self.tagsField.textDelegate = self;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+//    NSLog(@"WSTagsField End Editing...");
+    [self.tagsField acceptCurrentTextAsTag];
 }
 
 - (void)notifyCellHeightChanged {

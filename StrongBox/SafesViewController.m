@@ -1058,6 +1058,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     else if ([segue.identifier isEqualToString:@"segueToCreateDatabase"]) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
+        
         SelectedStorageParameters* params = (SelectedStorageParameters*)sender;
         BOOL expressMode = params == nil;
         BOOL createMode = params == nil || params.createMode;
@@ -1163,7 +1164,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
         if (@available(iOS 13.0, *)) {
-            if (!Settings.sharedInstance.isFreeTrial) {
+            if (Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.modalInPresentation = YES;
             }
@@ -1238,8 +1239,14 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     else if (params.method == kStorageMethodFilesAppUrl) {
         [self dismissViewControllerAnimated:YES completion:^{
-            NSLog(@"Files App: [%@]", params.url);
-            [self import:params.url canOpenInPlace:YES forceOpenInPlace:YES];
+            NSLog(@"Files App: [%@] - Create: %d", params.url, params.createMode);
+
+            if (params.createMode) {
+                [self performSegueWithIdentifier:@"segueToCreateDatabase" sender:params];
+            }
+            else {
+                [self import:params.url canOpenInPlace:YES forceOpenInPlace:YES];
+            }
         }];
     }
     else if (params.method == kStorageMethodManualUrlDownloadedData || params.method == kStorageMethodNativeStorageProvider) {
@@ -1818,6 +1825,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url  {
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
     DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    
+//    NSLog(@"Importing URL: [%@]", url);
     
     if(Settings.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self

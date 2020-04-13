@@ -60,6 +60,15 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     });
 }
 
+- (NSURL *)iCloudDocumentsFolder {
+    if (_iCloudRoot) {
+        return [_iCloudRoot URLByAppendingPathComponent:@"Documents" isDirectory:YES];
+    }
+    else {
+        return nil;
+    }
+}
+
 - (void)migrateLocalToiCloud:(void (^)(BOOL show)) completion {
     self.showMigrationUi = completion;
     _migrationInProcessDoNotUpdateSafesCollection = YES;

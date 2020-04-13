@@ -26,6 +26,10 @@
     //NSLog(@"Copying: %@", string);
     
     [NSPasteboard.generalPasteboard clearContents]; // Must be called!
+    
+    // TODO:
+    [NSPasteboard.generalPasteboard prepareForNewContentsWithOptions:NSPasteboardContentsCurrentHostOnly];
+    
     [NSPasteboard.generalPasteboard setString:(string ? string : @"")
                                       forType:NSStringPboardType];
 }

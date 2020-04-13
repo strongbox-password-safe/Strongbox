@@ -23,7 +23,7 @@ typedef NS_ENUM (unsigned int, DatabaseStorageMethod) {
 
 + (instancetype)userCancelled;
 + (instancetype)error:(NSError*)error withProvider:(id<SafeStorageProvider>)provider;
-+ (instancetype)parametersForFilesApp:(NSURL*)url;
++ (instancetype)parametersForFilesApp:(NSURL*_Nullable)url withProvider:(id<SafeStorageProvider>)provider;
 + (instancetype)parametersForManualDownload:(NSData*)data;
 + (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider file:(StorageBrowserItem* _Nullable)file likelyFormat:(DatabaseFormat)likelyFormat;
 + (instancetype)parametersForNativeProviderCreate:(id<SafeStorageProvider>)provider folder:(NSObject* _Nullable)folder;

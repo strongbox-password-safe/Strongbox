@@ -16,7 +16,7 @@
 #import "ClipboardManager.h"
 #import "Utils.h"
 
-@interface Delegate : NSObject <CHCSVParserDelegate>
+@interface Delegate : NSObject <CHCSVParserDelegate, UIActivityItemSource>
 
 @property (readonly) NSArray *lines;
 
@@ -24,6 +24,7 @@
 
 @interface ExportOptionsTableViewController () <UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate>
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellShare;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellFiles;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEmail;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEmailCsv;
@@ -55,6 +56,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    self.cellShare.imageView.image = [UIImage imageNamed:@"upload"];
     self.cellFiles.imageView.image = [UIImage imageNamed:@"documents"];
     self.cellEmail.imageView.image = [UIImage imageNamed:@"attach"];
     self.cellEmailCsv.imageView.image = [UIImage imageNamed:@"message"];
@@ -66,7 +68,10 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
-    if(cell == self.cellFiles) {
+    if (cell == self.cellShare) {
+        [self onShare];
+    }
+    else if(cell == self.cellFiles) {
         [self onFiles];
     }
     else if(cell == self.cellEmail) {
@@ -81,6 +86,62 @@
     else if(cell == self.cellHtml) {
         [self exportHtmlByEmail];
     }
+}
+
+- (void)onShare {
+    if(self.backupMode) {
+        [self onShareWithData:self.encrypted];
+    }
+    else {
+        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            if (userCancelled) { }
+            else if (!data) {
+                [Alerts error:self
+                        title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
+                        error:error];
+            }
+            else {
+                [self onShareWithData:data];
+            }
+        }];
+    }
+}
+
+- (void)onShareWithData:(NSData*)data {
+    NSString* filename = self.backupMode ? self.metadata.fileName : self.viewModel.metadata.fileName;
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    
+    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
+    [data writeToFile:f atomically:YES];
+    
+    NSURL* url = [NSURL fileURLWithPath:f];
+        
+    NSArray *activityItems = @[filename, url, self];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+    
+    // Required for iPad... Center Popover
+    
+    activityViewController.popoverPresentationController.sourceView = self.view;
+    activityViewController.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds),0,0);
+    activityViewController.popoverPresentationController.permittedArrowDirections = 0L; // Don't show the arrow as it's not really anchored
+    
+    [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+        NSError *errorBlock;
+        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
+            NSLog(@"error deleting file %@", errorBlock);
+            return;
+        }
+    }];
+    
+    [self presentViewController:activityViewController animated:YES completion:nil];
+}
+
+- (NSString *)activityViewController:(UIActivityViewController *)activityViewController subjectForActivityType:(NSString *)activityType
+{
+    NSString* nickname = self.backupMode ? self.metadata.nickName : self.viewModel.metadata.nickName;
+    NSString* subject = [NSString stringWithFormat:NSLocalizedString(@"export_vc_email_subject", @"Strongbox Database: '%@'"), nickname];
+
+    return subject;
 }
 
 - (void)copyCsv {
@@ -260,6 +321,10 @@
     }];
     
     [document closeWithCompletionHandler:nil];
+}
+
+- (IBAction)onDone:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

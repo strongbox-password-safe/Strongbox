@@ -19,7 +19,7 @@
 #import "KeePass2TagPackage.h"
 
 static const uint32_t kKdbx4MajorVersionNumber = 4;
-static const uint32_t kKdbx4MinorVersionNumber = 0;
+static const uint32_t kKdbx4MaximumAcceptableMinorVersionNumber = 1; // MMcG - 10-Apr-2020 - KeeWeb had originally set a few of its files to 4.1 - now fixed but some users will have 4.1 in header - accept them
 
 static const BOOL kLogVerbose = NO;
 
@@ -38,7 +38,7 @@ static const BOOL kLogVerbose = NO;
 }
 
 + (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    return keePass2SignatureAndVersionMatch(candidate, kKdbx4MajorVersionNumber, kKdbx4MinorVersionNumber, error);
+    return keePass2SignatureAndVersionMatch(candidate, kKdbx4MajorVersionNumber, kKdbx4MaximumAcceptableMinorVersionNumber, error);
 }
 
 - (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {

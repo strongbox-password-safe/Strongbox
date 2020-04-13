@@ -267,12 +267,24 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     return self.freeTrialPurchaseDate != nil;
 }
 
+- (BOOL)hasPurchasedLifeTime {
+    if (RMAppReceipt.bundleReceipt == nil) {
+        NSLog(@"bundleReceipt = nil");
+        return NO;
+    }
+
+    RMAppReceiptIAP *iap = [RMAppReceipt.bundleReceipt.inAppPurchases firstOrDefault:^BOOL(RMAppReceiptIAP *iap) {
+        return [iap.productIdentifier isEqualToString:kIapProId];
+    }];
+    
+    return iap != nil;
+}
+
 - (NSDate*)freeTrialPurchaseDate {
     if (RMAppReceipt.bundleReceipt == nil) {
         NSLog(@"bundleReceipt = nil");
         return nil;
     }
-
 
     RMAppReceiptIAP *freeTrialIap = [RMAppReceipt.bundleReceipt.inAppPurchases firstOrDefault:^BOOL(RMAppReceiptIAP *iap) {
         return [iap.productIdentifier isEqualToString:kIapFreeTrial];

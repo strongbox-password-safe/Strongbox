@@ -400,6 +400,30 @@
 		4D51EEFD21B94CC100623CA1 /* xml-keyfile.kdbx in Resources */ = {isa = PBXBuildFile; fileRef = 4D51EEFB21B94CC100623CA1 /* xml-keyfile.kdbx */; };
 		4D51EEFE21B94CC100623CA1 /* xml-keyfile.key in Resources */ = {isa = PBXBuildFile; fileRef = 4D51EEFC21B94CC100623CA1 /* xml-keyfile.key */; };
 		4D51EF0021B94E7200623CA1 /* DatabaseModelTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D51EEFF21B94E7200623CA1 /* DatabaseModelTests.m */; };
+		4D526AA224407C8F00B0B700 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9D24407C8F00B0B700 /* WSTagView.swift */; };
+		4D526AA324407C8F00B0B700 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9D24407C8F00B0B700 /* WSTagView.swift */; };
+		4D526AA424407C8F00B0B700 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9D24407C8F00B0B700 /* WSTagView.swift */; };
+		4D526AA524407C8F00B0B700 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9D24407C8F00B0B700 /* WSTagView.swift */; };
+		4D526AA624407C8F00B0B700 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9E24407C8F00B0B700 /* Constants.swift */; };
+		4D526AA724407C8F00B0B700 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9E24407C8F00B0B700 /* Constants.swift */; };
+		4D526AA824407C8F00B0B700 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9E24407C8F00B0B700 /* Constants.swift */; };
+		4D526AA924407C8F00B0B700 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9E24407C8F00B0B700 /* Constants.swift */; };
+		4D526AAA24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9F24407C8F00B0B700 /* BackspaceDetectingTextField.swift */; };
+		4D526AAB24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9F24407C8F00B0B700 /* BackspaceDetectingTextField.swift */; };
+		4D526AAC24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9F24407C8F00B0B700 /* BackspaceDetectingTextField.swift */; };
+		4D526AAD24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526A9F24407C8F00B0B700 /* BackspaceDetectingTextField.swift */; };
+		4D526AAE24407C8F00B0B700 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA024407C8F00B0B700 /* WSTagsField.swift */; };
+		4D526AAF24407C8F00B0B700 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA024407C8F00B0B700 /* WSTagsField.swift */; };
+		4D526AB024407C8F00B0B700 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA024407C8F00B0B700 /* WSTagsField.swift */; };
+		4D526AB124407C8F00B0B700 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA024407C8F00B0B700 /* WSTagsField.swift */; };
+		4D526AB224407C8F00B0B700 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA124407C8F00B0B700 /* WSTag.swift */; };
+		4D526AB324407C8F00B0B700 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA124407C8F00B0B700 /* WSTag.swift */; };
+		4D526AB424407C8F00B0B700 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA124407C8F00B0B700 /* WSTag.swift */; };
+		4D526AB524407C8F00B0B700 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D526AA124407C8F00B0B700 /* WSTag.swift */; };
+		4D526ABB2440BA4400B0B700 /* Export.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D526AB92440BA4400B0B700 /* Export.storyboard */; };
+		4D526ABC2440BA4400B0B700 /* Export.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D526AB92440BA4400B0B700 /* Export.storyboard */; };
+		4D526ABD2440BA4400B0B700 /* Export.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D526AB92440BA4400B0B700 /* Export.storyboard */; };
+		4D526ABE2440BA4400B0B700 /* Export.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D526AB92440BA4400B0B700 /* Export.storyboard */; };
 		4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
 		4D556F0E22B7F1B300E16027 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
 		4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F1022B7FF6100E16027 /* CacheManager.m */; };
@@ -454,26 +478,6 @@
 		4D637C5D236187A800C273B3 /* BiometricsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D637C59236187A800C273B3 /* BiometricsManager.m */; };
 		4D646A2022D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */; };
 		4D646A2122D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */; };
-		4D669524242E5FE6005A98D7 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669523242E5FE6005A98D7 /* WSTagsField.swift */; };
-		4D669525242E5FE6005A98D7 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669523242E5FE6005A98D7 /* WSTagsField.swift */; };
-		4D669526242E5FE6005A98D7 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669523242E5FE6005A98D7 /* WSTagsField.swift */; };
-		4D669527242E5FE6005A98D7 /* WSTagsField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669523242E5FE6005A98D7 /* WSTagsField.swift */; };
-		4D66952A242E6005005A98D7 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669528242E6005005A98D7 /* WSTag.swift */; };
-		4D66952B242E6005005A98D7 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669528242E6005005A98D7 /* WSTag.swift */; };
-		4D66952C242E6005005A98D7 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669528242E6005005A98D7 /* WSTag.swift */; };
-		4D66952D242E6005005A98D7 /* WSTag.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669528242E6005005A98D7 /* WSTag.swift */; };
-		4D66952E242E6005005A98D7 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669529242E6005005A98D7 /* WSTagView.swift */; };
-		4D66952F242E6005005A98D7 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669529242E6005005A98D7 /* WSTagView.swift */; };
-		4D669530242E6005005A98D7 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669529242E6005005A98D7 /* WSTagView.swift */; };
-		4D669531242E6005005A98D7 /* WSTagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669529242E6005005A98D7 /* WSTagView.swift */; };
-		4D669533242E6024005A98D7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669532242E6024005A98D7 /* Constants.swift */; };
-		4D669534242E6024005A98D7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669532242E6024005A98D7 /* Constants.swift */; };
-		4D669535242E6024005A98D7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669532242E6024005A98D7 /* Constants.swift */; };
-		4D669536242E6024005A98D7 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669532242E6024005A98D7 /* Constants.swift */; };
-		4D669538242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669537242E6043005A98D7 /* BackspaceDetectingTextField.swift */; };
-		4D669539242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669537242E6043005A98D7 /* BackspaceDetectingTextField.swift */; };
-		4D66953A242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669537242E6043005A98D7 /* BackspaceDetectingTextField.swift */; };
-		4D66953B242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D669537242E6043005A98D7 /* BackspaceDetectingTextField.swift */; };
 		4D66953D242E6185005A98D7 /* TagsViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D66953C242E6185005A98D7 /* TagsViewCell.xib */; };
 		4D66953E242E6185005A98D7 /* TagsViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D66953C242E6185005A98D7 /* TagsViewCell.xib */; };
 		4D66953F242E6185005A98D7 /* TagsViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D66953C242E6185005A98D7 /* TagsViewCell.xib */; };
@@ -2032,6 +2036,12 @@
 		4D51F0CA233BE5DB00F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		4D51F0CB233BE5DB00F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/EditPasswordCell.strings; sourceTree = "<group>"; };
 		4D51F0CC233BE5DB00F5BB3D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/IconTableCell.strings; sourceTree = "<group>"; };
+		4D526A9D24407C8F00B0B700 /* WSTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTagView.swift; path = lib/WSTagsField/WSTagView.swift; sourceTree = SOURCE_ROOT; };
+		4D526A9E24407C8F00B0B700 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = lib/WSTagsField/Constants.swift; sourceTree = SOURCE_ROOT; };
+		4D526A9F24407C8F00B0B700 /* BackspaceDetectingTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackspaceDetectingTextField.swift; path = lib/WSTagsField/BackspaceDetectingTextField.swift; sourceTree = SOURCE_ROOT; };
+		4D526AA024407C8F00B0B700 /* WSTagsField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTagsField.swift; path = lib/WSTagsField/WSTagsField.swift; sourceTree = SOURCE_ROOT; };
+		4D526AA124407C8F00B0B700 /* WSTag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTag.swift; path = lib/WSTagsField/WSTag.swift; sourceTree = SOURCE_ROOT; };
+		4D526ABA2440BA4400B0B700 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = StrongBox/Base.lproj/Export.storyboard; sourceTree = "<group>"; };
 		4D556F0B22B7F1B300E16027 /* FileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FileManager.h; path = StrongBox/FileManager.h; sourceTree = "<group>"; };
 		4D556F0C22B7F1B300E16027 /* FileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FileManager.m; path = StrongBox/FileManager.m; sourceTree = "<group>"; };
 		4D556F0F22B7FF6100E16027 /* CacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CacheManager.h; path = StrongBox/CacheManager.h; sourceTree = "<group>"; };
@@ -2082,11 +2092,6 @@
 		4D637C59236187A800C273B3 /* BiometricsManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BiometricsManager.m; path = StrongBox/BiometricsManager.m; sourceTree = "<group>"; };
 		4D646A1E22D2A42C00C5D2FE /* UIImage+FixOrientation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UIImage+FixOrientation.h"; path = "StrongBox/UIImage+FixOrientation.h"; sourceTree = "<group>"; };
 		4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "UIImage+FixOrientation.m"; path = "StrongBox/UIImage+FixOrientation.m"; sourceTree = "<group>"; };
-		4D669523242E5FE6005A98D7 /* WSTagsField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTagsField.swift; path = ../../../../WSTagsField/Source/WSTagsField.swift; sourceTree = "<group>"; };
-		4D669528242E6005005A98D7 /* WSTag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTag.swift; path = ../../../../WSTagsField/Source/WSTag.swift; sourceTree = "<group>"; };
-		4D669529242E6005005A98D7 /* WSTagView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTagView.swift; path = ../../../../WSTagsField/Source/WSTagView.swift; sourceTree = "<group>"; };
-		4D669532242E6024005A98D7 /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Constants.swift; path = ../../../../WSTagsField/Source/Constants.swift; sourceTree = "<group>"; };
-		4D669537242E6043005A98D7 /* BackspaceDetectingTextField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BackspaceDetectingTextField.swift; path = ../../../../WSTagsField/Source/BackspaceDetectingTextField.swift; sourceTree = "<group>"; };
 		4D66953C242E6185005A98D7 /* TagsViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = TagsViewCell.xib; path = StrongBox/CustomCells/TagsViewCell.xib; sourceTree = SOURCE_ROOT; };
 		4D669541242E680F005A98D7 /* TagsViewTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TagsViewTableViewCell.h; path = StrongBox/CustomCells/TagsViewTableViewCell.h; sourceTree = SOURCE_ROOT; };
 		4D669542242E6810005A98D7 /* TagsViewTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TagsViewTableViewCell.m; path = StrongBox/CustomCells/TagsViewTableViewCell.m; sourceTree = SOURCE_ROOT; };
@@ -2410,6 +2415,14 @@
 		4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreviousPasswordsTableViewController.m; path = StrongBox/PreviousPasswordsTableViewController.m; sourceTree = "<group>"; };
 		4D915D781EDC4B77002615F6 /* Alerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Alerts.h; path = StrongBox/Alerts.h; sourceTree = "<group>"; };
 		4D915D791EDC4B77002615F6 /* Alerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Alerts.m; path = StrongBox/Alerts.m; sourceTree = "<group>"; };
+		4D92F1D92440BDF100C737D5 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "StrongBox/zh-Hans.lproj/Export.strings"; sourceTree = "<group>"; };
+		4D92F1DB2440BDF200C737D5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = StrongBox/fr.lproj/Export.strings; sourceTree = "<group>"; };
+		4D92F1DD2440BDF600C737D5 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = StrongBox/de.lproj/Export.strings; sourceTree = "<group>"; };
+		4D92F1DF2440BDF900C737D5 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = StrongBox/it.lproj/Export.strings; sourceTree = "<group>"; };
+		4D92F1E32440BE0000C737D5 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = StrongBox/ru.lproj/Export.strings; sourceTree = "<group>"; };
+		4D92F1E52440BE0300C737D5 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = StrongBox/es.lproj/Export.strings; sourceTree = "<group>"; };
+		4D92F1E72440BE0800C737D5 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = StrongBox/sv.lproj/Export.strings; sourceTree = "<group>"; };
+		4D92F1E92440BE0B00C737D5 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = StrongBox/uk.lproj/Export.strings; sourceTree = "<group>"; };
 		4D93AC902184ADE000A141C6 /* MiscScratchPadTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MiscScratchPadTests.m; path = StrongboxTests/MiscScratchPadTests.m; sourceTree = "<group>"; };
 		4D93AC952184B04D00A141C6 /* OfflineCacheNameDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineCacheNameDetector.h; path = StrongBox/OfflineCacheNameDetector.h; sourceTree = "<group>"; };
 		4D93AC962184B04D00A141C6 /* OfflineCacheNameDetector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OfflineCacheNameDetector.m; path = StrongBox/OfflineCacheNameDetector.m; sourceTree = "<group>"; };
@@ -3631,11 +3644,11 @@
 		4D669522242E5FD4005A98D7 /* WSTagsField */ = {
 			isa = PBXGroup;
 			children = (
-				4D669537242E6043005A98D7 /* BackspaceDetectingTextField.swift */,
-				4D669528242E6005005A98D7 /* WSTag.swift */,
-				4D669529242E6005005A98D7 /* WSTagView.swift */,
-				4D669523242E5FE6005A98D7 /* WSTagsField.swift */,
-				4D669532242E6024005A98D7 /* Constants.swift */,
+				4D526A9F24407C8F00B0B700 /* BackspaceDetectingTextField.swift */,
+				4D526A9E24407C8F00B0B700 /* Constants.swift */,
+				4D526AA124407C8F00B0B700 /* WSTag.swift */,
+				4D526AA024407C8F00B0B700 /* WSTagsField.swift */,
+				4D526A9D24407C8F00B0B700 /* WSTagView.swift */,
 			);
 			path = WSTagsField;
 			sourceTree = "<group>";
@@ -4227,6 +4240,7 @@
 				4D6C51971F6407580035640E /* DatabaseOperations.m */,
 				4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */,
 				4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */,
+				4D526AB92440BA4400B0B700 /* Export.storyboard */,
 				4DD755EA232F084900758824 /* ExportOptionsTableViewController.h */,
 				4DD755E9232F084900758824 /* ExportOptionsTableViewController.m */,
 				4D25673021E8B086006260B7 /* PinsConfigurationController.h */,
@@ -4864,6 +4878,7 @@
 				4DE7F0E422F89D610095F51F /* SelectKeyFile.storyboard in Resources */,
 				4D4D3FD12409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
 				4D4D3FDC2409CDC80056A7E2 /* Assets.xcassets in Resources */,
+				4D526ABB2440BA4400B0B700 /* Export.storyboard in Resources */,
 				4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4DE7F0EB22F89D6F0095F51F /* PinEntry.storyboard in Resources */,
@@ -4947,6 +4962,7 @@
 				4DC4E13B23488BAA000743C4 /* SelectKeyFile.storyboard in Resources */,
 				4D4D3FD22409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
 				4D4D3FDD2409CDC80056A7E2 /* Assets.xcassets in Resources */,
+				4D526ABD2440BA4400B0B700 /* Export.storyboard in Resources */,
 				4DC4E13C23488BAA000743C4 /* BrowseItemTotpCell.xib in Resources */,
 				4DC4E13D23488BAA000743C4 /* Images.xcassets in Resources */,
 				4DC4E13E23488BAA000743C4 /* PinEntry.storyboard in Resources */,
@@ -5049,6 +5065,7 @@
 				4DC4E26823488BAE000743C4 /* IconTableCell.xib in Resources */,
 				4DC4E26923488BAE000743C4 /* IconsSectionHeaderReusableView.xib in Resources */,
 				4DC4E26A23488BAE000743C4 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				4D526ABE2440BA4400B0B700 /* Export.storyboard in Resources */,
 				4DC4E26B23488BAE000743C4 /* NotesTableViewCell.xib in Resources */,
 				4DC4E26C23488BAE000743C4 /* IconCellView.xib in Resources */,
 				4D7F5A4023602000003ED785 /* ItemDetails.storyboard in Resources */,
@@ -5116,6 +5133,7 @@
 				4D770F8B230324A800CBE244 /* IconTableCell.xib in Resources */,
 				4DF2997E2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
 				4D36B0C322C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				4D526ABC2440BA4400B0B700 /* Export.storyboard in Resources */,
 				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4D7F5A3F23601FFF003ED785 /* ItemDetails.storyboard in Resources */,
@@ -5443,9 +5461,11 @@
 				4D196797217F1C190057DF06 /* PwSafeMetadata.m in Sources */,
 				4D0835CF228474D800CA7405 /* WebDAVStorageProvider.m in Sources */,
 				4DCEE40C2273470C004AE3A7 /* AutoCompleteTextField.m in Sources */,
+				4D526AA224407C8F00B0B700 /* WSTagView.swift in Sources */,
 				4D326E8F22302BED00DCD8C7 /* NMSSHHostConfig.m in Sources */,
 				4D67B1E12191DA5A00B0D29A /* SelectDatabaseFormatTableViewController.m in Sources */,
 				4DB1B7DC2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */,
+				4D526AAE24407C8F00B0B700 /* WSTagsField.swift in Sources */,
 				4D792A6B222EF46A00250086 /* RMStoreTransaction.m in Sources */,
 				4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4DF97F1D21BF101B0090A55E /* DAVCredentials.m in Sources */,
@@ -5507,7 +5527,6 @@
 				4D56D91321B837A20030E13A /* AddNewSafeHelper.m in Sources */,
 				4D669543242E6810005A98D7 /* TagsViewTableViewCell.m in Sources */,
 				4D210F4E21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
-				4D66952A242E6005005A98D7 /* WSTag.swift in Sources */,
 				4DC5B9C1217B376F00FE9DD9 /* Root.m in Sources */,
 				4D326E8922302BED00DCD8C7 /* NMSSHConfig.m in Sources */,
 				4DD755EE232F087A00758824 /* WelcomeUseICloudViewController.m in Sources */,
@@ -5518,7 +5537,6 @@
 				4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
-				4D669538242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
 				4DE46659233D2BBD00398A65 /* BackupItem.m in Sources */,
 				4DB1B7D42188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
@@ -5544,6 +5562,7 @@
 				4D44983123926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
 				4D08B5C7234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
+				4D526AB224407C8F00B0B700 /* WSTag.swift in Sources */,
 				4D24C76D238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
 				4D556F2422B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8322302BED00DCD8C7 /* socket_helper.m in Sources */,
@@ -5551,7 +5570,6 @@
 				4D326E8522302BED00DCD8C7 /* NMSSHSession.m in Sources */,
 				4DB7D520229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m in Sources */,
 				4DCF5FBC1F7294A800011756 /* StrongboxUIDocument.m in Sources */,
-				4D669533242E6024005A98D7 /* Constants.swift in Sources */,
 				4D2E47AE233CFD8D00C1DE90 /* BackupsManager.m in Sources */,
 				4D08B5C9234C9613003D1953 /* GCDWebServerFileRequest.m in Sources */,
 				4DFF34C4238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
@@ -5611,6 +5629,7 @@
 				4D326E8B22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
 				4D2259F922C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0AFD2522A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m in Sources */,
+				4D526AAA24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */,
 				4D74B929218C40B000FC369E /* V3Binary.m in Sources */,
 				4DE498B52271AD28007EF98C /* AddAttachmentHelper.m in Sources */,
 				4D08B5BD234C9613003D1953 /* GCDWebServerFileResponse.m in Sources */,
@@ -5631,7 +5650,6 @@
 				4D4766F22178C82B00C4358F /* DecryptionParameters.m in Sources */,
 				4D74B92D218C438800FC369E /* V3BinariesList.m in Sources */,
 				4D08B5CD234C97DC003D1953 /* LocalHttpServerViewController.m in Sources */,
-				4D669524242E5FE6005A98D7 /* WSTagsField.swift in Sources */,
 				4D5F5B72218B350C00A0739A /* DatabaseAttachment.m in Sources */,
 				4D0AFD2222A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m in Sources */,
 				4D004CDB21F4C26700E2B194 /* OTPTokenType.m in Sources */,
@@ -5642,7 +5660,6 @@
 				4D5F5B93218B6C9D00A0739A /* NodeFileAttachment.m in Sources */,
 				4D9098EC239956BA0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */,
 				4DD72BF924264B18009F4091 /* DatabasePreferencesController.m in Sources */,
-				4D66952E242E6005005A98D7 /* WSTagView.swift in Sources */,
 				4D25673221E8B086006260B7 /* PinsConfigurationController.m in Sources */,
 				4D5F5B6E218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */,
@@ -5693,6 +5710,7 @@
 				4DD696A5218F0B170082DC08 /* AttachmentsRationalizer.m in Sources */,
 				4D08B5C1234C9613003D1953 /* GCDWebServerStreamedResponse.m in Sources */,
 				4DF97F2321BF101B0090A55E /* DAVRequestGroup.m in Sources */,
+				4D526AA624407C8F00B0B700 /* Constants.swift in Sources */,
 				4D08B5BF234C9613003D1953 /* GCDWebServerDataResponse.m in Sources */,
 				4D08B5BB234C9613003D1953 /* GCDWebServerErrorResponse.m in Sources */,
 				4D3E147C2183049E00A41CA0 /* Kdbx4Serialization.m in Sources */,
@@ -5732,7 +5750,6 @@
 				4DC4E01D23488BAA000743C4 /* InnerRandomStreamFactory.m in Sources */,
 				4DC4E01E23488BAA000743C4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D08B5B8234C9613003D1953 /* GCDWebServer.m in Sources */,
-				4D66952C242E6005005A98D7 /* WSTag.swift in Sources */,
 				4DC4E01F23488BAA000743C4 /* PasswordHistoryEntry.m in Sources */,
 				4DC4E02023488BAA000743C4 /* Kdb1Database.m in Sources */,
 				4DC4E02123488BAA000743C4 /* SortOrderTableViewController.m in Sources */,
@@ -5819,6 +5836,7 @@
 				4DC4E06623488BAA000743C4 /* AddNewSafeHelper.m in Sources */,
 				4DC4E06723488BAA000743C4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4DC4E06823488BAA000743C4 /* Root.m in Sources */,
+				4D526AB424407C8F00B0B700 /* WSTag.swift in Sources */,
 				4DC4E06923488BAA000743C4 /* NMSSHConfig.m in Sources */,
 				4DC4E06A23488BAA000743C4 /* WelcomeUseICloudViewController.m in Sources */,
 				4DC4E06B23488BAA000743C4 /* IOsUtils.m in Sources */,
@@ -5843,7 +5861,6 @@
 				4DC4E07B23488BAA000743C4 /* CollapsibleTableViewHeader.m in Sources */,
 				4DC4E07C23488BAA000743C4 /* KeePassHistoryController.m in Sources */,
 				4D637C5C236187A800C273B3 /* BiometricsManager.m in Sources */,
-				4D66953A242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */,
 				4DC4E07D23488BAA000743C4 /* SafesList.m in Sources */,
 				4DC4E07E23488BAA000743C4 /* Salsa20Stream.m in Sources */,
 				4DC4E07F23488BAA000743C4 /* KeyFileParser.m in Sources */,
@@ -5873,6 +5890,7 @@
 				4DD72BFA24264B1F009F4091 /* DatabasePreferencesController.m in Sources */,
 				4DC4E09423488BAA000743C4 /* ClipboardManager.m in Sources */,
 				4DC4E09523488BAA000743C4 /* IconsCollectionViewController.m in Sources */,
+				4D526AA424407C8F00B0B700 /* WSTagView.swift in Sources */,
 				4DC4E09623488BAA000743C4 /* KdfParameters.m in Sources */,
 				4DC4E09723488BAA000743C4 /* PasswordGenerationConfig.m in Sources */,
 				4DC4E09823488BAA000743C4 /* NodeFields.m in Sources */,
@@ -5894,6 +5912,7 @@
 				4DC4E0A723488BAA000743C4 /* BrowseItemTotpCell.m in Sources */,
 				4DC4E0A823488BAA000743C4 /* SafeMetaData.m in Sources */,
 				4DC4E0A923488BAA000743C4 /* TPKeyboardAvoidingScrollView.m in Sources */,
+				4D526AAC24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */,
 				4DC4E0AA23488BAA000743C4 /* KeePassDatabase.m in Sources */,
 				4D832A9723CE226800A7885E /* SecretStore.m in Sources */,
 				4D4D3FDB2409CDC80056A7E2 /* NamedColors.swift in Sources */,
@@ -5904,17 +5923,16 @@
 				4DC4E0AF23488BAA000743C4 /* DAVResponseItem.m in Sources */,
 				4DC4E0B023488BAA000743C4 /* OfflineDetector.m in Sources */,
 				4DC4E0B123488BAA000743C4 /* KdbxSerialization.m in Sources */,
-				4D669530242E6005005A98D7 /* WSTagView.swift in Sources */,
 				4DC4E0B223488BAA000743C4 /* crypt_argchk.c in Sources */,
 				4D4761362437531C00E312D9 /* WelcomeFreemiumViewController.m in Sources */,
 				4D08B5B6234C9613003D1953 /* GCDWebServerFunctions.m in Sources */,
 				4DC4E0B323488BAA000743C4 /* CustomFieldsViewController.m in Sources */,
+				4D526AA824407C8F00B0B700 /* Constants.swift in Sources */,
 				4D6B5050238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC4E0B423488BAA000743C4 /* Meta.m in Sources */,
 				4D1E77ED23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */,
 				4DC4E0B523488BAA000743C4 /* MasterDetailViewController.m in Sources */,
 				4DC4E0B623488BAA000743C4 /* ItemMetadataEntry.m in Sources */,
-				4D669535242E6024005A98D7 /* Constants.swift in Sources */,
 				4DC4E0B723488BAA000743C4 /* NSData+GZIP.m in Sources */,
 				4DC4E0B823488BAA000743C4 /* ChaCha20Stream.m in Sources */,
 				4DC4E0B923488BAA000743C4 /* AutoFillNewRecordSettingsController.m in Sources */,
@@ -5940,6 +5958,7 @@
 				4DC4E0CB23488BAA000743C4 /* blake2b.c in Sources */,
 				4DC4E0CC23488BAA000743C4 /* QRCodeScannerViewController.m in Sources */,
 				4DC4E0CD23488BAA000743C4 /* TextFieldAutoSuggest.m in Sources */,
+				4D526AB024407C8F00B0B700 /* WSTagsField.swift in Sources */,
 				4DC4E0CE23488BAA000743C4 /* DecryptionParameters.m in Sources */,
 				4DC4E0CF23488BAA000743C4 /* V3BinariesList.m in Sources */,
 				4D08B5CE234C97DC003D1953 /* LocalHttpServerViewController.m in Sources */,
@@ -5974,7 +5993,6 @@
 				4DC4E0E823488BAA000743C4 /* OfflineCacheNameDetector.m in Sources */,
 				4DC4E0E923488BAA000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4DC4E0EA23488BAA000743C4 /* GoogleDriveManager.m in Sources */,
-				4D669526242E5FE6005A98D7 /* WSTagsField.swift in Sources */,
 				4DC4E0EB23488BAA000743C4 /* Model.m in Sources */,
 				4DC4E0EC23488BAA000743C4 /* CryptoParameters.m in Sources */,
 				4DC4E0ED23488BAA000743C4 /* CustomIcon.m in Sources */,
@@ -6034,7 +6052,6 @@
 				4DC4E17423488BAE000743C4 /* CollapsibleTableViewHeader.m in Sources */,
 				4DC4E17523488BAE000743C4 /* KdbSerialization.m in Sources */,
 				4DC4E17623488BAE000743C4 /* BasicOrderedDictionary.m in Sources */,
-				4D66952D242E6005005A98D7 /* WSTag.swift in Sources */,
 				4DC4E17723488BAE000743C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4DC4E17823488BAE000743C4 /* ItemMetadataEntry.m in Sources */,
 				4DC4E17923488BAE000743C4 /* Meta.m in Sources */,
@@ -6048,7 +6065,6 @@
 				4DC4E18123488BAE000743C4 /* XMLWriter.m in Sources */,
 				4DC4E18223488BAE000743C4 /* ItemDetailsModel.m in Sources */,
 				4DC4E18323488BAE000743C4 /* String.m in Sources */,
-				4D66953B242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */,
 				4DC4E18423488BAE000743C4 /* DAVListingParser.m in Sources */,
 				4DC4E18523488BAE000743C4 /* ChaCha20Cipher.m in Sources */,
 				4D8354CD2389141F00E264E0 /* FavIconManager.m in Sources */,
@@ -6066,7 +6082,6 @@
 				4DC4E19023488BAE000743C4 /* KdfParameters.m in Sources */,
 				4DC4E19123488BAE000743C4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4DC4E19223488BAE000743C4 /* DatabaseSearchAndSorter.m in Sources */,
-				4D669536242E6024005A98D7 /* Constants.swift in Sources */,
 				4DC4E19323488BAE000743C4 /* KdbxSerializationCommon.m in Sources */,
 				4DC4E19423488BAE000743C4 /* ItemDetailsViewController.m in Sources */,
 				4D6B5055238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
@@ -6080,6 +6095,7 @@
 				4DC4E19A23488BAE000743C4 /* DAVRequestGroup.m in Sources */,
 				4DC4E19B23488BAE000743C4 /* CustomFieldEditorViewController.m in Sources */,
 				4DC4E19C23488BAE000743C4 /* RootXmlDomainObject.m in Sources */,
+				4D526AB124407C8F00B0B700 /* WSTagsField.swift in Sources */,
 				4DC4E19D23488BAE000743C4 /* DatabaseCell.m in Sources */,
 				4DC4E19E23488BAE000743C4 /* AesKdfCipher.m in Sources */,
 				4DC4E19F23488BAE000743C4 /* OTPToken+Generation.m in Sources */,
@@ -6087,7 +6103,6 @@
 				4DC4E1A023488BAE000743C4 /* AutoFillManager.m in Sources */,
 				4DC4E1A123488BAE000743C4 /* ClipboardManager.m in Sources */,
 				4DC4E1A223488BAE000743C4 /* Kdb1Database.m in Sources */,
-				4D669531242E6005005A98D7 /* WSTagView.swift in Sources */,
 				4DC4E1A323488BAE000743C4 /* StrongboxDatabase.m in Sources */,
 				4DC4E1A423488BAE000743C4 /* SimpleXmlValueExtractor.m in Sources */,
 				4DC4E1A523488BAE000743C4 /* SprCompilation.m in Sources */,
@@ -6096,7 +6111,7 @@
 				4DC4E1A723488BAE000743C4 /* NMSSHChannel.m in Sources */,
 				4DC4E1A823488BAE000743C4 /* ISO8601DateFormatter.m in Sources */,
 				4DC4E1A923488BAE000743C4 /* OTPAlgorithm.m in Sources */,
-				4D669527242E5FE6005A98D7 /* WSTagsField.swift in Sources */,
+				4D526AA524407C8F00B0B700 /* WSTagView.swift in Sources */,
 				4DC4E1AA23488BAE000743C4 /* PasswordGenerationViewController.m in Sources */,
 				4D832A9823CE226800A7885E /* SecretStore.m in Sources */,
 				4DC4E1AB23488BAE000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
@@ -6189,6 +6204,7 @@
 				4DC4E1FE23488BAE000743C4 /* CustomFieldTableCell.m in Sources */,
 				4DC4E1FF23488BAE000743C4 /* Entry.m in Sources */,
 				4DC4E20023488BAE000743C4 /* NMSFTPFile.m in Sources */,
+				4D526AA924407C8F00B0B700 /* Constants.swift in Sources */,
 				4DC4E20123488BAE000743C4 /* NSDateRFC1123.m in Sources */,
 				4DC4E20223488BAE000743C4 /* PinEntryController.m in Sources */,
 				4DC4E20323488BAE000743C4 /* DAVCredentials.m in Sources */,
@@ -6215,6 +6231,7 @@
 				4DC4E21623488BAE000743C4 /* EditDateCell.m in Sources */,
 				4DC4E21723488BAE000743C4 /* FontManager.m in Sources */,
 				4DC4E21823488BAE000743C4 /* SetNodeIconUiHelper.m in Sources */,
+				4D526AAD24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */,
 				4DC4E21923488BAE000743C4 /* AppleICloudProvider.m in Sources */,
 				4DC4E21A23488BAE000743C4 /* SFTPProviderData.m in Sources */,
 				4DC4E21B23488BAE000743C4 /* core.c in Sources */,
@@ -6239,6 +6256,7 @@
 				4DC4E22D23488BAE000743C4 /* NSData+GZIP.m in Sources */,
 				4DC4E22E23488BAE000743C4 /* NSURL+QueryItems.m in Sources */,
 				4DC4E22F23488BAE000743C4 /* Settings.m in Sources */,
+				4D526AB524407C8F00B0B700 /* WSTag.swift in Sources */,
 				4DC4E23023488BAE000743C4 /* SafeMetaData.m in Sources */,
 				4DC4E23123488BAE000743C4 /* FileManager.m in Sources */,
 				4DC4E23223488BAE000743C4 /* SafesList.m in Sources */,
@@ -6264,7 +6282,6 @@
 				4D33FA3D22872134006C31B2 /* CollapsibleTableViewHeader.m in Sources */,
 				4D5B1EAC2194AEB400ECAF0D /* KdbSerialization.m in Sources */,
 				4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */,
-				4D66952B242E6005005A98D7 /* WSTag.swift in Sources */,
 				4DAE98AD2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D33FA3B2287210C006C31B2 /* ItemMetadataEntry.m in Sources */,
 				4D47670C217905AB00C4358F /* Meta.m in Sources */,
@@ -6278,7 +6295,6 @@
 				4D2F6C1E21807C25007931E4 /* XMLWriter.m in Sources */,
 				4D33FA3A2287210C006C31B2 /* ItemDetailsModel.m in Sources */,
 				4D2F6C3921807C7E007931E4 /* String.m in Sources */,
-				4D669539242E6043005A98D7 /* BackspaceDetectingTextField.swift in Sources */,
 				4DF972C921C01ABF00F384C9 /* DAVListingParser.m in Sources */,
 				4D5F5B6F218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				4D8354CB2389141F00E264E0 /* FavIconManager.m in Sources */,
@@ -6296,7 +6312,6 @@
 				4D3E1485218326BE00A41CA0 /* KdfParameters.m in Sources */,
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
-				4D669534242E6024005A98D7 /* Constants.swift in Sources */,
 				4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
 				4D33FA3922872008006C31B2 /* ItemDetailsViewController.m in Sources */,
 				4D6B5053238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
@@ -6310,6 +6325,7 @@
 				4DF972CB21C01ABF00F384C9 /* DAVRequestGroup.m in Sources */,
 				4D0835B82284742000CA7405 /* CustomFieldEditorViewController.m in Sources */,
 				4D4767082179013900C4358F /* RootXmlDomainObject.m in Sources */,
+				4D526AAF24407C8F00B0B700 /* WSTagsField.swift in Sources */,
 				4DE18BBB22F09A3F007D902D /* DatabaseCell.m in Sources */,
 				4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */,
@@ -6317,7 +6333,6 @@
 				4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D2CB4922332CBE400C2E084 /* ClipboardManager.m in Sources */,
 				4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */,
-				4D66952F242E6005005A98D7 /* WSTagView.swift in Sources */,
 				4D0835D62284750900CA7405 /* StrongboxDatabase.m in Sources */,
 				4DC3F83423215A58002BDEF7 /* SimpleXmlValueExtractor.m in Sources */,
 				4D18F2372257987F00768E18 /* SprCompilation.m in Sources */,
@@ -6326,7 +6341,7 @@
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
 				4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */,
-				4D669525242E5FE6005A98D7 /* WSTagsField.swift in Sources */,
+				4D526AA324407C8F00B0B700 /* WSTagView.swift in Sources */,
 				4DFA67DB22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
 				4D832A9623CE226800A7885E /* SecretStore.m in Sources */,
 				4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
@@ -6419,6 +6434,7 @@
 				4D33FA412287232E006C31B2 /* CustomFieldTableCell.m in Sources */,
 				4D2F6C3D21807C7E007931E4 /* Entry.m in Sources */,
 				4D326E8C22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
+				4D526AA724407C8F00B0B700 /* Constants.swift in Sources */,
 				4DF972D021C01AD500F384C9 /* NSDateRFC1123.m in Sources */,
 				4D0835E12284780400CA7405 /* PinEntryController.m in Sources */,
 				4DF972C821C01ABF00F384C9 /* DAVCredentials.m in Sources */,
@@ -6445,6 +6461,7 @@
 				4D2259FA22C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0835B62284742000CA7405 /* FontManager.m in Sources */,
 				4D33FA3E2287214D006C31B2 /* SetNodeIconUiHelper.m in Sources */,
+				4D526AAB24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */,
 				4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */,
 				4D0835C22284748200CA7405 /* SFTPProviderData.m in Sources */,
 				4D3E149621832C1500A41CA0 /* core.c in Sources */,
@@ -6469,6 +6486,7 @@
 				4D326EA7223037AE00DCD8C7 /* NSData+GZIP.m in Sources */,
 				4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */,
 				4DEF7B93216FC6EE00A3EE12 /* Settings.m in Sources */,
+				4D526AB324407C8F00B0B700 /* WSTag.swift in Sources */,
 				4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */,
 				4D556F0E22B7F1B300E16027 /* FileManager.m in Sources */,
 				4DE48A66216F558E00C9C991 /* SafesList.m in Sources */,
@@ -6539,6 +6557,22 @@
 			);
 			name = FreemiumOnboarding.storyboard;
 			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		4D526AB92440BA4400B0B700 /* Export.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4D526ABA2440BA4400B0B700 /* Base */,
+				4D92F1D92440BDF100C737D5 /* zh-Hans */,
+				4D92F1DB2440BDF200C737D5 /* fr */,
+				4D92F1DD2440BDF600C737D5 /* de */,
+				4D92F1DF2440BDF900C737D5 /* it */,
+				4D92F1E32440BE0000C737D5 /* ru */,
+				4D92F1E52440BE0300C737D5 /* es */,
+				4D92F1E72440BE0800C737D5 /* sv */,
+				4D92F1E92440BE0B00C737D5 /* uk */,
+			);
+			name = Export.storyboard;
 			sourceTree = "<group>";
 		};
 		4D5F5B80218B4C9300A0739A /* MainInterface.storyboard */ = {

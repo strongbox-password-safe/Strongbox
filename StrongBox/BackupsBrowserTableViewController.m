@@ -101,7 +101,8 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToExport"]) {
-        ExportOptionsTableViewController *vc = (ExportOptionsTableViewController *)segue.destinationViewController;
+        UINavigationController* nav = segue.destinationViewController;
+        ExportOptionsTableViewController *vc = (ExportOptionsTableViewController *)nav.topViewController;
     
         BackupItem* item = sender;
            

@@ -68,7 +68,7 @@ static NSString* const kDatabaseCellSubtitle1 = @"databaseCellSubtitle1";
 static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
-static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
+
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
 
@@ -206,14 +206,6 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     [defaults synchronize];
 }
 
-- (BOOL)hasDoneProFamilyCheck {
-    return [self getBool:kHasDoneProFamilyCheck];
-}
-
-- (void)setHasDoneProFamilyCheck:(BOOL)hasDoneProFamilyCheck {
-    [self setBool:kHasDoneProFamilyCheck value:hasDoneProFamilyCheck];
-}
-
 - (BOOL)monitorInternetConnectivity {
     return [self getBool:kMonitorInternetConnectivity fallback:YES];
 }
@@ -321,8 +313,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
 }
 
-- (BOOL)isPro
-{
+- (BOOL)isPro {
     NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
     
     return [userDefaults boolForKey:kIsProKey];
@@ -345,6 +336,10 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     NSLog(@"Free trial: %d Date: %@ - days remaining = [%ld]", freeTrial, date, (long)self.freeTrialDaysLeft);
     
     return freeTrial;
+}
+
+- (BOOL)freeTrialHasBeenOptedInAndExpired {
+    return !Settings.sharedInstance.isFreeTrial && Settings.sharedInstance.freeTrialEnd;
 }
 
 - (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from {

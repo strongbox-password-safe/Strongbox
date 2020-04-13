@@ -11,6 +11,18 @@
 #import "Utils.h"
 #import "BookmarksHelper.h"
 #import "SafesList.h"
+#import "FileManager.h"
+#import "iCloudSafesCoordinator.h"
+
+typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, NSError *error);
+
+@interface FilesAppUrlBookmarkProvider () <UIDocumentPickerDelegate>
+
+@property NSString* createNickName;
+@property NSURL* createTemporaryDatabaseUrl;
+@property CreateCompletionBlock createCompletion;
+
+@end
 
 @implementation FilesAppUrlBookmarkProvider
 
@@ -43,9 +55,82 @@
     return self;
 }
 
-- (void)create:(NSString *)nickName extension:(NSString *)extension data:(NSData *)data parentFolder:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(SafeMetaData *, NSError *))completion {
-    // NOTIMPL:
-    NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
+- (void)create:(NSString *)nickName
+     extension:(NSString *)extension
+          data:(NSData *)data
+  parentFolder:(NSObject *)parentFolder
+viewController:(UIViewController *)viewController completion:(CreateCompletionBlock)completion {
+    NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
+
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:desiredFilename];
+
+    NSError* error;
+    if (![NSFileManager.defaultManager removeItemAtPath:f error:&error] ) {
+        completion(nil, error);
+    }
+
+    if (![data writeToFile:f options:kNilOptions error:&error]) {
+        completion(nil, error);
+    }
+    
+    self.createTemporaryDatabaseUrl = [NSURL fileURLWithPath:f];
+    self.createCompletion = completion;
+    self.createNickName = nickName;
+    
+    UIDocumentPickerViewController* vc = [[UIDocumentPickerViewController alloc] initWithURL:self.createTemporaryDatabaseUrl inMode:UIDocumentPickerModeExportToService];
+    vc.delegate = self;
+    
+    [viewController presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+//    NSLog(@"Picked: [%@]", urls);
+
+    [self onCreateDestinationSelected:urls.firstObject];
+    
+    [NSFileManager.defaultManager removeItemAtURL:self.createTemporaryDatabaseUrl error:nil];
+}
+
+- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    [NSFileManager.defaultManager removeItemAtURL:self.createTemporaryDatabaseUrl error:nil];
+}
+
+- (void)onCreateDestinationSelected:(NSURL*)dest {
+    [dest startAccessingSecurityScopedResource];
+
+    NSURL *strongboxLocalDocumentsDirectory = FileManager.sharedInstance.documentsDirectory;
+    NSString *strongboxLocalDocumentsPath = strongboxLocalDocumentsDirectory.URLByStandardizingPath.URLByResolvingSymlinksInPath.path;
+
+    NSURL* strongboxICloudDocumentsDirectory = iCloudSafesCoordinator.sharedInstance.iCloudDocumentsFolder;
+    NSString* strongboxICloudDocumentsPath = strongboxICloudDocumentsDirectory ? strongboxICloudDocumentsDirectory.URLByStandardizingPath.URLByResolvingSymlinksInPath.path : nil;
+    
+    NSString *filePath = dest.URLByStandardizingPath.URLByResolvingSymlinksInPath.path;
+    NSString *fileParentPath = [filePath stringByDeletingLastPathComponent];
+    
+    NSLog(@"[%@] == [%@]", strongboxICloudDocumentsPath, fileParentPath);
+
+    BOOL isLocalSandboxFile = [fileParentPath isEqualToString:strongboxLocalDocumentsPath];
+    BOOL isStrongboxICloudFile = strongboxICloudDocumentsPath ? [fileParentPath isEqualToString:strongboxICloudDocumentsPath] : NO;
+
+    if (isLocalSandboxFile || isStrongboxICloudFile) {
+        // Nop - Don't do anything Background watcher will pick up this new DB
+        NSLog(@"New Database is actually local to Sandbox or iCloud - using simplified non iOS Files Storage Provider. [%d][%d]", isLocalSandboxFile, isStrongboxICloudFile);
+    }
+    else {
+        NSError* error;
+        NSData* bookmark = [BookmarksHelper getBookmarkDataFromUrl:dest error:&error];
+        
+        if (bookmark) {
+            NSString* desiredFilename = dest.lastPathComponent;
+            SafeMetaData* metadata = [self getSafeMetaData:self.createNickName fileName:desiredFilename providerData:bookmark];
+            self.createCompletion(metadata, nil);
+        }
+        else {
+            NSLog(@"Error creating bookmark for iOS Files based database: [%@] - [%@]", error, dest);
+            self.createCompletion(nil, error);
+            return;
+        }
+    }
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {

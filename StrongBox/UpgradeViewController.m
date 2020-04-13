@@ -68,7 +68,6 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     };
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Not sure if we need to do this?
-    
 }
 
 - (void)setupUi {
@@ -108,7 +107,11 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
 }
 
 - (void)bindFreeTrialInfo {
-    if (Settings.sharedInstance.freeTrialEnd) {
+    if ([Settings.sharedInstance isPro]) {
+        self.buttonStartFreeTrial.hidden = YES;
+        self.viewFreeTrialInfo.hidden = YES;
+    }
+    else if (Settings.sharedInstance.freeTrialEnd) {
         self.buttonStartFreeTrial.hidden = YES;
         self.viewFreeTrialInfo.hidden = NO;
         
@@ -163,7 +166,7 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
 
 - (void)onProStatusChanged:(id)param {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self dismiss];
+        [self bindUi];
     });
 }
 

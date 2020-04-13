@@ -11,6 +11,8 @@
 #import "ClipboardManager.h"
 #import "Alerts.h"
 #import "Settings.h"
+#import "Utils.h"
+#import "ProUpgradeIAPManager.h"
 
 @interface AboutViewController ()
 
@@ -24,6 +26,15 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    if([[Settings sharedInstance] isPro]) {
+        NSString* about = [NSString stringWithFormat:
+                       NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@"), [Utils getAppVersion]];
+
+        self.navigationItem.title = about;
+    }
+
+    self.upgradeOptions.hidden = ProUpgradeIAPManager.isProFamilyEdition || ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime; // If we know user is lifetime don't show option to change license
     
     self.debugTextView.layer.cornerRadius = 2.0f;
     if (@available(iOS 13.0, *)) {
