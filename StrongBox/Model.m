@@ -244,6 +244,12 @@
     }
 }
 
+// Audit
+
+- (BOOL)isFlaggedByAudit:(Node*)item {
+    return [self.database isFlaggedByAudit:item];
+}
+
 // Pinned or Not?
 
 - (NSSet<NSString*>*)pinnedSet {
@@ -259,6 +265,7 @@
     
     return [self.cachedPinned containsObject:sid];
 }
+
 
 - (void)togglePin:(Node*)item {
     NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];

@@ -7,8 +7,12 @@
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "DatabaseAttachment.h"
 #import "UiAttachment.h"
+#import "DatabaseAuditorConfiguration.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+extern NSString* const kAuditProgressNotificationKey;
+extern NSString* const kAuditCompletedNotificationKey;
 
 @interface DatabaseModel : NSObject
 
@@ -20,13 +24,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
 
-
 + (void)fromData:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion;
 - (void)getAsData:(SaveCompletionBlock)completion;
 
-
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
+- (instancetype)initEmptyForTesting:(CompositeKeyFactors*)compositeKeyFactors;
 - (instancetype)initNew:(CompositeKeyFactors*)compositeKeyFactors format:(DatabaseFormat)format;
 - (instancetype)initWithDatabase:(StrongboxDatabase*)database adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor;
 
@@ -39,6 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
+
+- (void)startAudit:(DatabaseAuditorConfiguration*)config;
+- (BOOL)isFlaggedByAudit:(Node*)item;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;

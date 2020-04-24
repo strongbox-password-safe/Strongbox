@@ -301,6 +301,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     UIImage* icon = [NodeIconHelper getIconForNode:node model:self.model];
     NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
     
+    NSDictionary<NSNumber*, UIColor*> *flagTintColors;
+    NSArray* flags = [self getFlags:node tintColors:&flagTintColors];
+
     if(node.isGroup) {
         BOOL italic = (self.model.database.recycleBinEnabled && node == self.model.database.recycleBinNode);
         
@@ -311,26 +314,81 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
             childCount:childCount
                 italic:italic
          groupLocation:groupLocation
-                pinned:self.model.metadata.showFlagsInBrowse ? [self.model isPinned:node] : NO
+                 flags:flags
               hideIcon:self.model.metadata.hideIconInBrowse];
     }
     else {
         DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database metadata:self.model.metadata];
         
         NSString* subtitle = [searcher getBrowseItemSubtitle:node];
-        
+                
         [cell setRecord:title
                subtitle:subtitle
                    icon:icon
           groupLocation:groupLocation
-                 pinned:self.model.metadata.showFlagsInBrowse ? [self.model isPinned:node] : NO
-         hasAttachments:self.model.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
+                  flags:flags
+         flagTintColors:flagTintColors
                 expired:node.expired
                otpToken:node.fields.otpToken
                hideIcon:self.model.metadata.hideIconInBrowse];
     }
     
     return cell;
+}
+
+// TODO: This is duplicated
+- (NSArray<UIImage*>*)getFlags:(Node*)node tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
+    if ( !self.model.metadata.showFlagsInBrowse ) {
+        if(*tintColors) {
+            *tintColors = @{};
+        }
+        return @[];
+    }
+
+    NSMutableArray<UIImage*> *flags = NSMutableArray.array;
+    
+    if(!node.isGroup && [self.model isFlaggedByAudit:node]) {
+        UIImage* image;
+        UIColor* tintColor;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+        }
+        else {
+            image = [UIImage imageNamed:@"error"];
+        }
+        tintColor = UIColor.systemOrangeColor;
+        
+        if(tintColors) {
+            *tintColors = @{ @(flags.count) : tintColor };
+        }
+
+        [flags addObject:image];
+    }
+
+    if([self.model isPinned:node]) {
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+           image = [UIImage systemImageNamed:@"pin"];
+        }
+        else {
+           image = [UIImage imageNamed:@"pin"];
+        }
+
+        [flags addObject:image];
+    }
+
+    if(!node.isGroup && node.fields.attachments.count) {
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"paperclip"];
+        }
+        else {
+            image = [UIImage imageNamed:@"attach"];
+        }
+        [flags addObject:image];
+    }
+    
+    return flags;
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {

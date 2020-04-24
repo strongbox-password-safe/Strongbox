@@ -59,6 +59,7 @@
 
         self.colorizePasswords = YES;
         self.keePassIconSet = kKeePassIconSetSfSymbols;
+        self.auditConfig = DatabaseAuditorConfiguration.defaults;
     }
     
     return self;
@@ -172,6 +173,9 @@
     [encoder encodeBool:self.colorizePasswords forKey:@"colorizePasswords"];
     [encoder encodeInteger:self.keePassIconSet forKey:@"keePassIconSet"];
     [encoder encodeBool:self.colorizeProtectedCustomFields forKey:@"colorizeProtectedCustomFields"];
+
+    // TODO: Restore when Audit feature goes live
+//    [encoder encodeObject:self.auditConfig forKey:@"auditConfig"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -368,6 +372,10 @@
         
         if([decoder containsValueForKey:@"colorizeProtectedCustomFields"]) {
             self.colorizeProtectedCustomFields = [decoder decodeBoolForKey:@"colorizeProtectedCustomFields"];
+        }
+        
+        if ([decoder containsValueForKey:@"auditConfig"]) {
+            self.auditConfig = [decoder decodeObjectForKey:@"auditConfig"];
         }
     }
     

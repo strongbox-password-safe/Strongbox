@@ -1174,8 +1174,21 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
+//    NSURLComponents *components = [NSURLComponents componentsWithString:urlString];
+//
+//    NSLog(@"%@-%@-%@", components.host, components.path, components.query);
+//
+//    NSURL* url = components.URL;
+//    NSLog(@"Launching URL: %@", url);
+    
+//    urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLHostAllowedCharacterSet];
+//    urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
+
+    NSURL* url = [NSURL URLWithString:urlString];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
+        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:^(BOOL success) {
+            NSLog(@"Success = [%d]", success);
+        }];
     });
 #endif
 }

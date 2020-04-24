@@ -374,10 +374,10 @@
             return @"KeePass 1";
             break;
         case kKeePass:
-            return @"KeePass 2 Classic";
+            return @"KeePass 2 (Legacy)";
             break;
         case kKeePass4:
-            return @"KeePass 2 Advanced";
+            return @"KeePass 2";
             break;
         case kPasswordSafe:
             return @"Password Safe 3";

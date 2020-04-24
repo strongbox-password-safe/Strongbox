@@ -55,7 +55,8 @@ static NSString* const kNewEntryKey = @"newEntry";
 @interface ViewController () <  NSWindowDelegate,
                                 NSTextFieldDelegate,
                                 QLPreviewPanelDataSource,
-                                QLPreviewPanelDelegate>
+                                QLPreviewPanelDelegate,
+                                NSSearchFieldDelegate>
 
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
@@ -373,6 +374,28 @@ static NSImage* kStrongBox256Image;
     
     self.quickViewColumn.hidden = !Settings.sharedInstance.revealDetailsImmediately;
     [self bindQuickViewButton];
+    
+    // Search Enabled for all...
+    
+    NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
+    [self.searchField setPlaceholderString:loc];
+    self.searchField.enabled = YES;
+    self.searchField.delegate = self;
+    self.searchSegmentedControl.enabled = YES;
+}
+
+- (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
+    if(control == self.searchField) { // On Down in Search Field - go to first result if available
+        if (commandSelector == @selector(moveDown:)) {
+//            NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
+            if (self.outlineView.numberOfRows > 0) {
+                [self.view.window makeFirstResponder:self.outlineView];
+                return YES;
+            }
+        }
+    }
+    
+    return NO;
 }
 
 - (void)customizeOutlineView {
@@ -477,19 +500,18 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)disableFeaturesForLiteVersion {
-    NSString* loc = NSLocalizedString(@"mac_search_disabled_please_upgrade", @"Search Disabled - Please Upgrade");
-    
-    [self.searchField setPlaceholderString:loc];
-    self.searchField.enabled = NO;
-    self.searchSegmentedControl.enabled = NO;
+//    NSString* loc = NSLocalizedString(@"mac_search_disabled_please_upgrade", @"Search Disabled - Please Upgrade");
+//    [self.searchField setPlaceholderString:loc];
+//    self.searchField.enabled = NO;
+//    self.searchSegmentedControl.enabled = NO;
 }
 
 - (void)enableFeaturesForFullVersion {
-    NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
-    
-    [self.searchField setPlaceholderString:loc];
-    self.searchField.enabled = YES;
-    self.searchSegmentedControl.enabled = YES;
+//    NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
+//
+//    [self.searchField setPlaceholderString:loc];
+//    self.searchField.enabled = YES;
+//    self.searchSegmentedControl.enabled = YES;
 }
 
 - (void)initializeFullOrTrialOrLiteUI {
@@ -1656,27 +1678,38 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSLog(@"hasPromptedForTouchIdEnrol: %d",self.model.databaseMetadata.hasPromptedForTouchIdEnrol);
     
     if ( BiometricIdHelper.sharedInstance.biometricIdAvailable) {
-        if(
-        (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) &&
-        !self.model.databaseMetadata.hasPromptedForTouchIdEnrol) {
+        if( (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) && !self.model.databaseMetadata.hasPromptedForTouchIdEnrol) {
+            
         NSLog(@"Biometric ID is available on Device. Should we enrol?");
 
-        NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be securely stored for %@ before you need to re-enter it.");
-        
-
-        NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
-
         NSInteger expiryPeriodInHours = self.model.databaseMetadata.touchIdPasswordExpiryPeriodHours;
-        expiryPeriodInHours = expiryPeriodInHours <= 0 ? kDefaultPasswordExpiryHours : expiryPeriodInHours;
         
-        fmt.allowedUnits = expiryPeriodInHours > 23 ? (NSCalendarUnitDay | NSCalendarUnitWeekOfMonth) : (NSCalendarUnitHour | NSCalendarUnitDay | NSCalendarUnitWeekOfMonth);
-        fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
-        fmt.maximumUnitCount = 2;
-        fmt.collapsesLargestUnit = YES;
-        
-        NSString* timeSpan = [fmt stringFromTimeInterval:expiryPeriodInHours * 60 * 60];
-        NSString* message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName, timeSpan];
+        NSString* message;
+        if (expiryPeriodInHours < 0) { // Forever
+            NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_simple_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be stored securely.");
+            
+            message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName];
+        }
+        else if(expiryPeriodInHours == 0) { // 0 - App Exit
+            NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_simple_app_exit_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be stored securely until you exit Strongbox");
+            
+            message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName];
+        }
+        else {
+            NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
 
+            fmt.allowedUnits = expiryPeriodInHours > 23 ? (NSCalendarUnitDay | NSCalendarUnitWeekOfMonth) : (NSCalendarUnitHour | NSCalendarUnitDay | NSCalendarUnitWeekOfMonth);
+            fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
+            fmt.maximumUnitCount = 2;
+            fmt.collapsesLargestUnit = YES;
+            
+            NSString* timeSpan = [fmt stringFromTimeInterval:expiryPeriodInHours * 60 * 60];
+
+            NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be securely stored for %@ before you need to re-enter it.");
+    
+            message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName, timeSpan];
+        }
+ 
         [Alerts yesNo:message
                window:self.view.window
            completion:^(BOOL yesNo) {
@@ -2841,8 +2874,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return self.model && !self.model.locked;
     }
     else if (theAction == @selector(onFind:)) {
-        return self.model && !self.model.locked &&
-        ([Settings sharedInstance].fullVersion || [Settings sharedInstance].freeTrial);
+        return self.model && !self.model.locked;
+            // ([Settings sharedInstance].fullVersion || [Settings sharedInstance].freeTrial);
     }
     else if(theAction == @selector(onLaunchUrl:) ||
             theAction == @selector(onCopyUrl:)) {
@@ -3033,10 +3066,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSString *dateString = [dateFormatter stringFromDate:date];
     
     return dateString;
-}
-
-- (IBAction)onPasswordPreferences:(id)sender {
-    [PreferencesWindowController.sharedInstance showOnTab:1];
 }
 
 - (void)onPreferencesChanged:(NSNotification*)notification {

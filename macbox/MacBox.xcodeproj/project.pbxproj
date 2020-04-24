@@ -367,6 +367,10 @@
 		4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099D21825134007BA1E7 /* KeePassDatabase.m */; };
 		4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A121825161007BA1E7 /* Salsa20Stream.m */; };
 		4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
+		4DA50D03244DFD2100364781 /* DatabaseAuditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50CFD244DFD2100364781 /* DatabaseAuditor.m */; };
+		4DA50D04244DFD2100364781 /* DatabaseAuditReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50CFF244DFD2100364781 /* DatabaseAuditReport.m */; };
+		4DA50D05244DFD2100364781 /* DatabaseAuditorConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50D00244DFD2100364781 /* DatabaseAuditorConfiguration.m */; };
+		4DA50D06244DFD2100364781 /* NSString+Levenshtein.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50D02244DFD2100364781 /* NSString+Levenshtein.m */; };
 		4DACA5C023CCD40F00891366 /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DACA5BF23CCD40F00891366 /* SecretStore.m */; };
 		4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
 		4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
@@ -861,6 +865,14 @@
 		4D9E09A021825161007BA1E7 /* Salsa20Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Salsa20Stream.h; path = ../model/keepass/Salsa20Stream.h; sourceTree = "<group>"; };
 		4D9E09A121825161007BA1E7 /* Salsa20Stream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Salsa20Stream.m; path = ../model/keepass/Salsa20Stream.m; sourceTree = "<group>"; };
 		4DA203911F7662D000113A6B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		4DA50CFB244DFD2100364781 /* DatabaseAuditorConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseAuditorConfiguration.h; path = ../model/DatabaseAuditorConfiguration.h; sourceTree = "<group>"; };
+		4DA50CFC244DFD2100364781 /* NSString+Levenshtein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Levenshtein.h"; path = "../model/NSString+Levenshtein.h"; sourceTree = "<group>"; };
+		4DA50CFD244DFD2100364781 /* DatabaseAuditor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditor.m; path = ../model/DatabaseAuditor.m; sourceTree = "<group>"; };
+		4DA50CFE244DFD2100364781 /* DatabaseAuditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseAuditor.h; path = ../model/DatabaseAuditor.h; sourceTree = "<group>"; };
+		4DA50CFF244DFD2100364781 /* DatabaseAuditReport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditReport.m; path = ../model/DatabaseAuditReport.m; sourceTree = "<group>"; };
+		4DA50D00244DFD2100364781 /* DatabaseAuditorConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditorConfiguration.m; path = ../model/DatabaseAuditorConfiguration.m; sourceTree = "<group>"; };
+		4DA50D01244DFD2100364781 /* DatabaseAuditReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseAuditReport.h; path = ../model/DatabaseAuditReport.h; sourceTree = "<group>"; };
+		4DA50D02244DFD2100364781 /* NSString+Levenshtein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Levenshtein.m"; path = "../model/NSString+Levenshtein.m"; sourceTree = "<group>"; };
 		4DACA5BF23CCD40F00891366 /* SecretStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStore.m; path = ../model/SecretStore.m; sourceTree = "<group>"; };
 		4DAF56EA240181480026282C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = ../StrongBox/es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableImageView.h; path = MacBox/ClickableImageView.h; sourceTree = "<group>"; };
@@ -1638,6 +1650,21 @@
 			name = KeePass;
 			sourceTree = "<group>";
 		};
+		4DA50CFA244DFCFE00364781 /* Audit */ = {
+			isa = PBXGroup;
+			children = (
+				4DA50CFE244DFD2100364781 /* DatabaseAuditor.h */,
+				4DA50CFD244DFD2100364781 /* DatabaseAuditor.m */,
+				4DA50CFB244DFD2100364781 /* DatabaseAuditorConfiguration.h */,
+				4DA50D00244DFD2100364781 /* DatabaseAuditorConfiguration.m */,
+				4DA50D01244DFD2100364781 /* DatabaseAuditReport.h */,
+				4DA50CFF244DFD2100364781 /* DatabaseAuditReport.m */,
+				4DA50CFC244DFD2100364781 /* NSString+Levenshtein.h */,
+				4DA50D02244DFD2100364781 /* NSString+Levenshtein.m */,
+			);
+			name = Audit;
+			sourceTree = "<group>";
+		};
 		4DAE28C724073089003D9221 /* Upgrade */ = {
 			isa = PBXGroup;
 			children = (
@@ -1787,6 +1814,7 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4DA50CFA244DFCFE00364781 /* Audit */,
 				4D3587A624104AF100318688 /* ColoredStringHelper.h */,
 				4D3587A724104AF100318688 /* ColoredStringHelper.m */,
 				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
@@ -2412,6 +2440,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4DA50D04244DFD2100364781 /* DatabaseAuditReport.m in Sources */,
 				4D2CB4952332D7C400C2E084 /* SimpleXmlValueExtractor.m in Sources */,
 				4D524CED219B481200C22CB4 /* InnerRandomStreamFactory.m in Sources */,
 				4DF299832243CED70080F9DC /* CollectionViewHeader.m in Sources */,
@@ -2440,6 +2469,7 @@
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
 				4D59E20723FCA15A0004B309 /* MacYubiKeyManager.m in Sources */,
 				4D524CBF219B479900C22CB4 /* KdbSerialization.m in Sources */,
+				4DA50D03244DFD2100364781 /* DatabaseAuditor.m in Sources */,
 				4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */,
 				4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */,
 				4DF348072074FA6C00148741 /* Node.m in Sources */,
@@ -2451,6 +2481,7 @@
 				4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */,
 				4D524CBD219B479900C22CB4 /* KdbGroup.m in Sources */,
 				4D9E098D21825108007BA1E7 /* DecryptionParameters.m in Sources */,
+				4DA50D06244DFD2100364781 /* NSString+Levenshtein.m in Sources */,
 				4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
 				4D524C9F219B44F300C22CB4 /* twofish.c in Sources */,
@@ -2557,6 +2588,7 @@
 				4D524CD3219B47DB00C22CB4 /* Argon2KdfCipher.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4DFF400C2180726700B69383 /* BasicOrderedDictionary.m in Sources */,
+				4DA50D05244DFD2100364781 /* DatabaseAuditorConfiguration.m in Sources */,
 				4D524D03219B48D300C22CB4 /* V3Binary.m in Sources */,
 				4DF347E92074FA3500148741 /* Field.m in Sources */,
 				4D50321D2412C36100766489 /* ClickableSecureTextField.m in Sources */,

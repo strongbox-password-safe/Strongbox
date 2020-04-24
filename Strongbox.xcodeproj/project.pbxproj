@@ -300,6 +300,10 @@
 		4D3AC320219074C40010CFCD /* VariantObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC31E219072C90010CFCD /* VariantObject.m */; };
 		4D3AC32321908D4A0010CFCD /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC32221908D4A0010CFCD /* Keys.m */; };
 		4D3AC32421908D4A0010CFCD /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC32221908D4A0010CFCD /* Keys.m */; };
+		4D3CF1CF244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D3CF1CE244C5E360025D3EA /* 10-million-password-list-top-10000.txt */; };
+		4D3CF1D0244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D3CF1CE244C5E360025D3EA /* 10-million-password-list-top-10000.txt */; };
+		4D3CF1D1244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D3CF1CE244C5E360025D3EA /* 10-million-password-list-top-10000.txt */; };
+		4D3CF1D2244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D3CF1CE244C5E360025D3EA /* 10-million-password-list-top-10000.txt */; };
 		4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */; };
 		4D3D991C1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
@@ -569,6 +573,13 @@
 		4D792A70222EF46A00250086 /* RMAppReceipt.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A64222EF46A00250086 /* RMAppReceipt.m */; };
 		4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A65222EF46A00250086 /* RMStoreKeychainPersistence.m */; };
 		4D792A72222EF46A00250086 /* RMStoreUserDefaultsPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A67222EF46A00250086 /* RMStoreUserDefaultsPersistence.m */; };
+		4D79F7F0244DD6F000C278A5 /* DatabaseAuditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB102449AE9300376240 /* DatabaseAuditor.m */; };
+		4D79F7F1244DD6F000C278A5 /* DatabaseAuditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB102449AE9300376240 /* DatabaseAuditor.m */; };
+		4D79F7F2244DD6F100C278A5 /* DatabaseAuditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB102449AE9300376240 /* DatabaseAuditor.m */; };
+		4D79F7F3244DD71100C278A5 /* DatabaseAuditReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB132449AF1E00376240 /* DatabaseAuditReport.m */; };
+		4D79F7F4244DD71200C278A5 /* DatabaseAuditReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB132449AF1E00376240 /* DatabaseAuditReport.m */; };
+		4D79F7F5244DDBE200C278A5 /* DatabaseAuditorConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB172449B0E700376240 /* DatabaseAuditorConfiguration.m */; };
+		4D79F7F6244DDBE200C278A5 /* DatabaseAuditorConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB172449B0E700376240 /* DatabaseAuditorConfiguration.m */; };
 		4D7C21D22180EAC200458A5B /* funky.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C21D12180EAC200458A5B /* funky.xml */; };
 		4D7C2660233EA14800412AA5 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D7C2662233EA14800412AA5 /* Backups.storyboard */; };
 		4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */; };
@@ -664,6 +675,16 @@
 		4D98344A21777E3000731FFC /* password-two-entries-ladder.xml in Resources */ = {isa = PBXBuildFile; fileRef = 4D98344921777E3000731FFC /* password-two-entries-ladder.xml */; };
 		4D9AC55622A153FA00449F3F /* StaticDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */; };
 		4D9AC55722A153FA00449F3F /* StaticDataTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */; };
+		4D9AFB0B2449AA6500376240 /* DatabaseGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB0A2449AA6500376240 /* DatabaseGenerator.m */; };
+		4D9AFB0C2449AA6B00376240 /* DatabaseGenerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB0A2449AA6500376240 /* DatabaseGenerator.m */; };
+		4D9AFB0E2449ACA500376240 /* DatabaseAuditorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB0D2449ACA500376240 /* DatabaseAuditorTests.m */; };
+		4D9AFB112449AE9300376240 /* DatabaseAuditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB102449AE9300376240 /* DatabaseAuditor.m */; };
+		4D9AFB142449AF1E00376240 /* DatabaseAuditReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB132449AF1E00376240 /* DatabaseAuditReport.m */; };
+		4D9AFB152449AF1E00376240 /* DatabaseAuditReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB132449AF1E00376240 /* DatabaseAuditReport.m */; };
+		4D9AFB182449B0E700376240 /* DatabaseAuditorConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB172449B0E700376240 /* DatabaseAuditorConfiguration.m */; };
+		4D9AFB192449B0E700376240 /* DatabaseAuditorConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB172449B0E700376240 /* DatabaseAuditorConfiguration.m */; };
+		4D9AFB242449D66A00376240 /* NSString+Levenshtein.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB222449D66900376240 /* NSString+Levenshtein.m */; };
+		4D9AFB252449D66A00376240 /* NSString+Levenshtein.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9AFB222449D66900376240 /* NSString+Levenshtein.m */; };
 		4D9E08E621822F5C007BA1E7 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E08E521822F5C007BA1E7 /* AesCipher.m */; };
 		4D9E08E721822F5C007BA1E7 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E08E521822F5C007BA1E7 /* AesCipher.m */; };
 		4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E08EF21824CBF007BA1E7 /* Kdbx4Database.m */; };
@@ -1851,6 +1872,7 @@
 		4D3AC31E219072C90010CFCD /* VariantObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VariantObject.m; path = model/keepass/VariantObject.m; sourceTree = "<group>"; };
 		4D3AC32121908D4A0010CFCD /* Keys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Keys.h; path = model/keepass/Keys.h; sourceTree = "<group>"; };
 		4D3AC32221908D4A0010CFCD /* Keys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Keys.m; path = model/keepass/Keys.m; sourceTree = "<group>"; };
+		4D3CF1CE244C5E360025D3EA /* 10-million-password-list-top-10000.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "10-million-password-list-top-10000.txt"; path = "resources/10-million-password-list-top-10000.txt"; sourceTree = "<group>"; };
 		4D3D0A08228AF81400C38C94 /* PrivacyViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PrivacyViewController.h; path = StrongBox/PrivacyViewController.h; sourceTree = "<group>"; };
 		4D3D0A09228AF81400C38C94 /* PrivacyViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PrivacyViewController.m; path = StrongBox/PrivacyViewController.m; sourceTree = "<group>"; };
 		4D3D991A1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppleICloudOrLocalSafeFile.h; path = StrongBox/AppleICloudOrLocalSafeFile.h; sourceTree = "<group>"; };
@@ -2472,6 +2494,17 @@
 		4D98344921777E3000731FFC /* password-two-entries-ladder.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "password-two-entries-ladder.xml"; sourceTree = "<group>"; };
 		4D9AC55422A153F900449F3F /* StaticDataTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StaticDataTableViewController.m; path = StrongBox/StaticDataTableViewController.m; sourceTree = "<group>"; };
 		4D9AC55522A153F900449F3F /* StaticDataTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StaticDataTableViewController.h; path = StrongBox/StaticDataTableViewController.h; sourceTree = "<group>"; };
+		4D9AFB092449AA6500376240 /* DatabaseGenerator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseGenerator.h; path = StrongBox/DatabaseGenerator.h; sourceTree = "<group>"; };
+		4D9AFB0A2449AA6500376240 /* DatabaseGenerator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseGenerator.m; path = StrongBox/DatabaseGenerator.m; sourceTree = "<group>"; };
+		4D9AFB0D2449ACA500376240 /* DatabaseAuditorTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditorTests.m; path = StrongboxTests/DatabaseAuditorTests.m; sourceTree = "<group>"; };
+		4D9AFB0F2449AE9300376240 /* DatabaseAuditor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseAuditor.h; path = model/DatabaseAuditor.h; sourceTree = "<group>"; };
+		4D9AFB102449AE9300376240 /* DatabaseAuditor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditor.m; path = model/DatabaseAuditor.m; sourceTree = "<group>"; };
+		4D9AFB122449AF1E00376240 /* DatabaseAuditReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseAuditReport.h; path = model/DatabaseAuditReport.h; sourceTree = "<group>"; };
+		4D9AFB132449AF1E00376240 /* DatabaseAuditReport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditReport.m; path = model/DatabaseAuditReport.m; sourceTree = "<group>"; };
+		4D9AFB162449B0E700376240 /* DatabaseAuditorConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseAuditorConfiguration.h; path = model/DatabaseAuditorConfiguration.h; sourceTree = "<group>"; };
+		4D9AFB172449B0E700376240 /* DatabaseAuditorConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditorConfiguration.m; path = model/DatabaseAuditorConfiguration.m; sourceTree = "<group>"; };
+		4D9AFB222449D66900376240 /* NSString+Levenshtein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Levenshtein.m"; path = "model/NSString+Levenshtein.m"; sourceTree = "<group>"; };
+		4D9AFB232449D66A00376240 /* NSString+Levenshtein.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Levenshtein.h"; path = "model/NSString+Levenshtein.h"; sourceTree = "<group>"; };
 		4D9E08E421822F5C007BA1E7 /* AesCipher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesCipher.h; path = model/keepass/AesCipher.h; sourceTree = SOURCE_ROOT; };
 		4D9E08E521822F5C007BA1E7 /* AesCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesCipher.m; path = model/keepass/AesCipher.m; sourceTree = SOURCE_ROOT; };
 		4D9E08EE21824CBF007BA1E7 /* Kdbx4Database.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Kdbx4Database.h; path = model/keepass/Kdbx4Database.h; sourceTree = SOURCE_ROOT; };
@@ -3209,6 +3242,7 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				4D9AFB0D2449ACA500376240 /* DatabaseAuditorTests.m */,
 				4D098B9E2429186F006D9430 /* TagsTests.m */,
 				4D2CB7E723D1BCC0000A9ABC /* SecretStoreTests.m */,
 				4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */,
@@ -3247,6 +3281,8 @@
 				4DD755F2232F093900758824 /* XmlComparisonElement.m */,
 				4DD755EF232F093800758824 /* XmlToDictionaryParser.h */,
 				4DD755F1232F093900758824 /* XmlToDictionaryParser.m */,
+				4D9AFB092449AA6500376240 /* DatabaseGenerator.h */,
+				4D9AFB0A2449AA6500376240 /* DatabaseGenerator.m */,
 			);
 			name = Tests;
 			sourceTree = "<group>";
@@ -3710,6 +3746,7 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D9AFB212449D0CD00376240 /* Audit */,
 				4D1D6FD61F38760F00D2B8EC /* Model.m */,
 				4D1D6FD51F38760F00D2B8EC /* Model.h */,
 				4DD6E78E23E731AD00AC2A49 /* BookmarksHelper.h */,
@@ -4085,6 +4122,29 @@
 			name = StaticDataTableViewController;
 			sourceTree = "<group>";
 		};
+		4D9AFB1A2449CD2B00376240 /* Common Password */ = {
+			isa = PBXGroup;
+			children = (
+				4D3CF1CE244C5E360025D3EA /* 10-million-password-list-top-10000.txt */,
+			);
+			name = "Common Password";
+			sourceTree = "<group>";
+		};
+		4D9AFB212449D0CD00376240 /* Audit */ = {
+			isa = PBXGroup;
+			children = (
+				4D9AFB232449D66A00376240 /* NSString+Levenshtein.h */,
+				4D9AFB222449D66900376240 /* NSString+Levenshtein.m */,
+				4D9AFB0F2449AE9300376240 /* DatabaseAuditor.h */,
+				4D9AFB102449AE9300376240 /* DatabaseAuditor.m */,
+				4D9AFB122449AF1E00376240 /* DatabaseAuditReport.h */,
+				4D9AFB132449AF1E00376240 /* DatabaseAuditReport.m */,
+				4D9AFB162449B0E700376240 /* DatabaseAuditorConfiguration.h */,
+				4D9AFB172449B0E700376240 /* DatabaseAuditorConfiguration.m */,
+			);
+			name = Audit;
+			sourceTree = "<group>";
+		};
 		4D9E08E321822F38007BA1E7 /* crypto */ = {
 			isa = PBXGroup;
 			children = (
@@ -4416,6 +4476,7 @@
 		4DE2688E22A65C8B00A1D158 /* Password Generation */ = {
 			isa = PBXGroup;
 			children = (
+				4D9AFB1A2449CD2B00376240 /* Common Password */,
 				4D8FCEA223606D45001F2172 /* Names */,
 				4D0835E522847BAF00CA7405 /* Word Lists */,
 				4DE7F0FB22F89D8D0095F51F /* PasswordGenerationPreferences.storyboard */,
@@ -4889,6 +4950,7 @@
 				4DE7F0DE22F89D510095F51F /* KeePassHistory.storyboard in Resources */,
 				4DE7F11422F8A16A0095F51F /* Localizable.strings in Resources */,
 				4D62E268234386FF00119604 /* About.rtf in Resources */,
+				4D3CF1CF244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */,
 				4D770F9B230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4D770F8E2303262400CBE244 /* QRCodeScannerViewController.xib in Resources */,
@@ -4973,6 +5035,7 @@
 				4DC4E14323488BAA000743C4 /* KeePassHistory.storyboard in Resources */,
 				4DC4E14423488BAA000743C4 /* Localizable.strings in Resources */,
 				4DC4E14523488BAA000743C4 /* About.rtf in Resources */,
+				4D3CF1D1244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */,
 				4DC4E14623488BAA000743C4 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4DC4E14723488BAA000743C4 /* Main.storyboard in Resources */,
 				4DC4E14823488BAA000743C4 /* QRCodeScannerViewController.xib in Resources */,
@@ -5025,6 +5088,7 @@
 				4DC4E24D23488BAE000743C4 /* LaunchScreen.storyboard in Resources */,
 				4DC4E24E23488BAE000743C4 /* Localizable.strings in Resources */,
 				4D7F5A50236021B6003ED785 /* DatabaseOperations.storyboard in Resources */,
+				4D3CF1D2244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */,
 				4DC4E24F23488BAE000743C4 /* InfoPlist.strings in Resources */,
 				4D8FCEA723606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DC4E25023488BAE000743C4 /* DatabaseCell.xib in Resources */,
@@ -5093,6 +5157,7 @@
 				4D8144B62199B7790044E617 /* Images.xcassets in Resources */,
 				4DE7F0CF22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
 				4D12E59122FB866F00CBFECC /* Localizable.strings in Resources */,
+				4D3CF1D0244C5E360025D3EA /* 10-million-password-list-top-10000.txt in Resources */,
 				4D7F5A4F236021B5003ED785 /* DatabaseOperations.storyboard in Resources */,
 				4D8FCEA523606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DE18BB722F09976007D902D /* DatabaseCell.xib in Resources */,
@@ -5414,6 +5479,7 @@
 				4DF97F2E21BF116A0090A55E /* DavKitTests.m in Sources */,
 				4D2561B1233FEB6E00179B84 /* YubiKeyTests.m in Sources */,
 				4D2E3CF423C7886200712FC6 /* AlternativeUrlTests.m in Sources */,
+				4D9AFB0C2449AA6B00376240 /* DatabaseGenerator.m in Sources */,
 				4DD755F3232F093900758824 /* XmlToDictionaryParser.m in Sources */,
 				4D25E8EE2175F4CE00ACF108 /* KeePassXmlSerializationTests.m in Sources */,
 				4DC8D9A621B6E444004F1812 /* KeyFileParsingTests.m in Sources */,
@@ -5421,6 +5487,7 @@
 				4D1967AD217F7F4B0057DF06 /* KeePassDatabaseTests.m in Sources */,
 				4D4766FE2178CDCF00C4358F /* KeePassXmlParsingTests.m in Sources */,
 				4D18F23322577FB100768E18 /* FieldReferenceTests.m in Sources */,
+				4D9AFB0E2449ACA500376240 /* DatabaseAuditorTests.m in Sources */,
 				4DC5CD4A231F007A0038FC9F /* MemoryPerformanceTests.m in Sources */,
 				4DD696A7218F13C80082DC08 /* AttachmentsRationalizerTests.m in Sources */,
 				4D098B9F2429186F006D9430 /* TagsTests.m in Sources */,
@@ -5493,6 +5560,7 @@
 				4DAE98C42270B4E200A811C4 /* ItemDetailsModel.m in Sources */,
 				4DE18BBA22F09A3F007D902D /* DatabaseCell.m in Sources */,
 				4D08B5B3234C9613003D1953 /* GCDWebServerRequest.m in Sources */,
+				4D9AFB182449B0E700376240 /* DatabaseAuditorConfiguration.m in Sources */,
 				4D216F7F22CBCEC1000954D0 /* PasswordMaker.m in Sources */,
 				4D326E8D22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4D7E39DB22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
@@ -5595,6 +5663,7 @@
 				4D5B1EAB2194AEB400ECAF0D /* KdbSerialization.m in Sources */,
 				4DE498BD2271E911007EF98C /* IconTableCell.m in Sources */,
 				4D2F6C1621807C00007931E4 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				4D9AFB112449AE9300376240 /* DatabaseAuditor.m in Sources */,
 				4D3E149221832BEF00A41CA0 /* encoding.c in Sources */,
 				4DC9690F238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
@@ -5629,6 +5698,7 @@
 				4D326E8B22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
 				4D2259F922C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0AFD2522A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m in Sources */,
+				4D9AFB142449AF1E00376240 /* DatabaseAuditReport.m in Sources */,
 				4D526AAA24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */,
 				4D74B929218C40B000FC369E /* V3Binary.m in Sources */,
 				4DE498B52271AD28007EF98C /* AddAttachmentHelper.m in Sources */,
@@ -5666,9 +5736,11 @@
 				4D004CDC21F4C26700E2B194 /* OTPToken+Persistence.m in Sources */,
 				4DD9D98A241D36BF00267D49 /* UpgradeAnswerViewController.m in Sources */,
 				4D18F2362257987E00768E18 /* SprCompilation.m in Sources */,
+				4D9AFB0B2449AA6500376240 /* DatabaseGenerator.m in Sources */,
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
 				4D036E4A2298443100AC892B /* CloudSessionsTableViewController.m in Sources */,
 				4DDA01562242621400C7F0E2 /* NSUUID+Zero.m in Sources */,
+				4D9AFB242449D66A00376240 /* NSString+Levenshtein.m in Sources */,
 				4D3E14A121832D5500A41CA0 /* ref.c in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
 				4D4767072179013900C4358F /* RootXmlDomainObject.m in Sources */,
@@ -5757,6 +5829,7 @@
 				4DC4E02323488BAA000743C4 /* DAVRequest.m in Sources */,
 				4DC4E02423488BAA000743C4 /* PinEntryController.m in Sources */,
 				4DC4E02523488BAA000743C4 /* argon2.c in Sources */,
+				4D9AFB252449D66A00376240 /* NSString+Levenshtein.m in Sources */,
 				4DC4E02623488BAA000743C4 /* NSArray+Extensions.m in Sources */,
 				4D669545242E6810005A98D7 /* TagsViewTableViewCell.m in Sources */,
 				4DC4E02723488BAA000743C4 /* AppDelegate.m in Sources */,
@@ -5766,6 +5839,7 @@
 				4DC4E02B23488BAA000743C4 /* CustomIconList.m in Sources */,
 				4DC4E02C23488BAA000743C4 /* MBAutoGrowingTextView.m in Sources */,
 				4DC4E02D23488BAA000743C4 /* PasswordHistoryViewController.m in Sources */,
+				4D9AFB152449AF1E00376240 /* DatabaseAuditReport.m in Sources */,
 				4D7228AD23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
 				4DC4E02E23488BAA000743C4 /* VariantObject.m in Sources */,
 				4DC4E02F23488BAA000743C4 /* CustomNavigationItemTitleView.m in Sources */,
@@ -5813,6 +5887,7 @@
 				4DC4E05623488BAA000743C4 /* Kdbx4Database.m in Sources */,
 				4DC4E05723488BAA000743C4 /* Node.m in Sources */,
 				4D4D3FD72409CDAC0056A7E2 /* RootViewController.swift in Sources */,
+				4D79F7F1244DD6F000C278A5 /* DatabaseAuditor.m in Sources */,
 				4DC4E05823488BAA000743C4 /* NSDictionary+Extensions.m in Sources */,
 				4DC4E05923488BAA000743C4 /* Utils.m in Sources */,
 				4DBBDE3823EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
@@ -5947,6 +6022,7 @@
 				4D08B5BE234C9613003D1953 /* GCDWebServerFileResponse.m in Sources */,
 				4DC4E0C223488BAA000743C4 /* UiAttachment.m in Sources */,
 				4DC4E0C323488BAA000743C4 /* StrongboxDatabase.m in Sources */,
+				4D9AFB192449B0E700376240 /* DatabaseAuditorConfiguration.m in Sources */,
 				4DC4E0C423488BAA000743C4 /* WebDAVProviderData.m in Sources */,
 				4DC4E0C523488BAA000743C4 /* OTPToken.m in Sources */,
 				4DC4E0C623488BAA000743C4 /* WelcomeCreateDatabaseViewController.m in Sources */,
@@ -6116,6 +6192,7 @@
 				4D832A9823CE226800A7885E /* SecretStore.m in Sources */,
 				4DC4E1AB23488BAE000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
 				4D4D3FAF2409CA7C0056A7E2 /* Foo.swift in Sources */,
+				4D79F7F2244DD6F100C278A5 /* DatabaseAuditor.m in Sources */,
 				4DC96912238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4DC4E1AC23488BAE000743C4 /* regdom.c in Sources */,
 				4DC4E1AD23488BAE000743C4 /* DecryptionParameters.m in Sources */,
@@ -6169,6 +6246,7 @@
 				4DC4E1DB23488BAE000743C4 /* BackupsTableViewController.m in Sources */,
 				4DC4E1DC23488BAE000743C4 /* SetIconModel.m in Sources */,
 				4DC4E1DD23488BAE000743C4 /* BackupItem.m in Sources */,
+				4D79F7F6244DDBE200C278A5 /* DatabaseAuditorConfiguration.m in Sources */,
 				4DC4E1DE23488BAE000743C4 /* Binary.m in Sources */,
 				4DC4E1E023488BAE000743C4 /* CASGParams.m in Sources */,
 				4DC4E1E123488BAE000743C4 /* PasswordHistoryEntry.m in Sources */,
@@ -6189,6 +6267,7 @@
 				4DC4E1EF23488BAE000743C4 /* PwSafeDatabase.m in Sources */,
 				4DC4E1F023488BAE000743C4 /* KeyFilesTableViewController.m in Sources */,
 				4DC4E1F123488BAE000743C4 /* OTPToken+Persistence.m in Sources */,
+				4D79F7F4244DD71200C278A5 /* DatabaseAuditReport.m in Sources */,
 				4DC4E1F223488BAE000743C4 /* PasswordMaker.m in Sources */,
 				4DC4E1F323488BAE000743C4 /* Node.m in Sources */,
 				4DC4E1F423488BAE000743C4 /* NodeFields.m in Sources */,
@@ -6346,6 +6425,7 @@
 				4D832A9623CE226800A7885E /* SecretStore.m in Sources */,
 				4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
 				4D4D3FAD2409CA7C0056A7E2 /* Foo.swift in Sources */,
+				4D79F7F0244DD6F000C278A5 /* DatabaseAuditor.m in Sources */,
 				4DC96910238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
 				4D3652152184A24700A56519 /* regdom.c in Sources */,
 				4D4766F32178C82B00C4358F /* DecryptionParameters.m in Sources */,
@@ -6399,6 +6479,7 @@
 				4D1F580A233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */,
 				4DE498BA2271E5C7007EF98C /* SetIconModel.m in Sources */,
 				4DE4665A233D2E8C00398A65 /* BackupItem.m in Sources */,
+				4D79F7F5244DDBE200C278A5 /* DatabaseAuditorConfiguration.m in Sources */,
 				4D5F5B90218B66C500A0739A /* Binary.m in Sources */,
 				4D9597BF22A2CB38008DB224 /* CASGParams.m in Sources */,
 				4D1884D621709E1F001AE6B0 /* PasswordHistoryEntry.m in Sources */,
@@ -6419,6 +6500,7 @@
 				4D1884D221709DF8001AE6B0 /* PwSafeDatabase.m in Sources */,
 				4D1140A8229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				4D004CE921F4F7B900E2B194 /* OTPToken+Persistence.m in Sources */,
+				4D79F7F3244DD71100C278A5 /* DatabaseAuditReport.m in Sources */,
 				4D216F8122CBCED4000954D0 /* PasswordMaker.m in Sources */,
 				4D1884D021709DF3001AE6B0 /* Node.m in Sources */,
 				4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */,
@@ -7773,6 +7855,7 @@
 					"$(SDKROOT)/usr/include/libxml2",
 					"\"$(PODS_ROOT)/libsodium/src/libsodium/include/sodium\"",
 					"\"$(PODS_ROOT)/libsodium/src/libsodium/include\"",
+					"\"$(PROJECT_DIR)/lib/YubiKit\"/**",
 				);
 				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -7857,6 +7940,7 @@
 					"$(SDKROOT)/usr/include/libxml2",
 					"\"$(PODS_ROOT)/libsodium/src/libsodium/include/sodium\"",
 					"\"$(PODS_ROOT)/libsodium/src/libsodium/include\"",
+					"\"$(PROJECT_DIR)/lib/YubiKit\"/**",
 				);
 				INFOPLIST_FILE = "Strongbox Auto Fill/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;

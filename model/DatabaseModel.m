@@ -15,13 +15,18 @@
 #import "KeePassCiphers.h"
 #import "KissXML.h"
 #import "NSArray+Extensions.h"
+#import "DatabaseAuditor.h"
 
 @interface DatabaseModel ()
 
+@property DatabaseAuditor* auditor;
 @property (nonatomic, strong) StrongboxDatabase* theSafe;
 @property (nonatomic, strong) id<AbstractDatabaseFormatAdaptor> adaptor;
 
 @end
+
+NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
+NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
 
 @implementation DatabaseModel
 
@@ -221,8 +226,27 @@
     }];
 }
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.auditor = [[DatabaseAuditor alloc] init];
+    }
+    return self;
+}
+
+- (instancetype)initEmptyForTesting:(CompositeKeyFactors *)compositeKeyFactors {
+    if(self = [self init]) {
+        // FUTURE: It shouldn't be necessary to use a particular adaptor to create the model...
+        self.adaptor = [DatabaseModel getAdaptor:kKeePass];
+        self.theSafe = [self.adaptor create:compositeKeyFactors];
+    }
+    
+    return self;
+}
+
 - (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors format:(DatabaseFormat)format {
-    if(self = [super init]) {
+    if(self = [self init]) {
         self.adaptor = [DatabaseModel getAdaptor:format];
         self.theSafe = [self.adaptor create:compositeKeyFactors];
         
@@ -243,14 +267,14 @@
 }
 
 - (instancetype)initWithDatabase:(StrongboxDatabase*)database adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor {
-    if(self = [super init]) {
+    if(self = [self init]) {
         self.theSafe = database;
         self.adaptor = adaptor;
     }
     
     return self;
 }
-    
+
 - (void)getAsData:(SaveCompletionBlock)completion {
     [self.theSafe performPreSerializationTidy]; // Tidy up attachments, custom icons, trim history
     
@@ -283,6 +307,34 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
                                                   fields:fields
                                                     uuid:nil]
                                 keePassGroupTitleRules:NO];
+}
+
+// Audit - TODO:
+
+- (void)startAudit:(DatabaseAuditorConfiguration*)config {
+    [self.auditor stop]; // TODO: Will this call completions and do anything weird?
+    
+    self.auditor = [[DatabaseAuditor alloc] init];
+    
+    [self.auditor start:self.activeRecords
+                 config:config isDereferenceable:^BOOL(NSString * _Nonnull string) {
+        return [self isDereferenceableText:string];
+    } progress:^(CGFloat progress) {
+        NSLog(@"Audit Progress Callback: %f", progress);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
+        });
+    } completion:^(BOOL userStopped) {
+        NSLog(@"Audit Completed - User Cancelled: %d", userStopped);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@(userStopped)];
+        });
+    }];
+}
+
+- (BOOL)isFlaggedByAudit:(Node*)item {
+    NSSet<NSNumber*>* auditFlags = [self.auditor getQuickAuditFlagsForNode:item];
+    return auditFlags.count > 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

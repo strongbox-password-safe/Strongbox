@@ -669,8 +669,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"{\n    password = [%@]\n    username = [%@]\n    email = [%@]\n    url = [%@]\n}",
-            self.password,
+    return [NSString stringWithFormat:@"{ username = [%@]\n    email = [%@]\n    url = [%@]\n}",
             self.username,
             self.email,
             self.url];

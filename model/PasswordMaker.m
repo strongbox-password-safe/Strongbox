@@ -30,6 +30,8 @@ static NSString* const kAmbiguous = @"{}[]()/\\'\"`~,;:.<>";
 @property NSArray<NSString*> *firstNamesCache;
 @property NSArray<NSString*> *surnamesCache;
 
+@property NSSet<NSString*>* commonPasswordsSetCache;
+
 @end
 
 @implementation PasswordMaker
@@ -224,6 +226,15 @@ const static NSArray<NSString*> *kEmailDomains;
 }
 
 #endif
+
+- (BOOL)isCommonPassword:(NSString *)password {
+    if(!self.commonPasswordsSetCache) {
+        NSArray<NSString*>* common = [self loadWordsForList:@"10-million-password-list-top-10000"];
+        self.commonPasswordsSetCache = [NSSet setWithArray:common];
+    }
+    
+    return [self.commonPasswordsSetCache containsObject:password.lowercaseString]; // Ignore casing
+}
 
 - (NSString*)generateName {
     NSString* firstName = [self getFirstName];

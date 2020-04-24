@@ -451,7 +451,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 - (BOOL)doNotFloatDetailsWindowOnTop {
-    return [self getBool:kDoNotFloatDetailsWindowOnTop];
+    return [self getBool:kDoNotFloatDetailsWindowOnTop fallback:YES];
 }
 
 - (void)setDoNotFloatDetailsWindowOnTop:(BOOL)doNotFloatDetailsWindowOnTop {

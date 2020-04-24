@@ -9,7 +9,7 @@
 #import "DatabaseMetadata.h"
 #import "SecretStore.h"
 
-const NSInteger kDefaultPasswordExpiryHours = 14 * 24; // 2 weeks
+const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
 
 @implementation DatabaseMetadata
 

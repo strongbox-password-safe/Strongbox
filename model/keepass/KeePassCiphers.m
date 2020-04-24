@@ -192,7 +192,7 @@ NSString* keyDerivationAlgorithmString(NSUUID* uuid){
 
 NSString* outerEncryptionAlgorithmString(NSUUID* uuid) {
     if([uuid isEqual:aesCipherUuid()]) {
-        return @"AES";
+        return @"AES-256";
     }
     else if([uuid isEqual:chaCha20CipherUuid()]) {
         return @"ChaCha20";

@@ -55,10 +55,10 @@
             selectedFormat = kKeePass;
             break;
         case 2:
-            selectedFormat = kPasswordSafe;
+            selectedFormat = kKeePass1;
             break;
         case 3:
-            selectedFormat = kKeePass1;
+            selectedFormat = kPasswordSafe;
             break;
         default:
             selectedFormat = kKeePass4;

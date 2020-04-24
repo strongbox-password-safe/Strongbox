@@ -29,6 +29,8 @@
          message:(NSString *)message
           action:(void (^)(BOOL response))action;
 
++ (void)error:(UIViewController *)viewController error:(NSError *)error;
+
 + (void)error:(UIViewController *)viewController
         title:(NSString *)title
         error:(NSError *)error;

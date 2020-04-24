@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
       childCount:(NSString*)childCount
           italic:(BOOL)italic
    groupLocation:(NSString*)groupLocation
-          pinned:(BOOL)pinned
+           flags:(NSArray<UIImage*>*)flags
         hideIcon:(BOOL)hideIcon;
 
 - (void)setGroup:(NSString *)title
@@ -30,15 +30,15 @@ NS_ASSUME_NONNULL_BEGIN
           italic:(BOOL)italic
    groupLocation:(NSString*)groupLocation
        tintColor:(UIColor* _Nullable )tintColor
-          pinned:(BOOL)pinned
+           flags:(NSArray<UIImage*>*)flags
         hideIcon:(BOOL)hideIcon;
 
 - (void)setRecord:(NSString*)title
          subtitle:(NSString*)subtitle
              icon:(UIImage*)icon
     groupLocation:(NSString*)groupLocation
-           pinned:(BOOL)pinned
-   hasAttachments:(BOOL)hasAttachments
+            flags:(NSArray<UIImage*>*)flags
+   flagTintColors:(NSDictionary<NSNumber*, UIColor*> *)flagTintColors
           expired:(BOOL)expired
          otpToken:(OTPToken*_Nullable)otpToken
          hideIcon:(BOOL)hideIcon;

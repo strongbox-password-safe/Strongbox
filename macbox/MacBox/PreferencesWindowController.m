@@ -134,9 +134,14 @@
     [self showWindow:nil];
 }
 
-- (void)showOnTab:(NSUInteger)tab {
+- (void)showFavIconPreferences {
     [self show];
-    [self.tabView selectTabViewItemAtIndex:tab];
+    [self.tabView selectTabViewItemAtIndex:6];
+}
+
+- (void)showPasswordSettings {
+    [self show];
+    [self.tabView selectTabViewItemAtIndex:4];
 }
 
 - (void)windowDidLoad {

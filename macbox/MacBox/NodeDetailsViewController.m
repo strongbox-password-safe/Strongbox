@@ -299,7 +299,6 @@ static NSString* trimField(NSTextField* textField) {
 - (void)viewDidAppear {
     [super viewDidAppear];
     [self.view.window setLevel:Settings.sharedInstance.doNotFloatDetailsWindowOnTop ? NSNormalWindowLevel : NSFloatingWindowLevel];
-    [self.view.window setHidesOnDeactivate:YES];
 }
 
 - (void)observeModelChanges {
@@ -362,7 +361,10 @@ static NSString* trimField(NSTextField* textField) {
 - (void)setupUi {
     NSUInteger doc = [NSDocumentController.sharedDocumentController.documents indexOfObject:self.model.document];
 //    NSLog(@"doc = %lu", (unsigned long)doc);
-    self.view.window.tabbingIdentifier = @(doc).stringValue;
+    
+    if (@available(macOS 10.12, *)) {
+        self.view.window.tabbingIdentifier = @(doc).stringValue;
+    }
     
     self.view.window.delegate = self; // Catch Window events like close / undo manager etc
     
@@ -1302,7 +1304,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onPasswordSettings:(id)sender {
-    [PreferencesWindowController.sharedInstance showOnTab:2];
+    [PreferencesWindowController.sharedInstance showPasswordSettings];
 }
 
 - (IBAction)onGenerate:(id)sender {

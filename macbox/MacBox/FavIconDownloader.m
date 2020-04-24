@@ -135,7 +135,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (IBAction)onPreferences:(id)sender {
-    [PreferencesWindowController.sharedInstance showOnTab:4];
+    [PreferencesWindowController.sharedInstance showFavIconPreferences];
 }
 
 - (void)bindUi {

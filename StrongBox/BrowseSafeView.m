@@ -142,6 +142,14 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [self startOtpRefresh];
         
         [self maybeShowNagScreen];
+        
+        if (self.viewModel.metadata.auditConfig.startAuditOnUnlock) {
+            // [self.viewModel.database startAudit:self.viewModel.metadata.auditConfig];
+            
+            // TODO: Listen for Audit Update Notifications ?
+            
+            // TODO: How do we stop the auditor on exit..?
+        }
     }
     
     // Add an edit button to the top right
@@ -179,11 +187,17 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];
-    [data writeToFile:f atomically:YES];
+    
+    NSError* err;
+    [data writeToFile:f options:kNilOptions error:&err];
+    
+    if (err) {
+        [Alerts error:self error:err];
+        return;
+    }
     
     NSURL* url = [NSURL fileURLWithPath:f];
-        
-    NSArray *activityItems = @[filename, url, self];
+    NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
     // Required for iPad...
@@ -1087,6 +1101,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
         NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @""; // [node.fields.tags.allObjects componentsJoinedByString:@", "];
+        
+        NSDictionary<NSNumber*, UIColor*> *flagTintColors;
+        NSArray* flags = [self getFlags:node tintColors:&flagTintColors];
 
         if(node.isGroup) {
             BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
@@ -1099,7 +1116,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                     italic:italic
              groupLocation:groupLocation
                  tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil
-                    pinned:self.viewModel.metadata.showFlagsInBrowse ? [self.viewModel isPinned:node] : NO
+                     flags:flags
                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }
         else {
@@ -1109,8 +1126,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                    subtitle:subtitle
                        icon:icon
               groupLocation:groupLocation
-                     pinned:self.viewModel.metadata.showFlagsInBrowse ? [self.viewModel isPinned:node] : NO
-             hasAttachments:self.viewModel.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
+                      flags:flags
+             flagTintColors:flagTintColors
                     expired:node.expired
                    otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
                    hideIcon:self.viewModel.metadata.hideIconInBrowse];
@@ -1118,6 +1135,60 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         return cell;
     }
+}
+
+- (NSArray<UIImage*>*)getFlags:(Node*)node tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
+    if ( !self.viewModel.metadata.showFlagsInBrowse ) {
+        if(*tintColors) {
+            *tintColors = @{};
+        }
+        return @[];
+    }
+
+    NSMutableArray<UIImage*> *flags = NSMutableArray.array;
+    
+    if(!node.isGroup && [self.viewModel isFlaggedByAudit:node]) {
+        UIImage* image;
+        UIColor* tintColor;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+        }
+        else {
+            image = [UIImage imageNamed:@"error"];
+        }
+        tintColor = UIColor.systemOrangeColor;
+        
+        if(tintColors) {
+            *tintColors = @{ @(flags.count) : tintColor };
+        }
+
+        [flags addObject:image];
+    }
+
+    if([self.viewModel isPinned:node]) {
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+           image = [UIImage systemImageNamed:@"pin"];
+        }
+        else {
+           image = [UIImage imageNamed:@"pin"];
+        }
+
+        [flags addObject:image];
+    }
+
+    if(!node.isGroup && node.fields.attachments.count) {
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"paperclip"];
+        }
+        else {
+            image = [UIImage imageNamed:@"attach"];
+        }
+        [flags addObject:image];
+    }
+    
+    return flags;
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {

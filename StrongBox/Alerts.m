@@ -173,6 +173,10 @@
     });
 }
 
++ (void)error:(UIViewController *)viewController error:(NSError *)error {
+    [Alerts error:viewController title:NSLocalizedString(@"generic_error", @"Error") error:error];
+}
+
 + (void)error:(UIViewController *)viewController
         title:(NSString *)title
         error:(NSError *)error {

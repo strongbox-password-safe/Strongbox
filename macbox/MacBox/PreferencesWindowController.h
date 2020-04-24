@@ -13,6 +13,7 @@
 + (instancetype)sharedInstance;
 
 - (void)show;
-- (void)showOnTab:(NSUInteger)tab;
+- (void)showFavIconPreferences;
+- (void)showPasswordSettings;
 
 @end

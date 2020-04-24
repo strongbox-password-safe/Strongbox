@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15705" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15705"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -20,9 +20,9 @@
         <window title="Upgrade to Pro?" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES"/>
             <rect key="contentRect" x="196" y="240" width="597" height="546"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
-            <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="597" height="593"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <view key="contentView" wantsLayer="YES" misplaced="YES" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="597" height="565"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <button verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" verticalCompressionResistancePriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="0sw-da-jUF">
@@ -107,10 +107,10 @@ DQ
                         </textFieldCell>
                     </textField>
                     <progressIndicator wantsLayer="YES" horizontalHuggingPriority="750" verticalHuggingPriority="750" maxValue="100" displayedWhenStopped="NO" bezeled="NO" indeterminate="YES" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="EAJ-3L-JEi">
-                        <rect key="frame" x="283" y="281" width="32" height="32"/>
+                        <rect key="frame" x="283" y="267" width="32" height="32"/>
                     </progressIndicator>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="4HD-0q-W3y">
-                        <rect key="frame" x="233" y="565" width="131" height="16"/>
+                        <rect key="frame" x="233" y="537" width="131" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Developer Message" id="Ifz-pQ-wMW">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -118,7 +118,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Euf-d5-41k">
-                        <rect key="frame" x="255" y="436" width="87" height="16"/>
+                        <rect key="frame" x="255" y="408" width="87" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="Pro Features" id="oaj-GB-Co0">
                             <font key="font" metaFont="systemBold"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -126,7 +126,7 @@ DQ
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="TaR-0l-sDe">
-                        <rect key="frame" x="18" y="477" width="561" height="80"/>
+                        <rect key="frame" x="18" y="449" width="561" height="80"/>
                         <textFieldCell key="cell" selectable="YES" alignment="left" id="sdu-EB-4r2">
                             <font key="font" metaFont="system"/>
                             <string key="title">Hi! I was wondering if you would like to upgrade and help to support Strongbox? In addition to contributing to ongoing development, you will also get access to all the Pro features listed below.  I hope you'll choose to contribute. 
@@ -137,16 +137,8 @@ Thanks!
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5Yc-Am-7Q0">
-                        <rect key="frame" x="201" y="408" width="196" height="16"/>
+                        <rect key="frame" x="201" y="380" width="196" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="✅ Touch ID or Watch Unlock" id="Ucc-Id-yEC">
-                            <font key="font" metaFont="system"/>
-                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XoU-5e-1Yt">
-                        <rect key="frame" x="201" y="352" width="69" height="16"/>
-                        <textFieldCell key="cell" lineBreakMode="clipping" title="✅ Search" id="RmW-8g-RMr">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -177,7 +169,7 @@ Thanks!
                         </textFieldCell>
                     </textField>
                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="sjs-Nn-cc2">
-                        <rect key="frame" x="20" y="462" width="557" height="5"/>
+                        <rect key="frame" x="20" y="434" width="557" height="5"/>
                     </box>
                     <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="hlb-fK-dxo">
                         <rect key="frame" x="20" y="253" width="557" height="5"/>
@@ -191,7 +183,7 @@ Thanks!
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pQW-YJ-RZ9">
-                        <rect key="frame" x="201" y="380" width="121" height="16"/>
+                        <rect key="frame" x="201" y="352" width="121" height="16"/>
                         <textFieldCell key="cell" lineBreakMode="clipping" title="✅ YubiKey Unlock" id="MNb-I6-5lT">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -208,9 +200,7 @@ Thanks!
                     <constraint firstItem="Gcu-Yv-UYH" firstAttribute="leading" secondItem="se5-gp-TjO" secondAttribute="leading" constant="20" symbolic="YES" id="8YF-Sb-Y2x"/>
                     <constraint firstAttribute="trailing" secondItem="hlb-fK-dxo" secondAttribute="trailing" constant="20" id="EEC-Sl-0eV"/>
                     <constraint firstItem="TaR-0l-sDe" firstAttribute="top" secondItem="4HD-0q-W3y" secondAttribute="bottom" constant="8" id="FF4-RB-Gyr"/>
-                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="XoU-5e-1Yt" secondAttribute="trailing" constant="20" symbolic="YES" id="FPg-qc-XU9"/>
                     <constraint firstItem="pQW-YJ-RZ9" firstAttribute="leading" secondItem="5Yc-Am-7Q0" secondAttribute="leading" id="G6p-Tx-9Ns"/>
-                    <constraint firstItem="XoU-5e-1Yt" firstAttribute="top" secondItem="pQW-YJ-RZ9" secondAttribute="bottom" constant="12" id="GEo-wG-LJ5"/>
                     <constraint firstItem="5Yc-Am-7Q0" firstAttribute="top" secondItem="Euf-d5-41k" secondAttribute="bottom" constant="12" id="Hwi-Jc-mTW"/>
                     <constraint firstAttribute="trailing" secondItem="sjs-Nn-cc2" secondAttribute="trailing" constant="20" id="IXP-GC-Hb3"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="pQW-YJ-RZ9" secondAttribute="trailing" constant="20" symbolic="YES" id="LBq-gP-UQX"/>
@@ -236,8 +226,7 @@ Thanks!
                     <constraint firstItem="OGh-1Z-Jl6" firstAttribute="leading" secondItem="5Yc-Am-7Q0" secondAttribute="leading" id="fIk-Dn-fA4"/>
                     <constraint firstItem="Euf-d5-41k" firstAttribute="top" secondItem="sjs-Nn-cc2" secondAttribute="bottom" constant="12" id="fap-aC-iMX"/>
                     <constraint firstItem="v45-sK-Mss" firstAttribute="top" secondItem="jcc-jf-Ou8" secondAttribute="bottom" constant="2" id="fb5-8h-uv1"/>
-                    <constraint firstItem="NJW-wn-dKi" firstAttribute="top" secondItem="XoU-5e-1Yt" secondAttribute="bottom" constant="12" id="hcq-h9-bNr"/>
-                    <constraint firstItem="XoU-5e-1Yt" firstAttribute="leading" secondItem="5Yc-Am-7Q0" secondAttribute="leading" id="maA-cC-uFl"/>
+                    <constraint firstItem="NJW-wn-dKi" firstAttribute="top" secondItem="pQW-YJ-RZ9" secondAttribute="bottom" constant="12" id="k5l-SQ-vHm"/>
                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="v45-sK-Mss" secondAttribute="trailing" constant="20" symbolic="YES" id="mgu-8k-6bD"/>
                     <constraint firstItem="OGh-1Z-Jl6" firstAttribute="top" secondItem="NJW-wn-dKi" secondAttribute="bottom" constant="12" id="nFH-ZU-62o"/>
                     <constraint firstAttribute="trailing" secondItem="TaR-0l-sDe" secondAttribute="trailing" constant="20" symbolic="YES" id="o6y-qj-wUE"/>

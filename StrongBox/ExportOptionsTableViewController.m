@@ -112,11 +112,18 @@
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];
-    [data writeToFile:f atomically:YES];
+    
+    NSError* err;
+    [data writeToFile:f options:kNilOptions error:&err];
+    
+    if (err) {
+        [Alerts error:self error:err];
+        return;
+    }
     
     NSURL* url = [NSURL fileURLWithPath:f];
-        
-    NSArray *activityItems = @[filename, url, self];
+    NSArray *activityItems = @[url]; // NB: Do not add NSString or NSData here it messes up the available apps
+    
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
     // Required for iPad... Center Popover

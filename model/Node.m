@@ -561,8 +561,8 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                 attachmentString = [NSString stringWithFormat:@"(%lu attachments)", (unsigned long)child.fields.attachments.count];
             }
             
-            [ret appendFormat:@"%@%@[%@] (username: [%@], password: [%@], url: [%@], tags: [%@]) - [%@] - %@\n",
-             indent, baseIndent, child.title, child.fields.username, child.fields.password, child.fields.url, child.fields.tags,
+            [ret appendFormat:@"%@%@[%@] (username: [%@], url: [%@], tags: [%@]) - [%@] - %@\n",
+             indent, baseIndent, child.title, child.fields.username, child.fields.url, child.fields.tags,
              child.fields.created, attachmentString];
         }
 
@@ -609,8 +609,8 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
         }
     }
     else {
-        return [NSString stringWithFormat:@"{\n[%@] (username: [%@], password: [%@], url: [%@], tags: [%@]) (%lu attachments)\n}",
-                self.title, self.fields.username, self.fields.password, self.fields.url, self.fields.tags, (unsigned long)self.fields.attachments.count];
+        return [NSString stringWithFormat:@"{\n[%@] (username: [%@], url: [%@], tags: [%@]) (%lu attachments)\n}",
+                self.title, self.fields.username, self.fields.url, self.fields.tags, (unsigned long)self.fields.attachments.count];
     }
 }
 

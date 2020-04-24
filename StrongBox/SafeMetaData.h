@@ -15,6 +15,7 @@
 #import "BrowseSortField.h"
 #import "BrowseItemSubtitleField.h"
 #import "YubiKeyHardwareConfiguration.h"
+#import "DatabaseAuditorConfiguration.h"
 
 typedef NS_ENUM (NSInteger, KeePassIconSet) {
     kKeePassIconSetClassic,
@@ -118,6 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hideTotpCustomFieldsInViewMode;
 
 @property YubiKeyHardwareConfiguration* yubiKeyConfig;
+@property DatabaseAuditorConfiguration* auditConfig;
 
 @property BOOL colorizePasswords;
 @property BOOL colorizeProtectedCustomFields;

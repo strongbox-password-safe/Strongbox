@@ -92,18 +92,76 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     NSString* subtitle = [searcher getBrowseItemSubtitle:node];
     
     NSString *groupLocation = [self.df stringFromDate:node.fields.modified];
+    
+    NSDictionary<NSNumber*, UIColor*> *flagTintColors;
+    NSArray* flags = [self getFlags:node tintColors:&flagTintColors];
 
     [cell setRecord:title
            subtitle:subtitle
                icon:icon
       groupLocation:groupLocation
-             pinned:self.viewModel.metadata.showFlagsInBrowse ? [self.viewModel isPinned:node] : NO
-     hasAttachments:self.viewModel.metadata.showFlagsInBrowse ? node.fields.attachments.count : NO
+              flags:flags
+     flagTintColors:flagTintColors
             expired:node.expired
            otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
            hideIcon:self.viewModel.metadata.hideIconInBrowse];
     
     return cell;
+}
+
+// TODO: This is duplicated
+- (NSArray<UIImage*>*)getFlags:(Node*)node tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
+    if ( !self.viewModel.metadata.showFlagsInBrowse ) {
+        if(*tintColors) {
+            *tintColors = @{};
+        }
+        return @[];
+    }
+
+    NSMutableArray<UIImage*> *flags = NSMutableArray.array;
+    
+    if(!node.isGroup && [self.viewModel isFlaggedByAudit:node]) {
+        UIImage* image;
+        UIColor* tintColor;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+        }
+        else {
+            image = [UIImage imageNamed:@"error"];
+        }
+        tintColor = UIColor.systemOrangeColor;
+        
+        if(tintColors) {
+            *tintColors = @{ @(flags.count) : tintColor };
+        }
+
+        [flags addObject:image];
+    }
+
+    if([self.viewModel isPinned:node]) {
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+           image = [UIImage systemImageNamed:@"pin"];
+        }
+        else {
+           image = [UIImage imageNamed:@"pin"];
+        }
+
+        [flags addObject:image];
+    }
+
+    if(!node.isGroup && node.fields.attachments.count) {
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"paperclip"];
+        }
+        else {
+            image = [UIImage imageNamed:@"attach"];
+        }
+        [flags addObject:image];
+    }
+    
+    return flags;
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {

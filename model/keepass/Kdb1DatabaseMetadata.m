@@ -30,7 +30,7 @@ static const uint32_t kDefaultVersion = 0x00030004;
     BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_format", @"Database Format") andValue:@"KeePass 1"];
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption") andValue:((self.flags & kFlagsAes) == kFlagsAes) ? @"AES" : @"TwoFish"];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption") andValue:((self.flags & kFlagsAes) == kFlagsAes) ? @"AES-256" : @"TwoFish"];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds") andValue:[NSString stringWithFormat:@"%u", self.transformRounds]];
     
     return kvps;

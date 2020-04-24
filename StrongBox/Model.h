@@ -52,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)deleteItem:(Node *_Nonnull)child;
 - (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
+- (BOOL)isFlaggedByAudit:(Node*)item;
+
 - (BOOL)isPinned:(Node*)item;
 - (void)togglePin:(Node*)item;
 @property (readonly) NSSet<NSString*>* pinnedSet;

@@ -21,6 +21,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *childCountLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag1;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag2;
+@property (weak, nonatomic) IBOutlet UIImageView *imageFlag3;
 
 @property OTPToken* otpToken;
 
@@ -41,7 +42,7 @@
     self.iconImageView.hidden = YES;
     self.iconImageView.image = nil;
         
-    [self setFlags:NO hasAttachments:NO];
+    [self setFlags:@[] flagTintColors:nil];
     
     [self stopObservingOtpUpdateTimer];
 }
@@ -51,9 +52,9 @@
       childCount:(NSString*)childCount
           italic:(BOOL)italic
    groupLocation:(NSString*)groupLocation
-          pinned:(BOOL)pinned
+           flags:(NSArray<UIImage*>*)flags
         hideIcon:(BOOL)hideIcon {
-    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil pinned:pinned hideIcon:hideIcon];
+    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil flags:flags hideIcon:hideIcon];
 }
 
 - (void)setGroup:(NSString *)title
@@ -62,7 +63,7 @@
           italic:(BOOL)italic
    groupLocation:(NSString *)groupLocation
        tintColor:(UIColor*)tintColor
-          pinned:(BOOL)pinned
+           flags:(NSArray<UIImage *> *)flags
         hideIcon:(BOOL)hideIcon {
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
@@ -74,7 +75,7 @@
     self.usernameLabel.text = @"";
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
-    [self setFlags:pinned hasAttachments:NO];
+    [self setFlags:flags flagTintColors:nil];
 
     self.otpLabel.text = @"";
     self.otpLabel.hidden = YES;
@@ -90,10 +91,10 @@
          subtitle:(NSString *)subtitle
              icon:(UIImage *)icon
     groupLocation:(NSString *)groupLocation
-           pinned:(BOOL)pinned
-   hasAttachments:(BOOL)hasAttachments
+            flags:(NSArray<UIImage *> *)flags
+   flagTintColors:(nonnull NSDictionary<NSNumber *,UIColor *> *)flagTintColors
           expired:(BOOL)expired
-         otpToken:(OTPToken*)otpToken
+         otpToken:(OTPToken *)otpToken
          hideIcon:(BOOL)hideIcon {
     self.titleLabel.text = title;
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
@@ -106,7 +107,7 @@
     self.pathLabel.text = groupLocation;
     self.accessoryType = UITableViewCellAccessoryNone;
     
-    [self setFlags:pinned hasAttachments:hasAttachments];
+    [self setFlags:flags flagTintColors:flagTintColors];
 
     self.childCountLabel.hidden = YES;
     self.bottomRow.hidden = subtitle.length == 0 && groupLocation.length == 0;
@@ -120,24 +121,33 @@
     [self subscribeToOtpUpdateTimerIfNecessary];
 }
 
-- (void)setFlags:(BOOL)pinned hasAttachments:(BOOL)hasAttachments {
-    if(pinned) {
-        if (@available(iOS 13.0, *)) {
-            self.imageFlag1.image = [UIImage systemImageNamed:@"pin"];
+- (void)setFlags:(NSArray<UIImage*>*)flags flagTintColors:(NSDictionary<NSNumber *,UIColor *> *)flagTintColors {
+    UIImage* flag1 = flags.count > 0 ? flags[0] : nil;
+    UIImage* flag2 = flags.count > 1 ? flags[1] : nil;
+    UIImage* flag3 = flags.count > 2 ? flags[2] : nil;
+    
+    self.imageFlag1.hidden = flag1 == nil;
+    self.imageFlag2.hidden = flag2 == nil;
+    self.imageFlag3.hidden = flag3 == nil;
+    
+    self.imageFlag1.image = flag1;
+    self.imageFlag2.image = flag2;
+    self.imageFlag3.image = flag3;
+    
+    [self.imageFlag1 setTintColor:nil];
+    [self.imageFlag2 setTintColor:nil];
+    [self.imageFlag3 setTintColor:nil];
+
+    if (flagTintColors) {
+        if (flagTintColors[@(0)]) {
+            [self.imageFlag1 setTintColor:flagTintColors[@(0)]];
         }
-        else {
-            self.imageFlag1.image = pinned ? [UIImage imageNamed:@"pin"] : nil;
+        if (flagTintColors[@(1)]) {
+            [self.imageFlag2 setTintColor:flagTintColors[@(1)]];
         }
-        
-        self.imageFlag1.hidden = !pinned;
-        self.imageFlag2.image = hasAttachments ? [UIImage imageNamed:@"attach"] : nil;
-        self.imageFlag2.hidden = !hasAttachments;
-    }
-    else {
-        self.imageFlag1.image = hasAttachments ? [UIImage imageNamed:@"attach"] : nil;
-        self.imageFlag1.hidden = !hasAttachments;
-        self.imageFlag2.image = nil;
-        self.imageFlag2.hidden = YES;
+        if (flagTintColors[@(2)]) {
+            [self.imageFlag3 setTintColor:flagTintColors[@(2)]];
+        }
     }
 }
 
