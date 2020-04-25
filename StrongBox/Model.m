@@ -15,11 +15,18 @@
 #import "PasswordMaker.h"
 #import "BackupsManager.h"
 #import "NSArray+Extensions.h"
+#import "DatabaseAuditor.h"
+
+NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
+NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
+NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
 
 @interface Model ()
 
 @property (nonnull) NSData* lastSnapshot;
 @property NSSet<NSString*> *cachedPinned;
+@property DatabaseAuditor* auditor;
+@property BOOL isAutoFillOpen;
 
 @end
 
@@ -34,7 +41,8 @@
                             metaData:(SafeMetaData *)metaData
                      storageProvider:(id <SafeStorageProvider>)provider
                            cacheMode:(BOOL)cacheMode
-                          isReadOnly:(BOOL)isReadOnly {
+                          isReadOnly:(BOOL)isReadOnly
+                      isAutoFillOpen:(BOOL)isAutoFillOpen {
     if (self = [super init]) {
         _database = passwordDatabase;
         _lastSnapshot = originalDataForBackup;
@@ -44,12 +52,96 @@
         _isReadOnly = isReadOnly || metaData.readOnly;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
         
+        self.isAutoFillOpen = isAutoFillOpen;
+        
+        self.auditor = [[DatabaseAuditor alloc] init];
+
+        [self restartBackgroundAudit];
+        
         return self;
     }
     else {
         return nil;
     }
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)closeAndCleanup { // Called when user is done/finised with model... // TODO: Call on Exit Mac!
+    NSLog(@"Model closeAndCleanup...");
+    if (self.auditor) {
+        [self.auditor stop];
+        self.auditor = nil;
+    }
+}
+
+- (AuditState)auditState {
+    return self.auditor.state;
+}
+
+- (void)restartBackgroundAudit {
+    if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
+         [self restartAudit];
+    }
+    else {
+        NSLog(@"Audit not configured to run. Skipping.");
+    }
+}
+
+-(void)stopAudit {
+    [self.auditor stop];
+}
+
+- (void)stopAndClearAuditor {
+    [self.auditor stop];
+    self.auditor = [[DatabaseAuditor alloc] init];
+}
+
+- (void)restartAudit {
+    [self stopAndClearAuditor];
+
+    [self.auditor start:self.database.activeRecords
+                 config:self.metadata.auditConfig
+      isDereferenceable:^BOOL(NSString * _Nonnull string) {
+        return [self.database isDereferenceableText:string];
+    }
+            nodesChanged:^{
+        NSLog(@"Audit Nodes Changed Callback...");
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kAuditNodesChangedNotificationKey object:nil];
+        });
+    }
+               progress:^(CGFloat progress) {
+        NSLog(@"Audit Progress Callback: %f", progress);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
+        });
+    } completion:^(BOOL userStopped) {
+        NSLog(@"Audit Completed - User Cancelled: %d", userStopped);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@(userStopped)];
+        });
+    }];
+}
+
+- (NSString*)getQuickAuditSummaryForNode:(Node*)item {
+    if (self.auditor) {
+        return [self.auditor getQuickAuditSummaryForNode:item];
+    }
+    
+    return nil;
+}
+
+- (BOOL)isFlaggedByAudit:(Node*)item {
+    if (self.auditor) {
+        NSSet<NSNumber*>* auditFlags = [self.auditor getQuickAuditFlagsForNode:item];
+        return auditFlags.count > 0;
+    }
+    
+    return NO;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (BOOL)isCloudBasedStorage {
     return _storageProvider.allowOfflineCache;
@@ -89,6 +181,11 @@
                                   [self updateOfflineCacheWithData:data];
                                   [self updateAutoFillCacheWithData:data];
                                   [self updateAutoFillQuickTypeDatabase];
+                                  
+                                  // Re-audit - FUTURE - Make this more incremental?
+                                  if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
+                                       [self restartAudit];
+                                  }
                               }
                               handler(NO, error);
                           }];
@@ -242,12 +339,6 @@
         [child.parent removeChild:child];
         return YES;
     }
-}
-
-// Audit
-
-- (BOOL)isFlaggedByAudit:(Node*)item {
-    return [self.database isFlaggedByAudit:item];
 }
 
 // Pinned or Not?

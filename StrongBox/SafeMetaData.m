@@ -174,8 +174,7 @@
     [encoder encodeInteger:self.keePassIconSet forKey:@"keePassIconSet"];
     [encoder encodeBool:self.colorizeProtectedCustomFields forKey:@"colorizeProtectedCustomFields"];
 
-    // TODO: Restore when Audit feature goes live
-//    [encoder encodeObject:self.auditConfig forKey:@"auditConfig"];
+    [encoder encodeObject:self.auditConfig forKey:@"auditConfig"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {

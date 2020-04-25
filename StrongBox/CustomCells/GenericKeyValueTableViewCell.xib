@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -19,7 +19,7 @@
                         <rect key="frame" x="20" y="11" width="391" height="124"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="Bhh-sD-DhU">
-                                <rect key="frame" x="0.0" y="15.5" width="353" height="93.5"/>
+                                <rect key="frame" x="0.0" y="5" width="353" height="114.5"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Key that couild get very long too could alsbe be very long, no need to translate this string" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999999999999996" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oFX-hJ-zwW">
                                         <rect key="frame" x="0.0" y="0.0" width="353" height="14.5"/>
@@ -32,14 +32,38 @@
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                     </textField>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Value that gets very big very quickluy and also be very hard to present on svreen" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rIW-5l-d5R" userLabel="Value Label">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="753" text="Value that gets very big very quickluy and also be very hard to present on svreen" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rIW-5l-d5R" userLabel="Value Label">
                                         <rect key="frame" x="0.0" y="45.5" width="353" height="42.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="2Fm-9I-7Iu">
+                                        <rect key="frame" x="0.0" y="93" width="353" height="16"/>
+                                        <subviews>
+                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="error" translatesAutoresizingMaskIntoConstraints="NO" id="sgz-Sv-BcU">
+                                                <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
+                                                <color key="tintColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="16" id="JcQ-LL-qvd"/>
+                                                    <constraint firstAttribute="width" constant="16" id="dp2-u4-zx5"/>
+                                                </constraints>
+                                            </imageView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="&lt;Audit Warning Placeholder - No Translation Needed&gt;" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Z86-PQ-27q" userLabel="Audit Warning Label">
+                                                <rect key="frame" x="20" y="2" width="333" height="12"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption2"/>
+                                                <color key="textColor" systemColor="systemOrangeColor" red="1" green="0.58431372550000005" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="Z86-PQ-27q" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2Fm-9I-7Iu" secondAttribute="top" constant="2" id="03J-3J-RkF"/>
+                                            <constraint firstItem="Z86-PQ-27q" firstAttribute="centerY" secondItem="2Fm-9I-7Iu" secondAttribute="centerY" id="1kG-Cx-x9v"/>
+                                            <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Z86-PQ-27q" secondAttribute="bottom" constant="2" id="Rib-dP-8AM"/>
+                                        </constraints>
+                                    </stackView>
                                     <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kDW-Lf-bb8" userLabel="Horizontal Line">
-                                        <rect key="frame" x="0.0" y="93" width="353" height="0.5"/>
+                                        <rect key="frame" x="0.0" y="114" width="353" height="0.5"/>
                                         <color key="backgroundColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="0.5" id="QXy-L3-XX5"/>
@@ -72,9 +96,13 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="auditStack" destination="2Fm-9I-7Iu" id="x2R-6l-GwY"/>
                 <outlet property="buttonRightButton" destination="rQz-OR-vZ7" id="KHt-JT-Qew"/>
                 <outlet property="horizontalLine" destination="kDW-Lf-bb8" id="M6w-zn-wdE"/>
+                <outlet property="imageAuditError" destination="sgz-Sv-BcU" id="qha-l1-QZh"/>
                 <outlet property="keyLabel" destination="oFX-hJ-zwW" id="OMB-qA-pjC"/>
+                <outlet property="labelAudit" destination="Z86-PQ-27q" id="SQ6-VZ-Gf5"/>
+                <outlet property="linesStack" destination="Bhh-sD-DhU" id="kIB-an-kVv"/>
                 <outlet property="valueLabel" destination="rIW-5l-d5R" id="VzQ-Na-TZi"/>
                 <outlet property="valueText" destination="miA-4r-w9p" id="tLV-he-fcE"/>
             </connections>
@@ -82,6 +110,7 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="error" width="30" height="30"/>
         <image name="visible" width="30" height="30"/>
     </resources>
 </document>

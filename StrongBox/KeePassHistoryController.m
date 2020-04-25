@@ -88,7 +88,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
     
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel];
     NSString* subtitle = [searcher getBrowseItemSubtitle:node];
     
     NSString *groupLocation = [self.df stringFromDate:node.fields.modified];

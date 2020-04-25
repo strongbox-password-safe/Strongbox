@@ -2993,3 +2993,54 @@
 
 /* Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be stored securely until you exit Strongbox Note for translators (1st Param = "Touch ID") */
 "mac_use_biometric_to_open_in_future_simple_app_exit_fmt" = "Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be stored securely until you exit Strongbox";
+
+/* Audit: No password set */
+"audit_quick_summary_no_password_set" = "No password set";
+
+/* Audit: Password is very common */
+"audit_quick_summary_very_common_password" = "Password is very common";
+
+/* Audit: Password is duplicated in another entry */
+"audit_quick_summary_duplicated_password" = "Password is duplicated in another entry";
+
+/* Audit: Password is similar to one in another entry. */
+"audit_quick_summary_password_is_similar_to_another" = "Password is similar to one in another entry.";
+
+/* All Entries */
+"quick_view_title_all_entries_title" = "All Entries";
+
+/* View every entry in a flat list... */
+"quick_view_title_all_entries_subtitle" = "View every entry in a flat list...";
+
+/* Audit Issues */
+"quick_view_title_audit_issues_title" = "Audit Issues";
+
+/* View all entries with audit issues */
+"quick_view_title_audit_issues_subtitle" = "View all entries with audit issues";
+
+/* TOTP Entries */
+"quick_view_title_totp_entries_title" = "TOTP Entries";
+
+/* View all entries with a TOTP token */
+"quick_view_title_totp_entries_subtitle" = "View all entries with a TOTP token";
+
+/* Quick Views */
+"quick_view_section_title_quick_views" = "Quick Views";
+
+/* Audit Complete */
+"audit_status_complete" = "Audit Complete";
+
+/* Database Auditor Initialized */
+"audit_status_initialized" = "Database Auditor Initialized";
+
+/* Auditing... (%d%%) - Translator's Note - 1st Parameter is a percentage e.g. 25% - NB: Only 1 param (double percentages are an escape string for the single percentage symbol) */
+"audit_status_running_with_progress_fmt" = "Auditing... (%d%%)";
+
+/* Auditing... */
+"audit_status_running_with_ellipsis" = "Auditing...";
+
+/* Audit Stopped */
+"audit_status_stopped" = "Audit Stopped";
+
+/* Enhanced Audits (Pro Edition Only) */
+"audit_enhanced_audits_pro_only_title" = "Enhanced Audits (Pro Edition Only)";

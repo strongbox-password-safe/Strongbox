@@ -210,6 +210,16 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                                            selector:@selector(onDatabaseViewPreferencesChanged:)
                                                name:kDatabaseViewPreferencesChangedNotificationKey
                                              object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onAuditNodesChanged:)
+                                               name:kAuditNodesChangedNotificationKey
+                                             object:nil];
+}
+
+- (void)onAuditNodesChanged:(id)param {
+    NSLog(@"onAuditNodesChanged: TODO");
+    [self performFullReload];
 }
 
 - (void)onDatabaseViewPreferencesChanged:(id)param {
@@ -535,7 +545,9 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             return 0;
         }
         else if(indexPath.row == kRowPassword && shouldHideEmpty && !self.model.password.length) {
-            return 0;
+            if (![self.databaseModel isFlaggedByAudit:self.item]) { // Don't hide if there's an audit issue - No Password
+                return 0;
+            }
         }
         else if(indexPath.row == kRowURL && shouldHideEmpty && !self.model.url.length) {
             return 0;
@@ -1601,10 +1613,13 @@ showGenerateButton:YES];
     else {
         GenericKeyValueTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         
+        NSString* audit = [self.databaseModel getQuickAuditSummaryForNode:self.item];
+        
         [cell setConfidentialKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
                            value:[self maybeDereference:self.model.password]
                        concealed:self.passwordConcealedInUi
-                        colorize:self.databaseModel.metadata.colorizePasswords];
+                        colorize:self.databaseModel.metadata.colorizePasswords
+                           audit:audit];
         
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
@@ -1764,7 +1779,8 @@ showGenerateButton:YES];
             [cell setConfidentialKey:cf.key
                                value:[self maybeDereference:cf.value]
                            concealed:cf.concealedInUI
-                            colorize:self.databaseModel.metadata.colorizeProtectedCustomFields];
+                            colorize:self.databaseModel.metadata.colorizeProtectedCustomFields
+                               audit:nil];
 
             __weak GenericKeyValueTableViewCell* weakCell = cell;
             cell.onRightButton = ^{

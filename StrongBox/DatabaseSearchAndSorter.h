@@ -10,14 +10,18 @@
 #import "DatabaseModel.h"
 #import "Node.h"
 #import "SearchScope.h"
-#import "SafeMetaData.h"
+#import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const kSpecialSearchTermAllEntries;
+extern NSString* const kSpecialSearchTermAuditEntries;
+extern NSString* const kSpecialSearchTermTotpEntries;
+          
 @interface DatabaseSearchAndSorter : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithDatabase:(DatabaseModel*)database metadata:(SafeMetaData*)metadata;
+- (instancetype)initWithModel:(Model*)model;
 
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope

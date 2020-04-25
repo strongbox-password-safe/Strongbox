@@ -33,10 +33,11 @@
             config:DatabaseAuditorConfiguration.defaults
  isDereferenceable:^BOOL(NSString * _Nonnull string) {
         return NO;
-    }
+        }
+      nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
           progress:^(CGFloat progress) {
         NSLog(@"Audit Progress: %f", progress);
-    }
+        }
         completion:^(BOOL userStopped) {
         DatabaseAuditReport* report = [auditor getAuditReport];
         NSLog(@"Completed - Database Audit Report = %@ - User Stopped: %d", report, userStopped);
@@ -63,6 +64,7 @@
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
            return NO;
        }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
              progress:^(CGFloat progress) {
            NSLog(@"Audit Progress: %f", progress);
        }
@@ -96,6 +98,7 @@
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
            return NO;
        }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
              progress:^(CGFloat progress) {
            NSLog(@"Audit Progress: %f", progress);
        }
@@ -135,6 +138,7 @@
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
            return NO;
        }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
              progress:^(CGFloat progress) {
            NSLog(@"Audit Progress: %f", progress);
        }
@@ -166,6 +170,7 @@
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
            return NO;
        }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
              progress:^(CGFloat progress) {
            NSLog(@"Audit Progress: %f", progress);
        }
@@ -199,12 +204,13 @@
     DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
     config.checkForSimilarPasswords = YES;
     
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] init];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initForTesting];
        [auditor start:db.activeRecords
                config:config
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
            return NO;
        }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
              progress:^(CGFloat progress) {
            NSLog(@"Audit Progress: %f", progress);
        }
@@ -212,8 +218,7 @@
            DatabaseAuditReport* report = [auditor getAuditReport];
 
            NSLog(@"Database Audit Report = %@", report);
-           //    XCTAssertEqual(report.entriesWithNoPasswords.count, 1);
-           //    XCTAssertEqual(report.entriesWithNoPasswords.allObjects.firstObject, nodeWithNoPassword);
+           XCTAssertGreaterThanOrEqual(report.entriesWithSimilarPasswords.count, 2);
 
            self.done = YES;
        }];
@@ -236,12 +241,13 @@
     config.checkForSimilarPasswords = YES;
     config.levenshteinSimilarityThreshold = 0.4;
 
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] init];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initForTesting];
        [auditor start:db.activeRecords
                config:config
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
            return NO;
        }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
              progress:^(CGFloat progress) {
            NSLog(@"Audit Progress: %f", progress);
        }

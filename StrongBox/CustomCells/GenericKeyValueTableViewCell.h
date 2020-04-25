@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit useEasyReadFont:(BOOL)useEasyReadFont;
 
-- (void)setConfidentialKey:(NSString*)key value:(NSString*)value concealed:(BOOL)concealed colorize:(BOOL)colorize;
+- (void)setConfidentialKey:(NSString*)key value:(NSString*)value concealed:(BOOL)concealed colorize:(BOOL)colorize audit:(NSString*_Nullable)audit;
 
 - (void)pokeValue:(NSString *)value;
 

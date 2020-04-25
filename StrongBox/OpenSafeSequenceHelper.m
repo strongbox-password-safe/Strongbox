@@ -316,7 +316,8 @@
                                                           metaData:metadata
                                                    storageProvider:DuressDummyStorageProvider.sharedInstance
                                                          cacheMode:NO
-                                                        isReadOnly:NO];
+                                                        isReadOnly:NO
+                                                    isAutoFillOpen:NO];
             
             self.completion(viewModel, nil);
         }];
@@ -1114,7 +1115,8 @@
                                                   metaData:self.safe
                                            storageProvider:cacheMode ? nil : provider // Guarantee nothing can be written!
                                                  cacheMode:cacheMode
-                                                isReadOnly:NO];
+                                                isReadOnly:NO
+                                            isAutoFillOpen:self.isAutoFillOpen];
     
     viewModel.openedWithYubiKeySecret = self.yubikeySecret;
     

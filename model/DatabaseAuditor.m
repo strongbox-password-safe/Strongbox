@@ -10,12 +10,16 @@
 #import "NSArray+Extensions.h"
 #import "PasswordMaker.h"
 #import "NSString+Levenshtein.h"
+#import "Settings.h"
 
 @interface DatabaseAuditor ()
 
 @property AuditIsDereferenceableTextBlock isDereferenceable;
+
 @property AuditProgressBlock progress;
 @property AuditCompletionBlock completion;
+@property AuditNodesChangedBlock nodesChanged;
+
 @property BOOL stopRequested;
 @property NSSet<Node*>* nodes;
 @property DatabaseAuditorConfiguration* config;
@@ -29,6 +33,8 @@
 
 @property NSSet<Node*>* duplicatedPasswordsNodeSet; // PERF
 @property NSSet<Node*>* similarPasswordsNodeSet; // PERF
+
+@property BOOL isTesting;
 
 @end
 
@@ -51,9 +57,18 @@
     return self;
 }
 
+- (instancetype)initForTesting {
+    self = [super init];
+    if (self) {
+        self.isTesting = YES;
+    }
+    return self;
+}
+
 - (BOOL)start:(NSArray<Node *> *)nodes
        config:(DatabaseAuditorConfiguration *)config
 isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
+ nodesChanged:(AuditNodesChangedBlock)nodesChanged
      progress:(AuditProgressBlock)progress
    completion:(AuditCompletionBlock)completion {
     if (self.state != kAuditStateInitial) {
@@ -62,40 +77,75 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     }
 
     self.state = kAuditStateRunning;
-    self.completion = completion;
+
     self.isDereferenceable = isDereferenceable;
+
+    self.completion = completion;
+    self.nodesChanged = nodesChanged;
     self.progress = progress;
+
     self.nodes = nodes.copy;
     self.config = config;
     
-    self.progress(0.0);
-    
-    // Do express audits now... very fast and allows immediate display in browse on Unlock
-
-    [self performExpressAudits];
-    
-    // Possibly Longer running...
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
-        [self performComprehensiveAudits];
-        
-        self.completion(self.state == kAuditStateStoppedIncomplete);
+        [self audit];
     });
     
     return YES;
 }
 
+- (void)audit {
+    NSLog(@"AUDIT: Starting Audit...");
+    
+    self.progress(0.0);
+
+    [self performAudits];
+    
+    self.progress(1.0);
+
+    if (self.state == kAuditStateRunning) { // Don't overwrite stopped incomplete
+        self.state = kAuditStateDone;
+    }
+    
+    self.completion(self.state == kAuditStateStoppedIncomplete);
+}
+
 - (void)stop {
-    self.stopRequested = YES; // TODO:
+    NSLog(@"AUDIT: Stopping Audit...");
+    self.stopRequested = YES;
 }
 
 - (DatabaseAuditReport *)getAuditReport {
     DatabaseAuditReport* report = [[DatabaseAuditReport alloc] initWithNoPasswordEntries:self.noPasswords
                                                                      duplicatedPasswords:self.duplicatedPasswords
                                                                          commonPasswords:self.commonPasswords
-                                                                                 similar:self.similar]; // TODO:
+                                                                                 similar:self.similar];
     
     return report;
+}
+
+- (NSString *)getQuickAuditSummaryForNode:(Node *)item {
+    NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
+    
+    if (flags.anyObject) {
+        if ([flags containsObject:@(kAuditFlagNoPassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_no_password_set", @"Audit: No password set");
+        }
+
+        if ([flags containsObject:@(kAuditFlagCommonPassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_common_password", @"Audit: Password is very common");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagDuplicatePassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_duplicated_password", @"Audit: Password is duplicated in another entry");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagSimilarPassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_password_is_similar_to_another", @"Audit: Password is similar to one in another entry.");
+        }
+    }
+    
+    return nil;
 }
 
 - (NSSet<NSNumber *> *)getQuickAuditFlagsForNode:(Node *)node {
@@ -117,25 +167,45 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return ret;
 }
 
-- (void)performExpressAudits {
+- (void)performAudits {
+    // No Passwords
+    
     self.noPasswords = [self checkForNoPasswords];
-    self.duplicatedPasswords = [self checkForDuplicatedPasswords];
-    self.commonPasswords = [self checkForCommonPasswords];
+    if (self.noPasswords.anyObject) {
+        self.nodesChanged();
+    }
 
+    // Duplicated Passwords within DB
+
+    self.duplicatedPasswords = [self checkForDuplicatedPasswords];
     self.duplicatedPasswordsNodeSet = [NSSet setWithArray:[self.duplicatedPasswords.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
         return obj.allObjects;
     }]];
-}
 
-- (void)performComprehensiveAudits {
+    if (self.duplicatedPasswordsNodeSet.anyObject) {
+        self.nodesChanged();
+    }
 
+    // Common Weak/Popular Passwords
+
+    self.commonPasswords = [self checkForCommonPasswords];
+    if (self.commonPasswords.anyObject) {
+         self.nodesChanged();
+    }
+    
     // Similar
 
-    self.similar = [self checkForSimilarPasswords];
-    self.similarPasswordsNodeSet = [NSSet setWithArray:[self.similar.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
-        return obj.allObjects;
-    }]];
-    
+    if (self.isTesting || Settings.sharedInstance.isProOrFreeTrial) {
+        self.similar = [self checkForSimilarPasswords];
+        self.similarPasswordsNodeSet = [NSSet setWithArray:[self.similar.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
+            return obj.allObjects;
+        }]];
+
+        if (self.similarPasswordsNodeSet.anyObject) {
+             self.nodesChanged();
+        }
+    }
+        
     // Future Extensions: Extend Audit to these
     //
     // Weak (Low Entropy)
@@ -145,9 +215,8 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     
     //    return [[DatabaseAuditReport alloc] initWithNoPasswordEntries:noPasswords duplicatedPasswords:duplicatedPasswords commonPasswords:commonPasswords similar:similar];
 
-//    return nil;
+    //    return nil;
 
-    self.progress(1.0);
 }
 
 - (NSSet<Node*>*)checkForNoPasswords {
@@ -245,12 +314,17 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         [uncheckedOthers removeObject:entry];
 
         for (Node* other in uncheckedOthers) {
-            if (i % 1000 == 0) {
+            if (i % 500 == 0) {
                 //                NSLog(@"%d/%d", i, totalComparisons);
                 CGFloat progress = (CGFloat)i/(CGFloat)totalComparisons; // FUTURE: Weight this against other tasks
                 self.progress(progress);
             }
             i++;
+
+            if (self.stopRequested) {
+                self.state = kAuditStateStoppedIncomplete;
+                return similarGroups.copy;
+            }
             
             // (Levenstein) -     // Levenshtein distance (https://en.wikipedia.org/wiki/Levenshtein_distance).
 

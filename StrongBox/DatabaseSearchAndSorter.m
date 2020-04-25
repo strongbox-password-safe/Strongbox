@@ -14,20 +14,22 @@
 #import "BrowseSortField.h"
 #import "Utils.h"
 
+NSString* const kSpecialSearchTermAllEntries = @"strongbox:allEntries";
+NSString* const kSpecialSearchTermAuditEntries = @"strongbox:auditEntries";
+NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
+          
 @interface DatabaseSearchAndSorter ()
 
-@property DatabaseModel* database;
-@property SafeMetaData* metadata;
+@property Model* model;
 
 @end
 
 @implementation DatabaseSearchAndSorter
 
-- (instancetype)initWithDatabase:(DatabaseModel *)database metadata:(SafeMetaData *)metadata {
+- (instancetype)initWithModel:(Model *)model {
     self = [super init];
     if (self) {
-        self.database = database;
-        self.metadata = metadata;
+        self.model = model;
     }
     return self;
 }
@@ -37,7 +39,7 @@
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
-    if(self.database.format == kPasswordSafe || !text.length) {
+    if(self.model.database.format == kPasswordSafe || !text.length) {
         return text;
     }
     
@@ -45,7 +47,7 @@
     
     BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
     
-    NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.database.rootGroup error:&error] : text;
+    NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.model.database.rootGroup error:&error] : text;
     
     if(error) {
         NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
@@ -61,7 +63,7 @@
         includeRecycleBin:(BOOL)includeRecycleBin
            includeExpired:(BOOL)includeExpired
             includeGroups:(BOOL)includeGroups {
-    return [self searchNodes:self.database.allNodes
+    return [self searchNodes:self.model.database.allNodes
                   searchText:searchText
                        scope:scope
                  dereference:dereference
@@ -81,7 +83,7 @@
                  includeGroups:(BOOL)includeGroups {
     NSMutableArray* results = [nodes mutableCopy]; // Mutable for memory/perf reasons
     
-    NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
+    NSArray<NSString*>* terms = [self.model.database getSearchTerms:searchText];
     
     for (NSString* word in terms) {
         [self filterForWord:results
@@ -115,7 +117,22 @@
            searchText:(NSString *)searchText
                 scope:(NSInteger)scope
           dereference:(BOOL)dereference {
-    if (scope == kSearchScopeTitle) {
+    if ([searchText isEqualToString:kSpecialSearchTermAllEntries]) { // Special Strongbox Search Operator
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return !obj.isGroup;
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermAuditEntries]) { // Special Strongbox Search Operator
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return [self.model isFlaggedByAudit:obj];
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermTotpEntries]) { // Special Strongbox Search Operator
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.otpToken != nil;
+        }];
+    }
+    else if (scope == kSearchScopeTitle) {
         [self searchTitle:searchNodes searchText:searchText dereference:dereference];
     }
     else if (scope == kSearchScopeUsername) {
@@ -137,37 +154,37 @@
 
 - (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isTitleMatches:searchText node:node dereference:dereference];
+        return [self.model.database isTitleMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUsernameMatches:searchText node:node dereference:dereference];
+        return [self.model.database isUsernameMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isPasswordMatches:searchText node:node dereference:dereference];
+        return [self.model.database isPasswordMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUrlMatches:searchText node:node dereference:dereference];
+        return [self.model.database isUrlMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchTags:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isTagsMatches:searchText node:node];
+        return [self.model.database isTagsMatches:searchText node:node];
     }];
 }
 
 - (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference];
+        return [self.model.database isAllFieldsMatches:searchText node:node dereference:dereference];
     }];
 }
 
@@ -177,8 +194,8 @@
         includeExpired:(BOOL)includeExpired
          includeGroups:(BOOL)includeGroups {
     if(!includeKeePass1Backup) {
-        if (self.database.format == kKeePass1) {
-            Node* backupGroup = self.database.keePass1BackupNode;
+        if (self.model.database.format == kKeePass1) {
+            Node* backupGroup = self.model.database.keePass1BackupNode;
             if(backupGroup) {
                 [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
                     return (obj != backupGroup && ![backupGroup contains:obj]);
@@ -187,7 +204,7 @@
         }
     }
 
-    Node* recycleBin = self.database.recycleBinNode;
+    Node* recycleBin = self.model.database.recycleBinNode;
     if(!includeRecycleBin && recycleBin) {
         [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
             return obj != recycleBin && ![recycleBin contains:obj];
@@ -208,14 +225,14 @@
 }
 
 - (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items {
-    BrowseSortField field = self.metadata.browseSortField;
-    BOOL descending = self.metadata.browseSortOrderDescending;
-    BOOL foldersSeparately = self.metadata.browseSortFoldersSeparately;
+    BrowseSortField field = self.model.metadata.browseSortField;
+    BOOL descending = self.model.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
     
-    if(field == kBrowseSortFieldEmail && self.database.format != kPasswordSafe) {
+    if(field == kBrowseSortFieldEmail && self.model.database.format != kPasswordSafe) {
         field = kBrowseSortFieldTitle;
     }
-    else if(field == kBrowseSortFieldNone && self.database.format == kPasswordSafe) {
+    else if(field == kBrowseSortFieldNone && self.model.database.format == kPasswordSafe) {
         field = kBrowseSortFieldTitle;
     }
     
@@ -293,18 +310,18 @@
 }
 
 - (NSString*)getBrowseItemSubtitle:(Node*)node {
-    switch (self.metadata.browseItemSubtitleField) {
+    switch (self.model.metadata.browseItemSubtitleField) {
         case kBrowseItemSubtitleNoField:
             return @"";
             break;
         case kBrowseItemSubtitleUsername:
-            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+            return self.model.metadata.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
             break;
         case kBrowseItemSubtitlePassword:
-            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
+            return self.model.metadata.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
             break;
         case kBrowseItemSubtitleUrl:
-            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
+            return self.model.metadata.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
             break;
         case kBrowseItemSubtitleEmail:
             return node.fields.email;
@@ -316,7 +333,7 @@
             return friendlyDateString(node.fields.created);
             break;
         case kBrowseItemSubtitleNotes:
-            return self.metadata.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;
+            return self.model.metadata.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;
             break;
         case kBrowseItemSubtitleTags:
             return sortedTagsString(node);

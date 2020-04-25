@@ -31,23 +31,16 @@
 #import "DatabasePreferencesController.h"
 #import "ExportOptionsTableViewController.h"
 
-const NSUInteger kSectionIdxPinned = 0;
-const NSUInteger kSectionIdxNearlyExpired = 1;
-const NSUInteger kSectionIdxExpired = 2;
-const NSUInteger kSectionIdxLast = 3;
+#import "BrowseTableDatasource.h"
+#import "ConfiguredBrowseTableDatasource.h"
+#import "SearchResultsBrowseTableDatasource.h"
+#import "BrowseTableViewCellHelper.h"
+#import "QuickViewsBrowseTableDataSource.h"
 
-static NSString* const kBrowseItemCell = @"BrowseItemCell";
-static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 @interface BrowseSafeView () < UISearchBarDelegate, UISearchResultsUpdating, DZNEmptyDataSetSource>
-
-@property (strong, nonatomic) NSArray<Node*> *searchResults;
-@property (strong, nonatomic) NSArray<Node*> *standardItemsCache;
-@property (strong, nonatomic) NSArray<Node*> *pinnedItemsCache;
-@property (strong, nonatomic) NSArray<Node*> *expiredItemsCache;
-@property (strong, nonatomic) NSArray<Node*> *nearlyExpiredItemsCache;
 
 @property (strong, nonatomic) UISearchController *searchController;
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
@@ -67,6 +60,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property NSTimer* timerRefreshOtp;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *exportBarButton;
+
+@property ConfiguredBrowseTableDatasource* configuredDataSource;
+@property SearchResultsBrowseTableDatasource* searchDataSource;
+@property QuickViewsBrowseTableDataSource* quickViewsDataSource;
 
 @end
 
@@ -141,15 +138,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
          // This coordinates all TOTP UI updates for this database
         [self startOtpRefresh];
         
-        [self maybeShowNagScreen];
-        
-        if (self.viewModel.metadata.auditConfig.startAuditOnUnlock) {
-            // [self.viewModel.database startAudit:self.viewModel.metadata.auditConfig];
-            
-            // TODO: Listen for Audit Update Notifications ?
-            
-            // TODO: How do we stop the auditor on exit..?
-        }
+        [self maybeShowNagScreen];        
     }
     
     // Add an edit button to the top right
@@ -228,6 +217,15 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                            selector:@selector(onDatabaseViewPreferencesChanged:)
                                                name:kDatabaseViewPreferencesChangedNotificationKey
                                              object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onAuditNodesChanged:)
+                                               name:kAuditNodesChangedNotificationKey
+                                             object:nil];
+}
+
+- (void)onAuditNodesChanged:(id)param {
+    [self refreshItems];
 }
 
 - (void)onDatabaseViewPreferencesChanged:(id)param {
@@ -247,10 +245,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         return;
     }
     else if(Settings.sharedInstance.isFreeTrial) {
-        percentageChanceOfShowing = 10;
+        percentageChanceOfShowing = 5;
     }
     else {
-        percentageChanceOfShowing = 20;
+        percentageChanceOfShowing = 10;
     }
 
     NSInteger random = arc4random_uniform(100);
@@ -403,9 +401,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)setupTableview {
-    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
-    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemTotpCell bundle:nil] forCellReuseIdentifier:kBrowseItemTotpCell];
-
+    self.configuredDataSource = [[ConfiguredBrowseTableDatasource alloc] initWithModel:self.viewModel isDisplayingRootGroup:[self isDisplayingRootGroup] tableView:self.tableView];
+    self.searchDataSource = [[SearchResultsBrowseTableDatasource alloc] initWithModel:self.viewModel tableView:self.tableView];
+    self.quickViewsDataSource = [[QuickViewsBrowseTableDataSource alloc] initWithModel:self.viewModel tableView:self.tableView];
+    
     self.tableView.emptyDataSetSource = self;
     
     self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
@@ -434,6 +433,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (IBAction)onClose:(id)sender {
     MasterDetailViewController* master = (MasterDetailViewController*)self.splitViewController;
     [master onClose];
+    
+    if (self.viewModel) {
+        [self.viewModel closeAndCleanup];
+    }
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -556,6 +559,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                     completion(response);
                 }
            }];
+}
+
+- (NSString*)dereference:(NSString*)text node:(Node*)node {
+    return [self.viewModel.database dereference:text node:node];
 }
 
 - (void)onSetIconForItem:(NSIndexPath * _Nonnull)indexPath {
@@ -754,6 +761,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (UISwipeActionsConfiguration *)getModernSlideActions:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)) {
+    if (![self getTableDataSource].supportsSlideActions) {
+        return [UISwipeActionsConfiguration configurationWithActions:@[]];
+    }
+    
     UIContextualAction* removeAction = [self getRemoveAction:indexPath];
     UIContextualAction* renameAction = [self getRenameAction:indexPath];
     UIContextualAction* setIconAction = [self getSetIconAction:indexPath];
@@ -778,7 +789,14 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
+    if (![self getTableDataSource].supportsSlideActions) {
+        return nil;
+    }
+    
     Node *item = [self getNodeFromIndexPath:indexPath];
+    if (!item) {
+        return nil;
+    }
     
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive
                                                                             title:NSLocalizedString(@"browse_vc_action_delete", @"Delete")
@@ -871,16 +889,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     return !self.isEditing && (sender == self || [identifier isEqualToString:@"segueToSafeSettings"]);
 }
 
-- (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
+//////////////////////////////////////////////////////////////////////////////////////
+// Data Source Control
 
-    self.searchResults = [searcher search:searchController.searchBar.text
-                                    scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex
-                              dereference:self.viewModel.metadata.searchDereferencedFields
-                    includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
-                        includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults
-                           includeExpired:self.viewModel.metadata.showExpiredInSearch
-                            includeGroups:YES];
+- (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    [self.searchDataSource updateSearchResults:searchController];
     
     [self.tableView reloadData];
 }
@@ -889,313 +902,69 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     [self updateSearchResultsForSearchController:self.searchController];
 }
 
-////////////////////////////////
-// Data Sources
-
-- (NSArray<Node*>*)loadPinnedItems {
-    if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.pinnedSet.count) {
-        return @[];
-    }
-    
-    NSSet<NSString*> *set = self.viewModel.pinnedSet;
-    
-    NSArray<Node*>* pinned = [self.viewModel.database.rootGroup filterChildren:YES
-                                                                     predicate:^BOOL(Node * _Nonnull node) {
-        NSString* sid = [node getSerializationId:self.viewModel.database.format != kPasswordSafe];
-        return [set containsObject:sid];
-    }];
-    
-    DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
-
-    return [searcher filterAndSortForBrowse:pinned.mutableCopy
-                      includeKeePass1Backup:YES
-                          includeRecycleBin:YES
-                             includeExpired:YES
-                              includeGroups:YES];
-}
-
-- (NSArray<Node*>*)loadNearlyExpiredItems {
-    if(!self.viewModel.metadata.showQuickViewNearlyExpired) {
-        return @[];
-    }
-    
-    NSArray<Node*>* ne = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.nearlyExpired;
-    }];
-
-    DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
-
-    return [searcher filterAndSortForBrowse:ne.mutableCopy
-                      includeKeePass1Backup:NO
-                          includeRecycleBin:NO
-                             includeExpired:NO
-                              includeGroups:YES];
-}
-
-- (NSArray<Node*>*)loadExpiredItems {
-    if(!self.viewModel.metadata.showQuickViewExpired) {
-        return @[];
-    }
-    
-    NSArray<Node*>* exp = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.expired;
-    }];
-    
-    DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
-
-    return [searcher filterAndSortForBrowse:exp.mutableCopy
-                      includeKeePass1Backup:NO
-                          includeRecycleBin:NO
-                             includeExpired:YES
-                              includeGroups:YES];
-}
-
-- (NSArray<Node*>*)loadStandardItems {
-    NSArray<Node*>* ret;
-    
-    switch (self.viewModel.metadata.browseViewType) {
-        case kBrowseViewTypeHierarchy:
-            ret = self.currentGroup.children;
-            break;
-        case kBrowseViewTypeList:
-            ret = self.currentGroup.allChildRecords;
-            break;
-        case kBrowseViewTypeTotpList:
-            ret = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-                return obj.fields.otpToken != nil;
-            }];
-            break;
-        default:
-            break;
-    }
-    
-    DatabaseSearchAndSorter *searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
-    
-    return [searcher filterAndSortForBrowse:ret.mutableCopy
-                      includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
-                          includeRecycleBin:!self.viewModel.metadata.doNotShowRecycleBinInBrowse
-                             includeExpired:self.viewModel.metadata.showExpiredInBrowse
-                              includeGroups:YES];
-}
-
-- (NSUInteger)getQuickViewRowCount {
-    return [self getDataSourceForSection:kSectionIdxPinned].count +
-    [self getDataSourceForSection:kSectionIdxNearlyExpired].count +
-    [self getDataSourceForSection:kSectionIdxExpired].count;
-}
-
-- (NSArray<Node*>*)getDataSourceForSection:(NSUInteger)section {
-    if(section == kSectionIdxPinned) {
-        return self.pinnedItemsCache;
-    }
-    else if (section == kSectionIdxNearlyExpired) {
-        return self.nearlyExpiredItemsCache;
-    }
-    else if (section == kSectionIdxExpired) {
-        return self.expiredItemsCache;
-    }
-    else if(section == kSectionIdxLast) {
-        return (self.searchController.isActive ? self.searchResults : self.standardItemsCache);
-    }
-    
-    NSLog(@"EEEEEEK: WARNWARN: DataSource not found for section");
-    return nil;
-}
-
-- (Node*)getNodeFromIndexPath:(NSIndexPath*)indexPath {
-    NSArray<Node*>* dataSource = [self getDataSourceForSection:indexPath.section];
-    
-    if(!dataSource || indexPath.row >= dataSource.count) {
-        NSLog(@"EEEEEK: WARNWARN - Should never happen but unknown node for indexpath: [%@]", indexPath);
-        return nil;
-    }
-    
-    return dataSource[indexPath.row];
-}
-
 - (void)refreshItems {
-    self.standardItemsCache = [self loadStandardItems];
-    
-    // PERF: These can only appear in Root Group...
-    
-    self.pinnedItemsCache = [self isDisplayingRootGroup] ? [self loadPinnedItems] : @[];
-    self.nearlyExpiredItemsCache = [self isDisplayingRootGroup] ? [self loadNearlyExpiredItems] : @[];
-    self.expiredItemsCache = [self isDisplayingRootGroup] ? [self loadExpiredItems] : @[];
-    
-    // Display
-    
     if(self.searchController.isActive) {
+        [self.quickViewsDataSource refresh]; // Refresh Tags
         [self updateSearchResultsForSearchController:self.searchController];
     }
     else {
+        [self.configuredDataSource refreshItems:self.currentGroup];
         [self.tableView reloadData];
+        
+        self.editButtonItem.enabled = (!self.viewModel.isUsingOfflineCache &&
+        !self.viewModel.isReadOnly);
     }
-    
-    self.editButtonItem.enabled = (!self.viewModel.isUsingOfflineCache &&
-                                   !self.viewModel.isReadOnly);
     
     [self enableDisableToolbarButtons];
 }
 
-////////
+- (id<BrowseTableDatasource>)getTableDataSource {
+    if (self.searchController.isActive) {
+        if (self.searchController.searchBar.text.length) {
+            return self.searchDataSource;
+        }
+        else {
+            return self.quickViewsDataSource;
+        }
+    }
+    else {
+        return self.configuredDataSource;
+    }
+}
+
+- (Node*)getNodeFromIndexPath:(NSIndexPath*)indexPath {
+    return [[self getTableDataSource] getNodeFromIndexPath:indexPath];
+}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return kSectionIdxLast + 1;
+    return [self getTableDataSource].sections;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if((![self isDisplayingRootGroup] || self.searchController.isActive) && section != kSectionIdxLast) {
-        return 0;
-    }
-    else {
-        return [self getDataSourceForSection:section].count;
-    }
+    return [[self getTableDataSource] rowsForSection:section];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(self.searchController.isActive) {
-        return nil;
-    }
-    
-    if(section == kSectionIdxPinned && [self isDisplayingRootGroup] && [self getDataSourceForSection:section].count) {
-        return NSLocalizedString(@"browse_vc_section_title_pinned", @"Section Header Title for Pinned Items");
-    }
-    else if (section == kSectionIdxNearlyExpired && [self isDisplayingRootGroup] && [self getDataSourceForSection:section].count) {
-        return NSLocalizedString(@"browse_vc_section_title_nearly_expired", @"Section Header Title for Nearly Expired Items");
-    }
-    else if (section == kSectionIdxExpired && [self isDisplayingRootGroup] && [self getDataSourceForSection:section].count) {
-        return NSLocalizedString(@"browse_vc_section_title_expired", @"Section Header Title for Expired Items");
-    }
-    else if (section == kSectionIdxLast && [self isDisplayingRootGroup]){
-        if (self.viewModel.metadata.showQuickViewFavourites ||
-            self.viewModel.metadata.showQuickViewNearlyExpired ||
-            self.viewModel.metadata.showQuickViewExpired) {
-            NSUInteger countRows = [self getQuickViewRowCount];
-            return countRows ? NSLocalizedString(@"browse_vc_section_title_standard_view", @"Standard View Sections Header") : nil;
-        }
-    }
-    
-    return nil;
+    return [[self getTableDataSource] titleForSection:section];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    Node* node = [self getNodeFromIndexPath:indexPath];
-    return [self getTableViewCellFromNode:node indexPath:indexPath];
+    return [[self getTableDataSource] cellForRowAtIndexPath:indexPath];
 }
 
-- (UITableViewCell*)getTableViewCellFromNode:(Node*)node indexPath:(NSIndexPath*)indexPath {
-    NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
-    UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
-
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.viewModel.database metadata:self.viewModel.metadata];
-
-    if(!self.searchController.isActive && self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList) {
-        BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
-        NSString* subtitle = [searcher getBrowseItemSubtitle:node];
-        
-        [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken];
-        
-        return cell;
-    }
-    else {
-        BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
-
-        NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @""; // [node.fields.tags.allObjects componentsJoinedByString:@", "];
-        
-        NSDictionary<NSNumber*, UIColor*> *flagTintColors;
-        NSArray* flags = [self getFlags:node tintColors:&flagTintColors];
-
-        if(node.isGroup) {
-            BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
-
-            NSString* childCount = self.viewModel.metadata.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
-            
-            [cell setGroup:title
-                      icon:icon
-                childCount:childCount
-                    italic:italic
-             groupLocation:groupLocation
-                 tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil
-                     flags:flags
-                  hideIcon:self.viewModel.metadata.hideIconInBrowse];
-        }
-        else {
-            NSString* subtitle = [searcher getBrowseItemSubtitle:node];
-            
-            [cell setRecord:title
-                   subtitle:subtitle
-                       icon:icon
-              groupLocation:groupLocation
-                      flags:flags
-             flagTintColors:flagTintColors
-                    expired:node.expired
-                   otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
-                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
-        }
-        
-        return cell;
-    }
-}
-
-- (NSArray<UIImage*>*)getFlags:(Node*)node tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
-    if ( !self.viewModel.metadata.showFlagsInBrowse ) {
-        if(*tintColors) {
-            *tintColors = @{};
-        }
-        return @[];
-    }
-
-    NSMutableArray<UIImage*> *flags = NSMutableArray.array;
-    
-    if(!node.isGroup && [self.viewModel isFlaggedByAudit:node]) {
-        UIImage* image;
-        UIColor* tintColor;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
-        }
-        else {
-            image = [UIImage imageNamed:@"error"];
-        }
-        tintColor = UIColor.systemOrangeColor;
-        
-        if(tintColors) {
-            *tintColors = @{ @(flags.count) : tintColor };
-        }
-
-        [flags addObject:image];
-    }
-
-    if([self.viewModel isPinned:node]) {
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-           image = [UIImage systemImageNamed:@"pin"];
-        }
-        else {
-           image = [UIImage imageNamed:@"pin"];
-        }
-
-        [flags addObject:image];
-    }
-
-    if(!node.isGroup && node.fields.attachments.count) {
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"paperclip"];
-        }
-        else {
-            image = [UIImage imageNamed:@"attach"];
-        }
-        [flags addObject:image];
-    }
-    
-    return flags;
-}
-
-- (NSString*)dereference:(NSString*)text node:(Node*)node {
-    return [self.viewModel.database dereference:text node:node];
+- (BOOL)isShowingQuickViews {
+    return self.searchController.isActive && self.searchController.searchBar.text.length == 0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if ([self isShowingQuickViews]) {
+        
+        [self.quickViewsDataSource performTapAction:indexPath searchController:self.searchController];
+
+        [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+        return;
+    }
+    
     if(self.viewModel.metadata.doubleTapAction == kBrowseTapActionNone && self.viewModel.metadata.tripleTapAction == kBrowseTapActionNone) { // No need for timer or delay if no double/triple tap actions...
         NSLog(@"Expediting Single Tap action as no double/triple tap actions set");
         [self handleSingleTap:indexPath];
@@ -1244,11 +1013,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     self.tapCount = 0;
     self.tappedIndexPath = nil;
     self.tapTimer = nil;
-}
-
-- (NSString *)getGroupPathDisplayString:(Node *)vm {
-    return [NSString stringWithFormat:NSLocalizedString(@"browse_vc_group_path_string_fmt", @"(in %@)"),
-            [self.viewModel.database getSearchParentGroupPathDisplayString:vm]];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

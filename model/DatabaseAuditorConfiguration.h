@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)defaults;
 
-@property BOOL startAuditOnUnlock;
+@property BOOL auditInBackground;
 @property BOOL checkForNoPasswords;
 @property BOOL checkForDuplicatedPasswords;
 @property BOOL caseInsensitiveMatchForDuplicates;

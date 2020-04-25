@@ -19,6 +19,7 @@
 #import "AutoFillManager.h"
 #import "PinsConfigurationController.h"
 #import "StatisticsPropertiesViewController.h"
+#import "AuditConfigurationVcTableViewController.h"
 
 @interface DatabasePreferencesController ()
 
@@ -45,6 +46,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStats;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewAudit;
 
 @end
 
@@ -58,7 +60,8 @@
     self.imageViewStats.image = [UIImage imageNamed:@"statistics"];
     self.imageViewBiometric.image = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
     self.imageViewPinCodes.image = [UIImage imageNamed:@"keypad"];
-
+    self.imageViewAudit.image = [UIImage imageNamed:@"security_checked"];
+    
     [self bindUi];
 }
 
@@ -248,6 +251,11 @@
     else if ([segue.identifier isEqualToString:@"segueToStatistics"]) {
         StatisticsPropertiesViewController* vc = (StatisticsPropertiesViewController*)segue.destinationViewController;
         vc.viewModel = self.viewModel;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToAudit"]) {
+        UINavigationController* nav = segue.destinationViewController;
+        AuditConfigurationVcTableViewController* vc = (AuditConfigurationVcTableViewController*)nav.topViewController;
+        vc.model = self.viewModel;
     }
 }
 

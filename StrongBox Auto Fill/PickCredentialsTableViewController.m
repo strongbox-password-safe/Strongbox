@@ -261,7 +261,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database metadata:self.model.metadata];
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model];
     
     return [searcher search:searchText
                       scope:scope
@@ -318,7 +318,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
               hideIcon:self.model.metadata.hideIconInBrowse];
     }
     else {
-        DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithDatabase:self.model.database metadata:self.model.metadata];
+        DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model];
         
         NSString* subtitle = [searcher getBrowseItemSubtitle:node];
                 
@@ -391,7 +391,7 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     return flags;
 }
 
-- (NSString *)getGroupPathDisplayString:(Node *)vm {
+- (NSString *)getGroupPathDisplayString:(Node *)vm { // TODO: Dupl;icated?
     NSArray<NSString*> *hierarchy = [vm getTitleHierarchy];
     
     NSString *path = [[hierarchy subarrayWithRange:NSMakeRange(0, hierarchy.count - 1)] componentsJoinedByString:@"/"];

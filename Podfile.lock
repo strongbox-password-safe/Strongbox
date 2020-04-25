@@ -35,7 +35,7 @@ PODS:
   - KissXML/Core (5.3.1)
   - libsodium (1.0.12)
   - MTBBarcodeScanner (5.0.11)
-  - ObjectiveDropboxOfficial (3.10.0)
+  - ObjectiveDropboxOfficial (3.11.2)
   - OneDriveSDK (1.3.0):
     - OneDriveSDK/Auth (= 1.3.0)
     - OneDriveSDK/Common (= 1.3.0)
@@ -100,10 +100,10 @@ SPEC CHECKSUMS:
   KissXML: 5c8e0f2e8b9f071d3e1ae123dec3eb5da615c10c
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
-  ObjectiveDropboxOfficial: 19a4913d4d52fba035d41f40da71df0d6b303327
+  ObjectiveDropboxOfficial: a819defd8c0cf3a509a541657cc175087c91ccaa
   OneDriveSDK: 90ab8781f0992c37d96b68cc340585f5cf36701f
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
 
-PODFILE CHECKSUM: e7fde055a0383c46f7a690b7b5b72af00d1bdca6
+PODFILE CHECKSUM: cea400c139cd13e216db9b13ea282c5becde4a4b
 
 COCOAPODS: 1.5.3

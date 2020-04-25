@@ -184,7 +184,6 @@ static NSString* const kStrongboxTotpIssuer = @"Strongbox";
 
 @end
 
-
 @implementation NSData (Secret)
 
 + (NSData *)secretWithString:(NSString *)string

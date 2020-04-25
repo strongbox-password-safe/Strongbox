@@ -19,14 +19,10 @@
 
 @interface DatabaseModel ()
 
-@property DatabaseAuditor* auditor;
 @property (nonatomic, strong) StrongboxDatabase* theSafe;
 @property (nonatomic, strong) id<AbstractDatabaseFormatAdaptor> adaptor;
 
 @end
-
-NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
-NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
 
 @implementation DatabaseModel
 
@@ -230,7 +226,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
 {
     self = [super init];
     if (self) {
-        self.auditor = [[DatabaseAuditor alloc] init];
+
     }
     return self;
 }
@@ -307,34 +303,6 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
                                                   fields:fields
                                                     uuid:nil]
                                 keePassGroupTitleRules:NO];
-}
-
-// Audit - TODO:
-
-- (void)startAudit:(DatabaseAuditorConfiguration*)config {
-    [self.auditor stop]; // TODO: Will this call completions and do anything weird?
-    
-    self.auditor = [[DatabaseAuditor alloc] init];
-    
-    [self.auditor start:self.activeRecords
-                 config:config isDereferenceable:^BOOL(NSString * _Nonnull string) {
-        return [self isDereferenceableText:string];
-    } progress:^(CGFloat progress) {
-        NSLog(@"Audit Progress Callback: %f", progress);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
-        });
-    } completion:^(BOOL userStopped) {
-        NSLog(@"Audit Completed - User Cancelled: %d", userStopped);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@(userStopped)];
-        });
-    }];
-}
-
-- (BOOL)isFlaggedByAudit:(Node*)item {
-    NSSet<NSNumber*>* auditFlags = [self.auditor getQuickAuditFlagsForNode:item];
-    return auditFlags.count > 0;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

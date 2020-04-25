@@ -20,6 +20,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *valueLabel; // Allows for multiline display in non edit mode
 @property (weak, nonatomic) IBOutlet UIButton *buttonRightButton;
 
+@property (weak, nonatomic) IBOutlet UIStackView *auditStack;
+@property (weak, nonatomic) IBOutlet UIImageView *imageAuditError;
+@property (weak, nonatomic) IBOutlet UILabel *labelAudit;
+
+@property (weak, nonatomic) IBOutlet UIStackView *linesStack;
+
 @property BOOL selectAllOnEdit;
 @property BOOL useEasyReadFont;
 @property BOOL concealed;
@@ -37,9 +43,11 @@
     [super awakeFromNib];
 
     if (@available(iOS 13.0, *)) {
+        self.imageAuditError.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
         self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
     }
     else {
+        self.imageAuditError.image = [UIImage imageNamed:@"error"];
         self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
     }
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
@@ -54,6 +62,11 @@
     self.valueText.font = self.configuredValueFont;
 
     self.valueLabel.adjustsFontForContentSizeCategory = YES;
+    
+    self.auditStack.hidden = YES;
+    if (@available(iOS 11.0, *)) {
+        [self.linesStack setCustomSpacing:10.0f afterView:self.valueLabel];
+    }
     
     self.selectAllOnEdit = NO;
     
@@ -108,6 +121,8 @@
     
     self.rightButtonImage = nil;
     self.showGenerateButton = NO;
+
+    self.auditStack.hidden = YES;
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
@@ -148,22 +163,24 @@ showGenerateButton:NO colorizeValue:NO];
 - (void)setConfidentialKey:(NSString *)key
                      value:(NSString *)value
                  concealed:(BOOL)concealed
-                  colorize:(BOOL)colorize {
+                  colorize:(BOOL)colorize
+                     audit:(NSString *)audit {
     // Only for viewing - special cells required for edit...
         
     UIImage* image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
 
     [self setKey:key
-           value:value
-         editing:NO
- selectAllOnEdit:NO
-     formatAsUrl:NO
+            value:value
+          editing:NO
+  selectAllOnEdit:NO
+      formatAsUrl:NO
 suggestionProvider:nil
-    useEasyReadFont:YES
-    rightButtonImage:image
-       concealed:concealed
+ useEasyReadFont:YES
+ rightButtonImage:image
+        concealed:concealed
 showGenerateButton:NO
-     colorizeValue:colorize];
+   colorizeValue:colorize
+           audit:audit];
 }
 
 - (void)setKey:(NSString*)key
@@ -176,7 +193,32 @@ showGenerateButton:NO
  rightButtonImage:(UIImage*)rightButtonImage
      concealed:(BOOL)concealed
 showGenerateButton:(BOOL)showGenerateButton
-colorizeValue:(BOOL)colorizeValue {
+ colorizeValue:(BOOL)colorizeValue {
+    [self setKey:key value:value
+         editing:editing
+ selectAllOnEdit:selectAllOnEdit
+     formatAsUrl:formatAsUrl
+suggestionProvider:suggestionProvider
+ useEasyReadFont:useEasyReadFont
+rightButtonImage:rightButtonImage
+       concealed:concealed
+showGenerateButton:showGenerateButton
+   colorizeValue:colorizeValue
+           audit:nil];
+}
+
+- (void)setKey:(NSString*)key
+         value:(NSString*)value
+       editing:(BOOL)editing
+    selectAllOnEdit:(BOOL)selectAllOnEdit
+    formatAsUrl:(BOOL)formatAsUrl
+    suggestionProvider:(SuggestionProvider)suggestionProvider
+    useEasyReadFont:(BOOL)useEasyReadFont
+ rightButtonImage:(UIImage*)rightButtonImage
+     concealed:(BOOL)concealed
+showGenerateButton:(BOOL)showGenerateButton
+ colorizeValue:(BOOL)colorizeValue
+         audit:(NSString*_Nullable)audit {
     [self bindKey:key];
         
     self.selectAllOnEdit = selectAllOnEdit;
@@ -199,6 +241,13 @@ colorizeValue:(BOOL)colorizeValue {
     
     self.valueLabel.hidden = self.editing;
     self.valueText.hidden = !self.editing;
+    
+    [self bindAudit:audit];
+}
+
+- (void)bindAudit:(NSString*)audit {
+    self.auditStack.hidden = audit == nil;
+    self.labelAudit.text = audit ? audit : @"";
 }
 
 - (void)bindKey:(NSString*)key {

@@ -13,7 +13,7 @@
 + (instancetype)defaults {
     DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
 
-    config.startAuditOnUnlock = YES;
+    config.auditInBackground = YES;
     config.checkForNoPasswords = YES;
     config.checkForDuplicatedPasswords = YES;
     config.caseInsensitiveMatchForDuplicates = YES;
@@ -26,7 +26,7 @@
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
     if((self = [self init])) {
-        self.startAuditOnUnlock = [coder decodeBoolForKey:@"startAuditOnUnlock"];
+        self.auditInBackground = [coder decodeBoolForKey:@"auditInBackground"];
         self.checkForNoPasswords = [coder decodeBoolForKey:@"checkForNoPasswords"];
         self.checkForDuplicatedPasswords = [coder decodeBoolForKey:@"checkForDuplicatedPasswords"];
         self.caseInsensitiveMatchForDuplicates = [coder decodeBoolForKey:@"caseInsensitiveMatchForDuplicates"];
@@ -39,7 +39,7 @@
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeBool:self.startAuditOnUnlock forKey:@"startAuditOnUnlock"];
+    [coder encodeBool:self.auditInBackground forKey:@"auditInBackground"];
     [coder encodeBool:self.checkForNoPasswords forKey:@"checkForNoPasswords"];
     [coder encodeBool:self.checkForDuplicatedPasswords forKey:@"checkForDuplicatedPasswords"];
     [coder encodeBool:self.caseInsensitiveMatchForDuplicates forKey:@"caseInsensitiveMatchForDuplicates"];

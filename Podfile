@@ -1,12 +1,20 @@
 workspace 'StrongBox'
 
-target 'Strongbox' do
+abstract_target 'common-mac' do
     project 'macbox/MacBox.xcodeproj'
     platform :osx, '10.9'
     use_frameworks!
 
     pod 'KissXML'   
     pod 'libsodium'
+
+    target 'Strongbox' do
+
+    end
+
+    target 'Strongbox-Outright-Pro' do
+
+    end
 end
 
 abstract_target 'common-ios' do

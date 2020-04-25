@@ -30,20 +30,26 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
 
 typedef void (^AuditCompletionBlock)(BOOL userStopped);
 typedef void (^AuditProgressBlock)(CGFloat progress);
+typedef void (^AuditNodesChangedBlock)(void);
 typedef BOOL (^AuditIsDereferenceableTextBlock)(NSString* string);
 
 @interface DatabaseAuditor : NSObject
+
+- (instancetype)init;
+- (instancetype)initForTesting;
 
 @property AuditState state;
 
 - (BOOL)start:(NSArray<Node*>*)nodes
        config:(DatabaseAuditorConfiguration*)config
 isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
+ nodesChanged:(AuditNodesChangedBlock)nodesChanged
      progress:(AuditProgressBlock)progress
    completion:(AuditCompletionBlock)completion;
 
 - (void)stop;
 
+- (NSString*_Nullable)getQuickAuditSummaryForNode:(Node*)item;
 - (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)node;
 - (DatabaseAuditReport*)getAuditReport;
 

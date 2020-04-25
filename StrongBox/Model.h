@@ -11,8 +11,13 @@
 #import "SafesList.h"
 #import "DatabaseModel.h"
 #import "AbstractDatabaseMetadata.h"
+#import "DatabaseAuditor.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+extern NSString* const kAuditNodesChangedNotificationKey;
+extern NSString* const kAuditProgressNotificationKey;
+extern NSString* const kAuditCompletedNotificationKey;
 
 @interface Model : NSObject
 
@@ -33,9 +38,17 @@ NS_ASSUME_NONNULL_BEGIN
                                        metaData:(SafeMetaData *_Nonnull)metaData
                                 storageProvider:(id <SafeStorageProvider>_Nonnull)provider
                                       cacheMode:(BOOL)usingOfflineCache
-                                     isReadOnly:(BOOL)isReadOnly NS_DESIGNATED_INITIALIZER;
+                                     isReadOnly:(BOOL)isReadOnly
+                                 isAutoFillOpen:(BOOL)isAutoFillOpen NS_DESIGNATED_INITIALIZER;
 
 - (void)update:(BOOL)isAutoFill handler:(void (^)(BOOL userCancelled, NSError*_Nullable error))handler;
+
+- (void)stopAudit;
+- (void)restartBackgroundAudit;
+- (void)stopAndClearAuditor;
+@property (readonly) AuditState auditState;
+    
+- (void)closeAndCleanup;
 
 // Cache Stuff
 
@@ -53,6 +66,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
 - (BOOL)isFlaggedByAudit:(Node*)item;
+- (NSString*)getQuickAuditSummaryForNode:(Node*)item;
 
 - (BOOL)isPinned:(Node*)item;
 - (void)togglePin:(Node*)item;
