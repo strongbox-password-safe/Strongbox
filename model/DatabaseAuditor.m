@@ -10,7 +10,6 @@
 #import "NSArray+Extensions.h"
 #import "PasswordMaker.h"
 #import "NSString+Levenshtein.h"
-#import "Settings.h"
 
 @interface DatabaseAuditor ()
 
@@ -30,17 +29,18 @@
 @property NSDictionary<NSString*, NSSet<Node*>*>* duplicatedPasswords;
 @property NSSet<Node*>* noPasswords;
 @property NSDictionary<NSUUID*, NSSet<Node*>*>* similar;
+@property NSSet<Node*>* tooShort;
 
 @property NSSet<Node*>* duplicatedPasswordsNodeSet; // PERF
 @property NSSet<Node*>* similarPasswordsNodeSet; // PERF
 
-@property BOOL isTesting;
+@property BOOL isPro;
 
 @end
 
 @implementation DatabaseAuditor
 
-- (instancetype)init {
+- (instancetype)initWithPro:(BOOL)pro {
     self = [super init];
     
     if (self) {
@@ -49,19 +49,14 @@
         self.commonPasswords = NSSet.set;
         self.duplicatedPasswords = @{};
         self.noPasswords = NSSet.set;
+        self.tooShort = NSSet.set;
+        
         self.similar = @{};
         self.duplicatedPasswordsNodeSet = NSSet.set;
         self.similarPasswordsNodeSet = NSSet.set;
+        self.isPro = pro;
     }
     
-    return self;
-}
-
-- (instancetype)initForTesting {
-    self = [super init];
-    if (self) {
-        self.isTesting = YES;
-    }
     return self;
 }
 
@@ -119,9 +114,38 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     DatabaseAuditReport* report = [[DatabaseAuditReport alloc] initWithNoPasswordEntries:self.noPasswords
                                                                      duplicatedPasswords:self.duplicatedPasswords
                                                                          commonPasswords:self.commonPasswords
-                                                                                 similar:self.similar];
+                                                                                 similar:self.similar
+                                                                                tooShort:self.tooShort];
     
     return report;
+}
+
+- (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item {
+    NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
+    
+    if (flags.anyObject) {
+        if ([flags containsObject:@(kAuditFlagNoPassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_brief_no_password_set", @"No Password");
+        }
+
+        if ([flags containsObject:@(kAuditFlagCommonPassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_brief_very_common_password", @"Weak/Common");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagDuplicatePassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_brief_duplicated_password", @"Duplicated");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagSimilarPassword)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_brief_password_is_similar_to_another", @"Similar");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagTooShort)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_brief_password_is_too_short", @"Short");
+        }
+    }
+    
+    return @"";
 }
 
 - (NSString *)getQuickAuditSummaryForNode:(Node *)item {
@@ -141,11 +165,15 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         }
         
         if ([flags containsObject:@(kAuditFlagSimilarPassword)]) {
-            return NSLocalizedString(@"audit_quick_summary_password_is_similar_to_another", @"Audit: Password is similar to one in another entry.");
+            return NSLocalizedString(@"audit_quick_summary_password_is_similar_to_another", @"Audit: Password is similar to one in another entry.=");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagTooShort)]) {
+            return NSLocalizedString(@"audit_quick_summary_password_is_too_short", @"Audit: Password is too short.=");
         }
     }
     
-    return nil;
+    return @"";
 }
 
 - (NSSet<NSNumber *> *)getQuickAuditFlagsForNode:(Node *)node {
@@ -154,26 +182,45 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     if ([self.noPasswords containsObject:node]) {
         [ret addObject:@(kAuditFlagNoPassword)];
     }
+
     if ([self.commonPasswords containsObject:node]) {
         [ret addObject:@(kAuditFlagCommonPassword)];
     }
+
     if ([self.duplicatedPasswordsNodeSet containsObject:node]) {
         [ret addObject:@(kAuditFlagDuplicatePassword)];
     }
-    if ([self.similarPasswordsNodeSet containsObject:node]) { // TODO: Incremental - It would be good to have this work while audit in progress
+
+    if ([self.similarPasswordsNodeSet containsObject:node]) {
         [ret addObject:@(kAuditFlagSimilarPassword)];
     }
-    
+
+    if ([self.tooShort containsObject:node]) {
+        [ret addObject:@(kAuditFlagTooShort)];
+    }
+
     return ret;
+}
+
+- (NSUInteger)auditIssueNodeCount {
+    NSMutableSet* set = [NSMutableSet setWithSet:self.noPasswords];
+    
+    [set addObjectsFromArray:self.commonPasswords.allObjects];
+    [set addObjectsFromArray:self.duplicatedPasswordsNodeSet.allObjects];
+    [set addObjectsFromArray:self.similarPasswordsNodeSet.allObjects];
+    [set addObjectsFromArray:self.tooShort.allObjects];
+    
+    return set.count;
+}
+
+- (NSUInteger)auditIssueCount {
+    return self.noPasswords.count + self.commonPasswords.count + self.duplicatedPasswordsNodeSet.count + self.similarPasswordsNodeSet.count + self.tooShort.count;
 }
 
 - (void)performAudits {
     // No Passwords
     
     self.noPasswords = [self checkForNoPasswords];
-    if (self.noPasswords.anyObject) {
-        self.nodesChanged();
-    }
 
     // Duplicated Passwords within DB
 
@@ -182,20 +229,23 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         return obj.allObjects;
     }]];
 
-    if (self.duplicatedPasswordsNodeSet.anyObject) {
-        self.nodesChanged();
-    }
-
     // Common Weak/Popular Passwords
 
     self.commonPasswords = [self checkForCommonPasswords];
-    if (self.commonPasswords.anyObject) {
+
+    // Too Short
+    
+    self.tooShort = [self checkForTooShort];
+    
+    // Batch up these fast ones into a single notification
+    
+    if (self.tooShort.anyObject || self.noPasswords.anyObject || self.duplicatedPasswordsNodeSet.anyObject || self.commonPasswords.anyObject) {
          self.nodesChanged();
     }
-    
+
     // Similar
 
-    if (self.isTesting || Settings.sharedInstance.isProOrFreeTrial) {
+    if (self.isPro) {
         self.similar = [self checkForSimilarPasswords];
         self.similarPasswordsNodeSet = [NSSet setWithArray:[self.similar.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
             return obj.allObjects;
@@ -205,7 +255,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
              self.nodesChanged();
         }
     }
-        
+            
     // Future Extensions: Extend Audit to these
     //
     // Weak (Low Entropy)
@@ -231,6 +281,18 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return [NSSet setWithArray:results];
 }
 
+- (NSSet<Node*>*)checkForTooShort {
+    if (!self.config.checkForMinimumLength) {
+        return NSSet.set;
+    }
+
+    NSArray<Node*>* results = [self.nodes.allObjects filter:^BOOL(Node * _Nonnull obj) {
+        return obj.fields.password.length > 0 && obj.fields.password.length < self.config.minimumLength; // Exclude  empties
+    }];
+
+    return [NSSet setWithArray:results];
+}
+
 - (NSDictionary<NSString*, NSSet<Node*>*>*)checkForDuplicatedPasswords {
     if (!self.config.checkForDuplicatedPasswords) {
         return NSDictionary.dictionary;
@@ -242,13 +304,13 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         // FUTURE: Detect historical entries with same passwords?
         NSString* password = entry.fields.password;
         
-        // Exclude Field References...
+        // Exclude Field References and Empties...
 
-        if (self.isDereferenceable(password)) {
+        if (password.length == 0 || self.isDereferenceable(password)) {
             continue;
         }
         
-        if (self.config.caseInsensitiveMatchForDuplicates) { // TODO: In UI you will need to present these differently or grab the unique case?
+        if (self.config.caseInsensitiveMatchForDuplicates) {
             password = password.lowercaseString;
         }
         

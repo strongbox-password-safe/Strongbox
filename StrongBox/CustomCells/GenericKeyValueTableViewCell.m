@@ -42,12 +42,12 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
 
+    self.imageAuditError.image = [UIImage imageNamed:@"security_checked"];
+
     if (@available(iOS 13.0, *)) {
-        self.imageAuditError.image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
         self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
     }
     else {
-        self.imageAuditError.image = [UIImage imageNamed:@"error"];
         self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
     }
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
@@ -246,7 +246,7 @@ showGenerateButton:(BOOL)showGenerateButton
 }
 
 - (void)bindAudit:(NSString*)audit {
-    self.auditStack.hidden = audit == nil;
+    self.auditStack.hidden = audit.length == 0;
     self.labelAudit.text = audit ? audit : @"";
 }
 

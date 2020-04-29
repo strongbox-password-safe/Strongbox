@@ -15,6 +15,7 @@
 @property NSDictionary<NSString*, NSSet<Node *>*>* duplicatedPasswords;
 @property NSSet<Node*>* commonPasswords;
 @property NSDictionary<NSString*, NSSet<Node *>*>* similarPasswords;
+@property NSSet<Node*>* tooShort;
 
 @end
 
@@ -23,7 +24,8 @@
 - (instancetype)initWithNoPasswordEntries:(NSSet<Node *> *)noPasswords
                       duplicatedPasswords:(NSDictionary<NSString *,NSSet<Node *> *> *)duplicatedPasswords
                           commonPasswords:(NSSet<Node *> *)commonPasswords
-                                  similar:(nonnull NSDictionary<NSUUID *,NSSet<Node *> *> *)similar {
+                                  similar:(nonnull NSDictionary<NSUUID *,NSSet<Node *> *> *)similar
+                                 tooShort:(NSSet<Node *> *)tooShort {
     self = [super init];
     
     if (self) {
@@ -31,6 +33,7 @@
         self.duplicatedPasswords = duplicatedPasswords.copy;
         self.commonPasswords = commonPasswords.copy;
         self.similarPasswords = similar.copy;
+        self.tooShort = tooShort.copy;
     }
     
     return self;
@@ -48,11 +51,6 @@
     return [NSSet setWithArray:flattened];
 }
 
-- (NSSet<Node *> *)duplicatedPasswordEntriesForEntry:(Node *)entry {
-    
-    return nil; // TODO:
-}
-
 - (NSSet<Node *> *)entriesWithCommonPasswords {
     return self.commonPasswords;
 }
@@ -63,6 +61,10 @@
     }];
     
     return [NSSet setWithArray:flattened];
+}
+
+- (NSSet<Node *> *)entriesTooShort {
+    return self.tooShort;
 }
 
 - (NSString *)description {

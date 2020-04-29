@@ -17,7 +17,9 @@
 @implementation ZlibStreamTests
 
 - (void)testLargeBuffer {
-    NSData *largeDb = [CommonTesting getDataFromBundleFile:@"large-zlib" ofType:@"zlib"];
+    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-zlib.zlib"];
+
+//    NSData *largeDb = [CommonTesting getDataFromBundleFile:@"large-zlib" ofType:@"zlib"];
     XCTAssertNotNil(largeDb);
     
     GZipInputStream *stream = [[GZipInputStream alloc] initWithData:largeDb];

@@ -893,6 +893,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 // Data Source Control
 
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
+    if (!searchController.searchBar.text.length) {
+        [self.quickViewsDataSource refresh]; // Refresh Tags / Audit Count
+    }
+    
     [self.searchDataSource updateSearchResults:searchController];
     
     [self.tableView reloadData];
@@ -904,7 +908,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)refreshItems {
     if(self.searchController.isActive) {
-        [self.quickViewsDataSource refresh]; // Refresh Tags
         [self updateSearchResultsForSearchController:self.searchController];
     }
     else {

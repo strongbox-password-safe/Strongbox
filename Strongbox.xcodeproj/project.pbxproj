@@ -1387,7 +1387,6 @@
 		4DD755EE232F087A00758824 /* WelcomeUseICloudViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755EC232F087A00758824 /* WelcomeUseICloudViewController.m */; };
 		4DD755F3232F093900758824 /* XmlToDictionaryParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755F1232F093900758824 /* XmlToDictionaryParser.m */; };
 		4DD755F4232F093900758824 /* XmlComparisonElement.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD755F2232F093900758824 /* XmlComparisonElement.m */; };
-		4DD755F8232F0A1600758824 /* large-zlib.zlib in Resources */ = {isa = PBXBuildFile; fileRef = 4DD755F7232F0A1600758824 /* large-zlib.zlib */; };
 		4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */; };
 		4DD85C8122E8FB2700700192 /* AttachmentsPoolViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */; };
 		4DD9D98A241D36BF00267D49 /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
@@ -2683,8 +2682,6 @@
 		4DD755F0232F093900758824 /* XmlComparisonElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlComparisonElement.h; path = StrongBox/XmlComparisonElement.h; sourceTree = "<group>"; };
 		4DD755F1232F093900758824 /* XmlToDictionaryParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlToDictionaryParser.m; path = StrongBox/XmlToDictionaryParser.m; sourceTree = "<group>"; };
 		4DD755F2232F093900758824 /* XmlComparisonElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlComparisonElement.m; path = StrongBox/XmlComparisonElement.m; sourceTree = "<group>"; };
-		4DD755F5232F09A100758824 /* large-100-10-100.kdbx */ = {isa = PBXFileReference; lastKnownFileType = file; path = "large-100-10-100.kdbx"; sourceTree = "<group>"; };
-		4DD755F7232F0A1600758824 /* large-zlib.zlib */ = {isa = PBXFileReference; lastKnownFileType = file; path = "large-zlib.zlib"; sourceTree = "<group>"; };
 		4DD7B7EB2173A0F900B4FD98 /* PickCredentialsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PickCredentialsTableViewController.h; path = "StrongBox Auto Fill/PickCredentialsTableViewController.h"; sourceTree = SOURCE_ROOT; };
 		4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PickCredentialsTableViewController.m; path = "StrongBox Auto Fill/PickCredentialsTableViewController.m"; sourceTree = SOURCE_ROOT; };
 		4DD85C7F22E8FB2700700192 /* AttachmentsPoolViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AttachmentsPoolViewController.h; path = StrongBox/AttachmentsPoolViewController.h; sourceTree = "<group>"; };
@@ -3027,7 +3024,7 @@
 			name = "Select Icon";
 			sourceTree = "<group>";
 		};
-		4D0835DF2284773C00CA7405 /* Preferences */ = {
+		4D0835DF2284773C00CA7405 /* App Preferences */ = {
 			isa = PBXGroup;
 			children = (
 				4D48C6EB22AD0DE9002B502E /* About */,
@@ -3045,7 +3042,7 @@
 				4D7D2194229FDA5F00C1C925 /* SelectItemTableViewController.h */,
 				4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */,
 			);
-			name = Preferences;
+			name = "App Preferences";
 			sourceTree = "<group>";
 		};
 		4D0835E02284775E00CA7405 /* Deprecated */ = {
@@ -3701,23 +3698,22 @@
 			children = (
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4DED20C72168BF1800A5800A /* Home */,
-				4DE7F0D122F89D120095F51F /* LaunchScreen.storyboard */,
+				4D0835DD2284769900CA7405 /* Browse */,
+				4DAE986A2270B39100A811C4 /* Item Details */,
+				4D0835DF2284773C00CA7405 /* App Preferences */,
+				4DBA028022A3EECA00BAC858 /* Database Preferences */,
 				4D12084F22A79F0C00139570 /* Onboarding */,
 				4D06943622083E2000FB826C /* Upgrade */,
 				4DF78E45238D4DC2007E2F80 /* FavIcon */,
 				4DE4665B233D2EFA00398A65 /* Backups */,
-				4D0835DD2284769900CA7405 /* Browse */,
-				4DAE986A2270B39100A811C4 /* Item Details */,
 				4DE2688B22A659BF00A1D158 /* History */,
 				4D114096229D5EE200DEECF3 /* CASG */,
 				4D81FAD42284836E00A0B4CF /* Select Location */,
 				4D20E7A72299593E00ABFC89 /* PIN Code */,
-				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
-				4DBA028022A3EECA00BAC858 /* Database Preferences & Management */,
-				4D0835DF2284773C00CA7405 /* Preferences */,
 				4DE2688E22A65C8B00A1D158 /* Password Generation */,
 				4D0835DE2284770900CA7405 /* Select Icon */,
 				4DFD46D0240DC217001F1209 /* ColoredStringHelper.h */,
+				4DE7F0D122F89D120095F51F /* LaunchScreen.storyboard */,
 				4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */,
 			);
 			name = UI;
@@ -4183,10 +4179,8 @@
 				4D1967B0217F83440057DF06 /* a.kdbx */,
 				4DA12F08219860BC0000CEBB /* custom-icon.kdbx */,
 				4D4598C8219302FD00792EF7 /* TwoFish-with-AesKdf.kdbx */,
-				4DD755F7232F0A1600758824 /* large-zlib.zlib */,
 				4D4598C52192F66400792EF7 /* Database-ChCha20-AesKdf.kdbx */,
 				4D1967AE217F82FF0057DF06 /* Database.kdbx */,
-				4DD755F5232F09A100758824 /* large-100-10-100.kdbx */,
 				4D19679C217F23860057DF06 /* simple-unit-test-strongbox.dat */,
 				4D9834422177473200731FFC /* generic-non-gzipped.kdbx */,
 				4D983440217743F200731FFC /* generic.kdbx */,
@@ -4372,9 +4366,12 @@
 			path = StrongBox/RecordScene/Model;
 			sourceTree = "<group>";
 		};
-		4DBA028022A3EECA00BAC858 /* Database Preferences & Management */ = {
+		4DBA028022A3EECA00BAC858 /* Database Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				4D160AA2245354360097C730 /* Audit.storyboard */,
+				4D160A97245333620097C730 /* AuditConfigurationVcTableViewController.h */,
+				4D160A98245333620097C730 /* AuditConfigurationVcTableViewController.m */,
 				4DE7F0F122F89D790095F51F /* DatabaseOperations.storyboard */,
 				4DD72BF724264B18009F4091 /* DatabasePreferencesController.h */,
 				4DD72BF824264B18009F4091 /* DatabasePreferencesController.m */,
@@ -4391,11 +4388,8 @@
 				4DD85C8022E8FB2700700192 /* AttachmentsPoolViewController.m */,
 				4D45BF632426605C0024F332 /* StatisticsPropertiesViewController.h */,
 				4D45BF642426605C0024F332 /* StatisticsPropertiesViewController.m */,
-				4D160AA2245354360097C730 /* Audit.storyboard */,
-				4D160A97245333620097C730 /* AuditConfigurationVcTableViewController.h */,
-				4D160A98245333620097C730 /* AuditConfigurationVcTableViewController.m */,
 			);
-			name = "Database Preferences & Management";
+			name = "Database Preferences";
 			sourceTree = "<group>";
 		};
 		4DBE5B281C8356C700C310BC = {
@@ -4610,6 +4604,7 @@
 		4DED20C72168BF1800A5800A /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
 				4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */,
 				4DE2689F22A67A6200A1D158 /* MasterDetailViewController.m */,
 				4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */,
@@ -4957,7 +4952,6 @@
 				4DC8D9B521B6F14C004F1812 /* sample-hex-text.key in Resources */,
 				4D98343A21773B3300731FFC /* generic-keepass.xml in Resources */,
 				4DC8D9A821B6E4B6004F1812 /* sample-xml.key in Resources */,
-				4DD755F8232F0A1600758824 /* large-zlib.zlib in Resources */,
 				4D8FBEEB21A9A70F004797FA /* kp2-keyfile.kdbx in Resources */,
 				4DDA015322425CBF00C7F0E2 /* corrupt-recycly-bin-values.xml in Resources */,
 				4D1967AF217F82FF0057DF06 /* Database.kdbx in Resources */,
@@ -7475,7 +7469,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7496,7 +7490,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7565,7 +7559,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7586,7 +7580,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7654,7 +7648,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7675,7 +7669,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7736,7 +7730,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7757,7 +7751,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7821,7 +7815,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7841,7 +7835,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -7898,7 +7892,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7918,7 +7912,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7973,7 +7967,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8000,7 +7994,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -8058,7 +8052,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2871;
+				CURRENT_PROJECT_VERSION = 2886;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8085,7 +8079,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.47.6;
+				MARKETING_VERSION = 1.48.2;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

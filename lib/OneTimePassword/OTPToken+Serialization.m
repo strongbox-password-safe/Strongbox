@@ -72,7 +72,7 @@ static NSString* const kStrongboxTotpIssuer = @"Strongbox";
     token.algorithm = algorithmString ? [algorithmString algorithmValue] : [OTPToken defaultAlgorithm];
 
     NSString *secretString = query[kQuerySecretKey];
-    token.secret = [NSData dataWithBase32String:secretString];
+    token.secret = [NSData mmcg_dataWithBase32String:secretString];
 
     NSString *digitString = query[kQueryDigitsKey];
     token.digits = digitString ? (NSUInteger)[digitString integerValue] : [OTPToken defaultDigits];
@@ -118,7 +118,8 @@ static NSString* const kStrongboxTotpIssuer = @"Strongbox";
     NSMutableArray *query = [NSMutableArray array];
 
     if(includeSecret){
-        [query addObject:[NSURLQueryItem queryItemWithName:kQuerySecretKey value:[self.secret base32String]]];
+        NSString* b32Secret = [self.secret mmcg_base32StringNoPadding];
+        [query addObject:[NSURLQueryItem queryItemWithName:kQuerySecretKey value:b32Secret]];
     }
     
     if(self.algorithm == OTPAlgorithmSteam) {
@@ -186,9 +187,8 @@ static NSString* const kStrongboxTotpIssuer = @"Strongbox";
 
 @implementation NSData (Secret)
 
-+ (NSData *)secretWithString:(NSString *)string
-{
-    return [NSData dataWithBase32String:string];
++ (NSData *)secretWithString:(NSString *)string {
+    return [NSData mmcg_dataWithBase32String:string];
 }
 
 @end

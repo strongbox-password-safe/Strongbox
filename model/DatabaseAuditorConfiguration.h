@@ -23,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL checkForSimilarPasswords;
 @property double levenshteinSimilarityThreshold;
 
+@property BOOL checkForMinimumLength;
+@property NSUInteger minimumLength;
+
 @end
 
 NS_ASSUME_NONNULL_END

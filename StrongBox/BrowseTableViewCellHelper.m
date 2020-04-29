@@ -36,7 +36,19 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     return self;
 }
 
-- (UITableViewCell *)getBrowseCellForNode:(Node*)node indexPath:(NSIndexPath*)indexPath totp:(BOOL)totp showGroupLocation:(BOOL)showGroupLocation {
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node
+                                indexPath:(NSIndexPath*)indexPath
+                        showLargeTotpCell:(BOOL)totp
+                        showGroupLocation:(BOOL)showGroupLocation {
+    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:totp showGroupLocation:showGroupLocation groupLocationOverride:nil accessoryType:UITableViewCellAccessoryNone];
+}
+
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node
+                                indexPath:(NSIndexPath*)indexPath
+                        showLargeTotpCell:(BOOL)totp
+                        showGroupLocation:(BOOL)showGroupLocation
+                    groupLocationOverride:(NSString*)groupLocationOverride
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType {
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
 
@@ -53,11 +65,13 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     else {
         BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
 
-        NSString *groupLocation = showGroupLocation ? [self getGroupPathDisplayString:node] : @"";
+        NSString *groupLocation = showGroupLocation ? (groupLocationOverride ? groupLocationOverride : [self getGroupPathDisplayString:node]) : @"";
         
         NSDictionary<NSNumber*, UIColor*> *flagTintColors;
-        NSArray* flags = [self getFlags:node tintColors:&flagTintColors];
-
+        
+        NSString* briefAudit = self.viewModel.metadata.showFlagsInBrowse  ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node] : @"";
+        NSArray* flags = self.viewModel.metadata.showFlagsInBrowse ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];
+        
         if(node.isGroup) {
             BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
 
@@ -83,14 +97,17 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
              flagTintColors:flagTintColors
                     expired:node.expired
                    otpToken:self.viewModel.metadata.hideTotpInBrowse ? nil : node.fields.otpToken
-                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
+                   hideIcon:self.viewModel.metadata.hideIconInBrowse
+                      audit:briefAudit];
+            
+            cell.accessoryType = accessoryType;
         }
         
         return cell;
     }
 }
 
-- (NSArray<UIImage*>*)getFlags:(Node*)node tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
+- (NSArray<UIImage*>*)getFlags:(Node*)node isFlaggedByAudit:(BOOL)isFlaggedByAudit tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
     if ( !self.viewModel.metadata.showFlagsInBrowse ) {
         if(*tintColors) {
             *tintColors = @{};
@@ -100,24 +117,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
     NSMutableArray<UIImage*> *flags = NSMutableArray.array;
     
-    if(!node.isGroup && [self.viewModel isFlaggedByAudit:node]) {
-        UIImage* image;
-        UIColor* tintColor;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
-        }
-        else {
-            image = [UIImage imageNamed:@"error"];
-        }
-        tintColor = UIColor.systemOrangeColor;
-        
-        if(tintColors) {
-            *tintColors = @{ @(flags.count) : tintColor };
-        }
-
-        [flags addObject:image];
-    }
-
     if([self.viewModel isPinned:node]) {
         UIImage* image;
         if (@available(iOS 13.0, *)) {
@@ -141,6 +140,19 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         [flags addObject:image];
     }
     
+    if(!node.isGroup && isFlaggedByAudit) {
+        UIImage* image;
+        UIColor* tintColor;
+        image = [UIImage imageNamed:@"security_checked"];
+        tintColor = UIColor.systemOrangeColor;
+        
+        if(tintColors) {
+            *tintColors = @{ @(flags.count) : tintColor };
+        }
+
+        [flags addObject:image];
+    }
+
     return flags;
 }
 

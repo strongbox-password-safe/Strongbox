@@ -18,8 +18,7 @@
 #import "DatabaseSearchAndSorter.h"
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
-
-static NSString* const kBrowseItemCell = @"BrowseItemCell";
+#import "BrowseTableViewCellHelper.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -34,6 +33,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 @property (nonatomic) NSIndexPath *tappedIndexPath;
 @property (strong, nonatomic) NSTimer *tapTimer;
 
+@property BrowseTableViewCellHelper* cellHelper;
+
 @end
 
 @implementation PickCredentialsTableViewController
@@ -44,23 +45,9 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     if(Settings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
-    
-    [self.tableView registerNib:[UINib nibWithNibName:kBrowseItemCell bundle:nil] forCellReuseIdentifier:kBrowseItemCell];
-    
-    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                                initWithTarget:self
-                                action:@selector(handleLongPress:)];
-    self.longPressRecognizer.minimumPressDuration = 1;
-    self.longPressRecognizer.cancelsTouchesInView = YES;
-    
-    [self.tableView addGestureRecognizer:self.longPressRecognizer];
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
-    self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
-    self.tableView.rowHeight = UITableViewAutomaticDimension;
-    
-    self.tableView.tableFooterView = [UIView new];
-    
+
+    [self setupTableview];
+
     self.buttonAddCredential.enabled = [self canCreateNewCredential];
     
     self.extendedLayoutIncludesOpaqueBars = YES;
@@ -90,6 +77,24 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
     }
     
     [self loadItems];
+}
+
+- (void)setupTableview {
+    self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.model tableView:self.tableView];
+    
+    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                initWithTarget:self
+                                action:@selector(handleLongPress:)];
+    self.longPressRecognizer.minimumPressDuration = 1;
+    self.longPressRecognizer.cancelsTouchesInView = YES;
+    
+    [self.tableView addGestureRecognizer:self.longPressRecognizer];
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    
+    self.tableView.tableFooterView = [UIView new];
 }
 
 - (void)loadItems {
@@ -295,110 +300,8 @@ static NSString* const kBrowseItemCell = @"BrowseItemCell";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node *node = [self getDataSource][indexPath.row];
-    BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
-    
-    NSString* title = self.model.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
-    UIImage* icon = [NodeIconHelper getIconForNode:node model:self.model];
-    NSString *groupLocation = self.searchController.isActive ? [self getGroupPathDisplayString:node] : @"";
-    
-    NSDictionary<NSNumber*, UIColor*> *flagTintColors;
-    NSArray* flags = [self getFlags:node tintColors:&flagTintColors];
 
-    if(node.isGroup) {
-        BOOL italic = (self.model.database.recycleBinEnabled && node == self.model.database.recycleBinNode);
-        
-        NSString* childCount = self.model.metadata.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
-        
-        [cell setGroup:title
-                  icon:icon
-            childCount:childCount
-                italic:italic
-         groupLocation:groupLocation
-                 flags:flags
-              hideIcon:self.model.metadata.hideIconInBrowse];
-    }
-    else {
-        DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model];
-        
-        NSString* subtitle = [searcher getBrowseItemSubtitle:node];
-                
-        [cell setRecord:title
-               subtitle:subtitle
-                   icon:icon
-          groupLocation:groupLocation
-                  flags:flags
-         flagTintColors:flagTintColors
-                expired:node.expired
-               otpToken:node.fields.otpToken
-               hideIcon:self.model.metadata.hideIconInBrowse];
-    }
-    
-    return cell;
-}
-
-// TODO: This is duplicated
-- (NSArray<UIImage*>*)getFlags:(Node*)node tintColors:(NSDictionary<NSNumber*, UIColor*>**)tintColors {
-    if ( !self.model.metadata.showFlagsInBrowse ) {
-        if(*tintColors) {
-            *tintColors = @{};
-        }
-        return @[];
-    }
-
-    NSMutableArray<UIImage*> *flags = NSMutableArray.array;
-    
-    if(!node.isGroup && [self.model isFlaggedByAudit:node]) {
-        UIImage* image;
-        UIColor* tintColor;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"exclamationmark.triangle"];
-        }
-        else {
-            image = [UIImage imageNamed:@"error"];
-        }
-        tintColor = UIColor.systemOrangeColor;
-        
-        if(tintColors) {
-            *tintColors = @{ @(flags.count) : tintColor };
-        }
-
-        [flags addObject:image];
-    }
-
-    if([self.model isPinned:node]) {
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-           image = [UIImage systemImageNamed:@"pin"];
-        }
-        else {
-           image = [UIImage imageNamed:@"pin"];
-        }
-
-        [flags addObject:image];
-    }
-
-    if(!node.isGroup && node.fields.attachments.count) {
-        UIImage* image;
-        if (@available(iOS 13.0, *)) {
-            image = [UIImage systemImageNamed:@"paperclip"];
-        }
-        else {
-            image = [UIImage imageNamed:@"attach"];
-        }
-        [flags addObject:image];
-    }
-    
-    return flags;
-}
-
-- (NSString *)getGroupPathDisplayString:(Node *)vm { // TODO: Dupl;icated?
-    NSArray<NSString*> *hierarchy = [vm getTitleHierarchy];
-    
-    NSString *path = [[hierarchy subarrayWithRange:NSMakeRange(0, hierarchy.count - 1)] componentsJoinedByString:@"/"];
-    
-    return hierarchy.count == 1 ?
-        NSLocalizedString(@"pick_creds_vc_group_path_display_string_root", @"(in /)") :
-        [NSString stringWithFormat:NSLocalizedString(@"pick_creds_vc_group_path_display_string_fmt", @"(in /%@)"), path];
+    return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:NO showGroupLocation:self.searchController.isActive];
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {

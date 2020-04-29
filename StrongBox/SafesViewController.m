@@ -457,8 +457,36 @@
 }
 
 - (UIViewController*)getVisibleViewController {
-    UIViewController* navVisible = self.navigationController.visibleViewController;
-    return navVisible.presentedViewController ? navVisible.presentedViewController : navVisible;
+    UIViewController* visibleSoFar = self.navigationController;
+    int attempts = 10;
+    do {
+        if ([visibleSoFar isKindOfClass:UINavigationController.class]) {
+            UINavigationController* nav = (UINavigationController*)visibleSoFar;
+            
+            // NSLog(@"VISIBLE: [%@] is Nav Controller, moving to Visisble: [%@]", visibleSoFar, nav.visibleViewController);
+
+            if (nav.visibleViewController) {
+                visibleSoFar = nav.visibleViewController;
+            }
+            else {
+                break;
+            }
+        }
+        else {
+            // NSLog(@"VISIBLE: [%@] is regular VC checking is it's presenting anything: [%@]", visibleSoFar, visibleSoFar.presentedViewController);
+
+            if (visibleSoFar.presentedViewController) {
+                visibleSoFar = visibleSoFar.presentedViewController;
+            }
+            else {
+                break;
+            }
+        }
+    } while (--attempts); // Prevent any kind of infinite regress
+
+    NSLog(@"VISIBLE: [%@]", visibleSoFar);
+    
+    return visibleSoFar;
 }
 
 - (BOOL)isVisibleViewController {

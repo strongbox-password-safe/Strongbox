@@ -16,7 +16,8 @@
 @implementation TagsTests
 
 - (void)testExample {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/tags.kdbx"];
+    NSString *path = @"/Users/strongbox/strongbox-test-files/tags.kdbx";    
+    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:path];
 
     XCTAssertNotNil(safeData);
     

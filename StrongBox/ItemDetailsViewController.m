@@ -218,7 +218,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (void)onAuditNodesChanged:(id)param {
-    NSLog(@"onAuditNodesChanged: TODO");
     [self performFullReload];
 }
 

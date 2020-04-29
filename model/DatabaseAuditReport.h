@@ -17,13 +17,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithNoPasswordEntries:(NSSet<Node*>*)noPasswords
                       duplicatedPasswords:(NSDictionary<NSString*, NSSet<Node*>*>*)duplicatedPasswords
                           commonPasswords:(NSSet<Node*>* )commonPasswords
-                                  similar:(NSDictionary<NSUUID*, NSSet<Node*>*>*)similar NS_DESIGNATED_INITIALIZER;
+                                  similar:(NSDictionary<NSUUID*, NSSet<Node*>*>*)similar
+                                 tooShort:(NSSet<Node *> *)tooShort NS_DESIGNATED_INITIALIZER;
 
 @property (readonly) NSSet<Node*>* entriesWithNoPasswords;
 @property (readonly) NSSet<Node*>* entriesWithDuplicatePasswords;
-- (NSSet<Node*>*)duplicatedPasswordEntriesForEntry:(Node*)entry;
 @property (readonly) NSSet<Node*>* entriesWithCommonPasswords;
 @property (readonly) NSSet<Node*>* entriesWithSimilarPasswords;
+@property (readonly) NSSet<Node*>* entriesTooShort;
 
 @end
 

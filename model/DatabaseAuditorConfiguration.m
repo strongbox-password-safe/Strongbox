@@ -8,18 +8,22 @@
 
 #import "DatabaseAuditorConfiguration.h"
 
+const int kDefaultMinimumLength = 12;
+
 @implementation DatabaseAuditorConfiguration
 
 + (instancetype)defaults {
     DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
 
     config.auditInBackground = YES;
-    config.checkForNoPasswords = YES;
+    config.checkForNoPasswords = NO;
     config.checkForDuplicatedPasswords = YES;
     config.caseInsensitiveMatchForDuplicates = YES;
     config.checkForCommonPasswords = YES;
     config.checkForSimilarPasswords = YES;
     config.levenshteinSimilarityThreshold = 0.75f;
+    config.minimumLength = kDefaultMinimumLength;
+    config.checkForMinimumLength = NO;
     
     return config;
 }
@@ -33,6 +37,17 @@
         self.checkForCommonPasswords = [coder decodeBoolForKey:@"checkForCommonPasswords"];
         self.checkForSimilarPasswords = [coder decodeBoolForKey:@"checkForSimilarPasswords"];
         self.levenshteinSimilarityThreshold = [coder decodeFloatForKey:@"levenshteinSimilarityThreshold"];
+        
+        if ([coder containsValueForKey:@"minimumLength"]) {
+            self.minimumLength = [coder decodeIntegerForKey:@"minimumLength"];
+        }
+        else {
+            self.minimumLength = kDefaultMinimumLength;
+        }
+
+        if ([coder containsValueForKey:@"checkForMinimumLength"]) {
+            self.checkForMinimumLength = [coder decodeBoolForKey:@"checkForMinimumLength"];
+        }
     }
     
     return self;
@@ -46,6 +61,8 @@
     [coder encodeBool:self.checkForCommonPasswords forKey:@"checkForCommonPasswords"];
     [coder encodeBool:self.checkForSimilarPasswords forKey:@"checkForSimilarPasswords"];
     [coder encodeFloat:self.levenshteinSimilarityThreshold forKey:@"levenshteinSimilarityThreshold"];
+    [coder encodeInteger:self.minimumLength forKey:@"minimumLength"];
+    [coder encodeBool:self.checkForMinimumLength forKey:@"checkForMinimumLength"];
 }
 
 @end

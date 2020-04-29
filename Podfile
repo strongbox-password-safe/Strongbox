@@ -9,11 +9,9 @@ abstract_target 'common-mac' do
     pod 'libsodium'
 
     target 'Strongbox' do
-
     end
 
     target 'Strongbox-Outright-Pro' do
-
     end
 end
 

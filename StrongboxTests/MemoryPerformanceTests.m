@@ -47,7 +47,8 @@
 }
 
 - (void)testReadLarge {
-    NSData *largeDb = [CommonTesting getDataFromBundleFile:@"large-100-10-100" ofType:@"kdbx"];
+//    NSData *largeDb = [CommonTesting getDataFromBundleFile:@"large-100-10-100" ofType:@"kdbx"];
+    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-100-10-100.kdbx"];
 
     XCTAssertNotNil(largeDb);
     

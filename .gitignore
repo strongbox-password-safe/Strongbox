@@ -30,3 +30,8 @@ DerivedData/
 ## Gcc Patch
 /*.gcno
 
+.DS_Store
+*.ipa
+*.zip
+
+fastlane/screenshots

@@ -176,7 +176,7 @@
     self.selectedPassword = self.textFieldPassword.text;
     
     if(self.selectedPassword.length != 0 || self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
-        [self moveToDoneOrNext];
+        [self checkKeyFileForCommonMistake];
         return;
     }
     
@@ -191,7 +191,7 @@
         return;
     }
 
-    [self moveToDoneOrNext];
+    [self checkKeyFileForCommonMistake];
 }
 
 - (void)askAboutEmptyOrNonePasswordAndContinue {
@@ -203,13 +203,48 @@
                           action:^(int response) {
                               if(response == 0) {
                                   self.selectedPassword = @"";
-                                  [self moveToDoneOrNext];
+                                  [self checkKeyFileForCommonMistake];
                               }
                               else if(response == 1) {
                                   self.selectedPassword = nil; // None
-                                  [self moveToDoneOrNext];
+                                  [self checkKeyFileForCommonMistake];
                               }
                           }];
+}
+
+- (void)checkKeyFileForCommonMistake {
+    // Common mistake to set the key file to the database file for naive users... warn them... This check is only done if the key file was not previously
+    // set as part of an open... i.e. if the user really is using a key file with the same filename as the database, that's ok.
+    
+    if ([self keyFileIsSet] && self.validateCommonKeyFileMistakes) {
+        NSSet* commonDbExts = [NSSet setWithArray:@[@"kdbx", @"kdb", @"psafe3"]];
+        BOOL likelyCommonMistake = [commonDbExts containsObject:self.selectedKeyFileUrl.pathExtension.lowercaseString];
+        
+        if(likelyCommonMistake) {
+            NSString* title = NSLocalizedString(@"casg_key_file_correct_title", @"Is your Key File correct?");
+            NSString* message = NSLocalizedString(@"casg_key_file_correct_message", @"You have configured this database to open with a Key File but the key file you have chosen doesn't look like a valid key file.\n\nAre you sure you are using this key file?\n\nNB: A Key File is not the same as your database file.");
+            NSString* option1 = NSLocalizedString(@"casg_key_file_correct_yes_key_file_correct", @"Yes, the key file is correct");
+            NSString* option2 = NSLocalizedString(@"casg_key_file_correct_no_no_key_file", @"No, I don't use a key file");
+                                
+            [Alerts twoOptionsWithCancel:self title:title message:message defaultButtonText:option1 secondButtonText:option2 action:^(int response) {
+                NSLog(@"%d", response);
+                
+                if (response == 0) {
+                    [self moveToDoneOrNext];
+                }
+                else if (response == 1) {
+                    self.selectedKeyFileUrl = nil;
+                    [self moveToDoneOrNext];
+                }
+            }];
+        }
+        else {
+            [self moveToDoneOrNext];
+        }
+    }
+    else {
+        [self moveToDoneOrNext];
+    }
 }
 
 - (void)moveToDoneOrNext {

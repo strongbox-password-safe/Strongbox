@@ -125,8 +125,8 @@
     }
     return data;
 }
-+(NSString *)base32StringFromData:(NSData *)data
-{
+
++(NSString *)base32StringFromData:(NSData *)data pad:(BOOL)pad {
     NSString *encoding = nil;
     unsigned char *encodingBytes = NULL;
     @try {
@@ -223,26 +223,32 @@
 }
 @end
 
-@implementation NSString (Base32Addition)
--(NSString *)base32String
-{
-    NSData *utf8encoding = [self dataUsingEncoding:NSUTF8StringEncoding];
-    return [MMcG_MF_Base32Codec base32StringFromData:utf8encoding];
-}
-+(NSString *)stringFromBase32String:(NSString *)base32String
-{
-    NSData *utf8encoding = [MMcG_MF_Base32Codec dataFromBase32String:base32String];
-    return [[NSString alloc] initWithData:utf8encoding encoding:NSUTF8StringEncoding];
-}
-@end
+//@implementation NSString (Base32Addition)
+//
+//-(NSString *)base32String {
+//    NSData *utf8encoding = [self dataUsingEncoding:NSUTF8StringEncoding];
+//    return [MMcG_MF_Base32Codec base32StringFromData:utf8encoding pad:YES];
+//}
+//
+//+(NSString *)stringFromBase32String:(NSString *)base32String {
+//    NSData *utf8encoding = [MMcG_MF_Base32Codec dataFromBase32String:base32String];
+//    return [[NSString alloc] initWithData:utf8encoding encoding:NSUTF8StringEncoding];
+//}
+//
+//@end
 
-@implementation NSData (Base32Addition)
-+(NSData *)dataWithBase32String:(NSString *)base32String
-{
+@implementation NSData (MMcGBase32Addition)
+
++(NSData *)mmcg_dataWithBase32String:(NSString *)base32String {
     return [MMcG_MF_Base32Codec dataFromBase32String:base32String];
 }
--(NSString *)base32String
-{
-    return [MMcG_MF_Base32Codec base32StringFromData:self];
+
+-(NSString *)mmcg_base32String {
+    return [MMcG_MF_Base32Codec base32StringFromData:self pad:YES];
 }
+
+-(NSString *)mmcg_base32StringNoPadding {
+    return [MMcG_MF_Base32Codec base32StringFromData:self pad:NO];
+}
+
 @end

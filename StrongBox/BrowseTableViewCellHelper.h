@@ -18,7 +18,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithModel:(Model*)model tableView:(UITableView*)tableView NS_DESIGNATED_INITIALIZER;
 
-- (UITableViewCell *)getBrowseCellForNode:(Node*)node indexPath:(NSIndexPath*)indexPath totp:(BOOL)totp showGroupLocation:(BOOL)showGroupLocation;
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node indexPath:(NSIndexPath*)indexPath showLargeTotpCell:(BOOL)totp showGroupLocation:(BOOL)showGroupLocation;
+
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node
+                                indexPath:(NSIndexPath*)indexPath
+                        showLargeTotpCell:(BOOL)totp
+                        showGroupLocation:(BOOL)showGroupLocation
+                    groupLocationOverride:(NSString*)groupLocationOverride
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType;
 
 @end
 

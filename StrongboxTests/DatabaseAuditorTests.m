@@ -28,7 +28,7 @@
 - (void)testAuditGeneratedDatabase {
     DatabaseModel* db = [DatabaseGenerator generate:@"a"];
     
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] init];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
     [auditor start:db.activeRecords
             config:DatabaseAuditorConfiguration.defaults
  isDereferenceable:^BOOL(NSString * _Nonnull string) {
@@ -58,7 +58,7 @@
     Node* nodeWithPassword = [DatabaseGenerator generateSampleNode:db.rootGroup];
     [db.rootGroup addChild:nodeWithPassword keePassGroupTitleRules:NO];
 
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] init];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
        [auditor start:db.activeRecords
                config:DatabaseAuditorConfiguration.defaults
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
@@ -92,7 +92,7 @@
     r1.fields.password = @"dupl1cat3d";
     r2.fields.password = @"Dupl1cat3d";
 
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] init];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
        [auditor start:db.activeRecords
                config:DatabaseAuditorConfiguration.defaults
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
@@ -132,7 +132,7 @@
     DatabaseAuditorConfiguration* config = DatabaseAuditorConfiguration.defaults;
     config.caseInsensitiveMatchForDuplicates = NO;
 
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] init];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
        [auditor start:db.activeRecords
                config:config
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
@@ -155,6 +155,43 @@
     [self waitUntilDone];
 }
 
+- (void)testAuditDatabaseWithEmptyPasswordsNotDuplicates {
+    DatabaseModel* db = [DatabaseGenerator generateEmpty:@"a"];
+
+    Node* r1 = [DatabaseGenerator generateSampleNode:db.rootGroup];
+    [db.rootGroup addChild:r1 keePassGroupTitleRules:NO];
+    Node* r2 = [DatabaseGenerator generateSampleNode:db.rootGroup];
+    [db.rootGroup addChild:r2 keePassGroupTitleRules:NO];
+
+    r1.fields.password = @"";
+    r2.fields.password = @"";
+
+    DatabaseAuditorConfiguration* config = DatabaseAuditorConfiguration.defaults;
+    config.caseInsensitiveMatchForDuplicates = NO;
+
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
+       [auditor start:db.activeRecords
+               config:config
+    isDereferenceable:^BOOL(NSString * _Nonnull string) {
+           return NO;
+       }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
+             progress:^(CGFloat progress) {
+           NSLog(@"Audit Progress: %f", progress);
+       }
+           completion:^(BOOL userStopped) {
+           DatabaseAuditReport* report = [auditor getAuditReport];
+           
+           NSLog(@"Database Audit Report = %@", report);
+
+           XCTAssertEqual(report.entriesWithDuplicatePasswords.count, 0);
+           
+           self.done = YES;
+       }];
+    
+    [self waitUntilDone];
+}
+
 - (void)testAuditDatabaseWithSomeCommonPasswords {
     DatabaseModel* db = [DatabaseGenerator generate:@"a"];
 
@@ -164,7 +201,7 @@
 
     r1.fields.password = @"123456";
 
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] init];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
        [auditor start:db.activeRecords
                config:DatabaseAuditorConfiguration.defaults
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
@@ -204,7 +241,7 @@
     DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
     config.checkForSimilarPasswords = YES;
     
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initForTesting];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
        [auditor start:db.activeRecords
                config:config
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
@@ -241,7 +278,7 @@
     config.checkForSimilarPasswords = YES;
     config.levenshteinSimilarityThreshold = 0.4;
 
-    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initForTesting];
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
        [auditor start:db.activeRecords
                config:config
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
@@ -263,6 +300,43 @@
            for(Node* node in report.entriesWithSimilarPasswords) {
                NSLog(@"%@", node.fields.password);
            }
+
+           self.done = YES;
+       }];
+    
+    [self waitUntilDone];
+}
+
+- (void)testMinLength {
+    DatabaseModel* db = [DatabaseGenerator generateEmpty:@"a"];
+
+    Node* nodeWithPassword1 = [DatabaseGenerator generateSampleNode:db.rootGroup];
+    nodeWithPassword1.fields.password = @"12345678";
+    [db.rootGroup addChild:nodeWithPassword1 keePassGroupTitleRules:NO];
+
+    Node* nodeWithPassword2 = [DatabaseGenerator generateSampleNode:db.rootGroup];
+    [db.rootGroup addChild:nodeWithPassword2 keePassGroupTitleRules:NO];
+    nodeWithPassword2.fields.password = @"1234567";
+
+    DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
+    config.checkForMinimumLength = YES;
+    config.minimumLength = 8;
+    
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
+       [auditor start:db.activeRecords
+               config:config
+    isDereferenceable:^BOOL(NSString * _Nonnull string) {
+           return NO;
+       }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
+             progress:^(CGFloat progress) {
+           NSLog(@"Audit Progress: %f", progress);
+       }
+           completion:^(BOOL userStopped) {
+           DatabaseAuditReport* report = [auditor getAuditReport];
+
+           NSLog(@"Database Audit Report = %@", report);
+           XCTAssertEqual(report.entriesTooShort.count, 1);
 
            self.done = YES;
        }];

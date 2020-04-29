@@ -20,8 +20,8 @@
 @implementation KdbxHistory
 
 - (void)testGoogleDriveSafeWithHistory {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/favicon-test2.kdbx"];
-    
+    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/favicon-test2.kdbx"];
+
     [[[Kdbx4Database alloc] init] open:safeData
                                    ckf:[CompositeKeyFactors password:@"a"]
                             completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {

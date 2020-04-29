@@ -68,8 +68,7 @@
 }
 
 - (void)testInitExistingWithGoogleDriveSafe {
-    NSError* error;
-    NSData *safeData = [NSData dataWithContentsOfFile:@"/Users/mark/Google Drive/strongbox/keepass/kp2-twofish-with-aes-kdf.kdbx" options:kNilOptions error:&error];
+    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/kp2-twofish-with-aes-kdf.kdbx"];
 
     XCTAssertNotNil(safeData);
     

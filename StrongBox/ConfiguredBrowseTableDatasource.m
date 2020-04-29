@@ -54,7 +54,7 @@ const NSUInteger kSectionIdxLast = 3;
 
     BOOL showTotp = self.viewModel.metadata.browseViewType == kBrowseViewTypeTotpList;
     
-    return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath totp:showTotp showGroupLocation:NO];
+    return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showTotp showGroupLocation:NO];
 }
 
 - (NSUInteger)rowsForSection:(NSUInteger)section {

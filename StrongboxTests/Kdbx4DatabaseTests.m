@@ -37,7 +37,7 @@
 }
 
 - (void)testInitExistingWithLargeAGoogleDriveSafeUncompressed {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/Database-Large-Uncompressed.kdbx"];
+    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/Database-Large-Uncompressed.kdbx"];
     
     [[[Kdbx4Database alloc] init] open:safeData ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
@@ -46,7 +46,7 @@
 }
 
 - (void)testInitExistingWithLargeGoogleDriveSafe {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/Database-Large.kdbx"];
+    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/Database-Large.kdbx"];
 
     [[[Kdbx4Database alloc] init] open:safeData ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@ - [%@]", db, error);

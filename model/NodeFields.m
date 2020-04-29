@@ -349,7 +349,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         // Set Common TOTP Fields..
         // KeePassXC Legacy...
         
-        self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:[token.secret base32String] protected:YES];
+        self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:[token.secret mmcg_base32String] protected:YES];
         
         if(token.algorithm == OTPAlgorithmSteam) {
             NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
@@ -370,7 +370,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         
         if(self.usingLegacyKeeOtpStyle) {
             NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
-            NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret base32String]];
+            NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret mmcg_base32String]];
             
             if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
                 NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];

@@ -29,7 +29,7 @@
         self.immediateSearchOnBrowse = NO;
         self.hideTotpInBrowse = NO;
         self.showKeePass1BackupGroup = NO;
-        self.showChildCountOnFolderInBrowse = NO;
+        self.showChildCountOnFolderInBrowse = YES;
         self.showFlagsInBrowse = YES;
         self.doNotShowRecycleBinInBrowse = NO;
         self.showRecycleBinInSearchResults = NO;

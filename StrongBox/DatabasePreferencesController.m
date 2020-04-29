@@ -253,8 +253,7 @@
         vc.viewModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToAudit"]) {
-        UINavigationController* nav = segue.destinationViewController;
-        AuditConfigurationVcTableViewController* vc = (AuditConfigurationVcTableViewController*)nav.topViewController;
+        AuditConfigurationVcTableViewController* vc = (AuditConfigurationVcTableViewController*)segue.destinationViewController;
         vc.model = self.viewModel;
     }
 }

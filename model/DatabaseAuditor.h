@@ -26,6 +26,7 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
     kAuditFlagCommonPassword,
     kAuditFlagDuplicatePassword,
     kAuditFlagSimilarPassword,
+    kAuditFlagTooShort,
 };
 
 typedef void (^AuditCompletionBlock)(BOOL userStopped);
@@ -35,8 +36,8 @@ typedef BOOL (^AuditIsDereferenceableTextBlock)(NSString* string);
 
 @interface DatabaseAuditor : NSObject
 
-- (instancetype)init;
-- (instancetype)initForTesting;
+- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithPro:(BOOL)pro NS_DESIGNATED_INITIALIZER;
 
 @property AuditState state;
 
@@ -49,9 +50,14 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
 - (void)stop;
 
-- (NSString*_Nullable)getQuickAuditSummaryForNode:(Node*)item;
+- (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item;
+- (NSString*)getQuickAuditSummaryForNode:(Node*)item;
+
 - (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)node;
 - (DatabaseAuditReport*)getAuditReport;
+
+@property (readonly) NSUInteger auditIssueNodeCount;
+@property (readonly) NSUInteger auditIssueCount;
 
 @end
 

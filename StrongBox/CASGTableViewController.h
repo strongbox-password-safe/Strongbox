@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL initialOfflineCache;
 @property BOOL initialReadOnly;
 @property YubiKeyHardwareConfiguration* initialYubiKeyConfig;
+@property BOOL validateCommonKeyFileMistakes;
 
 @property BOOL autoDetectedKeyFileUrl;
 @property NSString* initialName;

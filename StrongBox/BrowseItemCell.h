@@ -43,6 +43,17 @@ NS_ASSUME_NONNULL_BEGIN
          otpToken:(OTPToken*_Nullable)otpToken
          hideIcon:(BOOL)hideIcon;
 
+- (void)setRecord:(NSString*)title
+         subtitle:(NSString*)subtitle
+             icon:(UIImage*)icon
+    groupLocation:(NSString*)groupLocation
+            flags:(NSArray<UIImage*>*)flags
+   flagTintColors:(NSDictionary<NSNumber*, UIColor*> *)flagTintColors
+          expired:(BOOL)expired
+         otpToken:(OTPToken*_Nullable)otpToken
+         hideIcon:(BOOL)hideIcon
+            audit:(NSString*_Nullable)audit;
+
 @end
 
 NS_ASSUME_NONNULL_END

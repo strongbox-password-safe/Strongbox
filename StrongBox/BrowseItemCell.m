@@ -18,10 +18,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
 @property (weak, nonatomic) IBOutlet UILabel *pathLabel;
-@property (weak, nonatomic) IBOutlet UILabel *childCountLabel;
+@property (weak, nonatomic) IBOutlet UILabel *childCount;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag1;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag2;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag3;
+@property (weak, nonatomic) IBOutlet UILabel *labelAudit;
 
 @property OTPToken* otpToken;
 
@@ -80,8 +81,10 @@
     self.otpLabel.text = @"";
     self.otpLabel.hidden = YES;
     
-    self.childCountLabel.hidden = childCount.length == 0;
-    self.childCountLabel.text = childCount;
+    self.childCount.hidden = childCount.length == 0;
+    self.childCount.text = childCount;
+    
+    self.labelAudit.hidden = YES;
     
     self.pathLabel.text = groupLocation;
     self.bottomRow.hidden = groupLocation.length == 0;
@@ -96,6 +99,19 @@
           expired:(BOOL)expired
          otpToken:(OTPToken *)otpToken
          hideIcon:(BOOL)hideIcon {
+    [self setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags flagTintColors:flagTintColors expired:expired otpToken:otpToken hideIcon:hideIcon audit:nil];
+}
+
+- (void)setRecord:(NSString *)title
+         subtitle:(NSString *)subtitle
+             icon:(UIImage *)icon
+    groupLocation:(NSString *)groupLocation
+            flags:(NSArray<UIImage *> *)flags
+   flagTintColors:(nonnull NSDictionary<NSNumber *,UIColor *> *)flagTintColors
+          expired:(BOOL)expired
+         otpToken:(OTPToken *)otpToken
+         hideIcon:(BOOL)hideIcon
+            audit:(NSString*_Nullable)audit {
     self.titleLabel.text = title;
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
     
@@ -109,7 +125,13 @@
     
     [self setFlags:flags flagTintColors:flagTintColors];
 
-    self.childCountLabel.hidden = YES;
+    self.childCount.hidden = YES;
+    self.labelAudit.hidden = audit == nil;
+    
+    if (audit) {
+        self.labelAudit.text = audit;
+    }
+    
     self.bottomRow.hidden = subtitle.length == 0 && groupLocation.length == 0;
 
     self.otpLabel.hidden = NO;

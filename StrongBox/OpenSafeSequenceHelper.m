@@ -486,6 +486,7 @@
     scVc.initialReadOnly = self.safe.readOnly;
     scVc.initialOfflineCache = self.manualOpenOfflineCache;
     scVc.initialYubiKeyConfig = self.safe.yubiKeyConfig;
+    scVc.validateCommonKeyFileMistakes = self.safe.keyFileUrl == nil; // No key file set for this db, then perform some simple checks before accepting it
     
     // Less than perfect but helpful
     
@@ -918,9 +919,17 @@
                      message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_problem_opening_convenience_incorrect_message", @"The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled.")]] ;
             }
             else {
-                [Alerts info:self.viewController
-                       title:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title", @"Incorrect Credentials")
-                     message:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message", @"The credentials were incorrect for this database.")];
+                if (self.keyFileDigest) {
+                    [Alerts info:self.viewController
+                           title:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title", @"Incorrect Credentials")
+                         message:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message_verify_key_file", @"The credentials were incorrect for this database. Are you sure you are using this key file?\n\nNB: A key files are not the same as your database file.")];
+
+                }
+                else {
+                    [Alerts info:self.viewController
+                           title:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title", @"Incorrect Credentials")
+                         message:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message", @"The credentials were incorrect for this database.")];
+                }
             }
         }
         else {

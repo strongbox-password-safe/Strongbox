@@ -10,16 +10,12 @@ Strongbox supports the open source Password Safe (version 3) and KeePass file fo
 # License Notes
 This software provided here on Github is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project. Copyright/Ownership is held by Mark McGuill. Strongbox is licensed to Apple under a different license which is compatible with the App Store.
 
-If you are interested in using the code, commercially, or in some other fashion for which the GPL is unsuitable, or if you would simply like to discuss an alternative licence or custom builds for your organization, then please contact Mark directly: [mark@strongboxsafe.com](mailto:mark@strongboxsafe.com).
+If you are interested in using the code, commercially, or in some other fashion for which the GPL is unsuitable, or if you would simply like to discuss an alternative licence or custom builds for your organization, then please get in touch.
 
 # Supporting Development
 There are several ways you can help support continuous development. Obviously if you purchase a subscription or lifetime licence that's really helpful. But there are a few other options if you like the app and you are feeling generous! You can help by contributing financially here:
 
 - Patreon: https://www.patreon.com/strongboxpasswordsafe
-
-- Paypal: https://paypal.me/MarkMcGuill
-
-- Bitcoin: 3PXJZ939Y9oC1vX8nzQZZaNGiNp6HbNov4
 
 Obviously the more support I get here the more time I can allocate to development, I rely on the community to support the work as in-app purchases are a one off payment and just about cover Apple's yearly developer program fee. If you can chip in the price of a cup of coffee every month I'd be very grateful.
 
@@ -47,7 +43,7 @@ Localization and translation is managed through the parallel Babel project here:
 
 https://github.com/strongbox-password-safe/babel
 
-This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch with me (mark@strongboxsafe.com) and we'll try to set you up. Currently we are using Crowd In to manage things and it seems to be working well. Get in touch to get an invite to that system and being work on your language.
+This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch (support@strongboxsafe.com) and we'll try to set you up. Currently we are using Crowd In to manage things and it seems to be working well. Get in touch to get an invite to that system and being work on your language.
 
 You can submit Pull Requests any way you choose, and it will be much appreciated, but please get in touch first so I can make sure the Repo is setup correctly for your language.
 

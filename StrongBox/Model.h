@@ -46,8 +46,15 @@ extern NSString* const kAuditCompletedNotificationKey;
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
 - (void)stopAndClearAuditor;
+
 @property (readonly) AuditState auditState;
-    
+@property (readonly) NSUInteger auditIssueCount;
+@property (readonly) NSUInteger auditIssueNodeCount;
+- (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)item;
+- (BOOL)isFlaggedByAudit:(Node*)item;
+- (NSString*)getQuickAuditSummaryForNode:(Node*)item;
+- (NSString*)getQuickAuditVeryBriefSummaryForNode:(Node*)item;
+
 - (void)closeAndCleanup;
 
 // Cache Stuff
@@ -64,9 +71,6 @@ extern NSString* const kAuditCompletedNotificationKey;
 - (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
 - (BOOL)deleteItem:(Node *_Nonnull)child;
 - (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
-
-- (BOOL)isFlaggedByAudit:(Node*)item;
-- (NSString*)getQuickAuditSummaryForNode:(Node*)item;
 
 - (BOOL)isPinned:(Node*)item;
 - (void)togglePin:(Node*)item;

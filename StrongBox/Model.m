@@ -54,7 +54,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
         
         self.isAutoFillOpen = isAutoFillOpen;
         
-        self.auditor = [[DatabaseAuditor alloc] init];
+        self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial];
 
         [self restartBackgroundAudit];
         
@@ -88,13 +88,13 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     }
 }
 
--(void)stopAudit {
+- (void)stopAudit {
     [self.auditor stop];
 }
 
 - (void)stopAndClearAuditor {
     [self.auditor stop];
-    self.auditor = [[DatabaseAuditor alloc] init];
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial];
 }
 
 - (void)restartAudit {
@@ -124,12 +124,36 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     }];
 }
 
+- (NSUInteger)auditIssueCount {
+    return self.auditor ? self.auditor.auditIssueCount : 0;
+}
+
+- (NSUInteger)auditIssueNodeCount {
+    return self.auditor ? self.auditor.auditIssueNodeCount : 0;
+}
+
+- (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item {
+    if (self.auditor) {
+        return [self.auditor getQuickAuditVeryBriefSummaryForNode:item];
+    }
+    
+    return @"";
+}
+
 - (NSString*)getQuickAuditSummaryForNode:(Node*)item {
     if (self.auditor) {
         return [self.auditor getQuickAuditSummaryForNode:item];
     }
     
-    return nil;
+    return @"";
+}
+
+- (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)item {
+    if (self.auditor) {
+        return [self.auditor getQuickAuditFlagsForNode:item];
+    }
+    
+    return NSSet.set;
 }
 
 - (BOOL)isFlaggedByAudit:(Node*)item {

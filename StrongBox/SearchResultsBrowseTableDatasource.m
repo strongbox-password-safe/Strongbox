@@ -40,7 +40,7 @@
 - (nonnull UITableViewCell *)cellForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     Node* node = [self getNodeFromIndexPath:indexPath];
     
-    return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath totp:NO showGroupLocation:YES];
+    return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:NO showGroupLocation:YES];
 }
 
 - (NSUInteger)rowsForSection:(NSUInteger)section {

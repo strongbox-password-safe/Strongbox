@@ -74,7 +74,7 @@
 }
 
 - (void)testDeserializeGoogleDriveFileToXml {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/mark/Google Drive/strongbox/keepass/Database.kdbx"];
+    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/Database.kdbx"];
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
     [Kdbx4Serialization deserialize:safeData

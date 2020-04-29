@@ -9,6 +9,8 @@
 #import "AuditConfigurationVcTableViewController.h"
 #import "Settings.h"
 
+const int kSectionIdxSimilarPasswords = 4; // Careful if sections move around
+
 @interface AuditConfigurationVcTableViewController ()
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAuditInBackground;
@@ -21,6 +23,12 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelCheckSimilar;
 @property (weak, nonatomic) IBOutlet UILabel *labelSimilarityThresholdTitle;
 @property (weak, nonatomic) IBOutlet UILabel *labelStatus;
+@property (weak, nonatomic) IBOutlet UISwitch *switchCaseInsenstiveDupes;
+
+@property (weak, nonatomic) IBOutlet UISlider *sliderMinLength;
+@property (weak, nonatomic) IBOutlet UILabel *minLengthLabel;
+@property (weak, nonatomic) IBOutlet UISwitch *switchMinLength;
+@property (weak, nonatomic) IBOutlet UILabel *statusSubtitle;
 
 @end
 
@@ -46,12 +54,20 @@
     self.switchAuditInBackground.on = self.model.metadata.auditConfig.auditInBackground;
     self.switchNoPassword.on = self.model.metadata.auditConfig.checkForNoPasswords;
     self.switchDuplicates.on = self.model.metadata.auditConfig.checkForDuplicatedPasswords;
+    self.switchCaseInsenstiveDupes.on = self.model.metadata.auditConfig.caseInsensitiveMatchForDuplicates;
+    
     self.switchCommon.on = self.model.metadata.auditConfig.checkForCommonPasswords;
     self.switchSimilar.on = self.model.metadata.auditConfig.checkForSimilarPasswords;
     
     int sim = self.model.metadata.auditConfig.levenshteinSimilarityThreshold * 100.0f;
     self.labelSimilar.text = [NSString stringWithFormat:@"%d%%", sim];
     self.sliderSimilar.value = sim;
+    self.sliderSimilar.enabled = self.model.metadata.auditConfig.checkForSimilarPasswords;
+    
+    self.switchMinLength.on = self.model.metadata.auditConfig.checkForMinimumLength;
+    self.sliderMinLength.value = self.model.metadata.auditConfig.minimumLength;
+    self.minLengthLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.metadata.auditConfig.minimumLength];
+    self.sliderMinLength.enabled = self.model.metadata.auditConfig.checkForMinimumLength;
     
     [self bindAuditStatusWithProgress:nil];
     
@@ -76,8 +92,8 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == 2) {//} && !Settings.sharedInstance.isProOrFreeTrial) {
-        return NSLocalizedString(@"audit_enhanced_audits_pro_only_title", @"Enhanced Audits (Pro Edition Only)");
+    if(section == kSectionIdxSimilarPasswords && !Settings.sharedInstance.isProOrFreeTrial) {
+        return NSLocalizedString(@"audit_similar_passwords_pro_only_title", @"Similar Passwords (Pro Edition Only");
     }
     
     return [super tableView:tableView titleForHeaderInSection:section];
@@ -90,28 +106,48 @@
 - (void)bindAuditStatusWithProgress:(NSNumber*)progress {
     switch (self.model.auditState) {
         case kAuditStateDone:
-            self.labelStatus.text = [NSString stringWithFormat:NSLocalizedString(@"audit_status_complete", @"Audit Complete")];
+        {
+            self.labelStatus.text = NSLocalizedString(@"audit_status_complete", @"Status: Complete");
+         
+            NSString *loc = self.model.auditIssueCount ?
+                NSLocalizedString(@"audit_status_fmt", @"Found %@ issues in %@ entries") : NSLocalizedString(@"audit_status_no_issues_found", @"No issues found");
+            
+            self.statusSubtitle.hidden = NO;
+            self.statusSubtitle.text =  [NSString stringWithFormat:loc, @(self.model.auditIssueCount), @(self.model.auditIssueNodeCount)];
+        }
             break;
         case kAuditStateInitial:
-            self.labelStatus.text = NSLocalizedString(@"audit_status_initialized", @"Database Auditor Initialized");
+            self.labelStatus.text = self.model.metadata.auditConfig.auditInBackground ? NSLocalizedString(@"audit_status_initialized", @"Database Auditor Initialized") : NSLocalizedString(@"audit_status_initialized_but_disabled", @"audit_status_initialized_but_disabled");
+            self.statusSubtitle.hidden = YES;
             break;
         case kAuditStateRunning:
             self.labelStatus.text = progress ? [NSString stringWithFormat:NSLocalizedString(@"audit_status_running_with_progress_fmt", @"Auditing... (%d%%)"), ((int)(progress.floatValue * 100.0))] : NSLocalizedString(@"audit_status_running_with_ellipsis", @"Auditing...");
+            self.statusSubtitle.hidden = YES;
             break;
         case kAuditStateStoppedIncomplete:
             self.labelStatus.text = NSLocalizedString(@"audit_status_stopped", @"Audit Stopped");
+            self.statusSubtitle.hidden = YES;
             break;
         default:
             break;
     }
+    
+    // Resize Cells
+    [self.tableView beginUpdates];
+    [self.tableView endUpdates];
 }
 
 - (IBAction)onPreferenceChanged:(id)sender {    
     self.model.metadata.auditConfig.auditInBackground = self.switchAuditInBackground.on;
     self.model.metadata.auditConfig.checkForNoPasswords = self.switchNoPassword.on;
     self.model.metadata.auditConfig.checkForDuplicatedPasswords = self.switchDuplicates.on;
+    self.model.metadata.auditConfig.caseInsensitiveMatchForDuplicates = self.switchCaseInsenstiveDupes.on;
+    
     self.model.metadata.auditConfig.checkForCommonPasswords = self.switchCommon.on;
     self.model.metadata.auditConfig.checkForSimilarPasswords = self.switchSimilar.on;
+
+    self.model.metadata.auditConfig.checkForMinimumLength = self.switchMinLength.on;
+    self.model.metadata.auditConfig.minimumLength = self.sliderMinLength.value;
     
     self.model.metadata.auditConfig.levenshteinSimilarityThreshold = ((CGFloat)self.sliderSimilar.value / 100.0f);
     
