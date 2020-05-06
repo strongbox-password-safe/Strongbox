@@ -229,7 +229,9 @@ const static NSArray<NSString*> *kEmailDomains;
 
 - (BOOL)isCommonPassword:(NSString *)password {
     if(!self.commonPasswordsSetCache) {
-        NSArray<NSString*>* common = [self loadWordsForList:@"10-million-password-list-top-10000"];
+        NSMutableArray<NSString*>* common = [self getWordsForList:@"10-million-password-list-top-10000"].mutableCopy;
+        [common addObjectsFromArray:[self getWordsForList:@"eff_large_wordlist.utf8"]];
+        
         self.commonPasswordsSetCache = [NSSet setWithArray:common];
     }
     

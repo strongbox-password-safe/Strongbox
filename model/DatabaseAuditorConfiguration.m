@@ -13,19 +13,32 @@ const int kDefaultMinimumLength = 12;
 @implementation DatabaseAuditorConfiguration
 
 + (instancetype)defaults {
-    DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
+    return [[DatabaseAuditorConfiguration alloc] init];
+}
 
-    config.auditInBackground = YES;
-    config.checkForNoPasswords = NO;
-    config.checkForDuplicatedPasswords = YES;
-    config.caseInsensitiveMatchForDuplicates = YES;
-    config.checkForCommonPasswords = YES;
-    config.checkForSimilarPasswords = YES;
-    config.levenshteinSimilarityThreshold = 0.75f;
-    config.minimumLength = kDefaultMinimumLength;
-    config.checkForMinimumLength = NO;
-    
-    return config;
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.auditInBackground = YES;
+        self.checkForNoPasswords = NO;
+        self.checkForDuplicatedPasswords = YES;
+        self.caseInsensitiveMatchForDuplicates = YES;
+        self.checkForCommonPasswords = YES;
+        self.levenshteinSimilarityThreshold = 0.75f;
+        self.minimumLength = kDefaultMinimumLength;
+        self.checkForMinimumLength = NO;
+
+        self.checkForSimilarPasswords = NO; // CPU Heavy
+        self.checkHibp = NO; // Online Access
+        
+        self.lastKnownAuditIssueCount = nil;
+        self.showAuditPopupNotifications = YES;
+        self.hibpCaveatAccepted = NO;
+        self.hibpCheckForNewBreachesIntervalSeconds = 24 * 60 * 60; // Once a day check for newly compromised passwords
+        self.lastHibpOnlineCheck = nil;
+    }
+        
+    return self;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
@@ -48,6 +61,30 @@ const int kDefaultMinimumLength = 12;
         if ([coder containsValueForKey:@"checkForMinimumLength"]) {
             self.checkForMinimumLength = [coder decodeBoolForKey:@"checkForMinimumLength"];
         }
+
+        if ([coder containsValueForKey:@"checkHibp"]) {
+            self.checkHibp = [coder decodeBoolForKey:@"checkHibp"];
+        }
+        
+        if ([coder containsValueForKey:@"lastKnownAuditIssueCount"]) {
+            self.lastKnownAuditIssueCount = [coder decodeObjectForKey:@"lastKnownAuditIssueCount"];
+        }
+        
+        if ([coder containsValueForKey:@"showAuditPopupNotifications"]) {
+            self.showAuditPopupNotifications = [coder decodeBoolForKey:@"showAuditPopupNotifications"];
+        }
+        
+        if ([coder containsValueForKey:@"hibpCaveatShown"]) {
+            self.hibpCaveatAccepted = [coder decodeBoolForKey:@"hibpCaveatShown"];
+        }
+        
+        if ([coder containsValueForKey:@"hibpCheckForNewBreachesIntervalSeconds"]) {
+            self.hibpCheckForNewBreachesIntervalSeconds = [coder decodeIntegerForKey:@"hibpCheckForNewBreachesIntervalSeconds"];
+        }
+        
+        if ([coder containsValueForKey:@"lastHibpOnlineCheck"]) {
+            self.lastHibpOnlineCheck = [coder decodeObjectForKey:@"lastHibpOnlineCheck"];
+        }
     }
     
     return self;
@@ -63,6 +100,12 @@ const int kDefaultMinimumLength = 12;
     [coder encodeFloat:self.levenshteinSimilarityThreshold forKey:@"levenshteinSimilarityThreshold"];
     [coder encodeInteger:self.minimumLength forKey:@"minimumLength"];
     [coder encodeBool:self.checkForMinimumLength forKey:@"checkForMinimumLength"];
+    [coder encodeBool:self.checkHibp forKey:@"checkHibp"];
+    [coder encodeObject:self.lastKnownAuditIssueCount forKey:@"lastKnownAuditIssueCount"];
+    [coder encodeBool:self.showAuditPopupNotifications forKey:@"showAuditPopupNotifications"];
+    [coder encodeBool:self.hibpCaveatAccepted forKey:@"hibpCaveatShown"];
+    [coder encodeInteger:self.hibpCheckForNewBreachesIntervalSeconds forKey:@"hibpCheckForNewBreachesIntervalSeconds"];
+    [coder encodeObject:self.lastHibpOnlineCheck forKey:@"lastHibpOnlineCheck"];
 }
 
 @end

@@ -16,6 +16,7 @@
 #import "KissXML.h"
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
+#import "NSData+Extensions.h"
 
 @interface DatabaseModel ()
 
@@ -52,7 +53,7 @@
         
         NSString* errorSummary = @"Invalid Database. Debug Info:\n";
         
-        NSString* prefix = [Utils hexadecimalString:prefixBytes];
+        NSString* prefix = prefixBytes.hex;
         
         if([prefix hasPrefix:@"004D534D414D415250435259"]) { // MSMAMARPCRY - https://github.com/strongbox-password-safe/Strongbox/issues/303
             NSString* loc = NSLocalizedString(@"error_database_is_encrypted_ms_intune", @"It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.");

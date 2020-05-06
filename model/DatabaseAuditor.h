@@ -11,6 +11,7 @@
 #import "DatabaseModel.h"
 #import "DatabaseAuditReport.h"
 #import "DatabaseAuditorConfiguration.h"
+#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -27,6 +28,7 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
     kAuditFlagDuplicatePassword,
     kAuditFlagSimilarPassword,
     kAuditFlagTooShort,
+    kAuditFlagPwned,
 };
 
 typedef void (^AuditCompletionBlock)(BOOL userStopped);
@@ -37,7 +39,7 @@ typedef BOOL (^AuditIsDereferenceableTextBlock)(NSString* string);
 @interface DatabaseAuditor : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithPro:(BOOL)pro NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPro:(BOOL)pro metadata:(SafeMetaData*)metadata NS_DESIGNATED_INITIALIZER;
 
 @property AuditState state;
 
@@ -50,14 +52,18 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
 - (void)stop;
 
+// Lightweight Performant Queries
+
 - (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item;
 - (NSString*)getQuickAuditSummaryForNode:(Node*)item;
-
 - (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)node;
-- (DatabaseAuditReport*)getAuditReport;
-
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditIssueCount;
+
+// Heavy Weight Reporting
+- (DatabaseAuditReport*)getAuditReport;
+
+@property (readonly) NSUInteger haveIBeenPwnedErrorCount;
 
 @end
 

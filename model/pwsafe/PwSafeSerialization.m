@@ -5,7 +5,7 @@
 #import "Record.h"
 #import "Field.h"
 #import "Utils.h"
-#import "Utils.h"
+#import "NSData+Extensions.h"
 
 #include <Security/Security.h>
 
@@ -190,7 +190,7 @@
     
     // hPbar => We now have P' we need H(P') so one more sha256!
 
-    NSData *hPBar = sha256(pBarData);
+    NSData *hPBar = pBarData.sha256;
     [hPBar getBytes:hdr.hPBar length:32];
 
     // We generate new K and L
@@ -358,7 +358,7 @@
     
     // We now have P' we need H(P') so one more sha256!
 
-    return sha256(*ppBar);
+    return (*ppBar).sha256;
 }
 
 + (BOOL)getKandL:(NSData *)pBar header:(PasswordSafe3Header)header K_p:(NSData **)K_p L_p:(NSData **)L_p {

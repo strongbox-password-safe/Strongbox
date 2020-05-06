@@ -50,8 +50,40 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="K5h-H4-XTY" userLabel="Show Audit Popup Notifications">
+                                        <rect key="frame" x="0.0" y="99.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="K5h-H4-XTY" id="dqN-kn-p2c">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Show Popup Notifications" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KZT-Dq-T6O" userLabel="Start with Search">
+                                                    <rect key="frame" x="20" y="11" width="197" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gif-Xe-wd2">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferenceChanged:" destination="01A-OU-JQM" eventType="valueChanged" id="Qdu-Rq-iDU"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="KZT-Dq-T6O" firstAttribute="leading" secondItem="dqN-kn-p2c" secondAttribute="leading" constant="20" id="31X-HJ-f6L"/>
+                                                <constraint firstItem="KZT-Dq-T6O" firstAttribute="top" secondItem="dqN-kn-p2c" secondAttribute="topMargin" id="8vd-EY-m7z"/>
+                                                <constraint firstItem="KZT-Dq-T6O" firstAttribute="centerY" secondItem="gif-Xe-wd2" secondAttribute="centerY" id="TeW-cr-3Y8"/>
+                                                <constraint firstItem="gif-Xe-wd2" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="KZT-Dq-T6O" secondAttribute="trailing" constant="8" symbolic="YES" id="cjZ-yM-hRN"/>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="gif-Xe-wd2" secondAttribute="bottom" constant="6.5" id="cvz-KK-3rx"/>
+                                                <constraint firstItem="gif-Xe-wd2" firstAttribute="top" relation="greaterThanOrEqual" secondItem="dqN-kn-p2c" secondAttribute="top" constant="6.5" id="eXR-95-zOM"/>
+                                                <constraint firstItem="gif-Xe-wd2" firstAttribute="trailing" secondItem="dqN-kn-p2c" secondAttribute="trailing" constant="-20" id="jb2-be-7d6"/>
+                                                <constraint firstItem="KZT-Dq-T6O" firstAttribute="bottom" secondItem="dqN-kn-p2c" secondAttribute="bottomMargin" id="uZW-iq-m87"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="none" indentationWidth="10" id="loH-6V-mXA" userLabel="Audit Status">
-                                        <rect key="frame" x="0.0" y="99.5" width="414" height="100"/>
+                                        <rect key="frame" x="0.0" y="143.5" width="414" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="loH-6V-mXA" id="7XS-7C-Vlg">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="100"/>
@@ -87,7 +119,7 @@
                             <tableViewSection headerTitle="Basic Audits" footerTitle="These checks are straightforward tests. These checks are completely offline (no network access required)" id="Gzg-vF-nnp">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="wrV-R3-VFk" userLabel="Empty Passwords">
-                                        <rect key="frame" x="0.0" y="307" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="351" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wrV-R3-VFk" id="gRa-Qb-mxY">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -119,7 +151,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="CYo-Iv-GKK" userLabel="Common Passwords">
-                                        <rect key="frame" x="0.0" y="351" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="395" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CYo-Iv-GKK" id="NIn-nX-zJj">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -152,10 +184,101 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Have I Been Pwned?" id="dPk-gM-4bf" userLabel="Have I Been Pwned">
+                                <mutableString key="footerTitle">This is an online service that can check your passwords against known compromised passwords from hacker forums and 'pastes'. Compromised password hashes are securely cached by Strongbox to display audit warnings and reduce network traffic.
+
+Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonymization, a short 5-byte prefix is sent to HIBP servers to check if compromised. You may or may not be comfortable with this. Use at your own discretion. You can read more about this system at https://haveibeenpwned.com</mutableString>
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="iFc-kW-wS9" userLabel="Check 'Have I Been Pwned?'">
+                                        <rect key="frame" x="0.0" y="530.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="iFc-kW-wS9" id="1Pp-sj-EsD">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Check 'Have I Been Pwned?'" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XtZ-t1-tEw">
+                                                    <rect key="frame" x="20" y="11" width="216.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q6q-wX-Hcq">
+                                                    <rect key="frame" x="345" y="8" width="51" height="28"/>
+                                                    <connections>
+                                                        <action selector="onHibpChanged:" destination="01A-OU-JQM" eventType="valueChanged" id="qXF-oo-ntR"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="XtZ-t1-tEw" firstAttribute="bottom" secondItem="1Pp-sj-EsD" secondAttribute="bottomMargin" id="3YL-v3-W0W"/>
+                                                <constraint firstItem="XtZ-t1-tEw" firstAttribute="leading" secondItem="1Pp-sj-EsD" secondAttribute="leading" constant="20" id="8Ot-pE-Mf2"/>
+                                                <constraint firstItem="XtZ-t1-tEw" firstAttribute="top" secondItem="1Pp-sj-EsD" secondAttribute="topMargin" id="O37-TP-VWj"/>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Q6q-wX-Hcq" secondAttribute="bottom" constant="8" id="lcT-5f-kQ6"/>
+                                                <constraint firstItem="Q6q-wX-Hcq" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="XtZ-t1-tEw" secondAttribute="trailing" constant="8" symbolic="YES" id="ltr-qt-JdG"/>
+                                                <constraint firstItem="XtZ-t1-tEw" firstAttribute="centerY" secondItem="Q6q-wX-Hcq" secondAttribute="centerY" id="oVi-1Z-EU5"/>
+                                                <constraint firstItem="Q6q-wX-Hcq" firstAttribute="top" relation="greaterThanOrEqual" secondItem="1Pp-sj-EsD" secondAttribute="top" constant="8" id="oZI-EF-8Dk"/>
+                                                <constraint firstItem="Q6q-wX-Hcq" firstAttribute="trailing" secondItem="1Pp-sj-EsD" secondAttribute="trailing" constant="-20" id="zid-k7-tOv"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="qvz-RJ-jzN" userLabel="Online Check Interval">
+                                        <rect key="frame" x="0.0" y="574.5" width="414" height="200"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qvz-RJ-jzN" id="zb3-yu-2zD">
+                                            <rect key="frame" x="0.0" y="0.0" width="383" height="200"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="bNl-CP-1hw">
+                                                    <rect key="frame" x="20" y="8" width="163" height="27.5"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Online Check Interval" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eWF-ET-car">
+                                                            <rect key="frame" x="0.0" y="0.0" width="163" height="6"/>
+                                                            <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <stackView opaque="NO" contentMode="scaleToFill" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="u2c-YL-BIz">
+                                                            <rect key="frame" x="0.0" y="14" width="140" height="13.5"/>
+                                                            <subviews>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" horizontalCompressionResistancePriority="749" text="Last Checked:" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qun-2B-JNr">
+                                                                    <rect key="frame" x="0.0" y="0.0" width="75" height="13.5"/>
+                                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleCaption2"/>
+                                                                    <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="252" horizontalCompressionResistancePriority="749" verticalCompressionResistancePriority="751" text="4 May 2012" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2BC-RY-Mcn">
+                                                                    <rect key="frame" x="79" y="0.0" width="61" height="13.5"/>
+                                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleCaption2"/>
+                                                                    <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                    <nil key="highlightedColor"/>
+                                                                </label>
+                                                            </subviews>
+                                                        </stackView>
+                                                    </subviews>
+                                                </stackView>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Once a Day" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aQm-Q9-VIQ">
+                                                    <rect key="frame" x="287" y="11.5" width="88" height="20.5"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="aQm-Q9-VIQ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="bNl-CP-1hw" secondAttribute="trailing" constant="8" symbolic="YES" id="Ghu-6W-3sL"/>
+                                                <constraint firstItem="bNl-CP-1hw" firstAttribute="top" secondItem="zb3-yu-2zD" secondAttribute="top" constant="8" id="Ksf-p1-Diq"/>
+                                                <constraint firstAttribute="trailing" secondItem="aQm-Q9-VIQ" secondAttribute="trailing" constant="8" id="UKP-a8-ifa"/>
+                                                <constraint firstItem="bNl-CP-1hw" firstAttribute="leading" secondItem="zb3-yu-2zD" secondAttribute="leading" constant="20" id="mLS-sE-X9N"/>
+                                                <constraint firstAttribute="bottom" secondItem="bNl-CP-1hw" secondAttribute="bottom" constant="8" id="y29-BE-k1O"/>
+                                                <constraint firstItem="aQm-Q9-VIQ" firstAttribute="centerY" secondItem="bNl-CP-1hw" secondAttribute="centerY" id="y6O-Bw-g0M"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection headerTitle="Minimum Length" footerTitle="This check finds any password below a certain length. This check is completely offline (no network access required)" id="BYJ-Xt-Ybf">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="AmO-bK-ubn" userLabel="Start with Search">
-                                        <rect key="frame" x="0.0" y="486.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1010" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AmO-bK-ubn" id="hZQ-mE-Giw">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -187,7 +310,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="84" id="flm-lx-Bc2">
-                                        <rect key="frame" x="0.0" y="530.5" width="414" height="84"/>
+                                        <rect key="frame" x="0.0" y="1054" width="414" height="84"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="flm-lx-Bc2" id="MYf-X2-dyG">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="84"/>
@@ -231,7 +354,7 @@
                             <tableViewSection headerTitle="Duplicates" footerTitle="This check detects exact duplicate passwords. This check is completely offline (no network access required)" id="7y7-Rh-Wx2" userLabel="Duplicates">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="AhJ-0F-V5J" userLabel="Duplicated Passwords">
-                                        <rect key="frame" x="0.0" y="706" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1229.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AhJ-0F-V5J" id="leT-YR-R8D">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -263,7 +386,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="1YP-Ks-OEy" userLabel="Case Sensitive">
-                                        <rect key="frame" x="0.0" y="750" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1273.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1YP-Ks-OEy" id="4z3-h4-yQ9">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -300,7 +423,7 @@
                                 <string key="footerTitle">This check detects minor differences between passwords e.g. 'password5' and 'password2'. You can change the similarity threshold too, lower values will find less similar passwords. This check is completely offline (no network access required)</string>
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="kMD-su-26p" userLabel="Start with Search">
-                                        <rect key="frame" x="0.0" y="885.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1409" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kMD-su-26p" id="kLw-1H-z2t">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -332,7 +455,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="84" id="ivO-Nh-U5x">
-                                        <rect key="frame" x="0.0" y="929.5" width="414" height="84"/>
+                                        <rect key="frame" x="0.0" y="1453" width="414" height="84"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ivO-Nh-U5x" id="fFr-zt-cjv">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="84"/>
@@ -390,20 +513,29 @@
                     <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="cellOnlineHibpInterval" destination="qvz-RJ-jzN" id="9Qe-3a-ev3"/>
+                        <outlet property="labelCheckHaveIBeenPwned" destination="XtZ-t1-tEw" id="MZq-Wq-4dY"/>
                         <outlet property="labelCheckSimilar" destination="Ivv-Og-lCA" id="h97-bp-McS"/>
+                        <outlet property="labelLastChecked" destination="qun-2B-JNr" id="oeW-5o-6ld"/>
+                        <outlet property="labelLastOnineCheck" destination="2BC-RY-Mcn" id="HDB-tW-0F2"/>
+                        <outlet property="labelLastOnlineCheckHeader" destination="eWF-ET-car" id="3cz-oA-VjZ"/>
+                        <outlet property="labelOnlineCheckInterval" destination="aQm-Q9-VIQ" id="Qpk-ag-jIC"/>
                         <outlet property="labelSimilar" destination="5Wv-DH-TK3" id="sMX-GI-Jge"/>
                         <outlet property="labelSimilarityThresholdTitle" destination="hJk-QQ-I4O" id="BJK-Ut-djt"/>
                         <outlet property="labelStatus" destination="DTc-Dv-diB" id="gXP-Vn-L12"/>
                         <outlet property="minLengthLabel" destination="bZW-TB-Oe0" id="2Wi-W5-W1p"/>
                         <outlet property="sliderMinLength" destination="pkQ-YG-UBr" id="5gV-ef-2dd"/>
                         <outlet property="sliderSimilar" destination="bpg-NN-zhQ" id="r0u-J1-vJL"/>
+                        <outlet property="stackViewLastOnlineCheck" destination="u2c-YL-BIz" id="guy-xe-tdA"/>
                         <outlet property="statusSubtitle" destination="r4c-ff-uct" id="cZh-Ul-KU3"/>
                         <outlet property="switchAuditInBackground" destination="hJr-A0-Qhg" id="Zmk-0K-Bho"/>
                         <outlet property="switchCaseInsenstiveDupes" destination="pxu-4k-Bpg" id="yh0-nJ-Sj5"/>
                         <outlet property="switchCommon" destination="8R7-T2-Trm" id="240-W0-Rwp"/>
                         <outlet property="switchDuplicates" destination="pYo-0w-i4z" id="Fy8-oy-RKj"/>
+                        <outlet property="switchHibp" destination="Q6q-wX-Hcq" id="gdL-Jx-Kou"/>
                         <outlet property="switchMinLength" destination="4mb-Nx-2en" id="T3S-en-wEV"/>
                         <outlet property="switchNoPassword" destination="MrY-Ui-fVB" id="Dl9-Qw-2nG"/>
+                        <outlet property="switchShowPopups" destination="gif-Xe-wd2" id="1h2-0C-8dd"/>
                         <outlet property="switchSimilar" destination="6LC-iN-O5j" id="eCS-Vo-kFQ"/>
                     </connections>
                 </tableViewController>

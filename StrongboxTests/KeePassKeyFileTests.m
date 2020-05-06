@@ -11,6 +11,7 @@
 #import "CommonTesting.h"
 #import "Kdb1Database.h"
 #import "Utils.h"
+#import "NSData+Extensions.h"
 
 @interface KeePassKeyFileTests : XCTestCase
 
@@ -20,7 +21,7 @@
 
 - (void)testKeePass2 {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp2-keyfile" ofType:@"kdbx"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
     
     XCTAssert(data);
     XCTAssert(keyFileDigest);
@@ -34,7 +35,7 @@
 
 - (void)testKeePass1 {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp1-keyfile" ofType:@"kdb"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
 
     XCTAssert(data);
     XCTAssert(keyFileDigest);
@@ -49,7 +50,7 @@
 
 - (void)testKeePass2KeyFileOnly {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp2-keyfile-only" ofType:@"kdbx"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
     
     XCTAssert(data);
     XCTAssert(keyFileDigest);
@@ -64,7 +65,7 @@
 
 - (void)testKeePass2KeyFileOnlyEmptyNotNil {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp2-keyfile-only" ofType:@"kdbx"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
     
     XCTAssert(data);
     XCTAssert(keyFileDigest);
@@ -79,7 +80,7 @@
 
 - (void)testKeePass1KeyFileOnly {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp1-keyfile-only" ofType:@"kdb"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
     
     XCTAssert(data);
     XCTAssert(keyFileDigest);
@@ -94,7 +95,7 @@
 
 - (void)testKeePass1KeyFileOnlyEmptyNotNil {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp1-keyfile-only" ofType:@"kdb"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
     
     XCTAssert(data);
     XCTAssert(keyFileDigest);
@@ -109,7 +110,7 @@
 
 - (void)testKeePass1OpenSaveOpen {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp1-keyfile-only" ofType:@"kdb"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
     
     XCTAssert(data);
     XCTAssert(keyFileDigest);
@@ -129,7 +130,7 @@
 
 - (void)testKeePass2OpenSaveOpen {
     NSData *data = [CommonTesting getDataFromBundleFile:@"kp2-keyfile-only" ofType:@"kdbx"];
-    NSData *keyFileDigest = sha256([CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"]);
+    NSData *keyFileDigest = [CommonTesting getDataFromBundleFile:@"ferrari" ofType:@"jpg"].sha256;
     
     XCTAssert(data);
     XCTAssert(keyFileDigest);

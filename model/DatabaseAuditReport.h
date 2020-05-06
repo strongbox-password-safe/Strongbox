@@ -18,13 +18,15 @@ NS_ASSUME_NONNULL_BEGIN
                       duplicatedPasswords:(NSDictionary<NSString*, NSSet<Node*>*>*)duplicatedPasswords
                           commonPasswords:(NSSet<Node*>* )commonPasswords
                                   similar:(NSDictionary<NSUUID*, NSSet<Node*>*>*)similar
-                                 tooShort:(NSSet<Node *> *)tooShort NS_DESIGNATED_INITIALIZER;
+                                 tooShort:(NSSet<Node *> *)tooShort
+                                    pwned:(NSSet<Node *> *)pwned NS_DESIGNATED_INITIALIZER;
 
 @property (readonly) NSSet<Node*>* entriesWithNoPasswords;
 @property (readonly) NSSet<Node*>* entriesWithDuplicatePasswords;
 @property (readonly) NSSet<Node*>* entriesWithCommonPasswords;
 @property (readonly) NSSet<Node*>* entriesWithSimilarPasswords;
 @property (readonly) NSSet<Node*>* entriesTooShort;
+@property (readonly) NSSet<Node*>* entriesPwned;
 
 @end
 

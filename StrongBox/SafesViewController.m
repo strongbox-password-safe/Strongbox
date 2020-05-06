@@ -44,6 +44,7 @@
 #import "BookmarksHelper.h"
 #import "YubiManager.h"
 #import "WelcomeFreemiumViewController.h"
+#import "MasterDetailViewController.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -1027,7 +1028,9 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             vc = segue.destinationViewController;
         }
         else {
-            UISplitViewController *svc = segue.destinationViewController;
+            MasterDetailViewController *svc = segue.destinationViewController;
+            svc.viewModel = (Model*)sender;
+            
             UINavigationController *nav = [svc.viewControllers firstObject];
             vc = (BrowseSafeView*)nav.topViewController;
         }

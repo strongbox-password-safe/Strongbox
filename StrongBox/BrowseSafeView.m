@@ -11,7 +11,6 @@
 #import "SelectDestinationGroupController.h"
 #import "RecordView.h"
 #import "Alerts.h"
-#import <ISMessages/ISMessages.h>
 #import "Settings.h"
 #import "DatabaseOperations.h"
 #import "NSArray+Extensions.h"
@@ -36,11 +35,18 @@
 #import "SearchResultsBrowseTableDatasource.h"
 #import "BrowseTableViewCellHelper.h"
 #import "QuickViewsBrowseTableDataSource.h"
+#import <ISMessages/ISMessages.h>
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
 
-@interface BrowseSafeView () < UISearchBarDelegate, UISearchResultsUpdating, DZNEmptyDataSetSource>
+@interface BrowseSafeView () < UISearchBarDelegate, UISearchResultsUpdating, DZNEmptyDataSetSource >
+
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonAddRecord;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonSafeSettings;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonMove;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonDelete;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSortItems;
 
 @property (strong, nonatomic) UISearchController *searchController;
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
@@ -65,18 +71,28 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property SearchResultsBrowseTableDatasource* searchDataSource;
 @property QuickViewsBrowseTableDataSource* quickViewsDataSource;
 
+@property BOOL hasGivenAuditNotification;
+
 @end
 
 @implementation BrowseSafeView
 
 - (void)dealloc {
+    NSLog(@"DEALLOC [%@]", self);
+    
+    [self unListenToNotifications];
+    
     [self killOtpTimer];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    
+
     if(self.isMovingFromParentViewController) { // Kill
+        NSLog(@"isMovingFromParentViewController [%@]", self);
+
+        [self unListenToNotifications];
+        
         [self killOtpTimer];
     }
 }
@@ -222,10 +238,89 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                            selector:@selector(onAuditNodesChanged:)
                                                name:kAuditNodesChangedNotificationKey
                                              object:nil];
+
+    if ([self isDisplayingRootGroup]) {
+        [NSNotificationCenter.defaultCenter addObserver:self
+                                               selector:@selector(onAuditCompleted:)
+                                                   name:kAuditCompletedNotificationKey
+                                                 object:nil];
+    }
+}
+
+- (void)unListenToNotifications {
+//    [NSNotificationCenter.defaultCenter removeObserver:self name:UIViewControllerShowDetailTargetDidChangeNotification object:self.splitViewController]; // TODO: Call this?!
+    
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseViewPreferencesChangedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditNodesChangedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditCompletedNotificationKey object:nil];
 }
 
 - (void)onAuditNodesChanged:(id)param {
     [self refreshItems];
+}
+
+- (void)onAuditCompleted:(id)param {
+    NSNotification* note = param;
+    NSNumber* numNote = note.object;
+    
+    NSLog(@"Audit Completed... [%@]-[%@]", self, numNote);
+    
+    if (numNote.boolValue) { // User Cancelled/Stopped or Restarted the Audit - Just ignore
+        return;
+    }
+    
+    NSUInteger issueCount = self.viewModel.auditIssueCount;
+    NSNumber* lastKnownAuditIssueCount = self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount;
+    
+    NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", (unsigned long)issueCount, lastKnownAuditIssueCount);
+    
+    self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount = @(issueCount);
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+
+    if ( self.hasGivenAuditNotification || !self.viewModel.metadata.auditConfig.showAuditPopupNotifications) { // Only show this once per unlock session on the top root controller
+        return;
+    }
+    
+    [self showAuditPopup:issueCount lastKnownAuditIssueCount:lastKnownAuditIssueCount];
+        
+    self.hasGivenAuditNotification = YES;
+}
+
+- (void)showAuditPopup:(NSUInteger)issueCount lastKnownAuditIssueCount:(NSNumber*)lastKnownAuditIssueCount {
+//    NSLog(@"showAuditPopup... [%@]", self);
+    
+    if (lastKnownAuditIssueCount == nil) { // First time
+        if (issueCount == 0) {
+            [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
+                                       message:NSLocalizedString(@"browse_vc_audit_complete_message", @"No issues found")
+                                      duration:1.5f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeSuccess
+                                 alertPosition:ISAlertPositionTop
+                                       didHide:nil];
+        }
+        else {
+            [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
+                                       message:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_issues_found_fmt", @"%ld issues found"), issueCount]
+                                      duration:1.5f
+                                   hideOnSwipe:YES
+                                     hideOnTap:YES
+                                     alertType:ISAlertTypeWarning
+                                 alertPosition:ISAlertPositionTop
+                                       didHide:nil];
+        }
+    }
+    else if (issueCount > lastKnownAuditIssueCount.unsignedIntegerValue) {
+        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
+                                   message:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_new_issues_found_fmt",@"%ld New Issues Found!"), issueCount - lastKnownAuditIssueCount.unsignedIntegerValue]
+                                  duration:1.5f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeError
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
+    }
 }
 
 - (void)onDatabaseViewPreferencesChanged:(id)param {

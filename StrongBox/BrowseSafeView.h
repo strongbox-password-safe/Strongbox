@@ -17,15 +17,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) Model *viewModel;
 @property (nonatomic, strong, nonnull) Node *currentGroup;
 
-@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonAddRecord;
-@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonSafeSettings;
-@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonMove;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonDelete;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSortItems;
-
-- (IBAction)onAddItem:(id _Nullable )sender;
-- (IBAction)onMove:(id _Nullable)sender;
-
 @end
 
 NS_ASSUME_NONNULL_END

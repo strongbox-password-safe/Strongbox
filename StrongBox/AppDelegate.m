@@ -45,9 +45,9 @@
     [self initializeProFamilyEdition];
     
     [self performMigrations];
-    
-    // Do not backup local safes, caches or key files
 
+    // Do not backup local safes, caches or key files
+    
     [FileManager.sharedInstance excludeDirectoriesFromBackup];
     
     [self cleanupInbox:launchOptions];

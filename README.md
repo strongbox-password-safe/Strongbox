@@ -92,6 +92,9 @@ Another great project is KeeWeb, a fully javascript based client which works cro
 https://github.com/keeweb/keeweb
 https://keeweb.info/
 
+** Have I Been Pwned **
+The ['Have I Been Pwned?'](https://haveibeenpwned.com/) service is provided by Troy Hunt. Strongbox uses the Pwned Passwords API there. Many thanks for some amazing work. Please consider donating to him to keep the service running [here](https://haveibeenpwned.com/Donate).
+
 I use many different libraries in the app here are just a few:
 
 - Dropbox-iOS-SDK

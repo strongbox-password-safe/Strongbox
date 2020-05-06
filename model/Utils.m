@@ -8,6 +8,7 @@
 
 #import "Utils.h"
 #import <CommonCrypto/CommonCrypto.h>
+#import "NSData+Extensions.h"
 
 #if TARGET_OS_IPHONE
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -160,7 +161,7 @@ NSString* keePassStringIdFromUuid(NSUUID* uuid) {
     uuid_t uid;
     [uuid getUUIDBytes:(uint8_t*)&uid];
     
-    return [Utils hexadecimalString:[NSData dataWithBytes:uid length:sizeof(uuid_t)]];
+    return [NSData dataWithBytes:uid length:sizeof(uuid_t)].hex;
 }
 
 NSUUID* uuidFromKeePassStringId(NSString* stringId) {
@@ -331,23 +332,6 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
     printf("\n");
 }
 
-+ (NSString *)hexadecimalString:(NSData *)data {
-    const unsigned char *dataBuffer = (const unsigned char *)data.bytes;
-    
-    if (!dataBuffer) {
-        return [NSString string];
-    }
-    
-    NSUInteger dataLength = data.length;
-    NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
-    
-    for (int i = 0; i < dataLength; ++i) {
-        [hexString appendString:[NSString stringWithFormat:@"%02lX", (unsigned long)dataBuffer[i]]];
-    }
-    
-    return [NSString stringWithString:hexString];
-}
-
 + (NSData *)dataFromHexString:(NSString*)string {
     // Remove any and all spaces
     string = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
@@ -367,16 +351,6 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
     }
     
     return data;
-}
-
-NSData* sha256(NSData *data) {
-    uint8_t digest[CC_SHA256_DIGEST_LENGTH] = { 0 };
-    
-    CC_SHA256(data.bytes, (CC_LONG)data.length, digest);
-    
-    NSData *out = [NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
-    
-    return out;
 }
 
 NSData* hmacSha1(NSData* data, NSData* key) {

@@ -8,7 +8,7 @@
 
 #import "KeyFileParser.h"
 #import "KissXML.h"
-#import "Utils.h"
+#import "NSData+Extensions.h"
 
 static NSString* const kKeyFileRootElementName = @"KeyFile";
 static NSString* const kKeyElementName = @"Key";
@@ -47,7 +47,7 @@ static NSString* const kDataElementName = @"Data";
     
     // 4. Any other file is hashed by sha256, which again produces a 32-byte key.
 
-    return sha256(data);
+    return data.sha256;
 }
 
 + (NSData*)getHexTextKey:(NSData*)data {

@@ -16,6 +16,8 @@
 #import "KdbSerializationData.h"
 #import "KeePassConstants.h"
 #import <CommonCrypto/CommonDigest.h>
+#import "NSString+Extensions.h"
+#import "NSData+Extensions.h"
 
 typedef struct _KdbHeader {
     uint8_t signature1[4];
@@ -84,13 +86,13 @@ static const BOOL kLogVerbose = NO;
 
 static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable keyFileDigest) {
     if(password.length && !keyFileDigest) {
-        return sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
+        return password.sha256;
     }
     else if(keyFileDigest && !password.length) {
         return keyFileDigest;
     }
     else {
-        NSData* hashedPassword = sha256([password dataUsingEncoding:NSUTF8StringEncoding]);
+        NSData* hashedPassword = password.sha256;
         
         NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH ];
         CC_SHA256_CTX context;
@@ -186,7 +188,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
 
     //NSLog(@"DESERIALIZE: [%@] - %lu", [sha256(pt) base64EncodedStringWithOptions:kNilOptions], (unsigned long)pt.length);
 
-    if(![sha256(pt) isEqualToData:contentsSha256]) {
+    if(![pt.sha256 isEqualToData:contentsSha256]) {
         NSLog(@"Actual Database Contents Hash does not match expected. This file is corrupt or the password is incorect.");
         if(error) {
             *error = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key) or Corrupt File." errorCode:kStrongboxErrorCodeIncorrectCredentials];
@@ -262,7 +264,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
         [pt appendData:writeEntry(entry)];
     }
     
-    NSData* contentsHash = sha256(pt);
+    NSData* contentsHash = pt.sha256;
     //NSLog(@"SERIALIZE: [%@] - %lu", [contentsHash base64EncodedStringWithOptions:kNilOptions], (unsigned long)pt.length);
     
     NSData *compositeKey = getComposite(password, keyFileDigest);

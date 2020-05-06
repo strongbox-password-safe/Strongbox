@@ -54,7 +54,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
         
         self.isAutoFillOpen = isAutoFillOpen;
         
-        self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial];
+        self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial metadata:metaData];
 
         [self restartBackgroundAudit];
         
@@ -94,7 +94,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
 
 - (void)stopAndClearAuditor {
     [self.auditor stop];
-    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial];
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial metadata:self.metadata];
 }
 
 - (void)restartAudit {
@@ -112,7 +112,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
         });
     }
                progress:^(CGFloat progress) {
-        NSLog(@"Audit Progress Callback: %f", progress);
+//        NSLog(@"Audit Progress Callback: %f", progress);
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
         });
@@ -122,6 +122,10 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@(userStopped)];
         });
     }];
+}
+
+- (NSUInteger)auditHibpErrorCount {
+    return self.auditor ? self.auditor.haveIBeenPwnedErrorCount : 0;
 }
 
 - (NSUInteger)auditIssueCount {

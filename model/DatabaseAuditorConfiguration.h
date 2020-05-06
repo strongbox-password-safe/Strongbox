@@ -26,6 +26,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL checkForMinimumLength;
 @property NSUInteger minimumLength;
 
+@property BOOL checkHibp;
+
+@property (nullable) NSNumber* lastKnownAuditIssueCount;
+@property BOOL showAuditPopupNotifications;
+@property BOOL hibpCaveatAccepted;
+
+@property NSUInteger hibpCheckForNewBreachesIntervalSeconds;
+@property (nullable) NSDate* lastHibpOnlineCheck;
+
 @end
 
 NS_ASSUME_NONNULL_END

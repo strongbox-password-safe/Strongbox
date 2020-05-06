@@ -7,6 +7,8 @@
 //
 
 #import "MasterDetailViewController.h"
+#import <ISMessages/ISMessages.h>
+#import "BrowseSafeView.h"
 
 @interface MasterDetailViewController () <UISplitViewControllerDelegate>
 
@@ -18,6 +20,8 @@
     [super viewDidLoad];
     self.delegate = self;
     self.preferredDisplayMode = UISplitViewControllerDisplayModeAllVisible;
+    
+//    [self listenToNotifications];
 }
 
 - (BOOL)splitViewController:(UISplitViewController *)splitViewController collapseSecondaryViewController:(UIViewController *)secondaryViewController ontoPrimaryViewController:(UIViewController *)primaryViewController {
@@ -25,6 +29,8 @@
 }
 
 - (void)onClose {
+//    [self unListenToNotifications];
+    
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 

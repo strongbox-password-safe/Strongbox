@@ -58,9 +58,12 @@
     Node* nodeWithPassword = [DatabaseGenerator generateSampleNode:db.rootGroup];
     [db.rootGroup addChild:nodeWithPassword keePassGroupTitleRules:NO];
 
+    DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
+    config.checkForNoPasswords = YES;
+    
     DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
        [auditor start:db.activeRecords
-               config:DatabaseAuditorConfiguration.defaults
+               config:config
     isDereferenceable:^BOOL(NSString * _Nonnull string) {
            return NO;
        }
@@ -337,6 +340,42 @@
 
            NSLog(@"Database Audit Report = %@", report);
            XCTAssertEqual(report.entriesTooShort.count, 1);
+
+           self.done = YES;
+       }];
+    
+    [self waitUntilDone];
+}
+
+- (void)testHibp {
+    DatabaseModel* db = [DatabaseGenerator generateEmpty:@"a"];
+
+    Node* nodeWithPassword1 = [DatabaseGenerator generateSampleNode:db.rootGroup];
+    nodeWithPassword1.fields.password = @"12345678";
+    [db.rootGroup addChild:nodeWithPassword1 keePassGroupTitleRules:NO];
+
+    Node* nodeWithPassword2 = [DatabaseGenerator generateSampleNode:db.rootGroup];
+    [db.rootGroup addChild:nodeWithPassword2 keePassGroupTitleRules:NO];
+    nodeWithPassword2.fields.password = @"1234567";
+
+    DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
+    config.checkHibp = YES;
+    
+    DatabaseAuditor* auditor = [[DatabaseAuditor alloc] initWithPro:YES];
+       [auditor start:db.activeRecords
+               config:config
+    isDereferenceable:^BOOL(NSString * _Nonnull string) {
+           return NO;
+       }
+        nodesChanged:^{ NSLog(@"AUDIT: Nodes Changed"); }
+             progress:^(CGFloat progress) {
+           NSLog(@"Audit Progress: %f", progress);
+       }
+           completion:^(BOOL userStopped) {
+           DatabaseAuditReport* report = [auditor getAuditReport];
+
+           NSLog(@"Database Audit Report = %@", report);
+           XCTAssertEqual(report.entriesPwned.count, 2);
 
            self.done = YES;
        }];

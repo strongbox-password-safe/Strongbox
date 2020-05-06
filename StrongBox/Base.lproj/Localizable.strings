@@ -1665,6 +1665,9 @@
 /* SecureDrop */
 "pwgen_wordlist_securedrop" = "SecureDrop";
 
+/* Norwegian */
+"pwgen_wordlist_norwegian" = "Norwegian";
+
 /* EFF Large */
 "pwgen_wordlist_eff_large" = "EFF Large";
 
@@ -3006,6 +3009,9 @@
 /* Audit: Password is similar to one in another entry. */
 "audit_quick_summary_password_is_similar_to_another" = "Password is similar to one in another entry";
 
+/* Password is Pwned (HIBP) */
+"audit_quick_summary_pwned" = "Password is Pwned (HIBP)";
+
 /* All Entries */
 "quick_view_title_all_entries_title" = "All Entries";
 
@@ -3048,11 +3054,17 @@
 /* Short - Translators note: This should be very very short or abbreviated - It appears in the Browse screen with limited room beside the Audit badge */
 "audit_quick_summary_very_brief_password_is_too_short" = "Short";
 
+/* Pwned */
+"audit_quick_summary_very_brief_password_is_pwned" = "Pwned";
+
 /* Audit: Password is too short. */
 "audit_quick_summary_password_is_too_short" = "Audit: Password is too short";
 
 /* Found %@ issues in %@ entries - Translators note, both parameters are numbers, e.g. 24 issues found in 12 entries */
 "audit_status_fmt" = "Found %@ issues in %@ entries";
+
+/* Found %@ issues in %@ entries - Translators note, all parameters are numbers, e.g. 24 issues found in 12 entries (with 5 HIBP Errors) */
+"audit_status_done_with_hibp_errors_fmt" = "Found %@ issues in %@ entries (with %@ HIBP Errors)";
 
 /* Audit Complete */
 "audit_status_complete" = "Status: Complete";
@@ -3089,3 +3101,45 @@
 
 /* No, I don't use a key file */
 "casg_key_file_correct_no_no_key_file" = "No, I don't use a key file";
+
+/* Security Audit Complete */
+"browse_vc_audit_complete_title" = "Security Audit Complete";
+
+/* No issues found */
+"browse_vc_audit_complete_message" = "No issues found";
+
+/* %ld issues found */
+"browse_vc_audit_complete_message_issues_found_fmt" = "%ld issues found";
+
+/* %ld New Issues Found! */
+"browse_vc_audit_complete_message_new_issues_found_fmt" = "%ld New Issues Found!";
+
+/* HIBP Disclaimer */
+"audit_hibp_warning_title" = "HIBP Disclaimer";
+
+/* I understand that my passwords will be sent over the web (HTTPS) to the 'Have I Been Pwned?' password checking service (using k-anonymity) and that I fully consent to this functionality. I also absolve Strongbox, Mark McGuill and Phoebe Code Limited of all liabilty for using this feature. */
+"audit_hibp_warning_message" = "I understand that my passwords will be sent over the web (HTTPS) to the 'Have I Been Pwned?' password checking service (using k-anonymity) and that I fully consent to this functionality. I also absolve Strongbox, Mark McGuill and Phoebe Code Limited of all liabilty for using this feature.";
+
+/* No, I don't want to use this feature */
+"audit_hibp_warning_no" = "No, I don't want to use this feature";
+
+/* Yes, I understand and agree */
+"audit_hibp_warning_yes" = "Yes, I understand and agree";
+
+/* Always Check */
+"hibp_check_interval_always_check" = "Always Check";
+
+/* Once a Day */
+"hibp_check_interval_once_a_day" = "Once a Day";
+
+/* Once a Week */
+"hibp_check_interval_once_a_week" = "Once a Week";
+
+/* Once Every 30 days */
+"hibp_check_interval_once_every_30_days" = "Once Every 30 days";
+
+/* Select Online Check Interval */
+"audit_hibp_online_check_interval" = "Select Online Check Interval";
+
+/* Have I Been Pwned? (Pro Edition Only) */
+"audit_hibp_pro_only_title" = "Have I Been Pwned? (Pro Edition Only)";

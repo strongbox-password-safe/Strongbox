@@ -20,6 +20,8 @@
 #import "KdbxSerializationCommon.h"
 #import "KeePassCiphers.h"
 #import "GZipInputStream.h"
+#import "NSData+Extensions.h"
+#import "NSString+Extensions.h"
 
 typedef struct _HeaderEntryHeader {
     uint8_t id;
@@ -583,7 +585,7 @@ static NSData *getMaster(NSData* masterSeed, NSData *transformKey, NSData* yubiR
     CC_SHA256_Update(&context, masterSeed.bytes, (CC_LONG)masterSeed.length);
     
     if(yubiResponse) {
-        NSData* hashed = sha256(yubiResponse);
+        NSData* hashed = yubiResponse.sha256;
         CC_SHA256_Update(&context, hashed.bytes, (CC_LONG)hashed.length);
     }
     
@@ -600,8 +602,8 @@ static NSData *getMaster(NSData* masterSeed, NSData *transformKey, NSData* yubiR
 }
 
 static NSData *getCompositeKey(CompositeKeyFactors* compositeKeyFactors) {
-    NSData *hashedPassword = compositeKeyFactors.password != nil ? sha256([compositeKeyFactors.password dataUsingEncoding:NSUTF8StringEncoding]) : nil;
-    
+    NSData *hashedPassword = compositeKeyFactors.password != nil ? compositeKeyFactors.password.sha256 : nil;
+        
     // Concatenate together in one big sha256...
     
     NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];

@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
                                 indexPath:(NSIndexPath*)indexPath
                         showLargeTotpCell:(BOOL)totp
                         showGroupLocation:(BOOL)showGroupLocation
-                    groupLocationOverride:(NSString*)groupLocationOverride
+                    groupLocationOverride:(NSString*_Nullable)groupLocationOverride
                             accessoryType:(UITableViewCellAccessoryType)accessoryType;
 
 @end

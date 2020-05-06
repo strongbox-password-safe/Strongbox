@@ -9,7 +9,6 @@
 #import "Kdbx4Serialization.h"
 #import "Utils.h"
 #import "KdbxSerializationCommon.h"
-#import "Utils.h"
 #import "KdfParameters.h"
 #import "KeePassCiphers.h"
 #import "Argon2KdfCipher.h"
@@ -25,6 +24,8 @@
 #import "Keys.h"
 #import "AesKdfCipher.h"
 #import "GZipInputStream.h"
+#import "NSData+Extensions.h"
+#import "NSString+Extensions.h"
 
 typedef struct _HeaderEntryHeader {
     uint8_t id;
@@ -162,7 +163,7 @@ static const BOOL kLogVerbose = NO;
     // Header Hash (SHA256)
   
     NSMutableData *ret = [[NSMutableData alloc] initWithData:headerData];
-    [ret appendData:sha256(headerData)];
+    [ret appendData:headerData.sha256];
     
     // HEADER SHA256 HMAC
     
@@ -771,7 +772,7 @@ typedef void (^GetCompositeKeyCompletionBlock)(BOOL userCancelled, NSData*_Nulla
 + (void)getCompositeKey:(NSData*)yubiKeyChallenge
     compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
              completion:(GetCompositeKeyCompletionBlock)completion {
-    NSData *hashedPassword = compositeKeyFactors.password != nil ? sha256([compositeKeyFactors.password dataUsingEncoding:NSUTF8StringEncoding]) : nil;
+    NSData *hashedPassword = compositeKeyFactors.password != nil ? compositeKeyFactors.password.sha256 : nil;
     
     if(compositeKeyFactors.yubiKeyCR) {
         compositeKeyFactors.yubiKeyCR(yubiKeyChallenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {
@@ -784,7 +785,7 @@ typedef void (^GetCompositeKeyCompletionBlock)(BOOL userCancelled, NSData*_Nulla
                 if (hashedPassword) [factors addObject:hashedPassword];
                 if (compositeKeyFactors.keyFileDigest) [factors addObject:compositeKeyFactors.keyFileDigest];
                 
-                [factors addObject:sha256(response)];
+                [factors addObject:response.sha256];
 
                 [Kdbx4Serialization completeWithCKFs:factors completion:completion];
             }

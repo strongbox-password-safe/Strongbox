@@ -62,4 +62,27 @@
     return nil;
 }
 
+- (NSSet *)set {
+    return [NSSet setWithArray:self];
+}
+
+- (NSDictionary *)groupBy:(id  _Nonnull (^)(id _Nonnull))block {
+    NSMutableDictionary *ret = NSMutableDictionary.dictionary;
+    
+    for(id obj in self) {
+        id key = block(obj);
+        
+        NSMutableArray* group = ret[key];
+        
+        if (!group) {
+            group = NSMutableArray.array;
+            ret[key] =  group;
+        }
+        
+        [group addObject:obj];
+    }
+    
+    return ret.copy;
+}
+
 @end

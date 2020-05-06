@@ -20,6 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray *)flatMap:(NSArray* (^)(ObjectType obj, NSUInteger idx))block;
 
+@property (readonly) NSSet<ObjectType>* set;
+
+- (NSDictionary<id, NSArray<ObjectType>*>*)groupBy:(id (^)(ObjectType obj))block;
+
 @end
 
 NS_ASSUME_NONNULL_END

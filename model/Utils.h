@@ -79,10 +79,9 @@ uint16_t littleEndian2BytesToUInt16(uint8_t *bytes);
 int64_t littleEndianNBytesToInt64(uint8_t* bytes, int n);
 
 void hexdump(unsigned char *buffer, unsigned long index, unsigned long width);
-+ (NSString *)hexadecimalString:(NSData *)data;
-+ (NSData *)dataFromHexString:(NSString*)string;
 
-NSData* sha256(NSData *data);
++ (NSData *)dataFromHexString:(NSString*)string;
+NSString*_Nullable sha1Base64String(NSString *string);
 NSData* hmacSha1(NSData *data, NSData* key);
 NSData*_Nullable getRandomData(uint32_t length);
 uint32_t getRandomUint32(void);

@@ -50,6 +50,8 @@ extern NSString* const kAuditCompletedNotificationKey;
 @property (readonly) AuditState auditState;
 @property (readonly) NSUInteger auditIssueCount;
 @property (readonly) NSUInteger auditIssueNodeCount;
+@property (readonly) NSUInteger auditHibpErrorCount;
+
 - (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)item;
 - (BOOL)isFlaggedByAudit:(Node*)item;
 - (NSString*)getQuickAuditSummaryForNode:(Node*)item;
