@@ -2983,7 +2983,7 @@
 "upgrade_vc_start_your_free_trial_price_free" = "Free";
 
 /* Upgrade (Free Trial Available) */
-"safes_vc_upgrade_info_trial_available_button_title" = "Upgrade (Free Trial Available)";
+"safes_vc_upgrade_info_trial_available_button_title" = "Upgrade (Free 'Pro' Trial)...";
 
 /* Would you like to add an entry or a group? */
 "browse_add_group_or_entry_question" = "Would you like to add an entry or a group?";
@@ -3143,3 +3143,15 @@
 
 /* Have I Been Pwned? (Pro Edition Only) */
 "audit_hibp_pro_only_title" = "Have I Been Pwned? (Pro Edition Only)";
+
+/* Auto Fetch FavIcon? */
+"item_details_prompt_auto_fetch_favicon_title" = "Auto Fetch FavIcon?";
+
+/* Strongbox can automatically fetch FavIcons when an new entry is created or updated.\n\nWould you like to Strongbox to do this? */
+"item_details_prompt_auto_fetch_favicon_message" = "Strongbox can automatically fetch FavIcons when an new entry is created or updated.\n\nWould you like to Strongbox to do this?";
+
+/* Try Strongbox Pro? */
+"browse_pro_nudge_title" = "Try Strongbox Pro?";
+
+/* Strongbox Pro is full of handy features like %@ Unlock.\n\nGood news! You have a Free 90-Day Trial available. Would you like to try Strongbox Pro? (Translators Note: 1st parameter is biometric id like 'Touch ID' or 'Face ID') */
+"browse_pro_nudge_message_fmt" = "Strongbox Pro is full of handy features like %@ Unlock.\n\nGood news! You have a Free 90-Day Trial available. Would you like to try Strongbox Pro?";

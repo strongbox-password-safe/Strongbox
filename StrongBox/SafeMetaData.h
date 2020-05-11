@@ -126,6 +126,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property KeePassIconSet keePassIconSet;
 
+@property BOOL promptedForAutoFetchFavIcon;
+
 @end
 
 NS_ASSUME_NONNULL_END

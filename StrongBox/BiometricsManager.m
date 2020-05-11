@@ -160,6 +160,10 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
     }
 }
 
+- (NSString *)biometricIdName {
+    return [self getBiometricIdName];
+}
+
 - (NSString*)getBiometricIdName {
     NSString* biometricIdName = NSLocalizedString(@"settings_touch_id_name", @"Touch ID");
     

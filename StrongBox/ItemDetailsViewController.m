@@ -1438,6 +1438,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     // will pick up the new custom icon as a bad reference (not on a node within the root group)...
 
     if(self.iconExplicitlyChanged) {
+        self.iconExplicitlyChanged = NO;
         if(self.model.icon.customImage) {
             NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
             [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
@@ -1460,35 +1461,58 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     else {
         if(self.createNewItem || self.urlJustChanged) {
             self.urlJustChanged = NO;
-            // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
-            // grab a FavIcon?
 #ifndef IS_APP_EXTENSION
-            if(Settings.sharedInstance.isProOrFreeTrial &&
-               self.databaseModel.metadata.tryDownloadFavIconForNewRecord &&
-               (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) &&
-               isValidUrl(self.model.url)) {
-                self.sni = [[SetNodeIconUiHelper alloc] init];
-                self.sni.customIcons = self.databaseModel.database.customIcons;
-                
-                [self.sni expressDownloadBestFavIcon:self.model.url
-                                          completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
-                                      if(userSelectedNewCustomIcon) {
-                                          NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
-                                          [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
-                                      }
-                                      
-                                      completion();
-                                  }];
-                return;
+            // No Custom Icon has been set for this entry, and it's a brand new entry or URL has just changed, does the user want us to try grab a FavIcon?
+            BOOL favIconFetchPossible = (Settings.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) && isValidUrl(self.model.url));
+
+            if (favIconFetchPossible) {
+                if (!self.databaseModel.metadata.promptedForAutoFetchFavIcon) {
+                    [Alerts yesNo:self
+                            title:NSLocalizedString(@"item_details_prompt_auto_fetch_favicon_title", @"Auto Fetch FavIcon?")
+                          message:NSLocalizedString(@"item_details_prompt_auto_fetch_favicon_message", @"Strongbox can automatically fetch FavIcons when an new entry is created or updated.\n\nWould you like to Strongbox to do this?")
+                           action:^(BOOL response) {
+                        self.databaseModel.metadata.promptedForAutoFetchFavIcon = YES;
+                        self.databaseModel.metadata.tryDownloadFavIconForNewRecord = response;
+                        [SafesList.sharedInstance update:self.databaseModel.metadata];
+
+                        if (self.databaseModel.metadata.tryDownloadFavIconForNewRecord ) {
+                            [self fetchFavIcon:completion];
+                            return;
+                        }
+                    }];
+                }
+                else {
+                    if (self.databaseModel.metadata.tryDownloadFavIconForNewRecord ) {
+                        [self fetchFavIcon:completion];
+                        return;
+                    }
+                }
             }
 #endif
         }
     }
     
-    self.iconExplicitlyChanged = NO;
-    
     completion();
 }
+
+#ifndef IS_APP_EXTENSION
+
+- (void)fetchFavIcon:(void (^)(void))completion {
+    self.sni = [[SetNodeIconUiHelper alloc] init];
+    self.sni.customIcons = self.databaseModel.database.customIcons;
+
+    [self.sni expressDownloadBestFavIcon:self.model.url
+                              completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
+                          if(userSelectedNewCustomIcon) {
+                              NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
+                              [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
+                          }
+
+                          completion();
+                      }];
+}
+
+#endif
 
 - (void)addHistoricalNode:(Node*)originalNodeForHistory {
     BOOL shouldAddHistory = YES; // FUTURE: Config on/off? only valid for KeePass 2+ also...
@@ -1599,7 +1623,7 @@ showGenerateButton:YES];
             [self onModelEdited];
         };
         
-#ifndef IS_APP_EXTENSION // TODO: Allow this after unifying storyboard?
+#ifndef IS_APP_EXTENSION // TODO: Make this available - (What is this -> Allow this after unifying storyboard?)
         cell.onPasswordSettings = ^(void) {
             [self performSegueWithIdentifier:@"segueToPasswordGenerationSettings" sender:nil];
         };

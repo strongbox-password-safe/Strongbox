@@ -93,6 +93,9 @@
 @property (weak) IBOutlet ClickableSecureTextField *concealedPasswordField;
 @property BOOL passwordIsRevealed;
 
+@property (weak) IBOutlet NSView *tagsStack;
+@property (weak) IBOutlet NSTokenField *tagsField;
+
 @end
 
 @implementation NodeDetailsViewController
@@ -298,7 +301,7 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)viewDidAppear {
     [super viewDidAppear];
-    [self.view.window setLevel:Settings.sharedInstance.doNotFloatDetailsWindowOnTop ? NSNormalWindowLevel : NSFloatingWindowLevel];
+    [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
 }
 
 - (void)observeModelChanges {
@@ -385,6 +388,7 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)showHideForDatabaseFormat {
     self.emailRow.hidden = self.model.format != kPasswordSafe;
+    self.tagsStack.hidden = self.model.format == kPasswordSafe || self.model.format == kKeePass1;
     
     if(self.model.format == kPasswordSafe) {
         [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; // Remove Custom Fields
@@ -518,6 +522,9 @@ static NSString* trimField(NSTextField* textField) {
     self.textFieldEmail.stringValue = self.node.fields.email;
     self.textFieldUrl.stringValue = self.node.fields.url;
     self.textViewNotes.string = self.node.fields.notes;
+
+    NSArray<NSString*>* sortedTags = [self.node.fields.tags.allObjects sortedArrayUsingComparator:finderStringComparator];
+    [self.tagsField setObjectValue:sortedTags];
     
     self.imageViewIcon.image = [self getIconForNode];
     self.imageViewIcon.onClick = ^{ [self onEditNodeIcon]; };
@@ -532,6 +539,9 @@ static NSString* trimField(NSTextField* textField) {
     self.textFieldUsername.enabled = !self.historical;
     self.revealedPasswordField.enabled = !self.historical;
     self.textFieldEmail.enabled = !self.historical;
+    
+    self.tagsField.enabled = !self.historical;
+    
     self.textFieldUrl.enabled = !self.historical;
     self.textViewNotes.editable = !self.historical;
     self.comboGroup.enabled = !self.historical;
@@ -628,6 +638,8 @@ static NSString* trimField(NSTextField* textField) {
     NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
     
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
+
         [self.tableViewCustomFields reloadData];
     });
 }

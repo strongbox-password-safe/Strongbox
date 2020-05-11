@@ -75,6 +75,8 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 static NSString* const kAutoFillExitedCleanly = @"autoFillExitedCleanly";
 static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 
+static NSString* const kLastFreeTrialNudge = @"lastFreeTrialNudge";
+
 @implementation Settings
 
 + (void)initialize {
@@ -157,6 +159,17 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (NSDate *)lastFreeTrialNudge {
+    NSDate* date = [[self getSharedAppGroupDefaults] objectForKey:kLastFreeTrialNudge];
+    return date ? date : NSDate.date; // App Install will count as first nudge in a technical sense
+}
+
+- (void)setLastFreeTrialNudge:(NSDate *)lastFreeTrialNudge {
+    NSUserDefaults *userDefaults = [self getSharedAppGroupDefaults];
+    [userDefaults setObject:lastFreeTrialNudge forKey:kLastFreeTrialNudge];
+    [userDefaults synchronize];
+}
 
 - (BOOL)mfiYubiKeyEnabled {
     return YES;

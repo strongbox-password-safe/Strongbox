@@ -2,7 +2,7 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="HOc-E3-CoK">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -351,7 +351,7 @@
                         <segue destination="ztE-eu-wgR" kind="popoverPresentation" identifier="segueToSortOrder" popoverAnchorBarButtonItem="3Mz-oA-Fxf" id="47f-nZ-uri">
                             <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
                         </segue>
-                        <segue destination="GGA-iw-LIe" kind="presentation" identifier="segueToUpgrade" modalPresentationStyle="fullScreen" id="YwW-OJ-ZsZ"/>
+                        <segue destination="GGA-iw-LIe" kind="presentation" identifier="segueToUpgrade" modalPresentationStyle="automatic" id="YwW-OJ-ZsZ"/>
                         <segue destination="aIG-BJ-Ksc" kind="presentation" identifier="segueToPreferencesAndManagement" id="aRj-ud-yhr"/>
                     </connections>
                 </tableViewController>
@@ -472,7 +472,7 @@
                 <viewControllerPlaceholder storyboardName="Upgrade" id="GGA-iw-LIe" sceneMemberID="viewController"/>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="mci-qK-0kq" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="118" y="898"/>
+            <point key="canvasLocation" x="-128" y="751"/>
         </scene>
         <!--Search For Group Destination Nav-->
         <scene sceneID="ABd-4Y-wqA">

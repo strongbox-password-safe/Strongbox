@@ -66,6 +66,8 @@
 @property BOOL hasAppearedOnce; // Used for App Lock initial load
 @property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock - Ideally we should also clear this on DB close but we don't have that event setup yet...
 
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
+
 @end
 
 @implementation SafesViewController
@@ -570,6 +572,24 @@
     self.tableView.emptyDataSetDelegate = self;
     self.tableView.tableFooterView = [UIView new];
     self.tableView.rowHeight = UITableViewAutomaticDimension;
+    
+    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                initWithTarget:self
+                                action:@selector(handleLongPress)];
+    self.longPressRecognizer.minimumPressDuration = 1;
+    self.longPressRecognizer.cancelsTouchesInView = YES;
+    
+    [self.tableView addGestureRecognizer:self.longPressRecognizer];
+
+}
+
+- (void)handleLongPress {
+    if (!self.tableView.editing) {
+        [self setEditing:YES animated:YES];
+        
+        UIImpactFeedbackGenerator* gen = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleMedium];
+        [gen impactOccurred];
+    }
 }
 
 - (void)setupTips {
@@ -833,17 +853,17 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                           } ];
     [alertController addAction:quickLaunchAction];
 
-    // Start Re-ordering...
+    // Start Re-ordering... Replaced with Long Press
     
-    UIAlertAction *reorderAction = [UIAlertAction actionWithTitle:
-            NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-                                                              [self setEditing:YES];
-                                                        } ];
-    
-    [alertController addAction:reorderAction];
-    
+//    UIAlertAction *reorderAction = [UIAlertAction actionWithTitle:
+//            NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
+//                                                            style:UIAlertActionStyleDefault
+//                                                          handler:^(UIAlertAction *a) {
+//                                                              [self setEditing:YES];
+//                                                        } ];
+//
+//    [alertController addAction:reorderAction];
+//
     // Local Device options
     
     BOOL localDeviceOption = safe.storageProvider == kLocalDevice;

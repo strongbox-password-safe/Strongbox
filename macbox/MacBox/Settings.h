@@ -54,7 +54,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;
 
-@property BOOL doNotFloatDetailsWindowOnTop;
+@property BOOL floatOnTop;
 @property BOOL noAlternatingRows;
 @property BOOL showHorizontalGrid;
 @property BOOL showVerticalGrid;

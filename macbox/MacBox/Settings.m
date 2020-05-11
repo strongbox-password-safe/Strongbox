@@ -37,7 +37,7 @@ static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSecond
 static NSString* const kDoNotShowTotp = @"doNotShowTotp";
 static NSString* const kShowRecycleBinInSearchResults = @"showRecycleBinInSearchResults";
 static NSString* const kDoNotShowRecycleBinInBrowse = @"doNotShowRecycleBinInBrowse";
-static NSString* const kDoNotFloatDetailsWindowOnTop = @"doNotFloatDetailsWindowOnTop";
+static NSString* const kFloatOnTop = @"floatOnTop";
 static NSString* const kNoAlternatingRows = @"noAlternatingRows";
 static NSString* const kShowHorizontalGrid = @"showHorizontalGrid";
 static NSString* const kShowVerticalGrid = @"showVerticalGrid";
@@ -450,12 +450,12 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
     [self setBool:kDoNotShowRecycleBinInBrowse value:doNotShowRecycleBinInBrowse];
 }
 
-- (BOOL)doNotFloatDetailsWindowOnTop {
-    return [self getBool:kDoNotFloatDetailsWindowOnTop fallback:YES];
+- (BOOL)floatOnTop {
+    return [self getBool:kFloatOnTop];
 }
 
-- (void)setDoNotFloatDetailsWindowOnTop:(BOOL)doNotFloatDetailsWindowOnTop {
-    [self setBool:kDoNotFloatDetailsWindowOnTop value:doNotFloatDetailsWindowOnTop];
+- (void)setFloatOnTop:(BOOL)floatOnTop {
+    [self setBool:kFloatOnTop value:floatOnTop];
 }
 
 - (BOOL)noAlternatingRows {

@@ -86,10 +86,6 @@
     return self;
 }
 
-- (NSString *)description {
-    return [NSString stringWithFormat:@"%@ [%u] - [%@-%@]", self.nickName, self.storageProvider, self.fileName, self.fileIdentifier];
-}
-
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:self.uuid forKey:@"uuid"];
     [encoder encodeObject:self.nickName forKey:@"nickName"];
@@ -175,6 +171,8 @@
     [encoder encodeBool:self.colorizeProtectedCustomFields forKey:@"colorizeProtectedCustomFields"];
 
     [encoder encodeObject:self.auditConfig forKey:@"auditConfig"];
+    
+    [encoder encodeBool:self.promptedForAutoFetchFavIcon forKey:@"promptedForAutoFetchFavIcon"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -376,10 +374,16 @@
         if ([decoder containsValueForKey:@"auditConfig"]) {
             self.auditConfig = [decoder decodeObjectForKey:@"auditConfig"];
         }
+        
+        if ([decoder containsValueForKey:@"promptedForAutoFetchFavIcon"]) {
+            self.promptedForAutoFetchFavIcon = [decoder decodeBoolForKey:@"promptedForAutoFetchFavIcon"];
+        }
     }
     
     return self;
 }
+
+////////////////////////
 
 - (NSArray<NSString *> *)favourites {
     NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];
@@ -482,6 +486,10 @@
     [FileManager.sharedInstance createIfNecessary:url];
     
     return url;
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"%@ [%u] - [%@-%@]", self.nickName, self.storageProvider, self.fileName, self.fileIdentifier];
 }
 
 @end

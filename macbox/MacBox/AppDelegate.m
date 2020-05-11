@@ -289,6 +289,11 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     if (theAction == @selector(onUpgradeToFullVersion:)) {
         return self.validProducts != nil;
     }
+    
+    if (theAction == @selector(onFloatOnTopToggle:)) {
+        NSMenuItem* item = (NSMenuItem*) anItem;
+        [item setState:Settings.sharedInstance.floatOnTop ? NSOnState : NSOffState];
+    }
 
     return YES;
 }
@@ -507,6 +512,12 @@ static NSInteger clipboardChangeCount;
             NSLog(@"Clearing Custom App Pasteboard!");
         }
     }
+}
+
+- (IBAction)onFloatOnTopToggle:(id)sender {
+    Settings.sharedInstance.floatOnTop = !Settings.sharedInstance.floatOnTop;
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
 @end

@@ -117,7 +117,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     NSArray<NSDictionary*>* attachments = dict[@"attachments"];
     NSArray<NSDictionary*>* customFields = dict[@"customFields"];
 
-    NSSet<NSString*>* tags = dict[@"tags"]; // TODO: Tags - Test
+    NSArray<NSString*>* tagsArray = dict[@"tags"]; // Must be an array to serialize correctly to JSON!
 
     NodeFields* ret = [[NodeFields alloc] initWithUsername:username
                                                        url:url
@@ -125,7 +125,8 @@ static NSString* const kKeeOtpPluginKey = @"otp";
                                                      notes:notes
                                                      email:email];
 
-    ret.tags = tags.mutableCopy;
+    ret.tags = [NSMutableSet setWithArray:tagsArray];
+    
     ret.passwordModified = passwordModified != nil ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
     ret.expires = expires != nil ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
 //    ret.locationChanged = locationChanged ? [NSDate dateWithTimeIntervalSince1970:locationChanged.unsignedIntegerValue] : nil;
@@ -189,7 +190,9 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     ret[@"customFields"] = customFields;
     
-    ret[@"tags"] = self.tags; // TODO: Test Tags on mac?
+    // Tags
+    
+    ret[@"tags"] = self.tags.allObjects;
     
     return ret;
 }

@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
              fallbackTitle:(NSString*_Nullable)fallbackTitle
                 completion:(void(^_Nullable)(BOOL success, NSError * __nullable error))completion;
 
+@property (readonly) NSString* biometricIdName;
 - (NSString*)getBiometricIdName;
 
 - (BOOL)isBiometricDatabaseStateRecorded:(BOOL)autoFill;

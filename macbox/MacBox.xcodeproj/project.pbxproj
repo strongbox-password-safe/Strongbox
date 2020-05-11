@@ -38,7 +38,6 @@
 		4D1FFA832403030100B75EA2 /* NSData+GZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D87F8AB22304A04006A6320 /* NSData+GZIP.m */; };
 		4D1FFA842403030100B75EA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
 		4D1FFA852403030100B75EA2 /* ViewModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */; };
-		4D1FFA862403030100B75EA2 /* MacYubiKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */; };
 		4D1FFA872403030100B75EA2 /* KdbSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB7219B479800C22CB4 /* KdbSerialization.m */; };
 		4D1FFA882403030100B75EA2 /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097E21825107007BA1E7 /* XMLWriter.m */; };
 		4D1FFA892403030100B75EA2 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
@@ -175,12 +174,8 @@
 		4D1FFB0C2403030100B75EA2 /* OTPAlgorithm.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B421F898470043DDC0 /* OTPAlgorithm.m */; };
 		4D1FFB0D2403030100B75EA2 /* SerializationPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4A00392312CC5400B69E09 /* SerializationPackage.m */; };
 		4D1FFB0F2403030100B75EA2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA203911F7662D000113A6B /* StoreKit.framework */; };
-		4D1FFB102403030100B75EA2 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A323FCA3320004B309 /* libjson.a */; };
 		4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */; };
-		4D1FFB132403030100B75EA2 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A223FCA3320004B309 /* libykpers-1.a */; };
 		4D1FFB142403030100B75EA2 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
-		4D1FFB152403030100B75EA2 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A123FCA3320004B309 /* libyubikey.a */; };
-		4D1FFB162403030100B75EA2 /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A023FCA3320004B309 /* libjson-c.a */; };
 		4D1FFB182403030100B75EA2 /* PreferencesWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A023A116D5001E742E /* PreferencesWindowController.xib */; };
 		4D1FFB192403030100B75EA2 /* CheckboxCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805D423A1176E001E742E /* CheckboxCell.xib */; };
 		4D1FFB1A2403030100B75EA2 /* harrypotter_8k_2018.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */; };
@@ -318,22 +313,12 @@
 		4D55A56F23D743C40057CBA8 /* BookmarksHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */; };
 		4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
 		4D59DA57224D3C5100D1D6E4 /* CustomFieldTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */; };
-		4D59E20723FCA15A0004B309 /* MacYubiKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */; };
-		4D59E2A423FCA3320004B309 /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A023FCA3320004B309 /* libjson-c.a */; };
-		4D59E2A523FCA3320004B309 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A123FCA3320004B309 /* libyubikey.a */; };
-		4D59E2A623FCA3320004B309 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A223FCA3320004B309 /* libykpers-1.a */; };
-		4D59E2A723FCA3320004B309 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D59E2A323FCA3320004B309 /* libjson.a */; };
 		4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
-		4D5C21932406F8FE0003A61A /* PressYubiKeyWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */; };
 		4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */; };
 		4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643B9E23B65075000C383A /* NodeDetailsViewController.m */; };
 		4D643BA623B67E18000C383A /* MacKeePassHistoryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D643BA423B67E18000C383A /* MacKeePassHistoryViewController.m */; };
 		4D68255823E498D7002DC4FB /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */; };
 		4D6EB45E23DF26910045C8D5 /* DatabasePreferences.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */; };
-		4D70345A2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */; };
-		4D70345B2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */; };
-		4D788CF82404761E007BD8D6 /* YubiKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D788CF72404761E007BD8D6 /* YubiKeyData.m */; };
-		4D788CF92404761E007BD8D6 /* YubiKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D788CF72404761E007BD8D6 /* YubiKeyData.m */; };
 		4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
 		4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; };
 		4D8354C6238908AB00E264E0 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4D8354C4238908AB00E264E0 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -414,9 +399,6 @@
 		4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
-		4DCC991424074EBF00B7DAB2 /* PressYubiKeyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */; };
-		4DCC992924074EDC00B7DAB2 /* PressYubiKeyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */; };
-		4DCC992C24074F9000B7DAB2 /* PressYubiKeyWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */; };
 		4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
 		4DD2BAB9238BE44400513271 /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD2BAB8238BE44400513271 /* MMcG_MF_Base32Additions.m */; };
 		4DD7840A2412CE6C00E45D1C /* ColoredStringHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3587A724104AF100318688 /* ColoredStringHelper.m */; };
@@ -453,6 +435,44 @@
 		4DFF409021807A0200B69383 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF408F21807A0200B69383 /* PwSafeMetadata.m */; };
 		519C2CAA704EB1D2C41D0116 /* Pods_common_mac_Strongbox_Outright_Pro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */; };
 		6B9B902F795918EE0444B2D8 /* Pods_common_mac_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */; };
+		C85B9D77246544C600EEBFC9 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
+		C85B9D78246544C600EEBFC9 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
+		C85B9D79246544C600EEBFC9 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D76246544C600EEBFC9 /* NSString+Extensions.m */; };
+		C85B9D7A246544C600EEBFC9 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D76246544C600EEBFC9 /* NSString+Extensions.m */; };
+		C85B9D822465454800EEBFC9 /* json-c in Resources */ = {isa = PBXBuildFile; fileRef = C85B9D7C2465454700EEBFC9 /* json-c */; };
+		C85B9D832465454800EEBFC9 /* json-c in Resources */ = {isa = PBXBuildFile; fileRef = C85B9D7C2465454700EEBFC9 /* json-c */; };
+		C85B9D842465454800EEBFC9 /* MacYubiKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D7D2465454700EEBFC9 /* MacYubiKeyManager.m */; };
+		C85B9D852465454800EEBFC9 /* MacYubiKeyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D7D2465454700EEBFC9 /* MacYubiKeyManager.m */; };
+		C85B9D862465454800EEBFC9 /* json in Resources */ = {isa = PBXBuildFile; fileRef = C85B9D7E2465454700EEBFC9 /* json */; };
+		C85B9D872465454800EEBFC9 /* json in Resources */ = {isa = PBXBuildFile; fileRef = C85B9D7E2465454700EEBFC9 /* json */; };
+		C85B9D882465454800EEBFC9 /* ykpers-1 in Resources */ = {isa = PBXBuildFile; fileRef = C85B9D7F2465454700EEBFC9 /* ykpers-1 */; };
+		C85B9D892465454800EEBFC9 /* ykpers-1 in Resources */ = {isa = PBXBuildFile; fileRef = C85B9D7F2465454700EEBFC9 /* ykpers-1 */; };
+		C85B9D8C2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D8B2465462200EEBFC9 /* ConcurrentMutableSet.m */; };
+		C85B9D8D2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D8B2465462200EEBFC9 /* ConcurrentMutableSet.m */; };
+		C85B9D902465463F00EEBFC9 /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D8F2465463F00EEBFC9 /* UrlRequestOperation.m */; };
+		C85B9D912465463F00EEBFC9 /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D8F2465463F00EEBFC9 /* UrlRequestOperation.m */; };
+		C85B9D962465478D00EEBFC9 /* PressYubiKeyWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D922465478C00EEBFC9 /* PressYubiKeyWindow.m */; };
+		C85B9D972465478D00EEBFC9 /* PressYubiKeyWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D922465478C00EEBFC9 /* PressYubiKeyWindow.m */; };
+		C85B9D982465478D00EEBFC9 /* YubiKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D942465478C00EEBFC9 /* YubiKeyData.m */; };
+		C85B9D992465478D00EEBFC9 /* YubiKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D942465478C00EEBFC9 /* YubiKeyData.m */; };
+		C85B9D9C246547BA00EEBFC9 /* YubiKeyConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D9B246547B900EEBFC9 /* YubiKeyConfiguration.m */; };
+		C85B9D9D246547BA00EEBFC9 /* YubiKeyConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D9B246547B900EEBFC9 /* YubiKeyConfiguration.m */; };
+		C85B9DA32465480B00EEBFC9 /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9D9F2465480A00EEBFC9 /* libjson-c.a */; };
+		C85B9DA42465480B00EEBFC9 /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9D9F2465480A00EEBFC9 /* libjson-c.a */; };
+		C85B9DA52465480B00EEBFC9 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA02465480A00EEBFC9 /* libyubikey.a */; };
+		C85B9DA62465480B00EEBFC9 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA02465480A00EEBFC9 /* libyubikey.a */; };
+		C85B9DA72465480B00EEBFC9 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA12465480A00EEBFC9 /* libykpers-1.a */; };
+		C85B9DA82465480B00EEBFC9 /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA12465480A00EEBFC9 /* libykpers-1.a */; };
+		C85B9DA92465480B00EEBFC9 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA22465480B00EEBFC9 /* libjson.a */; };
+		C85B9DAA2465480B00EEBFC9 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA22465480B00EEBFC9 /* libjson.a */; };
+		C85B9DAD24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C85B9DAE24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C85B9DB424655D6200EEBFC9 /* surnames.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DB124655D5C00EEBFC9 /* surnames.us.txt */; };
+		C85B9DB524655D6300EEBFC9 /* surnames.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DB124655D5C00EEBFC9 /* surnames.us.txt */; };
+		C85B9DB624655D6600EEBFC9 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */; };
+		C85B9DB724655D6700EEBFC9 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */; };
+		C85B9DB824655D6A00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */; };
+		C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -703,51 +723,8 @@
 		4D58A45A207368B10061E046 /* PreferencesWindowController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PreferencesWindowController.m; path = MacBox/PreferencesWindowController.m; sourceTree = "<group>"; };
 		4D59DA55224D3C5100D1D6E4 /* CustomFieldTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomFieldTableCellView.h; path = MacBox/CustomFieldTableCellView.h; sourceTree = "<group>"; };
 		4D59DA56224D3C5100D1D6E4 /* CustomFieldTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomFieldTableCellView.m; path = MacBox/CustomFieldTableCellView.m; sourceTree = "<group>"; };
-		4D59E20523FCA15A0004B309 /* MacYubiKeyManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacYubiKeyManager.h; sourceTree = "<group>"; };
-		4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacYubiKeyManager.m; sourceTree = "<group>"; };
-		4D59E26123FCA22E0004B309 /* printbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = printbuf.h; sourceTree = "<group>"; };
-		4D59E26223FCA22E0004B309 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
-		4D59E26323FCA22E0004B309 /* json_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_util.h; sourceTree = "<group>"; };
-		4D59E26423FCA22E0004B309 /* json_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_config.h; sourceTree = "<group>"; };
-		4D59E26523FCA22E0004B309 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
-		4D59E26623FCA22E0004B309 /* json_c_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_c_version.h; sourceTree = "<group>"; };
-		4D59E26723FCA22E0004B309 /* json_object_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_private.h; sourceTree = "<group>"; };
-		4D59E26823FCA22E0004B309 /* arraylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arraylist.h; sourceTree = "<group>"; };
-		4D59E26923FCA22E0004B309 /* linkhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linkhash.h; sourceTree = "<group>"; };
-		4D59E26A23FCA22E0004B309 /* json_tokener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_tokener.h; sourceTree = "<group>"; };
-		4D59E26B23FCA22E0004B309 /* json_object_iterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_iterator.h; sourceTree = "<group>"; };
-		4D59E26C23FCA22E0004B309 /* json_inttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_inttypes.h; sourceTree = "<group>"; };
-		4D59E26D23FCA22E0004B309 /* bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bits.h; sourceTree = "<group>"; };
-		4D59E26E23FCA22E0004B309 /* json_object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object.h; sourceTree = "<group>"; };
-		4D59E27023FCA22E0004B309 /* ykpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykpers.h; sourceTree = "<group>"; };
-		4D59E27123FCA22E0004B309 /* ykpbkdf2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykpbkdf2.h; sourceTree = "<group>"; };
-		4D59E27223FCA22E0004B309 /* ykstatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykstatus.h; sourceTree = "<group>"; };
-		4D59E27323FCA22E0004B309 /* ykpers-version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ykpers-version.h"; sourceTree = "<group>"; };
-		4D59E27423FCA22E0004B309 /* ykdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykdef.h; sourceTree = "<group>"; };
-		4D59E27523FCA22E0004B309 /* ykcore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ykcore.h; sourceTree = "<group>"; };
-		4D59E27623FCA22E0004B309 /* yubikey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = yubikey.h; sourceTree = "<group>"; };
-		4D59E27823FCA22E0004B309 /* printbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = printbuf.h; sourceTree = "<group>"; };
-		4D59E27923FCA22E0004B309 /* debug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = debug.h; sourceTree = "<group>"; };
-		4D59E27A23FCA22E0004B309 /* json_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_util.h; sourceTree = "<group>"; };
-		4D59E27B23FCA22E0004B309 /* json_config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_config.h; sourceTree = "<group>"; };
-		4D59E27C23FCA22E0004B309 /* json.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json.h; sourceTree = "<group>"; };
-		4D59E27D23FCA22E0004B309 /* json_c_version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_c_version.h; sourceTree = "<group>"; };
-		4D59E27E23FCA22E0004B309 /* json_object_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_private.h; sourceTree = "<group>"; };
-		4D59E27F23FCA22E0004B309 /* arraylist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = arraylist.h; sourceTree = "<group>"; };
-		4D59E28023FCA22E0004B309 /* linkhash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = linkhash.h; sourceTree = "<group>"; };
-		4D59E28123FCA22E0004B309 /* json_tokener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_tokener.h; sourceTree = "<group>"; };
-		4D59E28223FCA22E0004B309 /* json_object_iterator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object_iterator.h; sourceTree = "<group>"; };
-		4D59E28323FCA22E0004B309 /* json_inttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_inttypes.h; sourceTree = "<group>"; };
-		4D59E28423FCA22E0004B309 /* bits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bits.h; sourceTree = "<group>"; };
-		4D59E28523FCA22E0004B309 /* json_object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = json_object.h; sourceTree = "<group>"; };
-		4D59E2A023FCA3320004B309 /* libjson-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libjson-c.a"; sourceTree = "<group>"; };
-		4D59E2A123FCA3320004B309 /* libyubikey.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libyubikey.a; sourceTree = "<group>"; };
-		4D59E2A223FCA3320004B309 /* libykpers-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libykpers-1.a"; sourceTree = "<group>"; };
-		4D59E2A323FCA3320004B309 /* libjson.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libjson.a; sourceTree = "<group>"; };
 		4D5AE1E81F432BBC000A34D7 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = MacBox/Settings.h; sourceTree = "<group>"; };
 		4D5AE1E91F432BBC000A34D7 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = MacBox/Settings.m; sourceTree = "<group>"; };
-		4D5C21902406F8FE0003A61A /* PressYubiKeyWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PressYubiKeyWindow.h; path = MacBox/PressYubiKeyWindow.h; sourceTree = SOURCE_ROOT; };
-		4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PressYubiKeyWindow.m; path = MacBox/PressYubiKeyWindow.m; sourceTree = SOURCE_ROOT; };
 		4D60CC6B1F4C1627005B66B8 /* UpgradeWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UpgradeWindowController.h; path = MacBox/UpgradeWindowController.h; sourceTree = "<group>"; };
 		4D60CC6C1F4C1627005B66B8 /* UpgradeWindowController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UpgradeWindowController.m; path = MacBox/UpgradeWindowController.m; sourceTree = "<group>"; };
 		4D643B9D23B65075000C383A /* NodeDetailsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeDetailsViewController.h; path = MacBox/NodeDetailsViewController.h; sourceTree = "<group>"; };
@@ -763,10 +740,6 @@
 		4D68256823E498EA002DC4FB /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		4D6EB45C23DF26910045C8D5 /* DatabasePreferences.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabasePreferences.h; path = MacBox/DatabasePreferences.h; sourceTree = "<group>"; };
 		4D6EB45D23DF26910045C8D5 /* DatabasePreferences.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasePreferences.m; path = MacBox/DatabasePreferences.m; sourceTree = "<group>"; };
-		4D7034582405B20200F4F41E /* YubiKeyConfiguration.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = YubiKeyConfiguration.h; path = MacBox/YubiKeyConfiguration.h; sourceTree = SOURCE_ROOT; };
-		4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = YubiKeyConfiguration.m; path = MacBox/YubiKeyConfiguration.m; sourceTree = SOURCE_ROOT; };
-		4D788CF62404761E007BD8D6 /* YubiKeyData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YubiKeyData.h; sourceTree = SOURCE_ROOT; };
-		4D788CF72404761E007BD8D6 /* YubiKeyData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YubiKeyData.m; sourceTree = SOURCE_ROOT; };
 		4D832A9923CE2AC000A7885E /* SecretStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SecretStore.h; path = ../model/SecretStore.h; sourceTree = "<group>"; };
 		4D8354C12389086E00E264E0 /* FavIconManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FavIconManager.h; path = ../model/FavIconManager.h; sourceTree = "<group>"; };
 		4D8354C22389086E00E264E0 /* FavIconManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FavIconManager.m; path = ../model/FavIconManager.m; sourceTree = "<group>"; };
@@ -949,15 +922,6 @@
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DocumentController.h; path = MacBox/DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DocumentController.m; path = MacBox/DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = MacBox/Credits.rtf; sourceTree = "<group>"; };
-		4DCC991524074EBF00B7DAB2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PressYubiKeyWindow.xib; sourceTree = "<group>"; };
-		4DCC991A24074ECE00B7DAB2 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PressYubiKeyWindow.strings"; sourceTree = "<group>"; };
-		4DCC991C24074ED000B7DAB2 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
-		4DCC991E24074ED100B7DAB2 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
-		4DCC992024074ED100B7DAB2 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
-		4DCC992224074ED200B7DAB2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
-		4DCC992424074ED300B7DAB2 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
-		4DCC992624074ED400B7DAB2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
-		4DCC992824074ED500B7DAB2 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
 		4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NSCheckboxTableCellView.h; path = MacBox/NSCheckboxTableCellView.h; sourceTree = "<group>"; };
 		4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NSCheckboxTableCellView.m; path = MacBox/NSCheckboxTableCellView.m; sourceTree = "<group>"; };
 		4DD2BAB7238BE44400513271 /* MMcG_MF_Base32Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMcG_MF_Base32Additions.h; path = ../lib/Base32/MMcG_MF_Base32Additions.h; sourceTree = "<group>"; };
@@ -1077,6 +1041,50 @@
 		963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5775E930C35CCA891076DB8 /* Pods_Macbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Macbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Outright_Pro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C803E1CD2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
+		C803E1CE2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		C803E1CF2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Main.strings; sourceTree = "<group>"; };
+		C803E1D02464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		C803E1D12464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
+		C803E1D22464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
+		C803E1D32464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
+		C803E1D42464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		C803E1D52464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
+		C803E1D62464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		C803E1D72464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		C803E1D82464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
+		C803E1D92464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
+		C803E1DA2464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
+		C803E1DB2464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
+		C803E1DC2464978F001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
+		C85B9D73246544C600EEBFC9 /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "../StrongBox/NSString+Extensions.h"; sourceTree = "<group>"; };
+		C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+Extensions.m"; path = "../StrongBox/NSData+Extensions.m"; sourceTree = "<group>"; };
+		C85B9D75246544C600EEBFC9 /* NSData+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Extensions.h"; path = "../StrongBox/NSData+Extensions.h"; sourceTree = "<group>"; };
+		C85B9D76246544C600EEBFC9 /* NSString+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Extensions.m"; path = "../StrongBox/NSString+Extensions.m"; sourceTree = "<group>"; };
+		C85B9D7C2465454700EEBFC9 /* json-c */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "json-c"; path = "include/YubiKey/json-c"; sourceTree = "<group>"; };
+		C85B9D7D2465454700EEBFC9 /* MacYubiKeyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MacYubiKeyManager.m; path = include/YubiKey/MacYubiKeyManager.m; sourceTree = "<group>"; };
+		C85B9D7E2465454700EEBFC9 /* json */ = {isa = PBXFileReference; lastKnownFileType = folder; name = json; path = include/YubiKey/json; sourceTree = "<group>"; };
+		C85B9D7F2465454700EEBFC9 /* ykpers-1 */ = {isa = PBXFileReference; lastKnownFileType = folder; name = "ykpers-1"; path = "include/YubiKey/ykpers-1"; sourceTree = "<group>"; };
+		C85B9D802465454700EEBFC9 /* yubikey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = yubikey.h; path = include/YubiKey/yubikey.h; sourceTree = "<group>"; };
+		C85B9D812465454700EEBFC9 /* MacYubiKeyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacYubiKeyManager.h; path = include/YubiKey/MacYubiKeyManager.h; sourceTree = "<group>"; };
+		C85B9D8A2465462200EEBFC9 /* ConcurrentMutableSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableSet.h; path = ../ConcurrentMutableSet.h; sourceTree = "<group>"; };
+		C85B9D8B2465462200EEBFC9 /* ConcurrentMutableSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableSet.m; path = ../ConcurrentMutableSet.m; sourceTree = "<group>"; };
+		C85B9D8E2465463F00EEBFC9 /* UrlRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UrlRequestOperation.h; path = ../StrongBox/UrlRequestOperation.h; sourceTree = "<group>"; };
+		C85B9D8F2465463F00EEBFC9 /* UrlRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UrlRequestOperation.m; path = ../StrongBox/UrlRequestOperation.m; sourceTree = "<group>"; };
+		C85B9D922465478C00EEBFC9 /* PressYubiKeyWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PressYubiKeyWindow.m; path = include/YubiKey/PressYubiKeyWindow.m; sourceTree = "<group>"; };
+		C85B9D932465478C00EEBFC9 /* PressYubiKeyWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PressYubiKeyWindow.h; path = include/YubiKey/PressYubiKeyWindow.h; sourceTree = "<group>"; };
+		C85B9D942465478C00EEBFC9 /* YubiKeyData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YubiKeyData.m; path = include/YubiKey/YubiKeyData.m; sourceTree = "<group>"; };
+		C85B9D952465478C00EEBFC9 /* YubiKeyData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YubiKeyData.h; path = include/YubiKey/YubiKeyData.h; sourceTree = "<group>"; };
+		C85B9D9A246547B900EEBFC9 /* YubiKeyConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YubiKeyConfiguration.h; path = include/YubiKey/YubiKeyConfiguration.h; sourceTree = "<group>"; };
+		C85B9D9B246547B900EEBFC9 /* YubiKeyConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YubiKeyConfiguration.m; path = include/YubiKey/YubiKeyConfiguration.m; sourceTree = "<group>"; };
+		C85B9D9F2465480A00EEBFC9 /* libjson-c.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libjson-c.a"; path = "lib/libjson-c.a"; sourceTree = "<group>"; };
+		C85B9DA02465480A00EEBFC9 /* libyubikey.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libyubikey.a; path = lib/libyubikey.a; sourceTree = "<group>"; };
+		C85B9DA12465480A00EEBFC9 /* libykpers-1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libykpers-1.a"; path = "lib/libykpers-1.a"; sourceTree = "<group>"; };
+		C85B9DA22465480B00EEBFC9 /* libjson.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjson.a; path = lib/libjson.a; sourceTree = "<group>"; };
+		C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "norwegian-diceware.wordlist.utf8.txt"; path = "../norwegian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "10-million-password-list-top-10000.txt"; path = "resources/10-million-password-list-top-10000.txt"; sourceTree = "<group>"; };
+		C85B9DB124655D5C00EEBFC9 /* surnames.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = surnames.us.txt; path = resources/names/surnames/surnames.us.txt; sourceTree = "<group>"; };
+		C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = first.names.us.txt; path = resources/names/first/first.names.us.txt; sourceTree = "<group>"; };
 		EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; sourceTree = "<group>"; };
 		F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1087,13 +1095,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D1FFB0F2403030100B75EA2 /* StoreKit.framework in Frameworks */,
-				4D1FFB102403030100B75EA2 /* libjson.a in Frameworks */,
+				C85B9DAA2465480B00EEBFC9 /* libjson.a in Frameworks */,
 				4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */,
-				4D1FFB132403030100B75EA2 /* libykpers-1.a in Frameworks */,
 				4D1FFB142403030100B75EA2 /* FavIcon.framework in Frameworks */,
-				4D1FFB152403030100B75EA2 /* libyubikey.a in Frameworks */,
-				4D1FFB162403030100B75EA2 /* libjson-c.a in Frameworks */,
+				C85B9DA82465480B00EEBFC9 /* libykpers-1.a in Frameworks */,
 				519C2CAA704EB1D2C41D0116 /* Pods_common_mac_Strongbox_Outright_Pro.framework in Frameworks */,
+				C85B9DA62465480B00EEBFC9 /* libyubikey.a in Frameworks */,
+				C85B9DA42465480B00EEBFC9 /* libjson-c.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1109,13 +1117,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */,
-				4D59E2A723FCA3320004B309 /* libjson.a in Frameworks */,
+				C85B9DA92465480B00EEBFC9 /* libjson.a in Frameworks */,
 				4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */,
-				4D59E2A623FCA3320004B309 /* libykpers-1.a in Frameworks */,
 				4D8354C5238908AB00E264E0 /* FavIcon.framework in Frameworks */,
-				4D59E2A523FCA3320004B309 /* libyubikey.a in Frameworks */,
-				4D59E2A423FCA3320004B309 /* libjson-c.a in Frameworks */,
+				C85B9DA72465480B00EEBFC9 /* libykpers-1.a in Frameworks */,
 				6B9B902F795918EE0444B2D8 /* Pods_common_mac_Strongbox.framework in Frameworks */,
+				C85B9DA52465480B00EEBFC9 /* libyubikey.a in Frameworks */,
+				C85B9DA32465480B00EEBFC9 /* libjson-c.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1162,6 +1170,8 @@
 		4D216F5922CBCD73000954D0 /* Password Generation */ = {
 			isa = PBXGroup;
 			children = (
+				C85B9DB024655D5C00EEBFC9 /* Common Password */,
+				C85B9DB324655D5C00EEBFC9 /* Names */,
 				4D216F5B22CBCDBF000954D0 /* Word Lists */,
 				4D216F5322CBCCDE000954D0 /* PasswordMaker.h */,
 				4D216F5422CBCCDE000954D0 /* PasswordMaker.m */,
@@ -1174,6 +1184,7 @@
 		4D216F5B22CBCDBF000954D0 /* Word Lists */ = {
 			isa = PBXGroup;
 			children = (
+				C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */,
 				4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */,
 				4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */,
 				4DC8059023A11493001E742E /* star_trek_8k_2018.utf8.txt */,
@@ -1415,8 +1426,8 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				4DAE28C724073089003D9221 /* Upgrade */,
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
+				4DAE28C724073089003D9221 /* Upgrade */,
 				4D6EB45923DF23750045C8D5 /* Database Properties */,
 				4DE2CA3E23C38B5E00F76255 /* Main */,
 				4D14A13B224D211400C71ABF /* Node Details */,
@@ -1441,102 +1452,6 @@
 				4DF299822243CED70080F9DC /* CollectionViewHeader.m */,
 			);
 			name = View;
-			sourceTree = "<group>";
-		};
-		4D59E25F23FCA22E0004B309 /* YubiKey */ = {
-			isa = PBXGroup;
-			children = (
-				4D59E29F23FCA3320004B309 /* lib */,
-				4D59E2A823FCA36D0004B309 /* include */,
-				4D59E20523FCA15A0004B309 /* MacYubiKeyManager.h */,
-				4D59E20623FCA15A0004B309 /* MacYubiKeyManager.m */,
-				4D788CF62404761E007BD8D6 /* YubiKeyData.h */,
-				4D788CF72404761E007BD8D6 /* YubiKeyData.m */,
-				4D7034582405B20200F4F41E /* YubiKeyConfiguration.h */,
-				4D7034592405B20200F4F41E /* YubiKeyConfiguration.m */,
-				4D5C21902406F8FE0003A61A /* PressYubiKeyWindow.h */,
-				4D5C21912406F8FE0003A61A /* PressYubiKeyWindow.m */,
-				4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */,
-			);
-			name = YubiKey;
-			path = include/YubiKey;
-			sourceTree = "<group>";
-		};
-		4D59E26023FCA22E0004B309 /* json-c */ = {
-			isa = PBXGroup;
-			children = (
-				4D59E26123FCA22E0004B309 /* printbuf.h */,
-				4D59E26223FCA22E0004B309 /* debug.h */,
-				4D59E26323FCA22E0004B309 /* json_util.h */,
-				4D59E26423FCA22E0004B309 /* json_config.h */,
-				4D59E26523FCA22E0004B309 /* json.h */,
-				4D59E26623FCA22E0004B309 /* json_c_version.h */,
-				4D59E26723FCA22E0004B309 /* json_object_private.h */,
-				4D59E26823FCA22E0004B309 /* arraylist.h */,
-				4D59E26923FCA22E0004B309 /* linkhash.h */,
-				4D59E26A23FCA22E0004B309 /* json_tokener.h */,
-				4D59E26B23FCA22E0004B309 /* json_object_iterator.h */,
-				4D59E26C23FCA22E0004B309 /* json_inttypes.h */,
-				4D59E26D23FCA22E0004B309 /* bits.h */,
-				4D59E26E23FCA22E0004B309 /* json_object.h */,
-			);
-			path = "json-c";
-			sourceTree = "<group>";
-		};
-		4D59E26F23FCA22E0004B309 /* ykpers-1 */ = {
-			isa = PBXGroup;
-			children = (
-				4D59E27023FCA22E0004B309 /* ykpers.h */,
-				4D59E27123FCA22E0004B309 /* ykpbkdf2.h */,
-				4D59E27223FCA22E0004B309 /* ykstatus.h */,
-				4D59E27323FCA22E0004B309 /* ykpers-version.h */,
-				4D59E27423FCA22E0004B309 /* ykdef.h */,
-				4D59E27523FCA22E0004B309 /* ykcore.h */,
-			);
-			path = "ykpers-1";
-			sourceTree = "<group>";
-		};
-		4D59E27723FCA22E0004B309 /* json */ = {
-			isa = PBXGroup;
-			children = (
-				4D59E27823FCA22E0004B309 /* printbuf.h */,
-				4D59E27923FCA22E0004B309 /* debug.h */,
-				4D59E27A23FCA22E0004B309 /* json_util.h */,
-				4D59E27B23FCA22E0004B309 /* json_config.h */,
-				4D59E27C23FCA22E0004B309 /* json.h */,
-				4D59E27D23FCA22E0004B309 /* json_c_version.h */,
-				4D59E27E23FCA22E0004B309 /* json_object_private.h */,
-				4D59E27F23FCA22E0004B309 /* arraylist.h */,
-				4D59E28023FCA22E0004B309 /* linkhash.h */,
-				4D59E28123FCA22E0004B309 /* json_tokener.h */,
-				4D59E28223FCA22E0004B309 /* json_object_iterator.h */,
-				4D59E28323FCA22E0004B309 /* json_inttypes.h */,
-				4D59E28423FCA22E0004B309 /* bits.h */,
-				4D59E28523FCA22E0004B309 /* json_object.h */,
-			);
-			path = json;
-			sourceTree = "<group>";
-		};
-		4D59E29F23FCA3320004B309 /* lib */ = {
-			isa = PBXGroup;
-			children = (
-				4D59E2A023FCA3320004B309 /* libjson-c.a */,
-				4D59E2A123FCA3320004B309 /* libyubikey.a */,
-				4D59E2A223FCA3320004B309 /* libykpers-1.a */,
-				4D59E2A323FCA3320004B309 /* libjson.a */,
-			);
-			path = lib;
-			sourceTree = SOURCE_ROOT;
-		};
-		4D59E2A823FCA36D0004B309 /* include */ = {
-			isa = PBXGroup;
-			children = (
-				4D59E27623FCA22E0004B309 /* yubikey.h */,
-				4D59E26023FCA22E0004B309 /* json-c */,
-				4D59E26F23FCA22E0004B309 /* ykpers-1 */,
-				4D59E27723FCA22E0004B309 /* json */,
-			);
-			name = include;
 			sourceTree = "<group>";
 		};
 		4D643BA023B67D48000C383A /* KeePass History */ = {
@@ -1564,6 +1479,8 @@
 		4D87F8AA223049EB006A6320 /* GZIP */ = {
 			isa = PBXGroup;
 			children = (
+				4D2CB4962332D80900C2E084 /* GZipInputStream.h */,
+				4D2CB4972332D80A00C2E084 /* GZipInputStream.m */,
 				4D87F8AC22304A04006A6320 /* NSData+GZIP.h */,
 				4D87F8AB22304A04006A6320 /* NSData+GZIP.m */,
 			);
@@ -1636,6 +1553,20 @@
 		4D9E0948218250F6007BA1E7 /* KeePass */ = {
 			isa = PBXGroup;
 			children = (
+				4DBCE2292224207000A2AFA2 /* KeePassPredefinedIcons.h */,
+				4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */,
+				4D2CB4A22332D92900C2E084 /* XmlSerializer.h */,
+				4D2CB4A32332D92900C2E084 /* XmlSerializer.m */,
+				4D2CB4992332D82D00C2E084 /* KeePassXmlParser.h */,
+				4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */,
+				4D2CB4932332D7C400C2E084 /* SimpleXmlValueExtractor.h */,
+				4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */,
+				4DBFD382225CFE2F00290488 /* SprCompilation.h */,
+				4DBFD383225CFE2F00290488 /* SprCompilation.m */,
+				4DC8D9BA21B6F391004F1812 /* KeyFileParser.h */,
+				4DC8D9B921B6F391004F1812 /* KeyFileParser.m */,
+				4D1E77D323AFD7FB007240FA /* CustomIconsRationalizer.h */,
+				4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */,
 				4DEA5894224BFA7200013808 /* AesKdfCipher.h */,
 				4DEA5896224BFA7200013808 /* AesKdfCipher.m */,
 				4DEA5893224BFA7200013808 /* StringValue.h */,
@@ -1826,66 +1757,22 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C85B9D7B2465453A00EEBFC9 /* YubiKey */,
+				C85B9D71246543BA00EEBFC9 /* Strongbox Model */,
+				C85B9D702465439E00EEBFC9 /* ViewModel */,
 				4DA50CFA244DFCFE00364781 /* Audit */,
-				4D3587A624104AF100318688 /* ColoredStringHelper.h */,
-				4D3587A724104AF100318688 /* ColoredStringHelper.m */,
-				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
-				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
-				4D2CB4A22332D92900C2E084 /* XmlSerializer.h */,
-				4D2CB4A32332D92900C2E084 /* XmlSerializer.m */,
-				4D2CB4992332D82D00C2E084 /* KeePassXmlParser.h */,
-				4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */,
-				4D2CB4962332D80900C2E084 /* GZipInputStream.h */,
-				4D2CB4972332D80A00C2E084 /* GZipInputStream.m */,
-				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
-				4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */,
-				4D01BA2B22BD31F00044226F /* SearchScope.h */,
-				4D0835A4228472D200CA7405 /* UiAttachment.h */,
-				4D0835A5228472D200CA7405 /* UiAttachment.m */,
-				4DBFD385225CFE2F00290488 /* NSDictionary+Extensions.h */,
-				4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */,
-				4D2CB4932332D7C400C2E084 /* SimpleXmlValueExtractor.h */,
-				4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */,
-				4DBFD382225CFE2F00290488 /* SprCompilation.h */,
-				4DBFD383225CFE2F00290488 /* SprCompilation.m */,
-				4DC8D9BA21B6F391004F1812 /* KeyFileParser.h */,
-				4DC8D9B921B6F391004F1812 /* KeyFileParser.m */,
-				4D29663F21ADAC0B009B7936 /* CustomField.h */,
-				4D29664021ADAC0B009B7936 /* CustomField.m */,
+				4DF347D52074FA1D00148741 /* PwSafe */,
+				4D9E0948218250F6007BA1E7 /* KeePass */,
+				4DFC06D5226467AA00A4254A /* libs */,
+				4D216F5922CBCD73000954D0 /* Password Generation */,
+				4D5AE1E81F432BBC000A34D7 /* Settings.h */,
+				4D5AE1E91F432BBC000A34D7 /* Settings.m */,
 				4D4AD4F021A027E5002C33C6 /* AbstractDatabaseFormatAdaptor.h */,
-				4D524D09219B490100C22CB4 /* NodeFileAttachment.h */,
-				4D524D08219B490100C22CB4 /* NodeFileAttachment.m */,
-				4D524CAC219B474100C22CB4 /* CHCSVParser.h */,
-				4D524CAD219B474100C22CB4 /* CHCSVParser.m */,
-				4D524CA9219B45F700C22CB4 /* DatabaseAttachment.h */,
-				4D524CAA219B45F700C22CB4 /* DatabaseAttachment.m */,
 				4D524CA7219B459A00C22CB4 /* AutoFillNewRecordSettings.h */,
 				4D524CA6219B459A00C22CB4 /* AutoFillNewRecordSettings.m */,
-				4D524CA1219B458A00C22CB4 /* BiometricIdHelper.h */,
-				4D524CA3219B458B00C22CB4 /* BiometricIdHelper.m */,
-				4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */,
-				4DFF40072180726700B69383 /* BasicOrderedDictionary.h */,
-				4DFF40092180726700B69383 /* BasicOrderedDictionary.m */,
-				4D44680A216CE08A00F6358D /* Csv.h */,
-				4D44680B216CE08A00F6358D /* Csv.m */,
-				4D446804216CDA4400F6358D /* NSArray+Extensions.h */,
-				4D446805216CDA4500F6358D /* NSArray+Extensions.m */,
-				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
-				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
-				4DF347FE2074FA6C00148741 /* Node.h */,
-				4DF348002074FA6C00148741 /* Node.m */,
-				4DF347FA2074FA6C00148741 /* NodeFields.h */,
-				4DF347F22074FA6B00148741 /* NodeFields.m */,
 				4DF347FD2074FA6C00148741 /* StorageProvider.h */,
-				4DF347F02074FA6B00148741 /* Strongbox.h */,
-				4DF347F52074FA6C00148741 /* Utils.h */,
-				4DF347FB2074FA6C00148741 /* Utils.m */,
 				4D4A00382312CC5400B69E09 /* SerializationPackage.h */,
 				4D4A00392312CC5400B69E09 /* SerializationPackage.m */,
-				4D1E77D323AFD7FB007240FA /* CustomIconsRationalizer.h */,
-				4D1E77D423AFD7FB007240FA /* CustomIconsRationalizer.m */,
-				4DF522B423C8ABEF00CD948E /* ClipboardManager.h */,
-				4DF522B523C8ABEF00CD948E /* ClipboardManager.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -1893,55 +1780,23 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
-				4D50321B2412C36100766489 /* ClickableSecureTextField.h */,
-				4D50321C2412C36100766489 /* ClickableSecureTextField.m */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
+				4D524D2B219B503F00C22CB4 /* View */,
+				C85B9D6E2465426A00EEBFC9 /* UI Components */,
+				4DF347EF2074FA5A00148741 /* Model */,
+				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
+				4DF347F02074FA6B00148741 /* Strongbox.h */,
 				4D1FFB492403030100B75EA2 /* Mac-Outright-Pro-Info.plist */,
 				4DF59F651F30DB7A00D68BFE /* Info.plist */,
-				4DF347EF2074FA5A00148741 /* Model */,
-				4D59E25F23FCA22E0004B309 /* YubiKey */,
-				4D524D2B219B503F00C22CB4 /* View */,
-				4DCA65AD1F4B45800078B962 /* DocumentController.h */,
-				4DCA65AE1F4B45800078B962 /* DocumentController.m */,
+				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
-				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,
-				4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */,
-				4D55A56D23D743C40057CBA8 /* BookmarksHelper.h */,
-				4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */,
-				4D832A9923CE2AC000A7885E /* SecretStore.h */,
-				4DACA5BF23CCD40F00891366 /* SecretStore.m */,
-				4DF59F5D1F30DB7A00D68BFE /* Document.h */,
-				4DF59F5E1F30DB7A00D68BFE /* Document.m */,
-				4DC805D423A1176E001E742E /* CheckboxCell.xib */,
-				4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */,
-				4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */,
-				4DBCE22D2224438800A2AFA2 /* KSPasswordField.h */,
-				4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */,
 				4DF59F571F30DB7A00D68BFE /* Supporting Files */,
-				4D00B1F61F3DB03300D7560B /* Alerts.h */,
-				4D00B1F71F3DB03300D7560B /* Alerts.m */,
-				4D5AE1E81F432BBC000A34D7 /* Settings.h */,
-				4D5AE1E91F432BBC000A34D7 /* Settings.m */,
-				4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */,
-				4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */,
-				4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */,
-				4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */,
-				4DBCE2292224207000A2AFA2 /* KeePassPredefinedIcons.h */,
-				4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */,
-				4D92C8251F38A03500341A58 /* WindowController.h */,
-				4D92C8261F38A03500341A58 /* WindowController.m */,
-				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
-				4D216F5922CBCD73000954D0 /* Password Generation */,
-				4DFC06D5226467AA00A4254A /* libs */,
-				4D9E0948218250F6007BA1E7 /* KeePass */,
-				4DF347D52074FA1D00148741 /* PwSafe */,
 				4D2965F721AD6B4B009B7936 /* MacboxTests */,
 				4D29660621AD6EFB009B7936 /* MacUnitTests */,
 				4D29661421AD6FB2009B7936 /* MBTests */,
 				4D29663621AD7318009B7936 /* MB1Tests */,
 				4DF59F521F30DB7A00D68BFE /* Products */,
 				4D1D6F3A1F386CB700D2B8EC /* Frameworks */,
-				4DC225701F558D47000B0FBB /* StrongBox.entitlements */,
 				83A5026A689FD4BF4431C710 /* Pods */,
 			);
 			sourceTree = "<group>";
@@ -1968,10 +1823,22 @@
 		4DFC06D5226467AA00A4254A /* libs */ = {
 			isa = PBXGroup;
 			children = (
-				4DD2BAB6238BE42600513271 /* Base32 */,
-				4D8DE9A921F898240043DDC0 /* OneTimePassword */,
-				4DBF492322232A1100F48182 /* DAVKit */,
 				4D87F8AA223049EB006A6320 /* GZIP */,
+				4D8DE9A921F898240043DDC0 /* OneTimePassword */,
+				4DD2BAB6238BE42600513271 /* Base32 */,
+				C85B9D722465444E00EEBFC9 /* CSV */,
+				C85B9D6F2465435800EEBFC9 /* McGuill */,
+				4D55A56D23D743C40057CBA8 /* BookmarksHelper.h */,
+				4D55A56E23D743C40057CBA8 /* BookmarksHelper.m */,
+				4D832A9923CE2AC000A7885E /* SecretStore.h */,
+				4DACA5BF23CCD40F00891366 /* SecretStore.m */,
+				4D524CA1219B458A00C22CB4 /* BiometricIdHelper.h */,
+				4D524CA3219B458B00C22CB4 /* BiometricIdHelper.m */,
+				4DF522B423C8ABEF00CD948E /* ClipboardManager.h */,
+				4DF522B523C8ABEF00CD948E /* ClipboardManager.m */,
+				4D3587A624104AF100318688 /* ColoredStringHelper.h */,
+				4D3587A724104AF100318688 /* ColoredStringHelper.m */,
+				4DBF492322232A1100F48182 /* DAVKit */,
 				4DBFD388225D127500290488 /* MyAutoComplete */,
 				4D22DA3B22609CAB00561AF7 /* MBProgressHUD */,
 			);
@@ -1991,6 +1858,160 @@
 				34629E3CBC779E0F1547E434 /* Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig */,
 			);
 			name = Pods;
+			sourceTree = "<group>";
+		};
+		C85B9D6E2465426A00EEBFC9 /* UI Components */ = {
+			isa = PBXGroup;
+			children = (
+				4D00B1F61F3DB03300D7560B /* Alerts.h */,
+				4D00B1F71F3DB03300D7560B /* Alerts.m */,
+				4D50321B2412C36100766489 /* ClickableSecureTextField.h */,
+				4D50321C2412C36100766489 /* ClickableSecureTextField.m */,
+				4DC805D423A1176E001E742E /* CheckboxCell.xib */,
+				4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */,
+				4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */,
+				4DBCE22D2224438800A2AFA2 /* KSPasswordField.h */,
+				4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */,
+				4DEB21401F717AE3009E3729 /* NSAdvancedTextField.h */,
+				4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */,
+				4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */,
+				4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */,
+			);
+			name = "UI Components";
+			sourceTree = "<group>";
+		};
+		C85B9D6F2465435800EEBFC9 /* McGuill */ = {
+			isa = PBXGroup;
+			children = (
+				C85B9D8E2465463F00EEBFC9 /* UrlRequestOperation.h */,
+				C85B9D8F2465463F00EEBFC9 /* UrlRequestOperation.m */,
+				C85B9D8A2465462200EEBFC9 /* ConcurrentMutableSet.h */,
+				C85B9D8B2465462200EEBFC9 /* ConcurrentMutableSet.m */,
+				C85B9D75246544C600EEBFC9 /* NSData+Extensions.h */,
+				C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */,
+				C85B9D73246544C600EEBFC9 /* NSString+Extensions.h */,
+				C85B9D76246544C600EEBFC9 /* NSString+Extensions.m */,
+				4DBFD385225CFE2F00290488 /* NSDictionary+Extensions.h */,
+				4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */,
+				4DFF40072180726700B69383 /* BasicOrderedDictionary.h */,
+				4DFF40092180726700B69383 /* BasicOrderedDictionary.m */,
+				4D446804216CDA4400F6358D /* NSArray+Extensions.h */,
+				4D446805216CDA4500F6358D /* NSArray+Extensions.m */,
+				4DF347F52074FA6C00148741 /* Utils.h */,
+				4DF347FB2074FA6C00148741 /* Utils.m */,
+			);
+			name = McGuill;
+			sourceTree = "<group>";
+		};
+		C85B9D702465439E00EEBFC9 /* ViewModel */ = {
+			isa = PBXGroup;
+			children = (
+				4DCA65AD1F4B45800078B962 /* DocumentController.h */,
+				4DCA65AE1F4B45800078B962 /* DocumentController.m */,
+				4D92C8251F38A03500341A58 /* WindowController.h */,
+				4D92C8261F38A03500341A58 /* WindowController.m */,
+				4D4DFC091F3B135000BE1C2D /* ViewModel.h */,
+				4D4DFC0A1F3B135000BE1C2D /* ViewModel.m */,
+				4DF59F5D1F30DB7A00D68BFE /* Document.h */,
+				4DF59F5E1F30DB7A00D68BFE /* Document.m */,
+			);
+			name = ViewModel;
+			sourceTree = "<group>";
+		};
+		C85B9D71246543BA00EEBFC9 /* Strongbox Model */ = {
+			isa = PBXGroup;
+			children = (
+				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
+				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
+				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
+				4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */,
+				4D01BA2B22BD31F00044226F /* SearchScope.h */,
+				4D524D09219B490100C22CB4 /* NodeFileAttachment.h */,
+				4D524D08219B490100C22CB4 /* NodeFileAttachment.m */,
+				4D524CA9219B45F700C22CB4 /* DatabaseAttachment.h */,
+				4D524CAA219B45F700C22CB4 /* DatabaseAttachment.m */,
+				4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */,
+				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
+				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
+				4DF347FE2074FA6C00148741 /* Node.h */,
+				4DF348002074FA6C00148741 /* Node.m */,
+				4DF347FA2074FA6C00148741 /* NodeFields.h */,
+				4DF347F22074FA6B00148741 /* NodeFields.m */,
+				4D0835A4228472D200CA7405 /* UiAttachment.h */,
+				4D0835A5228472D200CA7405 /* UiAttachment.m */,
+				4D29663F21ADAC0B009B7936 /* CustomField.h */,
+				4D29664021ADAC0B009B7936 /* CustomField.m */,
+			);
+			name = "Strongbox Model";
+			sourceTree = "<group>";
+		};
+		C85B9D722465444E00EEBFC9 /* CSV */ = {
+			isa = PBXGroup;
+			children = (
+				4D524CAC219B474100C22CB4 /* CHCSVParser.h */,
+				4D524CAD219B474100C22CB4 /* CHCSVParser.m */,
+				4D44680A216CE08A00F6358D /* Csv.h */,
+				4D44680B216CE08A00F6358D /* Csv.m */,
+			);
+			name = CSV;
+			sourceTree = "<group>";
+		};
+		C85B9D7B2465453A00EEBFC9 /* YubiKey */ = {
+			isa = PBXGroup;
+			children = (
+				C85B9DAB246548C400EEBFC9 /* lib */,
+				C85B9D9E246547D500EEBFC9 /* include */,
+				C85B9D9A246547B900EEBFC9 /* YubiKeyConfiguration.h */,
+				C85B9D9B246547B900EEBFC9 /* YubiKeyConfiguration.m */,
+				C85B9D932465478C00EEBFC9 /* PressYubiKeyWindow.h */,
+				C85B9D922465478C00EEBFC9 /* PressYubiKeyWindow.m */,
+				C85B9D952465478C00EEBFC9 /* YubiKeyData.h */,
+				C85B9D942465478C00EEBFC9 /* YubiKeyData.m */,
+				C85B9D812465454700EEBFC9 /* MacYubiKeyManager.h */,
+				C85B9D7D2465454700EEBFC9 /* MacYubiKeyManager.m */,
+			);
+			name = YubiKey;
+			sourceTree = "<group>";
+		};
+		C85B9D9E246547D500EEBFC9 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				C85B9D7E2465454700EEBFC9 /* json */,
+				C85B9D7C2465454700EEBFC9 /* json-c */,
+				C85B9D7F2465454700EEBFC9 /* ykpers-1 */,
+				C85B9D802465454700EEBFC9 /* yubikey.h */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		C85B9DAB246548C400EEBFC9 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				C85B9D9F2465480A00EEBFC9 /* libjson-c.a */,
+				C85B9DA22465480B00EEBFC9 /* libjson.a */,
+				C85B9DA12465480A00EEBFC9 /* libykpers-1.a */,
+				C85B9DA02465480A00EEBFC9 /* libyubikey.a */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
+		C85B9DB024655D5C00EEBFC9 /* Common Password */ = {
+			isa = PBXGroup;
+			children = (
+				C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */,
+			);
+			name = "Common Password";
+			path = ..;
+			sourceTree = "<group>";
+		};
+		C85B9DB324655D5C00EEBFC9 /* Names */ = {
+			isa = PBXGroup;
+			children = (
+				C85B9DB124655D5C00EEBFC9 /* surnames.us.txt */,
+				C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */,
+			);
+			name = Names;
+			path = ..;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2107,6 +2128,7 @@
 				"zh-Hans",
 				es,
 				it,
+				nb,
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
 			productRefGroup = 4DF59F521F30DB7A00D68BFE /* Products */;
@@ -2125,12 +2147,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C85B9DAE24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB182403030100B75EA2 /* PreferencesWindowController.xib in Resources */,
-				4DCC992924074EDC00B7DAB2 /* PressYubiKeyWindow.xib in Resources */,
 				4D1FFB192403030100B75EA2 /* CheckboxCell.xib in Resources */,
 				4D1FFB1A2403030100B75EA2 /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4D1FFB1B2403030100B75EA2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB1C2403030100B75EA2 /* MacKeePassHistory.storyboard in Resources */,
+				C85B9D892465454800EEBFC9 /* ykpers-1 in Resources */,
 				4D1FFB1D2403030100B75EA2 /* CollectionViewHeader.xib in Resources */,
 				4D1FFB1E2403030100B75EA2 /* UpgradeWindowController.xib in Resources */,
 				4D1FFB1F2403030100B75EA2 /* diceware.wordlist.utf8.txt in Resources */,
@@ -2140,14 +2163,17 @@
 				4D1FFB232403030100B75EA2 /* AttachmentItem.xib in Resources */,
 				4D1FFB242403030100B75EA2 /* star_trek_8k_2018.utf8.txt in Resources */,
 				4D1FFB252403030100B75EA2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				C85B9DB724655D6700EEBFC9 /* first.names.us.txt in Resources */,
 				4D1FFB262403030100B75EA2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4D1FFB272403030100B75EA2 /* PredefinedKeePassIcon.xib in Resources */,
 				4D1FFB282403030100B75EA2 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D1FFB292403030100B75EA2 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				C85B9DB524655D6300EEBFC9 /* surnames.us.txt in Resources */,
 				4D1FFB2A2403030100B75EA2 /* Assets.xcassets in Resources */,
 				4D1FFB2B2403030100B75EA2 /* QRCodePresenter.storyboard in Resources */,
 				4D1FFB2C2403030100B75EA2 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB2D2403030100B75EA2 /* DownloadFavIcons.storyboard in Resources */,
+				C85B9D872465454800EEBFC9 /* json in Resources */,
 				4D1FFB2E2403030100B75EA2 /* Localizable.strings in Resources */,
 				4D1FFB2F2403030100B75EA2 /* starwars_8k_2018.utf8.txt in Resources */,
 				4D1FFB302403030100B75EA2 /* ProgressWindow.xib in Resources */,
@@ -2155,6 +2181,7 @@
 				4D1FFB322403030100B75EA2 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB332403030100B75EA2 /* FavIconResultTableCell.xib in Resources */,
 				4D1FFB342403030100B75EA2 /* formatV3.txt in Resources */,
+				C85B9D832465454800EEBFC9 /* json-c in Resources */,
 				4D1FFB352403030100B75EA2 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4D1FFB372403030100B75EA2 /* formatV4.txt in Resources */,
@@ -2167,6 +2194,7 @@
 				4D1FFB3E2403030100B75EA2 /* eff_large_wordlist.utf8.txt in Resources */,
 				4D1FFB3F2403030100B75EA2 /* NodeDetails.storyboard in Resources */,
 				4D1FFB402403030100B75EA2 /* SafesMetaDataViewer.xib in Resources */,
+				C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
 				4D1FFB412403030100B75EA2 /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2182,12 +2210,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C85B9DAD24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
 				4DC8059E23A116D5001E742E /* PreferencesWindowController.xib in Resources */,
-				4DCC991424074EBF00B7DAB2 /* PressYubiKeyWindow.xib in Resources */,
 				4DC805D223A1176E001E742E /* CheckboxCell.xib in Resources */,
 				4DC8059123A11493001E742E /* harrypotter_8k_2018.utf8.txt in Resources */,
 				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */,
+				C85B9D882465454800EEBFC9 /* ykpers-1 in Resources */,
 				4DC805B823A1173D001E742E /* CollectionViewHeader.xib in Resources */,
 				4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
@@ -2197,14 +2226,17 @@
 				4DC805C423A11752001E742E /* AttachmentItem.xib in Resources */,
 				4DC8059423A11493001E742E /* star_trek_8k_2018.utf8.txt in Resources */,
 				4D216F6F22CBCE0D000954D0 /* swedish-diceware.wordlist.utf8.txt in Resources */,
+				C85B9DB624655D6600EEBFC9 /* first.names.us.txt in Resources */,
 				4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
 				4DC805BF23A11749001E742E /* PredefinedKeePassIcon.xib in Resources */,
 				4D216F7722CBCE0D000954D0 /* eff_short_wordlist_2_0.utf8.txt in Resources */,
 				4D216F7622CBCE0D000954D0 /* eff_short_wordlist_1.utf8.txt in Resources */,
+				C85B9DB424655D6200EEBFC9 /* surnames.us.txt in Resources */,
 				4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */,
 				4DF522B823C8BACE00CD948E /* QRCodePresenter.storyboard in Resources */,
 				4D216F7522CBCE0D000954D0 /* japanese-diceware.wordlist.utf8.txt in Resources */,
 				4D1E77E223AFEBF4007240FA /* DownloadFavIcons.storyboard in Resources */,
+				C85B9D862465454800EEBFC9 /* json in Resources */,
 				4D4A003D231317A900B69E09 /* Localizable.strings in Resources */,
 				4DC8059223A11493001E742E /* starwars_8k_2018.utf8.txt in Resources */,
 				4DC805AD23A11702001E742E /* ProgressWindow.xib in Resources */,
@@ -2212,6 +2244,7 @@
 				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
+				C85B9D822465454800EEBFC9 /* json-c in Resources */,
 				4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DC805A723A116E9001E742E /* ChangeMasterPasswordWindowController.xib in Resources */,
 				4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */,
@@ -2224,6 +2257,7 @@
 				4D216F6E22CBCE0D000954D0 /* eff_large_wordlist.utf8.txt in Resources */,
 				4D40B08423BFB8AA00BAD0D2 /* NodeDetails.storyboard in Resources */,
 				4DC805A123A116DD001E742E /* SafesMetaDataViewer.xib in Resources */,
+				C85B9DB824655D6A00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2329,6 +2363,7 @@
 				4D1FFA712403030100B75EA2 /* Entry.m in Sources */,
 				4D1FFA722403030100B75EA2 /* VariantDictionary.m in Sources */,
 				4D1FFA732403030100B75EA2 /* DatabasePreferences.m in Sources */,
+				C85B9D992465478D00EEBFC9 /* YubiKeyData.m in Sources */,
 				4D1FFA742403030100B75EA2 /* DatabaseAttachment.m in Sources */,
 				4D1FFA752403030100B75EA2 /* AesKdfCipher.m in Sources */,
 				4D1FFA762403030100B75EA2 /* crypt_argchk.c in Sources */,
@@ -2347,7 +2382,6 @@
 				4D1FFA832403030100B75EA2 /* NSData+GZIP.m in Sources */,
 				4D1FFA842403030100B75EA2 /* SelectPredefinedIconController.m in Sources */,
 				4D1FFA852403030100B75EA2 /* ViewModel.m in Sources */,
-				4D1FFA862403030100B75EA2 /* MacYubiKeyManager.m in Sources */,
 				4D1FFA872403030100B75EA2 /* KdbSerialization.m in Sources */,
 				4D1FFA882403030100B75EA2 /* XMLWriter.m in Sources */,
 				4D37D872244E074800C3182D /* DatabaseAuditor.m in Sources */,
@@ -2355,6 +2389,8 @@
 				4D1FFA8A2403030100B75EA2 /* Node.m in Sources */,
 				4D1FFA8B2403030100B75EA2 /* DatabaseModel.m in Sources */,
 				4D1FFA8C2403030100B75EA2 /* OTPToken+Persistence.m in Sources */,
+				C85B9D9D246547BA00EEBFC9 /* YubiKeyConfiguration.m in Sources */,
+				C85B9D78246544C600EEBFC9 /* NSData+Extensions.m in Sources */,
 				4D1FFA8D2403030100B75EA2 /* DatabasePropertiesController.m in Sources */,
 				4D50321E2412C36800766489 /* ClickableSecureTextField.m in Sources */,
 				4D1FFA8E2403030100B75EA2 /* Kdbx4Database.m in Sources */,
@@ -2375,7 +2411,6 @@
 				4D1FFA9C2403030100B75EA2 /* V3BinariesList.m in Sources */,
 				4D1FFA9D2403030100B75EA2 /* DatabaseMetadata.m in Sources */,
 				4D1FFA9E2403030100B75EA2 /* BaseXmlDomainObjectHandler.m in Sources */,
-				4D788CF92404761E007BD8D6 /* YubiKeyData.m in Sources */,
 				4D1FFA9F2403030100B75EA2 /* argon2.c in Sources */,
 				4D1FFAA02403030100B75EA2 /* KeePass4DatabaseMetadata.m in Sources */,
 				4D1FFAA12403030100B75EA2 /* FavIconResultTableCellView.m in Sources */,
@@ -2389,7 +2424,6 @@
 				4D1FFAA92403030100B75EA2 /* CHCSVParser.m in Sources */,
 				4D1FFAAA2403030100B75EA2 /* PasswordHistoryEntry.m in Sources */,
 				4D1FFAAB2403030100B75EA2 /* KdbEntry.m in Sources */,
-				4D70345B2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */,
 				4D1FFAAC2403030100B75EA2 /* core.c in Sources */,
 				4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */,
 				4D1FFAAE2403030100B75EA2 /* Document.m in Sources */,
@@ -2403,7 +2437,6 @@
 				4D1FFAB62403030100B75EA2 /* KeePassDatabase.m in Sources */,
 				4D1FFAB72403030100B75EA2 /* PwSafeSerialization.m in Sources */,
 				4D1FFAB82403030100B75EA2 /* CustomIconsRationalizer.m in Sources */,
-				4DCC992C24074F9000B7DAB2 /* PressYubiKeyWindow.m in Sources */,
 				4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */,
 				4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */,
 				4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */,
@@ -2419,6 +2452,7 @@
 				4D1FFAC42403030100B75EA2 /* DAVCredentials.m in Sources */,
 				4D1FFAC52403030100B75EA2 /* KeePassGroup.m in Sources */,
 				4D1FFAC62403030100B75EA2 /* ChaCha20Stream.m in Sources */,
+				C85B9D972465478D00EEBFC9 /* PressYubiKeyWindow.m in Sources */,
 				4D1FFAC72403030100B75EA2 /* QRCodePresenterPopover.m in Sources */,
 				4D1FFAC82403030100B75EA2 /* ViewController.m in Sources */,
 				4D1FFAC92403030100B75EA2 /* DAVSession.m in Sources */,
@@ -2452,6 +2486,7 @@
 				4D1FFAE52403030100B75EA2 /* main.m in Sources */,
 				4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */,
 				4D1FFAE72403030100B75EA2 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				C85B9D912465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
 				4D1FFAE82403030100B75EA2 /* DAVRequest.m in Sources */,
 				4D1FFAE92403030100B75EA2 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D1FFAEA2403030100B75EA2 /* AppDelegate.m in Sources */,
@@ -2460,6 +2495,7 @@
 				4D1FFAED2403030100B75EA2 /* Times.m in Sources */,
 				4D37D874244E074E00C3182D /* DatabaseAuditReport.m in Sources */,
 				4D1FFAEE2403030100B75EA2 /* OTPToken+Serialization.m in Sources */,
+				C85B9D852465454800EEBFC9 /* MacYubiKeyManager.m in Sources */,
 				4D1FFAEF2403030100B75EA2 /* SprCompilation.m in Sources */,
 				4D1FFAF02403030100B75EA2 /* StringValue.m in Sources */,
 				4D1FFAF12403030100B75EA2 /* MBProgressHUD.m in Sources */,
@@ -2468,6 +2504,7 @@
 				4D1FFAF42403030100B75EA2 /* CustomFieldTableCellView.m in Sources */,
 				4D1FFAF52403030100B75EA2 /* History.m in Sources */,
 				4D1FFAF62403030100B75EA2 /* NodeDetailsViewController.m in Sources */,
+				C85B9D7A246544C600EEBFC9 /* NSString+Extensions.m in Sources */,
 				4D1FFAF72403030100B75EA2 /* Argon2KdfCipher.m in Sources */,
 				4D1FFAF82403030100B75EA2 /* DocumentController.m in Sources */,
 				4D1FFAF92403030100B75EA2 /* BasicOrderedDictionary.m in Sources */,
@@ -2477,6 +2514,7 @@
 				4D37D873244E074B00C3182D /* DatabaseAuditorConfiguration.m in Sources */,
 				4D1FFAFD2403030100B75EA2 /* ProgressWindow.m in Sources */,
 				4D1FFAFE2403030100B75EA2 /* MMcGACTextViewEditor.m in Sources */,
+				C85B9D8D2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
 				4D1FFAFF2403030100B75EA2 /* NSArray+Extensions.m in Sources */,
 				4D1FFB002403030100B75EA2 /* DatabasesManager.m in Sources */,
 				4D1FFB012403030100B75EA2 /* Group.m in Sources */,
@@ -2515,6 +2553,7 @@
 				4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */,
 				4D9E098121825108007BA1E7 /* Entry.m in Sources */,
 				4D524CDA219B47DB00C22CB4 /* VariantDictionary.m in Sources */,
+				C85B9D982465478D00EEBFC9 /* YubiKeyData.m in Sources */,
 				4D6EB45E23DF26910045C8D5 /* DatabasePreferences.m in Sources */,
 				4D524CAB219B45F700C22CB4 /* DatabaseAttachment.m in Sources */,
 				4DEA5898224BFA7300013808 /* AesKdfCipher.m in Sources */,
@@ -2535,12 +2574,13 @@
 				4D87F8AD22304A04006A6320 /* NSData+GZIP.m in Sources */,
 				4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */,
 				4D4DFC0B1F3B135000BE1C2D /* ViewModel.m in Sources */,
-				4D59E20723FCA15A0004B309 /* MacYubiKeyManager.m in Sources */,
 				4D524CBF219B479900C22CB4 /* KdbSerialization.m in Sources */,
 				4DA50D03244DFD2100364781 /* DatabaseAuditor.m in Sources */,
 				4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */,
 				4D0835AA2284732500CA7405 /* StrongboxDatabase.m in Sources */,
 				4DF348072074FA6C00148741 /* Node.m in Sources */,
+				C85B9D9C246547BA00EEBFC9 /* YubiKeyConfiguration.m in Sources */,
+				C85B9D77246544C600EEBFC9 /* NSData+Extensions.m in Sources */,
 				4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */,
 				4D8DE9BE21F898470043DDC0 /* OTPToken+Persistence.m in Sources */,
 				4D0BD69923DF4205004C48BB /* DatabasePropertiesController.m in Sources */,
@@ -2562,7 +2602,6 @@
 				4D524D07219B48D300C22CB4 /* V3BinariesList.m in Sources */,
 				4D559FA520750D1D009856E3 /* DatabaseMetadata.m in Sources */,
 				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
-				4D788CF82404761E007BD8D6 /* YubiKeyData.m in Sources */,
 				4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */,
 				4D524CD6219B47DB00C22CB4 /* KeePass4DatabaseMetadata.m in Sources */,
 				4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */,
@@ -2576,7 +2615,6 @@
 				4D524CAE219B474200C22CB4 /* CHCSVParser.m in Sources */,
 				4DF347E52074FA3500148741 /* PasswordHistoryEntry.m in Sources */,
 				4D524CBE219B479900C22CB4 /* KdbEntry.m in Sources */,
-				4D70345A2405B20200F4F41E /* YubiKeyConfiguration.m in Sources */,
 				4D524D25219B4B2A00C22CB4 /* core.c in Sources */,
 				4DBF494322232A3200F48182 /* DAVRequests.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
@@ -2590,7 +2628,6 @@
 				4D9E099F21825134007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D524C9D219B44BE00C22CB4 /* PwSafeSerialization.m in Sources */,
 				4D1E77D523AFD7FB007240FA /* CustomIconsRationalizer.m in Sources */,
-				4D5C21932406F8FE0003A61A /* PressYubiKeyWindow.m in Sources */,
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
 				4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */,
 				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
@@ -2605,6 +2642,7 @@
 				4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */,
 				4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */,
 				4D524CF0219B481200C22CB4 /* ChaCha20Stream.m in Sources */,
+				C85B9D962465478D00EEBFC9 /* PressYubiKeyWindow.m in Sources */,
 				4DF522BB23C8BBA900CD948E /* QRCodePresenterPopover.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4DBF494222232A3200F48182 /* DAVSession.m in Sources */,
@@ -2638,6 +2676,7 @@
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */,
 				4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				C85B9D902465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
 				4DBF494022232A3200F48182 /* DAVRequest.m in Sources */,
 				4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4DF59F561F30DB7A00D68BFE /* AppDelegate.m in Sources */,
@@ -2646,6 +2685,7 @@
 				4D9E098321825108007BA1E7 /* Times.m in Sources */,
 				4D8DE9BC21F898470043DDC0 /* OTPToken+Serialization.m in Sources */,
 				4DBFD386225CFE2F00290488 /* SprCompilation.m in Sources */,
+				C85B9D842465454800EEBFC9 /* MacYubiKeyManager.m in Sources */,
 				4DEA5897224BFA7300013808 /* StringValue.m in Sources */,
 				4D22DA3E22609CBB00561AF7 /* MBProgressHUD.m in Sources */,
 				4DBCE22B2224207000A2AFA2 /* KeePassPredefinedIcons.m in Sources */,
@@ -2654,6 +2694,7 @@
 				4DE0CB712232C0F200E109F9 /* History.m in Sources */,
 				4D643B9F23B65075000C383A /* NodeDetailsViewController.m in Sources */,
 				4D524CD3219B47DB00C22CB4 /* Argon2KdfCipher.m in Sources */,
+				C85B9D79246544C600EEBFC9 /* NSString+Extensions.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4DFF400C2180726700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4DA50D05244DFD2100364781 /* DatabaseAuditorConfiguration.m in Sources */,
@@ -2663,6 +2704,7 @@
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
 				4DBFD38E225D156D00290488 /* MMcGACTextViewEditor.m in Sources */,
+				C85B9D8C2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
 				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,
 				4D524CA4219B458B00C22CB4 /* DatabasesManager.m in Sources */,
 				4DF347E72074FA3500148741 /* Group.m in Sources */,
@@ -2704,6 +2746,7 @@
 				4DD8D56F23CC9D4000E7F57B /* zh-Hans */,
 				4D8B370823FAD61100A81725 /* es */,
 				4D95482E24004F5E008D2BE1 /* it */,
+				C803E1D62464978E001EB9A5 /* nb */,
 			);
 			name = DownloadFavIcons.storyboard;
 			path = MacBox;
@@ -2721,6 +2764,7 @@
 				4DD8D57023CC9D4000E7F57B /* zh-Hans */,
 				4D8B370923FAD61100A81725 /* es */,
 				4D95482F24004F5F008D2BE1 /* it */,
+				C803E1D72464978E001EB9A5 /* nb */,
 			);
 			name = MacKeePassHistory.storyboard;
 			path = MacBox;
@@ -2738,6 +2782,7 @@
 				4DD8D56923CC9D3F00E7F57B /* zh-Hans */,
 				4D8B370223FAD61000A81725 /* es */,
 				4D95482824004F5E008D2BE1 /* it */,
+				C803E1D02464978D001EB9A5 /* nb */,
 			);
 			name = NodeDetails.storyboard;
 			path = MacBox;
@@ -2771,6 +2816,7 @@
 				4D68256823E498EA002DC4FB /* uk */,
 				4D8B370023FAD61000A81725 /* es */,
 				4D95482624004F5E008D2BE1 /* it */,
+				C803E1CE2464978D001EB9A5 /* nb */,
 			);
 			name = DatabaseProperties.storyboard;
 			path = MacBox;
@@ -2788,6 +2834,7 @@
 				4DD8D56E23CC9D4000E7F57B /* zh-Hans */,
 				4D8B370723FAD61100A81725 /* es */,
 				4D95482D24004F5E008D2BE1 /* it */,
+				C803E1D52464978E001EB9A5 /* nb */,
 			);
 			name = PreferencesWindowController.xib;
 			path = MacBox;
@@ -2805,6 +2852,7 @@
 				4DD8D57123CC9D4000E7F57B /* zh-Hans */,
 				4D8B370A23FAD61100A81725 /* es */,
 				4D95483024004F5F008D2BE1 /* it */,
+				C803E1D82464978E001EB9A5 /* nb */,
 			);
 			name = SafesMetaDataViewer.xib;
 			path = MacBox;
@@ -2822,6 +2870,7 @@
 				4DD8D57523CC9D4000E7F57B /* zh-Hans */,
 				4D8B370E23FAD61200A81725 /* es */,
 				4D95483424004F5F008D2BE1 /* it */,
+				C803E1CD2464978D001EB9A5 /* nb */,
 			);
 			name = UpgradeWindowController.xib;
 			path = MacBox;
@@ -2839,6 +2888,7 @@
 				4DD8D56D23CC9D4000E7F57B /* zh-Hans */,
 				4D8B370623FAD61100A81725 /* es */,
 				4D95482C24004F5E008D2BE1 /* it */,
+				C803E1D42464978E001EB9A5 /* nb */,
 			);
 			name = ChangeMasterPasswordWindowController.xib;
 			path = MacBox;
@@ -2856,6 +2906,7 @@
 				4DD8D57223CC9D4000E7F57B /* zh-Hans */,
 				4D8B370B23FAD61200A81725 /* es */,
 				4D95483124004F5F008D2BE1 /* it */,
+				C803E1D92464978E001EB9A5 /* nb */,
 			);
 			name = ProgressWindow.xib;
 			path = MacBox;
@@ -2873,6 +2924,7 @@
 				4DD8D56C23CC9D3F00E7F57B /* zh-Hans */,
 				4D8B370523FAD61100A81725 /* es */,
 				4D95482B24004F5E008D2BE1 /* it */,
+				C803E1D32464978D001EB9A5 /* nb */,
 			);
 			name = SelectPredefinedIconController.xib;
 			path = MacBox;
@@ -2884,6 +2936,7 @@
 				4DC805B923A1173D001E742E /* Base */,
 				4D8B370D23FAD61200A81725 /* es */,
 				4D95483324004F5F008D2BE1 /* it */,
+				C803E1DB2464978E001EB9A5 /* nb */,
 			);
 			name = CollectionViewHeader.xib;
 			path = MacBox;
@@ -2901,6 +2954,7 @@
 				4DD8D57323CC9D4000E7F57B /* zh-Hans */,
 				4D8B370C23FAD61200A81725 /* es */,
 				4D95483224004F5F008D2BE1 /* it */,
+				C803E1DA2464978E001EB9A5 /* nb */,
 			);
 			name = PredefinedKeePassIcon.xib;
 			path = MacBox;
@@ -2912,6 +2966,7 @@
 				4DC805C523A11752001E742E /* Base */,
 				4D8B370423FAD61000A81725 /* es */,
 				4D95482A24004F5E008D2BE1 /* it */,
+				C803E1D22464978D001EB9A5 /* nb */,
 			);
 			name = AttachmentItem.xib;
 			path = MacBox;
@@ -2923,6 +2978,7 @@
 				4DC805C823A11756001E742E /* Base */,
 				4D8B370323FAD61000A81725 /* es */,
 				4D95482924004F5E008D2BE1 /* it */,
+				C803E1D12464978D001EB9A5 /* nb */,
 			);
 			name = CustomFieldTableCellView.xib;
 			path = MacBox;
@@ -2934,27 +2990,11 @@
 				4DC805D323A1176E001E742E /* Base */,
 				4D8B370F23FAD61200A81725 /* es */,
 				4D95483524004F5F008D2BE1 /* it */,
+				C803E1DC2464978F001EB9A5 /* nb */,
 			);
 			name = CheckboxCell.xib;
 			path = MacBox;
 			sourceTree = "<group>";
-		};
-		4DCC991624074EBF00B7DAB2 /* PressYubiKeyWindow.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				4DCC991524074EBF00B7DAB2 /* Base */,
-				4DCC991A24074ECE00B7DAB2 /* zh-Hans */,
-				4DCC991C24074ED000B7DAB2 /* fr */,
-				4DCC991E24074ED100B7DAB2 /* de */,
-				4DCC992024074ED100B7DAB2 /* it */,
-				4DCC992224074ED200B7DAB2 /* ru */,
-				4DCC992424074ED300B7DAB2 /* es */,
-				4DCC992624074ED400B7DAB2 /* sv */,
-				4DCC992824074ED500B7DAB2 /* uk */,
-			);
-			name = PressYubiKeyWindow.xib;
-			path = MacBox;
-			sourceTree = SOURCE_ROOT;
 		};
 		4DF59F621F30DB7A00D68BFE /* Main.storyboard */ = {
 			isa = PBXVariantGroup;
@@ -2968,6 +3008,7 @@
 				4DD8D56823CC9D3F00E7F57B /* zh-Hans */,
 				4D8B370123FAD61000A81725 /* es */,
 				4D95482724004F5E008D2BE1 /* it */,
+				C803E1CF2464978D001EB9A5 /* nb */,
 			);
 			name = Main.storyboard;
 			path = MacBox;
@@ -2982,10 +3023,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2907;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3008,10 +3049,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2907;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3189,10 +3230,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2907;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3215,10 +3256,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2907;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;

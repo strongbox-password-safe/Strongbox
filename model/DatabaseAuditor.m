@@ -15,7 +15,6 @@
 #import "ConcurrentMutableSet.h"
 #import "UrlRequestOperation.h"
 #import "SecretStore.h"
-#import "SafesList.h"
 
 static const int kHttpStatusOk = 200;
 static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwnedSetCacheKey";
@@ -57,13 +56,13 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 @property NSSet<Node*>* nodes;
 @property NSArray<Node*>* auditableNonEmptyPasswordNodes;
 
-@property SafeMetaData* metadata;
+@property (nullable) SaveConfigurationBlock saveConfig;
 
 @end
 
 @implementation DatabaseAuditor
 
-- (instancetype)initWithPro:(BOOL)pro metadata:(nonnull SafeMetaData *)metadata {
+- (instancetype)initWithPro:(BOOL)pro saveConfig:(SaveConfigurationBlock)saveConfig {
     self = [super init];
     
     if (self) {
@@ -83,7 +82,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         self.hibpQueue.maxConcurrentOperationCount = 4;
         self.mutablePwnedNodes = ConcurrentMutableSet.mutableSet;
         
-        self.metadata = metadata;
+        self.saveConfig = saveConfig;
     }
     
     return self;
@@ -488,9 +487,10 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     
     if (checkForNewBreaches) {
         NSLog(@"Will Check for New Breaches....");
-        if (self.metadata) { // Unit Test will be nil
-            self.config.lastHibpOnlineCheck = NSDate.date;
-            [SafesList.sharedInstance update:self.metadata];
+        self.config.lastHibpOnlineCheck = NSDate.date;
+        
+        if (self.saveConfig) {
+            self.saveConfig(self.config);
         }
     }
     

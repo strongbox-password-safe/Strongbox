@@ -36,6 +36,7 @@
 #import "BrowseTableViewCellHelper.h"
 #import "QuickViewsBrowseTableDataSource.h"
 #import <ISMessages/ISMessages.h>
+#import "BiometricsManager.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -70,8 +71,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property ConfiguredBrowseTableDatasource* configuredDataSource;
 @property SearchResultsBrowseTableDatasource* searchDataSource;
 @property QuickViewsBrowseTableDataSource* quickViewsDataSource;
-
-@property BOOL hasGivenAuditNotification;
 
 @end
 
@@ -154,7 +153,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
          // This coordinates all TOTP UI updates for this database
         [self startOtpRefresh];
         
-        [self maybeShowNagScreen];        
+        [self maybePromptToTryProFeatures];        
     }
     
     // Add an edit button to the top right
@@ -277,13 +276,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount = @(issueCount);
     [SafesList.sharedInstance update:self.viewModel.metadata];
 
-    if ( self.hasGivenAuditNotification || !self.viewModel.metadata.auditConfig.showAuditPopupNotifications) { // Only show this once per unlock session on the top root controller
-        return;
+    if ( self.viewModel.metadata.auditConfig.showAuditPopupNotifications) {
+        [self showAuditPopup:issueCount lastKnownAuditIssueCount:lastKnownAuditIssueCount];
     }
-    
-    [self showAuditPopup:issueCount lastKnownAuditIssueCount:lastKnownAuditIssueCount];
-        
-    self.hasGivenAuditNotification = YES;
 }
 
 - (void)showAuditPopup:(NSUInteger)issueCount lastKnownAuditIssueCount:(NSNumber*)lastKnownAuditIssueCount {
@@ -314,7 +309,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     else if (issueCount > lastKnownAuditIssueCount.unsignedIntegerValue) {
         [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_audit_complete_title", @"Security Audit Complete")
                                    message:[NSString stringWithFormat:NSLocalizedString(@"browse_vc_audit_complete_message_new_issues_found_fmt",@"%ld New Issues Found!"), issueCount - lastKnownAuditIssueCount.unsignedIntegerValue]
-                                  duration:1.5f
+                                  duration:2.5f
                                hideOnSwipe:YES
                                  hideOnTap:YES
                                  alertType:ISAlertTypeError
@@ -327,34 +322,53 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self refreshItems];
 }
 
-- (void)maybeShowNagScreen {
-    if([Settings.sharedInstance isPro]) {
+- (void)maybePromptToTryProFeatures {
+    // Free or Pro? Definitely no
+    
+    if(Settings.sharedInstance.isProOrFreeTrial) {
         return;
     }
 
-    NSInteger percentageChanceOfShowing;
-    NSInteger daysInstalled = Settings.sharedInstance.daysInstalled;
+    // Has the user ever given Pro a try? Maybe the just need a nudge...
+
+    NSDate* dueDate = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitDay value:7 toDate:Settings.sharedInstance.lastFreeTrialNudge options:kNilOptions];
+    //NSLog(@"Nudge Due: [%@]", dueDate);
+    BOOL nudgeDue = dueDate.timeIntervalSinceNow < 0; // Due date is in past
     
-    if(daysInstalled < 60) {
-        NSLog(@"Less than 60 days installed... not showing Nag Screen");
-        return;
-    }
-    else if(Settings.sharedInstance.isFreeTrial) {
-        percentageChanceOfShowing = 5;
+    if (!Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired && nudgeDue) {
+        Settings.sharedInstance.lastFreeTrialNudge = NSDate.date;
+        
+        NSString* locMsg = NSLocalizedString(@"browse_pro_nudge_message_fmt", @"Strongbox Pro is full of handy features like %@ Unlock.\n\nYou have a Free Trial available to use, would you like to try Strongbox Pro?");
+        NSString* locMsgFmt = [NSString stringWithFormat:locMsg, BiometricsManager.sharedInstance.biometricIdName];
+        
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"browse_pro_nudge_title", @"Try Strongbox Pro?")
+              message:locMsgFmt
+               action:^(BOOL response) {
+            if (response) {
+                [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
+            }
+        }];
     }
     else {
-        percentageChanceOfShowing = 10;
-    }
+        // User has already tried for more than 90 days... Nag :(
+        if ([self userHasAlreadyTriedAppForMoreThan90Days]) {
+            const NSUInteger percentageChanceOfShowing = 4;
+            NSInteger random = arc4random_uniform(100);
 
-    NSInteger random = arc4random_uniform(100);
-
-    if(random < percentageChanceOfShowing) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
-        });
+            if(random < percentageChanceOfShowing) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+                    [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
+                });
+            }
+        }
     }
 }
 
+- (BOOL)userHasAlreadyTriedAppForMoreThan90Days {
+    return (Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90);
+}
+    
 - (void)showDetailTargetDidChange:(NSNotification *)notification{
     NSLog(@"showDetailTargetDidChange");
     if(!self.splitViewController.isCollapsed) {
@@ -1218,7 +1232,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
         if (@available(iOS 13.0, *)) {
-            if (Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
+            if ([self userHasAlreadyTriedAppForMoreThan90Days]) {
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.modalInPresentation = YES;
             }

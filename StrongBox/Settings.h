@@ -111,6 +111,8 @@ extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 
 @property BOOL colorizeUseColorBlindPalette;
 
+@property NSDate* lastFreeTrialNudge;
+
 NS_ASSUME_NONNULL_END
 
 @end

@@ -54,7 +54,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
         
         self.isAutoFillOpen = isAutoFillOpen;
         
-        self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial metadata:metaData];
+        [self createNewAuditor];
 
         [self restartBackgroundAudit];
         
@@ -89,12 +89,21 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
 }
 
 - (void)stopAudit {
-    [self.auditor stop];
+    if (self.auditor) {
+        [self.auditor stop];
+    }
 }
 
 - (void)stopAndClearAuditor {
-    [self.auditor stop];
-    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial metadata:self.metadata];
+    [self stopAudit];
+    [self createNewAuditor];
+}
+
+- (void)createNewAuditor {
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
+        // We can ignore the actual passed in config because we know it's part of the overall Database SafeMetaData;
+        [SafesList.sharedInstance update:self.metadata];
+    }];
 }
 
 - (void)restartAudit {

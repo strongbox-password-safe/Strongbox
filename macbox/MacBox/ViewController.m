@@ -206,7 +206,9 @@ static NSImage* kStrongBox256Image;
     [super viewDidAppear];
     
     self.view.window.delegate = self;
-    
+
+    [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
+
     [self initializeFullOrTrialOrLiteUI];
     
     [self setInitialFocus];
@@ -2342,7 +2344,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else if(destinationItem.isGroup) {
         NSData* json = [pasteboard dataForType:kDragAndDropExternalUti];
         if(json && destinationItem.isGroup) {
-            NSLog(@"copy pasta!");
+            //NSLog(@"copy pasta!");
 
             BOOL ret = [self pasteFromExternal:json destinationItem:destinationItem];
             if(clear) {
@@ -3072,6 +3074,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSLog(@"Preferences Have Changed Notification Received... Refreshing View.");
 
     dispatch_async(dispatch_get_main_queue(), ^{
+        [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
+
         if(self.model == nil || self.model.locked) {
             [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
             [self bindLockScreenUi];
