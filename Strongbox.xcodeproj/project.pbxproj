@@ -1500,6 +1500,19 @@
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
+		C86E907A246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
+		C86E907B246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
+		C86E907C246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
+		C86E907D246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
+		C86E9080246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */; };
+		C86E9081246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */; };
+		C86E9082246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */; };
+		C86E9083246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */; };
+		C86E9085246D9D4C0029623A /* DeletesAndMovesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9084246D9D4C0029623A /* DeletesAndMovesTest.m */; };
+		C86E9088246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
+		C86E9089246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
+		C86E908A246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
+		C86E908B246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
 		C88F812D245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
 		C88F812E245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
 		C88F812F245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
@@ -1516,6 +1529,22 @@
 		C8BEF17424600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17524600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17624600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
+		C8BF76E82472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
+		C8BF76E92472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
+		C8BF76EA2472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
+		C8BF76EB2472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
+		C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
+		C8E6D4EA246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
+		C8E6D4EB246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
+		C8E6D4EC246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
+		C8E6D4EF246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C8E6D4F0246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C8E6D4F1246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C8E6D4F2246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C8E6D4F3246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C8E6D4F4246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C8E6D4F5246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C8E6D4F6246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
 		C8E9DA9E245DAD4C0093F97C /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */; };
 		C8E9DA9F245DAD4C0093F97C /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */; };
 		C8E9DAA0245DAD4C0093F97C /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */; };
@@ -2900,6 +2929,13 @@
 		C843333E2461668F00E2E550 /* Fastfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Fastfile; path = fastlane/Fastfile; sourceTree = "<group>"; };
 		C843333F2461668F00E2E550 /* changelog.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = changelog.txt; path = fastlane/changelog.txt; sourceTree = "<group>"; };
 		C84333402461668F00E2E550 /* Appfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Appfile; path = fastlane/Appfile; sourceTree = "<group>"; };
+		C86E9078246D99C80029623A /* DeletedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DeletedObject.h; path = model/keepass/DeletedObject.h; sourceTree = "<group>"; };
+		C86E9079246D99C80029623A /* DeletedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DeletedObject.m; path = model/keepass/DeletedObject.m; sourceTree = "<group>"; };
+		C86E907E246D9A110029623A /* KeePassDatabaseWideProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseWideProperties.h; path = model/keepass/KeePassDatabaseWideProperties.h; sourceTree = "<group>"; };
+		C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseWideProperties.m; path = model/keepass/KeePassDatabaseWideProperties.m; sourceTree = "<group>"; };
+		C86E9084246D9D4C0029623A /* DeletesAndMovesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletesAndMovesTest.m; path = StrongboxTests/DeletesAndMovesTest.m; sourceTree = "<group>"; };
+		C86E9086246DA2530029623A /* DeletedItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedItem.h; path = model/keepass/DeletedItem.h; sourceTree = "<group>"; };
+		C86E9087246DA2530029623A /* DeletedItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedItem.m; path = model/keepass/DeletedItem.m; sourceTree = "<group>"; };
 		C88F812B245D8C7C00B0B998 /* ConcurrentMutableSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConcurrentMutableSet.h; sourceTree = "<group>"; };
 		C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConcurrentMutableSet.m; sourceTree = "<group>"; };
 		C88F8131245D90C500B0B998 /* NSData+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSData+Extensions.h"; path = "StrongBox/NSData+Extensions.h"; sourceTree = "<group>"; };
@@ -2911,6 +2947,12 @@
 		C8961909246166F7008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C896190A246166F7008D4BD1 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
 		C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "norwegian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		C8BF76E62472E1820080A808 /* DeletedObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedObjects.h; path = model/DeletedObjects.h; sourceTree = "<group>"; };
+		C8BF76E72472E1820080A808 /* DeletedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedObjects.m; path = model/DeletedObjects.m; sourceTree = "<group>"; };
+		C8E6D4E7246D43EA00AFFE13 /* WordList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = model/WordList.h; sourceTree = "<group>"; };
+		C8E6D4E8246D43EA00AFFE13 /* WordList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = model/WordList.m; sourceTree = "<group>"; };
+		C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "finnish-diceware.wordlist.utf8.txt"; path = "resources/wordlists/finnish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8E9DA9C245DAD4C0093F97C /* UrlRequestOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UrlRequestOperation.h; path = StrongBox/UrlRequestOperation.h; sourceTree = "<group>"; };
 		C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UrlRequestOperation.m; path = StrongBox/UrlRequestOperation.m; sourceTree = "<group>"; };
 		CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill_Family.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3138,6 +3180,8 @@
 		4D0835E522847BAF00CA7405 /* Word Lists */ = {
 			isa = PBXGroup;
 			children = (
+				C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */,
+				C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */,
 				C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */,
 				4D6C8544239630A200008391 /* gameofthrones_8k_2018.utf8.txt */,
 				4D6C8543239630A200008391 /* harrypotter_8k_2018.utf8.txt */,
@@ -3349,6 +3393,7 @@
 		4D196787217F0BEE0057DF06 /* Xml */ = {
 			isa = PBXGroup;
 			children = (
+				4D4767032178D1A700C4358F /* XmlDomainObjects */,
 				4D2F6C4221807CF9007931E4 /* BaseXmlDomainObjectHandler.h */,
 				4D2F6C4321807CF9007931E4 /* BaseXmlDomainObjectHandler.m */,
 				4D2F6C1321807BFF007931E4 /* XmlStrongBoxModelAdaptor.h */,
@@ -3357,7 +3402,6 @@
 				4D2F6C1121807BFF007931E4 /* XmlStrongboxNodeModelAdaptor.m */,
 				4D664DBB2179D1A30023FF0C /* XmlWriting */,
 				4D4767042178D25800C4358F /* XmlParsing */,
-				4D4767032178D1A700C4358F /* XmlDomainObjects */,
 				4D5F5B74218B39BF00A0739A /* InnerRandomStreamFactory.h */,
 				4D5F5B75218B39BF00A0739A /* InnerRandomStreamFactory.m */,
 				4D7862B6231C119A0063A1A2 /* IXmlSerializer.h */,
@@ -3397,12 +3441,13 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C86E9084246D9D4C0029623A /* DeletesAndMovesTest.m */,
+				4D98344621775F3800731FFC /* test-files */,
 				4D9AFB0D2449ACA500376240 /* DatabaseAuditorTests.m */,
 				4D098B9E2429186F006D9430 /* TagsTests.m */,
 				4D2CB7E723D1BCC0000A9ABC /* SecretStoreTests.m */,
 				4D2E3CF323C7886200712FC6 /* AlternativeUrlTests.m */,
 				4D2561B0233FEB6E00179B84 /* YubiKeyTests.m */,
-				4D98344621775F3800731FFC /* test-files */,
 				4D1BF4FA23244150007DF0E6 /* ZlibStreamTests.m */,
 				4DC5CD49231F007A0038FC9F /* MemoryPerformanceTests.m */,
 				4D8AC1612319B22F00CAB5F5 /* MemoryConsumptionTests.m */,
@@ -3635,6 +3680,10 @@
 				4DA12F01219837830000CEBB /* CustomIconList.m */,
 				4DA12F04219837D10000CEBB /* CustomIcon.h */,
 				4DA12F05219837D10000CEBB /* CustomIcon.m */,
+				C8BF76E62472E1820080A808 /* DeletedObjects.h */,
+				C8BF76E72472E1820080A808 /* DeletedObjects.m */,
+				C86E9078246D99C80029623A /* DeletedObject.h */,
+				C86E9079246D99C80029623A /* DeletedObject.m */,
 			);
 			name = XmlDomainObjects;
 			sourceTree = "<group>";
@@ -3894,14 +3943,13 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C88F813D245D994800B0B998 /* Database */,
 				4D2962AC223171BA0082897D /* misc */,
 				4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */,
 				4D18855F2170DE90001AE6B0 /* OpenSafeSequenceHelper.h */,
 				4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */,
-				C88F813E245D99D200B0B998 /* Serialization Adaptors */,
 				4D62D6961C85F35E0051E13B /* StorageProviders */,
 				4D6BA68323CCB981008DCE8A /* SecretStore */,
-				C88F813D245D994800B0B998 /* Database */,
 				C88F812A245D8C5E00B0B998 /* McGuill */,
 				C89BE52F245B253700A73688 /* Password Generation */,
 				4D326EA1223032C800DCD8C7 /* Libraries */,
@@ -3949,15 +3997,16 @@
 		4D78AC251FB1E24D00A68A92 /* Keepass */ = {
 			isa = PBXGroup;
 			children = (
+				4D9E08F221824E12007BA1E7 /* Kdbx3.1 */,
+				4D9E08ED21824C8C007BA1E7 /* Kdbx4 */,
+				4D196787217F0BEE0057DF06 /* Xml */,
+				C86E907E246D9A110029623A /* KeePassDatabaseWideProperties.h */,
+				C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */,
 				4DF176F023293D1500255CD6 /* KeePassXmlParser.h */,
 				4DF176F123293D1500255CD6 /* KeePassXmlParser.m */,
 				4D0835C3228474A800CA7405 /* KeyDerivationCipher.h */,
-				4D6FE2BD219444F900EB9997 /* Kdb-1 */,
 				4D3E148A21832B5F00A41CA0 /* Argon2 */,
-				4D9E08F221824E12007BA1E7 /* Kdbx3.1 */,
-				4D9E08ED21824C8C007BA1E7 /* Kdbx4 */,
 				4D9E08E321822F38007BA1E7 /* crypto */,
-				4D196787217F0BEE0057DF06 /* Xml */,
 				4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */,
 				4D8FBEEE21A9CA0F004797FA /* KdbxSerializationCommon.h */,
 				4D4766DA2178C82B00C4358F /* DecryptionParameters.h */,
@@ -3980,6 +4029,8 @@
 				4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */,
 				4D305764224B4F8F00C36287 /* StringValue.h */,
 				4D305765224B4F8F00C36287 /* StringValue.m */,
+				C86E9086246DA2530029623A /* DeletedItem.h */,
+				C86E9087246DA2530029623A /* DeletedItem.m */,
 			);
 			name = Keepass;
 			sourceTree = "<group>";
@@ -4446,6 +4497,7 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				4D3652162184A34600A56519 /* AppDelegate.m */,
 				4D62D6941C85F2B50051E13B /* UI */,
 				4D78AC231FB1E22C00A68A92 /* Model */,
@@ -4453,7 +4505,6 @@
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
-				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				4DC4E16F23488BAB000743C4 /* Strongbox-iOS copy-Info.plist */,
 				4DC4E27723488BAF000743C4 /* Strongbox Auto Fill copy-Info.plist */,
 				4D8A99A7230AF31700AB98DC /* RMStore.strings */,
@@ -4595,6 +4646,8 @@
 				4DE7F0FB22F89D8D0095F51F /* PasswordGenerationPreferences.storyboard */,
 				4DFA67D822C7F2D4000FC012 /* PasswordGenerationViewController.h */,
 				4DFA67D922C7F2D4000FC012 /* PasswordGenerationViewController.m */,
+				C8E6D4E7246D43EA00AFFE13 /* WordList.h */,
+				C8E6D4E8246D43EA00AFFE13 /* WordList.m */,
 			);
 			name = "Password Generation";
 			sourceTree = "<group>";
@@ -4630,11 +4683,11 @@
 		4DED20C72168BF1800A5800A /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
 				4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */,
 				4DE2689F22A67A6200A1D158 /* MasterDetailViewController.m */,
 				4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */,
-				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D1A5C001F7927D60036684C /* VersionConflictController.h */,
 				4D1A5C011F7927D60036684C /* VersionConflictController.m */,
 				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
@@ -4823,6 +4876,17 @@
 		C88F813D245D994800B0B998 /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				C88F813E245D99D200B0B998 /* Serialization Adaptors */,
+				4D78AC2D1FB1E27700A68A92 /* Node.h */,
+				4D78AC2E1FB1E27700A68A92 /* Node.m */,
+				4D78AC281FB1E27700A68A92 /* NodeFields.h */,
+				4D78AC2A1FB1E27700A68A92 /* NodeFields.m */,
+				4D1D6FD61F38760F00D2B8EC /* Model.m */,
+				4D1D6FD51F38760F00D2B8EC /* Model.h */,
+				4D78AC261FB1E27700A68A92 /* DatabaseModel.h */,
+				4D78AC271FB1E27700A68A92 /* DatabaseModel.m */,
+				4D0835D32284750900CA7405 /* StrongboxDatabase.h */,
+				4D0835D42284750900CA7405 /* StrongboxDatabase.m */,
 				4D18F2342257987E00768E18 /* SprCompilation.h */,
 				4D18F2352257987E00768E18 /* SprCompilation.m */,
 				4D8C72B722525E160016A5CC /* AutoFillManager.h */,
@@ -4833,16 +4897,6 @@
 				4D196791217F1B2A0057DF06 /* AbstractDatabaseMetadata.h */,
 				4D402D6E2074EAFF00F7BC70 /* SafeMetaData.h */,
 				4D402D702074EAFF00F7BC70 /* SafeMetaData.m */,
-				4D1D6FD61F38760F00D2B8EC /* Model.m */,
-				4D1D6FD51F38760F00D2B8EC /* Model.h */,
-				4D0835D32284750900CA7405 /* StrongboxDatabase.h */,
-				4D0835D42284750900CA7405 /* StrongboxDatabase.m */,
-				4D78AC261FB1E27700A68A92 /* DatabaseModel.h */,
-				4D78AC271FB1E27700A68A92 /* DatabaseModel.m */,
-				4D78AC2D1FB1E27700A68A92 /* Node.h */,
-				4D78AC2E1FB1E27700A68A92 /* Node.m */,
-				4D78AC281FB1E27700A68A92 /* NodeFields.h */,
-				4D78AC2A1FB1E27700A68A92 /* NodeFields.m */,
 				4D5F5B91218B6C9D00A0739A /* NodeFileAttachment.h */,
 				4D5F5B92218B6C9D00A0739A /* NodeFileAttachment.m */,
 				4D876B4121AC36F800805DED /* CustomField.h */,
@@ -4856,6 +4910,7 @@
 		C88F813E245D99D200B0B998 /* Serialization Adaptors */ = {
 			isa = PBXGroup;
 			children = (
+				4D6FE2BD219444F900EB9997 /* Kdb-1 */,
 				4D78AC241FB1E23B00A68A92 /* PwSafe */,
 				4D78AC251FB1E24D00A68A92 /* Keepass */,
 			);
@@ -5169,6 +5224,7 @@
 				4D4D3FE22409CE1C0056A7E2 /* ProgressHudView.xib in Resources */,
 				4DE2689722A665A400A1D158 /* RecordView.storyboard in Resources */,
 				4D36B0B622C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				C8E6D4EF246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4DE7F0E422F89D610095F51F /* SelectKeyFile.storyboard in Resources */,
 				4D4D3FD12409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
 				4D4D3FDC2409CDC80056A7E2 /* Assets.xcassets in Resources */,
@@ -5211,6 +5267,7 @@
 				4DE7F0F522F89D870095F51F /* SelectItem.storyboard in Resources */,
 				4DE7F0CE22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
 				4DE7F0F822F89D8D0095F51F /* PasswordGenerationPreferences.storyboard in Resources */,
+				C8E6D4F3246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0C022C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
 				4DE7F0D822F89D3E0095F51F /* ItemDetails.storyboard in Resources */,
@@ -5257,6 +5314,7 @@
 				4D4D3FE32409CE1C0056A7E2 /* ProgressHudView.xib in Resources */,
 				4DC4E13923488BAA000743C4 /* RecordView.storyboard in Resources */,
 				4DC4E13A23488BAA000743C4 /* dutch-diceware.wordlist.utf8.txt in Resources */,
+				C8E6D4F1246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E13B23488BAA000743C4 /* SelectKeyFile.storyboard in Resources */,
 				4D4D3FD22409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
 				4D4D3FDD2409CDC80056A7E2 /* Assets.xcassets in Resources */,
@@ -5299,6 +5357,7 @@
 				4DC4E15823488BAA000743C4 /* SelectItem.storyboard in Resources */,
 				4DC4E15923488BAA000743C4 /* LaunchScreen.storyboard in Resources */,
 				4DC4E15A23488BAA000743C4 /* PasswordGenerationPreferences.storyboard in Resources */,
+				C8E6D4F5246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E15B23488BAA000743C4 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E15C23488BAA000743C4 /* GoogleService-Info.plist in Resources */,
 				4DC4E15D23488BAA000743C4 /* ItemDetails.storyboard in Resources */,
@@ -5367,12 +5426,14 @@
 				4D160A8B2453002E0097C730 /* BrowseQuickViewItemCell.xib in Resources */,
 				4DC4E26823488BAE000743C4 /* IconTableCell.xib in Resources */,
 				4DC4E26923488BAE000743C4 /* IconsSectionHeaderReusableView.xib in Resources */,
+				C8E6D4F2246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E26A23488BAE000743C4 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4D526ABE2440BA4400B0B700 /* Export.storyboard in Resources */,
 				4DC4E26B23488BAE000743C4 /* NotesTableViewCell.xib in Resources */,
 				4DC4E26C23488BAE000743C4 /* IconCellView.xib in Resources */,
 				4D7F5A4023602000003ED785 /* ItemDetails.storyboard in Resources */,
 				4DC4E26D23488BAE000743C4 /* ViewAttachmentCell.xib in Resources */,
+				C8E6D4F6246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E26E23488BAE000743C4 /* WebDAVConfigurationViewController.xib in Resources */,
 				4D7F5A4C23602143003ED785 /* Browse.storyboard in Resources */,
 				4DC4E26F23488BAE000743C4 /* french-diceware.wordlist.utf8.txt in Resources */,
@@ -5439,12 +5500,14 @@
 				4D160A892453002E0097C730 /* BrowseQuickViewItemCell.xib in Resources */,
 				4D770F8B230324A800CBE244 /* IconTableCell.xib in Resources */,
 				4DF2997E2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
+				C8E6D4F0246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0C322C94740003E9B68 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				4D526ABC2440BA4400B0B700 /* Export.storyboard in Resources */,
 				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4D7F5A3F23601FFF003ED785 /* ItemDetails.storyboard in Resources */,
 				4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
+				C8E6D4F4246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4D770FA0230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */,
 				4D7F5A4B23602142003ED785 /* Browse.storyboard in Resources */,
 				4D36B0BF22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
@@ -5704,6 +5767,7 @@
 				4D983445217749F700731FFC /* KeePassXmlStrongboxNodeModelAdaptorTests.m in Sources */,
 				4D2259F322C67E56005547EA /* FavIconTests.m in Sources */,
 				4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */,
+				C86E9085246D9D4C0029623A /* DeletesAndMovesTest.m in Sources */,
 				4DD41FBA2182FBFB00FDDBB5 /* Kdbx4DatabaseTests.m in Sources */,
 				4D1BF4FB23244150007DF0E6 /* ZlibStreamTests.m in Sources */,
 				4DD755F4232F093900758824 /* XmlComparisonElement.m in Sources */,
@@ -5753,6 +5817,7 @@
 				4D08B5B7234C9613003D1953 /* GCDWebServer.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
+				C8BF76E82472E1820080A808 /* DeletedObjects.m in Sources */,
 				4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */,
 				4D646A2022D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
 				4DF97F2021BF101B0090A55E /* DAVRequest.m in Sources */,
@@ -5927,6 +5992,7 @@
 				4D1F5809233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
 				4D766D5322204E4A00AEF439 /* IconViewCell.m in Sources */,
+				C86E907A246D99C80029623A /* DeletedObject.m in Sources */,
 				4D06943922083E5200FB826C /* ProUpgradeIAPManager.m in Sources */,
 				4DF97F1E21BF101B0090A55E /* DAVResponseItem.m in Sources */,
 				4DEF7B97216FC74A00A3EE12 /* OfflineDetector.m in Sources */,
@@ -5963,6 +6029,8 @@
 				4DF14F6A2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */,
 				4D08B5B9234C9613003D1953 /* GCDWebServerConnection.m in Sources */,
 				4D5F5B8F218B66C500A0739A /* Binary.m in Sources */,
+				C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */,
+				C86E9088246DA2530029623A /* DeletedItem.m in Sources */,
 				4DF972B921BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */,
 				4D3E149E21832CC700A41CA0 /* blake2b.c in Sources */,
 				4DE9A60521F5FEF700128560 /* QRCodeScannerViewController.m in Sources */,
@@ -6047,6 +6115,7 @@
 				4D01BA2722BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				4DF97F2B21BF10EB0090A55E /* NSDateRFC1123.m in Sources */,
 				4D08B5C5234C9613003D1953 /* GCDWebServerMultiPartFormRequest.m in Sources */,
+				C86E9080246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				4D4761342437531C00E312D9 /* WelcomeFreemiumViewController.m in Sources */,
 				4D0835C12284748200CA7405 /* SFTPProviderData.m in Sources */,
 				4D9597B922A28825008DB224 /* SelectedStorageParameters.m in Sources */,
@@ -6107,6 +6176,7 @@
 				4DC4E03623488BAA000743C4 /* RMStoreTransaction.m in Sources */,
 				4D160A90245314040097C730 /* QuickViewConfig.m in Sources */,
 				4DC4E03723488BAA000743C4 /* AppleICloudOrLocalSafeFile.m in Sources */,
+				C8E6D4EB246D43EA00AFFE13 /* WordList.m in Sources */,
 				4DC4E03823488BAA000743C4 /* DAVCredentials.m in Sources */,
 				4DC4E03923488BAA000743C4 /* DatabasesViewPreferencesController.m in Sources */,
 				4DC4E03A23488BAA000743C4 /* DatabaseOperations.m in Sources */,
@@ -6151,6 +6221,7 @@
 				4DC4E05A23488BAA000743C4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DC4E05B23488BAA000743C4 /* KdbSerializationData.m in Sources */,
 				4DC4E05C23488BAA000743C4 /* CompositeKeyFactors.m in Sources */,
+				C86E907C246D99C80029623A /* DeletedObject.m in Sources */,
 				4DC4E05D23488BAA000743C4 /* KdbEntry.m in Sources */,
 				C88F812F245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */,
 				4DC4E05E23488BAA000743C4 /* DuressDummyStorageProvider.m in Sources */,
@@ -6222,6 +6293,7 @@
 				4DFF34C6238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DC4E08F23488BAA000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
 				4DC4E09023488BAA000743C4 /* GoogleDriveStorageProvider.m in Sources */,
+				C86E908A246DA2530029623A /* DeletedItem.m in Sources */,
 				4DC4E09123488BAA000743C4 /* SFTPStorageProvider.m in Sources */,
 				4DC4E09223488BAA000743C4 /* NMSFTP.m in Sources */,
 				4DC4E09323488BAA000743C4 /* DropboxV2StorageProvider.m in Sources */,
@@ -6329,6 +6401,7 @@
 				4DC4E0E523488BAA000743C4 /* RecordView.m in Sources */,
 				4DC4E0E623488BAA000743C4 /* OTPToken+Serialization.m in Sources */,
 				4DD6CB54238E6491005B94CF /* FavIconBulkViewController.m in Sources */,
+				C8BF76EA2472E1820080A808 /* DeletedObjects.m in Sources */,
 				4DC4E0E723488BAA000743C4 /* StorageBrowserTableViewController.m in Sources */,
 				4DC4E0E823488BAA000743C4 /* OfflineCacheNameDetector.m in Sources */,
 				4DC4E0E923488BAA000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */,
@@ -6371,6 +6444,7 @@
 				4D08B5C6234C9613003D1953 /* GCDWebServerMultiPartFormRequest.m in Sources */,
 				4DC4E10A23488BAA000743C4 /* SFTPProviderData.m in Sources */,
 				4DC4E10B23488BAA000743C4 /* SelectedStorageParameters.m in Sources */,
+				C86E9082246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				4DC4E10C23488BAA000743C4 /* CustomFieldViewModel.m in Sources */,
 				4DC4E10D23488BAA000743C4 /* ItemDetailsViewController.m in Sources */,
 				4DC4E10E23488BAA000743C4 /* StringValue.m in Sources */,
@@ -6430,6 +6504,7 @@
 				4DBBDE3923EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
 				4DC4E19523488BAE000743C4 /* EditAttachmentCell.m in Sources */,
 				4DC4E19623488BAE000743C4 /* WebDAVConfigurationViewController.m in Sources */,
+				C86E907D246D99C80029623A /* DeletedObject.m in Sources */,
 				4DC4E19723488BAE000743C4 /* CompositeKeyFactors.m in Sources */,
 				4D6B504D238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4DC4E19823488BAE000743C4 /* XmlSerializer.m in Sources */,
@@ -6497,6 +6572,7 @@
 				4DC4E1CB23488BAE000743C4 /* crypt_argchk.c in Sources */,
 				4DC4E1CC23488BAE000743C4 /* SafeStorageProviderFactory.m in Sources */,
 				4DC4E1CD23488BAE000743C4 /* DropboxV2StorageProvider.m in Sources */,
+				C86E908B246DA2530029623A /* DeletedItem.m in Sources */,
 				4DC4E1CE23488BAE000743C4 /* KeePassDatabase.m in Sources */,
 				4DC4E1CF23488BAE000743C4 /* Root.m in Sources */,
 				4DC4E1D023488BAE000743C4 /* twofish.c in Sources */,
@@ -6510,6 +6586,7 @@
 				4DC4E1D723488BAE000743C4 /* AddAttachmentHelper.m in Sources */,
 				4DC4E1D823488BAE000743C4 /* KdbGroup.m in Sources */,
 				4DC4E1D923488BAE000743C4 /* PasswordHistory.m in Sources */,
+				C8E6D4EC246D43EA00AFFE13 /* WordList.m in Sources */,
 				4DD6E79223E731AD00AC2A49 /* BookmarksHelper.m in Sources */,
 				4DC4E1DA23488BAE000743C4 /* ChaCha20Stream.m in Sources */,
 				4DC4E1DB23488BAE000743C4 /* BackupsTableViewController.m in Sources */,
@@ -6534,6 +6611,7 @@
 				4DC4E1EC23488BAE000743C4 /* Field.m in Sources */,
 				4DC4E1ED23488BAE000743C4 /* NSDictionary+Extensions.m in Sources */,
 				4DC4E1EE23488BAE000743C4 /* CustomIcon.m in Sources */,
+				C8BF76EB2472E1820080A808 /* DeletedObjects.m in Sources */,
 				4DC4E1EF23488BAE000743C4 /* PwSafeDatabase.m in Sources */,
 				4DC4E1F023488BAE000743C4 /* KeyFilesTableViewController.m in Sources */,
 				4DC4E1F123488BAE000743C4 /* OTPToken+Persistence.m in Sources */,
@@ -6586,6 +6664,7 @@
 				4D160A842452FC9D0097C730 /* QuickViewsBrowseTableDataSource.m in Sources */,
 				4DC4E21923488BAE000743C4 /* AppleICloudProvider.m in Sources */,
 				4DC4E21A23488BAE000743C4 /* SFTPProviderData.m in Sources */,
+				C86E9083246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				4DC4E21B23488BAE000743C4 /* core.c in Sources */,
 				4DC4E21C23488BAE000743C4 /* LocalDatabaseIdentifier.m in Sources */,
 				4DC4E21D23488BAE000743C4 /* NMSSHConfig.m in Sources */,
@@ -6673,6 +6752,7 @@
 				4DBBDE3723EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
 				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
 				4D0835D2228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
+				C86E907B246D99C80029623A /* DeletedObject.m in Sources */,
 				4D3169A822DE33AF003FAD3F /* CompositeKeyFactors.m in Sources */,
 				4D6B504B238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4D2F6C2021807C25007931E4 /* XmlSerializer.m in Sources */,
@@ -6740,6 +6820,7 @@
 				4D1884DA21709E5F001AE6B0 /* crypt_argchk.c in Sources */,
 				4D5F5B7D218B4C4300A0739A /* SafeStorageProviderFactory.m in Sources */,
 				4D5F5B7E218B4C4E00A0739A /* DropboxV2StorageProvider.m in Sources */,
+				C86E9089246DA2530029623A /* DeletedItem.m in Sources */,
 				4D9E09AA218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4DC5B9C2217B376F00FE9DD9 /* Root.m in Sources */,
 				4D1884D921709E3C001AE6B0 /* twofish.c in Sources */,
@@ -6753,6 +6834,7 @@
 				4DE498B62271B2AF007EF98C /* AddAttachmentHelper.m in Sources */,
 				4D5B1EA42194A56300ECAF0D /* KdbGroup.m in Sources */,
 				4D1884D721709E26001AE6B0 /* PasswordHistory.m in Sources */,
+				C8E6D4EA246D43EA00AFFE13 /* WordList.m in Sources */,
 				4DD6E79023E731AD00AC2A49 /* BookmarksHelper.m in Sources */,
 				4DB1B7D92188B22500CF1663 /* ChaCha20Stream.m in Sources */,
 				4D1F580A233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */,
@@ -6777,6 +6859,7 @@
 				4D1884D321709E0E001AE6B0 /* Field.m in Sources */,
 				4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				4DA12F07219837D10000CEBB /* CustomIcon.m in Sources */,
+				C8BF76E92472E1820080A808 /* DeletedObjects.m in Sources */,
 				4D1884D221709DF8001AE6B0 /* PwSafeDatabase.m in Sources */,
 				4D1140A8229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				4D004CE921F4F7B900E2B194 /* OTPToken+Persistence.m in Sources */,
@@ -6829,6 +6912,7 @@
 				4D160A822452FC9D0097C730 /* QuickViewsBrowseTableDataSource.m in Sources */,
 				4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */,
 				4D0835C22284748200CA7405 /* SFTPProviderData.m in Sources */,
+				C86E9081246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				4D3E149621832C1500A41CA0 /* core.c in Sources */,
 				4D556F2522B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8A22302BED00DCD8C7 /* NMSSHConfig.m in Sources */,

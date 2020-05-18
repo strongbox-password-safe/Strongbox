@@ -18,6 +18,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 @interface StrongboxDatabase ()
 
 @property (nonatomic, readonly) NSMutableArray<DatabaseAttachment*> *mutableAttachments;
+@property (nonatomic, readonly) NSMutableArray<DeletedItem*> *mutableDeletedObjects;
 @property (nonatomic) NSMutableDictionary<NSUUID*, NSData*>* mutableCustomIcons;
 
 @end
@@ -56,6 +57,20 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments
                       customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons {
+    return [self initWithRootGroup:rootGroup
+                          metadata:metadata
+               compositeKeyFactors:compositeKeyFactors
+                       attachments:attachments
+                       customIcons:[NSDictionary dictionary]
+                    deletedObjects:@[]];
+}
+
+- (instancetype)initWithRootGroup:(Node *)rootGroup
+                         metadata:(id<AbstractDatabaseMetadata>)metadata
+              compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      attachments:(NSArray<DatabaseAttachment *> *)attachments
+                      customIcons:(NSDictionary<NSUUID *,NSData *> *)customIcons
+                   deletedObjects:(NSArray<DeletedItem *> *)deletedObjects {
     self = [super init];
     
     if (self) {
@@ -66,6 +81,10 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         
         self.mutableCustomIcons = [customIcons mutableCopy];
         [self rationalizeCustomIcons];
+        
+        _mutableDeletedObjects = deletedObjects.mutableCopy;
+        
+        NSLog(@"Got Deleted Objects: [%@]", deletedObjects);
     }
     
     return self;
@@ -214,7 +233,6 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     [self rationalizeAttachments];
 }
 
-
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment *)attachment {
     [self addNodeAttachment:node attachment:attachment rationalize:YES];
 }
@@ -232,6 +250,110 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     if(rationalize) {
         [self rationalizeAttachments];
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Deletions
+
+- (NSArray<DeletedItem *> *)deletedObjects {
+    return [self.mutableDeletedObjects copy];
+}
+
+- (void)deleteItem:(Node *)item {
+    if (item.parent == nil || ![item.parent contains:item]) { // Very very strange if this ever happens we're in trouble
+        NSLog(@"WARNWARN: Attempt to delete item with no parent");
+        return;
+    }
+
+    NSDate* now = NSDate.date;
+    
+    if (item.isGroup) {
+        [self deleteAllGroupItems:item deletionDate:now];
+    }
+
+    [item.parent removeChild:item];
+    [self.mutableDeletedObjects addObject:[DeletedItem uuid:item.uuid date:now]];
+}
+
+- (void)deleteAllGroupItems:(Node*)group deletionDate:(NSDate*)deletionDate {
+    for (Node* entry in group.childRecords) {
+        [group removeChild:entry];
+        [self.mutableDeletedObjects addObject:[DeletedItem uuid:entry.uuid date:deletionDate]];
+    }
+
+    for (Node* subgroup in group.childGroups) {
+        [self deleteAllGroupItems:subgroup deletionDate:deletionDate];
+        [self.mutableDeletedObjects addObject:[DeletedItem uuid:subgroup.uuid date:deletionDate]];
+    }
+}
+
+//- (BOOL)unDeleteItemAndRemoveFromDeletedObjects:(Node *)item parent:(Node *)parent {
+//    // TODO:
+//    // Need to find parent and re-add item
+//    // Also need to remove from Deleted Objects
+//
+//    return NO;
+//}
+
+- (BOOL)recycleItem:(Node *)item {
+    if (!self.recycleBinEnabled) {
+        NSLog(@"WARNWARN: Attempt to recycle item when recycle bin disabled!");
+        return NO;
+    }
+    
+    if(self.recycleBinNode == nil) {     // UUID is NIL/Non Existent or Zero? - Create
+        [self createNewRecycleBinNode];
+    }
+    
+    BOOL ret = [item changeParent:self.recycleBinNode keePassGroupTitleRules:YES];
+    
+    if (ret) {
+        [item touch]; // NB: LocationChanged not set but accessed/usage count recursively (weirdly I think)
+    }
+
+    return ret;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Moves
+
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    BOOL invalid = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+        return obj.parent == nil || ![obj validateChangeParent:destination keePassGroupTitleRules:keePassGroupTitleRules];
+    }];
+    
+    if (invalid) {
+        return NO;
+    }
+    
+    // Attempt the move now - this could break despite the above check because someone tries to insert a group with the same name as one we've already inserted for example
+    
+    BOOL rollback = NO;
+    
+    NSMutableArray<Node*> *rollbackTo = NSMutableArray.array;
+    for(Node* itemToMove in items) {
+        [rollbackTo addObject:itemToMove.parent];
+        
+        if(![itemToMove changeParent:destination keePassGroupTitleRules:keePassGroupTitleRules]) {
+            rollback = YES;
+            NSLog(@"Error Changing Parents. [%@]", itemToMove);
+            break;
+        }
+    }
+    
+    if (rollback) {
+        int i = 0;
+        for (Node* previousParent in rollbackTo) {
+            [items[i++] changeParent:previousParent keePassGroupTitleRules:keePassGroupTitleRules];
+        }
+    }
+    else {
+        for(Node* itemToMove in items) {
+            [itemToMove touchLocationChanged]; // NB: Only LocationChanged (Date Mod/Accessed not changed) nor parents
+        }
+    }
+    
+    return !rollback;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,9 +402,22 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Recycle Bin (KeePass 2)
+// Recycle Bin (KeePass 2) -
+
+- (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
+    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
+        metadata.recycleBinEnabled = recycleBinEnabled;
+    }
+    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
+        metadata.recycleBinEnabled = recycleBinEnabled;
+    }
+}
 
 - (BOOL)recycleBinEnabled {
+    // TODO: Move the adaptor specific metadata checks into the adaptors, shouldn't be here at all
+    
     if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
         KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
         return metadata.recycleBinEnabled;

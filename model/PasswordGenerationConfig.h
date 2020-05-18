@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "WordList.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,7 +56,7 @@ typedef NS_ENUM (NSInteger, PasswordGenerationSaltConfig) {
 @interface PasswordGenerationConfig : NSObject
 
 + (instancetype)defaults;
-+ (NSDictionary<NSString*, NSString*>*)wordLists;
++ (NSDictionary<NSString*, WordList*>*)wordListsMap; // TODO: Mac
 
 + (NSString*)getCasingStringForCasing:(PasswordGenerationWordCasing)casing;
 + (NSString*)characterPoolToPoolString:(PasswordGenerationCharacterPool)pool;

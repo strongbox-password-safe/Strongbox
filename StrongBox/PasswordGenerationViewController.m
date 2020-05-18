@@ -186,11 +186,12 @@
     // This can happen if we change the key (mostly during development) but for safety include here...
     
     NSArray* knownWordLists = [self.config.wordLists filter:^BOOL(NSString * _Nonnull obj) {
-        return PasswordGenerationConfig.wordLists[obj] != nil;
+        return PasswordGenerationConfig.wordListsMap[obj] != nil;
     }];
     
     NSArray<NSString*> *friendlyWordLists = [knownWordLists map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-        return PasswordGenerationConfig.wordLists[obj];
+        WordList* list = PasswordGenerationConfig.wordListsMap[obj];
+        return list.name;
     }];
     
     NSString* friendlyWordListsCombined = [friendlyWordLists componentsJoinedByString:@", "];
@@ -381,37 +382,91 @@
 }
 
 - (void)changeWordLists {
-    NSArray<NSString*> *sortedKeys = [PasswordGenerationConfig.wordLists.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        NSString* v1 = PasswordGenerationConfig.wordLists[obj1];
-        NSString* v2 = PasswordGenerationConfig.wordLists[obj2];
-        
-        return finderStringCompare(v1, v2);
+    NSDictionary<NSNumber*, NSArray<WordList*>*>* wordListsByCategory = [PasswordGenerationConfig.wordListsMap.allValues groupBy:^id _Nonnull(WordList * _Nonnull obj) {
+        return @(obj.category);
     }];
     
-    NSArray* friendlySortedNames = [sortedKeys map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-        return PasswordGenerationConfig.wordLists[obj];
-    }];
+    NSArray<NSNumber*>* categories = @[@(kWordListCategoryStandard),
+                                       @(kWordListCategoryFandom),
+                                       @(kWordListCategoryLanguages)];
+
     
-    NSMutableIndexSet* sel = [NSMutableIndexSet indexSet];
-    for(int i=0;i<sortedKeys.count;i++) {
-        if([self.config.wordLists containsObject:sortedKeys[i]]) {
-            [sel addIndex:i];
+    NSArray<NSString*>* headers = [categories map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        if (obj.unsignedIntValue == kWordListCategoryStandard) {
+            return NSLocalizedString(@"password_gen_vc_wordlist_category_standard", @"Standard");
         }
-    }
+        if (obj.unsignedIntValue == kWordListCategoryFandom) {
+            return NSLocalizedString(@"password_gen_vc_wordlist_category_fandom", @"Fandom");
+        }
+        else {
+            return NSLocalizedString(@"password_gen_vc_wordlist_category_languages", @"Languages");
+        }
+    }];
     
-    [self promptForItems:NSLocalizedString(@"password_gen_vc_select_wordlists", @"Select Word Lists")
-                 options:friendlySortedNames
-         selectedIndices:sel
-              completion:^(NSIndexSet *selected) {
-                  NSMutableArray<NSString*>* selectedKeys = @[].mutableCopy;
-                  [selected enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
-                      [selectedKeys addObject:sortedKeys[idx]];
-                  }];
-                  self.config.wordLists = selectedKeys;
-                  Settings.sharedInstance.passwordGenerationConfig = self.config;
-                  [self bindUi];
-                  [self refreshGenerated];
-              }];
+    NSArray<NSArray<WordList*>*>* categorizedWordLists = [categories map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return  [wordListsByCategory[obj] sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            WordList* v1 = obj1;
+            WordList* v2 = obj2;
+    
+            return finderStringCompare(v1.name, v2.name);
+        }];
+    }];
+    
+    NSArray<NSArray<NSString*>*>* friendlyNames = [categorizedWordLists map:^id _Nonnull(NSArray<WordList *> * _Nonnull obj, NSUInteger idx) {
+        return [obj map:^id _Nonnull(WordList * _Nonnull obj, NSUInteger idx) {
+            return obj.name;
+        }];
+    }];
+    
+    NSArray<NSIndexSet*>* selected = [categorizedWordLists map:^id _Nonnull(NSArray<WordList *> * _Nonnull obj, NSUInteger idx) {
+        NSMutableIndexSet* indexSet = [NSMutableIndexSet indexSet];
+        
+        int i = 0;
+        for (WordList* wordList in obj) {
+            if([self.config.wordLists containsObject:wordList.key]) {
+                NSLog(@"Selecting: %@", wordList.key);
+                [indexSet addIndex:i];
+            }
+            
+            i++;
+        }
+        
+        return indexSet;
+    }];
+        
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+    
+    vc.groupItems = friendlyNames;
+    vc.groupHeaders = headers;
+    vc.selectedIndexPaths = selected;
+    vc.multipleSelectMode = YES;
+    vc.multipleSelectDisallowEmpty = YES;
+    
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSMutableArray<NSString*>* selectedKeys = @[].mutableCopy;
+        
+        int category = 0;
+        for (NSIndexSet* categorySet in selectedIndices) {
+            NSArray<WordList*>* wlc = categorizedWordLists[category];
+            
+            [categorySet enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+                WordList* wl = wlc[idx];
+                [selectedKeys addObject:wl.key];
+            }];
+
+            category++;
+        }
+        
+        self.config.wordLists = selectedKeys;
+        Settings.sharedInstance.passwordGenerationConfig = self.config;
+        [self bindUi];
+        [self refreshGenerated];
+    };
+    
+    vc.title = NSLocalizedString(@"password_gen_vc_select_wordlists", @"Select Word Lists");
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 - (void)changeCharacterGroups {
@@ -486,11 +541,12 @@
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
-    vc.items = options;
-    vc.selected = [NSIndexSet indexSetWithIndex:currentIndex];
-    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
+    vc.groupItems = @[options];
+    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentIndex]];
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
         [self.navigationController popViewControllerAnimated:YES];
-        completion(selectedIndices.firstIndex);
+        NSIndexSet* set = selectedIndices.firstObject;
+        completion(set.firstIndex);
     };
     
     vc.title = title;
@@ -506,13 +562,14 @@
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
-    vc.items = options;
-    vc.selected = selectedIndices;
+    vc.groupItems = @[options];
+    vc.selectedIndexPaths = @[selectedIndices];
     vc.multipleSelectMode = YES;
     vc.multipleSelectDisallowEmpty = YES;
     
-    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
-        completion(selectedIndices);
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSIndexSet* set = selectedIndices.firstObject;
+        completion(set);
     };
     
     vc.title = title;

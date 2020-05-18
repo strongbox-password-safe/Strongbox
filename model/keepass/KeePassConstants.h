@@ -21,6 +21,10 @@ static NSString* const kExpiresElementName = @"Expires";
 static NSString* const kLastAccessTimeElementName = @"LastAccessTime";
 static NSString* const kUsageCountElementName = @"UsageCount";
 static NSString* const kLocationChangedTimeElementName = @"LocationChanged";
+static NSString* const kDeletionTimeElementName = @"DeletionTime";
+
+static NSString* const kDeletedObjectElementName = @"DeletedObject";
+static NSString* const kDeletedObjectsElementName = @"DeletedObjects";
 
 static NSString* const kMetaElementName = @"Meta";
 static NSString* const kRootElementName = @"Root";
@@ -33,6 +37,7 @@ static NSString* const kTagsElementName = @"Tags";
 
 static NSString* const kUuidElementName = @"UUID";
 static NSString* const kTimesElementName = @"Times";
+
 static NSString* const kGeneratorElementName = @"Generator";
 
 static NSString* const kHistoryMaxItemsElementName = @"HistoryMaxItems";

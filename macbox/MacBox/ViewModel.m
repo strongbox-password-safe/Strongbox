@@ -988,40 +988,42 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)deleteItem:(Node *_Nonnull)child {
-    if([self deleteWillRecycle:child]) {
-        // UUID is NIL/Non Existent or Zero? - Create
-        if(self.passwordDatabase.recycleBinNode == nil) {
-            [self.passwordDatabase createNewRecycleBinNode];
-        }
+    BOOL wasRecycled;
+    BOOL ret = [self.passwordDatabase deleteOrRecycleItem:child wasRecycled:&wasRecycled];
 
-        return [self changeParent:self.passwordDatabase.recycleBinNode node:child isRecycleOp:YES];
+    if (wasRecycled) {
+            // Needs to be undoable
+        //    [self changeParent:self.passwordDatabase.recycleBinNode node:child isRecycleOp:YES];
+
+        // TODO: How to properly undo this?!
     }
     else {
-        [child.parent removeChild:child];
+        // TODO: How to properly undo this?!
         
-        [[self.document.undoManager prepareWithInvocationTarget:self] addItem:child parent:child.parent newItemCreated:NO];
+        [[self.document.undoManager prepareWithInvocationTarget:self] unDeleteItem:child];
         if(!self.document.undoManager.isUndoing) {
             NSString* loc = NSLocalizedString(@"mac_undo_action_delete_item", @"Delete Item");
             [self.document.undoManager setActionName:loc];
         }
+    }
 
+    if (ret) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.onDeleteItem(child);
         });
     }
     
-    return YES;
+    return ret;
+}
+
+- (BOOL)unDeleteItem:(Node *)item {
+    // TODO: Need to notify UI
+    
+    return [self.passwordDatabase unDeleteItem:item];
 }
 
 - (BOOL)deleteWillRecycle:(Node *)child {
-    BOOL willRecycle = self.passwordDatabase.recycleBinEnabled;
-    if(self.passwordDatabase.recycleBinEnabled && self.passwordDatabase.recycleBinNode) {
-        if([self.passwordDatabase.recycleBinNode contains:child] || self.passwordDatabase.recycleBinNode == child) {
-            willRecycle = NO;
-        }
-    }
-    
-    return willRecycle;
+    return [self.passwordDatabase deleteWillRecycle:child];
 }
 
 - (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {

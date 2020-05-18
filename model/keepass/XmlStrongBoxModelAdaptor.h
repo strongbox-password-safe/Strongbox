@@ -10,6 +10,7 @@
 #import "RootXmlDomainObject.h"
 #import "KeePassDatabaseMetadata.h"
 #import "Node.h"
+#import "KeePassDatabaseWideProperties.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,9 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
                                 error:(NSError**)error;
 
 - (nullable RootXmlDomainObject*)toXmlModelFromStrongboxModel:(Node*)rootNode
-                                         customIcons:(NSDictionary<NSUUID*, NSData*> *)customIcons
-                                        originalMeta:(Meta*_Nullable)originalMeta
-                                             context:(XmlProcessingContext*)context
+                                           databaseProperties:(KeePassDatabaseWideProperties*)databaseProperties
+                                                      context:(XmlProcessingContext*)context
                                                error:(NSError **)error;
 
 @end

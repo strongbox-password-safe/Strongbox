@@ -473,6 +473,18 @@
 		C85B9DB724655D6700EEBFC9 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */; };
 		C85B9DB824655D6A00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */; };
 		C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */; };
+		C86E9076246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */; };
+		C86E9077246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */; };
+		C8BF66C3246E835100BA6C43 /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF66C2246E835100BA6C43 /* DeletedItem.m */; };
+		C8BF66C4246E835100BA6C43 /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF66C2246E835100BA6C43 /* DeletedItem.m */; };
+		C8E6D4F9246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C8E6D4FA246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C8E6D4FB246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C8E6D4FC246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
+		C8E6D4FF246D5C7600AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4FE246D5C7600AFFE13 /* WordList.m */; };
+		C8E6D500246D5C7600AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4FE246D5C7600AFFE13 /* WordList.m */; };
+		C8E6D503246D71E800AFFE13 /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D502246D71E800AFFE13 /* DeletedObject.m */; };
+		C8E6D504246D71E800AFFE13 /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D502246D71E800AFFE13 /* DeletedObject.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1085,6 +1097,16 @@
 		C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "10-million-password-list-top-10000.txt"; path = "resources/10-million-password-list-top-10000.txt"; sourceTree = "<group>"; };
 		C85B9DB124655D5C00EEBFC9 /* surnames.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = surnames.us.txt; path = resources/names/surnames/surnames.us.txt; sourceTree = "<group>"; };
 		C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = first.names.us.txt; path = resources/names/first/first.names.us.txt; sourceTree = "<group>"; };
+		C86E9074246D88D70029623A /* KeePassDatabaseWideProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseWideProperties.h; path = ../model/keepass/KeePassDatabaseWideProperties.h; sourceTree = "<group>"; };
+		C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseWideProperties.m; path = ../model/keepass/KeePassDatabaseWideProperties.m; sourceTree = "<group>"; };
+		C8BF66C1246E835100BA6C43 /* DeletedItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DeletedItem.h; path = ../model/keepass/DeletedItem.h; sourceTree = "<group>"; };
+		C8BF66C2246E835100BA6C43 /* DeletedItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DeletedItem.m; path = ../model/keepass/DeletedItem.m; sourceTree = "<group>"; };
+		C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "finnish-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/finnish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		C8E6D4FD246D5C7600AFFE13 /* WordList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = ../model/WordList.h; sourceTree = "<group>"; };
+		C8E6D4FE246D5C7600AFFE13 /* WordList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = ../model/WordList.m; sourceTree = "<group>"; };
+		C8E6D501246D71E800AFFE13 /* DeletedObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedObject.h; path = ../model/keepass/DeletedObject.h; sourceTree = "<group>"; };
+		C8E6D502246D71E800AFFE13 /* DeletedObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedObject.m; path = ../model/keepass/DeletedObject.m; sourceTree = "<group>"; };
 		EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; sourceTree = "<group>"; };
 		F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -1173,6 +1195,8 @@
 				C85B9DB024655D5C00EEBFC9 /* Common Password */,
 				C85B9DB324655D5C00EEBFC9 /* Names */,
 				4D216F5B22CBCDBF000954D0 /* Word Lists */,
+				C8E6D4FD246D5C7600AFFE13 /* WordList.h */,
+				C8E6D4FE246D5C7600AFFE13 /* WordList.m */,
 				4D216F5322CBCCDE000954D0 /* PasswordMaker.h */,
 				4D216F5422CBCCDE000954D0 /* PasswordMaker.m */,
 				4D216F5722CBCD16000954D0 /* PasswordGenerationConfig.h */,
@@ -1184,6 +1208,8 @@
 		4D216F5B22CBCDBF000954D0 /* Word Lists */ = {
 			isa = PBXGroup;
 			children = (
+				C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */,
+				C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */,
 				C85B9DAC24655C9700EEBFC9 /* norwegian-diceware.wordlist.utf8.txt */,
 				4DC8058F23A11492001E742E /* gameofthrones_8k_2018.utf8.txt */,
 				4DC8058D23A11492001E742E /* harrypotter_8k_2018.utf8.txt */,
@@ -1373,6 +1399,8 @@
 				4D9E095221825103007BA1E7 /* Entry.m */,
 				4D9E094921825103007BA1E7 /* BaseXmlDomainObjectHandler.h */,
 				4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */,
+				C8E6D501246D71E800AFFE13 /* DeletedObject.h */,
+				C8E6D502246D71E800AFFE13 /* DeletedObject.m */,
 			);
 			name = Xml;
 			sourceTree = "<group>";
@@ -1426,6 +1454,7 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				C85B9D6E2465426A00EEBFC9 /* UI Components */,
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DAE28C724073089003D9221 /* Upgrade */,
 				4D6EB45923DF23750045C8D5 /* Database Properties */,
@@ -1553,6 +1582,13 @@
 		4D9E0948218250F6007BA1E7 /* KeePass */ = {
 			isa = PBXGroup;
 			children = (
+				4D524CF2219B481A00C22CB4 /* Xml */,
+				4D524CC2219B47A300C22CB4 /* KDBX4 */,
+				4D524CF3219B482800C22CB4 /* KDBX3 */,
+				4D524CA9219B45F700C22CB4 /* DatabaseAttachment.h */,
+				4D524CAA219B45F700C22CB4 /* DatabaseAttachment.m */,
+				C8BF66C1246E835100BA6C43 /* DeletedItem.h */,
+				C8BF66C2246E835100BA6C43 /* DeletedItem.m */,
 				4DBCE2292224207000A2AFA2 /* KeePassPredefinedIcons.h */,
 				4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */,
 				4D2CB4A22332D92900C2E084 /* XmlSerializer.h */,
@@ -1573,22 +1609,21 @@
 				4DEA5895224BFA7200013808 /* StringValue.m */,
 				4DDA01582242A1B300C7F0E2 /* NSUUID+Zero.h */,
 				4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */,
-				4D524CF3219B482800C22CB4 /* KDBX3 */,
-				4D524CF2219B481A00C22CB4 /* Xml */,
 				4D524CDB219B47EA00C22CB4 /* Crypto */,
-				4D524CC2219B47A300C22CB4 /* KDBX4 */,
 				4D524CAF219B476200C22CB4 /* KDB1 */,
 				4D9E095821825103007BA1E7 /* KeePassConstants.h */,
 				4D4AD4F721A02B0A002C33C6 /* KeePass2TagPackage.h */,
 				4D4AD4F821A02B0A002C33C6 /* KeePass2TagPackage.m */,
-				4D9E094D21825103007BA1E7 /* XmlStrongBoxModelAdaptor.h */,
 				4D524CFF219B48D300C22CB4 /* AttachmentsRationalizer.h */,
 				4D524CFC219B48D300C22CB4 /* AttachmentsRationalizer.m */,
 				4D524D0B219B497B00C22CB4 /* KdbxSerializationCommon.h */,
 				4D524CF6219B48D200C22CB4 /* KdbxSerializationCommon.m */,
+				4D9E094D21825103007BA1E7 /* XmlStrongBoxModelAdaptor.h */,
 				4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */,
 				4D9E096821825105007BA1E7 /* XmlStrongboxNodeModelAdaptor.h */,
 				4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */,
+				C86E9074246D88D70029623A /* KeePassDatabaseWideProperties.h */,
+				C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */,
 			);
 			name = KeePass;
 			sourceTree = "<group>";
@@ -1757,12 +1792,10 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				C85B9D7B2465453A00EEBFC9 /* YubiKey */,
-				C85B9D71246543BA00EEBFC9 /* Strongbox Model */,
+				C85B9D71246543BA00EEBFC9 /* Database */,
 				C85B9D702465439E00EEBFC9 /* ViewModel */,
+				C85B9D7B2465453A00EEBFC9 /* YubiKey */,
 				4DA50CFA244DFCFE00364781 /* Audit */,
-				4DF347D52074FA1D00148741 /* PwSafe */,
-				4D9E0948218250F6007BA1E7 /* KeePass */,
 				4DFC06D5226467AA00A4254A /* libs */,
 				4D216F5922CBCD73000954D0 /* Password Generation */,
 				4D5AE1E81F432BBC000A34D7 /* Settings.h */,
@@ -1782,7 +1815,6 @@
 			children = (
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
 				4D524D2B219B503F00C22CB4 /* View */,
-				C85B9D6E2465426A00EEBFC9 /* UI Components */,
 				4DF347EF2074FA5A00148741 /* Model */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF347F02074FA6B00148741 /* Strongbox.h */,
@@ -1918,9 +1950,11 @@
 			name = ViewModel;
 			sourceTree = "<group>";
 		};
-		C85B9D71246543BA00EEBFC9 /* Strongbox Model */ = {
+		C85B9D71246543BA00EEBFC9 /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				4DF347D52074FA1D00148741 /* PwSafe */,
+				4D9E0948218250F6007BA1E7 /* KeePass */,
 				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
 				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
 				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
@@ -1928,8 +1962,6 @@
 				4D01BA2B22BD31F00044226F /* SearchScope.h */,
 				4D524D09219B490100C22CB4 /* NodeFileAttachment.h */,
 				4D524D08219B490100C22CB4 /* NodeFileAttachment.m */,
-				4D524CA9219B45F700C22CB4 /* DatabaseAttachment.h */,
-				4D524CAA219B45F700C22CB4 /* DatabaseAttachment.m */,
 				4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */,
 				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
 				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
@@ -1942,7 +1974,7 @@
 				4D29663F21ADAC0B009B7936 /* CustomField.h */,
 				4D29664021ADAC0B009B7936 /* CustomField.m */,
 			);
-			name = "Strongbox Model";
+			name = Database;
 			sourceTree = "<group>";
 		};
 		C85B9D722465444E00EEBFC9 /* CSV */ = {
@@ -2148,6 +2180,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C85B9DAE24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
+				C8E6D4FA246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB182403030100B75EA2 /* PreferencesWindowController.xib in Resources */,
 				4D1FFB192403030100B75EA2 /* CheckboxCell.xib in Resources */,
 				4D1FFB1A2403030100B75EA2 /* harrypotter_8k_2018.utf8.txt in Resources */,
@@ -2162,6 +2195,7 @@
 				4D1FFB222403030100B75EA2 /* SelectPredefinedIconController.xib in Resources */,
 				4D1FFB232403030100B75EA2 /* AttachmentItem.xib in Resources */,
 				4D1FFB242403030100B75EA2 /* star_trek_8k_2018.utf8.txt in Resources */,
+				C8E6D4FC246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB252403030100B75EA2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				C85B9DB724655D6700EEBFC9 /* first.names.us.txt in Resources */,
 				4D1FFB262403030100B75EA2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -2211,6 +2245,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C85B9DAD24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
+				C8E6D4F9246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4DC8059E23A116D5001E742E /* PreferencesWindowController.xib in Resources */,
 				4DC805D223A1176E001E742E /* CheckboxCell.xib in Resources */,
 				4DC8059123A11493001E742E /* harrypotter_8k_2018.utf8.txt in Resources */,
@@ -2225,6 +2260,7 @@
 				4DC805B323A1170E001E742E /* SelectPredefinedIconController.xib in Resources */,
 				4DC805C423A11752001E742E /* AttachmentItem.xib in Resources */,
 				4DC8059423A11493001E742E /* star_trek_8k_2018.utf8.txt in Resources */,
+				C8E6D4FB246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4D216F6F22CBCE0D000954D0 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				C85B9DB624655D6600EEBFC9 /* first.names.us.txt in Resources */,
 				4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -2402,6 +2438,7 @@
 				4D37D875244E075200C3182D /* NSString+Levenshtein.m in Sources */,
 				4D1FFA942403030100B75EA2 /* UpgradeWindowController.m in Sources */,
 				4D1FFA952403030100B75EA2 /* twofish.c in Sources */,
+				C8BF66C4246E835100BA6C43 /* DeletedItem.m in Sources */,
 				4D1FFA962403030100B75EA2 /* KeePass2TagPackage.m in Sources */,
 				4D1FFA972403030100B75EA2 /* ref.c in Sources */,
 				4D1FFA982403030100B75EA2 /* KdbxSerializationCommon.m in Sources */,
@@ -2473,8 +2510,10 @@
 				4D1FFAD82403030100B75EA2 /* AttachmentsRationalizer.m in Sources */,
 				4D1FFAD92403030100B75EA2 /* PasswordGenerationConfig.m in Sources */,
 				4D1FFADA2403030100B75EA2 /* CompositeKeyFactors.m in Sources */,
+				C8E6D500246D5C7600AFFE13 /* WordList.m in Sources */,
 				4D1FFADB2403030100B75EA2 /* FavIconDownloadOptions.m in Sources */,
 				4D1FFADC2403030100B75EA2 /* thread.c in Sources */,
+				C8E6D504246D71E800AFFE13 /* DeletedObject.m in Sources */,
 				4D1FFADD2403030100B75EA2 /* VariantObject.m in Sources */,
 				4D1FFADE2403030100B75EA2 /* encoding.c in Sources */,
 				4D1FFADF2403030100B75EA2 /* NSDateRFC1123.m in Sources */,
@@ -2486,6 +2525,7 @@
 				4D1FFAE52403030100B75EA2 /* main.m in Sources */,
 				4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */,
 				4D1FFAE72403030100B75EA2 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				C86E9077246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				C85B9D912465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
 				4D1FFAE82403030100B75EA2 /* DAVRequest.m in Sources */,
 				4D1FFAE92403030100B75EA2 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
@@ -2592,6 +2632,7 @@
 				4DA50D06244DFD2100364781 /* NSString+Levenshtein.m in Sources */,
 				4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
+				C8BF66C3246E835100BA6C43 /* DeletedItem.m in Sources */,
 				4D524C9F219B44F300C22CB4 /* twofish.c in Sources */,
 				4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */,
 				4D524D28219B4B2A00C22CB4 /* ref.c in Sources */,
@@ -2663,8 +2704,10 @@
 				4D524D04219B48D300C22CB4 /* AttachmentsRationalizer.m in Sources */,
 				4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4DE206A022E5FB9700F15184 /* CompositeKeyFactors.m in Sources */,
+				C8E6D4FF246D5C7600AFFE13 /* WordList.m in Sources */,
 				4DC8058C23A113EC001E742E /* FavIconDownloadOptions.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
+				C8E6D503246D71E800AFFE13 /* DeletedObject.m in Sources */,
 				4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */,
 				4D524D26219B4B2A00C22CB4 /* encoding.c in Sources */,
 				4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */,
@@ -2676,6 +2719,7 @@
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */,
 				4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */,
+				C86E9076246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				C85B9D902465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
 				4DBF494022232A3200F48182 /* DAVRequest.m in Sources */,
 				4D9E098021825108007BA1E7 /* XmlStrongboxNodeModelAdaptor.m in Sources */,

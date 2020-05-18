@@ -53,6 +53,7 @@ Big thank you to all the localization contributors
 - French - Charles-Ivan Chesneau
 - German - @Slummi
 - Italian - Marco Ermini
+- Norwegian - Ole Aldric
 - Russian - Wishes to remain anonymous
 - Spanish - Wishes to remain anonymous
 - Swedish - Jari Häkkinen
@@ -119,4 +120,4 @@ I use many different libraries in the app here are just a few:
 - NameDatabases (https://github.com/smashew/NameDatabases)
 - WSTagsField (https://github.com/whitesmith/WSTagsField)
 - Common Passwords List from https://github.com/danielmiessler/SecLists
-
+- Finnish & Icelandic diceware word lists - SmirGel

@@ -137,8 +137,8 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     return self.auditor ? self.auditor.haveIBeenPwnedErrorCount : 0;
 }
 
-- (NSUInteger)auditIssueCount {
-    return self.auditor ? self.auditor.auditIssueCount : 0;
+- (NSNumber*)auditIssueCount {
+    return self.auditor ? @(self.auditor.auditIssueCount) : nil;
 }
 
 - (NSUInteger)auditIssueNodeCount {
@@ -352,30 +352,20 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     return nil;
 }
 
-- (BOOL)deleteWillRecycle:(Node*_Nonnull)child {
-    BOOL willRecycle = self.database.recycleBinEnabled;
-    if(self.database.recycleBinEnabled && self.database.recycleBinNode) {
-        if([self.database.recycleBinNode contains:child] || self.database.recycleBinNode == child) {
-            willRecycle = NO;
-        }
-    }
-
-    return willRecycle;
+- (BOOL)deleteWillRecycle:(Node*_Nonnull)item {
+    return [self.database deleteWillRecycle:item];
 }
 
-- (BOOL)deleteItem:(Node *_Nonnull)child {
-    if([self deleteWillRecycle:child]) {
-        // UUID is NIL/Non Existent or Zero? - Create
-        if(self.database.recycleBinNode == nil) {
-            [self.database createNewRecycleBinNode];
+- (BOOL)deleteOrRecycleItem:(Node *_Nonnull)item {
+    BOOL ret = [self.database deleteOrRecycleItem:item];
+    
+    if (ret) { // Also Unpin
+        if([self isPinned:item]) {
+            [self togglePin:item];
         }
-        
-        return [child changeParent:self.database.recycleBinNode keePassGroupTitleRules:YES];
     }
-    else {
-        [child.parent removeChild:child];
-        return YES;
-    }
+    
+    return ret;
 }
 
 // Pinned or Not?
@@ -393,7 +383,6 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     
     return [self.cachedPinned containsObject:sid];
 }
-
 
 - (void)togglePin:(Node*)item {
     NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];

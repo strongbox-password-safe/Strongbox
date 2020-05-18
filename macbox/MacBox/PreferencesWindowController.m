@@ -164,11 +164,11 @@
 }
 
 - (void)setupPasswordGenerationUi {
-    NSDictionary* wordlists = PasswordGenerationConfig.wordLists;
+    NSDictionary<NSString*, WordList*>* wordlists = PasswordGenerationConfig.wordListsMap;
     
     self.sortedWordListKeys = [wordlists.allKeys sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        NSString* v1 = wordlists[obj1];
-        NSString* v2 = wordlists[obj2];
+        NSString* v1 = wordlists[obj1].name;
+        NSString* v2 = wordlists[obj2].name;
         return finderStringCompare(v1, v2);
     }];
     
@@ -475,7 +475,9 @@
     NSString* wordListKey = self.sortedWordListKeys[row];
     
     result.checkbox.state = [params.wordLists containsObject:wordListKey];
-    [result.checkbox setTitle:PasswordGenerationConfig.wordLists[wordListKey]];
+    WordList* wl = PasswordGenerationConfig.wordListsMap[wordListKey];
+    
+    [result.checkbox setTitle:wl.name];
     
     result.onClicked = ^(BOOL checked) {
         NSLog(@"%@ - %d", wordListKey, checked);

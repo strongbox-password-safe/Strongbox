@@ -516,7 +516,7 @@
                                                   type:fieldStart->type];
 
             if (fieldStart->type == FIELD_TYPE_END) {
-                Record *newRecord = [[Record alloc]initWithFields:fields];
+                Record *newRecord = [[Record alloc] initWithFields:fields];
                 
                 [*records_p addObject:newRecord];
 

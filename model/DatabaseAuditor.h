@@ -39,6 +39,7 @@ typedef void (^SaveConfigurationBlock)(DatabaseAuditorConfiguration* config);
 @interface DatabaseAuditor : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithPro:(BOOL)pro;
 - (instancetype)initWithPro:(BOOL)pro saveConfig:(SaveConfigurationBlock _Nullable)saveConfig NS_DESIGNATED_INITIALIZER;
 
 @property AuditState state;

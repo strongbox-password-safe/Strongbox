@@ -53,6 +53,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* children;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childGroups;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childRecords;
+
+@property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildren;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildRecords;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* allChildGroups;
 
@@ -95,8 +97,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)restoreFromHistoricalNode:(Node*)historicalItem;
 
+- (void)touch; // Recursive Non Modified Touch
+- (void)touch:(BOOL)modified; // Recursive Touch
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents;
-- (void)touchWithExplicitModifiedDate:(NSDate*)modDate touchParents:(BOOL)touchParents; // Used mostly for undo...
+- (void)touchLocationChanged;
+
+- (void)setModifiedDateExplicit:(NSDate*)modDate setParents:(BOOL)setParents; // Used mostly for undo...
 
 - (BOOL)setTotpWithString:(NSString *)string
          appendUrlToNotes:(BOOL)appendUrlToNotes

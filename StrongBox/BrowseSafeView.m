@@ -268,21 +268,27 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         return;
     }
     
-    NSUInteger issueCount = self.viewModel.auditIssueCount;
+    NSNumber* issueCount = self.viewModel.auditIssueCount;
+    if (issueCount == nil) {
+        NSLog(@"WARNWARN: Invalid Audit Issue Count but Audit Completed Notification Received. Stale BrowseView... ignore");
+        return;
+    }
+    
+    
     NSNumber* lastKnownAuditIssueCount = self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount;
     
-    NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", (unsigned long)issueCount, lastKnownAuditIssueCount);
+    NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", issueCount.unsignedLongValue, lastKnownAuditIssueCount);
     
-    self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount = @(issueCount);
+    self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount = issueCount;
     [SafesList.sharedInstance update:self.viewModel.metadata];
 
     if ( self.viewModel.metadata.auditConfig.showAuditPopupNotifications) {
-        [self showAuditPopup:issueCount lastKnownAuditIssueCount:lastKnownAuditIssueCount];
+        [self showAuditPopup:issueCount.unsignedLongValue lastKnownAuditIssueCount:lastKnownAuditIssueCount];
     }
 }
 
 - (void)showAuditPopup:(NSUInteger)issueCount lastKnownAuditIssueCount:(NSNumber*)lastKnownAuditIssueCount {
-//    NSLog(@"showAuditPopup... [%@]", self);
+    NSLog(@"showAuditPopup... [%@] = [%ld/%@]", self, (unsigned long)issueCount, lastKnownAuditIssueCount);
     
     if (lastKnownAuditIssueCount == nil) { // First time
         if (issueCount == 0) {
@@ -331,7 +337,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
     // Has the user ever given Pro a try? Maybe the just need a nudge...
 
-    NSDate* dueDate = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitDay value:7 toDate:Settings.sharedInstance.lastFreeTrialNudge options:kNilOptions];
+    const NSUInteger kProNudgeIntervalDays = 14;
+    NSDate* dueDate = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitDay value:kProNudgeIntervalDays toDate:Settings.sharedInstance.lastFreeTrialNudge options:kNilOptions];
     //NSLog(@"Nudge Due: [%@]", dueDate);
     BOOL nudgeDue = dueDate.timeIntervalSinceNow < 0; // Due date is in past
     
@@ -623,7 +630,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
             [item setTitle:text keePassGroupTitleRules:self.viewModel.database.format != kPasswordSafe];
 
-            [item touch:YES touchParents:YES];
+            [item touch:YES touchParents:NO];
 
             [self saveChangesToSafeAndRefreshView];
         }
@@ -649,17 +656,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                    NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"), [self dereference:item.title node:item]]
            action:^(BOOL response) {
                 if (response) {
-                    if(![self.viewModel deleteItem:item]) {
+                    if(![self.viewModel deleteOrRecycleItem:item]) {
                         [Alerts warn:self
                                title:NSLocalizedString(@"browse_vc_delete_failed", @"Delete Failed")
                              message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
                     }
                     else {
-                        if([self.viewModel isPinned:item]) {
-                            // Also Unpin
-                            [self togglePinEntry:item];
-                        }
-
                         [self saveChangesToSafeAndRefreshView];
                     }
                 }
@@ -699,7 +701,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                     Node* originalNodeForHistory = [item cloneForHistory];
                     [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
                 }
-                [item touch:YES touchParents:YES];
+                [item touch:YES touchParents:NO];
                 item.customIconUuid = userSelectedExistingCustomIconId;
             }
             else if(userSelectedNewIconIndex) {
@@ -707,7 +709,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                     Node* originalNodeForHistory = [item cloneForHistory];
                     [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
                 }
-                [item touch:YES touchParents:YES];
+                [item touch:YES touchParents:NO];
 
                 if(userSelectedNewIconIndex.intValue == -1) {
                     item.iconId = !item.isGroup ? @(0) : @(48); // Default
@@ -750,7 +752,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
     }
     
-    [item touch:YES touchParents:YES];
+    [item touch:YES touchParents:NO];
 
     NSData *data = UIImagePNGRepresentation(image);
     [self.viewModel.database setNodeCustomIcon:item data:data rationalize:YES];
@@ -1378,14 +1380,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                        
                        BOOL fail = NO;
                        for (Node* item in items) {
-                           if(![self.viewModel deleteItem:item]) {
+                           if(![self.viewModel deleteOrRecycleItem:item]) {
                                fail = YES;
-                           }
-                           
-                            // Also Unpin
-                           
-                           if([self.viewModel isPinned:item]) {
-                               [self togglePinEntry:item];
                            }
                        }
                        

@@ -1727,7 +1727,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [document openWithCompletionHandler:^(BOOL success) {
         [SVProgressHUD dismiss];
         
-        NSData* data = document.data;
+        NSData* data = document.data ? document.data.copy : nil; // MMcG: Attempt to fix a crash
         
         [document closeWithCompletionHandler:nil];
         

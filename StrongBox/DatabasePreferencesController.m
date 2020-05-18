@@ -317,14 +317,17 @@
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
-    vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+    NSArray<NSString*>* items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return formatAsIntervals ? [Utils formatTimeInterval:obj.integerValue] : obj.stringValue;
     }];
     
+    vc.groupItems = @[items];
+    
     NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
-    vc.selected = [NSIndexSet indexSetWithIndex:currentlySelectIndex];
-    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
-        NSInteger selectedValue = options[selectedIndices.firstIndex].integerValue;
+    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSIndexSet* set = selectedIndices.firstObject;
+        NSInteger selectedValue = options[set.firstIndex].integerValue;
         [self.navigationController popViewControllerAnimated:YES];
         completion(YES, selectedValue);
     };

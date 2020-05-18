@@ -20,7 +20,6 @@
 #import "CacheManager.h"
 #import "ExportOptionsTableViewController.h"
 #import "AttachmentsPoolViewController.h"
-#import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "BiometricsManager.h"
 #import "FavIconBulkViewController.h"

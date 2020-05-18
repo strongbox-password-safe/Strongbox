@@ -3155,3 +3155,28 @@
 
 /* Strongbox Pro is full of handy features like %@ Unlock.\n\nGood news! You have a Free 90-Day Trial available. Would you like to try Strongbox Pro? (Translators Note: 1st parameter is biometric id like 'Touch ID' or 'Face ID') */
 "browse_pro_nudge_message_fmt" = "Strongbox Pro is full of handy features like %@ Unlock.\n\nGood news! You have a Free 90-Day Trial available. Would you like to try Strongbox Pro?";
+
+/* Finnish */
+"pwgen_wordlist_finnish" = "Finnish";
+
+/* Icelandic */
+"pwgen_wordlist_icelandic" = "Icelandic";
+
+/* Standard */
+"password_gen_vc_wordlist_category_standard" = "Standard";
+
+/* Fandom */
+"password_gen_vc_wordlist_category_fandom" = "Fandom";
+
+/* Languages */
+"password_gen_vc_wordlist_category_languages" = "Languages";
+
+/* Accessed */
+"item_details_metadata_accessed_field_title" = "Accessed";
+
+/* Location Changed */
+"item_details_metadata_location_changed_field_title" = "Location Changed";
+
+/* Usage Count */
+"item_details_metadata_usage_count_field_title" = "Usage Count";
+

@@ -219,7 +219,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
             
             [self bindLastOnlineCheckUi];
             
-            self.statusSubtitle.text =  [NSString stringWithFormat:loc, @(self.model.auditIssueCount), @(self.model.auditIssueNodeCount), @(self.model.auditHibpErrorCount)];
+            self.statusSubtitle.text =  [NSString stringWithFormat:loc, self.model.auditIssueCount, @(self.model.auditIssueNodeCount), @(self.model.auditHibpErrorCount)];
         }
             break;
         case kAuditStateInitial:
@@ -324,12 +324,13 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
-    vc.items = options;
-    vc.selected = currentIndex == NSNotFound ? NSIndexSet.indexSet : [NSIndexSet indexSetWithIndex:currentIndex];
+    vc.groupItems = @[options];
+    vc.selectedIndexPaths = currentIndex == NSNotFound ? @[NSIndexSet.indexSet] : @[[NSIndexSet indexSetWithIndex:currentIndex]];
     
-    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSIndexSet* set = selectedIndices.firstObject;
         [self.navigationController popViewControllerAnimated:YES];
-        completion(YES, selectedIndices.firstIndex);
+        completion(YES, set.firstIndex);
     };
     vc.title = title;
     

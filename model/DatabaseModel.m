@@ -299,11 +299,11 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
                                                         notes:@""
                                                         email:@"user@gmail.com"];
 
-    [sampleFolder addChild:[[Node alloc]    initAsRecord:NSLocalizedString(@"model_sample_entry_title", @"Sample")
-                                                  parent:sampleFolder
-                                                  fields:fields
-                                                    uuid:nil]
-                                keePassGroupTitleRules:NO];
+    [parent addChild:[[Node alloc] initAsRecord:NSLocalizedString(@"model_sample_entry_title", @"Sample")
+                                         parent:parent
+                                         fields:fields
+                                           uuid:nil]
+                         keePassGroupTitleRules:NO];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -426,6 +426,10 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     [self.theSafe setNodeCustomIcon:node data:data rationalize:rationalize];
 }
 
+- (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
+    self.theSafe.recycleBinEnabled = recycleBinEnabled;
+}
+
 - (BOOL)recycleBinEnabled {
     return self.theSafe.recycleBinEnabled;
 }
@@ -434,12 +438,52 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return self.theSafe.recycleBinNode;
 }
 
-- (void)createNewRecycleBinNode {
-    [self.theSafe createNewRecycleBinNode];
-}
-
 - (Node *)keePass1BackupNode {
     return self.theSafe.keePass1BackupNode;
+}
+
+- (BOOL)deleteOrRecycleItem:(Node *)node {
+    return [self deleteOrRecycleItem:node wasRecycled:nil];
+}
+
+- (BOOL)deleteOrRecycleItem:(Node *)node wasRecycled:(BOOL*)wasRecycled {
+    if([self deleteWillRecycle:node]) {
+        if (wasRecycled) {
+            *wasRecycled = YES;
+        }
+        
+        return [self.theSafe recycleItem:node];
+    }
+    else {
+        if (wasRecycled) {
+            *wasRecycled = NO;
+        }
+
+        [self.theSafe deleteItem:node];
+        return YES;
+    }
+}
+
+- (BOOL)deleteWillRecycle:(Node*_Nonnull)node {
+    BOOL willRecycle = self.recycleBinEnabled;
+    if(self.recycleBinEnabled && self.recycleBinNode) {
+        if([self.recycleBinNode contains:node] || self.recycleBinNode == node) {
+            willRecycle = NO;
+        }
+    }
+
+    return willRecycle;
+}
+
+- (NSArray<DeletedItem *> *)deletedObjects {
+    return self.theSafe.deletedObjects;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Moves
+
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination {
+    return [self.theSafe moveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

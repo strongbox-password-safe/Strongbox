@@ -72,9 +72,10 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         
         _modified = date;
         _accessed = date;
+        _locationChanged = date;
         _usageCount = @(0);
+        _created = date;
         
-        self.created = date;
         self.passwordModified = date;
         self.attachments = [NSMutableArray array];
         self.mutableCustomFields = [NSMutableDictionary dictionary];
@@ -111,9 +112,6 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     NSNumber* passwordModified = dict[@"passwordModified"];
     NSNumber* expires = dict[@"expires"];
     
-//    NSNumber* usageCount = dict[@"usageCount"];
-//    NSNumber* locationChanged = dict[@"locationChanged"];
-    
     NSArray<NSDictionary*>* attachments = dict[@"attachments"];
     NSArray<NSDictionary*>* customFields = dict[@"customFields"];
 
@@ -129,9 +127,6 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     ret.passwordModified = passwordModified != nil ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
     ret.expires = expires != nil ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
-//    ret.locationChanged = locationChanged ? [NSDate dateWithTimeIntervalSince1970:locationChanged.unsignedIntegerValue] : nil;
-    
-    [ret setTouchProperties:NSDate.date modified:NSDate.date usageCount:@(0)];
     
     // Attachments... These need to be fixed up to fit into destination
     
@@ -170,13 +165,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     if(self.expires) {
         ret[@"expires"] = @((NSUInteger)[self.expires timeIntervalSince1970]);
     }
-//    if(self.usageCount) {
-//        ret[@"usageCount"] = self.usageCount;
-//    }
-//    if(self.locationChanged) {
-//        ret[@"locationChanged"] = self.locationChanged;
-//    }
-    
+
     NSArray<NSDictionary*>* attachments = [self.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
         [serialization.usedAttachmentIndices addObject:@(obj.index)];
         return @{ obj.filename : @(obj.index) };
@@ -197,7 +186,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return ret;
 }
 
-- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneMetadataDates:(BOOL)cloneMetadataDates {
+- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneTouchProperties:(BOOL)cloneMetadataDates {
     NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username
                                                        url:self.url
                                                   password:self.password
@@ -205,17 +194,16 @@ static NSString* const kKeeOtpPluginKey = @"otp";
                                                      email:self.email];
     
     ret.expires = self.expires;
-    ret.locationChanged = self.locationChanged;
+    ret.passwordModified = self.passwordModified;
+
+    if (cloneMetadataDates) {
+        [ret setTouchPropertiesWithCreated:self.created accessed:self.accessed modified:self.modified locationChanged:self.locationChanged usageCount:self.usageCount];
+    }
+
     ret.attachments = [self cloneAttachments];
     ret.mutableCustomFields = [self cloneCustomFields];
     ret.tags = self.tags.mutableCopy;
-    
-    if (cloneMetadataDates) {
-        ret.passwordModified = self.passwordModified;
-        ret.created = self.created;
-        [ret setTouchProperties:self.accessed modified:self.modified usageCount:self.usageCount];
-    }
-    
+
     if (clearHistory) {
         ret.keePassHistory = [NSMutableArray array];
     }
@@ -285,21 +273,37 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
 - (void)touch:(BOOL)modified {
     _usageCount = self.usageCount != nil ? @(self.usageCount.integerValue + 1) : @(1);
-    _accessed = NSDate.date;
+
+    NSDate *now = NSDate.date;
+    _accessed = now;
     
     if(modified) {
-        [self touchWithExplicitModifiedDate:NSDate.date];
+        [self setModifiedDateExplicit:now];
     }
 }
 
-- (void)touchWithExplicitModifiedDate:(NSDate*)modDate {
-    _modified = modDate;
+- (void)touchLocationChanged {
+    [self setTouchPropertiesWithCreated:nil accessed:nil modified:nil locationChanged:NSDate.date usageCount:nil];
 }
 
-- (void)setTouchProperties:(NSDate*)accessed modified:(NSDate*)modified usageCount:(NSNumber*)usageCount {
-    _accessed = accessed;
-    _modified = modified;
-    _usageCount = usageCount;
+- (void)setModifiedDateExplicit:(NSDate*)modified {
+    [self setTouchPropertiesWithCreated:nil accessed:modified modified:modified locationChanged:nil usageCount:nil];
+}
+
+- (void)setTouchPropertiesWithAccessed:(NSDate*)accessed modified:(NSDate*)modified usageCount:(NSNumber*)usageCount {
+    [self setTouchPropertiesWithCreated:nil accessed:accessed modified:modified locationChanged:nil usageCount:usageCount];
+}
+
+- (void)setTouchPropertiesWithCreated:(NSDate*)created accessed:(NSDate*)accessed modified:(NSDate*)modified locationChanged:(NSDate*)locationChanged usageCount:(NSNumber*)usageCount {
+    if (created != nil) _created = created;
+    
+    if (accessed != nil) _accessed = accessed;
+    
+    if (modified != nil) _modified = modified;
+    
+    if (locationChanged != nil) _locationChanged = locationChanged;
+
+    if (usageCount != nil) _usageCount = usageCount;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

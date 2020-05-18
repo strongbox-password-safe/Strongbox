@@ -32,13 +32,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) NSString *email;
 @property (nonatomic, strong, nonnull) NSString *url;
 @property (nonatomic, strong, nonnull) NSString *notes;
-@property (nonatomic, strong, nullable) NSDate *created;
-@property (nonatomic, strong, nullable) NSDate *modified;
-@property (nonatomic, strong, nullable) NSDate *accessed;
+
+@property (readonly, nonatomic, strong, nullable) NSDate *created;
+@property (readonly, nonatomic, strong, nullable) NSDate *modified;
+@property (readonly, nonatomic, strong, nullable) NSDate *accessed;
+@property (readonly, nonatomic, strong, nullable) NSDate *locationChanged;
+@property (readonly, nonatomic, strong, nullable, readonly) NSNumber *usageCount;
+
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
 @property (nonatomic, strong, nullable) NSDate *expires;
-@property (nonatomic, strong, nullable) NSDate *locationChanged;
-@property (nonatomic, strong, nullable, readonly) NSNumber *usageCount;
 
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
 
@@ -52,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NodeFields *)deserialize:(NSDictionary *)dict;
 - (NSDictionary*)serialize:(SerializationPackage*)serialization;
 
-- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneMetadataDates:(BOOL)cloneMetadataDates;
+- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneTouchProperties:(BOOL)cloneTouchProperties;
 
 - (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;
 - (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;
@@ -64,10 +66,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeCustomField:(NSString*)key;
 - (void)setCustomField:(NSString*)key value:(StringValue*)value;
 
-- (void)touch:(BOOL)modified;
-- (void)touchWithExplicitModifiedDate:(NSDate*)modDate; // largely designed for undo...
 
-- (void)setTouchProperties:(NSDate*_Nullable)accessed modified:(NSDate*_Nullable)modified usageCount:(NSNumber*_Nullable)usageCount;
+- (void)touch:(BOOL)modified;
+- (void)touchLocationChanged;
+
+- (void)setModifiedDateExplicit:(const NSDate*)modified;
+- (void)setTouchPropertiesWithAccessed:(const NSDate*)accessed modified:(const NSDate*)modified usageCount:(const NSNumber*)usageCount;
+- (void)setTouchPropertiesWithCreated:(const NSDate*_Nullable)created accessed:(const NSDate*_Nullable)accessed modified:(const NSDate*_Nullable)modified locationChanged:(const NSDate*_Nullable)locationChanged usageCount:(const NSNumber*_Nullable)usageCount;
 
 ///////////////////////////////////////////////
 // TOTP

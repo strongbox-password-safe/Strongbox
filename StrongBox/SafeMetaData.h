@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) DuressAction duressAction;
 @property (nonatomic) int failedPinAttempts;
 
-@property (nonatomic, readonly) BOOL offlineCacheEnabled; // This is always on - TODO: Get this configurable...
+@property (nonatomic, readonly) BOOL offlineCacheEnabled; // This is always on - TODO: Get this configurable... will be part of SyncManager?
 @property (nonatomic) BOOL offlineCacheAvailable;
 
 @property (nonatomic) BOOL autoFillEnabled;

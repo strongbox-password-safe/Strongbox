@@ -18,6 +18,7 @@
         self.entries = [NSMutableArray array];
         self.name = @"";
         self.uuid = NSUUID.UUID;
+        self.times = [[Times alloc] initWithXmlElementName:kTimesElementName context:context];
     }
     
     return self;
@@ -39,6 +40,9 @@
     if([xmlElementName isEqualToString:kGroupElementName]) {
         return [[KeePassGroup alloc] initWithContext:self.context];
     }
+    if([xmlElementName isEqualToString:kTimesElementName]) {
+        return [[Times alloc] initWithContext:self.context];
+    }
     else if([xmlElementName isEqualToString:kEntryElementName]) {
         return [[Entry alloc] initWithContext:self.context];
     }
@@ -49,6 +53,10 @@
 - (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kGroupElementName]) {
         [self.groups addObject:(KeePassGroup*)completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kTimesElementName]) {
+        self.times = (Times*)completedObject;
         return YES;
     }
     else if([withXmlElementName isEqualToString:kNameElementName]) {
@@ -87,6 +95,8 @@
     if (self.icon && ![serializer writeElement:kIconIdElementName integer:self.icon.integerValue]) return NO;
     if (self.customIcon && ![serializer writeElement:kCustomIconUuidElementName uuid:self.customIcon]) return NO;
 
+    if(self.times && ![self.times writeXml:serializer]) return NO;
+    
     if(self.groups) {
         for (KeePassGroup *group in self.groups) {
             if(![group writeXml:serializer]) {
@@ -138,6 +148,9 @@
     if (!(self.customIcon == nil && other.customIcon == nil) && ![self.customIcon isEqual:other.customIcon]) {
         return NO;
     }
+    if (![self.times isEqual:other.times]) {
+        return NO;
+    }
     if(self.entries.count != other.entries.count) {
         return NO;
     }
@@ -165,7 +178,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Name = [%@], Entries = [%@], Groups = [%@], iconId=[%@]/[%@]\nUUID = [%@]", self.name, self.entries, self.groups, self.icon, self.customIcon, self.uuid];
+    return [NSString stringWithFormat:@"Name = [%@], Entries = [%@], Groups = [%@], Times = [%@], iconId=[%@]/[%@]\nUUID = [%@]", self.name, self.entries, self.groups, self.times, self.icon, self.customIcon, self.uuid];
 }
 
 @end

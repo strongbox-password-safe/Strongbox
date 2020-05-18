@@ -10,6 +10,10 @@
 
 @implementation CompositeKeyFactors
 
++ (instancetype)unitTestDefaults {
+    return [CompositeKeyFactors password:@"a"];
+}
+
 + (instancetype)password:(NSString *)password {
     return [CompositeKeyFactors password:password keyFileDigest:nil];
 }

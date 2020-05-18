@@ -39,6 +39,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
 
+- (BOOL)deleteOrRecycleItem:(Node*)node;
+- (BOOL)deleteOrRecycleItem:(Node*)node wasRecycled:(BOOL*_Nullable)wasRecycled;
+- (BOOL)deleteWillRecycle:(Node*_Nonnull)node;
+
+@property (readonly) NSArray<DeletedItem*>* deletedObjects;
+
+- (BOOL)moveItems:(const NSArray<Node*>*)items destination:(Node*)destination;
+
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
@@ -69,10 +77,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
-@property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
-@property (readonly) Node* recycleBinNode;
-- (void)createNewRecycleBinNode;
-
+// TODO: Combine KP1 and KP2 Recycle Bin / Backup Group?
+@property BOOL recycleBinEnabled;
+@property (readonly, nullable) Node* recycleBinNode;
 @property (nullable, readonly) Node* keePass1BackupNode;
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm;

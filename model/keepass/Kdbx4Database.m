@@ -17,6 +17,7 @@
 #import "XmlSerializer.h"
 #import "XmlStrongBoxModelAdaptor.h"
 #import "KeePass2TagPackage.h"
+#import "NSArray+Extensions.h"
 
 static const uint32_t kKdbx4MajorVersionNumber = 4;
 static const uint32_t kKdbx4MaximumAcceptableMinorVersionNumber = 1; // MMcG - 10-Apr-2020 - KeeWeb had originally set a few of its files to 4.1 - now fixed but some users will have 4.1 in header - accept them
@@ -83,7 +84,8 @@ static const BOOL kLogVerbose = NO;
     
     Meta* xmlMeta = serializationData.rootXmlObject.keePassFile ? serializationData.rootXmlObject.keePassFile.meta : nil;
     NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
-    
+    NSArray<DeletedItem*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
+        
     // Metadata
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
@@ -110,10 +112,11 @@ static const BOOL kLogVerbose = NO;
     metadata.version = serializationData.fileVersion;
     
     StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
-                                                                    metadata:metadata
-                                                        compositeKeyFactors:ckf
-                                                                attachments:serializationData.attachments
-                                                                customIcons:customIcons];
+                                                                 metadata:metadata
+                                                      compositeKeyFactors:ckf
+                                                              attachments:serializationData.attachments
+                                                              customIcons:customIcons
+                                                           deletedObjects:deletedObjects];
 
     KeePass2TagPackage* tag = [[KeePass2TagPackage alloc] init];
     tag.unknownHeaders = serializationData.extraUnknownHeaders;
@@ -135,16 +138,19 @@ static const BOOL kLogVerbose = NO;
     }
 
     KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
-    Meta* originalMeta = tag ? tag.originalMeta : nil;
     
     // From Strongbox to Xml Model
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     
+    KeePassDatabaseWideProperties* databaseProperties = [[KeePassDatabaseWideProperties alloc] init];
+    databaseProperties.customIcons = database.customIcons;
+    databaseProperties.originalMeta = tag ? tag.originalMeta : nil;
+    databaseProperties.deletedObjects = database.deletedObjects;
+    
     NSError* error;
     RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
-                                                                        customIcons:database.customIcons
-                                                                       originalMeta:originalMeta
+                                                                 databaseProperties:databaseProperties
                                                                             context:[XmlProcessingContext standardV4Context]
                                                                               error:&error];
     
@@ -247,6 +253,22 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(Meta* meta) {
     }
     
     return [NSMutableDictionary dictionary];
+}
+
+static NSArray<DeletedItem*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
+    if (existingRootXmlDocument) {
+        if (existingRootXmlDocument.keePassFile) {
+            if (existingRootXmlDocument.keePassFile.root) {
+                if (existingRootXmlDocument.keePassFile.root.deletedObjects) {
+                    return [existingRootXmlDocument.keePassFile.root.deletedObjects.deletedObjects map:^id _Nonnull(DeletedObject * _Nonnull obj, NSUInteger idx) {
+                        return [DeletedItem uuid:obj.uuid date:obj.deletionTime];
+                    }];
+                }
+            }
+        }
+    }
+    
+    return @[];
 }
 
 @end

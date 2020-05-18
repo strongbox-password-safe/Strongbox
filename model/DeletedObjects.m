@@ -1,39 +1,39 @@
 //
-//  CustomIconList.m
+//  DeletedObjects.m
 //  Strongbox
 //
-//  Created by Mark on 11/11/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Created by Strongbox on 18/05/2020.
+//  Copyright © 2020 Mark McGuill. All rights reserved.
 //
 
-#import "CustomIconList.h"
+#import "DeletedObjects.h"
 #import "KeePassConstants.h"
 
-@implementation CustomIconList
+@implementation DeletedObjects
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
-    return [self initWithXmlElementName:kCustomIconListElementName context:context];
+    return [self initWithXmlElementName:kDeletedObjectsElementName context:context];
 }
 
 - (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:xmlElementName context:context]) {
-        self.icons = [NSMutableArray array];
+        self.deletedObjects = [NSMutableArray array];
     }
     
     return self;
 }
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
-    if([xmlElementName isEqualToString:kCustomIconElementName]) {
-        return [[CustomIcon alloc] initWithXmlElementName:kCustomIconElementName context:self.context];
+    if([xmlElementName isEqualToString:kDeletedObjectElementName]) {
+        return [[DeletedObject alloc] initWithXmlElementName:kDeletedObjectElementName context:self.context];
     }
     
     return [super getChildHandler:xmlElementName];
 }
 
 - (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
-    if([withXmlElementName isEqualToString:kCustomIconElementName]) {
-        [self.icons addObject:(CustomIcon*)completedObject];
+    if([withXmlElementName isEqualToString:kDeletedObjectElementName]) {
+        [self.deletedObjects addObject:(DeletedObject*)completedObject];
         return YES;
     }
     
@@ -41,14 +41,18 @@
 }
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer {
+    if (self.deletedObjects.count == 0 && self.unmanagedChildren.count == 0) {
+        return YES;
+    }
+    
     if(![serializer beginElement:self.originalElementName
                             text:self.originalText
                       attributes:self.originalAttributes]) {
         return NO;
     }
     
-    for (CustomIcon *icon in self.icons) {
-        [icon writeXml:serializer];
+    for (DeletedObject *deletedObject in self.deletedObjects) {
+        [deletedObject writeXml:serializer];
     }
     
     if(![super writeUnmanagedChildren:serializer]) {
@@ -58,5 +62,6 @@
     [serializer endElement];
     return YES;
 }
+
 
 @end

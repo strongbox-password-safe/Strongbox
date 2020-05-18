@@ -639,6 +639,10 @@
             [self openWithOfflineCacheFile:message];
         }
         else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+            });
+            
             [provider read:self.safe
             viewController:self.viewController
                 isAutoFill:self.isAutoFillOpen
@@ -654,7 +658,7 @@
                      error:(NSError *)error
                  cacheMode:(BOOL)cacheMode {
     dispatch_async(dispatch_get_main_queue(), ^{
-//        [SVProgressHUD dismiss];
+        [SVProgressHUD dismiss];
         
         if (error != nil || data == nil) {
             NSLog(@"Error: %@", error);

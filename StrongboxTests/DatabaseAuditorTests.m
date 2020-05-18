@@ -239,7 +239,7 @@
 
     Node* nodeWithPassword2 = [DatabaseGenerator generateSampleNode:db.rootGroup];
     [db.rootGroup addChild:nodeWithPassword2 keePassGroupTitleRules:NO];
-    nodeWithPassword2.fields.password = @"wrist";
+    nodeWithPassword2.fields.password = @"rest";
 
     DatabaseAuditorConfiguration* config = [[DatabaseAuditorConfiguration alloc] init];
     config.checkForSimilarPasswords = YES;

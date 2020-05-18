@@ -146,7 +146,6 @@ static const BOOL kLogVerbose = NO;
     return nil;
 }
 
-
 -(void)nodeModelToGroupsAndEntries:(int)level
                              group:(Node*)group
                  serializationData:(KdbSerializationData*)serializationData
@@ -177,13 +176,14 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
     
     ret.name = group.title;
     ret.imageId = group.iconId != nil ? group.iconId : @(48);
-    
+
+    ret.creation = group.fields.created;
+    ret.modification = group.fields.modified;
+    ret.lastAccess = group.fields.accessed;
+
     if(group.linkedData) {
         KdbGroup* previous = (KdbGroup*)group.linkedData;
         
-        ret.creation = previous.creation;
-        ret.modification = previous.modification;
-        ret.lastAccess = previous.lastAccess;
         ret.expiry = previous.expiry;
         ret.flags = previous.flags;
     }
@@ -270,6 +270,8 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         Node* node = [[Node alloc] initAsGroup:group.name parent:parentNode keePassGroupTitleRules:YES uuid:nil];
         node.iconId = group.imageId;
         
+        [node.fields setTouchPropertiesWithCreated:group.creation accessed:group.lastAccess modified:group.modification locationChanged:nil usageCount:nil];
+        
         node.linkedData = group;
         [parentNode addChild:node keePassGroupTitleRules:YES];
         
@@ -301,9 +303,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
                                                         notes:entry.notes
                                                         email:@""];
     
-    fields.created = entry.creation;
-    
-    [fields setTouchProperties:entry.accessed modified:entry.modified usageCount:nil];
+    [fields setTouchPropertiesWithCreated:entry.creation accessed:entry.accessed modified:entry.modified locationChanged:nil usageCount:nil];
 
     fields.expires = entry.expired;
     

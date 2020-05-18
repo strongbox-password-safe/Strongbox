@@ -135,11 +135,13 @@
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
-    vc.items = options;
-    vc.selected = [NSIndexSet indexSetWithIndex:currentIndex];
-    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
+    vc.groupItems = @[options];
+    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentIndex]];
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
         [self.navigationController popViewControllerAnimated:YES];
-        completion(YES, selectedIndices.firstIndex);
+        
+        NSIndexSet* set = selectedIndices.firstObject;
+        completion(YES, set.firstIndex);
     };
     vc.title = title;
     

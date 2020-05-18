@@ -73,13 +73,13 @@
 }
 
 - (IBAction)onMoveHere:(id)sender {
-    for(Node* itemToMove in self.itemsToMove) {
-        if(![itemToMove changeParent:self.currentGroup keePassGroupTitleRules:self.viewModel.database.format != kPasswordSafe]) {
-            NSLog(@"Error Changing Parents.");
-            NSError* error = [Utils createNSError:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving") errorCode:-1];
-            self.onDone(NO, error);
-            return;
-        }
+    BOOL ret = [self.viewModel.database moveItems:self.itemsToMove destination:self.currentGroup];
+    
+    if (!ret) {
+        NSLog(@"Error Moving");
+        NSError* error = [Utils createNSError:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving") errorCode:-1];
+        self.onDone(NO, error);
+        return;
     }
 
     [self.viewModel update:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {

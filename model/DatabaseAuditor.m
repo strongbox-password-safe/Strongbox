@@ -62,6 +62,10 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
 @implementation DatabaseAuditor
 
+- (instancetype)initWithPro:(BOOL)pro {
+    return [self initWithPro:pro saveConfig:nil];
+}
+
 - (instancetype)initWithPro:(BOOL)pro saveConfig:(SaveConfigurationBlock)saveConfig {
     self = [super init];
     

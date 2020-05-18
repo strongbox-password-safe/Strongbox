@@ -12,14 +12,23 @@
 @implementation Root
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
-    return self = [super initWithXmlElementName:kRootElementName context:context];
+    return self = [self initWithXmlElementName:kRootElementName context:context];
+}
+
+- (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(XmlProcessingContext *)context {
+    if(self = [super initWithXmlElementName:xmlElementName context:context]) {
+        self.deletedObjects = [[DeletedObjects alloc] initWithContext:self.context];
+    }
+    
+    return self;
 }
 
 - (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context {
     self = [self initWithContext:context];
     
     if(self) {
-        _rootGroup = [[KeePassGroup alloc] initAsKeePassRoot:context];
+        self.rootGroup = [[KeePassGroup alloc] initAsKeePassRoot:context];
+        self.deletedObjects = [[DeletedObjects alloc] initWithContext:self.context];
     }
     
     return self;
@@ -38,6 +47,9 @@
             NSLog(@"WARN: Multiple Root Groups found. Ignoring extra.");
         }
     }
+    else if ([xmlElementName isEqualToString:kDeletedObjectsElementName]) {
+        return [[DeletedObjects alloc] initWithContext:self.context];
+    }
     
     return [super getChildHandler:xmlElementName];
 }
@@ -47,7 +59,10 @@
         _rootGroup = (KeePassGroup*)completedObject;
         return YES;
     }
-  
+    else if ([withXmlElementName isEqualToString:kDeletedObjectsElementName]) {
+        self.deletedObjects = completedObject;
+    }
+    
     return NO;
 }
 
@@ -58,8 +73,12 @@
         return NO;
     }
 
-    if(self.rootGroup) {
+    if (self.rootGroup) {
         [self.rootGroup writeXml:serializer];
+    }
+    
+    if (self.deletedObjects) {
+        [self.deletedObjects writeXml:serializer];
     }
 
     if(![super writeUnmanagedChildren:serializer]) {

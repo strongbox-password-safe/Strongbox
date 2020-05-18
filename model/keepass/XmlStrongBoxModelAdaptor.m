@@ -10,6 +10,7 @@
 #import "XmlStrongboxNodeModelAdaptor.h"
 #import "Utils.h"
 #import "KeePassConstants.h"
+#import "NSArray+Extensions.h"
 
 @implementation XmlStrongBoxModelAdaptor
 
@@ -35,11 +36,14 @@
 }
 
 - (RootXmlDomainObject*)toXmlModelFromStrongboxModel:(Node*)rootNode
-                                         customIcons:(NSDictionary<NSUUID*, NSData*> *)customIcons
-                                        originalMeta:(Meta*)originalMeta
+                                  databaseProperties:(KeePassDatabaseWideProperties*)databaseProperties
                                              context:(XmlProcessingContext*)context
                                                error:(NSError **)error {
     RootXmlDomainObject *ret = [[RootXmlDomainObject alloc] initWithDefaultsAndInstantiatedChildren:context];
+    
+    Meta* originalMeta = databaseProperties.originalMeta;
+    NSDictionary<NSUUID*, NSData*> * customIcons = databaseProperties.customIcons;
+    
     if(originalMeta && originalMeta.unmanagedChildren) {
         for (id<XmlParsingDomainObject> child in originalMeta.unmanagedChildren) {
             [ret.keePassFile.meta addUnknownChildObject:child];
@@ -57,10 +61,28 @@
     }
 
     // 3. Metadata
-    
-    ret.keePassFile.root.rootGroup = rootXmlGroup;
+
     ret.keePassFile.meta.generator = kStrongboxGenerator;
+    ret.keePassFile.root.rootGroup = rootXmlGroup;
+
+    // Deleted Objects
     
+    if (databaseProperties.deletedObjects.count && !ret.keePassFile.root.deletedObjects) {
+        ret.keePassFile.root.deletedObjects = [[DeletedObjects alloc] initWithContext:XmlProcessingContext.standardV3Context];
+        
+    }
+    
+    if(ret.keePassFile.root.deletedObjects) {
+        [ret.keePassFile.root.deletedObjects.deletedObjects removeAllObjects];
+    }
+    
+    for (DeletedItem* deletedItem in databaseProperties.deletedObjects) {
+        DeletedObject* dob = [[DeletedObject alloc] initWithContext:XmlProcessingContext.standardV3Context];
+        dob.uuid = deletedItem.uuid;
+        dob.deletionTime = deletedItem.date;
+        [ret.keePassFile.root.deletedObjects.deletedObjects addObject:dob];
+    }
+        
     // 4. Custom Icons
 
     if(customIcons.count && !ret.keePassFile.meta.customIconList) {

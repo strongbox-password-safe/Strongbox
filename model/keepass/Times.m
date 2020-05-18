@@ -138,8 +138,8 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"LastModificationTime = [%@], CreationTime = [%@], LastAccessTime = [%@], expires=[%d], expiryTime=[%@]",
-            self.lastModificationTime, self.creationTime, self.lastAccessTime, self.expires, self.expiryTime];
+    return [NSString stringWithFormat:@"LastModificationTime = [%@], CreationTime = [%@], LastAccessTime = [%@], expires=[%d], expiryTime=[%@], usageCount = [%@], locationChanged = [%@]",
+            self.lastModificationTime, self.creationTime, self.lastAccessTime, self.expires, self.expiryTime, self.usageCount, self.locationChangedTime];
 }
 
 @end

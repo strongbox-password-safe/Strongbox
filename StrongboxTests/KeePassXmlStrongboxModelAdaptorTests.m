@@ -134,9 +134,11 @@
     Node* node = [[Node alloc] initAsRoot:nil];
     
     NSError *error;
+    
+    KeePassDatabaseWideProperties* props = [[KeePassDatabaseWideProperties alloc] init];
+    
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
-                                                         customIcons:[NSDictionary dictionary]
-                                                        originalMeta:nil
+                                                  databaseProperties:props
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     
@@ -154,9 +156,10 @@
     [node addChild:keePassRootGroup keePassGroupTitleRules:YES];
 
     NSError *error;
+    KeePassDatabaseWideProperties* props = [[KeePassDatabaseWideProperties alloc] init];
+
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
-                                                         customIcons:[NSDictionary dictionary]
-                                                        originalMeta:nil
+                                                  databaseProperties:props
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     
@@ -192,9 +195,9 @@
     [keePassRootGroup addChild:barEntry keePassGroupTitleRules:YES];
     
     NSError *error;
+    KeePassDatabaseWideProperties* props = [[KeePassDatabaseWideProperties alloc] init];
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
-                                                          customIcons:[NSDictionary dictionary]
-                                             originalMeta:nil
+                                                  databaseProperties:props
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     
@@ -241,11 +244,10 @@
     Node* nodeWithAttachment = [[Node alloc] initAsRecord:@"Attachments" parent:keePassRootGroup fields:fields uuid:nil];
     [keePassRootGroup addChild:nodeWithAttachment keePassGroupTitleRules:YES];
     
-    
     NSError *error;
+    KeePassDatabaseWideProperties* props = [[KeePassDatabaseWideProperties alloc] init];
     RootXmlDomainObject *ret = [adaptor toXmlModelFromStrongboxModel:node
-                                                         customIcons:[NSDictionary dictionary]
-                                             originalMeta:nil
+                                                  databaseProperties:props
                                                              context:[XmlProcessingContext standardV3Context]
                                                                error:&error];
     

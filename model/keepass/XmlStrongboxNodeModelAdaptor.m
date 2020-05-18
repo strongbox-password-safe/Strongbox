@@ -75,6 +75,16 @@
         }
     }
 
+    // Times
+    
+    ret.times.lastAccessTime = group.fields.accessed;
+    ret.times.lastModificationTime = group.fields.modified;
+    ret.times.creationTime = group.fields.created;
+    ret.times.usageCount = group.fields.usageCount;
+    ret.times.locationChangedTime = group.fields.locationChanged;
+
+    //
+    
     ret.icon = group.iconId;
     ret.customIcon = group.customIconUuid;
     
@@ -162,10 +172,15 @@
 - (BOOL)buildGroup:(KeePassGroup*)group parentNode:(Node*)parentNode {
     Node* groupNode = [[Node alloc] initAsGroup:group.name parent:parentNode keePassGroupTitleRules:YES uuid:group.uuid];
     
+    [groupNode.fields setTouchPropertiesWithCreated:group.times.creationTime
+                                           accessed:group.times.lastAccessTime
+                                           modified:group.times.lastModificationTime
+                                    locationChanged:group.times.locationChangedTime
+                                         usageCount:group.times.usageCount];
+    
     if(group.customIcon) groupNode.customIconUuid = group.customIcon;
     if(group.icon != nil) groupNode.iconId = group.icon;
 
-    
     for (KeePassGroup *childGroup in group.groups) {
         if(![self buildGroup:childGroup parentNode:groupNode]) {
             NSLog(@"Error Builing Child Group: [%@]", childGroup);
@@ -197,13 +212,14 @@
                                                      password:childEntry.password
                                                         notes:childEntry.notes
                                                         email:@""]; // Not an official Keepass Field!
-    
-    fields.created = childEntry.times.creationTime;
 
-    [fields setTouchProperties:childEntry.times.lastAccessTime modified:childEntry.times.lastModificationTime usageCount:childEntry.times.usageCount];
+    [fields setTouchPropertiesWithCreated:childEntry.times.creationTime
+                                 accessed:childEntry.times.lastAccessTime
+                                 modified:childEntry.times.lastModificationTime
+                          locationChanged:childEntry.times.locationChangedTime
+                               usageCount:childEntry.times.usageCount];
 
     fields.expires = childEntry.times.expires ? childEntry.times.expiryTime : nil;
-    fields.locationChanged = childEntry.times.locationChangedTime;
     
     for (Binary* binary in childEntry.binaries) {
         NodeFileAttachment* attachment = [[NodeFileAttachment alloc] init];

@@ -24,6 +24,19 @@
 //    [self listenToNotifications];
 }
 
+//- (NSArray<UIKeyCommand *> *)keyCommands {
+//    return @[[UIKeyCommand commandWithTitle:@"Find"
+//                                      image:nil
+//                                     action:@selector(onFind:)
+//                                      input:@"f"
+//                              modifierFlags:UIKeyModifierCommand
+//                               propertyList:nil]];
+//}
+//
+//- (void)onFind:(id)param {
+//    NSLog(@"onFind - [%@]", param);
+//}
+
 - (BOOL)splitViewController:(UISplitViewController *)splitViewController collapseSecondaryViewController:(UIViewController *)secondaryViewController ontoPrimaryViewController:(UIViewController *)primaryViewController {
     return YES;
 }

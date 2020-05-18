@@ -9,6 +9,7 @@
 #import "XmlSerializer.h"
 #import "KdbxSerializationCommon.h"
 #import "KeePass2TagPackage.h"
+#import "NSArray+Extensions.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -96,6 +97,7 @@
         // 6.
         
         NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
+        NSArray<DeletedItem*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
         
         // 7. Metadata
 
@@ -134,7 +136,8 @@
                                                                      metadata:metadata
                                                           compositeKeyFactors:ckf
                                                                   attachments:attachments
-                                                                  customIcons:customIcons];
+                                                                  customIcons:customIcons
+                                                               deletedObjects:deletedObjects];
         ret.adaptorTag = adaptorTag;
         
         completion(NO, ret, nil);
@@ -156,9 +159,14 @@
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     NSError* err;
+    
+    KeePassDatabaseWideProperties* databaseProperties = [[KeePassDatabaseWideProperties alloc] init];
+    databaseProperties.customIcons = database.customIcons;
+    databaseProperties.originalMeta = adaptorTag ? adaptorTag.originalMeta : nil;
+    databaseProperties.deletedObjects = database.deletedObjects;
+    
     RootXmlDomainObject *xmlDoc = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
-                                                               customIcons:database.customIcons
-                                                              originalMeta:adaptorTag ? adaptorTag.originalMeta : nil
+                                                        databaseProperties:databaseProperties
                                                                    context:[XmlProcessingContext standardV3Context]
                                                                      error:&err];
     
@@ -308,6 +316,22 @@ static NSMutableArray<V3Binary*>* safeGetBinaries(RootXmlDomainObject* root) {
     }
     
     return [NSMutableArray array];
+}
+
+static NSArray<DeletedItem*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
+    if (existingRootXmlDocument) {
+        if (existingRootXmlDocument.keePassFile) {
+            if (existingRootXmlDocument.keePassFile.root) {
+                if (existingRootXmlDocument.keePassFile.root.deletedObjects) {
+                    return [existingRootXmlDocument.keePassFile.root.deletedObjects.deletedObjects map:^id _Nonnull(DeletedObject * _Nonnull obj, NSUInteger idx) {
+                        return [DeletedItem uuid:obj.uuid date:obj.deletionTime];
+                    }];
+                }
+            }
+        }
+    }
+    
+    return @[];
 }
 
 @end

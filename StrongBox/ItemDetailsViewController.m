@@ -950,7 +950,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (void)onDeleteHistoryItem:(Node*)historicalNode {
-    [self.item touch:YES touchParents:YES];
+    [self.item touch:YES touchParents:NO];
     [self.item.fields.keePassHistory removeObject:historicalNode];
     
     [self performFullReload];
@@ -986,7 +986,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     // Make Changes
     
-    [self.item touch:YES touchParents:YES];
+    [self.item touch:YES touchParents:NO];
     
     [self.item restoreFromHistoricalNode:historicalNode];
     
@@ -1019,7 +1019,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(BOOL userCancelled, NSError *error))onDone {
     self.item.fields.passwordHistory = changed;
-    [self.item touch:YES touchParents:YES];
+    [self.item touch:YES touchParents:NO];
     
     [self performFullReload];
     
@@ -1215,23 +1215,44 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Node -> Model -> Node -> Save -> Model
 
-- (ItemDetailsModel*)modelFromItem:(Node*)item {
-    // Metadata
-    
+- (NSArray<ItemMetadataEntry*>*)getMetadataFromItem:(Node*)item format:(DatabaseFormat)format {
     NSMutableArray<ItemMetadataEntry*>* metadata = [NSMutableArray array];
-    
-    DatabaseFormat format = self.databaseModel.database.format;
-    
-    if(format != kPasswordSafe) {
-        [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
-    }
-    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
-                                                  value:friendlyDateString(item.fields.modified)
-                                               copyable:NO]];
-    
+
+    [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
+
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
                                                   value:friendlyDateString(item.fields.created)
                                                copyable:NO]];
+    
+//    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_accessed_field_title", @"Accessed")
+//                                                  value:friendlyDateString(item.fields.accessed)
+//                                               copyable:NO]];
+
+    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
+                                                  value:friendlyDateString(item.fields.modified)
+                                               copyable:NO]];
+        
+    if (format == kKeePass4 || format == kKeePass) {
+        [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_location_changed_field_title", @"Location Changed")
+                                                      value:friendlyDateString(item.fields.locationChanged)
+                                                   copyable:NO]];
+
+        if (item.fields.usageCount) {
+//            [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_usage_count_field_title", @"Usage Count")
+//                                                          value:item.fields.usageCount.stringValue
+//                                                       copyable:NO]];
+        }
+    }
+    
+    return metadata;
+}
+
+- (ItemDetailsModel*)modelFromItem:(Node*)item {
+    DatabaseFormat format = self.databaseModel.database.format;
+    
+    // Metadata
+    
+    NSArray<ItemMetadataEntry*>* metadata = [self getMetadataFromItem:item format:format];
     
     // Has History?
     
@@ -1276,7 +1297,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)applyModelChangesToNodeItem {
     if (self.createNewItem) {
-        self.item.fields.created = [[NSDate alloc] init];
         [self.parentGroup addChild:self.item keePassGroupTitleRules:NO];
     }
     else { // Add History Entry for this change if appropriate...
@@ -1284,7 +1304,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         [self addHistoricalNode:originalNodeForHistory];
     }
 
-    [self.item touch:YES touchParents:YES];
+    [self.item touch:YES touchParents:NO];
 
     [self.item setTitle:self.model.title keePassGroupTitleRules:NO];
 
@@ -1362,31 +1382,31 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [self.coverView removeFromSuperview];
 }
 
-- (void)resetNodeItemTo:(Node*)preSaveCloneOfItem {
-    if (self.createNewItem) {
-        [self.parentGroup removeChild:self.item];
-    }
-    else {
-        self.item.fields.keePassHistory = preSaveCloneOfItem.fields.keePassHistory;
-    }
-
-    [self.item touchWithExplicitModifiedDate:preSaveCloneOfItem.fields.modified touchParents:YES];
-     
-    [self.item setTitle:preSaveCloneOfItem.title keePassGroupTitleRules:NO];
-
-    self.item.fields.username = preSaveCloneOfItem.fields.username;
-    self.item.fields.password = preSaveCloneOfItem.fields.password;
-    self.item.fields.url = preSaveCloneOfItem.fields.url;
-    self.item.fields.email = preSaveCloneOfItem.fields.email;
-    self.item.fields.notes = preSaveCloneOfItem.fields.notes;
-    self.item.fields.expires = preSaveCloneOfItem.fields.expires;
-
-    // FUTURE: There's a problem here with rationalization :( - This needs more work... perhaps use the ViewModel class
-    // from the Mac version?
-    
-    self.item.fields.customFields = preSaveCloneOfItem.fields.customFields;
-    self.item.fields.attachments = preSaveCloneOfItem.fields.attachments;
-}
+//- (void)resetNodeItemTo:(Node*)preSaveCloneOfItem { // TODO: Make use of UNDO in Model when available?
+//    if (self.createNewItem) {
+//        [self.parentGroup removeChild:self.item];
+//    }
+//    else {
+//        self.item.fields.keePassHistory = preSaveCloneOfItem.fields.keePassHistory;
+//    }
+//
+//    [self.item touchWithExplicitModifiedDate:preSaveCloneOfItem.fields.modified touchParents:YES];
+//     
+//    [self.item setTitle:preSaveCloneOfItem.title keePassGroupTitleRules:NO];
+//
+//    self.item.fields.username = preSaveCloneOfItem.fields.username;
+//    self.item.fields.password = preSaveCloneOfItem.fields.password;
+//    self.item.fields.url = preSaveCloneOfItem.fields.url;
+//    self.item.fields.email = preSaveCloneOfItem.fields.email;
+//    self.item.fields.notes = preSaveCloneOfItem.fields.notes;
+//    self.item.fields.expires = preSaveCloneOfItem.fields.expires;
+//
+//    // FUTURE: There's a problem here with rationalization :( - This needs more work... perhaps use the ViewModel class
+//    // from the Mac version?
+//    
+//    self.item.fields.customFields = preSaveCloneOfItem.fields.customFields;
+//    self.item.fields.attachments = preSaveCloneOfItem.fields.attachments;
+//}
 
 - (void)onSaveChangesDone:(BOOL)userCancelled preSaveCloneOfItem:(Node*)preSaveCloneOfItem error:(NSError*)error {
     if(userCancelled) {
@@ -1479,7 +1499,11 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                             [self fetchFavIcon:completion];
                             return;
                         }
+                        else {
+                            completion();
+                        }
                     }];
+                    return;
                 }
                 else {
                     if (self.databaseModel.metadata.tryDownloadFavIconForNewRecord ) {

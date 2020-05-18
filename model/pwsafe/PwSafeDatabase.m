@@ -197,9 +197,8 @@
     fields.email = record.email;
     fields.expires = record.expires;
     
-    [fields setTouchProperties:record.accessed modified:record.modified usageCount:nil];
+    [fields setTouchPropertiesWithCreated:record.created accessed:record.accessed modified:record.modified locationChanged:nil usageCount:nil]; // PwSafe doesn't support usage count or location changed
     
-    fields.created = record.created;
     fields.passwordModified = record.passwordModified;
     
     NSUUID* uniqueId = record.uuid ? record.uuid : [NSUUID UUID];

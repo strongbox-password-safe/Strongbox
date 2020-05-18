@@ -84,7 +84,6 @@
     [self bindHideTips];
     [self bindClearClipboard];
     [self bindAppLock];
-    [self bindDeleteOnFailedUnlock];
     [self customizeAppLockSectionFooter];
     [self bindGenericPreferencesChanged];
 }
@@ -104,7 +103,7 @@
                         if (success) {
                             Settings.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
                         }
-                        [self bindDeleteOnFailedUnlock];
+                        [self bindAppLock];
                     }];
     }
     else if(cell == self.cellAboutVersion) {
@@ -370,23 +369,6 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)bindDeleteOnFailedUnlock {
-    BOOL enabled = Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
-    
-    self.switchDeleteDataEnabled.on = enabled;
-    self.cellDeleteDataAttempts.userInteractionEnabled = enabled;
-    
-    NSString* str = @(Settings.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
-        self.labelDeleteDataAttemptCount.text = enabled ? str : NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-    
-    if (@available(iOS 13.0, *)) {
-        self.labelDeleteDataAttemptCount.textColor = !enabled ? UIColor.tertiaryLabelColor : UIColor.labelColor;
-    }
-    else {
-        self.labelDeleteDataAttemptCount.textColor = !enabled ? UIColor.lightGrayColor : UIColor.darkTextColor;
-    }
-}
-
 - (IBAction)onDeleteDataChanged:(id)sender {
     if(self.switchDeleteDataEnabled.on) {
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; // Default
@@ -399,7 +381,7 @@
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; // Off
     }
     
-    [self bindDeleteOnFailedUnlock];
+    [self bindAppLock];
 }
 
 - (void)onFaq {
@@ -460,6 +442,25 @@
     self.appLockOnPreferences.enabled = effectiveMode != kNoLock;
     
     NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
+    
+    BOOL deleteOnOff = Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
+    BOOL deleteEnabled = effectiveMode != kNoLock;
+    
+    self.switchDeleteDataEnabled.enabled = deleteEnabled;
+    
+    self.switchDeleteDataEnabled.on = deleteOnOff;
+    self.cellDeleteDataAttempts.userInteractionEnabled = deleteOnOff && deleteEnabled;
+    
+    NSString* str = @(Settings.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
+    
+    self.labelDeleteDataAttemptCount.text = deleteOnOff && deleteEnabled ? str : NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
+    
+    if (@available(iOS 13.0, *)) {
+        self.labelDeleteDataAttemptCount.textColor = !(deleteOnOff && deleteEnabled) ? UIColor.tertiaryLabelColor : UIColor.labelColor;
+    }
+    else {
+        self.labelDeleteDataAttemptCount.textColor = !(deleteOnOff && deleteEnabled) ? UIColor.lightGrayColor : UIColor.darkTextColor;
+    }
 }
 
 - (void)onReviewInAppStore {
@@ -496,14 +497,17 @@
     UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
-    vc.items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+    NSArray<NSString*>* items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return formatAsIntervals ? [Utils formatTimeInterval:obj.integerValue] : obj.stringValue;
     }];
+    vc.groupItems = @[items];
     
     NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
-    vc.selected = [NSIndexSet indexSetWithIndex:currentlySelectIndex];
-    vc.onSelectionChanged = ^(NSIndexSet * _Nonnull selectedIndices) {
-        NSInteger selectedValue = options[selectedIndices.firstIndex].integerValue;
+    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSIndexSet* set = selectedIndices.firstObject;
+        
+        NSInteger selectedValue = options[set.firstIndex].integerValue;
         [self.navigationController popViewControllerAnimated:YES];
         completion(YES, selectedValue);
     };

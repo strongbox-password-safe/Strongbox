@@ -209,7 +209,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
        cloneMetadataDates:(BOOL)cloneMetadataDates
                 cloneUuid:(BOOL)cloneUuid
                  newTitle:(NSString*)newTitle {
-    NodeFields* clonedFields = [self.fields cloneOrDuplicate:clearHistory cloneMetadataDates:cloneMetadataDates];
+    NodeFields* clonedFields = [self.fields cloneOrDuplicate:clearHistory cloneTouchProperties:cloneMetadataDates];
     
     Node* ret = [[Node alloc] initWithParent:self.parent
                                        title:newTitle.length ? newTitle : self.title
@@ -260,20 +260,36 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return self.fields.nearlyExpired;
 }
 
+- (void)touch {
+    [self touch:NO];
+}
+
+- (void)touchLocationChanged {
+    [self.fields touchLocationChanged];
+}
+
+- (void)touch:(BOOL)modified {
+    [self touch:modified touchParents:YES];
+}
+
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents {
     [self.fields touch:modified];
     
     if(touchParents && self.parent) {
-        [self.parent touch:modified touchParents:YES];
+        [self.parent touch:modified];
     }
 }
 
-- (void)touchWithExplicitModifiedDate:(NSDate *)modDate touchParents:(BOOL)touchParents {
-    [self.fields touchWithExplicitModifiedDate:modDate];
+- (void)setModifiedDateExplicit:(NSDate *)modDate setParents:(BOOL)setParents { // Used for Undo's in Mac...
+    [self.fields setModifiedDateExplicit:modDate];
     
-    if(touchParents && self.parent) {
-        [self.parent touchWithExplicitModifiedDate:modDate touchParents:YES];
+    if(setParents && self.parent) {
+        [self.parent setModifiedDateExplicit:modDate setParents:YES];
     }
+}
+
+- (NSArray<Node*>*)allChildren {
+    return self.isGroup ? [self filterChildren:YES predicate:nil] : [NSArray array];
 }
 
 - (NSArray<Node*>*)children {
@@ -395,13 +411,18 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     [self.parent removeChild:self];
     
+    Node* rollbackParent = self.parent;
+    
     _parent = parent;
     
     if([parent addChild:self keePassGroupTitleRules:keePassGroupTitleRules]) {
         return YES;
     }
-    
-    return NO;
+    else { // Should pretty much never happen because we validate above...
+        _parent = rollbackParent;
+        [rollbackParent addChild:self keePassGroupTitleRules:keePassGroupTitleRules];
+        return NO;
+    }
 }
 
 - (BOOL)isChildOf:(Node*)parent {

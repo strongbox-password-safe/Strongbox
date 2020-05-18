@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSNumber* icon;
 @property (nonatomic, nullable) NSUUID* customIcon;
 
+@property (nonatomic) Times* times;
+
 @end
 
 NS_ASSUME_NONNULL_END

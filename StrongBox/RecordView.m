@@ -896,7 +896,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
 - (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(BOOL userCancelled, NSError *error))onDone {
     self.record.fields.passwordHistory = changed;
-    [self.record touch:YES touchParents:YES];
+    [self.record touch:YES touchParents:NO];
 
     [self sync:^(BOOL userCancelled, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -911,7 +911,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     // Makes Changes
 
-    [self.record touch:YES touchParents:YES];
+    [self.record touch:YES touchParents:NO];
 
     [self.viewModel.database setNodeAttachments:node attachments:attachments];
     
@@ -938,7 +938,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     // Make Changes
     
-    [self.record touch:YES touchParents:YES];
+    [self.record touch:YES touchParents:NO];
     
     [node.fields removeAllCustomFields];
     
@@ -965,7 +965,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)onDeleteHistoryItem:(Node*) historicalNode {
-    [self.record touch:YES touchParents:YES];
+    [self.record touch:YES touchParents:NO];
     
     [self.record.fields.keePassHistory removeObject:historicalNode];
 
@@ -994,7 +994,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     // Make Changes
     
-    [self.record touch:YES touchParents:YES];
+    [self.record touch:YES touchParents:NO];
     
     [self.record restoreFromHistoricalNode:historicalNode];
     
@@ -1114,7 +1114,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 - (void)saveAfterTotpSet:(Node*)originalNodeForHistory {
     [self addHistoricalNode:originalNodeForHistory];
     
-    [self.record touch:YES touchParents:YES];
+    [self.record touch:YES touchParents:NO];
     
     [self sync:^(BOOL userCancelled, NSError *error) {
         if (userCancelled) {
@@ -1169,7 +1169,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)saveChanges:(Node*)originalNodeForHistory completion:(void (^)(BOOL userCancelled, NSError* error))completion {
-    [self.record touch:YES touchParents:YES];
+    [self.record touch:YES touchParents:NO];
 
     self.record.fields.notes = self.textViewNotes.text;
     self.record.fields.password = trim(self.textFieldPassword.text);
@@ -1179,7 +1179,6 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.email = trim(self.textFieldEmail.text);
     
     if (self.editingNewRecord) {
-        self.record.fields.created = [[NSDate alloc] init];
         [self.parentGroup addChild:self.record keePassGroupTitleRules:NO];
     }
     else { // Add History Entry for this change if appropriate...

@@ -15,6 +15,8 @@ typedef void (^YubiKeyCRHandlerBlock)(NSData* challenge, YubiKeyCRResponseBlock 
 
 @interface CompositeKeyFactors : NSObject
 
++ (instancetype)unitTestDefaults;
+
 + (instancetype)password:(NSString*_Nullable)password;
 + (instancetype)password:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest;
 + (instancetype)password:(NSString*_Nullable)password keyFileDigest:(NSData*_Nullable)keyFileDigest yubiKeyCR:(YubiKeyCRHandlerBlock _Nullable)yubiKeyCR;

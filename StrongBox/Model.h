@@ -48,7 +48,8 @@ extern NSString* const kAuditCompletedNotificationKey;
 - (void)stopAndClearAuditor;
 
 @property (readonly) AuditState auditState;
-@property (readonly) NSUInteger auditIssueCount;
+
+@property (readonly) NSNumber* auditIssueCount;
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditHibpErrorCount;
 
@@ -71,7 +72,7 @@ extern NSString* const kAuditCompletedNotificationKey;
 // Operations
 
 - (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
-- (BOOL)deleteItem:(Node *_Nonnull)child;
+- (BOOL)deleteOrRecycleItem:(Node *_Nonnull)child;
 - (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
 
 - (BOOL)isPinned:(Node*)item;
