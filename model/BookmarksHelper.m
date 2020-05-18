@@ -23,11 +23,13 @@
 }
 
 + (NSData *)getBookmarkDataFromUrl:(NSURL *)url readOnly:(BOOL)readOnly error:(NSError *_Nonnull*)error {
-    NSURLBookmarkCreationOptions options = NSURLBookmarkCreationMinimalBookmark; // MMcG: 8-May-2020 - Attempt to improve stale bookmark issues...
+    NSURLBookmarkCreationOptions options = kNilOptions;
     
     #if !TARGET_OS_IPHONE
-        options |= readOnly ? NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess : kNilOptions;
+        options |= readOnly ? NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess : kNilOptions; // NSURLBookmarkCreationMinimalBookmark;
         options |= NSURLBookmarkCreationWithSecurityScope;
+    #else
+        options |= NSURLBookmarkCreationMinimalBookmark; // iOS
     #endif
 
     [url startAccessingSecurityScopedResource]; // MMcG: Do not check return here explicitly because it will fail if the URL was not generated from a bookmark - i.e. if it was just passed in by the system - This is fine we will continue and successfully generate a bookmark (or not).
