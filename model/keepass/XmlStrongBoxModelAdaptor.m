@@ -76,10 +76,10 @@
         [ret.keePassFile.root.deletedObjects.deletedObjects removeAllObjects];
     }
     
-    for (DeletedItem* deletedItem in databaseProperties.deletedObjects) {
+    for (NSUUID* uuid in databaseProperties.deletedObjects.allKeys) {
         DeletedObject* dob = [[DeletedObject alloc] initWithContext:XmlProcessingContext.standardV3Context];
-        dob.uuid = deletedItem.uuid;
-        dob.deletionTime = deletedItem.date;
+        dob.uuid = uuid;
+        dob.deletionTime = databaseProperties.deletedObjects[uuid];
         [ret.keePassFile.root.deletedObjects.deletedObjects addObject:dob];
     }
         

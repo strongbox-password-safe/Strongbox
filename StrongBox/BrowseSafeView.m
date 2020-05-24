@@ -64,6 +64,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property BOOL hasAlreadyAppeared;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
+@property NSString* originalCloseTitle;
+
 @property NSTimer* timerRefreshOtp;
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *exportBarButton;
@@ -393,6 +395,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)setupNavBar {
+    self.originalCloseTitle = self.closeBarButton.title;
+    
     if(self.splitViewController) {
         if(![self isDisplayingRootGroup]) {
             self.closeBarButton.enabled = NO;
@@ -436,6 +440,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-desc" : @"sort-asc"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-desc" : @"sort-asc"];
     
     [self.buttonSortItems setImage:sortImage];
+    
+    [self.closeBarButton setTitle:self.isEditing ? NSLocalizedString(@"generic_cancel", @"Cancel") : self.originalCloseTitle];
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animate {
@@ -547,11 +553,16 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (IBAction)onClose:(id)sender {
-    MasterDetailViewController* master = (MasterDetailViewController*)self.splitViewController;
-    [master onClose];
-    
-    if (self.viewModel) {
-        [self.viewModel closeAndCleanup];
+    if (self.isEditing) {
+        [self cancelEditing];
+    }
+    else {
+        MasterDetailViewController* master = (MasterDetailViewController*)self.splitViewController;
+        [master onClose];
+        
+        if (self.viewModel) {
+            [self.viewModel closeAndCleanup];
+        }
     }
 }
 
@@ -639,37 +650,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             completion(response);
         }
     }];
-}
-
-- (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath {
-    [self onDeleteSingleItem:indexPath completion:nil];
-}
-
-- (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
-    Node *item = [self getNodeFromIndexPath:indexPath];
-    BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
-
-    [Alerts yesNo:self.searchController.isActive ? self.searchController : self
-            title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
-          message:[NSString stringWithFormat:willRecycle ?
-                   NSLocalizedString(@"browse_vc_are_you_sure_recycle_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?") :
-                   NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"), [self dereference:item.title node:item]]
-           action:^(BOOL response) {
-                if (response) {
-                    if(![self.viewModel deleteOrRecycleItem:item]) {
-                        [Alerts warn:self
-                               title:NSLocalizedString(@"browse_vc_delete_failed", @"Delete Failed")
-                             message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
-                    }
-                    else {
-                        [self saveChangesToSafeAndRefreshView];
-                    }
-                }
-                
-                if (completion) {
-                    completion(response);
-                }
-           }];
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
@@ -1361,41 +1341,144 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
 }
 
+////////////////////////////////////////////////////////////////////////
+// Deletes
+
 - (IBAction)onDeleteToolbarButton:(id)sender {
-    NSArray *selectedRows = (self.tableView).indexPathsForSelectedRows;
+    NSArray<NSIndexPath*> *selectedRows = (self.tableView).indexPathsForSelectedRows;
     
     if (selectedRows.count > 0) {
-        NSArray<Node *> *items = [self getSelectedItems:selectedRows];
-        Node* item = [items firstObject];
-        BOOL willRecycle = [self.viewModel deleteWillRecycle:item];
-        
-        [Alerts yesNo:self.searchController.isActive ? self.searchController : self
-                title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
-              message:willRecycle ?
-         NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?") :
-         NSLocalizedString(@"browse_vc_are_you_sure_delete", @"Are you sure you want to permanently delete these item(s)?")
-               action:^(BOOL response) {
-                   if (response) {
-                       NSArray<Node *> *items = [self getSelectedItems:selectedRows];
-                       
-                       BOOL fail = NO;
-                       for (Node* item in items) {
-                           if(![self.viewModel deleteOrRecycleItem:item]) {
-                               fail = YES;
-                           }
-                       }
-                       
-                       if(fail) {
-                           [Alerts warn:self
-                                  title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
-                                message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
-                       }
-                       
-                       [self saveChangesToSafeAndRefreshView];
-                   }
-               }];
+        if (selectedRows.count > 1) {
+            [self onDeleteMultipleSelected:selectedRows];
+        }
+        else {
+            [self onDeleteSingleItem:selectedRows.firstObject];
+        }
     }
 }
+
+- (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath {
+    [self onDeleteSingleItem:indexPath completion:nil];
+}
+
+- (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
+    Node *item = [self getNodeFromIndexPath:indexPath];
+    BOOL willRecycle = [self.viewModel canRecycle:item];
+
+    [Alerts yesNo:self.searchController.isActive ? self.searchController : self
+            title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
+          message:[NSString stringWithFormat:willRecycle ?
+                   NSLocalizedString(@"browse_vc_are_you_sure_recycle_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?") :
+                   NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"), [self dereference:item.title node:item]]
+           action:^(BOOL response) {
+                if (response) {
+                    BOOL failed = NO;
+                    if (willRecycle) {
+                        failed = ![self.viewModel recycleItems:@[item]];
+                    }
+                    else {
+                        [self.viewModel deleteItems:@[item]];
+                    }
+
+                    if (failed) {
+                        [Alerts warn:self
+                               title:NSLocalizedString(@"browse_vc_delete_failed", @"Delete Failed")
+                             message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
+                    }
+                    else {
+                        [self saveChangesToSafeAndRefreshView];
+                    }
+                }
+        
+                if (completion) {
+                    completion(response);
+                }
+           }];
+}
+
+- (void)onDeleteMultipleSelected:(NSArray<NSIndexPath*>*)selected {
+    NSArray<Node *> *items = [self getSelectedItems:selected];
+    
+    NSDictionary* grouped = [items groupBy:^id _Nonnull(Node * _Nonnull obj) {
+        BOOL delete = [self.viewModel canRecycle:obj];
+        return @(delete);
+    }];
+
+    const NSArray<Node*> *toBeDeleted = grouped[@(NO)];
+    const NSArray<Node*> *toBeRecycled = grouped[@(YES)];
+
+    if ( toBeDeleted == nil ) {
+        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled];
+    }
+    else {
+        if ( toBeRecycled == nil ) {
+            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted];
+        }
+        else { // Mixed delete and recycle
+            [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled];
+        }
+    }
+}
+
+- (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled {
+    [Alerts yesNo:self.searchController.isActive ? self.searchController : self
+            title:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
+          message:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
+           action:^(BOOL response) {
+        if (response) {
+            // Delete first, then recycly because the item to be deleted could be the recycle bin, and if we recycle first then we will actually
+            // permanently delete the items we wanted to recycle! This is more conservative and a better outcome.
+            
+            [self.viewModel deleteItems:toBeDeleted];
+            
+            BOOL fail = ![self.viewModel recycleItems:toBeRecycled];
+            
+            if(fail) {
+                [Alerts warn:self
+                       title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                     message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
+            }
+            
+            [self saveChangesToSafeAndRefreshView];
+        }
+    }];
+}
+
+- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+    [Alerts yesNo:self.searchController.isActive ? self.searchController : self
+            title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
+          message:NSLocalizedString(@"browse_vc_are_you_sure_delete", @"Are you sure you want to permanently delete these item(s)?")
+           action:^(BOOL response) {
+               if (response) {
+                   [self.viewModel deleteItems:items];
+                   [self saveChangesToSafeAndRefreshView];
+               }
+           }];
+}
+
+- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+    [Alerts yesNo:self.searchController.isActive ? self.searchController : self
+            title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
+          message:NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?")
+           action:^(BOOL response) {
+               if (response) {
+                   BOOL fail = ![self.viewModel recycleItems:items];
+                   
+                   if(fail) {
+                       [Alerts warn:self
+                              title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                            message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
+                       
+                       [self refreshItems];
+                   }
+                   else {
+                       [self saveChangesToSafeAndRefreshView];
+                   }
+               }
+           }];
+}
+
+///
 
 - (NSArray<Node*> *)getSelectedItems:(NSArray<NSIndexPath *> *)selectedRows {
     NSMutableArray<Node*>* ret = [NSMutableArray array];

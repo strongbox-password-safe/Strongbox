@@ -475,8 +475,10 @@
 		C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */; };
 		C86E9076246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */; };
 		C86E9077246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */; };
-		C8BF66C3246E835100BA6C43 /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF66C2246E835100BA6C43 /* DeletedItem.m */; };
-		C8BF66C4246E835100BA6C43 /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF66C2246E835100BA6C43 /* DeletedItem.m */; };
+		C8BFECBA24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */; };
+		C8BFECBB24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */; };
+		C8E2CB192477D5270029E1CB /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E2CB172477D5270029E1CB /* DeletedObjects.m */; };
+		C8E2CB1A2477D5270029E1CB /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E2CB172477D5270029E1CB /* DeletedObjects.m */; };
 		C8E6D4F9246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
 		C8E6D4FA246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
 		C8E6D4FB246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */; };
@@ -1099,8 +1101,10 @@
 		C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = first.names.us.txt; path = resources/names/first/first.names.us.txt; sourceTree = "<group>"; };
 		C86E9074246D88D70029623A /* KeePassDatabaseWideProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseWideProperties.h; path = ../model/keepass/KeePassDatabaseWideProperties.h; sourceTree = "<group>"; };
 		C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseWideProperties.m; path = ../model/keepass/KeePassDatabaseWideProperties.m; sourceTree = "<group>"; };
-		C8BF66C1246E835100BA6C43 /* DeletedItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DeletedItem.h; path = ../model/keepass/DeletedItem.h; sourceTree = "<group>"; };
-		C8BF66C2246E835100BA6C43 /* DeletedItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DeletedItem.m; path = ../model/keepass/DeletedItem.m; sourceTree = "<group>"; };
+		C8BFECB824781C660051D21E /* NodeHierarchyReconstructionData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeHierarchyReconstructionData.h; path = ../model/NodeHierarchyReconstructionData.h; sourceTree = "<group>"; };
+		C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeHierarchyReconstructionData.m; path = ../model/NodeHierarchyReconstructionData.m; sourceTree = "<group>"; };
+		C8E2CB172477D5270029E1CB /* DeletedObjects.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DeletedObjects.m; path = ../model/DeletedObjects.m; sourceTree = "<group>"; };
+		C8E2CB182477D5270029E1CB /* DeletedObjects.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DeletedObjects.h; path = ../model/DeletedObjects.h; sourceTree = "<group>"; };
 		C8E6D4F7246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "finnish-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/finnish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8E6D4F8246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "../resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8E6D4FD246D5C7600AFFE13 /* WordList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = ../model/WordList.h; sourceTree = "<group>"; };
@@ -1366,6 +1370,8 @@
 		4D524CF2219B481A00C22CB4 /* Xml */ = {
 			isa = PBXGroup;
 			children = (
+				C8E2CB182477D5270029E1CB /* DeletedObjects.h */,
+				C8E2CB172477D5270029E1CB /* DeletedObjects.m */,
 				4D524CF7219B48D200C22CB4 /* XmlProcessingContext.h */,
 				4D524CFE219B48D300C22CB4 /* XmlProcessingContext.m */,
 				4D524CFA219B48D200C22CB4 /* CustomIcon.h */,
@@ -1454,11 +1460,11 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				4DE2CA3E23C38B5E00F76255 /* Main */,
 				C85B9D6E2465426A00EEBFC9 /* UI Components */,
 				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DAE28C724073089003D9221 /* Upgrade */,
 				4D6EB45923DF23750045C8D5 /* Database Properties */,
-				4DE2CA3E23C38B5E00F76255 /* Main */,
 				4D14A13B224D211400C71ABF /* Node Details */,
 				4DD9EB1D23C4FD1500887237 /* Set Icon */,
 				4DE2CA3D23C38B4100F76255 /* Change Password and Format */,
@@ -1587,8 +1593,6 @@
 				4D524CF3219B482800C22CB4 /* KDBX3 */,
 				4D524CA9219B45F700C22CB4 /* DatabaseAttachment.h */,
 				4D524CAA219B45F700C22CB4 /* DatabaseAttachment.m */,
-				C8BF66C1246E835100BA6C43 /* DeletedItem.h */,
-				C8BF66C2246E835100BA6C43 /* DeletedItem.m */,
 				4DBCE2292224207000A2AFA2 /* KeePassPredefinedIcons.h */,
 				4DBCE22A2224207000A2AFA2 /* KeePassPredefinedIcons.m */,
 				4D2CB4A22332D92900C2E084 /* XmlSerializer.h */,
@@ -1957,14 +1961,14 @@
 				4D9E0948218250F6007BA1E7 /* KeePass */,
 				4D0835A92284732500CA7405 /* StrongboxDatabase.m */,
 				4D0835A82284732500CA7405 /* StrongboxDatabase.h */,
+				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
+				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
 				4DE2069F22E5FB9700F15184 /* CompositeKeyFactors.h */,
 				4DE2069E22E5FB9700F15184 /* CompositeKeyFactors.m */,
 				4D01BA2B22BD31F00044226F /* SearchScope.h */,
 				4D524D09219B490100C22CB4 /* NodeFileAttachment.h */,
 				4D524D08219B490100C22CB4 /* NodeFileAttachment.m */,
 				4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */,
-				4DF347F82074FA6C00148741 /* DatabaseModel.h */,
-				4DF347F12074FA6B00148741 /* DatabaseModel.m */,
 				4DF347FE2074FA6C00148741 /* Node.h */,
 				4DF348002074FA6C00148741 /* Node.m */,
 				4DF347FA2074FA6C00148741 /* NodeFields.h */,
@@ -1973,6 +1977,8 @@
 				4D0835A5228472D200CA7405 /* UiAttachment.m */,
 				4D29663F21ADAC0B009B7936 /* CustomField.h */,
 				4D29664021ADAC0B009B7936 /* CustomField.m */,
+				C8BFECB824781C660051D21E /* NodeHierarchyReconstructionData.h */,
+				C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */,
 			);
 			name = Database;
 			sourceTree = "<group>";
@@ -2324,23 +2330,19 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${SRCROOT}/../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KissXML-macOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E8957E36C777D4AF2AFDE57D /* [CP] Embed Pods Frameworks */ = {
@@ -2349,7 +2351,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KissXML-macOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
 			);
@@ -2360,7 +2362,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		EB990A80726BEB171877A069 /* [CP] Check Pods Manifest.lock */ = {
@@ -2438,7 +2440,6 @@
 				4D37D875244E075200C3182D /* NSString+Levenshtein.m in Sources */,
 				4D1FFA942403030100B75EA2 /* UpgradeWindowController.m in Sources */,
 				4D1FFA952403030100B75EA2 /* twofish.c in Sources */,
-				C8BF66C4246E835100BA6C43 /* DeletedItem.m in Sources */,
 				4D1FFA962403030100B75EA2 /* KeePass2TagPackage.m in Sources */,
 				4D1FFA972403030100B75EA2 /* ref.c in Sources */,
 				4D1FFA982403030100B75EA2 /* KdbxSerializationCommon.m in Sources */,
@@ -2464,6 +2465,7 @@
 				4D1FFAAC2403030100B75EA2 /* core.c in Sources */,
 				4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */,
 				4D1FFAAE2403030100B75EA2 /* Document.m in Sources */,
+				C8E2CB1A2477D5270029E1CB /* DeletedObjects.m in Sources */,
 				4D1FFAAF2403030100B75EA2 /* SecretStore.m in Sources */,
 				4D1FFAB02403030100B75EA2 /* Alerts.m in Sources */,
 				4D1FFAB12403030100B75EA2 /* CryptoParameters.m in Sources */,
@@ -2521,6 +2523,7 @@
 				4D1FFAE12403030100B75EA2 /* Keys.m in Sources */,
 				4D1FFAE22403030100B75EA2 /* DAVResponseItem.m in Sources */,
 				4D1FFAE32403030100B75EA2 /* CustomIconList.m in Sources */,
+				C8BFECBB24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */,
 				4D1FFAE52403030100B75EA2 /* main.m in Sources */,
 				4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */,
@@ -2632,7 +2635,6 @@
 				4DA50D06244DFD2100364781 /* NSString+Levenshtein.m in Sources */,
 				4D9E098721825108007BA1E7 /* KeePassFile.m in Sources */,
 				4D60CC6E1F4C1627005B66B8 /* UpgradeWindowController.m in Sources */,
-				C8BF66C3246E835100BA6C43 /* DeletedItem.m in Sources */,
 				4D524C9F219B44F300C22CB4 /* twofish.c in Sources */,
 				4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */,
 				4D524D28219B4B2A00C22CB4 /* ref.c in Sources */,
@@ -2658,6 +2660,7 @@
 				4D524CBE219B479900C22CB4 /* KdbEntry.m in Sources */,
 				4D524D25219B4B2A00C22CB4 /* core.c in Sources */,
 				4DBF494322232A3200F48182 /* DAVRequests.m in Sources */,
+				C8E2CB192477D5270029E1CB /* DeletedObjects.m in Sources */,
 				4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */,
 				4DACA5C023CCD40F00891366 /* SecretStore.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* Alerts.m in Sources */,
@@ -2715,6 +2718,7 @@
 				4D524CEE219B481200C22CB4 /* Keys.m in Sources */,
 				4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */,
 				4D524D01219B48D300C22CB4 /* CustomIconList.m in Sources */,
+				C8BFECBA24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D524CA8219B459B00C22CB4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */,
@@ -3070,7 +3074,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2912;
+				CURRENT_PROJECT_VERSION = 2922;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3080,7 +3084,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.3;
+				MARKETING_VERSION = 1.13.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3096,7 +3100,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2912;
+				CURRENT_PROJECT_VERSION = 2922;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3106,7 +3110,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.3;
+				MARKETING_VERSION = 1.13.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3277,7 +3281,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2912;
+				CURRENT_PROJECT_VERSION = 2922;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3287,7 +3291,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.0;
+				MARKETING_VERSION = 1.13.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3303,7 +3307,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2912;
+				CURRENT_PROJECT_VERSION = 2922;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3313,7 +3317,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.0;
+				MARKETING_VERSION = 1.13.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

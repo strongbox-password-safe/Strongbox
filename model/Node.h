@@ -83,6 +83,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)removeChild:(Node* _Nonnull)node; 
 
 - (Node*)clone;
+- (Node*)clone:(BOOL)recursive;
 - (Node*)cloneForHistory;
 - (Node*)duplicate:(NSString*)newTitle; // NB: Must be added to parent to take effect
 
@@ -98,9 +99,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)restoreFromHistoricalNode:(Node*)historicalItem;
 
 - (void)touch; // Recursive Non Modified Touch
+- (void)touchAt:(NSDate*)date; // Recursive Non Modified Touch
+- (void)touchAt:(BOOL)modified date:(NSDate *)date;
+
 - (void)touch:(BOOL)modified; // Recursive Touch
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents;
+- (void)touch:(BOOL)modified touchParents:(BOOL)touchParents date:(NSDate*)date;
+
 - (void)touchLocationChanged;
+- (void)touchLocationChanged:(NSDate*)date;
 
 - (void)setModifiedDateExplicit:(NSDate*)modDate setParents:(BOOL)setParents; // Used mostly for undo...
 

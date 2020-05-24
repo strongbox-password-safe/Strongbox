@@ -18,7 +18,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 @interface StrongboxDatabase ()
 
 @property (nonatomic, readonly) NSMutableArray<DatabaseAttachment*> *mutableAttachments;
-@property (nonatomic, readonly) NSMutableArray<DeletedItem*> *mutableDeletedObjects;
+@property (nonatomic, readonly) NSMutableDictionary<NSUUID*, NSDate*> *mutableDeletedObjects;
 @property (nonatomic) NSMutableDictionary<NSUUID*, NSData*>* mutableCustomIcons;
 
 @end
@@ -62,7 +62,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
                compositeKeyFactors:compositeKeyFactors
                        attachments:attachments
                        customIcons:[NSDictionary dictionary]
-                    deletedObjects:@[]];
+                    deletedObjects:@{}];
 }
 
 - (instancetype)initWithRootGroup:(Node *)rootGroup
@@ -70,7 +70,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
               compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment *> *)attachments
                       customIcons:(NSDictionary<NSUUID *,NSData *> *)customIcons
-                   deletedObjects:(NSArray<DeletedItem *> *)deletedObjects {
+                   deletedObjects:(NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
     self = [super init];
     
     if (self) {
@@ -88,6 +88,12 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     }
     
     return self;
+}
+
+- (Node*)findById:(NSUUID*)uuid {
+    return [self.rootGroup findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        return [node.uuid isEqual:uuid];
+    }];
 }
 
 - (void)rationalizeAttachments {
@@ -252,50 +258,129 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     }
 }
 
+- (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes {
+    // Filter out children that are already included because the group is included,
+    // so we're not copying/moving/deleting twice
+    
+    NSArray<Node*>* groups = [nodes filter:^BOOL(Node * _Nonnull obj) {
+        return obj.isGroup;
+    }];
+    
+    NSArray<Node*>* minimalNodeSet = [nodes filter:^BOOL(Node * _Nonnull node) {
+        BOOL alreadyContained = [groups anyMatch:^BOOL(Node * _Nonnull group) {
+            return [group contains:node];
+        }];
+        return !alreadyContained;
+    }];
+    
+    return [NSSet setWithArray:minimalNodeSet];
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Deletions
 
-- (NSArray<DeletedItem *> *)deletedObjects {
-    return [self.mutableDeletedObjects copy];
+- (NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
+    return self.mutableDeletedObjects.copy;
 }
 
-- (void)deleteItem:(Node *)item {
-    if (item.parent == nil || ![item.parent contains:item]) { // Very very strange if this ever happens we're in trouble
-        NSLog(@"WARNWARN: Attempt to delete item with no parent");
-        return;
-    }
-
-    NSDate* now = NSDate.date;
+- (BOOL)canRecycle:(Node *)item {
+    BOOL willRecycle = self.recycleBinEnabled;
     
-    if (item.isGroup) {
-        [self deleteAllGroupItems:item deletionDate:now];
+    if(self.recycleBinEnabled && self.recycleBinNode) {
+        if([self.recycleBinNode contains:item] || self.recycleBinNode == item) {
+            willRecycle = NO;
+        }
     }
 
-    [item.parent removeChild:item];
-    [self.mutableDeletedObjects addObject:[DeletedItem uuid:item.uuid date:now]];
+    return willRecycle;
 }
 
 - (void)deleteAllGroupItems:(Node*)group deletionDate:(NSDate*)deletionDate {
     for (Node* entry in group.childRecords) {
         [group removeChild:entry];
-        [self.mutableDeletedObjects addObject:[DeletedItem uuid:entry.uuid date:deletionDate]];
+        self.mutableDeletedObjects[entry.uuid] = deletionDate;
     }
 
     for (Node* subgroup in group.childGroups) {
         [self deleteAllGroupItems:subgroup deletionDate:deletionDate];
-        [self.mutableDeletedObjects addObject:[DeletedItem uuid:subgroup.uuid date:deletionDate]];
+        self.mutableDeletedObjects[subgroup.uuid] = deletionDate;
     }
 }
 
-//- (BOOL)unDeleteItemAndRemoveFromDeletedObjects:(Node *)item parent:(Node *)parent {
-//    // TODO:
-//    // Need to find parent and re-add item
-//    // Also need to remove from Deleted Objects
-//
-//    return NO;
-//}
+- (NSArray<NodeHierarchyReconstructionData*>*)getHierarchyCloneForReconstruction:(const NSArray<Node*>*)items {
+    return [items map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        NodeHierarchyReconstructionData* recon = [[NodeHierarchyReconstructionData alloc] init];
+        
+        recon.index = [obj.parent.children indexOfObject:obj];
+        recon.clonedNode = [obj clone:YES];
+        
+        return recon;
+    }];
+}
 
-- (BOOL)recycleItem:(Node *)item {
+- (void)reconstruct:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    for (NodeHierarchyReconstructionData* recon in undoData) {
+        Node* parent = recon.clonedNode.parent;
+        
+        if (!parent) {
+            continue; // Should never happen
+        }
+        
+        [parent addChild:recon.clonedNode keePassGroupTitleRules:YES];
+        
+        NSUInteger currentIndex = parent.children.count - 1;
+        if (currentIndex != recon.index) {
+            [parent moveChild:currentIndex to:recon.index];
+        }
+    }
+}
+
+- (void)unDelete:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    [self reconstruct:undoData];
+    
+    for (NodeHierarchyReconstructionData* recon in undoData) {
+        // Remove all children and self from deleted Objects
+        NSArray<NSUUID*>* childIds = [recon.clonedNode.allChildren map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+            return obj.uuid;
+        }];
+        
+        [self.mutableDeletedObjects removeObjectForKey:recon.clonedNode.uuid];
+        [self.mutableDeletedObjects removeObjectsForKeys:childIds];
+    }
+}
+
+- (void)deleteItems:(const NSArray<Node *> *)items {
+    [self deleteItems:items undoData:nil];
+}
+
+- (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
+    NSDate* now = NSDate.date;
+    NSSet<Node*> *minimalNodeSet = [self getMinimalNodeSet:items];
+    
+    if (undoData) {
+        *undoData = [self getHierarchyCloneForReconstruction:items];
+    }
+    
+    for (Node* item in minimalNodeSet) {
+        if (item.parent == nil || ![item.parent contains:item]) { // Very very strange if this ever happens we're in trouble
+            NSLog(@"WARNWARN: Attempt to delete item with no parent");
+            return;
+        }
+
+        if (item.isGroup) {
+            [self deleteAllGroupItems:item deletionDate:now];
+        }
+
+        [item.parent removeChild:item];
+        self.mutableDeletedObjects[item.uuid] = now;
+    }
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items {
+    return [self recycleItems:items undoData:nil];
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
     if (!self.recycleBinEnabled) {
         NSLog(@"WARNWARN: Attempt to recycle item when recycle bin disabled!");
         return NO;
@@ -305,20 +390,53 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         [self createNewRecycleBinNode];
     }
     
-    BOOL ret = [item changeParent:self.recycleBinNode keePassGroupTitleRules:YES];
+    NSDate* now = NSDate.date;
+    NSSet<Node*> *minimalNodeSet = [self getMinimalNodeSet:items];
+
+    BOOL ret = [self moveItems:minimalNodeSet.allObjects destination:self.recycleBinNode keePassGroupTitleRules:YES date:now undoData:undoData];
     
     if (ret) {
-        [item touch]; // NB: LocationChanged not set but accessed/usage count recursively (weirdly I think)
+        for (Node* item in minimalNodeSet) { // Confirmed correct - touch should only be done on minimal node set - 22-May-2020
+            [item touchAt:now]; // NB: accessed/usage count recursively (weirdly I think but following KeePass original)
+        }
     }
 
     return ret;
 }
 
+- (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    [self undoMove:undoData];
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Moves
 
+- (BOOL)validateMoveItems:(const NSArray<Node*>*)items destination:(Node*)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    NSArray<Node*>* minimalItems = [self getMinimalNodeSet:items].allObjects;
+    
+    BOOL invalid = [minimalItems anyMatch:^BOOL(Node * _Nonnull obj) {
+        return obj.parent == nil || ![obj validateChangeParent:destination keePassGroupTitleRules:keePassGroupTitleRules];
+    }];
+    
+    return !invalid;
+}
+
 - (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
-    BOOL invalid = [items anyMatch:^BOOL(Node * _Nonnull obj) {
+    return [self moveItems:items destination:destination keePassGroupTitleRules:keePassGroupTitleRules date:NSDate.date undoData:nil];
+}
+
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
+    return [self moveItems:items destination:destination keePassGroupTitleRules:keePassGroupTitleRules date:NSDate.date undoData:undoData];
+}
+
+- (BOOL)moveItems:(const NSArray<Node *> *_Nonnull)items
+      destination:(Node*_Nonnull)destination
+keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
+             date:(NSDate*_Nonnull)date
+         undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
+    NSArray<Node*>* minimalItems = [self getMinimalNodeSet:items].allObjects;
+    
+    BOOL invalid = [minimalItems anyMatch:^BOOL(Node * _Nonnull obj) {
         return obj.parent == nil || ![obj validateChangeParent:destination keePassGroupTitleRules:keePassGroupTitleRules];
     }];
     
@@ -326,12 +444,17 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         return NO;
     }
     
-    // Attempt the move now - this could break despite the above check because someone tries to insert a group with the same name as one we've already inserted for example
+    if (undoData) {
+        *undoData = [self getHierarchyCloneForReconstruction:items];
+    }
+
+    // Attempt the move now - this could break despite the above check because someone tries to
+    // insert a group with the same name as one we've already inserted for example
     
     BOOL rollback = NO;
     
     NSMutableArray<Node*> *rollbackTo = NSMutableArray.array;
-    for(Node* itemToMove in items) {
+    for(Node* itemToMove in minimalItems) {
         [rollbackTo addObject:itemToMove.parent];
         
         if(![itemToMove changeParent:destination keePassGroupTitleRules:keePassGroupTitleRules]) {
@@ -344,16 +467,57 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     if (rollback) {
         int i = 0;
         for (Node* previousParent in rollbackTo) {
-            [items[i++] changeParent:previousParent keePassGroupTitleRules:keePassGroupTitleRules];
+            [minimalItems[i++] changeParent:previousParent keePassGroupTitleRules:keePassGroupTitleRules];
         }
     }
     else {
-        for(Node* itemToMove in items) {
-            [itemToMove touchLocationChanged]; // NB: Only LocationChanged (Date Mod/Accessed not changed) nor parents
+        for(Node* itemToMove in minimalItems) { // Confirmed correct - touch should only be done on minimal node set - 22-May-2020
+            [itemToMove touchLocationChanged:date]; // NB: Only LocationChanged (Date Mod/Accessed not changed) nor parents in keeping with KeePass original
         }
     }
     
     return !rollback;
+}
+
+- (void)undoMove:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    // Find the items that were moved based on the undo data and delete them completely from the hierarchy
+    // then reconstruct the hierarcjy based on the undo data and clones in there. This completely reverses
+    // the move (including Location Changed and all touch properties.
+    
+    for (NodeHierarchyReconstructionData* reconItem in undoData) {
+        Node* originalMovedItem = [self findById:reconItem.clonedNode.uuid];
+    
+        if (originalMovedItem) {
+            [originalMovedItem.parent removeChild:originalMovedItem];
+        }
+        else {
+            // Should never happen but WARN
+            NSLog(@"WARNWARN: Could not find original moved item! [%@]", reconItem);
+        }
+    }
+    
+    // Now rebuild with the undo clone...
+    
+    [self reconstruct:undoData];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Add
+
+- (BOOL)validateAddChild:(Node *)item destination:(Node *)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    return [destination validateAddChild:item keePassGroupTitleRules:keePassGroupTitleRules];
+}
+
+- (BOOL)addChild:(Node *)item destination:(Node *)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    if( ![destination validateAddChild:item keePassGroupTitleRules:keePassGroupTitleRules]) {
+        return NO;
+    }
+
+    return [destination addChild:item keePassGroupTitleRules:keePassGroupTitleRules];
+}
+
+- (void)unAddChild:(Node *)item {
+    [item.parent removeChild:item];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -25,9 +25,9 @@
     
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
-
+    BOOL wasRecycled = [model canRecycle:node];
+    [model deleteItems:@[node]];
+    
     XCTAssertFalse(wasRecycled);
     XCTAssertFalse(model.recycleBinEnabled);
     XCTAssertEqual(prevCount - 1, model.allRecords.count);
@@ -40,9 +40,9 @@
     NSUInteger prevCount = model.allRecords.count;
     
     NSLog(@"Going to delete [%@]", node);
-    
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+
+    BOOL wasRecycled = [model canRecycle:node];
+    [model deleteItems:@[node]];
 
     XCTAssertFalse(wasRecycled);
     XCTAssertFalse(model.recycleBinEnabled);
@@ -56,8 +56,8 @@
     
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model recycleItems:@[node]];
 
     XCTAssertTrue(wasRecycled);
     XCTAssertTrue(model.recycleBinEnabled);
@@ -75,8 +75,8 @@
     
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model deleteItems:@[node]];
 
     XCTAssertFalse(wasRecycled);
     XCTAssertFalse(model.recycleBinEnabled);
@@ -92,8 +92,8 @@
     
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model recycleItems:@[node]];
 
     XCTAssertTrue(wasRecycled);
     XCTAssertTrue(model.recycleBinEnabled);
@@ -111,8 +111,8 @@
     
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model deleteItems:@[node]];
 
     XCTAssertFalse(wasRecycled);
     XCTAssertFalse(model.recycleBinEnabled);
@@ -217,8 +217,8 @@
     
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model recycleItems:@[node]];
 
     XCTAssertTrue(wasRecycled);
     XCTAssertTrue(model.recycleBinEnabled);
@@ -234,12 +234,13 @@
     
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model deleteItems:@[node]];
 
     XCTAssertFalse(wasRecycled);
     XCTAssertTrue(model.deletedObjects.count == 1);
-    XCTAssertEqual(model.deletedObjects.firstObject.uuid, node.uuid);
+    
+    XCTAssertNotNil(model.deletedObjects[node.uuid]);
 }
 
 - (void)testDeleteGroupRecursivelyDeletesAndAddsToDeletedObjects {
@@ -268,14 +269,94 @@
 
     NSLog(@"Going to delete [%@]", node);
     
-    BOOL wasRecycled;
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model deleteItems:@[node]];
 
     XCTAssertFalse(wasRecycled);
     XCTAssertEqual(model.deletedObjects.count, 7);
-    XCTAssertEqual(model.deletedObjects.lastObject.uuid, node.uuid);
-    
+    XCTAssertNotNil(model.deletedObjects[node.uuid]);
+        
     NSLog(@"Deleted: [%@]", model.deletedObjects);
+}
+
+- (void)testTimeSort {
+    NSDictionary<NSUUID*, NSArray<NSDate*>*>* byUuid = @{
+        NSUUID.UUID : @[NSDate.date, [NSDate.date dateByAddingTimeInterval:60*60*24*2]]
+    };
+
+    NSLog(@"UnSorted: %@", byUuid);
+
+    NSMutableDictionary<NSUUID*, NSDate*> *ret = NSMutableDictionary.dictionary;
+    for (NSUUID* uuid in byUuid.allKeys) {
+        NSArray<NSDate*>* deletes = byUuid[uuid];
+        NSArray<NSDate*>* sortedDeletes = [deletes sortedArrayUsingComparator:^NSComparisonResult(NSDate*  _Nonnull obj1, NSDate*  _Nonnull obj2) {
+            return [obj2 compare:obj1];
+        }];
+        
+        ret[uuid] = sortedDeletes.firstObject;
+    }
+    
+    NSLog(@"Sorted: %@", ret);
+}
+    
+- (void)testDeleteUndelete {
+    DatabaseModel* model = [[DatabaseModel alloc] initNew:[CompositeKeyFactors password:@"a"] format:kKeePass4];
+    model.recycleBinEnabled = NO;
+    
+    Node* node = model.allGroups.firstObject;
+        
+    Node* g1 = [[Node alloc] initAsGroup:@"Test" parent:node keePassGroupTitleRules:YES uuid:nil];
+    [node addChild:g1 keePassGroupTitleRules:YES];
+
+    // Do in this order so we can check it has been inserted back in the right location (index) after undo]
+    
+    Node* g2 = [[Node alloc] initAsGroup:@"X-Ray" parent:g1 keePassGroupTitleRules:YES uuid:nil];
+    [g1 addChild:g2 keePassGroupTitleRules:YES];
+
+    Node* e1 = [[Node alloc] initAsRecord:@"Foo" parent:g1];
+    [g1 addChild:e1 keePassGroupTitleRules:YES];
+    
+    Node* e2 = [[Node alloc] initAsRecord:@"Bar" parent:g2];
+    [g2 addChild:e2 keePassGroupTitleRules:YES];
+
+    Node* g3 = [[Node alloc] initAsGroup:@"Zephyr" parent:g2 keePassGroupTitleRules:YES uuid:nil];
+    [g2 addChild:g3 keePassGroupTitleRules:YES];
+    
+    Node* e3 = [[Node alloc] initAsRecord:@"Zebra" parent:g3];
+    [g3 addChild:e3 keePassGroupTitleRules:YES];
+    
+    NSLog(@"BEFORE: [%@]", node.description);
+
+    XCTAssertEqual(g1.children.count, 2);
+    XCTAssertEqual(node.allChildren.count, 6);
+    XCTAssertEqual(model.deletedObjects.count, 0);
+
+    ////////////////////////
+    
+    NSArray<NodeHierarchyReconstructionData*>* undoData = nil;
+    [model deleteItems:@[g2] undoData:&undoData];
+
+    XCTAssertEqual(model.deletedObjects.count, 4);
+    XCTAssertNotNil(model.deletedObjects[g2.uuid]);
+ 
+    // Now can we reconstruct and undo the delete:
+
+    NSLog(@"Undo Data: [%@]", undoData);
+
+    [model unDelete:undoData];
+
+    XCTAssertEqual(g1.children.count, 2);
+    
+    Node* reconstructedG2 = [g1 findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
+        return [node.uuid isEqual:g2.uuid];
+    }];
+    
+    XCTAssertEqual([g1.children indexOfObject:reconstructedG2], 0);
+
+    XCTAssertEqual(node.allChildren.count, 6);
+    XCTAssertEqual(model.deletedObjects.count, 0);
+
+    NSLog(@"AFTER: [%@]", node.description);
 }
 
 //
@@ -306,11 +387,11 @@
 
     NSLog(@"Going to recycle [%@]", node);
     
-    BOOL wasRecycled;
     NSDate* oldAccessed = node.fields.accessed;
     NSDate* oldLocationChanged = node.fields.locationChanged;
     
-    [model deleteOrRecycleItem:node wasRecycled:&wasRecycled];
+    BOOL wasRecycled = [model canRecycle:node];
+    [model recycleItems:@[node]];
 
     XCTAssertTrue(wasRecycled);
     XCTAssertEqual(model.deletedObjects.count, 0);
@@ -319,9 +400,8 @@
     XCTAssertEqual(model.recycleBinNode.childGroups.firstObject.uuid, node.uuid);
 
     XCTAssertNotEqual(node.fields.accessed, oldAccessed);
-    XCTAssertNotEqual(node.fields.accessed, model.rootGroup.fields.accessed);
-    
-    XCTAssertEqual(node.fields.locationChanged, oldLocationChanged);
+    XCTAssertEqual(node.fields.accessed, model.rootGroup.fields.accessed);
+    XCTAssertNotEqual(node.fields.locationChanged, oldLocationChanged);
     
 }
 
@@ -379,10 +459,11 @@
     model.recycleBinEnabled = NO;
     Node* node = model.rootGroup.childRecords.firstObject;
     
-    [model deleteOrRecycleItem:node];
+    [model deleteItems:@[node]];
+
     XCTAssertEqual(model.deletedObjects.count, 1);
     
-    [model deleteOrRecycleItem:model.rootGroup.allChildGroups.firstObject];
+    [model deleteItems:@[model.rootGroup.allChildGroups.firstObject]];
     
     XCTAssertEqual(model.deletedObjects.count, 2);
     
@@ -401,10 +482,7 @@
             
             XCTAssertNotNil(model2);
             XCTAssertEqual(model2.deletedObjects.count, 2);
-            
-            NSLog(@"%@ -> %@", model2.deletedObjects.firstObject.uuid, node.uuid);
-            
-            XCTAssertTrue([model2.deletedObjects.firstObject.uuid isEqual:node.uuid]);
+            XCTAssertNotNil(model2.deletedObjects[node.uuid]);
         }];
     }];
 }

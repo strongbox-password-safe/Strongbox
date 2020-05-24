@@ -442,48 +442,80 @@ void addSampleGroupAndRecordToGroup(Node* parent) {
     return self.theSafe.keePass1BackupNode;
 }
 
-- (BOOL)deleteOrRecycleItem:(Node *)node {
-    return [self deleteOrRecycleItem:node wasRecycled:nil];
+- (NSSet<Node *> *)getMinimalNodeSet:(const NSArray<Node *> *)nodes {
+    return [self.theSafe getMinimalNodeSet:nodes];
 }
 
-- (BOOL)deleteOrRecycleItem:(Node *)node wasRecycled:(BOOL*)wasRecycled {
-    if([self deleteWillRecycle:node]) {
-        if (wasRecycled) {
-            *wasRecycled = YES;
-        }
-        
-        return [self.theSafe recycleItem:node];
-    }
-    else {
-        if (wasRecycled) {
-            *wasRecycled = NO;
-        }
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Delete
 
-        [self.theSafe deleteItem:node];
-        return YES;
-    }
-}
-
-- (BOOL)deleteWillRecycle:(Node*_Nonnull)node {
-    BOOL willRecycle = self.recycleBinEnabled;
-    if(self.recycleBinEnabled && self.recycleBinNode) {
-        if([self.recycleBinNode contains:node] || self.recycleBinNode == node) {
-            willRecycle = NO;
-        }
-    }
-
-    return willRecycle;
-}
-
-- (NSArray<DeletedItem *> *)deletedObjects {
+- (NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
     return self.theSafe.deletedObjects;
+}
+
+- (void)deleteItems:(const NSArray<Node *> *)items {
+    [self deleteItems:items undoData:nil];
+}
+
+- (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *>**)undoData {
+    [self.theSafe deleteItems:items undoData:undoData];
+}
+
+- (void)unDelete:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
+    [self.theSafe unDelete:undoData];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Recycle
+
+- (BOOL)canRecycle:(Node *)item {
+    return [self.theSafe canRecycle:item];
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items {
+    return [self.theSafe recycleItems:items];
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
+    return [self.theSafe recycleItems:items undoData:undoData];
+}
+
+- (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
+    [self.theSafe undoRecycle:undoData];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // Moves
 
+- (BOOL)validateMoveItems:(const NSArray<Node *> *)items destination:(Node *)destination {
+    return [self.theSafe validateMoveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
+}
+
 - (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination {
     return [self.theSafe moveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
+}
+
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node *)destination undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
+    return [self.theSafe moveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe undoData:undoData];
+}
+
+- (void)undoMove:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
+    [self.theSafe undoMove:undoData];
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////
+// Add
+
+- (BOOL)validateAddChild:(Node *)item destination:(Node *)destination {
+    return [self.theSafe validateAddChild:item destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
+}
+
+- (BOOL)addChild:(Node *)item destination:(Node *)destination {
+    return [self.theSafe addChild:item destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
+}
+
+- (void)unAddChild:(Node *)item {
+    return [self.theSafe unAddChild:item];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -1509,10 +1509,6 @@
 		C86E9082246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */; };
 		C86E9083246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */; };
 		C86E9085246D9D4C0029623A /* DeletesAndMovesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9084246D9D4C0029623A /* DeletesAndMovesTest.m */; };
-		C86E9088246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
-		C86E9089246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
-		C86E908A246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
-		C86E908B246DA2530029623A /* DeletedItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9087246DA2530029623A /* DeletedItem.m */; };
 		C88F812D245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
 		C88F812E245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
 		C88F812F245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
@@ -1533,6 +1529,10 @@
 		C8BF76E92472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
 		C8BF76EA2472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
 		C8BF76EB2472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
+		C8BFECBE2478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
+		C8BFECBF2478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
+		C8BFECC02478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
+		C8BFECC12478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
 		C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EA246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EB246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
@@ -2934,8 +2934,6 @@
 		C86E907E246D9A110029623A /* KeePassDatabaseWideProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseWideProperties.h; path = model/keepass/KeePassDatabaseWideProperties.h; sourceTree = "<group>"; };
 		C86E907F246D9A110029623A /* KeePassDatabaseWideProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseWideProperties.m; path = model/keepass/KeePassDatabaseWideProperties.m; sourceTree = "<group>"; };
 		C86E9084246D9D4C0029623A /* DeletesAndMovesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletesAndMovesTest.m; path = StrongboxTests/DeletesAndMovesTest.m; sourceTree = "<group>"; };
-		C86E9086246DA2530029623A /* DeletedItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedItem.h; path = model/keepass/DeletedItem.h; sourceTree = "<group>"; };
-		C86E9087246DA2530029623A /* DeletedItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedItem.m; path = model/keepass/DeletedItem.m; sourceTree = "<group>"; };
 		C88F812B245D8C7C00B0B998 /* ConcurrentMutableSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConcurrentMutableSet.h; sourceTree = "<group>"; };
 		C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConcurrentMutableSet.m; sourceTree = "<group>"; };
 		C88F8131245D90C500B0B998 /* NSData+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSData+Extensions.h"; path = "StrongBox/NSData+Extensions.h"; sourceTree = "<group>"; };
@@ -2949,6 +2947,8 @@
 		C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "norwegian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8BF76E62472E1820080A808 /* DeletedObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedObjects.h; path = model/DeletedObjects.h; sourceTree = "<group>"; };
 		C8BF76E72472E1820080A808 /* DeletedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedObjects.m; path = model/DeletedObjects.m; sourceTree = "<group>"; };
+		C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeHierarchyReconstructionData.m; path = model/NodeHierarchyReconstructionData.m; sourceTree = "<group>"; };
+		C8BFECBD2478206C0051D21E /* NodeHierarchyReconstructionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeHierarchyReconstructionData.h; path = model/NodeHierarchyReconstructionData.h; sourceTree = "<group>"; };
 		C8E6D4E7246D43EA00AFFE13 /* WordList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = model/WordList.h; sourceTree = "<group>"; };
 		C8E6D4E8246D43EA00AFFE13 /* WordList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = model/WordList.m; sourceTree = "<group>"; };
 		C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
@@ -4029,8 +4029,6 @@
 				4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */,
 				4D305764224B4F8F00C36287 /* StringValue.h */,
 				4D305765224B4F8F00C36287 /* StringValue.m */,
-				C86E9086246DA2530029623A /* DeletedItem.h */,
-				C86E9087246DA2530029623A /* DeletedItem.m */,
 			);
 			name = Keepass;
 			sourceTree = "<group>";
@@ -4877,6 +4875,8 @@
 			isa = PBXGroup;
 			children = (
 				C88F813E245D99D200B0B998 /* Serialization Adaptors */,
+				C8BFECBD2478206C0051D21E /* NodeHierarchyReconstructionData.h */,
+				C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */,
 				4D78AC2D1FB1E27700A68A92 /* Node.h */,
 				4D78AC2E1FB1E27700A68A92 /* Node.m */,
 				4D78AC281FB1E27700A68A92 /* NodeFields.h */,
@@ -5526,47 +5526,43 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
+				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
-				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		4CDD569918F9EF06E120E163 /* [CP] Check Pods Manifest.lock */ = {
@@ -5634,21 +5630,17 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-resources.sh",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */ = {
@@ -5657,42 +5649,42 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
+				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
+				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
-				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMAppAuth/GTMAppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
-				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMAppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		C02A3952148B9EA3F8B5512D /* [CP] Check Pods Manifest.lock */ = {
@@ -5723,7 +5715,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh",
 				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
@@ -5732,7 +5724,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F663CF914C5F47C63EEFAE33 /* [CP] Check Pods Manifest.lock */ = {
@@ -6030,7 +6022,6 @@
 				4D08B5B9234C9613003D1953 /* GCDWebServerConnection.m in Sources */,
 				4D5F5B8F218B66C500A0739A /* Binary.m in Sources */,
 				C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */,
-				C86E9088246DA2530029623A /* DeletedItem.m in Sources */,
 				4DF972B921BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */,
 				4D3E149E21832CC700A41CA0 /* blake2b.c in Sources */,
 				4DE9A60521F5FEF700128560 /* QRCodeScannerViewController.m in Sources */,
@@ -6110,6 +6101,7 @@
 				4D9E08E621822F5C007BA1E7 /* AesCipher.m in Sources */,
 				4D2F6C3421807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D160A752452E74C0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
+				C8BFECBE2478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D2F6C1D21807C25007931E4 /* XMLWriter.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
 				4D01BA2722BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
@@ -6284,6 +6276,7 @@
 				4DC4E08923488BAA000743C4 /* socket_helper.m in Sources */,
 				4DC4E08A23488BAA000743C4 /* WebDAVSessionConfiguration.m in Sources */,
 				4DC4E08B23488BAA000743C4 /* NMSSHSession.m in Sources */,
+				C8BFECC02478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D160AB924535D1B0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
 				C8E9DAA0245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4DC4E08C23488BAA000743C4 /* AdvancedPreferencesTableViewController.m in Sources */,
@@ -6293,7 +6286,6 @@
 				4DFF34C6238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DC4E08F23488BAA000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
 				4DC4E09023488BAA000743C4 /* GoogleDriveStorageProvider.m in Sources */,
-				C86E908A246DA2530029623A /* DeletedItem.m in Sources */,
 				4DC4E09123488BAA000743C4 /* SFTPStorageProvider.m in Sources */,
 				4DC4E09223488BAA000743C4 /* NMSFTP.m in Sources */,
 				4DC4E09323488BAA000743C4 /* DropboxV2StorageProvider.m in Sources */,
@@ -6499,6 +6491,7 @@
 				4DC4E19223488BAE000743C4 /* DatabaseSearchAndSorter.m in Sources */,
 				C88F8130245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */,
 				4DC4E19323488BAE000743C4 /* KdbxSerializationCommon.m in Sources */,
+				C8BFECC12478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4DC4E19423488BAE000743C4 /* ItemDetailsViewController.m in Sources */,
 				4D6B5055238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4DBBDE3923EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
@@ -6572,7 +6565,6 @@
 				4DC4E1CB23488BAE000743C4 /* crypt_argchk.c in Sources */,
 				4DC4E1CC23488BAE000743C4 /* SafeStorageProviderFactory.m in Sources */,
 				4DC4E1CD23488BAE000743C4 /* DropboxV2StorageProvider.m in Sources */,
-				C86E908B246DA2530029623A /* DeletedItem.m in Sources */,
 				4DC4E1CE23488BAE000743C4 /* KeePassDatabase.m in Sources */,
 				4DC4E1CF23488BAE000743C4 /* Root.m in Sources */,
 				4DC4E1D023488BAE000743C4 /* twofish.c in Sources */,
@@ -6747,6 +6739,7 @@
 				4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				C88F812E245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */,
 				4D3E14792183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
+				C8BFECBF2478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D33FA3922872008006C31B2 /* ItemDetailsViewController.m in Sources */,
 				4D6B5053238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4DBBDE3723EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
@@ -6820,7 +6813,6 @@
 				4D1884DA21709E5F001AE6B0 /* crypt_argchk.c in Sources */,
 				4D5F5B7D218B4C4300A0739A /* SafeStorageProviderFactory.m in Sources */,
 				4D5F5B7E218B4C4E00A0739A /* DropboxV2StorageProvider.m in Sources */,
-				C86E9089246DA2530029623A /* DeletedItem.m in Sources */,
 				4D9E09AA218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4DC5B9C2217B376F00FE9DD9 /* Root.m in Sources */,
 				4D1884D921709E3C001AE6B0 /* twofish.c in Sources */,
@@ -7759,7 +7751,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7849,7 +7841,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7938,7 +7930,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8020,7 +8012,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8105,7 +8097,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8182,7 +8174,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8257,7 +8249,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8342,7 +8334,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2906;
+				CURRENT_PROJECT_VERSION = 2911;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

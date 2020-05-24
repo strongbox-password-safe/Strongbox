@@ -42,23 +42,14 @@
 }
 
 - (BOOL)moveOfItemsIsValid:(Node*)group subgroupsValid:(BOOL)subgroupsValid  {
-    BOOL ret = YES;
-    for(Node* itemToMove in self.itemsToMove) {
-        if(![itemToMove validateChangeParent:group keePassGroupTitleRules:self.viewModel.database.format != kPasswordSafe]) {
-            ret = NO;
-            break;
-        }
-    }
-    
+    BOOL ret = [self.viewModel.database validateMoveItems:self.itemsToMove destination:group];
+
     if(ret) {
         return YES;
     }
-    else if(subgroupsValid) {
-        NSArray<Node*> *subgroups = [group filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
-            return group.isGroup;
-        }];
-        
-        for(Node* subgroup in subgroups) {
+    
+    if(subgroupsValid) {
+        for(Node* subgroup in group.childGroups) {
             if([self moveOfItemsIsValid:subgroup subgroupsValid:YES]) {
                 return YES;
             }

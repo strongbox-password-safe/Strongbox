@@ -28,6 +28,9 @@ extern NSString* const kModelUpdateNotificationAttachmentsChanged;
 extern NSString* const kModelUpdateNotificationTotpChanged;
 extern NSString* const kNotificationUserInfoKeyIsBatchIconUpdate;
 extern NSString* const kModelUpdateNotificationExpiryChanged;
+extern NSString* const kModelUpdateNotificationItemsDeleted;
+extern NSString* const kModelUpdateNotificationItemsUnDeleted;
+extern NSString* const kModelUpdateNotificationItemsMoved;
 
 @interface ViewModel : NSObject
 
@@ -84,16 +87,26 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 - (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
 - (void)clearTotp:(Node *)item;
 
+// Additions
+
 - (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 - (BOOL)addNewRecord:(Node *)parentGroup;
-- (void)addNewGroup:(Node *)parentGroup title:(NSString*)title;
+- (BOOL)addNewGroup:(Node *)parentGroup title:(NSString*)title;
 
-- (BOOL)deleteItem:(Node *)child;
-- (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
+// Delete
 
-- (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node;
-- (BOOL)changeParent:(Node *)parent node:(Node *)node;
+- (void)deleteItems:(const NSArray<Node *>*)items;
+- (BOOL)recycleItems:(const NSArray<Node *>*)items;
+- (BOOL)canRecycle:(Node*_Nonnull)item;
 
+// Moves
+
+- (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination;
+- (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination;
+
+//
+
+- (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
 - (Node*_Nullable)getItemFromSerializationId:(NSString*)serializationId;
 
 - (NSString*)generatePassword;
@@ -139,9 +152,8 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
-@property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL newRecord);
-@property (nonatomic, copy, nullable) void (^onDeleteItem)(Node* node);
-@property (nonatomic, copy, nullable) void (^onChangeParent)(Node* node);
+// TODO: Move to notificationcenter 
+@property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL openEntryDetailsWindowWhenDone);
 @property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
 @property (nonatomic, copy, nullable) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
 

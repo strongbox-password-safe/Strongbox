@@ -8,6 +8,7 @@
 
 #import "ClipboardManager.h"
 #import <Cocoa/Cocoa.h>
+#import "Settings.h"
 
 @implementation ClipboardManager
 
@@ -22,16 +23,15 @@
 }
 
 - (void)copyConcealedString:(NSString *)string {
-    //    static NSString* const kConcealedType = @"org.nspasteboard.ConcealedType"; // Does not work well
-    //NSLog(@"Copying: %@", string);
+    [NSPasteboard.generalPasteboard clearContents]; // NB: Must be called!
     
-    [NSPasteboard.generalPasteboard clearContents]; // Must be called!
+    if (@available(macOS 10.12, *)) {
+        if (!Settings.sharedInstance.clipboardHandoff) {
+            [NSPasteboard.generalPasteboard prepareForNewContentsWithOptions:NSPasteboardContentsCurrentHostOnly];
+        }
+    }
     
-    // TODO:
-    [NSPasteboard.generalPasteboard prepareForNewContentsWithOptions:NSPasteboardContentsCurrentHostOnly];
-    
-    [NSPasteboard.generalPasteboard setString:(string ? string : @"")
-                                      forType:NSStringPboardType];
+    [NSPasteboard.generalPasteboard setString:(string ? string : @"") forType:NSStringPboardType];
 }
 
 @end

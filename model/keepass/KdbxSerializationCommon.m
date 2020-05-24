@@ -342,6 +342,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         if (error) {
            *error = [Utils createNSError:@"Could not read stream" errorCode:-1];
         }
+        free(my_handler);
         return nil;
     }
     
@@ -376,6 +377,11 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
             if (error) {
                 *error = [Utils createNSError:@"Error reading XML Stream" errorCode:err];
             }
+            
+            if (ctxt) {
+                xmlFreeParserCtxt(ctxt);
+            }
+            free(my_handler);
             return nil;
         }
         if(!ctxt) {
@@ -394,6 +400,9 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         if (error) {
             *error = [Utils createNSError:@"Error reading XML" errorCode:err];
         }
+        
+        xmlFreeParserCtxt(ctxt);
+        free(my_handler);
         return nil;
     }
     
@@ -406,6 +415,9 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
             *error = [Utils createNSError:[NSString stringWithFormat:@"Error reading Final XML Hex = [%@]", hex]
                                 errorCode:err];
         }
+
+        xmlFreeParserCtxt(ctxt);
+        free(my_handler);
         return nil;
     }
     

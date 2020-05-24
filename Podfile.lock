@@ -70,7 +70,7 @@ DEPENDENCIES:
   - Reachability
 
 SPEC REPOS:
-  https://github.com/cocoapods/specs.git:
+  trunk:
     - ADAL
     - AppAuth
     - Base32
@@ -106,4 +106,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: 0cac0b05043d194b89bf366191f58381fb481c7a
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.9.1

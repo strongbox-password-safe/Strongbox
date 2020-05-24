@@ -14,6 +14,7 @@
                 <outlet property="checkboxAlwaysShowPassword" destination="AIq-rw-YUd" id="Quw-Cn-9aM"/>
                 <outlet property="checkboxAutoDownloadFavIcon" destination="8od-gl-hYp" id="DPg-OT-yFg"/>
                 <outlet property="checkboxAutoSave" destination="lGm-nA-viI" id="yrd-8L-SRL"/>
+                <outlet property="checkboxClipboardHandoff" destination="D6H-8T-lFh" id="0A2-LJ-8so"/>
                 <outlet property="checkboxConcealEmptyProtected" destination="jiS-41-Ng9" id="Yyl-gE-nJh"/>
                 <outlet property="checkboxDereferenceOutlineView" destination="lHQ-UK-RWK" id="DY1-9B-IY9"/>
                 <outlet property="checkboxDereferenceQuickView" destination="jsN-b5-K5E" id="bYV-7P-dv0"/>
@@ -92,22 +93,22 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <rect key="contentRect" x="196" y="240" width="690" height="584"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
-            <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
-                <rect key="frame" x="0.0" y="0.0" width="690" height="344"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1097"/>
+            <view key="contentView" wantsLayer="YES" misplaced="YES" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="690" height="633"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView translatesAutoresizingMaskIntoConstraints="NO" id="pKR-KL-ngR">
-                        <rect key="frame" x="13" y="26" width="667" height="304"/>
+                        <rect key="frame" x="13" y="26" width="667" height="576"/>
                         <font key="font" metaFont="system"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="yNg-sv-E7G">
                                 <view key="view" id="elx-gC-YoE">
-                                    <rect key="frame" x="10" y="33" width="647" height="496"/>
+                                    <rect key="frame" x="10" y="33" width="647" height="530"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xfc-2q-RkA">
-                                            <rect key="frame" x="18" y="324" width="198" height="18"/>
+                                            <rect key="frame" x="18" y="358" width="198" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Auto Complete on Fields" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yeU-d7-EAN">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -117,7 +118,7 @@
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pxT-nk-uUw">
-                                            <rect key="frame" x="306" y="291" width="56" height="16"/>
+                                            <rect key="frame" x="306" y="325" width="56" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="seconds" id="1oQ-mP-YWU">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -125,7 +126,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d48-A0-G7M">
-                                            <rect key="frame" x="18" y="358" width="243" height="18"/>
+                                            <rect key="frame" x="18" y="392" width="243" height="18"/>
                                             <buttonCell key="cell" type="check" title="Display Popup Notifications for Edits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="CdL-C9-1bi">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -135,7 +136,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Wy-pB-zM8">
-                                            <rect key="frame" x="18" y="460" width="180" height="18"/>
+                                            <rect key="frame" x="18" y="494" width="180" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show in System Menu Bar" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Gyg-6A-be3">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -145,7 +146,7 @@
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wsV-1v-9l4">
-                                            <rect key="frame" x="219" y="288" width="60" height="21"/>
+                                            <rect key="frame" x="219" y="322" width="60" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="60" id="7cT-Z8-M0h"/>
                                             </constraints>
@@ -160,7 +161,7 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QEg-TP-0kC">
-                                            <rect key="frame" x="18" y="290" width="185" height="18"/>
+                                            <rect key="frame" x="18" y="324" width="185" height="18"/>
                                             <buttonCell key="cell" type="check" title="Auto Clear Clipboard After:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="rl3-rd-Ws6">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -170,7 +171,7 @@
                                             </connections>
                                         </button>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XkJ-k9-VXm">
-                                            <rect key="frame" x="284" y="285" width="19" height="28"/>
+                                            <rect key="frame" x="284" y="319" width="19" height="28"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" minValue="15" maxValue="1200" doubleValue="60" id="dVG-hS-h7r"/>
                                             <connections>
                                                 <action selector="onStepperClearClipboard:" target="-2" id="0Zl-NP-05u"/>
@@ -267,7 +268,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ia9-41-2Rl">
-                                            <rect key="frame" x="18" y="426" width="335" height="18"/>
+                                            <rect key="frame" x="18" y="460" width="335" height="18"/>
                                             <buttonCell key="cell" type="check" title="Automatically Prompt for Touch ID or Watch Open" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1BJ-eP-XiH">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -277,7 +278,7 @@
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="05q-E7-GBC">
-                                            <rect key="frame" x="18" y="392" width="225" height="18"/>
+                                            <rect key="frame" x="18" y="426" width="225" height="18"/>
                                             <buttonCell key="cell" type="check" title="Allow Watch Unlock (Catalina+)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wPY-JY-TVX">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                                                 <font key="font" metaFont="system"/>
@@ -306,6 +307,16 @@
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="ehc-9f-op4"/>
                                             </connections>
                                         </button>
+                                        <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D6H-8T-lFh">
+                                            <rect key="frame" x="18" y="290" width="170" height="18"/>
+                                            <buttonCell key="cell" type="check" title="Allow Clipboard Handoff" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2DK-wh-0xu">
+                                                <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                                <font key="font" metaFont="system"/>
+                                            </buttonCell>
+                                            <connections>
+                                                <action selector="onGeneralSettingsChange:" target="-2" id="SCx-Co-DaW"/>
+                                            </connections>
+                                        </button>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="dPS-9l-lnL" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="20" symbolic="YES" id="0eY-tl-kGz"/>
@@ -321,6 +332,8 @@
                                         <constraint firstItem="1QM-ew-ATR" firstAttribute="centerY" secondItem="M1Y-fH-3um" secondAttribute="centerY" id="A9x-0i-WoW"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Zd4-sH-oaR" secondAttribute="trailing" constant="20" symbolic="YES" id="Adb-5P-VjK"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="EvG-61-L1Q" secondAttribute="trailing" constant="20" symbolic="YES" id="Bdy-hn-8UI"/>
+                                        <constraint firstItem="MZP-ha-yar" firstAttribute="top" secondItem="D6H-8T-lFh" secondAttribute="bottom" constant="20" id="CzH-lf-mZJ"/>
+                                        <constraint firstItem="D6H-8T-lFh" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="20" id="FL3-Lb-Ocy"/>
                                         <constraint firstItem="QEg-TP-0kC" firstAttribute="firstBaseline" secondItem="wsV-1v-9l4" secondAttribute="firstBaseline" id="Hhf-aB-qs2"/>
                                         <constraint firstItem="d48-A0-G7M" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="20" symbolic="YES" id="Jkx-Lq-GhJ"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Xfc-2q-RkA" secondAttribute="trailing" constant="20" symbolic="YES" id="KNZ-3k-OTf"/>
@@ -333,7 +346,6 @@
                                         <constraint firstItem="0Wy-pB-zM8" firstAttribute="top" secondItem="elx-gC-YoE" secondAttribute="top" constant="20" id="Pyd-6h-ZUa"/>
                                         <constraint firstItem="MZP-ha-yar" firstAttribute="firstBaseline" secondItem="1QM-ew-ATR" secondAttribute="firstBaseline" id="RU0-hg-aay"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="05q-E7-GBC" secondAttribute="trailing" constant="20" symbolic="YES" id="S6X-IN-o9P"/>
-                                        <constraint firstItem="MZP-ha-yar" firstAttribute="top" secondItem="QEg-TP-0kC" secondAttribute="bottom" constant="20" id="Scb-Zg-spy"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="a59-6L-N1P" secondAttribute="trailing" constant="20" symbolic="YES" id="Tal-SZ-8dD"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="pxT-nk-uUw" secondAttribute="trailing" constant="20" symbolic="YES" id="Vw6-cw-ak8"/>
                                         <constraint firstItem="M1Y-fH-3um" firstAttribute="centerY" secondItem="a59-6L-N1P" secondAttribute="centerY" id="Y7w-bD-sQn"/>
@@ -345,6 +357,7 @@
                                         <constraint firstItem="Zd4-sH-oaR" firstAttribute="top" secondItem="dPS-9l-lnL" secondAttribute="bottom" constant="20" id="ZvI-QY-Zc1"/>
                                         <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="piJ-vX-OR4" secondAttribute="trailing" constant="20" symbolic="YES" id="a70-IB-QW6"/>
                                         <constraint firstItem="EvG-61-L1Q" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="20" symbolic="YES" id="aLg-Ox-gam"/>
+                                        <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="D6H-8T-lFh" secondAttribute="trailing" constant="20" symbolic="YES" id="ahE-N8-utV"/>
                                         <constraint firstItem="lGm-nA-viI" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="20" symbolic="YES" id="c92-GN-r4w"/>
                                         <constraint firstItem="Xfc-2q-RkA" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="20" symbolic="YES" id="g3E-7u-MNG"/>
                                         <constraint firstItem="piJ-vX-OR4" firstAttribute="leading" secondItem="elx-gC-YoE" secondAttribute="leading" constant="20" symbolic="YES" id="gGB-g3-UpM"/>
@@ -363,6 +376,7 @@
                                         <constraint firstItem="M1Y-fH-3um" firstAttribute="leading" secondItem="1QM-ew-ATR" secondAttribute="trailing" constant="8" id="wXH-9k-o93"/>
                                         <constraint firstItem="Xfc-2q-RkA" firstAttribute="top" secondItem="d48-A0-G7M" secondAttribute="bottom" constant="20" id="wfA-sp-pwM"/>
                                         <constraint firstItem="d48-A0-G7M" firstAttribute="top" secondItem="05q-E7-GBC" secondAttribute="bottom" constant="20" id="wkN-Ye-PBh"/>
+                                        <constraint firstItem="D6H-8T-lFh" firstAttribute="top" secondItem="QEg-TP-0kC" secondAttribute="bottom" constant="20" id="wsg-x8-Uvj"/>
                                     </constraints>
                                 </view>
                             </tabViewItem>

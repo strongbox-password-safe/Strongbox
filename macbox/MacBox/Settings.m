@@ -69,8 +69,17 @@ static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEn
 static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 static NSString* const kColorizePasswords = @"colorizePasswords";
 static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
+static NSString* const kClipboardHandoff = @"clipboardHandoff";
 
 @implementation Settings
+
+- (BOOL)clipboardHandoff {
+    return [self getBool:kClipboardHandoff fallback:NO]; // Default disallow clipboard handoff
+}
+
+- (void)setClipboardHandoff:(BOOL)clipboardHandoff {
+    [self setBool:kClipboardHandoff value:clipboardHandoff];
+}
 
 - (BOOL)colorizeUseColorBlindPalette {
     return [self getBool:kColorizeUseColorBlindPalette];

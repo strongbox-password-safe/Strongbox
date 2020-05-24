@@ -110,6 +110,7 @@
 
 @property (weak) IBOutlet NSButton *colorizePasswords;
 @property (weak) IBOutlet NSButton *useColorBlindPalette;
+@property (weak) IBOutlet NSButton *checkboxClipboardHandoff;
 
 @end
 
@@ -228,6 +229,7 @@
     
     self.colorizePasswords.state = Settings.sharedInstance.colorizePasswords ? NSOnState : NSOffState;
     self.useColorBlindPalette.state = Settings.sharedInstance.colorizeUseColorBlindPalette ? NSOnState : NSOffState;
+    self.checkboxClipboardHandoff.state = Settings.sharedInstance.clipboardHandoff ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -271,6 +273,8 @@
     Settings.sharedInstance.colorizePasswords = self.colorizePasswords.state == NSOnState;
     Settings.sharedInstance.colorizeUseColorBlindPalette = self.useColorBlindPalette.state == NSOnState;
     
+    Settings.sharedInstance.clipboardHandoff = self.checkboxClipboardHandoff.state == NSOnState;
+
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }

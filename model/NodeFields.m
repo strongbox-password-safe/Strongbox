@@ -272,18 +272,25 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 - (void)touch:(BOOL)modified {
+    [self touch:modified date:NSDate.date];
+}
+
+- (void)touch:(BOOL)modified date:(NSDate *)date {
     _usageCount = self.usageCount != nil ? @(self.usageCount.integerValue + 1) : @(1);
 
-    NSDate *now = NSDate.date;
-    _accessed = now;
+    _accessed = date;
     
     if(modified) {
-        [self setModifiedDateExplicit:now];
+        [self setModifiedDateExplicit:date];
     }
 }
 
 - (void)touchLocationChanged {
-    [self setTouchPropertiesWithCreated:nil accessed:nil modified:nil locationChanged:NSDate.date usageCount:nil];
+    [self touchLocationChanged:NSDate.date];
+}
+
+- (void)touchLocationChanged:(NSDate *)date {
+    [self setTouchPropertiesWithCreated:nil accessed:nil modified:nil locationChanged:date usageCount:nil];
 }
 
 - (void)setModifiedDateExplicit:(NSDate*)modified {

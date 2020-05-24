@@ -162,7 +162,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 - (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item {
     NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
     
-    if (flags.anyObject) {
+    if (flags.anyObject != nil) {
         if ([flags containsObject:@(kAuditFlagNoPassword)]) {
             return NSLocalizedString(@"audit_quick_summary_very_brief_no_password_set", @"No Password");
         }
@@ -194,7 +194,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 - (NSString *)getQuickAuditSummaryForNode:(Node *)item {
     NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
     
-    if (flags.anyObject) {
+    if (flags.anyObject != nil) {
         if ([flags containsObject:@(kAuditFlagNoPassword)]) {
             return NSLocalizedString(@"audit_quick_summary_no_password_set", @"Audit: No password set");
         }

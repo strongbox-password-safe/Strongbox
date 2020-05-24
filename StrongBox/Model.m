@@ -352,16 +352,30 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     return nil;
 }
 
-- (BOOL)deleteWillRecycle:(Node*_Nonnull)item {
-    return [self.database deleteWillRecycle:item];
+- (BOOL)canRecycle:(Node*_Nonnull)item {
+    return [self.database canRecycle:item];
 }
 
-- (BOOL)deleteOrRecycleItem:(Node *_Nonnull)item {
-    BOOL ret = [self.database deleteOrRecycleItem:item];
+- (void)deleteItems:(const NSArray<Node *> *)items {
+    [self.database deleteItems:items];
+
+    // Also Unpin
     
-    if (ret) { // Also Unpin
+    for (Node* item in items) {
         if([self isPinned:item]) {
             [self togglePin:item];
+        }
+    }
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items {
+    BOOL ret = [self.database recycleItems:items];
+    
+    if (ret) { // Also Unpin
+        for (Node* item in items) {
+            if([self isPinned:item]) {
+                [self togglePin:item];
+            }
         }
     }
     

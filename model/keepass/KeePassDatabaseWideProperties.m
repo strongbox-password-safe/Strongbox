@@ -15,7 +15,7 @@
     self = [super init];
     if (self) {
         self.customIcons = @{};
-        self.deletedObjects = @[];
+        self.deletedObjects = @{};
     }
     return self;
 }

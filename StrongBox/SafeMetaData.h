@@ -61,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) BOOL hasUnresolvedConflicts;
 
-@property NSURL* keyFileUrl;
+@property (nullable) NSURL* keyFileUrl;
 @property DatabaseFormat likelyFormat;
 
 @property (nonatomic) BOOL readOnly;

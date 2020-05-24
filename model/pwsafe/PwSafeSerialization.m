@@ -109,10 +109,10 @@
 }
 
 + (NSData *)encryptCBC:(NSData *)K ptData:(NSData *)ptData iv:(unsigned char *)iv {
-    int err;
+    //int err;
     symmetric_key cbckey;
 
-    if ((err = twofish_setup(K.bytes, TWOFISH_KEYSIZE_BYTES, 0, &cbckey)) != CRYPT_OK) {
+    if ((twofish_setup(K.bytes, TWOFISH_KEYSIZE_BYTES, 0, &cbckey)) != CRYPT_OK) {
         NSLog(@"Invalid K Key");
         return nil;
     }
@@ -364,11 +364,11 @@
 + (BOOL)getKandL:(NSData *)pBar header:(PasswordSafe3Header)header K_p:(NSData **)K_p L_p:(NSData **)L_p {
     /* schedule the key */
 
-    int err;
+    //int err;
     symmetric_key skey;
     unsigned char *key = (unsigned char *)pBar.bytes;
 
-    if ((err = twofish_setup(key, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
+    if ((twofish_setup(key, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
         NSLog(@"Crypto Problem");
         return NO;
     }
@@ -421,11 +421,11 @@
 }
 
 + (NSData *)decryptBlocks:(NSData *)K ct:(unsigned char *)ct iv:(unsigned char *)iv numBlocks:(NSUInteger)numBlocks {
-    int err;
+    //int err;
     symmetric_key skey;
     unsigned char *key = (unsigned char *)K.bytes;
 
-    if ((err = twofish_setup(key, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
+    if ((twofish_setup(key, TWOFISH_KEYSIZE_BYTES, 0, &skey)) != CRYPT_OK) {
         NSLog(@"Invalid K Key");
         return nil;
     }

@@ -213,7 +213,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
                 loc = NSLocalizedString(@"audit_status_done_with_hibp_errors_fmt", @"Found %@ issues in %@ entries (with %@ HIBP Errors)");
             }
             else {
-                loc = self.model.auditIssueCount ?
+                loc = (self.model.auditIssueCount != nil && self.model.auditIssueCount.intValue > 0) ?
                     NSLocalizedString(@"audit_status_fmt", @"Found %@ issues in %@ entries") : NSLocalizedString(@"audit_status_no_issues_found", @"No issues found");
             }
             

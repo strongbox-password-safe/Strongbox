@@ -15,6 +15,7 @@
 #import "OTPToken+Serialization.h"
 #import "FavIconManager.h"
 #import "DatabasesManager.h"
+#import "NSArray+Extensions.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -27,8 +28,11 @@ NSString* const kModelUpdateNotificationExpiryChanged = @"kModelUpdateNotificati
 NSString* const kModelUpdateNotificationIconChanged = @"kModelUpdateNotificationIconChanged";
 NSString* const kModelUpdateNotificationAttachmentsChanged = @"kModelUpdateNotificationAttachmentsChanged";
 NSString* const kModelUpdateNotificationTotpChanged = @"kModelUpdateNotificationTotpChanged";
-NSString* const kNotificationUserInfoKeyIsBatchIconUpdate = @"kNotificationUserInfoKeyIsBatchIconUpdate";
+NSString* const kModelUpdateNotificationItemsDeleted = @"kModelUpdateNotificationItemsDeleted";
+NSString* const kModelUpdateNotificationItemsUnDeleted = @"kModelUpdateNotificationItemsUnDeleted";
+NSString* const kModelUpdateNotificationItemsMoved = @"kModelUpdateNotificationItemsMoved";
 
+NSString* const kNotificationUserInfoKeyIsBatchIconUpdate = @"kNotificationUserInfoKeyIsBatchIconUpdate";
 NSString* const kNotificationUserInfoKeyNode = @"node";
 
 @interface ViewModel ()
@@ -337,7 +341,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 - (void)touchAndModify:(Node*)item modDate:(NSDate*_Nullable)modDate {
     if(modDate) {
-        [item touchWithExplicitModifiedDate:modDate touchParents:YES];
+        [item touch:YES touchParents:YES date:modDate];
     }
     else {
         [item touch:YES touchParents:YES];
@@ -621,8 +625,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     // Make Changes
     
-    item.fields.accessed = [[NSDate alloc] init];
-    item.fields.modified = [[NSDate alloc] init];
+    [item touch:YES touchParents:NO date:NSDate.date];
     
     [item restoreFromHistoricalNode:historicalItem];
     
@@ -884,6 +887,27 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     });
 }
 
+- (NSString*)getDefaultTitle {
+    return NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled");
+}
+
+- (NSSet<Node *> *)getMinimalNodeSet:(const NSArray<Node *> *)nodes {
+    return [self.passwordDatabase getMinimalNodeSet:nodes];
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Deletes, Moves and Additions
+
+- (BOOL)addNewRecord:(Node *_Nonnull)parentGroup {
+    Node* record = [self getDefaultNewEntryNode:parentGroup];
+    return [self addItem:record parent:parentGroup openEntryDetailsWindowWhenDone:YES];
+}
+
+- (BOOL)addNewGroup:(Node *)parentGroup title:(NSString *)title {
+    Node* newGroup = [self getNewGroupWithSafeName:parentGroup title:title];
+    return [self addItem:newGroup parent:parentGroup openEntryDetailsWindowWhenDone:NO];
+}
+
 - (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     for (Node* child in children) {
         if(![parent validateAddChild:child keePassGroupTitleRules:YES]) {
@@ -894,7 +918,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager beginUndoGrouping];
     
     for (Node* child in children) {
-        [self addItem:child parent:parent newItemCreated:NO];
+        [self addItem:child parent:parent openEntryDetailsWindowWhenDone:NO];
     }
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_add_items", @"Add Items");
@@ -904,154 +928,187 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return YES;
 }
 
-- (NSString*)getDefaultTitle {
-    return NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled");
-}
-
-- (BOOL)addNewRecord:(Node *_Nonnull)parentGroup {
-    AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
-    
-    // Title
-    
-    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? [self getDefaultTitle] :
-            autoFill.titleAutoFillMode == kSmartUrlFill ? [self getSmartFillTitle] : autoFill.titleCustomAutoFill;
-    
-    // Username
-    
-    NSString *actualUsername = autoFill.usernameAutoFillMode == kNone ? @"" :
-            autoFill.usernameAutoFillMode == kMostUsed ? [self getAutoFillMostPopularUsername] : autoFill.usernameCustomAutoFill;
-    
-    // Password
-    
-    NSString *actualPassword = autoFill.passwordAutoFillMode == kNone ? @"" : autoFill.passwordAutoFillMode == kGenerated ? [self generatePassword] : autoFill.passwordCustomAutoFill;
-    
-    // Email
-    
-    NSString *actualEmail = autoFill.emailAutoFillMode == kNone ? @"" :
-            autoFill.emailAutoFillMode == kMostUsed ? [self getAutoFillMostPopularEmail] : autoFill.emailCustomAutoFill;
-    
-    // URL
-    
-    NSString *actualUrl = autoFill.urlAutoFillMode == kNone ? @"" :
-        autoFill.urlAutoFillMode == kSmartUrlFill ? getSmartFillUrl(): autoFill.urlCustomAutoFill;
-    
-    // Notes
-
-    NSString *actualNotes = autoFill.notesAutoFillMode == kNone ? @"" :
-        autoFill.notesAutoFillMode == kClipboard ? getSmartFillNotes() : autoFill.notesCustomAutoFill;
-    
-    /////////////////////////////////////
-    
-    NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
-                                                          url:actualUrl
-                                                     password:actualPassword
-                                                        notes:actualNotes
-                                                        email:actualEmail];
-
-    Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields uuid:nil];
-    
-    if(![parentGroup validateAddChild:record keePassGroupTitleRules:YES]) {
+- (BOOL)addItem:(Node*)item parent:(Node*)parent openEntryDetailsWindowWhenDone:(BOOL)openEntryDetailsWindowWhenDone {
+    if (![self.passwordDatabase addChild:item destination:parent]) {
         return NO;
     }
     
-    [self addItem:record parent:parentGroup newItemCreated:YES];
+    [[self.document.undoManager prepareWithInvocationTarget:self] unAddItem:item];
+    
+    NSString* loc = NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
+    [self.document.undoManager setActionName:loc];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.onNewItemAdded(item, openEntryDetailsWindowWhenDone);
+    });
     
     return YES;
 }
 
-- (void)addNewGroup:(Node *)parentGroup title:(NSString *)title {
-    NSInteger i = 0;
-    BOOL success = NO;
-    Node* newGroup;
-    do {
-        newGroup = [[Node alloc] initAsGroup:title parent:parentGroup keePassGroupTitleRules:self.format != kPasswordSafe uuid:nil];
-        success =  newGroup && [parentGroup validateAddChild:newGroup keePassGroupTitleRules:self.format != kPasswordSafe];
-        i++;
-        title = [NSString stringWithFormat:@"%@ %ld", title, i];
-    } while (!success);
-    
-    [self addItem:newGroup parent:parentGroup newItemCreated:NO];
-}
-
-- (void)addItem:(Node*)item parent:(Node*)parent newItemCreated:(BOOL)newItemCreated {
-    [parent addChild:item keePassGroupTitleRules:YES];
-    
-    [[self.document.undoManager prepareWithInvocationTarget:self] deleteItem:item];
-    if(!self.document.undoManager.isUndoing) {
-        NSString* loc = NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
-        [self.document.undoManager setActionName:loc];
-    }
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.onNewItemAdded(item, newItemCreated);
-    });
-}
-
-- (BOOL)deleteItem:(Node *_Nonnull)child {
-    BOOL wasRecycled;
-    BOOL ret = [self.passwordDatabase deleteOrRecycleItem:child wasRecycled:&wasRecycled];
-
-    if (wasRecycled) {
-            // Needs to be undoable
-        //    [self changeParent:self.passwordDatabase.recycleBinNode node:child isRecycleOp:YES];
-
-        // TODO: How to properly undo this?!
-    }
-    else {
-        // TODO: How to properly undo this?!
-        
-        [[self.document.undoManager prepareWithInvocationTarget:self] unDeleteItem:child];
-        if(!self.document.undoManager.isUndoing) {
-            NSString* loc = NSLocalizedString(@"mac_undo_action_delete_item", @"Delete Item");
-            [self.document.undoManager setActionName:loc];
-        }
+- (void)unAddItem:(Node*)item {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
 
-    if (ret) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.onDeleteItem(child);
-        });
-    }
+    [self.passwordDatabase unAddChild:item];
+
+    [[self.document.undoManager prepareWithInvocationTarget:self] addItem:item parent:item.parent openEntryDetailsWindowWhenDone:NO];
     
-    return ret;
+    NSString* loc = NSLocalizedString(@"mac_undo_action_add_item", @"Add Item");
+    [self.document.undoManager setActionName:loc];
+
+    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
+                                                      object:self
+                                                    userInfo:@{ kNotificationUserInfoKeyNode : @[item] }];
 }
 
-- (BOOL)unDeleteItem:(Node *)item {
-    // TODO: Need to notify UI
-    
-    return [self.passwordDatabase unDeleteItem:item];
+- (BOOL)canRecycle:(Node *)item {
+    return [self.passwordDatabase canRecycle:item];
 }
 
-- (BOOL)deleteWillRecycle:(Node *)child {
-    return [self.passwordDatabase deleteWillRecycle:child];
-}
-
-- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
-    return [self changeParent:parent node:node isRecycleOp:NO];
-}
-
-- (BOOL)changeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node isRecycleOp:(BOOL)isRecycleOp {
-    if(![node validateChangeParent:parent keePassGroupTitleRules:self.format != kPasswordSafe]) {
-        return NO;
+- (void)deleteItems:(const NSArray<Node *> *)items {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
 
-    Node* old = node.parent;
+    NSArray<NodeHierarchyReconstructionData*>* undoData;
+    [self.passwordDatabase deleteItems:items undoData:&undoData];
+
+    [[self.document.undoManager prepareWithInvocationTarget:self] unDeleteItems:undoData];
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] changeParent:old node:node isRecycleOp:isRecycleOp];
-    
-    NSString* loc = isRecycleOp ?
-        NSLocalizedString(@"mac_undo_action_delete_item", @"Delete Item") :
-        NSLocalizedString(@"mac_undo_action_move_item", @"Move Item");
+    NSString* loc = items.count > 1 ?   NSLocalizedString(@"mac_menu_item_delete_items", "Delete Items") :
+                                        NSLocalizedString(@"mac_menu_item_delete_item", "Delete Item");
 
     [self.document.undoManager setActionName:loc];
-    
-    BOOL ret = [node changeParent:parent keePassGroupTitleRules:self.format != kPasswordSafe];
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        self.onChangeParent(node);
-    });
+    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
+                                                      object:self
+                                                    userInfo:@{ kNotificationUserInfoKeyNode : items }];
+}
+
+- (void)unDeleteItems:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
     
+    [self.passwordDatabase unDelete:undoData];
+    
+    NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
+        return obj.clonedNode;
+    }];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] deleteItems:items];
+    
+    NSString* loc = items.count > 1 ? NSLocalizedString(@"mac_menu_item_delete_items", "Delete Items") :
+                                      NSLocalizedString(@"mac_menu_item_delete_item", "Delete Item");
+
+    [self.document.undoManager setActionName:loc];
+
+    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsUnDeleted
+                                                      object:self
+                                                    userInfo:nil];
+}
+
+// Recycle
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    NSArray<NodeHierarchyReconstructionData*> *undoData;
+    BOOL ret = [self.passwordDatabase recycleItems:items undoData:&undoData];
+
+    [[self.document.undoManager prepareWithInvocationTarget:self] unRecycleItems:undoData];
+    
+    NSString* loc = items.count > 1 ?   NSLocalizedString(@"mac_menu_item_delete_items", "Delete Items") :
+                                        NSLocalizedString(@"mac_menu_item_delete_item", "Delete Item");
+    [self.document.undoManager setActionName:loc];
+
+    if (ret) {
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsDeleted
+                                                          object:self
+                                                        userInfo:@{ kNotificationUserInfoKeyNode : items }];
+    }
+
     return ret;
+}
+
+- (void)unRecycleItems:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    [self.passwordDatabase undoRecycle:undoData];
+    
+    NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
+        return obj.clonedNode;
+    }];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] recycleItems:items];
+    
+    NSString* loc = items.count > 1 ? NSLocalizedString(@"mac_menu_item_delete_items", "Delete Items") :
+                                      NSLocalizedString(@"mac_menu_item_delete_item", "Delete Item");
+
+    [self.document.undoManager setActionName:loc];
+
+    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsUnDeleted
+                                                      object:self
+                                                    userInfo:nil];
+}
+
+////////////////////////////////////////////
+// Moves
+
+- (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination {
+    return [self.passwordDatabase validateMoveItems:items destination:destination];
+}
+
+- (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    NSArray<NodeHierarchyReconstructionData*> *undoData;
+    BOOL ret = [self.passwordDatabase moveItems:items destination:destination undoData:&undoData];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] unMove:undoData destination:destination];
+    
+    NSString* loc = items.count > 1 ? NSLocalizedString(@"mac_undo_action_move_items", @"Move Items") :
+                                      NSLocalizedString(@"mac_undo_action_move_item", @"Move Item");
+    
+    [self.document.undoManager setActionName:loc];
+
+    if (ret) {
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsMoved
+                                                          object:self
+                                                        userInfo:@{ kNotificationUserInfoKeyNode : items }];
+    }
+
+    return ret;
+}
+
+- (void)unMove:(NSArray<NodeHierarchyReconstructionData*>*)undoData destination:(Node*)destination {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    [self.passwordDatabase undoMove:undoData];
+    
+    NSArray<Node*>* items = [undoData map:^id _Nonnull(NodeHierarchyReconstructionData * _Nonnull obj, NSUInteger idx) {
+        return obj.clonedNode;
+    }];
+    
+    [[self.document.undoManager prepareWithInvocationTarget:self] move:items destination:destination];
+
+    NSString* loc = items.count > 1 ? NSLocalizedString(@"mac_undo_action_move_items", @"Move Items") :
+                                      NSLocalizedString(@"mac_undo_action_move_item", @"Move Item");
+
+    [self.document.undoManager setActionName:loc];
+
+    [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationItemsMoved
+                                                      object:self
+                                                    userInfo:nil];
 }
 
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows {
@@ -1080,13 +1137,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         
         
         Node* record = [[Node alloc] initAsRecord:actualTitle parent:self.passwordDatabase.rootGroup fields:fields uuid:nil];
-        
-        NSDate* date = [NSDate date];
-        record.fields.created = date;
-        record.fields.accessed = date;
-        record.fields.modified = date;
-        
-        [self addItem:record parent:self.passwordDatabase.rootGroup newItemCreated:NO];
+        [self addItem:record parent:self.passwordDatabase.rootGroup openEntryDetailsWindowWhenDone:NO];
     }
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_import_entries_from_csv", @"Import Entries from CSV");
@@ -1097,8 +1148,64 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)validateChangeParent:(Node *_Nonnull)parent node:(Node *_Nonnull)node {
-    return [node validateChangeParent:parent keePassGroupTitleRules:self.format != kPasswordSafe];
+- (Node*)getDefaultNewEntryNode:(Node *_Nonnull)parentGroup {
+    AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
+    
+    // Title
+    
+    NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? [self getDefaultTitle] :
+            autoFill.titleAutoFillMode == kSmartUrlFill ? [self getSmartFillTitle] : autoFill.titleCustomAutoFill;
+
+    // Username
+    
+    NSString *actualUsername = autoFill.usernameAutoFillMode == kNone ? @"" :
+            autoFill.usernameAutoFillMode == kMostUsed ? [self getAutoFillMostPopularUsername] : autoFill.usernameCustomAutoFill;
+    
+    // Password
+    
+    NSString *actualPassword = autoFill.passwordAutoFillMode == kNone ? @"" : autoFill.passwordAutoFillMode == kGenerated ? [self generatePassword] : autoFill.passwordCustomAutoFill;
+    
+    // Email
+    
+    NSString *actualEmail = autoFill.emailAutoFillMode == kNone ? @"" :
+            autoFill.emailAutoFillMode == kMostUsed ? [self getAutoFillMostPopularEmail] : autoFill.emailCustomAutoFill;
+    
+    // URL
+    
+    NSString *actualUrl = autoFill.urlAutoFillMode == kNone ? @"" :
+        autoFill.urlAutoFillMode == kSmartUrlFill ? [self getSmartFillUrl] : autoFill.urlCustomAutoFill;
+    
+    // Notes
+
+    NSString *actualNotes = autoFill.notesAutoFillMode == kNone ? @"" :
+        autoFill.notesAutoFillMode == kClipboard ? [self getSmartFillNotes] : autoFill.notesCustomAutoFill;
+    
+    /////////////////////////////////////
+    
+    NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
+                                                          url:actualUrl
+                                                     password:actualPassword
+                                                        notes:actualNotes
+                                                        email:actualEmail];
+
+    Node* record = [[Node alloc] initAsRecord:actualTitle parent:parentGroup fields:fields uuid:nil];
+
+    return record;
+}
+
+- (Node*)getNewGroupWithSafeName:(Node *)parentGroup title:(NSString *)title {
+    NSInteger i = 0;
+    BOOL success = NO;
+    Node* newGroup;
+    
+    do {
+        newGroup = [[Node alloc] initAsGroup:title parent:parentGroup keePassGroupTitleRules:self.format != kPasswordSafe uuid:nil];
+        success =  newGroup && [parentGroup validateAddChild:newGroup keePassGroupTitleRules:self.format != kPasswordSafe];
+        i++;
+        title = [NSString stringWithFormat:@"%@ %ld", title, i];
+    } while (!success);
+
+    return newGroup;
 }
 
 - (NSString*)getSmartFillTitle {
@@ -1119,7 +1226,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return [self getDefaultTitle];
 }
 
-NSString* getSmartFillUrl() {
+- (NSString*)getSmartFillUrl {
     NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
     NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
     
@@ -1134,7 +1241,7 @@ NSString* getSmartFillUrl() {
     return @"";
 }
 
-NSString* getSmartFillNotes() {
+- (NSString*)getSmartFillNotes {
     NSPasteboard*  myPasteboard  = [NSPasteboard generalPasteboard];
     NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
     
@@ -1145,11 +1252,11 @@ NSString* getSmartFillNotes() {
     return @"";
 }
 
--(NSString*) getAutoFillMostPopularUsername {
+- (NSString*)getAutoFillMostPopularUsername {
     return self.passwordDatabase.mostPopularUsername == nil ? @"" : self.passwordDatabase.mostPopularUsername;
 }
 
--(NSString*) getAutoFillMostPopularEmail {
+- (NSString*)getAutoFillMostPopularEmail {
     return self.passwordDatabase.mostPopularEmail == nil ? @"" : self.passwordDatabase.mostPopularEmail;
 }
 

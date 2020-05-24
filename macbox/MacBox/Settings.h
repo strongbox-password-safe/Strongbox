@@ -103,6 +103,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL colorizePasswords;
 @property BOOL colorizeUseColorBlindPalette;
 
+@property BOOL clipboardHandoff;
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

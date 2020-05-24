@@ -68,7 +68,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)touch:(BOOL)modified;
+- (void)touch:(BOOL)modified date:(NSDate*)date;
+
 - (void)touchLocationChanged;
+- (void)touchLocationChanged:(NSDate*)date;
 
 - (void)setModifiedDateExplicit:(const NSDate*)modified;
 - (void)setTouchPropertiesWithAccessed:(const NSDate*)accessed modified:(const NSDate*)modified usageCount:(const NSNumber*)usageCount;

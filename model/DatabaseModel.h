@@ -39,13 +39,37 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
 
-- (BOOL)deleteOrRecycleItem:(Node*)node;
-- (BOOL)deleteOrRecycleItem:(Node*)node wasRecycled:(BOOL*_Nullable)wasRecycled;
-- (BOOL)deleteWillRecycle:(Node*_Nonnull)node;
+//
 
-@property (readonly) NSArray<DeletedItem*>* deletedObjects;
+- (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
 
+// Deletions
+
+@property (readonly) NSDictionary<NSUUID*, NSDate*>* deletedObjects;
+
+- (void)deleteItems:(const NSArray<Node *> *)items;
+- (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
+- (void)unDelete:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
+
+// Recycle
+
+- (BOOL)canRecycle:(Node*)item;
+- (BOOL)recycleItems:(const NSArray<Node *> *)items;
+- (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
+- (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
+
+// Move
+
+- (BOOL)validateMoveItems:(const NSArray<Node*>*)items destination:(Node*)destination;
 - (BOOL)moveItems:(const NSArray<Node*>*)items destination:(Node*)destination;
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
+- (void)undoMove:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
+
+// Add
+
+- (BOOL)validateAddChild:(Node*)item destination:(Node*)destination;
+- (BOOL)addChild:(Node*)item destination:(Node*)destination;
+- (void)unAddChild:(Node*)item;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
 @property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;

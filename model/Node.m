@@ -194,20 +194,25 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (Node*)duplicate:(NSString*)newTitle {
-    return [self cloneOrDuplicate:YES cloneMetadataDates:NO cloneUuid:NO newTitle:newTitle];
+    return [self cloneOrDuplicate:YES cloneMetadataDates:NO cloneUuid:NO cloneRecursive:NO newTitle:newTitle];
 }
 
 - (Node *)clone {
-    return [self cloneOrDuplicate:NO cloneMetadataDates:YES cloneUuid:YES newTitle:nil];
+    return [self clone:NO];
+}
+
+- (Node *)clone:(BOOL)recursive {
+    return [self cloneOrDuplicate:NO cloneMetadataDates:YES cloneUuid:YES cloneRecursive:recursive newTitle:nil];
 }
 
 - (Node *)cloneForHistory {
-    return [self cloneOrDuplicate:YES cloneMetadataDates:YES cloneUuid:YES newTitle:nil];
+    return [self cloneOrDuplicate:YES cloneMetadataDates:YES cloneUuid:YES cloneRecursive:NO newTitle:nil];
 }
 
 - (Node*)cloneOrDuplicate:(BOOL)clearHistory
        cloneMetadataDates:(BOOL)cloneMetadataDates
                 cloneUuid:(BOOL)cloneUuid
+           cloneRecursive:(BOOL)cloneRecursive
                  newTitle:(NSString*)newTitle {
     NodeFields* clonedFields = [self.fields cloneOrDuplicate:clearHistory cloneTouchProperties:cloneMetadataDates];
     
@@ -221,6 +226,18 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     ret.iconId = self.iconId;
     ret.customIconUuid = self.customIconUuid;
     ret.linkedData = self.linkedData;
+    
+    if (ret.isGroup && cloneRecursive) {
+        for (Node* child in self.children) {
+            Node* clonedChild = [child cloneOrDuplicate:clearHistory
+                                     cloneMetadataDates:cloneMetadataDates
+                                              cloneUuid:cloneUuid
+                                         cloneRecursive:cloneRecursive
+                                               newTitle:newTitle];
+        
+            [ret addChild:clonedChild keePassGroupTitleRules:YES];
+        }
+    }
     
     return ret;
 }
@@ -264,12 +281,36 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     [self touch:NO];
 }
 
+- (void)touchAt:(NSDate *)date {
+    [self touchAt:NO date:date];
+}
+
+- (void)touchAt:(BOOL)modified date:(NSDate *)date {
+    [self touch:modified touchParents:YES date:date];
+}
+
 - (void)touchLocationChanged {
     [self.fields touchLocationChanged];
 }
 
+- (void)touchLocationChanged:(NSDate*)date {
+    [self.fields touchLocationChanged:date];
+}
+
 - (void)touch:(BOOL)modified {
     [self touch:modified touchParents:YES];
+}
+
+- (void)touch:(BOOL)modified date:(NSDate*)date {
+    [self touch:modified touchParents:YES date:date];
+}
+
+- (void)touch:(BOOL)modified touchParents:(BOOL)touchParents date:(NSDate*)date {
+    [self.fields touch:modified date:date];
+    
+    if(touchParents && self.parent) {
+        [self.parent touch:modified date:date];
+    }
 }
 
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents {
@@ -602,7 +643,6 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     return ret;
 }
-
 
 - (BOOL)setTotpWithString:(NSString *)string
          appendUrlToNotes:(BOOL)appendUrlToNotes

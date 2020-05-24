@@ -67,7 +67,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
         NSString *groupLocation = showGroupLocation ? (groupLocationOverride ? groupLocationOverride : [self getGroupPathDisplayString:node]) : @"";
         
-        NSDictionary<NSNumber*, UIColor*> *flagTintColors;
+        NSDictionary<NSNumber*, UIColor*> *flagTintColors = @{};
         
         NSString* briefAudit = self.viewModel.metadata.showFlagsInBrowse  ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node] : @"";
         NSArray* flags = self.viewModel.metadata.showFlagsInBrowse ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];

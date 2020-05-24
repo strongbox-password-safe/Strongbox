@@ -72,8 +72,10 @@ extern NSString* const kAuditCompletedNotificationKey;
 // Operations
 
 - (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
-- (BOOL)deleteOrRecycleItem:(Node *_Nonnull)child;
-- (BOOL)deleteWillRecycle:(Node*_Nonnull)child;
+
+- (void)deleteItems:(const NSArray<Node *> *)items;
+- (BOOL)recycleItems:(const NSArray<Node *> *)items;
+- (BOOL)canRecycle:(Node*_Nonnull)child;
 
 - (BOOL)isPinned:(Node*)item;
 - (void)togglePin:(Node*)item;

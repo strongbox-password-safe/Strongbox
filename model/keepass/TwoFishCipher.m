@@ -16,10 +16,10 @@ static const uint32_t kIvSize = kBlockSize;
 @implementation TwoFishCipher
 
 - (NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
-     int err;
+    //int err;
     symmetric_key skey;
     
-    if ((err = twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
+    if ((twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
         NSLog(@"Invalid Key");
         return nil;
     }
@@ -78,10 +78,10 @@ static const uint32_t kIvSize = kBlockSize;
 }
 
 - (NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
-    int err;
+    //int err;
     symmetric_key skey;
     
-    if ((err = twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
+    if ((twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
         NSLog(@"Invalid Key");
         return nil;
     }

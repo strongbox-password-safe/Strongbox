@@ -548,13 +548,37 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-- (void)onDeleteItem:(Node*)node {
+- (void)onItemsDeletedNotification:(NSNotification*)param {
+    NSArray<Node*>* deletedItems = param.userInfo[kNotificationUserInfoKeyNode];
+    if (deletedItems) {
+        NSArray<NSUUID*> *ids = [deletedItems map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+            return obj.uuid;
+        }];
+        NSSet<NSUUID*>* idSet = [NSSet setWithArray:ids];
+        NSArray<NSUUID*> *idsToClose = [self.detailsViewControllers.allKeys filter:^BOOL(NSUUID * _Nonnull obj) {
+            return [idSet containsObject:obj];
+        }];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for (NSUUID* idToClose in idsToClose) {
+                NodeDetailsViewController* vc = self.detailsViewControllers[idToClose];
+                [vc closeWithCompletion:^{}];
+            }
+        });
+    }
+    
     self.itemsCache = nil; // Clear items cache
     [self.outlineView reloadData]; // Full reload in case we're in search and things have changed removing this item...
     [self bindDetailsPane];
 }
 
-- (void)onChangeParent:(Node*)node {
+- (void)onItemsUnDeletedNotification:(NSNotification*)param {
+    self.itemsCache = nil; // Clear items cache
+    [self.outlineView reloadData]; // Full reload in case we're in search and things have changed removing this item...
+    [self bindDetailsPane];
+}
+
+- (void)onItemsMovedNotification:(NSNotificationCenter*)param {
     self.itemsCache = nil; // Clear items cache
     [self.outlineView reloadData];
     [self bindDetailsPane];
@@ -710,12 +734,13 @@ static NSImage* kStrongBox256Image;
 - (void)stopObservingModelChanges {
     if(self.model) {
         self.model.onNewItemAdded = nil;
-        self.model.onDeleteItem = nil;
-        self.model.onChangeParent = nil;
         self.model.onDeleteHistoryItem = nil;
         self.model.onRestoreHistoryItem = nil;
     }
-    
+
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationItemsMoved object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationItemsUnDeleted object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationItemsDeleted object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationCustomFieldsChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationTitleChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationUsernameChanged object:nil];
@@ -731,14 +756,8 @@ static NSImage* kStrongBox256Image;
 
 - (void)startObservingModelChanges {
     __weak ViewController* weakSelf = self;
-    self.model.onNewItemAdded = ^(Node * _Nonnull node, BOOL newRecord) {
-        [weakSelf onNewItemAdded:node newRecord:newRecord];
-    };
-    self.model.onDeleteItem = ^(Node * _Nonnull node) {
-        [weakSelf onDeleteItem:node];
-    };
-    self.model.onChangeParent = ^(Node * _Nonnull node) {
-        [weakSelf onChangeParent:node];
+    self.model.onNewItemAdded = ^(Node * _Nonnull node, BOOL openEntryDetailsWindowWhenDone) {
+        [weakSelf onNewItemAdded:node openEntryDetailsWindowWhenDone:openEntryDetailsWindowWhenDone];
     };
     self.model.onDeleteHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
         [weakSelf onDeleteHistoryItem:item historicalItem:historicalItem];
@@ -758,6 +777,9 @@ static NSImage* kStrongBox256Image;
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemIconChanged:) name:kModelUpdateNotificationIconChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onAttachmentsChanged:) name:kModelUpdateNotificationAttachmentsChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onTotpChanged:) name:kModelUpdateNotificationTotpChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsDeletedNotification:) name:kModelUpdateNotificationItemsDeleted object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsUnDeletedNotification:) name:kModelUpdateNotificationItemsUnDeleted object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsMovedNotification:) name:kModelUpdateNotificationItemsMoved object:nil];
 }
 
 - (void)setInitialFocus {
@@ -1388,7 +1410,9 @@ static NSImage* kStrongBox256Image;
             // NSLog(@"Got key file digest: [%@]", [keyFileDigest base64EncodedStringWithOptions:kNilOptions]);
         }
         else {
-            *error = [Utils createNSError:@"Could not read key file..."  errorCode:-1];
+            if (error) {
+                *error = [Utils createNSError:@"Could not read key file..."  errorCode:-1];
+            }
         }
     }
     
@@ -2080,16 +2104,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (Node*)getCurrentSelectedItem {
-    NSInteger selectedRow = [self.outlineView selectedRow];
-    
-    //NSLog(@"Selected Row: %ld", (long)selectedRow);
-    
-    return [self.outlineView itemAtRow:selectedRow];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 - (void)expandParentsOfItem:(Node*)item {
     NSMutableArray *stack = [[NSMutableArray alloc] init];
     
@@ -2147,6 +2161,14 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self.outlineView registerForDraggedTypes:@[kDragAndDropExternalUti]];
 }
 
+- (Node*)getCurrentSelectedItem {
+    NSInteger selectedRow = [self.outlineView selectedRow];
+    
+    //NSLog(@"Selected Row: %ld", (long)selectedRow);
+    
+    return [self.outlineView itemAtRow:selectedRow];
+}
+
 - (NSArray<Node*>*)getSelectedItems {
     NSIndexSet *rows = [self.outlineView selectedRowIndexes];
     
@@ -2196,21 +2218,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                kDragAndDropExternalUti]
                        owner:self];
     
-    NSArray<Node*> *allSelected = items;
-    
-    // We need to filter out children that are already included because the group is included,
-    // so we're not copying/moving twice
-    
-    NSArray<Node*>* groups = [allSelected filter:^BOOL(Node * _Nonnull obj) {
-        return obj.isGroup;
-    }];
-    NSArray<Node*>* minimalNodeSet = [allSelected filter:^BOOL(Node * _Nonnull node) {
-        BOOL alreadyContained = [groups anyMatch:^BOOL(Node * _Nonnull group) {
-            return [group contains:node];
-        }];
-        return !alreadyContained;
-    }];
-    
+    NSArray<Node*>* minimalNodeSet = [self.model getMinimalNodeSet:items].allObjects;
     
     // Internal -> Moves
     
@@ -2288,17 +2296,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
             return [self.model getItemFromSerializationId:obj];
         }];
-        
-        BOOL notValid = [sourceItems anyMatch:^BOOL(Node * _Nonnull obj) {
-            BOOL valid = !destinationItem ||
-                        (destinationItem.isGroup && [self.model validateChangeParent:destinationItem node:obj]);
 
-            return !valid;
-        }];
-        
-        //NSLog(@"%@ -> %d", item ? ((Node*)item).title : @"ROOT", !notValid);
+        BOOL valid = [self.model validateMove:sourceItems destination:destinationItem];
 
-        return !notValid ? NSDragOperationMove : NSDragOperationNone;
+        return valid ? NSDragOperationMove : NSDragOperationNone;
     }
     else {
         NSData* json = [info.draggingPasteboard dataForType:kDragAndDropExternalUti];
@@ -2318,8 +2319,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (BOOL)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
                  destinationItem:(Node*)destinationItem
                           source:(id)source
-                           clear:(BOOL)clear
-{
+                           clear:(BOOL)clear {
     if(![pasteboard propertyListForType:kDragAndDropExternalUti] &&
        ![pasteboard dataForType:kDragAndDropInternalUti]) {
         return NO;
@@ -2331,21 +2331,17 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             return [self.model getItemFromSerializationId:obj];
         }];
 
-        for (Node* sourceItem in sourceItems) {
-            BOOL result = [self.model changeParent:destinationItem node:sourceItem];
-            NSLog(@"move: [%@] - success: [%d]", [sourceItem getSerializationId:self.model.format != kPasswordSafe], result);
-        }
-
+        BOOL result = [self.model move:sourceItems destination:destinationItem];
+        
         if(clear) {
             [pasteboard clearContents];
         }
-        return YES;
+        
+        return result;
     }
-    else if(destinationItem.isGroup) {
+    else if(destinationItem.isGroup) { // External
         NSData* json = [pasteboard dataForType:kDragAndDropExternalUti];
         if(json && destinationItem.isGroup) {
-            //NSLog(@"copy pasta!");
-
             BOOL ret = [self pasteFromExternal:json destinationItem:destinationItem];
             if(clear) {
                 [pasteboard clearContents];
@@ -2357,6 +2353,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(clear) {
         [pasteboard clearContents];
     }
+    
     return NO;
 }
 
@@ -2572,7 +2569,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                        }];
                    }
                    
-                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
+                   [self continuePaste:serialized nodes:filtered destinationItem:destinationItem sourceFormat:sourceFormat];
                }
            }];
     }
@@ -2625,7 +2622,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (void)processFormatIncompatibilities:(NSDictionary*)serialized
                                  nodes:(NSArray<Node*>*)nodes
-                       destinationItem:(Node*)destinationItem
+                       destinationItem:(Node*_Nonnull)destinationItem
                           sourceFormat:(DatabaseFormat)sourceFormat {
     if (sourceFormat == kPasswordSafe && (self.model.format == kKeePass || self.model.format == kKeePass4)) {
         [self processPasswordSafeToKeePass2:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
@@ -2746,7 +2743,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
 }
 
-- (void)onNewItemAdded:(Node*)node newRecord:(BOOL)newRecord {
+- (void)onNewItemAdded:(Node*)node openEntryDetailsWindowWhenDone:(BOOL)openEntryDetailsWindowWhenDone {
     self.itemsCache = nil; // Clear items cache
     self.searchField.stringValue = @""; // Clear any ongoing search...
     [self.outlineView reloadData];
@@ -2759,54 +2756,107 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: row] byExtendingSelection: NO];
     }
 
-    if(newRecord) {
+    if(openEntryDetailsWindowWhenDone) {
         [self openItemDetails:node newEntry:YES];
-        
         [self expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:node];
     }    
 }
 
 - (IBAction)onDelete:(id)sender {
-    NSIndexSet *rows = [self.outlineView selectedRowIndexes];
+    NSArray<Node *> *items = [self getSelectedItems];
+    if (items.count == 0) {
+        return;
+    }
+    
+    NSDictionary* grouped = [items groupBy:^id _Nonnull(Node * _Nonnull obj) {
+        BOOL delete = [self.model canRecycle:obj];
+        return @(delete);
+    }];
 
-    if(rows.count == 1) {
-        Node *item = [self getCurrentSelectedItem];
-        if(!item) {
-            return;
-        }
-        BOOL willRecycle = [self.model deleteWillRecycle:item];
-        
-        NSString* loc = willRecycle ? NSLocalizedString(@"mac_are_you_sure_recycle_bin_yes_no_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?") :
-                                    NSLocalizedString(@"mac_are_you_sure_delete_yes_no_fmt", @"Are you sure you want to delete '%@'?");
-        
-        [Alerts yesNo:[NSString stringWithFormat:loc, item.title]
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-            if(yesNo) {
-                if(![self.model deleteItem:item]) {
-                    [Alerts info:@"There was a problem trying to delete this item." window:self.view.window];
-                }
-            }
-        }];
+    const NSArray<Node*> *toBeDeleted = grouped[@(NO)];
+    const NSArray<Node*> *toBeRecycled = grouped[@(YES)];
+
+    if ( toBeDeleted == nil ) {
+        [self postValidationRecycleAllItemsWithConfirmPrompt:toBeRecycled];
     }
     else {
-        BOOL willRecycle = self.model.recycleBinEnabled;
-        
-        NSString* loc = willRecycle ?
-            NSLocalizedString(@"mac_are_you_sure_recycle_bin_multiple_yes_no_fmt", @"Are you sure you want to send %lu items to the Recycle Bin?") :
-            NSLocalizedString(@"mac_are_you_sure_delete_multiple_yes_no_fmt", @"Are you sure you want to delete %lu items?");
-        
-        [Alerts yesNo:[NSString stringWithFormat:loc, (unsigned long)rows.count]
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-            if(yesNo) {
-                [rows enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL *stop) {
-                    Node* node = [self.outlineView itemAtRow:idx];
-                    [self.model deleteItem:node];
-                }];
-            }
-        }];
+        if ( toBeRecycled == nil ) {
+            [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted];
+        }
+        else { // Mixed delete and recycle
+            [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled];
+        }
     }
+}
+
+- (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled {
+    [Alerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
+  informativeText:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
+           window:self.view.window
+       completion:^(BOOL yesNo) {
+        if (yesNo) {
+                   // Delete first, then recycly because the item to be deleted could be the recycle bin, and if we recycle first then we will actually
+                   // permanently delete the items we wanted to recycle! This is more conservative and a better outcome.
+                   
+                   [self.model deleteItems:toBeDeleted];
+                   
+                   BOOL fail = ![self.model recycleItems:toBeRecycled];
+                   
+                   if(fail) {
+                       [Alerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                    informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
+                             window:self.view.window
+                         completion:nil];
+                   }
+               }
+    }];
+}
+
+- (void)postValidationDeleteAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+    NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
+    
+    NSString* message;
+    
+    if (items.count > 1) {
+        message = NSLocalizedString(@"browse_vc_are_you_sure_delete", @"Are you sure you want to permanently delete these item(s)?");
+    }
+    else {
+        Node* item = items.firstObject;
+        message = [NSString stringWithFormat:NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"),
+                   [self.model dereference:item.title node:item]];
+    }
+    
+    [Alerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
+        if (yesNo) {
+            [self.model deleteItems:items];
+        }
+    }];
+}
+
+- (void)postValidationRecycleAllItemsWithConfirmPrompt:(const NSArray<Node*>*)items {
+    NSString* title = NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?");
+    NSString* message;
+    if (items.count > 1) {
+        message = NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?");
+    }
+    else {
+        Node* item = items.firstObject;
+        message = [NSString stringWithFormat:NSLocalizedString(@"mac_are_you_sure_recycle_bin_yes_no_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?"),
+                                [self.model dereference:item.title node:item]];
+    }
+    
+    [Alerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
+        if (yesNo) {
+            BOOL fail = ![self.model recycleItems:items];
+
+            if(fail) {
+               [Alerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+            informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
+                     window:self.view.window
+                 completion:nil];
+            }
+        }
+    }];
 }
 
 - (IBAction)onLaunchUrl:(id)sender {

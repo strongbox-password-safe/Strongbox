@@ -70,7 +70,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     
     vc.nodes = nodes;
     vc.onDone = onDone;
-    vc.singleNodeUrlOverride = [NSURL URLWithString:urlOverride];
+    vc.singleNodeUrlOverride = urlOverride ? [NSURL URLWithString:urlOverride] : nil;
     
     [presentingVc presentViewController:nav animated:YES completion:NULL];
 }

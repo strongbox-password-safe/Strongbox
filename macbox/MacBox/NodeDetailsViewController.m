@@ -223,7 +223,7 @@ static NSString* trimField(NSTextField* textField) {
                 // Delete New Entry if discarding changes
                 
                 [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-                [self.model deleteItem:self.node];
+//                [self.model deleteItems:@[self.node]]   ; // TODO: Broken - can we change to only add node if successful?
                 [self.view.window close];
                 [self onWindowClosed];
 
@@ -1085,14 +1085,13 @@ static NSString* trimField(NSTextField* textField) {
     //NSLog(@"Selected Group: [%@]", group.title);
     
     if(self.node.parent != group) {
-        if(![self.model validateChangeParent:group node:self.node]) { // Should never happen - but safety in case we someday cover groups?
-            
+        if(![self.model validateMove:@[self.node] destination:group]) { // Should never happen - but safety in case we someday cover groups?
             NSString* loc = NSLocalizedString(@"mac_node_details_could_not_change_group", @"Could not change group! Validate failed...");
             [Alerts info:loc window:self.view.window];
             [self syncComboGroupWithNode];
         }
         else {
-            [self.model changeParent:group node:self.node];
+            [self.model move:@[self.node] destination:group];
             self.newEntry = NO;
         }
     }

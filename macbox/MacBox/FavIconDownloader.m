@@ -485,9 +485,9 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     
     NSNumber* currentlySelected = self.nodeSelected[self.nodeToChoosePreferredIconsFor.uuid];
     
-    NSLog(@"refresh: %@ => %@", self.nodeToChoosePreferredIconsFor.title, currentlySelected.stringValue);
+    //NSLog(@"refresh: %@ => %@", self.nodeToChoosePreferredIconsFor.title, currentlySelected.stringValue);
       
-    if(currentlySelected) {
+    if(currentlySelected != nil) {
         NSArray<IMAGE_TYPE_PTR>* images = [self getImagesForNode:self.nodeToChoosePreferredIconsFor];
         IMAGE_TYPE_PTR currentlySelectedImage = images[currentlySelected.intValue];
         NSUInteger row = [images indexOfObject:currentlySelectedImage];

@@ -1232,17 +1232,17 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                                                   value:friendlyDateString(item.fields.modified)
                                                copyable:NO]];
         
-    if (format == kKeePass4 || format == kKeePass) {
-        [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_location_changed_field_title", @"Location Changed")
-                                                      value:friendlyDateString(item.fields.locationChanged)
-                                                   copyable:NO]];
-
-        if (item.fields.usageCount) {
+//    if (format == kKeePass4 || format == kKeePass) {
+//        [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_location_changed_field_title", @"Location Changed")
+//                                                      value:friendlyDateString(item.fields.locationChanged)
+//                                                   copyable:NO]];
+//
+//        if (item.fields.usageCount) {
 //            [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_usage_count_field_title", @"Usage Count")
 //                                                          value:item.fields.usageCount.stringValue
 //                                                       copyable:NO]];
-        }
-    }
+//        }
+//    }
     
     return metadata;
 }

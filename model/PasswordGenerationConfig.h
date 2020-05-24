@@ -56,7 +56,7 @@ typedef NS_ENUM (NSInteger, PasswordGenerationSaltConfig) {
 @interface PasswordGenerationConfig : NSObject
 
 + (instancetype)defaults;
-+ (NSDictionary<NSString*, WordList*>*)wordListsMap; // TODO: Mac
++ (NSDictionary<NSString*, WordList*>*)wordListsMap;
 
 + (NSString*)getCasingStringForCasing:(PasswordGenerationWordCasing)casing;
 + (NSString*)characterPoolToPoolString:(PasswordGenerationCharacterPool)pool;

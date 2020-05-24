@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "DeletedItem.h"
 #import "Meta.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -15,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface KeePassDatabaseWideProperties : NSObject
 
 @property NSDictionary<NSUUID*, NSData*> * customIcons;
-@property Meta* originalMeta;
-@property NSArray<DeletedItem*>* deletedObjects;
+@property (nullable) Meta* originalMeta;
+@property NSDictionary<NSUUID*, NSDate*>* deletedObjects;
 
 @end
 

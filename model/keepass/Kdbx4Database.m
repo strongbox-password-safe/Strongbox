@@ -84,7 +84,7 @@ static const BOOL kLogVerbose = NO;
     
     Meta* xmlMeta = serializationData.rootXmlObject.keePassFile ? serializationData.rootXmlObject.keePassFile.meta : nil;
     NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
-    NSArray<DeletedItem*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
+    NSDictionary<NSUUID*, NSDate*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
         
     // Metadata
     
@@ -255,20 +255,35 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(Meta* meta) {
     return [NSMutableDictionary dictionary];
 }
 
-static NSArray<DeletedItem*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
+// TODO: Duplicated in KDBX3
+static NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
     if (existingRootXmlDocument) {
         if (existingRootXmlDocument.keePassFile) {
             if (existingRootXmlDocument.keePassFile.root) {
                 if (existingRootXmlDocument.keePassFile.root.deletedObjects) {
-                    return [existingRootXmlDocument.keePassFile.root.deletedObjects.deletedObjects map:^id _Nonnull(DeletedObject * _Nonnull obj, NSUInteger idx) {
-                        return [DeletedItem uuid:obj.uuid date:obj.deletionTime];
+                    NSDictionary<NSUUID*, NSArray<DeletedObject*>*>* byUuid = [existingRootXmlDocument.keePassFile.root.deletedObjects.deletedObjects groupBy:^id _Nonnull(DeletedObject * _Nonnull obj) {
+                        return obj.uuid;
                     }];
+                    
+                    NSMutableDictionary<NSUUID*, NSDate*> *ret = NSMutableDictionary.dictionary;
+                    for (NSUUID* uuid in byUuid.allKeys) {
+                        NSArray<DeletedObject*>* deletes = byUuid[uuid];
+                        NSArray<DeletedObject*>* sortedDeletes = [deletes sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+                            DeletedObject* d1 = (DeletedObject*)obj1;
+                            DeletedObject* d2 = (DeletedObject*)obj2;
+                            return [d2.deletionTime compare:d1.deletionTime]; // Latest first
+                        }];
+                        
+                        ret[uuid] = sortedDeletes.firstObject.deletionTime;
+                    }
+                    
+                    return ret;
                 }
             }
         }
     }
     
-    return @[];
+    return @{};
 }
 
 @end

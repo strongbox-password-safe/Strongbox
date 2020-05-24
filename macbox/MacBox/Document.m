@@ -251,7 +251,10 @@
     
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
     
-    *outError = retError;
+    if (outError) {
+        *outError = retError;
+    }
+    
     return ret;
 }
 
