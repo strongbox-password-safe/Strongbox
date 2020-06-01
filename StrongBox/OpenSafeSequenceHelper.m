@@ -368,12 +368,18 @@
         [self onBiometricAuthenticationDone:YES error:nil];
     }
     else {
+        // Cool transparency if using biometric - no need for any overlay/UI
+
+        if (self.isAutoFillOpen) {
+            self.viewController.view.alpha = 0.0f;
+        }
+        
         BOOL ret = [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
                                                           fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
                                                              completion:^(BOOL success, NSError * _Nullable error) {
             [self onBiometricAuthenticationDone:success error:error];
         }];
-        
+
         if(!ret) {
             [Alerts info:self.viewController
                    title:@"iOS13 Biometric Bug"
@@ -482,7 +488,18 @@
     CASGTableViewController *scVc = (CASGTableViewController*)nav.topViewController;
     
     scVc.mode = kCASGModeGetCredentials;
-    scVc.initialKeyFileUrl = self.safe.keyFileUrl;
+    
+    // if using URL check it exists and fallback on bookmark if not - TODO: move solely to Bookmark
+    
+    NSURL* keyFileUrl = self.safe.keyFileUrl;
+    if (keyFileUrl) {
+        if (![NSFileManager.defaultManager fileExistsAtPath:keyFileUrl.path] && self.safe.keyFileBookmark ) {
+            keyFileUrl = [BookmarksHelper getExpressUrlFromBookmark:self.safe.keyFileBookmark];
+            NSLog(@"WARNWARN: Key File URL was not available. Fell back on Bookmark... [%@]", keyFileUrl);
+        }
+    }
+    
+    scVc.initialKeyFileUrl = keyFileUrl;
     scVc.initialReadOnly = self.safe.readOnly;
     scVc.initialOfflineCache = self.manualOpenOfflineCache;
     scVc.initialYubiKeyConfig = self.safe.yubiKeyConfig;
@@ -539,6 +556,14 @@
            yubikeySecret:(NSString*)yubikeySecret
     yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubikeyConfiguration {
     if(keyFileUrl || oneTimeKeyFileData) {
+        // if using URL check it exists and fallback on bookmark if not - TODO: move solely to Bookmark
+        if (keyFileUrl) {
+            if (![NSFileManager.defaultManager fileExistsAtPath:keyFileUrl.path] && self.safe.keyFileBookmark ) {
+                keyFileUrl = [BookmarksHelper getExpressUrlFromBookmark:self.safe.keyFileBookmark];
+                NSLog(@"WARNWARN: Key File URL was not available. Fell back on Bookmark... [%@]", keyFileUrl);
+            }
+        }
+        
         NSError *error;
         self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
 
@@ -590,9 +615,26 @@
        ![self.safe.keyFileUrl isEqual:keyFileUrl] ||
        ![self.safe.yubiKeyConfig isEqual:yubikeyConfiguration]) {
         self.safe.readOnly = readOnly;
-        self.safe.keyFileUrl = keyFileUrl;
-        self.safe.yubiKeyConfig = yubikeyConfiguration;
         
+        if (keyFileUrl) {
+            NSError* error = nil;
+            NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
+            if (bookmark && !error) {
+                self.safe.keyFileBookmark = bookmark;
+            }
+            else {
+                self.safe.keyFileBookmark = nil;
+                NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
+            }
+            
+            self.safe.keyFileUrl = keyFileUrl;
+        }
+        else {
+            self.safe.keyFileBookmark = nil;
+            self.safe.keyFileUrl = nil;
+        }
+
+        self.safe.yubiKeyConfig = yubikeyConfiguration;
         [SafesList.sharedInstance update:self.safe];
     }
     
@@ -632,25 +674,48 @@
             }
             return;
         }
-        else if (OfflineDetector.sharedInstance.isOffline && providerCanFallbackToOfflineCache(provider, self.safe)) {
+        else if ( OfflineDetector.sharedInstance.isOffline && provider.immediatelyOfferCacheIfOffline && offlineCacheAvailable(provider, self.safe)) {
             NSString * modDateStr = getLastCachedDate(self.safe);
-            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_user_looks_offline_open_offline_instead_fmt", @"Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
-            
-            [self openWithOfflineCacheFile:message];
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_user_looks_offline_open_offline_instead_fmt", @"It looks like you may be offline and '%@' may not be reachable. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
+
+            [Alerts twoOptionsWithCancel:self.viewController
+                                   title:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_title", @"Use Offline Cache?")
+                                 message:message
+                       defaultButtonText:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_yes_option", @"Yes, Use Offline Cache")
+                        secondButtonText:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_no_try_connect_option", @"No, Try to connect anyway")
+                                  action:^(int response) {
+                if (response == 0) { // Offline Cache
+                    [[CacheManager sharedInstance] readOfflineCachedSafe:self.safe completion:^(NSData *data, NSError *error) {
+                         if(data != nil) {
+                             [self onProviderReadDone:nil data:data error:error cacheMode:YES];
+                         }
+                     }];
+                }
+                else if (response == 1) { // Try anyway
+                    [self readLive:provider];
+                }
+                else {
+                    self.completion(nil, nil);
+                }
+            }];
         }
         else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-            });
-            
-            [provider read:self.safe
-            viewController:self.viewController
-                isAutoFill:self.isAutoFillOpen
-                completion:^(NSData *data, NSError *error) {
-                [self onProviderReadDone:provider data:data error:error cacheMode:NO];
-             }];
+            [self readLive:provider];
         }
     });
+}
+
+- (void)readLive:(id<SafeStorageProvider>)provider {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+    });
+    
+    [provider read:self.safe
+    viewController:self.viewController
+        isAutoFill:self.isAutoFillOpen
+        completion:^(NSData *data, NSError *error) {
+        [self onProviderReadDone:provider data:data error:error cacheMode:NO];
+     }];
 }
 
 - (void)onProviderReadDone:(id<SafeStorageProvider>)provider
@@ -662,11 +727,25 @@
         
         if (error != nil || data == nil) {
             NSLog(@"Error: %@", error);
-            if(providerCanFallbackToOfflineCache(provider, self.safe)) {
+            if(offlineCacheAvailable(provider, self.safe)) {
                 NSString * modDateStr = getLastCachedDate(self.safe);
                 NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"There was a problem reading the database on %@. If this happens repeatedly you should try removing and re-adding your database. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), provider.displayName, modDateStr];
-                
-                [self openWithOfflineCacheFile:message];
+
+                [Alerts yesNo:self.viewController
+                        title:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_title", @"Use Offline Cache?")
+                      message:message
+                       action:^(BOOL response) {
+                           if (response) {
+                               [[CacheManager sharedInstance] readOfflineCachedSafe:self.safe completion:^(NSData *data, NSError *error) {
+                                    if(data != nil) {
+                                        [self onProviderReadDone:nil data:data error:error cacheMode:YES];
+                                    }
+                                }];
+                           }
+                           else {
+                               self.completion(nil, nil);
+                           }
+                       }];
             }
             else {
                 [Alerts error:self.viewController
@@ -801,11 +880,14 @@
                                             yubiKeyCR:(YubiKeyCRHandlerBlock)yubiKeyCR {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
 
+    
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword
                                                    keyFileDigest:self.keyFileDigest
                                                        yubiKeyCR:yubiKeyCR];
 
+        NSLog(@"BEGIN DECRYPT: %f", [NSDate timeIntervalSinceReferenceDate]);
+        
         if(!self.isConvenienceUnlock &&
            (format == kKeePass || format == kKeePass4) &&
            self.masterPassword.length == 0 &&
@@ -880,6 +962,8 @@
                           provider:(id)provider
                               data:(NSData*)data
                              error:(NSError*)error {
+    NSLog(@"END DECRYPT: %f", [NSDate timeIntervalSinceReferenceDate]);
+
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [SVProgressHUD dismiss];
         
@@ -1151,29 +1235,6 @@
     self.completion(viewModel, nil);
 }
 
-- (void)openWithOfflineCacheFile:(NSString *)message {
-    [Alerts yesNo:self.viewController
-            title:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_title", @"Use Offline Cache?")
-          message:message
-           action:^(BOOL response) {
-               if (response) {
-                   [[CacheManager sharedInstance] readOfflineCachedSafe:self.safe
-                                                             completion:^(NSData *data, NSError *error)
-                    {
-                        if(data != nil) {
-                            [self onProviderReadDone:nil
-                                                data:data
-                                               error:error
-                                           cacheMode:YES];
-                        }
-                    }];
-               }
-               else {
-                   self.completion(nil, nil);
-               }
-           }];
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static NSString *getLastCachedDate(SafeMetaData *safe) {
@@ -1189,15 +1250,13 @@ static NSString *getLastCachedDate(SafeMetaData *safe) {
     return modDateStr;
 }
 
-BOOL providerCanFallbackToOfflineCache(id<SafeStorageProvider> provider, SafeMetaData* safe) {
-    BOOL basic =    provider &&
-                    provider.allowOfflineCache &&
-    !(provider.storageId == kiCloud && Settings.sharedInstance.iCloudOn) &&
-    safe.offlineCacheEnabled && safe.offlineCacheAvailable;
+static BOOL offlineCacheAvailable( id<SafeStorageProvider> provider, SafeMetaData* safe ) {
+    BOOL basic = provider.allowOfflineCache &&
+                 safe.offlineCacheEnabled &&
+                 safe.offlineCacheAvailable;
     
     if(basic) {
         NSDate *modDate = [[CacheManager sharedInstance] getOfflineCacheFileModificationDate:safe];
-        
         return modDate != nil;
     }
     

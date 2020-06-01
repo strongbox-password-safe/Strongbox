@@ -97,7 +97,6 @@
     
     [encoder encodeBool:self.isEnrolledForConvenience forKey:@"isEnrolledForTouchId"];
 
-    //[encoder encodeBool:self.offlineCacheEnabled forKey:@"offlineCacheEnabled"];
     [encoder encodeBool:self.offlineCacheAvailable forKey:@"offlineCacheAvailable"];
     [encoder encodeBool:self.hasUnresolvedConflicts forKey:@"hasUnresolvedConflicts"];
     [encoder encodeBool:self.autoFillEnabled forKey:@"autoFillCacheEnabled"];
@@ -108,8 +107,8 @@
     [encoder encodeBool:self.hasBeenPromptedForConvenience forKey:@"hasBeenPromptedForConvenience"];
     [encoder encodeInteger:self.failedPinAttempts forKey:@"failedPinAttempts"];
 
-//    [encoder encodeBool:self.useQuickTypeAutoFill forKey:@"useQuickTypeAutoFill"];
     [encoder encodeObject:self.keyFileUrl forKey:@"keyFileUrl"];
+    [encoder encodeObject:self.keyFileBookmark forKey:@"keyFileBookmark"];
     
     [encoder encodeInteger:self.likelyFormat forKey:@"likelyFormat"];
     [encoder encodeInteger:self.browseViewType forKey:@"browseViewType"];
@@ -118,9 +117,7 @@
     [encoder encodeInteger:self.doubleTapAction forKey:@"doubleTapAction"];
     [encoder encodeInteger:self.tripleTapAction forKey:@"tripleTapAction"];
     [encoder encodeInteger:self.longPressTapAction forKey:@"longPressTapAction"];
-    
-    // Migrate from Global Settings - 23-Jun-2019
-    
+        
     // Browse View
 
     [encoder encodeInteger:self.browseSortField forKey:@"browseSortField"];
@@ -223,6 +220,9 @@
         
         if([decoder containsValueForKey:@"keyFileUrl"]) {
             self.keyFileUrl = [decoder decodeObjectForKey:@"keyFileUrl"];
+        }
+        if([decoder containsValueForKey:@"keyFileBookmark"]) {
+            self.keyFileBookmark = [decoder decodeObjectForKey:@"keyFileBookmark"];
         }
         
         if([decoder containsValueForKey:@"likelyFormat"]) {

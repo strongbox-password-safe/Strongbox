@@ -1406,8 +1406,14 @@
 /* Could not open this database in offline mode. Does the Offline Cache exist? */
 "open_sequence_couldnt_open_offline_message" = "Could not open this database in offline mode. Does the Offline Cache exist?";
 
-/* Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ */
-"open_sequence_user_looks_offline_open_offline_instead_fmt" = "Could not reach %@, it looks like you may be offline, would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@";
+/* It looks like you may be offline and '%@' may not be reachable. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ - (Translators Note: 1st parameter is the name of the storage location, e.g. Dropbox, Google Drive etc, 2nd param is the date/time of the last cache) */
+"open_sequence_user_looks_offline_open_offline_instead_fmt" = "It looks like you may be offline and '%@' may not be reachable. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@";
+
+/* Yes, Use Offline Cache */
+"open_sequence_yesno_use_offline_cache_yes_option" = "Yes, Use Offline Cache";
+
+/* No, Try to connect anyway */
+"open_sequence_yesno_use_offline_cache_no_try_connect_option" = "No, Try to connect anyway";
 
 /* There was a problem reading the database on %@. would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ */
 "open_sequence_storage_unreachable_open_offline_instead_fmt" = "There was a problem reading the database on %@. If this happens repeatedly you should try removing and re-adding your database. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@";

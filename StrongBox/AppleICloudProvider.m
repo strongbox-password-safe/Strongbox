@@ -41,6 +41,7 @@
         _browsableNew = NO;
         _browsableExisting = NO;
         _rootFolderOnly = NO;
+        _immediatelyOfferCacheIfOffline = NO; // Works even if offline (presumably an Apple iCloud cache)
         
         return self;
     }

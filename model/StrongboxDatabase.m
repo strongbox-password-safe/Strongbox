@@ -84,7 +84,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         
         _mutableDeletedObjects = deletedObjects.mutableCopy;
         
-        NSLog(@"Got Deleted Objects: [%@]", deletedObjects);
+        //NSLog(@"Got Deleted Objects: [%@]", deletedObjects);
     }
     
     return self;

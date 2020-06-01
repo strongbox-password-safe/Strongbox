@@ -29,7 +29,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nonatomic, strong, nullable) NSString *storageInfo; // This is extra info for accessing the file - usually a bookmark
 @property (nonatomic) StorageProvider storageProvider;
 
-@property (nonatomic, strong, readonly) NSString* touchIdPassword;
+@property (nonatomic, strong, readonly) NSString* conveniencePassword;
 @property (nonatomic, strong, nullable) NSString* keyFileBookmark;
 @property (nonatomic, strong) YubiKeyConfiguration* yubiKeyConfiguration;
 
@@ -41,7 +41,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 - (SecretExpiryMode)getConveniencePasswordExpiryMode;
 - (NSDate*)getConveniencePasswordExpiryDate;
     
-- (NSString*)getConveniencePassword:(BOOL*)expired;
+- (NSString*)getConveniencePassword:(BOOL*_Nullable)expired;
 - (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*_Nullable)password; // null to clear
 
 @end

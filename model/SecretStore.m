@@ -568,7 +568,11 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     [dictionary setObject:kEncryptedBlobServiceName forKey:(__bridge id)kSecAttrService];
     [dictionary setObject:blobId forKey:(__bridge id)kSecAttrAccount];
     [dictionary setObject:@NO forKey:(__bridge id)(kSecAttrSynchronizable)]; // No iCloud Sync
-
+    
+    if (@available(macOS 10.15, *)) {
+        [dictionary setObject:@YES forKey:(__bridge id)(kSecUseDataProtectionKeychain)];
+    }
+    
     return dictionary;
 }
 

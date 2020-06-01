@@ -52,7 +52,7 @@
 
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     BOOL lastRunGood = [self enterWithLastCrashCheck:YES];
-
+    
     if (!lastRunGood) {
         [self showLastRunCrashedMessage:^{
             [self initializeQuickType:credentialIdentity];
@@ -74,7 +74,7 @@
         
         if(safe) {
             // Delay a litte to avoid UI Weirdness glitch
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 BOOL useAutoFillCache = ![self liveAutoFillIsPossibleWithSafe:safe];
 
                 Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no

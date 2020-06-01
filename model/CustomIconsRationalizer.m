@@ -13,12 +13,14 @@
 
 + (NSMutableDictionary<NSUUID *,NSData *> *)rationalize:(NSDictionary<NSUUID *,NSData *> *)customIcons root:(Node *)root {
     NSArray<Node*> *nodes = [CustomIconsRationalizer getAllNodesReferencingCustomIcons:root];
-//    NSLog(@"Before Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)customIcons.allKeys.count, (unsigned long)nodes.count);
+    NSLog(@"Before Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)customIcons.allKeys.count, (unsigned long)nodes.count);
     
     // 1. Node could point to non existent custom icon - clean those up and get a clean copy of the custom icon db
     
     NSMutableDictionary<NSUUID*, NSData*>* freshCopy = [CustomIconsRationalizer removeBadCustomIconReferencesAndBuildFreshIconMap:nodes customIcons:customIcons];
- 
+
+    NSLog(@"First removal of bad references fresh = [%@]", freshCopy.allKeys);
+
     // 2. There could be duplicate custom icons in the database. Remove and replace any references to the single
     //    instance.
 
@@ -27,8 +29,10 @@
     // 3. Custom Icon could now be unused by any node... remove
 
     freshCopy = [CustomIconsRationalizer removeBadCustomIconReferencesAndBuildFreshIconMap:nodes customIcons:freshCopy];
-    
-//    NSLog(@"After Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)freshCopy.allKeys.count, (unsigned long)nodes.count);
+
+    NSLog(@"Second removal of bad references fresh = [%@]", freshCopy.allKeys);
+
+    NSLog(@"After Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)freshCopy.allKeys.count, (unsigned long)nodes.count);
     
     return freshCopy;
 }

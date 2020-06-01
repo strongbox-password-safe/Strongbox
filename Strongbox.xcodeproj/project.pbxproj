@@ -1521,6 +1521,10 @@
 		C88F813A245D935A00B0B998 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
 		C88F813B245D935A00B0B998 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
 		C88F813C245D935A00B0B998 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
+		C89F6B86247FC5A30070E754 /* changelog-ios.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B82247FC5A20070E754 /* changelog-ios.txt */; };
+		C89F6B87247FC5A30070E754 /* changelog-mac.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B83247FC5A30070E754 /* changelog-mac.txt */; };
+		C89F6B88247FC5A30070E754 /* version-mac.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B84247FC5A30070E754 /* version-mac.txt */; };
+		C89F6B89247FC5A30070E754 /* version-ios.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B85247FC5A30070E754 /* version-ios.txt */; };
 		C8BEF17324600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17424600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17524600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
@@ -2927,7 +2931,6 @@
 		C843333A2461664B00E2E550 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C843333B2461666C00E2E550 /* Deliverfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; fileEncoding = 4; name = Deliverfile; path = fastlane/Deliverfile; sourceTree = "<group>"; };
 		C843333E2461668F00E2E550 /* Fastfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Fastfile; path = fastlane/Fastfile; sourceTree = "<group>"; };
-		C843333F2461668F00E2E550 /* changelog.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = changelog.txt; path = fastlane/changelog.txt; sourceTree = "<group>"; };
 		C84333402461668F00E2E550 /* Appfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Appfile; path = fastlane/Appfile; sourceTree = "<group>"; };
 		C86E9078246D99C80029623A /* DeletedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DeletedObject.h; path = model/keepass/DeletedObject.h; sourceTree = "<group>"; };
 		C86E9079246D99C80029623A /* DeletedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DeletedObject.m; path = model/keepass/DeletedObject.m; sourceTree = "<group>"; };
@@ -2944,6 +2947,10 @@
 		C8961908246166F1008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C8961909246166F7008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C896190A246166F7008D4BD1 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
+		C89F6B82247FC5A20070E754 /* changelog-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-ios.txt"; path = "build/changelog-ios.txt"; sourceTree = "<group>"; };
+		C89F6B83247FC5A30070E754 /* changelog-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-mac.txt"; path = "build/changelog-mac.txt"; sourceTree = "<group>"; };
+		C89F6B84247FC5A30070E754 /* version-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-mac.txt"; path = "build/version-mac.txt"; sourceTree = "<group>"; };
+		C89F6B85247FC5A30070E754 /* version-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-ios.txt"; path = "build/version-ios.txt"; sourceTree = "<group>"; };
 		C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "norwegian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8BF76E62472E1820080A808 /* DeletedObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedObjects.h; path = model/DeletedObjects.h; sourceTree = "<group>"; };
 		C8BF76E72472E1820080A808 /* DeletedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedObjects.m; path = model/DeletedObjects.m; sourceTree = "<group>"; };
@@ -3569,6 +3576,7 @@
 		4D326EA1223032C800DCD8C7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				4D3E148A21832B5F00A41CA0 /* Argon2 */,
 				4D6B503F238BBA0600DF2F88 /* SVProgressHUD */,
 				4D24C764238B9BEC000F8461 /* Base32 */,
 				4D08B58B234C95F4003D1953 /* GCDWebServer */,
@@ -4005,7 +4013,6 @@
 				4DF176F023293D1500255CD6 /* KeePassXmlParser.h */,
 				4DF176F123293D1500255CD6 /* KeePassXmlParser.m */,
 				4D0835C3228474A800CA7405 /* KeyDerivationCipher.h */,
-				4D3E148A21832B5F00A41CA0 /* Argon2 */,
 				4D9E08E321822F38007BA1E7 /* crypto */,
 				4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */,
 				4D8FBEEE21A9CA0F004797FA /* KdbxSerializationCommon.h */,
@@ -4805,7 +4812,10 @@
 		C84333362461662800E2E550 /* Build */ = {
 			isa = PBXGroup;
 			children = (
-				C843333F2461668F00E2E550 /* changelog.txt */,
+				C89F6B82247FC5A20070E754 /* changelog-ios.txt */,
+				C89F6B83247FC5A30070E754 /* changelog-mac.txt */,
+				C89F6B85247FC5A30070E754 /* version-ios.txt */,
+				C89F6B84247FC5A30070E754 /* version-mac.txt */,
 				C8433341246166CE00E2E550 /* plists */,
 				C843333D2461667C00E2E550 /* Fastlane */,
 				C84333382461663200E2E550 /* Strongbox-iOS copy-Info.plist */,
@@ -5222,9 +5232,11 @@
 				4D770F97230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
 				4D4D3FE22409CE1C0056A7E2 /* ProgressHudView.xib in Resources */,
+				C89F6B89247FC5A30070E754 /* version-ios.txt in Resources */,
 				4DE2689722A665A400A1D158 /* RecordView.storyboard in Resources */,
 				4D36B0B622C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				C8E6D4EF246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
+				C89F6B86247FC5A30070E754 /* changelog-ios.txt in Resources */,
 				4DE7F0E422F89D610095F51F /* SelectKeyFile.storyboard in Resources */,
 				4D4D3FD12409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
 				4D4D3FDC2409CDC80056A7E2 /* Assets.xcassets in Resources */,
@@ -5232,6 +5244,7 @@
 				4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4DE7F0EB22F89D6F0095F51F /* PinEntry.storyboard in Resources */,
+				C89F6B88247FC5A30070E754 /* version-mac.txt in Resources */,
 				4DE7F0F222F89D820095F51F /* Preferences.storyboard in Resources */,
 				4D36B0C622C94740003E9B68 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4D36B0CC22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */,
@@ -5260,6 +5273,7 @@
 				4D9677E723102BFB004AF091 /* Upgrade.storyboard in Resources */,
 				4DE7F0D522F89D270095F51F /* Browse.storyboard in Resources */,
 				4D2259F522C6C28A005547EA /* EditDateCell.xib in Resources */,
+				C89F6B87247FC5A30070E754 /* changelog-mac.txt in Resources */,
 				4D66953D242E6185005A98D7 /* TagsViewCell.xib in Resources */,
 				4D8FCEA923606D78001F2172 /* first.names.us.txt in Resources */,
 				4D770F862303249D00CBE244 /* EditPasswordCell.xib in Resources */,
@@ -7751,7 +7765,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7772,7 +7786,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7841,7 +7855,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7862,7 +7876,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -7930,7 +7944,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7951,7 +7965,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -8012,7 +8026,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8033,7 +8047,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.7;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -8097,7 +8111,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8117,7 +8131,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.7;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -8174,7 +8188,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8194,7 +8208,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.7;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -8249,7 +8263,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8276,7 +8290,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -8334,7 +8348,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2911;
+				CURRENT_PROJECT_VERSION = 2915;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8361,7 +8375,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.48.3;
+				MARKETING_VERSION = 1.48.8;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

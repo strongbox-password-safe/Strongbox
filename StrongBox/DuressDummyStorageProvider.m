@@ -31,6 +31,7 @@
         _browsableNew = NO;
         _browsableExisting = NO;
         _rootFolderOnly = YES;
+        _immediatelyOfferCacheIfOffline = NO;
         
         return self;
     }

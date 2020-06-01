@@ -1496,7 +1496,7 @@ static NSImage* kStrongBox256Image;
     
     BOOL ret =  (metaData == nil ||
                  !metaData.isTouchIdEnabled ||
-                 !(metaData.touchIdPassword) ||
+                 !(metaData.conveniencePassword) ||
                  !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
                  !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
 
@@ -1534,7 +1534,7 @@ static NSImage* kStrongBox256Image;
                     DatabaseMetadata* metaData = self.model.databaseMetadata;
 
                     NSError* err;
-                    CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:metaData.touchIdPassword
+                    CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:metaData.conveniencePassword
                                                                                            error:&err];
 
                     if(err) {
@@ -1674,7 +1674,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                     else {
                         [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.model.compositeKeyFactors.password];
                     }
-                else if(metaData.touchIdPassword == nil) { // Biometric ID has probably expired - reset in configured expiry mode...
+                else if(metaData.conveniencePassword == nil) { // Biometric ID has probably expired - reset in configured expiry mode...
                     [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.model.compositeKeyFactors.password];
                 }
             }
@@ -3811,7 +3811,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         if(metaData.isTouchIdEnrolled) {
             if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
                 if (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) {
-                    if(self.model.databaseMetadata.touchIdPassword) {
+                    if(self.model.databaseMetadata.conveniencePassword) {
                         [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
                     }
                     else {

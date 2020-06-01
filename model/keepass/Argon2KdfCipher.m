@@ -137,7 +137,7 @@ static const BOOL kLogVerbose = NO;
     ctx.threads = self.parallelism; // UNSURE but looks ok: Correct or should it be constant 4?
     ctx.allocate_cbk = nil; // Important - got caught with a bug here due to initialization values. Must be nil
     ctx.free_cbk = nil; // Important - got caught with a bug here due to initialization values. Must be nil
-    
+        
     argon2d_ctx(&ctx);
     
     NSData *transformKey = [NSData dataWithBytes:ctx.out length:ctx.outlen];

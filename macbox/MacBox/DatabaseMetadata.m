@@ -31,18 +31,16 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
     return self;
 }
 
-- (NSString*)touchIdPassword {
-    NSString* account = [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
-    return [SecretStore.sharedInstance getSecureString:account];
-}
-
-- (NSString*)getConveniencePassword:(BOOL*)expired {
-    NSString* account = [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
-    return [SecretStore.sharedInstance getSecureObject:account expired:expired];
-}
-
 - (NSString*)getConveniencePasswordIdentifier {
     return [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
+}
+
+- (NSString *)conveniencePassword {
+    return [self getConveniencePassword:nil];
+}
+
+- (NSString*)getConveniencePassword:(BOOL*_Nullable)expired {
+    return [SecretStore.sharedInstance getSecureObject:[self getConveniencePasswordIdentifier] expired:expired];
 }
 
 - (void)setConveniencePassword:(NSString*)password expiringAfterHours:(NSInteger)expiringAfterHours {
@@ -133,7 +131,7 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
             self.isTouchIdEnrolled = [decoder decodeBoolForKey:@"isTouchIdEnrolled"];
         }
         else {
-            self.isTouchIdEnrolled = self.touchIdPassword != nil;
+            self.isTouchIdEnrolled = self.conveniencePassword != nil;
         }
         
         if ([decoder containsValueForKey:@"yubiKeyConfiguration"]) {

@@ -123,7 +123,7 @@ static UpgradeWindowController *sharedInstance = nil;
     }
     else {
         dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
-                  NSForegroundColorAttributeName: upgradeButtonTitleColor,
+                  NSForegroundColorAttributeName:upgradeButtonTitleColor,
                   NSParagraphStyleAttributeName:style}; // Added line
     }
     

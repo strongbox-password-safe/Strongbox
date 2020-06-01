@@ -38,8 +38,9 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _iconsByUrl = [[NSMutableDictionary alloc] init];
+        _immediatelyOfferCacheIfOffline = YES; // Avoid long delay if offline
 
+        _iconsByUrl = [[NSMutableDictionary alloc] init];
         return self;
     }
     else {

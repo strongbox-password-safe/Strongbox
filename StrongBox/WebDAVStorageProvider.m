@@ -47,6 +47,7 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
+        _immediatelyOfferCacheIfOffline = NO; // Could be on LAN - try to connect
     }
     
     return self;

@@ -13,6 +13,7 @@
 #import "Settings.h"
 #import "LocalDeviceStorageProvider.h"
 #import "YubiManager.h"
+#import "BookmarksHelper.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 
@@ -91,7 +92,24 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
               viewController:vc
                   completion:^(SafeMetaData *metadata, NSError *error)
              {
-                metadata.keyFileUrl = keyFileUrl;
+                if (keyFileUrl) {
+                    NSError* error = nil;
+                    NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
+                    if (bookmark && !error) {
+                        metadata.keyFileBookmark = bookmark;
+                    }
+                    else {
+                        metadata.keyFileBookmark = nil;
+                        NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
+                    }
+                    
+                    metadata.keyFileUrl = keyFileUrl;
+                }
+                else {
+                    metadata.keyFileBookmark = nil;
+                    metadata.keyFileUrl = nil;
+                }
+
                 metadata.likelyFormat = database.format;
                 metadata.yubiKeyConfig = yubiKeyConfig;
 
@@ -143,7 +161,7 @@ NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, Database
 
 NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error) {
     NSData* keyFileData = nil;
-    if (keyFileUrl) {
+    if (keyFileUrl) { 
         keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
     }
     else if (onceOffKeyFileData) {

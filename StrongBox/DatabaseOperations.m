@@ -24,6 +24,7 @@
 #import "BiometricsManager.h"
 #import "FavIconBulkViewController.h"
 #import "YubiManager.h"
+#import "BookmarksHelper.h"
 
 @interface DatabaseOperations ()
 
@@ -195,7 +196,24 @@
         }
     }
     
-    self.viewModel.metadata.keyFileUrl = keyFileUrl;
+    if (keyFileUrl) {
+        NSError* error = nil;
+        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
+        if (bookmark && !error) {
+            self.viewModel.metadata.keyFileBookmark = bookmark;
+        }
+        else {
+            self.viewModel.metadata.keyFileBookmark = nil;
+            NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
+        }
+        
+        self.viewModel.metadata.keyFileUrl = keyFileUrl;
+    }
+    else {
+        self.viewModel.metadata.keyFileBookmark = nil;
+        self.viewModel.metadata.keyFileUrl = nil;
+    }
+    
     self.viewModel.metadata.yubiKeyConfig = yubiConfig;
     [SafesList.sharedInstance update:self.viewModel.metadata];
 

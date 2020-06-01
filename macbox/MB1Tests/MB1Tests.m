@@ -20,8 +20,8 @@
     
     [metadata resetConveniencePasswordWithCurrentConfiguration:@""];
     
-    XCTAssertNotNil(metadata.touchIdPassword);
-    XCTAssert(metadata.touchIdPassword.length == 0);
+    XCTAssertNotNil(metadata.conveniencePassword);
+    XCTAssert(metadata.conveniencePassword.length == 0);
 }
 
 - (void)testNil {
@@ -29,7 +29,7 @@
 
     [metadata resetConveniencePasswordWithCurrentConfiguration:nil];
     
-    XCTAssertNil(metadata.touchIdPassword);
+    XCTAssertNil(metadata.conveniencePassword);
 }
 
 - (void)testSomething {
@@ -37,7 +37,7 @@
 
     [metadata resetConveniencePasswordWithCurrentConfiguration:@"Something"];
     
-    XCTAssert([metadata.touchIdPassword isEqualToString:@"Something"]);
+    XCTAssert([metadata.conveniencePassword isEqualToString:@"Something"]);
 }
 
 @end

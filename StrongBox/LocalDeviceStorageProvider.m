@@ -48,6 +48,8 @@
         _browsableNew = NO;
         _browsableExisting = YES;
         _rootFolderOnly = YES;
+        _immediatelyOfferCacheIfOffline = NO;
+        
         return self;
     }
     else {

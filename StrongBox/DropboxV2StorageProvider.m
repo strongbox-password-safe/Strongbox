@@ -37,6 +37,7 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
+        _immediatelyOfferCacheIfOffline = YES; // Dropbox has a long delay if offline and unreachable - offer immediately if offline detected
         
         return self;
     }

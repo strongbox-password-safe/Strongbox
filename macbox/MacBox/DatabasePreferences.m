@@ -90,7 +90,7 @@
     if(featureAvailable) {
         if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
             if(self.model.databaseMetadata.isTouchIdEnabled) {
-                if(self.model.databaseMetadata.touchIdPassword != nil) {
+                if(self.model.databaseMetadata.conveniencePassword != nil) {
                     SecretExpiryMode mode = [self.model.databaseMetadata getConveniencePasswordExpiryMode];
                     if (mode == kExpiresAtTime) {
                         NSDate* date = [self.model.databaseMetadata getConveniencePasswordExpiryDate];
