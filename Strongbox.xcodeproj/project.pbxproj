@@ -1521,10 +1521,6 @@
 		C88F813A245D935A00B0B998 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
 		C88F813B245D935A00B0B998 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
 		C88F813C245D935A00B0B998 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F8138245D935A00B0B998 /* NSString+Extensions.m */; };
-		C89F6B86247FC5A30070E754 /* changelog-ios.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B82247FC5A20070E754 /* changelog-ios.txt */; };
-		C89F6B87247FC5A30070E754 /* changelog-mac.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B83247FC5A30070E754 /* changelog-mac.txt */; };
-		C89F6B88247FC5A30070E754 /* version-mac.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B84247FC5A30070E754 /* version-mac.txt */; };
-		C89F6B89247FC5A30070E754 /* version-ios.txt in Resources */ = {isa = PBXBuildFile; fileRef = C89F6B85247FC5A30070E754 /* version-ios.txt */; };
 		C8BEF17324600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17424600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17524600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
@@ -5232,11 +5228,9 @@
 				4D770F97230326A200CBE244 /* IconsCollectionViewController.xib in Resources */,
 				4DF544FB2231627A00DDEECE /* apple.cer in Resources */,
 				4D4D3FE22409CE1C0056A7E2 /* ProgressHudView.xib in Resources */,
-				C89F6B89247FC5A30070E754 /* version-ios.txt in Resources */,
 				4DE2689722A665A400A1D158 /* RecordView.storyboard in Resources */,
 				4D36B0B622C94740003E9B68 /* dutch-diceware.wordlist.utf8.txt in Resources */,
 				C8E6D4EF246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
-				C89F6B86247FC5A30070E754 /* changelog-ios.txt in Resources */,
 				4DE7F0E422F89D610095F51F /* SelectKeyFile.storyboard in Resources */,
 				4D4D3FD12409CD990056A7E2 /* MFIKeyActionSheetView.xib in Resources */,
 				4D4D3FDC2409CDC80056A7E2 /* Assets.xcassets in Resources */,
@@ -5244,7 +5238,6 @@
 				4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */,
 				4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */,
 				4DE7F0EB22F89D6F0095F51F /* PinEntry.storyboard in Resources */,
-				C89F6B88247FC5A30070E754 /* version-mac.txt in Resources */,
 				4DE7F0F222F89D820095F51F /* Preferences.storyboard in Resources */,
 				4D36B0C622C94740003E9B68 /* eff_short_wordlist_1.utf8.txt in Resources */,
 				4D36B0CC22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */,
@@ -5273,7 +5266,6 @@
 				4D9677E723102BFB004AF091 /* Upgrade.storyboard in Resources */,
 				4DE7F0D522F89D270095F51F /* Browse.storyboard in Resources */,
 				4D2259F522C6C28A005547EA /* EditDateCell.xib in Resources */,
-				C89F6B87247FC5A30070E754 /* changelog-mac.txt in Resources */,
 				4D66953D242E6185005A98D7 /* TagsViewCell.xib in Resources */,
 				4D8FCEA923606D78001F2172 /* first.names.us.txt in Resources */,
 				4D770F862303249D00CBE244 /* EditPasswordCell.xib in Resources */,
