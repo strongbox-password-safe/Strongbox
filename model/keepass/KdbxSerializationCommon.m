@@ -311,7 +311,11 @@ void dumpXml(NSInputStream* lib) {
     
     NSString* xml = [[NSString alloc] initWithData:d encoding:NSUTF8StringEncoding];
     NSError* error;
-    [xml writeToFile:@"/Users/mark/Desktop/dump.xml" atomically:YES encoding:NSUTF8StringEncoding error:&error];
+    NSString* file = [NSHomeDirectory() stringByAppendingPathComponent:@"dump.xml"];
+    
+    // @"/Users/mark/Desktop/dump.xml"
+    [xml writeToFile:file atomically:YES encoding:NSUTF8StringEncoding error:&error];
+    
     NSLog(@"XML Dumped: [%@]", error);
 }
 

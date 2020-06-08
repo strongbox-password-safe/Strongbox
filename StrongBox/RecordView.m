@@ -27,6 +27,7 @@
 #import "KeePassHistoryController.h"
 #import "PasswordGenerationViewController.h"
 #import "ClipboardManager.h"
+#import "NSString+Extensions.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -87,10 +88,10 @@ static const int kMinNotesCellHeight = 160;
             }
             else if(self.userSelectedNewIconIndex) {
                 if(self.userSelectedNewIconIndex.intValue == -1) {
-                    self.imageViewIcon.image = [NodeIconHelper iconSet:self.viewModel.metadata.keePassIconSet][0]; // Default
+                    self.imageViewIcon.image = [NodeIconHelper getIconSet:self.viewModel.metadata.keePassIconSet][0]; // Default
                 }
                 else {
-                    self.imageViewIcon.image = [NodeIconHelper iconSet:self.viewModel.metadata.keePassIconSet][self.userSelectedNewIconIndex.intValue];
+                    self.imageViewIcon.image = [NodeIconHelper getIconSet:self.viewModel.metadata.keePassIconSet][self.userSelectedNewIconIndex.intValue];
                 }
             }
             
@@ -698,8 +699,13 @@ static const int kMinNotesCellHeight = 160;
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
+    NSURL* url = [NSURL URLWithString:urlString];
+    if (url == nil) {
+        url = urlString.mmcgUrl; // TODO: Tidy
+    }
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]];
+        [[UIApplication sharedApplication] openURL:url];
     });
 }
 

@@ -2145,7 +2145,6 @@
 					};
 					4D29663421AD7318009B7936 = {
 						CreatedOnToolsVersion = 10.1;
-						DevelopmentTeam = 4326J8XDF2;
 						ProvisioningStyle = Automatic;
 						TestTargetID = 4DF59F501F30DB7A00D68BFE;
 					};
@@ -3090,7 +3089,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2930;
+				CURRENT_PROJECT_VERSION = 2933;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3116,7 +3115,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2930;
+				CURRENT_PROJECT_VERSION = 2933;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3140,10 +3139,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 4326J8XDF2;
+				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = MB1Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -3153,6 +3152,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.MB1Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Strongbox.app/Contents/MacOS/Strongbox";
 			};
 			name = Debug;
@@ -3164,10 +3164,10 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				DEVELOPMENT_TEAM = 4326J8XDF2;
+				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = MB1Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
@@ -3175,6 +3175,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.MB1Tests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Strongbox.app/Contents/MacOS/Strongbox";
 			};
 			name = Release;
@@ -3297,7 +3298,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2930;
+				CURRENT_PROJECT_VERSION = 2933;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3323,7 +3324,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2930;
+				CURRENT_PROJECT_VERSION = 2933;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;

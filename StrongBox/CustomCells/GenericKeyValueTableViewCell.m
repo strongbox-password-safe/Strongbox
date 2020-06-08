@@ -81,6 +81,12 @@
     [self addGestureRecognizer:singleTap];
     
     [singleTap requireGestureRecognizerToFail:doubleTap];
+    
+    self.labelAudit.userInteractionEnabled = YES;
+    UITapGestureRecognizer *tapGesture =
+          [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                  action:@selector(onAuditLabelTap)];
+    [self.labelAudit addGestureRecognizer:tapGesture];
 }
 
 - (void)prepareForReuse {
@@ -452,6 +458,12 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     self.value = value;
     [self bindValueText];
     [self onValueEdited];
+}
+
+- (void)onAuditLabelTap {
+    if (self.onAuditTap) {
+        self.onAuditTap();
+    }
 }
 
 @end

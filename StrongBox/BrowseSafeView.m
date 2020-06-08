@@ -37,6 +37,7 @@
 #import "QuickViewsBrowseTableDataSource.h"
 #import <ISMessages/ISMessages.h>
 #import "BiometricsManager.h"
+#import "AuditDrillDownController.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -240,12 +241,15 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                                name:kAuditNodesChangedNotificationKey
                                              object:nil];
 
-    if ([self isDisplayingRootGroup]) {
-        [NSNotificationCenter.defaultCenter addObserver:self
-                                               selector:@selector(onAuditCompleted:)
-                                                   name:kAuditCompletedNotificationKey
-                                                 object:nil];
-    }
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(refreshItems)
+                                               name:kNotificationNameItemDetailsEditDone
+                                             object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onAuditCompleted:)
+                                               name:kAuditCompletedNotificationKey
+                                             object:nil];
 }
 
 - (void)unListenToNotifications {
@@ -253,6 +257,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseViewPreferencesChangedNotificationKey object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditNodesChangedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kNotificationNameItemDetailsEditDone object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditCompletedNotificationKey object:nil];
 }
 
@@ -270,23 +275,27 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         return;
     }
     
-    NSNumber* issueCount = self.viewModel.auditIssueCount;
-    if (issueCount == nil) {
-        NSLog(@"WARNWARN: Invalid Audit Issue Count but Audit Completed Notification Received. Stale BrowseView... ignore");
-        return;
-    }
-    
-    
-    NSNumber* lastKnownAuditIssueCount = self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount;
-    
-    NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", issueCount.unsignedLongValue, lastKnownAuditIssueCount);
-    
-    self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount = issueCount;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
+    if ([self isDisplayingRootGroup]) {
+        NSNumber* issueCount = self.viewModel.auditIssueCount;
+        if (issueCount == nil) {
+            NSLog(@"WARNWARN: Invalid Audit Issue Count but Audit Completed Notification Received. Stale BrowseView... ignore");
+            return;
+        }
+        
+        
+        NSNumber* lastKnownAuditIssueCount = self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount;
+        
+        NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", issueCount.unsignedLongValue, lastKnownAuditIssueCount);
+        
+        self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount = issueCount;
+        [SafesList.sharedInstance update:self.viewModel.metadata];
 
-    if ( self.viewModel.metadata.auditConfig.showAuditPopupNotifications) {
-        [self showAuditPopup:issueCount.unsignedLongValue lastKnownAuditIssueCount:lastKnownAuditIssueCount];
+        if ( self.viewModel.metadata.auditConfig.showAuditPopupNotifications) {
+            [self showAuditPopup:issueCount.unsignedLongValue lastKnownAuditIssueCount:lastKnownAuditIssueCount];
+        }
     }
+    
+    [self refreshItems]; // Item may have been cleared of an audit issue, remove the audit badge
 }
 
 - (void)showAuditPopup:(NSUInteger)issueCount lastKnownAuditIssueCount:(NSNumber*)lastKnownAuditIssueCount {
@@ -739,11 +748,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView leadingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath  API_AVAILABLE(ios(11.0)){
-    return [self getModernSlideActions:indexPath];
+    return [self getRightSlideActions:indexPath];
 }
 
 - (UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath  API_AVAILABLE(ios(11.0)) {
-    return [self getModernSlideActions:indexPath];
+    return [self getLeftSlideActions:indexPath];
 }
 
 - (UIContextualAction*)getRemoveAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
@@ -777,7 +786,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else {
         renameAction.image = [UIImage imageNamed:@"pencil"];
     }
-    renameAction.backgroundColor = UIColor.systemBlueColor;
+    renameAction.backgroundColor = UIColor.systemGreenColor;
     
     return renameAction;
 }
@@ -799,7 +808,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         setIconAction.image = [UIImage imageNamed:@"picture"];
     }
 
-    setIconAction.backgroundColor = UIColor.systemOrangeColor;
+    setIconAction.backgroundColor = UIColor.systemBlueColor;
 
     return setIconAction;
 }
@@ -851,19 +860,50 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     return pinAction;
 }
 
-- (UISwipeActionsConfiguration *)getModernSlideActions:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)) {
+- (UIContextualAction*)getAuditAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
+    Node *item = [self getNodeFromIndexPath:indexPath];
+    
+    UIContextualAction *pinAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
+                                                                            title:NSLocalizedString(@"browse_vc_action_audit", @"Audit")
+                                                                          handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
+        [self showAuditDrillDown:item];
+        completionHandler(YES);
+    }];
+
+    pinAction.image = [UIImage imageNamed:@"security_checked"];
+    pinAction.backgroundColor = UIColor.systemOrangeColor;
+
+    return pinAction;
+}
+
+- (UISwipeActionsConfiguration *)getRightSlideActions:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)) {
     if (![self getTableDataSource].supportsSlideActions) {
         return [UISwipeActionsConfiguration configurationWithActions:@[]];
     }
-    
+
+    UIContextualAction* pinAction = [self getPinAction:indexPath];
+    UIContextualAction* auditAction = [self getAuditAction:indexPath];
+
+    Node *item = [self getNodeFromIndexPath:indexPath];
+
+    return [UISwipeActionsConfiguration configurationWithActions:item.isGroup ? @[pinAction] : @[auditAction, pinAction]];
+}
+
+- (UISwipeActionsConfiguration *)getLeftSlideActions:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)) {
+    if (![self getTableDataSource].supportsSlideActions) {
+        return [UISwipeActionsConfiguration configurationWithActions:@[]];
+    }
+
     UIContextualAction* removeAction = [self getRemoveAction:indexPath];
     UIContextualAction* renameAction = [self getRenameAction:indexPath];
     UIContextualAction* setIconAction = [self getSetIconAction:indexPath];
     UIContextualAction* duplicateItemAction = [self getDuplicateItemAction:indexPath];
     UIContextualAction* pinAction = [self getPinAction:indexPath];
-        
+    UIContextualAction* auditAction = [self getAuditAction:indexPath];
+
+    Node *item = [self getNodeFromIndexPath:indexPath];
+
     if(!self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly) {
-        Node *item = [self getNodeFromIndexPath:indexPath];
         if(item.isGroup) {
             return self.viewModel.database.format != kPasswordSafe ?    [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, setIconAction, pinAction]] :
                                                                         [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, pinAction]];
@@ -873,10 +913,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         }
     }
     else {
-        return [UISwipeActionsConfiguration configurationWithActions:@[pinAction]];
+        return [UISwipeActionsConfiguration configurationWithActions:item.isGroup ? @[pinAction] : @[auditAction, pinAction]];
     }
-
-    return [UISwipeActionsConfiguration configurationWithActions:@[removeAction]];
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -900,7 +938,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self onRenameItem:indexPath];
     }];
-    renameAction.backgroundColor = UIColor.systemBlueColor;
+    renameAction.backgroundColor = UIColor.systemGreenColor;
     
     UITableViewRowAction *setIconAction =
         [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
@@ -917,7 +955,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [self duplicateItem:item];
     }];
     duplicateItemAction.backgroundColor = UIColor.systemPurpleColor;
-    
+
+    UITableViewRowAction *auditItemAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                               title:NSLocalizedString(@"browse_vc_action_audit", @"Audit")
+                                                                             handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+        [self showAuditDrillDown:item];
+    }];
+
     UITableViewRowAction *pinAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                          title:[self.viewModel isPinned:item] ?
                                        NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") :
@@ -932,12 +976,16 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
         }
         else {
-            return @[removeAction, duplicateItemAction, setIconAction, pinAction];
+            return @[removeAction, duplicateItemAction, auditItemAction, pinAction];
         }
     }
     else {
-        return @[pinAction];
+        return item.isGroup ? @[pinAction] : @[auditItemAction, pinAction];
     }
+}
+
+- (void)showAuditDrillDown:(Node*)item {
+    [self performSegueWithIdentifier:@"segueToAuditDrillDown" sender:item];
 }
 
 - (void)togglePinEntry:(Node*)item {
@@ -1130,8 +1178,25 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.parentGroup = self.currentGroup;
         vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
         vc.databaseModel = self.viewModel;
-        vc.onChanged = ^{
-            [self refreshItems];
+    }
+    else if ([segue.identifier isEqualToString:@"segueToAuditDrillDown"]) {
+        UINavigationController* nav = segue.destinationViewController;
+        AuditDrillDownController *vc = (AuditDrillDownController*)nav.topViewController;
+
+        __weak BrowseSafeView* weakSelf = self;
+        
+        vc.model = self.viewModel;
+        vc.item = sender;
+        vc.onDone =  ^(BOOL showAllAuditIssues) {
+            NSLog(@"onDone: [%hhd]", showAllAuditIssues);
+            
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // Getting a weird glitch every now and then in this dismissal... attempt to fix y postponing briefly
+                [self dismissViewControllerAnimated:YES completion:^{
+                    if (showAllAuditIssues) {
+                        [weakSelf showAllAuditIssues];
+                    }
+                }];
+            });
         };
     }
     else if ([segue.identifier isEqualToString:@"segueMasterDetailToDetail"]) {
@@ -1148,9 +1213,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.parentGroup = self.currentGroup;
         vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
         vc.databaseModel = self.viewModel;
-        vc.onChanged = ^{
-            [self refreshItems];
-        };
     }
     else if ([segue.identifier isEqualToString:@"sequeToSubgroup"]){
         BrowseSafeView *vc = segue.destinationViewController;
@@ -1195,8 +1257,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             }
             [self saveChangesToSafeAndRefreshView];
         };
+        vc.onDone =  ^(BOOL showAllAuditIssues) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if (showAllAuditIssues) {
+                    [self showAllAuditIssues];
+                }
+            }];
+        };
     }
-    else if([segue.identifier isEqualToString:@"segueToSortOrder"]){
+    else if ([segue.identifier isEqualToString:@"segueToSortOrder"]){
         UINavigationController* nav = segue.destinationViewController;
         SortOrderTableViewController* vc = (SortOrderTableViewController*)nav.topViewController;
         vc.format = self.viewModel.database.format;
@@ -1223,6 +1292,18 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)showAllAuditIssues { // We should probably not do this via search...
+    
+    [self.searchController.searchBar becomeFirstResponder];
+    
+    self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
+    self.searchController.searchBar.text = kSpecialSearchTermAuditEntries;
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.searchController.searchBar endEditing:YES]; // Hide Keyboard after search
+    });
+}
 
 - (IBAction)onDatabasePreferences:(id)sender {
     [self performSegueWithIdentifier:@"segueToPreferencesAndManagement" sender:nil];

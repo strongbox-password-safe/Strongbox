@@ -20,6 +20,7 @@
 typedef NS_ENUM (NSInteger, KeePassIconSet) {
     kKeePassIconSetClassic,
     kKeePassIconSetSfSymbols,
+    kKeePassIconSetKeePassXC,
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -119,6 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL showQuickViewExpired;
 
 @property (nullable) NSArray<NSString*>* favourites;
+@property (nullable) NSArray<NSString*>* auditExcludedItems;
 
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
@@ -126,7 +128,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL hideTotpCustomFieldsInViewMode;
 
-@property YubiKeyHardwareConfiguration* yubiKeyConfig;
+@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
 @property DatabaseAuditorConfiguration* auditConfig;
 
 @property BOOL colorizePasswords;

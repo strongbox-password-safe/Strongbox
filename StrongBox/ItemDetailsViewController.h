@@ -17,6 +17,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const CellHeightsChangedNotification;
+extern NSString *const kNotificationNameItemDetailsEditDone;
 
 @interface ItemDetailsViewController : UITableViewController
 
@@ -29,8 +30,6 @@ extern NSString *const CellHeightsChangedNotification;
 @property Node*_Nullable item;
 @property BOOL readOnly;
 @property Model* databaseModel;
-
-@property (nonatomic, copy) void (^onChanged)(void);
 
 #ifdef IS_APP_EXTENSION
 @property (nonatomic, strong) CredentialProviderViewController *autoFillRootViewController;

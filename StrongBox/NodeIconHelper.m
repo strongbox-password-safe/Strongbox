@@ -12,9 +12,11 @@
 
 static UIImage* kPwSafeFolderImage;
 static UIImage* kPwSafeRecordImage;
+static UIColor *kSandyFolderColor;  // Maybe just use standard system blue coolor ? TODO:
+
 static NSArray<UIImage*> *kKeePassIconSet;
 static NSArray<UIImage*> *kKeePassiOS13SFIconSet;
-static UIColor *kSandyFolderColor;
+static NSArray<UIImage*> *kKeePassXCIconSet;
 
 @implementation NodeIconHelper
 
@@ -22,14 +24,11 @@ static UIColor *kSandyFolderColor;
     if(self == [NodeIconHelper class]) {
         kPwSafeFolderImage = [UIImage imageNamed:@"folder"];
         kPwSafeRecordImage = [UIImage imageNamed:@"document"];
-        
-        kKeePassIconSet = getKeePassIconSet();
-        kKeePassiOS13SFIconSet = getKeePassiOS13SFIconSet();
         kSandyFolderColor = ColorFromRGB(0xFAB805);
     }
 }
 
-static NSArray<UIImage*>* getKeePassiOS13SFIconSet() {
+static NSArray<UIImage*>* loadKeePassiOS13SFIconSet() {
     if (@available(iOS 13.0, *)) {
         NSArray<NSString*>* names = @[@"lock",
                                       @"globe",
@@ -107,11 +106,87 @@ static NSArray<UIImage*>* getKeePassiOS13SFIconSet() {
         }];
     }
     else {
-        return getKeePassIconSet();
+        return loadKeePassIconSet();
     }
 }
 
-static NSArray<UIImage*>* getKeePassIconSet() {
+static NSArray<UIImage*>* loadKeePassXCIconSet() {
+    NSArray<NSString*>* names = @[@"KPXC_C00_Password",
+                                  @"KPXC_C01_Package_Network",
+                                  @"KPXC_C02_MessageBox_Warning",
+                                  @"KPXC_C03_Server",
+                                  @"KPXC_C04_Klipper",
+                                  @"KPXC_C05_Edu_Languages",
+                                  @"KPXC_C06_KCMDF",
+                                  @"KPXC_C07_Kate",
+                                  @"KPXC_C08_Socket",
+                                  @"KPXC_C09_Identity",
+                                  @"KPXC_C10_Kontact",
+                                  @"KPXC_C11_Camera",
+                                  @"KPXC_C12_IRKickFlash",
+                                  @"KPXC_C13_KGPG_Key3",
+                                  @"KPXC_C14_Laptop_Power",
+                                  @"KPXC_C15_Scanner",
+                                  @"KPXC_C16_Mozilla_Firebird",
+                                  @"KPXC_C17_CDROM_Unmount",
+                                  @"KPXC_C18_Display",
+                                  @"KPXC_C19_Mail_Generic",
+                                  @"KPXC_C20_Misc",
+                                  @"KPXC_C21_KOrganizer",
+                                  @"KPXC_C22_ASCII",
+                                  @"KPXC_C23_Icons",
+                                  @"KPXC_C24_Connect_Established",
+                                  @"KPXC_C25_Folder_Mail",
+                                  @"KPXC_C26_FileSave",
+                                  @"KPXC_C27_NFS_Unmount",
+                                  @"KPXC_C28_Message",
+                                  @"KPXC_C29_KGPG_Term",
+                                  @"KPXC_C30_Konsole",
+                                  @"KPXC_C31_FilePrint",
+                                  @"KPXC_C32_FSView",
+                                  @"KPXC_C33_Run",
+                                  @"KPXC_C34_Configure",
+                                  @"KPXC_C35_KRFB",
+                                  @"KPXC_C36_Ark",
+                                  @"KPXC_C37_KPercentage",
+                                  @"KPXC_C38_Samba_Unmount",
+                                  @"KPXC_C39_History",
+                                  @"KPXC_C40_Mail_Find",
+                                  @"KPXC_C41_VectorGfx",
+                                  @"KPXC_C42_KCMMemory",
+                                  @"KPXC_C43_Trashcan_Full",
+                                  @"KPXC_C44_KNotes",
+                                  @"KPXC_C45_Cancel",
+                                  @"KPXC_C46_Help",
+                                  @"KPXC_C47_KPackage",
+                                  @"KPXC_C48_Folder",
+                                  @"KPXC_C49_Folder_Blue_Open",
+                                  @"KPXC_C50_Folder_Tar",
+                                  @"KPXC_C51_Decrypted",
+                                  @"KPXC_C52_Encrypted",
+                                  @"KPXC_C53_Apply",
+                                  @"KPXC_C54_Signature",
+                                  @"KPXC_C55_Thumbnail",
+                                  @"KPXC_C56_KAddressBook",
+                                  @"KPXC_C57_View_Text",
+                                  @"KPXC_C58_KGPG",
+                                  @"KPXC_C59_Package_Development",
+                                  @"KPXC_C60_KFM_Home",
+                                  @"KPXC_C61_Services",
+                                  @"KPXC_C62_Tux",
+                                  @"KPXC_C63_Feather",
+                                  @"KPXC_C64_Apple",
+                                  @"KPXC_C65_W",
+                                  @"KPXC_C66_Money",
+                                  @"KPXC_C67_Certificate",
+                                  @"KPXC_C68_Smartphone"];
+    
+    return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+        return [UIImage imageNamed:obj];
+    }];
+}
+
+static NSArray<UIImage*>* loadKeePassIconSet() {
     NSArray<NSString*>* names = @[@"C00_Password",
                                   @"C01_Package_Network",
                                   @"C02_MessageBox_Warning",
@@ -188,7 +263,7 @@ static NSArray<UIImage*>* getKeePassIconSet() {
 }
 
 + (UIColor*)folderTintColor {
-    return kSandyFolderColor;
+    return kSandyFolderColor; // Maybe just use standard system blue coolor ? TODO:
 }
 
 + (UIImage *)getIconForNode:(Node *)vm model:(id)model {
@@ -202,37 +277,21 @@ static NSArray<UIImage*>* getKeePassIconSet() {
              customIconUuid:(NSUUID *)customIconUuid
                      iconId:(NSNumber *)iconId
                       model:(Model*)model {
-    UIImage* ret;
-    
     if(model.database.format == kPasswordSafe) {
         return isGroup ? kPwSafeFolderImage : kPwSafeRecordImage;
     }
-    else {
-        ret = isGroup ? kKeePassIconSet[48] : kKeePassIconSet[0];
-
-        if(model.metadata.keePassIconSet == kKeePassIconSetSfSymbols) {
-            if (@available(iOS 13.0, *)) {
-                ret = isGroup ? kKeePassiOS13SFIconSet[48] : kKeePassiOS13SFIconSet[0];
-            }
-        }
-    }
     
-    // KeePass Specials
-    
+    NSArray<UIImage*>* iconSet = [NodeIconHelper getIconSet:model.metadata.keePassIconSet];
+        
     if(customIconUuid) {
-        ret = [NodeIconHelper getCustomIcon:customIconUuid customIcons:model.database.customIcons];
+        return [NodeIconHelper getCustomIcon:customIconUuid customIcons:model.database.customIcons];
     }
-    else if(iconId && iconId.intValue >= 0 && iconId.intValue < kKeePassIconSet.count) {
-        ret = kKeePassIconSet[iconId.intValue];
-
-        if(model.metadata.keePassIconSet == kKeePassIconSetSfSymbols) {
-            if (@available(iOS 13.0, *)) {
-                ret = kKeePassiOS13SFIconSet[iconId.intValue];
-            }
-        }
+    else if(iconId && iconId.intValue >= 0 && iconId.intValue < iconSet.count) {
+        return iconSet[iconId.intValue];
     }
-    
-    return ret;
+    else {
+        return isGroup ? iconSet[48] : iconSet[0];
+    }
 }
 
 
@@ -256,8 +315,40 @@ static NSArray<UIImage*>* getKeePassIconSet() {
     return nil;
 }
 
-+ (NSArray<UIImage*>*)iconSet:(KeePassIconSet)iconSet {
-    return iconSet == kKeePassIconSetClassic ? kKeePassIconSet : kKeePassiOS13SFIconSet;
++ (NSArray<UIImage*>*)getKeePassIconSet {
+    if (kKeePassIconSet == nil) {
+        kKeePassIconSet = loadKeePassIconSet();
+    }
+    
+    return kKeePassIconSet;
+}
+
++ (NSArray<UIImage*>*)getKeePassiOS13SFIconSet {
+    if (kKeePassiOS13SFIconSet == nil) {
+        kKeePassiOS13SFIconSet = loadKeePassiOS13SFIconSet();
+    }
+    
+    return kKeePassiOS13SFIconSet;
+}
+
++ (NSArray<UIImage*>*)getKeePassXCIconSet {
+    if (kKeePassXCIconSet == nil) {
+        kKeePassXCIconSet = loadKeePassXCIconSet();
+    }
+    
+    return kKeePassXCIconSet;
+}
+
++ (NSArray<UIImage*>*)getIconSet:(KeePassIconSet)iconSet {
+    if (iconSet == kKeePassIconSetKeePassXC) {
+        return [NodeIconHelper getKeePassXCIconSet];
+    }
+    else if (iconSet == kKeePassIconSetClassic) {
+        return [NodeIconHelper getKeePassIconSet];
+    }
+    else {
+        return [NodeIconHelper getKeePassiOS13SFIconSet];
+    }
 }
 
 @end

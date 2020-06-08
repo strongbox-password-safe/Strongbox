@@ -63,7 +63,7 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return ([self hasCustomIcons] && section == 0) ? self.customIcons.count : [NodeIconHelper iconSet:self.iconSet].count;
+    return ([self hasCustomIcons] && section == 0) ? self.customIcons.count : [NodeIconHelper getIconSet:self.iconSet].count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -80,7 +80,7 @@
     }
     else {
         IconViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CELL" forIndexPath:indexPath];
-        cell.imageView.image = [NodeIconHelper iconSet:self.iconSet][indexPath.item];
+        cell.imageView.image = [NodeIconHelper getIconSet:self.iconSet][indexPath.item];
         return cell;
     }
 }

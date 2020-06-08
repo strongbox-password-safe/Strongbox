@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="HOc-E3-CoK">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="HOc-E3-CoK">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -326,7 +326,7 @@
                             </connections>
                         </barButtonItem>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" title="&lt;Group Name&gt;" prompt="Tip: Try long pressing, or double/triple tapping for quick actions" largeTitleDisplayMode="never" id="5B9-6k-HF7">
+                    <navigationItem key="navigationItem" title="&lt;Group Name&gt;" prompt="Tip: Slide Left or Right for Actions" largeTitleDisplayMode="never" id="5B9-6k-HF7">
                         <barButtonItem key="leftBarButtonItem" title="Close" id="QGn-9Z-cSb">
                             <connections>
                                 <action selector="onClose:" destination="HOc-E3-CoK" id="ofa-Uf-2Su"/>
@@ -353,11 +353,20 @@
                         </segue>
                         <segue destination="GGA-iw-LIe" kind="presentation" identifier="segueToUpgrade" modalPresentationStyle="automatic" id="YwW-OJ-ZsZ"/>
                         <segue destination="aIG-BJ-Ksc" kind="presentation" identifier="segueToPreferencesAndManagement" id="aRj-ud-yhr"/>
+                        <segue destination="huf-9E-lLs" kind="presentation" identifier="segueToAuditDrillDown" modalPresentationStyle="formSheet" id="KOk-CG-jSt"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aJp-lr-fNs" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1207" y="230"/>
+        </scene>
+        <!--AuditDrillDown-->
+        <scene sceneID="MrM-6X-FnW">
+            <objects>
+                <viewControllerPlaceholder storyboardName="AuditDrillDown" id="huf-9E-lLs" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Wly-8w-SAA" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-628" y="-280"/>
         </scene>
         <!--DatabaseOperations-->
         <scene sceneID="Uga-AS-bnB">

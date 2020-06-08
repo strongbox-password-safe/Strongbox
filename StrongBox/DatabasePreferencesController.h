@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property Model* viewModel;
 @property (nonatomic, copy) void (^onDatabaseBulkIconUpdate)(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons);
+@property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues);
 
 @end
 

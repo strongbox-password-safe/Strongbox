@@ -230,7 +230,7 @@
 }
 
 - (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    self.onDone(NO);
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -255,6 +255,7 @@
     else if ([segue.identifier isEqualToString:@"segueToAudit"]) {
         AuditConfigurationVcTableViewController* vc = (AuditConfigurationVcTableViewController*)segue.destinationViewController;
         vc.model = self.viewModel;
+        vc.onDone = self.onDone;
     }
 }
 

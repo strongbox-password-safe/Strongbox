@@ -40,9 +40,12 @@
     }
     
     [[Kdbx4Database alloc] save:db completion:^(BOOL userCancelled, NSData * _Nullable largeDb, NSError * _Nullable error) {
-        BOOL success = [largeDb writeToFile:[NSString stringWithFormat:@"/Users/mark/Desktop/large-%d-%d-%d.kdbx", groupCount, subGroupCount, entryCount]
-                                 options:kNilOptions error:&error];
-        NSLog(@"Done: %d [%@]", success, error);
+        NSString* filename = [NSString stringWithFormat:@"large-%d-%d-%d.kdbx", groupCount, subGroupCount, entryCount];
+        NSString* file = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+        
+        BOOL success = [largeDb writeToFile:file options:kNilOptions error:&error];
+        
+        NSLog(@"Done: %d [%@] [%@]", success, error, file);
     }];
 }
 

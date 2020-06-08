@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01A-OU-JQM">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="01A-OU-JQM">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -82,8 +82,52 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" rowHeight="44" id="Em8-st-RBX" userLabel="View All Audit Issues...">
+                                        <rect key="frame" x="0.0" y="143.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Em8-st-RBX" id="D60-If-A1E">
+                                            <rect key="frame" x="0.0" y="0.0" width="383" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="View All Audit Issues" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="c4g-Lt-LFY">
+                                                    <rect key="frame" x="20" y="11" width="347" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailingMargin" secondItem="c4g-Lt-LFY" secondAttribute="trailing" constant="8" id="2xO-D2-Ey9"/>
+                                                <constraint firstItem="c4g-Lt-LFY" firstAttribute="top" secondItem="D60-If-A1E" secondAttribute="topMargin" id="avn-hR-1wu"/>
+                                                <constraint firstItem="c4g-Lt-LFY" firstAttribute="leading" secondItem="D60-If-A1E" secondAttribute="leading" constant="20" id="sSI-qS-DWm"/>
+                                                <constraint firstItem="c4g-Lt-LFY" firstAttribute="bottom" secondItem="D60-If-A1E" secondAttribute="bottomMargin" id="svW-in-AMm"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" rowHeight="44" id="B7p-mQ-cCU" userLabel="View Excluded Items">
+                                        <rect key="frame" x="0.0" y="187.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="B7p-mQ-cCU" id="Hsn-g9-OxO">
+                                            <rect key="frame" x="0.0" y="0.0" width="383" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="View All Excluded Items" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yqg-Rj-6iA">
+                                                    <rect key="frame" x="20" y="11" width="347" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Yqg-Rj-6iA" firstAttribute="leading" secondItem="Hsn-g9-OxO" secondAttribute="leading" constant="20" id="8Ep-OP-oH0"/>
+                                                <constraint firstAttribute="trailingMargin" secondItem="Yqg-Rj-6iA" secondAttribute="trailing" constant="8" id="FMt-aw-FN5"/>
+                                                <constraint firstItem="Yqg-Rj-6iA" firstAttribute="top" secondItem="Hsn-g9-OxO" secondAttribute="topMargin" id="tx6-b8-4PZ"/>
+                                                <constraint firstItem="Yqg-Rj-6iA" firstAttribute="bottom" secondItem="Hsn-g9-OxO" secondAttribute="bottomMargin" id="wz0-on-OD2"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="none" indentationWidth="10" id="loH-6V-mXA" userLabel="Audit Status">
-                                        <rect key="frame" x="0.0" y="143.5" width="414" height="100"/>
+                                        <rect key="frame" x="0.0" y="231.5" width="414" height="100"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="loH-6V-mXA" id="7XS-7C-Vlg">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="100"/>
@@ -119,7 +163,7 @@
                             <tableViewSection headerTitle="Basic Audits" footerTitle="These checks are straightforward tests. These checks are completely offline (no network access required)" id="Gzg-vF-nnp">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="wrV-R3-VFk" userLabel="Empty Passwords">
-                                        <rect key="frame" x="0.0" y="351" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="439" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="wrV-R3-VFk" id="gRa-Qb-mxY">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -151,7 +195,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="CYo-Iv-GKK" userLabel="Common Passwords">
-                                        <rect key="frame" x="0.0" y="395" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="483" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CYo-Iv-GKK" id="NIn-nX-zJj">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -185,12 +229,12 @@
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="Have I Been Pwned?" id="dPk-gM-4bf" userLabel="Have I Been Pwned">
-                                <mutableString key="footerTitle">This is an online service that can check your passwords against known compromised passwords from hacker forums and 'pastes'. Compromised password hashes are securely cached by Strongbox to display audit warnings and reduce network traffic.
+                                <string key="footerTitle">This is an online service that can check your passwords against known compromised passwords from hacker forums and 'pastes'. Compromised password hashes are securely cached by Strongbox to display audit warnings and reduce network traffic.
 
-Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonymization, a short 5-byte prefix is sent to HIBP servers to check if compromised. You may or may not be comfortable with this. Use at your own discretion. You can read more about this system at https://haveibeenpwned.com</mutableString>
+Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonymization, a short 5-byte prefix is sent to HIBP servers to check if compromised. You may or may not be comfortable with this. Use at your own discretion. You can read more about this system at https://haveibeenpwned.com</string>
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="iFc-kW-wS9" userLabel="Check 'Have I Been Pwned?'">
-                                        <rect key="frame" x="0.0" y="530.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="618.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="iFc-kW-wS9" id="1Pp-sj-EsD">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -222,7 +266,7 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" id="qvz-RJ-jzN" userLabel="Online Check Interval">
-                                        <rect key="frame" x="0.0" y="574.5" width="414" height="200"/>
+                                        <rect key="frame" x="0.0" y="662.5" width="414" height="200"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="qvz-RJ-jzN" id="zb3-yu-2zD">
                                             <rect key="frame" x="0.0" y="0.0" width="383" height="200"/>
@@ -273,12 +317,44 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="8w8-y2-6kZ" userLabel="Show Cached">
+                                        <rect key="frame" x="0.0" y="862.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="8w8-y2-6kZ" id="2BD-wb-wdg">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Check Offline Pwned Cache" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="loP-Ow-ttH">
+                                                    <rect key="frame" x="20" y="11" width="214" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vKg-yW-NTi">
+                                                    <rect key="frame" x="345" y="8" width="51" height="28"/>
+                                                    <connections>
+                                                        <action selector="onPreferenceChanged:" destination="01A-OU-JQM" eventType="valueChanged" id="d1t-42-yOP"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="loP-Ow-ttH" firstAttribute="leading" secondItem="2BD-wb-wdg" secondAttribute="leading" constant="20" id="2OJ-hY-mdK"/>
+                                                <constraint firstItem="loP-Ow-ttH" firstAttribute="top" secondItem="2BD-wb-wdg" secondAttribute="topMargin" id="F3u-iV-dH4"/>
+                                                <constraint firstItem="vKg-yW-NTi" firstAttribute="trailing" secondItem="2BD-wb-wdg" secondAttribute="trailing" constant="-20" id="Ikx-H8-2nb"/>
+                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="vKg-yW-NTi" secondAttribute="bottom" constant="8" id="K8v-a8-yVg"/>
+                                                <constraint firstItem="vKg-yW-NTi" firstAttribute="top" relation="greaterThanOrEqual" secondItem="2BD-wb-wdg" secondAttribute="top" constant="8" id="PBd-pA-ge5"/>
+                                                <constraint firstItem="vKg-yW-NTi" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="loP-Ow-ttH" secondAttribute="trailing" constant="8" symbolic="YES" id="PNZ-7C-swC"/>
+                                                <constraint firstItem="loP-Ow-ttH" firstAttribute="centerY" secondItem="vKg-yW-NTi" secondAttribute="centerY" id="Pka-Kl-SZN"/>
+                                                <constraint firstItem="loP-Ow-ttH" firstAttribute="bottom" secondItem="2BD-wb-wdg" secondAttribute="bottomMargin" id="r7r-ad-Ogu"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="Minimum Length" footerTitle="This check finds any password below a certain length. This check is completely offline (no network access required)" id="BYJ-Xt-Ybf">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="AmO-bK-ubn" userLabel="Start with Search">
-                                        <rect key="frame" x="0.0" y="1010" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1142" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AmO-bK-ubn" id="hZQ-mE-Giw">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -310,20 +386,20 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="84" id="flm-lx-Bc2">
-                                        <rect key="frame" x="0.0" y="1054" width="414" height="84"/>
+                                        <rect key="frame" x="0.0" y="1186" width="414" height="84"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="flm-lx-Bc2" id="MYf-X2-dyG">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="84"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="12" minValue="2" maxValue="200" translatesAutoresizingMaskIntoConstraints="NO" id="pkQ-YG-UBr">
-                                                    <rect key="frame" x="18" y="47.5" width="378" height="26.5"/>
+                                                    <rect key="frame" x="18" y="47.5" width="390" height="26.5"/>
                                                     <connections>
                                                         <action selector="onPreferenceChanged:" destination="01A-OU-JQM" eventType="valueChanged" id="yWr-da-FLQ"/>
                                                     </connections>
                                                 </slider>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bZW-TB-Oe0">
-                                                    <rect key="frame" x="376" y="19" width="18" height="20.5"/>
+                                                    <rect key="frame" x="388" y="19" width="18" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -354,7 +430,7 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                             <tableViewSection headerTitle="Duplicates" footerTitle="This check detects exact duplicate passwords. This check is completely offline (no network access required)" id="7y7-Rh-Wx2" userLabel="Duplicates">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="AhJ-0F-V5J" userLabel="Duplicated Passwords">
-                                        <rect key="frame" x="0.0" y="1229.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1361.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="AhJ-0F-V5J" id="leT-YR-R8D">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -386,7 +462,7 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="1YP-Ks-OEy" userLabel="Case Sensitive">
-                                        <rect key="frame" x="0.0" y="1273.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1405.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="1YP-Ks-OEy" id="4z3-h4-yQ9">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -423,14 +499,14 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                                 <string key="footerTitle">This check detects minor differences between passwords e.g. 'password5' and 'password2'. You can change the similarity threshold too, lower values will find less similar passwords. This check is completely offline (no network access required)</string>
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="kMD-su-26p" userLabel="Start with Search">
-                                        <rect key="frame" x="0.0" y="1409" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="1541" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="kMD-su-26p" id="kLw-1H-z2t">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Similar Passwords" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ivv-Og-lCA" userLabel="Start with Search">
-                                                    <rect key="frame" x="20" y="11" width="138" height="22"/>
+                                                    <rect key="frame" x="20" y="8" width="138" height="28"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -455,26 +531,26 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="84" id="ivO-Nh-U5x">
-                                        <rect key="frame" x="0.0" y="1453" width="414" height="84"/>
+                                        <rect key="frame" x="0.0" y="1585" width="414" height="84"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ivO-Nh-U5x" id="fFr-zt-cjv">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="84"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="75" minValue="40" maxValue="99" translatesAutoresizingMaskIntoConstraints="NO" id="bpg-NN-zhQ">
-                                                    <rect key="frame" x="18" y="47.5" width="390" height="26.5"/>
+                                                    <rect key="frame" x="18" y="44.5" width="390" height="32.5"/>
                                                     <connections>
                                                         <action selector="onPreferenceChanged:" destination="01A-OU-JQM" eventType="valueChanged" id="Qvf-Qs-BYQ"/>
                                                     </connections>
                                                 </slider>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="16" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5Wv-DH-TK3">
-                                                    <rect key="frame" x="388" y="19" width="18" height="20.5"/>
+                                                    <rect key="frame" x="388" y="16" width="18" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Similarity Threshold" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hJk-QQ-I4O">
-                                                    <rect key="frame" x="20" y="19" width="151.5" height="20.5"/>
+                                                    <rect key="frame" x="20" y="16" width="151.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -514,14 +590,19 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="cellOnlineHibpInterval" destination="qvz-RJ-jzN" id="9Qe-3a-ev3"/>
+                        <outlet property="cellViewAllAuditIssues" destination="Em8-st-RBX" id="fBo-gf-jtu"/>
+                        <outlet property="cellViewExcluded" destination="B7p-mQ-cCU" id="c0i-aV-Do5"/>
+                        <outlet property="labelCaseInsensitiveDupes" destination="SYj-Hd-U3m" id="ilq-Gs-EN4"/>
                         <outlet property="labelCheckHaveIBeenPwned" destination="XtZ-t1-tEw" id="MZq-Wq-4dY"/>
+                        <outlet property="labelCheckOfflinePwnedCache" destination="loP-Ow-ttH" id="o7N-JU-frx"/>
                         <outlet property="labelCheckSimilar" destination="Ivv-Og-lCA" id="h97-bp-McS"/>
                         <outlet property="labelLastChecked" destination="qun-2B-JNr" id="oeW-5o-6ld"/>
                         <outlet property="labelLastOnineCheck" destination="2BC-RY-Mcn" id="HDB-tW-0F2"/>
                         <outlet property="labelLastOnlineCheckHeader" destination="eWF-ET-car" id="3cz-oA-VjZ"/>
+                        <outlet property="labelLengthOfMinimumLength" destination="Cgs-79-shY" id="OUR-IV-OOU"/>
                         <outlet property="labelOnlineCheckInterval" destination="aQm-Q9-VIQ" id="Qpk-ag-jIC"/>
                         <outlet property="labelSimilar" destination="5Wv-DH-TK3" id="sMX-GI-Jge"/>
-                        <outlet property="labelSimilarityThresholdTitle" destination="hJk-QQ-I4O" id="BJK-Ut-djt"/>
+                        <outlet property="labelSimilarityThresholdTitle" destination="hJk-QQ-I4O" id="Kzt-yv-HVG"/>
                         <outlet property="labelStatus" destination="DTc-Dv-diB" id="gXP-Vn-L12"/>
                         <outlet property="minLengthLabel" destination="bZW-TB-Oe0" id="2Wi-W5-W1p"/>
                         <outlet property="sliderMinLength" destination="pkQ-YG-UBr" id="5gV-ef-2dd"/>
@@ -535,13 +616,44 @@ Caveat: Your passwords are hashed (SHA1) and then using a system called k-anonym
                         <outlet property="switchHibp" destination="Q6q-wX-Hcq" id="gdL-Jx-Kou"/>
                         <outlet property="switchMinLength" destination="4mb-Nx-2en" id="T3S-en-wEV"/>
                         <outlet property="switchNoPassword" destination="MrY-Ui-fVB" id="Dl9-Qw-2nG"/>
+                        <outlet property="switchShowCached" destination="vKg-yW-NTi" id="nhm-vT-eWQ"/>
                         <outlet property="switchShowPopups" destination="gif-Xe-wd2" id="1h2-0C-8dd"/>
                         <outlet property="switchSimilar" destination="6LC-iN-O5j" id="eCS-Vo-kFQ"/>
+                        <segue destination="29J-I3-kvD" kind="show" identifier="segueToExcludedItems" id="hDq-TP-Dqq"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="fi3-8B-FfL" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-72" y="-6"/>
+        </scene>
+        <!--Excluded Items-->
+        <scene sceneID="lLR-oe-vsw">
+            <objects>
+                <tableViewController id="29J-I3-kvD" customClass="ExcludedItemsViewController" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="u6m-1z-VAf">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="resuseId" id="CLR-hq-UBc">
+                                <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="CLR-hq-UBc" id="fCX-dh-cVU">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="29J-I3-kvD" id="rkr-fY-XPo"/>
+                            <outlet property="delegate" destination="29J-I3-kvD" id="VRi-j1-5dk"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Excluded Items" prompt="Slide Left for Actions" id="Boz-Dy-72k"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ggU-s6-uQz" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="762" y="-6"/>
         </scene>
     </scenes>
 </document>

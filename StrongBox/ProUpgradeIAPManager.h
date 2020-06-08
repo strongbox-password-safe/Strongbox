@@ -47,7 +47,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 @property (readonly) BOOL hasPurchasedLifeTime;
 @property (readonly) BOOL hasPurchasedFreeTrial;
-@property (readonly) NSDate* freeTrialPurchaseDate;
+@property (readonly, nullable) NSDate* freeTrialPurchaseDate;
 
 @end
 

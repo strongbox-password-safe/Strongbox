@@ -2914,7 +2914,7 @@
 "browse_prefs_icon_set" = "Icon Set";
 
 /* Classic */
-"keepass_icon_set_classic" = "Classic";
+"keepass_icon_set_classic" = "KeePass Classic";
 
 /* SF Symbols (iOS 13+) */
 "keepass_icon_set_sf_symbols" = "SF Symbols (iOS 13+)";
@@ -3194,3 +3194,81 @@
 
 /* Some of the items you have selected cannot be recycled and will be permanently deleted. Is that OK? */
 "browse_vc_partial_recycle_alert_message" = "Some of the items you have selected cannot be recycled and will be permanently deleted. Is that OK?";
+
+/* Audit */
+"browse_vc_action_audit" = "Audit";
+
+/* KeePassXC */
+"keepass_icon_set_keepassxc" = "KeePassXC";
+
+/* Preferences */
+"audit_drill_down_section_header_preferences" = "Preferences";
+
+/* Summary */
+"audit_drill_down_section_header_summary" = "Summary";
+
+/* Duplicate Passwords */
+"audit_drill_down_section_header_duplicates" = "Items using same password";
+
+/* Similar Passwords */
+"audit_drill_down_section_header_similar" = "Items using similar password";
+
+/* Actions */
+"audit_drill_down_section_header_actions" = "Actions";
+
+/* No password has been set */
+"audit_summary_flag_no_password_set" = "No password has been set";
+
+/* This password is very common */
+"audit_summary_flag_very_common_password" = "This password is very common";
+
+/* This password is pwned (HIBP) */
+"audit_summary_flag_pwned" = "This password is pwned (HIBP)";
+
+/* This password is too short */
+"audit_summary_flag_password_is_too_short" = "This password is too short";
+
+/* The items above use exactly the same password as this item, this is generally considered a weakness. You should strive not to have any duplicated passwords. */
+"audit_drill_down_section_footer_duplicates" = "The items above use exactly the same password as this item. This is generally considered a weakness. You should strive not to have any duplicated passwords.";
+
+/* The items above have a similar password to this item. This might indicate a weakness or use of a common component and could therefore be vulnerable to attack. */
+"audit_drill_down_section_footer_similar" = "The items above have a similar password to this item. This might indicate a weakness or use of a common component and could therefore be vulnerable to attack.";
+
+/* Audit this Item */
+"audit_drill_down_audit_this_item_preference_title" = "Audit this Item";
+
+/* Check if this password is Pwned (HIBP) */
+"audit_drill_down_action_check_hibp" = "Check if this password is Pwned (HIBP)";
+
+/* This item is excluded from Audits */
+"audit_status_item_is_exluded" = "This item is excluded from Audits";
+
+/* Checking HIBP */
+"audit_manual_pwn_progress_message" = "Checking HIBP";
+
+/* Manual HIBP Result */
+"audit_manual_pwn_check_result_title" = "Manual HIBP Result";
+
+/* Your password has NOT been pwned as is likely secure. */
+"audit_manual_pwn_check_result_not_pwned" = "Your password has NOT been pwned and is likely secure.";
+
+/* Manual HIBP Result */
+"audit_manual_pwn_check_result_title" = "Manual HIBP Result";
+
+/* This password is pwned and is vulnerable */
+"audit_manual_pwn_check_result_pwned" = "This password is pwned and is vulnerable";
+
+/* Database Audit Preferences */
+"audit_drill_down_go_to_database_audit_preferences" = "Database Audit Preferences";
+
+/* View All Audit Issues */
+"audit_drill_down_view_all_audit_issues" = "View All Audit Issues";
+
+/* No Excluded Items */
+"audit_drill_down_no_excluded_items_title" = "No Excluded Items";
+
+/* You have not explicitly excluded any items from the audit. You can exclude an item by sliding right on it and tapping the Audit button. */
+"audit_drill_down_no_excluded_items_subtitle" = "You have not explicitly excluded any items from the audit. You can exclude an item by sliding right on it and tapping the Audit button.";
+
+/* Unexclude */
+"audit_excluded_items_vc_action_unclude" = "Unexclude";

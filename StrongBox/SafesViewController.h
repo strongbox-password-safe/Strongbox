@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
 @interface SafesViewController : UITableViewController
 

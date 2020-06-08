@@ -100,7 +100,15 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
 }
 
 - (void)createNewAuditor {
-    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
+    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
+    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
+
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial
+                                             isExcluded:^BOOL(Node * _Nonnull item) {
+        NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+        return [set containsObject:sid];
+    }
+                                             saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
         // We can ignore the actual passed in config because we know it's part of the overall Database SafeMetaData;
         [SafesList.sharedInstance update:self.metadata];
     }];
@@ -176,6 +184,64 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     }
     
     return NO;
+}
+
+- (NSSet<Node *> *)getSimilarPasswordNodeSet:(Node *)node {
+    if (self.auditor) {
+        return [self.auditor getSimilarPasswordNodeSet:node];
+    }
+    
+    return NSSet.set;
+}
+
+- (NSSet<Node *> *)getDuplicatedPasswordNodeSet:(Node *)node {
+    if (self.auditor) {
+        return [self.auditor getDuplicatedPasswordNodeSet:node];
+    }
+    
+    return NSSet.set;
+}
+
+- (BOOL)isExcludedFromAudit:(Node *)item {
+    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+    
+    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
+    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
+    
+    return [set containsObject:sid];
+}
+
+- (void)setItemAuditExclusion:(Node *)item exclude:(BOOL)exclude {
+    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
+        
+    NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
+    
+    if (exclude) {
+        [mutable addObject:sid];
+    }
+    else {
+        [mutable removeObject:sid];
+    }
+    
+    self.metadata.auditExcludedItems = mutable.allObjects;
+    
+    [SafesList.sharedInstance update:self.metadata];
+}
+
+- (NSArray<Node*>*)getExcludedAuditItems {
+    NSSet<NSString*> *excludedSet = [NSSet setWithArray:self.metadata.auditExcludedItems];
+    return [self getNodesFromSerializationIds:excludedSet];
+}
+
+
+- (void)oneTimeHibpCheck:(NSString *)password completion:(void (^)(BOOL, NSError * _Nonnull))completion {
+    if (self.auditor) {
+        [self.auditor oneTimeHibpCheck:password completion:completion];
+    }
+    else {
+        completion (NO, [Utils createNSError:@"Auditor Unavailable!" errorCode:-2345]);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,6 +516,20 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     if(self.metadata.autoFillEnabled) {
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
     }
+}
+
+//
+
+- (NSArray<Node*>*)getNodesFromSerializationIds:(NSSet<NSString*>*)set {
+    // Got to be a better way to do things than this full search... FUTURE
+    
+    NSArray<Node*>* ret = [self.database.rootGroup filterChildren:YES
+                                                        predicate:^BOOL(Node * _Nonnull node) {
+        NSString* sid = [node getSerializationId:self.database.format != kPasswordSafe];
+        return [set containsObject:sid];
+    }];
+
+    return [ret sortedArrayUsingComparator:finderStyleNodeComparator];
 }
 
 @end

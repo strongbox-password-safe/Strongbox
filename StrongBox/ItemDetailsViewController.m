@@ -36,6 +36,8 @@
 #import "LargeTextViewController.h"
 #import "PasswordMaker.h"
 #import "TagsViewTableViewCell.h"
+#import "AuditDrillDownController.h"
+#import "NSString+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -46,6 +48,7 @@
 #endif
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
+NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
 
 //+ (NSArray<NSNumber*>*)defaultCollapsedSections - Remember to change this if you change the below sections
 static NSInteger const kSimpleFieldsSectionIdx = 0;
@@ -212,12 +215,17 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(onAuditNodesChanged:)
+                                           selector:@selector(onAuditChanged:)
                                                name:kAuditNodesChangedNotificationKey
+                                             object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onAuditChanged:)
+                                               name:kAuditCompletedNotificationKey
                                              object:nil];
 }
 
-- (void)onAuditNodesChanged:(id)param {
+- (void)onAuditChanged:(id)param {
     [self performFullReload];
 }
 
@@ -920,6 +928,18 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         vc.string = d[@"text"];
         vc.colorize = ((NSNumber*)(d[@"colorize"])).boolValue;
     }
+    else if ([segue.identifier isEqualToString:@"segueToAuditDrillDown"]) {
+        UINavigationController* nav = segue.destinationViewController;
+        AuditDrillDownController* vc = (AuditDrillDownController*)nav.topViewController;
+        
+        vc.model = self.databaseModel;
+        vc.item = self.item;
+        vc.hideShowAllAuditIssues = YES;
+        vc.onDone = ^(BOOL showAllAuditIssues) {
+            [self dismissViewControllerAnimated:YES completion:nil];
+            // TODO: Hide View All Issues button ;
+        };
+    }
 }
 
 - (void)onCustomFieldEditedOrAdded:(CustomFieldViewModel * _Nonnull)field fieldToEdit:(CustomFieldViewModel*)fieldToEdit {
@@ -1009,9 +1029,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                if(self.onChanged) {
-                    self.onChanged();
-                }
+                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.item];
             });
         }
     }];
@@ -1027,8 +1045,10 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                        handler:^(BOOL userCancelled, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(userCancelled, error);
-            if (!userCancelled && !error && self.onChanged) {
-                self.onChanged();
+            if (!userCancelled && !error) {
+                dispatch_async(dispatch_get_main_queue(), ^(void) {
+                    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.item];
+                });
             }
         });
     }];
@@ -1180,6 +1200,9 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                   message:NSLocalizedString(@"item_details_password_copied_and_launching", @"Password Copied. Launching URL...")];
     
 #ifndef IS_APP_EXTENSION
+    
+    // TODO: Move to mmcgUrl
+    
     if (![urlString.lowercaseString hasPrefix:@"http://"] &&
         ![urlString.lowercaseString hasPrefix:@"https://"]) {
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
@@ -1196,6 +1219,11 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 //    urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
 
     NSURL* url = [NSURL URLWithString:urlString];
+    
+    if (url == nil) {
+        url = urlString.mmcgUrl; // TODO: Tidy
+    }
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         [UIApplication.sharedApplication openURL:url options:@{} completionHandler:^(BOOL success) {
             NSLog(@"Success = [%d]", success);
@@ -1440,9 +1468,9 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         } completion:^(BOOL finished) {
             [self bindNavBar];
             
-            if(self.onChanged) {
-                self.onChanged();
-            }
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.item];
+            });
             
 #ifdef IS_APP_EXTENSION
             [self.autoFillRootViewController exitWithCredential:self.item.fields.username
@@ -1672,6 +1700,10 @@ showGenerateButton:YES];
         cell.onRightButton = ^{
             self.passwordConcealedInUi = !self.passwordConcealedInUi;
             weakCell.isConcealed = self.passwordConcealedInUi;
+        };
+        
+        cell.onAuditTap = ^{
+            [self performSegueWithIdentifier:@"segueToAuditDrillDown" sender:nil];
         };
         
         return cell;

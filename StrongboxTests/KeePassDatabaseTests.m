@@ -222,7 +222,8 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
 
-        //    [data writeToFile:@"/Users/mark/Desktop/large.kdbx" options:kNilOptions error:&error];
+//        NSString* file = [NSTemporaryDirectory() stringByAppendingPathComponent:@"large.kdbx"];
+        //[data writeToFile:file options:kNilOptions error:&error];
 
         NSLog(@"%@", error);
     }];

@@ -85,6 +85,8 @@ static const BOOL kLogVerbose = NO;
     Meta* xmlMeta = serializationData.rootXmlObject.keePassFile ? serializationData.rootXmlObject.keePassFile.meta : nil;
     NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
     NSDictionary<NSUUID*, NSDate*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
+   
+//    NSLog(@"deletedObjects = [%@]", deletedObjects);
         
     // Metadata
     

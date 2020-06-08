@@ -45,6 +45,7 @@
 #import "YubiManager.h"
 #import "WelcomeFreemiumViewController.h"
 #import "MasterDetailViewController.h"
+#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 

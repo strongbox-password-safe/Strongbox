@@ -8,12 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "Model.h"
-
+#import "StaticDataTableViewController.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AuditConfigurationVcTableViewController : UITableViewController
+@interface AuditConfigurationVcTableViewController : StaticDataTableViewController
 
 @property Model* model;
+@property BOOL hideShowAllAuditIssues;
+
+@property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues);
 
 @end
 

@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property CASGMode mode;
 @property DatabaseFormat initialFormat;
-@property NSURL* initialKeyFileUrl;
+@property (nullable) NSURL* initialKeyFileUrl;
 @property NSDate* offlineCacheDate;
 @property BOOL initialOfflineCache;
 @property BOOL initialReadOnly;

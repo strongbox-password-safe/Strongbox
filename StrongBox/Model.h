@@ -57,6 +57,12 @@ extern NSString* const kAuditCompletedNotificationKey;
 - (BOOL)isFlaggedByAudit:(Node*)item;
 - (NSString*)getQuickAuditSummaryForNode:(Node*)item;
 - (NSString*)getQuickAuditVeryBriefSummaryForNode:(Node*)item;
+- (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node;
+- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(Node*)node;
+- (void)setItemAuditExclusion:(Node*)item exclude:(BOOL)exclude;
+- (BOOL)isExcludedFromAudit:(Node*)item;
+- (NSArray<Node*>*)getExcludedAuditItems;
+- (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;
 
 - (void)closeAndCleanup;
 

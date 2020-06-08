@@ -35,12 +35,13 @@ typedef void (^AuditProgressBlock)(CGFloat progress);
 typedef void (^AuditNodesChangedBlock)(void);
 typedef BOOL (^AuditIsDereferenceableTextBlock)(NSString* string);
 typedef void (^SaveConfigurationBlock)(DatabaseAuditorConfiguration* config);
+typedef BOOL (^IsExcludedBlock)(Node* item);
 
 @interface DatabaseAuditor : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPro:(BOOL)pro;
-- (instancetype)initWithPro:(BOOL)pro saveConfig:(SaveConfigurationBlock _Nullable)saveConfig NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPro:(BOOL)pro isExcluded:(IsExcludedBlock _Nullable)isExcluded saveConfig:(SaveConfigurationBlock _Nullable)saveConfig NS_DESIGNATED_INITIALIZER;
 
 @property AuditState state;
 
@@ -64,7 +65,12 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 // Heavy Weight Reporting
 - (DatabaseAuditReport*)getAuditReport;
 
+- (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node;
+- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(Node*)node;
+
 @property (readonly) NSUInteger haveIBeenPwnedErrorCount;
+
+- (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;
 
 @end
 

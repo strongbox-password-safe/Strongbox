@@ -48,6 +48,7 @@
 
 @property BOOL isConvenienceUnlock;
 @property BOOL isAutoFillOpen;
+@property BOOL isAutoFillQuickTypeOpen;
 @property BOOL manualOpenOfflineCache;
 
 @property NSString* masterPassword;
@@ -104,11 +105,32 @@
                  manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                              completion:(CompletionBlock)completion {
+    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
+                                                       safe:safe
+                                          openAutoFillCache:openAutoFillCache
+                                        canConvenienceEnrol:canConvenienceEnrol
+                                             isAutoFillOpen:isAutoFillOpen
+                                    isAutoFillQuickTypeOpen:NO
+                                     manualOpenOfflineCache:manualOpenOfflineCache
+                                biometricAuthenticationDone:biometricAuthenticationDone
+                                                 completion:completion];
+}
+
++ (void)beginSequenceWithViewController:(UIViewController *)viewController
+                                   safe:(SafeMetaData *)safe
+                      openAutoFillCache:(BOOL)openAutoFillCache
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
+                isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
+                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                             completion:(CompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                                                        safe:safe
                                                                           openAutoFillCache:openAutoFillCache
                                                                         canConvenienceEnrol:canConvenienceEnrol
                                                                              isAutoFillOpen:isAutoFillOpen
+                                                                    isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
                                                                      manualOpenOfflineCache:manualOpenOfflineCache
                                                                         biometricPreCleared:biometricAuthenticationDone
                                                                                  completion:completion];
@@ -121,6 +143,7 @@
                      openAutoFillCache:(BOOL)openAutoFillCache
                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                         isAutoFillOpen:(BOOL)isAutoFillOpen
+               isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
                    biometricPreCleared:(BOOL)biometricPreCleared
                             completion:(CompletionBlock)completion {
@@ -133,6 +156,7 @@
         self.openAutoFillCache = openAutoFillCache;
         self.completion = completion;
         self.isAutoFillOpen = isAutoFillOpen;
+        self.isAutoFillQuickTypeOpen = isAutoFillQuickTypeOpen;
         self.manualOpenOfflineCache = manualOpenOfflineCache;
         self.biometricPreCleared = biometricPreCleared;
     }
@@ -370,7 +394,8 @@
     else {
         // Cool transparency if using biometric - no need for any overlay/UI
 
-        if (self.isAutoFillOpen) {
+        CGFloat previousAlpha = self.viewController.view.alpha;
+        if (self.isAutoFillQuickTypeOpen) {
             self.viewController.view.alpha = 0.0f;
         }
         
@@ -378,6 +403,10 @@
                                                           fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
                                                              completion:^(BOOL success, NSError * _Nullable error) {
             [self onBiometricAuthenticationDone:success error:error];
+            
+            if (self.isAutoFillQuickTypeOpen) {
+                self.viewController.view.alpha = previousAlpha;
+            }
         }];
 
         if(!ret) {

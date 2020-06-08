@@ -47,6 +47,7 @@
         self.showQuickViewFavourites = YES;
         self.showQuickViewNearlyExpired = YES;
         self.favourites = @[];
+        self.auditExcludedItems = @[];
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
         self.hideTotpCustomFieldsInViewMode = YES;
@@ -384,6 +385,25 @@
 }
 
 ////////////////////////
+
+- (NSArray<NSString *> *)auditExcludedItems {
+    NSString *key = [NSString stringWithFormat:@"%@-auditExcludedItems", self.uuid];
+    
+    NSArray<NSString *>* ret = [SecretStore.sharedInstance getSecureObject:key];
+    
+    return ret ? ret : @[];
+}
+
+- (void)setAuditExcludedItems:(NSArray<NSString *> *)auditExcludedItems {
+    NSString *key = [NSString stringWithFormat:@"%@-auditExcludedItems", self.uuid];
+    
+    if(auditExcludedItems) {
+        [SecretStore.sharedInstance setSecureObject:auditExcludedItems forIdentifier:key];
+    }
+    else {
+        [SecretStore.sharedInstance deleteSecureItem:key];
+    }
+}
 
 - (NSArray<NSString *> *)favourites {
     NSString *key = [NSString stringWithFormat:@"%@-favourites", self.uuid];

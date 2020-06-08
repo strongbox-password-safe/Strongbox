@@ -83,6 +83,7 @@
                                                       openAutoFillCache:useAutoFillCache
                                                     canConvenienceEnrol:NO
                                                          isAutoFillOpen:YES
+                                                isAutoFillQuickTypeOpen:YES
                                                  manualOpenOfflineCache:NO
                                             biometricAuthenticationDone:NO
                                                              completion:^(Model * _Nullable model, NSError * _Nullable error) {

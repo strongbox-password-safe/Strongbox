@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) void (^onDoubleTap)(void);
 @property (nonatomic, copy, nullable) void (^onRightButton)(void);
 @property (nonatomic, copy, nullable) void (^onGenerate)(void);
+@property (nonatomic, copy, nullable) void (^onAuditTap)(void);
 
 @property BOOL showUiValidationOnEmpty;
 @property BOOL isConcealed;

@@ -242,7 +242,9 @@
 
 - (void)onChangeIconSet {
     NSArray<NSNumber*>* options = @[@(kKeePassIconSetClassic),
-                                    @(kKeePassIconSetSfSymbols)];
+                                    @(kKeePassIconSetSfSymbols),
+//                                    @(kKeePassIconSetKeePassXC) // MMcG: As a courtesy wait for the KPXC crew to release, the make this available, not to steal their thunder! 5/Jun/2020
+    ];
     
     NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return [BrowsePreferencesTableViewController getIconSetName:(KeePassIconSet)obj.integerValue];
@@ -269,9 +271,17 @@
 }
 
 + (NSString*)getIconSetName:(KeePassIconSet)iconSet {
-    return iconSet == kKeePassIconSetClassic ?
-        NSLocalizedString(@"keepass_icon_set_classic", @"Classic") :
-        NSLocalizedString(@"keepass_icon_set_sf_symbols", @"SF Symbols (iOS 13+)");
+    switch (iconSet) {
+        case kKeePassIconSetKeePassXC:
+            return NSLocalizedString(@"keepass_icon_set_keepassxc", @"KeePassXC");
+            break;
+        case kKeePassIconSetSfSymbols:
+            return NSLocalizedString(@"keepass_icon_set_sf_symbols", @"SF Symbols (iOS 13+)");
+            break;
+        default:
+            return NSLocalizedString(@"keepass_icon_set_classic", @"Classic");
+            break;
+    }
 }
 
 - (void)onChangeTapAction:(UITableViewCell*)cell {
@@ -485,6 +495,7 @@
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
     vc.groupItems = @[options];
+//    vc.groupHeaders = @[@""];
     vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentIndex]];
     vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
         NSIndexSet* set = selectedIndices.firstObject;

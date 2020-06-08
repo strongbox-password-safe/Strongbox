@@ -12,6 +12,7 @@
 #import "Utils.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
+#import "ExcludedItemsViewController.h"
 
 static const int kSectionIdxHibp = 2; // Careful if sections move around
 static const int kSectionIdxSimilarPasswords = 5; // Careful if sections move around 
@@ -51,6 +52,12 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UILabel *labelLastOnlineCheckHeader;
 @property (weak, nonatomic) IBOutlet UIStackView *stackViewLastOnlineCheck;
 @property (weak, nonatomic) IBOutlet UILabel *labelCheckHaveIBeenPwned;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAllAuditIssues;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowCached;
+@property (weak, nonatomic) IBOutlet UILabel *labelCheckOfflinePwnedCache;
+@property (weak, nonatomic) IBOutlet UILabel *labelCaseInsensitiveDupes;
+@property (weak, nonatomic) IBOutlet UILabel *labelLengthOfMinimumLength;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellViewExcluded;
 
 @end
 
@@ -70,87 +77,73 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
                                             selector:@selector(bindAuditStatus:)
                                                 name:kAuditCompletedNotificationKey
                                              object:nil];
+    
+    [self cell:self.cellViewAllAuditIssues setHidden:self.hideShowAllAuditIssues]; // Some times, from Details view for example it is an awkward or unnatural transition to show all audit issues so we hide
 }
 
 - (void)bindUi {
+    UIColor* secondary = UIColor.darkGrayColor;
+    if (@available(iOS 13.0, *)) {
+        secondary = UIColor.secondaryLabelColor;
+    }
+
+    self.switchShowPopups.on = self.model.metadata.auditConfig.showAuditPopupNotifications;
     self.switchAuditInBackground.on = self.model.metadata.auditConfig.auditInBackground;
+    
+    // Simple
+    
     self.switchNoPassword.on = self.model.metadata.auditConfig.checkForNoPasswords;
+    self.switchCommon.on = self.model.metadata.auditConfig.checkForCommonPasswords;
+
+    // Duplicates
+    
     self.switchDuplicates.on = self.model.metadata.auditConfig.checkForDuplicatedPasswords;
     self.switchCaseInsenstiveDupes.on = self.model.metadata.auditConfig.caseInsensitiveMatchForDuplicates;
+    self.switchCaseInsenstiveDupes.enabled = self.switchDuplicates.on;
+    self.labelCaseInsensitiveDupes.textColor = self.switchDuplicates.on ? nil : secondary;
     
-    self.switchCommon.on = self.model.metadata.auditConfig.checkForCommonPasswords;
+    // Similar
+    
     self.switchSimilar.on = self.model.metadata.auditConfig.checkForSimilarPasswords;
-    
     int sim = self.model.metadata.auditConfig.levenshteinSimilarityThreshold * 100.0f;
     self.labelSimilar.text = [NSString stringWithFormat:@"%d%%", sim];
     self.sliderSimilar.value = sim;
-    self.sliderSimilar.enabled = self.model.metadata.auditConfig.checkForSimilarPasswords;
+    
+    // Minimum Length
     
     self.switchMinLength.on = self.model.metadata.auditConfig.checkForMinimumLength;
     self.sliderMinLength.value = self.model.metadata.auditConfig.minimumLength;
     self.minLengthLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)self.model.metadata.auditConfig.minimumLength];
     self.sliderMinLength.enabled = self.model.metadata.auditConfig.checkForMinimumLength;
-
-    self.switchShowPopups.on = self.model.metadata.auditConfig.showAuditPopupNotifications;
-
+    self.labelLengthOfMinimumLength.textColor = self.switchMinLength.on ? nil : secondary;
+    self.minLengthLabel.textColor = self.switchMinLength.on ? nil : secondary;
+    
+    // HIBP
+    
     self.switchHibp.on = self.model.metadata.auditConfig.checkHibp;
-    
+    self.switchShowCached.on = self.model.metadata.auditConfig.showCachedHibpHits;
     [self bindLastOnlineCheckUi];
-    
-    if (self.switchHibp.on) {
-        self.labelOnlineCheckInterval.textColor = nil;
-        self.labelLastOnlineCheckHeader.textColor = nil;
+    self.cellOnlineHibpInterval.userInteractionEnabled = self.switchHibp.on;
 
-        self.cellOnlineHibpInterval.userInteractionEnabled = YES;
-    }
-    else {
-        if (@available(iOS 13.0, *)) {
-            self.labelOnlineCheckInterval.textColor = UIColor.secondaryLabelColor;
-            self.labelLastOnlineCheckHeader.textColor = UIColor.secondaryLabelColor;
-        }
-        else {
-            self.labelOnlineCheckInterval.textColor = UIColor.darkGrayColor;
-            self.labelLastOnlineCheckHeader.textColor = UIColor.darkGrayColor;
-        }
-        
-        self.cellOnlineHibpInterval.userInteractionEnabled = NO;
-    }
+    // HIBP Enabled/Disabled based on Pro and on/off status
     
+    self.switchHibp.enabled = Settings.sharedInstance.isProOrFreeTrial;
+    self.switchShowCached.enabled = Settings.sharedInstance.isProOrFreeTrial;
+    self.labelCheckHaveIBeenPwned.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.labelLastOnlineCheckHeader.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
+    self.labelOnlineCheckInterval.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
+    self.labelCheckOfflinePwnedCache.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.labelCheckHaveIBeenPwned.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+
+    // Similarity Enabled/Disabled based on Pro and on/off status
+
+    self.switchSimilar.enabled = Settings.sharedInstance.isProOrFreeTrial;
+    self.sliderSimilar.enabled = Settings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on;
+    self.labelSimilar.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
+    self.labelSimilarityThresholdTitle.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
+    self.labelCheckSimilar.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+
     [self bindAuditStatusWithProgress:nil];
-    
-    if (Settings.sharedInstance.isProOrFreeTrial) {
-        self.switchSimilar.enabled = YES;
-        self.sliderSimilar.enabled = YES;
-        self.switchHibp.enabled = YES;
-        
-        self.labelOnlineCheckInterval.textColor = nil;
-        self.labelLastOnlineCheckHeader.textColor = nil;
-        self.labelCheckHaveIBeenPwned.textColor = nil;
-    }
-    else {
-        if (@available(iOS 13.0, *)) {
-            self.labelSimilar.textColor = UIColor.secondaryLabelColor;
-            self.labelCheckSimilar.textColor =  UIColor.secondaryLabelColor;
-            self.labelSimilarityThresholdTitle.textColor =  UIColor.secondaryLabelColor;
-            
-            self.labelOnlineCheckInterval.textColor = UIColor.secondaryLabelColor;
-            self.labelLastOnlineCheckHeader.textColor = UIColor.secondaryLabelColor;
-            self.labelCheckHaveIBeenPwned.textColor = UIColor.secondaryLabelColor;
-        }
-        else {
-            self.labelSimilar.textColor = UIColor.darkGrayColor;
-            self.labelCheckSimilar.textColor =  UIColor.darkGrayColor;
-            self.labelSimilarityThresholdTitle.textColor =  UIColor.darkGrayColor;
-            
-            self.labelOnlineCheckInterval.textColor = UIColor.darkGrayColor;
-            self.labelLastOnlineCheckHeader.textColor = UIColor.darkGrayColor;
-            self.labelCheckHaveIBeenPwned.textColor = UIColor.darkGrayColor;
-        }
-        
-        self.switchSimilar.enabled = NO;
-        self.sliderSimilar.enabled = NO;
-        self.switchHibp.enabled = NO;
-    }
 }
 
 - (void)bindLastOnlineCheckUi {
@@ -176,6 +169,12 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     if (cell == self.cellOnlineHibpInterval) {
         [self onChangeOnlineHibpInterval];
+    }
+    else if (cell == self.cellViewAllAuditIssues) {
+        self.onDone(YES);
+    }
+    else if (cell == self.cellViewExcluded) {
+        [self performSegueWithIdentifier:@"segueToExcludedItems" sender:nil];
     }
 }
 
@@ -227,7 +226,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
             self.statusSubtitle.hidden = YES;
             break;
         case kAuditStateRunning:
-            self.labelStatus.text = progress ? [NSString stringWithFormat:NSLocalizedString(@"audit_status_running_with_progress_fmt", @"Auditing... (%d%%)"), ((int)(progress.floatValue * 100.0))] : NSLocalizedString(@"audit_status_running_with_ellipsis", @"Auditing...");
+            self.labelStatus.text = progress != nil ? [NSString stringWithFormat:NSLocalizedString(@"audit_status_running_with_progress_fmt", @"Auditing... (%d%%)"), ((int)(progress.floatValue * 100.0))] : NSLocalizedString(@"audit_status_running_with_ellipsis", @"Auditing...");
             self.statusSubtitle.hidden = YES;
             break;
         case kAuditStateStoppedIncomplete:
@@ -259,6 +258,8 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
         
     self.model.metadata.auditConfig.checkHibp = self.switchHibp.on;
     self.model.metadata.auditConfig.showAuditPopupNotifications = self.switchShowPopups.on;
+    
+    self.model.metadata.auditConfig.showCachedHibpHits = self.switchShowCached.on;
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(restartBackgroundAudit) object:nil];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(saveSettingsAndRestartBackgroundAudit) object:nil];
@@ -313,7 +314,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    self.onDone(NO);
 }
 
 - (void)promptForString:(NSString*)title
@@ -354,6 +355,13 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
         default:
             return NSLocalizedString(@"generic_unknown", @"Unknown");
             break;
+    }
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueToExcludedItems"]) {
+        ExcludedItemsViewController* vc = segue.destinationViewController;
+        vc.model = self.model;
     }
 }
 

@@ -42,6 +42,16 @@ typedef void(^CompletionBlock)(Model*_Nullable model, NSError*_Nullable error);
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                              completion:(CompletionBlock)completion;
 
++ (void)beginSequenceWithViewController:(UIViewController*)viewController
+                       safe:(SafeMetaData*)safe
+          openAutoFillCache:(BOOL)openAutoFillCache
+        canConvenienceEnrol:(BOOL)canConvenienceEnrol
+             isAutoFillOpen:(BOOL)isAutoFillOpen
+    isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
+     manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                 completion:(CompletionBlock)completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

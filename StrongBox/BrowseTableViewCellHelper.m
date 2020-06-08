@@ -38,9 +38,18 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
 - (UITableViewCell *)getBrowseCellForNode:(Node*)node
                                 indexPath:(NSIndexPath*)indexPath
-                        showLargeTotpCell:(BOOL)totp
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
                         showGroupLocation:(BOOL)showGroupLocation {
-    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:totp showGroupLocation:showGroupLocation groupLocationOverride:nil accessoryType:UITableViewCellAccessoryNone];
+    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:nil accessoryType:UITableViewCellAccessoryNone];
+}
+
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node
+            indexPath:(NSIndexPath*)indexPath
+    showLargeTotpCell:(BOOL)showLargeTotpCell
+    showGroupLocation:(BOOL)showGroupLocation
+groupLocationOverride:(NSString*)groupLocationOverride
+        accessoryType:(UITableViewCellAccessoryType)accessoryType {
+    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:groupLocationOverride accessoryType:accessoryType noFlags:NO];
 }
 
 - (UITableViewCell *)getBrowseCellForNode:(Node*)node
@@ -48,7 +57,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                         showLargeTotpCell:(BOOL)totp
                         showGroupLocation:(BOOL)showGroupLocation
                     groupLocationOverride:(NSString*)groupLocationOverride
-                            accessoryType:(UITableViewCellAccessoryType)accessoryType {
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType
+                                  noFlags:(BOOL)noFlags {
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
 
@@ -69,8 +79,8 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         
         NSDictionary<NSNumber*, UIColor*> *flagTintColors = @{};
         
-        NSString* briefAudit = self.viewModel.metadata.showFlagsInBrowse  ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node] : @"";
-        NSArray* flags = self.viewModel.metadata.showFlagsInBrowse ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];
+        NSString* briefAudit = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node] : @"";
+        NSArray* flags = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];
         
         if(node.isGroup) {
             BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);

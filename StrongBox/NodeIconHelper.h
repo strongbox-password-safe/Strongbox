@@ -24,9 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (UIColor*)folderTintColor;
 
-+ (NSArray<UIImage*>*)iconSet:(KeePassIconSet)iconSet;
-
 + (nullable UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
+
++ (NSArray<UIImage*>*)getIconSet:(KeePassIconSet)iconSet;
 
 @end
 

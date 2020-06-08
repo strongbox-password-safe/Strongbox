@@ -15,6 +15,7 @@
 #import "ConcurrentMutableSet.h"
 #import "UrlRequestOperation.h"
 #import "SecretStore.h"
+#import "Utils.h"
 
 static const int kHttpStatusOk = 200;
 static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwnedSetCacheKey";
@@ -57,16 +58,17 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 @property NSArray<Node*>* auditableNonEmptyPasswordNodes;
 
 @property (nullable) SaveConfigurationBlock saveConfig;
+@property (nullable) IsExcludedBlock isExcluded;
 
 @end
 
 @implementation DatabaseAuditor
 
 - (instancetype)initWithPro:(BOOL)pro {
-    return [self initWithPro:pro saveConfig:nil];
+    return [self initWithPro:pro isExcluded:nil saveConfig:nil];
 }
 
-- (instancetype)initWithPro:(BOOL)pro saveConfig:(SaveConfigurationBlock)saveConfig {
+- (instancetype)initWithPro:(BOOL)pro isExcluded:(IsExcludedBlock)isExcluded saveConfig:(SaveConfigurationBlock)saveConfig {
     self = [super init];
     
     if (self) {
@@ -86,6 +88,9 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         self.hibpQueue.maxConcurrentOperationCount = 4;
         self.mutablePwnedNodes = ConcurrentMutableSet.mutableSet;
         
+        self.isExcluded = (isExcluded != nil) ? isExcluded : ^BOOL(Node * _Nonnull item) {
+            return NO;
+        };
         self.saveConfig = saveConfig;
     }
     
@@ -113,7 +118,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
     self.nodes = nodes.copy;
     self.auditableNonEmptyPasswordNodes = [self.nodes.allObjects filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.password.length && !self.isDereferenceable(obj.fields.password);
+        return obj.fields.password.length && !self.isDereferenceable(obj.fields.password) && !self.isExcluded(obj);
     }];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
@@ -216,7 +221,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         }
         
         if ([flags containsObject:@(kAuditFlagTooShort)]) {
-            return NSLocalizedString(@"audit_quick_summary_password_is_too_short", @"Audit: Password is too short.=");
+            return NSLocalizedString(@"audit_quick_summary_password_is_too_short", @"Audit: Password is too short.");
         }
     }
     
@@ -278,6 +283,72 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return self.hibpErrorCount;
 }
 
+- (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node {
+    if ([self.similarPasswordsNodeSet containsObject:node]) {
+        // Because of how we store similars (for computational efficiency reasons we may not always have direct 2 way map between similars so need to trawl
+        // linearly in some cases but these lists should be small so perf should be fine.
+        
+        NSArray<NSSet<Node*>*>* containedInOthers = [self.similar.allValues filter:^BOOL(NSSet<Node *> * _Nonnull obj) {
+            return [obj containsObject:node];
+        }];
+        
+        NSArray<Node*>* allSimilarTo = [containedInOthers flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
+            return obj.allObjects;
+        }];
+        
+        NSMutableSet* simSet = [NSMutableSet setWithArray:allSimilarTo];
+
+        // We may also have the straightforward set of direct similars
+        
+        NSSet<Node*>* directSimilars = self.similar[node.uuid];
+        if (directSimilars) {
+            [simSet addObjectsFromArray:directSimilars.allObjects];
+        }
+        
+        // Remove ourselves
+        
+        [simSet removeObject:node];
+        
+        return simSet.copy;
+    }
+    else {
+        return NSSet.set;
+    }
+}
+
+- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(Node*)node {
+    if ([self.duplicatedPasswordsNodeSet containsObject:node]) {
+        // Because of how we store similars (for computational efficiency reasons we may not always have direct 2 way map between similars so need to trawl
+        // linearly in some cases but these lists should be small so perf should be fine.
+        
+        NSArray<NSSet<Node*>*>* containedInOthers = [self.duplicatedPasswords.allValues filter:^BOOL(NSSet<Node *> * _Nonnull obj) {
+            return [obj containsObject:node];
+        }];
+        
+        NSArray<Node*>* allDuplicatesOf = [containedInOthers flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
+            return obj.allObjects;
+        }];
+        
+        NSMutableSet* dupeSet = [NSMutableSet setWithArray:allDuplicatesOf];
+
+        // We may also have the straightforward set of direct similars
+        
+        NSSet<Node*>* directDuplicates = self.duplicatedPasswords[node.fields.password];
+        if (directDuplicates) {
+            [dupeSet addObjectsFromArray:directDuplicates.allObjects];
+        }
+        
+        // Remove ourselves
+        
+        [dupeSet removeObject:node];
+        
+        return dupeSet.copy;
+    }
+    else {
+        return NSSet.set;
+    }
+}
+
 /////////////////////////////////////////
 // Audits
 
@@ -337,7 +408,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     }
 
     NSArray<Node*>* results = [self.nodes.allObjects filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.password.length == 0;
+        return obj.fields.password.length == 0 && !self.isExcluded(obj);
     }];
 
     return [NSSet setWithArray:results];
@@ -462,12 +533,13 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 }
 
 - (void)checkHibp {
-    if (!self.config.checkHibp) {
+    NSLog(@"AUDIT: Checking HaveIBeenPwned...");
+
+    if(!self.config.showCachedHibpHits && !self.config.checkHibp) {
+        // HIBP is totally off
         return;
     }
     
-    NSLog(@"AUDIT: Checking HaveIBeenPwned...");
-
     NSDictionary<NSString*, NSArray<Node*>*> *nodesByPasswords = [self.auditableNonEmptyPasswordNodes groupBy:^id _Nonnull(Node * _Nonnull obj) {
         return obj.fields.password;
     }];
@@ -475,14 +547,12 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     self.hibpQueue.suspended = YES;
     self.hibpTotalCount = nodesByPasswords.allKeys.count;
     self.hibpCompletedCount = 0;
-    
-    NSSet<NSString*>* pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
-    
+
+    BOOL checkForNewBreaches = self.config.checkHibp;
+
     NSDate *lastChecked = self.config.lastHibpOnlineCheck;
-    
     NSLog(@"Last Checked for New Breaches: [%@]", lastChecked);
-    BOOL checkForNewBreaches = YES;
-    if (lastChecked && self.config.hibpCheckForNewBreachesIntervalSeconds > 0) {
+    if (checkForNewBreaches && lastChecked && self.config.hibpCheckForNewBreachesIntervalSeconds > 0) {
         NSCalendar *cal = [NSCalendar currentCalendar];
         NSDate *dueDate = [cal dateByAddingUnit:NSCalendarUnitSecond value:self.config.hibpCheckForNewBreachesIntervalSeconds toDate:lastChecked options:0];
         checkForNewBreaches = dueDate.timeIntervalSinceNow < 0;
@@ -497,6 +567,11 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
             self.saveConfig(self.config);
         }
     }
+    else {
+        NSLog(@"Will NOT check for new breaches, due to config or last check to recent.");
+    }
+    
+    NSSet<NSString*>* pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
     
     for (NSString* password in nodesByPasswords.allKeys) {
         NSString* sha1HexPassword = password.sha1.hex;
@@ -533,10 +608,63 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     NSLog(@"AUDIT: HaveIBeenPwned... Done!");
 }
 
-- (UrlRequestOperation*)haveIBeenPwned:(NSString*)password sha1HexPassword:(NSString*)sha1HexPassword nodes:(NSArray<Node*>*)nodes {
+- (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion {
+    NSString* sha1HexPassword = password.sha1.hex;
+    NSSet<NSString*>* pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
+    
+    if ([pwnedCache containsObject:sha1HexPassword]) {
+        NSLog(@"Pwned: Cache HIT!");
+        completion(YES, nil);
+    }
+    else  {
+          NSMutableURLRequest *request = [self getHibpUrlRequest:sha1HexPassword];
+
+          UrlRequestOperation* op = [[UrlRequestOperation alloc] initWithRequest:request.copy dataTaskCompletionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
+              if (error) {
+                  NSLog(@"ERROR: [%@]", error);
+                  completion(NO, error);
+                  return;
+              }
+              
+              NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+              
+              if (httpResponse.statusCode == kHttpStatusOk) {
+                  BOOL found = [self processHibpResponse:data targetHash:sha1HexPassword];
+                   
+                  if (found) {
+                      NSSet<NSString*> *pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
+                      NSLog(@"Caching HIBP hit...");
+                      NSMutableSet<NSString*>* mut = pwnedCache ? pwnedCache.mutableCopy : NSMutableSet.set;
+                      [mut addObject:sha1HexPassword];
+                      [SecretStore.sharedInstance setSecureObject:mut.copy forIdentifier:kSecretStoreHibpPwnedSetCacheKey];
+                  }
+                  
+                  completion(found, nil);
+              }
+              else {
+                  NSLog(@"HTTP [%ld] - [%@]", (long)httpResponse.statusCode , error);
+                  completion(NO, [Utils createNSError:[NSString stringWithFormat:@"response = [%@]", httpResponse] errorCode:-2345]);
+              }
+        }];
+        
+        [self.hibpQueue addOperation:op];
+        self.hibpQueue.suspended = NO;
+    }
+}
+
+- (NSMutableURLRequest*)getHibpUrlRequest:(NSString*)sha1HexPassword {
     NSURL* url = [self buildHibpUrl:sha1HexPassword];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+    
+    const NSTimeInterval kUrlRequestTimeout = 5.0f; // 5 second timeout - probably could go lower
+    
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:kUrlRequestTimeout];
     [request addValue:@"true" forHTTPHeaderField:@"Add-Padding"]; // Enhance Privacy - Pads out responses to ensure all results contain a random number of records between 800 and 1,000.
+    
+    return request;
+}
+
+- (UrlRequestOperation*)haveIBeenPwned:(NSString*)password sha1HexPassword:(NSString*)sha1HexPassword nodes:(NSArray<Node*>*)nodes {
+    NSMutableURLRequest *request = [self getHibpUrlRequest:sha1HexPassword];
     
     return [[UrlRequestOperation alloc] initWithRequest:request.copy dataTaskCompletionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         [self handleUrlRequestCompletion:password sha1HexPassword:sha1HexPassword nodes:nodes data:data response:response error:error];

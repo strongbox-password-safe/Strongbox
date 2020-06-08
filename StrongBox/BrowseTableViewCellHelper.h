@@ -22,10 +22,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (UITableViewCell *)getBrowseCellForNode:(Node*)node
                                 indexPath:(NSIndexPath*)indexPath
-                        showLargeTotpCell:(BOOL)totp
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
                         showGroupLocation:(BOOL)showGroupLocation
                     groupLocationOverride:(NSString*_Nullable)groupLocationOverride
                             accessoryType:(UITableViewCellAccessoryType)accessoryType;
+
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node
+                                indexPath:(NSIndexPath*)indexPath
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
+                        showGroupLocation:(BOOL)showGroupLocation
+                    groupLocationOverride:(NSString*_Nullable)groupLocationOverride
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType
+                                  noFlags:(BOOL)noFlags;
 
 @end
 

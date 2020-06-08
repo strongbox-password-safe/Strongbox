@@ -36,6 +36,7 @@ const int kDefaultMinimumLength = 12;
         self.hibpCaveatAccepted = NO;
         self.hibpCheckForNewBreachesIntervalSeconds = 24 * 60 * 60; // Once a day check for newly compromised passwords
         self.lastHibpOnlineCheck = nil;
+        self.showCachedHibpHits = YES;
     }
         
     return self;
@@ -85,6 +86,10 @@ const int kDefaultMinimumLength = 12;
         if ([coder containsValueForKey:@"lastHibpOnlineCheck"]) {
             self.lastHibpOnlineCheck = [coder decodeObjectForKey:@"lastHibpOnlineCheck"];
         }
+        
+        if ([coder containsValueForKey:@"showCachedHibpHits"]) {
+            self.showCachedHibpHits = [coder decodeBoolForKey:@"showCachedHibpHits"];
+        }
     }
     
     return self;
@@ -106,6 +111,7 @@ const int kDefaultMinimumLength = 12;
     [coder encodeBool:self.hibpCaveatAccepted forKey:@"hibpCaveatShown"];
     [coder encodeInteger:self.hibpCheckForNewBreachesIntervalSeconds forKey:@"hibpCheckForNewBreachesIntervalSeconds"];
     [coder encodeObject:self.lastHibpOnlineCheck forKey:@"lastHibpOnlineCheck"];
+    [coder encodeBool:self.showCachedHibpHits forKey:@"showCachedHibpHits"];
 }
 
 @end

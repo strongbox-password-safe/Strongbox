@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" rowHeight="52" id="4Bp-nW-BV4" customClass="SwitchTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="405" height="52"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="4Bp-nW-BV4" id="c4S-vG-BqK">
+                <rect key="frame" x="0.0" y="0.0" width="405" height="52"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Label that could get quite long" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dYm-YH-IaF">
+                        <rect key="frame" x="20" y="15.5" width="232.5" height="21"/>
+                        <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                        <nil key="textColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jAH-Uq-xXh">
+                        <rect key="frame" x="328" y="10.5" width="51" height="31"/>
+                        <connections>
+                            <action selector="onSwitchOnOff:" destination="4Bp-nW-BV4" eventType="valueChanged" id="rv5-Bj-peA"/>
+                        </connections>
+                    </switch>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="dYm-YH-IaF" firstAttribute="centerY" secondItem="c4S-vG-BqK" secondAttribute="centerY" id="05y-lW-Esn"/>
+                    <constraint firstItem="jAH-Uq-xXh" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="dYm-YH-IaF" secondAttribute="trailing" constant="8" symbolic="YES" id="0Xj-1x-gC3"/>
+                    <constraint firstItem="jAH-Uq-xXh" firstAttribute="centerY" secondItem="c4S-vG-BqK" secondAttribute="centerY" id="1cC-a9-eOG"/>
+                    <constraint firstItem="dYm-YH-IaF" firstAttribute="leading" secondItem="c4S-vG-BqK" secondAttribute="leadingMargin" id="3IG-Of-9UM"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="jAH-Uq-xXh" secondAttribute="bottom" constant="6" id="5XI-5C-5u5"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="jAH-Uq-xXh" secondAttribute="trailing" constant="8" id="W3X-hI-vnh"/>
+                    <constraint firstItem="jAH-Uq-xXh" firstAttribute="top" relation="greaterThanOrEqual" secondItem="c4S-vG-BqK" secondAttribute="top" constant="6" id="ouH-Zg-bgP"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="labelText" destination="dYm-YH-IaF" id="WJa-rM-lAr"/>
+                <outlet property="switchOnOff" destination="jAH-Uq-xXh" id="NcU-R7-jMu"/>
+            </connections>
+            <point key="canvasLocation" x="16.666666666666668" y="0.6696428571428571"/>
+        </tableViewCell>
+    </objects>
+</document>
