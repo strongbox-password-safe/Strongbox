@@ -9,7 +9,7 @@
 #import "PasswordMaker.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 static NSString* const kAllSymbols = @"+-=_@#$%^&;:,.<>/~\\[](){}?!|*'\"";
 static NSString* const kAllUppercase = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -157,7 +157,7 @@ const static NSArray<NSString*> *kEmailDomains;
                                                                           preferredStyle:UIAlertControllerStyleAlert];
 
         
-        PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+        PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
         NSMutableArray* suggestions = [NSMutableArray arrayWithCapacity:3];
         
         if(usernamesOnly) {

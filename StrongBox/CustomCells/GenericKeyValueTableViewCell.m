@@ -10,7 +10,7 @@
 #import "FontManager.h"
 #import "ItemDetailsViewController.h"
 #import "ColoredStringHelper.h"
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface GenericKeyValueTableViewCell ()
 
@@ -316,7 +316,7 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
             if (@available(iOS 12.0, *)) {
                 dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
             }
-            BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+            BOOL colorBlind = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
             
             self.valueText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.value
                                                                                      colorize:self.colorizeValue

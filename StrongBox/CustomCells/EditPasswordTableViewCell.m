@@ -11,8 +11,8 @@
 #import "MBAutoGrowingTextView.h"
 #import "PasswordMaker.h"
 #import "FontManager.h"
-#import "Settings.h"
 #import "ColoredStringHelper.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface EditPasswordTableViewCell () <UITextViewDelegate>
 
@@ -51,7 +51,7 @@
 }
 
 - (IBAction)onGenerate:(id)sender {
-    PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
     [self setPassword:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
 }
 
@@ -77,7 +77,7 @@
     if (@available(iOS 12.0, *)) {
         dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
     }
-    BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+    BOOL colorBlind = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
     
     self.valueTextView.attributedText = [ColoredStringHelper getColorizedAttributedString:password
                                                                                  colorize:self.colorize

@@ -7,8 +7,8 @@
 //
 
 #import "SafesList.h"
-#import "Settings.h"
 #import "IOsUtils.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface SafesList()
 
@@ -42,7 +42,13 @@ NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChan
 }
 
 static NSUserDefaults* getSharedAppGroupDefaults() {
-    return [Settings.sharedInstance getSharedAppGroupDefaults];
+    return SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+}
+
+- (NSArray<SafeMetaData *> *)snapshot {
+    __block NSArray<SafeMetaData *> *result;
+    dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.data]; });
+    return result;
 }
 
 - (NSMutableArray<SafeMetaData*>*)load {
@@ -68,16 +74,34 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     });
 }
 
-- (void)add:(SafeMetaData *_Nonnull)safe {
+- (void)save {
     dispatch_barrier_async(self.dataQueue, ^{
-        [self.data addObject:safe];
-        
         [self serialize];
     });
 }
 
-- (void)save {
+- (void)update:(SafeMetaData *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
+        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return [obj.uuid isEqualToString:safe.uuid];
+        }];
+        
+        if(index != NSNotFound) {
+            [self.data replaceObjectAtIndex:index withObject:safe];
+            [self serialize];
+        }
+        else {
+            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", safe);
+        }
+    });
+}
+
+#ifndef IS_APP_EXTENSION
+
+- (void)add:(SafeMetaData *_Nonnull)safe {
+    dispatch_barrier_async(self.dataQueue, ^{
+        [self.data addObject:safe];
+        
         [self serialize];
     });
 }
@@ -101,12 +125,6 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     });
 }
 
-- (NSArray<SafeMetaData *> *)snapshot {
-    __block NSArray<SafeMetaData *> *result;
-    dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.data]; });
-    return result;
-}
-
 - (void)remove:(NSString*_Nonnull)uuid {
     dispatch_barrier_async(self.dataQueue, ^{
         NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -123,22 +141,6 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     });
 }
 
-- (void)update:(SafeMetaData *_Nonnull)safe {
-    dispatch_barrier_async(self.dataQueue, ^{
-        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            return [obj.uuid isEqualToString:safe.uuid];
-        }];
-        
-        if(index != NSNotFound) {
-            [self.data replaceObjectAtIndex:index withObject:safe];
-            [self serialize];
-        }
-        else {
-            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", safe);
-        }
-    });
-}
-
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex {
     dispatch_barrier_async(self.dataQueue, ^{
         SafeMetaData* item = [self.data objectAtIndex:sourceIndex];
@@ -147,6 +149,17 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         
         [self.data insertObject:item atIndex:destinationIndex];
         
+        [self serialize];
+    });
+}
+
+- (void)deleteAll {
+    for(SafeMetaData* database in self.snapshot) {
+        [database clearKeychainItems];
+    }
+    
+    dispatch_barrier_async(self.dataQueue, ^{
+        [self.data removeAllObjects];
         [self serialize];
     });
 }
@@ -163,6 +176,8 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     
     return [self isValidNickName:suggestion] ? suggestion : nil;
 }
+
+#endif
 
 - (NSString*)getSuggestedDatabaseNameUsingDeviceName {
     NSString* name = [IOsUtils nameFromDeviceName];
@@ -216,17 +231,6 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         SafeMetaData* item = (SafeMetaData*)evaluatedObject;
         return item.storageProvider == storageProvider;
     }]];
-}
-
-- (void)deleteAll {
-    for(SafeMetaData* database in self.snapshot) {
-        [database clearKeychainItems];
-    }
-    
-    dispatch_barrier_async(self.dataQueue, ^{
-        [self.data removeAllObjects];
-        [self serialize];
-    });
 }
 
 @end

@@ -14,6 +14,8 @@
 #import "LocalDeviceStorageProvider.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
+#import "SharedAppAndAutoFillSettings.h"
+#import "OpenSafeSequenceHelper.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 
@@ -31,7 +33,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
         return;
     }
     
-    BOOL iCloud = Settings.sharedInstance.iCloudOn;
+    BOOL iCloud = SharedAppAndAutoFillSettings.sharedInstance.iCloudOn;
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name
@@ -149,26 +151,6 @@ static DatabaseModel* getNewDatabase(NSString* password,
     }
     
     return [[DatabaseModel alloc] initNew:ckf format:format];
-}
-
-NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
-    NSData* keyFileData = getKeyFileData(keyFileUrl, onceOffKeyFileData, error);
-    
-    NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:format != kKeePass1] : nil;
-
-    return keyFileDigest;
-}
-
-NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error) {
-    NSData* keyFileData = nil;
-    if (keyFileUrl) { 
-        keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
-    }
-    else if (onceOffKeyFileData) {
-        keyFileData = onceOffKeyFileData;
-    }
-    
-    return keyFileData;
 }
 
 @end

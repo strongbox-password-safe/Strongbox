@@ -10,7 +10,6 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "SafesListTableViewController.h"
-#import "Settings.h"
 #import "iCloudSafesCoordinator.h"
 #import "Alerts.h"
 #import "mach/mach.h"
@@ -19,6 +18,7 @@
 #import "Utils.h"
 #import "OpenSafeSequenceHelper.h"
 #import "AutoFillManager.h"
+#import "AutoFillSettings.h"
 
 #import "LocalDeviceStorageProvider.h"
 
@@ -77,7 +77,7 @@
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 BOOL useAutoFillCache = ![self liveAutoFillIsPossibleWithSafe:safe];
 
-                Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
+                AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
                 [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                                    safe:safe
                                                       openAutoFillCache:useAutoFillCache
@@ -87,7 +87,7 @@
                                                  manualOpenOfflineCache:NO
                                             biometricAuthenticationDone:NO
                                                              completion:^(Model * _Nullable model, NSError * _Nullable error) {
-                    Settings.sharedInstance.autoFillExitedCleanly = YES;
+                    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
 
                                                                  NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
                     if(model) {
@@ -261,8 +261,8 @@
 }
 
 void showWelcomeMessageIfAppropriate(UIViewController *vc) { 
-    if(!Settings.sharedInstance.hasShownAutoFillLaunchWelcome) {
-        Settings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
+    if(!AutoFillSettings.sharedInstance.hasShownAutoFillLaunchWelcome) {
+        AutoFillSettings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
         
         [Alerts info:vc
                title:NSLocalizedString(@"auto_fill_welcome_message_header", @"Welcome")
@@ -284,7 +284,7 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
     
     self.quickTypeMode = quickType;
     
-    BOOL lastRunGood = Settings.sharedInstance.autoFillExitedCleanly;
+    BOOL lastRunGood = AutoFillSettings.sharedInstance.autoFillExitedCleanly;
     
     // MMcG: Don't do this here as iOS can and does regularly terminate the extension without notice
     // in normal situations. Only do this immediately before Database Open/Unlock
@@ -307,7 +307,7 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
 
 - (void)exitWithUserCancelled {
     NSLog(@"EXIT: User Cancelled");
-    Settings.sharedInstance.autoFillExitedCleanly = YES;
+    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
     
     [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
 }
@@ -321,14 +321,14 @@ void showWelcomeMessageIfAppropriate(UIViewController *vc) {
 
 - (void)exitWithErrorOccurred:(NSError*)error {
     NSLog(@"EXIT: Error Occured [%@]", error);
-    Settings.sharedInstance.autoFillExitedCleanly = YES; // Still a clean exit - no crash
+    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES; // Still a clean exit - no crash
     
     [self.extensionContext cancelRequestWithError:error];
 }
 
 - (void)exitWithCredential:(NSString*)username password:(NSString*)password {
     NSLog(@"EXIT: Success");
-    Settings.sharedInstance.autoFillExitedCleanly = YES;
+    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
     
     ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
     [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];

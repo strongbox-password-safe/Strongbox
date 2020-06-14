@@ -9,7 +9,10 @@
 #import "PreferencesTableViewController.h"
 #import "Alerts.h"
 #import "Utils.h"
+
 #import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
+
 #import <MessageUI/MessageUI.h>
 #import "SafesList.h"
 #import "PinEntryController.h"
@@ -122,10 +125,10 @@
         [self promptForInteger:NSLocalizedString(@"prefs_vc_clear_clipboard_delay", @"Clear Clipboard Delay")
                        options:@[@30, @45, @60, @90, @120, @180]
              formatAsIntervals:YES
-                  currentValue:Settings.sharedInstance.clearClipboardAfterSeconds
+                  currentValue:SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds
                     completion:^(BOOL success, NSInteger selectedValue) {
                         if (success) {
-                            Settings.sharedInstance.clearClipboardAfterSeconds = selectedValue;
+                            SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds = selectedValue;
                         }
                         [self bindClearClipboard];
                     }];
@@ -183,16 +186,16 @@
 
 - (void)bindAboutButton {
     NSString *aboutString;
-    if([[Settings sharedInstance] isPro]) {
+    if([[SharedAppAndAutoFillSettings sharedInstance] isPro]) {
         aboutString = [NSString stringWithFormat:
                        NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@"), [Utils getAppVersion]];
     }
     else {
-        if(Settings.sharedInstance.hasOptedInToFreeTrial) {
-            if([[Settings sharedInstance] isFreeTrial]) {
+        if(SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial) {
+            if([[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial]) {
                 aboutString = [NSString stringWithFormat:
                                NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt", @"About Strongbox %@ (Pro Trial - %ld days left)"),
-                               [Utils getAppVersion], (long)Settings.sharedInstance.freeTrialDaysLeft];
+                               [Utils getAppVersion], (long)SharedAppAndAutoFillSettings.sharedInstance.freeTrialDaysLeft];
             }
             else {
                 aboutString = [NSString stringWithFormat:
@@ -220,7 +223,7 @@
                                                               NSLocalizedString(@"prefs_vc_cloud_sessions_count_fmt", @"Sessions (%d)"), cloudSessionCount] :
     NSLocalizedString(@"prefs_vc_cloud_sessions_count_none", @"No Sessions");
 
-    self.switchUseICloud.on = [[Settings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
+    self.switchUseICloud.on = [[SharedAppAndAutoFillSettings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
     
     self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
@@ -229,11 +232,11 @@
 }
 
 - (void)bindHideTips {
-    self.switchShowTips.on = !Settings.sharedInstance.hideTips;
+    self.switchShowTips.on = !SharedAppAndAutoFillSettings.sharedInstance.hideTips;
 }
 
 - (IBAction)onHideTips:(id)sender {
-    Settings.sharedInstance.hideTips = !self.switchShowTips.on;
+    SharedAppAndAutoFillSettings.sharedInstance.hideTips = !self.switchShowTips.on;
     [self bindHideTips];
 }
 
@@ -305,7 +308,7 @@
                        NSLocalizedString(@"prefs_vc_master_password_icloud_migration_yesno_warning_message_fmt", @"It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings?"), biometricIdName, biometricIdName]
               action:^(BOOL response) {
             if(response) {
-                [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];
+                [[SharedAppAndAutoFillSettings sharedInstance] setICloudOn:self.switchUseICloud.on];
                 
                 [self bindCloudSessions];
             }
@@ -315,7 +318,7 @@
         }];
     }
     else {
-        [[Settings sharedInstance] setICloudOn:self.switchUseICloud.on];
+        [[SharedAppAndAutoFillSettings sharedInstance] setICloudOn:self.switchUseICloud.on];
         
         [self bindCloudSessions];
     }
@@ -389,14 +392,14 @@
 }
 
 - (IBAction)onSwitchClearClipboardEnable:(id)sender {
-    Settings.sharedInstance.clearClipboardEnabled = self.clearClipboardEnabled.on;
+    SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled = self.clearClipboardEnabled.on;
     
     [self bindClearClipboard];
 }
 
 - (void)bindClearClipboard {
-    NSInteger seconds = Settings.sharedInstance.clearClipboardAfterSeconds;
-    BOOL enabled = Settings.sharedInstance.clearClipboardEnabled;
+    NSInteger seconds = SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds;
+    BOOL enabled = SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled;
     
     self.clearClipboardEnabled.on = enabled;
     self.cellClearClipboardDelay.userInteractionEnabled = enabled;

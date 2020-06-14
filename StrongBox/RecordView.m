@@ -14,7 +14,6 @@
 #import "SVProgressHUD.h"
 #import "ISMessages/ISMessages.h"
 #import "TextFieldAutoSuggest.h"
-#import "Settings.h"
 #import "FileAttachmentsViewControllerTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "UiAttachment.h"
@@ -28,6 +27,7 @@
 #import "PasswordGenerationViewController.h"
 #import "ClipboardManager.h"
 #import "NSString+Extensions.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -618,7 +618,7 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (Node*)createNewRecord {
-    AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings* settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     NSString *title = settings.titleAutoFillMode == kDefault ? @"Untitled" : settings.titleCustomAutoFill;
     
@@ -1214,7 +1214,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         // No Custom Icon has been set for this entry, and it's a brand new entry, does the user want us to try
         // grab a FavIcon?
         
-        if(Settings.sharedInstance.isProOrFreeTrial && self.viewModel.metadata.tryDownloadFavIconForNewRecord &&
+        if(SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.viewModel.metadata.tryDownloadFavIconForNewRecord &&
            (self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4)) {
             NSString* urlHint = trim(self.textFieldUrl.text);
             if(!urlHint.length) {

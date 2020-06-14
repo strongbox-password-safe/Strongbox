@@ -7,12 +7,12 @@
 //
 
 #import "AuditConfigurationVcTableViewController.h"
-#import "Settings.h"
 #import "Alerts.h"
 #import "Utils.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "ExcludedItemsViewController.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 static const int kSectionIdxHibp = 2; // Careful if sections move around
 static const int kSectionIdxSimilarPasswords = 5; // Careful if sections move around 
@@ -127,21 +127,21 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
     // HIBP Enabled/Disabled based on Pro and on/off status
     
-    self.switchHibp.enabled = Settings.sharedInstance.isProOrFreeTrial;
-    self.switchShowCached.enabled = Settings.sharedInstance.isProOrFreeTrial;
-    self.labelCheckHaveIBeenPwned.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
-    self.labelLastOnlineCheckHeader.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
-    self.labelOnlineCheckInterval.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
-    self.labelCheckOfflinePwnedCache.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
-    self.labelCheckHaveIBeenPwned.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.switchHibp.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.switchShowCached.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.labelCheckHaveIBeenPwned.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.labelLastOnlineCheckHeader.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
+    self.labelOnlineCheckInterval.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
+    self.labelCheckOfflinePwnedCache.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.labelCheckHaveIBeenPwned.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
 
     // Similarity Enabled/Disabled based on Pro and on/off status
 
-    self.switchSimilar.enabled = Settings.sharedInstance.isProOrFreeTrial;
-    self.sliderSimilar.enabled = Settings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on;
-    self.labelSimilar.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
-    self.labelSimilarityThresholdTitle.textColor = Settings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
-    self.labelCheckSimilar.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.switchSimilar.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.sliderSimilar.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on;
+    self.labelSimilar.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
+    self.labelSimilarityThresholdTitle.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
+    self.labelCheckSimilar.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
 
     [self bindAuditStatusWithProgress:nil];
 }
@@ -153,11 +153,11 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == kSectionIdxHibp && !Settings.sharedInstance.isProOrFreeTrial) {
+    if(section == kSectionIdxHibp && !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         return NSLocalizedString(@"audit_hibp_pro_only_title", @"Have I Been Pwned? (Pro Edition Only)");
     }
     
-    if(section == kSectionIdxSimilarPasswords && !Settings.sharedInstance.isProOrFreeTrial) {
+    if(section == kSectionIdxSimilarPasswords && !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         return NSLocalizedString(@"audit_similar_passwords_pro_only_title", @"Similar Passwords (Pro Edition Only");
     }
 

@@ -11,10 +11,10 @@
 #import "BrowseTableViewCellHelper.h"
 #import "ItemDetailsViewController.h"
 #import "SwitchTableViewCell.h"
-#import "Settings.h"
 #import "Alerts.h"
 #import "SVProgressHUD.h"
 #import "AuditConfigurationVcTableViewController.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 const NSUInteger kSectionSettingsIdx = 0;
 const NSUInteger kSectionBasicIdx = 1;
@@ -77,7 +77,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     self.basicRows = [self getBasicRows:self.flags];
     self.duplicates = [mute.allObjects sortedArrayUsingComparator:finderStyleNodeComparator];
     self.similars = [muteSims.allObjects sortedArrayUsingComparator:finderStyleNodeComparator];
-    self.actions = [self.flags containsObject:@(kAuditFlagPwned)] || !Settings.sharedInstance.isProOrFreeTrial ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
+    self.actions = [self.flags containsObject:@(kAuditFlagPwned)] || !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
     
     [self.tableView reloadData];
 }

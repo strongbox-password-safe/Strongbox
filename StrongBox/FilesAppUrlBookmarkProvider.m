@@ -295,7 +295,9 @@ viewController:(UIViewController *)viewController
 
         safeMetaData.fileIdentifier = [self getJsonFileIdentifier:mainAppBookmark autoFillBookmark:autoFillBookmark];
 
+#ifndef IS_APP_EXTENSION // TODO: Auto Fill
         [SafesList.sharedInstance update:safeMetaData];
+#endif
     }
     
     NSLog(@"Got URL from Bookmark: [%@]", url);
@@ -310,11 +312,11 @@ viewController:(UIViewController *)viewController
 
 - (SafeMetaData*)setAutoFillBookmark:(NSData *)bookmark metadata:(SafeMetaData *)metadata {
     NSData* originalBookmark = [self bookMarkFromMetadata:metadata isAutoFill:NO];
-    
+
     NSString* fileIdentifier = [self getJsonFileIdentifier:originalBookmark autoFillBookmark:bookmark];
-    
+
     metadata.fileIdentifier = fileIdentifier;
-    
+
     return metadata;
 }
 

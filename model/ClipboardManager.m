@@ -10,7 +10,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/UTCoreTypes.h>
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface ClipboardManager ()
 
@@ -45,21 +45,21 @@
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
     if(@available(iOS 10.0, *)) {
-        if(Settings.sharedInstance.clearClipboardEnabled && Settings.sharedInstance.clearClipboardAfterSeconds > 0) {
+        if(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled && SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds > 0) {
             // Belt and braces approach here we can use the built in iOS 10+ expiry along with our
             // more manual clipboard watch task to catch other cases where we don't directly copy via this function
             
-            NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:Settings.sharedInstance.clearClipboardAfterSeconds];
+            NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds];
             
             NSLog(@"Expiration: %@", expirationTime);
             
             [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(!Settings.sharedInstance.clipboardHandoff) ,
+                         options: @{ UIPasteboardOptionLocalOnly : @(!SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff) ,
                                      UIPasteboardOptionExpirationDate : expirationTime }];
         }
         else {
             [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(!Settings.sharedInstance.clipboardHandoff) }];
+                         options: @{ UIPasteboardOptionLocalOnly : @(!SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff) }];
         }
     }
     else {
@@ -94,7 +94,7 @@
         self.clearClipboardAppBackgroundTask = UIBackgroundTaskInvalid;
     }];
     
-    NSLog(@"Creating New Clear Clipboard Background Task... with timeout = [%ld]", (long)Settings.sharedInstance.clearClipboardAfterSeconds);
+    NSLog(@"Creating New Clear Clipboard Background Task... with timeout = [%ld]", (long)SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds);
 
     NSInteger clipboardChangeCount = UIPasteboard.generalPasteboard.changeCount;
     self.clearClipboardTask = dispatch_block_create(0, ^{
@@ -102,12 +102,12 @@
     });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
-                                 (int64_t)(Settings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
+                                 (int64_t)(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
                     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), self.clearClipboardTask);
 }
 
 - (void)clearClipboardDelayedTask:(NSInteger)clipboardChangeCount {
-    if(!Settings.sharedInstance.clearClipboardEnabled) {
+    if(!SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled) {
         [self unobserveClipboardChangeNotifications];
         return; // In case a setting change has be made
     }
@@ -134,7 +134,7 @@
 }
 
 - (void)observeClipboardChangeNotifications {
-    if(Settings.sharedInstance.clearClipboardEnabled) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled) {
         if(!self.clipboardNotificationIdentifier) {
             // Delay by a small bit because we're definitely getting an odd crash or two somehow due to infinite loop now
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

@@ -7,9 +7,9 @@
 //
 
 #import "FileManager.h"
-#import "Settings.h"
 #import "SafesList.h"
 #import "DatabaseModel.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface FileManager ()
 
@@ -56,9 +56,9 @@
 }
 
 - (NSURL *)keyFilesDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:Settings.sharedInstance.appGroupName];
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
     if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", Settings.sharedInstance.appGroupName);
+        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
         return nil;
     }
     
@@ -70,9 +70,9 @@
 }
 
 - (NSURL *)backupFilesDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:Settings.sharedInstance.appGroupName];
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
     if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", Settings.sharedInstance.appGroupName);
+        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
         return nil;
     }
     
@@ -84,9 +84,9 @@
 }
 
 - (NSURL *)sharedAppGroupDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:Settings.sharedInstance.appGroupName];
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
     if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", Settings.sharedInstance.appGroupName);
+        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
         return nil;
     }
     

@@ -8,7 +8,7 @@
 
 #import "CustomFieldTableCell.h"
 #import "ColoredStringHelper.h"
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 NSString *const CustomFieldCellHeightChanged = @"CustomFieldCellHeightChangedNotification";
 
@@ -80,7 +80,7 @@ NSString *const CustomFieldCellHeightChanged = @"CustomFieldCellHeightChangedNot
         if (@available(iOS 12.0, *)) {
            dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
         }
-        BOOL colorBlind = Settings.sharedInstance.colorizeUseColorBlindPalette;
+        BOOL colorBlind = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
 
         self.valueLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:self._value
                                                                                   colorize:self.colorize

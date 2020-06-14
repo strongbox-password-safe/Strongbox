@@ -145,9 +145,9 @@
             }
 
         }
-        
+
         [SafesList.sharedInstance addWithDuplicateCheck:metadata];
-        
+
         [Alerts info:self
                title:NSLocalizedString(@"generic_done", @"Done")
              message:NSLocalizedString(@"backup_vc_backup_added_to_databases", @"This backup has been added to your databases")

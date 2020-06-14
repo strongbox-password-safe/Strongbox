@@ -11,11 +11,11 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "Utils.h"
 #import "IOsUtils.h"
-#import "Settings.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "FileManager.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface KeyFilesTableViewController () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DZNEmptyDataSetSource>
 
@@ -82,7 +82,7 @@
             NSLog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
-            if(Settings.sharedInstance.showAllFilesInLocalKeyFiles || ![self isUnlikelyKeyFile:url]) {
+            if(SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles || ![self isUnlikelyKeyFile:url]) {
                 [otherFiles addObject:url];
             }
         }

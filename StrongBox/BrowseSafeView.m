@@ -12,6 +12,7 @@
 #import "RecordView.h"
 #import "Alerts.h"
 #import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 #import "DatabaseOperations.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
@@ -342,7 +343,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)maybePromptToTryProFeatures {
     // Free or Pro? Definitely no
     
-    if(Settings.sharedInstance.isProOrFreeTrial) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         return;
     }
 
@@ -353,7 +354,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     //NSLog(@"Nudge Due: [%@]", dueDate);
     BOOL nudgeDue = dueDate.timeIntervalSinceNow < 0; // Due date is in past
     
-    if (!Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired && nudgeDue) {
+    if (!SharedAppAndAutoFillSettings.sharedInstance.freeTrialHasBeenOptedInAndExpired && nudgeDue) {
         Settings.sharedInstance.lastFreeTrialNudge = NSDate.date;
         
         NSString* locMsg = NSLocalizedString(@"browse_pro_nudge_message_fmt", @"Strongbox Pro is full of handy features like %@ Unlock.\n\nYou have a Free Trial available to use, would you like to try Strongbox Pro?");
@@ -384,7 +385,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (BOOL)userHasAlreadyTriedAppForMoreThan90Days {
-    return (Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90);
+    return (SharedAppAndAutoFillSettings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90);
 }
     
 - (void)showDetailTargetDidChange:(NSNotification *)notification{
@@ -515,11 +516,11 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)setupTips {
-    if(Settings.sharedInstance.hideTips) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     
-    if (!Settings.sharedInstance.hideTips && (!self.currentGroup || self.currentGroup.parent == nil)) {
+    if (!SharedAppAndAutoFillSettings.sharedInstance.hideTips && (!self.currentGroup || self.currentGroup.parent == nil)) {
         [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_tip_fast_tap_title", @"Fast Tap Actions")
                                    message:NSLocalizedString(@"browse_vc_tip_fast_tap_message", @"You can long press, or double/triple tap to quickly copy fields... Give it a try!")
                                   duration:2.5f

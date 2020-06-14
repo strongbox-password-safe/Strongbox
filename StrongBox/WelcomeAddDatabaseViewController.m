@@ -11,6 +11,7 @@
 #import "SafesList.h"
 #import "Settings.h"
 #import "WelcomeUseICloudViewController.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface WelcomeAddDatabaseViewController ()
 
@@ -87,7 +88,7 @@
 }
 
 - (IBAction)onCreate:(id)sender {
-    if(Settings.sharedInstance.iCloudAvailable && !Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+    if(Settings.sharedInstance.iCloudAvailable && !SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
         [self performSegueWithIdentifier:@"segueToICloudPrompt" sender:@(NO)];
     }
     else {
@@ -96,7 +97,7 @@
 }
 
 - (IBAction)onAdd:(id)sender {
-    if(Settings.sharedInstance.iCloudAvailable && !Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+    if(Settings.sharedInstance.iCloudAvailable && !SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
         [self performSegueWithIdentifier:@"segueToICloudPrompt" sender:@(YES)];
     }
     else {

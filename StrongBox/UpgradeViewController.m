@@ -12,6 +12,8 @@
 #import "Settings.h"
 #import "Alerts.h"
 #import "BiometricsManager.h"
+#import "Model.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface UpgradeViewController () <SKStoreProductViewControllerDelegate>
 
@@ -107,17 +109,17 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
 }
 
 - (void)bindFreeTrialInfo {
-    if ([Settings.sharedInstance isPro]) {
+    if ([SharedAppAndAutoFillSettings.sharedInstance isPro]) {
         self.buttonStartFreeTrial.hidden = YES;
         self.viewFreeTrialInfo.hidden = YES;
     }
-    else if (Settings.sharedInstance.freeTrialEnd) {
+    else if (SharedAppAndAutoFillSettings.sharedInstance.freeTrialEnd) {
         self.buttonStartFreeTrial.hidden = YES;
         self.viewFreeTrialInfo.hidden = NO;
         
-        NSInteger daysRemaining = Settings.sharedInstance.freeTrialDaysLeft;
+        NSInteger daysRemaining = SharedAppAndAutoFillSettings.sharedInstance.freeTrialDaysLeft;
 
-        if (Settings.sharedInstance.isFreeTrial) {
+        if (SharedAppAndAutoFillSettings.sharedInstance.isFreeTrial) {
             NSString* loc = NSLocalizedString(@"upgrade_vc_you_have_n_days_remaining_fmt", @"You have %ld days left in your Pro trial");
             self.freeTrialExpiryIndicator.text = [NSString stringWithFormat:loc, daysRemaining];
         }
@@ -338,7 +340,7 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
     [self enableButtons:NO];
     [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
     
-    BOOL optedInToFreeTrial = Settings.sharedInstance.hasOptedInToFreeTrial;
+    BOOL optedInToFreeTrial = SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial;
     
     [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -351,9 +353,9 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
                         error:error];
             }
             else {
-                BOOL freeTrialStarted = Settings.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
+                BOOL freeTrialStarted = SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
                 
-                if(!Settings.sharedInstance.isPro && !freeTrialStarted) {
+                if(!SharedAppAndAutoFillSettings.sharedInstance.isPro && !freeTrialStarted) {
                     [Alerts info:self
                            title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
                          message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")

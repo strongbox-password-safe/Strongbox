@@ -194,8 +194,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)startMonitoringDocumentsDirectory
-{
+- (void)startMonitoringDocumentsDirectory {
 #define fileChangedNotification @"fileChangedNotification"
     
     // Get the path to the home directory
@@ -323,7 +322,9 @@
 
 - (void)syncLocalSafesWithFileSystem {
     // Add any new
-    
+
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
+
     NSArray<StorageBrowserItem*> *items = [self scanForNewDatabases];
     
     if(items.count) {
@@ -345,6 +346,9 @@
             [SafesList.sharedInstance remove:localSafe.uuid];
         }
     }
+    
+#endif
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -423,8 +427,10 @@
     
     metadata.fileIdentifier = [identifier toJson];
     metadata.fileName = identifier.filename;
-    
+
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:metadata];
+#endif
     
     [self startMonitoringDocumentsDirectory];
     

@@ -13,6 +13,7 @@
 #import "PreviousPasswordsTableViewController.h"
 #import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
 #import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 #import "SafesViewController.h"
 #import "SafesViewController.h"
 #import "OfflineDetector.h"
@@ -79,7 +80,7 @@
 - (void)initializeProFamilyEdition {
     if([ProUpgradeIAPManager isProFamilyEdition]) {
         NSLog(@"Pro Family Edition... setting Pro");
-        [Settings.sharedInstance setPro:YES];
+        [SharedAppAndAutoFillSettings.sharedInstance setPro:YES];
     }
 }
 

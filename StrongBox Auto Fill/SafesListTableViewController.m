@@ -10,7 +10,6 @@
 #import "SafeMetaData.h"
 #import "SafesList.h"
 #import "SafeStorageProviderFactory.h"
-#import "Settings.h"
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "CredentialProviderViewController.h"
 #import "OpenSafeSequenceHelper.h"
@@ -24,6 +23,8 @@
 #import "FilesAppUrlBookmarkProvider.h"
 #import "Alerts.h"
 #import "StrongboxUIDocument.h"
+#import "AutoFillSettings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface SafesListTableViewController ()
 
@@ -42,14 +43,14 @@
     self.tableView.emptyDataSetSource = self;
     self.tableView.emptyDataSetDelegate = self;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
-    self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
+    self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
     self.tableView.tableFooterView = [UIView new];
     
     [SVProgressHUD setViewForExtension:self.view];
     
-    if(Settings.sharedInstance.quickLaunchUuid) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
         SafeMetaData* database = [self.safes firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-            return [obj.uuid isEqualToString:Settings.sharedInstance.quickLaunchUuid];
+            return [obj.uuid isEqualToString:SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid];
         }];
      
         if(database && [[self getInitialViewController] autoFillIsPossibleWithSafe:database]) {
@@ -161,7 +162,7 @@
     if(database.hasUnresolvedConflicts) {
         return [UIImage imageNamed:@"error"];
     }
-    else if([Settings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+    else if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
         return [UIImage imageNamed:@"rocket"];
     }
     else if(database.readOnly) {
@@ -172,15 +173,14 @@
 }
 
 - (void)populateDatabaseCell:(DatabaseCell*)cell database:(SafeMetaData*)database disabled:(BOOL)disabled {
-    UIImage* statusImage = Settings.sharedInstance.showDatabaseStatusIcon ? [self getStatusImage:database] : nil;
+    UIImage* statusImage = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon ? [self getStatusImage:database] : nil;
     
-    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellTopSubtitle];
-    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle1];
-    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle2];
-    
+    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
+    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
+    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
     
     UIImage* databaseIcon = nil;
-    if (Settings.sharedInstance.showDatabaseIcon) {
+    if (SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon) {
         // Manual Icons for unsupported/uncompilable providers in App Extension
         if(database.storageProvider == kOneDrive) {
             databaseIcon = [UIImage imageNamed:@"one-drive-icon-only-32x32"];
@@ -197,7 +197,7 @@
     // If we can't do live show auto fill cache date in subtitle 2
     
     if (disabled) {
-        databaseIcon = Settings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
+        databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
         subtitle2 = database.autoFillEnabled ?
         NSLocalizedString(@"autofill_safes_vc_item_subtitle_no_cache_yet", @"[No Auto Fill Cache File Yet]") :
         NSLocalizedString(@"autofill_safes_vc_item_subtitle_cache_disabled", @"[Auto Fill Disabled]");
@@ -273,7 +273,7 @@
 - (void)openDatabase:(SafeMetaData*)safe {
     BOOL useAutoFillCache = ![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe];
     
-    Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
+    AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
                                           openAutoFillCache:useAutoFillCache
@@ -282,7 +282,7 @@
                                      manualOpenOfflineCache:NO
                                 biometricAuthenticationDone:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
-        Settings.sharedInstance.autoFillExitedCleanly = YES;
+        AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
         
           if(model) {
               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];

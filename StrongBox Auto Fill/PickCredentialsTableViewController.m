@@ -8,7 +8,6 @@
 
 #import "PickCredentialsTableViewController.h"
 #import "NodeIconHelper.h"
-#import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "Alerts.h"
 #import "Utils.h"
@@ -19,6 +18,7 @@
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
 #import "BrowseTableViewCellHelper.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -42,7 +42,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    if(Settings.sharedInstance.hideTips) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
 

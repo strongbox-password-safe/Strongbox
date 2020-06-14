@@ -9,11 +9,13 @@
 #import "ProUpgradeIAPManager.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
-#import "Settings.h"
 #import "RMStore.h"
 #import "RMStoreAppReceiptVerifier.h"
 #import "RMAppReceipt.h"
 #import "Alerts.h"
+#import "SharedAppAndAutoFillSettings.h"
+#import "Settings.h"
+#import "Model.h"
 
 static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.pro";
 
@@ -106,7 +108,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
                title:NSLocalizedString(@"upgrade_mgr_entitlements_error_title", @"Strongbox Entitlements Error")
              message:NSLocalizedString(@"upgrade_mgr_entitlements_error_message", @"Strongbox is having trouble verifying its App Store entitlements. This means the App must be downgraded to the Free version. Please contact support@strongboxsafe.com if you think this is in error.")];
     
-        [Settings.sharedInstance setPro:NO];
+        [SharedAppAndAutoFillSettings.sharedInstance setPro:NO];
     }
 }
 
@@ -141,10 +143,10 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     Settings.sharedInstance.numberOfEntitlementCheckFails = 0;
     
     NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
-    if(freeTrialPurchaseDate && !Settings.sharedInstance.hasOptedInToFreeTrial) {
+    if(freeTrialPurchaseDate && !SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial) {
         NSLog(@"Found Free Trial Purchase: [%@] - Setting free trial end date accordingly", freeTrialPurchaseDate);
-        NSDate* endDate = [Settings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
-        Settings.sharedInstance.freeTrialEnd = endDate;
+        NSDate* endDate = [SharedAppAndAutoFillSettings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
+        SharedAppAndAutoFillSettings.sharedInstance.freeTrialEnd = endDate;
 
         // This should update the main screen
         [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
@@ -152,14 +154,14 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     
     if ([ProUpgradeIAPManager isProFamilyEdition]) {
         NSLog(@"Upgrading App to Pro as Receipt is Good and this is the Pro Family edition...");
-        [Settings.sharedInstance setPro:YES];
+        [SharedAppAndAutoFillSettings.sharedInstance setPro:YES];
     }
     else if([self receiptHasProEntitlements]) {
         NSLog(@"Upgrading App to Pro as Entitlement found in Receipt...");
-        [Settings.sharedInstance setPro:YES];
+        [SharedAppAndAutoFillSettings.sharedInstance setPro:YES];
     }
     else {
-        if(Settings.sharedInstance.isPro) {
+        if(SharedAppAndAutoFillSettings.sharedInstance.isPro) {
             NSLog(@"Downgrading App as Entitlement NOT found in Receipt...");
             
             if(vc) {
@@ -167,7 +169,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
                        title:NSLocalizedString(@"upgrade_mgr_downgrade_title", @"Strongbox Downgrade")
                      message:NSLocalizedString(@"upgrade_mgr_downgrade_message", @"It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt.")];
             }
-            [Settings.sharedInstance setPro:NO];
+            [SharedAppAndAutoFillSettings.sharedInstance setPro:NO];
         }
         else {
             NSLog(@"App Pro Entitlement not found in Receipt... leaving downgraded...");

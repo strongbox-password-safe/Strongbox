@@ -7,7 +7,8 @@
 //
 
 #import "DatabasesViewPreferencesController.h"
-#import "Settings.h"
+//#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 
@@ -33,19 +34,19 @@
 }
 
 - (void)bindUi {
-    self.switchShowStorageIcon.on = Settings.sharedInstance.showDatabaseIcon;
-    self.showStatusIndicator.on = Settings.sharedInstance.showDatabaseStatusIcon;
-    self.showSeparator.on = Settings.sharedInstance.showDatabasesSeparator;
+    self.switchShowStorageIcon.on = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon;
+    self.showStatusIndicator.on = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon;
+    self.showSeparator.on = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator;
     
-    self.labelTopRight.text = [self getDatabaseSubtitleFieldName:Settings.sharedInstance.databaseCellTopSubtitle];
-    self.labelSubtitle1.text = [self getDatabaseSubtitleFieldName:Settings.sharedInstance.databaseCellSubtitle1];
-    self.labelSubtitle2.text = [self getDatabaseSubtitleFieldName:Settings.sharedInstance.databaseCellSubtitle2];
+    self.labelTopRight.text = [self getDatabaseSubtitleFieldName:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
+    self.labelSubtitle1.text = [self getDatabaseSubtitleFieldName:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
+    self.labelSubtitle2.text = [self getDatabaseSubtitleFieldName:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
 }
 
 - (IBAction)onSettingChanged:(id)sender {
-    Settings.sharedInstance.showDatabaseIcon = self.switchShowStorageIcon.on;
-    Settings.sharedInstance.showDatabaseStatusIcon = self.showStatusIndicator.on;
-    Settings.sharedInstance.showDatabasesSeparator = self.showSeparator.on;
+    SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon = self.switchShowStorageIcon.on;
+    SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon = self.showStatusIndicator.on;
+    SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator = self.showSeparator.on;
     
     if(self.onPreferencesChanged) {
         self.onPreferencesChanged();
@@ -73,10 +74,10 @@
     if (cell == self.cellTopRight) {
         [self promptForString:NSLocalizedString(@"databases_preferences_select_top_right_field", @"Select Top Right Field")
                       options:options
-                 currentIndex:Settings.sharedInstance.databaseCellTopSubtitle
+                 currentIndex:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle
                    completion:^(BOOL success, NSInteger selectedIdx) {
                        if(success) {
-                           Settings.sharedInstance.databaseCellTopSubtitle = selectedIdx;
+                           SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle = selectedIdx;
                            [self onSettingChanged:nil];
                        }
                    }];
@@ -84,10 +85,10 @@
     else if (cell == self.cellSubtitle1) {
         [self promptForString:NSLocalizedString(@"databases_preferences_select_subtitle1_field", @"Select Subtitle 1 Field")
                       options:options
-                 currentIndex:Settings.sharedInstance.databaseCellSubtitle1
+                 currentIndex:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1
                    completion:^(BOOL success, NSInteger selectedIdx) {
                        if(success) {
-                           Settings.sharedInstance.databaseCellSubtitle1 = selectedIdx;
+                           SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1 = selectedIdx;
                            [self onSettingChanged:nil];
                        }
                    }];
@@ -95,10 +96,10 @@
     else if (cell == self.cellSubtitle2) {
         [self promptForString:NSLocalizedString(@"databases_preferences_select_subtitle2_field", @"Select Subtitle 2 Field")
                       options:options
-                 currentIndex:Settings.sharedInstance.databaseCellSubtitle2
+                 currentIndex:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2
                    completion:^(BOOL success, NSInteger selectedIdx) {
                        if(success) {
-                           Settings.sharedInstance.databaseCellSubtitle2 = selectedIdx;
+                           SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2 = selectedIdx;
                            [self onSettingChanged:nil];
                        }
                    }];

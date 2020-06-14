@@ -10,8 +10,8 @@
 #import "Alerts.h"
 #import <YubiKit.h>
 #import "Utils.h"
-#import "Settings.h"
 #import "Strongbox-Swift.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 typedef NS_ENUM (NSInteger, YubiKeyManagerInProgressState) {
     kInProgressStateInitial,
@@ -128,7 +128,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
 
 - (void)getNfcResponse:(NSData*)challenge {
     if (@available(iOS 13.0, *)) {
-        Settings.sharedInstance.suppressPrivacyScreen = YES;
+        SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = YES;
         [YubiKitManager.shared.nfcSession startIso7816Session];
     }
 }
@@ -329,7 +329,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
 - (void)onNfcSessionClosed {
     NSLog(@"NFC Session Closed");
 
-    Settings.sharedInstance.suppressPrivacyScreen = NO;
+    SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = NO;
     
     if (self.inProgressState != kInProgressStateCommsOpenAndWaitingOnHmacSha1Response) {
         NSLog(@"Resetting YubiManager state due to close outside of normal scan/open state.");

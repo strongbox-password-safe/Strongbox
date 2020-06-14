@@ -18,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString* const kAuditNodesChangedNotificationKey;
 extern NSString* const kAuditProgressNotificationKey;
 extern NSString* const kAuditCompletedNotificationKey;
+extern NSString* const kProStatusChangedNotificationKey;
+extern NSString* const kCentralUpdateOtpUiNotification;
+extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 
 @interface Model : NSObject
 

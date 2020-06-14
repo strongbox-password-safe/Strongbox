@@ -32,9 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
                         password:(NSString *)password
                       completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSError* error))completion;
 
-NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
-NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error);
-
 @end
 
 NS_ASSUME_NONNULL_END

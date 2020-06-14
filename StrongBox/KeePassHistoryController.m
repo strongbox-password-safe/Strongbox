@@ -16,6 +16,7 @@
 #import "Utils.h"
 #import "DatabaseSearchAndSorter.h"
 #import "BrowseTableViewCellHelper.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface KeePassHistoryController ()
 
@@ -33,7 +34,7 @@
     
     // Tips - Must be done here to avoid jumpy initial animation
     
-    if(Settings.sharedInstance.hideTips) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     else {

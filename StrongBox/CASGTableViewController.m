@@ -12,10 +12,10 @@
 #import "IOsUtils.h"
 #import "SafesList.h"
 #import "Utils.h"
-#import "Settings.h"
 #import "Alerts.h"
 #import "YubiKeyConfigurationController.h"
 #import "YubiManager.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface CASGTableViewController () <UITextFieldDelegate>
 
@@ -111,7 +111,7 @@
                             forControlEvents:UIControlEventEditingChanged];
     
     self.textFieldPassword.delegate = self;
-    self.textFieldPassword.enablesReturnKeyAutomatically = !Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.textFieldPassword.enablesReturnKeyAutomatically = !SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry;
     
     self.textFieldConfirmPassword.delegate = self;
     
@@ -134,7 +134,7 @@
     [self addShowHideToTextField:self.textFieldConfirmPassword tag:2];
     
     self.textFieldPassword.placeholder =
-        (self.mode == kCASGModeGetCredentials || Settings.sharedInstance.allowEmptyOrNoPasswordEntry) ?
+        (self.mode == kCASGModeGetCredentials || SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry) ?
             NSLocalizedString(@"casg_text_field_placeholder_password", @"Password") :
             NSLocalizedString(@"casg_text_field_placeholder_password_required", @"Password (Required)");
 }
@@ -312,7 +312,7 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
-        [self cell:self.cellYubiKeySecret setHidden:!Settings.sharedInstance.showYubikeySecretWorkaroundField ||
+        [self cell:self.cellYubiKeySecret setHidden:!SharedAppAndAutoFillSettings.sharedInstance.showYubikeySecretWorkaroundField ||
                                                      self.initialFormat == kPasswordSafe ||
                                                      self.initialFormat == kKeePass1];
 
@@ -335,7 +335,7 @@
     }
     else if ([segue.identifier isEqualToString:@"segueToSelectKeyFile"]) {
         KeyFilesTableViewController* vc = (KeyFilesTableViewController*)segue.destinationViewController;
-        vc.selectedUrl = Settings.sharedInstance.hideKeyFileOnUnlock ? nil : self.selectedKeyFileUrl;
+        vc.selectedUrl = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock ? nil : self.selectedKeyFileUrl;
         
         vc.onDone = ^(BOOL success, NSURL * _Nullable url, NSData * _Nullable oneTimeData) {
             if (success) {
@@ -368,7 +368,7 @@
         if ([NSFileManager.defaultManager fileExistsAtPath:self.selectedKeyFileUrl.path]) {
             self.cellKeyFile.imageView.image = [UIImage imageNamed:@"key"];
             
-            if(Settings.sharedInstance.hideKeyFileOnUnlock) {
+            if(SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock) {
                 self.cellKeyFile.textLabel.text = self.autoDetectedKeyFileUrl ?
                 NSLocalizedString(@"casg_key_file_auto_detected", @"Auto-Detected") :
                 NSLocalizedString(@"casg_key_file_configured", @"Configured");
@@ -588,7 +588,7 @@
                                     self.initialFormat == kFormatUnknown ||
                                     (self.initialFormat == kKeePass1 && [self keyFileIsSet]);
     
-    return self.textFieldPassword.text.length || (formatAllowsEmptyOrNone && Settings.sharedInstance.allowEmptyOrNoPasswordEntry);
+    return self.textFieldPassword.text.length || (formatAllowsEmptyOrNone && SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry);
 }
 
 - (BOOL)canSet {
@@ -605,7 +605,7 @@
 
 - (BOOL)passwordIsValid {
     BOOL formatAllowsEmptyOrNone = self.selectedFormat != kPasswordSafe;
-    BOOL preferenceAllowsEmpty = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    BOOL preferenceAllowsEmpty = SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry;
     
     return (preferenceAllowsEmpty && formatAllowsEmptyOrNone) ? YES : self.textFieldPassword.text.length > 0;
 }
@@ -620,32 +620,35 @@
 }
 
 - (IBAction)onAdvancedChanged:(id)sender {
-    Settings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
+#ifndef IS_APP_EXTENSION // TODO
+    SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
+#endif
+    
     [self bindUi];
 }
 
 - (void)bindAdvanced {
-    self.switchAllowEmpty.on = Settings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.switchAllowEmpty.on = SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry;
 }
 
 - (void)bindYubiKey {
-    if(self.selectedYubiKeyConfig != nil && self.selectedYubiKeyConfig.mode != kNone) {
+    if(self.selectedYubiKeyConfig != nil && self.selectedYubiKeyConfig.mode != kNoYubiKey) {
         if (self.selectedYubiKeyConfig.mode == kMfi) {
-            self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
+            self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
                 NSLocalizedString(@"casg_yubikey_configured_mfi", @"Lightning") :
                 NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+            self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
         }
         else {
-            self.cellYubiKey.textLabel.text = Settings.sharedInstance.isProOrFreeTrial ?
+            self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
                 NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
                 NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-            self.cellYubiKey.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+            self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
         }
 
         self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
             NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
-        self.cellYubiKey.detailTextLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+        self.cellYubiKey.detailTextLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
 
         self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];
     }
@@ -674,7 +677,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 3 && !Settings.sharedInstance.isProOrFreeTrial) {
+    if (section == 3 && !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         return NSLocalizedString(@"casg_section_header_yubikey_pro_only", @"Yubikey (Pro Edition Only)");
     }
     

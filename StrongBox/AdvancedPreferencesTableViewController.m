@@ -7,7 +7,8 @@
 //
 
 #import "AdvancedPreferencesTableViewController.h"
-#import "Settings.h"
+//#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 #import "AutoFillManager.h"
 #import "Alerts.h"
 #import "SafesList.h"
@@ -60,15 +61,15 @@
 - (IBAction)onPreferencesChanged:(id)sender {
     NSLog(@"Advanced Preference Changed: [%@]", sender);
     
-    Settings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
-    Settings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
-    Settings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
-    Settings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
-    Settings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
-    Settings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
-    Settings.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
+    SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
+    SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
+    SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
+    SharedAppAndAutoFillSettings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
+    SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
+    SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
+    SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
     
-    if(Settings.sharedInstance.monitorInternetConnectivity) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
     }
     else {
@@ -79,27 +80,27 @@
 }
 
 - (void)bindPreferences {
-    self.instantPinUnlock.on = Settings.sharedInstance.instantPinUnlocking;
-    self.switchHideKeyFileName.on = Settings.sharedInstance.hideKeyFileOnUnlock;
-    self.switchShowAllFilesInKeyFilesLocal.on = Settings.sharedInstance.showAllFilesInLocalKeyFiles;
-    self.switchShowYubikeySecretWorkaround.on = Settings.sharedInstance.showYubikeySecretWorkaroundField;
-    self.switchDetectOffline.on = Settings.sharedInstance.monitorInternetConnectivity;
-    self.switchAllowClipboardHandoff.on = Settings.sharedInstance.clipboardHandoff;
-    self.switchUseColorBlindPalette.on = Settings.sharedInstance.colorizeUseColorBlindPalette;
+    self.instantPinUnlock.on = SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
+    self.switchHideKeyFileName.on = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock;
+    self.switchShowAllFilesInKeyFilesLocal.on = SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles;
+    self.switchShowYubikeySecretWorkaround.on = SharedAppAndAutoFillSettings.sharedInstance.showYubikeySecretWorkaroundField;
+    self.switchDetectOffline.on = SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity;
+    self.switchAllowClipboardHandoff.on = SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff;
+    self.switchUseColorBlindPalette.on = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
 }
 
 - (void)bindAllowPinCodeOpen {
-    self.switchAllowPinCodeOpen.on = !Settings.sharedInstance.disallowAllPinCodeOpens;
+    self.switchAllowPinCodeOpen.on = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens;
 }
 
 - (void)bindAllowBiometric {
     self.labelAllowBiometric.text = [NSString stringWithFormat:NSLocalizedString(@"prefs_vc_enable_biometric_fmt", @"Enable %@"), [BiometricsManager.sharedInstance getBiometricIdName]];
-    self.switchAllowBiometric.on = !Settings.sharedInstance.disallowAllBiometricId;
+    self.switchAllowBiometric.on = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
 }
 
 - (IBAction)onAllowPinCodeOpen:(id)sender {
     if(self.switchAllowPinCodeOpen.on) {
-        Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
+        SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
         [self bindAllowPinCodeOpen];
     }
     else {
@@ -108,7 +109,7 @@
               message:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by PIN Codes")
                action:^(BOOL response) {
                     if(response) {
-                        Settings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
+                        SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
 
                         // Clear any Convenience Enrolled PIN Using Safes
 
@@ -138,7 +139,7 @@
     if(self.switchAllowBiometric.on) {
         NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
         
-        Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
+        SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
         
         [self bindAllowBiometric];
     }
@@ -150,7 +151,7 @@
                     if(response) {
                         NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
 
-                        Settings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
+                        SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
 
                         // Clear any Convenience Enrolled Biometric Using Safes
 

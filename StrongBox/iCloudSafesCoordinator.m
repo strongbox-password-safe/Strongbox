@@ -7,11 +7,11 @@
 //
 
 #import "iCloudSafesCoordinator.h"
-#import "Settings.h"
 #import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
 #import "Strongbox.h"
 #import "SafesList.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @implementation iCloudSafesCoordinator
 
@@ -103,7 +103,9 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         for(SafeMetaData *safe in localSafes) {
             [self migrateLocalSafeToICloud:safe];
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
             [SafesList.sharedInstance update:safe];
+#endif
         }
         
         self.showMigrationUi(NO);
@@ -123,7 +125,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         for(SafeMetaData *safe in iCloudSafes) {
             [self migrateICloudSafeToLocal:safe];
+
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
             [SafesList.sharedInstance update:safe];
+#endif
         }
         
         self.showMigrationUi(NO);
@@ -143,7 +148,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSURL *destURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:displayName extension:extension]];
     
     NSError * error;
-    BOOL success = [[NSFileManager defaultManager] setUbiquitous:[Settings sharedInstance].iCloudOn itemAtURL:fileURL destinationURL:destURL error:&error];
+    BOOL success = [[NSFileManager defaultManager] setUbiquitous:[SharedAppAndAutoFillSettings sharedInstance].iCloudOn itemAtURL:fileURL destinationURL:destURL error:&error];
     
     if (success) {
         NSString* newNickName = [self displayNameFromUrl:destURL];
@@ -175,7 +180,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
                                                  completion:^(SafeMetaData *metadata, NSError *error)
          {
              if (error == nil) {
-                 NSLog(@"Copied %@ to %@ (%d)", newURL, metadata.fileIdentifier, [Settings sharedInstance].iCloudOn);
+                 NSLog(@"Copied %@ to %@ (%d)", newURL, metadata.fileIdentifier, [SharedAppAndAutoFillSettings sharedInstance].iCloudOn);
                  
                  safe.nickName = metadata.nickName;
                  safe.storageProvider = kLocalDevice;
@@ -279,7 +284,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     
     _iCloudURLsReady = YES;
     
-    if ([Settings sharedInstance].iCloudOn && !_migrationInProcessDoNotUpdateSafesCollection) {
+    if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn && !_migrationInProcessDoNotUpdateSafesCollection) {
         [self syncICloudUpdateWithSafesCollection:_iCloudFiles];
     }
 
@@ -365,7 +370,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
             safe.fileIdentifier = [match.fileUrl absoluteString];
             safe.hasUnresolvedConflicts = match.hasUnresolvedConflicts;
             updated = YES;
+            
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
             [SafesList.sharedInstance update:safe];
+#endif
         }
     }
     
@@ -391,9 +399,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         newSafe.hasUnresolvedConflicts = safeFile.hasUnresolvedConflicts;
         
         NSLog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
-        
+      
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only
         [[SafesList sharedInstance] addWithDuplicateCheck:newSafe];
-        
+#endif
         added = YES;
     }
     
@@ -413,7 +422,9 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     for(SafeMetaData* safe in safeFileNamesToBeRemoved.allValues) {
         NSLog(@"iCloud Safe Removed: %@", safe);
         
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only
         [SafesList.sharedInstance remove:safe.uuid];
+#endif
         removed = YES;
     }
     

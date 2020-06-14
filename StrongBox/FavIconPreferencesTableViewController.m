@@ -7,8 +7,9 @@
 //
 
 #import "FavIconPreferencesTableViewController.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "Alerts.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface FavIconPreferencesTableViewController ()
 
@@ -30,7 +31,7 @@
 }
 
 - (void)bindUi {
-    FavIconDownloadOptions* options = Settings.sharedInstance.favIconDownloadOptions;
+    FavIconDownloadOptions* options = SharedAppAndAutoFillSettings.sharedInstance.favIconDownloadOptions;
     
     self.commonFiles.on = options.checkCommonFavIconFiles;
     self.duckDuckGo.on = options.duckDuckGo;
@@ -41,7 +42,7 @@
 }
 
 - (IBAction)onSettingChanged:(id)sender {
-    FavIconDownloadOptions* options = Settings.sharedInstance.favIconDownloadOptions;
+    FavIconDownloadOptions* options = SharedAppAndAutoFillSettings.sharedInstance.favIconDownloadOptions;
     
     options.checkCommonFavIconFiles = self.commonFiles.on;
     options.duckDuckGo = self.duckDuckGo.on;
@@ -51,7 +52,7 @@
     options.ignoreInvalidSSLCerts = self.ignoreSslErrors.on;
     
     if(options.isValid) {
-        Settings.sharedInstance.favIconDownloadOptions = options;
+        SharedAppAndAutoFillSettings.sharedInstance.favIconDownloadOptions = options;
     }
     else {
         [Alerts warn:self

@@ -9,17 +9,20 @@
 #import "Model.h"
 #import "Utils.h"
 #import "SVProgressHUD.h"
-#import "Settings.h"
 #import "AutoFillManager.h"
 #import "CacheManager.h"
 #import "PasswordMaker.h"
 #import "BackupsManager.h"
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
 NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
+NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
+NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
+NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
 
 @interface Model ()
 
@@ -103,14 +106,17 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
 
-    self.auditor = [[DatabaseAuditor alloc] initWithPro:Settings.sharedInstance.isProOrFreeTrial
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial
                                              isExcluded:^BOOL(Node * _Nonnull item) {
         NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
         return [set containsObject:sid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
         // We can ignore the actual passed in config because we know it's part of the overall Database SafeMetaData;
+        
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
         [SafesList.sharedInstance update:self.metadata];
+#endif
     }];
 }
 
@@ -226,7 +232,9 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     
     self.metadata.auditExcludedItems = mutable.allObjects;
     
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:self.metadata];
+#endif
 }
 
 - (NSArray<Node*>*)getExcludedAuditItems {
@@ -331,16 +339,19 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
           self.metadata.autoFillCacheAvailable = NO;
         
           [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-        
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
           [[SafesList sharedInstance] update:self.metadata];
+#endif
       }];
 }
 
 - (void)enableAutoFill {
     _metadata.autoFillCacheAvailable = NO;
     _metadata.autoFillEnabled = YES;
-    
+
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [[SafesList sharedInstance] update:self.metadata];
+#endif
 }
 
 //- (void)updateOfflineCache:(void (^)(void))handler {
@@ -372,7 +383,10 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
         }
 
         safe.offlineCacheAvailable = success;
+        
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
         [[SafesList sharedInstance] update:safe];
+#endif
     }];
 }
 
@@ -383,7 +397,10 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
           }
 
           safe.autoFillCacheAvailable = success;
+
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
           [[SafesList sharedInstance] update:safe];
+#endif
       }];
 }
 
@@ -489,7 +506,10 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
     self.cachedPinned = [NSSet setWithArray:trimmed];
 
     self.metadata.favourites = trimmed;
+    
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:self.metadata];
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -508,7 +528,7 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
 }
 
 - (NSString *)generatePassword {
-    PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 }
 

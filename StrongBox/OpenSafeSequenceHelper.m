@@ -7,7 +7,6 @@
 //
 
 #import "OpenSafeSequenceHelper.h"
-#import "Settings.h"
 #import "IOsUtils.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Alerts.h"
@@ -31,6 +30,8 @@
 #import "BiometricsManager.h"
 #import "BookmarksHelper.h"
 #import "YubiManager.h"
+#import "SharedAppAndAutoFillSettings.h"
+#import "AutoFillSettings.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -205,7 +206,10 @@
             // database.conveniencePin = nil; // KEEP PIN for users who use both...
             
             database.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful manual open
+            
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
             [SafesList.sharedInstance update:database];
+#endif
         }
     }
 
@@ -213,9 +217,9 @@
 }
 
 - (void)beginSeq {
-    if (self.safe.isEnrolledForConvenience && Settings.sharedInstance.isProOrFreeTrial) {
+    if (self.safe.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         BOOL biometricPossible = self.safe.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
-        BOOL biometricAllowed = !Settings.sharedInstance.disallowAllBiometricId;
+        BOOL biometricAllowed = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
         
         NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
                 
@@ -238,7 +242,7 @@
                 [self showBiometricAuthentication];
             }
         }
-        else if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
+        else if(!SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
             [self promptForConveniencePin];
         }
         else {
@@ -273,7 +277,9 @@
                     self.isConvenienceUnlock = YES;
                     self.safe.failedPinAttempts = 0;
                     
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
                     [SafesList.sharedInstance update:self.safe];
+#endif
                     
                     [self onGotCredentials:self.safe.convenienceMasterPassword
                                 keyFileUrl:self.safe.keyFileUrl
@@ -291,8 +297,11 @@
                 }
                 else {
                     self.safe.failedPinAttempts++;
+                    
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
                     [SafesList.sharedInstance update:self.safe];
-
+#endif
+                    
                     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                     [gen notificationOccurred:UINotificationFeedbackTypeError];
 
@@ -304,8 +313,10 @@
                         self.safe.convenienceMasterPassword = nil;
                         self.safe.convenenienceYubikeySecret = nil;
                         
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
                         [SafesList.sharedInstance update:self.safe];
-
+#endif
+                        
                         [Alerts warn:self.viewController
                                title:NSLocalizedString(@"open_sequence_prompt_too_many_incorrect_pins_title",@"Too Many Incorrect PINs")
                              message:NSLocalizedString(@"open_sequence_prompt_too_many_incorrect_pins_message",@"You have entered the wrong PIN too many times. PIN Unlock is now disabled, and you must enter the master password to unlock this database.")];
@@ -379,7 +390,10 @@
     [[CacheManager sharedInstance] deleteAutoFillCache:self.safe completion:nil];
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [[SafesList sharedInstance] remove:self.safe.uuid];
+#endif
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -425,7 +439,7 @@
         }
 
         self.isConvenienceUnlock = YES;
-        if(!Settings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
+        if(!SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self promptForConveniencePin];
             });
@@ -607,7 +621,9 @@
                 self.safe.isTouchIdEnabled = NO;
                 self.safe.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful open
                 
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
                 [SafesList.sharedInstance update:self.safe];
+#endif
             }
 
             if(keyFileUrl && self.isAutoFillOpen) {
@@ -664,7 +680,10 @@
         }
 
         self.safe.yubiKeyConfig = yubikeyConfiguration;
+
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
         [SafesList.sharedInstance update:self.safe];
+#endif
     }
     
     self.manualOpenOfflineCache = manualOpenOffline;
@@ -787,13 +806,13 @@
         }
         else {
             if(self.isAutoFillOpen &&
-               !Settings.sharedInstance.haveWarnedAboutAutoFillCrash &&
+               !AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash &&
                [DatabaseModel isAutoFillLikelyToCrash:data]) {
                 [Alerts warn:self.viewController
                        title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
                      message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
                 completion:^{
-                    Settings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
+                    AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
                     [self openSafeWithData:data provider:provider cacheMode:cacheMode];
                 }];
             }
@@ -884,7 +903,7 @@
 
 - (void)getYubiKeyChallengeResponse:(NSData*)challenge completion:(YubiKeyCRResponseBlock)completion {
 #ifndef IS_APP_EXTENSION
-    if([Settings.sharedInstance isProOrFreeTrial]) {
+    if([SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial]) {
         [YubiManager.sharedInstance getResponse:self.yubiKeyConfiguration
                                       challenge:challenge
                                      completion:completion];
@@ -1029,8 +1048,10 @@
                 self.safe.isTouchIdEnabled = NO;
                 self.safe.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful open
                 
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
                 [SafesList.sharedInstance update:self.safe];
-                
+#endif
+            
                 [Alerts info:self.viewController
                        title:NSLocalizedString(@"open_sequence_problem_opening_title", @"Could not open database")
                      message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_problem_opening_convenience_incorrect_message", @"The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled.")]] ;
@@ -1058,13 +1079,13 @@
         self.completion(nil, error);
     }
     else {
-        BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !Settings.sharedInstance.disallowAllBiometricId;
-        BOOL pinPossible = !Settings.sharedInstance.disallowAllPinCodeOpens;
+        BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
+        BOOL pinPossible = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens;
 
-        BOOL conveniencePossible = self.canConvenienceEnrol && !cacheMode && [Settings.sharedInstance isProOrFreeTrial] && (biometricPossible || pinPossible);
+        BOOL conveniencePossible = self.canConvenienceEnrol && !cacheMode && [SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial] && (biometricPossible || pinPossible);
         BOOL convenienceNotYetPrompted = !self.safe.hasBeenPromptedForConvenience;
         
-        BOOL quickLaunchPossible = !self.isAutoFillOpen && Settings.sharedInstance.quickLaunchUuid == nil;
+        BOOL quickLaunchPossible = !self.isAutoFillOpen && SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil;
         BOOL quickLaunchNotYetPrompted = !self.safe.hasBeenPromptedForQuickLaunch;
         
         if (conveniencePossible && convenienceNotYetPrompted) {
@@ -1083,17 +1104,23 @@
                    cacheMode:(BOOL)cacheMode
                     provider:(id)provider
                         data:(NSData *)data {
-    if(!self.isAutoFillOpen && Settings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
+    if(!self.isAutoFillOpen && SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
         [Alerts yesNo:self.viewController
                 title:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_title", @"Set Quick Launch?")
               message:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_message", @"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious tap.")
                action:^(BOOL response) {
                    if(response) {
-                       Settings.sharedInstance.quickLaunchUuid = self.safe.uuid;
+#ifndef IS_APP_EXTENSION // TODO
+                       SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = self.safe.uuid;
+#endif
                    }
                    
                    self.safe.hasBeenPromptedForQuickLaunch = YES;
+
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
                    [SafesList.sharedInstance update:self.safe];
+#endif
+            
                    [self onSuccessfulSafeOpen:cacheMode provider:provider openedSafe:openedSafe data:data];
                }];
     }
@@ -1107,7 +1134,10 @@
     self.safe.convenenienceYubikeySecret = self.yubikeySecret;
     self.safe.hasBeenPromptedForConvenience = YES;
     
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:self.safe];
+#endif
+    
 }
 
 - (void)enrolForPinCodeUnlock:(NSString*)pin compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
@@ -1118,7 +1148,9 @@
     self.safe.convenenienceYubikeySecret = self.yubikeySecret;
     self.safe.hasBeenPromptedForConvenience = YES;
 
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:self.safe];
+#endif
 }
 
 - (void)unenrolFromConvenience {
@@ -1130,7 +1162,9 @@
     self.safe.convenenienceYubikeySecret = nil;
     self.safe.hasBeenPromptedForConvenience = YES;
 
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:self.safe];
+#endif
 }
 
 - (void)promptForConvenienceEnrolAndOpen:(BOOL)biometricPossible
@@ -1155,7 +1189,7 @@
         message = NSLocalizedString(@"open_sequence_prompt_use_convenience_pin_message", @"You can use a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password");
     }
     
-    if (!Settings.sharedInstance.isPro) {
+    if (!SharedAppAndAutoFillSettings.sharedInstance.isPro) {
         message = [message stringByAppendingFormat:NSLocalizedString(@"open_sequence_append_convenience_pro_warning", @"\n\nNB: Convenience Unlock is a Pro feature")];
     }
     
@@ -1258,7 +1292,10 @@
 
         NSLog(@"Setting likelyFormat to [%ld]", (long)openedSafe.format);
         self.safe.likelyFormat = openedSafe.format;
+        
+#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
         [SafesList.sharedInstance update:self.safe];
+#endif
     }
     
     self.completion(viewModel, nil);
@@ -1379,9 +1416,30 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
     FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
     
     self.safe = [fp setAutoFillBookmark:bookMark metadata:self.safe];
+    
     [SafesList.sharedInstance update:self.safe];
     
     [self beginSeq];
+}
+
+NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
+    NSData* keyFileData = getKeyFileData(keyFileUrl, onceOffKeyFileData, error);
+    
+    NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:format != kKeePass1] : nil;
+
+    return keyFileDigest;
+}
+
+NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error) {
+    NSData* keyFileData = nil;
+    if (keyFileUrl) {
+        keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
+    }
+    else if (onceOffKeyFileData) {
+        keyFileData = onceOffKeyFileData;
+    }
+    
+    return keyFileData;
 }
 
 @end

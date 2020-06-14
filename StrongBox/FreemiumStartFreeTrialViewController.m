@@ -10,8 +10,8 @@
 #import "ProUpgradeIAPManager.h"
 #import "SVProgressHUD.h"
 #import "Alerts.h"
-#import "Settings.h"
-
+//#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 @interface FreemiumStartFreeTrialViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonStartTrial;
@@ -75,7 +75,7 @@
     self.buttonStartTrial.enabled = NO;
     [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
     
-    BOOL optedInToFreeTrial = Settings.sharedInstance.hasOptedInToFreeTrial;
+    BOOL optedInToFreeTrial = SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial;
     
     [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -89,9 +89,9 @@
                         error:error];
             }
             else {
-                BOOL freeTrialStarted = Settings.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
+                BOOL freeTrialStarted = SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
                 
-                if(!Settings.sharedInstance.isPro && !freeTrialStarted) {
+                if(!SharedAppAndAutoFillSettings.sharedInstance.isPro && !freeTrialStarted) {
                     [Alerts info:self
                            title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
                          message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")

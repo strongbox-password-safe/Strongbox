@@ -7,7 +7,7 @@
 //
 
 #import "YubiKeyConfigurationController.h"
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface YubiKeyConfigurationController ()
 
@@ -28,13 +28,8 @@
     
     self.currentConfig = self.initialConfiguration ? [self.initialConfiguration clone] : [YubiKeyHardwareConfiguration defaults];
     
-    if (!Settings.sharedInstance.isProOrFreeTrial) {
+    if (!SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         self.currentConfig.mode = kNoYubiKey;
-    }
-    
-    if (!Settings.sharedInstance.mfiYubiKeyEnabled) {
-        [self.cellMfiSlot1 setHidden:YES];
-        [self.cellMfiSlot2 setHidden:YES];
     }
     
     [self bindUi];
@@ -51,27 +46,22 @@
 
     self.cellMfiSlot2.accessoryType = (self.currentConfig != nil && self.currentConfig.mode == kMfi && self.currentConfig.slot == kSlot2) ?  UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
 
-    self.cellNfcSlot1.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
-    self.cellNfcSlot2.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
-    self.cellNfcSlot1.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
-    self.cellNfcSlot2.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
+    self.cellNfcSlot1.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.cellNfcSlot2.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.cellNfcSlot1.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
+    self.cellNfcSlot2.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
 
-    self.cellMfiSlot1.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
-    self.cellMfiSlot2.userInteractionEnabled = Settings.sharedInstance.isProOrFreeTrial;
-    self.cellMfiSlot1.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
-    self.cellMfiSlot2.textLabel.textColor = Settings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
+    self.cellMfiSlot1.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.cellMfiSlot2.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.cellMfiSlot1.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
+    self.cellMfiSlot2.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.lightGrayColor;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == 1 && !Settings.sharedInstance.isProOrFreeTrial) {
+    if(section == 1 && !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         return NSLocalizedString(@"yubikey_config_section_header_nfc_pro_only", @"NFC Yubikey (Pro Edition Only)");
     }
-    else if (section == 2) {
-        if(!Settings.sharedInstance.mfiYubiKeyEnabled) {
-            return nil;
-        }
-    }
-    
+
     return [super tableView:tableView titleForHeaderInSection:section];
 }
 

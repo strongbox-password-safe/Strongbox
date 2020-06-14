@@ -11,7 +11,8 @@
 #import "GTMSessionFetcherService.h"
 #import "SVProgressHUD.h"
 #import "real-secrets.h"
-#import "Settings.h"
+//#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 static NSString *const kMimeType = @"application/octet-stream";
 
@@ -80,7 +81,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
             [signIn restorePreviousSignIn];
         }
         else {
-            Settings.sharedInstance.suppressPrivacyScreen = YES;
+            SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = YES;
             [signIn signIn];
         }
     });
@@ -97,7 +98,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
         self.driveService.authorizer = user.authentication.fetcherAuthorizer;
     }
     
-    Settings.sharedInstance.suppressPrivacyScreen = NO;
+    SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = NO;
 
     if(error.code == kGIDSignInErrorCodeHasNoAuthInKeychain) {
         return; // Do not call completion if this is a silenet sign and there is no Auth in Key...

@@ -11,6 +11,7 @@
 #import "SelectItemTableViewController.h"
 #import "SafesList.h"
 #import "Settings.h"
+#import "Model.h"
 
 @interface BrowsePreferencesTableViewController ()
 

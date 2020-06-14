@@ -9,6 +9,7 @@
 #import "DebugHelper.h"
 #import "SafesList.h"
 #import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 #import "Utils.h"
 
 @implementation DebugHelper
@@ -34,8 +35,8 @@
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
-    NSString* pro = [[Settings sharedInstance] isPro] ? @"P" : @"";
-    NSString* isFreeTrial = [[Settings sharedInstance] isFreeTrial] ? @"F" : @"";
+    NSString* pro = [[SharedAppAndAutoFillSettings sharedInstance] isPro] ? @"P" : @"";
+    NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
 
     NSString* message = [NSString stringWithFormat:
@@ -81,8 +82,8 @@
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
-    NSString* pro = [[Settings sharedInstance] isPro] ? @"P" : @"";
-    NSString* isFreeTrial = [[Settings sharedInstance] isFreeTrial] ? @"F" : @"";
+    NSString* pro = [[SharedAppAndAutoFillSettings sharedInstance] isPro] ? @"P" : @"";
+    NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
 
     NSString* message = [NSString stringWithFormat:@"I'm having some trouble with Strongbox... <br /><br />"

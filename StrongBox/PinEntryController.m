@@ -7,7 +7,7 @@
 //
 
 #import "PinEntryController.h"
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface PinEntryController ()
 
@@ -67,7 +67,7 @@
     
     // If we're not in auto mode or we're setting PIN then show the done button
     
-    self.buttonDone.hidden = self.pinLength > 0 && Settings.sharedInstance.instantPinUnlocking;
+    self.buttonDone.hidden = self.pinLength > 0 && SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
     
     self.labelWarning.text = self.warning;
     self.labelWarning.hidden = self.warning.length == 0;
@@ -158,7 +158,7 @@
     
     [self validateButtonsUi];
     
-    if(self.pinLength > 0 && self.enteredText.length == self.pinLength && Settings.sharedInstance.instantPinUnlocking) {
+    if(self.pinLength > 0 && self.enteredText.length == self.pinLength && SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking) {
         // We auto submit at the matching length - This prevents repeated attempts bny using the 3 strikes failure mode
         // If we didn't do this then an attacker could try as many combinations as he liked if he knew you were using
         // Instant PIN mode...

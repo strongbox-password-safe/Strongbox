@@ -10,6 +10,7 @@
 #import "WelcomeCreateDatabaseViewController.h"
 #import "Settings.h"
 #import "SafesList.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface WelcomeUseICloudViewController ()
 
@@ -47,7 +48,7 @@
 
 - (void)enableICloudAndContinue:(BOOL)enable {
     Settings.sharedInstance.iCloudPrompted = YES;
-    Settings.sharedInstance.iCloudOn = enable;
+    SharedAppAndAutoFillSettings.sharedInstance.iCloudOn = enable;
     
     if(self.addExisting) {
         NSInteger count = SafesList.sharedInstance.snapshot.count;

@@ -7,7 +7,7 @@
 //
 
 #import "DuressDummyStorageProvider.h"
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @implementation DuressDummyStorageProvider
 
@@ -39,7 +39,6 @@
         return nil;
     }
 }
-
 
 - (void)create:(NSString *)nickName extension:(NSString *)extension data:(NSData *)data parentFolder:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(SafeMetaData *, NSError *))completion {
     // NOTIMPL
@@ -110,8 +109,7 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)getData:(void(^)(NSData* data))completion {
-    NSUserDefaults* defaults = [Settings.sharedInstance getSharedAppGroupDefaults]; // FUTURE: Not an ideal place for data storage
-    NSData* data = [defaults objectForKey:@"dd-safe"];
+    NSData* data = SharedAppAndAutoFillSettings.sharedInstance.duressDummyData;    
     if(!data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
         DatabaseModel* model = [[DatabaseModel alloc] initNew:cpf format:kKeePass];
@@ -126,9 +124,9 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)setData:(NSData*)data {
-    NSUserDefaults* defaults = [Settings.sharedInstance getSharedAppGroupDefaults];
-    [defaults setObject:data forKey:@"dd-safe"];
-    [defaults synchronize];
+#ifndef IS_APP_EXTENSION // TODO
+    SharedAppAndAutoFillSettings.sharedInstance.duressDummyData = data;
+#endif
 }
 
 @end

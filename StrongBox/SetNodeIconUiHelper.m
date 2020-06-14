@@ -13,9 +13,9 @@
 #import "SVProgressHUD.h"
 #import "Alerts.h"
 #import "IconsCollectionViewController.h"
-#import "Settings.h"
 #import "FavIconManager.h"
 #import "FavIconBulkViewController.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIDocumentPickerDelegate>
 
@@ -75,7 +75,7 @@
             UIAlertAction *fourthAction;
             
             if(node && node.isGroup) {
-                fourthAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons", @"Download FavIcons") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons_pro_only", @"Download FavIcons (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -84,7 +84,7 @@
                 }];
             }
             else {
-                fourthAction = [UIAlertAction actionWithTitle:Settings.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon", @"Download FavIcon") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon_pro_only", @"Download FavIcon (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -97,7 +97,7 @@
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { self.completionBlock(NO, nil, nil, NO,  nil); }];
             
-            fourthAction.enabled = Settings.sharedInstance.isProOrFreeTrial;
+            fourthAction.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
             
             [alertController addAction:defaultAction];
             [alertController addAction:secondAction];

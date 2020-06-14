@@ -20,6 +20,7 @@
 #import "PinsConfigurationController.h"
 #import "StatisticsPropertiesViewController.h"
 #import "AuditConfigurationVcTableViewController.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface DatabasePreferencesController ()
 
@@ -203,7 +204,7 @@
     
     NSString *biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
 
-    if (![Settings.sharedInstance isProOrFreeTrial]) {
+    if (![SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial]) {
         self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt_pro_only", @"%@ Unlock"), biometricIdName];
     }
     else {
@@ -339,7 +340,7 @@
 }
 
 - (BOOL)canToggleTouchId {
-    return BiometricsManager.isBiometricIdAvailable && [Settings.sharedInstance isProOrFreeTrial];
+    return BiometricsManager.isBiometricIdAvailable && [SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial];
 }
 
 - (BOOL)canToggleOfflineCache {

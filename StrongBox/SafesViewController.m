@@ -46,6 +46,7 @@
 #import "WelcomeFreemiumViewController.h"
 #import "MasterDetailViewController.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -92,7 +93,7 @@
 }
 
 - (void)doFirstLaunchTasks {
-    if (Settings.sharedInstance.isProOrFreeTrial) {
+    if (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         NSLog(@"New User is already Pro or in Free Trial... Standard Onboarding");
         [self startOnboarding];
     }
@@ -123,8 +124,8 @@
     NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
     if (freeTrialPurchaseDate) {
         NSLog(@"setFreeTrialEndDateBasedOnIapPurchase: [%@]", freeTrialPurchaseDate);
-        NSDate* endDate = [Settings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
-        Settings.sharedInstance.freeTrialEnd = endDate;
+        NSDate* endDate = [SharedAppAndAutoFillSettings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
+        SharedAppAndAutoFillSettings.sharedInstance.freeTrialEnd = endDate;
     }
     else {
         NSLog(@"setFreeTrialEndDateBasedOnIapPurchase: No Free Trial purchase found.");
@@ -168,7 +169,7 @@
 - (void)internalRefresh {
     self.collection = SafesList.sharedInstance.snapshot;
     
-    self.tableView.separatorStyle = Settings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
+    self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
 
     [self.tableView reloadData];
 }
@@ -179,7 +180,7 @@
     NSLog(@"appResignActive");
     
     self.privacyScreenSuppressedForBiometricAuth = NO;
-    if(Settings.sharedInstance.suppressPrivacyScreen) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen) {
         NSLog(@"appResignActive suppressPrivacyScreen... suppressing privacy and lock screen");
         self.privacyScreenSuppressedForBiometricAuth = YES;
         return;
@@ -356,14 +357,14 @@
     }
     
     // No matter what, iCloud isn't available so switch it to off.???
-    [Settings sharedInstance].iCloudOn = NO;
+    [SharedAppAndAutoFillSettings sharedInstance].iCloudOn = NO;
     [Settings sharedInstance].iCloudWasOn = NO;
     
     [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
 }
 
 - (void)onICloudAvailable:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation{
-    if (!Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+    if (!SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
         BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
         BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
         
@@ -387,7 +388,7 @@
               secondButtonText:NSLocalizedString(@"safesvc_option_local_only", @"Local Only")
                         action:^(BOOL response) {
                             if(response) {
-                                Settings.sharedInstance.iCloudOn = YES;
+                                SharedAppAndAutoFillSettings.sharedInstance.iCloudOn = YES;
                             }
                             [Settings sharedInstance].iCloudPrompted = YES;
                             [self onICloudAvailableContinuation:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
@@ -401,7 +402,7 @@
 
 - (void)onICloudAvailableContinuation:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
     // If iCloud newly switched on, move local docs to iCloud
-    if (Settings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudWasOn && [self getLocalDeviceSafes].count) {
+    if (SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudWasOn && [self getLocalDeviceSafes].count) {
         [Alerts twoOptions:self
                      title:NSLocalizedString(@"safesvc_icloud_available_title", @"iCloud Available")
                    message:NSLocalizedString(@"safesvc_question_migrate_local_to_icloud", @"Would you like to migrate your current local device databases to iCloud?")
@@ -417,7 +418,7 @@
     }
     
     // If iCloud newly switched off, move iCloud docs to local
-    if (!Settings.sharedInstance.iCloudOn && Settings.sharedInstance.iCloudWasOn && [self getICloudSafes].count) {
+    if (!SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && Settings.sharedInstance.iCloudWasOn && [self getICloudSafes].count) {
         [Alerts threeOptions:self
                        title:NSLocalizedString(@"safesvc_icloud_unavailable_title", @"iCloud Unavailable")
                      message:NSLocalizedString(@"safesvc_icloud_unavailable_question", @"What would you like to do with the databases currently on this device?")
@@ -426,8 +427,8 @@
              thirdButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_icloud_on", @"Switch iCloud Back On")
                       action:^(int response) {
                           if(response == 2) {           // @"Switch iCloud Back On"
-                              [Settings sharedInstance].iCloudOn = YES;
-                              [Settings sharedInstance].iCloudWasOn = [Settings sharedInstance].iCloudOn;
+                              [SharedAppAndAutoFillSettings sharedInstance].iCloudOn = YES;
+                              [Settings sharedInstance].iCloudWasOn = [SharedAppAndAutoFillSettings sharedInstance].iCloudOn;
                           }
                           else if(response == 1) {      // @"Keep a Local Copy"
                               [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
@@ -440,7 +441,7 @@
                       }];
     }
     
-    Settings.sharedInstance.iCloudWasOn = Settings.sharedInstance.iCloudOn;
+    Settings.sharedInstance.iCloudWasOn = SharedAppAndAutoFillSettings.sharedInstance.iCloudOn;
     [[iCloudSafesCoordinator sharedInstance] startQuery];
     
     [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
@@ -594,7 +595,7 @@
 }
 
 - (void)setupTips {
-    if(Settings.sharedInstance.hideTips) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     else {
@@ -681,7 +682,7 @@
     if(database.hasUnresolvedConflicts) {
         return [UIImage imageNamed:@"error"];
     }
-    else if([Settings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+    else if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
         return [UIImage imageNamed:@"rocket"];
     }
     else if(database.readOnly) {
@@ -692,14 +693,14 @@
 }
 
 - (void)populateDatabaseCell:(DatabaseCell*)cell database:(SafeMetaData*)database {
-    UIImage* statusImage = Settings.sharedInstance.showDatabaseStatusIcon ? [self getStatusImage:database] : nil;
+    UIImage* statusImage = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon ? [self getStatusImage:database] : nil;
     
-    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellTopSubtitle];
-    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle1];
-    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:Settings.sharedInstance.databaseCellSubtitle2];
+    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
+    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
+    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
     
     id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    UIImage* databaseIcon = Settings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:provider.icon] : nil;
+    UIImage* databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:provider.icon] : nil;
     
     [cell set:database.nickName
   topSubtitle:topSubtitle
@@ -844,7 +845,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     // Quick Launch Option
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    BOOL isAlreadyQuickLaunch = [Settings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
+    BOOL isAlreadyQuickLaunch = [SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
     UIAlertAction *quickLaunchAction = [UIAlertAction actionWithTitle:isAlreadyQuickLaunch ?
                                         NSLocalizedString(@"safes_vc_action_unset_as_quick_launch", @"Button Title to Unset Quick Launch") :
                                         NSLocalizedString(@"safes_vc_action_set_as_quick_launch", @"Button Title to Set Quick Launch")
@@ -906,8 +907,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)toggleQuickLaunch:(SafeMetaData*)database {
-    if([Settings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
-        Settings.sharedInstance.quickLaunchUuid = nil;
+    if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+        SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = nil;
         [self refresh];
     }
     else {
@@ -916,7 +917,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
               message:NSLocalizedString(@"safes_vc_about_setting_quick_launch_and_confirm", @"Message about quick launch feature and asking to confirm yes or no")
                action:^(BOOL response) {
             if (response) {
-                Settings.sharedInstance.quickLaunchUuid = database.uuid;
+                SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = database.uuid;
                 [self refresh];
             }
         }];
@@ -971,7 +972,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     NSString *message;
     
-    if(safe.storageProvider == kiCloud && [Settings sharedInstance].iCloudOn) {
+    if(safe.storageProvider == kiCloud && [SharedAppAndAutoFillSettings sharedInstance].iCloudOn) {
         message = NSLocalizedString(@"safes_vc_remove_icloud_databases_warning", @"warning message about removing database from icloud");
     }
     else {
@@ -1029,8 +1030,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
     // Clear Quick Launch if it was set...
-    if([Settings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
-        Settings.sharedInstance.quickLaunchUuid = nil;
+    if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
+        SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = nil;
     }
     
     // Delete all backups...
@@ -1216,7 +1217,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
         if (@available(iOS 13.0, *)) {
-            if (Settings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
+            if (SharedAppAndAutoFillSettings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.modalInPresentation = YES;
             }
@@ -1395,7 +1396,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName data:(NSData *)data {
-    if(Settings.sharedInstance.iCloudOn) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
                                title:NSLocalizedString(@"safes_vc_copy_icloud_or_local", @"Question Title: Copy to icloud or to local")
                              message:NSLocalizedString(@"safes_vc_copy_local_to_icloud", @"Question message: copy to iCloud or to Local")
@@ -1537,17 +1538,17 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 -(void)bindProOrFreeTrialUi {
-    self.navigationController.toolbarHidden =  [[Settings sharedInstance] isPro];
-    self.navigationController.toolbar.hidden = [[Settings sharedInstance] isPro];
+    self.navigationController.toolbarHidden =  [[SharedAppAndAutoFillSettings sharedInstance] isPro];
+    self.navigationController.toolbar.hidden = [[SharedAppAndAutoFillSettings sharedInstance] isPro];
     
-    if(![[Settings sharedInstance] isPro]) {
+    if(![[SharedAppAndAutoFillSettings sharedInstance] isPro]) {
         [self.buttonUpgrade setEnabled:YES];
     
         NSString *upgradeButtonTitle;
 
-        if (Settings.sharedInstance.hasOptedInToFreeTrial) {
-            if([[Settings sharedInstance] isFreeTrial]) {
-                NSInteger daysLeft = Settings.sharedInstance.freeTrialDaysLeft;
+        if (SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial) {
+            if([[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial]) {
+                NSInteger daysLeft = SharedAppAndAutoFillSettings.sharedInstance.freeTrialDaysLeft;
                 
                 if(daysLeft > 30) {
                     upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title", @"Upgrade Button Title - Upgrade Info")];
@@ -1661,13 +1662,13 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         return;
     }
     
-    if(!Settings.sharedInstance.quickLaunchUuid) {
+    if(!SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
         // NSLog(@"Not opening Quick Launch database as not configured");
         return;
     }
     
     SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-        return [obj.uuid isEqualToString:Settings.sharedInstance.quickLaunchUuid];
+        return [obj.uuid isEqualToString:SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid];
     }];
     
     if(!safe) {
@@ -1811,7 +1812,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
     if(editInPlace == NO) {
         NSString* filename = url.lastPathComponent;
-        if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && Settings.sharedInstance.iCloudOn == NO) {
+        if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && SharedAppAndAutoFillSettings.sharedInstance.iCloudOn == NO) {
             [Alerts twoOptionsWithCancel:self
                                    title:NSLocalizedString(@"safesvc_update_existing_database_title", @"Update Existing Database?")
                                  message:NSLocalizedString(@"safesvc_update_existing_question", @"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?")
@@ -1880,7 +1881,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
 //    NSLog(@"Importing URL: [%@]", url);
     
-    if(Settings.sharedInstance.iCloudOn) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
                                title:NSLocalizedString(@"safesvc_copy_database_to_location_title", @"Copy to iCloud or Local?")
                              message:NSLocalizedString(@"safesvc_copy_database_to_location_message", @"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?")

@@ -16,7 +16,6 @@
 #import "PinsConfigurationController.h"
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
-#import "AddNewSafeHelper.h"
 #import "CacheManager.h"
 #import "ExportOptionsTableViewController.h"
 #import "AttachmentsPoolViewController.h"
@@ -25,6 +24,7 @@
 #import "FavIconBulkViewController.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
+#import "OpenSafeSequenceHelper.h"
 
 @interface DatabaseOperations ()
 

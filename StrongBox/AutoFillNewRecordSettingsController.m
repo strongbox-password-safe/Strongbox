@@ -7,8 +7,9 @@
 //
 
 #import "AutoFillNewRecordSettingsController.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "Alerts.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface AutoFillNewRecordSettingsController ()
 
@@ -27,7 +28,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     Alerts *alerts = [[Alerts alloc] initWithTitle:NSLocalizedString(@"entry_defaults_vc_prompt_custom_title", @"Custom Default")
                                            message:NSLocalizedString(@"entry_defaults_vc_prompt_custom_message", @"Please enter a new custom default for this field")];
     
@@ -38,7 +39,7 @@
                                    completion:^(NSString *text, BOOL response) {
             if(response) {
                 settings.titleCustomAutoFill = text;
-                Settings.sharedInstance.autoFillNewRecordSettings = settings;
+                SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
                 
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
                     [self bindToSettings];
@@ -55,7 +56,7 @@
                                    completion:^(NSString *text, BOOL response) {
                                        if(response) {
                                            settings.usernameCustomAutoFill = text;
-                                           Settings.sharedInstance.autoFillNewRecordSettings = settings;
+                                           SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
                                            
                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
                                                [self bindToSettings];
@@ -72,7 +73,7 @@
                                    completion:^(NSString *text, BOOL response) {
                                        if(response) {
                                            settings.passwordCustomAutoFill = text;
-                                           Settings.sharedInstance.autoFillNewRecordSettings = settings;
+                                           SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
                                            
                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
                                                [self bindToSettings];
@@ -89,7 +90,7 @@
                                    completion:^(NSString *text, BOOL response) {
                                        if(response) {
                                            settings.emailCustomAutoFill = text;
-                                           Settings.sharedInstance.autoFillNewRecordSettings = settings;
+                                           SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
                                            
                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
                                                [self bindToSettings];
@@ -106,7 +107,7 @@
                                    completion:^(NSString *text, BOOL response) {
                                        if(response) {
                                            settings.urlCustomAutoFill = text;
-                                           Settings.sharedInstance.autoFillNewRecordSettings = settings;
+                                           SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
                                            
                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
                                                [self bindToSettings];
@@ -123,7 +124,7 @@
                                    completion:^(NSString *text, BOOL response) {
                                        if(response) {
                                            settings.notesCustomAutoFill = text;
-                                           Settings.sharedInstance.autoFillNewRecordSettings = settings;
+                                           SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
                                            
                                            dispatch_async(dispatch_get_main_queue(), ^(void) {
                                                [self bindToSettings];
@@ -137,7 +138,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
 
     if(indexPath.section == 0 && indexPath.row == 1)
     {
@@ -180,7 +181,7 @@
 }
 
 - (void)bindToSettings {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     // Title Options: Default / Custom
     
@@ -250,11 +251,11 @@
 }
 
 - (IBAction)onTitleSegmentChanged:(id)sender {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     settings.titleAutoFillMode = self.segmentTitle.selectedSegmentIndex == 0 ? kDefault : kCustom;
     
-    Settings.sharedInstance.autoFillNewRecordSettings = settings;
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
     
     [self bindToSettings];
 
@@ -263,7 +264,7 @@
 }
 
 - (IBAction)onUsernameSegmentChanged:(id)sender {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentUsername.selectedSegmentIndex) {
         case 0:
@@ -280,7 +281,7 @@
             break;
     }
     
-    Settings.sharedInstance.autoFillNewRecordSettings = settings;
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
     [self bindToSettings];
     
     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:1]]
@@ -288,7 +289,7 @@
 }
 
 - (IBAction)onPasswordSegmentChanged:(id)sender {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentPassword.selectedSegmentIndex) {
         case 0: // None
@@ -305,7 +306,7 @@
             break;
     }
     
-    Settings.sharedInstance.autoFillNewRecordSettings = settings;
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
     [self bindToSettings];
 
     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:2]]
@@ -313,7 +314,7 @@
 }
 
 - (IBAction)onEmailSegmentChanged:(id)sender {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentEmail.selectedSegmentIndex) {
         case 0:
@@ -330,7 +331,7 @@
             break;
     }
     
-    Settings.sharedInstance.autoFillNewRecordSettings = settings;
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
     [self bindToSettings];
     
     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:3]]
@@ -338,7 +339,7 @@
 }
 
 - (IBAction)onUrlSegmentChanged:(id)sender {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentUrl.selectedSegmentIndex) {
         case 0: // None
@@ -352,7 +353,7 @@
             break;
     }
     
-    Settings.sharedInstance.autoFillNewRecordSettings = settings;
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
     [self bindToSettings];
     
     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:4]]
@@ -360,7 +361,7 @@
 }
 
 - (IBAction)onNotesSegmentChanged:(id)sender {
-    AutoFillNewRecordSettings *settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentNotes.selectedSegmentIndex) {
         case 0: // None
@@ -374,7 +375,7 @@
             break;
     }
     
-    Settings.sharedInstance.autoFillNewRecordSettings = settings;
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings = settings;
     [self bindToSettings];
 
     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:1 inSection:5]]

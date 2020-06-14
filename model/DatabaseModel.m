@@ -6,7 +6,6 @@
 #import "Utils.h"
 #import "Kdbx4Database.h"
 #import "Kdb1Database.h"
-#import "Settings.h"
 #import "PasswordMaker.h"
 #import "SprCompilation.h"
 #import "NSArray+Extensions.h"
@@ -17,6 +16,7 @@
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
 #import "NSData+Extensions.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface DatabaseModel ()
 
@@ -283,7 +283,7 @@
 }
 
 void addSampleGroupAndRecordToGroup(Node* parent) {
-    PasswordGenerationConfig* config = Settings.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
     NSString* password = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 
     Node* sampleFolder = [[Node alloc] initAsGroup:NSLocalizedString(@"model_sample_group_title", @"Sample Group")

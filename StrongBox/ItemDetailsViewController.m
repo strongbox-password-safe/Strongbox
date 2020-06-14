@@ -22,7 +22,6 @@
 #import "IconTableCell.h"
 #import "TotpCell.h"
 #import "Alerts.h"
-#import "Settings.h"
 #import "NSDictionary+Extensions.h"
 #import "OTPToken+Serialization.h"
 #import "KeePassHistoryController.h"
@@ -38,6 +37,7 @@
 #import "TagsViewTableViewCell.h"
 #import "AuditDrillDownController.h"
 #import "NSString+Extensions.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -167,7 +167,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     // Needs to be done here to avoid jumpy animation on load...
     
-    if(Settings.sharedInstance.hideTips) {
+    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     else {
@@ -259,7 +259,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (Node*)createNewRecord {
-    AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings* settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     NSString *title = settings.titleAutoFillMode == kDefault ?
         NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
@@ -1511,7 +1511,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             self.urlJustChanged = NO;
 #ifndef IS_APP_EXTENSION
             // No Custom Icon has been set for this entry, and it's a brand new entry or URL has just changed, does the user want us to try grab a FavIcon?
-            BOOL favIconFetchPossible = (Settings.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) && isValidUrl(self.model.url));
+            BOOL favIconFetchPossible = (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) && isValidUrl(self.model.url));
 
             if (favIconFetchPossible) {
                 if (!self.databaseModel.metadata.promptedForAutoFetchFavIcon) {

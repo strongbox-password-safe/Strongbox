@@ -15,13 +15,13 @@
 #import "Alerts.h"
 #import "StorageBrowserTableViewController.h"
 #import "AppleICloudProvider.h"
-#import "Settings.h"
 #import "OneDriveStorageProvider.h"
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "FileManager.h"
 #import "FilesAppUrlBookmarkProvider.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
@@ -62,7 +62,7 @@
     
     // iCloud on Top if available
     
-    if ([Settings sharedInstance].iCloudOn) {
+    if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn) {
         [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
     

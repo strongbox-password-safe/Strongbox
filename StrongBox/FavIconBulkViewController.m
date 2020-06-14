@@ -11,7 +11,8 @@
 #import "FavIconManager.h"
 #import "FavIconDownloadResultsViewController.h"
 #import "Alerts.h"
-#import "Settings.h"
+#import "FavIconDownloadOptions.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     kFavIconBulkStatusInitial,
@@ -326,7 +327,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     
     [FavIconManager.sharedInstance getFavIconsForUrls:todo
                                                 queue:self.queue
-                                              options:Settings.sharedInstance.favIconDownloadOptions
+                                              options:SharedAppAndAutoFillSettings.sharedInstance.favIconDownloadOptions
                                          withProgress:^(NSURL * _Nonnull url, NSArray<UIImage *> * _Nonnull images) {
         [self onProgressUpdate:url images:images];
     }];

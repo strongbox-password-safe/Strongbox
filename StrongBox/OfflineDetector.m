@@ -8,7 +8,7 @@
 
 #import "OfflineDetector.h"
 #import "Reachability.h"
-#import "Settings.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface OfflineDetector ()
 
@@ -44,7 +44,7 @@
 }
     
 - (void) startMonitoringConnectivitity {
-    if (!Settings.sharedInstance.monitorInternetConnectivity) {
+    if (!SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
         NSLog(@"Not monitoring connectivity as configured OFF");
         return;
     }
