@@ -9,7 +9,7 @@
 #ifndef StorageProvider_h
 #define StorageProvider_h
 
-typedef NS_ENUM (unsigned int, StorageProvider) {
+typedef NS_ENUM (NSUInteger, StorageProvider) {
     kGoogleDrive,
     kDropbox,
     kLocalDevice,

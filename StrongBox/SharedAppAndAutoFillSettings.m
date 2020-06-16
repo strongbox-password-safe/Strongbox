@@ -165,7 +165,7 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
     NSDate* date = self.freeTrialEnd;
     
     if(date == nil) {
-        NSLog(@"No Free Trial date set yet. Not in free trial. User has not opted in to Free Trial.");
+        // NSLog(@"No Free Trial date set yet. Not in free trial. User has not opted in to Free Trial.");
         return NO;
     }
     

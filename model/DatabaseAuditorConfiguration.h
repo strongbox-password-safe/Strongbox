@@ -14,6 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)defaults;
 
++ (instancetype)fromJsonSerializationDictionary:(NSDictionary*)jsonDictionary;
+- (NSDictionary *)getJsonSerializationDictionary;
+
 @property BOOL auditInBackground;
 @property BOOL checkForNoPasswords;
 @property BOOL checkForDuplicatedPasswords;

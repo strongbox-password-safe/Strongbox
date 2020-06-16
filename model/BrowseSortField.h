@@ -9,7 +9,7 @@
 #ifndef BrowseSortField_h
 #define BrowseSortField_h
 
-typedef NS_ENUM (unsigned int, BrowseSortField) {
+typedef NS_ENUM (NSUInteger, BrowseSortField) {
     kBrowseSortFieldNone,
     kBrowseSortFieldTitle,
     kBrowseSortFieldUsername,

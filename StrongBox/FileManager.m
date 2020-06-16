@@ -83,6 +83,20 @@
     return ret;
 }
 
+- (NSURL *)preferencesDirectory {
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
+    if(!url) {
+        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
+        return nil;
+    }
+
+    NSURL* ret = [url URLByAppendingPathComponent:@"preferences"];
+
+    [self createIfNecessary:ret];
+
+    return ret;
+}
+
 - (NSURL *)sharedAppGroupDirectory {
     NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
     if(!url) {

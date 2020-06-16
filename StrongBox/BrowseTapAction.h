@@ -9,7 +9,7 @@
 #ifndef BrowseTapAction_h
 #define BrowseTapAction_h
 
-typedef NS_ENUM (unsigned int, BrowseTapAction) {
+typedef NS_ENUM (NSUInteger, BrowseTapAction) {
     kBrowseTapActionNone,
     kBrowseTapActionOpenDetails,
     kBrowseTapActionCopyTitle,

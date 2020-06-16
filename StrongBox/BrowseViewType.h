@@ -9,7 +9,7 @@
 #ifndef BrowseViewType_h
 #define BrowseViewType_h
 
-typedef NS_ENUM (unsigned int, BrowseViewType) {
+typedef NS_ENUM (NSUInteger, BrowseViewType) {
     kBrowseViewTypeHierarchy,
     kBrowseViewTypeList,
     kBrowseViewTypeTotpList,

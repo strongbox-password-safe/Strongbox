@@ -87,6 +87,172 @@
     return self;
 }
 
+////////////////////////
+// Serialization
+
++ (instancetype)fromJsonSerializationDictionary:(NSDictionary *)jsonDictionary {
+    SafeMetaData *ret = [[SafeMetaData alloc] init];
+    
+    if ( jsonDictionary[@"uuid"] != nil) ret.uuid = jsonDictionary[@"uuid"];
+    if ( jsonDictionary[@"nickName"] != nil ) ret.nickName = jsonDictionary[@"nickName"];
+    if ( jsonDictionary[@"fileName"] != nil ) ret.fileName = jsonDictionary[@"fileName"];
+    if ( jsonDictionary[@"fileIdentifier"] != nil ) ret.fileIdentifier = jsonDictionary[@"fileIdentifier"];
+    if ( jsonDictionary[@"keyFileUrl"] != nil ) ret.keyFileUrl = jsonDictionary[@"keyFileUrl"];
+    if ( jsonDictionary[@"keyFileBookmark"] != nil ) ret.keyFileBookmark = jsonDictionary[@"keyFileBookmark"];
+    if ( jsonDictionary[@"autoLockTimeoutSeconds"] != nil ) ret.autoLockTimeoutSeconds = jsonDictionary[@"autoLockTimeoutSeconds"];
+    if ( jsonDictionary[@"detailsViewCollapsedSections"] != nil ) ret.detailsViewCollapsedSections = jsonDictionary[@"detailsViewCollapsedSections"];
+    if ( jsonDictionary[@"failedPinAttempts"] != nil ) ret.failedPinAttempts = ((NSNumber*)jsonDictionary[@"failedPinAttempts"]).intValue;
+    
+    if ( jsonDictionary[@"autoFillEnabled"] != nil ) ret.autoFillEnabled = ((NSNumber*)jsonDictionary[@"autoFillEnabled"]).boolValue;
+    if ( jsonDictionary[@"browseSortOrderDescending"] != nil ) ret.browseSortOrderDescending = ((NSNumber*)jsonDictionary[@"browseSortOrderDescending"]).boolValue;
+    if ( jsonDictionary[@"browseSortFoldersSeparately"] != nil ) ret.browseSortFoldersSeparately = ((NSNumber*)jsonDictionary[@"browseSortFoldersSeparately"]).boolValue;
+    if ( jsonDictionary[@"immediateSearchOnBrowse"] != nil ) ret.immediateSearchOnBrowse = ((NSNumber*)jsonDictionary[@"immediateSearchOnBrowse"]).boolValue;
+    if ( jsonDictionary[@"hideTotpInBrowse"] != nil ) ret.hideTotpInBrowse = ((NSNumber*)jsonDictionary[@"hideTotpInBrowse"]).boolValue;
+    if ( jsonDictionary[@"showKeePass1BackupGroup"] != nil ) ret.showKeePass1BackupGroup = ((NSNumber*)jsonDictionary[@"showKeePass1BackupGroup"]).boolValue;
+    if ( jsonDictionary[@"showChildCountOnFolderInBrowse"] != nil ) ret.showChildCountOnFolderInBrowse = ((NSNumber*)jsonDictionary[@"showChildCountOnFolderInBrowse"]).boolValue;
+    if ( jsonDictionary[@"showFlagsInBrowse"] != nil ) ret.showFlagsInBrowse = ((NSNumber*)jsonDictionary[@"showFlagsInBrowse"]).boolValue;
+    if ( jsonDictionary[@"doNotShowRecycleBinInBrowse"] != nil ) ret.doNotShowRecycleBinInBrowse = ((NSNumber*)jsonDictionary[@"doNotShowRecycleBinInBrowse"]).boolValue;
+    if ( jsonDictionary[@"showRecycleBinInSearchResults"] != nil ) ret.showRecycleBinInSearchResults = ((NSNumber*)jsonDictionary[@"showRecycleBinInSearchResults"]).boolValue;
+    if ( jsonDictionary[@"viewDereferencedFields"] != nil ) ret.viewDereferencedFields = ((NSNumber*)jsonDictionary[@"viewDereferencedFields"]).boolValue;
+    if ( jsonDictionary[@"searchDereferencedFields"] != nil ) ret.searchDereferencedFields = ((NSNumber*)jsonDictionary[@"searchDereferencedFields"]).boolValue;
+    if ( jsonDictionary[@"showEmptyFieldsInDetailsView"] != nil ) ret.showEmptyFieldsInDetailsView = ((NSNumber*)jsonDictionary[@"showEmptyFieldsInDetailsView"]).boolValue;
+    if ( jsonDictionary[@"easyReadFontForAll"] != nil ) ret.easyReadFontForAll = ((NSNumber*)jsonDictionary[@"easyReadFontForAll"]).boolValue;
+    if ( jsonDictionary[@"hideTotp"] != nil ) ret.hideTotp = ((NSNumber*)jsonDictionary[@"hideTotp"]).boolValue;
+    if ( jsonDictionary[@"tryDownloadFavIconForNewRecord"] != nil ) ret.tryDownloadFavIconForNewRecord = ((NSNumber*)jsonDictionary[@"tryDownloadFavIconForNewRecord"]).boolValue;
+    if ( jsonDictionary[@"showPasswordByDefaultOnEditScreen"] != nil ) ret.showPasswordByDefaultOnEditScreen = ((NSNumber*)jsonDictionary[@"showPasswordByDefaultOnEditScreen"]).boolValue;
+    if ( jsonDictionary[@"showExpiredInBrowse"] != nil ) ret.showExpiredInBrowse = ((NSNumber*)jsonDictionary[@"showExpiredInBrowse"]).boolValue;
+    if ( jsonDictionary[@"showExpiredInSearch"] != nil ) ret.showExpiredInSearch = ((NSNumber*)jsonDictionary[@"showExpiredInSearch"]).boolValue;
+    if ( jsonDictionary[@"showQuickViewFavourites"] != nil ) ret.showQuickViewFavourites = ((NSNumber*)jsonDictionary[@"showQuickViewFavourites"]).boolValue;
+    if ( jsonDictionary[@"showQuickViewNearlyExpired"] != nil ) ret.showQuickViewNearlyExpired = ((NSNumber*)jsonDictionary[@"showQuickViewNearlyExpired"]).boolValue;
+    if ( jsonDictionary[@"makeBackups"] != nil ) ret.makeBackups = ((NSNumber*)jsonDictionary[@"makeBackups"]).boolValue;
+    if ( jsonDictionary[@"hideTotpCustomFieldsInViewMode"] != nil ) ret.hideTotpCustomFieldsInViewMode = ((NSNumber*)jsonDictionary[@"hideTotpCustomFieldsInViewMode"]).boolValue;
+    if ( jsonDictionary[@"hideIconInBrowse"] != nil ) ret.hideIconInBrowse = ((NSNumber*)jsonDictionary[@"hideIconInBrowse"]).boolValue;
+    if ( jsonDictionary[@"colorizePasswords"] != nil ) ret.colorizePasswords = ((NSNumber*)jsonDictionary[@"colorizePasswords"]).boolValue;
+    if ( jsonDictionary[@"isTouchIdEnabled"] != nil ) ret.isTouchIdEnabled = ((NSNumber*)jsonDictionary[@"isTouchIdEnabled"]).boolValue;
+    if ( jsonDictionary[@"isEnrolledForConvenience"] != nil ) ret.isEnrolledForConvenience = ((NSNumber*)jsonDictionary[@"isEnrolledForConvenience"]).boolValue;
+    if ( jsonDictionary[@"offlineCacheAvailable"] != nil ) ret.offlineCacheAvailable = ((NSNumber*)jsonDictionary[@"offlineCacheAvailable"]).boolValue;
+    if ( jsonDictionary[@"hasUnresolvedConflicts"] != nil ) ret.hasUnresolvedConflicts = ((NSNumber*)jsonDictionary[@"hasUnresolvedConflicts"]).boolValue;
+    if ( jsonDictionary[@"autoFillCacheAvailable"] != nil ) ret.autoFillCacheAvailable = ((NSNumber*)jsonDictionary[@"autoFillCacheAvailable"]).boolValue;
+    if ( jsonDictionary[@"readOnly"] != nil ) ret.readOnly = ((NSNumber*)jsonDictionary[@"readOnly"]).boolValue;
+    if ( jsonDictionary[@"hasBeenPromptedForConvenience"] != nil ) ret.hasBeenPromptedForConvenience = ((NSNumber*)jsonDictionary[@"hasBeenPromptedForConvenience"]).boolValue;
+    if ( jsonDictionary[@"hasBeenPromptedForQuickLaunch"] != nil ) ret.hasBeenPromptedForQuickLaunch = ((NSNumber*)jsonDictionary[@"hasBeenPromptedForQuickLaunch"]).boolValue;
+    if ( jsonDictionary[@"alwaysUseCacheForAutoFill"] != nil ) ret.alwaysUseCacheForAutoFill = ((NSNumber*)jsonDictionary[@"alwaysUseCacheForAutoFill"]).boolValue;
+    if ( jsonDictionary[@"showQuickViewExpired"] != nil ) ret.showQuickViewExpired = ((NSNumber*)jsonDictionary[@"showQuickViewExpired"]).boolValue;
+    if ( jsonDictionary[@"colorizeProtectedCustomFields"] != nil ) ret.colorizeProtectedCustomFields = ((NSNumber*)jsonDictionary[@"colorizeProtectedCustomFields"]).boolValue;
+    if ( jsonDictionary[@"promptedForAutoFetchFavIcon"] != nil ) ret.promptedForAutoFetchFavIcon = ((NSNumber*)jsonDictionary[@"promptedForAutoFetchFavIcon"]).boolValue;
+    
+    if ( jsonDictionary[@"keePassIconSet"] != nil ) ret.keePassIconSet = ((NSNumber*)jsonDictionary[@"keePassIconSet"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"browseItemSubtitleField"] != nil ) ret.browseItemSubtitleField = ((NSNumber*)jsonDictionary[@"browseItemSubtitleField"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"likelyFormat"] != nil ) ret.likelyFormat = ((NSNumber*)jsonDictionary[@"likelyFormat"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"browseViewType"] != nil ) ret.browseViewType = ((NSNumber*)jsonDictionary[@"browseViewType"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"browseSortField"] != nil ) ret.browseSortField = ((NSNumber*)jsonDictionary[@"browseSortField"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"maxBackupKeepCount"] != nil ) ret.maxBackupKeepCount = ((NSNumber*)jsonDictionary[@"maxBackupKeepCount"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"tapAction"] != nil ) ret.tapAction = ((NSNumber*)jsonDictionary[@"tapAction"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"doubleTapAction"] != nil ) ret.doubleTapAction = ((NSNumber*)jsonDictionary[@"doubleTapAction"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"tripleTapAction"] != nil ) ret.tripleTapAction = ((NSNumber*)jsonDictionary[@"tripleTapAction"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"longPressTapAction"] != nil ) ret.longPressTapAction = ((NSNumber*)jsonDictionary[@"longPressTapAction"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"storageProvider"] != nil ) ret.storageProvider = ((NSNumber*)jsonDictionary[@"storageProvider"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"duressAction"] != nil ) ret.duressAction = ((NSNumber*)jsonDictionary[@"duressAction"]).unsignedIntegerValue;
+    if ( jsonDictionary[@"failedPinAttempts"] != nil ) ret.failedPinAttempts = ((NSNumber*)jsonDictionary[@"failedPinAttempts"]).intValue;
+
+    if ( jsonDictionary[@"yubiKeyConfig"] != nil ) ret.yubiKeyConfig = [YubiKeyHardwareConfiguration fromJsonSerializationDictionary:jsonDictionary[@"yubiKeyConfig"]];
+    
+    if ( jsonDictionary[@"auditConfig"] != nil ) ret.auditConfig = [DatabaseAuditorConfiguration fromJsonSerializationDictionary:jsonDictionary[@"auditConfig"]];
+
+    return ret;
+}
+
+- (NSDictionary *)getJsonSerializationDictionary {
+    NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithDictionary:@{
+        @"uuid" : self.uuid,
+        @"failedPinAttempts" : @(self.failedPinAttempts),
+        @"autoFillEnabled" : @(self.autoFillEnabled),
+        @"likelyFormat" : @(self.likelyFormat),
+        @"browseViewType" : @(self.browseViewType),
+        @"browseSortField" : @(self.browseSortField),
+        @"browseSortOrderDescending" : @(self.browseSortOrderDescending),
+        @"browseSortFoldersSeparately" : @(self.browseSortFoldersSeparately),
+        @"browseItemSubtitleField" : @(self.browseItemSubtitleField),
+        @"immediateSearchOnBrowse" : @(self.immediateSearchOnBrowse),
+        @"hideTotpInBrowse" : @(self.hideTotpInBrowse),
+        @"showKeePass1BackupGroup" : @(self.showKeePass1BackupGroup),
+        @"showChildCountOnFolderInBrowse" : @(self.showChildCountOnFolderInBrowse),
+        @"showFlagsInBrowse" : @(self.showFlagsInBrowse),
+        @"doNotShowRecycleBinInBrowse" : @(self.doNotShowRecycleBinInBrowse),
+        @"showRecycleBinInSearchResults" : @(self.showRecycleBinInSearchResults),
+        @"viewDereferencedFields" : @(self.viewDereferencedFields),
+        @"searchDereferencedFields" : @(self.searchDereferencedFields),
+        @"showEmptyFieldsInDetailsView" : @(self.showEmptyFieldsInDetailsView),
+        @"easyReadFontForAll" : @(self.easyReadFontForAll),
+        @"hideTotp" : @(self.hideTotp),
+        @"tryDownloadFavIconForNewRecord" : @(self.tryDownloadFavIconForNewRecord),
+        @"showPasswordByDefaultOnEditScreen" : @(self.showPasswordByDefaultOnEditScreen),
+        @"showExpiredInBrowse" : @(self.showExpiredInBrowse),
+        @"showExpiredInSearch" : @(self.showExpiredInSearch),
+        @"showQuickViewFavourites" : @(self.showQuickViewFavourites),
+        @"showQuickViewNearlyExpired" : @(self.showQuickViewNearlyExpired),
+        @"makeBackups" : @(self.makeBackups),
+        @"maxBackupKeepCount" : @(self.maxBackupKeepCount),
+        @"hideTotpCustomFieldsInViewMode" : @(self.hideTotpCustomFieldsInViewMode),
+        @"hideIconInBrowse" : @(self.hideIconInBrowse),
+        @"tapAction" : @(self.tapAction),
+        @"doubleTapAction" : @(self.doubleTapAction),
+        @"tripleTapAction" : @(self.tripleTapAction),
+        @"longPressTapAction" : @(self.longPressTapAction),
+        @"colorizePasswords" : @(self.colorizePasswords),
+        @"keePassIconSet" : @(self.keePassIconSet),
+        @"isTouchIdEnabled" : @(self.isTouchIdEnabled),
+        @"isEnrolledForConvenience" : @(self.isEnrolledForConvenience),
+        @"offlineCacheAvailable" : @(self.offlineCacheAvailable),
+        @"hasUnresolvedConflicts" : @(self.hasUnresolvedConflicts),
+        @"autoFillCacheAvailable" : @(self.autoFillCacheAvailable),
+        @"readOnly" : @(self.readOnly),
+        @"hasBeenPromptedForConvenience" : @(self.hasBeenPromptedForConvenience),
+        @"hasBeenPromptedForQuickLaunch" : @(self.hasBeenPromptedForQuickLaunch),
+        @"alwaysUseCacheForAutoFill" : @(self.alwaysUseCacheForAutoFill),
+        @"showQuickViewExpired" : @(self.showQuickViewExpired),
+        @"colorizeProtectedCustomFields" : @(self.colorizeProtectedCustomFields),
+        @"promptedForAutoFetchFavIcon" : @(self.promptedForAutoFetchFavIcon),
+        @"storageProvider" : @(self.storageProvider),
+        @"duressAction" : @(self.duressAction),
+        @"failedPinAttempts" : @(self.failedPinAttempts),
+    }];
+    
+    if (self.nickName != nil) {
+        ret[@"nickName"] = self.nickName;
+    }
+    if (self.fileName != nil) {
+        ret[@"fileName"] = self.fileName;
+    }
+    if (self.fileIdentifier != nil) {
+        ret[@"fileIdentifier"] = self.fileIdentifier;
+    }
+    if (self.keyFileUrl != nil) {
+        ret[@"keyFileUrl"] = self.keyFileUrl;
+    }
+    if (self.keyFileBookmark != nil) {
+        ret[@"keyFileBookmark"] = self.keyFileBookmark;
+    }
+    if (self.autoLockTimeoutSeconds != nil) {
+        ret[@"autoLockTimeoutSeconds"] = self.autoLockTimeoutSeconds;
+    }
+    if (self.detailsViewCollapsedSections != nil) {
+        ret[@"detailsViewCollapsedSections"] = self.detailsViewCollapsedSections;
+    }
+    
+    if (self.yubiKeyConfig != nil) {
+        ret[@"yubiKeyConfig"] = [self.yubiKeyConfig getJsonSerializationDictionary];
+    }
+    if (self.auditConfig != nil) {
+        ret[@"auditConfig"] = [self.auditConfig getJsonSerializationDictionary];
+    }
+    
+    return ret;
+}
+
+////////////////////////
+// Legacy Serialization - Remove Eventually - TODO:
+
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:self.uuid forKey:@"uuid"];
     [encoder encodeObject:self.nickName forKey:@"nickName"];
@@ -488,7 +654,6 @@
 - (void)clearKeychainItems {
     self.convenienceMasterPassword = nil;
     self.convenenienceYubikeySecret = nil;
-    
     self.favourites = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;
@@ -509,7 +674,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ [%u] - [%@-%@]", self.nickName, self.storageProvider, self.fileName, self.fileIdentifier];
+    return [NSString stringWithFormat:@"%@ [%lu] - [%@-%@]", self.nickName, (unsigned long)self.storageProvider, self.fileName, self.fileIdentifier];
 }
 
 @end

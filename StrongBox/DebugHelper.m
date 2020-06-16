@@ -18,11 +18,11 @@
     int i=0;
     NSString *safesMessage = @"Databases Collection\n----------------\n";
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]\n   [%@]-[%@]-[%d%d%d%d%d]\n", i++,
+        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]\n   [%@]-[%@]-[%lu%d%d%d%d]\n", i++,
                               safe.nickName,
                               safe.fileName,
                               safe.fileIdentifier,
-                              safe.storageProvider,
+                              (unsigned long)safe.storageProvider,
                               safe.isTouchIdEnabled,
                               safe.isEnrolledForConvenience,
                               safe.offlineCacheEnabled,
@@ -65,11 +65,11 @@
     int i=0;
     NSString *safesMessage = @"Databases Collection<br />----------------<br />";
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%d%d%d%d%d]<br />", i++,
+        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%lu%d%d%d%d]<br />", i++,
                               safe.nickName,
                               safe.fileName,
                               safe.fileIdentifier,
-                              safe.storageProvider,
+                              (unsigned long)safe.storageProvider,
                               safe.isTouchIdEnabled,
                               safe.isEnrolledForConvenience,
                               safe.offlineCacheEnabled,

@@ -19,6 +19,30 @@
     return ret;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+
++ (instancetype)fromJsonSerializationDictionary:(NSDictionary *)jsonDictionary {
+    YubiKeyHardwareConfiguration* ret = YubiKeyHardwareConfiguration.defaults;
+    
+    if (jsonDictionary[@"mode"] != nil ) ret.mode = ((NSNumber*)(jsonDictionary[@"mode"])).unsignedIntegerValue;
+    if (jsonDictionary[@"slot"] != nil ) ret.slot = ((NSNumber*)(jsonDictionary[@"slot"])).unsignedIntegerValue;
+
+    return ret;
+}
+
+- (NSDictionary *)getJsonSerializationDictionary {
+    NSMutableDictionary *ret = [NSMutableDictionary dictionaryWithDictionary:@{
+        @"mode" : @(self.mode),
+        @"slot" : @(self.slot),
+    }];
+    
+    return ret;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Legacy Serialization - Remove eventually
+
 - (instancetype)initWithCoder:(NSCoder *)coder {
     if((self = [self init])) {
         self.mode = [coder decodeIntegerForKey:@"mode"];

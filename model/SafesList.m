@@ -9,15 +9,19 @@
 #import "SafesList.h"
 #import "IOsUtils.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "FileManager.h"
 
 @interface SafesList()
 
-@property (strong, nonatomic) NSMutableArray<SafeMetaData*> *data;
+@property (strong, nonatomic) NSMutableArray<SafeMetaData*> *databasesList;
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
+@property BOOL migratedToNewStore;
 
 @end
 
-static NSString* const kSafesList = @"safesList";
+static NSString* const kDatabasesFilename = @"databases.json";
+static NSString* const kMigratedToNewStore = @"migratedDatabasesToNewStore";
+
 NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChanged";
 
 @implementation SafesList
@@ -33,26 +37,64 @@ NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChan
 }
 
 - (instancetype)init {
-    if (self = [super init]) {        
+    if (self = [super init]) {
+        [self migrateToNewStore];
+
         _dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
-        _data = [self load];
+        _databasesList = [self deserialize];
     }
     
     return self;
 }
 
-static NSUserDefaults* getSharedAppGroupDefaults() {
-    return SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TODO: Eventually delete these - 14-Jun-2020 +12 months - 14-Jun-2021
+
+- (BOOL)migratedToNewStore {
+    NSNumber* obj = [getSharedAppGroupDefaults() objectForKey:kMigratedToNewStore];
+    return obj != nil ? obj.boolValue : NO;
 }
 
-- (NSArray<SafeMetaData *> *)snapshot {
-    __block NSArray<SafeMetaData *> *result;
-    dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.data]; });
-    return result;
+- (void)setMigratedToNewStore:(BOOL)migratedToNewStore {
+    [getSharedAppGroupDefaults() setBool:migratedToNewStore forKey:kMigratedToNewStore];
+    [getSharedAppGroupDefaults() synchronize];
 }
 
-- (NSMutableArray<SafeMetaData*>*)load {
+- (void)migrateToNewStore {
+#ifndef IS_APP_EXTENSION // AUTO-FILL component cannot perform migration (might be stale) so where this fails,
+                         // load below will return an empty list but not affect anything important - a restart/launch of main app will then migrate
+    if (self.migratedToNewStore) {
+        NSLog(@"Already Migrated to new store - not migrating");
+        return;
+    }
+    
+    self.databasesList = [self legacyLoad];
+    
+    NSLog(@"Migrating %lu databases to new store.", (unsigned long)self.databasesList.count);
+
+    [self serialize];
+
+    NSLog(@"Migrated %lu databases to new store!", (unsigned long)self.databasesList.count);
+
+    self.migratedToNewStore = YES;
+#endif
+}
+
+//- (void)legacySerialize {
+//    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.databasesList];
+//    NSUserDefaults * defaults = getSharedAppGroupDefaults();
+//    [defaults setObject:encodedObject forKey:kSafesList];
+//    [defaults synchronize];
+//
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
+//    });
+//}
+
+- (NSMutableArray<SafeMetaData*>*)legacyLoad {
     NSUserDefaults * defaults = getSharedAppGroupDefaults();
+    
+    static NSString* const kSafesList = @"safesList";
     NSData *encodedObject = [defaults objectForKey:kSafesList];
     
     if(encodedObject == nil) {
@@ -63,11 +105,79 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     return [[NSMutableArray<SafeMetaData*> alloc]initWithArray:object];
 }
 
+static NSUserDefaults* getSharedAppGroupDefaults() {
+    return SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (NSArray<SafeMetaData *> *)snapshot {
+    __block NSArray<SafeMetaData *> *result;
+    dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.databasesList]; });
+    return result;
+}
+
+- (NSMutableArray<SafeMetaData*>*)deserialize {
+    if (self.migratedToNewStore) {
+        NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
+        
+        NSError* error;
+        NSData* json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&error];
+        
+        if (error) {
+            NSLog(@"Error reading file for databases: [%@]", error);
+            return nil;
+        }
+
+        NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
+
+        if (error) {
+            NSLog(@"Error getting json dictionaries for databases: [%@]", error);
+            return nil;
+        }
+
+        
+        NSMutableArray<SafeMetaData*> *ret = NSMutableArray.array;
+        for (NSDictionary* jsonDatabase in jsonDatabases) {
+            SafeMetaData* database = [SafeMetaData fromJsonSerializationDictionary:jsonDatabase];
+            [ret addObject:database];
+        }
+        
+        return ret;
+    }
+    else {
+        NSLog(@"Not migrated yet... probably stale auto-fill component. Force user to restart");
+        return @[].mutableCopy;
+    }
+}
+
 - (void)serialize {
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.data];
-    NSUserDefaults * defaults = getSharedAppGroupDefaults();
-    [defaults setObject:encodedObject forKey:kSafesList];
-    [defaults synchronize];
+    NSMutableArray<NSDictionary*>* jsonDatabases = NSMutableArray.array;
+    
+    for (SafeMetaData* database in self.databasesList) {
+        NSDictionary* jsonDict = [database getJsonSerializationDictionary];
+        [jsonDatabases addObject:jsonDict];
+    }
+    
+    NSError* error;
+    NSUInteger options = NSJSONWritingPrettyPrinted;
+    if (@available(iOS 11.0, *)) {
+        options |= NSJSONWritingSortedKeys;
+    }
+    NSData* json = [NSJSONSerialization dataWithJSONObject:jsonDatabases options:options error:&error];
+
+    if (error) {
+        NSLog(@"Error getting json for databases: [%@]", error);
+        return;
+    }
+
+    NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
+    
+    BOOL success = [json writeToURL:fileUrl options:NSDataWritingAtomic error:&error];
+    if (!success) {
+        NSLog(@"Error writing Databases file: [%@]", error);
+        return;
+   }
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
@@ -82,12 +192,12 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 
 - (void)update:(SafeMetaData *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSUInteger index = [self.databasesList indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             return [obj.uuid isEqualToString:safe.uuid];
         }];
         
         if(index != NSNotFound) {
-            [self.data replaceObjectAtIndex:index withObject:safe];
+            [self.databasesList replaceObjectAtIndex:index withObject:safe];
             [self serialize];
         }
         else {
@@ -100,7 +210,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 
 - (void)add:(SafeMetaData *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
-        [self.data addObject:safe];
+        [self.databasesList addObject:safe];
         
         [self serialize];
     });
@@ -108,7 +218,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 
 - (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSArray* duplicates = [self.data filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        NSArray* duplicates = [self.databasesList filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
             SafeMetaData* item = (SafeMetaData*)evaluatedObject;
             return (item.storageProvider == safe.storageProvider &&
                     [item.fileName isEqualToString:safe.fileName] &&
@@ -118,7 +228,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         NSLog(@"Found %lu duplicates...", (unsigned long)duplicates.count);
         
         if([duplicates count] == 0) {
-            [self.data addObject:safe];
+            [self.databasesList addObject:safe];
             
             [self serialize];
         }
@@ -127,12 +237,12 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 
 - (void)remove:(NSString*_Nonnull)uuid {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSUInteger index = [self.databasesList indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             return [obj.uuid isEqualToString:uuid];
         }];
         
         if(index != NSNotFound) {
-            [self.data removeObjectAtIndex:index];
+            [self.databasesList removeObjectAtIndex:index];
             [self serialize];
         }
         else {
@@ -143,11 +253,11 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex {
     dispatch_barrier_async(self.dataQueue, ^{
-        SafeMetaData* item = [self.data objectAtIndex:sourceIndex];
+        SafeMetaData* item = [self.databasesList objectAtIndex:sourceIndex];
         
-        [self.data removeObjectAtIndex:sourceIndex];
+        [self.databasesList removeObjectAtIndex:sourceIndex];
         
-        [self.data insertObject:item atIndex:destinationIndex];
+        [self.databasesList insertObject:item atIndex:destinationIndex];
         
         [self serialize];
     });
@@ -159,7 +269,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     }
     
     dispatch_barrier_async(self.dataQueue, ^{
-        [self.data removeAllObjects];
+        [self.databasesList removeAllObjects];
         [self serialize];
     });
 }

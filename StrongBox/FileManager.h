@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* sharedAppGroupDirectory;
 @property (readonly, nullable) NSURL* keyFilesDirectory;
 @property (readonly, nullable) NSURL* backupFilesDirectory;
+@property (readonly, nullable) NSURL* preferencesDirectory;
 
 - (void)createIfNecessary:(NSURL*)url;
 

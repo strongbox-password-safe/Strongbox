@@ -9,7 +9,7 @@
 #ifndef BrowseItemSubtitleField_h
 #define BrowseItemSubtitleField_h
 
-typedef NS_ENUM (unsigned int, BrowseItemSubtitleField) {
+typedef NS_ENUM (NSUInteger, BrowseItemSubtitleField) {
     kBrowseItemSubtitleNoField,
     kBrowseItemSubtitleUsername,
     kBrowseItemSubtitlePassword,

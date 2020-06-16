@@ -32,6 +32,9 @@ NS_ASSUME_NONNULL_BEGIN
                         fileName:(NSString*)fileName
                   fileIdentifier:(NSString*)fileIdentifier;
 
++ (instancetype)fromJsonSerializationDictionary:(NSDictionary*)jsonDictionary;
+- (NSDictionary*)getJsonSerializationDictionary;
+
 - (void)clearKeychainItems;
 
 @property (nonatomic, strong) NSString *uuid;

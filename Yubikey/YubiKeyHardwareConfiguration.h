@@ -26,6 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)defaults;
 - (instancetype)clone;
 
++ (instancetype)fromJsonSerializationDictionary:(NSDictionary*)jsonDictionary;
+- (NSDictionary *)getJsonSerializationDictionary;
+
 @property YubiKeyHardwareMode mode;
 @property YubiKeyHardwareSlot slot;
 

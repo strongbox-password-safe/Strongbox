@@ -19,7 +19,7 @@
     
     NSMutableDictionary<NSUUID*, NSData*>* freshCopy = [CustomIconsRationalizer removeBadCustomIconReferencesAndBuildFreshIconMap:nodes customIcons:customIcons];
 
-    NSLog(@"First removal of bad references fresh = [%@]", freshCopy.allKeys);
+//    NSLog(@"First removal of bad references fresh = [%@]", freshCopy.allKeys);
 
     // 2. There could be duplicate custom icons in the database. Remove and replace any references to the single
     //    instance.
@@ -30,7 +30,7 @@
 
     freshCopy = [CustomIconsRationalizer removeBadCustomIconReferencesAndBuildFreshIconMap:nodes customIcons:freshCopy];
 
-    NSLog(@"Second removal of bad references fresh = [%@]", freshCopy.allKeys);
+//    NSLog(@"Second removal of bad references fresh = [%@]", freshCopy.allKeys);
 
     NSLog(@"After Rationalization: Icon Map Count = [%lu]. Node Count = [%lu]", (unsigned long)freshCopy.allKeys.count, (unsigned long)nodes.count);
     
