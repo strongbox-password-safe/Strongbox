@@ -97,7 +97,7 @@
     if ( jsonDictionary[@"nickName"] != nil ) ret.nickName = jsonDictionary[@"nickName"];
     if ( jsonDictionary[@"fileName"] != nil ) ret.fileName = jsonDictionary[@"fileName"];
     if ( jsonDictionary[@"fileIdentifier"] != nil ) ret.fileIdentifier = jsonDictionary[@"fileIdentifier"];
-    if ( jsonDictionary[@"keyFileUrl"] != nil ) ret.keyFileUrl = jsonDictionary[@"keyFileUrl"];
+    if ( jsonDictionary[@"keyFileUrl"] != nil ) ret.keyFileUrl = [NSURL URLWithString:((NSString*)jsonDictionary[@"keyFileUrl"])];
     if ( jsonDictionary[@"keyFileBookmark"] != nil ) ret.keyFileBookmark = jsonDictionary[@"keyFileBookmark"];
     if ( jsonDictionary[@"autoLockTimeoutSeconds"] != nil ) ret.autoLockTimeoutSeconds = jsonDictionary[@"autoLockTimeoutSeconds"];
     if ( jsonDictionary[@"detailsViewCollapsedSections"] != nil ) ret.detailsViewCollapsedSections = jsonDictionary[@"detailsViewCollapsedSections"];
@@ -228,7 +228,7 @@
         ret[@"fileIdentifier"] = self.fileIdentifier;
     }
     if (self.keyFileUrl != nil) {
-        ret[@"keyFileUrl"] = self.keyFileUrl;
+        ret[@"keyFileUrl"] = self.keyFileUrl.absoluteString;
     }
     if (self.keyFileBookmark != nil) {
         ret[@"keyFileBookmark"] = self.keyFileBookmark;

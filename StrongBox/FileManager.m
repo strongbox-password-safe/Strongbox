@@ -37,7 +37,15 @@
     return ret;
 }
 
+- (NSURL *)crashFile {
+    return [self.appSupportDirectory URLByAppendingPathComponent:@"last-unhandled-exception.log"];
+}
+
 - (NSURL *)offlineCacheDirectory {
+    return self.appSupportDirectory;
+}
+
+- (NSURL *)appSupportDirectory {
     NSURL *ret =  [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
                                                   inDomains:NSUserDomainMask].lastObject;
     
