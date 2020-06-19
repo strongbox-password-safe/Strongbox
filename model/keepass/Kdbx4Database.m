@@ -57,9 +57,13 @@ static const BOOL kLogVerbose = NO;
     return [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
 }
 
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+- (void)open:(NSData *)data
+         ckf:(CompositeKeyFactors *)ckf
+useLegacyDeserialization:(BOOL)useLegacyDeserialization
+  completion:(OpenCompletionBlock)completion {
     [Kdbx4Serialization deserialize:data
                 compositeKeyFactors:ckf
+           useLegacyDeserialization:useLegacyDeserialization
                          completion:^(BOOL userCancelled, Kdbx4SerializationData* serializationData, NSError* error) {
     if(userCancelled || serializationData == nil || serializationData.rootXmlObject == nil || error) {
         if(error) {

@@ -33,7 +33,7 @@
         }
         
         id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
-        [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        [adaptor open:blob ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
             XCTAssertNotNil(db);
             
             NSLog(@"%@", db);
@@ -50,7 +50,7 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
     [adaptor open:blob
-              ckf:[CompositeKeyFactors password:password]
+              ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         NSLog(@"%@", db);
@@ -65,7 +65,7 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
     
-    [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [adaptor open:blob ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         NSLog(@"%@", db);
     }];
@@ -79,7 +79,7 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdb1Database alloc] init];
     
-    [adaptor open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [adaptor open:blob ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         
         NSLog(@"BEFORE: %@", db);
@@ -87,7 +87,7 @@
         //db.masterPassword = @"ladder";
         
         [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable rec, NSError * _Nullable error) {
-            [adaptor open:rec ckf:[CompositeKeyFactors password:db.compositeKeyFactors.password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+            [adaptor open:rec ckf:[CompositeKeyFactors password:db.compositeKeyFactors.password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
                 NSLog(@"AFTER: %@", b);
                 XCTAssertNotNil(b);
             }];

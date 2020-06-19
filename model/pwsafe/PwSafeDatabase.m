@@ -35,7 +35,7 @@
     return ret;
 }
 
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(OpenCompletionBlock)completion {
     NSError* error;
     if (![PwSafeDatabase isAValidSafe:data error:&error]) {
         NSLog(@"Not a valid safe!");

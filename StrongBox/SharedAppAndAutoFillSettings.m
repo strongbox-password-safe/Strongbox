@@ -40,7 +40,9 @@ static NSString* const kDatabaseCellTopSubtitle = @"databaseCellTopSubtitle";
 static NSString* const kDatabaseCellSubtitle1 = @"databaseCellSubtitle1";
 static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
+static NSString* const kUseLegacyDeserialization = @"useLegacyDeserialization";
 
+// TODO: Move to JSON file instead of NSUserDefaults...
 @implementation SharedAppAndAutoFillSettings
 
 + (void)initialize {
@@ -82,46 +84,12 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (NSString*)getString:(NSString*)key {
-    return [self getString:key fallback:nil];
+- (BOOL)useLegacyDeserialization {
+    return [self getBool:kUseLegacyDeserialization];
 }
 
-- (NSString*)getString:(NSString*)key fallback:(NSString*)fallback {
-    NSString* obj = [self.sharedAppGroupDefaults objectForKey:key];
-    return obj != nil ? obj : fallback;
-}
-
-- (void)setString:(NSString*)key value:(NSString*)value {
-    [self.sharedAppGroupDefaults setObject:value forKey:key];
-    [self.sharedAppGroupDefaults synchronize];
-}
-
-- (BOOL)getBool:(NSString*)key {
-    return [self getBool:key fallback:NO];
-}
-
-- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
-    NSNumber* obj = [self.sharedAppGroupDefaults objectForKey:key];
-    return obj != nil ? obj.boolValue : fallback;
-}
-
-- (void)setBool:(NSString*)key value:(BOOL)value {
-    [self.sharedAppGroupDefaults setBool:value forKey:key];
-    [self.sharedAppGroupDefaults synchronize];
-}
-
-- (NSInteger)getInteger:(NSString*)key {
-    return [self.sharedAppGroupDefaults integerForKey:key];
-}
-
-- (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
-    NSNumber* obj = [self.sharedAppGroupDefaults objectForKey:key];
-    return obj != nil ? obj.integerValue : fallback;
-}
-
-- (void)setInteger:(NSString*)key value:(NSInteger)value {
-    [self.sharedAppGroupDefaults setInteger:value forKey:key];
-    [self.sharedAppGroupDefaults synchronize];
+- (void)setUseLegacyDeserialization:(BOOL)useLegacyDeserialization {
+    [self setBool:kUseLegacyDeserialization value:useLegacyDeserialization];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -455,6 +423,50 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 
 - (void)setDatabaseCellSubtitle2:(DatabaseCellSubtitleField)databaseCellSubtitle2 {
     [self setInteger:kDatabaseCellSubtitle2 value:databaseCellSubtitle2];
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (NSString*)getString:(NSString*)key {
+    return [self getString:key fallback:nil];
+}
+
+- (NSString*)getString:(NSString*)key fallback:(NSString*)fallback {
+    NSString* obj = [self.sharedAppGroupDefaults objectForKey:key];
+    return obj != nil ? obj : fallback;
+}
+
+- (void)setString:(NSString*)key value:(NSString*)value {
+    [self.sharedAppGroupDefaults setObject:value forKey:key];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)getBool:(NSString*)key {
+    return [self getBool:key fallback:NO];
+}
+
+- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
+    NSNumber* obj = [self.sharedAppGroupDefaults objectForKey:key];
+    return obj != nil ? obj.boolValue : fallback;
+}
+
+- (void)setBool:(NSString*)key value:(BOOL)value {
+    [self.sharedAppGroupDefaults setBool:value forKey:key];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (NSInteger)getInteger:(NSString*)key {
+    return [self.sharedAppGroupDefaults integerForKey:key];
+}
+
+- (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
+    NSNumber* obj = [self.sharedAppGroupDefaults objectForKey:key];
+    return obj != nil ? obj.integerValue : fallback;
+}
+
+- (void)setInteger:(NSString*)key value:(NSInteger)value {
+    [self.sharedAppGroupDefaults setInteger:value forKey:key];
+    [self.sharedAppGroupDefaults synchronize];
 }
 
 @end

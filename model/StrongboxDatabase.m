@@ -197,7 +197,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     NSUInteger binariesSize = 0;
     for (NodeFileAttachment* attachments in node.fields.attachments) {
         DatabaseAttachment* dbA = self.mutableAttachments[attachments.index];
-        binariesSize += dbA == nil ? 0 : dbA.data.length;
+        binariesSize += dbA == nil ? 0 : dbA.estimatedStorageBytes;
     }
     
     NSUInteger textSize = (basicFields + customFields) * 2; // Unicode in memory probably?
@@ -244,9 +244,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment *)attachment rationalize:(BOOL)rationalize {
-    DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] init];
-    dbAttachment.data = attachment.data;
-    [_mutableAttachments addObject:dbAttachment];
+    [_mutableAttachments addObject:attachment.dbAttachment];
     
     NodeFileAttachment* nodeAttachment = [[NodeFileAttachment alloc] init];
     nodeAttachment.filename = attachment.filename;
@@ -531,10 +529,7 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
     [node.fields.attachments removeAllObjects];
     
     for (UiAttachment* attachment in attachments) {
-        DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] init];
-        dbAttachment.data = attachment.data;
-        
-        [_mutableAttachments addObject:dbAttachment];
+        [_mutableAttachments addObject:attachment.dbAttachment];
         
         NodeFileAttachment *nodeAttachment = [[NodeFileAttachment alloc] init];
         nodeAttachment.filename = attachment.filename;

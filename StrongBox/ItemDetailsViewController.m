@@ -38,6 +38,7 @@
 #import "AuditDrillDownController.h"
 #import "NSString+Extensions.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "FileManager.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -46,6 +47,8 @@
 #import "QRCodeScannerViewController.h"
 
 #endif
+
+static const size_t kMaxAttachmentImageSize = 5 * 1024 * 1024;
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
@@ -424,7 +427,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             }
             else {
                 if(self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone]) {
-                    self.urlJustChanged = ![self.model.url isEqualToString:self.preEditModelClone.url];
+                    self.urlJustChanged = [self.model.url compare:self.preEditModelClone.url] != NSOrderedSame;
                     self.preEditModelClone = nil;
                     [self saveChanges];
                     return; // We will perform below changes when saving is done...
@@ -489,7 +492,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }
     
     UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
-    cell.textLabel.text = @"<Unknown Cell>";
+
     return cell;
 }
 
@@ -850,11 +853,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
-        NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-        for (NSString *file in tmpDirectory) {
-            NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-            [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-        }
+        [FileManager.sharedInstance deleteAllTmpFiles];
     });
 }
 
@@ -866,7 +865,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     UiAttachment* attachment = [self.model.attachments objectAtIndex:index];
     
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:attachment.filename];
-    [attachment.data writeToFile:f atomically:YES];
+    NSData* data = attachment.dbAttachment.deprecatedData;
+    [data writeToFile:f atomically:YES];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -1200,35 +1200,20 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                   message:NSLocalizedString(@"item_details_password_copied_and_launching", @"Password Copied. Launching URL...")];
     
 #ifndef IS_APP_EXTENSION
-    
-    // TODO: Move to mmcgUrl
-    
     if (![urlString.lowercaseString hasPrefix:@"http://"] &&
         ![urlString.lowercaseString hasPrefix:@"https://"]) {
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
-//    NSURLComponents *components = [NSURLComponents componentsWithString:urlString];
-//
-//    NSLog(@"%@-%@-%@", components.host, components.path, components.query);
-//
-//    NSURL* url = components.URL;
-//    NSLog(@"Launching URL: %@", url);
+    NSURL* url = urlString.urlExtendedParse;
     
-//    urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLHostAllowedCharacterSet];
-//    urlString = [urlString stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
-
-    NSURL* url = [NSURL URLWithString:urlString];
-    
-    if (url == nil) {
-        url = urlString.mmcgUrl; // TODO: Tidy
+    if (url) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:^(BOOL success) {
+                NSLog(@"Success = [%d]", success);
+            }];
+        });
     }
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:^(BOOL success) {
-            NSLog(@"Success = [%d]", success);
-        }];
-    });
 #endif
 }
 
@@ -1302,7 +1287,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSArray<DatabaseAttachment*>* dbAttachments = self.databaseModel.database.attachments;
     NSArray<UiAttachment*>* attachments = [item.fields.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
         DatabaseAttachment *dbAttachment = dbAttachments[obj.index];
-        return [UiAttachment attachmentWithFilename:obj.filename data:dbAttachment.data];
+        return [UiAttachment attachmentWithFilename:obj.filename dbAttachment:dbAttachment];
     }];
     
     ItemDetailsModel *ret = [[ItemDetailsModel alloc] initWithTitle:item.title
@@ -1588,17 +1573,19 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [header setCollapsed:self.databaseModel.metadata.detailsViewCollapsedSections[section].boolValue];
     
     __weak CollapsibleTableViewHeader* weakHeader = header;
+    __weak ItemDetailsViewController* weakSelf = self;
+    
     header.onToggleSection = ^() {
-        BOOL toggled = !self.databaseModel.metadata.detailsViewCollapsedSections[section].boolValue;
+        BOOL toggled = !weakSelf.databaseModel.metadata.detailsViewCollapsedSections[section].boolValue;
         
-        NSMutableArray* mutable = [self.databaseModel.metadata.detailsViewCollapsedSections mutableCopy];
+        NSMutableArray* mutable = [weakSelf.databaseModel.metadata.detailsViewCollapsedSections mutableCopy];
         mutable[section] = @(toggled);
-        self.databaseModel.metadata.detailsViewCollapsedSections = mutable;
+        weakSelf.databaseModel.metadata.detailsViewCollapsedSections = mutable;
         
-        [SafesList.sharedInstance update:self.databaseModel.metadata];
+        [SafesList.sharedInstance update:weakSelf.databaseModel.metadata];
         
         [weakHeader setCollapsed:toggled];
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
+        [weakSelf.tableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationAutomatic];
     };
 
     return header;
@@ -1608,11 +1595,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 - (UITableViewCell*)getUsernameCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
 
+    __weak ItemDetailsViewController* weakSelf = self;
+    
     [cell setKey:NSLocalizedString(@"item_details_username_field_title", @"Username")
            value:[self maybeDereference:self.model.username]
          editing:self.editing
 suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
-            NSArray* matches = [[[self.databaseModel.database.usernameSet allObjects] filter:^BOOL(NSString * obj) {
+            NSArray* matches = [[[weakSelf.databaseModel.database.usernameSet allObjects] filter:^BOOL(NSString * obj) {
                 return [obj hasPrefix:text];
             }] sortedArrayUsingComparator:finderStringComparator];
               return matches.firstObject;
@@ -1621,14 +1610,15 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
 showGenerateButton:YES];
 
     cell.onEdited = ^(NSString * _Nonnull text) {
-      self.model.username = trim(text);
-      [self onModelEdited];
+      weakSelf.model.username = trim(text);
+      [weakSelf onModelEdited];
     };
     
     __weak GenericKeyValueTableViewCell* weakCell = cell;
-    
     cell.onGenerate = ^{
-        [PasswordMaker.sharedInstance promptWithUsernameSuggestions:self action:^(NSString * _Nonnull response) {
+        [PasswordMaker.sharedInstance promptWithUsernameSuggestions:weakSelf
+                                                             config:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
+                                                             action:^(NSString * _Nonnull response) {
             [weakCell pokeValue:response];
         }];
     };
@@ -1639,16 +1629,18 @@ showGenerateButton:YES];
 - (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
     TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
 
+    __weak ItemDetailsViewController* weakSelf = self;
+    
     [cell setModel:!self.editing
               tags:self.model.tags
    useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
              onAdd:^(NSString * _Nonnull tag) {
-                [self.model addTag:trim(tag)];
-                [self onModelEdited];
+                [weakSelf.model addTag:trim(tag)];
+                [weakSelf onModelEdited];
             }
           onRemove:^(NSString * _Nonnull tag) {
-                [self.model removeTag:trim(tag)];
-                [self onModelEdited];
+                [weakSelf.model removeTag:trim(tag)];
+                [weakSelf onModelEdited];
             }];
 
     // FUTURE:
@@ -1663,7 +1655,9 @@ showGenerateButton:YES];
     return cell;
 }
 
-- (UITableViewCell*)getPasswordCell:(NSIndexPath*)indexPath { 
+- (UITableViewCell*)getPasswordCell:(NSIndexPath*)indexPath {
+    __weak ItemDetailsViewController* weakSelf = self;
+
     if(self.editing) {
         EditPasswordTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditPasswordCellId forIndexPath:indexPath];
         
@@ -1671,13 +1665,13 @@ showGenerateButton:YES];
         cell.parentVc = self;
         cell.password = self.model.password;
         cell.onPasswordEdited = ^(NSString * _Nonnull password) {
-            self.model.password = trim(password);
-            [self onModelEdited];
+            weakSelf.model.password = trim(password);
+            [weakSelf onModelEdited];
         };
         
 #ifndef IS_APP_EXTENSION // TODO: Make this available - (What is this -> Allow this after unifying storyboard?)
         cell.onPasswordSettings = ^(void) {
-            [self performSegueWithIdentifier:@"segueToPasswordGenerationSettings" sender:nil];
+            [weakSelf performSegueWithIdentifier:@"segueToPasswordGenerationSettings" sender:nil];
         };
         cell.showGenerationSettings = YES;
 #else
@@ -1698,12 +1692,12 @@ showGenerateButton:YES];
         
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
-            self.passwordConcealedInUi = !self.passwordConcealedInUi;
-            weakCell.isConcealed = self.passwordConcealedInUi;
+            weakSelf.passwordConcealedInUi = !weakSelf.passwordConcealedInUi;
+            weakCell.isConcealed = weakSelf.passwordConcealedInUi;
         };
         
         cell.onAuditTap = ^{
-            [self performSegueWithIdentifier:@"segueToAuditDrillDown" sender:nil];
+            [weakSelf performSegueWithIdentifier:@"segueToAuditDrillDown" sender:nil];
         };
         
         return cell;
@@ -1730,12 +1724,15 @@ showGenerateButton:YES];
 
 - (UITableViewCell*)getUrlCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
+    
+    __weak ItemDetailsViewController* weakSelf = self;
+    
     [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
          value:[self maybeDereference:self.model.url]
        editing:self.editing
     formatAsUrl:isValidUrl(self.model.url) && !self.editing
     suggestionProvider:^NSString*(NSString *text) {
-      NSArray* matches = [[[self.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
+      NSArray* matches = [[[weakSelf.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
             return [obj hasPrefix:text];
       }] sortedArrayUsingComparator:finderStringComparator];
       return matches.firstObject;
@@ -1743,22 +1740,22 @@ showGenerateButton:YES];
     useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
 
     cell.onEdited = ^(NSString * _Nonnull text) {
-      self.model.url = trim(text);
-      [self onModelEdited];
+      weakSelf.model.url = trim(text);
+      [weakSelf onModelEdited];
     };
 
     cell.onDoubleTap = ^{
-      if (isValidUrl(self.model.url)) {
-          [self copyAndLaunchUrl];
+      if (isValidUrl(weakSelf.model.url)) {
+          [weakSelf copyAndLaunchUrl];
       }
       else {
-          [self copyToClipboard:[self dereference:self.model.url]
-                        message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
+          [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.url]
+                            message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
       }
     };
     cell.onTap = ^{
-      [self copyToClipboard:[self dereference:self.model.url]
-                    message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
+      [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.url]
+                        message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
     };
 
     return cell;
@@ -1767,11 +1764,13 @@ showGenerateButton:YES];
 - (UITableViewCell*)getEmailCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         
+    __weak ItemDetailsViewController* weakSelf = self;
+    
     [cell setKey:NSLocalizedString(@"item_details_email_field_title", @"Email")
            value:self.model.email
          editing:self.editing
     suggestionProvider:^NSString*(NSString *text) {
-      NSArray* matches = [[[self.databaseModel.database.emailSet allObjects] filter:^BOOL(NSString * obj) {
+      NSArray* matches = [[[weakSelf.databaseModel.database.emailSet allObjects] filter:^BOOL(NSString * obj) {
             return [obj hasPrefix:text];
       }] sortedArrayUsingComparator:finderStringComparator];
       return matches.firstObject;
@@ -1780,14 +1779,16 @@ showGenerateButton:YES];
      showGenerateButton:NO];
 
     cell.onEdited = ^(NSString * _Nonnull text) {
-      self.model.email = trim(text);
-      [self onModelEdited];
+      weakSelf.model.email = trim(text);
+      [weakSelf onModelEdited];
     };
 
     return cell;
 }
 
 - (UITableViewCell*)getExpiresCell:(NSIndexPath*)indexPath {
+    __weak ItemDetailsViewController* weakSelf = self;
+
     if(self.isEditing) {
         EditDateCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditDateCell forIndexPath:indexPath];
         cell.keyLabel.text = NSLocalizedString(@"item_details_expires_field_title", @"Expires");
@@ -1795,8 +1796,8 @@ showGenerateButton:YES];
         
         cell.onDateChanged = ^(NSDate * _Nullable date) {
             NSLog(@"Setting Expiry Date to %@", friendlyDateString(date));
-            self.model.expires = date;
-            [self onModelEdited];
+            weakSelf.model.expires = date;
+            [weakSelf onModelEdited];
         };
         return cell;
     }
@@ -1820,18 +1821,20 @@ showGenerateButton:YES];
 - (UITableViewCell*)getNotesCell:(NSIndexPath*)indexPath {
     NotesTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kNotesCellId forIndexPath:indexPath];
 
+    __weak ItemDetailsViewController* weakSelf = self;
+    
     [cell setNotes:[self maybeDereference:self.model.notes]
           editable:self.editing
    useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
     
     cell.onNotesEdited = ^(NSString * _Nonnull notes) {
-        self.model.notes = notes;
-        [self onModelEdited];
+        weakSelf.model.notes = notes;
+        [weakSelf onModelEdited];
     };
     
     cell.onNotesDoubleTap = ^{
-        [self copyToClipboard:self.model.notes
-                      message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
+        [weakSelf copyToClipboard:weakSelf.model.notes
+                          message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
     };
 
     return cell;
@@ -1840,6 +1843,8 @@ showGenerateButton:YES];
 - (UITableViewCell*)getCustomFieldCell:(NSIndexPath*)indexPath {
     NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
     
+//    __weak ItemDetailsViewController* weakSelf = self;
+
     if(self.editing && virtualRow == self.model.customFields.count) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
         
@@ -1895,21 +1900,21 @@ showGenerateButton:YES];
         if(self.editing) {
             EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];
             cell.textField.text = attachment.filename;
-            
-            UIImage* img = [UIImage imageWithData:attachment.data];
-            if(img) {
-                @autoreleasepool { // Prevent App Extension Crash
-                    UIGraphicsBeginImageContextWithOptions(cell.image.bounds.size, NO, 0.0);
-                    
-                    CGRect imageRect = cell.image.bounds;
-                    [img drawInRect:imageRect];
-                    cell.image.image = UIGraphicsGetImageFromCurrentImageContext();
-                    
-                    UIGraphicsEndImageContext();
+            cell.image.image = [UIImage imageNamed:@"document"];
+            if (attachment.dbAttachment.length < kMaxAttachmentImageSize) {
+                NSData* data = attachment.dbAttachment.deprecatedData; // TODO:
+                UIImage* img = [UIImage imageWithData:data];
+                if(img) {
+                    @autoreleasepool { // Prevent App Extension Crash
+                        UIGraphicsBeginImageContextWithOptions(cell.image.bounds.size, NO, 0.0);
+                        
+                        CGRect imageRect = cell.image.bounds;
+                        [img drawInRect:imageRect];
+                        cell.image.image = UIGraphicsGetImageFromCurrentImageContext();
+                        
+                        UIGraphicsEndImageContext();
+                    }
                 }
-            }
-            else {
-                cell.image.image = [UIImage imageNamed:@"document"];
             }
             
             return cell;
@@ -1917,24 +1922,26 @@ showGenerateButton:YES];
         else {
             UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kViewAttachmentCellId forIndexPath:indexPath];
             cell.textLabel.text = attachment.filename;
-            NSUInteger filesize = attachment.data ? attachment.data.length : 0;
+            cell.imageView.image = [UIImage imageNamed:@"document"];
+
+            NSUInteger filesize = attachment.dbAttachment.length;
             cell.detailTextLabel.text = friendlyFileSizeString(filesize);
-            
-            UIImage* img = [UIImage imageWithData:attachment.data];
+           
+            if (attachment.dbAttachment.length < kMaxAttachmentImageSize) {
+                NSData* data = attachment.dbAttachment.deprecatedData; // TODO:
+                UIImage* img = [UIImage imageWithData:data];
 
-            if(img) { // Trick to keep all images to a fixed size
-                @autoreleasepool { // Prevent App Extension Crash
-                    UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
+                if(img) { // Trick to keep all images to a fixed size
+                    @autoreleasepool { // Prevent App Extension Crash
+                        UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
 
-                    CGRect imageRect = CGRectMake(0, 0, 48, 48);
-                    [img drawInRect:imageRect];
-                    cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+                        CGRect imageRect = CGRectMake(0, 0, 48, 48);
+                        [img drawInRect:imageRect];
+                        cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
 
-                    UIGraphicsEndImageContext();
+                        UIGraphicsEndImageContext();
+                    }
                 }
-            }
-            else {
-                cell.imageView.image = [UIImage imageNamed:@"document"];
             }
             
             return cell;
@@ -1971,6 +1978,8 @@ showGenerateButton:YES];
 - (UITableViewCell*)getIconAndTitleCell:(NSIndexPath*)indexPath {
     IconTableCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kIconTableCell forIndexPath:indexPath];
 
+    __weak ItemDetailsViewController* weakSelf = self;
+
     [cell setModel:[self maybeDereference:self.model.title]
               icon:[self getIconImageFromModel]
            editing:self.editing
@@ -1980,7 +1989,7 @@ showGenerateButton:YES];
 #ifndef IS_APP_EXTENSION
         if(self.isEditing) {
             cell.onIconTapped = ^{
-                [self onChangeIcon];
+                [weakSelf onChangeIcon];
             };
         }
         else {
@@ -1991,8 +2000,8 @@ showGenerateButton:YES];
 #endif
 
     cell.onTitleEdited = ^(NSString * _Nonnull text) {
-        self.model.title = trim(text);
-        [self onModelEdited];
+        weakSelf.model.title = trim(text);
+        [weakSelf onModelEdited];
     };
         
     return cell;

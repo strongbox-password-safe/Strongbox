@@ -22,7 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* keyFilesDirectory;
 @property (readonly, nullable) NSURL* backupFilesDirectory;
 @property (readonly, nullable) NSURL* preferencesDirectory;
+@property (readonly, nonnull) NSString* tmpEncryptedAttachmentPath;
 @property (readonly, nullable) NSURL* crashFile;
+@property (readonly, nullable) NSURL* archivedCrashFile;
 @property (readonly, nullable) NSURL* appSupportDirectory;
 
 - (void)createIfNecessary:(NSURL*)url;
@@ -30,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)excludeDirectoriesFromBackup;
 - (void)deleteAllLocalAndAppGroupFiles;
 - (void)deleteAllInboxItems;
+- (void)deleteAllTmpFiles;
 
 @end
 

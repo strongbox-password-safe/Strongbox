@@ -9,6 +9,7 @@
 #import "AesCipher.h"
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonCrypto.h>
+#import "AesInputStream.h"
 
 static const uint32_t kIvSize = kCCBlockSizeAES128;
 
@@ -61,5 +62,10 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
     
     return newKey;
 }
+
+- (NSInputStream *)getDecryptionStreamForStream:(NSInputStream *)inputStream key:(NSData *)key iv:(NSData *)iv {
+    return [[AesInputStream alloc] initWithStream:inputStream key:key iv:iv];
+}
+
 
 @end

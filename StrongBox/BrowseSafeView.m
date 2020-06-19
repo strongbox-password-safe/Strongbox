@@ -29,7 +29,6 @@
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
 #import "DatabasePreferencesController.h"
-#import "ExportOptionsTableViewController.h"
 
 #import "BrowseTableDatasource.h"
 #import "ConfiguredBrowseTableDatasource.h"

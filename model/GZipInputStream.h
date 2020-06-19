@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GZipInputStream : NSInputStream
 
+- (instancetype)initWithStream:(NSInputStream *)innerStream;
+- (instancetype)initWithData:(NSData *)data;
+
 @end
 
 NS_ASSUME_NONNULL_END

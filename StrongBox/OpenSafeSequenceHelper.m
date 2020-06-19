@@ -933,9 +933,10 @@
         CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword
                                                    keyFileDigest:self.keyFileDigest
                                                        yubiKeyCR:yubiKeyCR];
-
-        NSLog(@"BEGIN DECRYPT: %f", [NSDate timeIntervalSinceReferenceDate]);
         
+
+        DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+    
         if(!self.isConvenienceUnlock &&
            (format == kKeePass || format == kKeePass4) &&
            self.masterPassword.length == 0 &&
@@ -950,6 +951,8 @@
             if (!yubiKeyCR) { // Auto Figure it out
                 [DatabaseModel fromData:data
                                     ckf:cpf
+               useLegacyDeserialization:SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization
+                                 config:modelConfig
                              completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
                     if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
                         CompositeKeyFactors* ckf = [CompositeKeyFactors password:nil
@@ -960,6 +963,8 @@
                         
                         [DatabaseModel fromData:data
                                             ckf:ckf
+                       useLegacyDeserialization:SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization
+                                         config:modelConfig
                                      completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
                             if(model) {
                                 self.masterPassword = nil;
@@ -988,7 +993,11 @@
                     }
                     
                     cpf.password = self.masterPassword;
-                    [DatabaseModel fromData:data ckf:cpf completion:^(BOOL userCancelled, DatabaseModel* model, NSError* error) {
+                    [DatabaseModel fromData:data
+                                        ckf:cpf
+                   useLegacyDeserialization:SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization
+                                     config:modelConfig
+                                 completion:^(BOOL userCancelled, DatabaseModel* model, NSError* error) {
                         [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode provider:provider data:data error:error];
                     }];
                 }];
@@ -997,6 +1006,8 @@
         else {
             [DatabaseModel fromData:data
                                 ckf:cpf
+           useLegacyDeserialization:SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization
+                             config:modelConfig
                          completion:^(BOOL userCancelled, DatabaseModel* model, NSError* error) {
                 [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode provider:provider data:data error:error];
             }];
@@ -1010,8 +1021,6 @@
                           provider:(id)provider
                               data:(NSData*)data
                              error:(NSError*)error {
-    NSLog(@"END DECRYPT: %f", [NSDate timeIntervalSinceReferenceDate]);
-
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [SVProgressHUD dismiss];
         
@@ -1384,7 +1393,7 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
             return;
         }
         
-        if(![url.lastPathComponent isEqualToString:self.safe.fileName]) {
+        if([url.lastPathComponent compare:self.safe.fileName] != NSOrderedSame) {
             [Alerts yesNo:self.viewController
                     title:NSLocalizedString(@"open_sequence_database_different_filename_title",@"Different Filename")
                   message:NSLocalizedString(@"open_sequence_database_different_filename_message",@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?")

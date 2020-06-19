@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString* trimmed;
 @property (readonly) NSArray<NSString*>* lines;
 
-@property (readonly, nullable) NSURL* mmcgUrl;
+@property (readonly, nullable) NSURL* urlExtendedParse;
 
 @end
 

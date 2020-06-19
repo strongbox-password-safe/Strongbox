@@ -25,10 +25,12 @@
 #import "StrongboxUIDocument.h"
 #import "AutoFillSettings.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "MMWormhole.h"
 
 @interface SafesListTableViewController ()
 
 @property NSArray<SafeMetaData*> *safes;
+@property MMWormhole* wormhole;
 
 @end
 
@@ -37,17 +39,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
  
+    //[self setupAutoFillWormhole];
+    
+    [self setupUi];
+    
     [self refreshSafes];
 
-    [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
-    self.tableView.rowHeight = UITableViewAutomaticDimension;
-    self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
-    self.tableView.tableFooterView = [UIView new];
-    
-    [SVProgressHUD setViewForExtension:self.view];
-    
     if(SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
         SafeMetaData* database = [self.safes firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
             return [obj.uuid isEqualToString:SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid];
@@ -64,6 +61,23 @@
     //    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
     //    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
     //    [Alerts info:self title:@"Blah" message:@(serviceId.identifier).stringValue];
+}
+
+- (void)setupUi {
+    [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
+    self.tableView.emptyDataSetSource = self;
+    self.tableView.emptyDataSetDelegate = self;
+    self.tableView.rowHeight = UITableViewAutomaticDimension;
+    self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
+    self.tableView.tableFooterView = [UIView new];
+    
+    [SVProgressHUD setViewForExtension:self.view];
+}
+
+- (void)setupAutoFillWormhole {
+    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
+                                                         optionalDirectory:@"wormhole"
+                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
 }
 
 - (void)refreshSafes {
@@ -109,8 +123,7 @@
     return [UIImage imageNamed:@"AppIcon-2019-bw-180"];
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
-{
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
     NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_title", @"You Have No Databases Yet :(");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
@@ -119,8 +132,7 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
-{
+- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView {
     NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_subtitle", @"To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App.");
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
@@ -264,7 +276,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     SafeMetaData* safe = [self.safes objectAtIndex:indexPath.row];
-    
+ 
     [self openDatabase:safe];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

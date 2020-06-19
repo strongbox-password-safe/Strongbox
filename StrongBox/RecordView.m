@@ -699,14 +699,12 @@ static const int kMinNotesCellHeight = 160;
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
-    NSURL* url = [NSURL URLWithString:urlString];
-    if (url == nil) {
-        url = urlString.mmcgUrl; // TODO: Tidy
+    NSURL* url = urlString.urlExtendedParse;
+    if (url != nil) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [[UIApplication sharedApplication] openURL:url];
+        });
     }
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication] openURL:url];
-    });
 }
 
 - (IBAction)onCopyEmail:(id)sender {
@@ -804,7 +802,7 @@ static const int kMinNotesCellHeight = 160;
 static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAttachment*>* dbAttachments) {
     return [record.fields.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
         DatabaseAttachment *dbAttachment = dbAttachments[obj.index];
-        return [[UiAttachment alloc] initWithFilename:obj.filename data:dbAttachment.data];
+        return [[UiAttachment alloc] initWithFilename:obj.filename dbAttachment:dbAttachment];
     }];
 }
 

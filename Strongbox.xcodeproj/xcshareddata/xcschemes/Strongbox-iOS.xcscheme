@@ -42,6 +42,9 @@
                   Identifier = "DavKitTests">
                </Test>
                <Test
+                  Identifier = "FavIconTests">
+               </Test>
+               <Test
                   Identifier = "SFTPTests">
                </Test>
             </SkippedTests>
@@ -52,7 +55,7 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      launchStyle = "1"
+      launchStyle = "0"
       useCustomWorkingDirectory = "NO"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"

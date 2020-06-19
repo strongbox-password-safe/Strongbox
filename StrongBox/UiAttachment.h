@@ -7,18 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DatabaseAttachment.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface UiAttachment : NSObject
 
-+ (instancetype)attachmentWithFilename:(NSString*)filename data:(NSData*)data;
++ (instancetype)attachmentWithFilename:(NSString*)filename dbAttachment:(DatabaseAttachment*)dbAttachment;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithFilename:(NSString*)filename data:(NSData*)data NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithFilename:(NSString*)filename dbAttachment:(DatabaseAttachment*)dbAttachment NS_DESIGNATED_INITIALIZER;
 
 @property NSString* filename;
-@property NSData* data;
+@property DatabaseAttachment* dbAttachment;
 
 @end
 

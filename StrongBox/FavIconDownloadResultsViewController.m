@@ -13,6 +13,7 @@
 #import "FavIconManager.h"
 #import "Alerts.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "NSString+Extensions.h"
 
 @interface FavIconDownloadResultsViewController ()
 
@@ -78,7 +79,7 @@
 }
 
 - (NSArray<UIImage*>*)getImagesForNode:(Node*)node {
-    return self.results[self.singleNodeUrlOverride ? self.singleNodeUrlOverride : [NSURL URLWithString:node.fields.url]];
+    return self.results[self.singleNodeUrlOverride ? self.singleNodeUrlOverride : node.fields.url.urlExtendedParse];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

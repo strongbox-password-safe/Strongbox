@@ -340,11 +340,11 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     uint8_t chnk[kChunkSize];
     
-    NSUInteger read = [stream read:chnk maxLength:kChunkSize];
+    NSInteger read = [stream read:chnk maxLength:kChunkSize];
     if(read <= 0) {
         NSLog(@"Could not read stream");
         if (error) {
-           *error = [Utils createNSError:@"Could not read stream" errorCode:-1];
+            *error = stream.streamError ? stream.streamError : [Utils createNSError:@"Could not read stream" errorCode:-1];
         }
         free(my_handler);
         return nil;
@@ -376,12 +376,12 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     xmlParserCtxtPtr ctxt = nil;
     int err = XML_ERR_OK;
     do {
-        if(read == -1) {
-            NSLog(@"Error reading stream: %d", err);
+        if(read < 0) {
+            NSLog(@"Error reading stream: %ld - [%@]", (long)read, stream.streamError);
             if (error) {
-                *error = [Utils createNSError:@"Error reading XML Stream" errorCode:err];
+                *error = stream.streamError ? stream.streamError : [Utils createNSError:@"Error reading XML from Stream" errorCode:err];
             }
-            
+
             if (ctxt) {
                 xmlFreeParserCtxt(ctxt);
             }

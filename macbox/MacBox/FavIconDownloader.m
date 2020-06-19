@@ -15,6 +15,7 @@
 #import "Utils.h"
 #import "MacNodeIconHelper.h"
 #import "Alerts.h"
+#import "NSString+Extensions.h"
 
 @interface FavIconDownloader () <NSTableViewDataSource>
 
@@ -116,7 +117,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     self.validNodes = [[self.nodes filter:^BOOL(Node * _Nonnull obj) {
             return !obj.isGroup &&
             obj.fields.url.length != 0 &&
-            [NSURL URLWithString:obj.fields.url] != nil &&
+            obj.fields.url.urlExtendedParse != nil &&
             (overwriteExisting || obj.isUsingKeePassDefaultIcon);
         }] sortedArrayUsingComparator:finderStyleNodeComparator];
 
@@ -124,7 +125,8 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     NSMutableArray<NSURL*> *addedArray = [NSMutableArray arrayWithCapacity:self.nodes.count];
     
     for (Node* node in self.validNodes) {
-        NSURL* url = [NSURL URLWithString:node.fields.url];
+        NSURL* url = node.fields.url.urlExtendedParse;
+        
         if(![added containsObject:url]) {
             [added addObject:url];
             [addedArray addObject:url];
@@ -444,7 +446,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (NSArray<IMAGE_TYPE_PTR>*)getImagesForNode:(Node*)node {
-    NSArray<IMAGE_TYPE_PTR>* images = self.results[[NSURL URLWithString:node.fields.url]];
+    NSArray<IMAGE_TYPE_PTR>* images = self.results[node.fields.url.urlExtendedParse];
 
     NSArray<IMAGE_TYPE_PTR>* sorted = [images sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         IMAGE_TYPE_PTR i1 = (IMAGE_TYPE_PTR)obj1;

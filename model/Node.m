@@ -81,7 +81,7 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     }
     
     for (Node* child in parent.children) {
-        if (child.isGroup && !keePassGroupTitleRules && [child.title isEqualToString:title]) {
+        if (child.isGroup && !keePassGroupTitleRules && [child.title compare:title] == NSOrderedSame) {
             NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", parent.title, title);
             return nil;
         }
@@ -376,7 +376,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     if(self.isGroup) {
         for (Node* child in self.parent.children) {
-            if (child.isGroup && !keePassGroupTitleRules && [child.title isEqualToString:title]) {
+            if (child.isGroup && !keePassGroupTitleRules && [child.title compare:title] == NSOrderedSame) {
                 NSLog(@"Cannot create group as parent already has a group with this title. [%@-%@]", self.parent.title, title);
                 return NO;
             }
@@ -395,7 +395,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     if(node.isGroup) {
         for (Node* child in self.children) {
-            if (child.isGroup && !keePassGroupTitleRules && [child.title isEqualToString:node.title]) {
+            if (child.isGroup && !keePassGroupTitleRules && [child.title compare:node.title] == NSOrderedSame) {
                 NSLog(@"Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
                 return NO;
             }
@@ -499,7 +499,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
 - (Node*)getChildGroupWithTitle:(NSString*)title {
     for(Node* child in self.children) {
-        if(child.isGroup && [child.title isEqualToString:title]) {
+        if(child.isGroup && [child.title compare:title] == NSOrderedSame) {
             return child;
         }
     }

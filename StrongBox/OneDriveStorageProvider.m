@@ -374,7 +374,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         
         ODItem* foundItem = nil;
         for (ODItem* item in response.value) {
-            if([item.name isEqualToString:target]) {
+            if([item.name compare:target] == NSOrderedSame) {
                 foundItem = item;
                 break;
             }

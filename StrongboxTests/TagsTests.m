@@ -23,6 +23,7 @@
     
     [[[KeePassDatabase alloc] init] open:safeData
                                      ckf:[CompositeKeyFactors password:@"a"]
+     useLegacyDeserialization:NO
                               completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
@@ -49,6 +50,7 @@
         
         [[[KeePassDatabase alloc] init] open:data
                                          ckf:[CompositeKeyFactors password:@"a"]
+                    useLegacyDeserialization:NO
                                   completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
             NSLog(@"%@", db);
             

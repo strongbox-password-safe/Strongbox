@@ -52,9 +52,10 @@
     return ret;
 }
 
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(OpenCompletionBlock)completion {
     [KdbxSerialization deserialize:data
                compositeKeyFactors:ckf
+          useLegacyDeserialization:useLegacyDeserialization
                         completion:^(BOOL userCancelled, SerializationData * _Nullable serializationData, NSError * _Nullable error) {
         if(userCancelled || serializationData == nil || error) {
             completion(userCancelled, nil, error);
@@ -190,7 +191,7 @@
     for (DatabaseAttachment* binary in database.attachments) {
         V3Binary* bin = [[V3Binary alloc] initWithContext:[XmlProcessingContext standardV3Context]];
         bin.compressed = binary.compressed;
-        bin.data = binary.data;
+        bin.data = binary.deprecatedData;
         bin.id = i++;
         [v3Binaries addObject:bin];
     }
@@ -286,9 +287,7 @@ static NSArray<DatabaseAttachment*>* getAttachments(RootXmlDomainObject *xmlDoc)
     }];
     
     for (V3Binary* binary in sortedById) {
-        DatabaseAttachment* dbA = [[DatabaseAttachment alloc] init];
-        dbA.data = binary.data;
-        dbA.compressed = binary.compressed;
+        DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithData:binary.data compressed:YES protectedInMemory:YES];
         [attachments addObject:dbA];
     }
     

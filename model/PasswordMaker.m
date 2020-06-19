@@ -9,7 +9,6 @@
 #import "PasswordMaker.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
-#import "SharedAppAndAutoFillSettings.h"
 
 static NSString* const kAllSymbols = @"+-=_@#$%^&;:,.<>/~\\[](){}?!|*'\"";
 static NSString* const kAllUppercase = @"ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -136,17 +135,20 @@ const static NSArray<NSString*> *kEmailDomains;
 #if TARGET_OS_IPHONE
     
 - (void)promptWithUsernameSuggestions:(UIViewController *)viewController
+                               config:(PasswordGenerationConfig *)config
                                action:(void (^)(NSString * _Nonnull))action {
-    [self promptWithSuggestions:viewController usernamesOnly:YES action:action];
+    [self promptWithSuggestions:viewController usernamesOnly:YES config:config action:action];
 }
 
 - (void)promptWithSuggestions:(UIViewController *)viewController
+                       config:(PasswordGenerationConfig *)config
                        action:(void (^)(NSString * _Nonnull))action {
-    [self promptWithSuggestions:viewController usernamesOnly:NO action:action];
+    [self promptWithSuggestions:viewController usernamesOnly:NO config:config action:action];
 }
 
 - (void)promptWithSuggestions:(UIViewController *)viewController
                 usernamesOnly:(BOOL)usernamesOnly
+                       config:(PasswordGenerationConfig *)config
                        action:(void (^)(NSString * _Nonnull))action {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString* title = NSLocalizedString(@"select_generated_field_title", @"Select your preferred generated field title.");
@@ -156,8 +158,6 @@ const static NSArray<NSString*> *kEmailDomains;
                                                                                  message:message
                                                                           preferredStyle:UIAlertControllerStyleAlert];
 
-        
-        PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
         NSMutableArray* suggestions = [NSMutableArray arrayWithCapacity:3];
         
         if(usernamesOnly) {
@@ -204,7 +204,7 @@ const static NSArray<NSString*> *kEmailDomains;
         UIAlertAction *regenAction = [UIAlertAction actionWithTitle:loc
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) {
-            [self promptWithSuggestions:viewController usernamesOnly:usernamesOnly action:action];
+            [self promptWithSuggestions:viewController usernamesOnly:usernamesOnly config:config action:action];
         }];
         [regenAction setValue:UIColor.systemGreenColor forKey:@"titleTextColor"];
 

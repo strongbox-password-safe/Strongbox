@@ -10,6 +10,9 @@
 #import "Utils.h"
 #import "NSArray+Extensions.h"
 #import <QuickLook/QuickLook.h>
+#import "FileManager.h"
+
+static const size_t kMaxAttachmentImagePreviewSize = 5 * 1024 * 1024;
 
 @interface AttachmentsPoolViewController () <QLPreviewControllerDelegate, QLPreviewControllerDataSource>
 
@@ -76,24 +79,24 @@
     
     cell.textLabel.text = [self getAttachmentLikelyName:indexPath.row forDisplay:YES];
     
-    NSUInteger filesize = attachment.data ? attachment.data.length : 0;
+    NSUInteger filesize = attachment.length;
     cell.detailTextLabel.text = friendlyFileSizeString(filesize);
+    cell.imageView.image = [UIImage imageNamed:@"document"];
     
-    UIImage* img = [UIImage imageWithData:attachment.data];
-    
-    if(img) { // Trick to keep all images to a fixed size
-        @autoreleasepool { // Prevent App Extension Crash
-            UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
-            
-            CGRect imageRect = CGRectMake(0, 0, 48, 48);
-            [img drawInRect:imageRect];
-            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-            
-            UIGraphicsEndImageContext();
+    if (attachment.length < kMaxAttachmentImagePreviewSize) {
+        UIImage* img = [UIImage imageWithData:attachment.deprecatedData];
+        
+        if(img) { // Trick to keep all images to a fixed size
+            @autoreleasepool { // Prevent App Extension Crash
+                UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
+                
+                CGRect imageRect = CGRectMake(0, 0, 48, 48);
+                [img drawInRect:imageRect];
+                cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+                
+                UIGraphicsEndImageContext();
+            }
         }
-    }
-    else {
-        cell.imageView.image = [UIImage imageNamed:@"document"];
     }
 
     return cell;
@@ -141,12 +144,7 @@
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-    for (NSString *file in tmpDirectory) {
-        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-        
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-    }
+    [FileManager.sharedInstance deleteAllTmpFiles];
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
@@ -159,7 +157,7 @@
     NSString* filename = [self getAttachmentLikelyName:index forDisplay:NO];
     
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
-    [attachment.data writeToFile:f atomically:YES];
+    [attachment.deprecatedData writeToFile:f atomically:YES];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;

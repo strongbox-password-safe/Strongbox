@@ -8,6 +8,7 @@
 
 #import "ChaCha20Cipher.h"
 #import "sodium.h"
+#import "ChaCha20ReadStream.h"
 
 static const uint32_t kIvSize = 12;
 static const uint32_t kKeySize = 32;
@@ -65,6 +66,11 @@ static const BOOL kLogVerbose = NO;
     
     return newKey;
 }
+
+- (NSInputStream *)getDecryptionStreamForStream:(NSInputStream *)inputStream key:(NSData *)key iv:(NSData *)iv {
+    return [[ChaCha20ReadStream alloc] initWithStream:inputStream key:key iv:iv];
+}
+
 
 
 @end

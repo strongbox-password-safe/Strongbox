@@ -18,9 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString* const kAuditNodesChangedNotificationKey;
 extern NSString* const kAuditProgressNotificationKey;
 extern NSString* const kAuditCompletedNotificationKey;
-extern NSString* const kProStatusChangedNotificationKey;
+extern NSString* const kProStatusChangedNotificationKey; // TODO: Dismiss the Free Trial Onboarding if this is received
+extern NSString* const kAppStoreSaleNotificationKey; 
 extern NSString* const kCentralUpdateOtpUiNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
+extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 @interface Model : NSObject
 

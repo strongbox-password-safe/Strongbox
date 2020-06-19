@@ -22,6 +22,7 @@
 #import "FileManager.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "NSString+Extensions.h"
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
@@ -166,7 +167,7 @@
                           message:NSLocalizedString(@"sspc_manual_import_enter_url_message", @"Please Enter the URL of the Database File.")
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               NSURL *url = [NSURL URLWithString:text];
+                               NSURL *url = text.urlExtendedParse;
                                NSLog(@"URL: %@", url);
                                
                                [self importFromManualUiUrl:url];

@@ -27,7 +27,7 @@
         
         NSString* password = [CommonTesting.testKdbx4FilesAndPasswords objectForKey:file];
         
-        [[[Kdbx4Database alloc] init] open:blob ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        [[[Kdbx4Database alloc] init] open:blob ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
             XCTAssertNotNil(db);
             
             NSLog(@"%@", db);
@@ -39,7 +39,7 @@
 - (void)testInitExistingWithLargeAGoogleDriveSafeUncompressed {
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/Database-Large-Uncompressed.kdbx"];
     
-    [[[Kdbx4Database alloc] init] open:safeData ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [[[Kdbx4Database alloc] init] open:safeData ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
     }];
@@ -48,7 +48,7 @@
 - (void)testInitExistingWithLargeGoogleDriveSafe {
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/Database-Large.kdbx"];
 
-    [[[Kdbx4Database alloc] init] open:safeData ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [[[Kdbx4Database alloc] init] open:safeData ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@ - [%@]", db, error);
         XCTAssertNotNil(db);
     }];
@@ -74,7 +74,7 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
         
-        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
             if(error) {
                 NSLog(@"%@", error);
             }
@@ -111,10 +111,12 @@
     
     Node* record = [[Node alloc] initAsRecord:@"Title" parent:keePassRoot fields:fields uuid:nil];
     [keePassRoot addChild:record keePassGroupTitleRules:YES];
-    
-    [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment1.txt" data:data1]];
-    [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment2.txt" data:data2]];
-    
+        
+    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] initWithData:data1 compressed:YES protectedInMemory:YES];
+    [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment1.txt" dbAttachment:db1]];
+    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] initWithData:data2 compressed:YES protectedInMemory:YES];
+    [db addNodeAttachment:record attachment:[[UiAttachment alloc] initWithFilename:@"attachment2.txt" dbAttachment:db2]];
+
     //NSLog(@"BEFORE: %@", db);
     
     [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
@@ -127,6 +129,7 @@
         
         [adaptor open:data
                   ckf:[CompositeKeyFactors password:@"password"]
+         useLegacyDeserialization:NO
            completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
             if(error) {
                 NSLog(@"%@", error);
@@ -161,8 +164,8 @@
 
             XCTAssert(b.attachments.count == 2);
 
-            XCTAssert([b.attachments[0].data isEqualToData:data1]);
-            XCTAssert([b.attachments[1].data isEqualToData:data2]);
+            XCTAssert([b.attachments[0].deprecatedData isEqualToData:data1]);
+            XCTAssert([b.attachments[1].deprecatedData isEqualToData:data2]);
         }];
     }];
 }
@@ -180,7 +183,7 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database-Aes-Argon2NonDefault" ofType:@"kdbx"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         
         NSLog(@"%@", db);
@@ -199,6 +202,7 @@
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
     [adaptor open:blob
               ckf:[CompositeKeyFactors password:@"a"]
+     useLegacyDeserialization:NO
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         
@@ -207,7 +211,7 @@
         [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
             XCTAssert(data);
             
-            [adaptor open:data ckf:[CompositeKeyFactors password:@"a"]
+            [adaptor open:data ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO
                completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db2, NSError * _Nullable error) {
                 NSLog(@"AFTER: %@", db2);
 
@@ -225,7 +229,7 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"custom-icon-4" ofType:@"kdbx"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         
         XCTAssertNotNil(db);
         
@@ -248,13 +252,13 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"custom-icon-4" ofType:@"kdbx"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
         XCTAssertNotNil(b);
         
         NSLog(@"BEFORE: %@", b);
         
         [adaptor save:b completion:^(BOOL userCancelled, NSData * _Nullable recData, NSError * _Nullable error) {
-            [adaptor open:recData ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+            [adaptor open:recData ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
                 Node* testNode = db.rootGroup.childGroups[0].childRecords[0];
                 XCTAssert(testNode);
                 XCTAssert([testNode.title isEqualToString:@"Sample Entry"]);
@@ -273,7 +277,7 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"db-4-nocompression" ofType:@"kdbx"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[Kdbx4Database alloc] init];
-    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         
         NSLog(@"%@", db);

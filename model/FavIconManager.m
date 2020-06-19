@@ -8,6 +8,7 @@
 
 #import "FavIconManager.h"
 #import "Node.h"
+#import "NSString+Extensions.h"
 
 @import FavIcon;
 
@@ -137,7 +138,7 @@
 
     if(url.scheme.length == 0) {
         NSString* foo = [@"https://" stringByAppendingString:url.absoluteString];
-        url = [NSURL URLWithString:foo];
+        url = foo.urlExtendedParse;
 //        NSLog(@"Cleaned Up URL: [%@]", url);
     }
     

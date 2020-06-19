@@ -26,26 +26,7 @@
 #import "GZipInputStream.h"
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
-
-typedef struct _HeaderEntryHeader {
-    uint8_t id;
-    uint8_t lengthBytes[4];
-} HeaderEntryHeader;
-#define SIZE_OF_HEADER_ENTRY_HEADER      5
-
-typedef struct _HmacBlockHeader {
-    uint8_t hmacSha256[32];
-    uint8_t lengthBytes[4];
-    uint8_t data[];
-} HmacBlockHeader;
-#define SIZE_OF_HMAC_BLOCK_HEADER 36
-
-typedef struct _InnerHeaderEntryHeader {
-    uint8_t type;
-    uint8_t lengthBytes[4];
-    uint8_t data[];
-} InnerHeaderEntryHeader;
-#define SIZE_OF_INNER_HEADER_ENTRY_HEADER      5
+#import "HmacBlockStream.h"
 
 static const uint8_t kInnerHeaderTypeEnd = 0;
 static const uint8_t kInnerHeaderTypeInnerRandomStreamId = 1;
@@ -53,6 +34,7 @@ static const uint8_t kInnerHeaderTypeInnerRandomStreamKey = 2;
 static const uint8_t kInnerHeaderTypeBinary = 3;
 
 static const BOOL kLogVerbose = NO;
+
 
 @implementation Kdbx4Serialization
 
@@ -206,9 +188,7 @@ static const BOOL kLogVerbose = NO;
     return [[CryptoParameters alloc] initFromHeaders:headerEntries];
 }
 
-+ (void)deserialize:(NSData*)safeData
-compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
-         completion:(Deserialize4CompletionBlock)completion {
++ (void)deserialize:(NSData *)safeData compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(Deserialize4CompletionBlock)completion {
     size_t endOfHeadersOffset;
     NSDictionary<NSNumber*, NSObject*> *headerEntries = getHeaderEntries((uint8_t*)safeData.bytes, safeData.length, &endOfHeadersOffset);
     
@@ -247,6 +227,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                endOfHeadersOffset:endOfHeadersOffset
                                     headerEntries:headerEntries
                                      cryptoParams:cryptoParams
+                         useLegacyDeserialization:useLegacyDeserialization
                                        completion:completion];
         }
     }];
@@ -257,6 +238,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
        endOfHeadersOffset:(size_t)endOfHeadersOffset
             headerEntries:(NSDictionary<NSNumber*, NSObject*> *)headerEntries
              cryptoParams:(CryptoParameters*)cryptoParams
+ useLegacyDeserialization:(BOOL)useLegacyDeserialization
                completion:(Deserialize4CompletionBlock)completion {
     //NSLog(@"DESERIALIZE KEYS: [%@]", keys);
 
@@ -278,17 +260,36 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                                       endOfHeadersOffset +
                                                       CC_SHA256_DIGEST_LENGTH +
                                                       CC_SHA256_DIGEST_LENGTH);
+    
+    NSInputStream* decompressedStream;
+    BOOL compressed = cryptoParams.compressionFlags == 1;
 
-    NSData* decrypted = decryptBlocks(blockHeader, keys, cryptoParams, eof);
-    if(!decrypted){
-        NSError* error = [Utils createNSError:@"Could not decrypt this database, either due to corruption or unknown Cipher."
-                                    errorCode:-4];
-        completion(NO, nil, error);
-        return;
+    if (useLegacyDeserialization) {
+        NSData* decrypted = decryptBlocks(blockHeader, keys, cryptoParams, eof);
+        if(!decrypted){
+            NSError* error = [Utils createNSError:@"Could not decrypt this database, either due to corruption or unknown Cipher."
+                                        errorCode:-4];
+            completion(NO, nil, error);
+            return;
+        }
+        
+        decompressedStream = compressed ? [[GZipInputStream alloc] initWithData:decrypted] : [NSInputStream inputStreamWithData:decrypted];
+    }
+    else {
+        id<Cipher> cipher = getCipher(cryptoParams.cipherUuid);
+        size_t len = eof - ((uint8_t*)blockHeader);
+        HmacBlockStream* hmacedBlockStream = [[HmacBlockStream alloc] initWithData:(uint8_t*)blockHeader length:len hmacKey:keys.hmacKey];
+        NSInputStream* plainTextStream = [cipher getDecryptionStreamForStream:hmacedBlockStream key:keys.masterKey iv:cryptoParams.iv];
+        decompressedStream = compressed ? [[GZipInputStream alloc] initWithStream:plainTextStream] : plainTextStream;
     }
     
+    [decompressedStream open];
+
     NSError* error;
-    Kdbx4SerializationData* ret = readDecrypted(decrypted, cryptoParams.compressionFlags == 1, &error);
+    Kdbx4SerializationData* ret = readDecrypted(decompressedStream, &error);
+
+    [decompressedStream close];
+
     if(ret == nil) {
         NSLog(@"Could not read decrypted! [%@]", error);
         completion(NO, nil, error);
@@ -357,7 +358,7 @@ static NSMutableData* createInnerHeaders(NSArray<DatabaseAttachment*> *attachmen
     for (DatabaseAttachment *attachment in attachments) {
         uint8_t protected[] = { attachment.protectedInMemory ? 0x01 : 0x00 };
         NSMutableData *binary = [NSMutableData dataWithBytes:&protected length:1];
-        [binary appendData:attachment.data];
+        [binary appendData:attachment.deprecatedData];
         
         appendInnerHeader(ret, kInnerHeaderTypeBinary, binary);
     }
@@ -379,16 +380,19 @@ static void appendInnerHeader(NSMutableData* base, uint8_t type, NSData* data) {
     }
 }
 
-static Kdbx4SerializationData* readDecrypted(NSData* src, BOOL compressed, NSError** ppError) {
-    NSInputStream* stream = compressed ? [[GZipInputStream alloc] initWithData:src] : [NSInputStream inputStreamWithData:src];
-    [stream open];
-    
+static Kdbx4SerializationData* readDecrypted(NSInputStream* stream, NSError** ppError) {
     Kdbx4SerializationData* ret = readInnerHeaders(stream);
+    
+    if (!ret) {
+        if (ppError) {
+            *ppError = stream.streamError ? stream.streamError : [Utils createNSError:@"Error reading inner headers/attachments" errorCode:-3457];
+        }
+        NSLog(@"Error reading inner headers/attachments");
+        return nil;
+    }
     
     ret.rootXmlObject = parseXml(ret.innerRandomStreamId, ret.innerRandomStreamKey,
                                  XmlProcessingContext.standardV4Context, stream, ppError);
-
-    [stream close];
     
     if(ret.rootXmlObject == nil) {
         NSLog(@"Error parsing xml: %@", *ppError);
@@ -401,13 +405,13 @@ static Kdbx4SerializationData* readDecrypted(NSData* src, BOOL compressed, NSErr
 static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
     NSMutableArray* attachments = [NSMutableArray array];
     Kdbx4SerializationData* ret = [[Kdbx4SerializationData alloc] init];
+    int attachmentCount = 0;
     
     while(YES) {
         uint8_t header[SIZE_OF_INNER_HEADER_ENTRY_HEADER];
         NSInteger read = [stream read:header maxLength:SIZE_OF_INNER_HEADER_ENTRY_HEADER];
         if(read < SIZE_OF_INNER_HEADER_ENTRY_HEADER) {
             NSLog(@"Not enough data to read even initial inner header.");
-            [stream close];
             return nil;
         }
         
@@ -418,28 +422,41 @@ static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
         
         size_t headerLength = littleEndian4BytesToUInt32(innerHeader->lengthBytes);
         
-        NSMutableData *headerBuffer = [NSMutableData dataWithLength:headerLength];
-        read = [stream read:headerBuffer.mutableBytes maxLength:headerLength];
-        if (read < headerLength) {
-            NSLog(@"Not enough data to read even inner header data.");
-            [stream close];
-            return nil;
-        }
-        
         if (innerHeader->type == kInnerHeaderTypeInnerRandomStreamId) {
+            NSMutableData *headerBuffer = [NSMutableData dataWithLength:headerLength];
+            read = [stream read:headerBuffer.mutableBytes maxLength:headerLength];
+            if (read < headerLength) {
+                NSLog(@"Not enough data to read even inner header data.");
+                return nil;
+            }
+            
             ret.innerRandomStreamId = littleEndian4BytesToUInt32((uint8_t*)headerBuffer.bytes);
         }
         else if (innerHeader->type == kInnerHeaderTypeInnerRandomStreamKey) { // Inner Random Stream Key
+            NSMutableData *headerBuffer = [NSMutableData dataWithLength:headerLength];
+            read = [stream read:headerBuffer.mutableBytes maxLength:headerLength];
+            if (read < headerLength) {
+                NSLog(@"Not enough data to read even inner header data.");
+                return nil;
+            }
+            
             ret.innerRandomStreamKey = headerBuffer;
         }
         else if(innerHeader->type == kInnerHeaderTypeBinary) { // Binary
-            BOOL protectedInMemory = ((uint8_t*)headerBuffer.bytes)[0] == 1;
-            NSData* binary = [headerBuffer subdataWithRange:NSMakeRange(1, headerLength-1)];
+            uint8_t block[1];
+            NSInteger bytesRead = [stream read:block maxLength:1];
+            if (bytesRead != 1) {
+                NSLog(@"Could not read initial attachment byte!");
+                return nil;
+            }
+            BOOL protectedInMemory = block[0] == 1;
             
-            DatabaseAttachment *attachment = [[DatabaseAttachment alloc] init];
-            attachment.compressed = YES;
-            attachment.protectedInMemory = protectedInMemory;
-            attachment.data = binary;
+            NSLog(@"Reading Attachment %d [%ld]", attachmentCount++, headerLength - 1);
+            DatabaseAttachment *attachment = [[DatabaseAttachment alloc] initWithStream:stream length:headerLength - 1 protectedInMemory:protectedInMemory];
+            
+            if (attachment == nil) {
+                return nil;
+            }
             
             [attachments addObject:attachment];
         }
@@ -497,42 +514,50 @@ static NSData* hmacBlockifyAndEncrypt(NSData *payload, NSData* iv, Keys *keys, i
 }
 
 static NSData* decryptBlocks(HmacBlockHeader *blockHeader, Keys *keys, CryptoParameters *cryptoParams, uint8_t* eof) {
+    size_t readSoFar = 0;
+    
     int i=0;
     size_t blockLength = littleEndian4BytesToInt32(blockHeader->lengthBytes);
     NSMutableData *dec = [[NSMutableData alloc] init];
-    
+
     while (blockLength > 0) {
-        //NSLog(@"Decrypting Block %d of length [%zu]", i, blockLength);
+        //NSLog(@"DEBUG: Decrypting Block %d of length [%zu] - [%zu]", i, blockLength, readSoFar);
+        
         if(blockHeader->data + blockLength > eof) {
             NSLog(@"Not enough data to decrypt Block!");
             return nil;
         }
-        
+
         NSData* block = [NSData dataWithBytes:blockHeader->data length:blockLength];
-        
+
         NSData *actualHmac = getBlockHmac(block, keys.hmacKey, i);
         NSData *expectedHmac = [NSData dataWithBytes:blockHeader->hmacSha256 length:CC_SHA256_DIGEST_LENGTH];
-        
+
         if(![actualHmac isEqual:expectedHmac]) {
             NSLog(@"Actual Block HMAC does not match expected. Block has been corrupted.");
             return nil;
         }
-    
+
         [dec appendData:block];
+        
+        readSoFar += blockLength;
+        //NSLog(@"DEBUG: Decrypted Block %d of length [%zu] - [%zu]", i, blockLength, readSoFar);
         
         blockHeader = (HmacBlockHeader*)(((uint8_t*)blockHeader) + SIZE_OF_HMAC_BLOCK_HEADER + blockLength);
         blockLength = littleEndian4BytesToInt32(blockHeader->lengthBytes);
         i++;
     }
-    
+
     id<Cipher> cipher = getCipher(cryptoParams.cipherUuid);
-    
+
     if(!cipher) {
         NSLog(@"Unknown Cipher ID: [%@]. Do not know how to decrypt.", [cryptoParams.cipherUuid UUIDString]);
         return nil;
     }
+
+    NSData* ret = [cipher decrypt:dec iv:cryptoParams.iv key:keys.masterKey];
     
-    return [cipher decrypt:dec iv:cryptoParams.iv key:keys.masterKey];
+    return ret;
 }
 
 typedef void (^GetKeysCompletionBlock)(BOOL userCancelled, Keys*_Nullable keys, NSError*_Nullable error);
@@ -656,50 +681,13 @@ static NSData* getHmacKey(NSData* masterSeed, NSData* transformKey) {
     return headerHmacKey;
 }
 
-static NSData* getHmacKeyForBlock(NSData* key, uint64_t blockIndex)
-{
-    NSData* index = Uint64ToLittleEndianData(blockIndex);
-    
-    NSMutableData *hash = [NSMutableData dataWithLength:CC_SHA512_DIGEST_LENGTH];
-    
-    CC_SHA512_CTX ctx;
-    CC_SHA512_Init(&ctx);
-    CC_SHA512_Update(&ctx, index.bytes, (CC_LONG)index.length);
-    CC_SHA512_Update(&ctx, key.bytes, (CC_LONG)key.length);
-    CC_SHA512_Final(hash.mutableBytes, &ctx);
-    
-    return hash;
-}
-
-static NSData* getHeaderHmac(NSData *header, NSData* hmacKey)
-{
+static NSData* getHeaderHmac(NSData *header, NSData* hmacKey) {
     NSData* blockKey = getHmacKeyForBlock(hmacKey, 0xFFFFFFFFFFFFFFFF);
    
     NSMutableData *hmac = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
     
     CCHmac(kCCHmacAlgSHA256, blockKey.bytes, blockKey.length, header.bytes, (CC_LONG)header.length, hmac.mutableBytes);
 
-    return hmac;
-}
-
-static NSData* getBlockHmac(NSData *data, NSData* hmacKey, uint64_t blockIndex)
-{
-    NSData* blockKey = getHmacKeyForBlock(hmacKey, blockIndex);
-    NSData* index = Uint64ToLittleEndianData(blockIndex);
-    NSData* blockSizeData = Uint32ToLittleEndianData((uint32_t)data.length);
-
-    CCHmacContext ctx;
-    CCHmacInit(&ctx, kCCHmacAlgSHA256, blockKey.bytes, blockKey.length);
-    CCHmacUpdate(&ctx, index.bytes, index.length);
-    CCHmacUpdate(&ctx, blockSizeData.bytes, blockSizeData.length);
-
-    if(data.length){
-        CCHmacUpdate(&ctx, data.bytes, data.length);
-    }
-
-    NSMutableData *hmac = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
-    CCHmacFinal(&ctx, hmac.mutableBytes);
-    
     return hmac;
 }
 

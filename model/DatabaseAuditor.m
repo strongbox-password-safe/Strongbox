@@ -511,7 +511,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
             NSString* otherPassword = other.fields.password;
             
-            if ([password isEqualToString:otherPassword]) {
+            if ([password compare:otherPassword] == NSOrderedSame) {
                 continue; // Skip exact duplicates - FUTURE maybe we should include?
             }
             

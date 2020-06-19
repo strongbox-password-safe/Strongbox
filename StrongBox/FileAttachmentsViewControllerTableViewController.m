@@ -16,6 +16,7 @@
 #import "SVProgressHUD.h"
 #import "AddAttachmentHelper.h"
 #import "NSArray+Extensions.h"
+#import "FileManager.h"
 
 @interface FileAttachmentsViewControllerTableViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate>
 
@@ -68,9 +69,8 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
-{
-    NSString *text = @"No Attachments";
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+    NSString *text = NSLocalizedString(@"file_attachments_view_controller_empty_attachments_text", @"No Attachments");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
                                  NSForegroundColorAttributeName: [UIColor darkGrayColor]};
@@ -80,7 +80,7 @@
 
 - (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
 {
-    NSString *text = @"Tap the + button in the top right corner to add an attachment";
+    NSString *text = NSLocalizedString(@"file_attachments_view_controller_empty_attachments_description", @"Tap the + button in the top right corner to add an attachment");
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
     paragraph.lineBreakMode = NSLineBreakByWordWrapping;
@@ -98,11 +98,15 @@
         return @[];
     }
     
-    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive title:@"Remove" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDestructive
+                                                                            title:NSLocalizedString(@"generic_remove", @"Remove")
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self removeAttachment:indexPath];
     }];
     
-    UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal title:@"Rename" handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+    UITableViewRowAction *renameAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                            title:NSLocalizedString(@"casg_rename_action", @"Rename")
+                                                                          handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [self renameAttachment:indexPath];
     }];
     
@@ -150,12 +154,7 @@
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-    for (NSString *file in tmpDirectory) {
-        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-        
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-    }
+    [FileManager.sharedInstance deleteAllTmpFiles];
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
@@ -166,7 +165,8 @@
     UiAttachment* attachment = [self.workingAttachments objectAtIndex:index];
     
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:attachment.filename];
-    [attachment.data writeToFile:f atomically:YES];
+    NSData* data = attachment.dbAttachment.deprecatedData;
+    [data writeToFile:f atomically:YES];
     NSURL* url = [NSURL fileURLWithPath:f];
    
     return url;
@@ -184,9 +184,11 @@
     UiAttachment* attachment = [self.workingAttachments objectAtIndex:indexPath.row];
     
     cell.textLabel.text = attachment.filename;
-    cell.detailTextLabel.text = friendlyFileSizeString(attachment.data.length);
+    cell.detailTextLabel.text = friendlyFileSizeString(attachment.dbAttachment.length);
     
-    UIImage* img = [UIImage imageWithData:attachment.data];
+    NSData* data = attachment.dbAttachment.deprecatedData; // TODO: Don't load above a certain size
+    UIImage* img = [UIImage imageWithData:data];
+//    [UIImage imageWithContentsOfFile: ]; // TODO: ?
     if(img) {
         @autoreleasepool { // Prevent App Extension Crash
             UIGraphicsBeginImageContextWithOptions(cell.imageView.bounds.size, NO, 0.0);

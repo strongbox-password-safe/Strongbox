@@ -16,12 +16,14 @@
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
 #import "NSData+Extensions.h"
-#import "SharedAppAndAutoFillSettings.h"
+
+const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; // 128 KB - Maybe play with this but this seems to have decent perf for now
 
 @interface DatabaseModel ()
 
 @property (nonatomic, strong) StrongboxDatabase* theSafe;
 @property (nonatomic, strong) id<AbstractDatabaseFormatAdaptor> adaptor;
+@property DatabaseModelConfig* config;
 
 @end
 
@@ -183,8 +185,14 @@
     return nil;
 }
 
++ (void)fromData:(NSData *)data ckf:(CompositeKeyFactors *)ckf useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(void (^)(BOOL, DatabaseModel * _Nonnull, NSError * _Nonnull))completion {
+    [DatabaseModel fromData:data ckf:ckf useLegacyDeserialization:useLegacyDeserialization config:DatabaseModelConfig.defaults completion:completion];
+}
+
 + (void)fromData:(NSData *)data
              ckf:(CompositeKeyFactors *)ckf
+useLegacyDeserialization:(BOOL)useLegacyDeserialization
+          config:(DatabaseModelConfig*)config
       completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion {
     if(data == nil) {
         completion(NO, nil, nil);
@@ -209,64 +217,82 @@
         completion(NO, nil, err);
         return;
     }
-
+    
+    NSTimeInterval startDecryptTime = NSDate.timeIntervalSinceReferenceDate;
     [adaptor open:data
               ckf:ckf
+useLegacyDeserialization:useLegacyDeserialization
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        NSLog(@"====================================== PERF ======================================");
+        NSLog(@"DESERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startDecryptTime);
+        NSLog(@"====================================== PERF ======================================");
+
         if(userCancelled || database == nil || error) {
             completion(userCancelled, nil ,error);
         }
         else {
-            DatabaseModel* model = [[DatabaseModel alloc] initWithDatabase:database adaptor:adaptor];
+            DatabaseModel* model = [[DatabaseModel alloc] initWithDatabase:database adaptor:adaptor config:config];
             completion(NO, model, nil);
         }
     }];
 }
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-
-    }
-    return self;
-}
-
-- (instancetype)initEmptyForTesting:(CompositeKeyFactors *)compositeKeyFactors {
-    if(self = [self init]) {
-        // FUTURE: It shouldn't be necessary to use a particular adaptor to create the model...
-        self.adaptor = [DatabaseModel getAdaptor:kKeePass];
-        self.theSafe = [self.adaptor create:compositeKeyFactors];
-    }
-    
-    return self;
-}
-
-- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors format:(DatabaseFormat)format {
-    if(self = [self init]) {
-        self.adaptor = [DatabaseModel getAdaptor:format];
-        self.theSafe = [self.adaptor create:compositeKeyFactors];
-        
-        if (self.theSafe == nil) {
+- (instancetype)initWithDatabase:(StrongboxDatabase*)database
+                         adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor
+                          config:(DatabaseModelConfig*)config {
+    if (self = [super init]) {
+        if (adaptor == nil) {
+            return nil;
+        }
+        if (database == nil) {
             return nil;
         }
         
+        self.adaptor = adaptor;
+        self.theSafe = database;
+    }
+    return self;
+}
+
+- (instancetype)initWithFormat:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
+    return [self initWithFormat:format compositeKeyFactors:compositeKeyFactors config:DatabaseModelConfig.defaults];
+}
+
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+                        config:(DatabaseModelConfig*)config {
+    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:format];
+    if (adaptor == nil) {
+        return nil;
+    }
+    
+    StrongboxDatabase* database = [adaptor create:compositeKeyFactors];
+    
+    return [self initWithDatabase:database adaptor:adaptor config:config];
+}
+
+- (instancetype)initEmptyForTesting:(CompositeKeyFactors *)compositeKeyFactors {
+    DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:PasswordGenerationConfig.defaults];
+    
+    return [self initWithFormat:kKeePass compositeKeyFactors:compositeKeyFactors config:config];
+}
+
+- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
+                 format:(DatabaseFormat)format {
+    return [self initNew:compositeKeyFactors format:format config:DatabaseModelConfig.defaults];
+}
+
+- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
+                 format:(DatabaseFormat)format
+                 config:(DatabaseModelConfig*)config {
+    if (self = [self initWithFormat:format compositeKeyFactors:compositeKeyFactors config:config]) {
         if(format != kKeePass1) {
             [self addSampleGroupAndRecordToRoot];
         }
         else {
             Node *parent = self.theSafe.rootGroup.childGroups[0];
-            addSampleGroupAndRecordToGroup(parent);
+            [self addSampleGroupAndRecordToGroup:parent];
         }
-    }
-    
-    return self;
-}
-
-- (instancetype)initWithDatabase:(StrongboxDatabase*)database adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor {
-    if(self = [self init]) {
-        self.theSafe = database;
-        self.adaptor = adaptor;
     }
     
     return self;
@@ -279,12 +305,11 @@
 }
 
 - (void)addSampleGroupAndRecordToRoot {
-    addSampleGroupAndRecordToGroup(self.rootGroup);
+    [self addSampleGroupAndRecordToGroup:self.rootGroup];
 }
 
-void addSampleGroupAndRecordToGroup(Node* parent) {
-    PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
-    NSString* password = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
+- (void)addSampleGroupAndRecordToGroup:(Node*)parent {
+    NSString* password = [PasswordMaker.sharedInstance generateForConfigOrDefault:self.config.passwordGeneration];
 
     Node* sampleFolder = [[Node alloc] initAsGroup:NSLocalizedString(@"model_sample_group_title", @"Sample Group")
                                             parent:parent

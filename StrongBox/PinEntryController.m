@@ -186,7 +186,7 @@
         }
     }
     else {
-        self.labelEnteredText.text = self.info.length ? self.info : @"PIN";
+        self.labelEnteredText.text = self.info.length ? self.info : NSLocalizedString(@"pin_entry_default_text", @"PIN");
         if (@available(iOS 13.0, *)) {
             self.labelEnteredText.textColor = UIColor.systemGrayColor;
         }

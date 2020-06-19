@@ -35,6 +35,7 @@ typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSData*_Nullable data, N
 
 - (void)open:(NSData*)data
          ckf:(CompositeKeyFactors*)ckf
+useLegacyDeserialization:(BOOL)useLegacyDeserialization
   completion:(OpenCompletionBlock)completion;
 
 - (void)save:(StrongboxDatabase*)database completion:(SaveCompletionBlock)completion;

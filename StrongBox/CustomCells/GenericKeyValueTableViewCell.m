@@ -292,8 +292,9 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 
 - (void)bindValueText {
     if(self.concealed) {
-        self.valueText.text = @"*****************";
-        self.valueLabel.text = @"*****************";
+        
+        self.valueText.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
+        self.valueLabel.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
 
         if (@available(iOS 13.0, *)) {
             self.valueText.textColor = UIColor.secondaryLabelColor;

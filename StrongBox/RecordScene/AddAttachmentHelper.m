@@ -305,7 +305,8 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
                                   }
                                   else {
                                       if(self.onAdd) {
-                                          UiAttachment* attachment = [[UiAttachment alloc] initWithFilename:text data:data];
+                                          DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithData:data compressed:YES protectedInMemory:YES];
+                                          UiAttachment* attachment = [[UiAttachment alloc] initWithFilename:text dbAttachment:dbAttachment];
                                           
                                           NSLog(@"Adding Attachment: [%@]", attachment);
                                           

@@ -168,7 +168,9 @@
 }
 
 - (void)bindUi {
-    self.cellAlgorithm.detailTextLabel.text = self.config.algorithm == kPasswordGenerationAlgorithmBasic ? NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic") : @"Diceware (XKCD)";
+    self.cellAlgorithm.detailTextLabel.text = self.config.algorithm == kPasswordGenerationAlgorithmBasic ?
+        NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic") :
+        NSLocalizedString(@"password_gen_vc_mode_diceware_xkcd_title", @"Diceware (XKCD)");
     
     NSArray<NSString*> *characterGroups = [self.config.useCharacterGroups map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return [PasswordGenerationConfig characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];

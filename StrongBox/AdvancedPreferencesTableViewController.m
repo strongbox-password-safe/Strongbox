@@ -28,6 +28,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchDetectOffline;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowClipboardHandoff;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseColorBlindPalette;
+@property (weak, nonatomic) IBOutlet UISwitch *switchUseLegacySerializer;
 
 @end
 
@@ -68,6 +69,7 @@
     SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
     SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
     SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
+    SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization = self.switchUseLegacySerializer.on;
     
     if(SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
@@ -80,6 +82,7 @@
 }
 
 - (void)bindPreferences {
+    self.switchUseLegacySerializer.on = SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization;
     self.instantPinUnlock.on = SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
     self.switchHideKeyFileName.on = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles;

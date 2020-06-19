@@ -61,9 +61,9 @@ statusImage:(UIImage*)statusImage
 
     self.statusImage.image = statusImage;
 
-    self.topSubtitle.text = topSubtitle ? topSubtitle : @"Dummy";
-    self.subtitle1.text = subtitle1 ? subtitle1 : @"Dummy";
-    self.subtitle2.text = subtitle2 ? subtitle2 : @"Dummy";
+    self.topSubtitle.text = topSubtitle ? topSubtitle : @"";
+    self.subtitle1.text = subtitle1 ? subtitle1 : @"";
+    self.subtitle2.text = subtitle2 ? subtitle2 : @"";
     
     self.subtitle1.hidden = subtitle1 == nil;
     self.subtitle2.hidden = subtitle2 == nil;

@@ -187,7 +187,7 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
         
-        [DatabaseModel fromData:data ckf:CompositeKeyFactors.unitTestDefaults completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model2, NSError * _Nonnull error) {
+        [DatabaseModel fromData:data ckf:CompositeKeyFactors.unitTestDefaults useLegacyDeserialization:NO completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model2, NSError * _Nonnull error) {
             if(error) {
                 NSLog(@"%@", error);
             }
@@ -475,7 +475,7 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
         
-        [DatabaseModel fromData:data ckf:CompositeKeyFactors.unitTestDefaults completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model2, NSError * _Nonnull error) {
+        [DatabaseModel fromData:data ckf:CompositeKeyFactors.unitTestDefaults useLegacyDeserialization:NO completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model2, NSError * _Nonnull error) {
             if(error) {
                 NSLog(@"%@", error);
             }

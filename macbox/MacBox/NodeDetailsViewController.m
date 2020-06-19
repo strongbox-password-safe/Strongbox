@@ -31,6 +31,7 @@
 #import "OTPToken+Serialization.h"
 #import "ColoredStringHelper.h"
 #import "ClickableSecureTextField.h"
+#import "NSString+Extensions.h"
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -1025,7 +1026,7 @@ static NSString* trimField(NSTextField* textField) {
     DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
     
     item.textField.stringValue = attachment.filename;
-    item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.data.length countStyle:NSByteCountFormatterCountStyleFile];
+    item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.deprecatedData.length countStyle:NSByteCountFormatterCountStyleFile];
     
     if(self.attachmentsIconCache == nil) {
         self.attachmentsIconCache = [NSMutableDictionary dictionary];
@@ -1050,7 +1051,7 @@ static NSString* trimField(NSTextField* textField) {
         for (int i=0;i<workingCopy.count;i++) {
             DatabaseAttachment* dbAttachment = workingCopy[i];
             
-            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.data];
+            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.deprecatedData];
             if(img) {
                 img = scaleImage(img, CGSizeMake(88, 88));
                 [self.attachmentsIconCache setObject:img forKey:@(i)];
@@ -1185,7 +1186,7 @@ static NSString* trimField(NSTextField* textField) {
     
     NSError* error;
     //BOOL success =
-    [dbAttachment.data writeToFile:f options:kNilOptions error:&error];
+    [dbAttachment.deprecatedData writeToFile:f options:kNilOptions error:&error];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -1294,7 +1295,7 @@ static NSString* trimField(NSTextField* textField) {
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
+    [[NSWorkspace sharedWorkspace] openURL:urlString.urlExtendedParse];
     
     NSString* loc = NSLocalizedString(@"mac_node_details_password_copied_url_launched", @"Password Copied and URL Launched");
     [self showPopupToastNotification:loc];
@@ -1381,7 +1382,7 @@ static NSString* trimField(NSTextField* textField) {
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-            [dbAttachment.data writeToFile:savePanel.URL.path atomically:YES];
+            [dbAttachment.deprecatedData writeToFile:savePanel.URL.path atomically:YES];
             [savePanel orderOut:self];
         }
     }];
@@ -1428,7 +1429,10 @@ static NSString* trimField(NSTextField* textField) {
                 
                 NSString* filename = url.lastPathComponent;
                 
-                [self.model addItemAttachment:self.node attachment:[[UiAttachment alloc] initWithFilename:filename data:data]];
+                DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithData:data compressed:YES protectedInMemory:YES];
+                UiAttachment* att = [[UiAttachment alloc] initWithFilename:filename dbAttachment:dbA];
+                
+                [self.model addItemAttachment:self.node attachment:att];
             }
         }
     }];

@@ -215,7 +215,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 - (void)setPassword:(NSString *)password {
-    if([password isEqualToString:_password]) {
+    if([password compare:_password] == NSOrderedSame) {
         return;
     }
     
@@ -239,7 +239,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 - (void)setNotes:(NSString *)notes {
-    if([notes isEqualToString:_notes]) {
+    if([notes compare:_notes] == NSOrderedSame) {
         return;
     }
     

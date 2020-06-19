@@ -7,7 +7,8 @@
 //
 
 #import "WebDAVConfigurationViewController.h"
-#import "utils.h"
+#import "Utils.h"
+#import "NSString+Extensions.h"
 
 @interface WebDAVConfigurationViewController ()
 
@@ -41,9 +42,7 @@
         hostStr = [hostStr substringToIndex:hostStr.length - 1];
     }
 
-    NSURL *urlHost = [NSURL URLWithString:[hostStr stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-
-    self.configuration.host = urlHost;
+    self.configuration.host = hostStr.urlExtendedParse;
     self.configuration.username = self.textFieldUsername.text;
     self.configuration.password = self.textFieldPassword.text;
     self.configuration.allowUntrustedCertificate = self.switchAllowUntrusted.on;
@@ -61,7 +60,7 @@
 
 - (void)validateConnect {
     NSString* host = trim(self.textFieldRootUrl.text);
-    NSURL *urlHost = [NSURL URLWithString:[host stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSURL *urlHost = host.urlExtendedParse;
     
     if(!(urlHost && urlHost.scheme && urlHost.host)) {
         self.labelValidation.text = NSLocalizedString(@"webdav_vc_validation_url_invalid", @"URL Invalid");

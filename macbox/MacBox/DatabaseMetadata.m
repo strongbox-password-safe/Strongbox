@@ -94,7 +94,7 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ [%u] - [%@-%@]", self.nickName, self.storageProvider, self.fileUrl, self.storageInfo];
+    return [NSString stringWithFormat:@"%@ [%lu] - [%@-%@]", self.nickName, (unsigned long)self.storageProvider, self.fileUrl, self.storageInfo];
 }
 
 - (void)encodeWithCoder:(NSCoder *)encoder {

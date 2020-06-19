@@ -16,6 +16,7 @@
 #import "FavIconManager.h"
 #import "FavIconBulkViewController.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "NSString+Extensions.h"
 
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIDocumentPickerDelegate>
 
@@ -44,7 +45,7 @@
         [self presentKeePassAndDatabaseIconSets:keePassIconSet];
     }
     else {
-        BOOL favIconPossible = node ? (node.isGroup || [NSURL URLWithString:node.fields.url] != nil) : [self smartDetermineUrlFromHint:urlOverride] != nil;
+        BOOL favIconPossible = node ? (node.isGroup || node.fields.url.urlExtendedParse != nil) : [self smartDetermineUrlFromHint:urlOverride] != nil;
         
         if (favIconPossible) {
             UIAlertController *alertController =
@@ -193,7 +194,7 @@
 }
 
 - (NSURL*)smartDetermineUrlFromHint:(NSString*)urlHint {
-    NSURL* url = [NSURL URLWithString:urlHint];
+    NSURL* url = urlHint.urlExtendedParse;
     
     if(urlHint.length > 0) {
         NSURLComponents *components = [NSURLComponents componentsWithString:urlHint];

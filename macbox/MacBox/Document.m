@@ -45,7 +45,8 @@
 
 - (instancetype)initWithCredentials:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
     if (self = [super init]) {
-        DatabaseModel *db = [[DatabaseModel alloc] initNew:compositeKeyFactors format:format];
+        DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:Settings.sharedInstance.passwordGenerationConfig];
+        DatabaseModel *db = [[DatabaseModel alloc] initNew:compositeKeyFactors format:format config:config];
         self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:nil];
     }
     
@@ -265,8 +266,12 @@
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
     
+    DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:Settings.sharedInstance.passwordGenerationConfig];
+    
     [DatabaseModel fromData:data
                         ckf:self.credentialsForUnlock
+   useLegacyDeserialization:NO
+                     config:modelConfig
                  completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
         // NSLog(@"[%@][%@] readFromData: Completion...", [NSThread currentThread], NSThread.mainThread);
         db = model;

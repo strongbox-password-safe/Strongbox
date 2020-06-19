@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ln1-Rl-vEb">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ln1-Rl-vEb">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -667,7 +667,7 @@
                                 <attributedString key="attributedText">
                                     <fragment content="Testing">
                                         <attributes>
-                                            <font key="NSFont" metaFont="label" size="11"/>
+                                            <font key="NSFont" metaFont="message" size="11"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -1069,6 +1069,36 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="l37-h7-bsz" userLabel="Emergency: Use Legacy Serializer">
+                                        <rect key="frame" x="0.0" y="507" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="l37-h7-bsz" id="TkH-I7-Ji8">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Emergency: Use Legacy Serializer" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jRJ-bT-Kka" userLabel="Emergency: Use Legacy Serializer">
+                                                    <rect key="frame" x="20" y="11" width="259.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wNi-6f-RtU">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="IvR-z4-o1Y"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="centerY" secondItem="wNi-6f-RtU" secondAttribute="centerY" id="28c-9W-XcL"/>
+                                                <constraint firstItem="wNi-6f-RtU" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="jRJ-bT-Kka" secondAttribute="trailing" constant="8" symbolic="YES" id="64c-cU-9wZ"/>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="bottom" secondItem="TkH-I7-Ji8" secondAttribute="bottomMargin" id="8Hu-Hf-tT6"/>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="top" secondItem="TkH-I7-Ji8" secondAttribute="topMargin" id="FuC-QF-iBC"/>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="leading" secondItem="TkH-I7-Ji8" secondAttribute="leading" constant="20" id="Nvz-Rs-hgH"/>
+                                                <constraint firstItem="wNi-6f-RtU" firstAttribute="trailing" secondItem="TkH-I7-Ji8" secondAttribute="trailing" constant="-20" id="f8B-Sd-fJ1"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -1099,6 +1129,7 @@
                         <outlet property="switchShowAllFilesInKeyFilesLocal" destination="NUW-RD-8sG" id="eS2-52-5yN"/>
                         <outlet property="switchShowYubikeySecretWorkaround" destination="wGm-bI-fp3" id="rcC-7N-efl"/>
                         <outlet property="switchUseColorBlindPalette" destination="fQJ-uY-SEH" id="9pG-Ud-fOY"/>
+                        <outlet property="switchUseLegacySerializer" destination="wNi-6f-RtU" id="mFx-qh-ZbT"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hAm-UX-ANu" userLabel="First Responder" sceneMemberID="firstResponder"/>

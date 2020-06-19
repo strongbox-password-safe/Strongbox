@@ -41,6 +41,7 @@
 #import "DatabasePropertiesController.h"
 #import "MacYubiKeyManager.h"
 #import "ColoredStringHelper.h"
+#import "NSString+Extensions.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -630,7 +631,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:(Node*)node {
-    NSURL* url = [NSURL URLWithString:node.fields.url];
+    NSURL* url = node.fields.url.urlExtendedParse;
         
     BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
 
@@ -2254,7 +2255,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     for (NSNumber* index in serializationPackage.usedAttachmentIndices) {
         DatabaseAttachment* a = self.model.attachments[index.integerValue];
-        [attachmentsMap setValue:[a.data base64EncodedStringWithOptions:kNilOptions] forKey:index.stringValue];
+        [attachmentsMap setValue:[a.deprecatedData base64EncodedStringWithOptions:kNilOptions] forKey:index.stringValue];
     }
     
     // Custom Icons
@@ -2708,7 +2709,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     for (NodeFileAttachment* attachment in originalAttachments) {
         NSString* b64Data = attachmentsMap[@(attachment.index).stringValue];
         NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
-        UiAttachment* uiAttachment = [UiAttachment attachmentWithFilename:attachment.filename data:data];
+        
+        DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithData:data compressed:YES protectedInMemory:YES];
+        UiAttachment* uiAttachment = [UiAttachment attachmentWithFilename:attachment.filename dbAttachment:dbA];
     
         [self.model addItemAttachment:node attachment:uiAttachment rationalize:NO]; // DO Not Rationalize since these attachments are not officially linked to the database yet!
     }
@@ -2873,7 +2876,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         urlString = [NSString stringWithFormat:@"http://%@", urlString];
     }
     
-    [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:urlString]];
+    [[NSWorkspace sharedWorkspace] openURL:urlString.urlExtendedParse];
 }
 
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
@@ -3207,7 +3210,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         NSString* cellId = isFileNameColumn ? @"AttachmentFileNameCellIdentifier" : @"AttachmentFileSizeCellIdentifier";
         NSTableCellView* cell = [self.attachmentsTable makeViewWithIdentifier:cellId owner:nil];
 
-        cell.textField.stringValue = isFileNameColumn ? attachment.filename : [NSByteCountFormatter stringFromByteCount:dbAttachment.data.length countStyle:NSByteCountFormatterCountStyleFile];
+        cell.textField.stringValue = isFileNameColumn ? attachment.filename : [NSByteCountFormatter stringFromByteCount:dbAttachment.deprecatedData.length countStyle:NSByteCountFormatterCountStyleFile];
         
         if(self.attachmentsIconCache == nil) {
             self.attachmentsIconCache = @{};
@@ -3259,7 +3262,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         for (int i=0;i<workingCopy.count;i++) {
             DatabaseAttachment* dbAttachment = workingCopy[i];
             
-            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.data];
+            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.deprecatedData];
             if(img) {
                 img = scaleImage(img, CGSizeMake(17, 17));
                 tmp[@(i)] = img;
@@ -3308,7 +3311,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     NSError* error;
     //BOOL success =
-    [dbAttachment.data writeToFile:f options:kNilOptions error:&error];
+    [dbAttachment.deprecatedData writeToFile:f options:kNilOptions error:&error];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -3359,7 +3362,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-            [dbAttachment.data writeToFile:savePanel.URL.path atomically:YES];
+            [dbAttachment.deprecatedData writeToFile:savePanel.URL.path atomically:YES];
             [savePanel orderOut:self];
         }
     }];
@@ -3619,7 +3622,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (void)showFindFavIconsForItem:(Node*)item {
-    NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.model.rootGroup.allChildRecords;
+    NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.model.activeRecords;
     
     [FavIconDownloader showUi:self nodes:items viewModel:self.model onDone:^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
         if(go) {

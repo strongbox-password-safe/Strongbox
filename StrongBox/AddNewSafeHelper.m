@@ -150,7 +150,9 @@ static DatabaseModel* getNewDatabase(NSString* password,
         ckf = [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
     }
     
-    return [[DatabaseModel alloc] initNew:ckf format:format];
+    return [[DatabaseModel alloc] initNew:ckf
+                                   format:format
+                                   config:[DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig]];
 }
 
 @end

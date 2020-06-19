@@ -55,6 +55,11 @@ BOOL isValidUrl(NSString* urlString) {
     return [NSString stringWithFormat:@"%@", info[@"CFBundleShortVersionString"]];
 }
 
++ (NSString *)getAppBuildNumber {
+    NSDictionary *info = [NSBundle mainBundle].infoDictionary;
+    return info[@"CFBundleVersion"];
+}
+
 + (NSString *)getAppName {
     NSDictionary *info = [NSBundle mainBundle].infoDictionary;
     NSString *appName = [NSString stringWithFormat:@"%@ v%@", info[@"CFBundleName"], info[@"CFBundleShortVersionString"]];

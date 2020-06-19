@@ -35,6 +35,7 @@
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
     [KdbxSerialization deserialize:safeData
                compositeKeyFactors:cpf
+     useLegacyDeserialization:NO
                         completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
         if(!data) {
             NSLog(@"%@", error);
@@ -59,7 +60,7 @@
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
     [KdbxSerialization deserialize:safeData
-               compositeKeyFactors:cpf
+               compositeKeyFactors:cpf useLegacyDeserialization:NO
                         completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
         if(!data) {
             NSLog(@"%@", error);
@@ -78,7 +79,7 @@
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
     [Kdbx4Serialization deserialize:safeData
-                compositeKeyFactors:cpf
+                compositeKeyFactors:cpf useLegacyDeserialization:NO
                          completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable data, NSError * _Nullable error) {
         if(!data) {
             NSLog(@"%@", error);
@@ -97,7 +98,7 @@
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
     [KdbxSerialization deserialize:safeData
-                                         compositeKeyFactors:cpf
+                                         compositeKeyFactors:cpf useLegacyDeserialization:NO
                                                   completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
         if(!data) {
             NSLog(@"%@", error);

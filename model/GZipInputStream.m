@@ -8,26 +8,31 @@
 
 #import "GZipInputStream.h"
 #import <zlib.h>
+#import "DatabaseModel.h"
+#import "Utils.h"
 
 @interface GZipInputStream ()
 
-@property NSData* source;
 @property z_stream* stream;
 @property BOOL done;
+
+@property NSData* innerData;
+
+@property NSInputStream* innerStream;
+
+@property uint8_t *workingData;
+@property size_t workingDataLength;
+
+@property size_t debugDecompresedTotal;
+
+@property NSError* error;
 
 @end
 
 @implementation GZipInputStream
 
-- (instancetype)initWithData:(NSData *)data {
-    self = [super initWithData:data];
-    if (self) {
-        if (!data || data.length == 0 || !isGzippedData(data)) {
-            NSLog(@"Data empty or not GZIPed");
-            return nil;
-        }
-        
-        self.source = data;
+- (instancetype)initWithInitialBuffer:(const uint8_t*)buffer length:(NSUInteger)length {
+    if (self = [super init]) {
         self.stream = malloc(sizeof(z_stream));
         if (self.stream == NULL) {
             return nil;
@@ -36,8 +41,8 @@
         
         self.stream->zalloc = Z_NULL;
         self.stream->zfree = Z_NULL;
-        self.stream->avail_in = (uint)self.source.length;
-        self.stream->next_in = (Bytef *)self.source.bytes;
+        self.stream->avail_in = (uInt)length;
+        self.stream->next_in = (uint8_t*)buffer;
         self.stream->total_out = 0;
         self.stream->avail_out = 0;
         
@@ -48,25 +53,148 @@
             return nil;
         }
     }
+    return self;
+}
+
+- (instancetype)initWithStream:(NSInputStream *)innerStream {
+    if (!innerStream) {
+        NSLog(@"Inner Stream NIL");
+        return nil;
+    }
+
+    self.innerStream = innerStream;
+    [self.innerStream open];
+    
+    [self fillWorkingBuffer];
+    
+    return [self initWithInitialBuffer:self.workingData length:self.workingDataLength];
+}
+
+- (instancetype)initWithData:(NSData *)data {
+    if (self = [self initWithInitialBuffer:data.bytes length:data.length]) {
+        if (!data || data.length == 0 || !isGzippedData(data)) {
+            NSLog(@"Data empty or not GZIPed");
+            return nil;
+        }
+        
+        self.innerData = data;
+    }
 
     return self;
 }
 
+//////////////////////////////////////////////////////
+
 - (void)open { }
 
 - (void)close {
-    self.source = nil;
+    if (self.innerStream) {
+        [self.innerStream close];
+        self.innerStream = nil;
+    }
+    
+    self.innerData = nil;
+    
     if (self.stream) {
         free(self.stream);
         self.stream = nil;
     }
+    
+    if (self.workingData) {
+        free(self.workingData);
+    }
+    self.workingData = nil;
+}
+
+- (void)fillWorkingBuffer {
+    if (self.workingData == nil) {
+        self.workingData = malloc(kStreamingSerializationChunkSize);
+    }
+    
+    NSInteger read = [self.innerStream read:self.workingData maxLength:kStreamingSerializationChunkSize];
+    
+    if (read < 0) {
+        self.workingData = nil;
+        return;
+    }
+    self.workingDataLength = read;
 }
 
 - (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
     if(self.done) {
         return 0;
     }
+
+    NSInteger ret = 0;
+    if (self.innerData) {
+        ret = [self readFromData:buffer maxLength:len];
+    }
+    else {
+        ret = [self readFromStream:buffer maxLength:len];
+    }
     
+    self.debugDecompresedTotal += ret;
+    
+    //NSLog(@"GZIP DEBUG: Read so far => [%zu]", self.debugDecompresedTotal);
+    
+    return ret;
+}
+
+- (NSInteger)readFromStream:(uint8_t *)buffer maxLength:(NSUInteger)len {
+    self.stream->next_out = buffer;
+    self.stream->avail_out = (uInt)len;
+    
+    int status;
+    do {
+        if (self.stream->avail_in == 0) {
+            [self fillWorkingBuffer];
+            if (self.workingData == nil) {
+                self.error = [Utils createNSError:@"Could not read enough data into Working Data from input stream." errorCode:-1];
+                return -1;
+            }
+            
+            self.stream->avail_in = (uInt)self.workingDataLength;
+            self.stream->next_in = (uint8_t*)self.workingData;
+            if (self.stream-> avail_in == 0) {
+                status = Z_STREAM_END;
+                break;
+            }
+        }
+        
+        status = inflate (self.stream, Z_SYNC_FLUSH);
+    } while (status == Z_OK && self.stream->avail_out > 0);
+    
+    NSUInteger read = len - self.stream->avail_out;
+    
+    if(status == Z_STREAM_END) {
+        if (inflateEnd(self.stream) == Z_OK) {
+            self.done = YES;
+
+            if (self.stream) {
+                free(self.stream);
+                self.stream = nil;
+            }
+            
+            if (self.workingData) {
+                free(self.workingData);
+                self.workingData = nil;
+            }
+        }
+        else {
+            NSLog(@"ERROR inflateEnd GZIP! %d", status);
+            self.error = [Utils createNSError:@"ERROR inflateEnd GZIP!." errorCode:status];
+        }
+    }
+    else if (status != Z_OK) {
+        NSLog(@"ERROR Reading GZIP! %d", status);
+        self.error = [Utils createNSError:@"ERROR Reading GZIP!." errorCode:status];
+        return 0;
+    }
+    
+    return read;
+}
+
+- (NSInteger)readFromData:(uint8_t *)buffer maxLength:(NSUInteger)len {
     self.stream->next_out = buffer;
     self.stream->avail_out = (uInt)len;
     
@@ -78,7 +206,7 @@
         if(status == Z_STREAM_END) {
             if (inflateEnd(self.stream) == Z_OK) {
                 self.done = YES;
-                self.source = nil;
+                self.innerData = nil;
                 if (self.stream) {
                     free(self.stream);
                     self.stream = nil;
@@ -103,4 +231,7 @@ BOOL isGzippedData(NSData* data) {
     return (data.length >= 2 && bytes[0] == 0x1f && bytes[1] == 0x8b);
 }
 
+- (NSError *)streamError {
+    return self.error;
+}
 @end

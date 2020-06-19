@@ -221,14 +221,9 @@
     Node* node = [[Node alloc] initAsRoot:nil];
  
     // Attachments
-    
-    DatabaseAttachment* databaseAttachment = [[DatabaseAttachment alloc] init];
-    
-    NSString* text = @"Twas the best of times...";
-    databaseAttachment.data = [text dataUsingEncoding:NSUTF8StringEncoding];
-    databaseAttachment.protectedInMemory = YES;
-    databaseAttachment.compressed = YES;
-    
+
+//    NSString* text = @"Twas the best of times...";
+//    DatabaseAttachment* databaseAttachment = [[DatabaseAttachment alloc] initWithData:[text dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
     NodeFileAttachment* nodeAttachment = [[NodeFileAttachment alloc] init];
     nodeAttachment.index = 0;
     nodeAttachment.filename = @"test-attachment.txt";

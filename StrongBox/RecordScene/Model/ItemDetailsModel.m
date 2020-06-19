@@ -80,12 +80,12 @@
 }
 
 - (BOOL)isDifferentFrom:(ItemDetailsModel *)other {
-    BOOL simpleEqual =  [self.title isEqualToString:other.title] &&
-                        [self.username isEqualToString:other.username] &&
-                        [self.password isEqualToString:other.password] &&
-                        [self.url isEqualToString:other.url] &&
-                        [self.notes isEqualToString:other.notes] &&
-                        [self.email isEqualToString:other.email];
+    BOOL simpleEqual =  [self.title compare:other.title] == NSOrderedSame &&
+                        [self.username compare:other.username] == NSOrderedSame &&
+                        [self.password compare:other.password] == NSOrderedSame &&
+                        [self.url compare:other.url] == NSOrderedSame &&
+                        [self.notes compare:other.notes] == NSOrderedSame &&
+                        [self.email compare:other.email] == NSOrderedSame;
    
     if(!simpleEqual) {
         // NSLog(@"Model: Simply Different");
@@ -149,8 +149,8 @@
         UiAttachment* a = self.attachments[i];
         UiAttachment* b = other.attachments[i];
         
-        if([a.filename isEqualToString:b.filename]) {
-            if(![a.data isEqualToData:b.data]) {
+        if([a.filename compare:b.filename] == NSOrderedSame) {
+            if(![a.dbAttachment.digestHash isEqualToString:b.dbAttachment.digestHash]) {
                 return YES;
             }
         }
@@ -233,10 +233,10 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     CustomFieldViewModel *c2 = [CustomFieldViewModel customFieldWithKey:@"Key" value:@"Value" protected:NO];
     CustomFieldViewModel *c3 = [CustomFieldViewModel customFieldWithKey:@"Longish Key" value:@"Well this is a very very long thing that is going on here and there and must wrap" protected:YES];
 
-    UiAttachment* a1 = [[UiAttachment alloc] initWithFilename:@"filename.jpg" data:[NSData data]];
-    UiAttachment* a2 = [[UiAttachment alloc] initWithFilename:@"document.txt" data:[NSData data]];
-    UiAttachment* a3 = [[UiAttachment alloc] initWithFilename:@"abc.pdf" data:[NSData data]];
-    UiAttachment* a4 = [[UiAttachment alloc] initWithFilename:@"cool.mpg" data:[NSData data]];
+    UiAttachment* a1 = [[UiAttachment alloc] initWithFilename:@"filename.jpg" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
+    UiAttachment* a2 = [[UiAttachment alloc] initWithFilename:@"document.txt" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
+    UiAttachment* a3 = [[UiAttachment alloc] initWithFilename:@"abc.pdf" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
+    UiAttachment* a4 = [[UiAttachment alloc] initWithFilename:@"cool.mpg" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
     
     NSArray<ItemMetadataEntry*>* metadata = @[ [ItemMetadataEntry entryWithKey:@"ID" value:NSUUID.UUID.UUIDString copyable:YES],
                                 [ItemMetadataEntry entryWithKey:@"Created" value:@"November 21 at 13:21" copyable:NO],

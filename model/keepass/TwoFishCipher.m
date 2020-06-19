@@ -8,6 +8,7 @@
 
 #import "TwoFishCipher.h"
 #import "tomcrypt.h"
+#import "TwoFishReadStream.h"
 
 static const uint32_t kKeySize = 32;
 static const uint32_t kBlockSize = 16;
@@ -134,6 +135,10 @@ static const uint32_t kIvSize = kBlockSize;
     }
     
     return newKey;
+}
+
+- (NSInputStream *)getDecryptionStreamForStream:(NSInputStream *)inputStream key:(NSData *)key iv:(NSData *)iv {
+    return [[TwoFishReadStream alloc] initWithStream:inputStream key:key iv:iv];
 }
 
 @end

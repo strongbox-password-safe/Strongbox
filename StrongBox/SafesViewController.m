@@ -47,6 +47,8 @@
 #import "MasterDetailViewController.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "SharedAppAndAutoFillSettings.h"
+#import "MMWormhole.h"
+#import "MMWormholeSession.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -69,6 +71,7 @@
 @property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock - Ideally we should also clear this on DB close but we don't have that event setup yet...
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
+@property MMWormhole* wormhole;
 
 @end
 
@@ -77,18 +80,72 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    [self checkForPreviousCrash];
+
     self.collection = [NSArray array];
-    
     [self setupTableview];
     
     [self internalRefresh];
     
     [self listenToNotifications];
     
+    // [self setupAutoFillWormhole];
+    
     [self setFreeTrialEndDateBasedOnIapPurchase]; // Update Free Trial Date
 
     if([Settings.sharedInstance getLaunchCount] == 1) {
         [self doFirstLaunchTasks];
+    }
+}
+
+- (void)setupAutoFillWormhole {
+    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
+                                                         optionalDirectory:@"wormhole"
+                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
+    
+    [self.wormhole listenForMessageWithIdentifier:kWormholeAutoFillUpdateMessageId
+                                         listener:^(id messageObject) {
+        NSLog(@"AutoFill Wormhole Message: [%@]", messageObject);
+//        [SafesList.sharedInstance forceReload];
+    }];
+}
+
+- (void)sharePreviousCrash {
+    NSArray *activityItems = @[FileManager.sharedInstance.archivedCrashFile];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+
+    // Required for iPad...
+    activityViewController.popoverPresentationController.barButtonItem = self.buttonAddSafe; // Weird spot but can't think of a better location
+    
+    [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) { }];
+
+    [self presentViewController:activityViewController animated:YES completion:nil];
+}
+
+- (void)copyPreviousCrashToClipboard {
+    NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    [pasteboard setString:[[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding]];
+ }
+
+- (void)checkForPreviousCrash {
+    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.crashFile.path]) {
+        [NSFileManager.defaultManager removeItemAtURL:FileManager.sharedInstance.archivedCrashFile error:nil];
+        [NSFileManager.defaultManager moveItemAtURL:FileManager.sharedInstance.crashFile toURL:FileManager.sharedInstance.archivedCrashFile error:nil];
+
+        [Alerts twoOptionsWithCancel:self
+                               title:NSLocalizedString(@"crash_diagnostics_share_last_title", @"Share Crash Diagnostics?")
+                             message:NSLocalizedString(@"crash_diagnostics_share_last_message", @"It looks like Strongbox had a crash last time. Would you be so kind as to share the diagnostics with Strongbox Support?\n\nPlease mail to support@strongboxsafe.com")
+                   defaultButtonText:NSLocalizedString(@"crash_diagnostics_share_action", @"Share")
+                    secondButtonText:NSLocalizedString(@"crash_diagnostics_copy_action", @"Copy to Clipboard")
+                              action:^(int response) {
+            if ( response == 0 ) {
+                [self sharePreviousCrash];
+            }
+            else if ( response == 1 ) {
+                [self copyPreviousCrashToClipboard];
+            }
+        }];
     }
 }
 
@@ -191,6 +248,8 @@
 
 - (void)appBecameActive {
     NSLog(@"appBecameActive");
+    
+    [SafesList.sharedInstance forceReload]; // Auto-Fill may have updated databases
     
     if(self.privacyScreenSuppressedForBiometricAuth) {
         NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
@@ -1382,7 +1441,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (SafeMetaData*)addDatabaseWithiCloudRaceCheck:(SafeMetaData*)metadata {
     if (metadata.storageProvider == kiCloud) {
         SafeMetaData* existing = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-            return obj.storageProvider == kiCloud && [obj.fileName isEqualToString:metadata.fileName];
+            return obj.storageProvider == kiCloud && [obj.fileName compare:metadata.fileName] == NSOrderedSame;
         }];
         
         if(existing) { // May have already been added by our iCloud watch thread.

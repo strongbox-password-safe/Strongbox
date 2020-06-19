@@ -308,7 +308,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 - (BOOL)fileNameExistsInICloud:(NSString *)fileName {
     BOOL nameExists = NO;
     for (AppleICloudOrLocalSafeFile *file in _iCloudFiles) {
-        if ([[file.fileUrl lastPathComponent] isEqualToString:fileName]) {
+        if ([[file.fileUrl lastPathComponent] compare:fileName] == NSOrderedSame) {
             nameExists = YES;
             break;
         }

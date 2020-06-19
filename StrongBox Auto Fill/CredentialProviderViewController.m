@@ -51,6 +51,10 @@
 }
 
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
+    NSLog(@"prepareInterfaceToProvideCredentialForIdentity = %@", credentialIdentity);
+    
+    [SafesList.sharedInstance forceReload];
+    
     BOOL lastRunGood = [self enterWithLastCrashCheck:YES];
     
     if (!lastRunGood) {
@@ -111,8 +115,8 @@
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
             
             [Alerts info:self
-                   title:@"Strongbox: Unknown Database"
-                 message:@"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill."
+                   title:NSLocalizedString(@"autofill_error_unknown_db_title", @"Strongbox: Unknown Database")
+                 message:NSLocalizedString(@"autofill_error_unknown_db_message", @"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
               completion:^{
                 [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
             }];
@@ -122,8 +126,9 @@
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
         [Alerts info:self
-               title:@"Strongbox: Error Locating Entry"
-             message:@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill." completion:^{
+               title:NSLocalizedString(@"autofill_error_unknown_item_title",@"Strongbox: Error Locating Entry")
+             message:NSLocalizedString(@"autofill_error_unknown_item_message",@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
+          completion:^{
             
             [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this record in Strongbox any longer." errorCode:-1]];
         }];
@@ -166,6 +171,8 @@
 
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"prepareCredentialListForServiceIdentifiers = %@", serviceIdentifiers);
+    [SafesList.sharedInstance forceReload];
+    
     self.serviceIdentifiers = serviceIdentifiers;
     
     BOOL lastRunGood = [self enterWithLastCrashCheck:NO];
@@ -192,7 +199,10 @@
     }
     
     if(!self.databasesListNavController) {
-        [Alerts warn:self title:@"Error" message:@"There was an error loading the Safes List View. Please mail support@strongboxsafe.com to inform the developer." completion:^{
+        [Alerts warn:self
+               title:@"Error"
+             message:@"There was an error loading the Safes List View. Please mail support@strongboxsafe.com to inform the developer."
+          completion:^{
             [self exitWithErrorOccurred:[Utils createNSError:@"There was an error loading the Safes List View" errorCode:-1]];
         }];
     }

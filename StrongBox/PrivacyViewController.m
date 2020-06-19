@@ -216,9 +216,9 @@
 - (void)deleteAllData {
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
-    [SafesList.sharedInstance deleteAll]; // This also removes Key Chain Entries
-    
     [FileManager.sharedInstance deleteAllLocalAndAppGroupFiles]; // Key Files, Caches, etc
+
+    [SafesList.sharedInstance deleteAll]; // This also removes Key Chain Entries
 }
 
 @end

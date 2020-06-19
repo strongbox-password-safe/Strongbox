@@ -93,8 +93,12 @@ viewController:(UIViewController *)viewController
     [self getData:^(NSData *data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
         
+        DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+        
         [DatabaseModel fromData:data
                             ckf:cpf
+       useLegacyDeserialization:SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization
+                         config:modelConfig
                      completion:^(BOOL userCancelled, DatabaseModel * model, NSError * error) {
             if(!model || error != nil) {
                 // For some reason we can't open the duress database... reset it - probably because someone changed the password
@@ -112,7 +116,9 @@ viewController:(UIViewController *)viewController
     NSData* data = SharedAppAndAutoFillSettings.sharedInstance.duressDummyData;    
     if(!data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
-        DatabaseModel* model = [[DatabaseModel alloc] initNew:cpf format:kKeePass];
+        DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+        DatabaseModel* model = [[DatabaseModel alloc] initNew:cpf format:kKeePass config:config];
+        
         [model getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
             [self setData:data];
             completion(data);

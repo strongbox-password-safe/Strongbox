@@ -22,19 +22,13 @@
 #import "GZipInputStream.h"
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
+#import "KP31HashedBlockStream.h"
 
 typedef struct _HeaderEntryHeader {
     uint8_t id;
     uint8_t lengthBytes[2];
 } HeaderEntryHeader;
 #define SIZE_OF_HEADER_ENTRY_HEADER      3
-
-typedef struct _BlockHeader {
-    uint8_t id[4];
-    uint8_t hash[32];
-    uint8_t size[4];
-} BlockHeader;
-#define SIZE_OF_BLOCK_HEADER 40
 
 static const struct _BlockHeader EndOfBlocksHeaderTemplate; // Useful way to zero everything out. Id needs to be set on use.
 
@@ -187,6 +181,7 @@ static BOOL kLogVerbose = NO;
 
 + (void)deserialize:(NSData *)safeData
 compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+useLegacyDeserialization:(BOOL)useLegacyDeserialization
          completion:(DeserializeCompletionBlock)completion {
     size_t offset;
     NSDictionary<NSNumber *,NSObject *> *headerEntries = getHeaderEntries3((uint8_t*)safeData.bytes, safeData.length, &offset);
@@ -213,13 +208,13 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
             }
             else {
                 NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, response);
-                [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey completion:completion];
+                [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey useLegacyDeserialization:useLegacyDeserialization completion:completion];
             }
         });
     }
     else {
         NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, nil);
-        [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey completion:completion];
+        [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey useLegacyDeserialization:useLegacyDeserialization completion:completion];
     }
 }
 
@@ -228,6 +223,7 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
             headerEntries:(NSDictionary<NSNumber *,NSObject *> *)headerEntries
      decryptionParameters:(DecryptionParameters*)decryptionParameters
                 masterKey:(NSData*)masterKey
+ useLegacyDeserialization:(BOOL)useLegacyDeserialization
                completion:(DeserializeCompletionBlock)completion {
     // Hash Header for corruption check
     
@@ -251,40 +247,72 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
         return;
     }
     
-    NSData *decrypted = [cipher decrypt:dataIn iv:decryptionParameters.encryptionIv key:masterKey];
-    if(decrypted == nil) {
-        NSError *error = [Utils createNSError:@"Could not decrypt using provided parameters" errorCode:-1];
-        completion(NO, nil, error);
-        return;
-    }
-
-    // Verify Start Stream - This checks the correct passphrase/keyfile has been used (or we've done something very wrong in the decryption process :/)
-    
-    NSData *actualStartStream = [decrypted subdataWithRange:NSMakeRange(0, decryptionParameters.streamStartBytes.length)];
-    if(![decryptionParameters.streamStartBytes isEqualToData:actualStartStream]) {
-        NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
-        completion(NO, nil, error);
-        return;
-    }
-    
-    // Deblockify
-    
-    NSData* deblockified = deblockify((uint8_t*)&decrypted.bytes[decryptionParameters.streamStartBytes.length]);
-    
-    if(!deblockified) {
-        NSError *error = [Utils createNSError:@"Could not find next block in unordered blocks list. Cannot deblockify" errorCode:-6];
-        completion(NO, nil, error);
-        return;
-    }
-    
     BOOL compressed = decryptionParameters.compressionFlags == kGzipCompressionFlag;
+    NSInputStream* stream;
+    if (useLegacyDeserialization) {
+        NSData *decrypted = [cipher decrypt:dataIn iv:decryptionParameters.encryptionIv key:masterKey];
+        if(decrypted == nil) {
+            NSError *error = [Utils createNSError:@"Could not decrypt using provided parameters" errorCode:-1];
+            completion(NO, nil, error);
+            return;
+        }
+
+        // Verify Start Stream - This checks the correct passphrase/keyfile has been used (or we've done something very wrong in the decryption process :/)
+        
+        NSData *actualStartStream = [decrypted subdataWithRange:NSMakeRange(0, decryptionParameters.streamStartBytes.length)];
+        if(![decryptionParameters.streamStartBytes isEqualToData:actualStartStream]) {
+            NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
+            completion(NO, nil, error);
+            return;
+        }
+        
+        // Deblockify
+        
+        NSData* deblockified = deblockify((uint8_t*)&decrypted.bytes[decryptionParameters.streamStartBytes.length]);
+        
+        if(!deblockified) {
+            NSError *error = [Utils createNSError:@"Could not find next block in unordered blocks list. Cannot deblockify" errorCode:-6];
+            completion(NO, nil, error);
+            return;
+        }
+        
+        stream = compressed ? [[GZipInputStream alloc] initWithData:deblockified] : [NSInputStream inputStreamWithData:deblockified];
+    }
+    else {
+        NSInputStream *cipherTextStream = [NSInputStream inputStreamWithData:dataIn];
+        NSInputStream *plaintextStream = [cipher getDecryptionStreamForStream:cipherTextStream key:masterKey iv:decryptionParameters.encryptionIv];
+        
+        uint8_t *start = malloc(decryptionParameters.streamStartBytes.length);
+        
+        [plaintextStream open];
+        NSInteger bytesReadFromStartStream = [plaintextStream read:start maxLength:decryptionParameters.streamStartBytes.length];
+        
+        if(bytesReadFromStartStream != decryptionParameters.streamStartBytes.length ||
+           memcmp(start, decryptionParameters.streamStartBytes.bytes, decryptionParameters.streamStartBytes.length) != 0) {
+            free(start);
+            NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
+            completion(NO, nil, error);
+            return;
+        }
+        free(start);
+        
+        NSInputStream* deblockifiedStream = [[KP31HashedBlockStream alloc] initWithStream:plaintextStream];
+        [deblockifiedStream open];
+        
+        stream = compressed ? [[GZipInputStream alloc] initWithStream:deblockifiedStream] : deblockifiedStream;
+    }
+        
+    [stream open];
+    
     NSError* error;
     RootXmlDomainObject *rootXmlObject = [KdbxSerialization readXml:compressed
-                                                             source:deblockified
+                                                             stream:stream
                                                 innerRandomStreamId:decryptionParameters.innerRandomStreamId
                                                  protectedStreamKey:decryptionParameters.protectedStreamKey
                                                               error:&error];
 
+    [stream close];
+    
     if(rootXmlObject == nil) {
         NSLog(@"Could not parse XML: [%@]", error);
         completion(NO, nil, error);
@@ -308,18 +336,12 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
 }
 
 + (RootXmlDomainObject*)readXml:(BOOL)compressed
-                         source:(NSData*)source
+                         stream:(NSInputStream*)stream
             innerRandomStreamId:(uint32_t)innerRandomStreamId
              protectedStreamKey:(NSData*)protectedStreamKey
                           error:(NSError**)error {
-    
-    NSInputStream* stream = compressed ? [[GZipInputStream alloc] initWithData:source] : [NSInputStream inputStreamWithData:source];
-    [stream open];
-    
     RootXmlDomainObject* rootXmlObject = parseXml(innerRandomStreamId, protectedStreamKey,
                                                 XmlProcessingContext.standardV3Context, stream, error);
-    
-    [stream close];
     
     return rootXmlObject;
 }

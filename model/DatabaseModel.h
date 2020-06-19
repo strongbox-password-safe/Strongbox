@@ -7,6 +7,9 @@
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "DatabaseAttachment.h"
 #import "UiAttachment.h"
+#import "DatabaseModelConfig.h"
+
+extern const NSUInteger kStreamingSerializationChunkSize;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,14 +23,36 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
 
-+ (void)fromData:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion;
++ (void)fromData:(NSData *)data
+             ckf:(CompositeKeyFactors *)ckf
+useLegacyDeserialization:(BOOL)useLegacyDeserialization
+      completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion;
+
++ (void)fromData:(NSData *)data
+             ckf:(CompositeKeyFactors *)ckf
+useLegacyDeserialization:(BOOL)useLegacyDeserialization
+          config:(DatabaseModelConfig*)config
+      completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion;
+
 - (void)getAsData:(SaveCompletionBlock)completion;
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (instancetype)initEmptyForTesting:(CompositeKeyFactors*)compositeKeyFactors;
-- (instancetype)initNew:(CompositeKeyFactors*)compositeKeyFactors format:(DatabaseFormat)format;
-- (instancetype)initWithDatabase:(StrongboxDatabase*)database adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor;
+
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
+
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+                        config:(DatabaseModelConfig*)config;
+
+- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
+                 format:(DatabaseFormat)format;
+
+- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
+                 format:(DatabaseFormat)format
+                 config:(DatabaseModelConfig*)config;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;

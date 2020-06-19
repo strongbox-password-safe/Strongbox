@@ -23,6 +23,8 @@ NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKe
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
 NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
 NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
+NSString* const kAppStoreSaleNotificationKey = @"appStoreSaleNotification";
+NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-id";
 
 @interface Model ()
 
@@ -69,6 +71,10 @@ NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotificatio
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)dealloc {
+    NSLog(@"Model DEALLOC...");
+}
 
 - (void)closeAndCleanup { // Called when user is done/finised with model... // TODO: Call on Exit Mac!
     NSLog(@"Model closeAndCleanup...");

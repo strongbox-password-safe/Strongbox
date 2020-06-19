@@ -3272,3 +3272,51 @@
 
 /* Unexclude */
 "audit_excluded_items_vc_action_unclude" = "Unexclude";
+
+/* Share Last Crash Diagnostics? */
+"crash_diagnostics_share_last_title" = "Share Crash Diagnostics?";
+
+/* It looks like Strongbox had a crash last time. Would you be so kind as to share the diagnostics with Strongbox Support?\n\nPlease mail to support@strongboxsafe.com */
+"crash_diagnostics_share_last_message" = "It looks like Strongbox had a crash last time. Would you be so kind as to share the diagnostics with Strongbox Support?\n\nPlease mail to support@strongboxsafe.com";
+
+/* Share */
+"crash_diagnostics_share_action" = "Share";
+
+/* Copy to Clipboard */
+"crash_diagnostics_copy_action" = "Copy to Clipboard";
+
+/* PIN */
+"pin_entry_default_text" = "PIN";
+
+/* No Attachments */
+"file_attachments_view_controller_empty_attachments_text" = "No Attachments";
+
+/* KeePass 1 */
+"database_format_keepass1" = "KeePass 1";
+
+/* KeePass 2 (Legacy) */
+"database_format_keepass2_kdbx3_1" = "KeePass 2 (Legacy)";
+
+/* KeePass 2 */
+"database_format_keepass2_kdbx4" = "KeePass 2";
+
+/* Password Safe 3 */
+"database_format_password_safe" = "Password Safe 3";
+
+/* ***************** (Translators Note: No need to translate here - this is just to remove XCode warnings about untranslated strings) */
+"generic_masked_protected_field_text" = "*****************";
+
+/* Diceware (XKCD) */
+"password_gen_vc_mode_diceware_xkcd_title" = "Diceware (XKCD)";
+
+/* Strongbox: Unknown Database */
+"autofill_error_unknown_db_title" = "Strongbox: Unknown Database";
+
+/* This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill. */
+"autofill_error_unknown_db_message" = "This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.";
+
+/* Strongbox: Error Locating Entry */
+"autofill_error_unknown_item_title" = "Strongbox: Error Locating Entry";
+
+/* Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill. */
+"autofill_error_unknown_item_message" = "Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.";

@@ -84,8 +84,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
-{
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
     NSString *text = @"No Custom Fields";
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
@@ -178,7 +177,7 @@
                                                     NSString* key = weakSelf.alertController.textFields[0].text;
                                                     NSString* value = weakSelf.alertController.textFields[1].text;
 
-                                                    if(![key isEqualToString:item.key]) {
+                                                    if([key compare:item.key] != NSOrderedSame) {
                                                         NSArray<NSString*>* existingKeys = [self.workingItems map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
                                                             return obj.key;
                                                         }];

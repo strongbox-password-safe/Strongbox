@@ -11,6 +11,8 @@
 #import "Settings.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "Utils.h"
+#import "git-version.h"
+#import "FileManager.h"
 
 @implementation DebugHelper
 
@@ -39,6 +41,12 @@
     NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
 
+    NSString* jsonCrash = @"{}";
+    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
+        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
+        jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
+    }
+    
     NSString* message = [NSString stringWithFormat:
                          @"%@\n"
                          @"Model: %@\n"
@@ -46,7 +54,8 @@
                          @"System Version: %@\n"
                          @"Ep: %ld\n"
                          @"Flags: %@%@%@\n"
-                         @"Bundle: %@ - (%@)",
+                         @"App Version: %@ [%@ (%@)@%@]\n"
+                         @"JSON Crash:\n%@",
                          safesMessage,
                          model,
                          systemName,
@@ -56,8 +65,11 @@
                          isFreeTrial,
                          [Settings.sharedInstance getFlagsStringForDiagnostics],
                          [Utils getAppBundleId],
-                         [Utils getAppVersion]];
-    
+                         [Utils getAppVersion],
+                         [Utils getAppBuildNumber],
+                         GIT_SHA_VERSION,
+                         jsonCrash];
+
     return message;
 }
 
@@ -86,6 +98,12 @@
     NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
 
+    NSString* jsonCrash = @"{}";
+    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
+        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
+        jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
+    }
+    
     NSString* message = [NSString stringWithFormat:@"I'm having some trouble with Strongbox... <br /><br />"
                          @"Please include as much detail as possible and screenshots if appropriate...<br /><br />"
                          @"Here is some debug information which might help:<br />"
@@ -94,8 +112,9 @@
                          @"System Name: %@<br />"
                          @"System Version: %@<br />"
                          @"Ep: %ld<br />"
-                         @"Bundle: %@ - (%@)<br />"
-                         @"Flags: %@%@%@",
+                         @"App Version: %@ [%@ (%@)@%@]<br />"
+                         @"Flags: %@%@%@<br />"
+                         @"JSON Crash:<br />%@",
                          safesMessage,
                          model,
                          systemName,
@@ -103,9 +122,12 @@
                          epoch,
                          [Utils getAppBundleId],
                          [Utils getAppVersion],
+                         [Utils getAppBuildNumber],
+                         GIT_SHA_VERSION,
                          pro,
                          isFreeTrial,
-                         [Settings.sharedInstance getFlagsStringForDiagnostics]];
+                         [Settings.sharedInstance getFlagsStringForDiagnostics],
+                         jsonCrash];
     
     return message;
 }

@@ -24,6 +24,7 @@
 
     [[[Kdbx4Database alloc] init] open:safeData
                                    ckf:[CompositeKeyFactors password:@"a"]
+              useLegacyDeserialization:NO
                             completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
         XCTAssertNotNil(db);

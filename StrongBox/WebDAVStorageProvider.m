@@ -237,7 +237,7 @@ viewController:(UIViewController *)viewController
             }
 
             files = [files filter:^BOOL(DAVResponseItem * _Nonnull obj) {
-                return obj.href && ![parentUrl.absoluteString isEqualToString:obj.href.absoluteString];
+                return obj.href && [parentUrl.absoluteString compare:obj.href.absoluteString] != NSOrderedSame;
             }];
             
             NSArray<StorageBrowserItem*>* browserItems = [files map:^id _Nonnull(DAVResponseItem * _Nonnull obj, NSUInteger idx) {

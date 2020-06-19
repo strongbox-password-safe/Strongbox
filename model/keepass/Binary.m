@@ -71,7 +71,7 @@
     
     Binary* other = (Binary*)object;
     
-    if (![self.filename isEqualToString:other.filename]) {
+    if ([self.filename compare:other.filename] != NSOrderedSame) {
         return NO;
     }
     if (self.index != other.index) {

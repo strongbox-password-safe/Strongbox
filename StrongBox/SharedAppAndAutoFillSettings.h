@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #ifndef IS_APP_EXTENSION
 
+@property BOOL useLegacyDeserialization;
 @property BOOL colorizeUseColorBlindPalette;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 @property (nonatomic) BOOL disallowAllPinCodeOpens;
@@ -49,7 +50,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSDate *freeTrialEnd;
 - (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
 
-
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL monitorInternetConnectivity;
 @property BOOL instantPinUnlocking;
@@ -64,6 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #else
 
+@property (readonly) BOOL useLegacyDeserialization;
 @property (readonly) BOOL colorizeUseColorBlindPalette;
 @property (readonly, nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 @property (readonly, nonatomic) BOOL disallowAllPinCodeOpens;

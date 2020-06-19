@@ -13,7 +13,7 @@
 @implementation RootXmlDomainObject
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
-    return self = [super initWithXmlElementName:@"Dummy" context:context];
+    return [super initWithXmlElementName:@"Dummy" context:context];
 }
 
 - (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context {

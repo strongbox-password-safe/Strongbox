@@ -11,6 +11,8 @@
 #import "DatabaseModel.h"
 #import "SharedAppAndAutoFillSettings.h"
 
+static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
+
 @interface FileManager ()
 
 @end
@@ -37,8 +39,12 @@
     return ret;
 }
 
+- (NSURL *)archivedCrashFile {
+    return [self.appSupportDirectory URLByAppendingPathComponent:@"last-crash.json"];
+}
+
 - (NSURL *)crashFile {
-    return [self.appSupportDirectory URLByAppendingPathComponent:@"last-unhandled-exception.log"];
+    return [self.documentsDirectory URLByAppendingPathComponent:@"crash.json"];
 }
 
 - (NSURL *)offlineCacheDirectory {
@@ -64,12 +70,7 @@
 }
 
 - (NSURL *)keyFilesDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
-    if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
-        return nil;
-    }
-    
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"key-files"];
     
     [self createIfNecessary:ret];
@@ -78,12 +79,7 @@
 }
 
 - (NSURL *)backupFilesDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
-    if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
-        return nil;
-    }
-    
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"backups"];
     
     [self createIfNecessary:ret];
@@ -92,12 +88,7 @@
 }
 
 - (NSURL *)preferencesDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
-    if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
-        return nil;
-    }
-
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"preferences"];
 
     [self createIfNecessary:ret];
@@ -127,10 +118,11 @@
 - (void)excludeDirectoriesFromBackup {
     [self excludeFromBackup:self.documentsDirectory];
     [self excludeFromBackup:self.offlineCacheDirectory];
-    [self excludeFromBackup:self.sharedAppGroupDirectory];
     [self excludeFromBackup:self.keyFilesDirectory];
     [self excludeFromBackup:self.autoFillCacheDirectory];
     [self excludeFromBackup:self.backupFilesDirectory];
+    [self excludeFromBackup:self.preferencesDirectory];
+    [self excludeFromBackup:self.sharedAppGroupDirectory];
 }
 
 - (void)excludeFromBackup:(NSURL*)URL {
@@ -147,27 +139,44 @@
 - (void)deleteAllLocalAndAppGroupFiles {
     [self deleteAllInDirectory:self.documentsDirectory];
     [self deleteAllInDirectory:self.offlineCacheDirectory];
-    [self deleteAllInDirectory:self.sharedAppGroupDirectory];
     [self deleteAllInDirectory:self.keyFilesDirectory];
     [self deleteAllInDirectory:self.autoFillCacheDirectory];
     [self deleteAllInDirectory:self.backupFilesDirectory];
+    [self deleteAllInDirectory:self.preferencesDirectory];
+    [self deleteAllInDirectory:self.sharedAppGroupDirectory recursive:NO]; // Remove any files but leave directories don't know about
 }
 
 - (void)deleteAllInDirectory:(NSURL*)url {
+    [self deleteAllInDirectory:url recursive:YES];
+}
+
+- (void)deleteAllInDirectory:(NSURL*)url recursive:(BOOL)recursive {
     NSLog(@"Deleting Files at [%@]", url);
     
     NSFileManager *fm = [NSFileManager defaultManager];
     
     NSString *directory = url.path;
     NSError *error = nil;
-    for (NSString *file in [fm contentsOfDirectoryAtPath:directory error:&error]) {
+    NSArray<NSString*> *files = [fm contentsOfDirectoryAtPath:directory error:&error];
+    
+    if (error) {
+        NSLog(@"Error reading contents of directory [%@]", error);
+        return;
+    }
+    
+    for (NSString *file in files) {
         NSString* path = [NSString pathWithComponents:@[directory, file]];
         
-        NSLog(@"Removing File: [%@]", path);
-        
-        BOOL success = [fm removeItemAtPath:path error:&error];
-        if (!success || error) {
-            NSLog(@"Failed to remove [%@]: [%@]", file, error);
+        BOOL isDirectory;
+        if ([NSFileManager.defaultManager fileExistsAtPath:path isDirectory:&isDirectory]) {
+            if (recursive || !isDirectory) {
+                NSLog(@"Removing File: [%@]", path);
+                
+                BOOL success = [fm removeItemAtPath:path error:&error];
+                if (!success || error) {
+                    NSLog(@"Failed to remove [%@]: [%@]", file, error);
+                }
+            }
         }
     }
 }
@@ -187,6 +196,28 @@
         BOOL success = [fm removeItemAtPath:path error:&error];
         if (!success || error) {
             NSLog(@"Failed to remove [%@]: [%@]", file, error);
+        }
+    }
+}
+
+- (NSString *)tmpEncryptedAttachmentPath {
+    NSString *ret =  [NSTemporaryDirectory() stringByAppendingPathComponent:kEncAttachmentDirectoryName];
+    NSError* error;
+    
+    if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
+        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+    }
+
+    return ret;
+}
+
+- (void)deleteAllTmpFiles {
+    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
+    
+    for (NSString *file in tmpDirectory) {
+        if (![file isEqualToString:kEncAttachmentDirectoryName]) {
+            NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
+            [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
         }
     }
 }

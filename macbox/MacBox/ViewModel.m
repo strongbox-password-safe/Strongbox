@@ -16,6 +16,7 @@
 #import "FavIconManager.h"
 #import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
+#import "NSString+Extensions.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -652,7 +653,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
  
     NodeFileAttachment* nodeAttachment = item.fields.attachments[atIndex];
     DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
-    UiAttachment* old = [[UiAttachment alloc] initWithFilename:nodeAttachment.filename data:dbAttachment.data];
+    UiAttachment* old = [[UiAttachment alloc] initWithFilename:nodeAttachment.filename dbAttachment:dbAttachment];
     NSDate* oldModified = item.fields.modified;
 
     if(self.document.undoManager.isUndoing) {
@@ -717,7 +718,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     for (NodeFileAttachment* nodeAttachment in item.fields.attachments) {
         if([nodeAttachment.filename isEqualToString:attachment.filename]) {
             DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
-            if([dbAttachment.data isEqualToData:attachment.data]) {
+            if([dbAttachment.digestHash isEqualToString:attachment.dbAttachment.digestHash]) {
                 foundIndex = i;
                 break;
             }
@@ -1215,7 +1216,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     if(clipboardText) {
         // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
         
-        NSURL *url = [NSURL URLWithString:clipboardText];
+        NSURL *url = clipboardText.urlExtendedParse;
         
         if (url && url.scheme && url.host)
         {
@@ -1231,7 +1232,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
     
     if(clipboardText) {
-        NSURL *url = [NSURL URLWithString:clipboardText];
+        NSURL *url = clipboardText.urlExtendedParse;
         if (url && url.scheme && url.host)
         {
             return clipboardText;

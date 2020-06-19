@@ -13,6 +13,7 @@
 #import "Alerts.h"
 #import "FavIconDownloadOptions.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "NSString+Extensions.h"
 
 typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     kFavIconBulkStatusInitial,
@@ -71,7 +72,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     
     vc.nodes = nodes;
     vc.onDone = onDone;
-    vc.singleNodeUrlOverride = urlOverride ? [NSURL URLWithString:urlOverride] : nil;
+    vc.singleNodeUrlOverride = urlOverride ? urlOverride.urlExtendedParse : nil;
     
     [presentingVc presentViewController:nav animated:YES completion:NULL];
 }
@@ -102,7 +103,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         self.validNodes = [[self.nodes filter:^BOOL(Node * _Nonnull obj) {
             return !obj.isGroup &&
             obj.fields.url.length != 0 &&
-            [NSURL URLWithString:obj.fields.url] != nil &&
+            obj.fields.url.urlExtendedParse != nil &&
             (overwriteExisting || obj.isUsingKeePassDefaultIcon);
         }] sortedArrayUsingComparator:finderStyleNodeComparator];
 
@@ -110,7 +111,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         NSMutableArray<NSURL*> *addedArray = [NSMutableArray arrayWithCapacity:self.nodes.count];
         
         for (Node* node in self.validNodes) {
-            NSURL* url = [NSURL URLWithString:node.fields.url];
+            NSURL* url = node.fields.url.urlExtendedParse;
             if(![added containsObject:url]) {
                 [added addObject:url];
                 [addedArray addObject:url];

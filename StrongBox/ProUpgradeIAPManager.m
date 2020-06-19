@@ -219,6 +219,14 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }];
 }
 
+- (void)checkForSaleAndNotify {
+    if (@available(iOS 11.2, *)) {
+        if(self.yearlyProduct.introductoryPrice) {
+            [NSNotificationCenter.defaultCenter postNotificationName:kAppStoreSaleNotificationKey object:nil];
+        }
+    }
+}
+
 - (NSDictionary<NSString *,SKProduct *> *)availableProducts {
     return self.readyState == kReady ? [self.products copy] : @{};
 }

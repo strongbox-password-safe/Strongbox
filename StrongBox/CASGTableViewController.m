@@ -406,19 +406,19 @@
 - (NSString*)getFormatTitle:(DatabaseFormat)format {
     switch (format) {
         case kKeePass1:
-            return @"KeePass 1";
+            return NSLocalizedString(@"database_format_keepass1", @"KeePass 1");
             break;
         case kKeePass:
-            return @"KeePass 2 (Legacy)";
+            return NSLocalizedString(@"database_format_keepass2_kdbx3_1", @"KeePass 2 (Legacy)");
             break;
         case kKeePass4:
-            return @"KeePass 2";
+            return NSLocalizedString(@"database_format_keepass2_kdbx4", @"KeePass 2");
             break;
         case kPasswordSafe:
-            return @"Password Safe 3";
+            return NSLocalizedString(@"database_format_password_safe", @"Password Safe 3");
             break;
         default:
-            return @"Unknown!";
+            return NSLocalizedString(@"generic_unknown", @"Unknown");
             break;
     }
 }
@@ -438,7 +438,7 @@
             return NSLocalizedString(@"casg_database_format_information_pwsafe", @"PSAFE3 version 3.x, TwoFish, SHA256");
             break;
         default:
-            return @"Unknown!";
+            return NSLocalizedString(@"generic_unknown", @"Unknown");
             break;
     }
 }
@@ -592,7 +592,7 @@
 }
 
 - (BOOL)canSet {
-    return [self.textFieldPassword.text isEqualToString:self.textFieldConfirmPassword.text] && [self credentialsValidForDatabaseFormat];
+    return ([self.textFieldPassword.text compare:self.textFieldConfirmPassword.text] == NSOrderedSame) && [self credentialsValidForDatabaseFormat];
 }
 
 - (BOOL)canCreate {

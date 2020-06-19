@@ -70,7 +70,9 @@ NSString *const CustomFieldCellHeightChanged = @"CustomFieldCellHeightChangedNot
 - (void)showHide {
     if(self._hidden) {
         [self.buttonShowHide setImage:[UIImage imageNamed:@"show"] forState:UIControlStateNormal];
-        self.valueLabel.text = @"*****************";
+        
+        self.valueLabel.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
+        
         self.valueLabel.textColor = [UIColor lightGrayColor];
     }
     else {

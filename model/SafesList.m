@@ -10,6 +10,7 @@
 #import "IOsUtils.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "FileManager.h"
+#import "NSArray+Extensions.h"
 
 @interface SafesList()
 
@@ -45,6 +46,10 @@ NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChan
     }
     
     return self;
+}
+
+- (void)forceReload {
+    self.databasesList = [self deserialize];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,21 +127,28 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
         
         NSError* error;
-        NSData* json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&error];
+        __block NSError* readError;
+        __block NSData* json = nil;
+        NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        [fileCoordinator coordinateReadingItemAtURL:fileUrl
+                                            options:kNilOptions
+                                              error:&error
+                                         byAccessor:^(NSURL * _Nonnull newURL) {
+            json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
+        }];
         
-        if (error) {
-            NSLog(@"Error reading file for databases: [%@]", error);
-            return nil;
+        if (!json || error || readError) {
+            NSLog(@"Error reading file for databases: [%@] - [%@]", error, readError);
+            return @[].mutableCopy;
         }
 
         NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
 
         if (error) {
             NSLog(@"Error getting json dictionaries for databases: [%@]", error);
-            return nil;
+            return @[].mutableCopy;
         }
 
-        
         NSMutableArray<SafeMetaData*> *ret = NSMutableArray.array;
         for (NSDictionary* jsonDatabase in jsonDatabases) {
             SafeMetaData* database = [SafeMetaData fromJsonSerializationDictionary:jsonDatabase];
@@ -172,12 +184,21 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     }
 
     NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
-    
-    BOOL success = [json writeToURL:fileUrl options:NSDataWritingAtomic error:&error];
-    if (!success) {
-        NSLog(@"Error writing Databases file: [%@]", error);
+
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+    __block NSError *writeError = nil;
+    __block BOOL success = NO;
+    [fileCoordinator coordinateWritingItemAtURL:fileUrl
+                                        options:0
+                                          error:&error
+                                     byAccessor:^(NSURL *newURL) {
+        success = [json writeToURL:newURL options:NSDataWritingAtomic error:&writeError];
+    }];
+
+    if (!success || error || writeError) {
+        NSLog(@"Error writing Databases file: [%@]-[%@]", error, writeError);
         return;
-   }
+    }
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
@@ -218,18 +239,24 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 
 - (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSArray* duplicates = [self.databasesList filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-            SafeMetaData* item = (SafeMetaData*)evaluatedObject;
-            return (item.storageProvider == safe.storageProvider &&
-                    [item.fileName isEqualToString:safe.fileName] &&
-                    [item.fileIdentifier isEqualToString:safe.fileIdentifier]);
-        }]];
-        
-        NSLog(@"Found %lu duplicates...", (unsigned long)duplicates.count);
-        
-        if([duplicates count] == 0) {
-            [self.databasesList addObject:safe];
+        BOOL duplicated = [self.databasesList anyMatch:^BOOL(SafeMetaData * _Nonnull obj) {
+            BOOL storage = obj.storageProvider == safe.storageProvider;
             
+            NSString* name1 = obj.fileName;
+            NSString* name2 = safe.fileName;
+            BOOL names = [name1 compare:name2] == NSOrderedSame; // Do not use isEqualToString - doesn't work with Umlauts!
+
+            NSString* id1 = obj.fileIdentifier;
+            NSString* id2 = safe.fileIdentifier;
+            BOOL ids = [id1 compare:id2] == NSOrderedSame;  // Do not use isEqualToString - doesn't work with Umlauts!
+
+            return storage && names && ids;
+        }];
+
+        NSLog(@"Found duplicate... Not Adding");
+        
+        if(!duplicated) {
+            [self.databasesList addObject:safe];
             [self serialize];
         }
     });
@@ -332,7 +359,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     
     NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
     
-    return [sanitized isEqualToString:nickName] && nickName.length > 0 && ![nicknamesLowerCase containsObject:nickName.lowercaseString];
+    return ([sanitized compare:nickName] == NSOrderedSame) && nickName.length > 0 && ![nicknamesLowerCase containsObject:nickName.lowercaseString];
 }
 
 - (NSArray<SafeMetaData*>*)getSafesOfProvider:(StorageProvider)storageProvider {

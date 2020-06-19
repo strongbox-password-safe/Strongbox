@@ -27,6 +27,7 @@
 #import "GoogleDriveManager.h"
 #import "iCloudSafesCoordinator.h"
 #import "SecretStore.h"
+#import "Alerts.h"
 
 @interface AppDelegate ()
 
@@ -37,6 +38,8 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [self installTopLevelExceptionHandlers];
+    
     [self initializeDropbox];
 
     [self performEarlyBasicICloudInitialization];
@@ -173,6 +176,46 @@
 
 - (void)initializeDropbox {
     [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
+}
+
+void uncaughtExceptionHandler(NSException *exception) {
+    NSDictionary* jsonDict = @{
+        @"name" : exception.name != nil ? exception.name : NSNull.null,
+        @"reason" : exception.reason != nil ? exception.reason : NSNull.null,
+        @"userInfo" : exception.userInfo != nil ? exception.userInfo : NSNull.null,
+        @"callStackSymbols" : exception.callStackSymbols != nil ? exception.callStackSymbols : NSNull.null,
+        @"callStackReturnAddresses" :  exception.callStackReturnAddresses != nil ? exception.callStackReturnAddresses : NSNull.null
+    };
+                
+    //        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
+    //        NSDictionary* jsonDict = [NSJSONSerialization JSONObjectWithData:crashFileData options:kNilOptions error:nil];
+    //        NSString* reason = jsonDict[@"reason"];
+    //        NSString* name = jsonDict[@"name"];
+    //        NSDictionary* userInfo = jsonDict[@"userInfo"];
+    //        NSArray* callStackReturnAddresses = jsonDict[@"callStackReturnAddresses"];
+    //        NSArray* callStackSymbols = jsonDict[@"callStackSymbols"];
+
+    NSData* json = [NSJSONSerialization dataWithJSONObject:jsonDict options:NSJSONWritingPrettyPrinted error:nil];
+    if (json) {
+        [json writeToURL:FileManager.sharedInstance.crashFile options:kNilOptions error:nil];
+    }
+}
+
+- (void)installTopLevelExceptionHandlers {
+    NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
+    
+    // MMcG: Sample code to cause a crash (based on a true story)... :/
+    //
+    //    NSURL* url = [NSURL URLWithString:@"https://www.strongboxsafe.com"];
+    //    [NSJSONSerialization dataWithJSONObject:@{ @"url" : url } options:NSJSONWritingPrettyPrinted error:nil];
+
+    // FUTURE?
+//    signal(SIGABRT, SignalHandler);
+//    signal(SIGILL, SignalHandler);
+//    signal(SIGSEGV, SignalHandler);
+//    signal(SIGFPE, SignalHandler);
+//    signal(SIGBUS, SignalHandler);
+//    signal(SIGPIPE, SignalHandler);
 }
 
 @end

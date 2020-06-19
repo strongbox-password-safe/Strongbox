@@ -112,14 +112,14 @@
     UITextField *name = _alertController.textFields[0];
     UITextField *password = _alertController.textFields[1];
 
-    (self.defaultAction).enabled = ([name.text isEqualToString:password.text]);
+    (self.defaultAction).enabled = ([name.text compare:password.text] == NSOrderedSame);
 }
 
 - (void)validatePasswordAndConfirmPasswordNotEmpty:(UITextField *)sender {
     UITextField *name = _alertController.textFields[0];
     UITextField *password = _alertController.textFields[1];
     
-    (self.defaultAction).enabled = name.text.length && ([name.text isEqualToString:password.text]);
+    (self.defaultAction).enabled = name.text.length && ([name.text compare:password.text] == NSOrderedSame);
 }
 
 + (void)okCancel:(UIViewController *)viewController

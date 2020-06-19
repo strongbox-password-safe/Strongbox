@@ -94,8 +94,7 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToExportOptions"]) {
-        UINavigationController* nav = segue.destinationViewController;
-        ExportOptionsTableViewController* vc = (ExportOptionsTableViewController*)nav.topViewController;
+        ExportOptionsTableViewController* vc = (ExportOptionsTableViewController*)segue.destinationViewController;
         vc.viewModel = self.viewModel;
     }
     else if([segue.identifier isEqualToString:@"segueToSetCredentials"]) {

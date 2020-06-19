@@ -22,7 +22,8 @@
 }
 
 - (BOOL)isDifferentFrom:(CustomFieldViewModel *)other {
-    return !([self.key isEqualToString:other.key] && [self.value isEqualToString:other.value] && self.protected == other.protected);
+    return !([self.key compare:other.key] == NSOrderedSame &&
+             [self.value compare:other.value] == NSOrderedSame && self.protected == other.protected);
 }
 
 - (NSString *)description

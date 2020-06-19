@@ -11,8 +11,8 @@
 #import "Entry.h"
 #import "NSArray+Extensions.h"
 #import "PasswordMaker.h"
-#import "Settings.h"
 #import "Alerts.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface CustomFieldEditorViewController () <UITextFieldDelegate, UITextViewDelegate>
 
@@ -113,7 +113,7 @@ const static NSSet<NSString*> *keePassReservedNames;
     
     if(keyIsValid) {
         if(self.customField) { // Existing Custom Field
-            if(![candidate isEqualToString:self.customField.key]) { // Custom Field and they've changed the key
+            if([candidate compare:self.customField.key] != NSOrderedSame) { // Custom Field and they've changed the key
                 NSMutableSet<NSString*> *otherKeys = [self.customFieldsKeySet mutableCopy];
                 [otherKeys removeObject:self.customField.key];
                 
@@ -228,6 +228,7 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 - (IBAction)onGenerate:(id)sender {
     [PasswordMaker.sharedInstance promptWithSuggestions:self
+                                                 config:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
                                                  action:^(NSString * _Nonnull response) {
         self.textView.text = response;
     }];

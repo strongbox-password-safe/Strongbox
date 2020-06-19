@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSNumber* iconId;
 @property (nullable) NSUUID* customIconUuid;
 @property (nonatomic, strong, readonly, nonnull) NodeFields *fields;
-@property (nonatomic, strong, readonly, nullable) Node* parent;
+@property (nonatomic, weak, readonly, nullable) Node* parent;
 
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* children;
 @property (nonatomic, strong, readonly, nonnull) NSArray<Node*>* childGroups;

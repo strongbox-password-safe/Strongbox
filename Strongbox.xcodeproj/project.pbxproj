@@ -1480,6 +1480,10 @@
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
+		C80E02ED249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
+		C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
+		C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
+		C80E02F0249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C86E907A246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
 		C86E907B246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
 		C86E907C246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
@@ -1525,12 +1529,53 @@
 		C89348C0248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
 		C89348C1248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
 		C89348C2248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
+		C89BA19D2494F0A800CC8579 /* KdbxStreamingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C89BA19C2494F0A800CC8579 /* KdbxStreamingTests.m */; };
+		C8A22048249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
+		C8A22049249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
+		C8A2204A249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
+		C8A2204B249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
 		C8A8DBAA2484F024009C673F /* AuditDrillDownController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A8DBA92484F024009C673F /* AuditDrillDownController.m */; };
 		C8A8DBAB2484F024009C673F /* AuditDrillDownController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A8DBA92484F024009C673F /* AuditDrillDownController.m */; };
 		C8A8DBAE2484F66E009C673F /* UpgradeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDEA21C241918A8002EEA02 /* UpgradeViewController.m */; };
 		C8A8DBAF2484F68F009C673F /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
 		C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
 		C8A8DBB12484F68F009C673F /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
+		C8B1CE73249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE64249BCD160024E38E /* MMWormholeSessionMessageTransiting.m */; };
+		C8B1CE74249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE64249BCD160024E38E /* MMWormholeSessionMessageTransiting.m */; };
+		C8B1CE75249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE64249BCD160024E38E /* MMWormholeSessionMessageTransiting.m */; };
+		C8B1CE76249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE64249BCD160024E38E /* MMWormholeSessionMessageTransiting.m */; };
+		C8B1CE77249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE65249BCD160024E38E /* MMWormholeFileTransiting.m */; };
+		C8B1CE78249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE65249BCD160024E38E /* MMWormholeFileTransiting.m */; };
+		C8B1CE79249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE65249BCD160024E38E /* MMWormholeFileTransiting.m */; };
+		C8B1CE7A249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE65249BCD160024E38E /* MMWormholeFileTransiting.m */; };
+		C8B1CE7B249BCD170024E38E /* MMWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE67249BCD160024E38E /* MMWormhole.m */; };
+		C8B1CE7C249BCD170024E38E /* MMWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE67249BCD160024E38E /* MMWormhole.m */; };
+		C8B1CE7D249BCD170024E38E /* MMWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE67249BCD160024E38E /* MMWormhole.m */; };
+		C8B1CE7E249BCD170024E38E /* MMWormhole.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE67249BCD160024E38E /* MMWormhole.m */; };
+		C8B1CE7F249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE68249BCD160024E38E /* MMWormholeSessionFileTransiting.m */; };
+		C8B1CE80249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE68249BCD160024E38E /* MMWormholeSessionFileTransiting.m */; };
+		C8B1CE81249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE68249BCD160024E38E /* MMWormholeSessionFileTransiting.m */; };
+		C8B1CE82249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE68249BCD160024E38E /* MMWormholeSessionFileTransiting.m */; };
+		C8B1CE83249BCD170024E38E /* MMWormholeSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE69249BCD160024E38E /* MMWormholeSession.m */; };
+		C8B1CE84249BCD170024E38E /* MMWormholeSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE69249BCD160024E38E /* MMWormholeSession.m */; };
+		C8B1CE85249BCD170024E38E /* MMWormholeSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE69249BCD160024E38E /* MMWormholeSession.m */; };
+		C8B1CE86249BCD170024E38E /* MMWormholeSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE69249BCD160024E38E /* MMWormholeSession.m */; };
+		C8B1CE87249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE6F249BCD170024E38E /* MMWormholeSessionContextTransiting.m */; };
+		C8B1CE88249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE6F249BCD170024E38E /* MMWormholeSessionContextTransiting.m */; };
+		C8B1CE89249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE6F249BCD170024E38E /* MMWormholeSessionContextTransiting.m */; };
+		C8B1CE8A249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE6F249BCD170024E38E /* MMWormholeSessionContextTransiting.m */; };
+		C8B1CE8B249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE70249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m */; };
+		C8B1CE8C249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE70249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m */; };
+		C8B1CE8D249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE70249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m */; };
+		C8B1CE8E249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B1CE70249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m */; };
+		C8B2C6E12493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
+		C8B2C6E22493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
+		C8B2C6E32493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
+		C8B2C6E42493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
+		C8B2C6E72493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
+		C8B2C6E82493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
+		C8B2C6E92493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
+		C8B2C6EA2493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
 		C8BEF17324600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17424600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17524600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
@@ -1543,6 +1588,10 @@
 		C8BFECBF2478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
 		C8BFECC02478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
 		C8BFECC12478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
+		C8DC76472497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
+		C8DC76482497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
+		C8DC76492497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
+		C8DC764A2497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EA246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EB246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
@@ -1555,10 +1604,16 @@
 		C8E6D4F4246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
 		C8E6D4F5246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
 		C8E6D4F6246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */; };
+		C8E8B958249100920008A7B7 /* DatabaseAttachmentTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E8B957249100920008A7B7 /* DatabaseAttachmentTests.m */; };
 		C8E9DA9E245DAD4C0093F97C /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */; };
 		C8E9DA9F245DAD4C0093F97C /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */; };
 		C8E9DAA0245DAD4C0093F97C /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */; };
 		C8E9DAA1245DAD4C0093F97C /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */; };
+		C8ED5DDC248E6BF600B84EBD /* KDBX4StreamingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ED5DDB248E6BF600B84EBD /* KDBX4StreamingTests.m */; };
+		C8ED5DDF248E6C6400B84EBD /* HmacBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ED5DDE248E6C6400B84EBD /* HmacBlockStream.m */; };
+		C8ED5DE0248E6C6400B84EBD /* HmacBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ED5DDE248E6C6400B84EBD /* HmacBlockStream.m */; };
+		C8ED5DE1248E6C6400B84EBD /* HmacBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ED5DDE248E6C6400B84EBD /* HmacBlockStream.m */; };
+		C8ED5DE2248E6C6400B84EBD /* HmacBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ED5DDE248E6C6400B84EBD /* HmacBlockStream.m */; };
 		C8EE24912486B0CE00D41935 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8855FD724857D24001EE933 /* AuditDrillDown.storyboard */; };
 		C8EE24922486B0CE00D41935 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8855FD724857D24001EE933 /* AuditDrillDown.storyboard */; };
 		C8F92293248A813B000F8292 /* CyrillicUrlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F92292248A813B000F8292 /* CyrillicUrlTests.m */; };
@@ -2934,6 +2989,8 @@
 		C803E1C92464977B001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C803E1CA2464977C001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C803E1CB2464977C001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/RMStore.strings; sourceTree = "<group>"; };
+		C80E02EB249372D5005A4129 /* ChaCha20ReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ChaCha20ReadStream.h; path = model/ChaCha20ReadStream.h; sourceTree = "<group>"; };
+		C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ChaCha20ReadStream.m; path = model/ChaCha20ReadStream.m; sourceTree = "<group>"; };
 		C84333372461663200E2E550 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C84333382461663200E2E550 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
 		C84333392461664B00E2E550 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
@@ -2975,23 +3032,52 @@
 		C8961908246166F1008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C8961909246166F7008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C896190A246166F7008D4BD1 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
+		C89BA19C2494F0A800CC8579 /* KdbxStreamingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxStreamingTests.m; path = StrongboxTests/KdbxStreamingTests.m; sourceTree = "<group>"; };
 		C89F6B82247FC5A20070E754 /* changelog-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-ios.txt"; path = "build/changelog-ios.txt"; sourceTree = "<group>"; };
 		C89F6B83247FC5A30070E754 /* changelog-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-mac.txt"; path = "build/changelog-mac.txt"; sourceTree = "<group>"; };
 		C89F6B84247FC5A30070E754 /* version-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-mac.txt"; path = "build/version-mac.txt"; sourceTree = "<group>"; };
 		C89F6B85247FC5A30070E754 /* version-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-ios.txt"; path = "build/version-ios.txt"; sourceTree = "<group>"; };
+		C8A22046249158AD0025B8B0 /* AesInputStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AesInputStream.h; path = model/AesInputStream.h; sourceTree = "<group>"; };
+		C8A22047249158AD0025B8B0 /* AesInputStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesInputStream.m; path = model/AesInputStream.m; sourceTree = "<group>"; };
 		C8A8DBA82484F024009C673F /* AuditDrillDownController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AuditDrillDownController.h; path = StrongBox/AuditDrillDownController.h; sourceTree = "<group>"; };
 		C8A8DBA92484F024009C673F /* AuditDrillDownController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AuditDrillDownController.m; path = StrongBox/AuditDrillDownController.m; sourceTree = "<group>"; };
+		C8B1CE64249BCD160024E38E /* MMWormholeSessionMessageTransiting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMWormholeSessionMessageTransiting.m; path = lib/MMWormhole/MMWormholeSessionMessageTransiting.m; sourceTree = "<group>"; };
+		C8B1CE65249BCD160024E38E /* MMWormholeFileTransiting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMWormholeFileTransiting.m; path = lib/MMWormhole/MMWormholeFileTransiting.m; sourceTree = "<group>"; };
+		C8B1CE66249BCD160024E38E /* MMWormholeTransiting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormholeTransiting.h; path = lib/MMWormhole/MMWormholeTransiting.h; sourceTree = "<group>"; };
+		C8B1CE67249BCD160024E38E /* MMWormhole.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMWormhole.m; path = lib/MMWormhole/MMWormhole.m; sourceTree = "<group>"; };
+		C8B1CE68249BCD160024E38E /* MMWormholeSessionFileTransiting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMWormholeSessionFileTransiting.m; path = lib/MMWormhole/MMWormholeSessionFileTransiting.m; sourceTree = "<group>"; };
+		C8B1CE69249BCD160024E38E /* MMWormholeSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMWormholeSession.m; path = lib/MMWormhole/MMWormholeSession.m; sourceTree = "<group>"; };
+		C8B1CE6A249BCD160024E38E /* MMWormholeSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormholeSession.h; path = lib/MMWormhole/MMWormholeSession.h; sourceTree = "<group>"; };
+		C8B1CE6B249BCD170024E38E /* MMWormholeSessionFileTransiting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormholeSessionFileTransiting.h; path = lib/MMWormhole/MMWormholeSessionFileTransiting.h; sourceTree = "<group>"; };
+		C8B1CE6C249BCD170024E38E /* MMWormholeSessionMessageTransiting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormholeSessionMessageTransiting.h; path = lib/MMWormhole/MMWormholeSessionMessageTransiting.h; sourceTree = "<group>"; };
+		C8B1CE6D249BCD170024E38E /* MMWormholeSessionContextTransiting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormholeSessionContextTransiting.h; path = lib/MMWormhole/MMWormholeSessionContextTransiting.h; sourceTree = "<group>"; };
+		C8B1CE6E249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormholeCoordinatedFileTransiting.h; path = lib/MMWormhole/MMWormholeCoordinatedFileTransiting.h; sourceTree = "<group>"; };
+		C8B1CE6F249BCD170024E38E /* MMWormholeSessionContextTransiting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMWormholeSessionContextTransiting.m; path = lib/MMWormhole/MMWormholeSessionContextTransiting.m; sourceTree = "<group>"; };
+		C8B1CE70249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMWormholeCoordinatedFileTransiting.m; path = lib/MMWormhole/MMWormholeCoordinatedFileTransiting.m; sourceTree = "<group>"; };
+		C8B1CE71249BCD170024E38E /* MMWormhole.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormhole.h; path = lib/MMWormhole/MMWormhole.h; sourceTree = "<group>"; };
+		C8B1CE72249BCD170024E38E /* MMWormholeFileTransiting.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMWormholeFileTransiting.h; path = lib/MMWormhole/MMWormholeFileTransiting.h; sourceTree = "<group>"; };
+		C8B2C6DF2493882300F6EA12 /* TwoFishReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TwoFishReadStream.h; path = model/TwoFishReadStream.h; sourceTree = "<group>"; };
+		C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TwoFishReadStream.m; path = model/TwoFishReadStream.m; sourceTree = "<group>"; };
+		C8B2C6E52493A4BA00F6EA12 /* KP31HashedBlockStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KP31HashedBlockStream.h; path = model/KP31HashedBlockStream.h; sourceTree = "<group>"; };
+		C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KP31HashedBlockStream.m; path = model/KP31HashedBlockStream.m; sourceTree = "<group>"; };
 		C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "norwegian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8BF76E62472E1820080A808 /* DeletedObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedObjects.h; path = model/DeletedObjects.h; sourceTree = "<group>"; };
 		C8BF76E72472E1820080A808 /* DeletedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedObjects.m; path = model/DeletedObjects.m; sourceTree = "<group>"; };
 		C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeHierarchyReconstructionData.m; path = model/NodeHierarchyReconstructionData.m; sourceTree = "<group>"; };
 		C8BFECBD2478206C0051D21E /* NodeHierarchyReconstructionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeHierarchyReconstructionData.h; path = model/NodeHierarchyReconstructionData.h; sourceTree = "<group>"; };
+		C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModelConfig.m; path = model/DatabaseModelConfig.m; sourceTree = "<group>"; };
+		C8DC76462497B59500C9C443 /* DatabaseModelConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModelConfig.h; path = model/DatabaseModelConfig.h; sourceTree = "<group>"; };
+		C8DEE079249A62AB00CF2AFE /* git-version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "git-version.h"; path = "build/git-version.h"; sourceTree = "<group>"; };
 		C8E6D4E7246D43EA00AFFE13 /* WordList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = model/WordList.h; sourceTree = "<group>"; };
 		C8E6D4E8246D43EA00AFFE13 /* WordList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = model/WordList.m; sourceTree = "<group>"; };
 		C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8E6D4EE246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "finnish-diceware.wordlist.utf8.txt"; path = "resources/wordlists/finnish-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
+		C8E8B957249100920008A7B7 /* DatabaseAttachmentTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseAttachmentTests.m; path = model/DatabaseAttachmentTests.m; sourceTree = "<group>"; };
 		C8E9DA9C245DAD4C0093F97C /* UrlRequestOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = UrlRequestOperation.h; path = StrongBox/UrlRequestOperation.h; sourceTree = "<group>"; };
 		C8E9DA9D245DAD4C0093F97C /* UrlRequestOperation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UrlRequestOperation.m; path = StrongBox/UrlRequestOperation.m; sourceTree = "<group>"; };
+		C8ED5DDB248E6BF600B84EBD /* KDBX4StreamingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KDBX4StreamingTests.m; path = model/KDBX4StreamingTests.m; sourceTree = "<group>"; };
+		C8ED5DDD248E6C6400B84EBD /* HmacBlockStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HmacBlockStream.h; sourceTree = "<group>"; };
+		C8ED5DDE248E6C6400B84EBD /* HmacBlockStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HmacBlockStream.m; sourceTree = "<group>"; };
 		C8F92292248A813B000F8292 /* CyrillicUrlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CyrillicUrlTests.m; path = StrongboxTests/CyrillicUrlTests.m; sourceTree = "<group>"; };
 		CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill_Family.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
@@ -3479,6 +3565,9 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C89BA19C2494F0A800CC8579 /* KdbxStreamingTests.m */,
+				C8E8B957249100920008A7B7 /* DatabaseAttachmentTests.m */,
+				C8ED5DDB248E6BF600B84EBD /* KDBX4StreamingTests.m */,
 				C8F92292248A813B000F8292 /* CyrillicUrlTests.m */,
 				C86E9084246D9D4C0029623A /* DeletesAndMovesTest.m */,
 				4D98344621775F3800731FFC /* test-files */,
@@ -3606,6 +3695,7 @@
 		4D326EA1223032C800DCD8C7 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				C8B1CE63249BCCF40024E38E /* MMWormhole */,
 				4D3E148A21832B5F00A41CA0 /* Argon2 */,
 				4D6B503F238BBA0600DF2F88 /* SVProgressHUD */,
 				4D24C764238B9BEC000F8461 /* Base32 */,
@@ -3849,9 +3939,9 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				4DED20C72168BF1800A5800A /* Home */,
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				C8A8DBA42484EF70009C673F /* Audit */,
-				4DED20C72168BF1800A5800A /* Home */,
 				4D0835DD2284769900CA7405 /* Browse */,
 				4DAE986A2270B39100A811C4 /* Item Details */,
 				4D333F1123EE0504009F487D /* Yubikey */,
@@ -3982,6 +4072,8 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C8DC76462497B59500C9C443 /* DatabaseModelConfig.h */,
+				C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */,
 				C88F813D245D994800B0B998 /* Database */,
 				4D2962AC223171BA0082897D /* misc */,
 				4D4D3FAB2409CA7C0056A7E2 /* Foo.swift */,
@@ -3991,7 +4083,6 @@
 				4D6BA68323CCB981008DCE8A /* SecretStore */,
 				C88F812A245D8C5E00B0B998 /* McGuill */,
 				C89BE52F245B253700A73688 /* Password Generation */,
-				4D326EA1223032C800DCD8C7 /* Libraries */,
 				4D9AFB212449D0CD00376240 /* Audit */,
 				4DD6E78E23E731AD00AC2A49 /* BookmarksHelper.h */,
 				4DD6E78D23E731AD00AC2A49 /* BookmarksHelper.m */,
@@ -4044,7 +4135,6 @@
 				4DF176F023293D1500255CD6 /* KeePassXmlParser.h */,
 				4DF176F123293D1500255CD6 /* KeePassXmlParser.m */,
 				4D0835C3228474A800CA7405 /* KeyDerivationCipher.h */,
-				4D9E08E321822F38007BA1E7 /* crypto */,
 				4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */,
 				4D8FBEEE21A9CA0F004797FA /* KdbxSerializationCommon.h */,
 				4D4766DA2178C82B00C4358F /* DecryptionParameters.h */,
@@ -4362,17 +4452,15 @@
 		4D9E08E321822F38007BA1E7 /* crypto */ = {
 			isa = PBXGroup;
 			children = (
+				C80E02F2249373E9005A4129 /* Inner Random Stream */,
+				C80E02F1249373A2005A4129 /* Streaming */,
 				4D3E14862183293200A41CA0 /* KeePassCiphers.h */,
 				4D3E14872183293200A41CA0 /* KeePassCiphers.m */,
 				4D5F5B6C218B33A700A0739A /* ChaCha20Cipher.h */,
 				4D5F5B6D218B33A700A0739A /* ChaCha20Cipher.m */,
-				4D9E09AB218251D0007BA1E7 /* Salsa20Stream.h */,
-				4D9E09AC218251D0007BA1E7 /* Salsa20Stream.m */,
 				4D3E14A42183365000A41CA0 /* Argon2KdfCipher.h */,
 				4D3E14A52183365000A41CA0 /* Argon2KdfCipher.m */,
 				4DB1B7C2218895B400CF1663 /* Cipher.h */,
-				4DB1B7D62188B22500CF1663 /* ChaCha20Stream.h */,
-				4DB1B7D72188B22500CF1663 /* ChaCha20Stream.m */,
 				4D3AC32121908D4A0010CFCD /* Keys.h */,
 				4D3AC32221908D4A0010CFCD /* Keys.m */,
 				4D4598CB2193048400792EF7 /* TwoFishCipher.h */,
@@ -4530,14 +4618,15 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D326EA1223032C800DCD8C7 /* Libraries */,
+				4D3652162184A34600A56519 /* AppDelegate.m */,
+				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
+				4D78AC231FB1E22C00A68A92 /* Model */,
+				4D62D6941C85F2B50051E13B /* UI */,
 				C84333362461662800E2E550 /* Build */,
 				C87A8CD5249513BC00356966 /* App Settings */,
 				4DF544FA2231627A00DDEECE /* apple.cer */,
 				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
-				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
-				4D3652162184A34600A56519 /* AppDelegate.m */,
-				4D62D6941C85F2B50051E13B /* UI */,
-				4D78AC231FB1E22C00A68A92 /* Model */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
 				4DA2A7DB219C31B0006689E6 /* LICENSE.md */,
 				4DC8DFF01EE19CE300F1F757 /* README.md */,
@@ -4838,9 +4927,38 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		C80E02F1249373A2005A4129 /* Streaming */ = {
+			isa = PBXGroup;
+			children = (
+				C8A22046249158AD0025B8B0 /* AesInputStream.h */,
+				C8A22047249158AD0025B8B0 /* AesInputStream.m */,
+				C80E02EB249372D5005A4129 /* ChaCha20ReadStream.h */,
+				C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */,
+				C8B2C6DF2493882300F6EA12 /* TwoFishReadStream.h */,
+				C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */,
+				C8B2C6E52493A4BA00F6EA12 /* KP31HashedBlockStream.h */,
+				C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */,
+				C8ED5DDD248E6C6400B84EBD /* HmacBlockStream.h */,
+				C8ED5DDE248E6C6400B84EBD /* HmacBlockStream.m */,
+			);
+			name = Streaming;
+			sourceTree = "<group>";
+		};
+		C80E02F2249373E9005A4129 /* Inner Random Stream */ = {
+			isa = PBXGroup;
+			children = (
+				4D9E09AB218251D0007BA1E7 /* Salsa20Stream.h */,
+				4D9E09AC218251D0007BA1E7 /* Salsa20Stream.m */,
+				4DB1B7D62188B22500CF1663 /* ChaCha20Stream.h */,
+				4DB1B7D72188B22500CF1663 /* ChaCha20Stream.m */,
+			);
+			name = "Inner Random Stream";
+			sourceTree = "<group>";
+		};
 		C84333362461662800E2E550 /* Build */ = {
 			isa = PBXGroup;
 			children = (
+				C8DEE079249A62AB00CF2AFE /* git-version.h */,
 				C89F6B82247FC5A20070E754 /* changelog-ios.txt */,
 				C89F6B83247FC5A30070E754 /* changelog-mac.txt */,
 				C89F6B85247FC5A30070E754 /* version-ios.txt */,
@@ -4926,6 +5044,7 @@
 		C88F813D245D994800B0B998 /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				4D9E08E321822F38007BA1E7 /* crypto */,
 				C88F813E245D99D200B0B998 /* Serialization Adaptors */,
 				C8BFECBD2478206C0051D21E /* NodeHierarchyReconstructionData.h */,
 				C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */,
@@ -5001,6 +5120,28 @@
 			name = Audit;
 			sourceTree = "<group>";
 		};
+		C8B1CE63249BCCF40024E38E /* MMWormhole */ = {
+			isa = PBXGroup;
+			children = (
+				C8B1CE71249BCD170024E38E /* MMWormhole.h */,
+				C8B1CE67249BCD160024E38E /* MMWormhole.m */,
+				C8B1CE6E249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.h */,
+				C8B1CE70249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m */,
+				C8B1CE72249BCD170024E38E /* MMWormholeFileTransiting.h */,
+				C8B1CE65249BCD160024E38E /* MMWormholeFileTransiting.m */,
+				C8B1CE6A249BCD160024E38E /* MMWormholeSession.h */,
+				C8B1CE69249BCD160024E38E /* MMWormholeSession.m */,
+				C8B1CE6D249BCD170024E38E /* MMWormholeSessionContextTransiting.h */,
+				C8B1CE6F249BCD170024E38E /* MMWormholeSessionContextTransiting.m */,
+				C8B1CE6B249BCD170024E38E /* MMWormholeSessionFileTransiting.h */,
+				C8B1CE68249BCD160024E38E /* MMWormholeSessionFileTransiting.m */,
+				C8B1CE6C249BCD170024E38E /* MMWormholeSessionMessageTransiting.h */,
+				C8B1CE64249BCD160024E38E /* MMWormholeSessionMessageTransiting.m */,
+				C8B1CE66249BCD160024E38E /* MMWormholeTransiting.h */,
+			);
+			name = MMWormhole;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -5026,6 +5167,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox-iOS" */;
 			buildPhases = (
+				C8DEE078249A61B000CF2AFE /* ShellScript */,
 				4CDD569918F9EF06E120E163 /* [CP] Check Pods Manifest.lock */,
 				4DBE5B2D1C8356C700C310BC /* Sources */,
 				4DBE5B2E1C8356C700C310BC /* Frameworks */,
@@ -5049,11 +5191,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DC4E16B23488BAA000743C4 /* Build configuration list for PBXNativeTarget "Strongbox-iOS-Family" */;
 			buildPhases = (
+				C8DEE07A249A63BD00CF2AFE /* ShellScript */,
 				F663CF914C5F47C63EEFAE33 /* [CP] Check Pods Manifest.lock */,
 				4DC4E01723488BAA000743C4 /* Sources */,
 				4DC4E11623488BAA000743C4 /* Frameworks */,
 				4DC4E12223488BAA000743C4 /* Resources */,
-				4DC4E16623488BAA000743C4 /* ShellScript */,
 				4DC4E16923488BAA000743C4 /* Embed Frameworks */,
 				4D058EEB2348A79C00F8B536 /* Embed App Extensions */,
 				27770DC6BEA7CCCC65222D78 /* [CP] Embed Pods Frameworks */,
@@ -5658,26 +5800,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		4DC4E16623488BAA000743C4 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"$(SRCROOT)/Carthage/Build/iOS/MSAL.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/MSGraphMSALAuthProvider.framework",
-				"$(SRCROOT)/Carthage/Build/iOS/MSGraphCoreSDK.framework",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n# /usr/local/bin/carthage copy-frameworks\n";
-		};
 		669D557B4789466E4BF62BB5 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -5784,6 +5906,40 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		C8DEE078249A61B000CF2AFE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "version=$(git rev-parse --verify HEAD | cut -c 1-7)\ncurdate=$(date +\"%d.%m.%y\")\n\nfilesource=\"//\\n//  GitVersion.h\\n//\\n//  Created by Mark McGuill on $curdate.\\n//\\n\\n#ifndef GitVersion_h\\n#define GitVersion_h\\n\\n#define GIT_SHA_VERSION @\\\"$version\\\"\\n\\n#endif\"\n\ncd ${SOURCE_ROOT}\necho \"$filesource\" > build/git-version.h\n\ntouch build/git-version.h\n";
+		};
+		C8DEE07A249A63BD00CF2AFE /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "version=$(git rev-parse --verify HEAD | cut -c 1-7)\ncurdate=$(date +\"%d.%m.%y\")\n\nfilesource=\"//\\n//  GitVersion.h\\n//\\n//  Created by Mark McGuill on $curdate.\\n//\\n\\n#ifndef GitVersion_h\\n#define GitVersion_h\\n\\n#define GIT_SHA_VERSION @\\\"$version\\\"\\n\\n#endif\"\n\ncd ${SOURCE_ROOT}\necho \"$filesource\" > build/git-version.h\n\ntouch build/git-version.h\n";
+		};
 		E82C278FED855BD63C77CDDD /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -5836,6 +5992,7 @@
 				4D8EA82622316B4300B47035 /* KdbxHistory.m in Sources */,
 				C86E9085246D9D4C0029623A /* DeletesAndMovesTest.m in Sources */,
 				C8F92293248A813B000F8292 /* CyrillicUrlTests.m in Sources */,
+				C89BA19D2494F0A800CC8579 /* KdbxStreamingTests.m in Sources */,
 				4DD41FBA2182FBFB00FDDBB5 /* Kdbx4DatabaseTests.m in Sources */,
 				4D1BF4FB23244150007DF0E6 /* ZlibStreamTests.m in Sources */,
 				4DD755F4232F093900758824 /* XmlComparisonElement.m in Sources */,
@@ -5861,7 +6018,9 @@
 				4DC8D9A621B6E444004F1812 /* KeyFileParsingTests.m in Sources */,
 				4D19679B217F22E90057DF06 /* PwSafeSerializationTests.m in Sources */,
 				4D1967AD217F7F4B0057DF06 /* KeePassDatabaseTests.m in Sources */,
+				C8E8B958249100920008A7B7 /* DatabaseAttachmentTests.m in Sources */,
 				4D4766FE2178CDCF00C4358F /* KeePassXmlParsingTests.m in Sources */,
+				C8ED5DDC248E6BF600B84EBD /* KDBX4StreamingTests.m in Sources */,
 				4D18F23322577FB100768E18 /* FieldReferenceTests.m in Sources */,
 				4D9AFB0E2449ACA500376240 /* DatabaseAuditorTests.m in Sources */,
 				4DC5CD4A231F007A0038FC9F /* MemoryPerformanceTests.m in Sources */,
@@ -5901,6 +6060,7 @@
 				4D160A99245333620097C730 /* AuditConfigurationVcTableViewController.m in Sources */,
 				4D0835B92284742000CA7405 /* MBAutoGrowingTextView.m in Sources */,
 				4D915D741EDC068D002615F6 /* PasswordHistoryViewController.m in Sources */,
+				C8B2C6E12493882300F6EA12 /* TwoFishReadStream.m in Sources */,
 				4D7228AB23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
 				4D3AC31F219072C90010CFCD /* VariantObject.m in Sources */,
 				4D87569C2222B46B00D6B8EA /* CustomNavigationItemTitleView.m in Sources */,
@@ -5948,10 +6108,12 @@
 				4D1F580D233E19EC00A01FB4 /* BackupsBrowserTableViewController.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlSerializer.m in Sources */,
 				4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */,
+				C8DC76472497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
 				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
 				4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
 				4D4D3FD62409CDAC0056A7E2 /* RootViewController.swift in Sources */,
+				C8B1CE77249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */,
 				4DDF7C9D225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				4D78AC311FB1E27700A68A92 /* Utils.m in Sources */,
 				4DBBDE3623EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
@@ -5964,6 +6126,7 @@
 				4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */,
 				4D6B5052238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
 				4D4D6B57222EF3E80056514E /* RMStore.m in Sources */,
+				C8A22048249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D7F5A3B236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DFD46D2240DC217001F1209 /* ColoredStringHelper.m in Sources */,
 				4D3E149521832C1500A41CA0 /* core.c in Sources */,
@@ -5986,6 +6149,7 @@
 				4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
+				C8B1CE7B249BCD170024E38E /* MMWormhole.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
 				4DE46659233D2BBD00398A65 /* BackupItem.m in Sources */,
 				4DB1B7D42188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
@@ -6002,6 +6166,7 @@
 				4D637C5A236187A800C273B3 /* BiometricsManager.m in Sources */,
 				4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */,
 				4D9E09AD218251D0007BA1E7 /* Salsa20Stream.m in Sources */,
+				C80E02ED249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC8D9AB21B6E8A9004F1812 /* KeyFileParser.m in Sources */,
 				4D3E14A62183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
 				4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */,
@@ -6019,6 +6184,7 @@
 				4D326E8522302BED00DCD8C7 /* NMSSHSession.m in Sources */,
 				4DB7D520229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m in Sources */,
 				4DCF5FBC1F7294A800011756 /* StrongboxUIDocument.m in Sources */,
+				C8B1CE8B249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */,
 				4D2E47AE233CFD8D00C1DE90 /* BackupsManager.m in Sources */,
 				4D08B5C9234C9613003D1953 /* GCDWebServerFileRequest.m in Sources */,
 				4DFF34C4238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
@@ -6059,6 +6225,7 @@
 				4DC66F39229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D9E09A9218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4D832A9523CE226800A7885E /* SecretStore.m in Sources */,
+				C8B1CE7F249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */,
 				4D4D3FDA2409CDC80056A7E2 /* NamedColors.swift in Sources */,
 				4D1F5809233E12BF00A01FB4 /* BackupsTableViewController.m in Sources */,
 				4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */,
@@ -6115,6 +6282,7 @@
 				4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
+				C8B2C6E72493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */,
 				4D5F5B93218B6C9D00A0739A /* NodeFileAttachment.m in Sources */,
 				4D9098EC239956BA0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */,
 				C89348BF248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */,
@@ -6123,6 +6291,7 @@
 				4D25673221E8B086006260B7 /* PinsConfigurationController.m in Sources */,
 				4D5F5B6E218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */,
+				C8B1CE73249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */,
 				4D004CDC21F4C26700E2B194 /* OTPToken+Persistence.m in Sources */,
 				4DD9D98A241D36BF00267D49 /* UpgradeAnswerViewController.m in Sources */,
 				4D18F2362257987E00768E18 /* SprCompilation.m in Sources */,
@@ -6148,6 +6317,7 @@
 				4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */,
 				4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */,
 				4DB1B7C82188972600CF1663 /* CryptoParameters.m in Sources */,
+				C8B1CE87249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */,
 				4DA12F06219837D10000CEBB /* CustomIcon.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
 				4DE0DA872351E7A500B4319F /* AboutViewController.m in Sources */,
@@ -6175,6 +6345,7 @@
 				4DD696A5218F0B170082DC08 /* AttachmentsRationalizer.m in Sources */,
 				4D08B5C1234C9613003D1953 /* GCDWebServerStreamedResponse.m in Sources */,
 				4DF97F2321BF101B0090A55E /* DAVRequestGroup.m in Sources */,
+				C8ED5DDF248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4D526AA624407C8F00B0B700 /* Constants.swift in Sources */,
 				4D08B5BF234C9613003D1953 /* GCDWebServerDataResponse.m in Sources */,
 				4D08B5BB234C9613003D1953 /* GCDWebServerErrorResponse.m in Sources */,
@@ -6200,6 +6371,7 @@
 				4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
 				4D6B504A238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
+				C8B1CE83249BCD170024E38E /* MMWormholeSession.m in Sources */,
 				4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D2962B3223173FC0082897D /* History.m in Sources */,
 				4D4598CD2193048400792EF7 /* TwoFishCipher.m in Sources */,
@@ -6229,6 +6401,7 @@
 				C87A8CDE24952CD600356966 /* AutoFillSettings.m in Sources */,
 				4D9AFB252449D66A00376240 /* NSString+Levenshtein.m in Sources */,
 				4DC4E02623488BAA000743C4 /* NSArray+Extensions.m in Sources */,
+				C8B1CE81249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */,
 				4D669545242E6810005A98D7 /* TagsViewTableViewCell.m in Sources */,
 				4DC4E02723488BAA000743C4 /* AppDelegate.m in Sources */,
 				4DC4E02823488BAA000743C4 /* DAVListingParser.m in Sources */,
@@ -6258,6 +6431,7 @@
 				4DC4E03A23488BAA000743C4 /* DatabaseOperations.m in Sources */,
 				4DC4E03B23488BAA000743C4 /* NMSSHLogger.m in Sources */,
 				4DC4E03C23488BAA000743C4 /* CustomFieldTableCell.m in Sources */,
+				C8ED5DE1248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4DC4E03D23488BAA000743C4 /* BrowseItemCell.m in Sources */,
 				4DC4E03E23488BAA000743C4 /* PwSafeDatabase.m in Sources */,
 				4DC4E03F23488BAA000743C4 /* RMAppReceipt.m in Sources */,
@@ -6300,6 +6474,7 @@
 				4DC4E05B23488BAA000743C4 /* KdbSerializationData.m in Sources */,
 				4DC4E05C23488BAA000743C4 /* CompositeKeyFactors.m in Sources */,
 				C86E907C246D99C80029623A /* DeletedObject.m in Sources */,
+				C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC4E05D23488BAA000743C4 /* KdbEntry.m in Sources */,
 				C88F812F245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */,
 				4DC4E05E23488BAA000743C4 /* DuressDummyStorageProvider.m in Sources */,
@@ -6318,6 +6493,7 @@
 				4DD6E79123E731AD00AC2A49 /* BookmarksHelper.m in Sources */,
 				4DC4E06423488BAA000743C4 /* OTPAlgorithm.m in Sources */,
 				4DC4E06523488BAA000743C4 /* SetIconModel.m in Sources */,
+				C8B1CE7D249BCD170024E38E /* MMWormhole.m in Sources */,
 				4DC4E06623488BAA000743C4 /* AddNewSafeHelper.m in Sources */,
 				4DC4E06723488BAA000743C4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4DC4E06823488BAA000743C4 /* Root.m in Sources */,
@@ -6373,6 +6549,7 @@
 				4DFF34C6238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DC4E08F23488BAA000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
 				4DC4E09023488BAA000743C4 /* GoogleDriveStorageProvider.m in Sources */,
+				C8B1CE85249BCD170024E38E /* MMWormholeSession.m in Sources */,
 				4DC4E09123488BAA000743C4 /* SFTPStorageProvider.m in Sources */,
 				4DC4E09223488BAA000743C4 /* NMSFTP.m in Sources */,
 				4DC4E09323488BAA000743C4 /* DropboxV2StorageProvider.m in Sources */,
@@ -6386,6 +6563,7 @@
 				4DC4E09923488BAA000743C4 /* StorageBrowserItem.m in Sources */,
 				4DC4E09A23488BAA000743C4 /* BrowsePreferencesTableViewController.m in Sources */,
 				4DC4E09B23488BAA000743C4 /* GZipInputStream.m in Sources */,
+				C8B2C6E32493882300F6EA12 /* TwoFishReadStream.m in Sources */,
 				4DC4E09C23488BAA000743C4 /* Keys.m in Sources */,
 				4DC4E09D23488BAA000743C4 /* AppleICloudProvider.m in Sources */,
 				4DC4E09E23488BAA000743C4 /* BaseXmlDomainObjectHandler.m in Sources */,
@@ -6469,6 +6647,7 @@
 				4D160A7D2452F2B80097C730 /* BrowseTableViewCellHelper.m in Sources */,
 				4DC4E0D923488BAA000743C4 /* Entry.m in Sources */,
 				4DC4E0DA23488BAA000743C4 /* OTPToken+Persistence.m in Sources */,
+				C8B1CE79249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */,
 				4DC4E0DB23488BAA000743C4 /* SprCompilation.m in Sources */,
 				4DC4E0DC23488BAA000743C4 /* DatabaseModel.m in Sources */,
 				4DC4E0DD23488BAA000743C4 /* CloudSessionsTableViewController.m in Sources */,
@@ -6505,6 +6684,7 @@
 				4DC4E0F723488BAA000743C4 /* SimpleXmlValueExtractor.m in Sources */,
 				4DC4E0F823488BAA000743C4 /* Csv.m in Sources */,
 				4DC4E0F923488BAA000743C4 /* SFTPSessionConfigurationViewController.m in Sources */,
+				C8B1CE8D249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */,
 				4DC4E0FA23488BAA000743C4 /* PreferencesTableViewController.m in Sources */,
 				4DC4E0FB23488BAA000743C4 /* DebugHelper.m in Sources */,
 				4DC4E0FC23488BAA000743C4 /* CASGTableViewController.m in Sources */,
@@ -6515,7 +6695,9 @@
 				4D08B5C2234C9613003D1953 /* GCDWebServerStreamedResponse.m in Sources */,
 				4DC4E10123488BAA000743C4 /* DAVRequestGroup.m in Sources */,
 				4D08B5C0234C9613003D1953 /* GCDWebServerDataResponse.m in Sources */,
+				C8B2C6E92493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */,
 				4D08B5BC234C9613003D1953 /* GCDWebServerErrorResponse.m in Sources */,
+				C8B1CE89249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */,
 				4DC4E10223488BAA000743C4 /* Kdbx4Serialization.m in Sources */,
 				4DC4E10423488BAA000743C4 /* AesCipher.m in Sources */,
 				4DC4E10523488BAA000743C4 /* KeePassFile.m in Sources */,
@@ -6531,8 +6713,11 @@
 				4DC4E10D23488BAA000743C4 /* ItemDetailsViewController.m in Sources */,
 				4DC4E10E23488BAA000743C4 /* StringValue.m in Sources */,
 				4DC4E11023488BAA000743C4 /* SafeStorageProviderFactory.m in Sources */,
+				C8A2204A249158AD0025B8B0 /* AesInputStream.m in Sources */,
+				C8B1CE75249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */,
 				4DC4E11123488BAA000743C4 /* NotesTableViewCell.m in Sources */,
 				4DC4E11223488BAA000743C4 /* LocalDeviceStorageProvider.m in Sources */,
+				C8DC76492497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
 				4D6B504C238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4DC4E11323488BAA000743C4 /* AesKdfCipher.m in Sources */,
 				4DC4E11423488BAA000743C4 /* History.m in Sources */,
@@ -6564,6 +6749,7 @@
 				4DC4E18323488BAE000743C4 /* String.m in Sources */,
 				4DC4E18423488BAE000743C4 /* DAVListingParser.m in Sources */,
 				4DC4E18523488BAE000743C4 /* ChaCha20Cipher.m in Sources */,
+				C8B1CE7E249BCD170024E38E /* MMWormhole.m in Sources */,
 				4D8354CD2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DC4E18623488BAE000743C4 /* GZipInputStream.m in Sources */,
 				C87A8CC924950B5A00356966 /* AutoFillSettings.m in Sources */,
@@ -6579,6 +6765,7 @@
 				4DC4E18E23488BAE000743C4 /* IconsCollectionViewController.m in Sources */,
 				4DC4E18F23488BAE000743C4 /* StringValue.m in Sources */,
 				4DC4E19023488BAE000743C4 /* KdfParameters.m in Sources */,
+				C8B2C6EA2493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */,
 				4DC4E19123488BAE000743C4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4DC4E19223488BAE000743C4 /* DatabaseSearchAndSorter.m in Sources */,
 				C88F8130245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */,
@@ -6628,6 +6815,7 @@
 				4DC4E1AF23488BAE000743C4 /* AesCipher.m in Sources */,
 				4DC4E1B023488BAE000743C4 /* thread.c in Sources */,
 				4DC4E1B123488BAE000743C4 /* Times.m in Sources */,
+				C8B1CE82249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */,
 				4DC4E1B223488BAE000743C4 /* PwSafeMetadata.m in Sources */,
 				4DC4E1B323488BAE000743C4 /* DAVBaseRequest.m in Sources */,
 				4DC4E1B423488BAE000743C4 /* DuressDummyStorageProvider.m in Sources */,
@@ -6637,6 +6825,7 @@
 				4DC4E1B823488BAE000743C4 /* BrowseItemCell.m in Sources */,
 				4DC4E1B923488BAE000743C4 /* DAVResponseItem.m in Sources */,
 				4DC4E1BA23488BAE000743C4 /* blake2b.c in Sources */,
+				C8B1CE76249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */,
 				4DC4E1BB23488BAE000743C4 /* CustomIconList.m in Sources */,
 				C88F813C245D935A00B0B998 /* NSString+Extensions.m in Sources */,
 				4DC4E1BC23488BAE000743C4 /* KeePassDatabaseMetadata.m in Sources */,
@@ -6656,6 +6845,7 @@
 				4DC4E1CB23488BAE000743C4 /* crypt_argchk.c in Sources */,
 				4DC4E1CC23488BAE000743C4 /* SafeStorageProviderFactory.m in Sources */,
 				4DC4E1CD23488BAE000743C4 /* DropboxV2StorageProvider.m in Sources */,
+				C8ED5DE2248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4DC4E1CE23488BAE000743C4 /* KeePassDatabase.m in Sources */,
 				4DC4E1CF23488BAE000743C4 /* Root.m in Sources */,
 				4DC4E1D023488BAE000743C4 /* twofish.c in Sources */,
@@ -6681,7 +6871,9 @@
 				4DC4E1E223488BAE000743C4 /* KeePassXmlParser.m in Sources */,
 				4DC4E1E323488BAE000743C4 /* SFTPSessionConfigurationViewController.m in Sources */,
 				4DC4E1E423488BAE000743C4 /* OTPToken.m in Sources */,
+				C8B2C6E42493882300F6EA12 /* TwoFishReadStream.m in Sources */,
 				4DC4E1E523488BAE000743C4 /* IconTableCell.m in Sources */,
+				C8B1CE7A249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */,
 				4DC4E1E623488BAE000743C4 /* Record.m in Sources */,
 				4DC4E1E723488BAE000743C4 /* OTPToken+Serialization.m in Sources */,
 				4DC4E1E823488BAE000743C4 /* MBAutoGrowingTextView.m in Sources */,
@@ -6698,13 +6890,16 @@
 				4DC4E1F023488BAE000743C4 /* KeyFilesTableViewController.m in Sources */,
 				C87A8CDB2495210C00356966 /* FavIconBulkViewController.m in Sources */,
 				4DC4E1F123488BAE000743C4 /* OTPToken+Persistence.m in Sources */,
+				C8B1CE86249BCD170024E38E /* MMWormholeSession.m in Sources */,
 				4D79F7F4244DD71200C278A5 /* DatabaseAuditReport.m in Sources */,
 				4DC4E1F223488BAE000743C4 /* PasswordMaker.m in Sources */,
+				C8B1CE8A249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */,
 				4DC4E1F323488BAE000743C4 /* Node.m in Sources */,
 				4DC4E1F423488BAE000743C4 /* NodeFields.m in Sources */,
 				4DC4E1F523488BAE000743C4 /* GenericBasicCell.m in Sources */,
 				4DC4E1F623488BAE000743C4 /* StaticDataTableViewController.m in Sources */,
 				4DC4E1F723488BAE000743C4 /* Kdbx4Serialization.m in Sources */,
+				C80E02F0249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC4E1F923488BAE000743C4 /* CASGTableViewController.m in Sources */,
 				4DC4E1FA23488BAE000743C4 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4DC4E1FB23488BAE000743C4 /* StorageBrowserItem.m in Sources */,
@@ -6760,11 +6955,13 @@
 				4DC4E22723488BAE000743C4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DC4E22823488BAE000743C4 /* NSMutableArray+Extensions.m in Sources */,
 				4DC4E22923488BAE000743C4 /* KeePass4DatabaseMetadata.m in Sources */,
+				C8DC764A2497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
 				4DC4E22A23488BAE000743C4 /* Alerts.m in Sources */,
 				4DC4E22B23488BAE000743C4 /* FileAttachmentsViewControllerTableViewController.m in Sources */,
 				4DC4E22C23488BAE000743C4 /* NodeIconHelper.m in Sources */,
 				4DC4E22D23488BAE000743C4 /* NSData+GZIP.m in Sources */,
 				4DC4E22E23488BAE000743C4 /* NSURL+QueryItems.m in Sources */,
+				C8B1CE8E249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */,
 				4D526AB524407C8F00B0B700 /* WSTag.swift in Sources */,
 				4DC4E23023488BAE000743C4 /* SafeMetaData.m in Sources */,
 				4DC4E23123488BAE000743C4 /* FileManager.m in Sources */,
@@ -6778,6 +6975,7 @@
 				4DC4E23823488BAE000743C4 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4DC4E23923488BAE000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4D160ABC24535D1C0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
+				C8A2204B249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5059238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4DC4E23A23488BAE000743C4 /* VariantObject.m in Sources */,
 				4DC4E23B23488BAE000743C4 /* PickCredentialsTableViewController.m in Sources */,
@@ -6808,6 +7006,7 @@
 				4D2F6C3921807C7E007931E4 /* String.m in Sources */,
 				4DF972C921C01ABF00F384C9 /* DAVListingParser.m in Sources */,
 				4D5F5B6F218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
+				C8B1CE7C249BCD170024E38E /* MMWormhole.m in Sources */,
 				4D8354CB2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4D1BF4FF232441D2007DF0E6 /* GZipInputStream.m in Sources */,
 				C87A8CC824950B5A00356966 /* AutoFillSettings.m in Sources */,
@@ -6823,6 +7022,7 @@
 				4D766D6022204EED00AEF439 /* IconsCollectionViewController.m in Sources */,
 				4D305767224B4F8F00C36287 /* StringValue.m in Sources */,
 				4D3E1485218326BE00A41CA0 /* KdfParameters.m in Sources */,
+				C8B2C6E82493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */,
 				4D210F4F21959A1D00B061B1 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D01BA2822BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				C88F812E245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */,
@@ -6872,6 +7072,7 @@
 				4D9E08E721822F5C007BA1E7 /* AesCipher.m in Sources */,
 				4D3E149A21832C3000A41CA0 /* thread.c in Sources */,
 				4D2F6C3B21807C7E007931E4 /* Times.m in Sources */,
+				C8B1CE80249BCD170024E38E /* MMWormholeSessionFileTransiting.m in Sources */,
 				4D196798217F1C190057DF06 /* PwSafeMetadata.m in Sources */,
 				4DF972C721C01ABF00F384C9 /* DAVBaseRequest.m in Sources */,
 				4D2BF3EC21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */,
@@ -6881,6 +7082,7 @@
 				4D4554AF2285C0BB0015C236 /* BrowseItemCell.m in Sources */,
 				4DF972CD21C01ABF00F384C9 /* DAVResponseItem.m in Sources */,
 				4D3E149F21832CC700A41CA0 /* blake2b.c in Sources */,
+				C8B1CE74249BCD170024E38E /* MMWormholeSessionMessageTransiting.m in Sources */,
 				4DA12F03219837830000CEBB /* CustomIconList.m in Sources */,
 				C88F813A245D935A00B0B998 /* NSString+Extensions.m in Sources */,
 				4D19678B217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
@@ -6900,6 +7102,7 @@
 				4D1884DA21709E5F001AE6B0 /* crypt_argchk.c in Sources */,
 				4D5F5B7D218B4C4300A0739A /* SafeStorageProviderFactory.m in Sources */,
 				4D5F5B7E218B4C4E00A0739A /* DropboxV2StorageProvider.m in Sources */,
+				C8ED5DE0248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4D9E09AA218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4DC5B9C2217B376F00FE9DD9 /* Root.m in Sources */,
 				4D1884D921709E3C001AE6B0 /* twofish.c in Sources */,
@@ -6925,7 +7128,9 @@
 				4DF176F323293D1500255CD6 /* KeePassXmlParser.m in Sources */,
 				4D0F122021C1418000C4451D /* SFTPSessionConfigurationViewController.m in Sources */,
 				4D004CE721F4F7B300E2B194 /* OTPToken.m in Sources */,
+				C8B2C6E22493882300F6EA12 /* TwoFishReadStream.m in Sources */,
 				4D33FA3F22872324006C31B2 /* IconTableCell.m in Sources */,
+				C8B1CE78249BCD170024E38E /* MMWormholeFileTransiting.m in Sources */,
 				4D1884D521709E18001AE6B0 /* Record.m in Sources */,
 				4D004CEA21F4F7BB00E2B194 /* OTPToken+Serialization.m in Sources */,
 				4D0835BA2284742000CA7405 /* MBAutoGrowingTextView.m in Sources */,
@@ -6942,13 +7147,16 @@
 				4D1140A8229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				C87A8CDA2495210B00356966 /* FavIconBulkViewController.m in Sources */,
 				4D004CE921F4F7B900E2B194 /* OTPToken+Persistence.m in Sources */,
+				C8B1CE84249BCD170024E38E /* MMWormholeSession.m in Sources */,
 				4D79F7F3244DD71100C278A5 /* DatabaseAuditReport.m in Sources */,
 				4D216F8122CBCED4000954D0 /* PasswordMaker.m in Sources */,
+				C8B1CE88249BCD170024E38E /* MMWormholeSessionContextTransiting.m in Sources */,
 				4D1884D021709DF3001AE6B0 /* Node.m in Sources */,
 				4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */,
 				4DAE98BF2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
 				4D9AC55722A153FA00449F3F /* StaticDataTableViewController.m in Sources */,
 				4D3E147D2183049E00A41CA0 /* Kdbx4Serialization.m in Sources */,
+				C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC5C10722A51B7D00E0F740 /* CASGTableViewController.m in Sources */,
 				4D1884CF21709D0F001AE6B0 /* AppleICloudOrLocalSafeFile.m in Sources */,
 				4D1884CD21709CFA001AE6B0 /* StorageBrowserItem.m in Sources */,
@@ -7004,11 +7212,13 @@
 				4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */,
 				4D7E39DC22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4DB1B7DD2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */,
+				C8DC76482497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
 				4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */,
 				4D5F5B8C218B5A7000A0739A /* FileAttachmentsViewControllerTableViewController.m in Sources */,
 				4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */,
 				4D326EA7223037AE00DCD8C7 /* NSData+GZIP.m in Sources */,
 				4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */,
+				C8B1CE8C249BCD170024E38E /* MMWormholeCoordinatedFileTransiting.m in Sources */,
 				4D526AB324407C8F00B0B700 /* WSTag.swift in Sources */,
 				4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */,
 				4D556F0E22B7F1B300E16027 /* FileManager.m in Sources */,
@@ -7022,6 +7232,7 @@
 				4DC66F3E229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D56D91021B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4D160AB824535D1A0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
+				C8A22049249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5057238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4D3AC320219074C40010CFCD /* VariantObject.m in Sources */,
 				4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */,
@@ -7856,7 +8067,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -7946,7 +8157,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8035,7 +8246,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8117,7 +8328,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8202,7 +8413,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8279,7 +8490,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8354,7 +8565,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8439,7 +8650,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2932;
+				CURRENT_PROJECT_VERSION = 2934;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

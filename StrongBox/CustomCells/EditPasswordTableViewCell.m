@@ -57,6 +57,7 @@
 
 - (IBAction)onAlternativeGenerate:(id)sender {
     [PasswordMaker.sharedInstance promptWithSuggestions:self.parentVc
+                                                 config:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
                                                  action:^(NSString * _Nonnull response) {
         [self setPassword:response];
     }];

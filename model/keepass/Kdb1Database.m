@@ -60,7 +60,7 @@ static const BOOL kLogVerbose = NO;
     return ret;
 }
 
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(OpenCompletionBlock)completion {
     NSError* error;
     KdbSerializationData *serializationData = [KdbSerialization deserialize:data
                                                                    password:ckf.password
@@ -212,7 +212,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         NodeFileAttachment *theAttachment = record.fields.attachments[0];
         
         ret.binaryFileName = theAttachment.filename;
-        ret.binaryData = attachments[theAttachment.index].data;
+        ret.binaryData = attachments[theAttachment.index].deprecatedData;
     }
     
     return ret;
@@ -308,10 +308,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     fields.expires = entry.expired;
     
     if(entry.binaryFileName.length) {
-        DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] init];
-        dbAttachment.data = entry.binaryData;
-        dbAttachment.compressed = NO;
-        dbAttachment.protectedInMemory = NO;
+        DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithData:entry.binaryData compressed:NO protectedInMemory:NO];
         [attachments addObject:dbAttachment];
         
         NodeFileAttachment *attachment = [[NodeFileAttachment alloc] init];

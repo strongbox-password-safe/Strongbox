@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable NSData*)encrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
 - (nullable NSData*)generateIv;
 
+- (NSInputStream*)getDecryptionStreamForStream:(NSInputStream*)inputStream key:(NSData*)key iv:(NSData*)iv;
+
 @end
 
 NS_ASSUME_NONNULL_END

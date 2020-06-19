@@ -8,6 +8,7 @@
 
 #import "WebDAVSessionConfiguration.h"
 #import "SecretStore.h"
+#import "NSString+Extensions.h"
 
 @interface WebDAVSessionConfiguration ()
 
@@ -45,9 +46,10 @@
     
     WebDAVSessionConfiguration *ret = [[WebDAVSessionConfiguration alloc] initWithKeyChainUuid:keyChainUuid];
     
-    ret.host = [NSURL URLWithString:[dictionary objectForKey:@"host"]];
-    ret.username = [dictionary objectForKey:@"username"];
+    NSString* host = [dictionary objectForKey:@"host"];
     
+    ret.host = host.urlExtendedParse;
+    ret.username = [dictionary objectForKey:@"username"];
     
     NSNumber* num = [dictionary objectForKey:@"allowUntrustedCertificate"];
     if(num != nil) {

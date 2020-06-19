@@ -70,23 +70,23 @@ static void removeBadReferences(NSArray<DatabaseAttachment*>* attachments, NSArr
 }
 
 static void remapDuplicates(NSArray<DatabaseAttachment*> *attachments, NSArray<NodeFileAttachment*> *allNodeAttachments) {
-    NSMutableDictionary<NSNumber*, NSNumber*>* attachmentHashMap = [NSMutableDictionary dictionary];
+    NSMutableDictionary<NSString*, NSNumber*>* attachmentHashMap = [NSMutableDictionary dictionary];
     NSMutableDictionary<NSNumber*, NSNumber*> *remappings = [NSMutableDictionary dictionary];
     
     for (int i=0;i<attachments.count;i++) {
         DatabaseAttachment *current = attachments[i];
-        NSNumber *hash = @(current.data.hash);
-        NSNumber* originalIndex = [attachmentHashMap objectForKey:hash];
+        NSString* digestHash = current.digestHash;
+        NSNumber* originalIndex = [attachmentHashMap objectForKey:digestHash];
         
         if(originalIndex != nil) {
             DatabaseAttachment *original = attachments[originalIndex.intValue];
-            if([original.data isEqualToData:current.data]) {
+            if ( [original.digestHash isEqualToString:current.digestHash] ) {
                 NSLog(@"Found Definite Duplicate... ");
                 [remappings setObject:originalIndex forKey:@(i)];
             }
         }
         else {
-            [attachmentHashMap setObject:@(i) forKey:@(current.data.hash)];
+            [attachmentHashMap setObject:@(i) forKey:current.digestHash];
         }
     }
     

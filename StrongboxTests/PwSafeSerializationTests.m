@@ -21,7 +21,10 @@
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
-    [adaptor open:safeData ckf:[CompositeKeyFactors password:@"a"]  completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [adaptor open:safeData
+              ckf:[CompositeKeyFactors password:@"a"]
+     useLegacyDeserialization:NO
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         if(!db) {
             NSLog(@"ERROR: %@", error);
             return;
@@ -40,7 +43,10 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
     
-    [adaptor open:safeData ckf:[CompositeKeyFactors password:@"M1cr0s0ft"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [adaptor open:safeData
+              ckf:[CompositeKeyFactors password:@"M1cr0s0ft"]
+useLegacyDeserialization:NO
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         if(!db) {
             NSLog(@"ERROR: %@", error);
             return;

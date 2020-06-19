@@ -177,9 +177,7 @@
 - (void)testToFromModelAndCompareXmlLarge {
     NSString * xml = [CommonTesting getXmlFromBundleFile:@"keypass-database-with-binary"];
     RootXmlDomainObject *rootObject = [CommonTesting parseKeePassXmlSalsa20:xml b64key:@"ztCAmxaRzv/Q/ws53V4wLACfqfJtDELuEa0lR0lK1UA="];
-    
-    DatabaseAttachment *fakeAttachment = [[DatabaseAttachment alloc] init];
-    fakeAttachment.data = [NSData data];
+//    DatabaseAttachment *fakeAttachment = [[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES];
     
     // Xml Model to Strongbox Model...
     

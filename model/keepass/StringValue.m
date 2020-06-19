@@ -37,7 +37,7 @@
     }
     
     StringValue* other = (StringValue*)object;
-    if(![self.value isEqualToString:other.value]) {
+    if([self.value compare:other.value] != NSOrderedSame) {
         return NO;
     }
     if(self.protected != other.protected) {

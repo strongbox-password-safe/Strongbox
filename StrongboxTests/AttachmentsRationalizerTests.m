@@ -18,23 +18,14 @@
 @implementation AttachmentsRationalizerTests
 
 static NSArray *getDbAttachments(int n) {
-    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] init];
     NSString* text1 = @"Twas the best of times...";
-    db1.data = [text1 dataUsingEncoding:NSUTF8StringEncoding];
-    db1.protectedInMemory = YES;
-    db1.compressed = YES;
-    
-    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] init];
+    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] initWithData:[text1 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
+
     NSString* text2 = @"Twas the blurst of times...";
-    db2.data = [text2 dataUsingEncoding:NSUTF8StringEncoding];
-    db2.protectedInMemory = YES;
-    db2.compressed = YES;
- 
-    DatabaseAttachment* db3 = [[DatabaseAttachment alloc] init];
+    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] initWithData:[text2 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
+
     NSString* text3 = @"Year 501...";
-    db3.data = [text3 dataUsingEncoding:NSUTF8StringEncoding];
-    db3.protectedInMemory = YES;
-    db3.compressed = YES;
+    DatabaseAttachment* db3 = [[DatabaseAttachment alloc] initWithData:[text3 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
     
     NSArray* dbAttachments = @[db1, db2, db3];
     
@@ -182,23 +173,14 @@ static NSArray *getDbAttachments(int n) {
 }
 
 - (void)testToXmlModelAttachments_DuplicateAttachments {
-    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] init];
     NSString* text1 = @"Twas the best of times...";
-    db1.data = [text1 dataUsingEncoding:NSUTF8StringEncoding];
-    db1.protectedInMemory = YES;
-    db1.compressed = YES;
- 
-    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] init];
+    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] initWithData:[text1 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
+
     NSString* text2 = @"Twas the blurst of times...";
-    db2.data = [text2 dataUsingEncoding:NSUTF8StringEncoding];
-    db2.protectedInMemory = YES;
-    db2.compressed = YES;
-    
-    DatabaseAttachment* db3 = [[DatabaseAttachment alloc] init];
+    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] initWithData:[text2 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
+
     NSString* text3 = @"Twas the best of times...";
-    db3.data = [text3 dataUsingEncoding:NSUTF8StringEncoding];
-    db3.protectedInMemory = YES;
-    db3.compressed = YES;
+    DatabaseAttachment* db3 = [[DatabaseAttachment alloc] initWithData:[text3 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
     
     NSArray* dbAttachments = @[db1, db2, db3]; // duplicate
     
@@ -237,17 +219,11 @@ static NSArray *getDbAttachments(int n) {
 }
 
 - (void)testToXmlModelAttachments_MultipleDuplicateAttachments {
-    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] init];
     NSString* text1 = @"Twas the best of times...";
-    db1.data = [text1 dataUsingEncoding:NSUTF8StringEncoding];
-    db1.protectedInMemory = YES;
-    db1.compressed = YES;
-    
-    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] init];
+    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] initWithData:[text1 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
+
     NSString* text2 = @"Twas the blurst of times...";
-    db2.data = [text2 dataUsingEncoding:NSUTF8StringEncoding];
-    db2.protectedInMemory = YES;
-    db2.compressed = YES;
+    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] initWithData:[text2 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
     
     NSArray* dbAttachments = @[db1, db1, db1, db2]; // duplicate
     
@@ -292,17 +268,11 @@ static NSArray *getDbAttachments(int n) {
 }
 
 - (void)testToXmlModelAttachments_MultipleDuplicateAttachmentsInterleaved {
-    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] init];
     NSString* text1 = @"Twas the best of times...";
-    db1.data = [text1 dataUsingEncoding:NSUTF8StringEncoding];
-    db1.protectedInMemory = YES;
-    db1.compressed = YES;
-    
-    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] init];
+    DatabaseAttachment* db1 = [[DatabaseAttachment alloc] initWithData:[text1 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
+
     NSString* text2 = @"Twas the blurst of times...";
-    db2.data = [text2 dataUsingEncoding:NSUTF8StringEncoding];
-    db2.protectedInMemory = YES;
-    db2.compressed = YES;
+    DatabaseAttachment* db2 = [[DatabaseAttachment alloc] initWithData:[text2 dataUsingEncoding:NSUTF8StringEncoding] compressed:YES protectedInMemory:YES];
     
     NSArray* dbAttachments = @[db1, db1, db1, db2, db1]; // duplicate
     

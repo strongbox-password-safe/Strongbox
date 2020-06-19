@@ -55,7 +55,7 @@
 
     XCTAssertNotNil(largeDb);
     
-    [[Kdbx4Database alloc] open:largeDb ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [[Kdbx4Database alloc] open:largeDb ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(db);
         NSLog(@"Done... [%@]", error);

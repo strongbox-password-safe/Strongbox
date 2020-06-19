@@ -10,22 +10,21 @@
 
 @implementation UiAttachment
 
-+ (instancetype)attachmentWithFilename:(NSString *)filename data:(NSData *)data {
-    return [[UiAttachment alloc] initWithFilename:filename data:data];
++ (instancetype)attachmentWithFilename:(NSString *)filename dbAttachment:(DatabaseAttachment *)dbAttachment {
+    return [[UiAttachment alloc] initWithFilename:filename dbAttachment:dbAttachment];
 }
 
-- (instancetype)initWithFilename:(NSString *)filename data:(NSData *)data {
+- (instancetype)initWithFilename:(NSString *)filename dbAttachment:(DatabaseAttachment *)dbAttachment {
     self = [super init];
     if (self) {
         self.filename = filename;
-        self.data = data;
+        self.dbAttachment = dbAttachment;
     }
     return self;
 }
 
-- (NSString *)description
-{
-    return [NSString stringWithFormat:@"filename = %@, size = [%lul]", self.filename, (unsigned long)self.data.length];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"filename = %@, dbAttachment = [%@]", self.filename, self.dbAttachment];
 }
 
 @end

@@ -12,6 +12,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef struct _BlockHeader {
+    uint8_t id[4];
+    uint8_t hash[32];
+    uint8_t size[4];
+} BlockHeader;
+#define SIZE_OF_BLOCK_HEADER 40
+
 typedef void (^SerializeCompletionBlock)(BOOL userCancelled, NSString*_Nullable hash, NSError*_Nullable error);
 
 typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, SerializationData*_Nullable serializationData, NSError*_Nullable error);
@@ -22,6 +29,7 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, SerializationData
 
 + (void)deserialize:(NSData*)safeData
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
+useLegacyDeserialization:(BOOL)useLegacyDeserialization
          completion:(DeserializeCompletionBlock)completion;
 
 - (instancetype)init:(SerializationData*)serializationData;

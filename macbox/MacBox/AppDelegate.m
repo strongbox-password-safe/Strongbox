@@ -70,7 +70,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
-        if(![Settings sharedInstance].freeTrial){
+        if(![Settings sharedInstance].freeTrial) {
             // Do not message for Upgrade until at least a while after initial open (per Apple guidelines)
 
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(180 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {

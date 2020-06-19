@@ -12,7 +12,7 @@
 @implementation Root
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
-    return self = [self initWithXmlElementName:kRootElementName context:context];
+    return [self initWithXmlElementName:kRootElementName context:context];
 }
 
 - (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(XmlProcessingContext *)context {

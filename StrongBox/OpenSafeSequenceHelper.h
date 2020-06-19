@@ -52,8 +52,8 @@ typedef void(^CompletionBlock)(Model*_Nullable model, NSError*_Nullable error);
 biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                  completion:(CompletionBlock)completion;
 
-NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
-NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error);
+NSData*_Nullable getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
+NSData*_Nullable getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error);
 
 @end
 
