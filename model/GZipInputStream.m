@@ -31,8 +31,13 @@
 
 @implementation GZipInputStream
 
-- (instancetype)initWithInitialBuffer:(const uint8_t*)buffer length:(NSUInteger)length {
+- (instancetype)initWithStream:(NSInputStream *)innerStream {
     if (self = [super init]) {
+        if (!innerStream) {
+            NSLog(@"Inner Stream NIL");
+            return nil;
+        }
+        
         self.stream = malloc(sizeof(z_stream));
         if (self.stream == NULL) {
             return nil;
@@ -41,8 +46,8 @@
         
         self.stream->zalloc = Z_NULL;
         self.stream->zfree = Z_NULL;
-        self.stream->avail_in = (uInt)length;
-        self.stream->next_in = (uint8_t*)buffer;
+        self.stream->avail_in = (uInt)0;
+        self.stream->next_in = (uint8_t*)nil;
         self.stream->total_out = 0;
         self.stream->avail_out = 0;
         
@@ -52,40 +57,53 @@
             self.stream = nil;
             return nil;
         }
+        
+        self.innerStream = innerStream;
     }
+    
     return self;
 }
 
-- (instancetype)initWithStream:(NSInputStream *)innerStream {
-    if (!innerStream) {
-        NSLog(@"Inner Stream NIL");
-        return nil;
-    }
-
-    self.innerStream = innerStream;
-    [self.innerStream open];
-    
-    [self fillWorkingBuffer];
-    
-    return [self initWithInitialBuffer:self.workingData length:self.workingDataLength];
-}
-
 - (instancetype)initWithData:(NSData *)data {
-    if (self = [self initWithInitialBuffer:data.bytes length:data.length]) {
+    if (self = [super init]) {
         if (!data || data.length == 0 || !isGzippedData(data)) {
             NSLog(@"Data empty or not GZIPed");
             return nil;
         }
         
+        self.stream = malloc(sizeof(z_stream));
+        if (self.stream == NULL) {
+            return nil;
+        }
+        memset(self.stream, 0, sizeof(z_stream));
+        
+        self.stream->zalloc = Z_NULL;
+        self.stream->zfree = Z_NULL;
+        self.stream->avail_in = (uInt)data.length;
+        self.stream->next_in = (uint8_t*)data.bytes;
+        self.stream->total_out = 0;
+        self.stream->avail_out = 0;
+        
+        if (inflateInit2(self.stream, 47) != Z_OK) {
+            NSLog(@"Error initializing z_stream");
+            free(self.stream);
+            self.stream = nil;
+            return nil;
+        }
+        
         self.innerData = data;
     }
-
+    
     return self;
 }
 
 //////////////////////////////////////////////////////
 
-- (void)open { }
+- (void)open {
+    if (self.innerStream) {
+        [self.innerStream open];
+    }
+}
 
 - (void)close {
     if (self.innerStream) {
@@ -114,9 +132,11 @@
     NSInteger read = [self.innerStream read:self.workingData maxLength:kStreamingSerializationChunkSize];
     
     if (read < 0) {
+        self.error = self.innerStream.streamError;
+        free(self.workingData);
         self.workingData = nil;
-        return;
     }
+    
     self.workingDataLength = read;
 }
 
@@ -149,7 +169,7 @@
         if (self.stream->avail_in == 0) {
             [self fillWorkingBuffer];
             if (self.workingData == nil) {
-                self.error = [Utils createNSError:@"Could not read enough data into Working Data from input stream." errorCode:-1];
+                self.error = self.error ? self.error : [Utils createNSError:@"Could not read enough data into Working Data from input stream." errorCode:-1];
                 return -1;
             }
             

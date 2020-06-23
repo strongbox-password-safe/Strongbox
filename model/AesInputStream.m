@@ -132,12 +132,18 @@
     if (bytesRead == 0) {
         CCCryptorStatus status = CCCryptorFinal(*self.cryptor, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
         if (status != kCCSuccess) {
-            NSLog(@"Crypto Error: %d", status);
-            self.error = [Utils createNSError:@"AES: Crypto Error" errorCode:status];
-            self.workChunk = nil;
-            self.workChunkLength = 0;
-            free(block);
-            return;
+            size_t req = CCCryptorGetOutputLength(*self.cryptor, bytesRead, YES);
+            if (status == kCCBufferTooSmall && req == 0) { // Weird and sporadic but safe to ignore... :/ - MMcG - 20-Jun-2020
+//                NSLog(@"Not really a crypto Error: %d-%zu", status, req);
+            }
+            else {
+                NSLog(@"Crypto Error: %d-%zu", status, req);
+                self.error = [Utils createNSError:@"AES: Crypto Error" errorCode:status];
+                self.workChunk = nil;
+                self.workChunkLength = 0;
+                free(block);
+                return;
+            }
         }
         
         self.writtenSoFar += self.workChunkLength;

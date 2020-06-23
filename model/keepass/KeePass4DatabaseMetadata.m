@@ -20,8 +20,7 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
 
 @implementation KeePass4DatabaseMetadata
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     
     if (self) {
