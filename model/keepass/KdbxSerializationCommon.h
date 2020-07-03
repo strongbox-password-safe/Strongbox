@@ -12,7 +12,7 @@
 #import "XmlProcessingContext.h"
 #import "CompositeKeyFactors.h"
 
-typedef struct _KeepassHeader {
+typedef struct _KeepassFileHeader {
     uint8_t signature1[4];
     uint8_t signature2[4];
     uint16_t minor;
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KdbxSerializationCommon : NSObject
 
-BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion, NSError** error);
+BOOL keePass2SignatureAndVersionMatch(NSData * prefix, uint32_t majorVersion, uint32_t minorVersion, NSError** error);
 
 KeepassFileHeader getKeePassFileHeader(NSData* data);
 KeepassFileHeader getNewFileHeader(NSString* version);
@@ -51,13 +51,14 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey);
 
 NSData*__nullable getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);
 
-void dumpXml(NSInputStream* lib);
-
 RootXmlDomainObject*_Nullable parseXml(uint32_t innerRandomStreamId,
                               NSData*_Nullable innerRandomStreamKey,
                               XmlProcessingContext* context,
                               NSInputStream* lib,
+                              NSOutputStream*_Nullable xmlDumpStream,
                               NSError** error);
+
+NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument);
 
 @end
 

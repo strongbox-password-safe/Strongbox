@@ -128,7 +128,6 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
     if (bytesRead < 0) {
         NSLog(@"TwoFishReadStream Could not read input stream");
         self.error = self.inputStream.streamError; // [Utils createNSError:@"TwoFishReadStream Could not read input stream" errorCode:-1];
-        self.workChunk = nil;
         self.workChunkLength = 0;
         return;
     }
@@ -145,7 +144,6 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
     if (bytesRead == 0 || remainder != 0)  {
         if (bytesRead != 0 && bytesRead != remainder ) {
             self.error = [Utils createNSError:@"TwoFishReadStream: bytesRead != 0 && bytesRead != remainder" errorCode:-1];
-            self.workChunk = nil;
             self.workChunkLength = 0;
             return;
             // This should never happen!

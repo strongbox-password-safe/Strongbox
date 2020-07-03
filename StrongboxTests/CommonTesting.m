@@ -192,7 +192,7 @@ XmlComparisonElement* dictionaryFromXml(NSString* xml) {
     [str1 open];
     
     NSError* error;
-    RootXmlDomainObject* ret = parseXml(streamId, key, context, str1, &error);
+    RootXmlDomainObject* ret = parseXml(streamId, key, context, str1, nil, &error);
     
     [str1 close];
     

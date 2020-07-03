@@ -92,7 +92,7 @@ groupLocationOverride:(NSString*)groupLocationOverride
                 childCount:childCount
                     italic:italic
              groupLocation:groupLocation
-                 tintColor:self.viewModel.database.format == kPasswordSafe ? [NodeIconHelper folderTintColor] : nil
+                 tintColor:nil
                      flags:flags
                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }

@@ -9,30 +9,54 @@
 #import "UiAttachment.h"
 #import "DatabaseModelConfig.h"
 
-extern const NSUInteger kStreamingSerializationChunkSize;
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseModel : NSObject
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
-+ (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)candidate;
-+ (BOOL)isAutoFillLikelyToCrash:(NSData*)data;
-+ (DatabaseFormat)getLikelyDatabaseFormat:(NSData *)candidate;
++ (BOOL)isValidDatabase:(NSURL*)url error:(NSError**)error;
++ (BOOL)isValidDatabaseWithPrefix:(nullable NSData *)prefix error:(NSError**)error; // TODO: Eventually remove - URL only
+
++ (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)prefix;
+
++ (DatabaseFormat)getDatabaseFormat:(NSURL*)url;
++ (DatabaseFormat)getDatabaseFormatWithPrefix:(NSData *)prefix;
+
 + (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format;
 
-+ (nullable id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format;
+////////////
+// FROM
 
-+ (void)fromData:(NSData *)data
-             ckf:(CompositeKeyFactors *)ckf
-useLegacyDeserialization:(BOOL)useLegacyDeserialization
-      completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion;
++ (void)fromLegacyData:legacyData
+                   ckf:(CompositeKeyFactors *)ckf
+            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
 
-+ (void)fromData:(NSData *)data
-             ckf:(CompositeKeyFactors *)ckf
-useLegacyDeserialization:(BOOL)useLegacyDeserialization
-          config:(DatabaseModelConfig*)config
-      completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion;
++ (void)fromLegacyData:legacyData
+                   ckf:(CompositeKeyFactors *)ckf
+                config:(DatabaseModelConfig*)config
+            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+
++ (void)fromUrl:(NSURL *)url
+            ckf:(CompositeKeyFactors *)ckf
+     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+
++ (void)fromUrl:(NSURL *)url
+            ckf:(CompositeKeyFactors *)ckf
+         config:(DatabaseModelConfig*)config
+     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+
++ (void)fromUrl:(NSURL *)url
+            ckf:(CompositeKeyFactors *)ckf
+         config:(DatabaseModelConfig*)config
+  xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
+     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+
++ (void)fromUrlOrLegacyData:(NSURL *)url
+                 legacyData:(NSData *)legacyData
+                        ckf:(CompositeKeyFactors *)ckf
+                     config:(DatabaseModelConfig*)config
+                 completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+
+//////
 
 - (void)getAsData:(SaveCompletionBlock)completion;
 

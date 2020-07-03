@@ -26,13 +26,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* crashFile;
 @property (readonly, nullable) NSURL* archivedCrashFile;
 @property (readonly, nullable) NSURL* appSupportDirectory;
+@property (readonly, nullable) NSURL* syncManagerLocalCopiesDirectory;
+@property (readonly, nullable) NSURL* sharedLocalDeviceDatabasesDirectory;
+
+@property (readonly, nullable) NSString* tmpAttachmentPreviewPath;
 
 - (void)createIfNecessary:(NSURL*)url;
 
-- (void)excludeDirectoriesFromBackup;
+- (void)setDirectoryInclusionFromBackup:(BOOL)localDocuments importedKeyFiles:(BOOL)importedKeyFiles;
+
 - (void)deleteAllLocalAndAppGroupFiles;
 - (void)deleteAllInboxItems;
-- (void)deleteAllTmpFiles;
+- (void)deleteAllTmpAttachmentPreviewFiles;
 
 @end
 

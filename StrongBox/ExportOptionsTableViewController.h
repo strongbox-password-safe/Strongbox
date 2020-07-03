@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Open / Unlocked Database Export Mode
 
-@property (nullable) Model *viewModel; // TODO: Eventually remove and switch to below
+@property (nullable) Model *viewModel; // TODO: This should be sufficient and remove use of below encrpted/metadata?
 
 // Backup Export mode
 

@@ -137,7 +137,7 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
             }
         }
         
-        NSString* loc = NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock");
+        NSString* loc = NSLocalizedString(@"generic_biometric_unlock_fmt", @"%@ Unlock");
         NSString* biometricUnlockFeature = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
 
         NSString* loc2 = NSLocalizedString(@"upgrade_vc_enjoy_features_by_upgrading_fmt", @"Enjoy %@ and other Pro features by Upgrading!");
@@ -160,7 +160,7 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
 }
 
 - (void)bindDeveloperMessage {
-    NSString* loc = NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock");
+    NSString* loc = NSLocalizedString(@"generic_biometric_unlock_fmt", @"%@ Unlock");
     NSString* biometricUnlockFeature = [NSString stringWithFormat:loc, [BiometricsManager.sharedInstance getBiometricIdName]];
     NSString* str = NSLocalizedString(@"upgrade_short_developer_message_fmt", @"");
     self.developerMessage.text = [NSString stringWithFormat:str, biometricUnlockFeature];

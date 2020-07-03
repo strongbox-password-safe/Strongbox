@@ -51,6 +51,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSDate* lastFreeTrialNudge;
 
+@property BOOL backupFiles;
+@property BOOL backupIncludeImportedKeyFiles;
+@property BOOL haveAskedAboutBackupSettings;
+
 NS_ASSUME_NONNULL_END
 
 @end

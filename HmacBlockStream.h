@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface HmacBlockStream : NSInputStream
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithData:(uint8_t *)data length:(size_t)length hmacKey:(NSData*)hmacKey;
+- (instancetype)initWithStream:(NSInputStream*)stream hmacKey:(NSData*)hmacKey;
 
 NSData* getBlockHmac(NSData *data, NSData* hmacKey, uint64_t blockIndex);
 NSData* getHmacKeyForBlock(NSData* key, uint64_t blockIndex);

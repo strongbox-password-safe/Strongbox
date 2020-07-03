@@ -45,27 +45,34 @@ NS_ASSUME_NONNULL_BEGIN
               data:(NSData *)data
       parentFolder:(NSObject * _Nullable)parentFolder
     viewController:(UIViewController *_Nullable)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
+        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion;
 
-- (void)      read:(SafeMetaData *)safeMetaData
+- (void)readLegacy:(SafeMetaData *)safeMetaData
     viewController:(UIViewController *)viewController
         isAutoFill:(BOOL)isAutoFill
-        completion:(void (^)(NSData *_Nullable data, NSError *_Nullable error))completion;
+        completion:(void (^)(NSData *_Nullable data, const NSError *_Nullable error))completion;
+
+- (void)read:(SafeMetaData *)safeMetaData
+viewController:(UIViewController *_Nullable)viewController
+  completion:(void (^)(NSData *_Nullable data, const NSError *_Nullable error))completion;
+
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData
+                completion:(void (^)(NSData *_Nullable data, const NSError *_Nullable error))completion;
 
 - (void)update:(SafeMetaData *)safeMetaData
           data:(NSData *)data
     isAutoFill:(BOOL)isAutoFill
     completion:(void (^)(NSError *_Nullable error))completion;
 
-- (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(NSError *_Nullable error))completion;
+- (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(const NSError *_Nullable error))completion;
 
-- (void)      list:(NSObject *)parentFolder
-    viewController:(UIViewController *)viewController
-        completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion;
+- (void)      list:(NSObject *_Nullable)parentFolder
+    viewController:(UIViewController *_Nullable)viewController
+        completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, const NSError *error))completion;
 
 - (void)readWithProviderData:(NSObject * _Nullable)providerData
-              viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, NSError *error))completionHandler;
+              viewController:(UIViewController *_Nullable)viewController
+                  completion:(void (^)(NSData *data, const NSError *error))completionHandler;
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
       completion:(void (^)(UIImage *image))completionHandler;

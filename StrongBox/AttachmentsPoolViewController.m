@@ -144,7 +144,7 @@ static const size_t kMaxAttachmentImagePreviewSize = 5 * 1024 * 1024;
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
-    [FileManager.sharedInstance deleteAllTmpFiles];
+    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
@@ -156,7 +156,7 @@ static const size_t kMaxAttachmentImagePreviewSize = 5 * 1024 * 1024;
     
     NSString* filename = [self getAttachmentLikelyName:index forDisplay:NO];
     
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     [attachment.deprecatedData writeToFile:f atomically:YES];
     NSURL* url = [NSURL fileURLWithPath:f];
     

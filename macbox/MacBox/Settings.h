@@ -105,6 +105,8 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL clipboardHandoff;
 
+
+
 @end
 
 //    [[Settings sharedInstance] setPro:NO];

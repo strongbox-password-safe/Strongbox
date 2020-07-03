@@ -9,7 +9,7 @@
 #import "AesInputStream.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import "Utils.h"
-#import "DatabaseModel.h"
+#import "Constants.h"
 
 @interface AesInputStream ()
 

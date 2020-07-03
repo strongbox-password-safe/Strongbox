@@ -16,6 +16,7 @@
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "SyncManager.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
@@ -36,23 +37,20 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 @end
 
 @implementation Model {
-    id <SafeStorageProvider> _storageProvider;
     BOOL _cacheMode;
     BOOL _isReadOnly;
 }
 
 - (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
-               originalDataForBackup:(NSData*)originalDataForBackup
+               originalDataForBackup:(NSData *)originalDataForBackup // TODO: ?
                             metaData:(SafeMetaData *)metaData
-                     storageProvider:(id <SafeStorageProvider>)provider
-                           cacheMode:(BOOL)cacheMode
+                           cacheMode:(BOOL)cacheMode            // TODO:
                           isReadOnly:(BOOL)isReadOnly
-                      isAutoFillOpen:(BOOL)isAutoFillOpen {
+                      isAutoFillOpen:(BOOL)isAutoFillOpen {     // TODO:
     if (self = [super init]) {
         _database = passwordDatabase;
         _lastSnapshot = originalDataForBackup;
         _metadata = metaData;
-        _storageProvider = provider;
         _cacheMode = cacheMode;
         _isReadOnly = isReadOnly || metaData.readOnly;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
@@ -122,9 +120,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
         // We can ignore the actual passed in config because we know it's part of the overall Database SafeMetaData;
         
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
         [SafesList.sharedInstance update:self.metadata];
-#endif
     }];
 }
 
@@ -240,9 +236,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     
     self.metadata.auditExcludedItems = mutable.allObjects;
     
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:self.metadata];
-#endif
 }
 
 - (NSArray<Node*>*)getExcludedAuditItems {
@@ -261,10 +255,6 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-- (BOOL)isCloudBasedStorage {
-    return _storageProvider.allowOfflineCache;
-}
 
 - (BOOL)isUsingOfflineCache {
     return _cacheMode;
@@ -291,23 +281,24 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
                 }
                 self.lastSnapshot = data;
             }
-                        
-            [self->_storageProvider update:self.metadata
-                                      data:data
-                                isAutoFill:isAutoFill
-                                completion:^(NSError *error) {
-                              if(!error) {
-                                  [self updateOfflineCacheWithData:data];
-                                  [self updateAutoFillCacheWithData:data];
-                                  [self updateAutoFillQuickTypeDatabase];
-                                  
-                                  // Re-audit - FUTURE - Make this more incremental?
-                                  if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
-                                       [self restartAudit];
-                                  }
-                              }
-                              handler(NO, error);
-                          }];
+
+            LegacySyncReadOptions* legacyOptions = [[LegacySyncReadOptions alloc] init];
+            legacyOptions.isAutoFill = isAutoFill;
+            
+            [SyncManager.sharedInstance updateLegacy:self.metadata data:data legacyOptions:legacyOptions completion:^(NSError *error) {
+                if(!error) {
+                    [self updateOfflineCacheWithData:data];
+                    [self updateAutoFillCacheWithData:data];
+                    [self updateAutoFillQuickTypeDatabase];
+
+                    // Re-audit - FUTURE - Make this more incremental?
+                    if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
+                        [self restartAudit];
+                    }
+                }
+                
+                handler(NO, error);
+            }];
         }];
     }
     else {
@@ -347,9 +338,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
           self.metadata.autoFillCacheAvailable = NO;
         
           [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
           [[SafesList sharedInstance] update:self.metadata];
-#endif
       }];
 }
 
@@ -357,9 +346,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     _metadata.autoFillCacheAvailable = NO;
     _metadata.autoFillEnabled = YES;
 
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [[SafesList sharedInstance] update:self.metadata];
-#endif
 }
 
 //- (void)updateOfflineCache:(void (^)(void))handler {
@@ -379,7 +366,8 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 //}
 
 - (void)updateOfflineCacheWithData:(NSData *)data {
-    if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
+    BOOL isCloudBased = [SyncManager.sharedInstance allowLegacyOfflineCache:self.metadata];
+    if (isCloudBased && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
         [self saveOfflineCacheFile:data safe:_metadata];
     }
 }
@@ -391,10 +379,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
         }
 
         safe.offlineCacheAvailable = success;
-        
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
         [[SafesList sharedInstance] update:safe];
-#endif
     }];
 }
 
@@ -405,10 +390,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
           }
 
           safe.autoFillCacheAvailable = success;
-
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
           [[SafesList sharedInstance] update:safe];
-#endif
       }];
 }
 
@@ -515,9 +497,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
     self.metadata.favourites = trimmed;
     
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
     [SafesList.sharedInstance update:self.metadata];
-#endif
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -95,7 +95,15 @@
 }
 
 -(void)foundCharacters:(NSString *)string {
-    [self.mutableText appendString:string];
+    id<XmlParsingDomainObject> currentHandler = [self.handlerStack lastObject];
+    
+    if (currentHandler.handlesStreamingText) {
+        BOOL streamOk = [currentHandler appendStreamedText:string];
+        self.errorParsing = !streamOk;
+    }
+    else {
+        [self.mutableText appendString:string];
+    }
 }
 
 - (void)didEndElement:(NSString *)elementName {

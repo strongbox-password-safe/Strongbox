@@ -154,7 +154,7 @@
 }
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
-    [FileManager.sharedInstance deleteAllTmpFiles];
+    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
@@ -164,7 +164,7 @@
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
     UiAttachment* attachment = [self.workingAttachments objectAtIndex:index];
     
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:attachment.filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:attachment.filename];
     NSData* data = attachment.dbAttachment.deprecatedData;
     [data writeToFile:f atomically:YES];
     NSURL* url = [NSURL fileURLWithPath:f];

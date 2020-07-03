@@ -90,7 +90,7 @@
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
     if(self.credentialsForUnlock) {
         NSError* error;
-        if(![DatabaseModel isAValidSafe:data error:&error]) {
+        if(![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) {
             if(outError != nil) {
                 *outError = error;
             }
@@ -268,11 +268,10 @@
     
     DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:Settings.sharedInstance.passwordGenerationConfig];
     
-    [DatabaseModel fromData:data
-                        ckf:self.credentialsForUnlock
-   useLegacyDeserialization:NO
-                     config:modelConfig
-                 completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+    [DatabaseModel fromLegacyData:data
+                              ckf:self.credentialsForUnlock
+                           config:modelConfig
+                       completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
         // NSLog(@"[%@][%@] readFromData: Completion...", [NSThread currentThread], NSThread.mainThread);
         db = model;
         retError = error;

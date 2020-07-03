@@ -19,9 +19,11 @@
     NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-3.1.kdbx"];
     XCTAssertNotNil(largeDb);
     
-    [[[KeePassDatabase alloc] init] open:largeDb
+    NSInputStream* stream = [NSInputStream inputStreamWithData:largeDb];
+    [stream open];
+    
+    [[[KeePassDatabase alloc] init] read:stream
                                      ckf:[CompositeKeyFactors password:@"a"]
-                useLegacyDeserialization:NO
                               completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
@@ -33,9 +35,11 @@
     NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-3.1-TwoFish.kdbx"];
     XCTAssertNotNil(largeDb);
     
-    [[[KeePassDatabase alloc] init] open:largeDb
+    NSInputStream* stream = [NSInputStream inputStreamWithData:largeDb];
+    [stream open];
+    
+    [[[KeePassDatabase alloc] init] read:stream
                                      ckf:[CompositeKeyFactors password:@"a"]
-                useLegacyDeserialization:NO
                               completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
@@ -47,9 +51,11 @@
     NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-3.1-ChaCha20.kdbx"];
     XCTAssertNotNil(largeDb);
     
-    [[[KeePassDatabase alloc] init] open:largeDb
+    NSInputStream* stream = [NSInputStream inputStreamWithData:largeDb];
+    [stream open];
+    
+    [[[KeePassDatabase alloc] init] read:stream
                                      ckf:[CompositeKeyFactors password:@"a"]
-                useLegacyDeserialization:YES
                               completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@ - error = [%@]", db, error);
         XCTAssertNotNil(db);

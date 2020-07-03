@@ -103,13 +103,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         for(SafeMetaData *safe in localSafes) {
             [self migrateLocalSafeToICloud:safe];
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
             [SafesList.sharedInstance update:safe];
-#endif
         }
         
         self.showMigrationUi(NO);
-//        self.onSafesCollectionUpdated();
         
         _migrationInProcessDoNotUpdateSafesCollection = NO;
     });
@@ -125,15 +122,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         for(SafeMetaData *safe in iCloudSafes) {
             [self migrateICloudSafeToLocal:safe];
-
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
             [SafesList.sharedInstance update:safe];
-#endif
         }
         
         self.showMigrationUi(NO);
-//        self.onSafesCollectionUpdated();
-        
         _migrationInProcessDoNotUpdateSafesCollection = NO;
     });
 }
@@ -371,9 +363,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
             safe.hasUnresolvedConflicts = match.hasUnresolvedConflicts;
             updated = YES;
             
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only - Remove on move to new SyncManager
             [SafesList.sharedInstance update:safe];
-#endif
         }
     }
     
@@ -400,9 +390,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         NSLog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
       
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only
         [[SafesList sharedInstance] addWithDuplicateCheck:newSafe];
-#endif
         added = YES;
     }
     
@@ -420,11 +408,8 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     }
     
     for(SafeMetaData* safe in safeFileNamesToBeRemoved.allValues) {
-        NSLog(@"iCloud Safe Removed: %@", safe);
-        
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only
+        NSLog(@"iCloud Safe Removed: %@", safe);        
         [SafesList.sharedInstance remove:safe.uuid];
-#endif
         removed = YES;
     }
     

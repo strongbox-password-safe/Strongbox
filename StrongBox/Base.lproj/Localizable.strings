@@ -726,8 +726,8 @@
 /* Delete Data Failed Attempt Count */
 "prefs_vc_delete_data_attempt_count" = "Delete Data Failed Attempt Count";
 
-/* Enable %@ */
-"prefs_vc_enable_biometric_fmt" = "Enable %@";
+/* Allow %@ ( Translators Note: 1st param is the name of biometric method, so: 'Allow Touch ID' or 'Allow Face ID')*/
+"prefs_vc_enable_biometric_fmt" = "Allow %@";
 
 /* Please find Strongbox in the App Store and you can write a review there. Much appreciated!\n-Mark */
 "prefs_vc_info_cannot_open_app_store_message" = "Please find Strongbox in the App Store and you can write a review there. Much appreciated!\n-Mark";
@@ -3320,3 +3320,24 @@
 
 /* Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill. */
 "autofill_error_unknown_item_message" = "Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.";
+
+/* Locating... */
+"generic_status_sp_locating_ellipsis" = "Locating...";
+
+/* %@ Unlock (Translators Note: 1st param is 'Touch ID' or 'Face ID' - Used on the Upgrade, Freemium Onboarding/Welcome screen and the Free vs Pro Chart screen) */
+"generic_biometric_unlock_fmt" = "%@ Unlock";
+
+/* By Default Strongbox now includes all your local documents and databases in Apple backups, however imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok? */
+"backup_settings_prompt_message" = "By default Strongbox includes all your local documents and databases in Apple backups, however imported Key Files are NOT included for security reasons. You can always change these settings in App Preferences.\n\nDoes this sound ok?";
+
+/* Backup Settings */
+"backup_settings_prompt_title" = "Backup Settings";
+
+/* Yes, the defaults sound good */
+"backup_settings_prompt_option_yes_looks_good" = "Yes, sounds good";
+
+/* Yes, but also backup Key Files */
+"backup_settings_prompt_yes_but_include_key_files" = "Yes, but also backup key files";
+
+/* No, do NOT backup anything */
+"backup_settings_prompt_no_dont_backup_anything" = "No, do NOT backup anything";

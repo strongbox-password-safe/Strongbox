@@ -40,11 +40,11 @@
     }
 }
 
-- (void)create:(NSString *)nickName extension:(NSString *)extension data:(NSData *)data parentFolder:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(SafeMetaData *, NSError *))completion {
+- (void)create:(NSString *)nickName extension:(NSString *)extension data:(NSData *)data parentFolder:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(SafeMetaData *, const NSError *))completion {
     // NOTIMPL
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
     // NOTIMPL
 }
 
@@ -61,7 +61,7 @@
     return meta;
 }
 
-- (void)list:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+- (void)list:(NSObject *)parentFolder viewController:(UIViewController *)viewController completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     // NOTIMPL
 }
 
@@ -69,18 +69,23 @@
     // NOTIMPL
 }
 
-- (void)read:(SafeMetaData *)safeMetaData
-viewController:(UIViewController *)viewController
-  isAutoFill:(BOOL)isAutoFill
-  completion:(void (^)(NSData * _Nonnull, NSError * _Nonnull))completion {
-    return [self readWithProviderData:nil viewController:viewController completion:completion];
+- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self read:safeMetaData viewController:viewController completion:completion];
+}
+
+- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self readNonInteractive:safeMetaData completion:completion];
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *, NSError *))completionHandler {
+                  completion:(void (^)(NSData *, const NSError *))completionHandler {
+    [self readNonInteractive:(SafeMetaData*)providerData completion:completionHandler];
+}
+
+- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
     [self getData:^(NSData *data) {
-        completionHandler(data, nil);
+        completion(data, nil);
     }];
 }
 
@@ -95,11 +100,10 @@ viewController:(UIViewController *)viewController
         
         DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
         
-        [DatabaseModel fromData:data
-                            ckf:cpf
-       useLegacyDeserialization:SharedAppAndAutoFillSettings.sharedInstance.useLegacyDeserialization
-                         config:modelConfig
-                     completion:^(BOOL userCancelled, DatabaseModel * model, NSError * error) {
+        [DatabaseModel fromLegacyData:data
+                                  ckf:cpf
+                               config:modelConfig
+                           completion:^(BOOL userCancelled, DatabaseModel * model, NSError * error) {
             if(!model || error != nil) {
                 // For some reason we can't open the duress database... reset it - probably because someone changed the password
                 [self setData:nil];
@@ -130,9 +134,7 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)setData:(NSData*)data {
-#ifndef IS_APP_EXTENSION // TODO
     SharedAppAndAutoFillSettings.sharedInstance.duressDummyData = data;
-#endif
 }
 
 @end

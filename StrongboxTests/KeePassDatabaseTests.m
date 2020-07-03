@@ -28,8 +28,10 @@
         NSString* password = [CommonTesting.testKdbxFilesAndPasswords objectForKey:file];
         
         id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-        
-        [adaptor open:blob ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+        [stream open];
+        [adaptor read:stream
+                   ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
             XCTAssertNotNil(database);
 
             NSLog(@"%@", database);
@@ -43,8 +45,10 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     
-    [adaptor open:blob
-              ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO
+     NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+     [stream open];
+     [adaptor read:stream
+              ckf:[CompositeKeyFactors password:@"a"]
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         
@@ -61,8 +65,11 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"Database" ofType:@"kdbx"];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
-    
-    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+
+    NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+    [stream open];
+    [adaptor read:stream
+               ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
         XCTAssertNotNil(database);
     }];
 }
@@ -74,7 +81,10 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     
-    [adaptor open:safeData ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+     NSInputStream* stream = [NSInputStream inputStreamWithData:safeData];
+     [stream open];
+     [adaptor read:stream
+               ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
         NSLog(@"%@", database);
         XCTAssertNotNil(database);
     }];
@@ -110,9 +120,11 @@
 
         XCTAssertNil(error);
         XCTAssertNotNil(data);
+        NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+        [stream open];
+        [adaptor read:stream
 
-        [adaptor open:data
-                  ckf:[CompositeKeyFactors password:@"password"] useLegacyDeserialization:NO
+                  ckf:[CompositeKeyFactors password:@"password"]
            completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
             if(error) {
                NSLog(@"%@", error);
@@ -137,8 +149,10 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     
-    [adaptor open:blob
-              ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO
+     NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+     [stream open];
+     [adaptor read:stream
+              ckf:[CompositeKeyFactors password:password]
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
 
@@ -154,7 +168,11 @@
 
             NSLog(@"================================================ Deserializing =======================================================================");
 
-            [adaptor open:data ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+            
+            NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+            [stream open];
+             [adaptor read:stream ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+                 [stream close];
                 if(error) {
                     NSLog(@"%@", error);
                 }
@@ -176,7 +194,10 @@
         
         id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
         
-        [adaptor open:blob ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+         NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+         [stream open];
+         [adaptor read:stream
+                   ckf:[CompositeKeyFactors password:password] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
             XCTAssertNotNil(db);
             
             //NSLog(@"%@", db);
@@ -190,7 +211,11 @@
                 XCTAssertNil(error);
                 XCTAssertNotNil(data);
                 
-                [adaptor open:data ckf:[CompositeKeyFactors password:password] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+                NSInputStream* s2 = [NSInputStream inputStreamWithData:data];
+                [s2 open];
+                [adaptor read:s2
+                          ckf:[CompositeKeyFactors password:password]
+                   completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
                     if(error) {
                         NSLog(@"%@", error);
                     }
@@ -259,7 +284,10 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
 
-        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] useLegacyDeserialization:NO
+        NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+        [stream open];
+        [adaptor read:stream
+                  ckf:[CompositeKeyFactors password:@"password"]
            completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
             if(error) {
                 NSLog(@"%@", error);
@@ -314,7 +342,10 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
         
-        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+         NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+         [stream open];
+         [adaptor read:stream
+                   ckf:[CompositeKeyFactors password:@"password"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
             if(error) {
                 NSLog(@"%@", error);
             }
@@ -360,7 +391,10 @@
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     
-    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+     NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+     [stream open];
+     [adaptor read:stream
+               ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         
         NSLog(@"%@", db);
@@ -377,7 +411,10 @@
     NSData *blob = [CommonTesting getDataFromBundleFile:@"TwoFish-with-AesKdf" ofType:@"kdbx"];
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     
-    [adaptor open:blob ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO
+     NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+     [stream open];
+     [adaptor read:stream
+              ckf:[CompositeKeyFactors password:@"a"]
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNotNil(db);
         
@@ -393,7 +430,10 @@
         [testNode setTitle:@"New Entry13333576hg-6sqIXJVO;Q" keePassGroupTitleRules:YES];
         
         [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable d, NSError * _Nullable error) {
-            [adaptor open:d ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+            NSInputStream* stream = [NSInputStream inputStreamWithData:d];
+            [stream open];
+            [adaptor read:stream
+                       ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
                 Node* testNode = b.rootGroup.childGroups[0].childRecords[0];
                 XCTAssert(testNode);
                 XCTAssert([testNode.title isEqualToString:@"New Entry13333576hg-6sqIXJVO;Q"]);
@@ -440,11 +480,16 @@
 
     id<AbstractDatabaseFormatAdaptor> adaptor = [[KeePassDatabase alloc] init];
     
-    [adaptor open:blob
-              ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO
+     NSInputStream* stream = [NSInputStream inputStreamWithData:blob];
+     [stream open];
+     [adaptor read:stream
+              ckf:[CompositeKeyFactors password:@"a"]
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
         [adaptor save:database completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-            [adaptor open:data ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable a, NSError * _Nullable error) {
+            NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+            [stream open];
+            [adaptor read:stream
+                       ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable a, NSError * _Nullable error) {
                 XCTAssertNotNil(a);
             }];
         }];
@@ -474,7 +519,10 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
         
-        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+         NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+         [stream open];
+         [adaptor read:stream
+                   ckf:[CompositeKeyFactors password:@"password"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
             if(error) {
                 NSLog(@"%@", error);
             }
@@ -514,7 +562,10 @@
         XCTAssertNil(error);
         XCTAssertNotNil(data);
         
-        [adaptor open:data ckf:[CompositeKeyFactors password:@"password"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
+         NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+         [stream open];
+         [adaptor read:stream
+                   ckf:[CompositeKeyFactors password:@"password"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable b, NSError * _Nullable error) {
             if(error) {
                 NSLog(@"%@", error);
             }

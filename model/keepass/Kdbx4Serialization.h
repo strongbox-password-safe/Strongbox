@@ -38,11 +38,11 @@ typedef void (^Serialize4CompletionBlock)(BOOL userCancelled, NSData *_Nullable 
 
 @interface Kdbx4Serialization : NSObject
 
-+ (nullable CryptoParameters*)getCryptoParams:(NSData*)safeData; // Used to test AutoFill crash likelyhood without full decrypt
++ (nullable CryptoParameters*)getCryptoParams:(NSInputStream*)stream; // Used to test AutoFill crash likelyhood without full decrypt
 
-+ (void)deserialize:(NSData*)safeData
++ (void)deserialize:(NSInputStream*)stream
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
-useLegacyDeserialization:(BOOL)useLegacyDeserialization
+      xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
          completion:(Deserialize4CompletionBlock)completion;
 
 + (void)serialize:(Kdbx4SerializationData*)serializationData

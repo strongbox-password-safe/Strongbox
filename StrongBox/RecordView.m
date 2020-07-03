@@ -702,7 +702,7 @@ static const int kMinNotesCellHeight = 160;
     NSURL* url = urlString.urlExtendedParse;
     if (url != nil) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            [[UIApplication sharedApplication] openURL:url];
+            [UIApplication.sharedApplication openURL:url options:@{ } completionHandler:nil];
         });
     }
 }

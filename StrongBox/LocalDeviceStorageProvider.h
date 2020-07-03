@@ -42,20 +42,14 @@ NS_ASSUME_NONNULL_BEGIN
      suggestedFilename:(NSString*)suggestedFilename
             completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
 
+
 // Used during importation - we may just want to update the underlying local file (seems to be a common usage pattern)
 - (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data;
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^ _Nullable)(NSError *_Nullable error))completion;
-
-#ifndef IS_APP_EXTENSION // TODO: Part of effort to make Auto-Fill Component Read Only
-- (void)startMonitoringDocumentsDirectory;
-#endif
-
 - (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData; // used by iCloud Migration
 - (BOOL)fileNameExistsInDefaultStorage:(NSString*)filename; // used by Import to see if we should update
-
 - (BOOL)isUsingSharedStorage:(SafeMetaData*)metadata;
-- (BOOL)toggleSharedStorage:(SafeMetaData*)metadata error:(NSError**)error;
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^ _Nullable)(NSError *_Nullable error))completion;
 
 @end
 

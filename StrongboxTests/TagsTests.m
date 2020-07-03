@@ -21,9 +21,11 @@
 
     XCTAssertNotNil(safeData);
     
-    [[[KeePassDatabase alloc] init] open:safeData
+    NSInputStream* stream = [NSInputStream inputStreamWithData:safeData];
+    [stream open];
+    
+    [[[KeePassDatabase alloc] init] read:stream
                                      ckf:[CompositeKeyFactors password:@"a"]
-     useLegacyDeserialization:NO
                               completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
@@ -48,9 +50,11 @@
                               completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
         XCTAssertNotNil(data);
         
-        [[[KeePassDatabase alloc] init] open:data
+        NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+        [stream open];
+        
+        [[[KeePassDatabase alloc] init] read:stream
                                          ckf:[CompositeKeyFactors password:@"a"]
-                    useLegacyDeserialization:NO
                                   completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
             NSLog(@"%@", db);
             

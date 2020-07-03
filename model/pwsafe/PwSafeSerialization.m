@@ -259,12 +259,12 @@
     return ret;
 }
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    if(candidate == nil || candidate.length < SIZE_OF_PASSWORD_SAFE_3_HEADER) {
++ (BOOL)isValidDatabase:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
+    if(prefix == nil || prefix.length < SIZE_OF_PASSWORD_SAFE_3_HEADER) {
         return NO;
     }
     
-    PasswordSafe3Header header = [PwSafeSerialization getHeader:candidate];
+    PasswordSafe3Header header = [PwSafeSerialization getHeader:prefix];
     
     if (header.tag[0] != 'P' ||
         header.tag[1] != 'W' ||
@@ -277,35 +277,26 @@
         return NO;
     }
 
-    NSUInteger endOfData = [PwSafeSerialization getEofFileOffset:candidate];
-    
-    if (endOfData == NSNotFound) {
-        NSLog(@"Invalid Password Safe. No End of File marker magic");
-        if(error) {
-            *error = [Utils createNSError:@"Invalid Password Safe 3 File. No End of File marker magic" errorCode:-1];
-        }
-        return NO;
-    }
-
-    NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
-    if (recordsLength <= 0) {
-        NSLog(@"Invalid Password Safe 3 File. Negative or zero record length");
-        if(error) {
-            *error = [Utils createNSError:@"Invalid Password Safe 3 File. Negative or zero record length" errorCode:-1];
-        }
-        return NO;
-    }
-
-    NSInteger numBlocks = recordsLength / TWOFISH_BLOCK_SIZE;
-    NSUInteger rem = recordsLength % TWOFISH_BLOCK_SIZE;
-
-    if (numBlocks <= 0 || rem != 0) {
-        NSLog(@"Invalid Password Safe. Zero blocks found or Non zero remainder in blocks.");
-        if(error) {
-            *error = [Utils createNSError:@"Invalid Password Safe 3 File. Zero blocks found or Non zero remainder in blocks." errorCode:-1];
-        }
-        return NO;
-    }
+//    NSUInteger endOfData = length - EOF_MARKER.length;
+//    NSUInteger recordsLength = endOfData - SIZE_OF_PASSWORD_SAFE_3_HEADER;
+//    if (recordsLength <= 0) {
+//        NSLog(@"Invalid Password Safe 3 File. Negative or zero record length");
+//        if(error) {
+//            *error = [Utils createNSError:@"Invalid Password Safe 3 File. Negative or zero record length" errorCode:-1];
+//        }
+//        return NO;
+//    }
+//
+//    NSInteger numBlocks = recordsLength / TWOFISH_BLOCK_SIZE;
+//    NSUInteger rem = recordsLength % TWOFISH_BLOCK_SIZE;
+//
+//    if (numBlocks <= 0 || rem != 0) {
+//        NSLog(@"Invalid Password Safe. Zero blocks found or Non zero remainder in blocks.");
+//        if(error) {
+//            *error = [Utils createNSError:@"Invalid Password Safe 3 File. Zero blocks found or Non zero remainder in blocks." errorCode:-1];
+//        }
+//        return NO;
+//    }
 
     return YES;
 }

@@ -69,7 +69,6 @@ NS_ASSUME_NONNULL_BEGIN
 // if key file is in Documents directory (ok if in AppGroup directory as that doesn't change on each release). Will start keeping both then
 // transition in 8 weeks or so (26-July-2020) to try using bookmark only and if that works remove the url entirely.
 // TODO: Soft Transition (with fallback to URL?) to Bookmark on 26-July-2020
-//
 
 @property (nullable) NSString* keyFileBookmark;
 @property (nullable) NSURL* keyFileUrl;

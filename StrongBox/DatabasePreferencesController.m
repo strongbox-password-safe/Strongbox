@@ -21,6 +21,7 @@
 #import "StatisticsPropertiesViewController.h"
 #import "AuditConfigurationVcTableViewController.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "SyncManager.h"
 
 @interface DatabasePreferencesController ()
 
@@ -344,7 +345,8 @@
 }
 
 - (BOOL)canToggleOfflineCache {
-    return !(self.viewModel.isUsingOfflineCache || !self.viewModel.isCloudBasedStorage);
+    BOOL isCloudBasedStorage = [SyncManager.sharedInstance allowLegacyOfflineCache:self.viewModel.metadata];
+    return !(self.viewModel.isUsingOfflineCache || !isCloudBasedStorage);
 }
 
 @end

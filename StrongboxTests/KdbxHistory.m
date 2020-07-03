@@ -22,9 +22,11 @@
 - (void)testGoogleDriveSafeWithHistory {
     NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/favicon-test2.kdbx"];
 
-    [[[Kdbx4Database alloc] init] open:safeData
+    NSInputStream* stream = [NSInputStream inputStreamWithData:safeData];
+    [stream open];
+    
+    [[[Kdbx4Database alloc] init] read:stream
                                    ckf:[CompositeKeyFactors password:@"a"]
-              useLegacyDeserialization:NO
                             completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         NSLog(@"%@", db);
         XCTAssertNotNil(db);

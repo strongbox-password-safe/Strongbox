@@ -16,6 +16,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setXmlInfo:(NSString*)elementName attributes:(NSDictionary*)attributes;
 - (void)setXmlText:(NSString*)text;
 
+- (BOOL)appendStreamedText:(NSString*)text;
+
+@property (readonly) BOOL handlesStreamingText;
 @property (readonly) NSString* originalElementName;
 @property (readonly) NSString* originalText;
 @property (readonly) NSDictionary* originalAttributes;

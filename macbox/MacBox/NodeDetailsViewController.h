@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NodeDetailsViewController : NSViewController
 
 @property Node* node;
-@property ViewModel* model;
+@property (weak) ViewModel* model;
 @property BOOL newEntry;
 @property BOOL historical;
 

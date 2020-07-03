@@ -16,6 +16,7 @@
 #import "BookmarksHelper.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "OpenSafeSequenceHelper.h"
+#import "SVProgressHUD.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 
@@ -80,47 +81,55 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
           parentFolder:(NSObject*)parentFolder
          yubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig
            completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSError* error))completion {
-    [database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-        if (userCancelled || data == nil || error) {
-            completion(userCancelled, nil, error);
-            return;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^(void) { // Saving Has to be done on main thread :(
-            [provider create:name
-                   extension:database.fileExtension
-                        data:data
-                parentFolder:parentFolder
-              viewController:vc
-                  completion:^(SafeMetaData *metadata, NSError *error)
-             {
-                if (keyFileUrl) {
-                    NSError* error = nil;
-                    NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
-                    if (bookmark && !error) {
-                        metadata.keyFileBookmark = bookmark;
+    dispatch_async(dispatch_get_main_queue(), ^(void) { // Saving Has to be done on main thread :(
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
+    });
+                   
+    dispatch_async(dispatch_get_global_queue(0L, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
+        [database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+            if (userCancelled || data == nil || error) {
+                completion(userCancelled, nil, error);
+                return;
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), ^(void) { // Saving Has to be done on main thread :(
+                [SVProgressHUD dismiss];
+                
+                [provider create:name
+                       extension:database.fileExtension
+                            data:data
+                    parentFolder:parentFolder
+                  viewController:vc
+                      completion:^(SafeMetaData *metadata, NSError *error)
+                 {
+                    if (keyFileUrl) {
+                        NSError* error = nil;
+                        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
+                        if (bookmark && !error) {
+                            metadata.keyFileBookmark = bookmark;
+                        }
+                        else {
+                            metadata.keyFileBookmark = nil;
+                            NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
+                        }
+                        
+                        metadata.keyFileUrl = keyFileUrl;
                     }
                     else {
                         metadata.keyFileBookmark = nil;
-                        NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
+                        metadata.keyFileUrl = nil;
                     }
-                    
-                    metadata.keyFileUrl = keyFileUrl;
-                }
-                else {
-                    metadata.keyFileBookmark = nil;
-                    metadata.keyFileUrl = nil;
-                }
 
-                metadata.likelyFormat = database.format;
-                metadata.yubiKeyConfig = yubiKeyConfig;
+                    metadata.likelyFormat = database.format;
+                    metadata.yubiKeyConfig = yubiKeyConfig;
 
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    completion(NO, metadata, error);
-                });
-             }];
-        });
-    }];
+                    dispatch_async(dispatch_get_main_queue(), ^(void) {
+                        completion(NO, metadata, error);
+                    });
+                 }];
+            });
+        }];
+    });
 }
 
 static DatabaseModel* getNewDatabase(NSString* password,

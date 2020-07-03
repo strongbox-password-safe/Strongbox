@@ -198,7 +198,7 @@
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSError* error;
-    NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];
+    NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];  // TODO: Would be good not to have to read all file
     
     if(error) {
         [Alerts error:self
@@ -207,7 +207,7 @@
         return;
     }
     
-    if (![DatabaseModel isAValidSafe:importedData error:&error]) {
+    if (![DatabaseModel isValidDatabaseWithPrefix:importedData error:&error] ) {
         [Alerts error:self
                 title:NSLocalizedString(@"sspc_error_invalid_database", @"Invalid Database")
                 error:error];

@@ -10,6 +10,7 @@
 #import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
 #import "Utils.h"
 #import "SVProgressHUD.h"
+#import "Constants.h"
 
 @implementation DropboxV2StorageProvider
 
@@ -51,7 +52,7 @@
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
     [SVProgressHUD show];
 
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
@@ -82,9 +83,23 @@
               }];
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
-    NSString *path = [NSString pathWithComponents:
-                      @[safeMetaData.fileIdentifier, safeMetaData.fileName]];
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    if ( !DBClientsManager.authorizedClient ) {
+        completion(nil, kUserInteractionRequiredError );
+        return;
+    }
+    
+    NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
+    [self readFileWithPath:path completion:completion];
+}
+
+- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self read:safeMetaData viewController:viewController completion:completion];
+}
+
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
+    
     [self performTaskWithAuthorizationIfNecessary:viewController
                                              task:^(BOOL userCancelled, NSError *error) {
                                                  if (error) {
@@ -98,7 +113,7 @@
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, NSError *error))completion {
+                  completion:(void (^)(NSData *data, const NSError *error))completion {
     DBFILESFileMetadata *file = (DBFILESFileMetadata *)providerData;
 
     [self readFileWithPath:file.pathLower completion:completion];
@@ -112,8 +127,7 @@
     DBUserClient *client = DBClientsManager.authorizedClient;
     [[[client.filesRoutes downloadData:path]
       setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *networkError,
-                         NSData *fileContents)
-    {
+                         NSData *fileContents) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
         });
@@ -175,7 +189,7 @@
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     [self performTaskWithAuthorizationIfNecessary:viewController task:^(BOOL userCancelled, NSError *error) {
         if (error) {
             completion(userCancelled, nil, error);
@@ -194,8 +208,7 @@
         id __block token = [center addObserverForName:@"isDropboxLinked"
                                                           object:nil
                                                            queue:nil
-                                                      usingBlock:^(NSNotification *_Nonnull note)
-        {
+                                                      usingBlock:^(NSNotification *_Nonnull note) {
             [center removeObserver:token];
   
             if (DBClientsManager.authorizedClient) {
@@ -220,7 +233,8 @@
             [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
                                            controller:viewController
                                               openURL:^(NSURL *url) {
-                [[UIApplication sharedApplication] openURL:url]; }];
+                [UIApplication.sharedApplication openURL:url options:@{ } completionHandler:nil];
+            }];
         });
         
 #else
@@ -354,9 +368,8 @@
     // NOTSUPPORTED
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
     // NOTIMPL
 }
-
 
 @end

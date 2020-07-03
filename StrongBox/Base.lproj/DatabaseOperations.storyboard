@@ -392,7 +392,7 @@ NB: It is important to note that in some jurisdictions this action in itself can
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="euc-Qg-0mW" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-1829" y="2158"/>
+            <point key="canvasLocation" x="-1725" y="2172"/>
         </scene>
         <!--Statistics & Properties-->
         <scene sceneID="epS-Fe-cI8">
@@ -1041,7 +1041,6 @@ NB: It is important to note that in some jurisdictions this action in itself can
         <!--Navigation Controller-->
         <scene sceneID="kP3-tP-HTN">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="SFg-PY-0m3" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" modalPresentationStyle="formSheet" id="Rf4-Vz-QaZ" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="K7e-Jc-gRM">
@@ -1053,6 +1052,7 @@ NB: It is important to note that in some jurisdictions this action in itself can
                         <segue destination="tDy-B6-fbm" kind="relationship" relationship="rootViewController" id="83E-P3-Vzb"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SFg-PY-0m3" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-3897" y="2235"/>
         </scene>

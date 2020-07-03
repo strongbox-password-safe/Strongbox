@@ -31,6 +31,11 @@ static NSString* const kAppLockDelay = @"appLockDelay2.0";
 
 static NSString* const kLastFreeTrialNudge = @"lastFreeTrialNudge";
 
+static NSString* const kBackupFiles = @"backupFiles";
+static NSString* const kBackupIncludeImportedKeyFiles = @"backupIncludeImportedKeyFiles";
+static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSettings";
+
+
 // TODO: Don't use shared settings for these...
 
 @implementation Settings
@@ -92,6 +97,29 @@ static NSString* const kLastFreeTrialNudge = @"lastFreeTrialNudge";
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+- (BOOL)haveAskedAboutBackupSettings {
+    return [self getBool:kHaveAskedAboutBackupSettings fallback:NO];
+}
+
+- (void)setHaveAskedAboutBackupSettings:(BOOL)haveAskedAboutBackupSettings {
+    [self setBool:kHaveAskedAboutBackupSettings value:haveAskedAboutBackupSettings];
+}
+
+- (BOOL)backupFiles {
+    return [self getBool:kBackupFiles fallback:YES];
+}
+
+- (void)setBackupFiles:(BOOL)backupFiles {
+    [self setBool:kBackupFiles value:backupFiles];
+}
+
+- (BOOL)backupIncludeImportedKeyFiles {
+    return [self getBool:kBackupIncludeImportedKeyFiles fallback:NO];
+}
+
+- (void)setBackupIncludeImportedKeyFiles:(BOOL)backupIncludeImportedKeyFiles {
+    return [self setBool:kBackupIncludeImportedKeyFiles value:backupIncludeImportedKeyFiles];
+}
 - (NSDate *)lastFreeTrialNudge {
     NSDate* date = [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:kLastFreeTrialNudge];
     return date ? date : NSDate.date; // App Install will count as first nudge in a technical sense

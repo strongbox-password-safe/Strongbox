@@ -14,11 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Kdbx4Database : NSObject<AbstractDatabaseFormatAdaptor>
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
-+ (NSString *)fileExtension;
-
-@property (nonatomic, readonly) DatabaseFormat format;
-@property (nonatomic, readonly) NSString* fileExtension;
+- (void)read:(NSInputStream *)stream
+         ckf:(CompositeKeyFactors *)ckf
+xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
+  completion:(OpenCompletionBlock)completion;
 
 @end
 

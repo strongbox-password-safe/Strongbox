@@ -4,6 +4,7 @@
 #import "PwSafeSerialization.h"
 #import <CommonCrypto/CommonHMAC.h>
 #import "Record.h"
+#import "Constants.h"
 
 @interface PwSafeDatabase ()
 
@@ -23,8 +24,8 @@
     return kPasswordSafe;
 }
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    return [PwSafeSerialization isAValidSafe:candidate error:error];
++ (BOOL)isValidDatabase:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
+    return [PwSafeSerialization isValidDatabase:prefix error:error];
 }
 
 - (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
@@ -35,9 +36,9 @@
     return ret;
 }
 
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(OpenCompletionBlock)completion {
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
     NSError* error;
-    if (![PwSafeDatabase isAValidSafe:data error:&error]) {
+    if (![PwSafeDatabase isValidDatabase:data error:&error]) {
         NSLog(@"Not a valid safe!");
         error = [Utils createNSError:@"This is not a valid Password Safe 3 File (Invalid Format)." errorCode:-1];
         completion(NO, nil, error);
@@ -74,6 +75,35 @@
     ret.adaptorTag = headerFields;
 
     completion(NO, ret, nil);
+}
+
+- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream *)xmlDumpStream completion:(OpenCompletionBlock)completion {
+    [self read:stream ckf:ckf completion:completion];
+}
+
+- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+    NSMutableData* mutableData = [NSMutableData dataWithCapacity:kStreamingSerializationChunkSize];
+    
+    [stream open];
+    uint8_t* buf = malloc(kStreamingSerializationChunkSize);
+    NSInteger bytesRead;
+    
+    do {
+        bytesRead = [stream read:buf maxLength:kStreamingSerializationChunkSize];
+        if (bytesRead > 0) {
+            [mutableData appendBytes:buf length:bytesRead];
+        }
+    } while (bytesRead > 0);
+    
+    free(buf);
+    [stream close];
+    
+    if (bytesRead < 0) {
+        completion(NO, nil, stream.streamError);
+        return;
+    }
+    
+    [self open:mutableData ckf:ckf completion:completion];
 }
 
 - (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {

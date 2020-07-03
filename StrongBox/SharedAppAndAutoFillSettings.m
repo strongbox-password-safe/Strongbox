@@ -40,7 +40,7 @@ static NSString* const kDatabaseCellTopSubtitle = @"databaseCellTopSubtitle";
 static NSString* const kDatabaseCellSubtitle1 = @"databaseCellSubtitle1";
 static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
-static NSString* const kUseLegacyDeserialization = @"useLegacyDeserialization";
+static NSString* const kUberSync = @"uberSync";
 
 // TODO: Move to JSON file instead of NSUserDefaults...
 @implementation SharedAppAndAutoFillSettings
@@ -84,12 +84,18 @@ static NSString* const kUseLegacyDeserialization = @"useLegacyDeserialization";
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)useLegacyDeserialization {
-    return [self getBool:kUseLegacyDeserialization];
+- (NSNumber *)optionalUberSync {
+    return [self.sharedAppGroupDefaults objectForKey:kUberSync];
 }
 
-- (void)setUseLegacyDeserialization:(BOOL)useLegacyDeserialization {
-    [self setBool:kUseLegacyDeserialization value:useLegacyDeserialization];
+- (void)setOptionalUberSync:(NSNumber *)optionalUberSync {
+    [self.sharedAppGroupDefaults setObject:optionalUberSync forKey:kUberSync];
+    [self.sharedAppGroupDefaults synchronize];
+
+}
+
+- (BOOL)uberSync {
+    return self.optionalUberSync == nil ? NO : self.optionalUberSync.boolValue;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

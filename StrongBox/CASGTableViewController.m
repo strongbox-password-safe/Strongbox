@@ -620,9 +620,7 @@
 }
 
 - (IBAction)onAdvancedChanged:(id)sender {
-#ifndef IS_APP_EXTENSION // TODO
     SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
-#endif
     
     [self bindUi];
 }

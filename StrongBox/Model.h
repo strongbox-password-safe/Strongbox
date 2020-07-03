@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SafeStorageProvider.h"
 #import "SafesList.h"
 #import "DatabaseModel.h"
 #import "AbstractDatabaseMetadata.h"
@@ -27,8 +26,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 @interface Model : NSObject
 
 @property (nonatomic, readonly, nonnull) SafeMetaData *metadata;
-@property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;
-@property (nonatomic, readonly) BOOL isCloudBasedStorage;
+@property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
 @property (nonatomic, readonly) BOOL isUsingOfflineCache;
 @property (nonatomic, readonly) BOOL isReadOnly;
 
@@ -41,8 +39,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 - (instancetype _Nullable )initWithSafeDatabase:(DatabaseModel *_Nonnull)passwordDatabase
                           originalDataForBackup:(NSData*_Nullable)originalDataForBackup // Can be null in case of Duress Dummy
                                        metaData:(SafeMetaData *_Nonnull)metaData
-                                storageProvider:(id <SafeStorageProvider>_Nonnull)provider
-                                      cacheMode:(BOOL)usingOfflineCache
+                                      cacheMode:(BOOL)cacheMode
                                      isReadOnly:(BOOL)isReadOnly
                                  isAutoFillOpen:(BOOL)isAutoFillOpen NS_DESIGNATED_INITIALIZER;
 

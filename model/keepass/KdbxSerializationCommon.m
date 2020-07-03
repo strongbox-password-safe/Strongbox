@@ -17,21 +17,22 @@
 #import "KeePassXmlParser.h"
 #include <libxml/parser.h>
 #import "NSData+Extensions.h"
+#import "NSArray+Extensions.h"
 
 static const BOOL kLogVerbose = NO;
 
 @implementation KdbxSerializationCommon
 
-BOOL keePass2SignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion, NSError** error) {
-    return keePassSignatureAndVersionMatch(candidate, majorVersion, minorVersion, error);
+BOOL keePass2SignatureAndVersionMatch(NSData * prefix, uint32_t majorVersion, uint32_t minorVersion, NSError** error) {
+    return keePassSignatureAndVersionMatch(prefix, majorVersion, minorVersion, error);
 }
 
-BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, uint32_t minorVersion, NSError** error) {
-    if(candidate == nil) {
+BOOL keePassSignatureAndVersionMatch(NSData * prefix, uint32_t majorVersion, uint32_t minorVersion, NSError** error) {
+    if(prefix == nil) {
         return NO;
     }
     
-    if(candidate.length < SIZE_OF_KEEPASS_HEADER) {
+    if(prefix.length < SIZE_OF_KEEPASS_HEADER) {
         if(error) {
             *error = [Utils createNSError:@"candidate.length < SIZE_OF_KEEPASS_HEADER" errorCode:-1];
         }
@@ -39,7 +40,7 @@ BOOL keePassSignatureAndVersionMatch(NSData * candidate, uint32_t majorVersion, 
         return NO;
     }
     
-    KeepassFileHeader header = getKeePassFileHeader(candidate);
+    KeepassFileHeader header = getKeePassFileHeader(prefix);
     
     // https://gist.github.com/msmuenchen/9318327
     
@@ -323,6 +324,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
                               NSData* innerRandomStreamKey,
                               XmlProcessingContext* context,
                               NSInputStream* stream,
+                              NSOutputStream* xmlDumpStream,
                               NSError** error) {
     KeePassXmlParser *parser =
         [[KeePassXmlParser alloc] initWithProtectedStreamId:innerRandomStreamId
@@ -388,6 +390,11 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
             free(my_handler);
             return nil;
         }
+        
+        if (xmlDumpStream) {
+            [xmlDumpStream write:chnk maxLength:read];
+        }
+
         if(!ctxt) {
             ctxt = xmlCreatePushParserCtxt(my_handler, (__bridge void *)(parser), (char*)chnk, (int)read, nil);
         }
@@ -496,6 +503,38 @@ NSInteger findXmlMarker(uint8_t* chars, NSUInteger length) {
     }
 }
 
+
+///
+
+NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
+    if (existingRootXmlDocument) {
+        if (existingRootXmlDocument.keePassFile) {
+            if (existingRootXmlDocument.keePassFile.root) {
+                if (existingRootXmlDocument.keePassFile.root.deletedObjects) {
+                    NSDictionary<NSUUID*, NSArray<DeletedObject*>*>* byUuid = [existingRootXmlDocument.keePassFile.root.deletedObjects.deletedObjects groupBy:^id _Nonnull(DeletedObject * _Nonnull obj) {
+                        return obj.uuid;
+                    }];
+                    
+                    NSMutableDictionary<NSUUID*, NSDate*> *ret = NSMutableDictionary.dictionary;
+                    for (NSUUID* uuid in byUuid.allKeys) {
+                        NSArray<DeletedObject*>* deletes = byUuid[uuid];
+                        NSArray<DeletedObject*>* sortedDeletes = [deletes sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+                            DeletedObject* d1 = (DeletedObject*)obj1;
+                            DeletedObject* d2 = (DeletedObject*)obj2;
+                            return [d2.deletionTime compare:d1.deletionTime]; // Latest first
+                        }];
+                        
+                        ret[uuid] = sortedDeletes.firstObject.deletionTime;
+                    }
+                    
+                    return ret;
+                }
+            }
+        }
+    }
+    
+    return @{};
+}
 //
 //    NSInteger offset = 0;
 //

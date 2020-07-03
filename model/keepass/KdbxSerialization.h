@@ -25,11 +25,11 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, SerializationData
 
 @interface KdbxSerialization : NSObject
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
++ (BOOL)isValidDatabase:(NSData*)prefix error:(NSError**)error;
 
-+ (void)deserialize:(NSData*)safeData
++ (void)deserialize:(NSInputStream*)stream
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
-useLegacyDeserialization:(BOOL)useLegacyDeserialization
+      xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
          completion:(DeserializeCompletionBlock)completion;
 
 - (instancetype)init:(SerializationData*)serializationData;

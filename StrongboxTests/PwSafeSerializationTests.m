@@ -21,9 +21,10 @@
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
     id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
-    [adaptor open:safeData
+     NSInputStream* stream = [NSInputStream inputStreamWithData:safeData];
+     [stream open];
+     [adaptor read:stream
               ckf:[CompositeKeyFactors password:@"a"]
-     useLegacyDeserialization:NO
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         if(!db) {
             NSLog(@"ERROR: %@", error);
@@ -33,28 +34,6 @@
         XCTAssertNotNil(db);
         
         NSLog(@"%@", db);
-    }];
-}
-
-- (void)testLargeMemoryConsumption {
-    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
-    NSString *path = [bundle pathForResource:@"pwsafe-mem-consumption" ofType:@"psafe3"];
-    NSData* safeData = [NSData dataWithContentsOfFile:path];
-    
-    id<AbstractDatabaseFormatAdaptor> adaptor = [[PwSafeDatabase alloc] init];
-    
-    [adaptor open:safeData
-              ckf:[CompositeKeyFactors password:@"M1cr0s0ft"]
-useLegacyDeserialization:NO
-       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
-        if(!db) {
-            NSLog(@"ERROR: %@", error);
-            return;
-        }
-        
-        XCTAssertNotNil(db);
-        
-        NSLog(@"%@", db); // [db getDiagnosticDumpString:YES]);
     }];
 }
 

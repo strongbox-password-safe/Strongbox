@@ -33,9 +33,11 @@
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    [KdbxSerialization deserialize:safeData
+    NSInputStream* inputStream = [NSInputStream inputStreamWithData:safeData];
+    [inputStream open];
+    [KdbxSerialization deserialize:inputStream
                compositeKeyFactors:cpf
-     useLegacyDeserialization:NO
+                     xmlDumpStream:nil
                         completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
         if(!data) {
             NSLog(@"%@", error);
@@ -59,8 +61,11 @@
     //KeePassDatabase *db = [[KeePassDatabase alloc] initExistingWithDataAndPassword:safeData password:@"a" error:&error];
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    [KdbxSerialization deserialize:safeData
-               compositeKeyFactors:cpf useLegacyDeserialization:NO
+    NSInputStream* inputStream = [NSInputStream inputStreamWithData:safeData];
+    [inputStream open];
+    [KdbxSerialization deserialize:inputStream
+               compositeKeyFactors:cpf
+                     xmlDumpStream:nil
                         completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
         if(!data) {
             NSLog(@"%@", error);
@@ -75,19 +80,22 @@
 }
 
 - (void)testDeserializeGoogleDriveFileToXml {
-    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/Database.kdbx"];
-    
+//    NSData *safeData = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/Database.kdbx"];
+    NSInputStream* inputStream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/Database.kdbx"];
+    [inputStream open];
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    [Kdbx4Serialization deserialize:safeData
-                compositeKeyFactors:cpf useLegacyDeserialization:NO
-                         completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable data, NSError * _Nullable error) {
-        if(!data) {
+    
+    [Kdbx4Serialization deserialize:inputStream
+                compositeKeyFactors:cpf
+                      xmlDumpStream:nil
+                         completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable error) {
+        if(!serializationData) {
             NSLog(@"%@", error);
         }
         
-        XCTAssert(data != nil);
+        XCTAssert(serializationData != nil);
         
-        NSLog(@"%@", data);
+        NSLog(@"%@", serializationData);
     }];
 }
 
@@ -97,9 +105,13 @@
     NSData* safeData = [NSData dataWithContentsOfFile:path];
     
     CompositeKeyFactors* cpf = [[CompositeKeyFactors alloc] initWithPassword:@"a"];
-    [KdbxSerialization deserialize:safeData
-                                         compositeKeyFactors:cpf useLegacyDeserialization:NO
-                                                  completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
+    NSInputStream* inputStream = [NSInputStream inputStreamWithData:safeData];
+    [inputStream open];
+    
+    [KdbxSerialization deserialize:inputStream
+               compositeKeyFactors:cpf
+                     xmlDumpStream:nil
+                        completion:^(BOOL userCancelled, SerializationData * _Nullable data, NSError * _Nullable error) {
         if(!data) {
             NSLog(@"%@", error);
         }

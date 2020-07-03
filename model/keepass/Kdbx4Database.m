@@ -38,8 +38,8 @@ static const BOOL kLogVerbose = NO;
     return kKeePass4;
 }
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    return keePass2SignatureAndVersionMatch(candidate, kKdbx4MajorVersionNumber, kKdbx4MaximumAcceptableMinorVersionNumber, error);
++ (BOOL)isValidDatabase:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
+    return keePass2SignatureAndVersionMatch(prefix, kKdbx4MajorVersionNumber, kKdbx4MaximumAcceptableMinorVersionNumber, error);
 }
 
 - (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
@@ -57,14 +57,23 @@ static const BOOL kLogVerbose = NO;
     return [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
 }
 
-- (void)open:(NSData *)data
+- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+    [self read:stream ckf:ckf xmlDumpStream:nil completion:completion];
+}
+
+- (void)read:(NSInputStream *)stream
          ckf:(CompositeKeyFactors *)ckf
-useLegacyDeserialization:(BOOL)useLegacyDeserialization
+xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
   completion:(OpenCompletionBlock)completion {
-    [Kdbx4Serialization deserialize:data
+    [Kdbx4Serialization deserialize:stream
                 compositeKeyFactors:ckf
-           useLegacyDeserialization:useLegacyDeserialization
-                         completion:^(BOOL userCancelled, Kdbx4SerializationData* serializationData, NSError* error) {
+                      xmlDumpStream:xmlDumpStream
+                         completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable error) {
+        onDeserialized(userCancelled, serializationData, error, ckf, completion);
+    }];
+}
+
+static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable error, CompositeKeyFactors* ckf, OpenCompletionBlock completion) {
     if(userCancelled || serializationData == nil || serializationData.rootXmlObject == nil || error) {
         if(error) {
             NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", error);
@@ -90,8 +99,6 @@ useLegacyDeserialization:(BOOL)useLegacyDeserialization
     NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
     NSDictionary<NSUUID*, NSDate*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
    
-//    NSLog(@"deletedObjects = [%@]", deletedObjects);
-        
     // Metadata
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
@@ -131,7 +138,6 @@ useLegacyDeserialization:(BOOL)useLegacyDeserialization
     ret.adaptorTag = tag;
     
     completion(NO, ret, nil);
-}];
 }
 
 - (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
@@ -259,37 +265,6 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(Meta* meta) {
     }
     
     return [NSMutableDictionary dictionary];
-}
-
-// TODO: Duplicated in KDBX3
-static NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
-    if (existingRootXmlDocument) {
-        if (existingRootXmlDocument.keePassFile) {
-            if (existingRootXmlDocument.keePassFile.root) {
-                if (existingRootXmlDocument.keePassFile.root.deletedObjects) {
-                    NSDictionary<NSUUID*, NSArray<DeletedObject*>*>* byUuid = [existingRootXmlDocument.keePassFile.root.deletedObjects.deletedObjects groupBy:^id _Nonnull(DeletedObject * _Nonnull obj) {
-                        return obj.uuid;
-                    }];
-                    
-                    NSMutableDictionary<NSUUID*, NSDate*> *ret = NSMutableDictionary.dictionary;
-                    for (NSUUID* uuid in byUuid.allKeys) {
-                        NSArray<DeletedObject*>* deletes = byUuid[uuid];
-                        NSArray<DeletedObject*>* sortedDeletes = [deletes sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-                            DeletedObject* d1 = (DeletedObject*)obj1;
-                            DeletedObject* d2 = (DeletedObject*)obj2;
-                            return [d2.deletionTime compare:d1.deletionTime]; // Latest first
-                        }];
-                        
-                        ret[uuid] = sortedDeletes.firstObject.deletionTime;
-                    }
-                    
-                    return ret;
-                }
-            }
-        }
-    }
-    
-    return @{};
 }
 
 @end

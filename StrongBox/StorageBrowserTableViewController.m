@@ -165,7 +165,7 @@
     }
     else {
         cell.imageView.image = file.folder ? _defaultFolderImage : _defaultFileImage;
-        cell.imageView.tintColor = file.folder ? NodeIconHelper.folderTintColor : nil;
+        cell.imageView.tintColor = nil;
     }
 
     cell.accessoryType = file.folder ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
@@ -227,9 +227,8 @@
 - (void)readForValidationDone:(StorageBrowserItem *)file data:(NSData *)data error:(NSError *)error {
     if (error == nil) {
         NSError* err;
-        if ([DatabaseModel isAValidSafe:data error:&err]) {
-            DatabaseFormat likelyFormat = [DatabaseModel getLikelyDatabaseFormat:data];
-            
+        if ([DatabaseModel isValidDatabaseWithPrefix:data error:&err]) {  // TODO: Would be good not to have to read all file
+            DatabaseFormat likelyFormat = [DatabaseModel getDatabaseFormatWithPrefix:data];
             self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider file:file likelyFormat:likelyFormat]);
         }
         else {

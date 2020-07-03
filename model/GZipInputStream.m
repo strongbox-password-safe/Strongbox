@@ -10,6 +10,7 @@
 #import <zlib.h>
 #import "DatabaseModel.h"
 #import "Utils.h"
+#import "Constants.h"
 
 @interface GZipInputStream ()
 

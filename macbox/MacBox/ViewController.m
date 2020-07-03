@@ -42,6 +42,7 @@
 #import "MacYubiKeyManager.h"
 #import "ColoredStringHelper.h"
 #import "NSString+Extensions.h"
+#import "FileManager.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -120,7 +121,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 @property NSArray* attachments;
 
-@property (strong, nonatomic) ViewModel* model;
+@property (weak, nonatomic) ViewModel* model;
 @property BOOL isPromptingAboutUnderlyingFileChange;
 @property NSArray* customFields;
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
@@ -3307,7 +3308,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
     
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:nodeAttachment.filename];
     
     NSError* error;
     //BOOL success =
@@ -3327,11 +3328,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-    for (NSString *file in tmpDirectory) {
-        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-    }
+    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
 - (IBAction)onPreviewQuickViewAttachment:(id)sender {

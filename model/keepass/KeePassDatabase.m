@@ -27,8 +27,8 @@
     return kKeePass;
 }
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    return [KdbxSerialization isAValidSafe:candidate error:error];
++ (BOOL)isValidDatabase:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
+    return [KdbxSerialization isValidDatabase:prefix error:error];
 }
 
 - (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
@@ -52,97 +52,110 @@
     return ret;
 }
 
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(OpenCompletionBlock)completion {
-    [KdbxSerialization deserialize:data
+- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [self read:stream ckf:ckf completion:completion];
+}
+
+- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
+    [self read:stream ckf:ckf xmlDumpStream:nil completion:completion];
+}
+
+- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream*)xmlDumpStream completion:(OpenCompletionBlock)completion {
+    [KdbxSerialization deserialize:stream
                compositeKeyFactors:ckf
-          useLegacyDeserialization:useLegacyDeserialization
+                     xmlDumpStream:xmlDumpStream
                         completion:^(BOOL userCancelled, SerializationData * _Nullable serializationData, NSError * _Nullable error) {
         if(userCancelled || serializationData == nil || error) {
             completion(userCancelled, nil, error);
             return;
         }
-                
-        RootXmlDomainObject* xmlObject = serializationData.rootXmlObject;
-        Meta* xmlMeta = xmlObject.keePassFile ? xmlObject.keePassFile.meta : nil;
         
-        // Verify Header Hash if present
-        
-        BOOL ignoreHeaderHash = NO;
-        if(!ignoreHeaderHash && xmlMeta && xmlMeta.headerHash) {
-            if(![xmlMeta.headerHash isEqualToString:serializationData.headerHash]) {
-                NSLog(@"Header Hash mismatch. Document has been corrupted or interfered with: [%@] != [%@]",
-                      serializationData.headerHash,
-                      xmlMeta.headerHash);
-                
-                NSError *error = [Utils createNSError:@"Header Hash incorrect. Document has been corrupted." errorCode:-3];
-                completion(NO, nil, error);
-                return;
-            }
-        }
-        
-        // 4. Convert the Xml Model to the Strongbox Model
-        
-        XmlStrongBoxModelAdaptor *xmlStrongboxModelAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
-        NSError* error2;
-        Node* rootGroup = [xmlStrongboxModelAdaptor fromXmlModelToStrongboxModel:xmlObject error:&error2];
-        if(rootGroup == nil) {
-            NSLog(@"Error converting Xml model to Strongbox model: [%@]", error2);
-            completion(NO, nil, error2);
+        onDeserialized(serializationData, ckf, completion);
+    }];
+}
+
+static void onDeserialized(SerializationData *serializationData, CompositeKeyFactors *ckf, OpenCompletionBlock completion) {
+    RootXmlDomainObject* xmlObject = serializationData.rootXmlObject;
+    Meta* xmlMeta = xmlObject.keePassFile ? xmlObject.keePassFile.meta : nil;
+    
+    // Verify Header Hash if present
+    
+    BOOL ignoreHeaderHash = NO;
+    if(!ignoreHeaderHash && xmlMeta && xmlMeta.headerHash) {
+        if(![xmlMeta.headerHash isEqualToString:serializationData.headerHash]) {
+            NSLog(@"Header Hash mismatch. Document has been corrupted or interfered with: [%@] != [%@]",
+                  serializationData.headerHash,
+                  xmlMeta.headerHash);
+            
+            NSError *error = [Utils createNSError:@"Header Hash incorrect. Document has been corrupted." errorCode:-3];
+            completion(NO, nil, error);
             return;
         }
+    }
+    
+    // 4. Convert the Xml Model to the Strongbox Model
+    
+    XmlStrongBoxModelAdaptor *xmlStrongboxModelAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
+    NSError* error2;
+    Node* rootGroup = [xmlStrongboxModelAdaptor fromXmlModelToStrongboxModel:xmlObject error:&error2];
+    if(rootGroup == nil) {
+        NSLog(@"Error converting Xml model to Strongbox model: [%@]", error2);
+        completion(NO, nil, error2);
+        return;
+    }
 
-        // 5. Get Attachments
-        
-        NSArray<DatabaseAttachment*>* attachments = getAttachments(xmlObject);
-        
-        // 6.
-        
-        NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
-        NSDictionary<NSUUID*, NSDate*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
-        
-        // 7. Metadata
+    // 5. Get Attachments
+    
+    NSArray<DatabaseAttachment*>* attachments = getAttachments(xmlObject);
+    
+    // 6.
+    
+    NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
+    NSDictionary<NSUUID*, NSDate*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
+    
+    // 7. Metadata
 
-        KeePassDatabaseMetadata *metadata = [[KeePassDatabaseMetadata alloc] init];
-        
-        // 7.1 Generator
+    KeePassDatabaseMetadata *metadata = [[KeePassDatabaseMetadata alloc] init];
+    
+    // 7.1 Generator
 
-        if(xmlMeta) {
-            metadata.generator = xmlMeta.generator ? xmlMeta.generator :  @"<Unknown>";
-            
-            // 7.2 History
-            
-            metadata.historyMaxItems = xmlMeta.historyMaxItems;
-            metadata.historyMaxSize = xmlMeta.historyMaxSize;
+    if(xmlMeta) {
+        metadata.generator = xmlMeta.generator ? xmlMeta.generator :  @"<Unknown>";
+        
+        // 7.2 History
+        
+        metadata.historyMaxItems = xmlMeta.historyMaxItems;
+        metadata.historyMaxSize = xmlMeta.historyMaxSize;
 
-            // 7.3 Recycle Bin
-            
-            metadata.recycleBinEnabled = xmlMeta.recycleBinEnabled;
-            metadata.recycleBinGroup = xmlMeta.recycleBinGroup;
-            metadata.recycleBinChanged = xmlMeta.recycleBinChanged;
-        }
+        // 7.3 Recycle Bin
         
-        // 7.4 Crypto...
-        
-        metadata.transformRounds = serializationData.transformRounds;
-        metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
-        metadata.compressionFlags = serializationData.compressionFlags;
-        metadata.version = serializationData.fileVersion;
-        metadata.cipherUuid = serializationData.cipherId;
-        
-        KeePass2TagPackage* adaptorTag = [[KeePass2TagPackage alloc] init];
-        adaptorTag.unknownHeaders = serializationData.extraUnknownHeaders;
-        adaptorTag.originalMeta = xmlMeta;
-        
-        StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
-                                                                     metadata:metadata
-                                                          compositeKeyFactors:ckf
-                                                                  attachments:attachments
-                                                                  customIcons:customIcons
-                                                               deletedObjects:deletedObjects];
-        ret.adaptorTag = adaptorTag;
-        
-        completion(NO, ret, nil);
-    }];
+        metadata.recycleBinEnabled = xmlMeta.recycleBinEnabled;
+        metadata.recycleBinGroup = xmlMeta.recycleBinGroup;
+        metadata.recycleBinChanged = xmlMeta.recycleBinChanged;
+    }
+    
+    // 7.4 Crypto...
+    
+    metadata.transformRounds = serializationData.transformRounds;
+    metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
+    metadata.compressionFlags = serializationData.compressionFlags;
+    metadata.version = serializationData.fileVersion;
+    metadata.cipherUuid = serializationData.cipherId;
+    
+    KeePass2TagPackage* adaptorTag = [[KeePass2TagPackage alloc] init];
+    adaptorTag.unknownHeaders = serializationData.extraUnknownHeaders;
+    adaptorTag.originalMeta = xmlMeta;
+    
+    StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
+                                                                 metadata:metadata
+                                                      compositeKeyFactors:ckf
+                                                              attachments:attachments
+                                                              customIcons:customIcons
+                                                           deletedObjects:deletedObjects];
+    ret.adaptorTag = adaptorTag;
+    
+    completion(NO, ret, nil);
 }
 
 - (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
@@ -189,9 +202,7 @@
     
     int i = 0;
     for (DatabaseAttachment* binary in database.attachments) {
-        V3Binary* bin = [[V3Binary alloc] initWithContext:[XmlProcessingContext standardV3Context]];
-        bin.compressed = binary.compressed;
-        bin.data = binary.deprecatedData;
+        V3Binary* bin = [[V3Binary alloc] initWithContext:[XmlProcessingContext standardV3Context] dbAttachment:binary];
         bin.id = i++;
         [v3Binaries addObject:bin];
     }
@@ -275,8 +286,6 @@
     completion(NO, data, nil);
 }
 
-// TODO: Shouldn't these be in the XML Adaptor and in common wth KDBX4 etc
-
 static NSArray<DatabaseAttachment*>* getAttachments(RootXmlDomainObject *xmlDoc) {
     NSArray<V3Binary*>* v3Binaries = safeGetBinaries(xmlDoc);
     
@@ -287,8 +296,7 @@ static NSArray<DatabaseAttachment*>* getAttachments(RootXmlDomainObject *xmlDoc)
     }];
     
     for (V3Binary* binary in sortedById) {
-        DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithData:binary.data compressed:YES protectedInMemory:YES];
-        [attachments addObject:dbA];
+        [attachments addObject:binary.dbAttachment];
     }
     
     return attachments;
@@ -317,36 +325,6 @@ static NSMutableArray<V3Binary*>* safeGetBinaries(RootXmlDomainObject* root) {
     }
     
     return [NSMutableArray array];
-}
-
-static NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
-    if (existingRootXmlDocument) {
-        if (existingRootXmlDocument.keePassFile) {
-            if (existingRootXmlDocument.keePassFile.root) {
-                if (existingRootXmlDocument.keePassFile.root.deletedObjects) {
-                    NSDictionary<NSUUID*, NSArray<DeletedObject*>*>* byUuid = [existingRootXmlDocument.keePassFile.root.deletedObjects.deletedObjects groupBy:^id _Nonnull(DeletedObject * _Nonnull obj) {
-                        return obj.uuid;
-                    }];
-                    
-                    NSMutableDictionary<NSUUID*, NSDate*> *ret = NSMutableDictionary.dictionary;
-                    for (NSUUID* uuid in byUuid.allKeys) {
-                        NSArray<DeletedObject*>* deletes = byUuid[uuid];
-                        NSArray<DeletedObject*>* sortedDeletes = [deletes sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-                            DeletedObject* d1 = (DeletedObject*)obj1;
-                            DeletedObject* d2 = (DeletedObject*)obj2;
-                            return [d2.deletionTime compare:d1.deletionTime]; // Latest first
-                        }];
-                        
-                        ret[uuid] = sortedDeletes.firstObject.deletionTime;
-                    }
-                    
-                    return ret;
-                }
-            }
-        }
-    }
-    
-    return @{};
 }
 
 @end

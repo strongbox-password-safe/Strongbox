@@ -51,8 +51,8 @@ static BOOL kLogVerbose = NO;
 
 @implementation KdbxSerialization
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    return keePass2SignatureAndVersionMatch(candidate, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber, error);
++ (BOOL)isValidDatabase:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
+    return keePass2SignatureAndVersionMatch(prefix, kKdbx3MajorVersionNumber, kKdbx3MinorVersionNumber, error);
 }
 
 - (instancetype)init:(SerializationData*)serializationData {
@@ -179,18 +179,41 @@ static BOOL kLogVerbose = NO;
     return ret;
 }
 
-+ (void)deserialize:(NSData *)safeData
+static BOOL readFileHeader(NSInputStream* stream, KeepassFileHeader *pFileHeader) {
+    NSInteger bytesRead = [stream read:(uint8_t*)pFileHeader maxLength:SIZE_OF_KEEPASS_HEADER];
+    
+    return (bytesRead == SIZE_OF_KEEPASS_HEADER);
+}
+
++ (void)deserialize:(NSInputStream *)stream
 compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
-useLegacyDeserialization:(BOOL)useLegacyDeserialization
+      xmlDumpStream:(NSOutputStream*)xmlDumpStream
          completion:(DeserializeCompletionBlock)completion {
-    size_t offset;
-    NSDictionary<NSNumber *,NSObject *> *headerEntries = getHeaderEntries3((uint8_t*)safeData.bytes, safeData.length, &offset);
+    NSMutableData* headerDataForIntegrityCheck = [NSMutableData data];
+    
+    // File Header
+    
+    KeepassFileHeader fileHeader = {0};
+    if (!readFileHeader(stream, &fileHeader)) {
+        NSLog(@"Error reading KDBX 3.1 file header");
+        NSError* error = [Utils createNSError:@"Error reading KDBX 3.1 file header" errorCode:-1];
+        completion(NO, nil, error);
+        return;
+    }
+    [headerDataForIntegrityCheck appendBytes:&fileHeader length:SIZE_OF_KEEPASS_HEADER];
+    
+    // Header Entries
+    
+    NSDictionary<NSNumber *,NSObject *> *headerEntries = getHeaderEntries3(stream, headerDataForIntegrityCheck);
+    
     if(!headerEntries) {
         NSLog(@"Error getting header entries. Possibly missing header entry.");
         NSError *error = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-3];
         completion(NO, nil, error);
         return;
     }
+    
+    // Get Keys
     
     DecryptionParameters * decryptionParameters = getDecryptionParameters(headerEntries);
     if(kLogVerbose) {
@@ -208,34 +231,42 @@ useLegacyDeserialization:(BOOL)useLegacyDeserialization
             }
             else {
                 NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, response);
-                [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey useLegacyDeserialization:useLegacyDeserialization completion:completion];
+                [KdbxSerialization deserializeStage2:stream
+                                       headerEntries:headerEntries
+                         headerDataForIntegrityCheck:headerDataForIntegrityCheck
+                                decryptionParameters:decryptionParameters
+                                           masterKey:masterKey
+                                       xmlDumpStream:xmlDumpStream
+                                          completion:completion];
             }
         });
     }
     else {
         NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, nil);
-        [KdbxSerialization deserializeStage2:safeData offset:offset headerEntries:headerEntries decryptionParameters:decryptionParameters masterKey:masterKey useLegacyDeserialization:useLegacyDeserialization completion:completion];
+        [KdbxSerialization deserializeStage2:stream
+                               headerEntries:headerEntries
+                 headerDataForIntegrityCheck:headerDataForIntegrityCheck
+                        decryptionParameters:decryptionParameters
+                                   masterKey:masterKey
+                               xmlDumpStream:xmlDumpStream
+                                  completion:completion];
     }
 }
 
-+ (void)deserializeStage2:(NSData *)safeData
-                   offset:(size_t)offset
++ (void)deserializeStage2:(NSInputStream *)inputStream
             headerEntries:(NSDictionary<NSNumber *,NSObject *> *)headerEntries
+headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
      decryptionParameters:(DecryptionParameters*)decryptionParameters
                 masterKey:(NSData*)masterKey
- useLegacyDeserialization:(BOOL)useLegacyDeserialization
+            xmlDumpStream:(NSOutputStream*)xmlDumpStream
                completion:(DeserializeCompletionBlock)completion {
-    // Hash Header for corruption check
-    
     NSMutableData* headerHash = [[NSMutableData alloc] initWithLength:CC_SHA256_DIGEST_LENGTH];
-    CC_SHA256(safeData.bytes, (CC_LONG)offset, headerHash.mutableBytes);
+    CC_SHA256(headerDataForIntegrityCheck.bytes, (CC_LONG)headerDataForIntegrityCheck.length, headerHash.mutableBytes);
     
     if(kLogVerbose) {
         NSLog(@"HEADERHASH (ACTUAL): %@", [headerHash base64EncodedStringWithOptions:kNilOptions]);
     }
-    
-    NSData *dataIn = [safeData subdataWithRange:NSMakeRange(offset, safeData.length - offset)];
-    
+        
     // Decrypt
     
     id<Cipher> cipher = getCipher(decryptionParameters.cipherId);
@@ -247,71 +278,38 @@ useLegacyDeserialization:(BOOL)useLegacyDeserialization
         return;
     }
     
-    BOOL compressed = decryptionParameters.compressionFlags == kGzipCompressionFlag;
-    NSInputStream* stream;
-    if (useLegacyDeserialization) {
-        NSData *decrypted = [cipher decrypt:dataIn iv:decryptionParameters.encryptionIv key:masterKey];
-        if(decrypted == nil) {
-            NSError *error = [Utils createNSError:@"Could not decrypt using provided parameters" errorCode:-1];
-            completion(NO, nil, error);
-            return;
-        }
-
-        // Verify Start Stream - This checks the correct passphrase/keyfile has been used (or we've done something very wrong in the decryption process :/)
-        
-        NSData *actualStartStream = [decrypted subdataWithRange:NSMakeRange(0, decryptionParameters.streamStartBytes.length)];
-        if(![decryptionParameters.streamStartBytes isEqualToData:actualStartStream]) {
-            NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
-            completion(NO, nil, error);
-            return;
-        }
-        
-        // Deblockify
-        
-        NSData* deblockified = deblockify((uint8_t*)&decrypted.bytes[decryptionParameters.streamStartBytes.length]);
-        
-        if(!deblockified) {
-            NSError *error = [Utils createNSError:@"Could not find next block in unordered blocks list. Cannot deblockify" errorCode:-6];
-            completion(NO, nil, error);
-            return;
-        }
-        
-        stream = compressed ? [[GZipInputStream alloc] initWithData:deblockified] : [NSInputStream inputStreamWithData:deblockified];
-    }
-    else {
-        NSInputStream *cipherTextStream = [NSInputStream inputStreamWithData:dataIn];
-        NSInputStream *plaintextStream = [cipher getDecryptionStreamForStream:cipherTextStream key:masterKey iv:decryptionParameters.encryptionIv];
-        
-        uint8_t *start = malloc(decryptionParameters.streamStartBytes.length);
-        
-        [plaintextStream open];
-        NSInteger bytesReadFromStartStream = [plaintextStream read:start maxLength:decryptionParameters.streamStartBytes.length];
-        
-        if(bytesReadFromStartStream != decryptionParameters.streamStartBytes.length ||
-           memcmp(start, decryptionParameters.streamStartBytes.bytes, decryptionParameters.streamStartBytes.length) != 0) {
-            free(start);
-            NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
-            completion(NO, nil, error);
-            return;
-        }
+    NSInputStream *plaintextStream = [cipher getDecryptionStreamForStream:inputStream key:masterKey iv:decryptionParameters.encryptionIv];
+    
+    uint8_t *start = malloc(decryptionParameters.streamStartBytes.length);
+    
+    [plaintextStream open];
+    NSInteger bytesReadFromStartStream = [plaintextStream read:start maxLength:decryptionParameters.streamStartBytes.length];
+    
+    if(bytesReadFromStartStream != decryptionParameters.streamStartBytes.length ||
+       memcmp(start, decryptionParameters.streamStartBytes.bytes, decryptionParameters.streamStartBytes.length) != 0) {
         free(start);
-        
-        NSInputStream* deblockifiedStream = [[KP31HashedBlockStream alloc] initWithStream:plaintextStream];
-        [deblockifiedStream open];
-        
-        stream = compressed ? [[GZipInputStream alloc] initWithStream:deblockifiedStream] : deblockifiedStream;
+        NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
+        completion(NO, nil, error);
+        return;
     }
+    free(start);
+    
+    NSInputStream* deblockifiedStream = [[KP31HashedBlockStream alloc] initWithStream:plaintextStream];
+    
+    BOOL compressed = decryptionParameters.compressionFlags == kGzipCompressionFlag;
+    NSInputStream* decompressedStream = compressed ? [[GZipInputStream alloc] initWithStream:deblockifiedStream] : deblockifiedStream;
         
-    [stream open];
+    [decompressedStream open];
     
     NSError* error;
     RootXmlDomainObject *rootXmlObject = [KdbxSerialization readXml:compressed
-                                                             stream:stream
+                                                             stream:decompressedStream
                                                 innerRandomStreamId:decryptionParameters.innerRandomStreamId
                                                  protectedStreamKey:decryptionParameters.protectedStreamKey
+                                                      xmlDumpStream:xmlDumpStream
                                                               error:&error];
 
-    [stream close];
+    [decompressedStream close];
     
     if(rootXmlObject == nil) {
         NSLog(@"Could not parse XML: [%@]", error);
@@ -320,7 +318,7 @@ useLegacyDeserialization:(BOOL)useLegacyDeserialization
     }
     
     SerializationData* ret = [[SerializationData alloc] init];
-    KeepassFileHeader keePassFileHeader = getKeePassFileHeader(safeData);
+    KeepassFileHeader keePassFileHeader = getKeePassFileHeader(headerDataForIntegrityCheck); // A little dirty
     
     ret.fileVersion = [NSString stringWithFormat:@"%hu.%hu", keePassFileHeader.major, keePassFileHeader.minor];
     ret.transformRounds = decryptionParameters.transformRounds;
@@ -339,9 +337,10 @@ useLegacyDeserialization:(BOOL)useLegacyDeserialization
                          stream:(NSInputStream*)stream
             innerRandomStreamId:(uint32_t)innerRandomStreamId
              protectedStreamKey:(NSData*)protectedStreamKey
+                  xmlDumpStream:(NSOutputStream*)xmlDumpStream
                           error:(NSError**)error {
     RootXmlDomainObject* rootXmlObject = parseXml(innerRandomStreamId, protectedStreamKey,
-                                                XmlProcessingContext.standardV3Context, stream, error);
+                                                XmlProcessingContext.standardV3Context, stream, xmlDumpStream, error);
     
     return rootXmlObject;
 }
@@ -434,50 +433,53 @@ static NSDictionary<NSNumber *,NSObject *>* getUnknownHeaders(NSDictionary<NSNum
     return ret;
 }
 
-NSDictionary<NSNumber *,NSObject *>* getHeaderEntries3(uint8_t * const buffer, size_t bufferLength, size_t* finalOffset) {
+NSDictionary<NSNumber *,NSObject *>* getHeaderEntries3(NSInputStream* stream, NSMutableData* headerDataForIntegrityCheck) {
     NSMutableDictionary<NSNumber *,NSObject *> *headerEntries = [NSMutableDictionary dictionary];
     
-    int offset = SIZE_OF_KEEPASS_HEADER;
-    
-    while (offset + SIZE_OF_HEADER_ENTRY_HEADER <= bufferLength) {
-        HeaderEntryHeader *headerEntry = (HeaderEntryHeader*)&buffer[offset];
+    do {
+        HeaderEntryHeader headerEntry;
+        NSInteger bytesRead = [stream read:(uint8_t*)&headerEntry maxLength:SIZE_OF_HEADER_ENTRY_HEADER];
         
-        int16_t length = littleEndian2BytesToInt16(headerEntry->lengthBytes);
-        uint8_t* data = &buffer[offset + SIZE_OF_HEADER_ENTRY_HEADER];
-        NSData* headerData = [NSData dataWithBytes:data length:length];
-        
-        if(kLogVerbose) {
-            NSLog(@"Found Header Entry of Type %d and length %d", headerEntry->id, length);
-        }
-        
-        if(offset + SIZE_OF_HEADER_ENTRY_HEADER + length > bufferLength) {
-            NSLog(@"This safe appears to be corrupt. Header entry found at [%d] with length of [%d] but only [%lu] data bytes total.", offset, length, bufferLength);
+        if (bytesRead < 0 || bytesRead < SIZE_OF_HEADER_ENTRY_HEADER) {
+            NSLog(@"Couldn't read Header Entry Header");
             return nil;
         }
+        [headerDataForIntegrityCheck appendBytes:&headerEntry length:bytesRead];
         
-        offset += SIZE_OF_HEADER_ENTRY_HEADER + length;
+        int16_t length = littleEndian2BytesToInt16(headerEntry.lengthBytes);
+        NSMutableData* headerData = [NSMutableData dataWithLength:length];
+        bytesRead = [stream read:headerData.mutableBytes maxLength:length];
         
-        if(END_OF_ENTRIES == headerEntry->id) {
+        if (bytesRead < 0 || bytesRead < length) {
+            NSLog(@"Couldn't read Header: [%ld]", (long)bytesRead);
+            return nil;
+        }
+        [headerDataForIntegrityCheck appendBytes:headerData.bytes length:bytesRead];
+
+        if(kLogVerbose) {
+            NSLog(@"Found Header Entry of Type %d and length %d", headerEntry.id, length);
+        }
+        
+        if(END_OF_ENTRIES == headerEntry.id) {
             //NSLog(@"END_OF_ENTRIES: %@", headerData);
             break;
         }
         else {
-            NSObject* obj = getHeaderEntryObject(headerEntry->id, headerData);
+            NSObject* obj = getHeaderEntryObject(headerEntry.id, headerData);
             if(obj) {
-                [headerEntries setObject:obj forKey:@(headerEntry->id)];
+                [headerEntries setObject:obj forKey:@(headerEntry.id)];
             }
         }
-    }
+    } while (YES);
     
-    if(kLogVerbose) {
+    if (kLogVerbose) {
         dumpHeaderEntries(headerEntries);
     }
     
-    if(![KdbxSerialization verifyRequiredHeadersPresent:headerEntries]) {
+    if (![KdbxSerialization verifyRequiredHeadersPresent:headerEntries]) {
         return nil;
     }
     
-    *finalOffset = offset;
     return headerEntries;
 }
 
@@ -544,59 +546,59 @@ static DecryptionParameters *getDecryptionParameters(NSDictionary *headerEntries
     return decryptionParameters;
 }
 
-static NSData* deblockify(uint8_t* blockified) {
-    BlockHeader* block = (BlockHeader*)blockified;
-    
-    NSMutableDictionary<NSNumber*, NSData*> *unorderedBlocks = [NSMutableDictionary dictionary];
-    while(YES) {
-        uint32_t size = littleEndian4BytesToInt32(block->size);
-        uint32_t blockId = littleEndian4BytesToInt32(block->id);
-        
-        if(kLogVerbose) {
-            NSLog(@"Found block id [%d] and size=[%d]", blockId, size);
-        }
-        
-        if(size == 0) {
-            break;
-        }
-        
-        uint8_t* data = (((uint8_t*)block) + SIZE_OF_BLOCK_HEADER);
-        NSData *blockData = [NSData dataWithBytes:data length:size];
-        
-        uint8_t actualHashBytes[CC_SHA256_DIGEST_LENGTH];
-        CC_SHA256(blockData.bytes, (uint32_t)blockData.length, actualHashBytes);
-        NSData* actualHash = [NSData dataWithBytes:actualHashBytes length:CC_SHA256_DIGEST_LENGTH];
-        NSData* expectedHash = [NSData dataWithBytes:block->hash length:CC_SHA256_DIGEST_LENGTH];
-
-        if(![actualHash isEqualToData:expectedHash]) {
-            NSLog(@"Block Header Hash does not match content. This safe is possibly corrupt.");
-            NSLog(@"%@ != %@", [actualHash base64EncodedDataWithOptions:kNilOptions], [expectedHash base64EncodedDataWithOptions:kNilOptions]);
-            return nil;
-        }
-        
-        [unorderedBlocks setObject:blockData forKey:@(blockId)];
-        
-        block = (BlockHeader*)(((uint8_t*)block) + SIZE_OF_BLOCK_HEADER + size);
-    }
-    
-    NSMutableData* deblockified = [NSMutableData data];
-    for(int i=0;i<unorderedBlocks.count;i++) {
-        NSData* blockData = [unorderedBlocks objectForKey:@(i)];
-        
-        if(!blockData) {
-            NSLog(@"Could not find block %d in unordered blocks list. Cannot deblockify.", i);
-            return nil;
-        }
-        
-        if(kLogVerbose) {
-            NSLog(@"Adding Block %d", i);
-        }
-        
-        [deblockified appendData:blockData];
-    }
-    
-    return [deblockified copy];
-}
+//static NSData* deblockify(uint8_t* blockified) {
+//    BlockHeader* block = (BlockHeader*)blockified;
+//
+//    NSMutableDictionary<NSNumber*, NSData*> *unorderedBlocks = [NSMutableDictionary dictionary];
+//    while(YES) {
+//        uint32_t size = littleEndian4BytesToInt32(block->size);
+//        uint32_t blockId = littleEndian4BytesToInt32(block->id);
+//
+//        if(kLogVerbose) {
+//            NSLog(@"Found block id [%d] and size=[%d]", blockId, size);
+//        }
+//
+//        if(size == 0) {
+//            break;
+//        }
+//
+//        uint8_t* data = (((uint8_t*)block) + SIZE_OF_BLOCK_HEADER);
+//        NSData *blockData = [NSData dataWithBytes:data length:size];
+//
+//        uint8_t actualHashBytes[CC_SHA256_DIGEST_LENGTH];
+//        CC_SHA256(blockData.bytes, (uint32_t)blockData.length, actualHashBytes);
+//        NSData* actualHash = [NSData dataWithBytes:actualHashBytes length:CC_SHA256_DIGEST_LENGTH];
+//        NSData* expectedHash = [NSData dataWithBytes:block->hash length:CC_SHA256_DIGEST_LENGTH];
+//
+//        if(![actualHash isEqualToData:expectedHash]) {
+//            NSLog(@"Block Header Hash does not match content. This safe is possibly corrupt.");
+//            NSLog(@"%@ != %@", [actualHash base64EncodedDataWithOptions:kNilOptions], [expectedHash base64EncodedDataWithOptions:kNilOptions]);
+//            return nil;
+//        }
+//
+//        [unorderedBlocks setObject:blockData forKey:@(blockId)];
+//
+//        block = (BlockHeader*)(((uint8_t*)block) + SIZE_OF_BLOCK_HEADER + size);
+//    }
+//
+//    NSMutableData* deblockified = [NSMutableData data];
+//    for(int i=0;i<unorderedBlocks.count;i++) {
+//        NSData* blockData = [unorderedBlocks objectForKey:@(i)];
+//
+//        if(!blockData) {
+//            NSLog(@"Could not find block %d in unordered blocks list. Cannot deblockify.", i);
+//            return nil;
+//        }
+//
+//        if(kLogVerbose) {
+//            NSLog(@"Adding Block %d", i);
+//        }
+//
+//        [deblockified appendData:blockData];
+//    }
+//
+//    return [deblockified copy];
+//}
 
 // MMcG: Because of the funky KDBX 3.1 YubiKey Challenge Response Design :(
 

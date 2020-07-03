@@ -667,7 +667,7 @@
                                 <attributedString key="attributedText">
                                     <fragment content="Testing">
                                         <attributes>
-                                            <font key="NSFont" metaFont="message" size="11"/>
+                                            <font key="NSFont" metaFont="controlContent" size="11"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -791,7 +791,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                         <sections>
-                            <tableViewSection headerTitle="Convenience Unlocking" id="o6m-Uq-NQN">
+                            <tableViewSection headerTitle="Database Convenience Unlocking" footerTitle="Allow or disallow application wide use of convenience unlocking methods" id="o6m-Uq-NQN">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="ZFd-YQ-R8H">
                                         <rect key="frame" x="0.0" y="55.5" width="414" height="44"/>
@@ -857,10 +857,75 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
-                            <tableViewSection headerTitle="Miscellaneous" id="l7v-m5-yUl">
+                            <tableViewSection headerTitle="Backup Settings (Apple Device Backup)" id="28j-ig-jed">
+                                <string key="footerTitle">When you perform a backup of this device via Finder or iTunes you can control whether local databases and imported key files are included in that backup here</string>
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="6w3-AL-TXb">
+                                        <rect key="frame" x="0.0" y="235" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="6w3-AL-TXb" id="JaB-32-jFg">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Backup Local Documents" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="D5P-d7-g5B">
+                                                    <rect key="frame" x="20" y="11" width="194.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="biU-AQ-YbQ">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onBackupSettingsChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="hzG-lp-0pU"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="D5P-d7-g5B" firstAttribute="top" secondItem="JaB-32-jFg" secondAttribute="topMargin" id="0KH-mq-M0p"/>
+                                                <constraint firstItem="D5P-d7-g5B" firstAttribute="centerY" secondItem="biU-AQ-YbQ" secondAttribute="centerY" id="BpQ-LJ-ku3"/>
+                                                <constraint firstItem="D5P-d7-g5B" firstAttribute="leading" secondItem="JaB-32-jFg" secondAttribute="leading" constant="20" id="Iux-A7-Tcy"/>
+                                                <constraint firstItem="biU-AQ-YbQ" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="D5P-d7-g5B" secondAttribute="trailing" constant="8" symbolic="YES" id="Tm0-OV-QRc"/>
+                                                <constraint firstItem="D5P-d7-g5B" firstAttribute="bottom" secondItem="JaB-32-jFg" secondAttribute="bottomMargin" id="cJz-gj-aXN"/>
+                                                <constraint firstAttribute="trailing" secondItem="biU-AQ-YbQ" secondAttribute="trailing" constant="20" id="jvx-n2-mLH"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Xgq-A4-s9p">
+                                        <rect key="frame" x="0.0" y="279" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Xgq-A4-s9p" id="WLN-OX-S0u">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Backup Imported Key Files" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IVW-mU-vYE">
+                                                    <rect key="frame" x="20" y="11" width="203.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wsP-PL-hvr">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onBackupSettingsChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="cnN-Z2-vA1"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="wsP-PL-hvr" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="IVW-mU-vYE" secondAttribute="trailing" constant="8" symbolic="YES" id="4uW-5O-eWc"/>
+                                                <constraint firstItem="IVW-mU-vYE" firstAttribute="leading" secondItem="WLN-OX-S0u" secondAttribute="leading" constant="20" id="AO9-vx-sbT"/>
+                                                <constraint firstItem="IVW-mU-vYE" firstAttribute="bottom" secondItem="WLN-OX-S0u" secondAttribute="bottomMargin" id="HBt-zJ-tiP"/>
+                                                <constraint firstItem="IVW-mU-vYE" firstAttribute="centerY" secondItem="wsP-PL-hvr" secondAttribute="centerY" id="YIf-PP-0MW"/>
+                                                <constraint firstItem="IVW-mU-vYE" firstAttribute="top" secondItem="WLN-OX-S0u" secondAttribute="topMargin" id="dpX-z0-tou"/>
+                                                <constraint firstAttribute="trailing" secondItem="wsP-PL-hvr" secondAttribute="trailing" constant="20" id="ktW-mJ-rNO"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Miscellaneous" footerTitle="More advanced or niche preferences. Some care may be required when using features labeled Alpha or Beta" id="l7v-m5-yUl">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="b7a-0Z-9yU" userLabel="Instant Pin Unlock Mode">
-                                        <rect key="frame" x="0.0" y="199" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="430.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="b7a-0Z-9yU" id="RWE-kc-mkG">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -890,7 +955,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="fw3-gc-cgu" userLabel="Yubikey Secret">
-                                        <rect key="frame" x="0.0" y="243" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="474.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fw3-gc-cgu" id="ydJ-lJ-NYu">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -920,7 +985,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="CYR-kY-sof" userLabel="Hide Key File Name on Unlock Screen">
-                                        <rect key="frame" x="0.0" y="287" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="518.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CYR-kY-sof" id="BzG-ai-wwd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -950,7 +1015,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="jqp-w9-9EG" userLabel="Show All Files in Key Files Local">
-                                        <rect key="frame" x="0.0" y="331" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="562.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jqp-w9-9EG" id="jTK-py-WHd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -980,7 +1045,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="bIg-gn-Wyn" userLabel="Show All Files in Key Files Local">
-                                        <rect key="frame" x="0.0" y="375" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="606.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bIg-gn-Wyn" id="tzb-hF-Oh4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1010,7 +1075,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="HIU-iF-9nx" userLabel="Allow Clipboard Handoff">
-                                        <rect key="frame" x="0.0" y="419" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="650.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HIU-iF-9nx" id="xsf-Vl-gtb">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1040,7 +1105,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Cca-ff-gxA" userLabel="Use Color Blind Palette for Passwords">
-                                        <rect key="frame" x="0.0" y="463" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="694.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Cca-ff-gxA" id="m7Z-SN-Vj7">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1070,14 +1135,14 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="l37-h7-bsz" userLabel="Emergency: Use Legacy Serializer">
-                                        <rect key="frame" x="0.0" y="507" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="738.5" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="l37-h7-bsz" id="TkH-I7-Ji8">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Emergency: Use Legacy Serializer" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jRJ-bT-Kka" userLabel="Emergency: Use Legacy Serializer">
-                                                    <rect key="frame" x="20" y="11" width="259.5" height="22"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Use Uber Sync (Caution: Alpha)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jRJ-bT-Kka" userLabel="Emergency: Use Legacy Serializer">
+                                                    <rect key="frame" x="20" y="11" width="243" height="22"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -1085,7 +1150,7 @@
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wNi-6f-RtU">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="IvR-z4-o1Y"/>
+                                                        <action selector="onUberSync:" destination="hwI-HO-qLt" eventType="valueChanged" id="6Ov-2d-Wdd"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -1110,7 +1175,7 @@
                     <toolbarItems>
                         <barButtonItem title="Item" id="p04-FH-J6b"/>
                     </toolbarItems>
-                    <navigationItem key="navigationItem" id="i6A-5B-gtC">
+                    <navigationItem key="navigationItem" title="Advanced Preferences" id="i6A-5B-gtC">
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="6IY-U4-Ror">
                             <connections>
                                 <action selector="onDone:" destination="hwI-HO-qLt" id="hqR-GC-wQ6"/>
@@ -1124,12 +1189,14 @@
                         <outlet property="switchAllowBiometric" destination="nkv-fb-Yh2" id="dkh-kz-RcF"/>
                         <outlet property="switchAllowClipboardHandoff" destination="7ik-ek-3YY" id="gYt-Eo-KcE"/>
                         <outlet property="switchAllowPinCodeOpen" destination="GPl-5V-wkN" id="b0u-l2-XWr"/>
+                        <outlet property="switchBackupFiles" destination="biU-AQ-YbQ" id="d4k-NS-glb"/>
+                        <outlet property="switchBackupImportedKeyFiles" destination="wsP-PL-hvr" id="LFO-ZI-1PI"/>
                         <outlet property="switchDetectOffline" destination="mv1-aw-VkP" id="soa-LJ-fjs"/>
                         <outlet property="switchHideKeyFileName" destination="G1j-ld-CDQ" id="Ca0-EJ-krQ"/>
                         <outlet property="switchShowAllFilesInKeyFilesLocal" destination="NUW-RD-8sG" id="eS2-52-5yN"/>
                         <outlet property="switchShowYubikeySecretWorkaround" destination="wGm-bI-fp3" id="rcC-7N-efl"/>
+                        <outlet property="switchUberSync" destination="wNi-6f-RtU" id="mFx-qh-ZbT"/>
                         <outlet property="switchUseColorBlindPalette" destination="fQJ-uY-SEH" id="9pG-Ud-fOY"/>
-                        <outlet property="switchUseLegacySerializer" destination="wNi-6f-RtU" id="mFx-qh-ZbT"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hAm-UX-ANu" userLabel="First Responder" sceneMemberID="firstResponder"/>

@@ -205,11 +205,15 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
             }];
 }
 
+- (void)readNonInteractive:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(void (^)(NSData *, NSError *))handler {
+    [self _read:parentFileIdentifier fileName:fileName completion:handler];
+}
+
 - (void)_read:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(void (^)(NSData *data, NSError *error))handler {
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:@"Locating..."];
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
     });
     
     [self findSafeFile:parentFileIdentifier
@@ -247,7 +251,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:@"Locating..."];
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
     });
     
     [self findSafeFile:parentFileIdentifier

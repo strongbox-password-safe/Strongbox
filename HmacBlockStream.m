@@ -15,10 +15,6 @@
 
 @interface HmacBlockStream ()
 
-@property uint8_t* source;
-@property size_t sourceLength;
-@property NSUInteger sourceOffset;
-
 @property NSUInteger workingBlockOffset;
 @property uint8_t* workingBlock;
 @property size_t workingBlockLength;
@@ -29,38 +25,54 @@
 
 @property NSError* error;
 
+@property NSInputStream* innerStream;
+@property BOOL finished;
+
 @end
 
 @implementation HmacBlockStream
 
-- (instancetype)initWithData:(uint8_t *)data length:(size_t)length hmacKey:(NSData*)hmacKey {
+- (instancetype)initWithStream:(NSInputStream *)stream hmacKey:(NSData *)hmacKey {
     if (self = [super init]) {
-        self.source = data;
-        self.sourceOffset = 0;
-        self.sourceLength = length;
+        if (!stream) {
+            return nil;
+        }
+        
         self.workingBlock = nil;
         self.workingBlockOffset = 0;
         self.workingBlockIndex = 0;
         self.hmacKey = hmacKey;
+        self.innerStream = stream;
+        self.finished = NO;
     }
     
     return self;
 }
 
-- (void)open { }
-
-- (void)close { }
-
-- (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
-    if (self.workingBlock != nil && self.workingBlockLength == 0) { // EOF
-        return 0L;
+- (void)open {
+    if (self.innerStream) {
+        [self.innerStream open];
     }
+}
 
+- (void)close {
+    if (self.innerStream) {
+        [self.innerStream close];
+        self.innerStream = nil;
+    }
+    
+    if (self.workingBlock) {
+        free(self.workingBlock);
+    }
+    self.workingBlock = nil;
+}
+
+- (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)maxLength {
     NSUInteger bufferWritten = 0;
     NSUInteger bufferOffset = 0;
     
-    while (bufferWritten < len) {
-        NSUInteger bufferAvailable = len - bufferWritten;
+    while (bufferWritten < maxLength) {
+        NSUInteger bufferAvailable = maxLength - bufferWritten;
         NSUInteger workingAvailable = self.workingBlockLength - self.workingBlockOffset;
 
         if (self.workingBlock == nil || workingAvailable == 0)  {
@@ -90,44 +102,69 @@
 }
 
 - (BOOL)loadNextBlock {
-    HmacBlockHeader *blockHeader = (HmacBlockHeader*)((uint8_t*)self.source + self.sourceOffset);
-    size_t blockLength = littleEndian4BytesToInt32(blockHeader->lengthBytes);
+    if (self.finished) { // EOF
+        if (self.workingBlock) {
+            free(self.workingBlock);
+        }
+        self.workingBlock = nil;
+        self.workingBlockLength = 0;
+        return YES;
+    }
 
-//    NSLog(@"DEBUG: Decrypting Block %d of length [%zu] - [%zu]", self.workingBlockIndex, blockLength, self.readSoFar);
-    // blockLength = blockLength    size_t    1048576
+    HmacBlockHeader blockHeader;
+    NSInteger bytesRead = [self.innerStream read:(uint8_t*)&blockHeader maxLength:SIZE_OF_HMAC_BLOCK_HEADER];
+    if (bytesRead != SIZE_OF_HMAC_BLOCK_HEADER) {
+        return NO;
+    }
+    
+    size_t blockLength = littleEndian4BytesToInt32(blockHeader.lengthBytes);
+    // NSLog(@"DEBUG: Un-HMAC Block %d of length [%zu] - [%zu]", self.workingBlockIndex, blockLength, self.readSoFar);
     
     if (blockLength > 0) {
-        if(self.sourceOffset + blockLength > self.sourceLength) {
-            NSLog(@"Not enough data to decrypt Block!");
-            self.error = [Utils createNSError:@"Not enough data to decrypt block." errorCode:-1];
+        if (self.workingBlock != nil) {
+            free(self.workingBlock);
+        }
+        self.workingBlock = malloc(blockLength);
+                                   
+        bytesRead = [self.innerStream read:self.workingBlock maxLength:blockLength];
+        if(bytesRead < 0 || bytesRead < blockLength) {
+            NSLog(@"Not enough data to decrypt Block! [%@]", self.innerStream.streamError);
+            self.error = self.innerStream.streamError ? self.innerStream.streamError : [Utils createNSError:@"Error: HmacBlocStream - Could not read enough from inner stream to decrypt block." errorCode:-1];
+            free(self.workingBlock);
             self.workingBlock = nil;
+            self.workingBlockLength = 0;
+            self.finished = YES;
             return NO;
         }
-
-        self.workingBlock = blockHeader->data;
+        
         self.workingBlockLength = blockLength;
         
         NSData *actualHmac = getBlockHmacBytes(self.workingBlock, self.workingBlockLength, self.hmacKey, self.workingBlockIndex);
-        NSData *expectedHmac = [NSData dataWithBytes:blockHeader->hmacSha256 length:CC_SHA256_DIGEST_LENGTH];
+        NSData *expectedHmac = [NSData dataWithBytes:blockHeader.hmacSha256 length:CC_SHA256_DIGEST_LENGTH];
 
         if(![actualHmac isEqual:expectedHmac]) {
             NSLog(@"Actual Block HMAC does not match expected. Block has been corrupted.");
             self.error = [Utils createNSError:@"Actual Block HMAC does not match expected. Block has been corrupted." errorCode:-1];
             self.workingBlock = nil;
+            self.finished = YES;
             return NO;
         }
     }
     else {
-        self.workingBlock = blockHeader->data;
+        if (self.workingBlock) {
+            free(self.workingBlock);
+        }
+        self.workingBlock = nil;
         self.workingBlockLength = 0;
+        self.finished = YES;
     }
     
     self.readSoFar += blockLength;
-//    NSLog(@"DEBUG: Decrypted Block %d of length [%zu] - [%zu]", self.workingBlockIndex, blockLength, self.readSoFar);
+    
+    // NSLog(@"DEBUG: Un-HMACed Block %d of length [%zu] - [%zu]", self.workingBlockIndex, blockLength, self.readSoFar);
 
     self.workingBlockIndex++;
     self.workingBlockOffset = 0;
-    self.sourceOffset += blockLength + SIZE_OF_HMAC_BLOCK_HEADER;
     
     return YES;
 }

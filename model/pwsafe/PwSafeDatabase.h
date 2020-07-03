@@ -11,12 +11,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PwSafeDatabase : NSObject <AbstractDatabaseFormatAdaptor>
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
-+ (NSString *)fileExtension;
-
-@property (nonatomic, readonly) DatabaseFormat format;
-@property (nonatomic, readonly) NSString* fileExtension;
-
 @end
 
 #endif // ifndef _PwSafeDatabase_h

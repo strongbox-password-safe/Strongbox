@@ -44,6 +44,14 @@
     return self;
 }
 
+- (BOOL)handlesStreamingText {
+    return NO;
+}
+
+- (BOOL)appendStreamedText:(NSString *)text {
+    return NO;
+}
+    
 - (NSString *)originalElementName {
     return self.internalElementName;
 }

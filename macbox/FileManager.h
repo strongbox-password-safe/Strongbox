@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 @property (readonly, nonnull) NSString* tmpEncryptedAttachmentPath;
+@property (readonly, nonnull) NSString* tmpAttachmentPreviewPath;
+
+- (void)deleteAllTmpAttachmentPreviewFiles;
 
 @end
 

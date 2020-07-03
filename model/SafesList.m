@@ -227,7 +227,11 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     });
 }
 
-#ifndef IS_APP_EXTENSION
+- (SafeMetaData *)getById:(NSUUID *)uuid {
+    return [self.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
+        return [obj.uuid isEqual:uuid];
+    }];
+}
 
 - (void)add:(SafeMetaData *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
@@ -252,12 +256,13 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 
             return storage && names && ids;
         }];
-
-        NSLog(@"Found duplicate... Not Adding");
         
         if(!duplicated) {
             [self.databasesList addObject:safe];
             [self serialize];
+        }
+        else {
+            NSLog(@"Found duplicate... Not Adding");
         }
     });
 }
@@ -313,8 +318,6 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     
     return [self isValidNickName:suggestion] ? suggestion : nil;
 }
-
-#endif
 
 - (NSString*)getSuggestedDatabaseNameUsingDeviceName {
     NSString* name = [IOsUtils nameFromDeviceName];

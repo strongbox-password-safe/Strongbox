@@ -17,7 +17,7 @@
 
 @end
 
-static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
+static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
 @implementation OneDriveStorageProvider
 
@@ -91,7 +91,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
             completion(nil, error);
@@ -142,41 +142,54 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
-        [self authWrapperWithCompletion:^(NSError *error) {
-            if(error) {
+- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self read:safeMetaData viewController:viewController completion:completion];
+}
+
+- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self readNonInteractive:safeMetaData completion:completion];
+}
+
+- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self authWrapperWithCompletion:^(NSError *error) {
+        if(error) {
+            completion(nil, error);
+            return;
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
+        });
+        
+        
+        [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+            
+            if(error || !item) {
+                if(!item) {
+                    error = [Utils createNSError:@"Could not locate the database file. Has it been renamed or moved?" errorCode:45];
+                }
+                
+                NSLog(@"OneDrive Read: %@", error);
                 completion(nil, error);
                 return;
             }
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD showWithStatus:@"Locating..."];
-            });
-            
-            
-            [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
-                
-                if(error || !item) {
-                    if(!item) {
-                        error = [Utils createNSError:@"Could not locate the database file. Has it been renamed or moved?" errorCode:45];
-                    }
-                    
-                    NSLog(@"OneDrive Read: %@", error);
-                    completion(nil, error);
-                    return;
-                }
-                
-                [self readWithProviderData:item viewController:viewController completion:completion];
-            }];
+            [self readWithProviderData:item completion:completion];
         }];
+    }];
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, NSError *error))completion {
+                  completion:(void (^)(NSData *data, const NSError *error))completion {
+    [self readWithProviderData:providerData completion:completion];
+}
+
+- (void)readWithProviderData:(NSObject *)providerData
+                  completion:(void (^)(NSData *data, const NSError *error))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
             completion(nil, error);
@@ -231,7 +244,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:@"Locating..."];
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
         });
         
         [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
@@ -269,7 +282,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
             completion(error.code == ODAuthCanceled, nil, error);
@@ -296,7 +309,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
 - (void)listRecursive:(ODChildrenCollectionRequest *)request
       error:(NSError *)error
       existingItems:(NSMutableArray<StorageBrowserItem*>*)existingItems
- completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, NSError *error))completion
+ completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, const NSError *error))completion
 {
     [request getWithCompletion:^(ODCollection *response, ODChildrenCollectionRequest *nr, NSError *error) {
         if(error) {
@@ -394,7 +407,7 @@ static NSString *kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953";
     // NOTSUPPORTED
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
     // NOTIMPL
 }
 

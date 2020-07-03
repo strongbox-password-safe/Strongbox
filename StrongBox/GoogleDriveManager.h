@@ -29,6 +29,8 @@
 
 - (void)readWithOnlyFileId:(UIViewController *)viewController fileIdentifier:(NSString *)fileIdentifier completion:(void (^)(NSData *data, NSError *error))handler;
 
+- (void)readNonInteractive:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(void (^)(NSData *data, NSError *error))handler;
+
 - (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(void (^)(NSData *data, NSError *error))handler;
 
 - (void)update:(NSString *)parentFileIdentifier

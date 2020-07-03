@@ -22,9 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString* appGroupName;
 @property BOOL suppressPrivacyScreen; // Used by Biometric Auth and Google Drive to suppress privacy screen which interferes with their operation - Not actually stored or serialized - belongs elsewhere
 
-#ifndef IS_APP_EXTENSION
-
-@property BOOL useLegacyDeserialization;
 @property BOOL colorizeUseColorBlindPalette;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
 @property (nonatomic) BOOL disallowAllPinCodeOpens;
@@ -38,7 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL clipboardHandoff;
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
-@property NSData* duressDummyData;
+@property (nullable) NSData* duressDummyData;
 
 @property (readonly) BOOL freeTrialHasBeenOptedInAndExpired;
 @property (readonly) NSInteger freeTrialDaysLeft;
@@ -62,47 +59,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property DatabaseCellSubtitleField databaseCellSubtitle2;
 @property BOOL showDatabaseIcon;
 
-#else
-
-@property (readonly) BOOL useLegacyDeserialization;
-@property (readonly) BOOL colorizeUseColorBlindPalette;
-@property (readonly, nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
-@property (readonly, nonatomic) BOOL disallowAllPinCodeOpens;
-@property (readonly, nonatomic) BOOL disallowAllBiometricId;
-@property (readonly, nullable) NSString* quickLaunchUuid;
-@property (readonly) BOOL allowEmptyOrNoPasswordEntry;
-@property (readonly) BOOL hideKeyFileOnUnlock;
-@property (readonly) BOOL showYubikeySecretWorkaroundField;
-@property (readonly, nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
-@property (readonly, nonatomic) BOOL hideTips;
-@property (readonly) BOOL clipboardHandoff;
-@property (readonly) BOOL clearClipboardEnabled;
-@property (readonly) NSInteger clearClipboardAfterSeconds;
-@property (readonly) NSData* duressDummyData;
-
-@property (readonly) BOOL freeTrialHasBeenOptedInAndExpired;
-@property (readonly) NSInteger freeTrialDaysLeft;
-@property (readonly) BOOL isProOrFreeTrial;
-@property (readonly) BOOL isPro;
-@property (readonly) BOOL isFreeTrial;
-@property (readonly) BOOL hasOptedInToFreeTrial;
-@property (readonly) NSDate *freeTrialEnd;
-
-- (NSDate*)calculateFreeTrialEndDateFromDate:(NSDate*)from;
-
-@property (readonly) BOOL showAllFilesInLocalKeyFiles;
-@property (readonly) BOOL monitorInternetConnectivity;
-@property (readonly) BOOL instantPinUnlocking;
-@property (nonatomic) BOOL iCloudOn;
-@property (readonly) FavIconDownloadOptions *favIconDownloadOptions;
-@property (readonly) BOOL showDatabasesSeparator;
-@property (readonly) BOOL showDatabaseStatusIcon;
-@property (readonly) DatabaseCellSubtitleField databaseCellTopSubtitle;
-@property (readonly) DatabaseCellSubtitleField databaseCellSubtitle1;
-@property (readonly) DatabaseCellSubtitleField databaseCellSubtitle2;
-@property (readonly) BOOL showDatabaseIcon;
-
-#endif
+@property (readonly) BOOL uberSync; // Readonly shim over below allowing for easy default on/off as configured
+@property (nullable) NSNumber* optionalUberSync; // Allowing for a default "Unset" == nil - meaning the user hasn't chosen, opt them into whatever is appropriate - NONE UBER SYNC for now - 20-June-2020
 
 @end
 

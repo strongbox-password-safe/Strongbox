@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface PwSafeSerialization : NSObject
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error;
++ (BOOL)isValidDatabase:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error;
 + (PasswordSafe3Header)getHeader:(NSData*)data;
 + (NSInteger)getKeyStretchIterations:(NSData*)data;
 + (NSInteger)getNumberOfBlocks:(NSData*)candidate;

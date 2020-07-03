@@ -67,7 +67,7 @@
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
     [self create:nickName
        extension:extension
             data:data
@@ -141,7 +141,15 @@ suggestedFilename:nil
     }];
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self readNonInteractive:safeMetaData completion:completion];
+}
+
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self readNonInteractive:safeMetaData completion:completion];
+}
+
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
     StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithFileURL:fileUrl];
     
@@ -270,14 +278,14 @@ suggestedFilename:nil
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     // NOTIMPL
     NSLog(@"NOTIMPL: list");
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, NSError *error))completionHandler {
+                  completion:(void (^)(NSData *data, const NSError *error))completionHandler {
         NSLog(@"NOTIMPL: readWithProviderData");
 }
 

@@ -22,8 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
                      iconId:(NSNumber*)iconId
                    model:(Model *)model;
 
-+ (UIColor*)folderTintColor;
-
 + (nullable UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
 
 + (NSArray<UIImage*>*)getIconSet:(KeePassIconSet)iconSet;

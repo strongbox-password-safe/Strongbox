@@ -853,7 +853,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)previewControllerDidDismiss:(QLPreviewController *)controller {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
-        [FileManager.sharedInstance deleteAllTmpFiles];
+        [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
     });
 }
 
@@ -864,7 +864,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
     UiAttachment* attachment = [self.model.attachments objectAtIndex:index];
     
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:attachment.filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:attachment.filename];
     NSData* data = attachment.dbAttachment.deprecatedData;
     [data writeToFile:f atomically:YES];
     NSURL* url = [NSURL fileURLWithPath:f];
@@ -1902,7 +1902,7 @@ showGenerateButton:YES];
             cell.textField.text = attachment.filename;
             cell.image.image = [UIImage imageNamed:@"document"];
             if (attachment.dbAttachment.length < kMaxAttachmentImageSize) {
-                NSData* data = attachment.dbAttachment.deprecatedData; // TODO:
+                NSData* data = attachment.dbAttachment.deprecatedData;
                 UIImage* img = [UIImage imageWithData:data];
                 if(img) {
                     @autoreleasepool { // Prevent App Extension Crash
@@ -1928,7 +1928,7 @@ showGenerateButton:YES];
             cell.detailTextLabel.text = friendlyFileSizeString(filesize);
            
             if (attachment.dbAttachment.length < kMaxAttachmentImageSize) {
-                NSData* data = attachment.dbAttachment.deprecatedData; // TODO:
+                NSData* data = attachment.dbAttachment.deprecatedData;
                 UIImage* img = [UIImage imageWithData:data];
 
                 if(img) { // Trick to keep all images to a fixed size

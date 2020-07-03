@@ -22,7 +22,7 @@
 #import "OfflineCacheNameDetector.h"
 #import "ProUpgradeIAPManager.h"
 #import "FileManager.h"
-#import "LocalDeviceStorageProvider.h"
+#import "SyncManager.h"
 #import "ClipboardManager.h"
 #import "GoogleDriveManager.h"
 #import "iCloudSafesCoordinator.h"
@@ -50,9 +50,7 @@
     
     [self performMigrations];
     
-    // Do not backup local safes, caches or key files
-    
-    [FileManager.sharedInstance excludeDirectoriesFromBackup];
+    [self markDirectoriesForBackupInclusion];
     
     [self cleanupInbox:launchOptions];
     
@@ -60,12 +58,17 @@
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
         
-    [LocalDeviceStorageProvider.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
+    [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
         
     NSLog(@"STARTUP - Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
     NSLog(@"STARTUP - Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
 
     return YES;
+}
+
+- (void)markDirectoriesForBackupInclusion {
+    [FileManager.sharedInstance setDirectoryInclusionFromBackup:Settings.sharedInstance.backupFiles
+                                               importedKeyFiles:Settings.sharedInstance.backupIncludeImportedKeyFiles];
 }
 
 - (void)performEarlyBasicICloudInitialization {

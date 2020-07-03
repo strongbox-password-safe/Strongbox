@@ -28,10 +28,9 @@
     NSData *data = [CommonTesting getDataFromBundleFile:@"xml-keyfile" ofType:@"kdbx"];
     XCTAssert(data);
     
-    [DatabaseModel fromData:data
-                        ckf:[CompositeKeyFactors password:nil keyFileDigest:digest]
-   useLegacyDeserialization:NO
-                 completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+    [DatabaseModel fromLegacyData:data
+                              ckf:[CompositeKeyFactors password:nil keyFileDigest:digest]
+                       completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
         XCTAssert(model);
         NSLog(@"%@", model);
     }];
@@ -65,11 +64,20 @@
         }
         else if (! [isDirectory boolValue]) {
             if ([validExtensions containsObject:url.pathExtension]) {
-                NSData* data = [NSData dataWithContentsOfURL:url];
-                [DatabaseModel fromData:data
-                                    ckf:[CompositeKeyFactors password:@"a"]
-               useLegacyDeserialization:NO
-                             completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+                
+                NSOutputStream* xmlDumpStream = nil;
+                
+                if ([url.lastPathComponent isEqualToString:@"favicon-test2-backup.kdbx"]) {
+                    xmlDumpStream = [NSOutputStream outputStreamToFileAtPath:[NSString stringWithFormat:@"/Users/strongbox/Desktop/%@.xml", url.lastPathComponent] append:NO];
+                    [xmlDumpStream open];
+                }
+                
+                [DatabaseModel fromUrl:url
+                                   ckf:[CompositeKeyFactors password:@"a"]
+                                config:DatabaseModelConfig.defaults
+                         xmlDumpStream:xmlDumpStream
+                            completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+                    [xmlDumpStream close];
                     if (error) {
                         NSLog(@"❌ Could not Open [%@]", url);
                         [unopenable addObject:url];
@@ -84,6 +92,27 @@
     }
 
     NSLog(@"Unopenable for: [%@]", unopenable);
+}
+
+- (void)testParticularFileAndDumpXml {
+    NSURL* url = [NSURL fileURLWithPath:@"/Users/strongbox/strongbox-test-files/random-tests/keepass/Database-with-empty-attachment.kdbx"];
+    NSOutputStream* xmlDumpStream = [NSOutputStream outputStreamToFileAtPath:@"/Users/strongbox/Desktop/unit-test-dump-xml.xml" append:NO];
+    [xmlDumpStream open];
+    
+    [DatabaseModel fromUrl:url
+                       ckf:[CompositeKeyFactors password:@"a"]
+                    config:DatabaseModelConfig.defaults
+             xmlDumpStream:xmlDumpStream
+                completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+        [xmlDumpStream close];
+        if (error) {
+            NSLog(@"❌ Could not Open [%@]", url);
+        }
+        else {
+            NSLog(@"✅ Opened [%@]", url);
+            XCTAssert(model);
+        }
+    }];
 }
 
 @end

@@ -16,8 +16,7 @@
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
 #import "NSData+Extensions.h"
-
-const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; // 128 KB - Maybe play with this but this seems to have decent perf for now
+#import "Constants.h"
 
 @interface DatabaseModel ()
 
@@ -29,14 +28,37 @@ const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; // 128 KB - Mayb
 
 @implementation DatabaseModel
 
-+ (BOOL)isAValidSafe:(nullable NSData *)candidate error:(NSError**)error {
-    if(candidate == nil) {
++ (NSData*_Nullable)getValidationPrefixFromUrl:(NSURL*)url {
+    NSInputStream* inputStream = [NSInputStream inputStreamWithURL:url];
+    
+    [inputStream open];
+    
+    uint8_t buf[kMinimumDatabasePrefixLengthForValidation];
+    NSInteger bytesRead = [inputStream read:buf maxLength:kMinimumDatabasePrefixLengthForValidation];
+    
+    [inputStream close];
+    
+    if (bytesRead > 0) {
+        return [NSData dataWithBytes:buf length:bytesRead];
+    }
+    
+    return nil;
+}
+
++ (BOOL)isValidDatabase:(NSURL *)url error:(NSError *__autoreleasing  _Nullable *)error {
+    NSData* prefix = [DatabaseModel getValidationPrefixFromUrl:url];
+    
+    return [DatabaseModel isValidDatabaseWithPrefix:prefix error:error];
+}
+ 
++ (BOOL)isValidDatabaseWithPrefix:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
+    if(prefix == nil) {
         if(error) {
             *error = [Utils createNSError:@"Database Data is Nil" errorCode:-1];
         }
         return NO;
     }
-    if(candidate.length == 0) {
+    if(prefix.length == 0) {
         if(error) {
             *error = [Utils createNSError:@"Database Data is zero length" errorCode:-1];
         }
@@ -44,14 +66,14 @@ const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; // 128 KB - Mayb
     }
 
     NSError *pw, *k1, *k2, *k3;
-    
-    BOOL ret = [PwSafeDatabase isAValidSafe:candidate error:&pw] ||
-          [KeePassDatabase isAValidSafe:candidate error:&k1] ||
-          [Kdbx4Database isAValidSafe:candidate error:&k2] ||
-          [Kdb1Database isAValidSafe:candidate error:&k3];
+        
+    BOOL ret = [PwSafeDatabase isValidDatabase:prefix error:&pw] ||
+        [KeePassDatabase isValidDatabase:prefix error:&k1] ||
+        [Kdbx4Database isValidDatabase:prefix error:&k2] ||
+        [Kdb1Database isValidDatabase:prefix error:&k3];
 
     if(!ret && error) {
-        NSData* prefixBytes = [candidate subdataWithRange:NSMakeRange(0, MIN(12, candidate.length))];
+        NSData* prefixBytes = [prefix subdataWithRange:NSMakeRange(0, MIN(12, prefix.length))];
         
         NSString* errorSummary = @"Invalid Database. Debug Info:\n";
         
@@ -75,79 +97,51 @@ const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; // 128 KB - Mayb
     return ret;
 }
 
-+ (BOOL)isAutoFillLikelyToCrash:(NSData*)data {
-    // Argon 2 Memory Consumption
-    
-    if([Kdbx4Database isAValidSafe:data error:nil]) {
-        CryptoParameters* params = [Kdbx4Serialization getCryptoParams:data];
-        
-        if(params && params.kdfParameters && [params.kdfParameters.uuid isEqual:argon2CipherUuid()]) {
-            static NSString* const kParameterMemory = @"M";
-            static uint64_t const kMaxArgon2Memory =  64 * 1024 * 1024;
-                        
-            VariantObject* vo = params.kdfParameters.parameters[kParameterMemory];
-            if(vo && vo.theObject) {
-                uint64_t memory = ((NSNumber*)vo.theObject).longLongValue;
-                if(memory > kMaxArgon2Memory) {
-                    return YES;
-                }
-            }
-        }
-    }
-    
-    // Very large DBs
-
-    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 6 * 1024 * 1024;
-
-    if (data.length > kProbablyTooLargeToOpenInAutoFillSizeBytes) {
-        return YES;
-    }
-
-    return NO;
++ (DatabaseFormat)getDatabaseFormat:(NSURL *)url {
+    NSData* prefix = [DatabaseModel getValidationPrefixFromUrl:url];
+    return [DatabaseModel getDatabaseFormatWithPrefix:prefix];
 }
 
-+ (DatabaseFormat)getLikelyDatabaseFormat:(NSData *)candidate {
-    if(candidate == nil) {
++ (DatabaseFormat)getDatabaseFormatWithPrefix:(NSData *)prefix {
+    if(prefix == nil || prefix.length == 0) {
         return kFormatUnknown;
     }
     
     NSError* error;
-    if([PwSafeDatabase isAValidSafe:candidate error:&error]) {
+    if([PwSafeDatabase isValidDatabase:prefix error:&error]) {
         return kPasswordSafe;
     }
-    else if ([KeePassDatabase isAValidSafe:candidate error:&error]) {
+    else if ([KeePassDatabase isValidDatabase:prefix error:&error]) {
         return kKeePass;
     }
-    else if([Kdbx4Database isAValidSafe:candidate error:&error]) {
+    else if([Kdbx4Database isValidDatabase:prefix error:&error]) {
         return kKeePass4;
     }
-    else if([Kdb1Database isAValidSafe:candidate error:&error]) {
+    else if([Kdb1Database isValidDatabase:prefix error:&error]) {
         return kKeePass1;
     }
     
     return kFormatUnknown;
 }
 
-+ (NSString*)getLikelyFileExtension:(NSData *)candidate {
-    if(candidate == nil) {
-        return @"dat";
-    }
++ (NSString*)getLikelyFileExtension:(NSData *)prefix {
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:prefix];
     
-    NSError* error;
-    if([PwSafeDatabase isAValidSafe:candidate error:&error]) {
+    if (format == kPasswordSafe) {
         return [PwSafeDatabase fileExtension];
     }
-    else if ([KeePassDatabase isAValidSafe:candidate error:&error]) {
-        return [KeePassDatabase fileExtension];
-    }
-    else if([Kdbx4Database isAValidSafe:candidate error:&error]) {
+    else if (format == kKeePass4) {
         return [Kdbx4Database fileExtension];
     }
-    else if([Kdb1Database isAValidSafe:candidate error:&error]) {
+    else if (format == kKeePass) {
+        return [KeePassDatabase fileExtension];
+    }
+    else if (format == kKeePass1) {
         return [Kdb1Database fileExtension];
     }
-    
-    return @"dat";
+    else {
+        return @"dat";
+    }
 }
 
 + (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format {
@@ -185,44 +179,92 @@ const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; // 128 KB - Mayb
     return nil;
 }
 
-+ (void)fromData:(NSData *)data ckf:(CompositeKeyFactors *)ckf useLegacyDeserialization:(BOOL)useLegacyDeserialization completion:(void (^)(BOOL, DatabaseModel * _Nonnull, NSError * _Nonnull))completion {
-    [DatabaseModel fromData:data ckf:ckf useLegacyDeserialization:useLegacyDeserialization config:DatabaseModelConfig.defaults completion:completion];
+//////
+
++ (void)fromUrlOrLegacyData:(NSURL *)url
+                 legacyData:(NSData *)legacyData
+                        ckf:(CompositeKeyFactors *)ckf
+                     config:(DatabaseModelConfig *)config
+                 completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+    if (url) {
+        [DatabaseModel fromUrl:url ckf:ckf config:config completion:completion];
+    }
+    else {
+        [DatabaseModel fromLegacyData:legacyData ckf:ckf config:config completion:completion];
+    }
 }
 
-+ (void)fromData:(NSData *)data
-             ckf:(CompositeKeyFactors *)ckf
-useLegacyDeserialization:(BOOL)useLegacyDeserialization
-          config:(DatabaseModelConfig*)config
-      completion:(void(^)(BOOL userCancelled, DatabaseModel* model, NSError* error))completion {
-    if(data == nil) {
++ (void)fromLegacyData:legacyData
+                   ckf:(CompositeKeyFactors *)ckf
+            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+    [DatabaseModel fromLegacyData:legacyData ckf:ckf config:DatabaseModelConfig.defaults completion:completion];
+}
+
++ (void)fromLegacyData:legacyData
+                   ckf:(CompositeKeyFactors *)ckf
+                config:(DatabaseModelConfig*)config
+            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:legacyData];
+    
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:legacyData];
+
+    [DatabaseModel fromStreamWithFormat:stream
+                                    ckf:ckf
+                                 config:config
+                                 format:format
+                          xmlDumpStream:nil
+                             completion:completion];
+}
+
++ (void)fromUrl:(NSURL *)url
+            ckf:(CompositeKeyFactors *)ckf
+     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+    [DatabaseModel fromUrl:url ckf:ckf config:DatabaseModelConfig.defaults completion:completion];
+}
+
++ (void)fromUrl:(NSURL *)url
+            ckf:(CompositeKeyFactors *)ckf
+         config:(DatabaseModelConfig *)config
+     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+    [DatabaseModel fromUrl:url ckf:ckf config:config xmlDumpStream:nil  completion:completion];
+}
+
++ (void)fromUrl:(NSURL *)url ckf:(CompositeKeyFactors *)ckf config:(DatabaseModelConfig *)config xmlDumpStream:(NSOutputStream *)xmlDumpStream completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+    DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
+     
+    NSInputStream* stream = [NSInputStream inputStreamWithURL:url]; 
+    [DatabaseModel fromStreamWithFormat:stream
+                                    ckf:ckf
+                                 config:config
+                                 format:format
+                          xmlDumpStream:xmlDumpStream
+                             completion:completion];
+}
+
++ (void)fromStreamWithFormat:(NSInputStream *)stream
+                         ckf:(CompositeKeyFactors *)ckf
+                      config:(DatabaseModelConfig*)config
+                      format:(DatabaseFormat)format
+               xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
+                  completion:(void(^)(BOOL userCancelled, DatabaseModel*_Nullable model, NSError*_Nullable error))completion {
+    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:format];
+
+    if (adaptor == nil) {
         completion(NO, nil, nil);
         return;
     }
     
-    NSError* err;
-    id<AbstractDatabaseFormatAdaptor> adaptor;
-    if([PwSafeDatabase isAValidSafe:data error:&err]) {
-        adaptor = [[PwSafeDatabase alloc] init];
-    }
-    else if([KeePassDatabase isAValidSafe:data error:&err]) {
-        adaptor = [[KeePassDatabase alloc] init];
-    }
-    else if([Kdbx4Database isAValidSafe:data error:&err]) {
-        adaptor = [[Kdbx4Database alloc] init];
-    }
-    else if([Kdb1Database isAValidSafe:data error:&err]) {
-        adaptor = [[Kdb1Database alloc] init];
-    }
-    else {
-        completion(NO, nil, err);
-        return;
-    }
-    
     NSTimeInterval startDecryptTime = NSDate.timeIntervalSinceReferenceDate;
-    [adaptor open:data
+    
+    [stream open];
+    
+    [adaptor read:stream
               ckf:ckf
-useLegacyDeserialization:useLegacyDeserialization
+    xmlDumpStream:xmlDumpStream
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        
+        [stream close];
+        
         NSLog(@"====================================== PERF ======================================");
         NSLog(@"DESERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startDecryptTime);
         NSLog(@"====================================== PERF ======================================");
@@ -236,6 +278,8 @@ useLegacyDeserialization:useLegacyDeserialization
         }
     }];
 }
+
+//
 
 - (instancetype)initWithDatabase:(StrongboxDatabase*)database
                          adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor

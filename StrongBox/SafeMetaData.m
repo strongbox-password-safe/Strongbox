@@ -251,7 +251,7 @@
 }
 
 ////////////////////////
-// Legacy Serialization - Remove Eventually - TODO:
+// TODO: Eventually delete these - 14-Jun-2020 +12 months - 14-Jun-2021
 
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:self.uuid forKey:@"uuid"];

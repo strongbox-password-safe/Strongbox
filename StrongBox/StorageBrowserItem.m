@@ -10,8 +10,7 @@
 
 @implementation StorageBrowserItem
 
-- (NSString *)description
-{
+- (NSString *)description {
     return [NSString stringWithFormat:@"%@ [folder: %d] - providerData = [%@]", self.name, self.folder, self.providerData];
 }
 

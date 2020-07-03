@@ -13,6 +13,7 @@
 #import "Utils.h"
 #import "WebDAVConfigurationViewController.h"
 #import "SVProgressHUD.h"
+#import "Constants.h"
 
 @interface WebDAVStorageProvider ()
 
@@ -65,6 +66,10 @@
     }
 }
 
+- (BOOL)userInteractionRequiredForConnection:(WebDAVSessionConfiguration*)config {
+    return config == nil;
+}
+
 -(void)connect:(WebDAVSessionConfiguration*)config
 viewController:(UIViewController*)viewController
     completion:(void (^)(BOOL userCancelled, DAVSession* session, WebDAVSessionConfiguration* configuration, NSError* error))completion {
@@ -110,7 +115,7 @@ viewController:(UIViewController*)viewController
           data:(NSData *)data
   parentFolder:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
-    completion:(void (^)(SafeMetaData *, NSError *))completion {
+    completion:(void (^)(SafeMetaData *, const NSError *))completion {
     if(self.maintainSessionForListings && self.maintainedSessionForListings) { // Create New
         [self createWithSession:nickName extension:extension data:data
                    parentFolder:parentFolder session:self.maintainedSessionForListings
@@ -180,7 +185,7 @@ viewController:(UIViewController *)viewController
 
 - (void)list:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
-  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     if(self.maintainSessionForListings && self.maintainedSessionForListings) {
         [self listWithSession:self.maintainedSessionForListings
                     parentFolder:parentFolder
@@ -261,13 +266,39 @@ viewController:(UIViewController *)viewController
     [session enqueueRequest:listingRequest];
 }
         
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nonnull, NSError * _Nonnull))completion {
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
+    [self readWithProviderData:providerData viewController:nil interactiveAllowed:NO completion:completion];
+}
+
+- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     [self readWithProviderData:providerData viewController:viewController completion:completion];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completionHandler {
+- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData
+    viewController:(nonnull UIViewController *)viewController
+        isAutoFill:(BOOL)isAutoFill
+        completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self read:safeMetaData viewController:viewController completion:completion];
+}
+
+- (void)readWithProviderData:(NSObject * _Nullable)providerData
+              viewController:(UIViewController *)viewController
+                  completion:(nonnull void (^)(NSData * _Nonnull, const NSError * _Nonnull))completionHandler {
+    [self readWithProviderData:providerData viewController:viewController interactiveAllowed:YES completion:completionHandler];
+}
+
+- (void)readWithProviderData:(NSObject *)providerData
+              viewController:(UIViewController *)viewController
+          interactiveAllowed:(BOOL)interactiveAllowed
+                  completion:(void (^)(NSData *, const NSError *))completionHandler {
     WebDAVProviderData* pd = (WebDAVProviderData*)providerData;
+    if (!interactiveAllowed && [self userInteractionRequiredForConnection:pd.sessionConfiguration]) {
+        completionHandler(nil, kUserInteractionRequiredError);
+        return;
+    }
+
     [self connect:pd.sessionConfiguration viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
             NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
@@ -372,7 +403,7 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
     // NOTIMPL
 }
 

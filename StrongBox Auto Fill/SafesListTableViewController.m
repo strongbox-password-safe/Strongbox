@@ -25,12 +25,10 @@
 #import "StrongboxUIDocument.h"
 #import "AutoFillSettings.h"
 #import "SharedAppAndAutoFillSettings.h"
-#import "MMWormhole.h"
 
 @interface SafesListTableViewController ()
 
 @property NSArray<SafeMetaData*> *safes;
-@property MMWormhole* wormhole;
 
 @end
 
@@ -74,11 +72,11 @@
     [SVProgressHUD setViewForExtension:self.view];
 }
 
-- (void)setupAutoFillWormhole {
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
-                                                         optionalDirectory:@"wormhole"
-                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
-}
+//- (void)setupAutoFillWormhole {
+//    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
+//                                                         optionalDirectory:@"wormhole"
+//                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
+//}
 
 - (void)refreshSafes {
     self.safes = SafesList.sharedInstance.snapshot;

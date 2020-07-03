@@ -50,12 +50,9 @@
 }
 
 - (void)testReadLarge {
-//    NSData *largeDb = [CommonTesting getDataFromBundleFile:@"large-100-10-100" ofType:@"kdbx"];
-    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-100-10-100.kdbx"];
-
-    XCTAssertNotNil(largeDb);
-    
-    [[Kdbx4Database alloc] open:largeDb ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/large-100-10-100.kdbx"];
+    [stream open];
+    [[Kdbx4Database alloc] read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(db);
         NSLog(@"Done... [%@]", error);

@@ -14,6 +14,7 @@
 #import "SFTPProviderData.h"
 #import "SFTPSessionConfigurationViewController.h"
 #import "SVProgressHUD.h"
+#import "Constants.h"
 
 @interface SFTPStorageProvider ()
 
@@ -59,7 +60,7 @@
           data:(NSData *)data
   parentFolder:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
-    completion:(void (^)(SafeMetaData *, NSError *))completion {
+    completion:(void (^)(SafeMetaData *, const NSError *))completion {
     if(self.maintainSessionForListing && self.maintainedSessionForListing) { // Create New
         [self createWithSession:nickName extension:extension data:data
                    parentFolder:parentFolder sftp:self.maintainedSessionForListing
@@ -106,7 +107,7 @@ viewController:(UIViewController *)viewController
 
 - (void)list:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
-  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     if(self.maintainSessionForListing && self.maintainedSessionForListing) {
         [self listWithSftpSession:self.maintainedSessionForListing
                      parentFolder:parentFolder
@@ -161,12 +162,7 @@ viewController:(UIViewController *)viewController
     completion(NO, browserItems, nil);
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
-    SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
-    [self readWithProviderData:providerData viewController:viewController completion:completion];
-}
-
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completionHandler {
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, const NSError *))completionHandler {
     SFTPProviderData* foo = (SFTPProviderData*)providerData;
     [self connectAndAuthenticate:foo.sFtpConfiguration
                   viewController:viewController
@@ -236,7 +232,7 @@ viewController:(UIViewController *)viewController
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
     // NOTIMPL
 }
 
@@ -274,6 +270,44 @@ viewController:(UIViewController *)viewController
                                   storageProvider:self.storageId
                                          fileName:[foo.filePath lastPathComponent]
                                    fileIdentifier:json];
+}
+
+- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self read:safeMetaData viewController:viewController completion:completion];
+}
+
+- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
+    [self readWithProviderData:providerData viewController:viewController completion:completion];
+}
+
+- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
+
+    if (providerData.sFtpConfiguration == nil) {
+        completion(nil, kUserInteractionRequiredError);
+        return;
+    }
+   
+    NSError* error;
+    NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:providerData.sFtpConfiguration error:&error];
+    
+    if(sftp == nil || error) {
+       completion(nil, error);
+       return;
+    }
+                     
+    NSData* data = [sftp contentsAtPath:providerData.filePath];
+
+    if(!data) {
+       error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+       completion(nil, error);
+       return;
+    }
+
+    [sftp disconnect];
+
+    completion(data, nil);
 }
 
 - (NSString *)getDirectoryFromParentFolderObject:(NSObject *)parentFolder sessionConfig:(SFTPSessionConfiguration*)sessionConfig {

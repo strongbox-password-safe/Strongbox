@@ -120,7 +120,7 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 - (NSString *)getGroupPathDisplayString:(Node *)node;
 
-@property (nonatomic, readonly) Document*  document;
+@property (nonatomic, readonly, weak) Document*  document;
 @property (nonatomic, readonly) BOOL locked;
 @property (nonatomic, readonly) NSURL*  fileUrl;
 @property (nonatomic, readonly) Node*  rootGroup;

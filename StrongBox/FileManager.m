@@ -69,6 +69,15 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     return ret;
 }
 
+- (NSURL *)syncManagerLocalCopiesDirectory {
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
+    NSURL* ret = [url URLByAppendingPathComponent:@"sync-manager/local"];
+    
+    [self createIfNecessary:ret];
+    
+    return ret;
+}
+
 - (NSURL *)keyFilesDirectory {
     NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"key-files"];
@@ -108,6 +117,15 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     return url;
 }
 
+- (NSURL*)sharedLocalDeviceDatabasesDirectory { // This is the new Uber Sync Local Directory
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
+    NSURL* ret = [url URLByAppendingPathComponent:@"local-databases"];
+
+    [self createIfNecessary:ret];
+
+    return ret;
+}
+
 - (void)createIfNecessary:(NSURL*)url {
     NSError* error;
     if (![[NSFileManager defaultManager] createDirectoryAtURL:url withIntermediateDirectories:YES attributes:nil error:&error]) {
@@ -115,24 +133,57 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     }
 }
 
-- (void)excludeDirectoriesFromBackup {
-    [self excludeFromBackup:self.documentsDirectory];
-    [self excludeFromBackup:self.offlineCacheDirectory];
-    [self excludeFromBackup:self.keyFilesDirectory];
-    [self excludeFromBackup:self.autoFillCacheDirectory];
-    [self excludeFromBackup:self.backupFilesDirectory];
-    [self excludeFromBackup:self.preferencesDirectory];
-    [self excludeFromBackup:self.sharedAppGroupDirectory];
+- (void)setDirectoryInclusionFromBackup:(BOOL)localDocuments importedKeyFiles:(BOOL)importedKeyFiles {
+    [self setIncludeExcludeFromBackup:self.documentsDirectory include:localDocuments];
+    [self setIncludeExcludeFromBackup:self.sharedLocalDeviceDatabasesDirectory include:localDocuments]; // New uber Sync location? TODO:
+
+    // Old Local Database files must be included/excluded individually as there is a permissions error on setting shared app group
+    
+    [self setIncludeExcludeSharedLocalFilesFromBackup:self.sharedAppGroupDirectory include:localDocuments];
+
+    
+    [self setIncludeExcludeFromBackup:self.backupFilesDirectory include:localDocuments];
+    [self setIncludeExcludeFromBackup:self.offlineCacheDirectory include:localDocuments];
+    [self setIncludeExcludeFromBackup:self.autoFillCacheDirectory include:localDocuments];
+    [self setIncludeExcludeFromBackup:self.preferencesDirectory include:localDocuments];
+
+    // Imported Key Files
+    
+    [self setIncludeExcludeFromBackup:self.keyFilesDirectory include:importedKeyFiles];
 }
 
-- (void)excludeFromBackup:(NSURL*)URL {
+- (void)setIncludeExcludeSharedLocalFilesFromBackup:(NSURL*)URL include:(BOOL)include {
+    NSArray<NSURL*>* sharedAppGroupContents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:URL
+                                                                  includingPropertiesForKeys:@[NSURLIsDirectoryKey]
+                                                                                     options:NSDirectoryEnumerationSkipsSubdirectoryDescendants |
+                                                                                             NSDirectoryEnumerationSkipsPackageDescendants   |
+                                                                                             NSDirectoryEnumerationSkipsHiddenFiles
+                                                                                       error:NULL];
+    
+    for (NSURL *file in sharedAppGroupContents) {
+        NSError *error;
+        NSNumber *isDirectory = nil;
+        if (![file getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
+            // handle error
+            NSLog(@"%@", error);
+        }
+        else if (![isDirectory boolValue]) {
+            [self setIncludeExcludeFromBackup:file include:include];
+        }
+    }
+}
+
+- (void)setIncludeExcludeFromBackup:(NSURL*)URL include:(BOOL)include {
     NSError *error = nil;
     
-    BOOL success = [URL setResourceValue:[NSNumber numberWithBool:YES]
+    BOOL success = [URL setResourceValue:[NSNumber numberWithBool:!include]
                                   forKey:NSURLIsExcludedFromBackupKey
                                    error:&error];
     if(!success){
-        NSLog(@"Error excluding %@ from backup %@", [URL lastPathComponent], error);
+        NSLog(@"Error setting include/exclude %@ from backup %@", [URL lastPathComponent], error);
+    }
+    else {
+        NSLog(@"%@ [%@] from backup", include ? @"Included" : @"Excluded", URL);
     }
 }
 
@@ -211,14 +262,27 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     return ret;
 }
 
-- (void)deleteAllTmpFiles {
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
+- (NSString*)tmpAttachmentPreviewPath {
+    NSString* ret = [NSTemporaryDirectory() stringByAppendingPathComponent:@"att_pr"];
+
+    NSError* error;
+    if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
+        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+    }
+
+    NSLog(@"Temp Attachment Path = [%@]", ret);
     
-    for (NSString *file in tmpDirectory) {
-        if (![file isEqualToString:kEncAttachmentDirectoryName]) {
-            NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-            [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-        }
+    return ret;
+}
+
+- (void)deleteAllTmpAttachmentPreviewFiles {
+    NSString* tmpPath = [self tmpAttachmentPreviewPath];
+    
+    NSArray* tmpDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpPath error:NULL];
+    
+    for (NSString *file in tmpDirectoryContents) {
+        NSString* path = [NSString pathWithComponents:@[tmpPath, file]];
+        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
     }
 }
 

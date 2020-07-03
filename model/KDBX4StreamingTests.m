@@ -20,14 +20,14 @@
 @implementation KDBX4StreamingTests
 
 - (void)testHmacBlockStream {
-    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/sample.hmac.blocks"];
-    XCTAssertNotNil(largeDb);
-    
     NSString* b64Key = @"ubUOkhrw8MdxdfPgENNmDDgAPIgdJUI9zqTw0G9woW2OF/5XZy0XEocccln9tpmuS5cUbkTMG7I5tiPDtH3PFQ==";
     NSData* hmacKey = [[NSData alloc] initWithBase64EncodedString:b64Key options:kNilOptions];
 //    NSString* masterb64Key = "TQxZ44nwA3k9RNJpOl6Zf2LfUw9wcQ5tM6Xm2orCAgo=";
     
-    HmacBlockStream *stream = [[HmacBlockStream alloc] initWithData:(uint8_t*)largeDb.bytes length:largeDb.length hmacKey:hmacKey];
+    NSURL* url = [NSURL fileURLWithPath:@"/Users/strongbox/strongbox-test-files/sample.hmac.blocks"];
+    NSInputStream *inputStream = [NSInputStream inputStreamWithURL:url];
+    HmacBlockStream *stream = [[HmacBlockStream alloc] initWithStream:inputStream hmacKey:hmacKey];
+    XCTAssertNotNil(stream);
     
     [stream open];
     
@@ -49,15 +49,14 @@
 }
 
 - (void)testHmacStreamAndAes {
-    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/sample.hmac.blocks"];
-
-    XCTAssertNotNil(largeDb);
-    
     NSString* b64Key = @"ubUOkhrw8MdxdfPgENNmDDgAPIgdJUI9zqTw0G9woW2OF/5XZy0XEocccln9tpmuS5cUbkTMG7I5tiPDtH3PFQ==";
     NSData* hmacKey = [[NSData alloc] initWithBase64EncodedString:b64Key options:kNilOptions];
     
-    HmacBlockStream *innerStream = [[HmacBlockStream alloc] initWithData:(uint8_t*)largeDb.bytes length:largeDb.length hmacKey:hmacKey];
-
+    NSURL* url = [NSURL fileURLWithPath:@"/Users/strongbox/strongbox-test-files/sample.hmac.blocks"];
+    NSInputStream *inputStream = [NSInputStream inputStreamWithURL:url];
+    HmacBlockStream *innerStream = [[HmacBlockStream alloc] initWithStream:inputStream hmacKey:hmacKey];
+    XCTAssertNotNil(innerStream);
+    
     NSString* masterb64Key = @"TQxZ44nwA3k9RNJpOl6Zf2LfUw9wcQ5tM6Xm2orCAgo=";
     NSData* masterKey = [[NSData alloc] initWithBase64EncodedString:masterb64Key options:kNilOptions];
     
@@ -91,14 +90,14 @@
 }
 
 - (void)testHmacAesAndGzip {
-    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/sample.hmac.blocks"];
-    XCTAssertNotNil(largeDb);
-    
     NSString* b64Key = @"ubUOkhrw8MdxdfPgENNmDDgAPIgdJUI9zqTw0G9woW2OF/5XZy0XEocccln9tpmuS5cUbkTMG7I5tiPDtH3PFQ==";
     NSData* hmacKey = [[NSData alloc] initWithBase64EncodedString:b64Key options:kNilOptions];
     
-    HmacBlockStream *innerStream = [[HmacBlockStream alloc] initWithData:(uint8_t*)largeDb.bytes length:largeDb.length hmacKey:hmacKey];
-
+    NSURL* url = [NSURL fileURLWithPath:@"/Users/strongbox/strongbox-test-files/sample.hmac.blocks"];
+    NSInputStream *inputStream = [NSInputStream inputStreamWithURL:url];
+    HmacBlockStream *innerStream = [[HmacBlockStream alloc] initWithStream:inputStream hmacKey:hmacKey];
+    XCTAssertNotNil(innerStream);
+    
     // AES Stream
     
     NSString* masterb64Key = @"TQxZ44nwA3k9RNJpOl6Zf2LfUw9wcQ5tM6Xm2orCAgo=";
@@ -138,18 +137,26 @@
     NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-AES-4.kdbx"];
     XCTAssertNotNil(largeDb);
     
-    [[[Kdbx4Database alloc] init] open:largeDb ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
-        NSLog(@"%@", db);
-        XCTAssertNotNil(db);
-        XCTAssertTrue([db.rootGroup.children[0].title isEqualToString:@"Database"]);
+    Kdbx4Database* adaptor = [[Kdbx4Database alloc] init];
+    NSURL* url = [NSURL fileURLWithPath:@"/Users/strongbox/strongbox-test-files/large-test-242-AES-4.kdbx"];
+    NSInputStream *inputStream = [NSInputStream inputStreamWithURL:url];
+    [inputStream open];
+    
+    [adaptor read:inputStream
+              ckf:[CompositeKeyFactors password:@"a"]
+       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        NSLog(@"%@", database);
+        XCTAssertNotNil(database);
+        XCTAssertTrue([database.rootGroup.children[0].title isEqualToString:@"Database"]);
     }];
 }
 
 - (void)testLargeChaCha20File {
-    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-ChaCha20-4.kdbx"];
-    XCTAssertNotNil(largeDb);
+    NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-ChaCha20-4.kdbx"];
+    [stream open];
     
-    [[[Kdbx4Database alloc] init] open:largeDb ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [[[Kdbx4Database alloc] init] read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        [stream close];
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
         XCTAssertTrue([db.rootGroup.children[0].title isEqualToString:@"Database"]);
@@ -157,10 +164,11 @@
 }
 
 - (void)testLargeTwoFishFile {
-    NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-TwoFish-4.kdbx"];
-    XCTAssertNotNil(largeDb);
+    NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-TwoFish-4.kdbx"];
+    [stream open];
     
-    [[[Kdbx4Database alloc] init] open:largeDb ckf:[CompositeKeyFactors password:@"a"] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [[[Kdbx4Database alloc] init] read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+        [stream close];
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
         XCTAssertTrue([db.rootGroup.children[0].title isEqualToString:@"Database"]);

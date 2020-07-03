@@ -159,13 +159,17 @@
 -(void)launchTweetAtStrongboxSafe {
     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"twitter://post?message=@StrongboxSafe%20Hi!"] options:@{} completionHandler:^(BOOL success) {
         if(!success) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/intent/tweet?text=@StrongboxSafe%20Hi!"]];
+            [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https://twitter.com/intent/tweet?text=@StrongboxSafe%20Hi!"]
+                                             options:@{ }
+                                   completionHandler:nil];
         }
     }];
 }
 
 - (void)launchStrongboxSafeTwitter {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/strongboxsafe"]];
+    [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https://twitter.com/strongboxsafe"]
+                                     options:@{ }
+                           completionHandler:nil];
 }
 
 - (void)customizeAppLockSectionFooter {
@@ -388,7 +392,7 @@
 }
 
 - (void)onFaq {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)onSwitchClearClipboardEnable:(id)sender {
@@ -475,12 +479,7 @@
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]];
     
     if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        if (@available(iOS 10.0, *)) {
-            [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-        }
-        else {
-            [[UIApplication sharedApplication] openURL:url];
-        }
+        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
     }
     else {
         [Alerts info:self

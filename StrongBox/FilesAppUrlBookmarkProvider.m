@@ -14,7 +14,7 @@
 #import "FileManager.h"
 #import "iCloudSafesCoordinator.h"
 
-typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, NSError *error);
+typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *error);
 
 @interface FilesAppUrlBookmarkProvider () <UIDocumentPickerDelegate>
 
@@ -134,7 +134,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
     }
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
     // NOTIMPL
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
     return;
@@ -151,7 +151,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
 
 - (void)list:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
-  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     // NOTIMPL
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
     return;
@@ -161,7 +161,12 @@ viewController:(UIViewController *)viewController
     // NOTIMPL
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
+- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self readNonInteractive:safeMetaData completion:completion];
+}
+
+
+- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
     //NSLog(@"READ! %@", safeMetaData);
     
     NSError *error;
@@ -188,7 +193,35 @@ viewController:(UIViewController *)viewController
     }];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, NSError *))completionHandler {
+
+- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    //NSLog(@"READ! %@", safeMetaData);
+    
+    NSError *error;
+    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:NO ppError:&error];
+    
+    if(error || !url) {
+        NSLog(@"Error or nil URL in Files App Provider: %@", error);
+        completion(nil, error);
+        return;
+    }
+
+    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
+    if (!securitySucceeded) {
+        NSLog(@"Could not access secure scoped resource!");
+        return;
+    }
+    
+    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+    
+    [document openWithCompletionHandler:^(BOOL success) {
+        completion(success ? document.data : nil, nil);
+        
+        [url stopAccessingSecurityScopedResource];
+    }];
+}
+
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, const NSError *))completionHandler {
     // NOTIMPL:
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
 }
@@ -294,10 +327,7 @@ viewController:(UIViewController *)viewController
         }
 
         safeMetaData.fileIdentifier = [self getJsonFileIdentifier:mainAppBookmark autoFillBookmark:autoFillBookmark];
-
-#ifndef IS_APP_EXTENSION // TODO: Auto Fill
         [SafesList.sharedInstance update:safeMetaData];
-#endif
     }
     
     NSLog(@"Got URL from Bookmark: [%@]", url);

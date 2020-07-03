@@ -27,7 +27,9 @@
     XCTAssert(keyFileDigest);
     
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
-    [adaptor open:data ckf:[CompositeKeyFactors password:@"a" keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+     [adaptor read:stream ckf:[CompositeKeyFactors password:@"a" keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssert(db);
         NSLog(@"%@", db);
     }];
@@ -42,7 +44,9 @@
     
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
 
-    [adaptor open:data ckf:[CompositeKeyFactors password:@"a" keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+     [adaptor read:stream ckf:[CompositeKeyFactors password:@"a" keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssert(db);
         NSLog(@"%@", db);
     }];
@@ -57,7 +61,10 @@
     
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
     
-    [adaptor open:data ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+    
+     [adaptor read:stream ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssert(db);
         NSLog(@"%@", db);
     }];
@@ -72,7 +79,10 @@
     
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
 
-    [adaptor open:data ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+    
+     [adaptor read:stream ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssert(db);
         NSLog(@"%@", db);
     }];
@@ -87,7 +97,9 @@
     
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
     
-    [adaptor open:data ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+     [adaptor read:stream ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssert(db);
         NSLog(@"%@", db);
     }];
@@ -102,7 +114,10 @@
     
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
     
-    [adaptor open:data ckf:[CompositeKeyFactors password:@"" keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+    
+     [adaptor read:stream ckf:[CompositeKeyFactors password:@"" keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssert(db);
         NSLog(@"%@", db);
     }];
@@ -117,10 +132,13 @@
     
     Kdb1Database* adaptor = [[Kdb1Database alloc] init];
     
-    [adaptor open:data ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+    
+     [adaptor read:stream ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable saved, NSError * _Nullable error) {
             XCTAssert(saved);
-            [adaptor open:saved ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable reopened, NSError * _Nullable error) {
+             [adaptor read:[NSInputStream inputStreamWithData:saved] ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable reopened, NSError * _Nullable error) {
                 XCTAssert(reopened);
                 NSLog(@"%@", reopened);
             }];
@@ -137,10 +155,17 @@
     
     KeePassDatabase* adaptor = [[KeePassDatabase alloc] init];
 
-    [adaptor open:data ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+    
+     [adaptor read:stream
+               ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         [adaptor save:db completion:^(BOOL userCancelled, NSData * _Nullable saved, NSError * _Nullable error) {
             XCTAssert(saved);
-            [adaptor open:saved ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] useLegacyDeserialization:NO completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable reopened, NSError * _Nullable error) {
+            NSInputStream* s2 = [NSInputStream inputStreamWithData:saved];
+            [s2 open];
+            
+             [adaptor read:s2 ckf:[CompositeKeyFactors password:nil keyFileDigest:keyFileDigest] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable reopened, NSError * _Nullable error) {
                 XCTAssert(reopened);
                 NSLog(@"%@", reopened);
             }];

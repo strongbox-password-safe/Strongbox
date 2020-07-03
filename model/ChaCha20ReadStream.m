@@ -9,7 +9,7 @@
 #import "ChaCha20ReadStream.h"
 #import "sodium.h"
 #import "Utils.h"
-#import "DatabaseModel.h"
+#import "Constants.h"
 
 static const uint32_t kBlockSize = 64;
 

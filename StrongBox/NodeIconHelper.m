@@ -12,7 +12,6 @@
 
 static UIImage* kPwSafeFolderImage;
 static UIImage* kPwSafeRecordImage;
-static UIColor *kSandyFolderColor;  // Maybe just use standard system blue coolor ? TODO:
 
 static NSArray<UIImage*> *kKeePassIconSet;
 static NSArray<UIImage*> *kKeePassiOS13SFIconSet;
@@ -24,7 +23,6 @@ static NSArray<UIImage*> *kKeePassXCIconSet;
     if(self == [NodeIconHelper class]) {
         kPwSafeFolderImage = [UIImage imageNamed:@"folder"];
         kPwSafeRecordImage = [UIImage imageNamed:@"document"];
-        kSandyFolderColor = ColorFromRGB(0xFAB805);
     }
 }
 
@@ -260,10 +258,6 @@ static NSArray<UIImage*>* loadKeePassIconSet() {
     return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
         return [UIImage imageNamed:obj];
     }];
-}
-
-+ (UIColor*)folderTintColor {
-    return kSandyFolderColor; // Maybe just use standard system blue coolor ? TODO:
 }
 
 + (UIImage *)getIconForNode:(Node *)vm model:(id)model {

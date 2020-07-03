@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "GoogleDriveStorageProvider.h"
 #import "SVProgressHUD.h"
+#import "Constants.h"
 
 @implementation GoogleDriveStorageProvider {
     NSMutableDictionary *_iconsByUrl;
@@ -53,7 +54,7 @@
               data:(NSData *)data
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
     [SVProgressHUD show];
 
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
@@ -80,17 +81,35 @@
     }];
 }
 
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, NSError * _Nullable))completion {
+- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    [self read:safeMetaData viewController:viewController completion:completion];
+}
+
+- (void)read:(nonnull SafeMetaData *)safeMetaData
+viewController:(UIViewController *)viewController
+  completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
     [[GoogleDriveManager sharedInstance] read:viewController
                          parentFileIdentifier:safeMetaData.fileIdentifier
                                      fileName:safeMetaData.fileName
-                                   completion:^(NSData *data, NSError *error)
-    {
+                                   completion:^(NSData *data, NSError *error) {
         if (error != nil) {
             NSLog(@"%@", error);
             [[GoogleDriveManager sharedInstance] signout];
         }
 
+        completion(data, error);
+    }];
+}
+
+- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+    if (!GoogleDriveManager.sharedInstance.authorized) {
+        completion(nil, kUserInteractionRequiredError);
+        return;
+    }
+    
+    [GoogleDriveManager.sharedInstance readNonInteractive:safeMetaData.fileIdentifier
+                                                 fileName:safeMetaData.fileName
+                                               completion:^(NSData *data, NSError *error) {
         completion(data, error);
     }];
 }
@@ -116,7 +135,7 @@
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
-        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+        completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
 
     GTLRDrive_File *parent = (GTLRDrive_File *)parentFolder;
     NSMutableArray *driveFiles = [[NSMutableArray alloc] init];
@@ -157,7 +176,7 @@
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, NSError *error))completion {
+                  completion:(void (^)(NSData *data, const NSError *error))completion {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
 
     GTLRDrive_File *file = (GTLRDrive_File *)providerData;
@@ -231,9 +250,8 @@
                                    fileIdentifier:parent];
 }
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
-    // NOTIMPL;
+- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
+    // NOTIMPL
 }
-
 
 @end

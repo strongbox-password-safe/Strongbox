@@ -32,6 +32,7 @@
 #import "ColoredStringHelper.h"
 #import "ClickableSecureTextField.h"
 #import "NSString+Extensions.h"
+#import "FileManager.h"
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -1182,7 +1183,7 @@ static NSString* trimField(NSTextField* textField) {
     
     DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
     
-    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:nodeAttachment.filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:nodeAttachment.filename];
     
     NSError* error;
     //BOOL success =
@@ -1202,11 +1203,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)endPreviewPanelControl:(QLPreviewPanel *)panel {
-    NSArray* tmpDirectory = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:NSTemporaryDirectory() error:NULL];
-    for (NSString *file in tmpDirectory) {
-        NSString* path = [NSString pathWithComponents:@[NSTemporaryDirectory(), file]];
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-    }
+    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
 //

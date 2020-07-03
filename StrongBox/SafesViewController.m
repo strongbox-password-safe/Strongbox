@@ -47,8 +47,7 @@
 #import "MasterDetailViewController.h"
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "SharedAppAndAutoFillSettings.h"
-#import "MMWormhole.h"
-#import "MMWormholeSession.h"
+#import "SyncManager.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -71,7 +70,6 @@
 @property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock - Ideally we should also clear this on DB close but we don't have that event setup yet...
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
-@property MMWormhole* wormhole;
 
 @end
 
@@ -98,17 +96,17 @@
     }
 }
 
-- (void)setupAutoFillWormhole {
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
-                                                         optionalDirectory:@"wormhole"
-                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
-    
-    [self.wormhole listenForMessageWithIdentifier:kWormholeAutoFillUpdateMessageId
-                                         listener:^(id messageObject) {
-        NSLog(@"AutoFill Wormhole Message: [%@]", messageObject);
-//        [SafesList.sharedInstance forceReload];
-    }];
-}
+//- (void)setupAutoFillWormhole {
+//    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
+//                                                         optionalDirectory:@"wormhole"
+//                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
+//    
+//    [self.wormhole listenForMessageWithIdentifier:kWormholeAutoFillUpdateMessageId
+//                                         listener:^(id messageObject) {
+//        NSLog(@"AutoFill Wormhole Message: [%@]", messageObject);
+////        [SafesList.sharedInstance forceReload];
+//    }];
+//}
 
 - (void)sharePreviousCrash {
     NSArray *activityItems = @[FileManager.sharedInstance.archivedCrashFile];
@@ -516,7 +514,44 @@
     NSLog(@"continueAppActivationTasks...");
     
     if([self isVisibleViewController]) {
-        [self openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
+        if(!SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
+            BOOL userHasLocalDatabases = [self getLocalDeviceSafes].firstObject != nil;
+            
+            if (!Settings.sharedInstance.haveAskedAboutBackupSettings && userHasLocalDatabases) {
+                NSString* title = NSLocalizedString(@"backup_settings_prompt_title", @"Backup Settings");
+                NSString* message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox now includes all your local documents and databases in Apple backups, however imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok?");
+                NSString* option1 = NSLocalizedString(@"backup_settings_prompt_option_yes_looks_good", @"Yes, the defaults sound good");
+                NSString* option2 = NSLocalizedString(@"backup_settings_prompt_yes_but_include_key_files", @"Yes, but also backup Key Files");
+                NSString* option3 = NSLocalizedString(@"backup_settings_prompt_no_dont_backup_anything", @"No, do NOT backup anything");
+                
+                [Alerts threeOptionsWithCancel:self title:title
+                                       message:message defaultButtonText:option1 secondButtonText:option2 thirdButtonText:option3 action:^(int response) {
+                    NSLog(@"Selected: %d", response);
+                    if (response == 0) {
+                        Settings.sharedInstance.backupFiles = YES;
+                        Settings.sharedInstance.backupIncludeImportedKeyFiles = NO;
+                    }
+                    else if (response == 1) {
+                        Settings.sharedInstance.backupFiles = YES;
+                        Settings.sharedInstance.backupIncludeImportedKeyFiles = YES;
+                    }
+                    else if (response == 2) {
+                        Settings.sharedInstance.backupFiles = NO;
+                        Settings.sharedInstance.backupIncludeImportedKeyFiles = NO;
+                    }
+                    
+                    if (response != 3) {
+                        [FileManager.sharedInstance setDirectoryInclusionFromBackup:Settings.sharedInstance.backupFiles
+                                                                   importedKeyFiles:Settings.sharedInstance.backupIncludeImportedKeyFiles];
+                        
+                        Settings.sharedInstance.haveAskedAboutBackupSettings = YES;
+                    }
+                }];
+            }
+        }
+        else {
+            [self openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
+        }
     }
 }
 
@@ -1002,7 +1037,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     SafeMetaData* metadata = [self.collection objectAtIndex:indexPath.row];
 
     NSError* error;
-    if (![LocalDeviceStorageProvider.sharedInstance toggleSharedStorage:metadata error:&error]) {
+    if (![SyncManager.sharedInstance toggleLocalDatabaseFilesVisibility:metadata error:&error]) {
         [Alerts error:self title:NSLocalizedString(@"safes_vc_could_not_change_storage_location_error", @"error message could not change local storage") error:error];
     }
     else {
@@ -1486,7 +1521,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-    DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];  // TODO: Would be good not to have to read all file
     
     [provider create:nickName
            extension:extension
@@ -1838,7 +1873,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 -(void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
     NSError* error;
     
-    if (![DatabaseModel isAValidSafe:data error:&error]) {
+    if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) { // TODO: Stream? use URL?
         [Alerts error:self
                 title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                 error:error];
@@ -1918,7 +1953,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     NSData *importedData = [NSData dataWithContentsOfURL:importURL];
     
     NSError* error;
-    if (![DatabaseModel isAValidSafe:importedData error:&error]) {
+    if (![DatabaseModel isValidDatabaseWithPrefix:importedData error:&error]) {
         [Alerts error:self
                 title:NSLocalizedString(@"safesvc_import_manual_url_invalid", @"Invalid Database")
                 error:error];
@@ -1936,7 +1971,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
 - (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url  {
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-    DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
     
 //    NSLog(@"Importing URL: [%@]", url);
     
@@ -2023,7 +2058,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     SafeMetaData* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getSafeMetaData:nickName fileName:filename providerData:bookMark];
     
-    DatabaseFormat format = [DatabaseModel getLikelyDatabaseFormat:data];
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
     metadata.likelyFormat = format;
     
     [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
