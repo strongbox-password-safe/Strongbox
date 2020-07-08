@@ -215,19 +215,20 @@
 //
 
 - (void)validateSelectedDatabase:(StorageBrowserItem *)file indexPath:(NSIndexPath *)indexPath  {
+    StorageProviderReadOptions *options = [[StorageProviderReadOptions alloc] init];
+
     [self.safeStorageProvider readWithProviderData:file.providerData
                                     viewController:self
-                                        completion:^(NSData *data, NSError *error) {
-                                            [self  readForValidationDone:file
-                                            data:data
-                                            error:error];
-                                        }];
+                                           options:options
+                                        completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
+        [self  readForValidationDone:result file:file data:data error:error];
+    }];
 }
 
-- (void)readForValidationDone:(StorageBrowserItem *)file data:(NSData *)data error:(NSError *)error {
-    if (error == nil) {
+- (void)readForValidationDone:(StorageProviderReadResult)result file:(StorageBrowserItem *)file data:(NSData *)data error:(const NSError *)error {
+    if (result == kReadResultSuccess) {
         NSError* err;
-        if ([DatabaseModel isValidDatabaseWithPrefix:data error:&err]) {  // TODO: Would be good not to have to read all file
+        if ([DatabaseModel isValidDatabaseWithPrefix:data error:&err]) {  //    : Would be good not to have to read all file
             DatabaseFormat likelyFormat = [DatabaseModel getDatabaseFormatWithPrefix:data];
             self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider file:file likelyFormat:likelyFormat]);
         }

@@ -43,7 +43,6 @@
         
         _icon = @"webdav-32x32";
         _storageId = kWebDAV;
-        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;
@@ -265,67 +264,82 @@ viewController:(UIViewController *)viewController
 
     [session enqueueRequest:listingRequest];
 }
-        
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+
+- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
-    [self readWithProviderData:providerData viewController:nil interactiveAllowed:NO completion:completion];
-}
-
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
-    [self readWithProviderData:providerData viewController:viewController completion:completion];
-}
-
-- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData
-    viewController:(nonnull UIViewController *)viewController
-        isAutoFill:(BOOL)isAutoFill
-        completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self read:safeMetaData viewController:viewController completion:completion];
-}
-
-- (void)readWithProviderData:(NSObject * _Nullable)providerData
-              viewController:(UIViewController *)viewController
-                  completion:(nonnull void (^)(NSData * _Nonnull, const NSError * _Nonnull))completionHandler {
-    [self readWithProviderData:providerData viewController:viewController interactiveAllowed:YES completion:completionHandler];
+    [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(UIViewController *)viewController
-          interactiveAllowed:(BOOL)interactiveAllowed
-                  completion:(void (^)(NSData *, const NSError *))completionHandler {
+                     options:(StorageProviderReadOptions *)options
+                  completion:(StorageProviderReadCompletionBlock)completionHandler {
+                      
     WebDAVProviderData* pd = (WebDAVProviderData*)providerData;
-    if (!interactiveAllowed && [self userInteractionRequiredForConnection:pd.sessionConfiguration]) {
-        completionHandler(nil, kUserInteractionRequiredError);
+    if (!options.interactiveAllowed && [self userInteractionRequiredForConnection:pd.sessionConfiguration]) {
+        completionHandler(kReadResultError, nil, nil, kUserInteractionRequiredError);
         return;
     }
 
     [self connect:pd.sessionConfiguration viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
             NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
-            completionHandler(nil, error);
+            completionHandler(kReadResultError, nil, nil, error);
             return;
         }
         
-        DAVGetRequest *request = [[DAVGetRequest alloc] initWithPath:pd.href];
-        request.delegate = self;
-        request.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
-            
+        // Get Metadata Request - Will actually be performed first
+        
+        NSString* path = pd.href;
+        DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
+        listingRequest.delegate = self;
+        listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
             if(!success) {
-                completionHandler(nil, error);
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+                
+                completionHandler(kReadResultError, nil, nil, error);
             }
             else {
-                completionHandler(result, error);
+                NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
+                if (listingResponse.count == 0) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [SVProgressHUD dismiss];
+                    });
+
+                    NSError* error = [Utils createNSError:@"Could not get attributes of webdav file" errorCode:-2];
+                    completionHandler(kReadResultError, nil, nil, error);
+                    return;
+                }
+                
+                DAVResponseItem* responseItem = listingResponse.firstObject;
+                NSDate* modDate = responseItem.modificationDate;
+                
+                DAVGetRequest *request = [[DAVGetRequest alloc] initWithPath:pd.href];
+                request.delegate = self;
+                request.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [SVProgressHUD dismiss];
+                    });
+                    
+                    if(!success) {
+                        completionHandler(kReadResultError, nil, nil, error);
+                    }
+                    else {
+                        completionHandler(kReadResultSuccess, result, modDate, nil);
+                    }
+                };
+
+                [session enqueueRequest:request];
             }
         };
-        
+  
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
         });
         
-        [session enqueueRequest:request];
+        [session enqueueRequest:listingRequest];
     }];
 }
 

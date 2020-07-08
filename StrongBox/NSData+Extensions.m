@@ -8,8 +8,19 @@
 
 #import "NSData+Extensions.h"
 #import <CommonCrypto/CommonCrypto.h>
+#import "StreamUtils.h"
 
 @implementation NSData (Extensions)
+
++ (instancetype)dataWithContentsOfStream:(NSInputStream*)inputStream {
+    NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory];
+    
+    if (![StreamUtils pipeFromStream:inputStream to:outputStream] ) {
+        return nil;
+    }
+    
+    return [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+}
 
 - (NSData *)sha1 {
     uint8_t digest[CC_SHA1_DIGEST_LENGTH] = { 0 };

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="88I-SM-cjP">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="88I-SM-cjP">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -437,6 +437,7 @@
                         <outlet property="lifeTimeBonusLabel" destination="C8E-3Q-1AO" id="BKt-bl-bU4"/>
                         <outlet property="lifeTimePrice" destination="g5v-pq-ZW3" id="Pne-AC-9Xs"/>
                         <outlet property="monthlyPrice" destination="nMB-wT-4Q2" id="PRO-e4-puD"/>
+                        <outlet property="termsAndConditionsTextView" destination="k2u-lE-LrX" id="EBZ-hI-30T"/>
                         <outlet property="upgradeForFeaturesSubLabel" destination="IC0-zQ-UPX" id="yqe-CE-x2T"/>
                         <outlet property="viewFreeTrialInfo" destination="qeK-Fa-gWW" id="RPB-IE-81U"/>
                         <outlet property="yearlyBonusLabel" destination="Yqo-mC-L9I" id="e31-3y-RVL"/>

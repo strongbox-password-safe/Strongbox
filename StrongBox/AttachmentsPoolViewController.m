@@ -11,8 +11,9 @@
 #import "NSArray+Extensions.h"
 #import <QuickLook/QuickLook.h>
 #import "FileManager.h"
-
-static const size_t kMaxAttachmentImagePreviewSize = 5 * 1024 * 1024;
+#import "NSData+Extensions.h"
+#import "StreamUtils.h"
+#import "Constants.h"
 
 @interface AttachmentsPoolViewController () <QLPreviewControllerDelegate, QLPreviewControllerDataSource>
 
@@ -83,8 +84,10 @@ static const size_t kMaxAttachmentImagePreviewSize = 5 * 1024 * 1024;
     cell.detailTextLabel.text = friendlyFileSizeString(filesize);
     cell.imageView.image = [UIImage imageNamed:@"document"];
     
-    if (attachment.length < kMaxAttachmentImagePreviewSize) {
-        UIImage* img = [UIImage imageWithData:attachment.deprecatedData];
+    if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
+        NSInputStream* attStream = [attachment getPlainTextInputStream];
+        NSData* data = [NSData dataWithContentsOfStream:attStream];
+        UIImage* img = [UIImage imageWithData:data];
         
         if(img) { // Trick to keep all images to a fixed size
             @autoreleasepool { // Prevent App Extension Crash
@@ -157,7 +160,10 @@ static const size_t kMaxAttachmentImagePreviewSize = 5 * 1024 * 1024;
     NSString* filename = [self getAttachmentLikelyName:index forDisplay:NO];
     
     NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
-    [attachment.deprecatedData writeToFile:f atomically:YES];
+    
+    NSInputStream* attStream = [attachment getPlainTextInputStream];
+    [StreamUtils pipeFromStream:attStream to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
+
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;

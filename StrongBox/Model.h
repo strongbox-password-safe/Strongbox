@@ -27,7 +27,6 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 @property (nonatomic, readonly, nonnull) SafeMetaData *metadata;
 @property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
-@property (nonatomic, readonly) BOOL isUsingOfflineCache;
 @property (nonatomic, readonly) BOOL isReadOnly;
 
 @property (nullable, nonatomic) NSString* openedWithYubiKeySecret; // Used for Convenience Setting if this database was opened with a Yubikey workaround
@@ -37,11 +36,11 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (instancetype _Nullable )initWithSafeDatabase:(DatabaseModel *_Nonnull)passwordDatabase
-                          originalDataForBackup:(NSData*_Nullable)originalDataForBackup // Can be null in case of Duress Dummy
                                        metaData:(SafeMetaData *_Nonnull)metaData
-                                      cacheMode:(BOOL)cacheMode
-                                     isReadOnly:(BOOL)isReadOnly
-                                 isAutoFillOpen:(BOOL)isAutoFillOpen NS_DESIGNATED_INITIALIZER;
+                                 forcedReadOnly:(BOOL)forcedReadOnly
+                                     isAutoFill:(BOOL)isAutoFillOpen;
+
+- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen templateMetaData:(SafeMetaData*)templateMetaData;
 
 - (void)update:(BOOL)isAutoFill handler:(void (^)(BOOL userCancelled, NSError*_Nullable error))handler;
 
@@ -68,15 +67,6 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 - (void)closeAndCleanup;
 
-// Cache Stuff
-
-- (void)updateOfflineCacheWithData:(NSData *_Nonnull)data;
-
-- (void)updateAutoFillCacheWithData:(NSData *_Nonnull)data;
-- (void)updateAutoFillCache:(void (^_Nonnull)(void))handler;
-- (void)disableAndClearAutoFill;
-- (void)enableAutoFill;
-     
 // Operations
 
 - (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
@@ -93,8 +83,11 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 - (NSString *_Nonnull)generatePassword;
 
-- (void)updateAutoFillQuickTypeDatabase;
-     
+// Auto Fill
+
+- (void)disableAndClearAutoFill;
+- (void)enableAutoFill;
+
 @end
 
 NS_ASSUME_NONNULL_END

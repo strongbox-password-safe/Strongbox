@@ -47,10 +47,6 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     return [self.documentsDirectory URLByAppendingPathComponent:@"crash.json"];
 }
 
-- (NSURL *)offlineCacheDirectory {
-    return self.appSupportDirectory;
-}
-
 - (NSURL *)appSupportDirectory {
     NSURL *ret =  [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
                                                   inDomains:NSUserDomainMask].lastObject;
@@ -60,16 +56,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     return ret;
 }
 
-- (NSURL *)autoFillCacheDirectory {
-    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
-    NSURL* ret = [url URLByAppendingPathComponent:@"auto-fill-caches"];
-    
-    [self createIfNecessary:ret];
-    
-    return ret;
-}
-
-- (NSURL *)syncManagerLocalCopiesDirectory {
+- (NSURL *)syncManagerLocalWorkingCachesDirectory {
     NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"sync-manager/local"];
     
@@ -134,17 +121,21 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 }
 
 - (void)setDirectoryInclusionFromBackup:(BOOL)localDocuments importedKeyFiles:(BOOL)importedKeyFiles {
-    [self setIncludeExcludeFromBackup:self.documentsDirectory include:localDocuments];
-    [self setIncludeExcludeFromBackup:self.sharedLocalDeviceDatabasesDirectory include:localDocuments]; // New uber Sync location? TODO:
+    // Exclude Local working caches
+    
+    [self setIncludeExcludeFromBackup:self.syncManagerLocalWorkingCachesDirectory include:NO];
 
+    [self setIncludeExcludeFromBackup:self.documentsDirectory include:localDocuments];
+    [self setIncludeExcludeFromBackup:self.sharedLocalDeviceDatabasesDirectory include:localDocuments];
+    
+    // New uber Sync location? TODO:
+    // TODO: Local Databases in new system need to be backup
+        
     // Old Local Database files must be included/excluded individually as there is a permissions error on setting shared app group
     
     [self setIncludeExcludeSharedLocalFilesFromBackup:self.sharedAppGroupDirectory include:localDocuments];
-
     
     [self setIncludeExcludeFromBackup:self.backupFilesDirectory include:localDocuments];
-    [self setIncludeExcludeFromBackup:self.offlineCacheDirectory include:localDocuments];
-    [self setIncludeExcludeFromBackup:self.autoFillCacheDirectory include:localDocuments];
     [self setIncludeExcludeFromBackup:self.preferencesDirectory include:localDocuments];
 
     // Imported Key Files
@@ -189,12 +180,14 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 
 - (void)deleteAllLocalAndAppGroupFiles {
     [self deleteAllInDirectory:self.documentsDirectory];
-    [self deleteAllInDirectory:self.offlineCacheDirectory];
     [self deleteAllInDirectory:self.keyFilesDirectory];
-    [self deleteAllInDirectory:self.autoFillCacheDirectory];
     [self deleteAllInDirectory:self.backupFilesDirectory];
     [self deleteAllInDirectory:self.preferencesDirectory];
+    [self deleteAllInDirectory:self.syncManagerLocalWorkingCachesDirectory];
     [self deleteAllInDirectory:self.sharedAppGroupDirectory recursive:NO]; // Remove any files but leave directories don't know about
+    
+    // New uber Sync location? TODO:
+    // TODO: Local Databases in new system need to be backup
 }
 
 - (void)deleteAllInDirectory:(NSURL*)url {
@@ -282,7 +275,10 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     
     for (NSString *file in tmpDirectoryContents) {
         NSString* path = [NSString pathWithComponents:@[tmpPath, file]];
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
+        
+        NSError* error;
+        [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
+        NSLog(@"Deleted: [%@]-[%@]", path, error);
     }
 }
 

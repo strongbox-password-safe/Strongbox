@@ -233,10 +233,13 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     CustomFieldViewModel *c2 = [CustomFieldViewModel customFieldWithKey:@"Key" value:@"Value" protected:NO];
     CustomFieldViewModel *c3 = [CustomFieldViewModel customFieldWithKey:@"Longish Key" value:@"Well this is a very very long thing that is going on here and there and must wrap" protected:YES];
 
-    UiAttachment* a1 = [[UiAttachment alloc] initWithFilename:@"filename.jpg" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
-    UiAttachment* a2 = [[UiAttachment alloc] initWithFilename:@"document.txt" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
-    UiAttachment* a3 = [[UiAttachment alloc] initWithFilename:@"abc.pdf" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
-    UiAttachment* a4 = [[UiAttachment alloc] initWithFilename:@"cool.mpg" dbAttachment:[[DatabaseAttachment alloc] initWithData:[NSData data] compressed:YES protectedInMemory:YES]];
+    NSInputStream* dataStream = [NSInputStream inputStreamWithData:NSData.data];
+    DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] initWithStream:dataStream protectedInMemory:YES compressed:YES];
+     
+    UiAttachment* a1 = [[UiAttachment alloc] initWithFilename:@"filename.jpg" dbAttachment:dbAttachment];
+    UiAttachment* a2 = [[UiAttachment alloc] initWithFilename:@"document.txt" dbAttachment:dbAttachment];
+    UiAttachment* a3 = [[UiAttachment alloc] initWithFilename:@"abc.pdf" dbAttachment:dbAttachment];
+    UiAttachment* a4 = [[UiAttachment alloc] initWithFilename:@"cool.mpg" dbAttachment:dbAttachment];
     
     NSArray<ItemMetadataEntry*>* metadata = @[ [ItemMetadataEntry entryWithKey:@"ID" value:NSUUID.UUID.UUIDString copyable:YES],
                                 [ItemMetadataEntry entryWithKey:@"Created" value:@"November 21 at 13:21" copyable:NO],

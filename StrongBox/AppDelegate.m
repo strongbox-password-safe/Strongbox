@@ -19,7 +19,6 @@
 #import "OfflineDetector.h"
 #import "real-secrets.h"
 #import "NSArray+Extensions.h"
-#import "OfflineCacheNameDetector.h"
 #import "ProUpgradeIAPManager.h"
 #import "FileManager.h"
 #import "SyncManager.h"

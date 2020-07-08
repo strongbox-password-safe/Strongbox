@@ -180,8 +180,8 @@
 
             XCTAssert(b.attachments.count == 2);
 
-            XCTAssert([b.attachments[0].deprecatedData isEqualToData:data1]);
-            XCTAssert([b.attachments[1].deprecatedData isEqualToData:data2]);
+            XCTAssert([b.attachments[0].unitTestDataOnly isEqualToData:data1]);
+            XCTAssert([b.attachments[1].unitTestDataOnly isEqualToData:data2]);
         }];
     }];
 }

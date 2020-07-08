@@ -16,7 +16,6 @@
 #import "PinsConfigurationController.h"
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
-#import "CacheManager.h"
 #import "ExportOptionsTableViewController.h"
 #import "AttachmentsPoolViewController.h"
 #import "NSArray+Extensions.h"
@@ -89,7 +88,7 @@
 }
 
 - (BOOL)canSetCredentials {
-    return !(self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache);
+    return !self.viewModel.isReadOnly;
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

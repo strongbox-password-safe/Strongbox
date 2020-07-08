@@ -1304,9 +1304,6 @@
 /* You are in read-only mode. Cannot Write! */
 "model_error_readonly_cannot_write" = "You are in read-only mode. Cannot Write!";
 
-/* You are currently in offline mode. The database cannot be modified. */
-"model_error_offline_cannot_write" = "You are currently in offline mode. The database cannot be modified.";
-
 /* Error while scanning */
 "qr_code_vc_error_scanning_title" = "Error while scanning";
 

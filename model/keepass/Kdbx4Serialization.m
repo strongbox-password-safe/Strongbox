@@ -375,7 +375,17 @@ static NSMutableData* createInnerHeaders(NSArray<DatabaseAttachment*> *attachmen
     for (DatabaseAttachment *attachment in attachments) {
         uint8_t protected[] = { attachment.protectedInMemory ? 0x01 : 0x00 };
         NSMutableData *binary = [NSMutableData dataWithBytes:&protected length:1];
-        [binary appendData:attachment.deprecatedData];
+        
+        NSInputStream* inputStream = [attachment getPlainTextInputStream];
+
+        // TODO: Stream this write
+        NSData* data = [NSData dataWithContentsOfStream:inputStream];
+
+        if (!data) {
+            return nil;
+        }
+        
+        [binary appendData:data];
         
         appendInnerHeader(ret, kInnerHeaderTypeBinary, binary);
     }

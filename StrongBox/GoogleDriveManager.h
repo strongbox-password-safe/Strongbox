@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <GoogleSignIn/GoogleSignIn.h>
 #import "GTLRDrive.h"
+#import "SafeStorageProvider.h"
 
 @interface GoogleDriveManager : NSObject <GIDSignInDelegate>
 
@@ -27,11 +28,14 @@
                         parentFolder:(NSObject *)parent
                           completion:(void (^)(GTLRDrive_File *file, NSError *error))handler;
 
-- (void)readWithOnlyFileId:(UIViewController *)viewController fileIdentifier:(NSString *)fileIdentifier completion:(void (^)(NSData *data, NSError *error))handler;
+- (void)readWithOnlyFileId:(UIViewController *)viewController
+            fileIdentifier:(NSString *)fileIdentifier
+              dateModified:(NSDate*)dateModified
+                completion:(StorageProviderReadCompletionBlock)handler ;
 
-- (void)readNonInteractive:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(void (^)(NSData *data, NSError *error))handler;
+- (void)readNonInteractive:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(StorageProviderReadCompletionBlock)handler;
 
-- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(void (^)(NSData *data, NSError *error))handler;
+- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(StorageProviderReadCompletionBlock)handler;
 
 - (void)update:(NSString *)parentFileIdentifier
       fileName:(NSString *)fileName

@@ -17,6 +17,7 @@
 #import "GzipDecompressOutputStream.h"
 #import "AesOutputStream.h"
 #import "Sha256PassThroughOutputStream.h"
+#import "AesInputStream.h"
 
 static const int kBlockSize = 32 * 1024;
 static NSString* kEmptyDataDigest;
@@ -50,10 +51,9 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
 
 - (void)cleanup {
     if (self.encryptedSessionFilePath) {
-        NSLog(@"DEALLOC - Removing temporary encrypted attachment file [%@]", self.encryptedSessionFilePath);
         NSError* error;
         [NSFileManager.defaultManager removeItemAtPath:self.encryptedSessionFilePath error:&error];
-        NSLog(@"DEALLOC - Removed temporary encrypted attachment with error [%@]", error);
+        NSLog(@"DEALLOC - Removed temporary encrypted attachment [%@]-[%@]", self.encryptedSessionFilePath, error);
     }
     
     self.encryptedSessionFilePath = nil;
@@ -61,20 +61,38 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
 }
 
 - (instancetype)initWithData:(NSData *)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory {
-    NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
-    [inputStream open];
-        
-    self = [self initWithStream:inputStream length:data.length protectedInMemory:protectedInMemory compressed:compressed];
-
-    [inputStream close];
-
-    return self;
+    return [self initWithStream:[NSInputStream inputStreamWithData:data] protectedInMemory:protectedInMemory compressed:compressed];
 }
 
 - (instancetype)initWithStream:(NSInputStream *)stream length:(NSUInteger)length protectedInMemory:(BOOL)protectedInMemory {
     return [self initWithStream:stream length:length protectedInMemory:protectedInMemory compressed:YES];
 }
 
+- (instancetype)initWithStream:(NSInputStream *)stream protectedInMemory:(BOOL)protectedInMemory compressed:(BOOL)compressed {
+    if (self = [self initForStreamWriting:protectedInMemory compressed:compressed]) {
+        _compressed = compressed;
+        _protectedInMemory = protectedInMemory;
+
+        uint8_t block[kBlockSize];
+        NSInteger read;
+        
+        [stream open];
+        while ((read = [stream read:block maxLength:kBlockSize]) > 0) {
+            [self writeStreamWithPlainDecompressedBytes:block maxLength:read];
+        }
+        [stream close];
+        
+        [self closeWriteStream];
+
+        if (read < 0) {
+            NSLog(@"Error reading stream... [%ld]", (long)read);
+            return nil;
+        }
+    }
+    
+    return self;
+}
+    
 - (instancetype)initWithStream:(NSInputStream *)stream length:(NSUInteger)length protectedInMemory:(BOOL)protectedInMemory compressed:(BOOL)compressed {
     if (self = [self initForStreamWriting:protectedInMemory compressed:compressed]) {
         _compressed = compressed;
@@ -178,38 +196,20 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
     _sha256Hex = self.digested ? self.digested.digest.hex : kEmptyDataDigest;
 }
 
-- (NSData*)getDataFromEncryptedTemporaryFile {
+- (NSInputStream *)getPlainTextInputStream {
     if (self.digested == nil) {
-        return NSData.data; // Handle weird edge case empty attachment
+        return [NSInputStream inputStreamWithData:NSData.data]; // Handle weird edge case empty attachment
     }
-    
-    NSOutputStream* mem = [NSOutputStream outputStreamToMemory];
-    NSOutputStream* outputMemoryStream = kEncrypt ? [[AesOutputStream alloc] initToOutputStream:mem encrypt:NO key:self.encryptionKey iv:self.encryptionIV] : mem;
-    [outputMemoryStream open];
-    
+ 
     NSInputStream* inStream = [NSInputStream inputStreamWithFileAtPath:self.encryptedSessionFilePath];
-    [inStream open];
+    
+    NSInputStream* aesDecrypt = kEncrypt ? [[AesInputStream alloc] initWithStream:inStream key:self.encryptionKey iv:self.encryptionIV] : inStream;
+    
+    return aesDecrypt;
+}
 
-    NSInteger bytesRead = 0;
-    uint8_t block[kBlockSize];
-    do {
-        bytesRead = [inStream read:block maxLength:kBlockSize];
-        if (bytesRead < 0) {
-            NSLog(@"Could not read encrypted session file: [%@]", self.encryptedSessionFilePath);
-            return nil;
-        }
-        
-        if (bytesRead > 0) {
-            [outputMemoryStream write:block maxLength:bytesRead];
-        }
-    } while (bytesRead > 0);
-
-    [inStream close];
-    [outputMemoryStream close];
-
-    NSData *contents = [mem propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
-
-    return contents;
+- (NSData *)unitTestDataOnly {
+    return [NSData dataWithContentsOfStream:[self getPlainTextInputStream]];
 }
 
 - (NSString*)getUniqueFileName {
@@ -220,10 +220,6 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
     } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
     
     return ret;
-}
-
-- (NSData *)deprecatedData {
-    return [self getDataFromEncryptedTemporaryFile];
 }
 
 - (NSUInteger)length {

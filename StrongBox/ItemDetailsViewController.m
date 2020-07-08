@@ -39,6 +39,9 @@
 #import "NSString+Extensions.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "FileManager.h"
+#import "StreamUtils.h"
+#import "NSData+Extensions.h"
+#import "Constants.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -47,8 +50,6 @@
 #import "QRCodeScannerViewController.h"
 
 #endif
-
-static const size_t kMaxAttachmentImageSize = 5 * 1024 * 1024;
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
@@ -865,8 +866,10 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     UiAttachment* attachment = [self.model.attachments objectAtIndex:index];
     
     NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:attachment.filename];
-    NSData* data = attachment.dbAttachment.deprecatedData;
-    [data writeToFile:f atomically:YES];
+    
+    NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+    [StreamUtils pipeFromStream:attStream to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
+
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -1901,8 +1904,10 @@ showGenerateButton:YES];
             EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];
             cell.textField.text = attachment.filename;
             cell.image.image = [UIImage imageNamed:@"document"];
-            if (attachment.dbAttachment.length < kMaxAttachmentImageSize) {
-                NSData* data = attachment.dbAttachment.deprecatedData;
+
+            if (attachment.dbAttachment.length < kMaxAttachmentTableviewIconImageSize) {
+                NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+                NSData* data = [NSData dataWithContentsOfStream:attStream];
                 UIImage* img = [UIImage imageWithData:data];
                 if(img) {
                     @autoreleasepool { // Prevent App Extension Crash
@@ -1927,8 +1932,9 @@ showGenerateButton:YES];
             NSUInteger filesize = attachment.dbAttachment.length;
             cell.detailTextLabel.text = friendlyFileSizeString(filesize);
            
-            if (attachment.dbAttachment.length < kMaxAttachmentImageSize) {
-                NSData* data = attachment.dbAttachment.deprecatedData;
+            if (attachment.dbAttachment.length < kMaxAttachmentTableviewIconImageSize) {
+                NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+                NSData* data = [NSData dataWithContentsOfStream:attStream];
                 UIImage* img = [UIImage imageWithData:data];
 
                 if(img) { // Trick to keep all images to a fixed size

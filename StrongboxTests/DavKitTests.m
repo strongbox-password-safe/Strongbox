@@ -79,59 +79,59 @@ static WebDAVStorageProvider* getSession() {
     [self waitUntilDone];
 }
 
-- (void)testRead {
-    WebDAVStorageProvider* provider = getSession();
-    
-    [provider create:@"Hello"
-           extension:@"txt"
-                data:[@"This is a test" dataUsingEncoding:NSUTF8StringEncoding]
-        parentFolder:nil
-      viewController:nil
-          completion:^(SafeMetaData *metadata, NSError *error) {
-              XCTAssertNil(error);
-              XCTAssertNotNil(metadata);
-              
-              if(metadata) {
-                  [provider read:metadata viewController:nil completion:^(NSData *data, NSError *error) {
-                      NSLog(@"Read: %@ - Error: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], error);
-                      self.done = YES;
-                  }];
-              }
-          }];
-    
-    [self waitUntilDone];
-}
-
-- (void)testReadFromNextCloud {
-    WebDAVStorageProvider* provider = getSession();
-    
-    WebDAVProviderData *pd = [[WebDAVProviderData alloc] init];
-    pd.href = @"https://demo.nextcloud.com/admin/remote.php/webdav/Nextcloud%20Manual.pdf";
-    pd.sessionConfiguration = provider.unitTestSessionConfiguration;
-    
-    [provider readWithProviderData:pd viewController:nil completion:^(NSData *data, NSError *error) {
-        NSLog(@"Read: %lu bytes - Error: %@",(unsigned long)data.length, error);
-        self.done = YES;
-    }];
-    
-    [self waitUntilDone];
-}
-
-- (void)testReadFromNextCloudRelative {
-    WebDAVStorageProvider* provider = getSession();
-    
-    WebDAVProviderData *pd = [[WebDAVProviderData alloc] init];
-    pd.href = @"Nextcloud Manual.pdf";
-    pd.sessionConfiguration = provider.unitTestSessionConfiguration;
-    
-    [provider readWithProviderData:pd viewController:nil completion:^(NSData *data, NSError *error) {
-        NSLog(@"Read: %lu bytes - Error: %@",(unsigned long)data.length, error);
-        self.done = YES;
-    }];
-    
-    [self waitUntilDone];
-}
-
+//- (void)testRead {
+//    WebDAVStorageProvider* provider = getSession();
+//
+//    [provider create:@"Hello"
+//           extension:@"txt"
+//                data:[@"This is a test" dataUsingEncoding:NSUTF8StringEncoding]
+//        parentFolder:nil
+//      viewController:nil
+//          completion:^(SafeMetaData *metadata, NSError *error) {
+//              XCTAssertNil(error);
+//              XCTAssertNotNil(metadata);
+//
+//              if(metadata) {
+//                  [provider read:metadata viewController:nil completion:^(NSData *data, NSError *error) {
+//                      NSLog(@"Read: %@ - Error: %@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], error);
+//                      self.done = YES;
+//                  }];
+//              }
+//          }];
+//
+//    [self waitUntilDone];
+//}
+//
+//- (void)testReadFromNextCloud {
+//    WebDAVStorageProvider* provider = getSession();
+//
+//    WebDAVProviderData *pd = [[WebDAVProviderData alloc] init];
+//    pd.href = @"https://demo.nextcloud.com/admin/remote.php/webdav/Nextcloud%20Manual.pdf";
+//    pd.sessionConfiguration = provider.unitTestSessionConfiguration;
+//
+//    [provider readWithProviderData:pd viewController:nil completion:^(NSData *data, NSError *error) {
+//        NSLog(@"Read: %lu bytes - Error: %@",(unsigned long)data.length, error);
+//        self.done = YES;
+//    }];
+//
+//    [self waitUntilDone];
+//}
+//
+//- (void)testReadFromNextCloudRelative {
+//    WebDAVStorageProvider* provider = getSession();
+//
+//    WebDAVProviderData *pd = [[WebDAVProviderData alloc] init];
+//    pd.href = @"Nextcloud Manual.pdf";
+//    pd.sessionConfiguration = provider.unitTestSessionConfiguration;
+//
+//    [provider readWithProviderData:pd viewController:nil completion:^(NSData *data, NSError *error) {
+//        NSLog(@"Read: %lu bytes - Error: %@",(unsigned long)data.length, error);
+//        self.done = YES;
+//    }];
+//
+//    [self waitUntilDone];
+//}
+//
 
 - (void)waitUntilDone {
     while(!self.done) {

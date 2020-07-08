@@ -15,7 +15,6 @@
 #import "OpenSafeSequenceHelper.h"
 #import "SVProgressHUD.h"
 #import "PickCredentialsTableViewController.h"
-#import "CacheManager.h"
 #import "NSArray+Extensions.h"
 #import "DatabaseCell.h"
 #import "Utils.h"
@@ -25,6 +24,7 @@
 #import "StrongboxUIDocument.h"
 #import "AutoFillSettings.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "SyncManager.h"
 
 @interface SafesListTableViewController ()
 
@@ -151,7 +151,9 @@
 }
 
 - (NSString*)getAutoFillCacheDate:(SafeMetaData*)safe {
-    NSDate* mod = [CacheManager.sharedInstance getAutoFillCacheModificationDate:safe];
+    NSDate* mod;
+    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    
     return mod ? [NSString stringWithFormat:NSLocalizedString(@"autofill_safes_vc_cache_date_fmt", @"Cached%@: %@"),
                   safe.alwaysUseCacheForAutoFill ?
                   NSLocalizedString(@"autofill_safes_vc_cache_is_forced_fmt", @" (Forced)") : @"",

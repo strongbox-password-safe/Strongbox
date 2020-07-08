@@ -10,7 +10,6 @@
 #import "Utils.h"
 #import "SVProgressHUD.h"
 #import "AutoFillManager.h"
-#import "CacheManager.h"
 #import "PasswordMaker.h"
 #import "BackupsManager.h"
 #import "NSArray+Extensions.h"
@@ -29,33 +28,59 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 @interface Model ()
 
-@property (nonnull) NSData* lastSnapshot;
 @property NSSet<NSString*> *cachedPinned;
 @property DatabaseAuditor* auditor;
 @property BOOL isAutoFillOpen;
+@property BOOL forcedReadOnly;
+@property BOOL isDuressDummyMode;
 
 @end
 
-@implementation Model {
-    BOOL _cacheMode;
-    BOOL _isReadOnly;
+@implementation Model
+
+- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen templateMetaData:(SafeMetaData*)templateMetaData {
+    SafeMetaData* meta = [[SafeMetaData alloc] initWithNickName:templateMetaData.nickName
+                                                storageProvider:templateMetaData.storageProvider
+                                                       fileName:templateMetaData.fileName
+                                                 fileIdentifier:templateMetaData.fileIdentifier];
+    meta.autoFillEnabled = NO;
+    
+    NSData* data = [self getDuressDummyData];
+    DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+    if (!data) {
+        CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
+        DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+        DatabaseModel* model = [[DatabaseModel alloc] initNew:cpf format:kKeePass config:config];
+    
+        data = [model expressToData];
+        [self setDuressDummyData:data];
+    }
+
+    DatabaseModel* model = [DatabaseModel expressFromData:data password:@"1234" config:config];
+    
+    return [self initWithSafeDatabase:model metaData:meta forcedReadOnly:NO isAutoFill:isAutoFillOpen isDuressDummyMode:YES];
 }
 
 - (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
-               originalDataForBackup:(NSData *)originalDataForBackup // TODO: ?
                             metaData:(SafeMetaData *)metaData
-                           cacheMode:(BOOL)cacheMode            // TODO:
-                          isReadOnly:(BOOL)isReadOnly
-                      isAutoFillOpen:(BOOL)isAutoFillOpen {     // TODO:
+                      forcedReadOnly:(BOOL)forcedReadOnly
+                          isAutoFill:(BOOL)isAutoFill {
+    return [self initWithSafeDatabase:passwordDatabase metaData:metaData forcedReadOnly:forcedReadOnly isAutoFill:isAutoFill isDuressDummyMode:NO];
+}
+
+- (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
+                            metaData:(SafeMetaData *)metaData
+                      forcedReadOnly:(BOOL)forcedReadOnly
+                          isAutoFill:(BOOL)isAutoFill
+                   isDuressDummyMode:(BOOL)isDuressDummyMode {
     if (self = [super init]) {
         _database = passwordDatabase;
-        _lastSnapshot = originalDataForBackup;
         _metadata = metaData;
-        _cacheMode = cacheMode;
-        _isReadOnly = isReadOnly || metaData.readOnly;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
         
-        self.isAutoFillOpen = isAutoFillOpen;
+        self.forcedReadOnly = forcedReadOnly;
+        self.isAutoFillOpen = isAutoFill;
+        self.isDuressDummyMode = isDuressDummyMode;
         
         [self createNewAuditor];
 
@@ -70,6 +95,15 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+- (NSData*)getDuressDummyData {
+    return SharedAppAndAutoFillSettings.sharedInstance.duressDummyData; // Less than ideal place to store?
+}
+
+- (void)setDuressDummyData:(NSData*)data {
+    SharedAppAndAutoFillSettings.sharedInstance.duressDummyData = data;
+}
+
+//
 - (void)dealloc {
     NSLog(@"=====================================================================");
     NSLog(@"Model DEALLOC...");
@@ -244,7 +278,6 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return [self getNodesFromSerializationIds:excludedSet];
 }
 
-
 - (void)oneTimeHibpCheck:(NSString *)password completion:(void (^)(BOOL, NSError * _Nonnull))completion {
     if (self.auditor) {
         [self.auditor oneTimeHibpCheck:password completion:completion];
@@ -256,160 +289,63 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)isUsingOfflineCache {
-    return _cacheMode;
-}
-
 - (BOOL)isReadOnly {
-    return _isReadOnly;
+    return self.metadata.readOnly || self.forcedReadOnly;
 }
 
-- (void)update:(BOOL)isAutoFill handler:(void(^)(BOOL, NSError * _Nullable error))handler {
-    if (!_cacheMode && !_isReadOnly) {
-        [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-            if (userCancelled || data == nil || error) {
-                handler(userCancelled, error);
-                return;
-            }
+- (void)update:(BOOL)isAutoFill handler:(void(^)(BOOL userCancelled, NSError * _Nullable error))handler {
+    if(self.isReadOnly) {
+        handler(NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
+        return;
+    }
 
-            if(self.lastSnapshot) { // Dummy Database => will be nil
-                if(![BackupsManager.sharedInstance writeBackup:self.lastSnapshot metadata:self.metadata]) {
-                    NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
-                    NSError* err = [Utils createNSError:em errorCode:-1];
-                    handler(NO, err);
-                    return;
-                }
-                self.lastSnapshot = data;
-            }
+    [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if (userCancelled || data == nil || error) {
+            handler(userCancelled, error);
+            return;
+        }
 
-            LegacySyncReadOptions* legacyOptions = [[LegacySyncReadOptions alloc] init];
-            legacyOptions.isAutoFill = isAutoFill;
-            
-            [SyncManager.sharedInstance updateLegacy:self.metadata data:data legacyOptions:legacyOptions completion:^(NSError *error) {
-                if(!error) {
-                    [self updateOfflineCacheWithData:data];
-                    [self updateAutoFillCacheWithData:data];
-                    [self updateAutoFillQuickTypeDatabase];
+        [self onUpdateWithEncryptedDone:data completion:handler];
+    }];
+}
 
-                    // Re-audit - FUTURE - Make this more incremental?
-                    if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
-                        [self restartAudit];
-                    }
-                }
-                
-                handler(NO, error);
-            }];
-        }];
+- (void)onUpdateWithEncryptedDone:(NSData*)data completion:(void(^)(BOOL userCancelled, NSError * _Nullable error))completion {
+    if (self.isDuressDummyMode) {
+        [self setDuressDummyData:data];
+        completion(NO, nil);
+        return;
     }
     else {
-        if(_isReadOnly) {
-            handler(NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
-        }
-        else {
-            handler(NO, [Utils createNSError:NSLocalizedString(@"model_error_offline_cannot_write", @"You are currently in offline mode. The database cannot be modified.") errorCode:-1]);
-        }
-    }
-}
+        LegacySyncReadOptions* legacyOptions = [[LegacySyncReadOptions alloc] init];
+        legacyOptions.isAutoFill = self.isAutoFillOpen;
 
-- (void)updateAutoFillCacheWithData:(NSData *)data {
-    if (self.metadata.autoFillEnabled) {
-        [self saveAutoFillCacheFile:data safe:self.metadata];
-    }
-}
+        [SyncManager.sharedInstance updateLegacy:self.metadata data:data legacyOptions:legacyOptions completion:^(NSError *error) {
+            if(!error) {
+                if(self.metadata.autoFillEnabled) {
+                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
+                }
 
-- (void)updateAutoFillCache:(void (^_Nonnull)(void))handler {
-    if (self.metadata.autoFillEnabled) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-            [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    if (data != nil) {
-                        [self saveAutoFillCacheFile:data safe:self.metadata];
-                    }
-                    handler();
-                });
-            }];
-        });
+                // Re-audit - FUTURE - Make this more incremental?
+                if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
+                    [self restartAudit];
+                }
+            }
+            
+            completion(NO, error);
+        }];
     }
 }
 
 - (void)disableAndClearAutoFill {
-    [[CacheManager sharedInstance] deleteAutoFillCache:_metadata completion:^(NSError *error) {
-          self.metadata.autoFillEnabled = NO;
-          self.metadata.autoFillCacheAvailable = NO;
-        
-          [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-          [[SafesList sharedInstance] update:self.metadata];
-      }];
+    self.metadata.autoFillEnabled = NO;
+    [[SafesList sharedInstance] update:self.metadata];
+    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 }
 
 - (void)enableAutoFill {
-    _metadata.autoFillCacheAvailable = NO;
     _metadata.autoFillEnabled = YES;
-
     [[SafesList sharedInstance] update:self.metadata];
 }
-
-//- (void)updateOfflineCache:(void (^)(void))handler {
-//    if (self.isCloudBasedStorage && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
-//        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
-//            [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-//                dispatch_async(dispatch_get_main_queue(), ^(void) {
-//                    if (data != nil) {
-//                        [self saveOfflineCacheFile:data safe:self->_metadata];
-//                    }
-//
-//                    handler();
-//                });
-//            }];
-//        });
-//    }
-//}
-
-- (void)updateOfflineCacheWithData:(NSData *)data {
-    BOOL isCloudBased = [SyncManager.sharedInstance allowLegacyOfflineCache:self.metadata];
-    if (isCloudBased && !self.isUsingOfflineCache && _metadata.offlineCacheEnabled) {
-        [self saveOfflineCacheFile:data safe:_metadata];
-    }
-}
-
-- (void)saveOfflineCacheFile:(NSData *)data safe:(SafeMetaData *)safe {
-    [[CacheManager sharedInstance] updateOfflineCachedSafe:safe data:data completion:^(BOOL success) {
-        if (!success) {
-            NSLog(@"Error updating Offline Cache file.");
-        }
-
-        safe.offlineCacheAvailable = success;
-        [[SafesList sharedInstance] update:safe];
-    }];
-}
-
-- (void)saveAutoFillCacheFile:(NSData *)data safe:(SafeMetaData *)safe {
-      [[CacheManager sharedInstance] updateAutoFillCache:safe data:data completion:^(BOOL success) {
-          if (!success) {
-              NSLog(@"Error updating Autofill Cache file.");
-          }
-
-          safe.autoFillCacheAvailable = success;
-          [[SafesList sharedInstance] update:safe];
-      }];
-}
-
-//- (void)disableAndClearOfflineCache {
-//    [[CacheManager sharedInstance] deleteOfflineCachedSafe:_metadata
-//                         completion:^(NSError *error) {
-//                             self->_metadata.offlineCacheEnabled = NO;
-//                             self->_metadata.offlineCacheAvailable = NO;
-//
-//                             [[SafesList sharedInstance] update:self.metadata];
-//                         }];
-//}
-//
-//- (void)enableOfflineCache {
-//    _metadata.offlineCacheAvailable = NO;
-//    _metadata.offlineCacheEnabled = YES;
-//
-//    [[SafesList sharedInstance] update:self.metadata];
-//}
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Operations
@@ -502,7 +438,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
--(void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSError* error))completion {
+- (void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSError* error))completion {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
@@ -518,12 +454,6 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 - (NSString *)generatePassword {
     PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
-}
-
-- (void)updateAutoFillQuickTypeDatabase {
-    if(self.metadata.autoFillEnabled) {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
-    }
 }
 
 //

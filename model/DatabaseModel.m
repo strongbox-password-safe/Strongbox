@@ -180,24 +180,77 @@
 }
 
 //////
+// Mostly shouldn't be used in normal course of events - used by Duress Dummy to simplify coding...
 
+- (NSData*)expressToData {
+    __block NSData* ret;
+
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+
+    [self getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        if (userCancelled || error) {
+            NSLog(@"Error: expressToData [%@]", error);
+        }
+        else {
+            ret = data;
+        }
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    return ret;
+}
+
++ (instancetype)expressFromData:(NSData*)data password:(NSString*)password config:(DatabaseModelConfig*)config {
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
+    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:format];
+    if (adaptor == nil) {
+       return nil;
+    }
+
+    __block DatabaseModel* model = nil;
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+
+    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
+    [stream open];
+    [adaptor read:stream
+              ckf:[CompositeKeyFactors password:password]
+    xmlDumpStream:nil
+     completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+        [stream close];
+      
+        if(userCancelled || database == nil || error) {
+            NSLog(@"Error: expressFromData = [%@]", error);
+            model = nil;
+        }
+        else {
+            model = [[DatabaseModel alloc] initWithDatabase:database adaptor:adaptor config:config];
+        }
+        
+        dispatch_group_leave(group);
+    }];
+
+    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+    return model;
+}
+
+
+//////
 + (void)fromUrlOrLegacyData:(NSURL *)url
                  legacyData:(NSData *)legacyData
                         ckf:(CompositeKeyFactors *)ckf
                      config:(DatabaseModelConfig *)config
-                 completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+                 completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
     if (url) {
         [DatabaseModel fromUrl:url ckf:ckf config:config completion:completion];
     }
     else {
         [DatabaseModel fromLegacyData:legacyData ckf:ckf config:config completion:completion];
     }
-}
-
-+ (void)fromLegacyData:legacyData
-                   ckf:(CompositeKeyFactors *)ckf
-            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
-    [DatabaseModel fromLegacyData:legacyData ckf:ckf config:DatabaseModelConfig.defaults completion:completion];
 }
 
 + (void)fromLegacyData:legacyData
@@ -218,18 +271,16 @@
 
 + (void)fromUrl:(NSURL *)url
             ckf:(CompositeKeyFactors *)ckf
-     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
-    [DatabaseModel fromUrl:url ckf:ckf config:DatabaseModelConfig.defaults completion:completion];
+         config:(DatabaseModelConfig *)config
+     completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
+    [DatabaseModel fromUrl:url ckf:ckf config:config xmlDumpStream:nil  completion:completion];
 }
 
 + (void)fromUrl:(NSURL *)url
             ckf:(CompositeKeyFactors *)ckf
          config:(DatabaseModelConfig *)config
-     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
-    [DatabaseModel fromUrl:url ckf:ckf config:config xmlDumpStream:nil  completion:completion];
-}
-
-+ (void)fromUrl:(NSURL *)url ckf:(CompositeKeyFactors *)ckf config:(DatabaseModelConfig *)config xmlDumpStream:(NSOutputStream *)xmlDumpStream completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
+  xmlDumpStream:(NSOutputStream *)xmlDumpStream
+     completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
     DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
      
     NSInputStream* stream = [NSInputStream inputStreamWithURL:url]; 

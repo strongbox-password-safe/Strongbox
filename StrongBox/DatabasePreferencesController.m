@@ -177,18 +177,16 @@
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
                                                            databaseUuid:self.viewModel.metadata.uuid];
         
-        [self.viewModel updateAutoFillCache:^{
-            [self bindUi];
-            
-            [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_done", @"AutoFill Enabled")
-                                                       message:nil
-                                                      duration:3.f
-                                                   hideOnSwipe:YES
-                                                     hideOnTap:YES
-                                                     alertType:ISAlertTypeSuccess
-                                                 alertPosition:ISAlertPositionTop
-                                                       didHide:nil];
-        }];
+        [self bindUi];
+
+        [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_done", @"AutoFill Enabled")
+                                                   message:nil
+                                                  duration:3.f
+                                               hideOnSwipe:YES
+                                                 hideOnTap:YES
+                                                 alertType:ISAlertTypeSuccess
+                                             alertPosition:ISAlertPositionTop
+                                                   didHide:nil];
     }
 }
 
@@ -342,11 +340,6 @@
 
 - (BOOL)canToggleTouchId {
     return BiometricsManager.isBiometricIdAvailable && [SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial];
-}
-
-- (BOOL)canToggleOfflineCache {
-    BOOL isCloudBasedStorage = [SyncManager.sharedInstance allowLegacyOfflineCache:self.viewModel.metadata];
-    return !(self.viewModel.isUsingOfflineCache || !isCloudBasedStorage);
 }
 
 @end

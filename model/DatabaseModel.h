@@ -23,12 +23,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format;
 
+//
+
+- (NSData*)expressToData;
++ (instancetype _Nullable)expressFromData:(NSData*)data password:(NSString*)password config:(DatabaseModelConfig*)config;
+
 ////////////
 // FROM
-
-+ (void)fromLegacyData:legacyData
-                   ckf:(CompositeKeyFactors *)ckf
-            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
 
 + (void)fromLegacyData:legacyData
                    ckf:(CompositeKeyFactors *)ckf
@@ -37,24 +38,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void)fromUrl:(NSURL *)url
             ckf:(CompositeKeyFactors *)ckf
-     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
-
-+ (void)fromUrl:(NSURL *)url
-            ckf:(CompositeKeyFactors *)ckf
          config:(DatabaseModelConfig*)config
-     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+     completion:(void (^)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error))completion;
 
 + (void)fromUrl:(NSURL *)url
             ckf:(CompositeKeyFactors *)ckf
          config:(DatabaseModelConfig*)config
   xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
-     completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+     completion:(void (^)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error))completion;
 
 + (void)fromUrlOrLegacyData:(NSURL *)url
                  legacyData:(NSData *)legacyData
                         ckf:(CompositeKeyFactors *)ckf
                      config:(DatabaseModelConfig*)config
-                 completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
+                 completion:(void (^)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error))completion;
 
 //////
 

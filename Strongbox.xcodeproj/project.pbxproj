@@ -216,8 +216,6 @@
 		4D27D74D21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D27D74B21A00AB900CA7B06 /* KeePass2TagPackage.m */; };
 		4D2962B3223173FC0082897D /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2962B2223173FC0082897D /* History.m */; };
 		4D2962B4223173FC0082897D /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2962B2223173FC0082897D /* History.m */; };
-		4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
-		4D2BF3EC21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4D2CB4912332CBE400C2E084 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		4D2CB4922332CBE400C2E084 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4902332CBE400C2E084 /* ClipboardManager.m */; };
 		4D2CB7E823D1BCC0000A9ABC /* SecretStoreTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB7E723D1BCC0000A9ABC /* SecretStoreTests.m */; };
@@ -453,8 +451,6 @@
 		4D526ABE2440BA4400B0B700 /* Export.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D526AB92440BA4400B0B700 /* Export.storyboard */; };
 		4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
 		4D556F0E22B7F1B300E16027 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
-		4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F1022B7FF6100E16027 /* CacheManager.m */; };
-		4D556F1222B7FF6100E16027 /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F1022B7FF6100E16027 /* CacheManager.m */; };
 		4D556F2422B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */; };
 		4D556F2522B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */; };
 		4D556F2C22B8329000E16027 /* BrowseItemTotpCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4D556F2B22B8328F00E16027 /* BrowseItemTotpCell.xib */; };
@@ -682,7 +678,6 @@
 		4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D761EDC06A0002615F6 /* PreviousPasswordsTableViewController.m */; };
 		4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D915D791EDC4B77002615F6 /* Alerts.m */; };
 		4D93AC912184ADE000A141C6 /* MiscScratchPadTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D93AC902184ADE000A141C6 /* MiscScratchPadTests.m */; };
-		4D93AC972184B04D00A141C6 /* OfflineCacheNameDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D93AC962184B04D00A141C6 /* OfflineCacheNameDetector.m */; };
 		4D9597B922A28825008DB224 /* SelectedStorageParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597B822A28825008DB224 /* SelectedStorageParameters.m */; };
 		4D9597BE22A2CB38008DB224 /* CASGParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597BD22A2CB38008DB224 /* CASGParams.m */; };
 		4D9597BF22A2CB38008DB224 /* CASGParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597BD22A2CB38008DB224 /* CASGParams.m */; };
@@ -823,7 +818,6 @@
 		4DC4E05123488BAA000743C4 /* OneDriveStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C3F21807CD1007931E4 /* OneDriveStorageProvider.m */; };
 		4DC4E05223488BAA000743C4 /* BackupsBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1F580C233E19EC00A01FB4 /* BackupsBrowserTableViewController.m */; };
 		4DC4E05323488BAA000743C4 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C1B21807C25007931E4 /* XmlSerializer.m */; };
-		4DC4E05423488BAA000743C4 /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F1022B7FF6100E16027 /* CacheManager.m */; };
 		4DC4E05523488BAA000743C4 /* SelectItemTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D7D2195229FDA5F00C1C925 /* SelectItemTableViewController.m */; };
 		4DC4E05623488BAA000743C4 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E08EF21824CBF007BA1E7 /* Kdbx4Database.m */; };
 		4DC4E05723488BAA000743C4 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2E1FB1E27700A68A92 /* Node.m */; };
@@ -833,7 +827,6 @@
 		4DC4E05B23488BAA000743C4 /* KdbSerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B1EAE2194B2D900ECAF0D /* KdbSerializationData.m */; };
 		4DC4E05C23488BAA000743C4 /* CompositeKeyFactors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3169A622DE33AF003FAD3F /* CompositeKeyFactors.m */; };
 		4DC4E05D23488BAA000743C4 /* KdbEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B1EA62194AAAF00ECAF0D /* KdbEntry.m */; };
-		4DC4E05E23488BAA000743C4 /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4DC4E05F23488BAA000743C4 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
 		4DC4E06023488BAA000743C4 /* RMStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4D6AF6222EF3E80056514E /* RMStore.m */; };
 		4DC4E06123488BAA000743C4 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E149421832C1500A41CA0 /* core.c */; };
@@ -968,7 +961,6 @@
 		4DC4E0E523488BAA000743C4 /* RecordView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4C49031EDEC0B900EB857D /* RecordView.m */; };
 		4DC4E0E623488BAA000743C4 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCC21F4C26600E2B194 /* OTPToken+Serialization.m */; };
 		4DC4E0E723488BAA000743C4 /* StorageBrowserTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */; };
-		4DC4E0E823488BAA000743C4 /* OfflineCacheNameDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D93AC962184B04D00A141C6 /* OfflineCacheNameDetector.m */; };
 		4DC4E0E923488BAA000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
 		4DC4E0EA23488BAA000743C4 /* GoogleDriveManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757981C8361D200E6356F /* GoogleDriveManager.m */; };
 		4DC4E0EB23488BAA000743C4 /* Model.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1D6FD61F38760F00D2B8EC /* Model.m */; };
@@ -1146,7 +1138,6 @@
 		4DC4E1B123488BAE000743C4 /* Times.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C2E21807C7E007931E4 /* Times.m */; };
 		4DC4E1B223488BAE000743C4 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D196796217F1C190057DF06 /* PwSafeMetadata.m */; };
 		4DC4E1B323488BAE000743C4 /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F1621BF101A0090A55E /* DAVBaseRequest.m */; };
-		4DC4E1B423488BAE000743C4 /* DuressDummyStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */; };
 		4DC4E1B523488BAE000743C4 /* NotesTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98852270B4E200A811C4 /* NotesTableViewCell.m */; };
 		4DC4E1B623488BAE000743C4 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9AA21B6E8A9004F1812 /* KeyFileParser.m */; };
 		4DC4E1B723488BAE000743C4 /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D74B92C218C438800FC369E /* V3BinariesList.m */; };
@@ -1247,7 +1238,6 @@
 		4DC4E21D23488BAE000743C4 /* NMSSHConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D326E6A22302BED00DCD8C7 /* NMSSHConfig.m */; };
 		4DC4E21E23488BAE000743C4 /* argon2.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E148B21832B7400A41CA0 /* argon2.c */; };
 		4DC4E21F23488BAE000743C4 /* DatabaseAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B71218B350C00A0739A /* DatabaseAttachment.m */; };
-		4DC4E22023488BAE000743C4 /* CacheManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F1022B7FF6100E16027 /* CacheManager.m */; };
 		4DC4E22123488BAE000743C4 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F7B22CBCEC1000954D0 /* PasswordGenerationConfig.m */; };
 		4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7C72188972600CF1663 /* CryptoParameters.m */; };
 		4DC4E22323488BAE000743C4 /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
@@ -1531,6 +1521,10 @@
 		C87A8CDD24952A9800356966 /* SharedAppAndAutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CCF2495101100356966 /* SharedAppAndAutoFillSettings.m */; };
 		C87A8CDE24952CD600356966 /* AutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CC724950B5A00356966 /* AutoFillSettings.m */; };
 		C87A8CDF24952CD700356966 /* AutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CC724950B5A00356966 /* AutoFillSettings.m */; };
+		C87F792324AA4A3000C90A1B /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C87F792224AA4A3000C90A1B /* StreamUtils.m */; };
+		C87F792424AA4A3000C90A1B /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C87F792224AA4A3000C90A1B /* StreamUtils.m */; };
+		C87F792524AA4A3000C90A1B /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C87F792224AA4A3000C90A1B /* StreamUtils.m */; };
+		C87F792624AA4A3000C90A1B /* StreamUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = C87F792224AA4A3000C90A1B /* StreamUtils.m */; };
 		C8855FB924854E8E001EE933 /* SwitchTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8855FB824854E8E001EE933 /* SwitchTableCell.xib */; };
 		C8855FBA24854E8E001EE933 /* SwitchTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8855FB824854E8E001EE933 /* SwitchTableCell.xib */; };
 		C8855FBD24854F93001EE933 /* SwitchTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8855FBC24854F93001EE933 /* SwitchTableViewCell.m */; };
@@ -1553,6 +1547,10 @@
 		C89348C0248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
 		C89348C1248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
 		C89348C2248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
+		C8991AD624B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
+		C8991AD724B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
+		C8991AD824B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
+		C8991AD924B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
 		C89BA19D2494F0A800CC8579 /* KdbxStreamingTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C89BA19C2494F0A800CC8579 /* KdbxStreamingTests.m */; };
 		C8A22048249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
 		C8A22049249158AD0025B8B0 /* AesInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8A22047249158AD0025B8B0 /* AesInputStream.m */; };
@@ -1845,7 +1843,7 @@
 		4D17579E1C8361D200E6356F /* LocalDeviceStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LocalDeviceStorageProvider.h; path = StrongBox/LocalDeviceStorageProvider.h; sourceTree = "<group>"; };
 		4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LocalDeviceStorageProvider.m; path = StrongBox/LocalDeviceStorageProvider.m; sourceTree = "<group>"; };
 		4D1757A21C8361D200E6356F /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = StrongBox/main.m; sourceTree = "<group>"; };
-		4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeStorageProvider.h; path = StrongBox/SafeStorageProvider.h; sourceTree = "<group>"; };
+		4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SafeStorageProvider.h; sourceTree = "<group>"; };
 		4D1757AF1C8361D300E6356F /* SafesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafesViewController.h; path = StrongBox/SafesViewController.h; sourceTree = "<group>"; };
 		4D1757B01C8361D300E6356F /* SafesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafesViewController.m; path = StrongBox/SafesViewController.m; sourceTree = "<group>"; };
 		4D1757B11C8361D300E6356F /* SelectDestinationGroupController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SelectDestinationGroupController.h; path = StrongBox/SelectDestinationGroupController.h; sourceTree = "<group>"; };
@@ -1952,8 +1950,6 @@
 		4D2962B1223173FC0082897D /* History.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = History.h; path = model/keepass/History.h; sourceTree = "<group>"; };
 		4D2962B2223173FC0082897D /* History.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = History.m; path = model/keepass/History.m; sourceTree = "<group>"; };
 		4D2BF3E821EE3ECD00E39EBB /* PinEntryResponse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PinEntryResponse.h; sourceTree = "<group>"; };
-		4D2BF3E921EF6B9000E39EBB /* DuressDummyStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuressDummyStorageProvider.h; path = StrongBox/DuressDummyStorageProvider.h; sourceTree = "<group>"; };
-		4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DuressDummyStorageProvider.m; path = StrongBox/DuressDummyStorageProvider.m; sourceTree = "<group>"; };
 		4D2BF3F221EFA2EB00E39EBB /* AppLockMode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppLockMode.h; sourceTree = "<group>"; };
 		4D2CB48F2332CBE400C2E084 /* ClipboardManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClipboardManager.h; path = model/ClipboardManager.h; sourceTree = "<group>"; };
 		4D2CB4902332CBE400C2E084 /* ClipboardManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClipboardManager.m; path = model/ClipboardManager.m; sourceTree = "<group>"; };
@@ -2082,12 +2078,12 @@
 		4D3E14A52183365000A41CA0 /* Argon2KdfCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Argon2KdfCipher.m; path = model/keepass/Argon2KdfCipher.m; sourceTree = SOURCE_ROOT; };
 		4D402D6E2074EAFF00F7BC70 /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = StrongBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
 		4D402D702074EAFF00F7BC70 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = StrongBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
-		4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = model/StorageProvider.h; sourceTree = SOURCE_ROOT; };
+		4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = Sync/StorageProvider.h; sourceTree = SOURCE_ROOT; };
 		4D409359217E2AA900E69844 /* ladder-single-entry.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ladder-single-entry.xml"; sourceTree = "<group>"; };
 		4D40B09123BFBF7400BAD0D2 /* sample-non-hex-64.key */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "sample-non-hex-64.key"; sourceTree = "<group>"; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageBrowserTableViewController.h; path = StrongBox/StorageBrowserTableViewController.h; sourceTree = "<group>"; };
 		4D40EEED1ED87734006532F8 /* StorageBrowserTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StorageBrowserTableViewController.m; path = StrongBox/StorageBrowserTableViewController.m; sourceTree = "<group>"; };
-		4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageBrowserItem.h; path = StrongBox/StorageBrowserItem.h; sourceTree = "<group>"; };
+		4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageBrowserItem.h; sourceTree = "<group>"; };
 		4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StorageBrowserItem.m; path = StrongBox/StorageBrowserItem.m; sourceTree = "<group>"; };
 		4D42A94B2409BE0C00F16DBC /* Strongbox-iOS-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-iOS-Bridging-Header.h"; sourceTree = "<group>"; };
 		4D42A94C2409BE0C00F16DBC /* Strongbox-Auto-Fill-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Auto-Fill-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -2243,10 +2239,8 @@
 		4D526AA024407C8F00B0B700 /* WSTagsField.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTagsField.swift; path = lib/WSTagsField/WSTagsField.swift; sourceTree = SOURCE_ROOT; };
 		4D526AA124407C8F00B0B700 /* WSTag.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WSTag.swift; path = lib/WSTagsField/WSTag.swift; sourceTree = SOURCE_ROOT; };
 		4D526ABA2440BA4400B0B700 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = StrongBox/Base.lproj/Export.storyboard; sourceTree = "<group>"; };
-		4D556F0B22B7F1B300E16027 /* FileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = FileManager.h; path = StrongBox/FileManager.h; sourceTree = "<group>"; };
-		4D556F0C22B7F1B300E16027 /* FileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = FileManager.m; path = StrongBox/FileManager.m; sourceTree = "<group>"; };
-		4D556F0F22B7FF6100E16027 /* CacheManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CacheManager.h; path = StrongBox/CacheManager.h; sourceTree = "<group>"; };
-		4D556F1022B7FF6100E16027 /* CacheManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CacheManager.m; path = StrongBox/CacheManager.m; sourceTree = "<group>"; };
+		4D556F0B22B7F1B300E16027 /* FileManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileManager.h; sourceTree = "<group>"; };
+		4D556F0C22B7F1B300E16027 /* FileManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FileManager.m; sourceTree = "<group>"; };
 		4D556F2222B817AA00E16027 /* LocalDatabaseIdentifier.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LocalDatabaseIdentifier.h; path = StrongBox/LocalDatabaseIdentifier.h; sourceTree = "<group>"; };
 		4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LocalDatabaseIdentifier.m; path = StrongBox/LocalDatabaseIdentifier.m; sourceTree = "<group>"; };
 		4D556F2A22B82B8600E16027 /* BrowseViewType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BrowseViewType.h; path = StrongBox/BrowseViewType.h; sourceTree = "<group>"; };
@@ -2625,8 +2619,6 @@
 		4D92F1E72440BE0800C737D5 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = StrongBox/sv.lproj/Export.strings; sourceTree = "<group>"; };
 		4D92F1E92440BE0B00C737D5 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = StrongBox/uk.lproj/Export.strings; sourceTree = "<group>"; };
 		4D93AC902184ADE000A141C6 /* MiscScratchPadTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MiscScratchPadTests.m; path = StrongboxTests/MiscScratchPadTests.m; sourceTree = "<group>"; };
-		4D93AC952184B04D00A141C6 /* OfflineCacheNameDetector.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineCacheNameDetector.h; path = StrongBox/OfflineCacheNameDetector.h; sourceTree = "<group>"; };
-		4D93AC962184B04D00A141C6 /* OfflineCacheNameDetector.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = OfflineCacheNameDetector.m; path = StrongBox/OfflineCacheNameDetector.m; sourceTree = "<group>"; };
 		4D95483724004F7C008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/MasterDetail.strings; sourceTree = "<group>"; };
 		4D95483824004F7C008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = StrongBox/it.lproj/Main.strings; sourceTree = "<group>"; };
 		4D95483924004F7D008D2BE1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -3027,6 +3019,8 @@
 		C87A8CC724950B5A00356966 /* AutoFillSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillSettings.m; path = "StrongBox Auto Fill/AutoFillSettings.m"; sourceTree = "<group>"; };
 		C87A8CCE2495101100356966 /* SharedAppAndAutoFillSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SharedAppAndAutoFillSettings.h; path = StrongBox/SharedAppAndAutoFillSettings.h; sourceTree = "<group>"; };
 		C87A8CCF2495101100356966 /* SharedAppAndAutoFillSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SharedAppAndAutoFillSettings.m; path = StrongBox/SharedAppAndAutoFillSettings.m; sourceTree = "<group>"; };
+		C87F792124AA4A3000C90A1B /* StreamUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StreamUtils.h; path = model/StreamUtils.h; sourceTree = "<group>"; };
+		C87F792224AA4A3000C90A1B /* StreamUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = StreamUtils.m; path = model/StreamUtils.m; sourceTree = "<group>"; };
 		C8855FB824854E8E001EE933 /* SwitchTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SwitchTableCell.xib; path = StrongBox/SwitchTableCell.xib; sourceTree = "<group>"; };
 		C8855FBB24854F93001EE933 /* SwitchTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchTableViewCell.h; sourceTree = "<group>"; };
 		C8855FBC24854F93001EE933 /* SwitchTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SwitchTableViewCell.m; sourceTree = "<group>"; };
@@ -3052,6 +3046,9 @@
 		C8961908246166F1008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C8961909246166F7008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C896190A246166F7008D4BD1 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
+		C8991AD424B0CF7200C2D604 /* StorageProviderReadOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StorageProviderReadOptions.h; sourceTree = "<group>"; };
+		C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StorageProviderReadOptions.m; sourceTree = "<group>"; };
+		C8991ADA24B0D01600C2D604 /* StorageProviderReadResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StorageProviderReadResult.h; sourceTree = "<group>"; };
 		C89BA19C2494F0A800CC8579 /* KdbxStreamingTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KdbxStreamingTests.m; path = StrongboxTests/KdbxStreamingTests.m; sourceTree = "<group>"; };
 		C89F6B82247FC5A20070E754 /* changelog-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-ios.txt"; path = "build/changelog-ios.txt"; sourceTree = "<group>"; };
 		C89F6B83247FC5A30070E754 /* changelog-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-mac.txt"; path = "build/changelog-mac.txt"; sourceTree = "<group>"; };
@@ -3938,15 +3935,6 @@
 			name = "iOS Files";
 			sourceTree = "<group>";
 		};
-		4D556F1922B812B200E16027 /* Duress Dummy */ = {
-			isa = PBXGroup;
-			children = (
-				4D2BF3E921EF6B9000E39EBB /* DuressDummyStorageProvider.h */,
-				4D2BF3EA21EF6B9000E39EBB /* DuressDummyStorageProvider.m */,
-			);
-			name = "Duress Dummy";
-			sourceTree = "<group>";
-		};
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
@@ -3977,15 +3965,9 @@
 			name = UI;
 			sourceTree = "<group>";
 		};
-		4D62D6961C85F35E0051E13B /* StorageProviders */ = {
+		4D62D6961C85F35E0051E13B /* Storage Providers */ = {
 			isa = PBXGroup;
 			children = (
-				4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */,
-				4D556F0F22B7FF6100E16027 /* CacheManager.h */,
-				4D556F1022B7FF6100E16027 /* CacheManager.m */,
-				4D556F0B22B7F1B300E16027 /* FileManager.h */,
-				4D556F0C22B7F1B300E16027 /* FileManager.m */,
-				4D556F1922B812B200E16027 /* Duress Dummy */,
 				4D556F1822B812A300E16027 /* iOS Files */,
 				4D556F1722B8128500E16027 /* iCloud */,
 				4D556F1622B8127200E16027 /* Dropbox */,
@@ -3996,11 +3978,11 @@
 				4D0F121721C13F5500C4451D /* SFTP */,
 				4D18854A2170ABD7001AE6B0 /* SafeStorageProviderFactory.h */,
 				4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */,
-				4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */,
 				4D40EEEF1ED878DB006532F8 /* StorageBrowserItem.h */,
 				4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */,
 			);
-			name = StorageProviders;
+			name = "Storage Providers";
+			path = ..;
 			sourceTree = "<group>";
 		};
 		4D664DBB2179D1A30023FF0C /* XmlWriting */ = {
@@ -4083,6 +4065,8 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4D556F0B22B7F1B300E16027 /* FileManager.h */,
+				4D556F0C22B7F1B300E16027 /* FileManager.m */,
 				C872B72D24A64B530042CE02 /* Streaming */,
 				C8BF569624A0E092003269C9 /* Constants.h */,
 				C8BF569724A0E092003269C9 /* Constants.m */,
@@ -4630,15 +4614,14 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				4D3652162184A34600A56519 /* AppDelegate.m */,
 				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				C87A8CD5249513BC00356966 /* App Settings */,
 				C84333362461662800E2E550 /* Build */,
 				4D62D6941C85F2B50051E13B /* UI */,
 				C8C73CCB249E429D00B34C8F /* Sync */,
-				4D62D6961C85F35E0051E13B /* StorageProviders */,
 				4D78AC231FB1E22C00A68A92 /* Model */,
 				4D326EA1223032C800DCD8C7 /* Libraries */,
-				4D3652162184A34600A56519 /* AppDelegate.m */,
 				4DF544FA2231627A00DDEECE /* apple.cer */,
 				4D2F82331F754FB0001688C9 /* Strongbox.entitlements */,
 				4DBE5B371C8356C700C310BC /* AppDelegate.h */,
@@ -4698,8 +4681,6 @@
 				4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */,
 				4DEF7B95216FC74A00A3EE12 /* OfflineDetector.h */,
 				4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */,
-				4D93AC952184B04D00A141C6 /* OfflineCacheNameDetector.h */,
-				4D93AC962184B04D00A141C6 /* OfflineCacheNameDetector.m */,
 				4D8144B22199B4A80044E617 /* NodeIconHelper.h */,
 				4D8144B32199B4A80044E617 /* NodeIconHelper.m */,
 			);
@@ -5048,6 +5029,8 @@
 				C872B73B24A671A70042CE02 /* AesOutputStream.m */,
 				C872B74024A676D60042CE02 /* Sha256PassThroughOutputStream.h */,
 				C872B74124A676D60042CE02 /* Sha256PassThroughOutputStream.m */,
+				C87F792124AA4A3000C90A1B /* StreamUtils.h */,
+				C87F792224AA4A3000C90A1B /* StreamUtils.m */,
 			);
 			name = Streaming;
 			sourceTree = "<group>";
@@ -5174,9 +5157,15 @@
 		C8C73CCB249E429D00B34C8F /* Sync */ = {
 			isa = PBXGroup;
 			children = (
+				4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */,
+				4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */,
+				4D62D6961C85F35E0051E13B /* Storage Providers */,
 				C8C73CD2249E466700B34C8F /* Legacy */,
 				C8C73CCC249E42C700B34C8F /* SyncManager.h */,
 				C8C73CCD249E42C700B34C8F /* SyncManager.m */,
+				C8991AD424B0CF7200C2D604 /* StorageProviderReadOptions.h */,
+				C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */,
+				C8991ADA24B0D01600C2D604 /* StorageProviderReadResult.h */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -5215,8 +5204,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DBE5B4B1C8356C700C310BC /* Build configuration list for PBXNativeTarget "Strongbox-iOS" */;
 			buildPhases = (
-				C8DEE078249A61B000CF2AFE /* ShellScript */,
 				4CDD569918F9EF06E120E163 /* [CP] Check Pods Manifest.lock */,
+				C8DEE078249A61B000CF2AFE /* ShellScript */,
 				4DBE5B2D1C8356C700C310BC /* Sources */,
 				4DBE5B2E1C8356C700C310BC /* Frameworks */,
 				4DBE5B2F1C8356C700C310BC /* Resources */,
@@ -5239,8 +5228,8 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 4DC4E16B23488BAA000743C4 /* Build configuration list for PBXNativeTarget "Strongbox-iOS-Family" */;
 			buildPhases = (
-				C8DEE07A249A63BD00CF2AFE /* ShellScript */,
 				F663CF914C5F47C63EEFAE33 /* [CP] Check Pods Manifest.lock */,
+				C8DEE07A249A63BD00CF2AFE /* ShellScript */,
 				4DC4E01723488BAA000743C4 /* Sources */,
 				4DC4E11623488BAA000743C4 /* Frameworks */,
 				4DC4E12223488BAA000743C4 /* Resources */,
@@ -6158,7 +6147,6 @@
 				4D2F6C4021807CD1007931E4 /* OneDriveStorageProvider.m in Sources */,
 				4D1F580D233E19EC00A01FB4 /* BackupsBrowserTableViewController.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlSerializer.m in Sources */,
-				4D556F1122B7FF6100E16027 /* CacheManager.m in Sources */,
 				C8DC76472497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
 				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
 				4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
@@ -6171,7 +6159,6 @@
 				4D5B1EAF2194B2D900ECAF0D /* KdbSerializationData.m in Sources */,
 				4D3169A722DE33AF003FAD3F /* CompositeKeyFactors.m in Sources */,
 				4D5B1EA72194AAAF00ECAF0D /* KdbEntry.m in Sources */,
-				4D2BF3EB21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */,
 				4D4D3FD32409CD990056A7E2 /* MFIKeyActionSheetView.swift in Sources */,
 				4D556F0D22B7F1B300E16027 /* FileManager.m in Sources */,
 				4D6B5052238BBA1F00DF2F88 /* SVIndefiniteAnimatedView.m in Sources */,
@@ -6329,6 +6316,7 @@
 				4D004CDB21F4C26700E2B194 /* OTPTokenType.m in Sources */,
 				4D6B5056238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */,
+				C8991AD624B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
 				C8B2C6E72493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */,
@@ -6361,7 +6349,6 @@
 				4D004CDA21F4C26700E2B194 /* OTPToken+Serialization.m in Sources */,
 				4DD6CB53238E6491005B94CF /* FavIconBulkViewController.m in Sources */,
 				4D40EEEE1ED87734006532F8 /* StorageBrowserTableViewController.m in Sources */,
-				4D93AC972184B04D00A141C6 /* OfflineCacheNameDetector.m in Sources */,
 				4D56D90F21B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4D1757C01C8361D300E6356F /* GoogleDriveManager.m in Sources */,
 				4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */,
@@ -6423,6 +6410,7 @@
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
 				4D6B504A238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */,
+				C87F792324AA4A3000C90A1B /* StreamUtils.m in Sources */,
 				4D2962B3223173FC0082897D /* History.m in Sources */,
 				4D4598CD2193048400792EF7 /* TwoFishCipher.m in Sources */,
 			);
@@ -6511,7 +6499,6 @@
 				4DC4E05123488BAA000743C4 /* OneDriveStorageProvider.m in Sources */,
 				4DC4E05223488BAA000743C4 /* BackupsBrowserTableViewController.m in Sources */,
 				4DC4E05323488BAA000743C4 /* XmlSerializer.m in Sources */,
-				4DC4E05423488BAA000743C4 /* CacheManager.m in Sources */,
 				4DC4E05523488BAA000743C4 /* SelectItemTableViewController.m in Sources */,
 				4DC4E05623488BAA000743C4 /* Kdbx4Database.m in Sources */,
 				4DC4E05723488BAA000743C4 /* Node.m in Sources */,
@@ -6529,7 +6516,6 @@
 				C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC4E05D23488BAA000743C4 /* KdbEntry.m in Sources */,
 				C88F812F245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */,
-				4DC4E05E23488BAA000743C4 /* DuressDummyStorageProvider.m in Sources */,
 				4D4D3FD42409CD990056A7E2 /* MFIKeyActionSheetView.swift in Sources */,
 				4DC4E05F23488BAA000743C4 /* FileManager.m in Sources */,
 				4D160A832452FC9D0097C730 /* QuickViewsBrowseTableDataSource.m in Sources */,
@@ -6581,6 +6567,7 @@
 				4DC4E08023488BAA000743C4 /* Argon2KdfCipher.m in Sources */,
 				4DC4E08123488BAA000743C4 /* NSURL+QueryItems.m in Sources */,
 				4DC4E08223488BAA000743C4 /* SafesViewController.m in Sources */,
+				C87F792524AA4A3000C90A1B /* StreamUtils.m in Sources */,
 				4DC4E08523488BAA000743C4 /* Group.m in Sources */,
 				4DC4E08623488BAA000743C4 /* CASGParams.m in Sources */,
 				4D44983323926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
@@ -6670,6 +6657,7 @@
 				4DC4E0C323488BAA000743C4 /* StrongboxDatabase.m in Sources */,
 				4D9AFB192449B0E700376240 /* DatabaseAuditorConfiguration.m in Sources */,
 				4DC4E0C423488BAA000743C4 /* WebDAVProviderData.m in Sources */,
+				C8991AD824B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */,
 				4DC4E0C523488BAA000743C4 /* OTPToken.m in Sources */,
 				4DC4E0C623488BAA000743C4 /* WelcomeCreateDatabaseViewController.m in Sources */,
@@ -6716,7 +6704,6 @@
 				4DD6CB54238E6491005B94CF /* FavIconBulkViewController.m in Sources */,
 				C8BF76EA2472E1820080A808 /* DeletedObjects.m in Sources */,
 				4DC4E0E723488BAA000743C4 /* StorageBrowserTableViewController.m in Sources */,
-				4DC4E0E823488BAA000743C4 /* OfflineCacheNameDetector.m in Sources */,
 				4DC4E0E923488BAA000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4DC4E0EA23488BAA000743C4 /* GoogleDriveManager.m in Sources */,
 				4DC4E0EB23488BAA000743C4 /* Model.m in Sources */,
@@ -6872,7 +6859,6 @@
 				4DC4E1B123488BAE000743C4 /* Times.m in Sources */,
 				4DC4E1B223488BAE000743C4 /* PwSafeMetadata.m in Sources */,
 				4DC4E1B323488BAE000743C4 /* DAVBaseRequest.m in Sources */,
-				4DC4E1B423488BAE000743C4 /* DuressDummyStorageProvider.m in Sources */,
 				4DC4E1B523488BAE000743C4 /* NotesTableViewCell.m in Sources */,
 				4DC4E1B623488BAE000743C4 /* KeyFileParser.m in Sources */,
 				4DC4E1B723488BAE000743C4 /* V3BinariesList.m in Sources */,
@@ -6937,6 +6923,7 @@
 				4DC4E1EB23488BAE000743C4 /* DAVRequest.m in Sources */,
 				4DC4E1EC23488BAE000743C4 /* Field.m in Sources */,
 				4DC4E1ED23488BAE000743C4 /* NSDictionary+Extensions.m in Sources */,
+				C8991AD924B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				4DC4E1EE23488BAE000743C4 /* CustomIcon.m in Sources */,
 				C87A8CDD24952A9800356966 /* SharedAppAndAutoFillSettings.m in Sources */,
 				C8BF76EB2472E1820080A808 /* DeletedObjects.m in Sources */,
@@ -6999,7 +6986,6 @@
 				4DC4E21D23488BAE000743C4 /* NMSSHConfig.m in Sources */,
 				4DC4E21E23488BAE000743C4 /* argon2.c in Sources */,
 				4DC4E21F23488BAE000743C4 /* DatabaseAttachment.m in Sources */,
-				4DC4E22023488BAE000743C4 /* CacheManager.m in Sources */,
 				4DC4E22123488BAE000743C4 /* PasswordGenerationConfig.m in Sources */,
 				4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */,
 				4D7228AE23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
@@ -7007,6 +6993,7 @@
 				4DC4E22523488BAE000743C4 /* KeePassFile.m in Sources */,
 				4DC4E22623488BAE000743C4 /* TotpCell.m in Sources */,
 				4DC4E22723488BAE000743C4 /* AutoFillNewRecordSettings.m in Sources */,
+				C87F792624AA4A3000C90A1B /* StreamUtils.m in Sources */,
 				4DC4E22823488BAE000743C4 /* NSMutableArray+Extensions.m in Sources */,
 				4DC4E22923488BAE000743C4 /* KeePass4DatabaseMetadata.m in Sources */,
 				C8DC764A2497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
@@ -7131,7 +7118,6 @@
 				4D2F6C3B21807C7E007931E4 /* Times.m in Sources */,
 				4D196798217F1C190057DF06 /* PwSafeMetadata.m in Sources */,
 				4DF972C721C01ABF00F384C9 /* DAVBaseRequest.m in Sources */,
-				4D2BF3EC21EF6B9000E39EBB /* DuressDummyStorageProvider.m in Sources */,
 				4D33FA432287233C006C31B2 /* NotesTableViewCell.m in Sources */,
 				4DC8D9AC21B6E8A9004F1812 /* KeyFileParser.m in Sources */,
 				4D74B92E218C438800FC369E /* V3BinariesList.m in Sources */,
@@ -7196,6 +7182,7 @@
 				4DF972CA21C01ABF00F384C9 /* DAVRequest.m in Sources */,
 				4D1884D321709E0E001AE6B0 /* Field.m in Sources */,
 				4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
+				C8991AD724B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				4DA12F07219837D10000CEBB /* CustomIcon.m in Sources */,
 				C87A8CDC24952A9700356966 /* SharedAppAndAutoFillSettings.m in Sources */,
 				C8BF76E92472E1820080A808 /* DeletedObjects.m in Sources */,
@@ -7258,7 +7245,6 @@
 				4D326E8A22302BED00DCD8C7 /* NMSSHConfig.m in Sources */,
 				4D3E148E21832B7400A41CA0 /* argon2.c in Sources */,
 				4D5F5B73218B350C00A0739A /* DatabaseAttachment.m in Sources */,
-				4D556F1222B7FF6100E16027 /* CacheManager.m in Sources */,
 				4D216F8022CBCED4000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
 				4D7228AC23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
@@ -7266,6 +7252,7 @@
 				4D2F6C3521807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D33FA47228729A0006C31B2 /* TotpCell.m in Sources */,
 				4DEF7B98216FC80C00A3EE12 /* AutoFillNewRecordSettings.m in Sources */,
+				C87F792424AA4A3000C90A1B /* StreamUtils.m in Sources */,
 				4D7E39DC22675AC000EC940E /* NSMutableArray+Extensions.m in Sources */,
 				4DB1B7DD2188B5C900CF1663 /* KeePass4DatabaseMetadata.m in Sources */,
 				C8DC76482497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
@@ -8123,7 +8110,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8213,7 +8200,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8302,7 +8289,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8384,7 +8371,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8469,7 +8456,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8546,7 +8533,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8621,7 +8608,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8706,7 +8693,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2938;
+				CURRENT_PROJECT_VERSION = 2940;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

@@ -11,9 +11,9 @@
 
 @interface Alerts : NSObject<NSTextFieldDelegate>
 
-+ (void)error:(NSError*)error window:(NSWindow*)window;
-+ (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window;
-+ (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion;
++ (void)error:(const NSError*)error window:(NSWindow*)window;
++ (void)error:(NSString*)message error:(const NSError*)error window:(NSWindow*)window;
++ (void)error:(NSString*)message error:(const NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion;
 
 + (void)info:(NSString *)info window:(NSWindow*)window;
 + (void)info:(NSString *)message informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(void))completion;

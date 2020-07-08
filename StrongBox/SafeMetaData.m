@@ -130,9 +130,7 @@
     if ( jsonDictionary[@"colorizePasswords"] != nil ) ret.colorizePasswords = ((NSNumber*)jsonDictionary[@"colorizePasswords"]).boolValue;
     if ( jsonDictionary[@"isTouchIdEnabled"] != nil ) ret.isTouchIdEnabled = ((NSNumber*)jsonDictionary[@"isTouchIdEnabled"]).boolValue;
     if ( jsonDictionary[@"isEnrolledForConvenience"] != nil ) ret.isEnrolledForConvenience = ((NSNumber*)jsonDictionary[@"isEnrolledForConvenience"]).boolValue;
-    if ( jsonDictionary[@"offlineCacheAvailable"] != nil ) ret.offlineCacheAvailable = ((NSNumber*)jsonDictionary[@"offlineCacheAvailable"]).boolValue;
     if ( jsonDictionary[@"hasUnresolvedConflicts"] != nil ) ret.hasUnresolvedConflicts = ((NSNumber*)jsonDictionary[@"hasUnresolvedConflicts"]).boolValue;
-    if ( jsonDictionary[@"autoFillCacheAvailable"] != nil ) ret.autoFillCacheAvailable = ((NSNumber*)jsonDictionary[@"autoFillCacheAvailable"]).boolValue;
     if ( jsonDictionary[@"readOnly"] != nil ) ret.readOnly = ((NSNumber*)jsonDictionary[@"readOnly"]).boolValue;
     if ( jsonDictionary[@"hasBeenPromptedForConvenience"] != nil ) ret.hasBeenPromptedForConvenience = ((NSNumber*)jsonDictionary[@"hasBeenPromptedForConvenience"]).boolValue;
     if ( jsonDictionary[@"hasBeenPromptedForQuickLaunch"] != nil ) ret.hasBeenPromptedForQuickLaunch = ((NSNumber*)jsonDictionary[@"hasBeenPromptedForQuickLaunch"]).boolValue;
@@ -203,9 +201,7 @@
         @"keePassIconSet" : @(self.keePassIconSet),
         @"isTouchIdEnabled" : @(self.isTouchIdEnabled),
         @"isEnrolledForConvenience" : @(self.isEnrolledForConvenience),
-        @"offlineCacheAvailable" : @(self.offlineCacheAvailable),
         @"hasUnresolvedConflicts" : @(self.hasUnresolvedConflicts),
-        @"autoFillCacheAvailable" : @(self.autoFillCacheAvailable),
         @"readOnly" : @(self.readOnly),
         @"hasBeenPromptedForConvenience" : @(self.hasBeenPromptedForConvenience),
         @"hasBeenPromptedForQuickLaunch" : @(self.hasBeenPromptedForQuickLaunch),
@@ -264,10 +260,8 @@
     
     [encoder encodeBool:self.isEnrolledForConvenience forKey:@"isEnrolledForTouchId"];
 
-    [encoder encodeBool:self.offlineCacheAvailable forKey:@"offlineCacheAvailable"];
     [encoder encodeBool:self.hasUnresolvedConflicts forKey:@"hasUnresolvedConflicts"];
     [encoder encodeBool:self.autoFillEnabled forKey:@"autoFillCacheEnabled"];
-    [encoder encodeBool:self.autoFillCacheAvailable forKey:@"autoFillCacheAvailable"];
     [encoder encodeBool:self.readOnly forKey:@"readOnly"];
     
     [encoder encodeInteger:self.duressAction forKey:@"duressAction"];
@@ -355,7 +349,6 @@
         self.isTouchIdEnabled = [decoder decodeBoolForKey:@"isTouchIdEnabled"];
         self.isEnrolledForConvenience = [decoder decodeBoolForKey:@"isEnrolledForTouchId"];
         
-        self.offlineCacheAvailable = [decoder decodeBoolForKey:@"offlineCacheAvailable"];
         self.hasUnresolvedConflicts = [decoder decodeBoolForKey:@"hasUnresolvedConflicts"];
         
         if([decoder containsValueForKey:@"autoFillCacheEnabled"]) {
@@ -363,10 +356,6 @@
         }
         else {
             self.autoFillEnabled = YES;
-        }
-
-        if([decoder containsValueForKey:@"autoFillCacheAvailable"]) {
-            self.autoFillCacheAvailable = [decoder decodeBoolForKey:@"autoFillCacheAvailable"];
         }
 
         if([decoder containsValueForKey:@"readOnly"]) {
@@ -657,12 +646,6 @@
     self.favourites = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;
-}
-
-//
-
-- (BOOL)offlineCacheEnabled {
-    return YES;
 }
 
 - (NSURL *)backupsDirectory {

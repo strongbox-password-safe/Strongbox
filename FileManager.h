@@ -16,8 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 @property (readonly, nonnull) NSURL* documentsDirectory;
-@property (readonly, nonnull) NSURL* offlineCacheDirectory;
-@property (readonly, nonnull) NSURL* autoFillCacheDirectory;
 @property (readonly, nullable) NSURL* sharedAppGroupDirectory;
 @property (readonly, nullable) NSURL* keyFilesDirectory;
 @property (readonly, nullable) NSURL* backupFilesDirectory;
@@ -26,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* crashFile;
 @property (readonly, nullable) NSURL* archivedCrashFile;
 @property (readonly, nullable) NSURL* appSupportDirectory;
-@property (readonly, nullable) NSURL* syncManagerLocalCopiesDirectory;
+@property (readonly, nullable) NSURL* syncManagerLocalWorkingCachesDirectory;
 @property (readonly, nullable) NSURL* sharedLocalDeviceDatabasesDirectory;
 
 @property (readonly, nullable) NSString* tmpAttachmentPreviewPath;

@@ -43,6 +43,8 @@
 #import "ColoredStringHelper.h"
 #import "NSString+Extensions.h"
 #import "FileManager.h"
+#import "NSData+Extensions.h"
+#import "StreamUtils.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -241,9 +243,16 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)closeAllDetailsWindows:(void (^)(void))completion {
+    if (self.detailsViewControllers.count == 0) {
+        return;
+    }
+    
+    NSArray<NodeDetailsViewController*>* vcs = [self.detailsViewControllers.allValues copy];
+    [self.detailsViewControllers removeAllObjects];
+
     // Copy as race condition of windows closing and calling into us will lead to crash
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        NSArray<NodeDetailsViewController*>* vcs = [self.detailsViewControllers.allValues copy];
 
         dispatch_group_t group = dispatch_group_create();
 
@@ -258,7 +267,7 @@ static NSImage* kStrongBox256Image;
         }
 
         dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-        [self.detailsViewControllers removeAllObjects];
+        
         if(completion) {
             completion();
         }
@@ -2256,7 +2265,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     for (NSNumber* index in serializationPackage.usedAttachmentIndices) {
         DatabaseAttachment* a = self.model.attachments[index.integerValue];
-        [attachmentsMap setValue:[a.deprecatedData base64EncodedStringWithOptions:kNilOptions] forKey:index.stringValue];
+        NSData* data = [NSData dataWithContentsOfStream:[a getPlainTextInputStream]];
+        NSString* base64 = [data base64EncodedStringWithOptions:kNilOptions];
+        [attachmentsMap setValue:base64 forKey:index.stringValue];
     }
     
     // Custom Icons
@@ -2711,7 +2722,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         NSString* b64Data = attachmentsMap[@(attachment.index).stringValue];
         NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
         
-        DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithData:data compressed:YES protectedInMemory:YES];
+        NSInputStream* stream  = [NSInputStream inputStreamWithData:data];
+        DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithStream:stream protectedInMemory:YES compressed:YES];
         UiAttachment* uiAttachment = [UiAttachment attachmentWithFilename:attachment.filename dbAttachment:dbA];
     
         [self.model addItemAttachment:node attachment:uiAttachment rationalize:NO]; // DO Not Rationalize since these attachments are not officially linked to the database yet!
@@ -3211,7 +3223,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         NSString* cellId = isFileNameColumn ? @"AttachmentFileNameCellIdentifier" : @"AttachmentFileSizeCellIdentifier";
         NSTableCellView* cell = [self.attachmentsTable makeViewWithIdentifier:cellId owner:nil];
 
-        cell.textField.stringValue = isFileNameColumn ? attachment.filename : [NSByteCountFormatter stringFromByteCount:dbAttachment.deprecatedData.length countStyle:NSByteCountFormatterCountStyleFile];
+        cell.textField.stringValue = isFileNameColumn ? attachment.filename : [NSByteCountFormatter stringFromByteCount:dbAttachment.length countStyle:NSByteCountFormatterCountStyleFile];
         
         if(self.attachmentsIconCache == nil) {
             self.attachmentsIconCache = @{};
@@ -3263,10 +3275,13 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         for (int i=0;i<workingCopy.count;i++) {
             DatabaseAttachment* dbAttachment = workingCopy[i];
             
-            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.deprecatedData];
+            NSData* data = [NSData dataWithContentsOfStream:[dbAttachment getPlainTextInputStream]];
+            NSImage* img = [[NSImage alloc] initWithData:data];
             if(img) {
                 img = scaleImage(img, CGSizeMake(17, 17));
-                tmp[@(i)] = img;
+                if (img.isValid) {
+                    tmp[@(i)] = img;
+                }
             }
         }
         
@@ -3309,10 +3324,8 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
     
     NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:nodeAttachment.filename];
+    [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
     
-    NSError* error;
-    //BOOL success =
-    [dbAttachment.deprecatedData writeToFile:f options:kNilOptions error:&error];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -3359,7 +3372,11 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-            [dbAttachment.deprecatedData writeToFile:savePanel.URL.path atomically:YES];
+            NSInputStream* inStream = [dbAttachment getPlainTextInputStream];
+            NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
+
+            [StreamUtils pipeFromStream:inStream to:outStream];
+            
             [savePanel orderOut:self];
         }
     }];
@@ -3403,14 +3420,20 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         if(icon) {
             if(data.length > kMaxRecommendCustomIconSize) {
                 NSImage* rescaled = scaleImage(icon, CGSizeMake(kMaxCustomIconDimension, kMaxCustomIconDimension));
-                CGImageRef cgRef = [rescaled CGImageForProposedRect:NULL context:nil hints:nil];
-                NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
-                NSData *compressed = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
-                NSInteger saving = data.length - compressed.length;
-                if(saving < 0) {
-                    NSLog(@"Not much saving from PNG trying JPG...");
-                    compressed = [newRep representationUsingType:NSBitmapImageFileTypeJPEG properties:@{ }];
+                NSInteger saving = 0;
+                NSData *compressed;
+                
+                if (rescaled.isValid) {
+                    CGImageRef cgRef = [rescaled CGImageForProposedRect:NULL context:nil hints:nil];
+                    NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
+                    compressed = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
+                    
                     saving = data.length - compressed.length;
+                    if(saving < 0) {
+                        NSLog(@"Not much saving from PNG trying JPG...");
+                        compressed = [newRep representationUsingType:NSBitmapImageFileTypeJPEG properties:@{ }];
+                        saving = data.length - compressed.length;
+                    }
                 }
                 
                 if(saving > (32 * 1024)) {

@@ -238,10 +238,11 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     });
 }
 
-- (void)promptForLargeImageRescaleChoice:(NSString*)suggestedFilename image:(UIImage*)image
-       data:(NSData*)data
-    resized:(NSDictionary<NSString*, NSData*> *)resized
- sortedKeys:(NSArray<NSString*>*)sortedKeys {
+- (void)promptForLargeImageRescaleChoice:(NSString*)suggestedFilename
+                                   image:(UIImage*)image
+                                    data:(NSData*)data
+                                 resized:(NSDictionary<NSString*, NSData*> *)resized
+                              sortedKeys:(NSArray<NSString*>*)sortedKeys {
     [SVProgressHUD dismiss];
     
     NSString* message = resized.count > 0 ?
@@ -305,7 +306,8 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
                                   }
                                   else {
                                       if(self.onAdd) {
-                                          DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithData:data compressed:YES protectedInMemory:YES];
+                                          NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
+                                          DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:inputStream protectedInMemory:YES compressed:YES];
                                           UiAttachment* attachment = [[UiAttachment alloc] initWithFilename:text dbAttachment:dbAttachment];
                                           
                                           NSLog(@"Adding Attachment: [%@]", attachment);

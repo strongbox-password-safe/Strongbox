@@ -64,7 +64,9 @@ static NSImage* kSmallLockImage;
         NSImage* img = [[NSImage alloc] initWithData:data]; // FUTURE: Cache
         if(img) {
             NSImage *resized = scaleImage(img, CGSizeMake(48, 48)); // FUTURE: Scale up if large? THis is only used on details pane
-            return resized;
+            if (resized.isValid) {
+                return resized;
+            }
         }
     }
     

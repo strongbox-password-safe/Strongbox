@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Backup Export mode
 
-@property (nullable) NSData *encrypted;
+@property (nullable) NSData *encrypted; // Can we use URL instead? TODO:
 @property (nullable) SafeMetaData* metadata;
 @property (nullable) BackupItem* backupItem;
 

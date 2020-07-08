@@ -15,7 +15,6 @@
 #import "KeyFileParser.h"
 #import "Utils.h"
 #import "PinEntryController.h"
-#import "DuressDummyStorageProvider.h"
 #import "AutoFillManager.h"
 #import "CASGTableViewController.h"
 #import "AddNewSafeHelper.h"
@@ -329,18 +328,8 @@
 
 - (void)performDuressAction {
     if (self.safe.duressAction == kOpenDummy) {
-        SafeMetaData* metadata = [DuressDummyStorageProvider.sharedInstance getSafeMetaData:self.safe.nickName filename:self.safe.fileName fileIdentifier:self.safe.fileIdentifier];
-        
-        [DuressDummyStorageProvider.sharedInstance database:^(DatabaseModel * _Nonnull model) {
-            Model *viewModel = [[Model alloc] initWithSafeDatabase:model
-                                             originalDataForBackup:nil
-                                                          metaData:metadata
-                                                         cacheMode:NO
-                                                        isReadOnly:NO
-                                                    isAutoFillOpen:NO];
-            
-            self.completion(viewModel, nil);
-        }];
+        Model *viewModel = [[Model alloc] initAsDuressDummy:self.isAutoFillOpen templateMetaData:self.safe];
+        self.completion(viewModel, nil);
     }
     else if (self.safe.duressAction == kPresentError) {
         NSError *error = [Utils createNSError:NSLocalizedString(@"open_sequence_duress_technical_error_message", @"There was a technical error opening the database.") errorCode:-1729];
@@ -528,9 +517,9 @@
     
     scVc.initialFormat = self.safe.likelyFormat != kFormatUnknown ? self.safe.likelyFormat : heuristicFormat;
     
-    if (self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable) {
-        scVc.offlineCacheDate = [SyncManager.sharedInstance getLegacyOfflineCacheFileModificationDate:self.safe];
-    }
+    NSDate* modDate;
+    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:self.safe modified:&modDate];
+    scVc.offlineCacheDate = modDate;
     
     // Auto Detect Key File if there's none explicitly set...
     
@@ -665,19 +654,12 @@
 
 - (void)getDatabaseOrCacheData {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        if(self.openAutoFillCache) {
-            [[SyncManager sharedInstance] readLegacyAutoFillCache:self.safe completion:^(NSData *data, NSError *error) {
-                [self onProviderReadDone:data error:error cacheMode:YES];
-            }];
-        }
-        else if (self.manualOpenOfflineCache) {
-            if(self.safe.offlineCacheEnabled && self.safe.offlineCacheAvailable) {
-                [[SyncManager sharedInstance] readLegacyOfflineCachedSafe:self.safe
-                                                          completion:^(NSData *data, NSError *error) {
-                     if(data != nil) {
-                         [self onProviderReadDone:data error:error cacheMode:YES];
-                     }
-                 }];
+        NSDate* mod;
+        NSURL* localWorkingCache = [SyncManager.sharedInstance getLocalWorkingCache:self.safe modified:&mod];
+
+        if(self.openAutoFillCache || self.manualOpenOfflineCache) {
+            if(localWorkingCache != nil) {
+                [self onProviderReadDone:localWorkingCache error:nil cacheMode:YES];
             }
             else {
                 [Alerts warn:self.viewController
@@ -689,8 +671,8 @@
         }
         else if ( OfflineDetector.sharedInstance.isOffline &&
                  [SyncManager.sharedInstance isLegacyImmediatelyOfferCacheIfOffline:self.safe] &&
-                 [SyncManager.sharedInstance isLegacyOfflineCacheAvailable:self.safe] ) {
-            NSString * modDateStr = getLastCachedDate(self.safe);
+                 localWorkingCache != nil ) {
+            NSString * modDateStr = getDateString(mod);
             NSString* primaryStorageDisplayName = [SyncManager.sharedInstance getPrimaryStorageDisplayName:self.safe];
             NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_user_looks_offline_open_offline_instead_fmt", @"It looks like you may be offline and '%@' may not be reachable. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), primaryStorageDisplayName, modDateStr];
 
@@ -701,11 +683,7 @@
                         secondButtonText:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_no_try_connect_option", @"No, Try to connect anyway")
                                   action:^(int response) {
                 if (response == 0) { // Offline Cache
-                    [[SyncManager sharedInstance] readLegacyOfflineCachedSafe:self.safe completion:^(NSData *data, NSError *error) {
-                         if(data != nil) {
-                             [self onProviderReadDone:data error:error cacheMode:YES];
-                         }
-                     }];
+                    [self onProviderReadDone:localWorkingCache error:nil cacheMode:YES];
                 }
                 else if (response == 1) { // Try anyway
                     [self getLocalOrLiveDatabase];
@@ -726,38 +704,28 @@
         [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
     });
     
-    if (SharedAppAndAutoFillSettings.sharedInstance.uberSync) {
-        NSURL* localCopyUrl = [SyncManager.sharedInstance getLocalCopyUrl:self.safe];
-        
-        if (localCopyUrl) {
-            [self openDatabase:localCopyUrl legacyData:nil cacheMode:NO];
-        }
-        else {
-            // Sync Required... ? TODO:
-        }
-    }
-    else {
-        LegacySyncReadOptions* legacyOptions = [[LegacySyncReadOptions alloc] init];
-        legacyOptions.isAutoFill = self.isAutoFillOpen;
-        legacyOptions.vc = self.viewController;
-        
-        [SyncManager.sharedInstance readLegacy:self.safe legacyOptions:legacyOptions completion:^(NSData * _Nonnull data, NSError * _Nonnull error) {
-            [self onProviderReadDone:data error:error cacheMode:NO];
-         }];
-    }
+    LegacySyncReadOptions* legacyOptions = [[LegacySyncReadOptions alloc] init];
+    legacyOptions.isAutoFill = self.isAutoFillOpen;
+    legacyOptions.vc = self.viewController;
+
+    [SyncManager.sharedInstance readLegacy:self.safe legacyOptions:legacyOptions completion:^(NSURL * _Nullable url, const NSError * _Nullable error) {
+        [self onProviderReadDone:url error:error cacheMode:NO];
+    }];
 }
 
-- (void)onProviderReadDone:(NSData *)legacyData // TODO: Remove eventually go to stream only
-                     error:(NSError *)error
+- (void)onProviderReadDone:(NSURL *_Nullable)url
+                     error:(const NSError *_Nullable)error
                  cacheMode:(BOOL)cacheMode {
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD dismiss];
     
-        if (error != nil || legacyData == nil) {
+        if (error != nil || url == nil) {
             NSLog(@"Error: %@", error);
-            
-            if([SyncManager.sharedInstance isLegacyOfflineCacheAvailable:self.safe]) {
-                NSString* modDateStr = getLastCachedDate(self.safe);
+            NSDate* mod;
+            NSURL* localWorkingCache = [SyncManager.sharedInstance getLocalWorkingCache:self.safe modified:&mod];
+
+            if(localWorkingCache != nil) {
+                NSString* modDateStr = getDateString(mod);
                 NSString* primaryStorageDisplayName = [SyncManager.sharedInstance getPrimaryStorageDisplayName:self.safe];
                 NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"There was a problem reading the database on %@. If this happens repeatedly you should try removing and re-adding your database. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), primaryStorageDisplayName, modDateStr];
 
@@ -766,11 +734,7 @@
                         message:message
                         action:^(BOOL response) {
                             if (response) {
-                                [[SyncManager sharedInstance] readLegacyOfflineCachedSafe:self.safe completion:^(NSData *data, NSError *error) {
-                                    if(data != nil) {
-                                        [self onProviderReadDone:data error:error cacheMode:YES];
-                                    }
-                                }];
+                                [self onProviderReadDone:localWorkingCache error:nil cacheMode:YES];
                             }
                             else {
                                 self.completion(nil, nil);
@@ -781,38 +745,35 @@
                 [Alerts error:self.viewController
                         title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
                         error:error
-                                                completion:^{
+                   completion:^{
                     self.completion(nil, error);
                 }];
             }
         }
         else {
-             // TODO: We need to do this for uber sync too
-            
-            if(legacyData &&
-               self.isAutoFillOpen &&
+            if(self.isAutoFillOpen &&
                !AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash &&
-               [OpenSafeSequenceHelper isAutoFillLikelyToCrash:legacyData]) {
+               [OpenSafeSequenceHelper isAutoFillLikelyToCrash:url]) {
                 [Alerts warn:self.viewController
                        title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
                      message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
                 completion:^{
                     AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
-                    [self openDatabase:nil legacyData:legacyData cacheMode:cacheMode];
+                    [self openDatabase:url cacheMode:cacheMode];
                 }];
             }
             else {
-                [self openDatabase:nil legacyData:legacyData cacheMode:cacheMode];
+                [self openDatabase:url cacheMode:cacheMode];
             }
         }
     });
 }
 
-+ (BOOL)isAutoFillLikelyToCrash:(NSData*)data { // TODO: Need to check in uber sync
-    // Argon 2 Memory Consumption
++ (BOOL)isAutoFillLikelyToCrash:(NSURL*)url {
+    DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
     
-    if([Kdbx4Database isValidDatabase:data error:nil]) {
-        NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
+    if(format == kKeePass4) {     // Argon 2 Memory Consumption
+        NSInputStream* inputStream = [NSInputStream inputStreamWithURL:url];
         CryptoParameters* params = [Kdbx4Serialization getCryptoParams:inputStream];
         
         if(params && params.kdfParameters && [params.kdfParameters.uuid isEqual:argon2CipherUuid()]) {
@@ -831,9 +792,12 @@
     
     // Very large DBs
 
-    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 12 * 1024 * 1024; // TODO: Reconsider with Uber Sync
+    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 12 * 1024 * 1024; // TODO: Reconsider params (argon23 mem and size) with Uber Sync and streamed writes
 
-    if (data.length > kProbablyTooLargeToOpenInAutoFillSizeBytes) {
+    NSError* error;
+    NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+    
+    if (error == nil && attributes.fileSize > kProbablyTooLargeToOpenInAutoFillSizeBytes) {
         return YES;
     }
 
@@ -874,38 +838,16 @@
     return challengeResponse;
 }
 
-- (void)openDatabase:(NSURL*)localCopyUrl
-          legacyData:(NSData *)legacyData // TODO: Remove completely
+- (void)openDatabase:(NSURL*)url
            cacheMode:(BOOL)cacheMode {
     NSError* error;
-
-    BOOL valid;
-    if (SharedAppAndAutoFillSettings.sharedInstance.uberSync) {
-        if (localCopyUrl) { // Uber Sync
-            valid = [DatabaseModel isValidDatabase:localCopyUrl error:&error];
-        }
-        else {
-            valid = NO; // Should never happen
-        }
-    }
-    else {
-        valid = [DatabaseModel isValidDatabaseWithPrefix:legacyData error:&error];
-    }
-    
+    BOOL valid = [DatabaseModel isValidDatabase:url error:&error];
     if (!valid) {
-        [self openSafeWithDataDone:error openedSafe:nil cacheMode:cacheMode data:legacyData];
+        [self openSafeWithDataDone:error openedSafe:nil cacheMode:cacheMode url:url];
         return;
     }
 
-    //
-    
-    DatabaseFormat format;
-    if (SharedAppAndAutoFillSettings.sharedInstance.uberSync) {
-        format = [DatabaseModel getDatabaseFormat:localCopyUrl];
-    }
-    else {
-        format = [DatabaseModel getDatabaseFormatWithPrefix:legacyData];
-    }
+    DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
     
     if (self.undigestedKeyFileData) {
         self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:self.undigestedKeyFileData checkForXml:format != kKeePass1];
@@ -914,8 +856,7 @@
     // Yubikey?
   
     if (self.yubiKeyConfiguration && self.yubiKeyConfiguration != kNoYubiKey) {
-        [self unlockValidDatabaseWithAllCompositeKeyFactors:localCopyUrl
-                                                 legacyData:legacyData
+        [self unlockValidDatabaseWithAllCompositeKeyFactors:url
                                                   cacheMode:cacheMode
                                                      format:format
                                                   yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
@@ -923,8 +864,7 @@
         }];
     }
     else if (self.yubikeySecret.length) {
-        [self unlockValidDatabaseWithAllCompositeKeyFactors:localCopyUrl
-                                                 legacyData:legacyData
+        [self unlockValidDatabaseWithAllCompositeKeyFactors:url
                                                   cacheMode:cacheMode
                                                      format:format
                                                   yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
@@ -933,7 +873,7 @@
         }];
     }
     else {
-        [self unlockValidDatabaseWithAllCompositeKeyFactors:localCopyUrl legacyData:legacyData cacheMode:cacheMode format:format yubiKeyCR:nil];
+        [self unlockValidDatabaseWithAllCompositeKeyFactors:url cacheMode:cacheMode format:format yubiKeyCR:nil];
     }
 }
 
@@ -958,7 +898,6 @@
 }
 
 - (void)unlockValidDatabaseWithAllCompositeKeyFactors:(NSURL*)url
-                                           legacyData:(NSData *)legacyData
                                             cacheMode:(BOOL)cacheMode
                                                format:(DatabaseFormat)format
                                             yubiKeyCR:(YubiKeyCRHandlerBlock)yubiKeyCR {
@@ -984,11 +923,10 @@
             // NB: self.masterPassword will be @"" initially just due to the way CASG handles things
 
             if (!yubiKeyCR) { // Auto Figure it out
-                [DatabaseModel fromUrlOrLegacyData:url
-                                        legacyData:legacyData
-                                                ckf:cpf
-                                                config:modelConfig
-                                        completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+                [DatabaseModel fromUrl:url
+                                   ckf:cpf
+                                config:modelConfig
+                            completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                     if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
                         CompositeKeyFactors* ckf = [CompositeKeyFactors password:nil
                                                                    keyFileDigest:self.keyFileDigest
@@ -996,20 +934,19 @@
                         
                         // FUTURE: For Yubikey users this is an issue because they will be asked twice... maybe explicitly ask them if they mean nil or empty
                         
-                        [DatabaseModel fromUrlOrLegacyData:url
-                                                legacyData:legacyData
-                                                       ckf:ckf
-                                                    config:modelConfig
-                                     completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
+                        [DatabaseModel fromUrl:url
+                               ckf:ckf
+                            config:modelConfig
+                        completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                             if(model) {
                                 self.masterPassword = nil;
                             }
                             
-                            [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode data:legacyData error:error];
+                            [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode url:url error:error];
                         }];
                     }
                     else {
-                        [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode data:legacyData error:error];
+                        [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode url:url error:error];
                     }
                 }];
             }
@@ -1028,23 +965,21 @@
                     }
                     
                     cpf.password = self.masterPassword;
-                    [DatabaseModel fromUrlOrLegacyData:url
-                                            legacyData:legacyData
-                                                   ckf:cpf
-                                                config:modelConfig
-                                            completion:^(BOOL userCancelled, DatabaseModel* model, NSError* error) {
-                        [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode data:legacyData error:error];
+                    [DatabaseModel fromUrl:url
+                                       ckf:cpf
+                                    config:modelConfig
+                                completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                        [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode url:url error:error];
                     }];
                 }];
             }
         }
         else {
-            [DatabaseModel fromUrlOrLegacyData:url
-                                    legacyData:legacyData
-                                           ckf:cpf
-                                        config:modelConfig
-                                    completion:^(BOOL userCancelled, DatabaseModel* model, NSError* error) {
-                [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode data:legacyData error:error];
+            [DatabaseModel fromUrl:url
+                               ckf:cpf
+                            config:modelConfig
+                        completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                [self onGotDatabaseModelFromData:userCancelled model:model cacheMode:cacheMode url:url error:error];
             }];
         }
     });
@@ -1053,8 +988,8 @@
 - (void)onGotDatabaseModelFromData:(BOOL)userCancelled
                              model:(DatabaseModel*)model
                          cacheMode:(BOOL)cacheMode
-                              data:(NSData*)data
-                             error:(NSError*)error {
+                               url:(NSURL*)url
+                             error:(const NSError*)error {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [SVProgressHUD dismiss];
         
@@ -1062,15 +997,15 @@
             self.completion(nil, nil);
         }
         else {
-            [self openSafeWithDataDone:error openedSafe:model cacheMode:cacheMode data:data];
+            [self openSafeWithDataDone:error openedSafe:model cacheMode:cacheMode url:url];
         }
     });
 }
 
-- (void)openSafeWithDataDone:(NSError*)error
+- (void)openSafeWithDataDone:(const NSError*)error
                   openedSafe:(DatabaseModel*)openedSafe
                    cacheMode:(BOOL)cacheMode
-                        data:(NSData *)data {
+                         url:(NSURL*)url {
     [SVProgressHUD dismiss];
     
     if (openedSafe == nil) {
@@ -1129,20 +1064,20 @@
         BOOL quickLaunchNotYetPrompted = !self.safe.hasBeenPromptedForQuickLaunch;
         
         if (conveniencePossible && convenienceNotYetPrompted) {
-             [self promptForConvenienceEnrolAndOpen:biometricPossible pinPossible:pinPossible openedSafe:openedSafe cacheMode:cacheMode data:data];
+            [self promptForConvenienceEnrolAndOpen:biometricPossible pinPossible:pinPossible openedSafe:openedSafe cacheMode:cacheMode url:url];
         }
         else if (quickLaunchPossible && quickLaunchNotYetPrompted) {
-             [self promptForQuickLaunch:openedSafe cacheMode:cacheMode data:data];
+            [self promptForQuickLaunch:openedSafe cacheMode:cacheMode url:url];
         }
         else {
-            [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe data:data];
+            [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe url:url];
         }
     }
 }
 
 - (void)promptForQuickLaunch:(DatabaseModel*)openedSafe
                    cacheMode:(BOOL)cacheMode
-                        data:(NSData *)data {
+                         url:(NSURL*)url {
     if(!self.isAutoFillOpen && SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil && !self.safe.hasBeenPromptedForQuickLaunch) {
         [Alerts yesNo:self.viewController
                 title:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_title", @"Set Quick Launch?")
@@ -1155,7 +1090,7 @@
             self.safe.hasBeenPromptedForQuickLaunch = YES;
             [SafesList.sharedInstance update:self.safe];
 
-            [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe data:data];
+            [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe url:url];
         }];
     }
 }
@@ -1198,7 +1133,7 @@
                              pinPossible:(BOOL)pinPossible
                               openedSafe:(DatabaseModel*)openedSafe
                                cacheMode:(BOOL)cacheMode
-                                    data:(NSData *)data {
+                                     url:(NSURL*)url {
     NSString *title;
     NSString *message;
     
@@ -1229,7 +1164,7 @@
                                                               style:UIAlertActionStyleDefault
                                                             handler:^(UIAlertAction *a) {
                                                                 [self enrolForBiometrics:openedSafe.compositeKeyFactors];
-                                                                [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe data:data];
+                                                                [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe url:url];
                                                             }];
         [alertController addAction:biometricAction];
     }
@@ -1239,7 +1174,7 @@
                                         [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_use_pin", @"Use a PIN Code...")]
                                                             style:UIAlertActionStyleDefault
                                                           handler:^(UIAlertAction *a) {
-                                                              [self setupConveniencePinAndOpen:openedSafe cacheMode:cacheMode data:data];
+            [self setupConveniencePinAndOpen:openedSafe cacheMode:cacheMode url:url];
                                                           }];
         [alertController addAction:pinCodeAction];
     }
@@ -1248,7 +1183,7 @@
                                                        style:UIAlertActionStyleCancel
                                                      handler:^(UIAlertAction *a) {
                                                          [self unenrolFromConvenience];
-                                                         [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe data:data];
+        [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe url:url];
                                                      }];
     
 
@@ -1259,7 +1194,7 @@
 
 - (void)setupConveniencePinAndOpen:(DatabaseModel*)openedSafe
                          cacheMode:(BOOL)cacheMode
-                              data:(NSData *)data {
+                               url:(NSURL*)url {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
@@ -1268,19 +1203,19 @@
             if(response == kOk) {
                 if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
                     [self enrolForPinCodeUnlock:pin compositeKeyFactors:openedSafe.compositeKeyFactors];
-                    [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe data:data];
+                    [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe url:url];
                 }
                 else {
                     [Alerts warn:self.viewController
                            title:NSLocalizedString(@"open_sequence_warn_pin_conflict_title", @"PIN Conflict")
                         message:NSLocalizedString(@"open_sequence_warn_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings")
                     completion:^{
-                        [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe data:data];
+                        [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe url:url];
                     }];
                 }
             }
             else {
-                [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe data:data];
+                [self onSuccessfulSafeOpen:cacheMode openedSafe:openedSafe url:url];
             }
         }];
     };
@@ -1290,26 +1225,19 @@
 
 -(void)onSuccessfulSafeOpen:(BOOL)cacheMode
                  openedSafe:(DatabaseModel *)openedSafe
-                       data:(NSData *)data {
+                        url:(NSURL*)url {
     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
     [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
 
     Model *viewModel = [[Model alloc] initWithSafeDatabase:openedSafe
-                                     originalDataForBackup:data
                                                   metaData:self.safe
-                                                 cacheMode:cacheMode
-                                                isReadOnly:NO
-                                            isAutoFillOpen:self.isAutoFillOpen];
+                                            forcedReadOnly:cacheMode
+                                                isAutoFill:self.isAutoFillOpen];
     
     viewModel.openedWithYubiKeySecret = self.yubikeySecret;
     
     if (!cacheMode) {
-        if(self.safe.offlineCacheEnabled) {
-            [viewModel updateOfflineCacheWithData:data];
-        }
-        
         if(self.safe.autoFillEnabled && !self.isAutoFillOpen) { // This is memory heavy ... don't blow it in Auto Fill
-            [viewModel updateAutoFillCacheWithData:data];
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
         }
 
@@ -1323,9 +1251,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static NSString *getLastCachedDate(SafeMetaData *safe) {
-    NSDate *modDate = [SyncManager.sharedInstance getLegacyOfflineCacheFileModificationDate:safe];
-    
+static NSString *getDateString(NSDate* modDate) {
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     df.timeStyle = NSDateFormatterShortStyle;
     df.dateStyle = NSDateFormatterShortStyle;

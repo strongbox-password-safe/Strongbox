@@ -13,6 +13,7 @@
 #import "KeePassConstants.h"
 #import "Utils.h"
 #import "Constants.h"
+#import "NSData+Extensions.h"
 
 static const BOOL kLogVerbose = NO;
 
@@ -244,7 +245,17 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         NodeFileAttachment *theAttachment = record.fields.attachments[0];
         
         ret.binaryFileName = theAttachment.filename;
-        ret.binaryData = attachments[theAttachment.index].deprecatedData;
+        
+        NSInputStream* inputStream = [attachments[theAttachment.index] getPlainTextInputStream];
+
+        // TODO: Stream this write
+        NSData* data = [NSData dataWithContentsOfStream:inputStream];
+
+        if (!data) {
+            return nil;
+        }
+        
+        ret.binaryData = data;
     }
     
     return ret;
@@ -340,7 +351,8 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
     fields.expires = entry.expired;
     
     if(entry.binaryFileName.length) {
-        DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithData:entry.binaryData compressed:NO protectedInMemory:NO];
+        NSInputStream* str = [NSInputStream inputStreamWithData:entry.binaryData];
+        DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:str protectedInMemory:NO compressed:NO];
         [attachments addObject:dbAttachment];
         
         NodeFileAttachment *attachment = [[NodeFileAttachment alloc] init];

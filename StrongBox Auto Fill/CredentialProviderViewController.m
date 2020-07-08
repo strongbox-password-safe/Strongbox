@@ -19,10 +19,9 @@
 #import "OpenSafeSequenceHelper.h"
 #import "AutoFillManager.h"
 #import "AutoFillSettings.h"
-
 #import "LocalDeviceStorageProvider.h"
-
 #import "ClipboardManager.h"
+#import "SyncManager.h"
 
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
@@ -263,7 +262,7 @@
         return YES;
     }
     
-    return safeMetaData.autoFillCacheAvailable;
+    return [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safeMetaData modified:nil];
 }
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers {

@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^CompletionBlock)(Model*_Nullable model, NSError*_Nullable error);
+typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable error);
 
 @interface OpenSafeSequenceHelper : NSObject
 

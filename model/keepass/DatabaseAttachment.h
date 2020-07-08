@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithData:(NSData*)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory; // TODO: Retire
+- (instancetype)initWithStream:(NSInputStream *)stream protectedInMemory:(BOOL)protectedInMemory compressed:(BOOL)compressed;
 - (instancetype)initWithStream:(NSInputStream*)stream length:(NSUInteger)length protectedInMemory:(BOOL)protectedInMemory;
 - (instancetype)initWithStream:(NSInputStream *)stream length:(NSUInteger)length protectedInMemory:(BOOL)protectedInMemory compressed:(BOOL)compressed;
 - (instancetype)initForStreamWriting:(BOOL)protectedInMemory compressed:(BOOL)compressed;
@@ -29,7 +29,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL compressed; // Keepass v3
 @property BOOL protectedInMemory; // Keepass v4
 
-@property (readonly, nonnull) NSData* deprecatedData; // TODO: Replace with Stream
+- (NSInputStream*)getPlainTextInputStream;
+
+// Unit Test only
+
+- (instancetype)initWithData:(NSData*)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory; // never use in prod. unit testing convenience only
+@property (readonly) NSData* unitTestDataOnly;
 
 @end
 

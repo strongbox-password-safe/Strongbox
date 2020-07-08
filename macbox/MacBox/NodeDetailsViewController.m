@@ -33,6 +33,8 @@
 #import "ClickableSecureTextField.h"
 #import "NSString+Extensions.h"
 #import "FileManager.h"
+#import "NSData+Extensions.h"
+#import "StreamUtils.h"
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -1027,7 +1029,7 @@ static NSString* trimField(NSTextField* textField) {
     DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
     
     item.textField.stringValue = attachment.filename;
-    item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.deprecatedData.length countStyle:NSByteCountFormatterCountStyleFile];
+    item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.length countStyle:NSByteCountFormatterCountStyleFile];
     
     if(self.attachmentsIconCache == nil) {
         self.attachmentsIconCache = [NSMutableDictionary dictionary];
@@ -1052,10 +1054,14 @@ static NSString* trimField(NSTextField* textField) {
         for (int i=0;i<workingCopy.count;i++) {
             DatabaseAttachment* dbAttachment = workingCopy[i];
             
-            NSImage* img = [[NSImage alloc] initWithData:dbAttachment.deprecatedData];
+            NSData* data = [NSData dataWithContentsOfStream:[dbAttachment getPlainTextInputStream]];
+            NSImage* img = [[NSImage alloc] initWithData:data];
+            
             if(img) {
                 img = scaleImage(img, CGSizeMake(88, 88));
-                [self.attachmentsIconCache setObject:img forKey:@(i)];
+                if (img) {
+                    [self.attachmentsIconCache setObject:img forKey:@(i)];
+                }
             }
         }
         
@@ -1184,10 +1190,8 @@ static NSString* trimField(NSTextField* textField) {
     DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
     
     NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:nodeAttachment.filename];
+    [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
     
-    NSError* error;
-    //BOOL success =
-    [dbAttachment.deprecatedData writeToFile:f options:kNilOptions error:&error];
     NSURL* url = [NSURL fileURLWithPath:f];
     
     return url;
@@ -1379,7 +1383,10 @@ static NSString* trimField(NSTextField* textField) {
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-            [dbAttachment.deprecatedData writeToFile:savePanel.URL.path atomically:YES];
+            
+            NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
+            [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:outStream];
+            
             [savePanel orderOut:self];
         }
     }];
@@ -1416,19 +1423,12 @@ static NSString* trimField(NSTextField* textField) {
     [openPanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
             for (NSURL* url in openPanel.URLs) {
-                NSError* error;
-                NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
-                
-                if(!data) {
-                    NSLog(@"Could not read file at %@. Error: %@", url, error);
-                    return;
-                }
+                NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:url.path];
+                DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithStream:stream protectedInMemory:YES compressed:YES];
                 
                 NSString* filename = url.lastPathComponent;
-                
-                DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithData:data compressed:YES protectedInMemory:YES];
                 UiAttachment* att = [[UiAttachment alloc] initWithFilename:filename dbAttachment:dbA];
-                
+
                 [self.model addItemAttachment:self.node attachment:att];
             }
         }

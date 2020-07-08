@@ -10,15 +10,18 @@
 #import <UIKit/UIKit.h>
 #import "SafeMetaData.h"
 #import "StorageBrowserItem.h"
+#import "StorageProviderReadOptions.h"
+#import "StorageProviderReadResult.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+typedef void (^StorageProviderReadCompletionBlock)(StorageProviderReadResult result, NSData *_Nullable data, NSDate*_Nullable dateModified, const NSError *_Nullable error);
 
 @protocol SafeStorageProvider <NSObject>
 
 @property (strong, nonatomic, readonly) NSString *displayName;
 @property (strong, nonatomic, readonly) NSString *icon;
 @property (nonatomic, readonly) StorageProvider storageId;
-@property (nonatomic, readonly) BOOL allowOfflineCache;
 @property (nonatomic, readonly) BOOL providesIcons;
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
@@ -49,15 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readLegacy:(SafeMetaData *)safeMetaData
     viewController:(UIViewController *)viewController
-        isAutoFill:(BOOL)isAutoFill
-        completion:(void (^)(NSData *_Nullable data, const NSError *_Nullable error))completion;
-
-- (void)read:(SafeMetaData *)safeMetaData
-viewController:(UIViewController *_Nullable)viewController
-  completion:(void (^)(NSData *_Nullable data, const NSError *_Nullable error))completion;
-
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData
-                completion:(void (^)(NSData *_Nullable data, const NSError *_Nullable error))completion;
+           options:(StorageProviderReadOptions*)options
+        completion:(StorageProviderReadCompletionBlock)completion;
 
 - (void)update:(SafeMetaData *)safeMetaData
           data:(NSData *)data
@@ -72,7 +68,8 @@ viewController:(UIViewController *_Nullable)viewController
 
 - (void)readWithProviderData:(NSObject * _Nullable)providerData
               viewController:(UIViewController *_Nullable)viewController
-                  completion:(void (^)(NSData *data, const NSError *error))completionHandler;
+                     options:(StorageProviderReadOptions*)options
+                  completion:(StorageProviderReadCompletionBlock)completionHandler;
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
       completion:(void (^)(UIImage *image))completionHandler;

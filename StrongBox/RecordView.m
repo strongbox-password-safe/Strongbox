@@ -360,7 +360,7 @@ static const int kMinNotesCellHeight = 160;
         [self setEditing:self.editingNewRecord animated:YES];
     }
     else {
-        self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.readOnlyMode);
+        self.editButtonItem.enabled = !self.readOnlyMode;
         [self enableDisableUiForEditing];
     }
 
@@ -448,7 +448,7 @@ static const int kMinNotesCellHeight = 160;
         }
         else {
             self.navigationItem.leftBarButtonItem = self.navBack;
-            self.editButtonItem.enabled = !(self.viewModel.isUsingOfflineCache || self.readOnlyMode);
+            self.editButtonItem.enabled = !self.readOnlyMode;
             self.textFieldTitle.borderStyle = UITextBorderStyleLine;
             self.navBack = nil;
             [self bindUiToKeePassDereferenceableFields:YES];
@@ -458,7 +458,7 @@ static const int kMinNotesCellHeight = 160;
 }
 
 -(BOOL)readOnlyMode {
-    return self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache || self.isHistoricalEntry;
+    return self.viewModel.isReadOnly || self.isHistoricalEntry;
 }
 
 - (BOOL)textFieldShouldBeginEditing:(UITextField *)textField {

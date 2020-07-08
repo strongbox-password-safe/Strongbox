@@ -30,7 +30,6 @@
 #import "WelcomeCreateDoneViewController.h"
 #import "NSArray+Extensions.h"
 #import "FileManager.h"
-#import "CacheManager.h"
 #import "LocalDeviceStorageProvider.h"
 #import "Utils.h"
 #import "DatabasesViewPreferencesController.h"
@@ -839,7 +838,9 @@
 }
 
 - (NSString*)getOfflineCacheModDateString:(SafeMetaData*)database {
-    NSDate* modDate = database.offlineCacheEnabled ? [CacheManager.sharedInstance getOfflineCacheFileModificationDate:database] : nil;
+    NSDate* modDate;
+    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:database modified:&modDate];
+    
     return modDate ? [NSString stringWithFormat:NSLocalizedString(@"safes_vc_cached_date_time_fmt", @"Date and Time last cache was taken"), friendlyDateStringVeryShort(modDate)] : @"";
 }
 
@@ -917,7 +918,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     moreActions.backgroundColor = [UIColor systemBlueColor];
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    BOOL offlineOption = safe.offlineCacheEnabled && safe.offlineCacheAvailable;
+    BOOL offlineOption = safe.storageProvider != kLocalDevice && [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:nil];
 
     return offlineOption ? @[removeAction, offlineAction, moreActions] : @[removeAction, moreActions];
 }
@@ -1108,19 +1109,9 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             }
         }];
     }
-    
-    if (safe.offlineCacheEnabled && safe.offlineCacheAvailable) {
-        [[CacheManager sharedInstance] deleteOfflineCachedSafe:safe completion:^(NSError *error) {
-          NSLog(@"Delete Offline Cache File. Error = %@", error);
-      }];
-    }
-    
-    if(safe.autoFillEnabled && safe.autoFillCacheAvailable) {
-        [CacheManager.sharedInstance deleteAutoFillCache:safe completion:^(NSError * _Nonnull error) {
-            NSLog(@"Delete Auto Fill Cache File. Error = %@", error);
-        }];
-    }
-    
+
+    [SyncManager.sharedInstance removeDatabaseAndLocalCopies:safe];
+
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
     // Clear Quick Launch if it was set...

@@ -68,10 +68,18 @@
         [attributes removeObjectForKey:kBinaryCompressedAttribute];
     }
     
+    NSInputStream* inputStream = [self.dbAttachment getPlainTextInputStream];
+
     // TODO: Stream this write
-    
-    NSData* data = self.dbAttachment.deprecatedData;
+    NSData* data = [NSData dataWithContentsOfStream:inputStream];
+
+    if (!data) {
+        NSLog(@"Could not serialize V3Binary!");
+        return NO;
+    }
+
     NSData* maybeCompressed = (self.compressed ? [data gzippedData] : data);
+
     NSString *b64 = [maybeCompressed base64EncodedStringWithOptions:kNilOptions];
 
     return [serializer writeElement:self.originalElementName text:b64 attributes:attributes];

@@ -40,7 +40,6 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 
         _icon = @"one-drive-icon-only-32x32";
         _storageId = kOneDrive;
-        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;
@@ -142,18 +141,12 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 
 }
 
-- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self read:safeMetaData viewController:viewController completion:completion];
-}
-
-- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self readNonInteractive:safeMetaData completion:completion];
-}
-
-- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
-            completion(nil, error);
+            [self.odClient signOutWithCompletion:^(NSError *error) { // Signout if something goes wrong - TODO: OK?
+                completion(kReadResultError, nil, nil, error);
+            }];
             return;
         }
         
@@ -173,7 +166,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
                 }
                 
                 NSLog(@"OneDrive Read: %@", error);
-                completion(nil, error);
+                completion(kReadResultError, nil, nil, error);
                 return;
             }
             
@@ -182,23 +175,23 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     }];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData
-              viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, const NSError *error))completion {
-    [self readWithProviderData:providerData completion:completion];
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
+    [self readWithProviderData:providerData completion:completionHandler];
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
-                  completion:(void (^)(NSData *data, const NSError *error))completion {
+                  completion:(StorageProviderReadCompletionBlock)completion {
     [self authWrapperWithCompletion:^(NSError *error) {
         if(error) {
-            completion(nil, error);
+            [self.odClient signOutWithCompletion:^(NSError *error) { // Signout if something goes wrong - TODO: OK?
+                completion(kReadResultError, nil, nil, error);
+            }];
             return;
         }
         
         ODItem* item = (ODItem*)providerData;
         
-        //NSLog(@"OneDrive Reading: [%@]", item);
+        //NSLog(@"OneDrive Reading: [%@]-[%@]", item, item.lastModifiedDateTime);
         
         ODItemContentRequest *request;
         
@@ -215,7 +208,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
             
             if(error) {
                 NSLog(@"%@", error);
-                completion(nil, error);
+                completion(kReadResultError, nil, nil, error);
                 return;
             }
             
@@ -231,7 +224,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
             
             //NSLog(@"OneDrive Read %lu bytes.", (unsigned long)data.length);
             
-            completion(data, nil);
+            completion(kReadResultSuccess, data, item.lastModifiedDateTime, nil);
         }];
     }];
 }

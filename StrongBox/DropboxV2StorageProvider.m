@@ -33,7 +33,6 @@
 
         _icon = @"dropbox-blue-32x32-nologo";
         _storageId = kDropbox;
-        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;
@@ -83,67 +82,92 @@
               }];
 }
 
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
     if ( !DBClientsManager.authorizedClient ) {
-        completion(nil, kUserInteractionRequiredError );
+        completion(kReadResultError, nil, nil, kUserInteractionRequiredError );
         return;
     }
     
     NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
-    [self readFileWithPath:path completion:completion];
+    [self readFileWithPath:path options:nil completion:completion];
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self read:safeMetaData viewController:viewController completion:completion];
-}
-
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData
+    viewController:(UIViewController *)viewController
+           options:(StorageProviderReadOptions *)options
+        completion:(StorageProviderReadCompletionBlock)completion {
     NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
     
     [self performTaskWithAuthorizationIfNecessary:viewController
                                              task:^(BOOL userCancelled, NSError *error) {
                                                  if (error) {
-                                                     completion(nil, error);
+                                                     completion(kReadResultError, nil, nil, error);
                                                  }
                                                  else {
-                                                     [self readFileWithPath:path completion:completion];
+                                                     [self readFileWithPath:path options:options completion:completion];
                                                  }
                                              }];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData
-              viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, const NSError *error))completion {
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
     DBFILESFileMetadata *file = (DBFILESFileMetadata *)providerData;
-
-    [self readFileWithPath:file.pathLower completion:completion];
+    [self readFileWithPath:file.pathLower options:options completion:completionHandler];
 }
 
-- (void)readFileWithPath:(NSString *)path completion:(void (^)(NSData *data, NSError *error))completion {
+- (void)readFileWithPath:(NSString *)path options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
     });
 
     DBUserClient *client = DBClientsManager.authorizedClient;
-    [[[client.filesRoutes downloadData:path]
-      setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *networkError,
-                         NSData *fileContents) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
-
+    
+    // Check Metadata:
+    
+    [[client.filesRoutes getMetadata:path] setResponseBlock:^(DBFILESMetadata * _Nullable result, DBFILESGetMetadataError * _Nullable routeError, DBRequestError * _Nullable networkError) {
         if (result) {
-            completion(fileContents, nil);
+            DBFILESFileMetadata* metadata = (DBFILESFileMetadata*)result;
+            
+            NSLog(@"Dropbox Date Modified: [%@]", metadata.serverModified);
+
+            if (options && options.onlyIfModifiedDifferentFrom) {
+                if ([metadata.serverModified isEqualToDate:options.onlyIfModifiedDifferentFrom]) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [SVProgressHUD dismiss];
+                    });
+                    
+                    completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
+                    return;
+                }
+            }
+            
+            [[[client.filesRoutes downloadData:path]
+              setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *networkError,
+                                 NSData *fileContents) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+
+                if (result) {
+                    completion(kReadResultSuccess, fileContents, result.serverModified, nil);
+                }
+                else {
+                    NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@\n", routeError, networkError];
+                    completion(kReadResultError, nil, nil, [Utils createNSError:message errorCode:-1]);
+                }
+            }]
+             setProgressBlock:^(int64_t bytesDownloaded, int64_t totalBytesDownloaded, int64_t totalBytesExpectedToDownload) {
+                 //NSLog(@"Dropbox Read Progress: %lld\n%lld\n%lld\n", bytesDownloaded, totalBytesDownloaded, totalBytesExpectedToDownload);
+             }];
         }
         else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+
             NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@\n", routeError, networkError];
-            completion(nil, [Utils createNSError:message
-                                       errorCode:-1]);
+            completion(kReadResultError, nil, nil, [Utils createNSError:message errorCode:-1]);
         }
-    }]
-     setProgressBlock:^(int64_t bytesDownloaded, int64_t totalBytesDownloaded, int64_t totalBytesExpectedToDownload) {
-         //NSLog(@"Dropbox Read Progress: %lld\n%lld\n%lld\n", bytesDownloaded, totalBytesDownloaded, totalBytesExpectedToDownload);
-     }];
+    }];
 }
 
 - (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
@@ -156,7 +180,7 @@
 - (void)createOrUpdate:(NSString *)path
                   data:(NSData *)data
             completion:(void (^)(NSError *error))completion {
-    [SVProgressHUD show];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
 
     DBUserClient *client = DBClientsManager.authorizedClient;
     

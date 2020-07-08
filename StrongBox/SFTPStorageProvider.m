@@ -44,7 +44,6 @@
         
         _icon = @"sftp-32x32"; 
         _storageId = kSFTP;
-        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = YES;
         _browsableExisting = YES;
@@ -162,38 +161,6 @@ viewController:(UIViewController *)viewController
     completion(NO, browserItems, nil);
 }
 
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, const NSError *))completionHandler {
-    SFTPProviderData* foo = (SFTPProviderData*)providerData;
-    [self connectAndAuthenticate:foo.sFtpConfiguration
-                  viewController:viewController
-                      completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
-        if(sftp == nil || error) {
-            completionHandler(nil, error);
-            return;
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-        });
-                          
-        NSData* data = [sftp contentsAtPath:foo.filePath];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
-     
-        if(!data) {
-            error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
-            completionHandler(nil, error);
-            return;
-        }
-        
-        [sftp disconnect];
-        
-        completionHandler(data, nil);
-    }];
-}
-
 - (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
@@ -272,20 +239,19 @@ viewController:(UIViewController *)viewController
                                    fileIdentifier:json];
 }
 
-- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self read:safeMetaData viewController:viewController completion:completion];
-}
-
-- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData
+    viewController:(UIViewController *)viewController
+           options:(StorageProviderReadOptions *)options
+        completion:(StorageProviderReadCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
-    [self readWithProviderData:providerData viewController:viewController completion:completion];
+    [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
 }
 
-- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
 
     if (providerData.sFtpConfiguration == nil) {
-        completion(nil, kUserInteractionRequiredError);
+        completion(kReadResultError, nil, nil, kUserInteractionRequiredError);
         return;
     }
    
@@ -293,21 +259,76 @@ viewController:(UIViewController *)viewController
     NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:providerData.sFtpConfiguration error:&error];
     
     if(sftp == nil || error) {
-       completion(nil, error);
-       return;
+        completion(kReadResultError, nil, nil, error);
+        return;
     }
-                     
+
+    NMSFTPFile* attr = [sftp infoForFileAtPath:providerData.filePath];
+    if(!attr) {
+        error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+        completion(kReadResultError, nil, nil, error);
+        return;
+    }
+
     NSData* data = [sftp contentsAtPath:providerData.filePath];
 
     if(!data) {
        error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
-       completion(nil, error);
+       completion(kReadResultError, nil, nil, error);
        return;
     }
 
     [sftp disconnect];
 
-    completion(data, nil);
+    completion(kReadResultSuccess, data, attr.modificationDate, nil);
+}
+
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
+    SFTPProviderData* foo = (SFTPProviderData*)providerData;
+    [self connectAndAuthenticate:foo.sFtpConfiguration
+                  viewController:viewController
+                      completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
+        if(sftp == nil || error) {
+            completionHandler(kReadResultError, nil, nil, error);
+            return;
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+        });
+        
+        NMSFTPFile* attr = [sftp infoForFileAtPath:foo.filePath];
+        if(!attr) {
+            error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+            completionHandler(kReadResultError, nil, nil, error);
+            return;
+        }
+        
+        if (options.onlyIfModifiedDifferentFrom && [options.onlyIfModifiedDifferentFrom isEqualToDate:attr.modificationDate]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+
+            completionHandler(kReadResultModifiedIsSameAsLocal, nil, nil, error);
+            return;
+        }
+
+        NSData* data = [sftp contentsAtPath:foo.filePath];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+     
+        if(!data) {
+            error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+            completionHandler(kReadResultError, nil, nil, error);
+            return;
+        }
+        
+        [sftp disconnect];
+        
+        completionHandler(kReadResultSuccess, data, attr.modificationDate, nil);
+    }];
 }
 
 - (NSString *)getDirectoryFromParentFolderObject:(NSObject *)parentFolder sessionConfig:(SFTPSessionConfiguration*)sessionConfig {

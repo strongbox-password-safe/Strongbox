@@ -36,7 +36,6 @@
         }
 
         _storageId = kiCloud;
-        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = NO;
@@ -141,16 +140,13 @@ suggestedFilename:nil
     }];
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self readNonInteractive:safeMetaData completion:completion];
-}
-
-- (void)read:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self readNonInteractive:safeMetaData completion:completion];
-}
-
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
+
+    NSError* error;
+    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:fileUrl.path error:&error];
+    NSLog(@"iCloud File Mod Date: [%@]", attr.fileModificationDate);
+
     StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithFileURL:fileUrl];
     
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -164,7 +160,7 @@ suggestedFilename:nil
         
         if (!success) {
             NSLog(@"Failed to open %@", fileUrl);
-            completion(nil, [Utils createNSError:@"Could not read iCloud file. Try restarting your device." errorCode:-6]);
+            completion(kReadResultError, nil, nil, [Utils createNSError:@"Could not read iCloud file. Try restarting your device." errorCode:-6]);
             return;
         }
 
@@ -175,11 +171,11 @@ suggestedFilename:nil
         [doc closeWithCompletionHandler:^(BOOL success) {
             if (!success) {
                 NSLog(@"Failed to close %@", fileUrl);
-                completion(nil, [Utils createNSError:@"Failed to close after reading" errorCode:-6]);
+                completion(kReadResultError, nil, nil, [Utils createNSError:@"Failed to close after reading" errorCode:-6]);
                 return;
             }
             
-            completion(data, nil);
+            completion(kReadResultSuccess, data, doc.fileModificationDate, nil);
         }];
     }];
 }
@@ -283,10 +279,8 @@ suggestedFilename:nil
     NSLog(@"NOTIMPL: list");
 }
 
-- (void)readWithProviderData:(NSObject *)providerData
-              viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, const NSError *error))completionHandler {
-        NSLog(@"NOTIMPL: readWithProviderData");
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
+    NSLog(@"NOTIMPL: readWithProviderData");
 }
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController

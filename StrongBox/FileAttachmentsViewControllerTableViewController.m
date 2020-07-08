@@ -17,6 +17,9 @@
 #import "AddAttachmentHelper.h"
 #import "NSArray+Extensions.h"
 #import "FileManager.h"
+#import "StreamUtils.h"
+#import "NSData+Extensions.h"
+#import "Constants.h"
 
 @interface FileAttachmentsViewControllerTableViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate>
 
@@ -165,8 +168,15 @@
     UiAttachment* attachment = [self.workingAttachments objectAtIndex:index];
     
     NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:attachment.filename];
-    NSData* data = attachment.dbAttachment.deprecatedData;
-    [data writeToFile:f atomically:YES];
+    
+    NSInputStream* inputStream = [attachment.dbAttachment getPlainTextInputStream];
+
+    NSOutputStream* os = [NSOutputStream outputStreamToFileAtPath:f append:NO];
+    
+    if (![StreamUtils pipeFromStream:inputStream to:os]) {
+        return nil;
+    }
+    
     NSURL* url = [NSURL fileURLWithPath:f];
    
     return url;
@@ -185,23 +195,24 @@
     
     cell.textLabel.text = attachment.filename;
     cell.detailTextLabel.text = friendlyFileSizeString(attachment.dbAttachment.length);
-    
-    NSData* data = attachment.dbAttachment.deprecatedData; // TODO: Don't load above a certain size
-    UIImage* img = [UIImage imageWithData:data];
-//    [UIImage imageWithContentsOfFile: ]; // TODO: ?
-    if(img) {
-        @autoreleasepool { // Prevent App Extension Crash
-            UIGraphicsBeginImageContextWithOptions(cell.imageView.bounds.size, NO, 0.0);
-            
-            CGRect imageRect = cell.imageView.bounds;
-            [img drawInRect:imageRect];
-            cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-            
-            UIGraphicsEndImageContext();
+    cell.imageView.image = [UIImage imageNamed:@"document"];
+
+    if (attachment.dbAttachment.length < kMaxAttachmentTableviewIconImageSize) {
+        NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+        NSData* data = [NSData dataWithContentsOfStream:attStream];
+        UIImage* img = [UIImage imageWithData:data];
+
+        if(img) {
+            @autoreleasepool { // Prevent App Extension Crash
+                UIGraphicsBeginImageContextWithOptions(cell.imageView.bounds.size, NO, 0.0);
+                
+                CGRect imageRect = cell.imageView.bounds;
+                [img drawInRect:imageRect];
+                cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
+                
+                UIGraphicsEndImageContext();
+            }
         }
-    }
-    else {
-        cell.imageView.image = [UIImage imageNamed:@"document"];
     }
     
     return cell;

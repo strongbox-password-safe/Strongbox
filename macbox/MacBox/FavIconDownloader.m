@@ -377,8 +377,10 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
                 selectedImage = scaleImage(selectedImage, CGSizeMake(32, 32));
             }
 
-            cell.icon.image = selectedImage;
-            cell.icon.hidden = NO;
+            if (selectedImage.isValid) {
+                cell.icon.image = selectedImage;
+                cell.icon.hidden = NO;
+            }
         }
         else {
             cell.subTitle.stringValue = [NSString stringWithFormat:NSLocalizedString(@"favicon_results_n_icons_found_none_selected_fmt", @"%lu Icons Found (None selected)"), (unsigned long)images.count];
@@ -512,7 +514,9 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         image = scaleImage(image, CGSizeMake(32, 32));
     }
     
-    cell.icon.image = image;
+    if (image.isValid) {
+        cell.icon.image = image;
+    }
     
     return cell;
 }

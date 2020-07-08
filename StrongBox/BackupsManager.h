@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-- (BOOL)writeBackup:(NSData*)data metadata:(SafeMetaData*)metadata;
+- (BOOL)writeBackup:(NSURL*)snapshot metadata:(SafeMetaData*)metadata;
 - (void)deleteBackup:(BackupItem*)item;
 - (void)deleteAllBackups:(SafeMetaData*)metadata;
 

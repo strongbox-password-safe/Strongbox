@@ -61,9 +61,9 @@
                                                     webDavProvider,
                                                     sftpProviderWithFastListing].mutableCopy;
     
-    // iCloud on Top if available
+    // iCloud on Top if available and want to add new
     
-    if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn) {
+    if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn && !self.existing) {
         [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
     

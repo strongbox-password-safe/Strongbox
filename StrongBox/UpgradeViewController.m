@@ -44,6 +44,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialTitle;
 @property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubtitle;
 @property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubSubTitle;
+@property (weak, nonatomic) IBOutlet UITextView *termsAndConditionsTextView;
 
 @end
 
@@ -106,6 +107,14 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     [self bindDeveloperMessage];
 
     [self bindFreeTrialInfo];
+    
+    // Fix weird Interface Builder localization issue with Terms & Conditions TextView... :/
+    
+    static NSString* const kTextViewInterfaceBuilderId = @"k2u-lE-LrX.text";
+    NSString *tc = NSLocalizedStringFromTable(kTextViewInterfaceBuilderId, @"Upgrade", @"");
+    if (tc && ![tc isEqualToString:kTextViewInterfaceBuilderId]) {
+        self.termsAndConditionsTextView.text = tc;
+    }
 }
 
 - (void)bindFreeTrialInfo {

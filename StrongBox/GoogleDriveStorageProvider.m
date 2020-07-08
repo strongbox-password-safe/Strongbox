@@ -34,7 +34,6 @@
 
         _icon = @"product32";
         _storageId = kGoogleDrive;
-        _allowOfflineCache = YES;
         _providesIcons = YES;
         _browsableNew = YES;
         _browsableExisting = YES;
@@ -81,36 +80,32 @@
     }];
 }
 
-- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self read:safeMetaData viewController:viewController completion:completion];
-}
-
-- (void)read:(nonnull SafeMetaData *)safeMetaData
-viewController:(UIViewController *)viewController
-  completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     [[GoogleDriveManager sharedInstance] read:viewController
                          parentFileIdentifier:safeMetaData.fileIdentifier
                                      fileName:safeMetaData.fileName
-                                   completion:^(NSData *data, NSError *error) {
+                                   completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
         if (error != nil) {
             NSLog(@"%@", error);
             [[GoogleDriveManager sharedInstance] signout];
+            completion(kReadResultError, nil, nil, error);
         }
-
-        completion(data, error);
+        else {
+            completion(kReadResultSuccess, data, dateModified, nil);
+        }
     }];
 }
 
-- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
     if (!GoogleDriveManager.sharedInstance.authorized) {
-        completion(nil, kUserInteractionRequiredError);
+        completion(kReadResultError, nil, nil, kUserInteractionRequiredError);
         return;
     }
     
     [GoogleDriveManager.sharedInstance readNonInteractive:safeMetaData.fileIdentifier
                                                  fileName:safeMetaData.fileName
-                                               completion:^(NSData *data, NSError *error) {
-        completion(data, error);
+                                               completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
+        completion(result, data, dateModified, error);
     }];
 }
 
@@ -174,27 +169,27 @@ viewController:(UIViewController *)viewController
     }];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData
-              viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, const NSError *error))completion {
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
 
     GTLRDrive_File *file = (GTLRDrive_File *)providerData;
+    
+    [[GoogleDriveManager sharedInstance] readWithOnlyFileId:viewController
+                                             fileIdentifier:file.identifier
+                                               dateModified:file.modifiedTime.date
+                                                 completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
 
-    [[GoogleDriveManager sharedInstance]
-     readWithOnlyFileId:viewController
-         fileIdentifier:file.identifier
-             completion:^(NSData *data, NSError *error) {
-                 dispatch_async(dispatch_get_main_queue(), ^{
-                     [SVProgressHUD dismiss];
-                 });
-                 
-                 if(error) {
-                     [[GoogleDriveManager sharedInstance] signout];
-                 }
-                 
-                 completion(data, error);
-             }];
+        if ( error ) {
+            [[GoogleDriveManager sharedInstance] signout];
+            completionHandler(kReadResultError, nil, nil, error);
+        }
+        else {
+            completionHandler(kReadResultSuccess, data, dateModified, nil);
+        }
+    }];
 }
 
 - (NSArray<StorageBrowserItem *> *)mapToStorageBrowserItems:(NSArray<GTLRDrive_File *> *)items {

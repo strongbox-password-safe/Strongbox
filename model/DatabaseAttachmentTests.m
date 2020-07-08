@@ -73,13 +73,13 @@
     DatabaseAttachment* streamAttachment = [[DatabaseAttachment alloc] initWithStream:stream length:length protectedInMemory:YES];
     [stream close];
 
-    NSData* sd = streamAttachment.deprecatedData;
-    NSData* dd = dataAttachment.deprecatedData;
+    NSData* sd = streamAttachment.unitTestDataOnly;
+    NSData* dd = dataAttachment.unitTestDataOnly;
 
     XCTAssertTrue(dataAttachment.estimatedStorageBytes == streamAttachment.estimatedStorageBytes);
     XCTAssertTrue([dataAttachment.digestHash isEqualToString:streamAttachment.digestHash]);
-    XCTAssertTrue([dataAttachment.digestHash isEqualToString:dataAttachment.deprecatedData.sha256.hex]);
-    XCTAssertTrue([streamAttachment.digestHash isEqualToString:streamAttachment.deprecatedData.sha256.hex]);
+    XCTAssertTrue([dataAttachment.digestHash isEqualToString:dataAttachment.unitTestDataOnly.sha256.hex]);
+    XCTAssertTrue([streamAttachment.digestHash isEqualToString:streamAttachment.unitTestDataOnly.sha256.hex]);
 
     NSLog(@"SHA256: [%@] = [%@] = [%@] = [%@]", dataAttachment.digestHash, streamAttachment.digestHash, dd.sha256.hex, sd.sha256.hex);
 

@@ -45,7 +45,6 @@ typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *err
         
         _icon = @"lock"; 
         _storageId = kFilesAppUrlBookmark;
-        _allowOfflineCache = YES;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = NO;
@@ -161,20 +160,15 @@ viewController:(UIViewController *)viewController
     // NOTIMPL
 }
 
-- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self readNonInteractive:safeMetaData completion:completion];
-}
-
-
-- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     //NSLog(@"READ! %@", safeMetaData);
     
     NSError *error;
-    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:isAutoFill ppError:&error];
+    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:options.isAutoFill ppError:&error];
     
     if(error || !url) {
         NSLog(@"Error or nil URL in Files App Provider: %@", error);
-        completion(nil, error);
+        completion(kReadResultError, nil, nil, error);
         return;
     }
 
@@ -183,18 +177,20 @@ viewController:(UIViewController *)viewController
         NSLog(@"Could not access secure scoped resource!");
         return;
     }
-    
+
+    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+    NSLog(@"[Files] File Mod Date: [%@][%@]", attr.fileModificationDate, error);
+
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     
     [document openWithCompletionHandler:^(BOOL success) {
-        completion(success ? document.data : nil, nil);
-        
+        NSLog(@"[Files] File Mod Date2: [%@]", document.fileModificationDate);
+        completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, nil);
         [url stopAccessingSecurityScopedResource];
     }];
 }
 
-
-- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
     //NSLog(@"READ! %@", safeMetaData);
     
     NSError *error;
@@ -202,7 +198,7 @@ viewController:(UIViewController *)viewController
     
     if(error || !url) {
         NSLog(@"Error or nil URL in Files App Provider: %@", error);
-        completion(nil, error);
+        completion(kReadResultError, nil, nil, error);
         return;
     }
 
@@ -215,13 +211,12 @@ viewController:(UIViewController *)viewController
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     
     [document openWithCompletionHandler:^(BOOL success) {
-        completion(success ? document.data : nil, nil);
-        
+        completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, success ? document.fileModificationDate : nil, nil);
         [url stopAccessingSecurityScopedResource];
     }];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(NSData *, const NSError *))completionHandler {
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
     // NOTIMPL:
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
 }

@@ -23,14 +23,24 @@
     return sharedInstance;
 }
 
-- (BOOL)writeBackup:(NSData *)data metadata:(SafeMetaData *)metadata {
+- (BOOL)writeBackup:(NSURL *)snapshot metadata:(SafeMetaData *)metadata {
     if(metadata.makeBackups) {
-        NSString* filename = [NSString stringWithFormat:@"%@.bak", iso8601DateString(NSDate.date)];
+        NSDate* now = NSDate.date;
+        NSString* filename = [NSString stringWithFormat:@"%@.bak", iso8601DateString(now)];
 
         NSURL* url = [metadata.backupsDirectory URLByAppendingPathComponent:filename];
 
         NSError* error;
-        BOOL success = [data writeToURL:url options:kNilOptions error:&error];
+        BOOL success = [NSFileManager.defaultManager copyItemAtURL:snapshot toURL:url error:&error];
+        if(!success) {
+            NSLog(@"Error saving backup: [%@]", error);
+            return NO;
+        }
+        
+        // Set the created date to now - this is used to display when the backup was made - Otherwise it copies metadata
+        // from the passed in Snapshot which can be wrong
+        
+        [NSFileManager.defaultManager setAttributes:@{ NSFileCreationDate : now } ofItemAtPath:url.path error:&error];
         if(!success) {
             NSLog(@"Error saving backup: [%@]", error);
             return NO;

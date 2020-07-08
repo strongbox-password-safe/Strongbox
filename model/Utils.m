@@ -387,8 +387,7 @@ NSData* getRandomData(uint32_t length) {
 }
 
 #if TARGET_OS_IPHONE
-UIImage* scaleImage(UIImage* image, CGSize newSize)
-{
+UIImage* scaleImage(UIImage* image, CGSize newSize) {
     float heightToWidthRatio = image.size.height / image.size.width;
     float scaleFactor = 1;
     if(heightToWidthRatio > 1) {
@@ -411,8 +410,11 @@ UIImage* scaleImage(UIImage* image, CGSize newSize)
     }
 }
 #else
-NSImage* scaleImage(NSImage* image, CGSize newSize)
-{
+NSImage* scaleImage(NSImage* image, CGSize newSize) {
+    if (!image || !image.isValid) {
+        return image;
+    }
+    
     float heightToWidthRatio = image.size.height / image.size.width;
     float scaleFactor = 1;
     if(heightToWidthRatio > 1) {
@@ -426,6 +428,9 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
     newSize2.height = image.size.height * scaleFactor;
 
     NSImage *ret = [[NSImage alloc] initWithSize:newSize2];
+    if (!ret || !ret.isValid) {
+        return image;
+    }
     
     [ret lockFocus];
     
@@ -441,26 +446,9 @@ NSImage* scaleImage(NSImage* image, CGSize newSize)
     
     [ret unlockFocus];
     
-//    CGContextRef contextRef =  CGBitmapContextCreate(0, newSize2.width, newSize2.height, 8, newSize2.width*4, [NSColorSpace genericRGBColorSpace].CGColorSpace, kCGImageAlphaPremultipliedFirst);
-//
-//    [image drawInRect:CGRectMake(0,0,newSize2.width, newSize2.height)];
-//
-//    CGImageRef imageRef = CGBitmapContextCreateImage(contextRef);
-//    NSImage* ret = [[NSImage alloc] initWithCGImage:imageRef size:NSMakeSize(newSize2.width, newSize2.height)];
-//    CFRelease(imageRef);
-//    CFRelease(contextRef);
-    
     return ret;
-    
-    //@autoreleasepool { // Prevent App Extension Crash
-
-        //[image drawInRect:CGRectMake(0,0,newSize2.width,newSize2.height)];
-        //UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
-       // UIGraphicsEndImageContext();
-        
-        //return newImage;
-    //}
 }
+
 #endif
 
 #if TARGET_OS_IPHONE

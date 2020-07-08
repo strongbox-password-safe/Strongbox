@@ -36,7 +36,6 @@
         
         _icon = @"iphone_x";
         _storageId = kLocalDevice;
-        _allowOfflineCache = NO;
         _providesIcons = NO;
         _browsableNew = NO;
         _browsableExisting = YES;
@@ -159,9 +158,7 @@
     // NOTIMPL
 }
 
-- (void)readWithProviderData:(NSObject *)providerData
-              viewController:(UIViewController *)viewController
-                  completion:(void (^)(NSData *data, const NSError *error))completionHandler {
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
     // NOTIMPL
 }
 
@@ -174,22 +171,30 @@
                                    fileIdentifier:[identifier toJson]];
 }
 
-- (void)read:(nonnull SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self readNonInteractive:safeMetaData completion:completion];
-}
-
-- (void)readLegacy:(nonnull SafeMetaData *)safeMetaData viewController:(nonnull UIViewController *)viewController isAutoFill:(BOOL)isAutoFill completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
-    [self readNonInteractive:safeMetaData completion:completion];
-}
-
-- (void)readNonInteractive:(nonnull SafeMetaData *)safeMetaData completion:(nonnull void (^)(NSData * _Nullable, const NSError * _Nullable))completion {
+- (void)readLegacy:(SafeMetaData *)safeMetaData
+    viewController:(UIViewController *)viewController
+           options:(StorageProviderReadOptions *)options
+        completion:(StorageProviderReadCompletionBlock)completion {
     NSURL *url = [self getFileUrl:safeMetaData];
 
     NSLog(@"Local Reading at: %@", url);
 
-    NSData *data = [[NSFileManager defaultManager] contentsAtPath:url.path];
-
-    completion(data, nil);
+    NSError* error;
+    NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+    
+    if (error) {
+        NSLog(@"Error = [%@]", error);
+        completion(kReadResultError, nil, nil, error);
+    }
+    else {
+        if (options.onlyIfModifiedDifferentFrom == nil || (![attributes.fileModificationDate isEqualToDate:options.onlyIfModifiedDifferentFrom] )) {
+            NSData *data = [[NSFileManager defaultManager] contentsAtPath:url.path];
+            completion(kReadResultSuccess, data, attributes.fileModificationDate, error);
+        }
+        else {
+            completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -418,10 +418,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
     self.navigationItem.leftItemsSupplementBackButton = YES;
 
-    self.navigationItem.title = [NSString stringWithFormat:@"%@%@%@",
+    self.navigationItem.title = [NSString stringWithFormat:@"%@%@",
                                  (self.currentGroup.parent == nil) ?
                                  self.viewModel.metadata.nickName : self.currentGroup.title,
-                                 self.viewModel.isUsingOfflineCache ? NSLocalizedString(@"browse_vc_offline_suffix", @" (Offline)") : @"",
                                  self.viewModel.isReadOnly ? NSLocalizedString(@"browse_vc_read_only_suffix", @" (Read Only)") : @""];
     
     if (@available(iOS 11.0, *)) {
@@ -435,7 +434,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)enableDisableToolbarButtons {
-    BOOL ro = self.viewModel.isUsingOfflineCache || self.viewModel.isReadOnly;
+    BOOL ro = self.viewModel.isReadOnly;
     
     self.buttonAddRecord.enabled = !ro && !self.isEditing;
     self.buttonSafeSettings.enabled = !self.isEditing;
@@ -903,7 +902,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
     Node *item = [self getNodeFromIndexPath:indexPath];
 
-    if(!self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly) {
+    if(!self.viewModel.isReadOnly) {
         if(item.isGroup) {
             return self.viewModel.database.format != kPasswordSafe ?    [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, setIconAction, pinAction]] :
                                                                         [UISwipeActionsConfiguration configurationWithActions:@[removeAction, renameAction, pinAction]];
@@ -971,7 +970,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                                                                                  }];
     pinAction.backgroundColor = UIColor.magentaColor;
     
-    if(!self.viewModel.isUsingOfflineCache && !self.viewModel.isReadOnly) {
+    if(!self.viewModel.isReadOnly) {
         if(item.isGroup) {
             return self.viewModel.database.format != kPasswordSafe ? @[removeAction, renameAction, setIconAction, pinAction] : @[removeAction, renameAction, pinAction];
         }
@@ -1053,8 +1052,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [self.configuredDataSource refreshItems:self.currentGroup];
         [self.tableView reloadData];
         
-        self.editButtonItem.enabled = (!self.viewModel.isUsingOfflineCache &&
-        !self.viewModel.isReadOnly);
+        self.editButtonItem.enabled = !self.viewModel.isReadOnly;
     }
     
     [self enableDisableToolbarButtons];
@@ -1176,7 +1174,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         vc.item = record;
         vc.parentGroup = self.currentGroup;
-        vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
+        vc.readOnly = self.viewModel.isReadOnly;
         vc.databaseModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToAuditDrillDown"]) {
@@ -1211,7 +1209,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         vc.item = record;
         vc.parentGroup = self.currentGroup;
-        vc.readOnly = self.viewModel.isReadOnly || self.viewModel.isUsingOfflineCache;
+        vc.readOnly = self.viewModel.isReadOnly;
         vc.databaseModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"sequeToSubgroup"]){

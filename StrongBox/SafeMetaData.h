@@ -57,12 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) DuressAction duressAction;
 @property (nonatomic) int failedPinAttempts;
 
-@property (nonatomic, readonly) BOOL offlineCacheEnabled; // This is always on - TODO: Get this configurable... will be part of SyncManager?
-@property (nonatomic) BOOL offlineCacheAvailable;
-
 @property (nonatomic) BOOL autoFillEnabled;
-@property (nonatomic) BOOL autoFillCacheAvailable;
-
 @property (nonatomic) BOOL hasUnresolvedConflicts;
 
 // MMcG: 26-May-2020 - Move to using bookmark for the key file instead of URL which breaks on each release
@@ -82,8 +77,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BrowseTapAction doubleTapAction;
 @property BrowseTapAction tripleTapAction;
 @property BrowseTapAction longPressTapAction;
-
-// Migrate from Global Settings - 23-Jun-2019
 
 // Browse View
 
@@ -111,7 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hideTotp;
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL showPasswordByDefaultOnEditScreen;
-@property BOOL alwaysUseCacheForAutoFill; // Some users want this...
+@property BOOL alwaysUseCacheForAutoFill; // Some users want this... // TODO: Remove on switch to background uber sync
 
 ///
 

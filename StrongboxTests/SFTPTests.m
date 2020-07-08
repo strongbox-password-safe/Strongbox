@@ -65,15 +65,15 @@
     }];
 }
 
-- (void)testRead {
-    [[self getSftp] create:@"test" extension:@"txt" data:[@"Hello" dataUsingEncoding:NSUTF8StringEncoding] parentFolder:@"/home/mark/" viewController:nil completion:^(SafeMetaData *metadata, NSError *error) {
-        NSLog(@"%@ [Error: %@]", metadata, error);
-        
-        XCTAssertNil(error);
-        [[self getSftp] read:metadata viewController:nil completion:^(NSData *data, NSError *error) {
-            NSLog(@"Got Data: %@ [Error: %@]", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], error);
-        }];
-    }];
-}
+//- (void)testRead {
+//    [[self getSftp] create:@"test" extension:@"txt" data:[@"Hello" dataUsingEncoding:NSUTF8StringEncoding] parentFolder:@"/home/mark/" viewController:nil completion:^(SafeMetaData *metadata, NSError *error) {
+//        NSLog(@"%@ [Error: %@]", metadata, error);
+//        
+//        XCTAssertNil(error);
+//        [[self getSftp] read:metadata viewController:nil completion:^(NSData *data, NSError *error) {
+//            NSLog(@"Got Data: %@ [Error: %@]", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding], error);
+//        }];
+//    }];
+//}
 
 @end

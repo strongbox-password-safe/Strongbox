@@ -30,6 +30,7 @@
     
     [DatabaseModel fromLegacyData:data
                               ckf:[CompositeKeyFactors password:nil keyFileDigest:digest]
+                           config:DatabaseModelConfig.defaults
                        completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
         XCTAssert(model);
         NSLog(@"%@", model);

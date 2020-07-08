@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSData (Extensions)
 
++ (instancetype _Nullable)dataWithContentsOfStream:(NSInputStream*)inputStream;
+
 @property (readonly) NSString* hex;
 @property (readonly) NSData* sha1;
 @property (readonly) NSData* sha256;
