@@ -44,6 +44,7 @@
 
 - (BOOL)appendStreamedText:(NSString *)text {
     NSInteger ret = [self.dbAttachment writeStreamWithB64Text:text];
+    
     return ret >= 0;
 }
 

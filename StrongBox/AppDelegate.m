@@ -208,8 +208,9 @@ void uncaughtExceptionHandler(NSException *exception) {
     
     // MMcG: Sample code to cause a crash (based on a true story)... :/
     //
-    //    NSURL* url = [NSURL URLWithString:@"https://www.strongboxsafe.com"];
-    //    [NSJSONSerialization dataWithJSONObject:@{ @"url" : url } options:NSJSONWritingPrettyPrinted error:nil];
+    
+//    NSURL* url = [NSURL URLWithString:@"https://www.strongboxsafe.com"];
+//    [NSJSONSerialization dataWithJSONObject:@{ @"url" : url } options:NSJSONWritingPrettyPrinted error:nil];
 
     // FUTURE?
 //    signal(SIGABRT, SignalHandler);

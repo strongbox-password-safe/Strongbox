@@ -64,8 +64,8 @@
                                                                             title:NSLocalizedString(@"generic_remove", @"Remove")
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
         [Alerts yesNo:self
-                title:NSLocalizedString(@"generic_remove", @"Remove")
-              message:NSLocalizedString(@"backup_vc_are_you_sure_remove", @"Are you sure you want to Remove this backup?")
+                title:NSLocalizedString(@"generic_are_you_sure", @"Are you sure?")
+              message:NSLocalizedString(@"backup_vc_are_you_sure_remove", @"Are you sure you want to remove this backup?")
                action:^(BOOL response) {
             if(response) {
                 [BackupsManager.sharedInstance deleteBackup:item];

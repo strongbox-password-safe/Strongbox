@@ -14,6 +14,7 @@
 #import "WebDAVConfigurationViewController.h"
 #import "SVProgressHUD.h"
 #import "Constants.h"
+#import "NSString+Extensions.h"
 
 @interface WebDAVStorageProvider ()
 
@@ -288,9 +289,13 @@ viewController:(UIViewController *)viewController
             return;
         }
         
-        // Get Metadata Request - Will actually be performed first
+        // Get Metadata Request - Will actually be performed first - Some WebDAV servers do not respond to PROPFIND on a single file
+        // So we do the listing on the parent folder and find the file in there... sigh
         
-        NSString* path = pd.href;
+        //NSString* path = pd.href;
+        NSURL* pathUrl = pd.href.urlExtendedParse;
+        NSString* path = pathUrl.URLByDeletingLastPathComponent.absoluteString;
+
         DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
         listingRequest.delegate = self;
         listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
@@ -303,7 +308,11 @@ viewController:(UIViewController *)viewController
             }
             else {
                 NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
-                if (listingResponse.count == 0) {
+                DAVResponseItem* responseItem = [listingResponse firstOrDefault:^BOOL(DAVResponseItem * _Nonnull obj) {
+                    return [obj.href.absoluteString isEqualToString:pd.href];
+                }];
+
+                if (!responseItem) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [SVProgressHUD dismiss];
                     });
@@ -313,7 +322,6 @@ viewController:(UIViewController *)viewController
                     return;
                 }
                 
-                DAVResponseItem* responseItem = listingResponse.firstObject;
                 NSDate* modDate = responseItem.modificationDate;
                 
                 DAVGetRequest *request = [[DAVGetRequest alloc] initWithPath:pd.href];

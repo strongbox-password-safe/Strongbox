@@ -657,7 +657,7 @@
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Free" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f1b-OU-nj4">
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Free" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f1b-OU-nj4">
                                                         <rect key="frame" x="247.5" y="105.5" width="53" height="33.5"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                         <nil key="textColor"/>
@@ -1179,6 +1179,7 @@
                                                 </subviews>
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                                 <constraints>
+                                                    <constraint firstItem="4uB-2T-eYd" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="f1b-OU-nj4" secondAttribute="trailing" constant="2" id="0OC-cO-p5N"/>
                                                     <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="5cO-8R-z1g" secondAttribute="trailing" id="1f6-ti-S0r"/>
                                                     <constraint firstAttribute="bottom" secondItem="sVV-mq-MYU" secondAttribute="bottom" id="2ie-lW-UAp"/>
                                                     <constraint firstItem="4uB-2T-eYd" firstAttribute="centerX" secondItem="tOK-9F-6bR" secondAttribute="centerX" id="Eq7-iD-CA1"/>

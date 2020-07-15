@@ -9,6 +9,7 @@
 #import <XCTest/XCTest.h>
 #import "Kdbx4Database.h"
 #import "CommonTesting.h"
+#import "KeePassDatabase.h"
 
 @interface MemoryPerformanceTests : XCTestCase
 
@@ -50,9 +51,9 @@
 }
 
 - (void)testReadLarge {
-    NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/large-100-10-100.kdbx"];
+    NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-3.1.kdbx"];
     [stream open];
-    [[Kdbx4Database alloc] read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [[KeePassDatabase alloc] read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
         XCTAssertNil(error);
         XCTAssertNotNil(db);
         NSLog(@"Done... [%@]", error);

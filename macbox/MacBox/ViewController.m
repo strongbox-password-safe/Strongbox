@@ -244,6 +244,9 @@ static NSImage* kStrongBox256Image;
 
 - (void)closeAllDetailsWindows:(void (^)(void))completion {
     if (self.detailsViewControllers.count == 0) {
+        if(completion) {
+            completion();
+        }
         return;
     }
     

@@ -9,6 +9,8 @@
 #import "NSString+Extensions.h"
 #import "NSData+Extensions.h"
 
+static NSString* const kDefaultScheme = @"https";
+
 @implementation NSString (Extensions)
 
 + (NSRegularExpression *)urlRegex {
@@ -93,7 +95,7 @@
 //        }
 //    }
 
-    NSString* scheme = [result rangeAtIndex:2].location != NSNotFound ? [self substringWithRange:[result rangeAtIndex:2]] : @"";
+    NSString* scheme = [result rangeAtIndex:2].location != NSNotFound ? [self substringWithRange:[result rangeAtIndex:2]] : kDefaultScheme;
     NSString* host =  [result rangeAtIndex:4].location != NSNotFound ? [self substringWithRange:[result rangeAtIndex:4]] : @"";
     NSString* path =  [result rangeAtIndex:5].location != NSNotFound ? [self substringWithRange:[result rangeAtIndex:5]] : @"";
     NSString* query =  [result rangeAtIndex:7].location != NSNotFound ? [self substringWithRange:[result rangeAtIndex:7]] : nil;
@@ -120,6 +122,10 @@
     NSString* port =  [hostResult rangeAtIndex:7].location != NSNotFound ? [host substringWithRange:[hostResult rangeAtIndex:7]] : nil;
     
     NSURLComponents *components = [[NSURLComponents alloc] init];
+
+    // Scheme needs to be ASCII only or exception...
+    
+    scheme = [scheme canBeConvertedToEncoding:NSASCIIStringEncoding] ? scheme : kDefaultScheme;
 
     components.scheme = scheme;
     components.host = processedHost;

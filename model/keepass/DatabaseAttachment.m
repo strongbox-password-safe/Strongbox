@@ -176,10 +176,25 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
         [self.incrementalWriteStream open];
     }
 
-    const char* ascii = text.UTF8String;
-    size_t len = strlen(ascii);
+    // Do not do text.UTF8String the pointer is not released!!
     
-    return [self writeStream:(const uint8_t*)ascii maxLength:len];
+    size_t len = [text lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
+    
+    uint8_t* ascii = malloc(len);
+    
+    BOOL converted = [text getBytes:ascii maxLength:len usedLength:nil encoding:NSASCIIStringEncoding options:kNilOptions range:NSMakeRange(0, len) remainingRange:nil];
+    
+    if (!converted) {
+        NSLog(@"Could not convert b64 text to ascii!");
+        free(ascii);
+        return -1;
+    }
+
+    NSInteger ret = [self writeStream:ascii maxLength:len];
+    
+    free(ascii);
+     
+    return ret;
 }
 
 - (NSInteger)writeStream:(const uint8_t*)buffer maxLength:(NSUInteger)len {

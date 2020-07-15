@@ -66,7 +66,7 @@
 @property BOOL privacyScreenSuppressedForBiometricAuth;
 
 @property BOOL hasAppearedOnce; // Used for App Lock initial load
-@property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock - Ideally we should also clear this on DB close but we don't have that event setup yet...
+@property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock - Ideally we should also clear this on DB close but we don't have that event setup yet... TODO: This may be a useful event for clearing working cache file on exit
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
@@ -108,7 +108,8 @@
 //}
 
 - (void)sharePreviousCrash {
-    NSArray *activityItems = @[FileManager.sharedInstance.archivedCrashFile];
+    NSArray *activityItems = @[FileManager.sharedInstance.archivedCrashFile,
+                               @"Please send this crash to support@strongboxsafe.com"]; // TODO: Localize
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
 
     // Required for iPad...
@@ -116,6 +117,8 @@
     
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) { }];
 
+//    [activityViewController setValue:@"My Subject Text" forKey:@"subject"]; Doesn't work :(
+    
     [self presentViewController:activityViewController animated:YES completion:nil];
 }
 

@@ -23,6 +23,14 @@
     XCTAssertNotNil(url);
 }
 
+- (void)testInvalidScheme {
+    NSString* unc = @"чa://честныйзнак.рф";
+    NSURL* url = unc.urlExtendedParse;
+    NSLog(@"url = [%@]", url);
+
+    XCTAssertNotNil(url);
+}
+
 - (void)testCyrillicNoPath {
     NSString* unc = @"https://честныйзнак.рф";
     NSURL* url = unc.urlExtendedParse;
