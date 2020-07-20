@@ -244,7 +244,7 @@
 - (void)onChangeIconSet {
     NSArray<NSNumber*>* options = @[@(kKeePassIconSetClassic),
                                     @(kKeePassIconSetSfSymbols),
-//                                    @(kKeePassIconSetKeePassXC) // MMcG: As a courtesy wait for the KPXC crew to release, the make this available, not to steal their thunder! 5/Jun/2020
+                                    @(kKeePassIconSetKeePassXC)
     ];
     
     NSArray* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {

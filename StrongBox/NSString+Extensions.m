@@ -123,23 +123,39 @@ static NSString* const kDefaultScheme = @"https";
     
     NSURLComponents *components = [[NSURLComponents alloc] init];
 
-    // Scheme needs to be ASCII only or exception...
+    // Future: Scheme Regex = alpha *( alpha | digit | "+" | "-" | "." )
+    //
+    //    Some examples from https://stackoverflow.com/questions/3641722/valid-characters-for-uri-schemes
+    //
+    //    h323 (has numbers)
+    //    h323:[<user>@]<host>[:<port>][;<parameters>]
+    //    z39.50r (has a . as well)
+    //    z39.50r://<host>[:<port>]/<database>?<docid>[;esn=<elementset>][;rs=<recordsyntax>]
+    //    paparazzi:http (has a :)
+    //    paparazzi:http:[//<host>[:[<port>][<transport>]]/
+    // scheme = [scheme canBeConvertedToEncoding:NSASCIIStringEncoding] ? scheme : kDefaultScheme;
     
-    scheme = [scheme canBeConvertedToEncoding:NSASCIIStringEncoding] ? scheme : kDefaultScheme;
-
-    components.scheme = scheme;
-    components.host = processedHost;
-    components.path = path;
-    components.query = query;
-    components.fragment = fragment;
-    components.user = username;
-    components.password = password;
-    components.port = port ? @(port.integerValue) : nil;
+    // NSURLComponent throws if chars are out of range, catch, log and bail.
+    
+    @try {
+        components.scheme = scheme;
+        components.host = processedHost;
+        components.path = path;
+        components.query = query;
+        components.fragment = fragment;
+        components.user = username;
+        components.password = password;
+        components.port = port ? @(port.integerValue) : nil;
+    } @catch (NSException *exception) {
+        NSLog(@"Exception while building URL: [%@]", exception);
+        return nil;
+    } @finally {
+        //
+    }
     
     NSLog(@"Built: [%@]", components.URL);
     
     return components.URL;
-
 }
 
 @end

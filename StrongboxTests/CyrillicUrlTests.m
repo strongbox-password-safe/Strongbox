@@ -28,7 +28,23 @@
     NSURL* url = unc.urlExtendedParse;
     NSLog(@"url = [%@]", url);
 
-    XCTAssertNotNil(url);
+    XCTAssertNil(url);
+}
+
+- (void)testInvalidScheme2 {
+    NSString* unc = @"%http://www.foo.com";
+    NSURL* url = unc.urlExtendedParse;
+    NSLog(@"url = [%@]", url);
+
+    XCTAssertNil(url);
+}
+
+- (void)testInvalidScheme3 {
+    NSString* unc = @"%blah";
+    NSURL* url = unc.urlExtendedParse;
+    NSLog(@"url = [%@]", url);
+
+    XCTAssertNil(url);
 }
 
 - (void)testCyrillicNoPath {
