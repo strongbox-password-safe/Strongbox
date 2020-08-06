@@ -51,33 +51,43 @@
                   options:(FavIconDownloadOptions*)options
                completion:(void (^)(IMAGE_TYPE_PTR _Nullable))completion {
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
-    
-    [FavIcon downloadAll:url
-                 favIcon:options.checkCommonFavIconFiles
-                scanHtml:options.scanHtml
-              duckDuckGo:options.duckDuckGo
-                  google:options.google
-    allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
-              completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
-        IMAGE_TYPE_PTR best = [self selectBest:images];
-        completion(best);
-    }];
+
+    @try {
+        [FavIcon downloadAll:url
+                     favIcon:options.checkCommonFavIconFiles
+                    scanHtml:options.scanHtml
+                  duckDuckGo:options.duckDuckGo
+                      google:options.google
+        allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
+                  completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
+            IMAGE_TYPE_PTR best = [self selectBest:images];
+            completion(best);
+        }];
+    } @catch (NSException *exception) {
+        NSLog(@"Exception in downloadAll: [%@]", exception);
+        completion(nil);
+    } @finally { }
 }
 
 - (void)downloadAll:(NSURL *)url
             options:(FavIconDownloadOptions*)options
          completion:(void (^)(NSArray<IMAGE_TYPE_PTR>* _Nullable))completion {
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
-    
-    [FavIcon downloadAll:url
-                 favIcon:options.checkCommonFavIconFiles
-                scanHtml:options.scanHtml
-              duckDuckGo:options.duckDuckGo
-                  google:options.google
-    allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
-              completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
-        completion(images);
-    }];
+
+    @try {
+        [FavIcon downloadAll:url
+                     favIcon:options.checkCommonFavIconFiles
+                    scanHtml:options.scanHtml
+                  duckDuckGo:options.duckDuckGo
+                      google:options.google
+        allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
+                  completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
+            completion(images);
+        }];
+    } @catch (NSException *exception) {
+        NSLog(@"Exception in downloadAll: [%@]", exception);
+        completion(nil);
+    } @finally { }
 }
 
 - (IMAGE_TYPE_PTR)selectBest:(NSArray<IMAGE_TYPE_PTR>*)images {

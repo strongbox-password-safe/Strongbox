@@ -59,7 +59,7 @@
     
         XCTAssertNil(error);
         
-        [[self getSftp] update:metadata data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(NSError *error) {
+        [[self getSftp] pushDatabase:metadata interactiveVC:nil data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(NSError *error) {
             NSLog(@"Done. Error = [%@]", error);
         }];
     }];

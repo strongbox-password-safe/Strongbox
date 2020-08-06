@@ -1576,7 +1576,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)saveChangesToSafeAndRefreshView {
     [self refreshItems];
     
-    [self.viewModel update:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
+    [self.viewModel update:self
+                isAutoFill:NO
+                   handler:^(BOOL userCancelled, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (userCancelled) {
                 [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully

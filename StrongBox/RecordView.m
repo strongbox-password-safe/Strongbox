@@ -1238,7 +1238,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)sync:(void (^)(BOOL userCancelled, NSError * error))completion {
-    [self.viewModel update:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
+    [self.viewModel update:self isAutoFill:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
         if(!error) {
             self.editingNewRecord = NO;
             self.userSelectedNewCustomIcon = nil;

@@ -11,6 +11,7 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "FileManager.h"
 #import "NSArray+Extensions.h"
+#import "SyncManager.h"
 
 @interface SafesList()
 
@@ -233,15 +234,13 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     }];
 }
 
-- (void)add:(SafeMetaData *_Nonnull)safe {
+- (void)add:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
     dispatch_barrier_async(self.dataQueue, ^{
-        [self.databasesList addObject:safe];
-        
-        [self serialize];
+        [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate];
     });
 }
 
-- (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe {
+- (void)addWithDuplicateCheck:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
     dispatch_barrier_async(self.dataQueue, ^{
         BOOL duplicated = [self.databasesList anyMatch:^BOOL(SafeMetaData * _Nonnull obj) {
             BOOL storage = obj.storageProvider == safe.storageProvider;
@@ -258,13 +257,31 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         }];
         
         if(!duplicated) {
-            [self.databasesList addObject:safe];
-            [self serialize];
+            [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate];
         }
         else {
             NSLog(@"Found duplicate... Not Adding");
         }
     });
+}
+
+- (void)_internalAdd:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
+    if (initialCache) {
+        NSError* error;
+        NSURL* url = [SyncManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe error:&error];
+
+        if (error || !url) {
+            NSLog(@"ERROR: Error adding database - setWorkingCacheWithData: [%@]", error);
+        }
+        else {
+            [self.databasesList addObject:safe];
+            [self serialize];
+        }
+    }
+    else {
+        [self.databasesList addObject:safe];
+        [self serialize];
+    }
 }
 
 - (void)remove:(NSString*_Nonnull)uuid {

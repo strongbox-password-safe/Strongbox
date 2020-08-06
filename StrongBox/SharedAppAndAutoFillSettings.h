@@ -59,8 +59,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property DatabaseCellSubtitleField databaseCellSubtitle2;
 @property BOOL showDatabaseIcon;
 
-@property (readonly) BOOL uberSync; // Readonly shim over below allowing for easy default on/off as configured
-@property (nullable) NSNumber* optionalUberSync; // Allowing for a default "Unset" == nil - meaning the user hasn't chosen, opt them into whatever is appropriate - NONE UBER SYNC for now - 20-June-2020
+@property BOOL syncPullEvenIfModifiedDateSame;
 
 @end
 

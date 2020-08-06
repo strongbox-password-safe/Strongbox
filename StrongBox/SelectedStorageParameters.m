@@ -49,13 +49,19 @@
     return ret;
 }
 
-+ (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider file:(StorageBrowserItem*)file likelyFormat:(DatabaseFormat)likelyFormat {
++ (instancetype)parametersForNativeProviderExisting:(id<SafeStorageProvider>)provider
+                                               file:(StorageBrowserItem *)file
+                                       likelyFormat:(DatabaseFormat)likelyFormat
+                                               data:(NSData *)data
+                                initialDateModified:(NSDate *)initialDateModified {
     SelectedStorageParameters* ret = [[SelectedStorageParameters alloc] init];
     
     ret.method = kStorageMethodNativeStorageProvider;
     ret.provider = provider;
     ret.file = file;
     ret.likelyFormat = likelyFormat;
+    ret.data = data;
+    ret.initialDateModified = initialDateModified;
     
     return ret;
 }

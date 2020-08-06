@@ -80,36 +80,22 @@
     }];
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     [[GoogleDriveManager sharedInstance] read:viewController
                          parentFileIdentifier:safeMetaData.fileIdentifier
                                      fileName:safeMetaData.fileName
+                                      options:options
                                    completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
-        if (error != nil) {
+        if (result == kReadResultError) {
             NSLog(@"%@", error);
             [[GoogleDriveManager sharedInstance] signout];
-            completion(kReadResultError, nil, nil, error);
         }
-        else {
-            completion(kReadResultSuccess, data, dateModified, nil);
-        }
-    }];
-}
-
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
-    if (!GoogleDriveManager.sharedInstance.authorized) {
-        completion(kReadResultError, nil, nil, kUserInteractionRequiredError);
-        return;
-    }
-    
-    [GoogleDriveManager.sharedInstance readNonInteractive:safeMetaData.fileIdentifier
-                                                 fileName:safeMetaData.fileName
-                                               completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
+        
         completion(result, data, dateModified, error);
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     [SVProgressHUD show];
 
     [[GoogleDriveManager sharedInstance] update:safeMetaData.fileIdentifier

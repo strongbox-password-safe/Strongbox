@@ -160,7 +160,7 @@ viewController:(UIViewController *)viewController
     // NOTIMPL
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     //NSLog(@"READ! %@", safeMetaData);
     
     NSError *error;
@@ -221,7 +221,7 @@ viewController:(UIViewController *)viewController
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSError *error;
     NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:isAutoFill ppError:&error];
     

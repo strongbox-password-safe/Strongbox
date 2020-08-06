@@ -47,6 +47,7 @@
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "SharedAppAndAutoFillSettings.h"
 #import "SyncManager.h"
+#import "SyncOperationInfo.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -66,7 +67,7 @@
 @property BOOL privacyScreenSuppressedForBiometricAuth;
 
 @property BOOL hasAppearedOnce; // Used for App Lock initial load
-@property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock - Ideally we should also clear this on DB close but we don't have that event setup yet... TODO: This may be a useful event for clearing working cache file on exit
+@property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
@@ -109,7 +110,8 @@
 
 - (void)sharePreviousCrash {
     NSArray *activityItems = @[FileManager.sharedInstance.archivedCrashFile,
-                               @"Please send this crash to support@strongboxsafe.com"]; // TODO: Localize
+                               NSLocalizedString(@"safes_vc_please_send_crash_report", @"Please send this crash to support@strongboxsafe.com")];
+    
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
 
     // Required for iPad...
@@ -634,6 +636,32 @@
                                            selector:@selector(appBecameActive)
                                                name:UIApplicationDidBecomeActiveNotification
                                              object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseSyncStatusChanged:)
+                                               name:kSyncManagerDatabaseSyncStatusChanged
+                                             object:nil];
+}
+
+- (void)onDatabaseSyncStatusChanged:(id)param {
+    NSNotification* notification = param;
+    SyncOperationInfo* syncInfo = notification.object;
+    
+    NSLog(@"onDatabaseSyncStatusChanged: [%@-%lu]", syncInfo.databaseId, (unsigned long)syncInfo.state);
+    
+    NSUInteger index = [self.collection indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return [obj.uuid isEqualToString:syncInfo.databaseId];
+    }];
+    
+    if (index == NSNotFound) {
+        NSLog(@"WARNWARN: Sync Status Update for DB [%@] but DB not found in Collection!", syncInfo.databaseId);
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^(void) {
+            [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]]
+                                  withRowAnimation:UITableViewRowAnimationAutomatic];
+        });
+    }
 }
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
@@ -679,6 +707,21 @@
     
     [self.tableView addGestureRecognizer:self.longPressRecognizer];
 
+    UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
+    
+    if (@available(iOS 10.0, *)) {
+        self.tableView.refreshControl = refreshControl;
+    }
+    else {
+        [self.tableView addSubview:refreshControl];
+    }
+}
+
+- (void)onManualPulldownRefresh {
+    [SyncManager.sharedInstance backgroundSyncAll];
+    
+    [self.tableView.refreshControl endRefreshing];
 }
 
 - (void)handleLongPress {
@@ -699,8 +742,7 @@
     }
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
-{
+- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
     NSString *text = NSLocalizedString(@"safes_vc_empty_databases_list_tableview_title", @"Title displayed in tableview when there are no databases setup");
     
     NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline],
@@ -774,23 +816,36 @@
     return cell;
 }
 
-- (UIImage*)getStatusImage:(SafeMetaData*)database {
+- (NSArray<UIImage*>*)getStatusImages:(SafeMetaData*)database syncState:(SyncOperationState)syncState {
+    NSMutableArray<UIImage*> *ret = NSMutableArray.array;
+    
     if(database.hasUnresolvedConflicts) {
-        return [UIImage imageNamed:@"error"];
+        [ret addObject:[UIImage imageNamed:@"error"]];
     }
-    else if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
-        return [UIImage imageNamed:@"rocket"];
+    
+    if (SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon) {
+        if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+            [ret addObject:[UIImage imageNamed:@"rocket"]];
+        }
+        
+        if(database.readOnly) {
+            [ret addObject:[UIImage imageNamed:@"glasses"]];
+        }
     }
-    else if(database.readOnly) {
-        return [UIImage imageNamed:@"glasses"];
+    
+    if (syncState == kSyncOperationStateInProgress || syncState == kSyncOperationStateError || syncState == kSyncOperationStateBackgroundButUserInteractionRequired) {
+        [ret addObject:[UIImage imageNamed:@"syncronize"]];
     }
-
-    return nil;
+    
+    return ret;
 }
 
 - (void)populateDatabaseCell:(DatabaseCell*)cell database:(SafeMetaData*)database {
-    UIImage* statusImage = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon ? [self getStatusImage:database] : nil;
+    SyncOperationInfo *syncStatus = [SyncManager.sharedInstance getSyncStatus:database];
+    SyncOperationState syncState = syncStatus.state;
     
+    NSArray<UIImage*>* statusImages =  [self getStatusImages:database syncState:syncState];
+        
     NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
     NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
     NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
@@ -803,7 +858,9 @@
     subtitle1:subtitle1
     subtitle2:subtitle2
  providerIcon:databaseIcon
-  statusImage:statusImage
+ statusImages:statusImages
+     rotateLastImage:syncState == kSyncOperationStateInProgress
+     lastImageTint:(syncState == kSyncOperationStateError || syncState == kSyncOperationStateBackgroundButUserInteractionRequired) ? UIColor.systemOrangeColor : nil
      disabled:NO];
 }
 
@@ -815,8 +872,14 @@
         case kDatabaseCellSubtitleFieldFileName:
             return database.fileName;
             break;
-        case kDatabaseCellSubtitleFieldLastCachedDate:
-            return [self getOfflineCacheModDateString:database];
+        case kDatabaseCellSubtitleFieldLastModifiedDate:
+            return [self getModifiedDate:database];
+            break;
+        case kDatabaseCellSubtitleFieldLastModifiedDatePrecise:
+            return [self getModifiedDatePrecise:database];
+            break;
+        case kDatabaseCellSubtitleFieldFileSize:
+            return [self getLocalWorkingCopyFileSize:database];
             break;
         case kDatabaseCellSubtitleFieldStorage:
             return [self getStorageString:database];
@@ -825,6 +888,24 @@
             return @"<Unknown Field>";
             break;
     }
+}
+
+- (NSString*)getModifiedDate:(SafeMetaData*)safe {
+    NSDate* mod;
+    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    return mod ? friendlyDateStringVeryShort(mod) : @"";
+}
+
+- (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
+    NSDate* mod;
+    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    return mod ? friendlyDateTimeStringPrecise(mod) : @"";
+}
+
+- (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
+    unsigned long long fileSize;
+    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:nil fileSize:&fileSize];
+    return url ? friendlyFileSizeString(fileSize) : @"";
 }
 
 - (NSString*)getStorageString:(SafeMetaData*)database {
@@ -838,13 +919,6 @@
         NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
     }
     return providerString;
-}
-
-- (NSString*)getOfflineCacheModDateString:(SafeMetaData*)database {
-    NSDate* modDate;
-    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:database modified:&modDate];
-    
-    return modDate ? [NSString stringWithFormat:NSLocalizedString(@"safes_vc_cached_date_time_fmt", @"Date and Time last cache was taken"), friendlyDateStringVeryShort(modDate)] : @"";
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -990,6 +1064,27 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     [alertController addAction:viewBackupsOption];
 
+    // Sync Status
+    
+    SyncOperationInfo *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
+    if (syncStatus.state == kSyncOperationStateBackgroundButUserInteractionRequired || syncStatus.state == kSyncOperationStateError) {
+        UIAlertAction *viewSyncStatus = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync status of this database")
+                                                                 style:UIAlertActionStyleDefault
+                                                               handler:^(UIAlertAction *a) {
+            if (syncStatus.state == kSyncOperationStateError) {
+                [Alerts error:self error:syncStatus.error];
+            }
+            else {
+                NSString* title = NSLocalizedString(@"sync_status_user_interaction_required_title", @"User Interaction Required");
+                NSString* message = NSLocalizedString(@"sync_status_user_interaction_required_message", @"Sync could not complete because user interaction is required.");
+                
+                [Alerts info:self title:title message:message];
+            }
+        }];
+        
+        [alertController addAction:viewSyncStatus];
+    }
+    
     // Cancel
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel Button")
@@ -1230,6 +1325,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         NSURL* url = params[@"url"];
         NSData* data = params[@"data"];
         NSNumber* numEIP = params[@"editInPlace"];
+        NSDate* modDate = params[@"modDate"];
+        
         BOOL editInPlace = numEIP.boolValue;
         
         if(url && url.lastPathComponent.length) {
@@ -1241,10 +1338,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
                     if(editInPlace) {
-                        [self addExternalFileReferenceSafe:creds.name data:data url:url];
+                        [self addExternalFileReferenceSafe:creds.name data:data url:url dateModified:modDate];
                     }
                     else {
-                        [self copyAndAddImportedSafe:creds.name data:data url:url];
+                        [self copyAndAddImportedSafe:creds.name data:data url:url modDate:modDate];
                     }
                 }
             }];
@@ -1399,18 +1496,21 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
 - (void)onAddExistingDatabaseUiDone:(SelectedStorageParameters*)storageParams
                                name:(NSString*)name {
-    if(storageParams.data) { // Manual URL Download and Add
-        [self addManuallyDownloadedUrlDatabase:name data:storageParams.data];
+    if(storageParams.method == kStorageMethodManualUrlDownloadedData) {
+        // Manual URL Download and Add
+        [self addManuallyDownloadedUrlDatabase:name modDate:NSDate.date data:storageParams.data];
     }
     else { // Standard Native Storage add
         SafeMetaData* database = [storageParams.provider getSafeMetaData:name providerData:storageParams.file.providerData];
         database.likelyFormat = storageParams.likelyFormat;
         
         if(database == nil) {
-            [Alerts warn:self title:NSLocalizedString(@"safes_vc_error_adding_database", @"Error title: error adding database") message:NSLocalizedString(@"safes_vc_unknown_error_while_adding_database", @"Error Message- unknown error while adding")];
+            [Alerts warn:self
+                   title:NSLocalizedString(@"safes_vc_error_adding_database", @"Error title: error adding database")
+                 message:NSLocalizedString(@"safes_vc_unknown_error_while_adding_database", @"Error Message- unknown error while adding")];
         }
         else {
-            [SafesList.sharedInstance add:database];
+            [SafesList.sharedInstance add:database initialCache:storageParams.data initialCacheModDate:storageParams.initialDateModified];
         }
     }
 }
@@ -1430,7 +1530,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                           yubiKeyConfig:yubiKeyConfig
                           storageParams:storageParams
                                  format:format
-                             completion:^(BOOL userCancelled, SafeMetaData * _Nullable metadata, NSError * _Nullable error) {
+                             completion:^(BOOL userCancelled, SafeMetaData * _Nullable metadata, NSData * _Nonnull initialSnapshot, NSError * _Nullable error) {
         if (userCancelled) {
             // NOP?
         }
@@ -1440,7 +1540,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                     error:error];
         }
         else {
-            [self addDatabaseWithiCloudRaceCheck:metadata];
+            [self addDatabaseWithiCloudRaceCheck:metadata initialCache:initialSnapshot initialCacheModDate:NSDate.date];
         }
     }];
 }
@@ -1450,7 +1550,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [AddNewSafeHelper createNewExpressDatabase:self
                                           name:name
                                       password:password
-                                    completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
+                                    completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
         if (userCancelled) {
             // NOP
         }
@@ -1460,14 +1560,14 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                     error:error];
         }
         else {
-            metadata = [self addDatabaseWithiCloudRaceCheck:metadata];
+            metadata = [self addDatabaseWithiCloudRaceCheck:metadata initialCache:initialSnapshot initialCacheModDate:NSDate.date];
             [self performSegueWithIdentifier:@"segueToCreateExpressDone"
                                       sender:@{@"database" : metadata, @"password" : password }];
         }
     }];
 }
 
-- (SafeMetaData*)addDatabaseWithiCloudRaceCheck:(SafeMetaData*)metadata {
+- (SafeMetaData*)addDatabaseWithiCloudRaceCheck:(SafeMetaData*)metadata initialCache:(NSData*)initialCache initialCacheModDate:(NSDate*)initialCacheModDate {
     if (metadata.storageProvider == kiCloud) {
         SafeMetaData* existing = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
             return obj.storageProvider == kiCloud && [obj.fileName compare:metadata.fileName] == NSOrderedSame;
@@ -1479,11 +1579,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         }
     }
     
-    [[SafesList sharedInstance] add:metadata];
+    [[SafesList sharedInstance] add:metadata initialCache:initialCache initialCacheModDate:initialCacheModDate];
+    
     return metadata;
 }
 
-- (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName data:(NSData *)data {
+- (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName modDate:(NSDate*)modDate data:(NSData *)data {
     if(SharedAppAndAutoFillSettings.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
                                title:NSLocalizedString(@"safes_vc_copy_icloud_or_local", @"Question Title: Copy to icloud or to local")
@@ -1492,19 +1593,19 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                     secondButtonText:NSLocalizedString(@"safes_vc_copy_to_icloud", @"Second Button: Copy to iCLoud")
                               action:^(int response) {
                                   if(response == 0) {
-                                      [self addManualDownloadUrl:NO data:data nickName:nickName];
+                                      [self addManualDownloadUrl:NO data:data modDate:modDate nickName:nickName];
                                   }
                                   else if(response == 1) {
-                                      [self addManualDownloadUrl:YES data:data nickName:nickName];
+                                      [self addManualDownloadUrl:YES data:data modDate:modDate nickName:nickName];
                                   }
                               }];
     }
     else {
-        [self addManualDownloadUrl:NO data:data nickName:nickName];
+        [self addManualDownloadUrl:NO data:data modDate:modDate nickName:nickName];
     }
 }
 
-- (void)addManualDownloadUrl:(BOOL)iCloud data:(NSData*)data nickName:(NSString *)nickName {
+- (void)addManualDownloadUrl:(BOOL)iCloud data:(NSData*)data modDate:(NSDate*)modDate nickName:(NSString *)nickName {
     id<SafeStorageProvider> provider;
 
     if(iCloud) {
@@ -1515,7 +1616,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];  // TODO: Would be good not to have to read all file
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];  // FUTURE: Would be good not to have to read all file
     
     [provider create:nickName
            extension:extension
@@ -1526,7 +1627,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
          dispatch_async(dispatch_get_main_queue(), ^(void) {
             if (error == nil) {
                 metadata.likelyFormat = format;
-                [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+                [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
             }
             else {
                 [Alerts error:self title:NSLocalizedString(@"safes_vc_error_importing_database", @"Error Title Error Importing Datavase") error:error];
@@ -1809,7 +1910,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     if(!url || url.absoluteString.length == 0) {
         NSLog(@"nil or empty URL in Files App provider");
-        [self onReadImportedFile:NO data:nil url:url canOpenInPlace:NO forceOpenInPlace:NO];
+        [self onReadImportedFile:NO data:nil url:url canOpenInPlace:NO forceOpenInPlace:NO modDate:nil];
         return;
     }
 
@@ -1819,18 +1920,27 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         
         NSData* data = document.data ? document.data.copy : nil; // MMcG: Attempt to fix a crash
         
+        NSError* error;
+        NSDictionary* att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+        NSDate* mod = att.fileModificationDate;
+        
         [document closeWithCompletionHandler:nil];
         
         // Inbox should be empty whenever possible so that we can detect the
         // re-importation of a certain file and ask if user wants to create a
         // new copy or just update an old one...
         [FileManager.sharedInstance deleteAllInboxItems];
-        
-        [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace];
+                
+        [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
     }];
 }
 
-- (void)onReadImportedFile:(BOOL)success data:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
+- (void)onReadImportedFile:(BOOL)success
+                      data:(NSData*)data
+                       url:(NSURL*)url
+            canOpenInPlace:(BOOL)canOpenInPlace
+          forceOpenInPlace:(BOOL)forceOpenInPlace
+                   modDate:(NSDate*)modDate {
     if(!success || !data) {
         [Alerts warn:self
                title:NSLocalizedString(@"safesvc_error_title_import_file_error_opening", @"Error Opening")
@@ -1841,7 +1951,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             [self importKey:data url:url];
         }
         else {
-            [self importSafe:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace];
+            [self importSafe:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:modDate];
         }
     }
 }
@@ -1864,10 +1974,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 }
 
--(void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
+- (void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace modDate:(NSDate*)modDate {
     NSError* error;
     
-    if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) { // TODO: Stream? use URL?
+    if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) { // FUTURE: Stream? use URL?
         [Alerts error:self
                 title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                 error:error];
@@ -1876,7 +1986,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     if(canOpenInPlace) {
         if(forceOpenInPlace) {
-            [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:YES];
+            [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:YES modDate:modDate];
         }
         else {
             [Alerts threeOptions:self
@@ -1887,17 +1997,17 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                  thirdButtonText:NSLocalizedString(@"generic_cancel", @"Cancel Option Button Title")
                           action:^(int response) {
                               if(response != 2) {
-                                  [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:response == 0];
+                                  [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:response == 0 modDate:modDate];
                               }
                           }];
         }
     }
     else {
-        [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:NO];
+        [self checkForLocalFileOverwriteOrGetNickname:data url:url editInPlace:NO modDate:modDate];
     }
 }
 
-- (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
+- (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace modDate:(NSDate*)modDate {
     if(editInPlace == NO) {
         NSString* filename = url.lastPathComponent;
         if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && SharedAppAndAutoFillSettings.sharedInstance.iCloudOn == NO) {
@@ -1918,52 +2028,40 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                           }
                                           else {
                                               NSLog(@"Updated...");
+                                              [SyncManager.sharedInstance backgroundSyncLocalDeviceDatabasesOnly];
                                           }
                                       }
                                       else if (response == 1){
-                                          [self promptForNickname:data url:url editInPlace:editInPlace];
+                                          [self promptForNickname:data url:url editInPlace:editInPlace modDate:modDate];
                                       }
                                   }];
         }
         else {
-            [self promptForNickname:data url:url editInPlace:editInPlace];
+            [self promptForNickname:data url:url editInPlace:editInPlace modDate:modDate];
         }
     }
     else {
-        [self promptForNickname:data url:url editInPlace:editInPlace];
+        [self promptForNickname:data url:url editInPlace:editInPlace modDate:modDate];
     }
 }
 
-- (void)promptForNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace {
+- (void)promptForNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace modDate:(NSDate*)modDate {
     [self performSegueWithIdentifier:@"segueFromInitialToAddDatabase"
                               sender:@{ @"editInPlace" : @(editInPlace),
                                         @"url" : url,
-                                        @"data" : data }];
+                                        @"data" : data,
+                                        @"modDate" : modDate
+                              }];
 }
 
 /////////////
-
-- (void)importFromManualUiUrl:(NSURL *)importURL {
-    NSData *importedData = [NSData dataWithContentsOfURL:importURL];
-    
-    NSError* error;
-    if (![DatabaseModel isValidDatabaseWithPrefix:importedData error:&error]) {
-        [Alerts error:self
-                title:NSLocalizedString(@"safesvc_import_manual_url_invalid", @"Invalid Database")
-                error:error];
-        
-        return;
-    }
-    
-    [self checkForLocalFileOverwriteOrGetNickname:importedData url:importURL editInPlace:NO];
-}
 
 - (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
     self.enqueuedImportUrl = url;
     self.enqueuedImportCanOpenInPlace = canOpenInPlace;
 }
 
-- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url  {
+- (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url modDate:(NSDate*)modDate {
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
     DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
     
@@ -1977,20 +2075,22 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                     secondButtonText:NSLocalizedString(@"safesvc_copy_database_option_to_icloud", @"Copy to iCloud")
                               action:^(int response) {
                                   if(response == 0) {
-                                      [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data];
+                                      [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
                                   }
                                   else if(response == 1) {
-                                      [self importToICloud:url format:format nickName:nickName extension:extension data:data];
+                                      [self importToICloud:url format:format nickName:nickName extension:extension data:data modDate:modDate];
                                   }
                               }];
     }
     else {
-        [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data];
+        [self importToLocalDevice:url format:format nickName:nickName extension:extension data:data modDate:modDate];
     }
 }
 
-- (void)importToICloud:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data {
+- (void)importToICloud:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
     NSString *suggestedFilename = url.lastPathComponent;
+    
+     // Do we need to set the iCloud file mod date to match?
     
     [AppleICloudProvider.sharedInstance create:nickName
                                      extension:extension
@@ -1998,12 +2098,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                              suggestedFilename:suggestedFilename
                                   parentFolder:nil
                                 viewController:self
-                                    completion:^(SafeMetaData *metadata, NSError *error)
-     {
+                                    completion:^(SafeMetaData *metadata, NSError *error) {
          dispatch_async(dispatch_get_main_queue(), ^(void) {
              if (error == nil) {
                  metadata.likelyFormat = format;
-                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+                 [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
              }
              else {
                  [Alerts error:self
@@ -2014,30 +2113,32 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
      }];
 }
 
-- (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data {
+- (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
     // Try to keep the filename the same... but don't overwrite any existing, will have asked previously above if the user wanted to
     
     NSString *suggestedFilename = url.lastPathComponent;
+        
     [LocalDeviceStorageProvider.sharedInstance create:nickName
                                             extension:extension
                                                  data:data
+                                              modDate:modDate
                                     suggestedFilename:suggestedFilename
                                            completion:^(SafeMetaData *metadata, NSError *error) {
-                                               dispatch_async(dispatch_get_main_queue(), ^(void) {
-                                                   if (error == nil) {
-                                                       metadata.likelyFormat = format;
-                                                       [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
-                                                   }
-                                                   else {
-                                                       [Alerts error:self
-                                                               title:NSLocalizedString(@"safesvc_error_importing_title", @"Error Importing Database")
-                                                               error:error];
-                                                   }
-                                               });
-                                           }];
+       dispatch_async(dispatch_get_main_queue(), ^(void) {
+           if (error == nil) {
+               metadata.likelyFormat = format;
+               [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
+           }
+           else {
+               [Alerts error:self
+                       title:NSLocalizedString(@"safesvc_error_importing_title", @"Error Importing Database")
+                       error:error];
+           }
+       });
+    }];
 }
 
-- (void)addExternalFileReferenceSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url {
+- (void)addExternalFileReferenceSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url dateModified:(NSDate*)dateModified {
     NSError* error;
     NSData* bookMark = [BookmarksHelper getBookmarkDataFromUrl:url error:&error];
     
@@ -2055,7 +2156,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
     metadata.likelyFormat = format;
     
-    [[SafesList sharedInstance] addWithDuplicateCheck:metadata];
+    [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:dateModified];
 }
 
 @end

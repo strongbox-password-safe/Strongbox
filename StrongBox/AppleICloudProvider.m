@@ -140,23 +140,23 @@ suggestedFilename:nil
     }];
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
-
-    NSError* error;
-    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:fileUrl.path error:&error];
-    NSLog(@"iCloud File Mod Date: [%@]", attr.fileModificationDate);
 
     StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithFileURL:fileUrl];
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-    });
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+        });
+    }
     
     [doc openWithCompletionHandler:^(BOOL success) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
         
         if (!success) {
             NSLog(@"Failed to open %@", fileUrl);
@@ -180,7 +180,7 @@ suggestedFilename:nil
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
     StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithData:data fileUrl:fileUrl];
     

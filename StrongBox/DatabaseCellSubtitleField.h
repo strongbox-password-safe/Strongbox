@@ -13,7 +13,9 @@ typedef NS_ENUM (NSInteger, DatabaseCellSubtitleField) {
     kDatabaseCellSubtitleFieldNone,
     kDatabaseCellSubtitleFieldFileName,
     kDatabaseCellSubtitleFieldStorage,
-    kDatabaseCellSubtitleFieldLastCachedDate,
+    kDatabaseCellSubtitleFieldLastModifiedDate,
+    kDatabaseCellSubtitleFieldLastModifiedDatePrecise,
+    kDatabaseCellSubtitleFieldFileSize,
 };
 
 #endif /* DatabaseCellSubtitleField_h */

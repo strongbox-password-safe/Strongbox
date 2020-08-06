@@ -248,7 +248,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         
         NSInputStream* inputStream = [attachments[theAttachment.index] getPlainTextInputStream];
 
-        // TODO: Stream this write
+        // FUTURE: Stream this write
         NSData* data = [NSData dataWithContentsOfStream:inputStream];
 
         if (!data) {

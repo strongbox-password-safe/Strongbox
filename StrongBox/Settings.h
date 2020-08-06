@@ -55,6 +55,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL backupIncludeImportedKeyFiles;
 @property BOOL haveAskedAboutBackupSettings;
 
+@property BOOL hasMigratedDatabaseSubtitles;
+
 NS_ASSUME_NONNULL_END
 
 @end

@@ -1590,10 +1590,10 @@
 		C8C73CCF249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
 		C8C73CD0249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
 		C8C73CD1249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
-		C8C73CD5249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* LegacySyncReadOptions.m */; };
-		C8C73CD6249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* LegacySyncReadOptions.m */; };
-		C8C73CD7249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* LegacySyncReadOptions.m */; };
-		C8C73CD8249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* LegacySyncReadOptions.m */; };
+		C8C73CD5249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
+		C8C73CD6249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
+		C8C73CD7249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
+		C8C73CD8249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
 		C8DC76472497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC76482497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC76492497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
@@ -1623,6 +1623,14 @@
 		C8EE24912486B0CE00D41935 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8855FD724857D24001EE933 /* AuditDrillDown.storyboard */; };
 		C8EE24922486B0CE00D41935 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8855FD724857D24001EE933 /* AuditDrillDown.storyboard */; };
 		C8F92293248A813B000F8292 /* CyrillicUrlTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8F92292248A813B000F8292 /* CyrillicUrlTests.m */; };
+		C8FA2A1824C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */; };
+		C8FA2A1924C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */; };
+		C8FA2A1A24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */; };
+		C8FA2A1B24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */; };
+		C8FA2A1E24C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
+		C8FA2A1F24C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
+		C8FA2A2024C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
+		C8FA2A2124C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
 		E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 		F8BC916E4E9421DA0B191040 /* Pods_common_ios_Strongbox_iOS_Family.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7523D7C245F96F478BCBC5E0 /* Pods_common_ios_Strongbox_iOS_Family.framework */; };
 /* End PBXBuildFile section */
@@ -3071,8 +3079,8 @@
 		C8BFECBD2478206C0051D21E /* NodeHierarchyReconstructionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeHierarchyReconstructionData.h; path = model/NodeHierarchyReconstructionData.h; sourceTree = "<group>"; };
 		C8C73CCC249E42C700B34C8F /* SyncManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncManager.h; sourceTree = "<group>"; };
 		C8C73CCD249E42C700B34C8F /* SyncManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncManager.m; sourceTree = "<group>"; };
-		C8C73CD3249E468C00B34C8F /* LegacySyncReadOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LegacySyncReadOptions.h; sourceTree = "<group>"; };
-		C8C73CD4249E468C00B34C8F /* LegacySyncReadOptions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LegacySyncReadOptions.m; sourceTree = "<group>"; };
+		C8C73CD3249E468C00B34C8F /* SyncReadOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncReadOptions.h; sourceTree = "<group>"; };
+		C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncReadOptions.m; sourceTree = "<group>"; };
 		C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModelConfig.m; path = model/DatabaseModelConfig.m; sourceTree = "<group>"; };
 		C8DC76462497B59500C9C443 /* DatabaseModelConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModelConfig.h; path = model/DatabaseModelConfig.h; sourceTree = "<group>"; };
 		C8DEE079249A62AB00CF2AFE /* git-version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "git-version.h"; path = "build/git-version.h"; sourceTree = "<group>"; };
@@ -3087,6 +3095,10 @@
 		C8ED5DDD248E6C6400B84EBD /* HmacBlockStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HmacBlockStream.h; sourceTree = "<group>"; };
 		C8ED5DDE248E6C6400B84EBD /* HmacBlockStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HmacBlockStream.m; sourceTree = "<group>"; };
 		C8F92292248A813B000F8292 /* CyrillicUrlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CyrillicUrlTests.m; path = StrongboxTests/CyrillicUrlTests.m; sourceTree = "<group>"; };
+		C8FA2A1624C5B0A300445D8B /* ConcurrentMutableDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableDictionary.h; path = model/ConcurrentMutableDictionary.h; sourceTree = "<group>"; };
+		C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableDictionary.m; path = model/ConcurrentMutableDictionary.m; sourceTree = "<group>"; };
+		C8FA2A1C24C5B2F500445D8B /* SyncOperationInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncOperationInfo.h; sourceTree = "<group>"; };
+		C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncOperationInfo.m; sourceTree = "<group>"; };
 		CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill_Family.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 		D21DDC737B043D968D5F9854 /* Pods-common-ios-Strongbox-Auto-Fill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-Auto-Fill.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-Auto-Fill/Pods-common-ios-Strongbox-Auto-Fill.release.xcconfig"; sourceTree = "<group>"; };
@@ -5051,10 +5063,12 @@
 		C88F812A245D8C5E00B0B998 /* McGuill */ = {
 			isa = PBXGroup;
 			children = (
-				4D646A1E22D2A42C00C5D2FE /* UIImage+FixOrientation.h */,
-				4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */,
 				C88F812B245D8C7C00B0B998 /* ConcurrentMutableSet.h */,
 				C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */,
+				C8FA2A1624C5B0A300445D8B /* ConcurrentMutableDictionary.h */,
+				C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */,
+				4D646A1E22D2A42C00C5D2FE /* UIImage+FixOrientation.h */,
+				4D646A1F22D2A42C00C5D2FE /* UIImage+FixOrientation.m */,
 				4D4F184A2165125B00578F0E /* NSArray+Extensions.h */,
 				4D4F184B2165125B00578F0E /* NSArray+Extensions.m */,
 				4DDF7C9B225B7D2C000B0114 /* NSDictionary+Extensions.h */,
@@ -5166,6 +5180,8 @@
 				C8991AD424B0CF7200C2D604 /* StorageProviderReadOptions.h */,
 				C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */,
 				C8991ADA24B0D01600C2D604 /* StorageProviderReadResult.h */,
+				C8FA2A1C24C5B2F500445D8B /* SyncOperationInfo.h */,
+				C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -5173,8 +5189,8 @@
 		C8C73CD2249E466700B34C8F /* Legacy */ = {
 			isa = PBXGroup;
 			children = (
-				C8C73CD3249E468C00B34C8F /* LegacySyncReadOptions.h */,
-				C8C73CD4249E468C00B34C8F /* LegacySyncReadOptions.m */,
+				C8C73CD3249E468C00B34C8F /* SyncReadOptions.h */,
+				C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */,
 			);
 			path = Legacy;
 			sourceTree = "<group>";
@@ -6083,7 +6099,7 @@
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
 				C8BF76E82472E1820080A808 /* DeletedObjects.m in Sources */,
-				C8C73CD5249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */,
+				C8C73CD5249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */,
 				4D646A2022D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
 				4DF97F2021BF101B0090A55E /* DAVRequest.m in Sources */,
@@ -6205,6 +6221,7 @@
 				C80E02ED249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC8D9AB21B6E8A9004F1812 /* KeyFileParser.m in Sources */,
 				4D3E14A62183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
+				C8FA2A1824C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4D004CD921F4C26700E2B194 /* NSURL+QueryItems.m in Sources */,
 				4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */,
 				4D8C148F2074F5F800CE9CAE /* Group.m in Sources */,
@@ -6286,6 +6303,7 @@
 				4D3652142184A24700A56519 /* regdom.c in Sources */,
 				4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4D326E8B22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
+				C8FA2A1E24C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
 				4D2259F922C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0AFD2522A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m in Sources */,
 				4D9AFB142449AF1E00376240 /* DatabaseAuditReport.m in Sources */,
@@ -6495,6 +6513,7 @@
 				4D08B5B4234C9613003D1953 /* GCDWebServerRequest.m in Sources */,
 				4DC4E04E23488BAA000743C4 /* PasswordMaker.m in Sources */,
 				4DC4E04F23488BAA000743C4 /* NMSSHChannel.m in Sources */,
+				C8FA2A1A24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4DC4E05023488BAA000743C4 /* NSMutableArray+Extensions.m in Sources */,
 				4DC4E05123488BAA000743C4 /* OneDriveStorageProvider.m in Sources */,
 				4DC4E05223488BAA000743C4 /* BackupsBrowserTableViewController.m in Sources */,
@@ -6544,6 +6563,7 @@
 				4DC4E06E23488BAA000743C4 /* DAVBaseRequest.m in Sources */,
 				4D8354CC2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DC4E06F23488BAA000743C4 /* TotpCell.m in Sources */,
+				C8FA2A2024C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
 				4DC4E07023488BAA000743C4 /* KeePassDatabaseMetadata.m in Sources */,
 				4DC4E07123488BAA000743C4 /* SelectStorageProviderController.m in Sources */,
 				4DC4E07223488BAA000743C4 /* BackupItem.m in Sources */,
@@ -6579,7 +6599,7 @@
 				4DC4E08A23488BAA000743C4 /* WebDAVSessionConfiguration.m in Sources */,
 				4DC4E08B23488BAA000743C4 /* NMSSHSession.m in Sources */,
 				C8BFECC02478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
-				C8C73CD7249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */,
+				C8C73CD7249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D160AB924535D1B0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
 				C8E9DAA0245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4DC4E08C23488BAA000743C4 /* AdvancedPreferencesTableViewController.m in Sources */,
@@ -6838,7 +6858,7 @@
 				4DC4E1A423488BAE000743C4 /* SimpleXmlValueExtractor.m in Sources */,
 				4D160A7E2452F2B80097C730 /* BrowseTableViewCellHelper.m in Sources */,
 				4DC4E1A523488BAE000743C4 /* SprCompilation.m in Sources */,
-				C8C73CD8249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */,
+				C8C73CD8249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D7F5A3E236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DC4E1A723488BAE000743C4 /* NMSSHChannel.m in Sources */,
 				4DC4E1A823488BAE000743C4 /* ISO8601DateFormatter.m in Sources */,
@@ -6964,11 +6984,13 @@
 				4DC4E20C23488BAE000743C4 /* V3Binary.m in Sources */,
 				4DC4E20D23488BAE000743C4 /* NMSSHSession.m in Sources */,
 				4DC4E20E23488BAE000743C4 /* IOsUtils.m in Sources */,
+				C8FA2A2124C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
 				4DC4E20F23488BAE000743C4 /* Utils.m in Sources */,
 				4DC4E21023488BAE000743C4 /* NMSSHLogger.m in Sources */,
 				4DC4E21123488BAE000743C4 /* StrongboxUIDocument.m in Sources */,
 				4DC4E21223488BAE000743C4 /* Kdbx4Database.m in Sources */,
 				4DC4E21323488BAE000743C4 /* Argon2KdfCipher.m in Sources */,
+				C8FA2A1B24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4DC4E21523488BAE000743C4 /* UIImage+FixOrientation.m in Sources */,
 				C872B73924A653E90042CE02 /* GzipDecompressOutputStream.m in Sources */,
 				4D507EF424322B2C000A4E76 /* TagsViewTableViewCell.m in Sources */,
@@ -7097,7 +7119,7 @@
 				4DC3F83423215A58002BDEF7 /* SimpleXmlValueExtractor.m in Sources */,
 				4D160A7C2452F2B80097C730 /* BrowseTableViewCellHelper.m in Sources */,
 				4D18F2372257987F00768E18 /* SprCompilation.m in Sources */,
-				C8C73CD6249E468C00B34C8F /* LegacySyncReadOptions.m in Sources */,
+				C8C73CD6249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D7F5A3C236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
@@ -7223,11 +7245,13 @@
 				4D74B92A218C40B000FC369E /* V3Binary.m in Sources */,
 				4D326E8622302BED00DCD8C7 /* NMSSHSession.m in Sources */,
 				4D1884CA21709CDA001AE6B0 /* IOsUtils.m in Sources */,
+				C8FA2A1F24C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
 				4D1884C921709CD4001AE6B0 /* Utils.m in Sources */,
 				4D326E8222302BED00DCD8C7 /* NMSSHLogger.m in Sources */,
 				4D1884C821709CCD001AE6B0 /* StrongboxUIDocument.m in Sources */,
 				4D9E08F121824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D3E14A72183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
+				C8FA2A1924C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4D646A2122D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
 				C872B73724A653E90042CE02 /* GzipDecompressOutputStream.m in Sources */,
 				4D507EF324322B2B000A4E76 /* TagsViewTableViewCell.m in Sources */,
@@ -8110,7 +8134,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8200,7 +8224,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8289,7 +8313,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8371,7 +8395,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8456,7 +8480,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8533,7 +8557,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8608,7 +8632,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8693,7 +8717,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2945;
+				CURRENT_PROJECT_VERSION = 2946;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

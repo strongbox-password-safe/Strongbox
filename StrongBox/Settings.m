@@ -35,6 +35,7 @@ static NSString* const kBackupFiles = @"backupFiles";
 static NSString* const kBackupIncludeImportedKeyFiles = @"backupIncludeImportedKeyFiles";
 static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSettings";
 
+static NSString* const kHasMigratedDatabaseSubtitles = @"hasMigratedDatabaseSubtitlesAug2020";
 
 // TODO: Don't use shared settings for these...
 
@@ -96,6 +97,14 @@ static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSet
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)hasMigratedDatabaseSubtitles {
+    return [self getBool:kHasMigratedDatabaseSubtitles];
+}
+
+- (void)setHasMigratedDatabaseSubtitles:(BOOL)hasMigratedDatabaseSubtitles {
+    [self setBool:kHasMigratedDatabaseSubtitles value:hasMigratedDatabaseSubtitles];
+}
 
 - (BOOL)haveAskedAboutBackupSettings {
     return [self getBool:kHaveAskedAboutBackupSettings fallback:NO];

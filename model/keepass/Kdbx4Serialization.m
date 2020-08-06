@@ -378,7 +378,7 @@ static NSMutableData* createInnerHeaders(NSArray<DatabaseAttachment*> *attachmen
         
         NSInputStream* inputStream = [attachment getPlainTextInputStream];
 
-        // TODO: Stream this write
+        // FUTURE: Stream this write
         NSData* data = [NSData dataWithContentsOfStream:inputStream];
 
         if (!data) {

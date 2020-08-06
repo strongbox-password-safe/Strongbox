@@ -25,12 +25,12 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 + (void)createNewExpressDatabase:(UIViewController*)vc
                             name:(NSString *)name
                         password:(NSString *)password
-                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSError* error))completion {
+                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
     NSError* error;
     DatabaseModel *database = getNewDatabase(password, nil, nil, nil, kDefaultFormat, &error);
     
     if(!database) {
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
@@ -54,12 +54,12 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
             yubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig
             storageParams:(nonnull SelectedStorageParameters *)storageParams
                    format:(DatabaseFormat)format
-               completion:(nonnull void (^)(BOOL userCancelled, SafeMetaData * _Nullable, NSError * _Nullable))completion {
+               completion:(nonnull void (^)(BOOL userCancelled, SafeMetaData * _Nullable, NSData* initialSnapshot, NSError * _Nullable))completion {
     NSError* error;
     DatabaseModel *database = getNewDatabase(password, keyFileUrl, onceOffKeyFileData, yubiKeyConfig, format, &error);
     
     if(!database) {
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
@@ -80,7 +80,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
               provider:(id<SafeStorageProvider>)provider
           parentFolder:(NSObject*)parentFolder
          yubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig
-           completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSError* error))completion {
+           completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
     dispatch_async(dispatch_get_main_queue(), ^(void) { // Saving Has to be done on main thread :(
         [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     });
@@ -88,7 +88,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
     dispatch_async(dispatch_get_global_queue(0L, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
         [database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
             if (userCancelled || data == nil || error) {
-                completion(userCancelled, nil, error);
+                completion(userCancelled, nil, nil, error);
                 return;
             }
             
@@ -124,7 +124,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                     metadata.yubiKeyConfig = yubiKeyConfig;
 
                     dispatch_async(dispatch_get_main_queue(), ^(void) {
-                        completion(NO, metadata, error);
+                        completion(NO, metadata, data, error);
                     });
                  }];
             });

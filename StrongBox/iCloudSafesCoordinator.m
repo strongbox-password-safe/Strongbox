@@ -12,6 +12,7 @@
 #import "Strongbox.h"
 #import "SafesList.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "StrongboxUIDocument.h"
 
 @implementation iCloudSafesCoordinator
 
@@ -390,7 +391,10 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         NSLog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
       
-        [[SafesList sharedInstance] addWithDuplicateCheck:newSafe];
+        // Unfortunately the iCloud URL doesn't exist at this point so we can't provide an initial cache...
+        
+        [[SafesList sharedInstance] addWithDuplicateCheck:newSafe initialCache:nil initialCacheModDate:nil];
+        
         added = YES;
     }
     

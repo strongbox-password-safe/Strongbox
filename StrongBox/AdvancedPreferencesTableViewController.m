@@ -30,7 +30,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchDetectOffline;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowClipboardHandoff;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseColorBlindPalette;
-@property (weak, nonatomic) IBOutlet UISwitch *switchUberSync;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchSyncForcePull;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
@@ -76,7 +77,8 @@
 
 - (IBAction)onPreferencesChanged:(id)sender {
     NSLog(@"Advanced Preference Changed: [%@]", sender);
-    
+
+    SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame = self.switchSyncForcePull.on;
     SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
@@ -95,14 +97,8 @@
     [self bindPreferences];
 }
 
-- (IBAction)onUberSync:(id)sender { // Explicit enable/disable
-    SharedAppAndAutoFillSettings.sharedInstance.optionalUberSync = self.switchUberSync.on ? @(YES) : nil; // nil = default = off
-
-    [self bindPreferences];
-}
-
 - (void)bindPreferences {
-    self.switchUberSync.on = SharedAppAndAutoFillSettings.sharedInstance.uberSync;
+    self.switchSyncForcePull.on = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
     self.instantPinUnlock.on = SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
     self.switchHideKeyFileName.on = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles;

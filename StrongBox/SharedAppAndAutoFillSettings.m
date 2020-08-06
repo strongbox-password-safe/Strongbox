@@ -40,9 +40,9 @@ static NSString* const kDatabaseCellTopSubtitle = @"databaseCellTopSubtitle";
 static NSString* const kDatabaseCellSubtitle1 = @"databaseCellSubtitle1";
 static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
-static NSString* const kUberSync = @"uberSync";
 
-// TODO: Move to JSON file instead of NSUserDefaults...
+static NSString* const kSyncPullEvenIfModifiedDateSame = @"syncPullEvenIfModifiedDateSame";
+
 @implementation SharedAppAndAutoFillSettings
 
 + (void)initialize {
@@ -84,18 +84,12 @@ static NSString* const kUberSync = @"uberSync";
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (NSNumber *)optionalUberSync {
-    return [self.sharedAppGroupDefaults objectForKey:kUberSync];
+- (BOOL)syncPullEvenIfModifiedDateSame {
+    return [self getBool:kSyncPullEvenIfModifiedDateSame];
 }
 
-- (void)setOptionalUberSync:(NSNumber *)optionalUberSync {
-    [self.sharedAppGroupDefaults setObject:optionalUberSync forKey:kUberSync];
-    [self.sharedAppGroupDefaults synchronize];
-
-}
-
-- (BOOL)uberSync {
-    return self.optionalUberSync == nil ? NO : self.optionalUberSync.boolValue;
+- (void)setSyncPullEvenIfModifiedDateSame:(BOOL)syncPullEvenIfModifiedDateSame {
+    [self setBool:kSyncPullEvenIfModifiedDateSame value:syncPullEvenIfModifiedDateSame];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -408,7 +402,7 @@ static NSString* const kUberSync = @"uberSync";
 }
 
 - (DatabaseCellSubtitleField)databaseCellTopSubtitle {
-    return[self getInteger:kDatabaseCellTopSubtitle fallback:kDatabaseCellSubtitleFieldNone];
+    return[self getInteger:kDatabaseCellTopSubtitle fallback:kDatabaseCellSubtitleFieldFileSize];
 }
 
 - (void)setDatabaseCellTopSubtitle:(DatabaseCellSubtitleField)databaseCellTopSubtitle {
@@ -424,7 +418,7 @@ static NSString* const kUberSync = @"uberSync";
 }
 
 - (DatabaseCellSubtitleField)databaseCellSubtitle2 {
-    return[self getInteger:kDatabaseCellSubtitle2 fallback:kDatabaseCellSubtitleFieldNone];
+    return[self getInteger:kDatabaseCellSubtitle2 fallback:kDatabaseCellSubtitleFieldLastModifiedDate];
 }
 
 - (void)setDatabaseCellSubtitle2:(DatabaseCellSubtitleField)databaseCellSubtitle2 {

@@ -198,7 +198,7 @@
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSError* error;
-    NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];  // TODO: Would be good not to have to read all file
+    NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];  // FUTURE: Would be good not to have to read all file
     
     if(error) {
         [Alerts error:self
@@ -226,8 +226,12 @@
     }
     else {
         if(self.existing) {
-            // How can we get here?! - I don't think this is possible
-            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:provider file:nil likelyFormat:kFormatUnknown]);
+            [Alerts info:self
+                   title:@"Error Selecting Storage Provider"
+                 message:@"Please contact support@strongboxsafe.com if you receive this message. It looks like there is a problem with this Storage provider"
+              completion:^{
+                self.onDone(SelectedStorageParameters.userCancelled); // Pretty sure this is unreachable...
+            }];
         }
         else {
             self.onDone([SelectedStorageParameters parametersForNativeProviderCreate:provider folder:nil]);

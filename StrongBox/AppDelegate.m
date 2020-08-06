@@ -89,7 +89,24 @@
     }
 }
 
-- (void)performMigrations {    
+- (void)performMigrations {
+    if (!Settings.sharedInstance.hasMigratedDatabaseSubtitles) {
+        Settings.sharedInstance.hasMigratedDatabaseSubtitles = YES;
+        
+        // If these subtitle fields are unused then default them to display file size and mod date...
+        
+        if (SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle == kDatabaseCellSubtitleFieldNone) {
+            SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle = kDatabaseCellSubtitleFieldFileSize;
+        }
+
+        if (SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1 == kDatabaseCellSubtitleFieldNone) {
+            SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1 = kDatabaseCellSubtitleFieldStorage;
+        }
+
+        if (SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2 == kDatabaseCellSubtitleFieldNone) {
+            SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2 = kDatabaseCellSubtitleFieldLastModifiedDate;
+        }
+    }
 }
 
 - (void)cleanupInbox:(NSDictionary *)launchOptions {

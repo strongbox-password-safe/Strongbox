@@ -140,24 +140,26 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
-    [self.navigationController setNavigationBarHidden:NO];
-    self.navigationController.navigationBar.hidden = NO;
+
+//    self.navigationController.navigationBar.hidden = NO; // on iOS14 Beta 3 - this causes 100% CPU? TODO: Revisit on next beta/release
+    
     self.navigationController.navigationBarHidden = NO;
+
     if (@available(iOS 11.0, *)) {
         self.navigationController.navigationBar.prefersLargeTitles = NO;
-    } 
+    }
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onCellHeightChangedNotification)
                                                  name:CellHeightsChangedNotification
                                                object:nil];
-    
+
     [self.tableView reloadData];
-    
+
     // Avoid Password Cell Glitch...
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
-    
+
     [UIView setAnimationsEnabled:YES];
 }
 
@@ -940,7 +942,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         vc.hideShowAllAuditIssues = YES;
         vc.onDone = ^(BOOL showAllAuditIssues) {
             [self dismissViewControllerAnimated:YES completion:nil];
-            // TODO: Hide View All Issues button ;
         };
     }
 }
@@ -980,7 +981,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
     // Sync
     
-    [self.databaseModel update:self.isAutoFillContext
+    [self.databaseModel update:self
+                    isAutoFill:self.isAutoFillContext
                        handler:^(BOOL userCancelled, NSError * _Nullable error) {
         if(userCancelled) {
             [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
@@ -1017,7 +1019,9 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     // Sync
     
-    [self.databaseModel update:self.isAutoFillContext handler:^(BOOL userCancelled, NSError * _Nullable error) {
+    [self.databaseModel update:self
+                    isAutoFill:self.isAutoFillContext
+                       handler:^(BOOL userCancelled, NSError * _Nullable error) {
         if(userCancelled) {
             [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
         }
@@ -1044,7 +1048,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     [self performFullReload];
     
-    [self.databaseModel update:self.isAutoFillContext
+    [self.databaseModel update:self
+                    isAutoFill:self.isAutoFillContext
                        handler:^(BOOL userCancelled, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(userCancelled, error);
@@ -1370,7 +1375,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSLog(@"SAVE: Processing Icon for Save...");
     [self processIconBeforeSave:^{ // This is behind a completion because we might go out and download the FavIcon which is async...
         NSLog(@"SAVE: Icon processed for Save...");
-        [self.databaseModel update:self.isAutoFillContext
+        [self.databaseModel update:self
+                        isAutoFill:self.isAutoFillContext
                            handler:^(BOOL userCancelled, NSError * _Nullable error) {
             NSLog(@"SAVE: Storage Provider Update Done [%d-%@]...", userCancelled, error);
             dispatch_async(dispatch_get_main_queue(), ^(void) {

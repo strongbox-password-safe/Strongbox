@@ -91,7 +91,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
       parentFolder:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion {
-    [self authWrapperWithCompletion:^(NSError *error) {
+    [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
             completion(nil, error);
             return;
@@ -141,24 +141,35 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
-    [self authWrapperWithCompletion:^(NSError *error) {
+- (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+    [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
-            [self.odClient signOutWithCompletion:^(NSError *error) { // Signout if something goes wrong - TODO: OK?
-                completion(kReadResultError, nil, nil, error);
-            }];
+            if (self.odClient) {
+                [self.odClient signOutWithCompletion:^(NSError *error) { }]; // Signout if something goes wrong
+            }
+            
+            completion(kReadResultError, nil, nil, error);
             return;
         }
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
-        });
+        if (userInteractionRequired) {
+            completion(kReadResultBackgroundReadButUserInteractionRequired, nil, nil, nil);
+            return;
+        }
+        
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
+            });
+        }
         
         
         [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
             
             if(error || !item) {
                 if(!item) {
@@ -170,41 +181,55 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
                 return;
             }
             
-            [self readWithProviderData:item completion:completion];
+            [self readWithProviderData:item viewController:viewController options:options completion:completion];
         }];
     }];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
-    [self readWithProviderData:providerData completion:completionHandler];
-}
-
-- (void)readWithProviderData:(NSObject *)providerData
-                  completion:(StorageProviderReadCompletionBlock)completion {
-    [self authWrapperWithCompletion:^(NSError *error) {
+- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+    [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
-            [self.odClient signOutWithCompletion:^(NSError *error) { // Signout if something goes wrong - TODO: OK?
+            [self.odClient signOutWithCompletion:^(NSError *error) { // Signout if something goes wrong
                 completion(kReadResultError, nil, nil, error);
             }];
             return;
         }
-        
+                      
+        if (userInteractionRequired) {
+            completion(kReadResultBackgroundReadButUserInteractionRequired, nil, nil, nil);
+            return;
+        }
+
         ODItem* item = (ODItem*)providerData;
         
-        //NSLog(@"OneDrive Reading: [%@]-[%@]", item, item.lastModifiedDateTime);
-        
+        NSLog(@"OneDrive Reading: [%@]-[%@]", item, item.lastModifiedDateTime);
+                
+        NSDate* dtMod = item.lastModifiedDateTime;
+        NSDate* dtMod2 = options.onlyIfModifiedDifferentFrom;
+    
+        if (options && dtMod2 && dtMod) {
+            if ([dtMod isEqualToDate:dtMod2]) {
+                completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
+                return;
+            }
+        }
+
         ODItemContentRequest *request;
         
         request = [[[self.odClient drives:item.parentReference.driveId] items:item.id] contentRequest];
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+            });
+        }
         
         [request downloadWithCompletion:^(NSURL *filePath, NSURLResponse *urlResponse, NSError *error){
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
             
             if(error) {
                 NSLog(@"%@", error);
@@ -229,12 +254,18 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
-    [self authWrapperWithCompletion:^(NSError *error) {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+    [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
             completion(error);
             return;
         }
+                      
+       if (userInteractionRequired) { // TODO: Completion needs to indicate if there's userinteraction is required
+           completion(nil);
+           return;
+       }
+
         
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
@@ -276,11 +307,17 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
-    [self authWrapperWithCompletion:^(NSError *error) {
+    [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
             completion(error.code == ODAuthCanceled, nil, error);
             return;
         }
+                      
+       if (userInteractionRequired) {
+           completion(NO, nil, nil); // TODO: Completion needed to take account of user interaction required?
+           return;
+       }
+
         
         ODItem* parent = ((ODItem*)parentFolder);
         
@@ -429,18 +466,33 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     return ret;
 }
 
-- (void)authWrapperWithCompletion:(void (^)(NSError* error))completion {
-    [ODClient clientWithCompletion:^(ODClient *client, NSError *error){
-        if (!error){
-            self.odClient = client;
-            completion(nil);
-        }
-        else {
-            NSLog(@"Onedrive error: %@", error);
-            self.odClient = nil;
-            completion(error);
-        }
-    }];
+- (void)authWrapperWithCompletion:(UIViewController*)viewController completion:(void (^)(BOOL userInteractionRequired, NSError* error))completion {
+    ODClient* current = [ODClient loadCurrentClient];
+    if (current) {
+        self.odClient = current;
+        completion(NO, nil);
+        return;
+    }
+    
+    if (!viewController) {
+        completion (YES, nil);
+        return;
+    }
+    else {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [ODClient clientWithCompletion:^(ODClient *client, NSError *error){
+                if (!error){
+                    self.odClient = client;
+                    completion(NO, nil);
+                }
+                else {
+                    NSLog(@"Onedrive error: %@", error);
+                    self.odClient = nil;
+                    completion(NO, error);
+                }
+            }];
+        });
+    }
 }
 
 - (void)signout:(void (^)(NSError *error))completion {

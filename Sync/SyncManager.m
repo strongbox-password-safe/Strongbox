@@ -20,11 +20,17 @@
 #import "Constants.h"
 #import "Utils.h"
 #import "BackupsManager.h"
+#import "ConcurrentMutableDictionary.h"
+#import "SyncOperationInfo.h"
+#import "SharedAppAndAutoFillSettings.h"
+
+NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
 
 @interface SyncManager ()
 
 @property (nonatomic, strong) dispatch_queue_t dispatchQueue;
 @property (nonatomic, strong) dispatch_source_t source;
+@property ConcurrentMutableDictionary<NSString*, SyncOperationInfo*>* syncOperations;
 
 @end
 
@@ -40,27 +46,99 @@
     return sharedInstance;
 }
 
-//- (void)read:(SafeMetaData *)database completion:(SyncManagerReadCompletionBlock)completion {
-//    // Things to think about -
-//      Duress Dummy
-//
-//    NSURL* localCopyUrl = [self getLocalCopyUrl:database];
-//
-//    if ([NSFileManager.defaultManager fileExistsAtPath:localCopyUrl.path]) {
-//         // if this file has a remote then check the date modified, if it's same then immediately return
-//        // otherwise pull latest? optional?
-//
-//        NSInputStream* localStream = [NSInputStream inputStreamWithURL:localCopyUrl];
-//        completion(localStream, nil);
-//    }
-//    else {
-//        // Pull from remote / storage provider
-//    }
-//}
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.syncOperations = ConcurrentMutableDictionary.mutableDictionary;
+    }
+    return self;
+}
 
-- (void)readLegacy:(SafeMetaData *)database
-     legacyOptions:(LegacySyncReadOptions *)legacyOptions
-        completion:(SyncManagerReadLegacyCompletionBlock)completion {
+- (void)backgroundSyncAll {
+    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
+        [self backgroundSyncDatabase:database];
+    }
+}
+
+- (void)backgroundSyncLocalDeviceDatabasesOnly {
+    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
+        if (database.storageProvider == kLocalDevice) {
+            [self backgroundSyncDatabase:database];
+        }
+    }
+}
+
+- (void)backgroundSyncDatabase:(SafeMetaData*)database {
+    SyncReadOptions* readOptions = [[SyncReadOptions alloc] init];
+    readOptions.isAutoFill = NO; // TODO: ?! No background sync done from autofill component?
+    readOptions.vc = nil; // Indicates to provider this is a background sync
+
+    [self queuePullFromRemote:database readOptions:readOptions completion:^(NSURL * _Nullable url, BOOL previousSyncAlreadyInProgress, const NSError * _Nullable error) {
+        NSLog(@"Background Sync Done - [%@] - previousSyncAlreadyInProgress [%d] - error: [%@]", database.nickName, previousSyncAlreadyInProgress, error);
+    }];
+}
+
+//////////////////////
+
+- (void)queuePullFromRemote:(SafeMetaData *)database
+                readOptions:(SyncReadOptions *)options
+                 completion:(SyncManagerReadCompletionBlock)completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        [self pullFromRemote:database readOptions:options completion:completion];
+    });
+}
+
+- (void)pullFromRemote:(SafeMetaData *)database
+           readOptions:(SyncReadOptions *)options
+            completion:(SyncManagerReadCompletionBlock)completion {
+    // TODO: Have a separate queue per database?
+    // and queue the sync instead - max one outstanding sync to do from local / remote
+    // This might be optional, like a read sync, pull from remote doesn't need to be queued
+    // but a write from the model/UI should definitely be queued... (Max 1 outstanding in queue)
+    
+    SyncOperationInfo* info = [self.syncOperations objectForKey:database.uuid];
+    
+    if (info != nil && info.state == kSyncOperationStateInProgress) {
+        NSLog(@"Database [%@] is already undergoing a sync operation...", database.nickName);
+
+        if (options.joinInProgressSync) {
+            NSLog(@"XXXXXX - Joining in progress sync...");
+            
+            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L);
+            
+            dispatch_group_notify(info.inProgressDispatchGroup, queue, ^{
+                NSURL* url = [self getLocalWorkingCache:database];
+
+                NSLog(@"XXXXXX - In Progress Sync Done with [%@]... Calling waiting completion...", info);
+
+                completion(info.error ? nil : url, NO, info.error);
+            });
+        }
+        else {
+            NSLog(@"XXXXXX - NOT Joining in progress sync...");
+
+            completion(nil, YES, nil);
+        }
+        return;
+    }
+
+    info = [[SyncOperationInfo alloc] initWithDatabaseId:database.uuid];
+    info.state = kSyncOperationStateInProgress;
+    info.inProgressDispatchGroup = dispatch_group_create();
+
+    dispatch_group_enter(info.inProgressDispatchGroup);
+
+    [self.syncOperations setObject:info forKey:database.uuid];
+
+    [self publishSyncStatusChangeNotification:info];
+
+    [self pullDatabase:database info:info readOptions:options completion:completion];
+}
+
+- (void)pullDatabase:(SafeMetaData *)database
+                info:(SyncOperationInfo*)info
+         readOptions:(SyncReadOptions *)options
+          completion:(SyncManagerReadCompletionBlock)completion {
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
     NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase:database];
     NSDate* localModDate = nil;
@@ -72,84 +150,60 @@
         }
     }
     
-    StorageProviderReadOptions* options = [[StorageProviderReadOptions alloc] init];
-    options.isAutoFill = legacyOptions.isAutoFill;
-    options.onlyIfModifiedDifferentFrom = SharedAppAndAutoFillSettings.sharedInstance.uberSync ? localModDate : nil;
+    StorageProviderReadOptions* opts = [[StorageProviderReadOptions alloc] init];
+    opts.isAutoFill = options.isAutoFill;
+    opts.onlyIfModifiedDifferentFrom = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame ? nil : localModDate;
     
-    [provider readLegacy:database
-          viewController:legacyOptions.vc
-                 options:options
-              completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
+    [provider pullDatabase:database
+             interactiveVC:options.vc
+                   options:opts
+                completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
+        NSLog(@"syncFromRemoteOverwriteLocal done with: [%@]", error);
+                
+        info.state = result == kReadResultError ? kSyncOperationStateError : (result == kReadResultBackgroundReadButUserInteractionRequired) ? kSyncOperationStateBackgroundButUserInteractionRequired : kSyncOperationStateDone;
+        info.error = (NSError*)error;
+        
         if (result == kReadResultError) {
-            NSLog(@"SyncManager::readLegacy - [%@] - Could not read data from provider: [%@]", provider.displayName, error);
-            completion(nil, error);
+            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] - Could not read data from provider: [%@]", provider.displayName, error);
+        
+            [self publishSyncStatusChangeNotification:info];
+            
+            completion(nil, NO, error);
+        }
+        else if (result == kReadResultBackgroundReadButUserInteractionRequired) {
+            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] remote modified equal to [%@] using local copy", provider.displayName, localModDate);
+
+            [self publishSyncStatusChangeNotification:info];
+            
+            completion(localWorkingCacheUrl, NO, nil);
         }
         else if (result == kReadResultModifiedIsSameAsLocal) {
-            NSLog(@"SyncManager::readLegacy - [%@] remote modified equal to [%@] using local copy", provider.displayName, localModDate);
-            completion(localWorkingCacheUrl, nil);
+            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] remote modified equal to [%@] using local copy", provider.displayName, localModDate);
+
+            [self publishSyncStatusChangeNotification:info];
+            
+            completion(localWorkingCacheUrl, NO, nil);
         }
         else {
-            NSLog(@"SyncManager::readLegacy - [%@] Got [%lu] bytes - modified [%@]", provider.displayName, (unsigned long)data.length, dateModified);
-            [self onReadWithData:database data:data dateModified:dateModified completion:completion];
+            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] Got [%lu] bytes - modified [%@]", provider.displayName, (unsigned long)data.length, dateModified);
+
+            NSError* error;
+            
+            NSURL* localWorkingCacheUrl = [self setWorkingCacheWithData:data dateModified:dateModified database:database error:&error];
+         
+            [self publishSyncStatusChangeNotification:info]; // Don't call until working cache has been set
+            
+            completion(error ? nil : localWorkingCacheUrl, NO, error);
         }
+        
+        dispatch_group_leave(info.inProgressDispatchGroup);
     }];
 }
 
-- (void)onReadWithData:(SafeMetaData *)database
-                  data:(NSData*)data
-          dateModified:(NSDate*)dateModified
-            completion:(SyncManagerReadLegacyCompletionBlock)completion {
-    NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase:database];
-
-    NSError* error;
-    [data writeToURL:localWorkingCacheUrl options:NSDataWritingAtomic error:&error];
-    
-    NSLog(@"SyncManager::onReadWithData - Wrote to working file [%@]-[%@]", localWorkingCacheUrl, error);
-
-    if (error) {
-        completion(nil, error);
-    }
-    else {
-        [NSFileManager.defaultManager setAttributes:@{ NSFileModificationDate : dateModified }
-                                       ofItemAtPath:localWorkingCacheUrl.path
-                                              error:&error];
-        
-        completion(error? nil : localWorkingCacheUrl, error);
-    }
-}
-
-- (NSString *)getPrimaryStorageDisplayName:(SafeMetaData *)database {
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    return provider.displayName;
-}
-
-- (BOOL)isLegacyImmediatelyOfferCacheIfOffline:(SafeMetaData *)database {
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    return provider.immediatelyOfferCacheIfOffline;
-}
-
-- (BOOL)isLegacyAutoFillBookmarkSet:(SafeMetaData *)database {
-    FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
-    return [fp autoFillBookMarkIsSet:database];
-}
-
-- (void)setLegacyAutoFillBookmark:(SafeMetaData *)database bookmark:(NSData *)bookmark {
-    FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
-    
-    database = [fp setAutoFillBookmark:bookmark metadata:database];
-    
-    [SafesList.sharedInstance update:database];
-}
-
-- (void)update:(SafeMetaData *)database data:(NSData *)encrypted {
-    // Check is database is readonly and bail early - definitely no writing
-    // Duress Dummy
-}
-
-- (void)updateLegacy:(SafeMetaData *)database
-                data:(NSData *)data
-       legacyOptions:(LegacySyncReadOptions *)legacyOptions
-          completion:(SyncManagerUpdateLegacyCompletionBlock)completion {
+- (void)syncFromLocalAndOverwriteRemote:(SafeMetaData *)database
+                                   data:(NSData *)data
+                          updateOptions:(SyncReadOptions *)updateOptions
+                             completion:(SyncManagerUpdateCompletionBlock)completion {
     if (database.readOnly) {
         NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1];
         completion(error);
@@ -157,7 +211,11 @@
     }
 
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    [provider update:database data:data isAutoFill:legacyOptions.isAutoFill completion:^(NSError * _Nullable error) {
+    [provider pushDatabase:database
+      interactiveVC:updateOptions.vc
+                data:data
+          isAutoFill:updateOptions.isAutoFill
+          completion:^(NSError * _Nullable error) {
         if (error) {
             completion(error);
         }
@@ -168,7 +226,7 @@
 
 - (void)onUpdatedRemoteSuccessfully:(SafeMetaData *)database
                                data:(NSData *)data
-                         completion:(SyncManagerUpdateLegacyCompletionBlock)completion {
+                         completion:(SyncManagerUpdateCompletionBlock)completion {
     NSURL* localWorkingCache = [self getLocalWorkingCache:database];
     
     // Perform local Backups
@@ -194,6 +252,78 @@
     }
  
     completion(nil); // Done
+}
+
+//////////////////////
+
+- (void)publishSyncStatusChangeNotification:(SyncOperationInfo*)info {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kSyncManagerDatabaseSyncStatusChanged object:info];
+    });
+}
+
+- (SyncOperationInfo*)getSyncStatus:(SafeMetaData *)database {
+    SyncOperationInfo *ret = [self.syncOperations objectForKey:database.uuid];
+
+    return ret ? ret : [[SyncOperationInfo alloc] initWithDatabaseId:database.uuid];
+}
+
+- (NSURL*)setWorkingCacheWithData:(NSData*)data dateModified:(NSDate*)dateModified database:(SafeMetaData*)database error:(NSError**)error {
+    if (!data || !dateModified) {
+        if (error) {
+            *error = [Utils createNSError:@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache" errorCode:-1];
+        }
+        
+        NSLog(@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache [%@][%@]", data, dateModified);
+        return nil;
+    }
+    
+    NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase:database];
+
+    [data writeToURL:localWorkingCacheUrl options:NSDataWritingAtomic error:error];
+    
+    NSLog(@"SyncManager::setWorkingCacheWithData - Wrote to working file [%@]-[%@]", localWorkingCacheUrl, *error);
+
+    if (*error) {
+        return nil;
+    }
+    else {
+        NSError *err2;
+        [NSFileManager.defaultManager setAttributes:@{ NSFileModificationDate : dateModified }
+                                       ofItemAtPath:localWorkingCacheUrl.path
+                                              error:&err2];
+        
+        NSLog(@"Set Working Cache Attributes for [%@] to [%@] with error = [%@]", database.nickName, dateModified, err2);
+        
+        if (err2 && error) {
+            *error = err2;
+        }
+        
+        return err2 ? nil : localWorkingCacheUrl;
+    }
+}
+
+- (NSString *)getPrimaryStorageDisplayName:(SafeMetaData *)database {
+    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
+    return provider.displayName;
+}
+
+- (BOOL)isLegacyImmediatelyOfferCacheIfOffline:(SafeMetaData *)database {
+    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
+    return provider.immediatelyOfferCacheIfOffline;
+}
+
+- (BOOL)isLegacyAutoFillBookmarkSet:(SafeMetaData *)database {
+    FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
+    return [fp autoFillBookMarkIsSet:database];
+}
+
+- (void)setLegacyAutoFillBookmark:(SafeMetaData *)database bookmark:(NSData *)bookmark {
+    FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
+    
+    database = [fp setAutoFillBookmark:bookmark metadata:database];
+    
+    [SafesList.sharedInstance update:database];
 }
 
 - (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database {
@@ -323,7 +453,14 @@
         NSString* name = [SafesList sanitizeSafeNickName:[item.name stringByDeletingPathExtension]];
         SafeMetaData *safe = [LocalDeviceStorageProvider.sharedInstance getSafeMetaData:name
                                                                            providerData:item.providerData];
-        [[SafesList sharedInstance] addWithDuplicateCheck:safe];
+        
+        NSURL *url = [FileManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
+        NSData* snapshot = [NSData dataWithContentsOfURL:url];
+        
+        NSError* error;
+        NSDictionary *att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+        
+        [[SafesList sharedInstance] addWithDuplicateCheck:safe initialCache:snapshot initialCacheModDate:att.fileModificationDate];
     }
     
     // Remove deleted
@@ -337,6 +474,10 @@
             [SafesList.sharedInstance remove:localSafe.uuid];
         }
     }
+    
+    // Pick up any updates and notify...
+    
+    [SyncManager.sharedInstance backgroundSyncLocalDeviceDatabasesOnly];
 }
 
 - (BOOL)toggleLocalDatabaseFilesVisibility:(SafeMetaData*)metadata error:(NSError**)error {
@@ -429,6 +570,10 @@
 }
 
 - (NSURL*)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate**)modified {
+    return [self getLocalWorkingCache:database modified:modified fileSize:nil];
+}
+
+- (NSURL*)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate**)modified fileSize:(unsigned long long*_Nullable)fileSize {
     NSURL* url = [self getLocalWorkingCacheUrlForDatabase:database];
 
     NSError* error;
@@ -446,33 +591,11 @@
         *modified = attributes.fileModificationDate;
     }
 
+    if (fileSize) {
+        *fileSize = attributes.fileSize;
+    }
+    
     return url;
 }
 
-/////////////////////////////////////////////////////////////////////////
-// Migration
-
 @end
-
-
-
-    
-    //    if (provider.storageId == kLocalDevice) {
-    //        NSURL* directCopyUrl = [LocalDeviceStorageProvider.sharedInstance getDirectUrlDeleteMe:database]; //  Errors and make conventional
-    //
-    //        [self deleteLocalWorkingCache:database];
-    //
-    //        NSError* error;
-    //        [NSFileManager.defaultManager copyItemAtURL:directCopyUrl toURL:localWorkingCacheUrl error:&error]; //  Check error
-    //
-    //        NSLog(@"SyncManager::readLegacy - [%@] Copied to working file [%@]-[%@]", provider.displayName, localWorkingCacheUrl, error);
-    //
-    //        if (error) {
-    //            completion(nil, error);
-    //        }
-    //        else {
-    //            completion(localWorkingCacheUrl, nil);
-    //        }
-    //    }
-    //    else {
-//      }

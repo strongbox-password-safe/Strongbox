@@ -92,7 +92,7 @@
         [AddNewSafeHelper createNewExpressDatabase:self
                                               name:self.name
                                           password:self.password
-                                        completion:^(BOOL userCancelled, SafeMetaData* metadata, NSError* error) {
+                                        completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
             if (userCancelled) {
                 self.onDone(NO, nil);
             }
@@ -106,7 +106,7 @@
                 }
                 else {
                     self.database = metadata;
-                    [SafesList.sharedInstance addWithDuplicateCheck:self.database];
+                    [SafesList.sharedInstance addWithDuplicateCheck:self.database initialCache:initialSnapshot initialCacheModDate:NSDate.date];
                     [self performSegueWithIdentifier:@"segueToDone" sender:nil];
                 }
             }];

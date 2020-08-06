@@ -136,6 +136,18 @@ NSString *friendlyDateStringVeryShort(NSDate *modDate) {
     return [df stringFromDate:modDate];
 }
 
+NSString *friendlyDateTimeStringPrecise(NSDate *modDate) {
+    if(!modDate) { return @""; }
+
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    df.timeStyle = kCFDateFormatterMediumStyle;
+    df.dateStyle = NSDateFormatterShortStyle;
+    df.doesRelativeDateFormatting = YES;
+    df.locale = NSLocale.currentLocale;
+
+    return [df stringFromDate:modDate];
+}
+
 NSString *iso8601DateString(NSDate *modDate) {
     if(!modDate) { return @""; }
     

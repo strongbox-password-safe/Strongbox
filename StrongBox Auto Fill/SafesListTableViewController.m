@@ -150,14 +150,30 @@
     return self.safes.count;
 }
 
-- (NSString*)getAutoFillCacheDate:(SafeMetaData*)safe {
+- (NSString*)getModifiedDate:(SafeMetaData*)safe {
     NSDate* mod;
     [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
     
-    return mod ? [NSString stringWithFormat:NSLocalizedString(@"autofill_safes_vc_cache_date_fmt", @"Cached%@: %@"),
-                  safe.alwaysUseCacheForAutoFill ?
-                  NSLocalizedString(@"autofill_safes_vc_cache_is_forced_fmt", @" (Forced)") : @"",
-                  friendlyDateStringVeryShort(mod)] : @"";
+    return mod ? friendlyDateStringVeryShort(mod) : @"";
+    
+    // TODO: Delete this strings?
+    //[NSString stringWithFormat:NSLocalizedString(@"autofill_safes_vc_cache_date_fmt", @"Cached%@: %@"),
+    //safe.alwaysUseCacheForAutoFill ?
+    //NSLocalizedString(@"autofill_safes_vc_cache_is_forced_fmt", @" (Forced)") : @"",
+    //friendlyDateStringVeryShort(mod)] : @"";
+}
+
+- (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
+    NSDate* mod;
+    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    
+    return mod ? iso8601DateString(mod) : @"";
+}
+
+- (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
+    unsigned long long fileSize;
+    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:nil fileSize:&fileSize];
+    return url ? friendlyFileSizeString(fileSize) : @"";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -170,22 +186,28 @@
     return cell;
 }
 
-- (UIImage*)getStatusImage:(SafeMetaData*)database {
+- (NSArray<UIImage*>*)getStatusImages:(SafeMetaData*)database {
+    NSMutableArray<UIImage*> *ret = NSMutableArray.array;
+    
     if(database.hasUnresolvedConflicts) {
-        return [UIImage imageNamed:@"error"];
-    }
-    else if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
-        return [UIImage imageNamed:@"rocket"];
-    }
-    else if(database.readOnly) {
-        return [UIImage imageNamed:@"glasses"];
+        [ret addObject:[UIImage imageNamed:@"error"]];
     }
     
-    return nil;
+    if (SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon) {
+        if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+            [ret addObject:[UIImage imageNamed:@"rocket"]];
+        }
+        
+        if(database.readOnly) {
+            [ret addObject:[UIImage imageNamed:@"glasses"]];
+        }
+    }
+    
+    return ret;
 }
 
 - (void)populateDatabaseCell:(DatabaseCell*)cell database:(SafeMetaData*)database disabled:(BOOL)disabled {
-    UIImage* statusImage = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon ? [self getStatusImage:database] : nil;
+    NSArray<UIImage*>* statusImages =  [self getStatusImages:database];
     
     NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
     NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
@@ -216,7 +238,7 @@
     }
     else {
         if(![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:database]) {
-            subtitle2 = [self getAutoFillCacheDate:database];
+            subtitle2 = [self getModifiedDate:database];
         }
     }
     
@@ -225,7 +247,9 @@
     subtitle1:subtitle1
     subtitle2:subtitle2
  providerIcon:databaseIcon
-  statusImage:statusImage
+  statusImages:statusImages
+     rotateLastImage:NO
+     lastImageTint:nil
      disabled:disabled];
 }
 
@@ -237,8 +261,14 @@
         case kDatabaseCellSubtitleFieldFileName:
             return database.fileName;
             break;
-        case kDatabaseCellSubtitleFieldLastCachedDate:
-            return [self getAutoFillCacheDate:database];
+        case kDatabaseCellSubtitleFieldLastModifiedDate:
+            return [self getModifiedDate:database];
+            break;
+        case kDatabaseCellSubtitleFieldLastModifiedDatePrecise:
+            return [self getModifiedDatePrecise:database];
+            break;
+        case kDatabaseCellSubtitleFieldFileSize:
+            return [self getLocalWorkingCopyFileSize:database];
             break;
         case kDatabaseCellSubtitleFieldStorage:
             return [self getStorageString:database];

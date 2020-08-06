@@ -42,7 +42,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 - (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen templateMetaData:(SafeMetaData*)templateMetaData;
 
-- (void)update:(BOOL)isAutoFill handler:(void (^)(BOOL userCancelled, NSError*_Nullable error))handler;
+- (void)update:(UIViewController*)viewController isAutoFill:(BOOL)isAutoFill handler:(void(^)(BOOL userCancelled, NSError * _Nullable error))handler;
 
 - (void)stopAudit;
 - (void)restartBackgroundAudit;

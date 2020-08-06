@@ -32,8 +32,11 @@ extern NSString* _Nonnull const kDatabasesListChangedNotification;
 // app as for some reason the Singleton is still around... MMcG - 17-June-2020
 - (void)forceReload;
 
-- (void)add:(SafeMetaData *_Nonnull)safe;
-- (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe;
+// Optional but highly desirable to provide an initial cache and mod date...
+
+- (void)add:(SafeMetaData *_Nonnull)safe initialCache:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
+- (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe initialCache:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
+
 - (void)remove:(NSString*_Nonnull)uuid;
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 - (void)deleteAll;

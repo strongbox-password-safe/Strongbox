@@ -127,12 +127,21 @@
         [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
         return;
     }
-        
+    
+    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:item.url.path error:&error];
+    if (!attr || error) {
+        [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
+        return;
+    }
+    
+    NSDate* modDate = attr.fileModificationDate;
+    
     NSString* nickName = [NSString stringWithFormat:@"Restored Backup of %@", self.metadata.nickName];
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
     [LocalDeviceStorageProvider.sharedInstance create:nickName
                                             extension:extension
                                                  data:data
+                                              modDate:modDate
                                     suggestedFilename:nickName
                                            completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
         if(error || !metadata) {
@@ -144,8 +153,8 @@
             }
 
         }
-
-        [SafesList.sharedInstance addWithDuplicateCheck:metadata];
+        
+        [SafesList.sharedInstance addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
 
         [Alerts info:self
                title:NSLocalizedString(@"generic_done", @"Done")

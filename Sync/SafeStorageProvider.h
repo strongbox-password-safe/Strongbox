@@ -50,15 +50,16 @@ typedef void (^StorageProviderReadCompletionBlock)(StorageProviderReadResult res
     viewController:(UIViewController *_Nullable)viewController
         completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion;
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData
-    viewController:(UIViewController *)viewController
-           options:(StorageProviderReadOptions*)options
-        completion:(StorageProviderReadCompletionBlock)completion;
+- (void)pullDatabase:(SafeMetaData *)safeMetaData
+       interactiveVC:(UIViewController *_Nullable)viewController
+             options:(StorageProviderReadOptions*)options
+          completion:(StorageProviderReadCompletionBlock)completion;
 
-- (void)update:(SafeMetaData *)safeMetaData
-          data:(NSData *)data
-    isAutoFill:(BOOL)isAutoFill
-    completion:(void (^)(NSError *_Nullable error))completion;
+- (void)pushDatabase:(SafeMetaData *)safeMetaData
+       interactiveVC:(UIViewController *_Nullable)viewController
+                data:(NSData *)data
+          isAutoFill:(BOOL)isAutoFill
+          completion:(void (^)(NSError *_Nullable error))completion;
 
 - (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(const NSError *_Nullable error))completion;
 

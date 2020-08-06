@@ -25,12 +25,12 @@ NS_ASSUME_NONNULL_BEGIN
             yubiKeyConfig:(YubiKeyHardwareConfiguration*_Nullable)yubiKeyConfig
             storageParams:(SelectedStorageParameters*)storageParams
                    format:(DatabaseFormat)format
-               completion:(void (^)(BOOL userCancelled, SafeMetaData*_Nullable metadata, NSError*_Nullable error))completion;
+               completion:(void (^)(BOOL userCancelled, SafeMetaData*_Nullable metadata, NSData* initialSnapshot, NSError*_Nullable error))completion;
 
 + (void)createNewExpressDatabase:(UIViewController*)vc
                             name:(NSString *)name
                         password:(NSString *)password
-                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSError* error))completion;
+                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion;
 
 @end
 

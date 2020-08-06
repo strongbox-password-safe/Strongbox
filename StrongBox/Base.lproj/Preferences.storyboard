@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ln1-Rl-vEb">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Ln1-Rl-vEb">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -667,7 +667,7 @@
                                 <attributedString key="attributedText">
                                     <fragment content="Testing">
                                         <attributes>
-                                            <font key="NSFont" metaFont="controlContent" size="11"/>
+                                            <font key="NSFont" metaFont="label" size="11"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -906,7 +906,7 @@
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wsP-PL-hvr">
                                                     <rect key="frame" x="345" y="6.5" width="51" height="31"/>
                                                     <connections>
-                                                        <action selector="onBackupSettingsChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="cnN-Z2-vA1"/>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="zZr-j8-L57"/>
                                                     </connections>
                                                 </switch>
                                             </subviews>
@@ -922,10 +922,44 @@
                                     </tableViewCell>
                                 </cells>
                             </tableViewSection>
+                            <tableViewSection headerTitle="Sync Settings" footerTitle="Control aspects of synchronization with remote storage providers" id="tRu-jp-Afk">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="l37-h7-bsz" userLabel="Force Pull (Ignore Remote Mod Date)">
+                                        <rect key="frame" x="0.0" y="430.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="l37-h7-bsz" id="TkH-I7-Ji8">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Force Pull (Ignore Remote Mod Date)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jRJ-bT-Kka">
+                                                    <rect key="frame" x="20" y="11" width="283" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wNi-6f-RtU">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="lh1-7Q-hfh"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="centerY" secondItem="wNi-6f-RtU" secondAttribute="centerY" id="28c-9W-XcL"/>
+                                                <constraint firstItem="wNi-6f-RtU" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="jRJ-bT-Kka" secondAttribute="trailing" constant="8" symbolic="YES" id="64c-cU-9wZ"/>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="bottom" secondItem="TkH-I7-Ji8" secondAttribute="bottomMargin" id="8Hu-Hf-tT6"/>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="top" secondItem="TkH-I7-Ji8" secondAttribute="topMargin" id="FuC-QF-iBC"/>
+                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="leading" secondItem="TkH-I7-Ji8" secondAttribute="leading" constant="20" id="Nvz-Rs-hgH"/>
+                                                <constraint firstItem="wNi-6f-RtU" firstAttribute="trailing" secondItem="TkH-I7-Ji8" secondAttribute="trailing" constant="-20" id="f8B-Sd-fJ1"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
                             <tableViewSection headerTitle="Miscellaneous" footerTitle="More advanced or niche preferences. Some care may be required when using features labeled Alpha or Beta" id="l7v-m5-yUl">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="b7a-0Z-9yU" userLabel="Instant Pin Unlock Mode">
-                                        <rect key="frame" x="0.0" y="430.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="566" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="b7a-0Z-9yU" id="RWE-kc-mkG">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -955,7 +989,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="fw3-gc-cgu" userLabel="Yubikey Secret">
-                                        <rect key="frame" x="0.0" y="474.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="610" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fw3-gc-cgu" id="ydJ-lJ-NYu">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -985,7 +1019,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="CYR-kY-sof" userLabel="Hide Key File Name on Unlock Screen">
-                                        <rect key="frame" x="0.0" y="518.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="654" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CYR-kY-sof" id="BzG-ai-wwd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1015,7 +1049,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="jqp-w9-9EG" userLabel="Show All Files in Key Files Local">
-                                        <rect key="frame" x="0.0" y="562.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="698" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jqp-w9-9EG" id="jTK-py-WHd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1045,7 +1079,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="bIg-gn-Wyn" userLabel="Show All Files in Key Files Local">
-                                        <rect key="frame" x="0.0" y="606.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="742" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bIg-gn-Wyn" id="tzb-hF-Oh4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1075,7 +1109,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="HIU-iF-9nx" userLabel="Allow Clipboard Handoff">
-                                        <rect key="frame" x="0.0" y="650.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="786" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HIU-iF-9nx" id="xsf-Vl-gtb">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1105,7 +1139,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Cca-ff-gxA" userLabel="Use Color Blind Palette for Passwords">
-                                        <rect key="frame" x="0.0" y="694.5" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="830" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Cca-ff-gxA" id="m7Z-SN-Vj7">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1131,36 +1165,6 @@
                                                 <constraint firstItem="lha-oo-sGv" firstAttribute="centerY" secondItem="fQJ-uY-SEH" secondAttribute="centerY" id="O1a-6B-m7d"/>
                                                 <constraint firstItem="lha-oo-sGv" firstAttribute="leading" secondItem="m7Z-SN-Vj7" secondAttribute="leading" constant="20" id="ZUU-e6-iXp"/>
                                                 <constraint firstItem="fQJ-uY-SEH" firstAttribute="trailing" secondItem="m7Z-SN-Vj7" secondAttribute="trailing" constant="-20" id="j11-0x-1Hb"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="l37-h7-bsz" userLabel="Emergency: Use Legacy Serializer">
-                                        <rect key="frame" x="0.0" y="738.5" width="414" height="44"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="l37-h7-bsz" id="TkH-I7-Ji8">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Use Uber Sync (Caution: Alpha)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jRJ-bT-Kka" userLabel="Emergency: Use Legacy Serializer">
-                                                    <rect key="frame" x="20" y="11" width="243" height="22"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wNi-6f-RtU">
-                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
-                                                    <connections>
-                                                        <action selector="onUberSync:" destination="hwI-HO-qLt" eventType="valueChanged" id="6Ov-2d-Wdd"/>
-                                                    </connections>
-                                                </switch>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="centerY" secondItem="wNi-6f-RtU" secondAttribute="centerY" id="28c-9W-XcL"/>
-                                                <constraint firstItem="wNi-6f-RtU" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="jRJ-bT-Kka" secondAttribute="trailing" constant="8" symbolic="YES" id="64c-cU-9wZ"/>
-                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="bottom" secondItem="TkH-I7-Ji8" secondAttribute="bottomMargin" id="8Hu-Hf-tT6"/>
-                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="top" secondItem="TkH-I7-Ji8" secondAttribute="topMargin" id="FuC-QF-iBC"/>
-                                                <constraint firstItem="jRJ-bT-Kka" firstAttribute="leading" secondItem="TkH-I7-Ji8" secondAttribute="leading" constant="20" id="Nvz-Rs-hgH"/>
-                                                <constraint firstItem="wNi-6f-RtU" firstAttribute="trailing" secondItem="TkH-I7-Ji8" secondAttribute="trailing" constant="-20" id="f8B-Sd-fJ1"/>
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
@@ -1195,7 +1199,7 @@
                         <outlet property="switchHideKeyFileName" destination="G1j-ld-CDQ" id="Ca0-EJ-krQ"/>
                         <outlet property="switchShowAllFilesInKeyFilesLocal" destination="NUW-RD-8sG" id="eS2-52-5yN"/>
                         <outlet property="switchShowYubikeySecretWorkaround" destination="wGm-bI-fp3" id="rcC-7N-efl"/>
-                        <outlet property="switchUberSync" destination="wNi-6f-RtU" id="mFx-qh-ZbT"/>
+                        <outlet property="switchSyncForcePull" destination="wNi-6f-RtU" id="4er-Db-Ko2"/>
                         <outlet property="switchUseColorBlindPalette" destination="fQJ-uY-SEH" id="9pG-Ud-fOY"/>
                     </connections>
                 </tableViewController>

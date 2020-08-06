@@ -7,22 +7,40 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "LegacySyncReadOptions.h"
+#import "SyncReadOptions.h"
 #import "SafeMetaData.h"
+#import "SyncOperationInfo.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-//typedef void (^SyncManagerReadCompletionBlock)(NSURL*_Nullable localCopyUrl, NSError*_Nullable error);
+extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 
-typedef void (^SyncManagerReadLegacyCompletionBlock)(NSURL*_Nullable url, const NSError*_Nullable error);
-typedef void (^SyncManagerUpdateLegacyCompletionBlock)(const NSError*_Nullable error);
+typedef void (^SyncManagerReadCompletionBlock)(NSURL*_Nullable url, BOOL previousSyncAlreadyInProgress, const NSError*_Nullable error);
+typedef void (^SyncManagerUpdateCompletionBlock)(const NSError*_Nullable error);
 
 @interface SyncManager : NSObject
 
 + (instancetype _Nullable)sharedInstance;
 
-- (void)update:(SafeMetaData*)database data:(NSData*)data;
-- (void)updateLegacy:(SafeMetaData*)database data:(NSData*)data legacyOptions:(LegacySyncReadOptions*)legacyOptions completion:(SyncManagerUpdateLegacyCompletionBlock)completion;
+/////////////
+
+- (SyncOperationInfo*)getSyncStatus:(SafeMetaData*)database;
+
+- (void)backgroundSyncAll;
+- (void)backgroundSyncLocalDeviceDatabasesOnly;
+
+// TODO: These should be merged so there is only one "sync" method which syncs local & remote
+
+- (void)queuePullFromRemote:(SafeMetaData*)database
+                         readOptions:(SyncReadOptions*)readOptions
+                          completion:(SyncManagerReadCompletionBlock)completion;
+
+- (void)syncFromLocalAndOverwriteRemote:(SafeMetaData*)database
+                                   data:(NSData*)data
+                          updateOptions:(SyncReadOptions*)updateOptions
+                             completion:(SyncManagerUpdateCompletionBlock)completion; // TODO: Sync Read Options probabaly should just be called SyncOptions and read/update should just be sync?
+
+///////////////////
 
 - (NSString*)getPrimaryStorageDisplayName:(SafeMetaData*)database;
 - (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database;
@@ -35,15 +53,15 @@ typedef void (^SyncManagerUpdateLegacyCompletionBlock)(const NSError*_Nullable e
 - (BOOL)isLegacyAutoFillBookmarkSet:(SafeMetaData*)database;
 - (void)setLegacyAutoFillBookmark:(SafeMetaData*)database bookmark:(NSData*)bookmark;
 
-- (void)readLegacy:(SafeMetaData*)database
-     legacyOptions:(LegacySyncReadOptions*)legacyOptions
-        completion:(SyncManagerReadLegacyCompletionBlock)completion;
-
 - (BOOL)isLegacyImmediatelyOfferCacheIfOffline:(SafeMetaData*)database;
 
 - (BOOL)isLocalWorkingCacheAvailable:(SafeMetaData*)database modified:(NSDate*_Nullable*_Nullable)modified;
 - (NSURL*)getLocalWorkingCache:(SafeMetaData*)database;
 - (NSURL*)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate *_Nullable*_Nullable)modified;
+- (NSURL*)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate *_Nullable*_Nullable)modified fileSize:(unsigned long long*_Nullable)fileSize;
+
+// Used to set the initial cache when DB is newly added...
+- (NSURL*_Nullable)setWorkingCacheWithData:(NSData*)data dateModified:(NSDate*)dateModified database:(SafeMetaData*)database error:(NSError**)error;
 
 @end
 

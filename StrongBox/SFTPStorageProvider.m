@@ -161,7 +161,7 @@ viewController:(UIViewController *)viewController
     completion(NO, browserItems, nil);
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
     [self connectAndAuthenticate:providerData.sFtpConfiguration
@@ -239,52 +239,20 @@ viewController:(UIViewController *)viewController
                                    fileIdentifier:json];
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData
-    viewController:(UIViewController *)viewController
-           options:(StorageProviderReadOptions *)options
-        completion:(StorageProviderReadCompletionBlock)completion {
+- (void)pullDatabase:(SafeMetaData *)safeMetaData
+         interactiveVC:(UIViewController *)viewController
+                options:(StorageProviderReadOptions *)options
+             completion:(StorageProviderReadCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
 }
 
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
-    SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
-
-    if (providerData.sFtpConfiguration == nil) {
-        completion(kReadResultError, nil, nil, kUserInteractionRequiredError);
-        return;
-    }
-   
-    NSError* error;
-    NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:providerData.sFtpConfiguration error:&error];
-    
-    if(sftp == nil || error) {
-        completion(kReadResultError, nil, nil, error);
-        return;
-    }
-
-    NMSFTPFile* attr = [sftp infoForFileAtPath:providerData.filePath];
-    if(!attr) {
-        error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
-        completion(kReadResultError, nil, nil, error);
-        return;
-    }
-
-    NSData* data = [sftp contentsAtPath:providerData.filePath];
-
-    if(!data) {
-       error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
-       completion(kReadResultError, nil, nil, error);
-       return;
-    }
-
-    [sftp disconnect];
-
-    completion(kReadResultSuccess, data, attr.modificationDate, nil);
-}
-
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
+- (void)readWithProviderData:(NSObject *)providerData
+              viewController:(UIViewController *)viewController
+                     options:(StorageProviderReadOptions *)options
+                  completion:(StorageProviderReadCompletionBlock)completionHandler {
     SFTPProviderData* foo = (SFTPProviderData*)providerData;
+    
     [self connectAndAuthenticate:foo.sFtpConfiguration
                   viewController:viewController
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
@@ -293,9 +261,11 @@ viewController:(UIViewController *)viewController
             return;
         }
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+            });
+        }
         
         NMSFTPFile* attr = [sftp infoForFileAtPath:foo.filePath];
         if(!attr) {
@@ -305,9 +275,11 @@ viewController:(UIViewController *)viewController
         }
         
         if (options.onlyIfModifiedDifferentFrom && [options.onlyIfModifiedDifferentFrom isEqualToDate:attr.modificationDate]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
 
             completionHandler(kReadResultModifiedIsSameAsLocal, nil, nil, error);
             return;
@@ -315,9 +287,11 @@ viewController:(UIViewController *)viewController
 
         NSData* data = [sftp contentsAtPath:foo.filePath];
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
      
         if(!data) {
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
@@ -357,7 +331,7 @@ viewController:(UIViewController *)viewController
                 [viewController dismissViewControllerAnimated:YES completion:^{
                     if(success) {
                         NSError* error;
-                        NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:weakRef.configuration error:&error];
+                        NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:weakRef.configuration viewController:viewController error:&error];
                         completion(NO, sftp, weakRef.configuration, error);
                     }
                     else {
@@ -373,30 +347,37 @@ viewController:(UIViewController *)viewController
     }
     
     NSError* error;
-    NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:sessionConfiguration error:&error];
+    NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:sessionConfiguration viewController:viewController error:&error];
     self.unitTestingSessionConfiguration = sessionConfiguration;
     completion(NO, sftp, sessionConfiguration, error);
 }
 
 - (NMSFTP*)connectAndAuthenticateWithSessionConfiguration:(SFTPSessionConfiguration*)sessionConfiguration
+                                           viewController:viewController
                                                     error:(NSError**)error {
     NSLog(@"Connecting to %@", sessionConfiguration.host);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:@"Connecting..."];
-    });
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:@"Connecting..."];
+        });
+    }
     
     NMSSHSession *session = [NMSSHSession connectToHost:sessionConfiguration.host
                                            withUsername:sessionConfiguration.username];
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD dismiss];
-    });
+
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+        });
+    }
     
     if (session.isConnected) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:@"Authenticating..."];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:@"Authenticating..."];
+            });
+        }
         
         NSLog(@"Supported Authentication Methods by Server: [%@]", session.supportedAuthenticationMethods);
         
@@ -409,9 +390,11 @@ viewController:(UIViewController *)viewController
             [session authenticateByPassword:sessionConfiguration.password];
         }
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
 
         if (!session.isAuthorized) {
             if(error) {

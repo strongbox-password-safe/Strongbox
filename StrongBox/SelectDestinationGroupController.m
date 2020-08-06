@@ -73,7 +73,7 @@
         return;
     }
 
-    [self.viewModel update:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
+    [self.viewModel update:self isAutoFill:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will crash BrowseSafeView dismiss.
             self.onDone(userCancelled, error);
         });

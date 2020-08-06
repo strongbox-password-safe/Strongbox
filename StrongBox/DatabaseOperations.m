@@ -157,7 +157,8 @@
     self.viewModel.database.compositeKeyFactors.keyFileDigest = newCkf.keyFileDigest;
     self.viewModel.database.compositeKeyFactors.yubiKeyCR = newCkf.yubiKeyCR;
     
-    [self.viewModel update:NO
+    [self.viewModel update:self
+                isAutoFill:NO
                    handler:^(BOOL userCancelled, NSError * _Nullable error) {
         if (userCancelled || error) {
             // Rollback

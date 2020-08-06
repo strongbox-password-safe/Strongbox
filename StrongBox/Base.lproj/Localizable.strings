@@ -900,8 +900,15 @@
 /* Filename */
 "databases_preferences_subtitle_field_name_filename" = "Filename";
 
-/* Last Cached Date */
-"databases_preferences_subtitle_field_name_last_cached_data" = "Last Cached Date";
+/* Last Modified */
+"databases_preferences_subtitle_field_name_last_cached_data" = "Last Modified";
+
+/* Last Modified (Precise) */
+"databases_preferences_subtitle_field_name_last_modified_date_precise" = "Last Modified (Precise)";
+
+/* File Size */
+"databases_preferences_subtitle_field_name_file_size" = "File Size";
+
 
 /* It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt. */
 "upgrade_mgr_downgrade_message" = "It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt.";
@@ -3338,3 +3345,15 @@
 
 /* No, do NOT backup anything */
 "backup_settings_prompt_no_dont_backup_anything" = "No, do NOT backup anything";
+
+/* View Sync Status */
+"safes_vc_action_view_sync_status" = "View Sync Status";
+
+/* User Interaction Required */
+"sync_status_user_interaction_required_title" = "User Interaction Required";
+
+/* Sync could not complete because user interaction is required. */
+"sync_status_user_interaction_required_message" = "Sync could not complete because user interaction is required.";
+
+/* Please send this crash report to support@strongboxsafe.com */
+"safes_vc_please_send_crash_report" = "Please send this crash report to support@strongboxsafe.com";

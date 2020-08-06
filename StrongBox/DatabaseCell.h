@@ -15,11 +15,13 @@ extern NSString* const kDatabaseCell;
 @interface DatabaseCell : UITableViewCell
 
 - (void)set:(NSString*)name
-topSubtitle:(NSString*_Nullable)topSubtitle
-  subtitle1:(NSString*_Nullable)subtitle1
-  subtitle2:(NSString*_Nullable)subtitle2
+topSubtitle:(NSString*)topSubtitle
+  subtitle1:(NSString*)subtitle1
+  subtitle2:(NSString*)subtitle2
 providerIcon:(UIImage*_Nullable)providerIcon
-statusImage:(UIImage*_Nullable)statusImage
+statusImages:(NSArray<UIImage*>*)statusImages
+rotateLastImage:(BOOL)rotateLastImage
+lastImageTint:(UIColor*_Nullable)lastImageTint
    disabled:(BOOL)disabled;
 
 @end

@@ -17,17 +17,22 @@
 @implementation DebugHelper
 
 + (NSString*)getAboutDebugString {
-    int i=0;
+//    int i=0;
     NSString *safesMessage = @"Databases Collection\n----------------\n";
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]\n   [%@]-[%@]-[%lu%d%d]\n", i++,
-                              safe.nickName,
-                              safe.fileName,
-                              safe.fileIdentifier,
-                              (unsigned long)safe.storageProvider,
-                              safe.isTouchIdEnabled,
-                              safe.isEnrolledForConvenience];
+        NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
+        NSString *thisSafe = [jsonDict description];
         
+        //
+        
+//        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]\n   [%@]-[%@]-[%lu%d%d]\n", i++,
+//                              safe.nickName,
+//                              safe.fileName,
+//                              safe.fileIdentifier,
+//                              (unsigned long)safe.storageProvider,
+//                              safe.isTouchIdEnabled,
+//                              safe.isEnrolledForConvenience];
+//        
         safesMessage = [safesMessage stringByAppendingString:thisSafe];
     }
     safesMessage = [safesMessage stringByAppendingString:@"----------------"];
@@ -72,19 +77,22 @@
 }
 
 + (NSString*)getSupportEmailDebugString {
-    int i=0;
+//    int i=0;
     NSString *safesMessage = @"Databases Collection<br />----------------<br />";
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%lu%d%d]<br />", i++,
-                              safe.nickName,
-                              safe.fileName,
-                              safe.fileIdentifier,
-                              (unsigned long)safe.storageProvider,
-                              safe.isTouchIdEnabled,
-                              safe.isEnrolledForConvenience];
-        
+        NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
+        NSString *thisSafe = [jsonDict description];
+//        [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%lu%d%d]<br />", i++,
+//                              safe.nickName,
+//                              safe.fileName,
+//                              safe.fileIdentifier,
+//                              (unsigned long)safe.storageProvider,
+//                              safe.isTouchIdEnabled,
+//                              json];
+//
         safesMessage = [safesMessage stringByAppendingString:thisSafe];
     }
+    
     safesMessage = [safesMessage stringByAppendingString:@"----------------"];
 
     NSString* model = [[UIDevice currentDevice] model];

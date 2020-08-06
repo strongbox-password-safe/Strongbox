@@ -127,10 +127,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 
     [self setIncludeExcludeFromBackup:self.documentsDirectory include:localDocuments];
     [self setIncludeExcludeFromBackup:self.sharedLocalDeviceDatabasesDirectory include:localDocuments];
-    
-    // New uber Sync location? TODO:
-    // TODO: Local Databases in new system need to be backup
-        
+            
     // Old Local Database files must be included/excluded individually as there is a permissions error on setting shared app group
     
     [self setIncludeExcludeSharedLocalFilesFromBackup:self.sharedAppGroupDirectory include:localDocuments];
@@ -180,14 +177,12 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 
 - (void)deleteAllLocalAndAppGroupFiles {
     [self deleteAllInDirectory:self.documentsDirectory];
+    [self deleteAllInDirectory:self.sharedLocalDeviceDatabasesDirectory];
     [self deleteAllInDirectory:self.keyFilesDirectory];
     [self deleteAllInDirectory:self.backupFilesDirectory];
     [self deleteAllInDirectory:self.preferencesDirectory];
     [self deleteAllInDirectory:self.syncManagerLocalWorkingCachesDirectory];
     [self deleteAllInDirectory:self.sharedAppGroupDirectory recursive:NO]; // Remove any files but leave directories don't know about
-    
-    // New uber Sync location? TODO:
-    // TODO: Local Databases in new system need to be backup
 }
 
 - (void)deleteAllInDirectory:(NSURL*)url {

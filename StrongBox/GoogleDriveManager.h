@@ -33,9 +33,7 @@
               dateModified:(NSDate*)dateModified
                 completion:(StorageProviderReadCompletionBlock)handler ;
 
-- (void)readNonInteractive:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(StorageProviderReadCompletionBlock)handler;
-
-- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(StorageProviderReadCompletionBlock)handler;
+- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)handler;
 
 - (void)update:(NSString *)parentFileIdentifier
       fileName:(NSString *)fileName

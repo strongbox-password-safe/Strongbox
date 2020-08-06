@@ -104,6 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hideTotp;
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL showPasswordByDefaultOnEditScreen;
+
 @property BOOL alwaysUseCacheForAutoFill; // Some users want this... // TODO: Remove on switch to background uber sync
 
 ///

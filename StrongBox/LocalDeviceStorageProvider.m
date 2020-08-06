@@ -56,14 +56,15 @@
     viewController:(UIViewController *)viewController
         completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
-    [self create:nickName extension:extension data:data suggestedFilename:desiredFilename completion:completion];
+    [self create:nickName extension:extension data:data modDate:NSDate.date suggestedFilename:desiredFilename completion:completion];
 }
 
-- (void)        create:(NSString *)nickName
-             extension:(NSString *)extension
-                  data:(NSData *)data
-     suggestedFilename:(NSString*)suggestedFilename
-            completion:(void (^)(SafeMetaData *metadata, NSError *error))completion {
+- (void)create:(NSString *)nickName
+     extension:(NSString *)extension
+          data:(NSData *)data
+       modDate:(NSDate *)modDate
+suggestedFilename:(NSString *)suggestedFilename
+    completion:(void (^)(SafeMetaData * _Nonnull, NSError *))completion {
     // Is the suggested a valid file name?
     // YES -> Does it exist
     //     Yes -> Are we allow to overwrite
@@ -84,6 +85,18 @@
     identifier.sharedStorage = YES;
     
     SafeMetaData *metadata = [self getSafeMetaData:nickName providerData:identifier];
+    
+    // Set Date Modified
+    
+    NSURL* url = [self getFileUrl:metadata];
+    
+    NSError *err2;
+    [NSFileManager.defaultManager setAttributes:@{ NSFileModificationDate : modDate }
+                                   ofItemAtPath:url.path
+                                          error:&err2];
+    
+    NSLog(@"Set Local Device database Attributes for [%@] to [%@] with error = [%@]", metadata.nickName, modDate, err2);
+
     completion(metadata, nil);
 }
 
@@ -127,7 +140,7 @@
     return ret;
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSURL* url = [self getFileUrl:safeMetaData];
 
     [data writeToFile:url.path atomically:YES];
@@ -171,8 +184,8 @@
                                    fileIdentifier:[identifier toJson]];
 }
 
-- (void)readLegacy:(SafeMetaData *)safeMetaData
-    viewController:(UIViewController *)viewController
+- (void)pullDatabase:(SafeMetaData *)safeMetaData
+    interactiveVC:(UIViewController *)viewController
            options:(StorageProviderReadOptions *)options
         completion:(StorageProviderReadCompletionBlock)completion {
     NSURL *url = [self getFileUrl:safeMetaData];

@@ -686,7 +686,7 @@
                     [self onProviderReadDone:localWorkingCache error:nil cacheMode:YES];
                 }
                 else if (response == 1) { // Try anyway
-                    [self getLocalOrLiveDatabase];
+                    [self pullFromRemoteAndRead];
                 }
                 else {
                     self.completion(nil, nil);
@@ -694,79 +694,94 @@
             }];
         }
         else {
-            [self getLocalOrLiveDatabase];
+            [self pullFromRemoteAndRead];
         }
     });
 }
 
-- (void)getLocalOrLiveDatabase {
+- (void)pullFromRemoteAndRead {
+    // TODO: Change to Syncing rather than Reading... once Sync logic in place
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
     });
-    
-    LegacySyncReadOptions* legacyOptions = [[LegacySyncReadOptions alloc] init];
-    legacyOptions.isAutoFill = self.isAutoFillOpen;
-    legacyOptions.vc = self.viewController;
 
-    [SyncManager.sharedInstance readLegacy:self.safe legacyOptions:legacyOptions completion:^(NSURL * _Nullable url, const NSError * _Nullable error) {
-        [self onProviderReadDone:url error:error cacheMode:NO];
+    SyncReadOptions* readOptions = [[SyncReadOptions alloc] init];
+    readOptions.isAutoFill = self.isAutoFillOpen;
+    readOptions.vc = self.viewController;
+    readOptions.joinInProgressSync = YES;
+    
+    // TODO: Option to wait/join sync or use existing local copy - per database
+    // TODO: Option also to wait max 5 seconds and offer to open RO local copy
+    
+    [SyncManager.sharedInstance queuePullFromRemote:self.safe
+                                        readOptions:readOptions
+                                         completion:^(NSURL * _Nullable url, BOOL previousSyncAlreadyInProgress, const NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss];
+            
+            if (previousSyncAlreadyInProgress) {
+                    // This is for debug only - in case we decide not to join in progress - eventually delete TODO:
+                // TODO: Probably not required... option to open anyway
+                [Alerts info:self.viewController title:@"Sync In Progress" message:@"A Sync is under way for this database, please wait until it finishes syncing to unlock..."];
+            }
+            else {
+                [self onProviderReadDone:url error:error cacheMode:NO];
+            }
+        });
     }];
 }
 
 - (void)onProviderReadDone:(NSURL *_Nullable)url
                      error:(const NSError *_Nullable)error
                  cacheMode:(BOOL)cacheMode {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD dismiss];
-    
-        if (error != nil || url == nil) {
-            NSLog(@"Error: %@", error);
-            NSDate* mod;
-            NSURL* localWorkingCache = [SyncManager.sharedInstance getLocalWorkingCache:self.safe modified:&mod];
+    if (error != nil || url == nil) {
+        NSLog(@"onProviderReadDone - Error: %@", error);
+        NSDate* mod;
+        NSURL* localWorkingCache = [SyncManager.sharedInstance getLocalWorkingCache:self.safe modified:&mod];
 
-            if(localWorkingCache != nil) {
-                NSString* modDateStr = getDateString(mod);
-                NSString* primaryStorageDisplayName = [SyncManager.sharedInstance getPrimaryStorageDisplayName:self.safe];
-                NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"There was a problem reading the database on %@. If this happens repeatedly you should try removing and re-adding your database. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), primaryStorageDisplayName, modDateStr];
+        if(localWorkingCache != nil) {
+            NSString* modDateStr = getDateString(mod);
+            NSString* primaryStorageDisplayName = [SyncManager.sharedInstance getPrimaryStorageDisplayName:self.safe];
+            NSString* message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_storage_unreachable_open_offline_instead_fmt", @"There was a problem reading the database on %@. If this happens repeatedly you should try removing and re-adding your database. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@"), primaryStorageDisplayName, modDateStr];
 
-                [Alerts yesNo:self.viewController
-                        title:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_title", @"Use Offline Cache?")
-                        message:message
-                        action:^(BOOL response) {
-                            if (response) {
-                                [self onProviderReadDone:localWorkingCache error:nil cacheMode:YES];
-                            }
-                            else {
-                                self.completion(nil, nil);
-                            }
-                        }];
-            }
-            else {
-                [Alerts error:self.viewController
-                        title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                        error:error
-                   completion:^{
-                    self.completion(nil, error);
-                }];
-            }
+            [Alerts yesNo:self.viewController
+                    title:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_title", @"Use Offline Cache?")
+                    message:message
+                    action:^(BOOL response) {
+                        if (response) {
+                            [self onProviderReadDone:localWorkingCache error:nil cacheMode:YES];
+                        }
+                        else {
+                            self.completion(nil, nil);
+                        }
+                    }];
         }
         else {
-            if(self.isAutoFillOpen &&
-               !AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash &&
-               [OpenSafeSequenceHelper isAutoFillLikelyToCrash:url]) {
-                [Alerts warn:self.viewController
-                       title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
-                     message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
-                completion:^{
-                    AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
-                    [self openDatabase:url cacheMode:cacheMode];
-                }];
-            }
-            else {
-                [self openDatabase:url cacheMode:cacheMode];
-            }
+            [Alerts error:self.viewController
+                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                    error:error
+               completion:^{
+                self.completion(nil, error);
+            }];
         }
-    });
+    }
+    else {
+        if(self.isAutoFillOpen &&
+           !AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash &&
+           [OpenSafeSequenceHelper isAutoFillLikelyToCrash:url]) {
+            [Alerts warn:self.viewController
+                   title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
+                 message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
+            completion:^{
+                AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
+                [self openDatabase:url cacheMode:cacheMode];
+            }];
+        }
+        else {
+            [self openDatabase:url cacheMode:cacheMode];
+        }
+    }
 }
 
 + (BOOL)isAutoFillLikelyToCrash:(NSURL*)url {
@@ -792,7 +807,7 @@
     
     // Very large DBs
 
-    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 12 * 1024 * 1024; // TODO: Reconsider params (argon23 mem and size) with Uber Sync and streamed writes
+    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 15 * 1024 * 1024; // TODO: Reconsider params (argon23 mem and size) with Uber Sync and streamed writes
 
     NSError* error;
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];

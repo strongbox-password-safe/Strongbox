@@ -82,42 +82,37 @@
               }];
 }
 
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
-    if ( !DBClientsManager.authorizedClient ) {
-        completion(kReadResultError, nil, nil, kUserInteractionRequiredError );
-        return;
-    }
-    
-    NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
-    [self readFileWithPath:path options:nil completion:completion];
-}
-
-- (void)readLegacy:(SafeMetaData *)safeMetaData
-    viewController:(UIViewController *)viewController
+- (void)pullDatabase:(SafeMetaData *)safeMetaData
+    interactiveVC:(UIViewController *)viewController
            options:(StorageProviderReadOptions *)options
         completion:(StorageProviderReadCompletionBlock)completion {
     NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
     
     [self performTaskWithAuthorizationIfNecessary:viewController
-                                             task:^(BOOL userCancelled, NSError *error) {
-                                                 if (error) {
-                                                     completion(kReadResultError, nil, nil, error);
-                                                 }
-                                                 else {
-                                                     [self readFileWithPath:path options:options completion:completion];
-                                                 }
-                                             }];
+                                             task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
+        if (error) {
+            completion(kReadResultError, nil, nil, error);
+        }
+        else if (userInteractionRequired) {
+            completion(kReadResultBackgroundReadButUserInteractionRequired, nil, nil, nil);
+        }
+        else {
+            [self readFileWithPath:path viewController:viewController options:options completion:completion];
+        }
+    }];
 }
 
 - (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
     DBFILESFileMetadata *file = (DBFILESFileMetadata *)providerData;
-    [self readFileWithPath:file.pathLower options:options completion:completionHandler];
+    [self readFileWithPath:file.pathLower viewController:viewController options:options completion:completionHandler];
 }
 
-- (void)readFileWithPath:(NSString *)path options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-    });
+- (void)readFileWithPath:(NSString *)path viewController:(UIViewController*)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+        });
+    }
 
     DBUserClient *client = DBClientsManager.authorizedClient;
     
@@ -131,9 +126,11 @@
 
             if (options && options.onlyIfModifiedDifferentFrom) {
                 if ([metadata.serverModified isEqualToDate:options.onlyIfModifiedDifferentFrom]) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [SVProgressHUD dismiss];
-                    });
+                    if (viewController) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [SVProgressHUD dismiss];
+                        });
+                    }
                     
                     completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
                     return;
@@ -143,9 +140,11 @@
             [[[client.filesRoutes downloadData:path]
               setResponseBlock:^(DBFILESFileMetadata *result, DBFILESDownloadError *routeError, DBRequestError *networkError,
                                  NSData *fileContents) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
+                if (viewController) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [SVProgressHUD dismiss];
+                    });
+                }
 
                 if (result) {
                     completion(kReadResultSuccess, fileContents, result.serverModified, nil);
@@ -160,9 +159,11 @@
              }];
         }
         else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
 
             NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@\n", routeError, networkError];
             completion(kReadResultError, nil, nil, [Utils createNSError:message errorCode:-1]);
@@ -170,7 +171,7 @@
     }];
 }
 
-- (void)update:(SafeMetaData *)safeMetaData data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
     NSString *path = [NSString pathWithComponents:
                       @[safeMetaData.fileIdentifier, safeMetaData.fileName]];
 
@@ -214,7 +215,7 @@
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
-    [self performTaskWithAuthorizationIfNecessary:viewController task:^(BOOL userCancelled, NSError *error) {
+    [self performTaskWithAuthorizationIfNecessary:viewController task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
         if (error) {
             completion(userCancelled, nil, error);
         }
@@ -225,25 +226,27 @@
 }
 
 - (void)performTaskWithAuthorizationIfNecessary:(UIViewController *)viewController
-                                           task:(void (^)(BOOL userCancelled, NSError *error))task {
+                                           task:(void (^)(BOOL userCancelled, BOOL userInteractionRequired, NSError *error))task {
     if (!DBClientsManager.authorizedClient) {
+        if (!viewController) {
+            task(NO, YES, nil);
+            return;
+        }
+        
 #ifndef IS_APP_EXTENSION
         NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
-        id __block token = [center addObserverForName:@"isDropboxLinked"
-                                                          object:nil
-                                                           queue:nil
-                                                      usingBlock:^(NSNotification *_Nonnull note) {
+        id __block token = [center addObserverForName:@"isDropboxLinked" object:nil queue:nil usingBlock:^(NSNotification *_Nonnull note) {
             [center removeObserver:token];
   
             if (DBClientsManager.authorizedClient) {
                 NSLog(@"Linked");
-                task(NO, nil);
+                task(NO, NO, nil);
             }
             else {
                 NSLog(@"Not Linked");
                 DBOAuthResult *authResult = (DBOAuthResult *)note.object;
                 NSLog(@"Error: %@", authResult);
-                task(authResult.tag == DBAuthCancel, [Utils createNSError:[NSString stringWithFormat:@"Could not create link to Dropbox: [%@]", authResult] errorCode:-1]);
+                task(authResult.tag == DBAuthCancel, NO, [Utils createNSError:[NSString stringWithFormat:@"Could not create link to Dropbox: [%@]", authResult] errorCode:-1]);
             }
         }];
 
@@ -254,6 +257,8 @@
         // Needs to be done on main queue...
         
         dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD dismiss]; // Hide any progress indicator
+            
             [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
                                            controller:viewController
                                               openURL:^(NSURL *url) {
@@ -264,12 +269,13 @@
 #else
         NSLog(@"Dropbox not fully available with App Extension. Displaying Alert.");
         
-        task(NO, [Utils createNSError:@"Could not create link to Dropbox. Dropbox is not fully available in App Extension."
-                        errorCode:-1]);
+        NSError* error = [Utils createNSError:@"Could not create link to Dropbox. Dropbox is not fully available in App Extension." errorCode:-1];
+        
+        task(NO, NO, error);
 #endif
     }
     else {
-        task(NO, nil);
+        task(NO, NO, nil);
     }
 }
 

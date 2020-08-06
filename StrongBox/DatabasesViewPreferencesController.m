@@ -65,7 +65,9 @@
     NSArray<NSNumber*>* opts = @[@(kDatabaseCellSubtitleFieldNone),
       @(kDatabaseCellSubtitleFieldFileName),
       @(kDatabaseCellSubtitleFieldStorage),
-      @(kDatabaseCellSubtitleFieldLastCachedDate)] ;
+      @(kDatabaseCellSubtitleFieldLastModifiedDate),
+      @(kDatabaseCellSubtitleFieldLastModifiedDatePrecise),
+      @(kDatabaseCellSubtitleFieldFileSize)] ;
     
     NSArray<NSString*>* options = [opts map:^id _Nonnull(NSNumber*  _Nonnull obj, NSUInteger idx) {
         return [self getDatabaseSubtitleFieldName:obj.integerValue];
@@ -116,8 +118,14 @@
         case kDatabaseCellSubtitleFieldFileName:
             return NSLocalizedString(@"databases_preferences_subtitle_field_name_filename", @"Filename");
             break;
-        case kDatabaseCellSubtitleFieldLastCachedDate:
-            return NSLocalizedString(@"databases_preferences_subtitle_field_name_last_cached_data", @"Last Cached Date");
+        case kDatabaseCellSubtitleFieldLastModifiedDate:
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_last_cached_data", @"Last Modified");
+            break;
+        case kDatabaseCellSubtitleFieldLastModifiedDatePrecise:
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_last_modified_date_precise", @"Last Modified (Precise)");
+            break;
+        case kDatabaseCellSubtitleFieldFileSize:
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_file_size", @"File Size");
             break;
         case kDatabaseCellSubtitleFieldStorage:
             return NSLocalizedString(@"databases_preferences_subtitle_field_name_database_storage", @"Database Storage");

@@ -11,10 +11,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LegacySyncReadOptions : NSObject
+@interface SyncReadOptions : NSObject
 
-@property BOOL isAutoFill;
-@property UIViewController* vc;
+@property BOOL isAutoFill; // TODO: Should be able to get rid of this once Auto-Fill moves to local only
+@property (nullable) UIViewController* vc; // If null -> Try to Background Sync
+@property BOOL joinInProgressSync; 
 
 @end
 

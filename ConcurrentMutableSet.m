@@ -21,8 +21,7 @@
     return [[ConcurrentMutableSet alloc] init];
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.data = NSMutableSet.set;

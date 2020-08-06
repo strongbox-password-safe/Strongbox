@@ -26,21 +26,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline;
 
 // Used on creation of brand new safe via standard UI
+
 - (void)    create:(NSString *)nickName
          extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject * _Nullable)parentFolder
     viewController:(UIViewController * _Nullable)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
+        completion:(void (^)(SafeMetaData *metadata, NSError *_Nullable error))completion;
 
 // Used during importation when we have a good idea of what the filename should be - try to maintain it if possible
 
-- (void)        create:(NSString *)nickName
-             extension:(NSString *)extension
-                  data:(NSData *)data
-     suggestedFilename:(NSString*)suggestedFilename
-            completion:(void (^)(SafeMetaData *metadata, NSError *error))completion;
-
+- (void)create:(NSString *)nickName
+     extension:(NSString *)extension
+          data:(NSData *)data
+       modDate:(NSDate*)modDate
+suggestedFilename:(NSString*)suggestedFilename
+    completion:(void (^)(SafeMetaData *metadata, NSError *_Nullable error))completion;
 
 // Used during importation - we may just want to update the underlying local file (seems to be a common usage pattern)
 - (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data;

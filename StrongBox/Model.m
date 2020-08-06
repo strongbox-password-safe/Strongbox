@@ -293,7 +293,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return self.metadata.readOnly || self.forcedReadOnly;
 }
 
-- (void)update:(BOOL)isAutoFill handler:(void(^)(BOOL userCancelled, NSError * _Nullable error))handler {
+- (void)update:(UIViewController*)viewController isAutoFill:(BOOL)isAutoFill handler:(void(^)(BOOL userCancelled, NSError * _Nullable error))handler {
     if(self.isReadOnly) {
         handler(NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
         return;
@@ -305,21 +305,22 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
             return;
         }
 
-        [self onUpdateWithEncryptedDone:data completion:handler];
+        [self onUpdateWithEncryptedDone:viewController data:data completion:handler];
     }];
 }
 
-- (void)onUpdateWithEncryptedDone:(NSData*)data completion:(void(^)(BOOL userCancelled, NSError * _Nullable error))completion {
+- (void)onUpdateWithEncryptedDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, NSError * _Nullable error))completion {
     if (self.isDuressDummyMode) {
         [self setDuressDummyData:data];
         completion(NO, nil);
         return;
     }
     else {
-        LegacySyncReadOptions* legacyOptions = [[LegacySyncReadOptions alloc] init];
-        legacyOptions.isAutoFill = self.isAutoFillOpen;
-
-        [SyncManager.sharedInstance updateLegacy:self.metadata data:data legacyOptions:legacyOptions completion:^(NSError *error) {
+        SyncReadOptions* updateOptions = [[SyncReadOptions alloc] init];
+        updateOptions.isAutoFill = self.isAutoFillOpen;
+        updateOptions.vc = viewController;
+        
+        [SyncManager.sharedInstance syncFromLocalAndOverwriteRemote:self.metadata data:data updateOptions:updateOptions completion:^(NSError *error) {
             if(!error) {
                 if(self.metadata.autoFillEnabled) {
                     [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];

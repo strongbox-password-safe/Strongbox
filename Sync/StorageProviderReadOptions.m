@@ -14,7 +14,6 @@
 {
     self = [super init];
     if (self) {
-        self.interactiveAllowed = YES;
         self.isAutoFill = NO;
         self.onlyIfModifiedDifferentFrom = nil;
     }

@@ -6,8 +6,8 @@
 //  Copyright © 2020 Mark McGuill. All rights reserved.
 //
 
-#import "LegacySyncReadOptions.h"
+#import "SyncReadOptions.h"
 
-@implementation LegacySyncReadOptions
+@implementation SyncReadOptions
 
 @end

@@ -11,16 +11,16 @@
 #import "GTMSessionFetcherService.h"
 #import "SVProgressHUD.h"
 #import "real-secrets.h"
-//#import "Settings.h"
 #import "SharedAppAndAutoFillSettings.h"
 
 static NSString *const kMimeType = @"application/octet-stream";
 
-typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
+typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractionRequired, NSError *error);
 
 @interface GoogleDriveManager ()
 
 @property Authenticationcompletion authCompletion;
+@property BOOL backgroundSyncAuthCompletionMode;
 
 @end
 
@@ -70,28 +70,42 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
 }
 
 - (void)authenticate:(UIViewController*)viewController
-          completion:(void (^)(BOOL userCancelled, NSError *error))completion {
+          completion:(Authenticationcompletion)completion {
     __weak GoogleDriveManager* weakSelf = self;
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // TODO: Need this for Biometrics but maybe can be moved into inner Sign in so only affected if we actually require a sign in
-        // Must be done on main queue
+    if (!viewController) { // Background Sync - Try to
         GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
         signIn.delegate = self;
-        signIn.presentingViewController = viewController;
-
         signIn.scopes = @[kGTLRAuthScopeDrive];
-
         weakSelf.authCompletion = completion;
+        weakSelf.backgroundSyncAuthCompletionMode = YES;
+                
+        [signIn restorePreviousSignIn];
+    }
+    else {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // TODO: Need this for Biometrics but maybe can be moved into inner Sign in so only affected if we actually require a sign in
+            // Must be done on main queue
+            GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
-        if(signIn.hasPreviousSignIn) {
-            [signIn restorePreviousSignIn];
-        }
-        else {
-            SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = YES;
-            [signIn signIn];
-        }
-    });
+            signIn.delegate = self;
+        
+            signIn.scopes = @[kGTLRAuthScopeDrive];
+
+            weakSelf.authCompletion = completion;
+            weakSelf.backgroundSyncAuthCompletionMode = NO;
+            
+            signIn.presentingViewController = viewController;
+            
+            if(signIn.hasPreviousSignIn) {
+                [signIn restorePreviousSignIn];
+            }
+            else {
+                SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = YES;
+                [signIn signIn];
+            }
+        });
+    }
 }
 
 - (void)      signIn:(GIDSignIn *)signIn
@@ -108,13 +122,24 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
     SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = NO;
 
     if(error.code == kGIDSignInErrorCodeHasNoAuthInKeychain) {
-        return; // Do not call completion if this is a silenet sign and there is no Auth in Key...
+        if(!self.backgroundSyncAuthCompletionMode) {
+            return; // Do not call completion if this is a silenet sign and there is no Auth in Key...
+        }
+        else {
+            if (self.authCompletion) {
+                NSLog(@"User Interaction Required for Google Auth - but in Background Sync mode...");
+                //NSLog(@"Google Callback: %@", authenticationcompletion);
+                self.authCompletion(NO, YES, nil);
+                self.authCompletion = nil;
+            }
+        }
     }
-    
-    if (self.authCompletion) {
-        //NSLog(@"Google Callback: %@", authenticationcompletion);
-        self.authCompletion(error.code == kGIDSignInErrorCodeCanceled, error);
-        self.authCompletion = nil;
+    else {
+        if (self.authCompletion) {
+            //NSLog(@"Google Callback: %@", authenticationcompletion);
+            self.authCompletion(error.code == kGIDSignInErrorCodeCanceled, NO, error);
+            self.authCompletion = nil;
+        }
     }
 }
 
@@ -190,45 +215,54 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
             fileIdentifier:(NSString *)fileIdentifier
               dateModified:(NSDate*)dateModified
                 completion:(StorageProviderReadCompletionBlock)handler {
-    [self getFile:fileIdentifier dateModified:dateModified handler:handler];
+    [self getFile:fileIdentifier dateModified:dateModified viewController:viewController handler:handler];
 }
 
-- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(StorageProviderReadCompletionBlock)handler {
+- (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)handler {
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
     [self authenticate:viewController
-            completion:^(BOOL userCancelled, NSError *error) {
+            completion:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
         NSLog(@"Google Authenticate done [%hhd]-[%@]", userCancelled, error);
-                if (error) {
-                    NSLog(@"%@", error);
-                    handler(kReadResultError, nil, nil, error);
-                }
-                else {
-                    [self    _read:parentFileIdentifier
-                          fileName:fileName
-                        completion:handler];
-                }
-            }];
+        if (error) {
+            NSLog(@"%@", error);
+            handler(kReadResultError, nil, nil, error);
+        }
+        else if (userInteractionRequired) {
+            handler(kReadResultBackgroundReadButUserInteractionRequired, nil, nil, nil);
+        }
+        else {
+            [self    _read:parentFileIdentifier
+                  fileName:fileName
+            viewController:viewController
+                   options:options
+                completion:handler];
+        }
+    }];
 }
 
-- (void)readNonInteractive:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(StorageProviderReadCompletionBlock)handler {
-    [self _read:parentFileIdentifier fileName:fileName completion:handler];
-}
-
-- (void)_read:(NSString *)parentFileIdentifier fileName:(NSString *)fileName completion:(StorageProviderReadCompletionBlock)handler {
+- (void)_read:(NSString *)parentFileIdentifier
+     fileName:(NSString *)fileName
+viewController:(UIViewController*)viewController
+      options:(StorageProviderReadOptions *)options
+   completion:(StorageProviderReadCompletionBlock)handler {
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
-    });
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
+        });
+    }
     
     [self findSafeFile:parentFileIdentifier
               fileName:fileName
             completion:^(GTLRDrive_File *file, NSError *error)
     {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
         
         if(error) {
             NSLog(@"%@", error);
@@ -244,7 +278,15 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
             }
             else {
                 GTLRDateTime* dtMod = file.modifiedTime;
-                [self getFile:file.identifier dateModified:dtMod.date handler:handler];
+                
+                if (options && options.onlyIfModifiedDifferentFrom && dtMod) {
+                    if ([dtMod.date isEqualToDate:options.onlyIfModifiedDifferentFrom]) {
+                        handler(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
+                        return;
+                    }
+                }
+                
+                [self getFile:file.identifier dateModified:dtMod.date viewController:viewController handler:handler];
             }
         }
     }];
@@ -314,16 +356,15 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
                 completion:(void (^)(BOOL userCancelled, NSArray *folders, NSArray *files, NSError *error))handler {
     parentFolderIdentifier = parentFolderIdentifier ? parentFolderIdentifier : @"root";
 
-    [self authenticate:viewController
-            completion:^(BOOL userCancelled, NSError *error) {
-                if (error) {
-                    NSLog(@"%@", error);
-                    handler(userCancelled, nil, nil, error);
-                }
-                else {
-                    [self _getFilesAndFolders:parentFolderIdentifier completion:handler];
-                }
-            }];
+    [self authenticate:viewController completion:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
+        if (error) {
+            NSLog(@"%@", error);
+            handler(userCancelled, nil, nil, error);
+        }
+        else {
+            [self _getFilesAndFolders:parentFolderIdentifier completion:handler];
+        }
+    }];
 }
 
 - (void)_getFilesAndFolders:(NSString *)parentFileIdentifier
@@ -344,7 +385,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
         
     }
     
-    query.fields = @"kind,nextPageToken,files(mimeType,id,name,iconLink,parents,size)";
+    query.fields = @"kind,nextPageToken,files(mimeType,id,name,iconLink,parents,size,modifiedTime)";
 
     [[self driveService] executeQuery:query
                     completionHandler:^(GTLRServiceTicket *ticket,
@@ -380,17 +421,25 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, NSError *error);
     }];
 }
 
-- (void)getFile:(NSString *)fileIdentifier dateModified:(NSDate*)dateModified handler:(StorageProviderReadCompletionBlock)handler {
+- (void)getFile:(NSString *)fileIdentifier
+   dateModified:(NSDate*)dateModified
+ viewController:(UIViewController*)viewController
+        handler:(StorageProviderReadCompletionBlock)handler {
     GTLRDriveQuery_FilesGet *query = [GTLRDriveQuery_FilesGet queryForMediaWithFileId:fileIdentifier];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-    });
+    
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+        });
+    }
     
     [[self driveService] executeQuery:query
                     completionHandler:^(GTLRServiceTicket *ticket, GTLRDataObject *data, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
         
         if (error != nil) {
             NSLog(@"Could not GET file. An error occurred: %@", error);

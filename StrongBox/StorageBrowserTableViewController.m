@@ -221,16 +221,21 @@
                                     viewController:self
                                            options:options
                                         completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
-        [self  readForValidationDone:result file:file data:data error:error];
+        [self  readForValidationDone:result file:file data:data initialDateModified:dateModified error:error];
     }];
 }
 
-- (void)readForValidationDone:(StorageProviderReadResult)result file:(StorageBrowserItem *)file data:(NSData *)data error:(const NSError *)error {
+- (void)readForValidationDone:(StorageProviderReadResult)result file:(StorageBrowserItem *)file data:(NSData *)data
+          initialDateModified:(NSDate*)initialDateModified error:(const NSError *)error {
     if (result == kReadResultSuccess) {
         NSError* err;
         if ([DatabaseModel isValidDatabaseWithPrefix:data error:&err]) {  //    : Would be good not to have to read all file
             DatabaseFormat likelyFormat = [DatabaseModel getDatabaseFormatWithPrefix:data];
-            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider file:file likelyFormat:likelyFormat]);
+            self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider
+                                                                                  file:file
+                                                                          likelyFormat:likelyFormat
+                                                                                  data:data
+                                                                   initialDateModified:initialDateModified]);
         }
         else {
             [Alerts error:self

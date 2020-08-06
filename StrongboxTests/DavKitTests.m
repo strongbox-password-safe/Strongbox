@@ -70,7 +70,7 @@ static WebDAVStorageProvider* getSession() {
         parentFolder:nil
       viewController:nil
           completion:^(SafeMetaData *metadata, NSError *error) {
-        [provider update:metadata data:[@"Another test...." dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(NSError *error) {
+        [provider pushDatabase:metadata interactiveVC:nil data:[@"Another test...." dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(NSError *error) {
             NSLog(@"Update: %@", error);
             self.done = YES;
         }];

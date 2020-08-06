@@ -71,7 +71,7 @@
     
     NSInputStream* inputStream = [self.dbAttachment getPlainTextInputStream];
 
-    // TODO: Stream this write
+    // FUTURE: Stream this write
     NSData* data = [NSData dataWithContentsOfStream:inputStream];
 
     if (!data) {
