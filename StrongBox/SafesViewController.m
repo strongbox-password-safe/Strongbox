@@ -1906,15 +1906,16 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 // Importation
 
 - (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_reading_data", @"Reading Data...")];
-    
-    if(!url || url.absoluteString.length == 0) {
-        NSLog(@"nil or empty URL in Files App provider");
+    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+
+    if(!document) {
+        NSLog(@"Invalid URL to Import [%@]", url);
         [self onReadImportedFile:NO data:nil url:url canOpenInPlace:NO forceOpenInPlace:NO modDate:nil];
         return;
     }
 
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_reading_data", @"Reading Data...")];
+
     [document openWithCompletionHandler:^(BOOL success) {
         [SVProgressHUD dismiss];
         
@@ -1942,9 +1943,15 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
           forceOpenInPlace:(BOOL)forceOpenInPlace
                    modDate:(NSDate*)modDate {
     if(!success || !data) {
-        [Alerts warn:self
-               title:NSLocalizedString(@"safesvc_error_title_import_file_error_opening", @"Error Opening")
-             message:NSLocalizedString(@"safesvc_error_message_import_file_error_opening", @"Could not access this file.")];
+        if ([url.absoluteString isEqualToString:@"auth://"]) {
+            // IGNORE - sent by Launcher app for some reason - just ignore...
+            NSLog(@"IGNORE - sent by Launcher app for some reason - just ignore...");
+        }
+        else {
+            [Alerts warn:self
+                   title:NSLocalizedString(@"safesvc_error_title_import_file_error_opening", @"Error Opening")
+                 message:NSLocalizedString(@"safesvc_error_message_import_file_error_opening", @"Could not access this file.")];
+        }
     }
     else {
         if([url.pathExtension caseInsensitiveCompare:@"key"] ==  NSOrderedSame) {

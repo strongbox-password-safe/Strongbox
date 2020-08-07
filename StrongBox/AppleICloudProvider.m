@@ -144,6 +144,10 @@ suggestedFilename:nil
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
 
     StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithFileURL:fileUrl];
+    if (!doc) {
+        completion(kReadResultError, nil, nil, [Utils createNSError:@"Invalid iCloud URL" errorCode:-6]);
+        return;
+    }
     
     if (viewController) {
         dispatch_async(dispatch_get_main_queue(), ^{

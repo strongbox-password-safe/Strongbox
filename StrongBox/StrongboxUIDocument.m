@@ -11,7 +11,13 @@
 @implementation StrongboxUIDocument
 
 -(instancetype)initWithFileURL:(NSURL *)url {
-    return [super initWithFileURL:url];
+    if (url && url.isFileURL) {
+        return [super initWithFileURL:url];
+    }
+    else {
+        NSLog(@"Invalid File URL: [%@]", url);
+        return nil;
+    }
 }
 
 - (instancetype)initWithData:(NSData*)data fileUrl:(NSURL*)fileUrl {

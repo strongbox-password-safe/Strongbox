@@ -183,35 +183,14 @@ viewController:(UIViewController *)viewController
 
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     
+    if (!document) {
+        completion(kReadResultError, nil, nil, [Utils createNSError:@"Invalid Files URL" errorCode:-6]);
+        return;
+    }
+
     [document openWithCompletionHandler:^(BOOL success) {
         NSLog(@"[Files] File Mod Date2: [%@]", document.fileModificationDate);
         completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, nil);
-        [url stopAccessingSecurityScopedResource];
-    }];
-}
-
-- (void)readNonInteractive:(SafeMetaData *)safeMetaData completion:(StorageProviderReadCompletionBlock)completion {
-    //NSLog(@"READ! %@", safeMetaData);
-    
-    NSError *error;
-    NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:NO ppError:&error];
-    
-    if(error || !url) {
-        NSLog(@"Error or nil URL in Files App Provider: %@", error);
-        completion(kReadResultError, nil, nil, error);
-        return;
-    }
-
-    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
-    if (!securitySucceeded) {
-        NSLog(@"Could not access secure scoped resource!");
-        return;
-    }
-    
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
-    
-    [document openWithCompletionHandler:^(BOOL success) {
-        completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, success ? document.fileModificationDate : nil, nil);
         [url stopAccessingSecurityScopedResource];
     }];
 }

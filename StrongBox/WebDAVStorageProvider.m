@@ -297,9 +297,10 @@ viewController:(UIViewController *)viewController
         // Get Metadata Request - Will actually be performed first - Some WebDAV servers do not respond to PROPFIND on a single file
         // So we do the listing on the parent folder and find the file in there... sigh
                     
-        NSURL* url = pd.href.urlExtendedParse;
-        NSString* path = url ? url.path.stringByDeletingLastPathComponent : pd.href.stringByDeletingLastPathComponent;
-        NSString* targetFileName = url ? url.path.lastPathComponent : pd.href.lastPathComponent;
+        //        NSURL* url = pd.href.urlExtendedParse; - Using URL like commented out below leads to an error 404 on Nextcloud which requires the full server path
+        
+        NSString* path = pd.href.stringByDeletingLastPathComponent; // url ? url.path.stringByDeletingLastPathComponent : pd.href.stringByDeletingLastPathComponent;
+        NSString* targetFileName = pd.href.lastPathComponent;       //url ? url.path.lastPathComponent : pd.href.lastPathComponent;
 
         DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
         listingRequest.delegate = self;

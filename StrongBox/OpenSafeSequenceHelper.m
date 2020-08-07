@@ -1277,7 +1277,28 @@ static NSString *getDateString(NSDate* modDate) {
     return modDateStr;
 }
 
+NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
+    NSData* keyFileData = getKeyFileData(keyFileUrl, onceOffKeyFileData, error);
+    
+    NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:format != kKeePass1] : nil;
+
+    return keyFileDigest;
+}
+
+NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error) {
+    NSData* keyFileData = nil;
+    if (keyFileUrl) {
+        keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
+    }
+    else if (onceOffKeyFileData) {
+        keyFileData = onceOffKeyFileData;
+    }
+    
+    return keyFileData;
+}
+
 //////////
+// TODO: Remove all below once Auto-Fill is local only...
 
 static OpenSafeSequenceHelper *sharedInstance = nil;
 
@@ -1305,6 +1326,14 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
     NSURL* url = [urls objectAtIndex:0];
     
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+    if (!document) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self readReselectedFilesDatabase:NO data:nil url:url];
+        });
+        return;
+    }
+
+    
     [document openWithCompletionHandler:^(BOOL success) {
         NSData* data = document.data;
         
@@ -1364,26 +1393,6 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
     [SyncManager.sharedInstance setLegacyAutoFillBookmark:self.safe bookmark:bookMark];
     
     [self beginSeq];
-}
-
-NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
-    NSData* keyFileData = getKeyFileData(keyFileUrl, onceOffKeyFileData, error);
-    
-    NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:format != kKeePass1] : nil;
-
-    return keyFileDigest;
-}
-
-NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error) {
-    NSData* keyFileData = nil;
-    if (keyFileUrl) {
-        keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
-    }
-    else if (onceOffKeyFileData) {
-        keyFileData = onceOffKeyFileData;
-    }
-    
-    return keyFileData;
 }
 
 @end
