@@ -300,8 +300,7 @@ viewController:(UIViewController *)viewController
         //        NSURL* url = pd.href.urlExtendedParse; - Using URL like commented out below leads to an error 404 on Nextcloud which requires the full server path
         
         NSString* path = pd.href.stringByDeletingLastPathComponent; // url ? url.path.stringByDeletingLastPathComponent : pd.href.stringByDeletingLastPathComponent;
-        NSString* targetFileName = pd.href.lastPathComponent;       //url ? url.path.lastPathComponent : pd.href.lastPathComponent;
-
+        
         DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
         listingRequest.delegate = self;
         listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
@@ -316,10 +315,13 @@ viewController:(UIViewController *)viewController
             }
             else {
                 NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
-                                
+                NSString* targetFileName = pd.href.lastPathComponent;       //url ? url.path.lastPathComponent : pd.href.lastPathComponent;
+                NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
+                            
                 DAVResponseItem* responseItem = [listingResponse firstOrDefault:^BOOL(DAVResponseItem * _Nonnull obj) {
                     NSString* foo = obj.href.path.lastPathComponent;
-                    return [foo isEqualToString:targetFileName];
+                    
+                    return [foo isEqualToString:targetFileName] || [foo isEqualToString:urlDecodedTargetFileName];
                 }];
 
                 if (!responseItem) {

@@ -166,8 +166,7 @@
 - (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
     NSDate* mod;
     [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
-    
-    return mod ? iso8601DateString(mod) : @"";
+    return mod ? friendlyDateTimeStringPrecise(mod) : @"";
 }
 
 - (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
