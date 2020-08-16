@@ -15,6 +15,7 @@
 #import "SVProgressHUD.h"
 #import "Constants.h"
 #import "NSString+Extensions.h"
+#import "NSDate+Extensions.h"
 
 @interface WebDAVStorageProvider ()
 
@@ -37,12 +38,6 @@
 
 - (instancetype)init {
     if(self = [super init]) {
-        _displayName = NSLocalizedString(@"storage_provider_name_webdav", @"WebDAV");
-        if([self.displayName isEqualToString:@"storage_provider_name_webdav"]) {
-            _displayName = @"WebDAV";
-        }
-        
-        _icon = @"webdav-32x32";
         _storageId = kWebDAV;
         _providesIcons = NO;
         _browsableNew = YES;
@@ -338,7 +333,7 @@ viewController:(UIViewController *)viewController
                 
                 NSDate* modDate = responseItem.modificationDate;
                 
-                if (modDate && options && options.onlyIfModifiedDifferentFrom && [options.onlyIfModifiedDifferentFrom isEqualToDate:modDate]) {
+                if (modDate && options && options.onlyIfModifiedDifferentFrom && [options.onlyIfModifiedDifferentFrom isEqualToDateWithinEpsilon:modDate]) {
                     if (viewController) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [SVProgressHUD dismiss];
@@ -380,13 +375,13 @@ viewController:(UIViewController *)viewController
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
-    [self connect:providerData.sessionConfiguration viewController:nil completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
+    [self connect:providerData.sessionConfiguration viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
             NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
-            completion(error);
+            completion(kUpdateResultError, nil, error);
             return;
         }
         
@@ -394,19 +389,83 @@ viewController:(UIViewController *)viewController
         request.data = data;
         request.delegate = self;
         request.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            if (!success) {
+                if (viewController) {
+                     dispatch_async(dispatch_get_main_queue(), ^{
+                         [SVProgressHUD dismiss];
+                     });
+                 }
 
-            completion(error);
+                completion(kUpdateResultError, nil, error);
+                return;
+            }
+            else {
+                [self onPutDone:safeMetaData interactiveVC:viewController session:session completion:completion];
+            }
         };
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
-        });
-
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+            });
+        }
+        
         [session enqueueRequest:request];
     }];
+}
+
+- (void)onPutDone:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController session:(DAVSession*)session completion:(StorageProviderUpdateCompletionBlock)completion {
+    WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
+    
+    NSString* path = providerData.href.stringByDeletingLastPathComponent; // url ? url.path.stringByDeletingLastPathComponent : pd.href.stringByDeletingLastPathComponent;
+    DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
+    listingRequest.delegate = self;
+    listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+        if(!success) {
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
+            
+            completion(kUpdateResultError, nil, error);
+        }
+        else {
+            NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
+            NSString* targetFileName = providerData.href.lastPathComponent;       //url ? url.path.lastPathComponent : pd.href.lastPathComponent;
+            NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
+                        
+            DAVResponseItem* responseItem = [listingResponse firstOrDefault:^BOOL(DAVResponseItem * _Nonnull obj) {
+                NSString* foo = obj.href.path.lastPathComponent;
+                
+                return [foo isEqualToString:targetFileName] || [foo isEqualToString:urlDecodedTargetFileName];
+            }];
+
+            if (!responseItem) {
+                if (viewController) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [SVProgressHUD dismiss];
+                    });
+                }
+
+                NSError* error = [Utils createNSError:@"Could not get attributes of webdav file" errorCode:-2];
+                completion(kUpdateResultError, nil, error);
+                return;
+            }
+            
+            NSDate* modDate = responseItem.modificationDate;
+
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
+
+            completion(kUpdateResultSuccess, modDate, nil);
+        }
+    };
+    
+    [session enqueueRequest:listingRequest];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

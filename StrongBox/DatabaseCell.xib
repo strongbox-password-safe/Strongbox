@@ -38,7 +38,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="jLk-K8-cyU" userLabel="Status Indicators">
-                                                <rect key="frame" x="37.5" y="21" width="76" height="16"/>
+                                                <rect key="frame" x="37.5" y="21" width="96" height="16"/>
                                                 <subviews>
                                                     <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="bX8-2B-lfT" userLabel="Indicator 1">
                                                         <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -66,6 +66,13 @@
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="16" id="8rY-we-wKg"/>
                                                             <constraint firstAttribute="height" constant="16" id="Cnt-Bc-xUt"/>
+                                                        </constraints>
+                                                    </imageView>
+                                                    <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="iuq-Zd-o95" userLabel="Indicator 5">
+                                                        <rect key="frame" x="80" y="0.0" width="16" height="16"/>
+                                                        <constraints>
+                                                            <constraint firstAttribute="height" constant="16" id="6ta-ul-N8Y"/>
+                                                            <constraint firstAttribute="width" constant="16" id="tWU-bw-eRN"/>
                                                         </constraints>
                                                     </imageView>
                                                 </subviews>
@@ -161,6 +168,7 @@
                 <outlet property="status2" destination="DJB-OL-CMt" id="Dbp-vH-cmK"/>
                 <outlet property="status3" destination="wB3-Jn-mhs" id="o41-cQ-kzQ"/>
                 <outlet property="status4" destination="GaG-rN-9MY" id="EFE-pQ-2hf"/>
+                <outlet property="status5" destination="iuq-Zd-o95" id="gnd-fO-p1E"/>
                 <outlet property="subtitle1" destination="i5d-mt-ehX" id="FNS-wB-8H0"/>
                 <outlet property="subtitle2" destination="ptJ-7K-bBY" id="eGL-WY-bxs"/>
                 <outlet property="topSubtitle" destination="ctS-F5-btQ" id="kex-wI-IHq"/>

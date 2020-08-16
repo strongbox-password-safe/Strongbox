@@ -21,7 +21,7 @@
 #import "Utils.h"
 #import "BackupsManager.h"
 #import "ConcurrentMutableDictionary.h"
-#import "SyncOperationInfo.h"
+#import "SyncStatus.h"
 #import "SharedAppAndAutoFillSettings.h"
 
 NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
@@ -30,7 +30,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
 @property (nonatomic, strong) dispatch_queue_t dispatchQueue;
 @property (nonatomic, strong) dispatch_source_t source;
-@property ConcurrentMutableDictionary<NSString*, SyncOperationInfo*>* syncOperations;
 
 @end
 
@@ -44,14 +43,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         sharedInstance = [[SyncManager alloc] init];
     });
     return sharedInstance;
-}
-
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        self.syncOperations = ConcurrentMutableDictionary.mutableDictionary;
-    }
-    return self;
 }
 
 - (void)backgroundSyncAll {
@@ -69,204 +60,58 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 }
 
 - (void)backgroundSyncDatabase:(SafeMetaData*)database {
-    SyncReadOptions* readOptions = [[SyncReadOptions alloc] init];
-    readOptions.isAutoFill = NO; // TODO: ?! No background sync done from autofill component?
-    readOptions.vc = nil; // Indicates to provider this is a background sync
-
-    [self queuePullFromRemote:database readOptions:readOptions completion:^(NSURL * _Nullable url, BOOL previousSyncAlreadyInProgress, const NSError * _Nullable error) {
-        NSLog(@"Background Sync Done - [%@] - previousSyncAlreadyInProgress [%d] - error: [%@]", database.nickName, previousSyncAlreadyInProgress, error);
+    SyncParameters* params = [[SyncParameters alloc] init];
+    
+    params.isAutoFill = NO;
+    params.inProgressBehaviour = kInProgressBehaviourJoin;
+    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
+        NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
     }];
 }
 
-//////////////////////
-
-- (void)queuePullFromRemote:(SafeMetaData *)database
-                readOptions:(SyncReadOptions *)options
-                 completion:(SyncManagerReadCompletionBlock)completion {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        [self pullFromRemote:database readOptions:options completion:completion];
-    });
-}
-
-- (void)pullFromRemote:(SafeMetaData *)database
-           readOptions:(SyncReadOptions *)options
-            completion:(SyncManagerReadCompletionBlock)completion {
-    // TODO: Have a separate queue per database?
-    // and queue the sync instead - max one outstanding sync to do from local / remote
-    // This might be optional, like a read sync, pull from remote doesn't need to be queued
-    // but a write from the model/UI should definitely be queued... (Max 1 outstanding in queue)
+- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC join:(BOOL)join isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+    SyncParameters* params = [[SyncParameters alloc] init];
     
-    SyncOperationInfo* info = [self.syncOperations objectForKey:database.uuid];
+    params.isAutoFill = isAutoFill; // TODO: We now need to remove Auto Fill sync ability!
+    params.interactiveVC = interactiveVC;
+    params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
     
-    if (info != nil && info.state == kSyncOperationStateInProgress) {
-        NSLog(@"Database [%@] is already undergoing a sync operation...", database.nickName);
-
-        if (options.joinInProgressSync) {
-            NSLog(@"XXXXXX - Joining in progress sync...");
-            
-            dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L);
-            
-            dispatch_group_notify(info.inProgressDispatchGroup, queue, ^{
-                NSURL* url = [self getLocalWorkingCache:database];
-
-                NSLog(@"XXXXXX - In Progress Sync Done with [%@]... Calling waiting completion...", info);
-
-                completion(info.error ? nil : url, NO, info.error);
-            });
-        }
-        else {
-            NSLog(@"XXXXXX - NOT Joining in progress sync...");
-
-            completion(nil, YES, nil);
-        }
-        return;
-    }
-
-    info = [[SyncOperationInfo alloc] initWithDatabaseId:database.uuid];
-    info.state = kSyncOperationStateInProgress;
-    info.inProgressDispatchGroup = dispatch_group_create();
-
-    dispatch_group_enter(info.inProgressDispatchGroup);
-
-    [self.syncOperations setObject:info forKey:database.uuid];
-
-    [self publishSyncStatusChangeNotification:info];
-
-    [self pullDatabase:database info:info readOptions:options completion:completion];
-}
-
-- (void)pullDatabase:(SafeMetaData *)database
-                info:(SyncOperationInfo*)info
-         readOptions:(SyncReadOptions *)options
-          completion:(SyncManagerReadCompletionBlock)completion {
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase:database];
-    NSDate* localModDate = nil;
-    if (localWorkingCacheUrl) {
-        NSError* error;
-        NSDictionary* localAttr = [NSFileManager.defaultManager attributesOfItemAtPath:localWorkingCacheUrl.path error:&error];
-        if (!error) {
-            localModDate = localAttr.fileModificationDate;
-        }
-    }
-    
-    StorageProviderReadOptions* opts = [[StorageProviderReadOptions alloc] init];
-    opts.isAutoFill = options.isAutoFill;
-    opts.onlyIfModifiedDifferentFrom = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame ? nil : localModDate;
-    
-    [provider pullDatabase:database
-             interactiveVC:options.vc
-                   options:opts
-                completion:^(StorageProviderReadResult result, NSData * _Nullable data, NSDate * _Nullable dateModified, const NSError * _Nullable error) {
-        NSLog(@"syncFromRemoteOverwriteLocal done with: [%@]", error);
-                
-        info.state = result == kReadResultError ? kSyncOperationStateError : (result == kReadResultBackgroundReadButUserInteractionRequired) ? kSyncOperationStateBackgroundButUserInteractionRequired : kSyncOperationStateDone;
-        info.error = (NSError*)error;
-        
-        if (result == kReadResultError) {
-            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] - Could not read data from provider: [%@]", provider.displayName, error);
-        
-            [self publishSyncStatusChangeNotification:info];
-            
-            completion(nil, NO, error);
-        }
-        else if (result == kReadResultBackgroundReadButUserInteractionRequired) {
-            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] remote modified equal to [%@] using local copy", provider.displayName, localModDate);
-
-            [self publishSyncStatusChangeNotification:info];
-            
-            completion(localWorkingCacheUrl, NO, nil);
-        }
-        else if (result == kReadResultModifiedIsSameAsLocal) {
-            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] remote modified equal to [%@] using local copy", provider.displayName, localModDate);
-
-            [self publishSyncStatusChangeNotification:info];
-            
-            completion(localWorkingCacheUrl, NO, nil);
-        }
-        else {
-            NSLog(@"SyncManager::syncFromRemoteOverwriteLocal - [%@] Got [%lu] bytes - modified [%@]", provider.displayName, (unsigned long)data.length, dateModified);
-
-            NSError* error;
-            
-            NSURL* localWorkingCacheUrl = [self setWorkingCacheWithData:data dateModified:dateModified database:database error:&error];
-         
-            [self publishSyncStatusChangeNotification:info]; // Don't call until working cache has been set
-            
-            completion(error ? nil : localWorkingCacheUrl, NO, error);
-        }
-        
-        dispatch_group_leave(info.inProgressDispatchGroup);
+    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
+        NSLog(@"INTERACTIVE SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
+        completion(result, conflictAndLocalWasChanged, error);
     }];
 }
 
-- (void)syncFromLocalAndOverwriteRemote:(SafeMetaData *)database
-                                   data:(NSData *)data
-                          updateOptions:(SyncReadOptions *)updateOptions
-                             completion:(SyncManagerUpdateCompletionBlock)completion {
-    if (database.readOnly) {
-        NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1];
-        completion(error);
-        return;
-    }
-
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    [provider pushDatabase:database
-      interactiveVC:updateOptions.vc
-                data:data
-          isAutoFill:updateOptions.isAutoFill
-          completion:^(NSError * _Nullable error) {
-        if (error) {
-            completion(error);
-        }
-
-        [self onUpdatedRemoteSuccessfully:database data:data completion:completion];
-    }];
-}
-
-- (void)onUpdatedRemoteSuccessfully:(SafeMetaData *)database
-                               data:(NSData *)data
-                         completion:(SyncManagerUpdateCompletionBlock)completion {
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error {
     NSURL* localWorkingCache = [self getLocalWorkingCache:database];
     
-    // Perform local Backups
-    
-    if (localWorkingCache == nil ||
-        ![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
-        // This should not be possible, something is very wrong if it is, because we will have loaded model
-        NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
-        NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
-        NSError* error = [Utils createNSError:em errorCode:-1];
-        completion(error);
-        return;
+    if (localWorkingCache) {
+        if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
+            // This should not be possible, something is very wrong if it is, because we will have loaded model
+            NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
+            NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
+            
+            if(error) {
+                *error = [Utils createNSError:em errorCode:-1];
+            }
+            return nil;
+        }
     }
+    
+    NSUUID* updateId = NSUUID.UUID;
+    database.outstandingUpdateId = updateId;
+    [SafesList.sharedInstance update:database];
+        
+    NSURL* url = [self setWorkingCacheWithData:data dateModified:NSDate.date database:database error:error];
+    
+    return url != nil;
+}
 
-    // Update Local Working Cache
-    
-    NSError* error;
-    [data writeToURL:localWorkingCache options:NSDataWritingAtomic error:&error];
-    if (error) {
-        NSLog(@"ERROR: Could not update local working cache: [%@]", localWorkingCache);
-        completion(error);
-        return;
-    }
- 
-    completion(nil); // Done
+- (SyncStatus*)getSyncStatus:(SafeMetaData *)database {
+    return [SyncAndMergeSequenceManager.sharedInstance getSyncStatus:database];
 }
 
 //////////////////////
-
-- (void)publishSyncStatusChangeNotification:(SyncOperationInfo*)info {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kSyncManagerDatabaseSyncStatusChanged object:info];
-    });
-}
-
-- (SyncOperationInfo*)getSyncStatus:(SafeMetaData *)database {
-    SyncOperationInfo *ret = [self.syncOperations objectForKey:database.uuid];
-
-    return ret ? ret : [[SyncOperationInfo alloc] initWithDatabaseId:database.uuid];
-}
 
 - (NSURL*)setWorkingCacheWithData:(NSData*)data dateModified:(NSDate*)dateModified database:(SafeMetaData*)database error:(NSError**)error {
     if (!data || !dateModified) {
@@ -304,11 +149,10 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 }
 
 - (NSString *)getPrimaryStorageDisplayName:(SafeMetaData *)database {
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    return provider.displayName;
+    return [SafeStorageProviderFactory getStorageDisplayName:database];
 }
 
-- (BOOL)isLegacyImmediatelyOfferCacheIfOffline:(SafeMetaData *)database {
+- (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData *)database { // TODO: This should be a database property - smart set initially based on provider but ultimately configurable... and doesn't belogn in here but in the OpenSequenceManager
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
     return provider.immediatelyOfferCacheIfOffline;
 }
@@ -596,6 +440,27 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }
     
     return url;
+}
+
+//////////
+
+static NSString* syncResultToString(SyncAndMergeResult result) {
+    switch(result) {
+        case kSyncAndMergeError:
+            return @"Error";
+            break;
+        case kSyncAndMergeSuccess:
+            return @"Success";
+            break;
+        case kSyncAndMergeResultUserInteractionRequired:
+            return @"User Interaction Required";
+            break;
+        case kSyncAndMergeResultUserCancelled:
+            return @"User Cancelled";
+            break;
+        default:
+            return @"Unknown!";
+    }
 }
 
 @end

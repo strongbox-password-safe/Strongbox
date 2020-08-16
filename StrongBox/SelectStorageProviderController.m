@@ -23,6 +23,7 @@
 #import "FilesAppUrlBookmarkProvider.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "NSString+Extensions.h"
+#import "SafeStorageProviderFactory.h"
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
@@ -111,8 +112,8 @@
             cell.image.image =  [UIImage imageNamed:@"folder"];
         }
         else {
-            cell.text.text = provider.displayName;
-            cell.image.image = [UIImage imageNamed:provider.icon];
+            cell.text.text = [SafeStorageProviderFactory getStorageDisplayNameForProvider:provider.storageId];
+            cell.image.image = [UIImage imageNamed:[SafeStorageProviderFactory getIconForProvider:provider.storageId]];
         }
     }
     

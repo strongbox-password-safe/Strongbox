@@ -13,6 +13,7 @@
 #import "SVProgressHUD.h"
 #import "UiAttachment.h"
 #import "UIImage+FixOrientation.h"
+#import "NSDate+Extensions.h"
 
 const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
 
@@ -155,7 +156,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
             UIImage* fixed = [image fixOrientation];
             
             data = UIImagePNGRepresentation(fixed);
-            suggestedFilename = [NSString stringWithFormat:@"%@.png", iso8601DateString(NSDate.date)];
+            suggestedFilename = [NSString stringWithFormat:@"%@.png", NSDate.date.iso8601DateString];
         }
     }
     else {

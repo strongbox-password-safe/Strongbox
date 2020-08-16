@@ -8,6 +8,7 @@
 
 #import "BackupItem.h"
 #import "Utils.h"
+#import "NSDate+Extensions.h"
 
 @implementation BackupItem
 
@@ -27,7 +28,7 @@
     
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@-%@", friendlyDateString(self.date), friendlyFileSizeString(self.fileSize.unsignedIntValue)];
+    return [NSString stringWithFormat:@"%@-%@", self.date.friendlyDateString, friendlyFileSizeString(self.fileSize.unsignedIntValue)];
 }
 
 @end

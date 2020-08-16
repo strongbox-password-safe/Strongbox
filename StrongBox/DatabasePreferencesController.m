@@ -118,7 +118,7 @@
                }];
     }
     else {
-        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileUrl) {
+        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileUrl) { 
             [Alerts warn:self
                    title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
                  message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
@@ -220,10 +220,6 @@
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
 
     self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillEnabled;
-
-//    self.labelAllowOfflineCahce.enabled = [self canToggleOfflineCache];
-//    self.switchAllowOfflineCache.enabled = [self canToggleOfflineCache];
-//    self.switchAllowOfflineCache.on = self.viewModel.metadata.offlineCacheEnabled;
 
     self.switchReadOnly.on = self.viewModel.metadata.readOnly;
     self.switchAutoFillAlwaysUseCache.on = self.viewModel.metadata.alwaysUseCacheForAutoFill;

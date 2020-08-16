@@ -14,6 +14,7 @@
 #import "DatabaseModel.h"
 #import "FileManager.h"
 #import "LocalDatabaseIdentifier.h"
+#import "NSDate+Extensions.h"
 
 @implementation LocalDeviceStorageProvider
 
@@ -29,12 +30,6 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
-        if([self.displayName isEqualToString:@"storage_provider_name_local_device"]) {
-            _displayName = @"Local Device";
-        }
-        
-        _icon = @"iphone_x";
         _storageId = kLocalDevice;
         _providesIcons = NO;
         _browsableNew = NO;
@@ -140,12 +135,23 @@ suggestedFilename:(NSString *)suggestedFilename
     return ret;
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
     NSURL* url = [self getFileUrl:safeMetaData];
 
-    [data writeToFile:url.path atomically:YES];
-
-    completion(nil);
+    NSError* error;
+    BOOL success = [data writeToFile:url.path options:NSDataWritingAtomic error:&error];
+    if (success) {
+        NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+        if (error) {
+            completion(kUpdateResultError, nil, error);
+        }
+        else {
+            completion(kUpdateResultSuccess, attr.fileModificationDate, nil);
+        }
+    }
+    else {
+        completion(kUpdateResultError, nil, error);
+    }
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *error))completion {
@@ -200,7 +206,7 @@ suggestedFilename:(NSString *)suggestedFilename
         completion(kReadResultError, nil, nil, error);
     }
     else {
-        if (options.onlyIfModifiedDifferentFrom == nil || (![attributes.fileModificationDate isEqualToDate:options.onlyIfModifiedDifferentFrom] )) {
+        if (options.onlyIfModifiedDifferentFrom == nil || (![attributes.fileModificationDate isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom] )) {
             NSData *data = [[NSFileManager defaultManager] contentsAtPath:url.path];
             completion(kReadResultSuccess, data, attributes.fileModificationDate, error);
         }

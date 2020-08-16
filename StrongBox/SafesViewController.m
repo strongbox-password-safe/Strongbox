@@ -47,7 +47,9 @@
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "SharedAppAndAutoFillSettings.h"
 #import "SyncManager.h"
-#import "SyncOperationInfo.h"
+#import "SyncStatus.h"
+#import "SyncLogViewController.h"
+#import "NSDate+Extensions.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -314,7 +316,10 @@
 }
 
 - (void)hidePrivacyScreen:(BOOL)userJustCompletedBiometricAuthentication {
-    if (self.privacyAndLockVc) {
+    UIViewController* visible =[self getVisibleViewController];
+    BOOL fallbackMethod = [visible isKindOfClass:PrivacyViewController.class];
+    
+    if (self.privacyAndLockVc || fallbackMethod) {
         if ([self shouldLockOpenDatabase]) {
             NSLog(@"Should Lock Database now...");
 
@@ -330,16 +335,26 @@
         }
         else {
             NSLog(@"Dismissing Privacy Screen");
-            [self.privacyAndLockVc.presentingViewController dismissViewControllerAnimated:NO completion:^{
-                NSLog(@"Dismissing Privacy Screen Done!");
-                [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
-            }];
+
+            if (self.privacyAndLockVc) {
+                [self.privacyAndLockVc.presentingViewController dismissViewControllerAnimated:NO completion:^{
+                    NSLog(@"Dismissing Privacy Screen Done!");
+                    [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
+                }];
+            }
+            else { // Fallback
+                // This dismisses all modals including the privacy screen which is what we want
+                [self dismissViewControllerAnimated:NO completion:^{
+                    [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
+                }];
+            }
         }
         
         self.enterBackgroundTime = nil;
     }
     else {
         // I don't think this is possible but would like to know about it if it ever somehow could occur
+        // This is weirdly possible but should now be handled by Fallback check on visible screen above 13-Aug-2020
         NSLog(@"XXXXX - Interesting Situation - hidePrivacyScreen but no Privacy Screen was up? - XXXX");
     }
 }
@@ -645,7 +660,7 @@
 
 - (void)onDatabaseSyncStatusChanged:(id)param {
     NSNotification* notification = param;
-    SyncOperationInfo* syncInfo = notification.object;
+    SyncStatus* syncInfo = notification.object;
     
     NSLog(@"onDatabaseSyncStatusChanged: [%@-%lu]", syncInfo.databaseId, (unsigned long)syncInfo.state);
     
@@ -779,10 +794,6 @@
     [self startOnboarding];
 }
 
-- (BOOL)isReasonablyNewUser {
-    return [[Settings sharedInstance] getLaunchCount] <= 10;
-}
-
 #pragma mark - Table view data source
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -811,114 +822,9 @@
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    [self populateDatabaseCell:cell database:safe];
+    [cell populateCell:safe disabled:NO];
     
     return cell;
-}
-
-- (NSArray<UIImage*>*)getStatusImages:(SafeMetaData*)database syncState:(SyncOperationState)syncState {
-    NSMutableArray<UIImage*> *ret = NSMutableArray.array;
-    
-    if(database.hasUnresolvedConflicts) {
-        [ret addObject:[UIImage imageNamed:@"error"]];
-    }
-    
-    if (SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon) {
-        if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
-            [ret addObject:[UIImage imageNamed:@"rocket"]];
-        }
-        
-        if(database.readOnly) {
-            [ret addObject:[UIImage imageNamed:@"glasses"]];
-        }
-    }
-    
-    if (syncState == kSyncOperationStateInProgress || syncState == kSyncOperationStateError || syncState == kSyncOperationStateBackgroundButUserInteractionRequired) {
-        [ret addObject:[UIImage imageNamed:@"syncronize"]];
-    }
-    
-    return ret;
-}
-
-- (void)populateDatabaseCell:(DatabaseCell*)cell database:(SafeMetaData*)database {
-    SyncOperationInfo *syncStatus = [SyncManager.sharedInstance getSyncStatus:database];
-    SyncOperationState syncState = syncStatus.state;
-    
-    NSArray<UIImage*>* statusImages =  [self getStatusImages:database syncState:syncState];
-        
-    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
-    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
-    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
-    
-    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    UIImage* databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:provider.icon] : nil;
-    
-    [cell set:database.nickName
-  topSubtitle:topSubtitle
-    subtitle1:subtitle1
-    subtitle2:subtitle2
- providerIcon:databaseIcon
- statusImages:statusImages
-     rotateLastImage:syncState == kSyncOperationStateInProgress
-     lastImageTint:(syncState == kSyncOperationStateError || syncState == kSyncOperationStateBackgroundButUserInteractionRequired) ? UIColor.systemOrangeColor : nil
-     disabled:NO];
-}
-
-- (NSString*)getDatabaseCellSubtitleField:(SafeMetaData*)database field:(DatabaseCellSubtitleField)field {
-    switch (field) {
-        case kDatabaseCellSubtitleFieldNone:
-            return nil;
-            break;
-        case kDatabaseCellSubtitleFieldFileName:
-            return database.fileName;
-            break;
-        case kDatabaseCellSubtitleFieldLastModifiedDate:
-            return [self getModifiedDate:database];
-            break;
-        case kDatabaseCellSubtitleFieldLastModifiedDatePrecise:
-            return [self getModifiedDatePrecise:database];
-            break;
-        case kDatabaseCellSubtitleFieldFileSize:
-            return [self getLocalWorkingCopyFileSize:database];
-            break;
-        case kDatabaseCellSubtitleFieldStorage:
-            return [self getStorageString:database];
-            break;
-        default:
-            return @"<Unknown Field>";
-            break;
-    }
-}
-
-- (NSString*)getModifiedDate:(SafeMetaData*)safe {
-    NSDate* mod;
-    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
-    return mod ? friendlyDateStringVeryShort(mod) : @"";
-}
-
-- (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
-    NSDate* mod;
-    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
-    return mod ? friendlyDateTimeStringPrecise(mod) : @"";
-}
-
-- (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
-    unsigned long long fileSize;
-    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:nil fileSize:&fileSize];
-    return url ? friendlyFileSizeString(fileSize) : @"";
-}
-
-- (NSString*)getStorageString:(SafeMetaData*)database {
-    id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    
-    NSString* providerString = provider.displayName;
-    BOOL localDeviceOption = database.storageProvider == kLocalDevice;
-    if(localDeviceOption) {
-        providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
-        NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
-        NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
-    }
-    return providerString;
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -930,19 +836,19 @@
         return;
     }
     
-    [self openSafeAtIndexPath:indexPath offline:NO];
+    [self openSafeAtIndexPath:indexPath openLocalOnly:NO];
 }
 
-- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath offline:(BOOL)offline {
+- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath openLocalOnly:(BOOL)offline {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    [self openDatabase:safe offline:offline userJustCompletedBiometricAuthentication:NO];
+    [self openDatabase:safe openLocalOnly:offline userJustCompletedBiometricAuthentication:NO];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)openDatabase:(SafeMetaData*)safe
-             offline:(BOOL)offline
+       openLocalOnly:(BOOL)openLocalOnly
 userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthentication {
     NSLog(@"======================== OPEN DATABASE: %@ ============================", safe);
     
@@ -954,7 +860,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                            safe:safe
                                             canConvenienceEnrol:YES
                                                  isAutoFillOpen:NO
-                                         manualOpenOfflineCache:offline
+                                                  openLocalOnly:openLocalOnly
                                     biometricAuthenticationDone:userJustCompletedBiometricAuthentication
                                                      completion:^(Model * _Nullable model, NSError * _Nullable error) {
             if(model) {
@@ -981,7 +887,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     UITableViewRowAction *offlineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                              title:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
                                                                            handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self openOffline:indexPath];
+        [self openLocalOnly:indexPath];
     }];
     offlineAction.backgroundColor = [UIColor darkGrayColor];
 
@@ -1065,25 +971,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [alertController addAction:viewBackupsOption];
 
     // Sync Status
-    
-    SyncOperationInfo *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
-    if (syncStatus.state == kSyncOperationStateBackgroundButUserInteractionRequired || syncStatus.state == kSyncOperationStateError) {
-        UIAlertAction *viewSyncStatus = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync status of this database")
-                                                                 style:UIAlertActionStyleDefault
-                                                               handler:^(UIAlertAction *a) {
-            if (syncStatus.state == kSyncOperationStateError) {
-                [Alerts error:self error:syncStatus.error];
-            }
-            else {
-                NSString* title = NSLocalizedString(@"sync_status_user_interaction_required_title", @"User Interaction Required");
-                NSString* message = NSLocalizedString(@"sync_status_user_interaction_required_message", @"Sync could not complete because user interaction is required.");
-                
-                [Alerts info:self title:title message:message];
-            }
-        }];
-        
-        [alertController addAction:viewSyncStatus];
-    }
+    UIAlertAction *viewSyncStatus = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
+                                                             style:UIAlertActionStyleDefault
+                                                           handler:^(UIAlertAction *a) {
+        [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
+    }];
+    [alertController addAction:viewSyncStatus];
     
     // Cancel
     
@@ -1151,8 +1044,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 }
 
-- (void)openOffline:(NSIndexPath*)indexPath {
-    [self openSafeAtIndexPath:indexPath offline:YES];
+- (void)openLocalOnly:(NSIndexPath*)indexPath {
+    [self openSafeAtIndexPath:indexPath openLocalOnly:YES];
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
@@ -1378,7 +1271,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         wcdvc.onDone = ^(BOOL addExisting, SafeMetaData * _Nullable databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(databaseToOpen) {
-                     [self openDatabase:databaseToOpen offline:NO userJustCompletedBiometricAuthentication:NO];
+                     [self openDatabase:databaseToOpen openLocalOnly:NO userJustCompletedBiometricAuthentication:NO];
                 }
             }];
         };
@@ -1398,6 +1291,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         BackupsTableViewController* vc = (BackupsTableViewController*)nav.topViewController;
         vc.metadata = (SafeMetaData*)sender;
+    }
+    else if ([segue.identifier isEqualToString:@"segueToSyncLog"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        SyncLogViewController* vc = (SyncLogViewController*)nav.topViewController;
+        vc.database = (SafeMetaData*)sender;
     }
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
@@ -1435,7 +1333,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         });
     }
     else if(databaseToOpen) {
-        [self openDatabase:databaseToOpen offline:NO userJustCompletedBiometricAuthentication:NO];
+        [self openDatabase:databaseToOpen openLocalOnly:NO userJustCompletedBiometricAuthentication:NO];
     }
 }
 
@@ -1865,7 +1763,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         return;
     }
     
-    [self openDatabase:safe offline:NO userJustCompletedBiometricAuthentication:userJustCompletedBiometricAuthentication];
+    [self openDatabase:safe openLocalOnly:NO userJustCompletedBiometricAuthentication:userJustCompletedBiometricAuthentication];
 }
 
 // iCloud Availability and Import / Export
@@ -1906,34 +1804,36 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 // Importation
 
 - (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+        StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
 
-    if(!document) {
-        NSLog(@"Invalid URL to Import [%@]", url);
-        [self onReadImportedFile:NO data:nil url:url canOpenInPlace:NO forceOpenInPlace:NO modDate:nil];
-        return;
-    }
+        if(!document) {
+            NSLog(@"Invalid URL to Import [%@]", url);
+            [self onReadImportedFile:NO data:nil url:url canOpenInPlace:NO forceOpenInPlace:NO modDate:nil];
+            return;
+        }
 
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_reading_data", @"Reading Data...")];
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"set_icon_vc_progress_reading_data", @"Reading Data...")];
 
-    [document openWithCompletionHandler:^(BOOL success) {
-        [SVProgressHUD dismiss];
-        
-        NSData* data = document.data ? document.data.copy : nil; // MMcG: Attempt to fix a crash
-        
-        NSError* error;
-        NSDictionary* att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-        NSDate* mod = att.fileModificationDate;
-        
-        [document closeWithCompletionHandler:nil];
-        
-        // Inbox should be empty whenever possible so that we can detect the
-        // re-importation of a certain file and ask if user wants to create a
-        // new copy or just update an old one...
-        [FileManager.sharedInstance deleteAllInboxItems];
-                
-        [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
-    }];
+        [document openWithCompletionHandler:^(BOOL success) {
+            [SVProgressHUD dismiss];
+            
+            NSData* data = document.data ? document.data.copy : nil; // MMcG: Attempt to fix a crash
+            
+            NSError* error;
+            NSDictionary* att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+            NSDate* mod = att.fileModificationDate;
+            
+            [document closeWithCompletionHandler:nil];
+            
+            // Inbox should be empty whenever possible so that we can detect the
+            // re-importation of a certain file and ask if user wants to create a
+            // new copy or just update an old one...
+            [FileManager.sharedInstance deleteAllInboxItems];
+                    
+            [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
+        }];
+    });
 }
 
 - (void)onReadImportedFile:(BOOL)success

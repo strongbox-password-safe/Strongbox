@@ -92,7 +92,7 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                                   duckDuckGo: Bool = true,
                                   google: Bool = true,
                                   allowInvalidSSLCerts: Bool = false,
-                                  completion: @escaping ([DetectedIcon], [String:String]) -> Void) {
+                                  completion: @escaping ([DetectedIcon], [String:String]) -> Void) throws {
         let syncQueue = DispatchQueue(label: "org.bitserf.FavIcon", attributes: [])
         var icons: [DetectedIcon] = []
         var additionalDownloads: [URLRequestWithCallback] = []
@@ -198,39 +198,45 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
         components?.user = nil; //@"";
         components?.password = nil; //@"";
         components?.fragment = nil; //@"";
-
+        
         let domain = components?.host ?? url.absoluteString;
-        let blah = String(format: "https://icons.duckduckgo.com/ip3/%@.ico" , domain)
+        let blah = String(format: "https://icons.duckduckgo.com/ip3/%@.ico" , domain.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!)
         
         if(duckDuckGo) {
-            let duckDuckGoURL = URL(string: blah)!.absoluteURL
-            let checkDuckDuckGoURLOperation = CheckURLExistsOperation(url: duckDuckGoURL, session: urlSession)
-            let checkDuckDuckGoURL = urlRequestOperation(checkDuckDuckGoURLOperation) { result in
-                if case let .success(actualURL) = result {
-                    syncQueue.sync {
-                        icons.append(DetectedIcon(url: actualURL, type: .classic)) // TODO: Classic?
+            let ddgUrl = URL(string: blah);
+            
+            if (ddgUrl != nil) {
+                let duckDuckGoURL = ddgUrl!.absoluteURL
+                let checkDuckDuckGoURLOperation = CheckURLExistsOperation(url: duckDuckGoURL, session: urlSession)
+                let checkDuckDuckGoURL = urlRequestOperation(checkDuckDuckGoURLOperation) { result in
+                    if case let .success(actualURL) = result {
+                        syncQueue.sync {
+                            icons.append(DetectedIcon(url: actualURL, type: .classic)) // TODO: Classic?
+                        }
                     }
                 }
+                
+                operations.append(checkDuckDuckGoURL);
             }
-            
-            operations.append(checkDuckDuckGoURL);
         }
         
         //
 
         if(google) {
-            let blah2 = String(format: "https://www.google.com/s2/favicons?domain=%@" , domain)
-            let googleURL = URL(string: blah2)!.absoluteURL
-            let checkGoogleUrlOperation = CheckURLExistsOperation(url: googleURL, session: urlSession)
-            let checkGoogleUrl = urlRequestOperation(checkGoogleUrlOperation) { result in
-                if case let .success(actualURL) = result {
-                    syncQueue.sync {
-                        icons.append(DetectedIcon(url: actualURL, type: .classic)) // TODO: Classic?
+            let blah2 = String(format: "https://www.google.com/s2/favicons?domain=%@" , domain.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!)
+            let googleURL = URL(string: blah2)?.absoluteURL
+            if (googleURL != nil) {
+                let checkGoogleUrlOperation = CheckURLExistsOperation(url: googleURL!, session: urlSession)
+                let checkGoogleUrl = urlRequestOperation(checkGoogleUrlOperation) { result in
+                    if case let .success(actualURL) = result {
+                        syncQueue.sync {
+                            icons.append(DetectedIcon(url: actualURL, type: .classic)) // TODO: Classic?
+                        }
                     }
                 }
+                
+                operations.append(checkGoogleUrl);
             }
-            
-            operations.append(checkGoogleUrl);
         }
 
         if(operations.count == 0) {
@@ -284,24 +290,35 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
         }
     }
 
+    enum MyError: Error {
+        case runtimeError(String)
+    }
+    
     @objc public static func downloadAll(_ url: URL,
                                          favIcon: Bool,
                                           scanHtml: Bool,
                                           duckDuckGo: Bool,
                                           google: Bool,
                                           allowInvalidSSLCerts: Bool,
-                                          completion: @escaping ([ImageType]?) -> Void) {
-        scan(url, favIcon: favIcon, scanHtml: scanHtml, duckDuckGo: duckDuckGo, google: google, allowInvalidSSLCerts: allowInvalidSSLCerts ) { icons, meta in
-            let iconMap = icons.reduce(into: [URL:DetectedIcon](), { current,icon in
-                current[icon.url] = icon
-            })
-            
-            let uniqueIcons = Array(iconMap.values);
-            dl(uniqueIcons) { downloaded in
-                let blah = Array(downloaded.values)
-                DispatchQueue.main.async {
-                    completion(blah)
+                                          completion: @escaping ([ImageType]?) -> Void)  throws {
+        do {
+            try scan(url, favIcon: favIcon, scanHtml: scanHtml, duckDuckGo: duckDuckGo, google: google, allowInvalidSSLCerts: allowInvalidSSLCerts ) { icons, meta in
+                let iconMap = icons.reduce(into: [URL:DetectedIcon](), { current,icon in
+                    current[icon.url] = icon
+                })
+                
+                let uniqueIcons = Array(iconMap.values);
+                dl(uniqueIcons) { downloaded in
+                    let blah = Array(downloaded.values)
+                    DispatchQueue.main.async {
+                        completion(blah)
+                    }
                 }
+            }
+        }
+        catch {
+            DispatchQueue.main.async {
+                completion([])
             }
         }
     }

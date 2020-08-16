@@ -21,10 +21,10 @@
 #import "LocalDeviceStorageProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "Alerts.h"
-#import "StrongboxUIDocument.h"
 #import "AutoFillSettings.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "SyncManager.h"
+#import "NSDate+Extensions.h"
 
 @interface SafesListTableViewController ()
 
@@ -144,35 +144,8 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-#pragma mark - Table view data source
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.safes.count;
-}
-
-- (NSString*)getModifiedDate:(SafeMetaData*)safe {
-    NSDate* mod;
-    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
-    
-    return mod ? friendlyDateStringVeryShort(mod) : @"";
-    
-    // TODO: Delete this strings?
-    //[NSString stringWithFormat:NSLocalizedString(@"autofill_safes_vc_cache_date_fmt", @"Cached%@: %@"),
-    //safe.alwaysUseCacheForAutoFill ?
-    //NSLocalizedString(@"autofill_safes_vc_cache_is_forced_fmt", @" (Forced)") : @"",
-    //friendlyDateStringVeryShort(mod)] : @"";
-}
-
-- (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
-    NSDate* mod;
-    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
-    return mod ? friendlyDateTimeStringPrecise(mod) : @"";
-}
-
-- (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
-    unsigned long long fileSize;
-    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:nil fileSize:&fileSize];
-    return url ? friendlyFileSizeString(fileSize) : @"";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -180,123 +153,11 @@
     SafeMetaData *safe = [self.safes objectAtIndex:indexPath.row];
     
     BOOL autoFillPossible = [[self getInitialViewController] autoFillIsPossibleWithSafe:safe];
-    [self populateDatabaseCell:cell database:safe disabled:!autoFillPossible];
+    BOOL liveIsPossible = [[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe];
+
+    [cell populateAutoFillCell:safe liveIsPossible:liveIsPossible disabled:!autoFillPossible];
     
     return cell;
-}
-
-- (NSArray<UIImage*>*)getStatusImages:(SafeMetaData*)database {
-    NSMutableArray<UIImage*> *ret = NSMutableArray.array;
-    
-    if(database.hasUnresolvedConflicts) {
-        [ret addObject:[UIImage imageNamed:@"error"]];
-    }
-    
-    if (SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon) {
-        if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
-            [ret addObject:[UIImage imageNamed:@"rocket"]];
-        }
-        
-        if(database.readOnly) {
-            [ret addObject:[UIImage imageNamed:@"glasses"]];
-        }
-    }
-    
-    return ret;
-}
-
-- (void)populateDatabaseCell:(DatabaseCell*)cell database:(SafeMetaData*)database disabled:(BOOL)disabled {
-    NSArray<UIImage*>* statusImages =  [self getStatusImages:database];
-    
-    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
-    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
-    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
-    
-    UIImage* databaseIcon = nil;
-    if (SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon) {
-        // Manual Icons for unsupported/uncompilable providers in App Extension
-        if(database.storageProvider == kOneDrive) {
-            databaseIcon = [UIImage imageNamed:@"one-drive-icon-only-32x32"];
-        }
-        else if (database.storageProvider == kGoogleDrive) {
-            databaseIcon = [UIImage imageNamed:@"product32"];
-        }
-        else {
-            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-            databaseIcon = [UIImage imageNamed:provider.icon];
-        }
-    }
-    
-    // If we can't do live show auto fill cache date in subtitle 2
-    
-    if (disabled) {
-        databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
-        subtitle2 = database.autoFillEnabled ?
-        NSLocalizedString(@"autofill_safes_vc_item_subtitle_no_cache_yet", @"[No Auto Fill Cache File Yet]") :
-        NSLocalizedString(@"autofill_safes_vc_item_subtitle_cache_disabled", @"[Auto Fill Disabled]");
-    }
-    else {
-        if(![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:database]) {
-            subtitle2 = [self getModifiedDate:database];
-        }
-    }
-    
-    [cell set:database.nickName
-  topSubtitle:topSubtitle
-    subtitle1:subtitle1
-    subtitle2:subtitle2
- providerIcon:databaseIcon
-  statusImages:statusImages
-     rotateLastImage:NO
-     lastImageTint:nil
-     disabled:disabled];
-}
-
-- (NSString*)getDatabaseCellSubtitleField:(SafeMetaData*)database field:(DatabaseCellSubtitleField)field {
-    switch (field) {
-        case kDatabaseCellSubtitleFieldNone:
-            return nil;
-            break;
-        case kDatabaseCellSubtitleFieldFileName:
-            return database.fileName;
-            break;
-        case kDatabaseCellSubtitleFieldLastModifiedDate:
-            return [self getModifiedDate:database];
-            break;
-        case kDatabaseCellSubtitleFieldLastModifiedDatePrecise:
-            return [self getModifiedDatePrecise:database];
-            break;
-        case kDatabaseCellSubtitleFieldFileSize:
-            return [self getLocalWorkingCopyFileSize:database];
-            break;
-        case kDatabaseCellSubtitleFieldStorage:
-            return [self getStorageString:database];
-            break;
-        default:
-            return @"<Unknown Field>";
-            break;
-    }
-}
-
-- (NSString*)getStorageString:(SafeMetaData*)database {
-    NSString* providerString;
-    if(database.storageProvider == kOneDrive) {
-        providerString = @"OneDrive";
-    }
-    else if (database.storageProvider == kGoogleDrive) {
-        providerString = @"Google Drive";
-    }
-    else {
-        id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-        providerString = provider.displayName;
-        if(database.storageProvider == kLocalDevice) {
-            providerString = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
-            NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
-            NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
-        }
-    }
-    
-    return providerString;
 }
 
 - (CredentialProviderViewController *)getInitialViewController {
@@ -320,7 +181,7 @@
                                           openAutoFillCache:useAutoFillCache
                                         canConvenienceEnrol:NO // MMcG: There appears to be problems with trying to sync from App Extensions here... just have user properly enrol in the main app...
                                              isAutoFillOpen:YES
-                                     manualOpenOfflineCache:NO
+                                     openLocalOnly:NO
                                 biometricAuthenticationDone:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
         AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;

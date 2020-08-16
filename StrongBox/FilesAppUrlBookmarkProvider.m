@@ -38,12 +38,6 @@ typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *err
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = NSLocalizedString(@"storage_provider_name_ios_files", @"iOS Files");
-        if([self.displayName isEqualToString:@"storage_provider_name_ios_files"]) {
-            _displayName = @"iOS Files"; 
-        }
-        
-        _icon = @"lock"; 
         _storageId = kFilesAppUrlBookmark;
         _providesIcons = NO;
         _browsableNew = NO;
@@ -181,18 +175,22 @@ viewController:(UIViewController *)viewController
     NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     NSLog(@"[Files] File Mod Date: [%@][%@]", attr.fileModificationDate, error);
 
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
-    
-    if (!document) {
-        completion(kReadResultError, nil, nil, [Utils createNSError:@"Invalid Files URL" errorCode:-6]);
-        return;
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+        StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+        
+        if (!document) {
+            completion(kReadResultError, nil, nil, [Utils createNSError:@"Invalid Files URL" errorCode:-6]);
+            return;
+        }
 
-    [document openWithCompletionHandler:^(BOOL success) {
-        NSLog(@"[Files] File Mod Date2: [%@]", document.fileModificationDate);
-        completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, nil);
-        [url stopAccessingSecurityScopedResource];
-    }];
+        [document openWithCompletionHandler:^(BOOL success) {
+            NSLog(@"[Files] File Mod Date2: [%@]", document.fileModificationDate);
+            completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, nil);
+            [url stopAccessingSecurityScopedResource];
+            
+            [document closeWithCompletionHandler:nil];
+        }];
+    });
 }
 
 - (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
@@ -200,35 +198,39 @@ viewController:(UIViewController *)viewController
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
     NSError *error;
     NSURL* url = [self filesAppUrlFromMetaData:safeMetaData isAutoFill:isAutoFill ppError:&error];
     
     if(error) {
         NSLog(@"Error or nil URL in Files App provider: [%@]", error);
-        completion(error);
+        completion(kUpdateResultError, nil, error);
         return;
     }
     
     if(!url || url.absoluteString.length == 0) {
         NSLog(@"nil or empty URL in Files App provider");
         error = [Utils createNSError:[NSString stringWithFormat:@"Invalid URL in Files App Provider: %@", url] errorCode:-1];
-        completion(error);
+        completion(kUpdateResultError, nil, error);
         return;
     }
     
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
-    
-    [document saveToURL:url forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
-        if(success) {
-            NSLog(@"Done");
-            completion(nil);
-        }
-        else {
-            NSError *err = [Utils createNSError:NSLocalizedString(@"files_provider_problem_saving", @"Problem Saving to External File") errorCode:-1];
-            completion(err);
-        }
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+        StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
+        
+        [document saveToURL:url forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
+            if(success) {
+                NSLog(@"Done");
+                completion(kUpdateResultSuccess, document.fileModificationDate, nil);
+            }
+            else {
+                NSError *err = [Utils createNSError:NSLocalizedString(@"files_provider_problem_saving", @"Problem Saving to External File") errorCode:-1];
+                completion(kUpdateResultError, nil, err);
+            }
+            
+            [document closeWithCompletionHandler:nil];
+        }];
+    });
 }
 
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {

@@ -667,7 +667,7 @@
                                 <attributedString key="attributedText">
                                     <fragment content="Testing">
                                         <attributes>
-                                            <font key="NSFont" metaFont="label" size="11"/>
+                                            <font key="NSFont" metaFont="message" size="11"/>
                                             <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
                                         </attributes>
                                     </fragment>
@@ -768,7 +768,7 @@
                         </connections>
                     </tableView>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" id="3v9-gX-Y0u">
+                    <navigationItem key="navigationItem" title="Cloud Sessions" id="3v9-gX-Y0u">
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="WdM-DA-cuf">
                             <connections>
                                 <action selector="onDone:" destination="8T5-OF-MF5" id="uMa-kj-bTj"/>
@@ -954,12 +954,42 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="pba-KR-xJL" userLabel="Force Push (Do not check for conflict)">
+                                        <rect key="frame" x="0.0" y="474.5" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="pba-KR-xJL" id="fkl-Hh-pNQ">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Force Push (No Conflict Check)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="NDC-ed-GFe">
+                                                    <rect key="frame" x="20" y="11" width="241.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="EBY-yi-RGh">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="POa-aP-tGC"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="EBY-yi-RGh" firstAttribute="trailing" secondItem="fkl-Hh-pNQ" secondAttribute="trailing" constant="-20" id="ILA-Fy-zuT"/>
+                                                <constraint firstItem="NDC-ed-GFe" firstAttribute="top" secondItem="fkl-Hh-pNQ" secondAttribute="topMargin" id="hQf-fn-Hgp"/>
+                                                <constraint firstItem="EBY-yi-RGh" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="NDC-ed-GFe" secondAttribute="trailing" constant="8" symbolic="YES" id="i65-0m-1lk"/>
+                                                <constraint firstItem="NDC-ed-GFe" firstAttribute="centerY" secondItem="EBY-yi-RGh" secondAttribute="centerY" id="kUy-4j-wWf"/>
+                                                <constraint firstItem="NDC-ed-GFe" firstAttribute="bottom" secondItem="fkl-Hh-pNQ" secondAttribute="bottomMargin" id="qP0-JY-JlJ"/>
+                                                <constraint firstItem="NDC-ed-GFe" firstAttribute="leading" secondItem="fkl-Hh-pNQ" secondAttribute="leading" constant="20" id="z8D-hs-5O1"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                             <tableViewSection headerTitle="Miscellaneous" footerTitle="More advanced or niche preferences. Some care may be required when using features labeled Alpha or Beta" id="l7v-m5-yUl">
                                 <cells>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="b7a-0Z-9yU" userLabel="Instant Pin Unlock Mode">
-                                        <rect key="frame" x="0.0" y="566" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="610" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="b7a-0Z-9yU" id="RWE-kc-mkG">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -989,7 +1019,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="fw3-gc-cgu" userLabel="Yubikey Secret">
-                                        <rect key="frame" x="0.0" y="610" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="654" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fw3-gc-cgu" id="ydJ-lJ-NYu">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1019,7 +1049,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="CYR-kY-sof" userLabel="Hide Key File Name on Unlock Screen">
-                                        <rect key="frame" x="0.0" y="654" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="698" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CYR-kY-sof" id="BzG-ai-wwd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1049,7 +1079,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="jqp-w9-9EG" userLabel="Show All Files in Key Files Local">
-                                        <rect key="frame" x="0.0" y="698" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="742" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="jqp-w9-9EG" id="jTK-py-WHd">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1079,14 +1109,14 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="bIg-gn-Wyn" userLabel="Show All Files in Key Files Local">
-                                        <rect key="frame" x="0.0" y="742" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="786" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="bIg-gn-Wyn" id="tzb-hF-Oh4">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Detect if Offline (to offer Offline Cache)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v7x-7f-dfb">
-                                                    <rect key="frame" x="20" y="11" width="302" height="22"/>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Detect if Offline (to offer Local Copy)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v7x-7f-dfb">
+                                                    <rect key="frame" x="20" y="11" width="282.5" height="22"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -1109,7 +1139,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="HIU-iF-9nx" userLabel="Allow Clipboard Handoff">
-                                        <rect key="frame" x="0.0" y="786" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="830" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HIU-iF-9nx" id="xsf-Vl-gtb">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1139,7 +1169,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="Cca-ff-gxA" userLabel="Use Color Blind Palette for Passwords">
-                                        <rect key="frame" x="0.0" y="830" width="414" height="44"/>
+                                        <rect key="frame" x="0.0" y="874" width="414" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Cca-ff-gxA" id="m7Z-SN-Vj7">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
@@ -1200,6 +1230,7 @@
                         <outlet property="switchShowAllFilesInKeyFilesLocal" destination="NUW-RD-8sG" id="eS2-52-5yN"/>
                         <outlet property="switchShowYubikeySecretWorkaround" destination="wGm-bI-fp3" id="rcC-7N-efl"/>
                         <outlet property="switchSyncForcePull" destination="wNi-6f-RtU" id="4er-Db-Ko2"/>
+                        <outlet property="switchSyncForcePush" destination="EBY-yi-RGh" id="CH9-dh-ei5"/>
                         <outlet property="switchUseColorBlindPalette" destination="fQJ-uY-SEH" id="9pG-Ud-fOY"/>
                     </connections>
                 </tableViewController>
@@ -1573,7 +1604,7 @@
                             <outlet property="delegate" destination="rF2-GZ-Oaf" id="7dZ-Vy-qoh"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="jzG-vS-ZzA">
+                    <navigationItem key="navigationItem" title="New Entry Defaults" id="jzG-vS-ZzA">
                         <barButtonItem key="rightBarButtonItem" style="done" systemItem="done" id="YWy-Cm-tyf">
                             <connections>
                                 <action selector="onDone:" destination="rF2-GZ-Oaf" id="jKY-Te-ruJ"/>

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,15 +15,8 @@ extern NSString* const kDatabaseCell;
 
 @interface DatabaseCell : UITableViewCell
 
-- (void)set:(NSString*)name
-topSubtitle:(NSString*)topSubtitle
-  subtitle1:(NSString*)subtitle1
-  subtitle2:(NSString*)subtitle2
-providerIcon:(UIImage*_Nullable)providerIcon
-statusImages:(NSArray<UIImage*>*)statusImages
-rotateLastImage:(BOOL)rotateLastImage
-lastImageTint:(UIColor*_Nullable)lastImageTint
-   disabled:(BOOL)disabled;
+- (void)populateCell:(SafeMetaData*)database disabled:(BOOL)disabled;
+- (void)populateAutoFillCell:(SafeMetaData*)database liveIsPossible:(BOOL)liveIsPossible disabled:(BOOL)disabled; // TODO: Remove once Auto-Fill is local only
 
 @end
 

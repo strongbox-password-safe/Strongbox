@@ -15,6 +15,7 @@
 #import "ISMessages.h"
 #import "ClipboardManager.h"
 #import "Utils.h"
+#import "NSDate+Extensions.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate, UIActivityItemSource>
 
@@ -206,7 +207,7 @@
     else {
         NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.metadata.likelyFormat];
         NSString* appendExtension = self.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
-        NSString *attachmentName = [NSString stringWithFormat:@"%@-%@-%@", self.metadata.fileName, iso8601DateString(self.backupItem.date), appendExtension];
+        NSString *attachmentName = [NSString stringWithFormat:@"%@-%@-%@", self.metadata.fileName, self.backupItem.date.iso8601DateString, appendExtension];
 
         [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:self.encrypted nickname:self.metadata.nickName];
     }

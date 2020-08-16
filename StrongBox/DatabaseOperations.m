@@ -159,8 +159,8 @@
     
     [self.viewModel update:self
                 isAutoFill:NO
-                   handler:^(BOOL userCancelled, NSError * _Nullable error) {
-        if (userCancelled || error) {
+                   handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+        if (userCancelled || error || conflictAndLocalWasChanged) {
             // Rollback
             self.viewModel.database.compositeKeyFactors.password = rollbackCkf.password;
             self.viewModel.database.compositeKeyFactors.keyFileDigest = rollbackCkf.keyFileDigest;

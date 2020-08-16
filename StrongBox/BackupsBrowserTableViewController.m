@@ -12,6 +12,7 @@
 #import "Alerts.h"
 #import "ExportOptionsTableViewController.h"
 #import "LocalDeviceStorageProvider.h"
+#import "NSDate+Extensions.h"
 
 @interface BackupsBrowserTableViewController ()
 
@@ -51,7 +52,7 @@
     
     BackupItem* item = self.items[indexPath.row];
     
-    cell.textLabel.text = friendlyDateString(item.date);
+    cell.textLabel.text = item.date.friendlyDateString;
     cell.detailTextLabel.text = friendlyFileSizeString(item.fileSize.unsignedIntegerValue);
     
     return cell;

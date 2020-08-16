@@ -32,6 +32,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseColorBlindPalette;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchSyncForcePull;
+@property (weak, nonatomic) IBOutlet UISwitch *switchSyncForcePush;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
@@ -79,6 +80,8 @@
     NSLog(@"Advanced Preference Changed: [%@]", sender);
 
     SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame = self.switchSyncForcePull.on;
+    SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts = self.switchSyncForcePush.on;
+    
     SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
@@ -99,6 +102,8 @@
 
 - (void)bindPreferences {
     self.switchSyncForcePull.on = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
+    self.switchSyncForcePush.on = SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts;
+    
     self.instantPinUnlock.on = SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
     self.switchHideKeyFileName.on = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles;

@@ -59,7 +59,9 @@
     
         XCTAssertNil(error);
         
-        [[self getSftp] pushDatabase:metadata interactiveVC:nil data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(NSError *error) {
+        [[self getSftp] pushDatabase:metadata
+                       interactiveVC:nil
+                                data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(StorageProviderUpdateResult result, NSDate * _Nullable newRemoteModDate, const NSError * _Nullable error) {
             NSLog(@"Done. Error = [%@]", error);
         }];
     }];

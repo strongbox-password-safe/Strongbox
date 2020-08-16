@@ -1470,6 +1470,18 @@
 		4DFF400521806A9500B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* BasicOrderedDictionary.m */; };
 		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
+		C8053F7224E178FC00416031 /* SyncLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7124E178FC00416031 /* SyncLogViewController.m */; };
+		C8053F7324E178FC00416031 /* SyncLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7124E178FC00416031 /* SyncLogViewController.m */; };
+		C8053F7624E1816100416031 /* SyncLogCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8053F7524E1816100416031 /* SyncLogCell.xib */; };
+		C8053F7724E1816100416031 /* SyncLogCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8053F7524E1816100416031 /* SyncLogCell.xib */; };
+		C8053F7A24E181CF00416031 /* SyncLogEntryTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7924E181CF00416031 /* SyncLogEntryTableViewCell.m */; };
+		C8053F7B24E181CF00416031 /* SyncLogEntryTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7924E181CF00416031 /* SyncLogEntryTableViewCell.m */; };
+		C8053F7D24E1ACA100416031 /* SyncOperationState.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7C24E1ACA100416031 /* SyncOperationState.m */; };
+		C8053F7E24E1ACA100416031 /* SyncOperationState.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7C24E1ACA100416031 /* SyncOperationState.m */; };
+		C8053F8124E1D6E800416031 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F8024E1D6E800416031 /* NSDate+Extensions.m */; };
+		C8053F8224E1D6E800416031 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F8024E1D6E800416031 /* NSDate+Extensions.m */; };
+		C8053F8324E1D6E800416031 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F8024E1D6E800416031 /* NSDate+Extensions.m */; };
+		C8053F8424E1D6E800416031 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F8024E1D6E800416031 /* NSDate+Extensions.m */; };
 		C80E02ED249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
@@ -1590,14 +1602,44 @@
 		C8C73CCF249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
 		C8C73CD0249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
 		C8C73CD1249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
-		C8C73CD5249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
-		C8C73CD6249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
-		C8C73CD7249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
-		C8C73CD8249E468C00B34C8F /* SyncReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */; };
 		C8DC76472497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC76482497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC76492497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC764A2497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
+		C8DDE38C24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C8DDE38D24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C8DDE38E24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C8DDE38F24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C8DDE39124DEB6FA00873392 /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39024DEB6FA00873392 /* SyncParameters.m */; };
+		C8DDE39224DEB6FA00873392 /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39024DEB6FA00873392 /* SyncParameters.m */; };
+		C8DDE39324DEB6FA00873392 /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39024DEB6FA00873392 /* SyncParameters.m */; };
+		C8DDE39424DEB6FA00873392 /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39024DEB6FA00873392 /* SyncParameters.m */; };
+		C8DDE39724DEE14600873392 /* SyncDatabaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39624DEE14600873392 /* SyncDatabaseRequest.m */; };
+		C8DDE39824DEE14600873392 /* SyncDatabaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39624DEE14600873392 /* SyncDatabaseRequest.m */; };
+		C8DDE39924DEE14600873392 /* SyncDatabaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39624DEE14600873392 /* SyncDatabaseRequest.m */; };
+		C8DDE39A24DEE14600873392 /* SyncDatabaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39624DEE14600873392 /* SyncDatabaseRequest.m */; };
+		C8DDE39D24DEE24200873392 /* ConcurrentMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39C24DEE24200873392 /* ConcurrentMutableArray.m */; };
+		C8DDE39E24DEE24200873392 /* ConcurrentMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39C24DEE24200873392 /* ConcurrentMutableArray.m */; };
+		C8DDE39F24DEE24200873392 /* ConcurrentMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39C24DEE24200873392 /* ConcurrentMutableArray.m */; };
+		C8DDE3A024DEE24200873392 /* ConcurrentMutableArray.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39C24DEE24200873392 /* ConcurrentMutableArray.m */; };
+		C8DDE3A324DEE32100873392 /* ConcurrentMutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A224DEE32100873392 /* ConcurrentMutableQueue.m */; };
+		C8DDE3A424DEE32100873392 /* ConcurrentMutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A224DEE32100873392 /* ConcurrentMutableQueue.m */; };
+		C8DDE3A524DEE32100873392 /* ConcurrentMutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A224DEE32100873392 /* ConcurrentMutableQueue.m */; };
+		C8DDE3A624DEE32100873392 /* ConcurrentMutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A224DEE32100873392 /* ConcurrentMutableQueue.m */; };
+		C8DDE3A924DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A824DEE79100873392 /* DatabaseSyncOperationalData.m */; };
+		C8DDE3AA24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A824DEE79100873392 /* DatabaseSyncOperationalData.m */; };
+		C8DDE3AB24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A824DEE79100873392 /* DatabaseSyncOperationalData.m */; };
+		C8DDE3AC24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3A824DEE79100873392 /* DatabaseSyncOperationalData.m */; };
+		C8DDE3AF24DF035200873392 /* SyncStatusLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */; };
+		C8DDE3B024DF035200873392 /* SyncStatusLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */; };
+		C8DDE3B124DF035200873392 /* SyncStatusLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */; };
+		C8DDE3B224DF035200873392 /* SyncStatusLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */; };
+		C8DF4AD124E68B4C00F0F74E /* SyncLog.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */; };
+		C8DF4AD224E68B4C00F0F74E /* SyncLog.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */; };
+		C8DF4AD524E69E3B00F0F74E /* ConcurrentCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */; };
+		C8DF4AD624E69E3B00F0F74E /* ConcurrentCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */; };
+		C8DF4AD724E6A19300F0F74E /* ConcurrentCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */; };
+		C8DF4AD824E6A19400F0F74E /* ConcurrentCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */; };
 		C8E6D4E9246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EA246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
 		C8E6D4EB246D43EA00AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4E8246D43EA00AFFE13 /* WordList.m */; };
@@ -1627,10 +1669,10 @@
 		C8FA2A1924C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */; };
 		C8FA2A1A24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */; };
 		C8FA2A1B24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */; };
-		C8FA2A1E24C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
-		C8FA2A1F24C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
-		C8FA2A2024C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
-		C8FA2A2124C5B2F500445D8B /* SyncOperationInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */; };
+		C8FA2A1E24C5B2F500445D8B /* SyncStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncStatus.m */; };
+		C8FA2A1F24C5B2F500445D8B /* SyncStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncStatus.m */; };
+		C8FA2A2024C5B2F500445D8B /* SyncStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncStatus.m */; };
+		C8FA2A2124C5B2F500445D8B /* SyncStatus.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FA2A1D24C5B2F500445D8B /* SyncStatus.m */; };
 		E750CA0CA61B19C562728B0A /* Pods_common_ios_Strongbox_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A77DE4E6DC63CE9BF3D4B8C /* Pods_common_ios_Strongbox_iOS.framework */; };
 		F8BC916E4E9421DA0B191040 /* Pods_common_ios_Strongbox_iOS_Family.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7523D7C245F96F478BCBC5E0 /* Pods_common_ios_Strongbox_iOS_Family.framework */; };
 /* End PBXBuildFile section */
@@ -2086,7 +2128,7 @@
 		4D3E14A52183365000A41CA0 /* Argon2KdfCipher.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Argon2KdfCipher.m; path = model/keepass/Argon2KdfCipher.m; sourceTree = SOURCE_ROOT; };
 		4D402D6E2074EAFF00F7BC70 /* SafeMetaData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SafeMetaData.h; path = StrongBox/SafeMetaData.h; sourceTree = SOURCE_ROOT; };
 		4D402D702074EAFF00F7BC70 /* SafeMetaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SafeMetaData.m; path = StrongBox/SafeMetaData.m; sourceTree = SOURCE_ROOT; };
-		4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = Sync/StorageProvider.h; sourceTree = SOURCE_ROOT; };
+		4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StorageProvider.h; sourceTree = SOURCE_ROOT; };
 		4D409359217E2AA900E69844 /* ladder-single-entry.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "ladder-single-entry.xml"; sourceTree = "<group>"; };
 		4D40B09123BFBF7400BAD0D2 /* sample-non-hex-64.key */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "sample-non-hex-64.key"; sourceTree = "<group>"; };
 		4D40EEEC1ED87734006532F8 /* StorageBrowserTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageBrowserTableViewController.h; path = StrongBox/StorageBrowserTableViewController.h; sourceTree = "<group>"; };
@@ -2997,6 +3039,14 @@
 		C803E1C92464977B001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C803E1CA2464977C001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C803E1CB2464977C001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/RMStore.strings; sourceTree = "<group>"; };
+		C8053F7024E178FC00416031 /* SyncLogViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SyncLogViewController.h; path = Sync/SyncLogViewController.h; sourceTree = "<group>"; };
+		C8053F7124E178FC00416031 /* SyncLogViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SyncLogViewController.m; path = Sync/SyncLogViewController.m; sourceTree = "<group>"; };
+		C8053F7524E1816100416031 /* SyncLogCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SyncLogCell.xib; path = Sync/SyncLogCell.xib; sourceTree = "<group>"; };
+		C8053F7824E181CF00416031 /* SyncLogEntryTableViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SyncLogEntryTableViewCell.h; path = Sync/SyncLogEntryTableViewCell.h; sourceTree = "<group>"; };
+		C8053F7924E181CF00416031 /* SyncLogEntryTableViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SyncLogEntryTableViewCell.m; path = Sync/SyncLogEntryTableViewCell.m; sourceTree = "<group>"; };
+		C8053F7C24E1ACA100416031 /* SyncOperationState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncOperationState.m; sourceTree = "<group>"; };
+		C8053F7F24E1D68500416031 /* NSDate+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSDate+Extensions.h"; path = "model/NSDate+Extensions.h"; sourceTree = "<group>"; };
+		C8053F8024E1D6E800416031 /* NSDate+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Extensions.m"; path = "model/NSDate+Extensions.m"; sourceTree = "<group>"; };
 		C80E02EB249372D5005A4129 /* ChaCha20ReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ChaCha20ReadStream.h; path = model/ChaCha20ReadStream.h; sourceTree = "<group>"; };
 		C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ChaCha20ReadStream.m; path = model/ChaCha20ReadStream.m; sourceTree = "<group>"; };
 		C84333372461663200E2E550 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
@@ -3079,11 +3129,28 @@
 		C8BFECBD2478206C0051D21E /* NodeHierarchyReconstructionData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeHierarchyReconstructionData.h; path = model/NodeHierarchyReconstructionData.h; sourceTree = "<group>"; };
 		C8C73CCC249E42C700B34C8F /* SyncManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncManager.h; sourceTree = "<group>"; };
 		C8C73CCD249E42C700B34C8F /* SyncManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncManager.m; sourceTree = "<group>"; };
-		C8C73CD3249E468C00B34C8F /* SyncReadOptions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncReadOptions.h; sourceTree = "<group>"; };
-		C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncReadOptions.m; sourceTree = "<group>"; };
+		C8C73CD3249E468C00B34C8F /* SyncParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncParameters.h; sourceTree = "<group>"; };
+		C8C7A2C924E54C5E00BCCE40 /* StorageProviderUpdateResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StorageProviderUpdateResult.h; path = StrongBox/StorageProviderUpdateResult.h; sourceTree = "<group>"; };
 		C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModelConfig.m; path = model/DatabaseModelConfig.m; sourceTree = "<group>"; };
 		C8DC76462497B59500C9C443 /* DatabaseModelConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModelConfig.h; path = model/DatabaseModelConfig.h; sourceTree = "<group>"; };
+		C8DDE38A24DEB3C600873392 /* SyncAndMergeSequenceManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncAndMergeSequenceManager.h; sourceTree = "<group>"; };
+		C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncAndMergeSequenceManager.m; sourceTree = "<group>"; };
+		C8DDE39024DEB6FA00873392 /* SyncParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncParameters.m; sourceTree = "<group>"; };
+		C8DDE39524DEE14600873392 /* SyncDatabaseRequest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncDatabaseRequest.h; sourceTree = "<group>"; };
+		C8DDE39624DEE14600873392 /* SyncDatabaseRequest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncDatabaseRequest.m; sourceTree = "<group>"; };
+		C8DDE39B24DEE24200873392 /* ConcurrentMutableArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableArray.h; path = model/ConcurrentMutableArray.h; sourceTree = "<group>"; };
+		C8DDE39C24DEE24200873392 /* ConcurrentMutableArray.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableArray.m; path = model/ConcurrentMutableArray.m; sourceTree = "<group>"; };
+		C8DDE3A124DEE32100873392 /* ConcurrentMutableQueue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableQueue.h; path = model/ConcurrentMutableQueue.h; sourceTree = "<group>"; };
+		C8DDE3A224DEE32100873392 /* ConcurrentMutableQueue.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableQueue.m; path = model/ConcurrentMutableQueue.m; sourceTree = "<group>"; };
+		C8DDE3A724DEE79100873392 /* DatabaseSyncOperationalData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DatabaseSyncOperationalData.h; sourceTree = "<group>"; };
+		C8DDE3A824DEE79100873392 /* DatabaseSyncOperationalData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DatabaseSyncOperationalData.m; sourceTree = "<group>"; };
+		C8DDE3AD24DF035200873392 /* SyncStatusLogEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncStatusLogEntry.h; sourceTree = "<group>"; };
+		C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncStatusLogEntry.m; sourceTree = "<group>"; };
+		C8DDE3B324DF04D600873392 /* SyncOperationState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncOperationState.h; sourceTree = "<group>"; };
 		C8DEE079249A62AB00CF2AFE /* git-version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "git-version.h"; path = "build/git-version.h"; sourceTree = "<group>"; };
+		C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SyncLog.storyboard; path = StrongBox/SyncLog.storyboard; sourceTree = "<group>"; };
+		C8DF4AD324E69E3B00F0F74E /* ConcurrentCircularBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentCircularBuffer.h; path = model/ConcurrentCircularBuffer.h; sourceTree = "<group>"; };
+		C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentCircularBuffer.m; path = model/ConcurrentCircularBuffer.m; sourceTree = "<group>"; };
 		C8E6D4E7246D43EA00AFFE13 /* WordList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = model/WordList.h; sourceTree = "<group>"; };
 		C8E6D4E8246D43EA00AFFE13 /* WordList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = model/WordList.m; sourceTree = "<group>"; };
 		C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
@@ -3097,8 +3164,8 @@
 		C8F92292248A813B000F8292 /* CyrillicUrlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CyrillicUrlTests.m; path = StrongboxTests/CyrillicUrlTests.m; sourceTree = "<group>"; };
 		C8FA2A1624C5B0A300445D8B /* ConcurrentMutableDictionary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableDictionary.h; path = model/ConcurrentMutableDictionary.h; sourceTree = "<group>"; };
 		C8FA2A1724C5B0A300445D8B /* ConcurrentMutableDictionary.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableDictionary.m; path = model/ConcurrentMutableDictionary.m; sourceTree = "<group>"; };
-		C8FA2A1C24C5B2F500445D8B /* SyncOperationInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncOperationInfo.h; sourceTree = "<group>"; };
-		C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncOperationInfo.m; sourceTree = "<group>"; };
+		C8FA2A1C24C5B2F500445D8B /* SyncStatus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncStatus.h; sourceTree = "<group>"; };
+		C8FA2A1D24C5B2F500445D8B /* SyncStatus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncStatus.m; sourceTree = "<group>"; };
 		CD878F9FEAB00773253A902C /* Pods_common_ios_Strongbox_Auto_Fill_Family.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_ios_Strongbox_Auto_Fill_Family.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE1CB13354AFEE41A4273C9D /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 		D21DDC737B043D968D5F9854 /* Pods-common-ios-Strongbox-Auto-Fill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-ios-Strongbox-Auto-Fill.release.xcconfig"; path = "Pods/Target Support Files/Pods-common-ios-Strongbox-Auto-Fill/Pods-common-ios-Strongbox-Auto-Fill.release.xcconfig"; sourceTree = "<group>"; };
@@ -3950,8 +4017,9 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				4DED20C72168BF1800A5800A /* Home */,
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
+				C8D5F02E24E2DD130056B6EE /* Sync */,
+				4DED20C72168BF1800A5800A /* Home */,
 				C8A8DBA42484EF70009C673F /* Audit */,
 				4D0835DD2284769900CA7405 /* Browse */,
 				4DAE986A2270B39100A811C4 /* Item Details */,
@@ -3980,6 +4048,12 @@
 		4D62D6961C85F35E0051E13B /* Storage Providers */ = {
 			isa = PBXGroup;
 			children = (
+				4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */,
+				4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */,
+				C8991AD424B0CF7200C2D604 /* StorageProviderReadOptions.h */,
+				C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */,
+				C8991ADA24B0D01600C2D604 /* StorageProviderReadResult.h */,
+				C8C7A2C924E54C5E00BCCE40 /* StorageProviderUpdateResult.h */,
 				4D556F1822B812A300E16027 /* iOS Files */,
 				4D556F1722B8128500E16027 /* iCloud */,
 				4D556F1622B8127200E16027 /* Dropbox */,
@@ -4077,6 +4151,7 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C88F812A245D8C5E00B0B998 /* McGuill */,
 				4D556F0B22B7F1B300E16027 /* FileManager.h */,
 				4D556F0C22B7F1B300E16027 /* FileManager.m */,
 				C872B72D24A64B530042CE02 /* Streaming */,
@@ -4090,7 +4165,6 @@
 				4D18855F2170DE90001AE6B0 /* OpenSafeSequenceHelper.h */,
 				4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */,
 				4D6BA68323CCB981008DCE8A /* SecretStore */,
-				C88F812A245D8C5E00B0B998 /* McGuill */,
 				C89BE52F245B253700A73688 /* Password Generation */,
 				4D9AFB212449D0CD00376240 /* Audit */,
 				4DD6E78E23E731AD00AC2A49 /* BookmarksHelper.h */,
@@ -4813,6 +4887,8 @@
 		4DED20C72168BF1800A5800A /* Home */ = {
 			isa = PBXGroup;
 			children = (
+				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
+				4D1757B01C8361D300E6356F /* SafesViewController.m */,
 				4D5F5B84218B4CCB00A0739A /* Main.storyboard */,
 				4D20E7A822995B5E00ABFC89 /* Privacy and Lock */,
 				4DE2689E22A67A6200A1D158 /* MasterDetailViewController.h */,
@@ -4820,8 +4896,6 @@
 				4DE7F0CD22F89CE30095F51F /* MasterDetail.storyboard */,
 				4D1A5C001F7927D60036684C /* VersionConflictController.h */,
 				4D1A5C011F7927D60036684C /* VersionConflictController.m */,
-				4D1757AF1C8361D300E6356F /* SafesViewController.h */,
-				4D1757B01C8361D300E6356F /* SafesViewController.m */,
 				4DE18BB522F09976007D902D /* DatabaseCell.xib */,
 				4DE18BB822F09A3F007D902D /* DatabaseCell.h */,
 				4DE18BB922F09A3F007D902D /* DatabaseCell.m */,
@@ -5063,6 +5137,12 @@
 		C88F812A245D8C5E00B0B998 /* McGuill */ = {
 			isa = PBXGroup;
 			children = (
+				C8DF4AD324E69E3B00F0F74E /* ConcurrentCircularBuffer.h */,
+				C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */,
+				C8DDE3A124DEE32100873392 /* ConcurrentMutableQueue.h */,
+				C8DDE3A224DEE32100873392 /* ConcurrentMutableQueue.m */,
+				C8DDE39B24DEE24200873392 /* ConcurrentMutableArray.h */,
+				C8DDE39C24DEE24200873392 /* ConcurrentMutableArray.m */,
 				C88F812B245D8C7C00B0B998 /* ConcurrentMutableSet.h */,
 				C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */,
 				C8FA2A1624C5B0A300445D8B /* ConcurrentMutableDictionary.h */,
@@ -5085,6 +5165,8 @@
 				4D78AC2C1FB1E27700A68A92 /* Utils.m */,
 				4D17579C1C8361D200E6356F /* IOsUtils.h */,
 				4D17579D1C8361D200E6356F /* IOsUtils.m */,
+				C8053F7F24E1D68500416031 /* NSDate+Extensions.h */,
+				C8053F8024E1D6E800416031 /* NSDate+Extensions.m */,
 			);
 			name = McGuill;
 			sourceTree = "<group>";
@@ -5171,28 +5253,38 @@
 		C8C73CCB249E429D00B34C8F /* Sync */ = {
 			isa = PBXGroup;
 			children = (
-				4D402D7B2074EC3D00F7BC70 /* StorageProvider.h */,
-				4D1757AD1C8361D300E6356F /* SafeStorageProvider.h */,
 				4D62D6961C85F35E0051E13B /* Storage Providers */,
-				C8C73CD2249E466700B34C8F /* Legacy */,
 				C8C73CCC249E42C700B34C8F /* SyncManager.h */,
 				C8C73CCD249E42C700B34C8F /* SyncManager.m */,
-				C8991AD424B0CF7200C2D604 /* StorageProviderReadOptions.h */,
-				C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */,
-				C8991ADA24B0D01600C2D604 /* StorageProviderReadResult.h */,
-				C8FA2A1C24C5B2F500445D8B /* SyncOperationInfo.h */,
-				C8FA2A1D24C5B2F500445D8B /* SyncOperationInfo.m */,
+				C8DDE38A24DEB3C600873392 /* SyncAndMergeSequenceManager.h */,
+				C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */,
+				C8FA2A1C24C5B2F500445D8B /* SyncStatus.h */,
+				C8FA2A1D24C5B2F500445D8B /* SyncStatus.m */,
+				C8C73CD3249E468C00B34C8F /* SyncParameters.h */,
+				C8DDE39024DEB6FA00873392 /* SyncParameters.m */,
+				C8DDE39524DEE14600873392 /* SyncDatabaseRequest.h */,
+				C8DDE39624DEE14600873392 /* SyncDatabaseRequest.m */,
+				C8DDE3A724DEE79100873392 /* DatabaseSyncOperationalData.h */,
+				C8DDE3A824DEE79100873392 /* DatabaseSyncOperationalData.m */,
+				C8DDE3AD24DF035200873392 /* SyncStatusLogEntry.h */,
+				C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */,
+				C8DDE3B324DF04D600873392 /* SyncOperationState.h */,
+				C8053F7C24E1ACA100416031 /* SyncOperationState.m */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
 		};
-		C8C73CD2249E466700B34C8F /* Legacy */ = {
+		C8D5F02E24E2DD130056B6EE /* Sync */ = {
 			isa = PBXGroup;
 			children = (
-				C8C73CD3249E468C00B34C8F /* SyncReadOptions.h */,
-				C8C73CD4249E468C00B34C8F /* SyncReadOptions.m */,
+				C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */,
+				C8053F7024E178FC00416031 /* SyncLogViewController.h */,
+				C8053F7124E178FC00416031 /* SyncLogViewController.m */,
+				C8053F7524E1816100416031 /* SyncLogCell.xib */,
+				C8053F7824E181CF00416031 /* SyncLogEntryTableViewCell.h */,
+				C8053F7924E181CF00416031 /* SyncLogEntryTableViewCell.m */,
 			);
-			path = Legacy;
+			name = Sync;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -5508,6 +5600,7 @@
 				4D770F9B230326B900CBE244 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */,
 				4D770F8E2303262400CBE244 /* QRCodeScannerViewController.xib in Resources */,
+				C8053F7624E1816100416031 /* SyncLogCell.xib in Resources */,
 				4D766D4F22204E0A00AEF439 /* IconCellView.xib in Resources */,
 				C8855FD924857D24001EE933 /* AuditDrillDown.storyboard in Resources */,
 				4D36B0C822C94740003E9B68 /* catalan-diceware.wordlist.utf8.txt in Resources */,
@@ -5517,6 +5610,7 @@
 				4D36B0BA22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D36B0CA22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
+				C8DF4AD124E68B4C00F0F74E /* SyncLog.storyboard in Resources */,
 				4D47613D2437577400E312D9 /* FreemiumOnboarding.storyboard in Resources */,
 				4D8FCEA423606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
@@ -5600,6 +5694,7 @@
 				4DC4E14623488BAA000743C4 /* SFTPSessionConfigurationViewController.xib in Resources */,
 				4DC4E14723488BAA000743C4 /* Main.storyboard in Resources */,
 				4DC4E14823488BAA000743C4 /* QRCodeScannerViewController.xib in Resources */,
+				C8053F7724E1816100416031 /* SyncLogCell.xib in Resources */,
 				4DC4E14923488BAA000743C4 /* IconCellView.xib in Resources */,
 				C8855FDA24857D24001EE933 /* AuditDrillDown.storyboard in Resources */,
 				4DC4E14A23488BAA000743C4 /* catalan-diceware.wordlist.utf8.txt in Resources */,
@@ -5609,6 +5704,7 @@
 				4DC4E14E23488BAA000743C4 /* diceware.wordlist.utf8.txt in Resources */,
 				4DC4E14F23488BAA000743C4 /* NotesTableViewCell.xib in Resources */,
 				4DC4E15023488BAA000743C4 /* beale.wordlist.utf8.txt in Resources */,
+				C8DF4AD224E68B4C00F0F74E /* SyncLog.storyboard in Resources */,
 				4D47613F2437577400E312D9 /* FreemiumOnboarding.storyboard in Resources */,
 				4D8FCEA623606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DC4E15123488BAA000743C4 /* IconsSectionHeaderReusableView.xib in Resources */,
@@ -6093,13 +6189,13 @@
 				C8A8DBAA2484F024009C673F /* AuditDrillDownController.m in Sources */,
 				4D3D0A0B228AF81400C38C94 /* PrivacyViewController.m in Sources */,
 				4DC66F3D229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
+				C8DDE38C24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */,
 				4D5F5B76218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
 				4D2F6C1521807C00007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D08B5B7234C9613003D1953 /* GCDWebServer.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
 				C8BF76E82472E1820080A808 /* DeletedObjects.m in Sources */,
-				C8C73CD5249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */,
 				4D646A2022D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
 				4DF97F2021BF101B0090A55E /* DAVRequest.m in Sources */,
@@ -6164,6 +6260,7 @@
 				4D1F580D233E19EC00A01FB4 /* BackupsBrowserTableViewController.m in Sources */,
 				4D2F6C1F21807C25007931E4 /* XmlSerializer.m in Sources */,
 				C8DC76472497B59500C9C443 /* DatabaseModelConfig.m in Sources */,
+				C8DDE3A324DEE32100873392 /* ConcurrentMutableQueue.m in Sources */,
 				4D7D2196229FDA5F00C1C925 /* SelectItemTableViewController.m in Sources */,
 				4D9E08F021824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
 				4D78AC321FB1E27700A68A92 /* Node.m in Sources */,
@@ -6202,6 +6299,7 @@
 				4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
+				C8DDE39724DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
 				4DE46659233D2BBD00398A65 /* BackupItem.m in Sources */,
 				4DB1B7D42188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
@@ -6215,6 +6313,7 @@
 				4D8C14972074F63B00CE9CAE /* twofish.c in Sources */,
 				4DBC7A4A2279DC1600CA534D /* CollapsibleTableViewHeader.m in Sources */,
 				4DC95E9E2231AA3B00DE4E9F /* KeePassHistoryController.m in Sources */,
+				C8DDE39D24DEE24200873392 /* ConcurrentMutableArray.m in Sources */,
 				4D637C5A236187A800C273B3 /* BiometricsManager.m in Sources */,
 				4D970DAE20F8BB3F00EBF6C0 /* SafesList.m in Sources */,
 				4D9E09AD218251D0007BA1E7 /* Salsa20Stream.m in Sources */,
@@ -6257,6 +6356,7 @@
 				4D376E4722AC4B4000BDB93A /* BrowsePreferencesTableViewController.m in Sources */,
 				4D1BF4FE232441D2007DF0E6 /* GZipInputStream.m in Sources */,
 				4D3AC32321908D4A0010CFCD /* Keys.m in Sources */,
+				C8DDE39124DEB6FA00873392 /* SyncParameters.m in Sources */,
 				4DCF5FBF1F7299DD00011756 /* AppleICloudProvider.m in Sources */,
 				4D2F6C4421807CF9007931E4 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D0835B52284742000CA7405 /* FontManager.m in Sources */,
@@ -6267,8 +6367,10 @@
 				4D2F6C1621807C00007931E4 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				4D160A812452FC9D0097C730 /* QuickViewsBrowseTableDataSource.m in Sources */,
 				4D9AFB112449AE9300376240 /* DatabaseAuditor.m in Sources */,
+				C8053F8124E1D6E800416031 /* NSDate+Extensions.m in Sources */,
 				4D3E149221832BEF00A41CA0 /* encoding.c in Sources */,
 				4DC9690F238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
+				C8DDE3A924DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4D8C14912074F5F900CE9CAE /* Field.m in Sources */,
 				4D160A8E245314040097C730 /* QuickViewConfig.m in Sources */,
 				4DAE98AC2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
@@ -6303,7 +6405,7 @@
 				4D3652142184A24700A56519 /* regdom.c in Sources */,
 				4DFF400621806AB700B69383 /* BasicOrderedDictionary.m in Sources */,
 				4D326E8B22302BED00DCD8C7 /* NMSFTPFile.m in Sources */,
-				C8FA2A1E24C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
+				C8FA2A1E24C5B2F500445D8B /* SyncStatus.m in Sources */,
 				4D2259F922C6C463005547EA /* EditDateCell.m in Sources */,
 				4D0AFD2522A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m in Sources */,
 				4D9AFB142449AF1E00376240 /* DatabaseAuditReport.m in Sources */,
@@ -6348,6 +6450,7 @@
 				4D5F5B6E218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */,
 				4D004CDC21F4C26700E2B194 /* OTPToken+Persistence.m in Sources */,
+				C8053F7A24E181CF00416031 /* SyncLogEntryTableViewCell.m in Sources */,
 				4DD9D98A241D36BF00267D49 /* UpgradeAnswerViewController.m in Sources */,
 				4D18F2362257987E00768E18 /* SprCompilation.m in Sources */,
 				4D9AFB0B2449AA6500376240 /* DatabaseGenerator.m in Sources */,
@@ -6357,6 +6460,7 @@
 				4D9AFB242449D66A00376240 /* NSString+Levenshtein.m in Sources */,
 				4D3E14A121832D5500A41CA0 /* ref.c in Sources */,
 				4D1757BB1C8361D300E6356F /* BrowseSafeView.m in Sources */,
+				C8053F7224E178FC00416031 /* SyncLogViewController.m in Sources */,
 				4D4767072179013900C4358F /* RootXmlDomainObject.m in Sources */,
 				4D0835D1228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
 				4D4D3FE02409CE1C0056A7E2 /* ProgressHudView.swift in Sources */,
@@ -6399,6 +6503,7 @@
 				C872B73624A653E90042CE02 /* GzipDecompressOutputStream.m in Sources */,
 				4DD696A5218F0B170082DC08 /* AttachmentsRationalizer.m in Sources */,
 				4D08B5C1234C9613003D1953 /* GCDWebServerStreamedResponse.m in Sources */,
+				C8DF4AD524E69E3B00F0F74E /* ConcurrentCircularBuffer.m in Sources */,
 				4DF97F2321BF101B0090A55E /* DAVRequestGroup.m in Sources */,
 				C8ED5DDF248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4D526AA624407C8F00B0B700 /* Constants.swift in Sources */,
@@ -6408,6 +6513,7 @@
 				4D9E08E621822F5C007BA1E7 /* AesCipher.m in Sources */,
 				4D2F6C3421807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D160A752452E74C0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
+				C8DDE3AF24DF035200873392 /* SyncStatusLogEntry.m in Sources */,
 				C8BFECBE2478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D2F6C1D21807C25007931E4 /* XMLWriter.m in Sources */,
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
@@ -6423,6 +6529,7 @@
 				4D47615324376F7800E312D9 /* FreemiumStartFreeTrialViewController.m in Sources */,
 				4D0835D92284759F00CA7405 /* ItemDetailsViewController.m in Sources */,
 				4D305766224B4F8F00C36287 /* StringValue.m in Sources */,
+				C8053F7D24E1ACA100416031 /* SyncOperationState.m in Sources */,
 				4D18854C2170ABD8001AE6B0 /* SafeStorageProviderFactory.m in Sources */,
 				4DAE98A82270B4E200A811C4 /* NotesTableViewCell.m in Sources */,
 				4D1757C41C8361D300E6356F /* LocalDeviceStorageProvider.m in Sources */,
@@ -6438,6 +6545,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8DF4AD624E69E3B00F0F74E /* ConcurrentCircularBuffer.m in Sources */,
 				4DC4E01823488BAA000743C4 /* OpenSafeSequenceHelper.m in Sources */,
 				4DC4E01923488BAA000743C4 /* KeePass2TagPackage.m in Sources */,
 				4DC4E01A23488BAA000743C4 /* Record.m in Sources */,
@@ -6472,6 +6580,7 @@
 				4D7228AD23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
 				4DC4E02E23488BAA000743C4 /* VariantObject.m in Sources */,
 				4DC4E02F23488BAA000743C4 /* CustomNavigationItemTitleView.m in Sources */,
+				C8053F7324E178FC00416031 /* SyncLogViewController.m in Sources */,
 				4DC4E03023488BAA000743C4 /* PwSafeMetadata.m in Sources */,
 				C8A8DBAF2484F68F009C673F /* FreeProChartViewController.m in Sources */,
 				4DC4E03123488BAA000743C4 /* WebDAVStorageProvider.m in Sources */,
@@ -6488,6 +6597,7 @@
 				4DC4E03A23488BAA000743C4 /* DatabaseOperations.m in Sources */,
 				4DC4E03B23488BAA000743C4 /* NMSSHLogger.m in Sources */,
 				4DC4E03C23488BAA000743C4 /* CustomFieldTableCell.m in Sources */,
+				C8DDE3AB24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				C8ED5DE1248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4DC4E03D23488BAA000743C4 /* BrowseItemCell.m in Sources */,
 				4DC4E03E23488BAA000743C4 /* PwSafeDatabase.m in Sources */,
@@ -6552,6 +6662,7 @@
 				4DC4E06423488BAA000743C4 /* OTPAlgorithm.m in Sources */,
 				4DC4E06523488BAA000743C4 /* SetIconModel.m in Sources */,
 				4DC4E06623488BAA000743C4 /* AddNewSafeHelper.m in Sources */,
+				C8DDE3A524DEE32100873392 /* ConcurrentMutableQueue.m in Sources */,
 				4DC4E06723488BAA000743C4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4DC4E06823488BAA000743C4 /* Root.m in Sources */,
 				4D526AB424407C8F00B0B700 /* WSTag.swift in Sources */,
@@ -6563,7 +6674,7 @@
 				4DC4E06E23488BAA000743C4 /* DAVBaseRequest.m in Sources */,
 				4D8354CC2389141F00E264E0 /* FavIconManager.m in Sources */,
 				4DC4E06F23488BAA000743C4 /* TotpCell.m in Sources */,
-				C8FA2A2024C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
+				C8FA2A2024C5B2F500445D8B /* SyncStatus.m in Sources */,
 				4DC4E07023488BAA000743C4 /* KeePassDatabaseMetadata.m in Sources */,
 				4DC4E07123488BAA000743C4 /* SelectStorageProviderController.m in Sources */,
 				4DC4E07223488BAA000743C4 /* BackupItem.m in Sources */,
@@ -6594,12 +6705,12 @@
 				4DC4E08723488BAA000743C4 /* Alerts.m in Sources */,
 				4D08B5C8234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
 				4D24C76F238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
+				C8DDE38E24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */,
 				4DC4E08823488BAA000743C4 /* LocalDatabaseIdentifier.m in Sources */,
 				4DC4E08923488BAA000743C4 /* socket_helper.m in Sources */,
 				4DC4E08A23488BAA000743C4 /* WebDAVSessionConfiguration.m in Sources */,
 				4DC4E08B23488BAA000743C4 /* NMSSHSession.m in Sources */,
 				C8BFECC02478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
-				C8C73CD7249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D160AB924535D1B0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
 				C8E9DAA0245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4DC4E08C23488BAA000743C4 /* AdvancedPreferencesTableViewController.m in Sources */,
@@ -6657,6 +6768,7 @@
 				4DC4E0B323488BAA000743C4 /* CustomFieldsViewController.m in Sources */,
 				4D526AA824407C8F00B0B700 /* Constants.swift in Sources */,
 				4D6B5050238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
+				C8053F7E24E1ACA100416031 /* SyncOperationState.m in Sources */,
 				4DC4E0B423488BAA000743C4 /* Meta.m in Sources */,
 				4D1E77ED23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */,
 				4DC4E0B523488BAA000743C4 /* MasterDetailViewController.m in Sources */,
@@ -6669,6 +6781,7 @@
 				4DC4E0BC23488BAA000743C4 /* BasicOrderedDictionary.m in Sources */,
 				4DC4E0BD23488BAA000743C4 /* NMSFTPFile.m in Sources */,
 				4DC4E0BE23488BAA000743C4 /* EditDateCell.m in Sources */,
+				C8DDE39F24DEE24200873392 /* ConcurrentMutableArray.m in Sources */,
 				4DC4E0BF23488BAA000743C4 /* WelcomeCreateDoneViewController.m in Sources */,
 				4DC4E0C023488BAA000743C4 /* V3Binary.m in Sources */,
 				4DC4E0C123488BAA000743C4 /* AddAttachmentHelper.m in Sources */,
@@ -6676,6 +6789,7 @@
 				4DC4E0C223488BAA000743C4 /* UiAttachment.m in Sources */,
 				4DC4E0C323488BAA000743C4 /* StrongboxDatabase.m in Sources */,
 				4D9AFB192449B0E700376240 /* DatabaseAuditorConfiguration.m in Sources */,
+				C8053F8324E1D6E800416031 /* NSDate+Extensions.m in Sources */,
 				4DC4E0C423488BAA000743C4 /* WebDAVProviderData.m in Sources */,
 				C8991AD824B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */,
@@ -6683,6 +6797,7 @@
 				4DC4E0C623488BAA000743C4 /* WelcomeCreateDatabaseViewController.m in Sources */,
 				4DC4E0C723488BAA000743C4 /* SerializationData.m in Sources */,
 				4DC4E0C823488BAA000743C4 /* QuickTypeRecordIdentifier.m in Sources */,
+				C8053F7B24E181CF00416031 /* SyncLogEntryTableViewCell.m in Sources */,
 				4D08B5BA234C9613003D1953 /* GCDWebServerConnection.m in Sources */,
 				4DC4E0C923488BAA000743C4 /* Binary.m in Sources */,
 				4DC4E0CA23488BAA000743C4 /* SFTPSessionConfiguration.m in Sources */,
@@ -6711,6 +6826,7 @@
 				4DC4E0DB23488BAA000743C4 /* SprCompilation.m in Sources */,
 				4DC4E0DC23488BAA000743C4 /* DatabaseModel.m in Sources */,
 				4DC4E0DD23488BAA000743C4 /* CloudSessionsTableViewController.m in Sources */,
+				C8DDE39924DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
 				4DC4E0DE23488BAA000743C4 /* NSUUID+Zero.m in Sources */,
 				4DC4E0E023488BAA000743C4 /* ref.c in Sources */,
 				4DC4E0E123488BAA000743C4 /* BrowseSafeView.m in Sources */,
@@ -6746,6 +6862,7 @@
 				4DC4E0F923488BAA000743C4 /* SFTPSessionConfigurationViewController.m in Sources */,
 				4DC4E0FA23488BAA000743C4 /* PreferencesTableViewController.m in Sources */,
 				4DC4E0FB23488BAA000743C4 /* DebugHelper.m in Sources */,
+				C8DDE39324DEB6FA00873392 /* SyncParameters.m in Sources */,
 				4DC4E0FC23488BAA000743C4 /* CASGTableViewController.m in Sources */,
 				4DC4E0FD23488BAA000743C4 /* CustomField.m in Sources */,
 				4DC4E0FE23488BAA000743C4 /* KeyFilesTableViewController.m in Sources */,
@@ -6780,6 +6897,7 @@
 				4D6B504C238BBA1F00DF2F88 /* SVProgressHUD.m in Sources */,
 				4DC4E11323488BAA000743C4 /* AesKdfCipher.m in Sources */,
 				4DC4E11423488BAA000743C4 /* History.m in Sources */,
+				C8DDE3B124DF035200873392 /* SyncStatusLogEntry.m in Sources */,
 				4DC4E11523488BAA000743C4 /* TwoFishCipher.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -6858,12 +6976,12 @@
 				4DC4E1A423488BAE000743C4 /* SimpleXmlValueExtractor.m in Sources */,
 				4D160A7E2452F2B80097C730 /* BrowseTableViewCellHelper.m in Sources */,
 				4DC4E1A523488BAE000743C4 /* SprCompilation.m in Sources */,
-				C8C73CD8249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D7F5A3E236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DC4E1A723488BAE000743C4 /* NMSSHChannel.m in Sources */,
 				4DC4E1A823488BAE000743C4 /* ISO8601DateFormatter.m in Sources */,
 				4DC4E1A923488BAE000743C4 /* OTPAlgorithm.m in Sources */,
 				4D160ABB24535D1C0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
+				C8DDE39A24DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
 				4D526AA524407C8F00B0B700 /* WSTagView.swift in Sources */,
 				4D832A9823CE226800A7885E /* SecretStore.m in Sources */,
 				4DC4E1AB23488BAE000743C4 /* IconsSectionHeaderReusableView.m in Sources */,
@@ -6882,6 +7000,7 @@
 				4DC4E1B523488BAE000743C4 /* NotesTableViewCell.m in Sources */,
 				4DC4E1B623488BAE000743C4 /* KeyFileParser.m in Sources */,
 				4DC4E1B723488BAE000743C4 /* V3BinariesList.m in Sources */,
+				C8DDE3AC24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4DC4E1B823488BAE000743C4 /* BrowseItemCell.m in Sources */,
 				C872B73324A64B7F0042CE02 /* Base64DecodeOutputStream.m in Sources */,
 				4DC4E1B923488BAE000743C4 /* DAVResponseItem.m in Sources */,
@@ -6890,6 +7009,7 @@
 				C88F813C245D935A00B0B998 /* NSString+Extensions.m in Sources */,
 				4DC4E1BC23488BAE000743C4 /* KeePassDatabaseMetadata.m in Sources */,
 				4DC4E1BD23488BAE000743C4 /* XmlProcessingContext.m in Sources */,
+				C8DF4AD724E6A19300F0F74E /* ConcurrentCircularBuffer.m in Sources */,
 				4DC4E1BE23488BAE000743C4 /* QuickTypeRecordIdentifier.m in Sources */,
 				4DC4E1C023488BAE000743C4 /* CustomField.m in Sources */,
 				4DC4E1C123488BAE000743C4 /* WebDAVProviderData.m in Sources */,
@@ -6903,6 +7023,7 @@
 				4DC4E1C923488BAE000743C4 /* KeePassCiphers.m in Sources */,
 				4DC4E1CA23488BAE000743C4 /* KdbxSerialization.m in Sources */,
 				4DC4E1CB23488BAE000743C4 /* crypt_argchk.c in Sources */,
+				C8DDE3B224DF035200873392 /* SyncStatusLogEntry.m in Sources */,
 				4DC4E1CC23488BAE000743C4 /* SafeStorageProviderFactory.m in Sources */,
 				4DC4E1CD23488BAE000743C4 /* DropboxV2StorageProvider.m in Sources */,
 				C8ED5DE2248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
@@ -6944,6 +7065,7 @@
 				4DC4E1EC23488BAE000743C4 /* Field.m in Sources */,
 				4DC4E1ED23488BAE000743C4 /* NSDictionary+Extensions.m in Sources */,
 				C8991AD924B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
+				C8DDE38F24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */,
 				4DC4E1EE23488BAE000743C4 /* CustomIcon.m in Sources */,
 				C87A8CDD24952A9800356966 /* SharedAppAndAutoFillSettings.m in Sources */,
 				C8BF76EB2472E1820080A808 /* DeletedObjects.m in Sources */,
@@ -6973,6 +7095,7 @@
 				4DC4E20323488BAE000743C4 /* DAVCredentials.m in Sources */,
 				4DC4E20423488BAE000743C4 /* NMSFTP.m in Sources */,
 				4DC4E20523488BAE000743C4 /* AttachmentsRationalizer.m in Sources */,
+				C8DDE39424DEB6FA00873392 /* SyncParameters.m in Sources */,
 				4D160A91245314040097C730 /* QuickViewConfig.m in Sources */,
 				4DC4E20623488BAE000743C4 /* DAVSession.m in Sources */,
 				4DC4E20723488BAE000743C4 /* IconViewCell.m in Sources */,
@@ -6984,11 +7107,12 @@
 				4DC4E20C23488BAE000743C4 /* V3Binary.m in Sources */,
 				4DC4E20D23488BAE000743C4 /* NMSSHSession.m in Sources */,
 				4DC4E20E23488BAE000743C4 /* IOsUtils.m in Sources */,
-				C8FA2A2124C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
+				C8FA2A2124C5B2F500445D8B /* SyncStatus.m in Sources */,
 				4DC4E20F23488BAE000743C4 /* Utils.m in Sources */,
 				4DC4E21023488BAE000743C4 /* NMSSHLogger.m in Sources */,
 				4DC4E21123488BAE000743C4 /* StrongboxUIDocument.m in Sources */,
 				4DC4E21223488BAE000743C4 /* Kdbx4Database.m in Sources */,
+				C8053F8424E1D6E800416031 /* NSDate+Extensions.m in Sources */,
 				4DC4E21323488BAE000743C4 /* Argon2KdfCipher.m in Sources */,
 				C8FA2A1B24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4DC4E21523488BAE000743C4 /* UIImage+FixOrientation.m in Sources */,
@@ -7007,6 +7131,7 @@
 				4DC4E21C23488BAE000743C4 /* LocalDatabaseIdentifier.m in Sources */,
 				4DC4E21D23488BAE000743C4 /* NMSSHConfig.m in Sources */,
 				4DC4E21E23488BAE000743C4 /* argon2.c in Sources */,
+				C8DDE3A624DEE32100873392 /* ConcurrentMutableQueue.m in Sources */,
 				4DC4E21F23488BAE000743C4 /* DatabaseAttachment.m in Sources */,
 				4DC4E22123488BAE000743C4 /* PasswordGenerationConfig.m in Sources */,
 				4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */,
@@ -7031,6 +7156,7 @@
 				4DC4E23323488BAE000743C4 /* SFTPStorageProvider.m in Sources */,
 				4DC4E23423488BAE000743C4 /* NSUUID+Zero.m in Sources */,
 				4DC4E23523488BAE000743C4 /* CredentialProviderViewController.m in Sources */,
+				C8DDE3A024DEE24200873392 /* ConcurrentMutableArray.m in Sources */,
 				4DC4E23623488BAE000743C4 /* InnerRandomStreamFactory.m in Sources */,
 				4DC4E23723488BAE000743C4 /* SafesListTableViewController.m in Sources */,
 				4D6B5051238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
@@ -7119,12 +7245,12 @@
 				4DC3F83423215A58002BDEF7 /* SimpleXmlValueExtractor.m in Sources */,
 				4D160A7C2452F2B80097C730 /* BrowseTableViewCellHelper.m in Sources */,
 				4D18F2372257987F00768E18 /* SprCompilation.m in Sources */,
-				C8C73CD6249E468C00B34C8F /* SyncReadOptions.m in Sources */,
 				4D7F5A3C236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
 				4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */,
 				4D160AB724535D1A0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
+				C8DDE39824DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
 				4D526AA324407C8F00B0B700 /* WSTagView.swift in Sources */,
 				4D832A9623CE226800A7885E /* SecretStore.m in Sources */,
 				4DF2997C2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
@@ -7143,6 +7269,7 @@
 				4D33FA432287233C006C31B2 /* NotesTableViewCell.m in Sources */,
 				4DC8D9AC21B6E8A9004F1812 /* KeyFileParser.m in Sources */,
 				4D74B92E218C438800FC369E /* V3BinariesList.m in Sources */,
+				C8DDE3AA24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4D4554AF2285C0BB0015C236 /* BrowseItemCell.m in Sources */,
 				C872B73124A64B7F0042CE02 /* Base64DecodeOutputStream.m in Sources */,
 				4DF972CD21C01ABF00F384C9 /* DAVResponseItem.m in Sources */,
@@ -7151,6 +7278,7 @@
 				C88F813A245D935A00B0B998 /* NSString+Extensions.m in Sources */,
 				4D19678B217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
 				4D67B1E52191FD0400B0D29A /* XmlProcessingContext.m in Sources */,
+				C8DF4AD824E6A19400F0F74E /* ConcurrentCircularBuffer.m in Sources */,
 				4DF14F6B2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */,
 				4D876B4421AC36F800805DED /* CustomField.m in Sources */,
 				4DF972D421C01E7100F384C9 /* WebDAVProviderData.m in Sources */,
@@ -7164,6 +7292,7 @@
 				4D3E14892183293200A41CA0 /* KeePassCiphers.m in Sources */,
 				4D9E09A8218251BE007BA1E7 /* KdbxSerialization.m in Sources */,
 				4D1884DA21709E5F001AE6B0 /* crypt_argchk.c in Sources */,
+				C8DDE3B024DF035200873392 /* SyncStatusLogEntry.m in Sources */,
 				4D5F5B7D218B4C4300A0739A /* SafeStorageProviderFactory.m in Sources */,
 				4D5F5B7E218B4C4E00A0739A /* DropboxV2StorageProvider.m in Sources */,
 				C8ED5DE0248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
@@ -7205,6 +7334,7 @@
 				4D1884D321709E0E001AE6B0 /* Field.m in Sources */,
 				4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				C8991AD724B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
+				C8DDE38D24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */,
 				4DA12F07219837D10000CEBB /* CustomIcon.m in Sources */,
 				C87A8CDC24952A9700356966 /* SharedAppAndAutoFillSettings.m in Sources */,
 				C8BF76E92472E1820080A808 /* DeletedObjects.m in Sources */,
@@ -7234,6 +7364,7 @@
 				4DF972C821C01ABF00F384C9 /* DAVCredentials.m in Sources */,
 				4D326E8822302BED00DCD8C7 /* NMSFTP.m in Sources */,
 				4DD696A8218F38EC0082DC08 /* AttachmentsRationalizer.m in Sources */,
+				C8DDE39224DEB6FA00873392 /* SyncParameters.m in Sources */,
 				4D160A8F245314040097C730 /* QuickViewConfig.m in Sources */,
 				4DF972CE21C01ABF00F384C9 /* DAVSession.m in Sources */,
 				4D766D5422204E4A00AEF439 /* IconViewCell.m in Sources */,
@@ -7245,11 +7376,12 @@
 				4D74B92A218C40B000FC369E /* V3Binary.m in Sources */,
 				4D326E8622302BED00DCD8C7 /* NMSSHSession.m in Sources */,
 				4D1884CA21709CDA001AE6B0 /* IOsUtils.m in Sources */,
-				C8FA2A1F24C5B2F500445D8B /* SyncOperationInfo.m in Sources */,
+				C8FA2A1F24C5B2F500445D8B /* SyncStatus.m in Sources */,
 				4D1884C921709CD4001AE6B0 /* Utils.m in Sources */,
 				4D326E8222302BED00DCD8C7 /* NMSSHLogger.m in Sources */,
 				4D1884C821709CCD001AE6B0 /* StrongboxUIDocument.m in Sources */,
 				4D9E08F121824CBF007BA1E7 /* Kdbx4Database.m in Sources */,
+				C8053F8224E1D6E800416031 /* NSDate+Extensions.m in Sources */,
 				4D3E14A72183365000A41CA0 /* Argon2KdfCipher.m in Sources */,
 				C8FA2A1924C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4D646A2122D2A42C00C5D2FE /* UIImage+FixOrientation.m in Sources */,
@@ -7268,6 +7400,7 @@
 				4D556F2522B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8A22302BED00DCD8C7 /* NMSSHConfig.m in Sources */,
 				4D3E148E21832B7400A41CA0 /* argon2.c in Sources */,
+				C8DDE3A424DEE32100873392 /* ConcurrentMutableQueue.m in Sources */,
 				4D5F5B73218B350C00A0739A /* DatabaseAttachment.m in Sources */,
 				4D216F8022CBCED4000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
@@ -7292,6 +7425,7 @@
 				4DF972B621BFD81800F384C9 /* SFTPStorageProvider.m in Sources */,
 				4DDA01572242621400C7F0E2 /* NSUUID+Zero.m in Sources */,
 				4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */,
+				C8DDE39E24DEE24200873392 /* ConcurrentMutableArray.m in Sources */,
 				4D5F5B77218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
 				4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */,
 				4D6B504F238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
@@ -8134,7 +8268,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8224,7 +8358,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8313,7 +8447,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8395,7 +8529,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8480,7 +8614,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8557,7 +8691,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8632,7 +8766,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8717,7 +8851,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2949;
+				CURRENT_PROJECT_VERSION = 2950;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

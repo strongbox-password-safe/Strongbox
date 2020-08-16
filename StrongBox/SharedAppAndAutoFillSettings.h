@@ -59,7 +59,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property DatabaseCellSubtitleField databaseCellSubtitle2;
 @property BOOL showDatabaseIcon;
 
-@property BOOL syncPullEvenIfModifiedDateSame;
+@property BOOL syncPullEvenIfModifiedDateSame; // Emergency use, probably never useful
+@property BOOL syncForcePushDoNotCheckForConflicts; // Emergency use, probably never useful
 
 @end
 

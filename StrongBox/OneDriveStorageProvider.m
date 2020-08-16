@@ -10,6 +10,7 @@
 #import "Utils.h"
 #import "SVProgressHUD.h"
 #import "OneDriveSDK.h"
+#import "NSDate+Extensions.h"
 
 @interface OneDriveStorageProvider()
 
@@ -33,12 +34,6 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = NSLocalizedString(@"storage_provider_name_onedrive", @"OneDrive");
-        if([_displayName isEqualToString:@"storage_provider_name_onedrive"]) {
-            _displayName = @"OneDrive";
-        }
-
-        _icon = @"one-drive-icon-only-32x32";
         _storageId = kOneDrive;
         _providesIcons = NO;
         _browsableNew = YES;
@@ -58,7 +53,15 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 
         //[ODClient setActiveDirectoryAppId:kBusinessApplicationId redirectURL:kBusinessRedirectUri];
         
-        [ODClient setActiveDirectoryAppId:kBusinessApplicationId resourceId:@"https://graph.microsoft.com/" apiEndpoint:@"https://graph.microsoft.com/v1.0/me" redirectURL:kBusinessRedirectUri];
+        [ODClient setActiveDirectoryAppId:kBusinessApplicationId
+                               resourceId:@"https://graph.microsoft.com/"
+                              apiEndpoint:@"https://graph.microsoft.com/v1.0/me"
+                              redirectURL:kBusinessRedirectUri];
+        
+//        [ODClient setActiveDirectoryAppId:kBusinessApplicationId
+//                               resourceId:kBusinessApplicationId
+//                              apiEndpoint:@"https://graph.microsoft.com/v1.0/me"
+//                              redirectURL:kBusinessRedirectUri];
 
         // Testing Code...
         
@@ -208,7 +211,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         NSDate* dtMod2 = options.onlyIfModifiedDifferentFrom;
     
         if (options && dtMod2 && dtMod) {
-            if ([dtMod isEqualToDate:dtMod2]) {
+            if ([dtMod isEqualToDateWithinEpsilon:dtMod2]) {
                 completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
                 return;
             }
@@ -254,27 +257,30 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
     [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
-            completion(error);
+            completion(kUpdateResultError, nil, error);
             return;
         }
                       
-       if (userInteractionRequired) { // TODO: Completion needs to indicate if there's userinteraction is required
-           completion(nil);
+        if (userInteractionRequired) {
+           completion(kUpdateResultUserInteractionRequired, nil, nil);
            return;
-       }
+        }
 
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
-        });
-        
-        [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
+        if (viewController) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
             });
+        }
+
+        [self providerDataFromMetadata:safeMetaData completion:^(ODItem *item, NSError *error) {
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
             
             if(error || !item) {
                 if(!item) {
@@ -282,23 +288,32 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
                 }
                 
                 NSLog(@"OneDrive Read: %@", error);
-                completion(error);
+                completion(kUpdateResultError, nil, error);
                 return;
             }
             
             ODItemContentRequest *request;
             request = [[[self.odClient drives:item.parentReference.driveId] items:item.id] contentRequest];
             
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD showWithStatus:@"Updating..."];
-            });
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD showWithStatus:@"Updating..."];
+                });
+            }
             
             [request uploadFromData:data completion:^(ODItem *response, NSError *error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
+                if (viewController) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [SVProgressHUD dismiss];
+                    });
+                }
                 
-                completion(error);
+                if (error) {
+                    completion(kUpdateResultError, nil, error);
+                }
+                else {
+                    completion(kUpdateResultSuccess, response.lastModifiedDateTime, nil);
+                }
             }];
         }];
     }];
@@ -314,7 +329,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         }
                       
        if (userInteractionRequired) {
-           completion(NO, nil, nil); // TODO: Completion needed to take account of user interaction required?
+           completion(NO, nil, nil);
            return;
        }
 

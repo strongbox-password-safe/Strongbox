@@ -42,6 +42,7 @@
 #import "StreamUtils.h"
 #import "NSData+Extensions.h"
 #import "Constants.h"
+#import "NSDate+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -141,7 +142,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
 
-//    self.navigationController.navigationBar.hidden = NO; // on iOS14 Beta 3 - this causes 100% CPU? TODO: Revisit on next beta/release
+//    self.navigationController.navigationBar.hidden = NO; // on iOS14 Beta 3 - this causes 100% CPU? Same on Beta 4
     
     self.navigationController.navigationBarHidden = NO;
 
@@ -983,9 +984,10 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     [self.databaseModel update:self
                     isAutoFill:self.isAutoFillContext
-                       handler:^(BOOL userCancelled, NSError * _Nullable error) {
-        if(userCancelled) {
-            [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
+                       handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+        // TODO: centralize updates in this class
+        if(userCancelled || conflictAndLocalWasChanged) {
+            [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state or reload gracefully
         }
         else if (error != nil) {
             [Alerts error:self
@@ -1021,9 +1023,10 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     [self.databaseModel update:self
                     isAutoFill:self.isAutoFillContext
-                       handler:^(BOOL userCancelled, NSError * _Nullable error) {
-        if(userCancelled) {
-            [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert to previous state gracefully
+                       handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+        // TODO: centralize updates in this class
+        if(userCancelled || conflictAndLocalWasChanged) {
+            [self dismissViewControllerAnimated:YES completion:nil];  // FUTURE - Revert to previous state or reload gracefully
         }
         else if (error != nil) {
             [Alerts error:self
@@ -1050,7 +1053,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     [self.databaseModel update:self
                     isAutoFill:self.isAutoFillContext
-                       handler:^(BOOL userCancelled, NSError * _Nullable error) {
+                       handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+        // TODO: centralize updates in this class
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(userCancelled, error);
             if (!userCancelled && !error) {
@@ -1242,7 +1246,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
 
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
-                                                  value:friendlyDateString(item.fields.created)
+                                                  value:item.fields.created ? item.fields.created.friendlyDateString : @""
                                                copyable:NO]];
     
 //    [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_accessed_field_title", @"Accessed")
@@ -1250,7 +1254,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 //                                               copyable:NO]];
 
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
-                                                  value:friendlyDateString(item.fields.modified)
+                                                  value:item.fields.modified ? item.fields.modified.friendlyDateString : @""
                                                copyable:NO]];
         
 //    if (format == kKeePass4 || format == kKeePass) {
@@ -1375,12 +1379,12 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSLog(@"SAVE: Processing Icon for Save...");
     [self processIconBeforeSave:^{ // This is behind a completion because we might go out and download the FavIcon which is async...
         NSLog(@"SAVE: Icon processed for Save...");
+        // TODO: Updates need to be centralized in this class, and then properly managed in Browse View too on failure or local merge/conflict changes
         [self.databaseModel update:self
                         isAutoFill:self.isAutoFillContext
-                           handler:^(BOOL userCancelled, NSError * _Nullable error) {
-            NSLog(@"SAVE: Storage Provider Update Done [%d-%@]...", userCancelled, error);
+                           handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self onSaveChangesDone:userCancelled preSaveCloneOfItem:preSaveCloneOfItem error:error];
+                [self onSaveChangesDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged preSaveCloneOfItem:preSaveCloneOfItem error:error];
             });
         }];
     }];
@@ -1430,8 +1434,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 //    self.item.fields.attachments = preSaveCloneOfItem.fields.attachments;
 //}
 
-- (void)onSaveChangesDone:(BOOL)userCancelled preSaveCloneOfItem:(Node*)preSaveCloneOfItem error:(NSError*)error {
-    if(userCancelled) {
+- (void)onSaveChangesDone:(BOOL)userCancelled conflictAndLocalWasChanged:(BOOL)conflictAndLocalWasChanged preSaveCloneOfItem:(Node*)preSaveCloneOfItem error:(NSError*)error {
+    if(userCancelled || conflictAndLocalWasChanged) {  // FUTURE: Revert gracefully
         if (error != nil) {
             [Alerts error:self
                     title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
@@ -1804,7 +1808,7 @@ showGenerateButton:YES];
         [cell setDate:self.model.expires];
         
         cell.onDateChanged = ^(NSDate * _Nullable date) {
-            NSLog(@"Setting Expiry Date to %@", friendlyDateString(date));
+            NSLog(@"Setting Expiry Date to %@", date ? date.friendlyDateString : @"");
             weakSelf.model.expires = date;
             [weakSelf onModelEdited];
         };
@@ -1814,7 +1818,7 @@ showGenerateButton:YES];
         GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         
         NSDate* expires = self.model.expires;
-        NSString *str = expires ? friendlyDateString(expires) : NSLocalizedString(@"item_details_expiry_never", @"Never");
+        NSString *str = expires ? expires.friendlyDateString : NSLocalizedString(@"item_details_expiry_never", @"Never");
         
         [cell setKey:NSLocalizedString(@"item_details_expires_field_title", @"Expires")
                value:str

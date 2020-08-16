@@ -9,6 +9,7 @@
 #import "BackupsManager.h"
 #import "FileManager.h"
 #import "Utils.h"
+#import "NSDate+Extensions.h"
 
 @implementation BackupsManager
 
@@ -26,7 +27,7 @@
 - (BOOL)writeBackup:(NSURL *)snapshot metadata:(SafeMetaData *)metadata {
     if(metadata.makeBackups) {
         NSDate* now = NSDate.date;
-        NSString* filename = [NSString stringWithFormat:@"%@.bak", iso8601DateString(now)];
+        NSString* filename = [NSString stringWithFormat:@"%@.bak", now.iso8601DateString];
 
         NSURL* url = [metadata.backupsDirectory URLByAppendingPathComponent:filename];
 

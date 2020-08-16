@@ -12,15 +12,15 @@
 #import "StorageBrowserItem.h"
 #import "StorageProviderReadOptions.h"
 #import "StorageProviderReadResult.h"
+#import "StorageProviderUpdateResult.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^StorageProviderReadCompletionBlock)(StorageProviderReadResult result, NSData *_Nullable data, NSDate*_Nullable dateModified, const NSError *_Nullable error);
+typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult result, NSDate*_Nullable newRemoteModDate, const NSError *_Nullable error);
 
 @protocol SafeStorageProvider <NSObject>
 
-@property (strong, nonatomic, readonly) NSString *displayName;
-@property (strong, nonatomic, readonly) NSString *icon;
 @property (nonatomic, readonly) StorageProvider storageId;
 @property (nonatomic, readonly) BOOL providesIcons;
 @property (nonatomic, readonly) BOOL browsableNew;
@@ -59,7 +59,7 @@ typedef void (^StorageProviderReadCompletionBlock)(StorageProviderReadResult res
        interactiveVC:(UIViewController *_Nullable)viewController
                 data:(NSData *)data
           isAutoFill:(BOOL)isAutoFill
-          completion:(void (^)(NSError *_Nullable error))completion;
+          completion:(StorageProviderUpdateCompletionBlock)completion;
 
 - (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(const NSError *_Nullable error))completion;
 

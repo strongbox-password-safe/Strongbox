@@ -13,6 +13,7 @@
 #import "NSArray+Extensions.h"
 #import "ExcludedItemsViewController.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "NSDate+Extensions.h"
 
 static const int kSectionIdxHibp = 2; // Careful if sections move around
 static const int kSectionIdxSimilarPasswords = 5; // Careful if sections move around 
@@ -148,7 +149,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 - (void)bindLastOnlineCheckUi {
     self.labelOnlineCheckInterval.text = [self getHibpIntervalString:self.model.metadata.auditConfig.hibpCheckForNewBreachesIntervalSeconds];
-    self.labelLastOnineCheck.text = friendlyDateString(self.model.metadata.auditConfig.lastHibpOnlineCheck);
+    self.labelLastOnineCheck.text = self.model.metadata.auditConfig.lastHibpOnlineCheck ? self.model.metadata.auditConfig.lastHibpOnlineCheck.friendlyDateString : @"";
     self.stackViewLastOnlineCheck.hidden = self.model.metadata.auditConfig.lastHibpOnlineCheck == nil;
 }
 

@@ -27,12 +27,6 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = NSLocalizedString(@"storage_provider_name_google_drive", @"Google Drive");
-        if([_displayName isEqualToString:@"storage_provider_name_google_drive"]) {
-            _displayName = @"Google Drive";
-        }
-
-        _icon = @"product32";
         _storageId = kGoogleDrive;
         _providesIcons = YES;
         _browsableNew = YES;
@@ -95,23 +89,28 @@
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
-    [SVProgressHUD show];
-
-    [[GoogleDriveManager sharedInstance] update:safeMetaData.fileIdentifier
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
+    if (viewController) {
+        [SVProgressHUD show];
+    }
+    
+    [[GoogleDriveManager sharedInstance] update:viewController
+                           parentFileIdentifier:safeMetaData.fileIdentifier
                                        fileName:safeMetaData.fileName
                                        withData:data
-                                     completion:^(NSError *error) {
-                                         dispatch_async(dispatch_get_main_queue(), ^{
-                                             [SVProgressHUD dismiss];
-                                         });
+                                     completion:^(StorageProviderUpdateResult result, NSDate * _Nullable newRemoteModDate, const NSError * _Nullable error) {
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
+        
+        if(error) {
+            [[GoogleDriveManager sharedInstance] signout];
+        }
 
-                                         if(error) {
-                                             [[GoogleDriveManager sharedInstance] signout];
-                                         }
-                                         
-                                         completion(error);
-                                     }];
+        completion(result, newRemoteModDate, error);
+    }];
 }
 
 - (void)      list:(NSObject *)parentFolder

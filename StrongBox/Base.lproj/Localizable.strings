@@ -20,7 +20,7 @@
 "safes_vc_cached_date_time_fmt" = "Cached: %@";
 
 /* Open ths database offline table action */
-"safes_vc_slide_left_open_offline_action" = "Open Offline";
+"safes_vc_slide_left_open_offline_action" = "Open Local...";
 
 /* Title of the 'More Actions' alert/action sheet */
 "safes_vc_database_actions_sheet_title" = "Database Actions";
@@ -380,9 +380,6 @@
 /* '%@' Notes Copied */
 "browse_vc_notes_copied_fmt" = "'%@' Notes Copied";
 
-/*  (Offline) */
-"browse_vc_offline_suffix" = " (Offline)";
-
 /* '%@' Password Copied */
 "browse_vc_password_copied_fmt" = "'%@' Password Copied";
 
@@ -549,15 +546,6 @@
 /* AutoFill Disabled */
 "db_management_disable_done" = "AutoFill Disabled";
 
-/* Offline Disabled */
-"db_management_disable_offline_done" = "Offline Disabled";
-
-/* Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this? */
-"db_management_disable_offline_yesno_message" = "Disabling offline access for this database will remove the offline cache and you will not be able to access the database when offline. Are you sure you want to do this?";
-
-/* Disable Offline Access? */
-"db_management_disable_offline_yesno_title" = "Disable Offline Access?";
-
 /* %@ has been enabled for this database. */
 "db_management_enable_biometric_notify_message_fmt" = "%@ has been enabled for this database.";
 
@@ -567,20 +555,11 @@
 /* AutoFill Enabled */
 "db_management_enable_done" = "AutoFill Enabled";
 
-/* Offline Enabled */
-"db_management_enable_offline_done" = "Offline Enabled";
-
 /* Could not change credentials */
 "db_management_error_title_couldnt_change_credentials" = "Could not change credentials";
 
 /* Master Password Changed */
 "db_management_password_changed" = "Master Password Changed";
-
-/* You must close and reopen this database for Read-Only changes to take effect. */
-"db_management_reopen_required_message" = "You must close and reopen this database for Read-Only changes to take effect.";
-
-/* Re-Open Required */
-"db_management_reopen_required_title" = "Re-Open Required";
 
 /* <None> */
 "db_management_statistics_none" = "<None>";
@@ -1404,17 +1383,8 @@
 /* Error Reading Key File */
 "open_sequence_error_reading_key_file" = "Could not read Key File. Has it been moved or deleted? Check Key Files Management in Preferences";
 
-/* Could Not Open Offline */
-"open_sequence_couldnt_open_offline_title" = "Could Not Open Offline";
-
-/* Could not open this database in offline mode. Does the Offline Cache exist? */
-"open_sequence_couldnt_open_offline_message" = "Could not open this database in offline mode. Does the Offline Cache exist?";
-
 /* It looks like you may be offline and '%@' may not be reachable. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@ - (Translators Note: 1st parameter is the name of the storage location, e.g. Dropbox, Google Drive etc, 2nd param is the date/time of the last cache) */
 "open_sequence_user_looks_offline_open_offline_instead_fmt" = "It looks like you may be offline and '%@' may not be reachable. Would you like to use a read-only offline cache version of this database instead?\n\nLast Cached: %@";
-
-/* Yes, Use Offline Cache */
-"open_sequence_yesno_use_offline_cache_yes_option" = "Yes, Use Offline Cache";
 
 /* No, Try to connect anyway */
 "open_sequence_yesno_use_offline_cache_no_try_connect_option" = "No, Try to connect anyway";
@@ -1482,9 +1452,6 @@
 
 /* Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings */
 "open_sequence_warn_pin_conflict_message" = "Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings";
-
-/* Use Offline Cache? */
-"open_sequence_yesno_use_offline_cache_title" = "Use Offline Cache?";
 
 /* Invalid Database - [%@] */
 "open_sequence_invalid_database_filename_fmt" = "Invalid Database - [%@]";
@@ -1569,12 +1536,6 @@
 
 /* To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App. */
 "autofill_safes_vc_empty_subtitle" = "To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App.";
-
-/* Cached%@: %@ */
-"autofill_safes_vc_cache_date_fmt" = "Cached%@: %@";
-
-/*  (Forced) */
-"autofill_safes_vc_cache_is_forced_fmt" = " (Forced)";
 
 /* [No Auto Fill Cache File Yet] */
 "autofill_safes_vc_item_subtitle_no_cache_yet" = "[No Auto Fill Cache File Yet]";
@@ -3347,13 +3308,64 @@
 "backup_settings_prompt_no_dont_backup_anything" = "No, do NOT backup anything";
 
 /* View Sync Status */
-"safes_vc_action_view_sync_status" = "View Sync Status";
+"safes_vc_action_view_sync_status" = "View Debug Sync Log";
+
+/* Please send this crash report to support@strongboxsafe.com */
+"safes_vc_please_send_crash_report" = "Please send this crash report to support@strongboxsafe.com";
+
+/* In Progress */
+"generic_in_progress" = "In Progress";
+
+/* Initial */
+"generic_initial_state" = "Initial";
+
+/* %@ - Sync No. %@ (Translators Note: 1st Parameter is the Date/Time of the Sync e.g. 'Today, 4:42PM', The second parameter is a sequence number like 1, 2, 42 etc. This is the number of times this database has been synced in this session */
+"sync_log_sync_header_fmt" = "%@ - Sync No. %@";
 
 /* User Interaction Required */
 "sync_status_user_interaction_required_title" = "User Interaction Required";
 
-/* Sync could not complete because user interaction is required. */
-"sync_status_user_interaction_required_message" = "Sync could not complete because user interaction is required.";
+/* User Cancelled */
+"sync_status_user_interaction_cancelled" = "User Cancelled";
 
-/* Please send this crash report to support@strongboxsafe.com */
-"safes_vc_please_send_crash_report" = "Please send this crash report to support@strongboxsafe.com";
+/* Use Mine/Local (%@) - Translators Note: The first parameter is the modified date of the local copy e.g. "Today, 14:22" */
+"sync_conflict_option_use_mine_fmt" = "Use Mine/Local (%@)";
+
+/* Use Theirs/Remote (%@) - Translators Note: The first parameter is the modified date of the remote copy e.g. "September 1st, 14:22" */
+"sync_conflict_option_use_theirs_fmt" = "Use Theirs/Remote (%@)";
+
+/* Sync Conflict */
+"sync_conflict_title" = "Sync Conflict";
+
+/* It looks like the remote version of this database on '%@' has changed and so has the local version you've been working on. Which version would you like to use?  - Translators Note: The first parameter is the name of the remote storage provider e.g. "Dropbox" */
+"sync_conflict_message_fmt" = "It looks like the remote version of this database on '%@' has changed and so has the local version you've been working on. Which version would you like to use?";
+
+/* Strongbox could not sync your changes. */
+"sync_could_not_sync_your_changes" = "Strongbox could not sync your changes.";
+
+/* You must close and reopen this database for Read-Only changes to take effect. */
+"db_management_reopen_required_message" = "You must close and reopen this database for changes to take effect.";
+
+/* Re-Open Required */
+"db_management_reopen_required_title" = "Re-Open Required";
+
+/* Could Not Open Local Copy */
+"open_sequence_couldnt_open_local_title" = "Could Not Open Local Copy";
+
+/* Could not open Strongbox's local copy of this database. A online sync is required. */
+"open_sequence_couldnt_open_local_message" = "Could not open Strongbox's local copy of this database. A online sync is required.";
+
+/* Use Local Copy? */
+"open_sequence_yesno_use_local_copy_title" = "Use Local Copy?";
+
+/* Yes, Use Local (Read-Only) */
+"open_sequence_yes_use_local_copy_option" = "Yes, Use Local (Read-Only)";
+
+/* It looks like you may be offline and '%@' may not be reachable. Would you like to use Strongbox's local copy in read-only mode instead? - (Translators Note: 1st parameter is the name of the storage location, e.g. Dropbox, Google Drive etc */
+"open_sequence_user_looks_offline_open_local_ro_fmt" = "It looks like you may be offline and '%@' may not be reachable. Would you like to use Strongbox's local copy in read-only mode instead?";
+
+/* Sync Error */
+"open_sequence_storage_provider_error_title" = "Sync Error";
+
+/* If this happens repeatedly you should try re-adding your database. See the Debug Sync Log for more...\n\nWould you like to open Strongbox's local copy in read-only mode instead? */
+"open_sequence_storage_provider_error_open_local_ro_instead" = "If this happens repeatedly you should try re-adding your database. See the Debug Sync Log for more...\n\nWould you like to open Strongbox's local copy in read-only mode instead?";

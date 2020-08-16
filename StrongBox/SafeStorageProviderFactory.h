@@ -15,6 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
 
++ (NSString*)getStorageDisplayName:(SafeMetaData*)database;
++ (NSString*)getStorageDisplayNameForProvider:(StorageProvider)provider;
+
++ (NSString*)getIcon:(SafeMetaData*)database;
++ (NSString*)getIconForProvider:(StorageProvider)provider;
+
 @end
 
 NS_ASSUME_NONNULL_END

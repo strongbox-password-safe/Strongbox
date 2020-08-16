@@ -13,6 +13,7 @@
 #import "Settings.h"
 #import "BrowseSortField.h"
 #import "Utils.h"
+#import "NSDate+Extensions.h"
 
 NSString* const kSpecialSearchTermAllEntries = @"strongbox:allEntries";
 NSString* const kSpecialSearchTermAuditEntries = @"strongbox:auditEntries";
@@ -327,10 +328,10 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
             return node.fields.email;
             break;
         case kBrowseItemSubtitleModified:
-            return friendlyDateString(node.fields.modified);
+            return node.fields.modified ? node.fields.modified.friendlyDateString : @"";
             break;
         case kBrowseItemSubtitleCreated:
-            return friendlyDateString(node.fields.created);
+            return node.fields.created ? node.fields.created.friendlyDateString : @"";
             break;
         case kBrowseItemSubtitleNotes:
             return self.model.metadata.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;

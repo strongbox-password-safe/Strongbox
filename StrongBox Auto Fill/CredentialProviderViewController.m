@@ -87,7 +87,7 @@
                                                     canConvenienceEnrol:NO
                                                          isAutoFillOpen:YES
                                                 isAutoFillQuickTypeOpen:YES
-                                                 manualOpenOfflineCache:NO
+                                                 openLocalOnly:NO
                                             biometricAuthenticationDone:NO
                                                              completion:^(Model * _Nullable model, NSError * _Nullable error) {
                     AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;

@@ -64,7 +64,7 @@
     self.selectedYubiKeyConfig = self.initialYubiKeyConfig;
     
     self.switchReadOnly.on = self.initialReadOnly;
-    self.switchOpenOffline.on = self.initialOfflineCache;
+    self.switchOpenOffline.on = self.initialOpenLocalOnly;
     
     self.textFieldName.text = self.selectedName.length ? self.selectedName : [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
   
@@ -256,7 +256,7 @@
     creds.oneTimeKeyFileData = self.selectedOneTimeKeyFileData;
     creds.format = self.selectedFormat;
     creds.readOnly = self.switchReadOnly.on;
-    creds.offlineCache = self.switchOpenOffline.on;
+    creds.openLocalOnly = self.switchOpenOffline.on;
     creds.yubiKeySecret = self.textFieldYubikeySecret.text;
     creds.yubiKeyConfig = self.selectedYubiKeyConfig;
     
@@ -316,7 +316,7 @@
                                                      self.initialFormat == kPasswordSafe ||
                                                      self.initialFormat == kKeePass1];
 
-        if(!self.offlineCacheDate) {
+        if(!self.showOpenLocalOnlyOption) {
             [self cell:self.cellOpenOffline setHidden:YES];
         }
     }

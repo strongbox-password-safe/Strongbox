@@ -1226,19 +1226,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.currentGroup = self.viewModel.database.rootGroup;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
-        vc.onDone = ^(BOOL userCancelled, NSError *error) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if (userCancelled) {
-                    [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE: Be more graceful and revert nicely
-                }
-                else if (error) {
-                    NSString* title = NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving");
-                    [Alerts error:self title:title error:error];
-                }
-                else {
-                    [self refreshItems];
-                }
-            }];
+        vc.onDone = ^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nonnull error) {
+            [self onUpdateDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged error:error];
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToPreferencesAndManagement"]) {
@@ -1540,21 +1529,21 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
           message:NSLocalizedString(@"browse_vc_are_you_sure_recycle", @"Are you sure you want to send these item(s) to the Recycle Bin?")
            action:^(BOOL response) {
-               if (response) {
-                   BOOL fail = ![self.viewModel recycleItems:items];
-                   
-                   if(fail) {
-                       [Alerts warn:self
-                              title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
-                            message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
-                       
-                       [self refreshItems];
-                   }
-                   else {
-                       [self saveChangesToSafeAndRefreshView];
-                   }
-               }
-           }];
+       if (response) {
+           BOOL fail = ![self.viewModel recycleItems:items];
+           
+           if(fail) {
+               [Alerts warn:self
+                      title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                    message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
+               
+               [self refreshItems];
+           }
+           else {
+               [self saveChangesToSafeAndRefreshView];
+           }
+       }
+    }];
 }
 
 ///
@@ -1578,30 +1567,42 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     [self.viewModel update:self
                 isAutoFill:NO
-                   handler:^(BOOL userCancelled, NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            if (userCancelled) {
-                [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully
-            }
-            else if (error) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"browse_vc_error_saving", @"Error Saving")
-                        error:error
-                   completion:^{
-                    [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully
-                }];
-            }
-            else {
-                if(self.isEditing) {
-                    [self setEditing:NO animated:YES];
-                }
-                
-                [self refreshItems];
-                
-                [self updateSplitViewDetailsView:nil editMode:NO];
-            }
-        });
+                   handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+        [self onUpdateDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged error:error];
     }];
+}
+
+- (void)onUpdateDone:(BOOL)userCancelled conflictAndLocalWasChanged:(BOOL)conflictAndLocalWasChanged error:(NSError*)error {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        if (userCancelled) {
+            [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully
+        }
+        else if (conflictAndLocalWasChanged) {
+            [Alerts info:self
+                   title:NSLocalizedString(@"db_management_reopen_required_title", @"Re-Open Required")
+                 message:NSLocalizedString(@"db_management_reopen_required_message", @"You must close and reopen this database for changes to take effect.")
+              completion:^{
+                [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully
+            }];
+        }
+        else if (error) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"browse_vc_error_saving", @"Error Saving")
+                    error:error
+               completion:^{
+                [self dismissViewControllerAnimated:YES completion:nil]; // FUTURE - Revert more gracefully
+            }];
+        }
+        else {
+            if(self.isEditing) {
+                [self setEditing:NO animated:YES];
+            }
+            
+            [self refreshItems];
+            
+            [self updateSplitViewDetailsView:nil editMode:NO];
+        }
+    });
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

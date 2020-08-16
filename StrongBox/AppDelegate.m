@@ -201,7 +201,6 @@ void uncaughtExceptionHandler(NSException *exception) {
     NSDictionary* jsonDict = @{
         @"name" : exception.name != nil ? exception.name : NSNull.null,
         @"reason" : exception.reason != nil ? exception.reason : NSNull.null,
-        @"userInfo" : exception.userInfo != nil ? exception.userInfo : NSNull.null,
         @"callStackSymbols" : exception.callStackSymbols != nil ? exception.callStackSymbols : NSNull.null,
         @"callStackReturnAddresses" :  exception.callStackReturnAddresses != nil ? exception.callStackReturnAddresses : NSNull.null
     };
@@ -210,7 +209,6 @@ void uncaughtExceptionHandler(NSException *exception) {
     //        NSDictionary* jsonDict = [NSJSONSerialization JSONObjectWithData:crashFileData options:kNilOptions error:nil];
     //        NSString* reason = jsonDict[@"reason"];
     //        NSString* name = jsonDict[@"name"];
-    //        NSDictionary* userInfo = jsonDict[@"userInfo"];
     //        NSArray* callStackReturnAddresses = jsonDict[@"callStackReturnAddresses"];
     //        NSArray* callStackSymbols = jsonDict[@"callStackSymbols"];
 

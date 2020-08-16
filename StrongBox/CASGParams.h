@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSData* oneTimeKeyFileData;
 @property DatabaseFormat format;
 @property BOOL readOnly;
-@property BOOL offlineCache;
+@property BOOL openLocalOnly;
 
 @end
 

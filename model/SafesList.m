@@ -78,7 +78,7 @@ NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChan
     
     NSLog(@"Migrating %lu databases to new store.", (unsigned long)self.databasesList.count);
 
-    [self serialize];
+    [self serialize:YES];
 
     NSLog(@"Migrated %lu databases to new store!", (unsigned long)self.databasesList.count);
 
@@ -164,7 +164,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     }
 }
 
-- (void)serialize {
+- (void)serialize:(BOOL)notify {
     NSMutableArray<NSDictionary*>* jsonDatabases = NSMutableArray.array;
     
     for (SafeMetaData* database in self.databasesList) {
@@ -201,15 +201,11 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         return;
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
-    });
-}
-
-- (void)save {
-    dispatch_barrier_async(self.dataQueue, ^{
-        [self serialize];
-    });
+    if (notify) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
+        });
+    }
 }
 
 - (void)update:(SafeMetaData *_Nonnull)safe {
@@ -220,7 +216,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         
         if(index != NSNotFound) {
             [self.databasesList replaceObjectAtIndex:index withObject:safe];
-            [self serialize];
+            [self serialize:NO]; // Don't notify if we're just updating an existing DB - no need to refresh DB list
         }
         else {
             NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", safe);
@@ -228,9 +224,9 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     });
 }
 
-- (SafeMetaData *)getById:(NSUUID *)uuid {
+- (SafeMetaData *)getById:(NSString*)uuid {
     return [self.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-        return [obj.uuid isEqual:uuid];
+        return [obj.uuid isEqualToString:uuid];
     }];
 }
 
@@ -275,12 +271,12 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         }
         else {
             [self.databasesList addObject:safe];
-            [self serialize];
+            [self serialize:YES];
         }
     }
     else {
         [self.databasesList addObject:safe];
-        [self serialize];
+        [self serialize:YES];
     }
 }
 
@@ -292,7 +288,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         
         if(index != NSNotFound) {
             [self.databasesList removeObjectAtIndex:index];
-            [self serialize];
+            [self serialize:YES];
         }
         else {
             NSLog(@"WARN: Attempt to remove a safe not found in list... [%@]", uuid);
@@ -308,7 +304,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         
         [self.databasesList insertObject:item atIndex:destinationIndex];
         
-        [self serialize];
+        [self serialize:YES];
     });
 }
 
@@ -319,7 +315,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     
     dispatch_barrier_async(self.dataQueue, ^{
         [self.databasesList removeAllObjects];
-        [self serialize];
+        [self serialize:YES];
     });
 }
 

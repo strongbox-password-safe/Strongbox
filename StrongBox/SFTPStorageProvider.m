@@ -15,6 +15,7 @@
 #import "SFTPSessionConfigurationViewController.h"
 #import "SVProgressHUD.h"
 #import "Constants.h"
+#import "NSDate+Extensions.h"
 
 @interface SFTPStorageProvider ()
 
@@ -37,12 +38,6 @@
 
 - (instancetype)init {
     if(self = [super init]) {
-        _displayName = NSLocalizedString(@"storage_provider_name_sftp", @"SFTP");
-        if([self.displayName isEqualToString:@"storage_provider_name_sftp"]) {
-            _displayName = @"SFTP";
-        }
-        
-        _icon = @"sftp-32x32"; 
         _storageId = kSFTP;
         _providesIcons = NO;
         _browsableNew = YES;
@@ -161,39 +156,54 @@ viewController:(UIViewController *)viewController
     completion(NO, browserItems, nil);
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData
+       interactiveVC:(UIViewController *)viewController
+                data:(NSData *)data
+          isAutoFill:(BOOL)isAutoFill
+          completion:(StorageProviderUpdateCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
     [self connectAndAuthenticate:providerData.sFtpConfiguration
                   viewController:nil
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
         if(sftp == nil || error) {
-            completion(error);
+            completion(kUpdateResultError, nil, error);
             return;
         }
     
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
-        });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+            });
+        }
 
         if(![sftp writeContents:data toFileAtPath:providerData.filePath progress:nil]) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
 
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
-            completion(error);
-            return;
+            completion(kUpdateResultError, nil, error);
         }
         else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            NMSFTPFile* attr = [sftp infoForFileAtPath:providerData.filePath];
+            if(!attr) {
+                error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+                completion(kUpdateResultError, nil, error);
+            }
+
+            if (viewController) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [SVProgressHUD dismiss];
+                });
+            }
+            
+            completion(kUpdateResultSuccess, attr.modificationDate, nil);
         }
         
         [sftp disconnect];
-        
-        completion(nil);
     }];
 }
 
@@ -274,7 +284,7 @@ viewController:(UIViewController *)viewController
             return;
         }
         
-        if (options.onlyIfModifiedDifferentFrom && [options.onlyIfModifiedDifferentFrom isEqualToDate:attr.modificationDate]) {
+        if (options.onlyIfModifiedDifferentFrom && [options.onlyIfModifiedDifferentFrom isEqualToDateWithinEpsilon:attr.modificationDate]) {
             if (viewController) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [SVProgressHUD dismiss];

@@ -108,57 +108,6 @@ BOOL isValidUrl(NSString* urlString) {
     return NSFullUserName();
 }
 
-NSString* friendlyFileSizeString(long long byteCount) {
-    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
-}
-
-NSString *friendlyDateString(NSDate *modDate) {
-    if(!modDate) { return @""; }
-    
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    df.timeStyle = NSDateFormatterShortStyle;
-    df.dateStyle = NSDateFormatterMediumStyle;
-    df.doesRelativeDateFormatting = YES;
-    df.locale = NSLocale.currentLocale;
-    
-    return [df stringFromDate:modDate];
-}
-
-NSString *friendlyDateStringVeryShort(NSDate *modDate) {
-    if(!modDate) { return @""; }
-    
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    df.timeStyle = NSDateFormatterShortStyle;
-    df.dateStyle = NSDateFormatterShortStyle;
-    df.doesRelativeDateFormatting = YES;
-    df.locale = NSLocale.currentLocale;
-    
-    return [df stringFromDate:modDate];
-}
-
-NSString *friendlyDateTimeStringPrecise(NSDate *modDate) {
-    if(!modDate) { return @""; }
-
-    NSDateFormatter *df = [[NSDateFormatter alloc] init];
-    df.timeStyle = kCFDateFormatterMediumStyle;
-    df.dateStyle = NSDateFormatterShortStyle;
-    df.doesRelativeDateFormatting = YES;
-    df.locale = NSLocale.currentLocale;
-
-    return [df stringFromDate:modDate];
-}
-
-NSString *iso8601DateString(NSDate *modDate) {
-    if(!modDate) { return @""; }
-    
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-    [dateFormatter setLocale:enUSPOSIXLocale];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZZ"];
-
-    return [dateFormatter stringFromDate:modDate];
-}
-
 + (NSString*)formatTimeInterval:(NSInteger)seconds {
     if(seconds == 0) {
         return NSLocalizedString(@"prefs_vc_time_interval_none", @"None");
@@ -170,6 +119,10 @@ NSString *iso8601DateString(NSDate *modDate) {
     fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
     
     return [fmt stringFromTimeInterval:seconds];
+}
+
+NSString* friendlyFileSizeString(long long byteCount) {
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
 }
 
 NSString* keePassStringIdFromUuid(NSUUID* uuid) {

@@ -293,35 +293,43 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return self.metadata.readOnly || self.forcedReadOnly;
 }
 
-- (void)update:(UIViewController*)viewController isAutoFill:(BOOL)isAutoFill handler:(void(^)(BOOL userCancelled, NSError * _Nullable error))handler {
+- (void)update:(UIViewController*)viewController isAutoFill:(BOOL)isAutoFill handler:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error))handler {
     if(self.isReadOnly) {
-        handler(NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
+        handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
         return;
     }
 
     [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
         if (userCancelled || data == nil || error) {
-            handler(userCancelled, error);
+            handler(userCancelled, NO, error);
             return;
         }
 
-        [self onUpdateWithEncryptedDone:viewController data:data completion:handler];
+        [self onEncryptionDone:viewController data:data completion:handler];
     }];
 }
 
-- (void)onUpdateWithEncryptedDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, NSError * _Nullable error))completion {
+- (void)onEncryptionDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error))completion {
     if (self.isDuressDummyMode) {
         [self setDuressDummyData:data];
-        completion(NO, nil);
+        completion(NO, NO, nil);
         return;
     }
     else {
-        SyncReadOptions* updateOptions = [[SyncReadOptions alloc] init];
-        updateOptions.isAutoFill = self.isAutoFillOpen;
-        updateOptions.vc = viewController;
+        // FUTURE: Make this block atomic so multiple updates can't intertwine... Should be pretty safe as is with UI blocked.
         
-        [SyncManager.sharedInstance syncFromLocalAndOverwriteRemote:self.metadata data:data updateOptions:updateOptions completion:^(NSError *error) {
-            if(!error) {
+        NSError* error;
+        BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata data:data error:&error];
+
+        if (!success) {
+            completion(NO, NO, error);
+            return;
+        }
+        
+        // TODO: AutoFill won't do this...
+        
+        [SyncManager.sharedInstance sync:self.metadata interactiveVC:viewController join:NO isAutoFill:self.isAutoFillOpen completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
+            if (result == kSyncAndMergeSuccess) {
                 if(self.metadata.autoFillEnabled) {
                     [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
                 }
@@ -330,9 +338,21 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
                 if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
                     [self restartAudit];
                 }
+                completion(NO, conflictAndLocalWasChanged, nil);
             }
-            
-            completion(NO, error);
+            else if (result == kSyncAndMergeError) {
+                completion(NO, NO, error);
+            }
+            else if (result == kSyncAndMergeResultUserCancelled) {
+                // Can happen if user cancels a conflict resolution request - The sync will fail because it doesn't know how to resolve a conflict...
+                NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
+                error = [Utils createNSError:message errorCode:-1];
+                completion(NO, NO, error); // TODO: This causes the Browse dialog to disappear - not losing the changes but it's still not great - might be best to allow continued editing here
+            }
+            else { // Impossible but catch (Only possible enum is User Interaction Required but that can't happen because this is an interactive sync)
+                error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
+                completion(NO, NO, error);
+            }
         }];
     }
 }

@@ -22,14 +22,14 @@ typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable er
                                    safe:(SafeMetaData*)safe
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
-                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+                          openLocalOnly:(BOOL)openLocalOnly
                              completion:(CompletionBlock)completion;
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
-                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+                          openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                              completion:(CompletionBlock)completion;
 
@@ -38,19 +38,19 @@ typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable er
                       openAutoFillCache:(BOOL)openAutoFillCache
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
-                 manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
+                          openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                              completion:(CompletionBlock)completion;
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
-                       safe:(SafeMetaData*)safe
-          openAutoFillCache:(BOOL)openAutoFillCache
-        canConvenienceEnrol:(BOOL)canConvenienceEnrol
-             isAutoFillOpen:(BOOL)isAutoFillOpen
-    isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
-     manualOpenOfflineCache:(BOOL)manualOpenOfflineCache
-biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
-                 completion:(CompletionBlock)completion;
+                                   safe:(SafeMetaData*)safe
+                      openAutoFillCache:(BOOL)openAutoFillCache
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
+                isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
+                          openLocalOnly:(BOOL)openLocalOnly
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                             completion:(CompletionBlock)completion;
 
 NSData*_Nullable getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
 NSData*_Nullable getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error);

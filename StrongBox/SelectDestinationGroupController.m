@@ -69,13 +69,17 @@
     if (!ret) {
         NSLog(@"Error Moving");
         NSError* error = [Utils createNSError:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving") errorCode:-1];
-        self.onDone(NO, error);
+        self.onDone(NO, NO, error);
         return;
     }
 
-    [self.viewModel update:self isAutoFill:NO handler:^(BOOL userCancelled, NSError * _Nullable error) {
+    // TODO: This should probably not be done here but in Browse View so we can centralize the handling of the update
+    
+    [self.viewModel update:self isAutoFill:NO handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will crash BrowseSafeView dismiss.
-            self.onDone(userCancelled, error);
+            [self dismissViewControllerAnimated:YES completion:^{
+                self.onDone(userCancelled, conflictAndLocalWasChanged, error);
+            }];
         });
     }];
 }

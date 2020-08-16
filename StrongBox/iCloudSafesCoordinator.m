@@ -12,7 +12,6 @@
 #import "Strongbox.h"
 #import "SafesList.h"
 #import "SharedAppAndAutoFillSettings.h"
-#import "StrongboxUIDocument.h"
 
 @implementation iCloudSafesCoordinator
 

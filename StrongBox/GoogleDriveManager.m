@@ -12,6 +12,7 @@
 #import "SVProgressHUD.h"
 #import "real-secrets.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "NSDate+Extensions.h"
 
 static NSString *const kMimeType = @"application/octet-stream";
 
@@ -280,7 +281,7 @@ viewController:(UIViewController*)viewController
                 GTLRDateTime* dtMod = file.modifiedTime;
                 
                 if (options && options.onlyIfModifiedDifferentFrom && dtMod) {
-                    if ([dtMod.date isEqualToDate:options.onlyIfModifiedDifferentFrom]) {
+                    if ([dtMod.date isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom]) {
                         handler(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
                         return;
                     }
@@ -292,61 +293,48 @@ viewController:(UIViewController*)viewController
     }];
 }
 
-- (void)update:(NSString *)parentFileIdentifier
-      fileName:(NSString *)fileName
-      withData:(NSData *)data
-    completion:(void (^)(NSError *error))handler {
+- (void)update:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName withData:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)handler {
     parentFileIdentifier = parentFileIdentifier ? parentFileIdentifier : @"root";
 
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
-    });
+    if (viewController) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_status_sp_locating_ellipsis", @"Locating...")];
+        });
+    }
     
     [self findSafeFile:parentFileIdentifier
               fileName:fileName
-            completion:^(GTLRDrive_File *file, NSError *error)
-    {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+            completion:^(GTLRDrive_File *file, NSError *error) {
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
         
-        if (!error) {
-            if (!file) {
-                handler(error);
-            }
-            else {
-                GTLRUploadParameters *uploadParameters = [GTLRUploadParameters
-                                                          uploadParametersWithData:data
-                                                                          MIMEType:kMimeType];
+        if (error || !file) {
+            NSLog(@"%@", error);
+            handler(kUpdateResultError, nil, error);
+        }
+        else {
+            GTLRUploadParameters *uploadParameters = [GTLRUploadParameters uploadParametersWithData:data MIMEType:kMimeType];
+            GTLRDriveQuery_FilesUpdate *query = [GTLRDriveQuery_FilesUpdate queryWithObject:[GTLRDrive_File object] fileId:file.identifier uploadParameters:uploadParameters];
+            query.fields = @"modifiedTime";
 
-                GTLRDriveQuery_FilesUpdate *query = [GTLRDriveQuery_FilesUpdate
-                                                     queryWithObject:[GTLRDrive_File object]
-                                                                  fileId:file.identifier
-                                                        uploadParameters:uploadParameters];
-
+            if (viewController) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
                 });
-                
-                [self.driveService executeQuery:query
-                              completionHandler:^(GTLRServiceTicket *callbackTicket,
-                                                                    GTLRDrive_File *uploadedFile,
-                                                                    NSError *callbackError) {
-                                  dispatch_async(dispatch_get_main_queue(), ^{
-                                      [SVProgressHUD dismiss];
-                                  });
-                                  
-                                  if (callbackError) {
-                                      NSLog(@"%@", callbackError);
-                                  }
-
-                                  handler(callbackError);
-                              }];
             }
-        }
-        else {
-            NSLog(@"%@", error);
-            handler(error);
+            
+            [self.driveService executeQuery:query completionHandler:^(GTLRServiceTicket *callbackTicket, GTLRDrive_File *uploadedFile, NSError *callbackError) {
+                if (viewController) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [SVProgressHUD dismiss];
+                    });
+                }
+
+                handler(callbackError ? kUpdateResultError : kUpdateResultSuccess, uploadedFile.modifiedTime.date, callbackError);
+            }];
         }
     }];
 }

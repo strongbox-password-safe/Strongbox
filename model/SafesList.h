@@ -18,7 +18,7 @@ extern NSString* _Nonnull const kDatabasesListChangedNotification;
 + (instancetype _Nullable)sharedInstance;
 @property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *snapshot;
 
-- (SafeMetaData*_Nullable)getById:(NSUUID*)uuid;
+- (SafeMetaData *)getById:(NSString*)uuid;
 
 + (NSString *_Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
 - (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;

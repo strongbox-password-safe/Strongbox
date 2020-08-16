@@ -46,16 +46,13 @@ NS_ASSUME_NONNULL_BEGIN
 NSString* keePassStringIdFromUuid(NSUUID* uuid);
 NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
 
-+ (NSString*)formatTimeInterval:(NSInteger)seconds;
-NSString* friendlyFileSizeString(long long byteCount);
-NSString *friendlyDateString(NSDate *modDate);
-NSString *friendlyDateStringVeryShort(NSDate *modDate);
-NSString *friendlyDateTimeStringPrecise(NSDate *modDate);
-NSString *iso8601DateString(NSDate *modDate);
-
 BOOL isValidUrl(NSString* urlString);
 NSString* trim(NSString* str);
 + (NSString *)trim:(NSString*)string;
+
++ (NSString*)formatTimeInterval:(NSInteger)seconds;
+
+NSString* friendlyFileSizeString(long long byteCount);
 
 extern NSComparator finderStringComparator;
 NSComparisonResult finderStringCompare(NSString* string1, NSString* string2);

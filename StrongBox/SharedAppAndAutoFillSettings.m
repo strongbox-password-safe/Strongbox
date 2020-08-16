@@ -42,6 +42,7 @@ static NSString* const kDatabaseCellSubtitle2 = @"databaseCellSubtitle2";
 static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 
 static NSString* const kSyncPullEvenIfModifiedDateSame = @"syncPullEvenIfModifiedDateSame";
+static NSString* const kSyncForcePushDoNotCheckForConflicts = @"syncForcePushDoNotCheckForConflicts";
 
 @implementation SharedAppAndAutoFillSettings
 
@@ -83,6 +84,14 @@ static NSString* const kSyncPullEvenIfModifiedDateSame = @"syncPullEvenIfModifie
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)syncForcePushDoNotCheckForConflicts {
+    return [self getBool:kSyncForcePushDoNotCheckForConflicts];
+}
+
+- (void)setSyncForcePushDoNotCheckForConflicts:(BOOL)syncForcePushDoNotCheckForConflicts {
+    [self setBool:kSyncForcePushDoNotCheckForConflicts value:syncForcePushDoNotCheckForConflicts];
+}
 
 - (BOOL)syncPullEvenIfModifiedDateSame {
     return [self getBool:kSyncPullEvenIfModifiedDateSame];

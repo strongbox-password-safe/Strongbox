@@ -79,7 +79,7 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"Method: %d, error: [%@], url: [%@], provider: [%@]",
-            self.method, self.error, self.url, self.provider ? self.provider.displayName : @"nil"];
+            self.method, self.error, self.url, self.provider ? @(self.provider.storageId) : @"nil"];
 }
 
 @end

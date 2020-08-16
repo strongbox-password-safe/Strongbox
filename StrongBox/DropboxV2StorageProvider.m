@@ -11,6 +11,7 @@
 #import "Utils.h"
 #import "SVProgressHUD.h"
 #import "Constants.h"
+#import "NSDate+Extensions.h"
 
 @implementation DropboxV2StorageProvider
 
@@ -26,12 +27,6 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        _displayName = NSLocalizedString(@"storage_provider_name_dropbox", @"Dropbox");
-        if([_displayName isEqualToString:@"storage_provider_name_dropbox"]) {
-            _displayName = @"Dropbox";
-        }
-
-        _icon = @"dropbox-blue-32x32-nologo";
         _storageId = kDropbox;
         _providesIcons = NO;
         _browsableNew = YES;
@@ -61,25 +56,26 @@
     NSString *path = [NSString pathWithComponents:
                       @[parentFolderPath, desiredFilename]];
 
-    [self createOrUpdate:path
+    [self createOrUpdate:viewController
+                    path:path
                     data:data
-              completion:^(NSError *error) {
-                  dispatch_async(dispatch_get_main_queue(), ^{
-                      [SVProgressHUD dismiss];
-                  });
+              completion:^(StorageProviderUpdateResult result, NSDate * _Nullable newRemoteModDate, const NSError * _Nullable error) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+          [SVProgressHUD dismiss];
+      });
 
-                  if (error == nil) {
-                      SafeMetaData *metadata = [[SafeMetaData alloc] initWithNickName:nickName
-                                                                      storageProvider:self.storageId
-                                                                             fileName:desiredFilename
-                                                                       fileIdentifier:parentFolderPath];
+      if (error == nil) {
+          SafeMetaData *metadata = [[SafeMetaData alloc] initWithNickName:nickName
+                                                          storageProvider:self.storageId
+                                                                 fileName:desiredFilename
+                                                           fileIdentifier:parentFolderPath];
 
-                      completion(metadata, error);
-                  }
-                  else {
-                      completion(nil, error);
-                  }
-              }];
+          completion(metadata, error);
+      }
+      else {
+          completion(nil, error);
+      }
+    }];
 }
 
 - (void)pullDatabase:(SafeMetaData *)safeMetaData
@@ -125,7 +121,7 @@
             NSLog(@"Dropbox Date Modified: [%@]", metadata.serverModified);
 
             if (options && options.onlyIfModifiedDifferentFrom) {
-                if ([metadata.serverModified isEqualToDate:options.onlyIfModifiedDifferentFrom]) {
+                if ([metadata.serverModified isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom]) {
                     if (viewController) {
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [SVProgressHUD dismiss];
@@ -171,16 +167,12 @@
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(void (^)(NSError * _Nullable))completion {
-    NSString *path = [NSString pathWithComponents:
-                      @[safeMetaData.fileIdentifier, safeMetaData.fileName]];
-
-    [self createOrUpdate:path data:data completion:completion];
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
+    NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
+    [self createOrUpdate:viewController path:path data:data completion:completion];
 }
 
-- (void)createOrUpdate:(NSString *)path
-                  data:(NSData *)data
-            completion:(void (^)(NSError *error))completion {
+- (void)createOrUpdate:(UIViewController*)viewController path:(NSString *)path data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
 
     DBUserClient *client = DBClientsManager.authorizedClient;
@@ -194,22 +186,23 @@
                       strictConflict:@(NO)
                            inputData:data]
       setResponseBlock:^(DBFILESFileMetadata *result, DBFILESUploadError *routeError, DBRequestError *networkError) {
-          dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-          });
+        if (viewController) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [SVProgressHUD dismiss];
+            });
+        }
 
-          if (result) {
-            completion(nil);
-          }
-          else {
+        if (result) {
+            completion(kUpdateResultSuccess, result.serverModified, nil);
+        }
+        else {
             NSLog(@"%@\n%@\n", routeError, networkError);
             NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
-            completion([Utils createNSError:message
-                                  errorCode:-1]);
-          }
-      }] setProgressBlock:^(int64_t bytesUploaded, int64_t totalBytesUploaded, int64_t totalBytesExpectedToUploaded) {
+            completion(kUpdateResultError, nil, [Utils createNSError:message errorCode:-1]);
+        }
+    }] setProgressBlock:^(int64_t bytesUploaded, int64_t totalBytesUploaded, int64_t totalBytesExpectedToUploaded) {
           //NSLog(@"Dropbox Progress: %lld\n%lld\n%lld\n", bytesUploaded, totalBytesUploaded, totalBytesExpectedToUploaded);
-         }];
+    }];
 }
 
 - (void)      list:(NSObject *)parentFolder

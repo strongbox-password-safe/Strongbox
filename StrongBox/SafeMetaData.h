@@ -134,6 +134,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL promptedForAutoFetchFavIcon;
 
+@property (nullable) NSUUID* outstandingUpdateId;
+@property (nullable) NSDate* lastSyncRemoteModDate; // Last time we got a remote sync (pulled from remote)
+
 @end
 
 NS_ASSUME_NONNULL_END

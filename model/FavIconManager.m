@@ -53,16 +53,23 @@
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
 
     @try {
+        NSError* error;
         [FavIcon downloadAll:url
                      favIcon:options.checkCommonFavIconFiles
                     scanHtml:options.scanHtml
                   duckDuckGo:options.duckDuckGo
                       google:options.google
         allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
-                  completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
+                       error:&error
+                  completion:^(NSArray<UIImage *> * _Nullable images) {
             IMAGE_TYPE_PTR best = [self selectBest:images];
             completion(best);
         }];
+        
+        if (error) {
+            NSLog(@"Error: [%@]", error);
+            completion(nil);
+        }
     } @catch (NSException *exception) {
         NSLog(@"Exception in downloadAll: [%@]", exception);
         completion(nil);
@@ -75,19 +82,26 @@
     url = [self cleanupUrl:url trimToDomainOnly:options.domainOnly];
 
     @try {
+        NSError* error;
         [FavIcon downloadAll:url
                      favIcon:options.checkCommonFavIconFiles
                     scanHtml:options.scanHtml
                   duckDuckGo:options.duckDuckGo
                       google:options.google
         allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
+                       error:&error
                   completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
-            completion(images);
+           completion(images);
         }];
+        
+        if (error) {
+            NSLog(@"Error: [%@]", error);
+            completion(@[]);
+        }
     } @catch (NSException *exception) {
         NSLog(@"Exception in downloadAll: [%@]", exception);
-        completion(nil);
-    } @finally { }
+        completion(@[]);
+    } @finally {    }
 }
 
 - (IMAGE_TYPE_PTR)selectBest:(NSArray<IMAGE_TYPE_PTR>*)images {

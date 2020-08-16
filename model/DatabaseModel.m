@@ -17,6 +17,7 @@
 #import "DatabaseAuditor.h"
 #import "NSData+Extensions.h"
 #import "Constants.h"
+#import "NSDate+Extensions.h"
 
 @interface DatabaseModel ()
 
@@ -939,7 +940,7 @@
     .entry-field-value { font-family: Menlo; padding: 2px; max-width: 700px; word-wrap: break-word; } \
     </style></head>";
     
-    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h6>Printed: %@</h6>    ", stylesheet, [self htmlStringFromString:databaseName], iso8601DateString(NSDate.date)];
+    NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h6>Printed: %@</h6>    ", stylesheet, [self htmlStringFromString:databaseName], NSDate.date.iso8601DateString];
     
     NSArray<Node*>* sortedGroups = [self.rootGroup.allChildGroups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         NSString* path1 = [self getGroupPathDisplayString:obj1];
@@ -1003,7 +1004,7 @@
     // Expiry
     
     if(entry.fields.expires) {
-        [str appendString:[self getHtmlEntryFieldRow:@"Expires" value:iso8601DateString(entry.fields.expires)]];
+        [str appendString:[self getHtmlEntryFieldRow:@"Expires" value:entry.fields.expires.iso8601DateString]];
         [str appendString:@"\n"];
     }
 

@@ -28,8 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property CASGMode mode;
 @property DatabaseFormat initialFormat;
 @property (nullable) NSURL* initialKeyFileUrl;
-@property NSDate* offlineCacheDate;
-@property BOOL initialOfflineCache;
+@property BOOL showOpenLocalOnlyOption;
+@property BOOL initialOpenLocalOnly;
 @property BOOL initialReadOnly;
 @property YubiKeyHardwareConfiguration* initialYubiKeyConfig;
 @property BOOL validateCommonKeyFileMistakes;

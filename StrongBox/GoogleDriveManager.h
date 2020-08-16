@@ -35,10 +35,11 @@
 
 - (void)read:(UIViewController *)viewController parentFileIdentifier:(NSString *)parentFileIdentifier fileName:(NSString *)fileName options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)handler;
 
-- (void)update:(NSString *)parentFileIdentifier
+- (void)update:(UIViewController *)viewController
+parentFileIdentifier:(NSString *)parentFileIdentifier
       fileName:(NSString *)fileName
       withData:(NSData *)data
-    completion:(void (^)(NSError *error))handler;
+    completion:(StorageProviderUpdateCompletionBlock)handler;
 
 - (void)getFilesAndFolders:(UIViewController *)viewController
           withParentFolder:(NSString *)parentFolderIdentifier
