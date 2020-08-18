@@ -18,8 +18,6 @@ typedef NS_ENUM (NSUInteger, SyncInProgressBehaviour) {
     
 @interface SyncParameters : NSObject
 
-@property BOOL isAutoFill; // TODO: Should be able to get rid of this once Auto-Fill moves to local only
-
 @property (nullable) UIViewController* interactiveVC; // If null -> This is a background sync
 @property SyncInProgressBehaviour inProgressBehaviour; // What to do if sync is already in progress
 

@@ -178,7 +178,7 @@ suggestedFilename:nil
     });
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
     
     dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely

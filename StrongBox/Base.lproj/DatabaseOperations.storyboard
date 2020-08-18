@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Rf4-Vz-QaZ">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Rf4-Vz-QaZ">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -1381,8 +1381,8 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="Open as Read-Only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dYn-dT-eVK" userLabel="Label">
-                                                    <rect key="frame" x="8" y="12" width="149.5" height="20.5"/>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="Read-Only" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dYn-dT-eVK" userLabel="Label">
+                                                    <rect key="frame" x="8" y="12" width="81.5" height="20.5"/>
                                                     <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
@@ -1440,39 +1440,6 @@ NB: It is important to note that in some jurisdictions this action in itself can
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="d9K-Iz-DC4" userLabel="Auto Fill: Force Use Cache">
-                                        <rect key="frame" x="0.0" y="941.5" width="414" height="40"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="d9K-Iz-DC4" id="lAr-gu-GJG">
-                                            <rect key="frame" x="0.0" y="0.0" width="414" height="40"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" horizontalHuggingPriority="251" horizontalCompressionResistancePriority="749" insetsLayoutMarginsFromSafeArea="NO" text="Auto Fill: Always Use Cache" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MWr-Bb-LQV" userLabel="Label">
-                                                    <rect key="frame" x="8" y="12" width="211" height="20"/>
-                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="i8B-Wf-QtK">
-                                                    <rect key="frame" x="357" y="8" width="51" height="28"/>
-                                                    <connections>
-                                                        <action selector="onAlwaysUseAutoFillCache:" destination="tDy-B6-fbm" eventType="valueChanged" id="CqE-I5-U6E"/>
-                                                    </connections>
-                                                </switch>
-                                            </subviews>
-                                            <constraints>
-                                                <constraint firstItem="MWr-Bb-LQV" firstAttribute="centerY" secondItem="lAr-gu-GJG" secondAttribute="centerY" id="0Pe-NT-QNW"/>
-                                                <constraint firstAttribute="trailingMargin" secondItem="i8B-Wf-QtK" secondAttribute="trailing" id="20X-va-cw0"/>
-                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="i8B-Wf-QtK" secondAttribute="bottom" constant="8" id="7Lq-O2-WqR"/>
-                                                <constraint firstItem="MWr-Bb-LQV" firstAttribute="top" relation="greaterThanOrEqual" secondItem="lAr-gu-GJG" secondAttribute="top" constant="8" id="7UE-ny-3fc"/>
-                                                <constraint firstItem="i8B-Wf-QtK" firstAttribute="centerY" secondItem="lAr-gu-GJG" secondAttribute="centerY" id="B2J-Cg-5YV"/>
-                                                <constraint firstItem="i8B-Wf-QtK" firstAttribute="top" relation="greaterThanOrEqual" secondItem="lAr-gu-GJG" secondAttribute="top" constant="8" id="UJX-h9-THJ"/>
-                                                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="MWr-Bb-LQV" secondAttribute="bottom" constant="8" id="ZmR-8G-NqI"/>
-                                                <constraint firstItem="i8B-Wf-QtK" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="MWr-Bb-LQV" secondAttribute="trailing" constant="8" id="idN-Vz-clJ"/>
-                                                <constraint firstItem="MWr-Bb-LQV" firstAttribute="leading" secondItem="lAr-gu-GJG" secondAttribute="leadingMargin" id="yDy-GK-fFp"/>
-                                            </constraints>
-                                        </tableViewCellContentView>
-                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -1508,7 +1475,6 @@ NB: It is important to note that in some jurisdictions this action in itself can
                         <outlet property="labelDatabaseAutoLockDelay" destination="IEL-1P-sSg" id="R4g-Ec-jnp"/>
                         <outlet property="switchAllowAutoFillCache" destination="GnR-SM-RVK" id="YdU-KX-e4s"/>
                         <outlet property="switchAllowBiometric" destination="pGn-m2-cFN" id="T1E-TI-DCU"/>
-                        <outlet property="switchAutoFillAlwaysUseCache" destination="i8B-Wf-QtK" id="xyE-o4-Pfy"/>
                         <outlet property="switchDatabaseAutoLockEnabled" destination="T6P-5g-eAS" id="u89-zb-DY3"/>
                         <outlet property="switchReadOnly" destination="xez-qH-UTD" id="LhK-1G-Iic"/>
                         <segue destination="aJP-12-BTT" kind="show" identifier="segueToPinsConfiguration" id="aaA-Dv-pFr"/>

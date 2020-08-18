@@ -19,6 +19,8 @@
 #import "ClipboardManager.h"
 #import "BrowseTableViewCellHelper.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "SafeStorageProviderFactory.h"
+#import "AutoFillSettings.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -349,13 +351,40 @@
     vc.parentGroup = self.model.database.rootGroup;
     vc.readOnly = NO;
     vc.databaseModel = self.model;
-    vc.autoFillRootViewController = self.rootViewController;
+    vc.onAutoFillNewItemAdded = ^(NSString * _Nonnull username, NSString * _Nonnull password) {
+        [self notifyUserToSwitchToAppAfterUpdate:username password:password];
+    };
     vc.autoFillSuggestedUrl = suggestedUrl;
     vc.autoFillSuggestedTitle = suggestedTitle;
 }
 
+- (void)notifyUserToSwitchToAppAfterUpdate:(NSString*)username password:(NSString*)password {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (self.model.metadata.storageProvider != kLocalDevice && !AutoFillSettings.sharedInstance.dontNotifyToSwitchToMainAppForSync) {
+            NSString* title = NSLocalizedString(@"autofill_add_entry_sync_required_title", @"Sync Required");
+            NSString* locMessage = NSLocalizedString(@"autofill_add_entry_sync_required_message_fmt",@"You have added a new entry and this change has been saved locally.\n\nDon't forget to switch to the main Strongbox app to fully sync these changes to %@.");
+            NSString* gotIt = NSLocalizedString(@"autofill_add_entry_sync_required_option_got_it",@"Got it!");
+            NSString* gotItDontTellMeAgain = NSLocalizedString(@"autofill_add_entry_sync_required_option_dont_tell_again",@"Don't tell me again");
+            
+            NSString* storageName = [SafeStorageProviderFactory getStorageDisplayName:self.model.metadata];
+            NSString* message = [NSString stringWithFormat:locMessage, storageName];
+            
+            [Alerts twoOptions:self title:title message:message defaultButtonText:gotIt secondButtonText:gotItDontTellMeAgain action:^(BOOL response) {
+                if (response == NO) {
+                    AutoFillSettings.sharedInstance.dontNotifyToSwitchToMainAppForSync = YES;
+                }
+                
+                [self.rootViewController exitWithCredential:username password:password];
+            }];
+        }
+        else {
+            [self.rootViewController exitWithCredential:username password:password];
+        }
+    });
+}
+                
 - (BOOL)canCreateNewCredential {
-    return [self.rootViewController liveAutoFillIsPossibleWithSafe:self.model.metadata] && !self.model.isReadOnly;
+    return !self.model.isReadOnly;
 }
 
 - (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {

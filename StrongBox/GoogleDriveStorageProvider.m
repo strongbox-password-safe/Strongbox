@@ -89,7 +89,7 @@
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     if (viewController) {
         [SVProgressHUD show];
     }

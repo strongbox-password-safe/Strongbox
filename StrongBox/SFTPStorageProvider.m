@@ -159,7 +159,6 @@ viewController:(UIViewController *)viewController
 - (void)pushDatabase:(SafeMetaData *)safeMetaData
        interactiveVC:(UIViewController *)viewController
                 data:(NSData *)data
-          isAutoFill:(BOOL)isAutoFill
           completion:(StorageProviderUpdateCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     

@@ -58,7 +58,6 @@ typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult
 - (void)pushDatabase:(SafeMetaData *)safeMetaData
        interactiveVC:(UIViewController *_Nullable)viewController
                 data:(NSData *)data
-          isAutoFill:(BOOL)isAutoFill
           completion:(StorageProviderUpdateCompletionBlock)completion;
 
 - (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(const NSError *_Nullable error))completion;

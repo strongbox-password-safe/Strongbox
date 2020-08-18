@@ -135,11 +135,11 @@
 //    NSLog(@"openURL: [%@] => [%@]", options, url);
     
     if ([url.absoluteString hasPrefix:@"db"]) {
-        DBOAuthResult *authResult = [DBClientsManager handleRedirectURL:url];
-
-        if (authResult != nil) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"isDropboxLinked" object:authResult];
-        }
+        [DBClientsManager handleRedirectURL:url completion:^(DBOAuthResult * _Nullable authResult) {
+            if (authResult != nil) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"isDropboxLinked" object:authResult];
+            }
+        }];
 
         return YES;
     }

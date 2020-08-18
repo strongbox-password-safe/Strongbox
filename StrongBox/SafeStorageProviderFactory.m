@@ -7,15 +7,15 @@
 //
 
 #import "SafeStorageProviderFactory.h"
-#import "DropboxV2StorageProvider.h"
-#import "AppleICloudProvider.h"
 #import "LocalDeviceStorageProvider.h"
-#import "FilesAppUrlBookmarkProvider.h"
-#import "SFTPStorageProvider.h"
-#import "WebDAVStorageProvider.h"
 
 #ifndef IS_APP_EXTENSION
 
+#import "DropboxV2StorageProvider.h"
+#import "AppleICloudProvider.h"
+#import "FilesAppUrlBookmarkProvider.h"
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
 #import "OneDriveStorageProvider.h"
 #import "GoogleDriveStorageProvider.h"
 
@@ -23,16 +23,11 @@
 
 @implementation SafeStorageProviderFactory
 
-// TODO: Entire Method should be unavailable to Auto-Fill when local only
+#ifndef IS_APP_EXTENSION
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
     if (providerId == kGoogleDrive) {
-#ifndef IS_APP_EXTENSION
         return [GoogleDriveStorageProvider sharedInstance];
-#else
-        NSLog(@"Google's new Library doesn't support App Extensions...");
-        return nil;
-#endif
     }
     else if (providerId == kDropbox)
     {
@@ -46,12 +41,7 @@
         return [LocalDeviceStorageProvider sharedInstance];
     }
     else if(providerId == kOneDrive) {
-#ifndef IS_APP_EXTENSION
         return [OneDriveStorageProvider sharedInstance];
-#else
-        NSLog(@"ADAL Onedrive Library doesn't support App Extensions. FUTURE: Use new ADAL! ");
-        return nil;
-#endif
     }
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
@@ -67,6 +57,15 @@
     
     return [LocalDeviceStorageProvider sharedInstance];
 }
+
+#else
+
++ (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
+    [NSException raise:@"Storage Provider Called From Auto Fill!!" format:@"Very Bad"];
+    return nil;
+}
+
+#endif
 
 + (NSString*)getStorageDisplayName:(SafeMetaData*)database {
     return [SafeStorageProviderFactory getDisplayNameForProvider:database.storageProvider database:database];

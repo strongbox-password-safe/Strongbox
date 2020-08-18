@@ -12,6 +12,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* _Nonnull const kDatabasesListChangedNotification;
+extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 @interface SafesList : NSObject
 

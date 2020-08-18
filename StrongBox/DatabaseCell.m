@@ -40,6 +40,8 @@ NSString* const kDatabaseCell = @"DatabaseCell";
 - (void)prepareForReuse {
     [super prepareForReuse];
     
+//    NSLog(@"XXXXXXXXXXXXXX - prepareForReuse [%@]", self.name.text);
+
     self.bottomRow.hidden = NO;
     self.subtitle1.hidden = NO;
     self.subtitle2.hidden = NO;
@@ -84,6 +86,8 @@ statusImages:(NSArray<UIImage*>*)statusImages
 rotateLastImage:(BOOL)rotateLastImage
       tints:(nonnull NSArray *)tints
    disabled:(BOOL)disabled {
+//    NSLog(@"XXXXXXXXXXXXXX - SET Database Cell for db [%@]", name);
+    
     self.name.text = name;
 
     self.providerIcon.image = providerIcon;
@@ -108,34 +112,38 @@ rotateLastImage:(BOOL)rotateLastImage
         statusImageControls[i].hidden = image == nil;
         statusImageControls[i].tintColor = (image != nil && tints && (tints[i] != NSNull.null)) ? tints[i] : nil;
         
-        if (i == statusImages.count - 1) {
-            if (rotateLastImage) {
-                [self runSpinAnimationOnView:statusImageControls[i] duration:1.0 rotations:1.0 repeat:1024 * 1024];
-            }
-        }
+        [self runSpinAnimationOnView:statusImageControls[i] doIt:(i == statusImages.count - 1 && rotateLastImage) duration:1.0 rotations:1.0 repeat:1024 * 1024];
     }
     
     [self setEnabled:!disabled];
 }
 
-- (void) runSpinAnimationOnView:(UIView*)view duration:(CGFloat)duration rotations:(CGFloat)rotations repeat:(float)repeat {
+- (void)runSpinAnimationOnView:(UIView*)view doIt:(BOOL)doIt duration:(CGFloat)duration rotations:(CGFloat)rotations repeat:(float)repeat {
+//    NSLog(@"XXXXXXXXXXXXXX - runSpinAnimationOnView for db [%@]-[%@]", self.name.text, doIt ? @"YUP" : @"Nope");
+
     [view.layer removeAllAnimations];
     
-    CABasicAnimation* rotationAnimation;
-    rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-    rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 /* full rotation*/ * rotations * duration ];
-    rotationAnimation.duration = duration;
-    rotationAnimation.cumulative = YES;
-    rotationAnimation.repeatCount = repeat ? HUGE_VALF : 0;
-
-    [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    if (doIt) {
+        CABasicAnimation* rotationAnimation;
+        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 /* full rotation*/ * rotations * duration ];
+        rotationAnimation.duration = duration;
+        rotationAnimation.cumulative = YES;
+        rotationAnimation.repeatCount = repeat ? HUGE_VALF : 0;
+        [rotationAnimation setRemovedOnCompletion:NO]; // Required or animation stops if the app deactivates or another view controller is pushed on the nav stack :(
+        
+        [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)populateCell:(SafeMetaData*)database disabled:(BOOL)disabled {
-    SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:database];
-    SyncOperationState syncState = syncStatus.state;
+- (void)populateCell:(SafeMetaData*)database {
+    [self populateCell:database disabled:NO autoFill:NO];
+}
+
+- (void)populateCell:(SafeMetaData *)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill {
+    SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [SyncManager.sharedInstance getSyncStatus:database].state;
     
     NSArray* tints;
     NSArray<UIImage*>* statusImages =  [self getStatusImages:database syncState:syncState tints:&tints];
@@ -147,6 +155,16 @@ rotateLastImage:(BOOL)rotateLastImage
     NSString* databaseIconName = [SafeStorageProviderFactory getIcon:database];
     UIImage* databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:databaseIconName] : nil;
 
+    if (disabled) {
+        databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
+        
+        if (autoFill) {
+            subtitle2 = database.autoFillEnabled ?
+                NSLocalizedString(@"autofill_vc_item_subtitle_local_copy_unavailable", @"Local Copy Unavailable") :
+                NSLocalizedString(@"autofill_vc_item_subtitle_disabled", @"Auto Fill Disabled");
+        }
+    }
+    
     [self set:database.nickName
   topSubtitle:topSubtitle
     subtitle1:subtitle1
@@ -156,44 +174,6 @@ rotateLastImage:(BOOL)rotateLastImage
      rotateLastImage:syncState == kSyncOperationStateInProgress
         tints:tints
      disabled:disabled];
-}
-
-// TODO: Remove and unify with above once Auto-Fill is local only
-- (void)populateAutoFillCell:(SafeMetaData*)database liveIsPossible:(BOOL)liveIsPossible disabled:(BOOL)disabled {
-    SyncOperationState syncState = kSyncOperationStateInitial; // Different for Auto Fill - Don't show sync state
-
-    NSArray* tints;
-    NSArray<UIImage*>* statusImages =  [self getStatusImages:database syncState:syncState tints:&tints];
-    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
-    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
-    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
-    NSString* databaseIconName = [SafeStorageProviderFactory getIcon:database];
-    UIImage* databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:databaseIconName] : nil;
-
-    // Different for auto-fill
-    // If we can't do live show auto fill cache date in subtitle 2
-    
-    if (disabled) {
-        databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
-        subtitle2 = database.autoFillEnabled ?
-        NSLocalizedString(@"autofill_safes_vc_item_subtitle_no_cache_yet", @"[No Auto Fill Cache File Yet]") :
-        NSLocalizedString(@"autofill_safes_vc_item_subtitle_cache_disabled", @"[Auto Fill Disabled]");
-    }
-    else {
-        if(!liveIsPossible) {
-            subtitle2 = [self getModifiedDate:database];
-        }
-    }
-    
-    [self set:database.nickName
-        topSubtitle:topSubtitle
-        subtitle1:subtitle1
-        subtitle2:subtitle2
-        providerIcon:databaseIcon
-        statusImages:statusImages
-    rotateLastImage:NO // Different for autofill
-           tints:tints
-        disabled:disabled];
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

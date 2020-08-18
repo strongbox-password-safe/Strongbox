@@ -15,8 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 @property BOOL autoFillExitedCleanly;
-@property (nonatomic) BOOL hasShownAutoFillLaunchWelcome;
 @property BOOL haveWarnedAboutAutoFillCrash;
+@property BOOL dontNotifyToSwitchToMainAppForSync;
 
 @end
 

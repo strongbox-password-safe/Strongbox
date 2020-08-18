@@ -375,7 +375,7 @@ viewController:(UIViewController *)viewController
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
     [self connect:providerData.sessionConfiguration viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {

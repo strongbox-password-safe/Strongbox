@@ -92,8 +92,6 @@
     [self.navigationController setToolbarHidden:NO];
     self.navigationController.toolbar.hidden = NO;
     self.navigationController.toolbarHidden = NO;
-    
-    showWelcomeMessageIfAppropriate(self);
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -153,9 +151,8 @@
     SafeMetaData *safe = [self.safes objectAtIndex:indexPath.row];
     
     BOOL autoFillPossible = [[self getInitialViewController] autoFillIsPossibleWithSafe:safe];
-    BOOL liveIsPossible = [[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe];
 
-    [cell populateAutoFillCell:safe liveIsPossible:liveIsPossible disabled:!autoFillPossible];
+    [cell populateCell:safe disabled:!autoFillPossible autoFill:YES];
     
     return cell;
 }
@@ -173,15 +170,13 @@
 }
 
 - (void)openDatabase:(SafeMetaData*)safe {
-    BOOL useAutoFillCache = ![[self getInitialViewController] liveAutoFillIsPossibleWithSafe:safe];
-    
     AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
+
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
-                                          openAutoFillCache:useAutoFillCache
                                         canConvenienceEnrol:NO // MMcG: There appears to be problems with trying to sync from App Extensions here... just have user properly enrol in the main app...
                                              isAutoFillOpen:YES
-                                     openLocalOnly:NO
+                                              openLocalOnly:NO
                                 biometricAuthenticationDone:NO
                                                  completion:^(Model * _Nullable model, NSError * _Nullable error) {
         AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;

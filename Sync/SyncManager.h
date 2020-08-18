@@ -24,8 +24,7 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 
 - (void)backgroundSyncAll;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;
-- (void)sync:(SafeMetaData*)database interactiveVC:(UIViewController*)interactiveVC join:(BOOL)join isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion;
-
+- (void)sync:(SafeMetaData*)database interactiveVC:(UIViewController*)interactiveVC join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error;
 
 ///////////////////
@@ -35,10 +34,6 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 
 - (void)startMonitoringDocumentsDirectory;
 - (BOOL)toggleLocalDatabaseFilesVisibility:(SafeMetaData*)metadata error:(NSError**)error;
-
-// Legacy - Remove eventually // TODO:
-- (BOOL)isLegacyAutoFillBookmarkSet:(SafeMetaData*)database;
-- (void)setLegacyAutoFillBookmark:(SafeMetaData*)database bookmark:(NSData*)bookmark;
 
 - (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData*)database;
 

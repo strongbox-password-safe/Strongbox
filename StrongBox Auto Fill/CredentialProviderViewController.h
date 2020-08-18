@@ -13,14 +13,11 @@
 API_AVAILABLE(ios(12.0))
 @interface CredentialProviderViewController : ASCredentialProviderViewController
 
-- (BOOL)liveAutoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 - (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData;
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers;
 
 - (void)exitWithUserCancelled;
 - (void)exitWithCredential:(NSString*)username password:(NSString*)password;
-
-void showWelcomeMessageIfAppropriate(UIViewController *vc);
 
 @end

@@ -10,7 +10,7 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "SafesListTableViewController.h"
-#import "iCloudSafesCoordinator.h"
+//#import "iCloudSafesCoordinator.h"
 #import "Alerts.h"
 #import "mach/mach.h"
 #import "QuickTypeRecordIdentifier.h"
@@ -33,14 +33,6 @@
 @end
 
 @implementation CredentialProviderViewController
-
-+ (void)initialize {
-    if(self == [CredentialProviderViewController class]) {
-        [iCloudSafesCoordinator.sharedInstance initializeiCloudAccessWithCompletion:^(BOOL available) {
-            NSLog(@"iCloud Access Initialized...");
-        }];
-    }
-}
 
 // QuickType Support...
 
@@ -78,21 +70,19 @@
         if(safe) {
             // Delay a litte to avoid UI Weirdness glitch
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                BOOL useAutoFillCache = ![self liveAutoFillIsPossibleWithSafe:safe];
-
                 AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
                 [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                                    safe:safe
-                                                      openAutoFillCache:useAutoFillCache
                                                     canConvenienceEnrol:NO
                                                          isAutoFillOpen:YES
                                                 isAutoFillQuickTypeOpen:YES
-                                                 openLocalOnly:NO
+                                                          openLocalOnly:NO
                                             biometricAuthenticationDone:NO
                                                              completion:^(Model * _Nullable model, NSError * _Nullable error) {
                     AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
 
-                                                                 NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
+                    NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
+                    
                     if(model) {
                         [self onOpenedQuickType:model identifier:identifier];
                     }
@@ -169,7 +159,7 @@
 }
 
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    NSLog(@"prepareCredentialListForServiceIdentifiers = %@", serviceIdentifiers);
+    NSLog(@"prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
     [SafesList.sharedInstance forceReload];
     
     self.serviceIdentifiers = serviceIdentifiers;
@@ -226,59 +216,16 @@
     [self cancel:nil];
 }
 
-- (BOOL)isLiveAutoFillProvider:(StorageProvider)storageProvider {
-    return  storageProvider == kFilesAppUrlBookmark ||
-            storageProvider == kiCloud ||
-            storageProvider == kWebDAV ||
-            storageProvider == kSFTP;
-}
-
-- (BOOL)liveAutoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
-    if(!safeMetaData.autoFillEnabled || safeMetaData.alwaysUseCacheForAutoFill) {
-        return NO;
-    }
-    
-    if([self isLiveAutoFillProvider:safeMetaData.storageProvider]) {
-        return YES;
-    }
-    
-    if(safeMetaData.storageProvider == kLocalDevice) {
-        return [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safeMetaData];
-    }
-    
-    return NO;
-}
-
 - (BOOL)autoFillIsPossibleWithSafe:(SafeMetaData*)safeMetaData {
     if(!safeMetaData.autoFillEnabled) {
         return NO;
     }
-    
-    if([self isLiveAutoFillProvider:safeMetaData.storageProvider] && !safeMetaData.alwaysUseCacheForAutoFill) {
-        return YES;
-    }
-    
-    if(safeMetaData.storageProvider == kLocalDevice && [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safeMetaData]) {
-        return YES;
-    }
-    
+        
     return [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safeMetaData modified:nil];
 }
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers {
     return self.serviceIdentifiers;
-}
-
-void showWelcomeMessageIfAppropriate(UIViewController *vc) { 
-    if(!AutoFillSettings.sharedInstance.hasShownAutoFillLaunchWelcome) {
-        AutoFillSettings.sharedInstance.hasShownAutoFillLaunchWelcome = YES;
-        
-        [Alerts info:vc
-               title:NSLocalizedString(@"auto_fill_welcome_message_header", @"Welcome")
-             message:NSLocalizedString(@"auto_fill_welcome_live_storage_warning_message", @"It should be noted that the following storage providers do not support live access to your database from App Extensions:" \
-         "\nDropbox, OneDrive & Google Drive\n"\
-         "In these cases, Strongbox can use a cache... Enjoy Strongbox Auto Fill!\n-Mark")];
-    }
 }
 
 - (IBAction)cancel:(id)sender {

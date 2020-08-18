@@ -75,7 +75,7 @@
 
     // TODO: This should probably not be done here but in Browse View so we can centralize the handling of the update
     
-    [self.viewModel update:self isAutoFill:NO handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+    [self.viewModel update:self handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will crash BrowseSafeView dismiss.
             [self dismissViewControllerAnimated:YES completion:^{
                 self.onDone(userCancelled, conflictAndLocalWasChanged, error);

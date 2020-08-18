@@ -61,7 +61,7 @@
         
         [[self getSftp] pushDatabase:metadata
                        interactiveVC:nil
-                                data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding] isAutoFill:NO completion:^(StorageProviderUpdateResult result, NSDate * _Nullable newRemoteModDate, const NSError * _Nullable error) {
+                                data:[@"Hello, World!" dataUsingEncoding:NSUTF8StringEncoding] completion:^(StorageProviderUpdateResult result, NSDate * _Nullable newRemoteModDate, const NSError * _Nullable error) {
             NSLog(@"Done. Error = [%@]", error);
         }];
     }];

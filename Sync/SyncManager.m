@@ -62,17 +62,15 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 - (void)backgroundSyncDatabase:(SafeMetaData*)database {
     SyncParameters* params = [[SyncParameters alloc] init];
     
-    params.isAutoFill = NO;
     params.inProgressBehaviour = kInProgressBehaviourJoin;
     [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
         NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
     }];
 }
 
-- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC join:(BOOL)join isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
     SyncParameters* params = [[SyncParameters alloc] init];
     
-    params.isAutoFill = isAutoFill; // TODO: We now need to remove Auto Fill sync ability!
     params.interactiveVC = interactiveVC;
     params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
     
@@ -94,7 +92,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             if(error) {
                 *error = [Utils createNSError:em errorCode:-1];
             }
-            return nil;
+            return NO;
         }
     }
     
@@ -153,21 +151,12 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 }
 
 - (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData *)database { // TODO: This should be a database property - smart set initially based on provider but ultimately configurable... and doesn't belogn in here but in the OpenSequenceManager
+#ifndef IS_APP_EXTENSION
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
     return provider.immediatelyOfferCacheIfOffline;
-}
-
-- (BOOL)isLegacyAutoFillBookmarkSet:(SafeMetaData *)database {
-    FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
-    return [fp autoFillBookMarkIsSet:database];
-}
-
-- (void)setLegacyAutoFillBookmark:(SafeMetaData *)database bookmark:(NSData *)bookmark {
-    FilesAppUrlBookmarkProvider* fp = [SafeStorageProviderFactory getStorageProviderFromProviderId:kFilesAppUrlBookmark];
-    
-    database = [fp setAutoFillBookmark:bookmark metadata:database];
-    
-    [SafesList.sharedInstance update:database];
+#else
+    return NO; // TODO: Remove this from SafeStorageProvider
+#endif
 }
 
 - (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database {

@@ -9,8 +9,8 @@
 #import "AutoFillSettings.h"
 
 static NSString* const kAutoFillExitedCleanly = @"autoFillExitedCleanly";
-static NSString* const kHasShownAutoFillLaunchWelcome = @"hasShownAutoFillLaunchWelcome";
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
+static NSString* const KDontNotifyToSwitchToMainAppForSync = @"dontNotifyToSwitchToMainAppForSync";
 
 @implementation AutoFillSettings
 
@@ -35,20 +35,20 @@ static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFill
     return [self setBool:kAutoFillExitedCleanly value:autoFillExitedCleanly];
 }
 
-- (BOOL)hasShownAutoFillLaunchWelcome {
-    return [self getBool:kHasShownAutoFillLaunchWelcome];
-}
-
-- (void)setHasShownAutoFillLaunchWelcome:(BOOL)hasShownAutoFillLaunchWelcome {
-    [self setBool:kHasShownAutoFillLaunchWelcome value:hasShownAutoFillLaunchWelcome];
-}
-
 - (BOOL)haveWarnedAboutAutoFillCrash {
     return [self getBool:kHaveWarnedAboutAutoFillCrash];
 }
 
 - (void)setHaveWarnedAboutAutoFillCrash:(BOOL)haveWarnedAboutAutoFillCrash {
     [self setBool:kHaveWarnedAboutAutoFillCrash value:haveWarnedAboutAutoFillCrash];
+}
+
+- (BOOL)dontNotifyToSwitchToMainAppForSync {
+    return [self getBool:KDontNotifyToSwitchToMainAppForSync];
+}
+
+- (void)setDontNotifyToSwitchToMainAppForSync:(BOOL)dontNotifyToSwitchToMainAppForSync {
+    [self setBool:KDontNotifyToSwitchToMainAppForSync value:dontNotifyToSwitchToMainAppForSync];
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

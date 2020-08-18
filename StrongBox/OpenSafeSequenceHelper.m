@@ -10,7 +10,6 @@
 #import "IOsUtils.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Alerts.h"
-#import "OfflineDetector.h"
 #import "SVProgressHUD.h"
 #import "KeyFileParser.h"
 #import "Utils.h"
@@ -33,6 +32,7 @@
 #import "NSDate+Extensions.h"
 
 #ifndef IS_APP_EXTENSION
+#import "OfflineDetector.h"
 #import "ISMessages/ISMessages.h"
 #endif
 
@@ -42,8 +42,6 @@
 @property (nonnull) UIViewController* viewController;
 @property (nonnull) SafeMetaData* safe;
 @property BOOL canConvenienceEnrol;
-@property BOOL openAutoFillCache;
-
 @property (nonnull) CompletionBlock completion;
 
 @property BOOL isConvenienceUnlock;
@@ -91,25 +89,6 @@
                              completion:(CompletionBlock)completion {
     [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
                                                        safe:safe
-                                          openAutoFillCache:NO
-                                        canConvenienceEnrol:canConvenienceEnrol
-                                             isAutoFillOpen:isAutoFillOpen
-                                     openLocalOnly:openLocalOnly
-                                biometricAuthenticationDone:biometricAuthenticationDone
-                                                 completion:completion];
-}
-
-+ (void)beginSequenceWithViewController:(UIViewController*)viewController
-                                   safe:(SafeMetaData*)safe
-                      openAutoFillCache:(BOOL)openAutoFillCache
-                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
-                         isAutoFillOpen:(BOOL)isAutoFillOpen
-                 openLocalOnly:(BOOL)openLocalOnly
-            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
-                             completion:(CompletionBlock)completion {
-    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
-                                                       safe:safe
-                                          openAutoFillCache:openAutoFillCache
                                         canConvenienceEnrol:canConvenienceEnrol
                                              isAutoFillOpen:isAutoFillOpen
                                     isAutoFillQuickTypeOpen:NO
@@ -120,7 +99,6 @@
 
 + (void)beginSequenceWithViewController:(UIViewController *)viewController
                                    safe:(SafeMetaData *)safe
-                      openAutoFillCache:(BOOL)openAutoFillCache
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                 isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
@@ -129,20 +107,18 @@
                              completion:(CompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                                                        safe:safe
-                                                                          openAutoFillCache:openAutoFillCache
                                                                         canConvenienceEnrol:canConvenienceEnrol
                                                                              isAutoFillOpen:isAutoFillOpen
                                                                     isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
-                                                                     openLocalOnly:openLocalOnly
+                                                                              openLocalOnly:openLocalOnly
                                                                         biometricPreCleared:biometricAuthenticationDone
                                                                                  completion:completion];
     
-    [helper beginSequenceWithAutoFillFilesCheck];
+    [helper beginSeq];
 }
 
 - (instancetype)initWithViewController:(UIViewController*)viewController
                                   safe:(SafeMetaData*)safe
-                     openAutoFillCache:(BOOL)openAutoFillCache
                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                         isAutoFillOpen:(BOOL)isAutoFillOpen
                isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
@@ -155,7 +131,6 @@
         self.viewController = viewController;
         self.safe = safe;
         self.canConvenienceEnrol = canConvenienceEnrol;
-        self.openAutoFillCache = openAutoFillCache;
         self.completion = completion;
         self.isAutoFillOpen = isAutoFillOpen;
         self.isAutoFillQuickTypeOpen = isAutoFillQuickTypeOpen;
@@ -164,27 +139,6 @@
     }
     
     return self;
-}
-
-- (void)beginSequenceWithAutoFillFilesCheck {
-    if(self.isAutoFillOpen && self.safe.storageProvider == kFilesAppUrlBookmark) {
-        // Special case - We can support the Files app provider in Auto Fill but we need to ask the
-        // user to actively re-select the database via UIDocumentPicjer :(
-        //
-        // Sucks but it's only a one time deal so do it...
-
-        if (![SyncManager.sharedInstance isLegacyAutoFillBookmarkSet:self.safe]) {
-            [Alerts info:self.viewController
-                   title:NSLocalizedString(@"open_sequence_prompt_database_reselect_required_title", @"Database File Select Required")
-                 message:NSLocalizedString(@"open_sequence_prompt_database_reselect_required_message", @"For technical reasons, you need to re-select your database file to enable Auto Fill. You will only need to do this once.\n\nThanks!\n-Mark")
-              completion:^{
-                  [self promptForAutofillBookmarkSelect];
-              }];
-            return;
-        }
-    }
-    
-    [self beginSeq];
 }
 
 - (void)clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState {
@@ -659,9 +613,7 @@
     NSDate* localCopyModDate;
     NSURL* localCopyUrl = [SyncManager.sharedInstance getLocalWorkingCache:self.safe modified:&localCopyModDate];
 
-    BOOL openLocalOnly = self.openAutoFillCache || self.openLocalOnly;
-    
-    if(openLocalOnly) {
+    if(self.isAutoFillOpen || self.openLocalOnly) {
         if(localCopyUrl == nil) {
             [Alerts warn:self.viewController
                    title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Local Copy")
@@ -669,10 +621,11 @@
             self.completion(nil, nil);
         }
         else{
-            self.forcedReadOnly = YES;
+            self.forcedReadOnly = !self.isAutoFillOpen; // Auto-Fill can edit local copy
             [self unlockLocalCopy];
         }
     }
+#ifndef IS_APP_EXTENSION
     else if ( OfflineDetector.sharedInstance.isOffline &&
              [SyncManager.sharedInstance isLegacyImmediatelyOfferLocalCopyIfOffline:self.safe] && localCopyUrl != nil ) {
         NSString* primaryStorageDisplayName = [SyncManager.sharedInstance getPrimaryStorageDisplayName:self.safe];
@@ -701,6 +654,7 @@
     else {
         [self syncAndUnlockLocalCopy];
     }
+#endif
 }
 
 - (void)syncAndUnlockLocalCopy {
@@ -712,12 +666,9 @@
         [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
     });
     
-    // TODO: Auto-Fill doesn't use this - read local copy above...
-
     [SyncManager.sharedInstance sync:self.safe
                        interactiveVC:self.viewController
                                 join:join
-                          isAutoFill:self.isAutoFillOpen
                           completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
@@ -1271,102 +1222,5 @@ NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** 
     
     return challengeResponse;
 }
-
-//////////
-// TODO: Remove all below once Auto-Fill is local only...
-
-static OpenSafeSequenceHelper *sharedInstance = nil;
-
-- (void)promptForAutofillBookmarkSelect {
-    self.documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
-    self.documentPicker.delegate = self;
-    self.documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
-    
-    
-    // Some Voodoo to keep this instance around otherwise the delegate never gets called... Only
-    // done in Auto Fill context but it would be nice to find a better way to do this?
-    
-    sharedInstance = self;
-    
-    [self.viewController presentViewController:self.documentPicker animated:YES completion:nil];
-}
-
-- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
-    self.completion(nil, nil);
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    NSLog(@"AutoFill: didPickDocumentsAtURLs: %@", urls);
-    
-    NSURL* url = [urls objectAtIndex:0];
-    
-    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
-    if (!document) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self readReselectedFilesDatabase:NO data:nil url:url];
-        });
-        return;
-    }
-
-    [document openWithCompletionHandler:^(BOOL success) {
-        NSData* data = document.data;
-        
-        [document closeWithCompletionHandler:nil];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self readReselectedFilesDatabase:success data:data url:url];
-        });
-    }];
-}
-
-- (void)readReselectedFilesDatabase:(BOOL)success data:(NSData*)data url:(NSURL*)url {
-    if(!success || !data) {
-        [Alerts warn:self.viewController
-               title:@"Error Opening This Database"
-             message:@"Could not access this file."];
-    }
-    else {
-        NSError* error;
-        
-        if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) {
-            [Alerts error:self.viewController
-                    title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
-                    error:error];
-            return;
-        }
-        
-        if([url.lastPathComponent compare:self.safe.fileName] != NSOrderedSame) {
-            [Alerts yesNo:self.viewController
-                    title:NSLocalizedString(@"open_sequence_database_different_filename_title",@"Different Filename")
-                  message:NSLocalizedString(@"open_sequence_database_different_filename_message",@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?")
-                   action:^(BOOL response) {
-                       if(response) {
-                           [self setAutoFillBookmark:url];
-                       }
-                   }];
-        }
-        else {
-            [self setAutoFillBookmark:url];
-        }
-    }
-}
-
-- (void)setAutoFillBookmark:(NSURL*)url {
-    NSError* error;
-    NSData* bookMark = [BookmarksHelper getBookmarkDataFromUrl:url error:&error];
-    
-    if (error) {
-        [Alerts error:self.viewController
-                title:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
-                error:error];
-        return;
-    }
-    
-    NSLog(@"Setting Auto Fill Bookmark: %@", bookMark);
-    
-    [SyncManager.sharedInstance setLegacyAutoFillBookmark:self.safe bookmark:bookMark];
-    
-    [self beginSeq];
-}
-
+                    
 @end

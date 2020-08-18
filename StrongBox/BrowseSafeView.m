@@ -1566,7 +1566,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     [self refreshItems];
     
     [self.viewModel update:self
-                isAutoFill:NO
                    handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         [self onUpdateDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged error:error];
     }];

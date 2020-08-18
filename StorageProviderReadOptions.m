@@ -14,7 +14,6 @@
 {
     self = [super init];
     if (self) {
-        self.isAutoFill = NO;
         self.onlyIfModifiedDifferentFrom = nil;
     }
     return self;

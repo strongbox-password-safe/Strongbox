@@ -163,7 +163,7 @@
                                                               handler:^(UIAlertAction *a) { action(YES); }];
 
         UIAlertAction *noAction = [UIAlertAction actionWithTitle:secondButtonText
-                                                           style:UIAlertActionStyleCancel
+                                                           style:UIAlertActionStyleDefault
                                                          handler:^(UIAlertAction *a) { action(NO); }];
 
         [alertController addAction:defaultAction];

@@ -293,7 +293,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return self.metadata.readOnly || self.forcedReadOnly;
 }
 
-- (void)update:(UIViewController*)viewController isAutoFill:(BOOL)isAutoFill handler:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error))handler {
+- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error))handler {
     if(self.isReadOnly) {
         handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
         return;
@@ -325,35 +325,38 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
             completion(NO, NO, error);
             return;
         }
-        
-        // TODO: AutoFill won't do this...
-        
-        [SyncManager.sharedInstance sync:self.metadata interactiveVC:viewController join:NO isAutoFill:self.isAutoFillOpen completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
-            if (result == kSyncAndMergeSuccess) {
-                if(self.metadata.autoFillEnabled) {
-                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
-                }
 
-                // Re-audit - FUTURE - Make this more incremental?
-                if (!self.isAutoFillOpen && self.metadata.auditConfig.auditInBackground) {
-                    [self restartAudit];
+        if (self.isAutoFillOpen) { // Auto-Fill doesn't ever sync
+            completion(NO, NO, nil);
+        }
+        else {
+            [SyncManager.sharedInstance sync:self.metadata interactiveVC:viewController join:NO completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
+                if (result == kSyncAndMergeSuccess) {
+                    if(self.metadata.autoFillEnabled) {
+                        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
+                    }
+
+                    // Re-audit - FUTURE - Make this more incremental?
+                    if (self.metadata.auditConfig.auditInBackground) {
+                        [self restartAudit];
+                    }
+                    completion(NO, conflictAndLocalWasChanged, nil);
                 }
-                completion(NO, conflictAndLocalWasChanged, nil);
-            }
-            else if (result == kSyncAndMergeError) {
-                completion(NO, NO, error);
-            }
-            else if (result == kSyncAndMergeResultUserCancelled) {
-                // Can happen if user cancels a conflict resolution request - The sync will fail because it doesn't know how to resolve a conflict...
-                NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
-                error = [Utils createNSError:message errorCode:-1];
-                completion(NO, NO, error); // TODO: This causes the Browse dialog to disappear - not losing the changes but it's still not great - might be best to allow continued editing here
-            }
-            else { // Impossible but catch (Only possible enum is User Interaction Required but that can't happen because this is an interactive sync)
-                error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
-                completion(NO, NO, error);
-            }
-        }];
+                else if (result == kSyncAndMergeError) {
+                    completion(NO, NO, error);
+                }
+                else if (result == kSyncAndMergeResultUserCancelled) {
+                    // Can happen if user cancels a conflict resolution request - The sync will fail because it doesn't know how to resolve a conflict...
+                    NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
+                    error = [Utils createNSError:message errorCode:-1];
+                    completion(NO, NO, error); // TODO: This causes the Browse dialog to disappear - not losing the changes but it's still not great - might be best to allow continued editing here
+                }
+                else { // Impossible but catch (Only possible enum is User Interaction Required but that can't happen because this is an interactive sync)
+                    error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
+                    completion(NO, NO, error);
+                }
+            }];
+        }
     }
 }
 

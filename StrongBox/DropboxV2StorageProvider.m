@@ -167,14 +167,16 @@
     }];
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data isAutoFill:(BOOL)isAutoFill completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     NSString *path = [NSString pathWithComponents:@[safeMetaData.fileIdentifier, safeMetaData.fileName]];
     [self createOrUpdate:viewController path:path data:data completion:completion];
 }
 
 - (void)createOrUpdate:(UIViewController*)viewController path:(NSString *)path data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
-
+    if (viewController) {
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+    }
+    
     DBUserClient *client = DBClientsManager.authorizedClient;
     
     [[[client.filesRoutes uploadData:path
@@ -226,7 +228,6 @@
             return;
         }
         
-#ifndef IS_APP_EXTENSION
         NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
         id __block token = [center addObserverForName:@"isDropboxLinked" object:nil queue:nil usingBlock:^(NSNotification *_Nonnull note) {
             [center removeObserver:token];
@@ -258,14 +259,6 @@
                 [UIApplication.sharedApplication openURL:url options:@{ } completionHandler:nil];
             }];
         });
-        
-#else
-        NSLog(@"Dropbox not fully available with App Extension. Displaying Alert.");
-        
-        NSError* error = [Utils createNSError:@"Could not create link to Dropbox. Dropbox is not fully available in App Extension." errorCode:-1];
-        
-        task(NO, NO, error);
-#endif
     }
     else {
         task(NO, NO, nil);

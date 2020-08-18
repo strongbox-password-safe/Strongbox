@@ -228,8 +228,10 @@
 }
 
 - (void)internalRefresh {
+    NSLog(@"REFRESH: Refreshing entire table...");
+
     self.collection = SafesList.sharedInstance.snapshot;
-    
+
     self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
 
     [self.tableView reloadData];
@@ -253,14 +255,22 @@
 - (void)appBecameActive {
     NSLog(@"appBecameActive");
     
-    [SafesList.sharedInstance forceReload]; // Auto-Fill may have updated databases
-    
     if(self.privacyScreenSuppressedForBiometricAuth) {
         NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
         self.privacyScreenSuppressedForBiometricAuth = NO;
         return;
     }
+
+    // Auto-Fill may have updated databases... Do the reload immediately here and before the sync because if you dispatch it
+    // sync will be working with stale data with outstanding update = nil - Losing all changes
     
+    // TODO: What about split screen on iPad? Does this get called?
+
+    [SafesList.sharedInstance forceReload];
+    self.collection = SafesList.sharedInstance.snapshot;
+    [SyncManager.sharedInstance backgroundSyncAll];
+    [self refresh]; // This is dispatched so will hapeen later
+
     if(!self.hasAppearedOnce) {
         [self doAppFirstActivationProcess];
     }
@@ -641,7 +651,12 @@
                                            selector:@selector(refresh)
                                                name:kDatabasesListChangedNotification
                                              object:nil];
-    
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseUpdated:)
+                                               name:kDatabaseUpdatedNotification
+                                             object:nil];
+
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(appResignActive)
                                                name:UIApplicationWillResignActiveNotification
@@ -653,29 +668,38 @@
                                              object:nil];
     
     [NSNotificationCenter.defaultCenter addObserver:self
-                                           selector:@selector(onDatabaseSyncStatusChanged:)
+                                           selector:@selector(onDatabaseUpdated:)
                                                name:kSyncManagerDatabaseSyncStatusChanged
                                              object:nil];
 }
 
-- (void)onDatabaseSyncStatusChanged:(id)param {
+- (void)onDatabaseUpdated:(id)param {
     NSNotification* notification = param;
-    SyncStatus* syncInfo = notification.object;
+    NSString* databaseId = notification.object;
+        
+    NSArray<SafeMetaData*>* newColl = SafesList.sharedInstance.snapshot;
     
-    NSLog(@"onDatabaseSyncStatusChanged: [%@-%lu]", syncInfo.databaseId, (unsigned long)syncInfo.state);
-    
-    NSUInteger index = [self.collection indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        return [obj.uuid isEqualToString:syncInfo.databaseId];
-    }];
-    
-    if (index == NSNotFound) {
-        NSLog(@"WARNWARN: Sync Status Update for DB [%@] but DB not found in Collection!", syncInfo.databaseId);
+    if (newColl.count != self.collection.count) { // Full refresh required if somehow number of items have changed
+        [self refresh];
     }
     else {
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]]
-                                  withRowAnimation:UITableViewRowAnimationAutomatic];
-        });
+        self.collection = newColl; // Required because our collection is old?
+
+        NSUInteger index = [self.collection indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return [obj.uuid isEqualToString:databaseId];
+        }];
+
+        if (index == NSNotFound) {
+            NSLog(@"WARNWARN: Database Update for DB [%@] but DB not found in Collection!", databaseId);
+        }
+        else {
+            NSLog(@"[%@] - Database Changed", self.collection[index].nickName);
+
+            dispatch_async(dispatch_get_main_queue(), ^(void) {
+                [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]]
+                                      withRowAnimation:UITableViewRowAnimationAutomatic];
+            });
+        }
     }
 }
 
@@ -736,7 +760,10 @@
 - (void)onManualPulldownRefresh {
     [SyncManager.sharedInstance backgroundSyncAll];
     
-    [self.tableView.refreshControl endRefreshing];
+    // Since above call is almost instantaneous - don't end refreshing immediately as it looks odd, delay slightly for more standard behaviour
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.tableView.refreshControl endRefreshing];
+    });
 }
 
 - (void)handleLongPress {
@@ -800,8 +827,7 @@
     return YES;
 }
 
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath
-{
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
     if(![sourceIndexPath isEqual:destinationIndexPath]) {
         NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
         
@@ -820,9 +846,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
 
-    [cell populateCell:safe disabled:NO];
+    [cell populateCell:database];
     
     return cell;
 }
@@ -871,9 +897,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                     [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
                 }
             }
-                                                         
-             [self refresh]; // Duress PIN may have caused a removal
-         }];
+        }];
     }
 }
 

@@ -32,9 +32,11 @@ extern NSString *const kNotificationNameItemDetailsEditDone;
 @property Model* databaseModel;
 
 #ifdef IS_APP_EXTENSION
-@property (nonatomic, strong) CredentialProviderViewController *autoFillRootViewController;
+
+@property (nonatomic, copy) void (^onAutoFillNewItemAdded)(NSString* username, NSString* password);
 @property (nonatomic, nullable) NSString* autoFillSuggestedTitle;
 @property (nonatomic, nullable) NSString* autoFillSuggestedUrl;
+
 #endif
 
 @end

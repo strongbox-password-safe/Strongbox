@@ -39,13 +39,9 @@
 		4D0835BD2284744B00CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835BB2284744A00CA7405 /* UiAttachment.m */; };
 		4D0835BE2284744B00CA7405 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835BB2284744A00CA7405 /* UiAttachment.m */; };
 		4D0835C12284748200CA7405 /* SFTPProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835BF2284748100CA7405 /* SFTPProviderData.m */; };
-		4D0835C22284748200CA7405 /* SFTPProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835BF2284748100CA7405 /* SFTPProviderData.m */; };
 		4D0835CB228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C4228474D700CA7405 /* WebDAVSessionConfiguration.m */; };
-		4D0835CC228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C4228474D700CA7405 /* WebDAVSessionConfiguration.m */; };
 		4D0835CF228474D800CA7405 /* WebDAVStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C9228474D700CA7405 /* WebDAVStorageProvider.m */; };
-		4D0835D0228474D800CA7405 /* WebDAVStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C9228474D700CA7405 /* WebDAVStorageProvider.m */; };
 		4D0835D1228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835CA228474D800CA7405 /* WebDAVConfigurationViewController.m */; };
-		4D0835D2228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835CA228474D800CA7405 /* WebDAVConfigurationViewController.m */; };
 		4D0835D52284750900CA7405 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835D42284750900CA7405 /* StrongboxDatabase.m */; };
 		4D0835D62284750900CA7405 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835D42284750900CA7405 /* StrongboxDatabase.m */; };
 		4D0835D92284759F00CA7405 /* ItemDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835D72284759E00CA7405 /* ItemDetailsViewController.m */; };
@@ -90,7 +86,6 @@
 		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D0F121E21C1400500C4451D /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
-		4D0F122021C1418000C4451D /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
 		4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
 		4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1140A6229D7D1F00DEECF3 /* KeyFilesTableViewController.m */; };
@@ -136,12 +131,10 @@
 		4D1757CD1C8361D300E6356F /* SafesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B01C8361D300E6356F /* SafesViewController.m */; };
 		4D1757CE1C8361D300E6356F /* SelectDestinationGroupController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1757B21C8361D300E6356F /* SelectDestinationGroupController.m */; };
 		4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579F1C8361D200E6356F /* LocalDeviceStorageProvider.m */; };
-		4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		4D1884C821709CCD001AE6B0 /* StrongboxUIDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBB1F7294A800011756 /* StrongboxUIDocument.m */; };
 		4D1884C921709CD4001AE6B0 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2C1FB1E27700A68A92 /* Utils.m */; };
 		4D1884CA21709CDA001AE6B0 /* IOsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D17579D1C8361D200E6356F /* IOsUtils.m */; };
 		4D1884CC21709CF1001AE6B0 /* DatabaseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC271FB1E27700A68A92 /* DatabaseModel.m */; };
-		4D1884CD21709CFA001AE6B0 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		4D1884CF21709D0F001AE6B0 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
 		4D1884D021709DF3001AE6B0 /* Node.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2E1FB1E27700A68A92 /* Node.m */; };
 		4D1884D121709DF3001AE6B0 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D78AC2A1FB1E27700A68A92 /* NodeFields.m */; };
@@ -458,7 +451,6 @@
 		4D55F0D81EE2BFF400C43B26 /* TextFieldAutoSuggest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D55F0D71EE2BFF400C43B26 /* TextFieldAutoSuggest.m */; };
 		4D56CBE52174A70000AC9187 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D56CBE32174A6F900AC9187 /* AuthenticationServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4D56D90F21B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
-		4D56D91021B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
 		4D56D91321B837A20030E13A /* AddNewSafeHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D91221B837A20030E13A /* AddNewSafeHelper.m */; };
 		4D57606F232BFB09000818F5 /* FavIcon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA5F8F62221DABE00B6C650 /* FavIcon.framework */; };
 		4D576070232BFB09000818F5 /* FavIcon.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 4DA5F8F62221DABE00B6C650 /* FavIcon.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -479,7 +471,6 @@
 		4D5F5B79218B4B8000A0739A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B78218B4B8000A0739A /* Images.xcassets */; };
 		4D5F5B7C218B4C3500A0739A /* OpenSafeSequenceHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1885602170DE90001AE6B0 /* OpenSafeSequenceHelper.m */; };
 		4D5F5B7D218B4C4300A0739A /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
-		4D5F5B7E218B4C4E00A0739A /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4D5F5B82218B4C9300A0739A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B80218B4C9300A0739A /* MainInterface.storyboard */; };
 		4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B80218B4C9300A0739A /* MainInterface.storyboard */; };
 		4D5F5B86218B4CCB00A0739A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D5F5B84218B4CCB00A0739A /* Main.storyboard */; };
@@ -1086,7 +1077,6 @@
 		4DC4E17B23488BAE000743C4 /* TPKeyboardAvoidingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F38229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m */; };
 		4DC4E17C23488BAE000743C4 /* History.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2962B2223173FC0082897D /* History.m */; };
 		4DC4E17D23488BAE000743C4 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCD21F4C26600E2B194 /* OTPTokenType.m */; };
-		4DC4E17E23488BAE000743C4 /* WebDAVSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C4228474D700CA7405 /* WebDAVSessionConfiguration.m */; };
 		4DC4E17F23488BAE000743C4 /* socket_helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D326E5F22302BED00DCD8C7 /* socket_helper.m */; };
 		4DC4E18023488BAE000743C4 /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2E47AD233CFD8D00C1DE90 /* BackupsManager.m */; };
 		4DC4E18123488BAE000743C4 /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C1A21807C25007931E4 /* XMLWriter.m */; };
@@ -1110,7 +1100,6 @@
 		4DC4E19323488BAE000743C4 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4DC4E19423488BAE000743C4 /* ItemDetailsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835D72284759E00CA7405 /* ItemDetailsViewController.m */; };
 		4DC4E19523488BAE000743C4 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
-		4DC4E19623488BAE000743C4 /* WebDAVConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835CA228474D800CA7405 /* WebDAVConfigurationViewController.m */; };
 		4DC4E19723488BAE000743C4 /* CompositeKeyFactors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3169A622DE33AF003FAD3F /* CompositeKeyFactors.m */; };
 		4DC4E19823488BAE000743C4 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C1B21807C25007931E4 /* XmlSerializer.m */; };
 		4DC4E19923488BAE000743C4 /* ref.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14A021832D5500A41CA0 /* ref.c */; };
@@ -1149,10 +1138,8 @@
 		4DC4E1BD23488BAE000743C4 /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D67B1E32191FD0400B0D29A /* XmlProcessingContext.m */; };
 		4DC4E1BE23488BAE000743C4 /* QuickTypeRecordIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */; };
 		4DC4E1C023488BAE000743C4 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D876B4221AC36F800805DED /* CustomField.m */; };
-		4DC4E1C123488BAE000743C4 /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972D221C01E7100F384C9 /* WebDAVProviderData.m */; };
 		4DC4E1C223488BAE000743C4 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C2C21807C7E007931E4 /* KeePassGroup.m */; };
 		4DC4E1C323488BAE000743C4 /* NMSSHHostConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D326E7222302BED00DCD8C7 /* NMSSHHostConfig.m */; };
-		4DC4E1C423488BAE000743C4 /* SFTPSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B821BFE63C00F384C9 /* SFTPSessionConfiguration.m */; };
 		4DC4E1C523488BAE000743C4 /* encoding.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E149121832BEF00A41CA0 /* encoding.c */; };
 		4DC4E1C623488BAE000743C4 /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F1C21BF101A0090A55E /* DAVRequests.m */; };
 		4DC4E1C723488BAE000743C4 /* SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4766C52178C82900C4358F /* SerializationData.m */; };
@@ -1161,12 +1148,10 @@
 		4DC4E1CA23488BAE000743C4 /* KdbxSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A4218251BE007BA1E7 /* KdbxSerialization.m */; };
 		4DC4E1CB23488BAE000743C4 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14982074F64A00CE9CAE /* crypt_argchk.c */; };
 		4DC4E1CC23488BAE000743C4 /* SafeStorageProviderFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D18854B2170ABD7001AE6B0 /* SafeStorageProviderFactory.m */; };
-		4DC4E1CD23488BAE000743C4 /* DropboxV2StorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE229A11ED8A102000FDC3D /* DropboxV2StorageProvider.m */; };
 		4DC4E1CE23488BAE000743C4 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A6218251BE007BA1E7 /* KeePassDatabase.m */; };
 		4DC4E1CF23488BAE000743C4 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC5B9C0217B376F00FE9DD9 /* Root.m */; };
 		4DC4E1D023488BAE000743C4 /* twofish.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14962074F63B00CE9CAE /* twofish.c */; };
 		4DC4E1D123488BAE000743C4 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14802074F5F700CE9CAE /* PwSafeSerialization.m */; };
-		4DC4E1D223488BAE000743C4 /* WebDAVStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835C9228474D700CA7405 /* WebDAVStorageProvider.m */; };
 		4DC4E1D323488BAE000743C4 /* KdbSerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5B1EAE2194B2D900ECAF0D /* KdbSerializationData.m */; };
 		4DC4E1D423488BAE000743C4 /* Kdbx4SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DB1B7D32188ABCB00CF1663 /* Kdbx4SerializationData.m */; };
 		4DC4E1D523488BAE000743C4 /* TwoFishCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4598CC2193048400792EF7 /* TwoFishCipher.m */; };
@@ -1181,7 +1166,6 @@
 		4DC4E1E023488BAE000743C4 /* CASGParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9597BD22A2CB38008DB224 /* CASGParams.m */; };
 		4DC4E1E123488BAE000743C4 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C14822074F5F700CE9CAE /* PasswordHistoryEntry.m */; };
 		4DC4E1E223488BAE000743C4 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF176F123293D1500255CD6 /* KeePassXmlParser.m */; };
-		4DC4E1E323488BAE000743C4 /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
 		4DC4E1E423488BAE000743C4 /* OTPToken.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CD621F4C26700E2B194 /* OTPToken.m */; };
 		4DC4E1E523488BAE000743C4 /* IconTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE498BC2271E911007EF98C /* IconTableCell.m */; };
 		4DC4E1E623488BAE000743C4 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8C148A2074F5F800CE9CAE /* Record.m */; };
@@ -1204,7 +1188,6 @@
 		4DC4E1F723488BAE000743C4 /* Kdbx4Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E147B2183049E00A41CA0 /* Kdbx4Serialization.m */; };
 		4DC4E1F923488BAE000743C4 /* CASGTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D4ACAE522A1275700D486B0 /* CASGTableViewController.m */; };
 		4DC4E1FA23488BAE000743C4 /* AppleICloudOrLocalSafeFile.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3D991B1F77FA1500E829B6 /* AppleICloudOrLocalSafeFile.m */; };
-		4DC4E1FB23488BAE000743C4 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		4DC4E1FC23488BAE000743C4 /* AutoCompleteTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCEE40B2273470C004AE3A7 /* AutoCompleteTextField.m */; };
 		4DC4E1FE23488BAE000743C4 /* CustomFieldTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835DA2284765D00CA7405 /* CustomFieldTableCell.m */; };
 		4DC4E1FF23488BAE000743C4 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2F6C3021807C7E007931E4 /* Entry.m */; };
@@ -1231,8 +1214,6 @@
 		4DC4E21623488BAE000743C4 /* EditDateCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2259F822C6C463005547EA /* EditDateCell.m */; };
 		4DC4E21723488BAE000743C4 /* FontManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835B02284742000CA7405 /* FontManager.m */; };
 		4DC4E21823488BAE000743C4 /* SetNodeIconUiHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA00AE0222180EE004C0C63 /* SetNodeIconUiHelper.m */; };
-		4DC4E21923488BAE000743C4 /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
-		4DC4E21A23488BAE000743C4 /* SFTPProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835BF2284748100CA7405 /* SFTPProviderData.m */; };
 		4DC4E21B23488BAE000743C4 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E149421832C1500A41CA0 /* core.c */; };
 		4DC4E21C23488BAE000743C4 /* LocalDatabaseIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F2322B817AA00E16027 /* LocalDatabaseIdentifier.m */; };
 		4DC4E21D23488BAE000743C4 /* NMSSHConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D326E6A22302BED00DCD8C7 /* NMSSHConfig.m */; };
@@ -1254,13 +1235,11 @@
 		4DC4E23023488BAE000743C4 /* SafeMetaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D402D702074EAFF00F7BC70 /* SafeMetaData.m */; };
 		4DC4E23123488BAE000743C4 /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D556F0C22B7F1B300E16027 /* FileManager.m */; };
 		4DC4E23223488BAE000743C4 /* SafesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D970DAD20F8BB3F00EBF6C0 /* SafesList.m */; };
-		4DC4E23323488BAE000743C4 /* SFTPStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B421BFD81800F384C9 /* SFTPStorageProvider.m */; };
 		4DC4E23423488BAE000743C4 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */; };
 		4DC4E23523488BAE000743C4 /* CredentialProviderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE48A59216F54A300C9C991 /* CredentialProviderViewController.m */; };
 		4DC4E23623488BAE000743C4 /* InnerRandomStreamFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B75218B39BF00A0739A /* InnerRandomStreamFactory.m */; };
 		4DC4E23723488BAE000743C4 /* SafesListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D34940F216FB87200C411B1 /* SafesListTableViewController.m */; };
 		4DC4E23823488BAE000743C4 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC66F3C229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m */; };
-		4DC4E23923488BAE000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
 		4DC4E23A23488BAE000743C4 /* VariantObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC31E219072C90010CFCD /* VariantObject.m */; };
 		4DC4E23B23488BAE000743C4 /* PickCredentialsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */; };
 		4DC4E23D23488BAE000743C4 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D1BF502232455A4007DF0E6 /* libxml2.2.dylib */; };
@@ -1430,9 +1409,7 @@
 		4DF544FC2231627A00DDEECE /* apple.cer in Resources */ = {isa = PBXBuildFile; fileRef = 4DF544FA2231627A00DDEECE /* apple.cer */; };
 		4DF972B221BFD78700F384C9 /* SFTPTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B121BFD78700F384C9 /* SFTPTests.m */; };
 		4DF972B521BFD81800F384C9 /* SFTPStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B421BFD81800F384C9 /* SFTPStorageProvider.m */; };
-		4DF972B621BFD81800F384C9 /* SFTPStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B421BFD81800F384C9 /* SFTPStorageProvider.m */; };
 		4DF972B921BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B821BFE63C00F384C9 /* SFTPSessionConfiguration.m */; };
-		4DF972BA21BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972B821BFE63C00F384C9 /* SFTPSessionConfiguration.m */; };
 		4DF972C721C01ABF00F384C9 /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F1621BF101A0090A55E /* DAVBaseRequest.m */; };
 		4DF972C821C01ABF00F384C9 /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F0B21BF101A0090A55E /* DAVCredentials.m */; };
 		4DF972C921C01ABF00F384C9 /* DAVListingParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F1721BF101A0090A55E /* DAVListingParser.m */; };
@@ -1444,7 +1421,6 @@
 		4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F2921BF10EB0090A55E /* ISO8601DateFormatter.m */; };
 		4DF972D021C01AD500F384C9 /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F2621BF10EA0090A55E /* NSDateRFC1123.m */; };
 		4DF972D321C01E7100F384C9 /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972D221C01E7100F384C9 /* WebDAVProviderData.m */; };
-		4DF972D421C01E7100F384C9 /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF972D221C01E7100F384C9 /* WebDAVProviderData.m */; };
 		4DF97F1D21BF101B0090A55E /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F0B21BF101A0090A55E /* DAVCredentials.m */; };
 		4DF97F1E21BF101B0090A55E /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F0C21BF101A0090A55E /* DAVResponseItem.m */; };
 		4DF97F1F21BF101B0090A55E /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF97F1321BF101A0090A55E /* DAVSession.m */; };
@@ -1523,10 +1499,6 @@
 		C87A8CC924950B5A00356966 /* AutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CC724950B5A00356966 /* AutoFillSettings.m */; };
 		C87A8CD02495101100356966 /* SharedAppAndAutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CCF2495101100356966 /* SharedAppAndAutoFillSettings.m */; };
 		C87A8CD22495101100356966 /* SharedAppAndAutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CCF2495101100356966 /* SharedAppAndAutoFillSettings.m */; };
-		C87A8CD624951F9700356966 /* OfflineDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */; };
-		C87A8CD724951F9800356966 /* OfflineDetector.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEF7B96216FC74A00A3EE12 /* OfflineDetector.m */; };
-		C87A8CD8249520D500356966 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
-		C87A8CD9249520D600356966 /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		C87A8CDA2495210B00356966 /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
 		C87A8CDB2495210C00356966 /* FavIconBulkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6CB52238E6491005B94CF /* FavIconBulkViewController.m */; };
 		C87A8CDC24952A9700356966 /* SharedAppAndAutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CCF2495101100356966 /* SharedAppAndAutoFillSettings.m */; };
@@ -1574,6 +1546,12 @@
 		C8A8DBAF2484F68F009C673F /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
 		C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
 		C8A8DBB12484F68F009C673F /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
+		C8AAD4E024E832B300E941BC /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
+		C8AAD4E124E832B400E941BC /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
+		C8AAD4E224E832C100E941BC /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		C8AAD4E324E832C200E941BC /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		C8AAD4E424E832FA00E941BC /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
+		C8AAD4E524E832FB00E941BC /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C8B2C6E12493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
 		C8B2C6E22493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
 		C8B2C6E32493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
@@ -1599,17 +1577,19 @@
 		C8BFECC02478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
 		C8BFECC12478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */; };
 		C8C73CCE249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
-		C8C73CCF249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
 		C8C73CD0249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
-		C8C73CD1249E42C700B34C8F /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
+		C8D87CB424E82967007E8E54 /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
+		C8D87CB524E82968007E8E54 /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
+		C8D87CB624E82B23007E8E54 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C8D87CB724E82B24007E8E54 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
+		C8DB6C8A24E999D7007C9024 /* SyncLog.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DB6C8D24E999D7007C9024 /* SyncLog.storyboard */; };
+		C8DB6C8B24E999D7007C9024 /* SyncLog.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DB6C8D24E999D7007C9024 /* SyncLog.storyboard */; };
 		C8DC76472497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC76482497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC76492497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DC764A2497B59500C9C443 /* DatabaseModelConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */; };
 		C8DDE38C24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
-		C8DDE38D24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
 		C8DDE38E24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
-		C8DDE38F24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE38B24DEB3C600873392 /* SyncAndMergeSequenceManager.m */; };
 		C8DDE39124DEB6FA00873392 /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39024DEB6FA00873392 /* SyncParameters.m */; };
 		C8DDE39224DEB6FA00873392 /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39024DEB6FA00873392 /* SyncParameters.m */; };
 		C8DDE39324DEB6FA00873392 /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE39024DEB6FA00873392 /* SyncParameters.m */; };
@@ -1634,8 +1614,6 @@
 		C8DDE3B024DF035200873392 /* SyncStatusLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */; };
 		C8DDE3B124DF035200873392 /* SyncStatusLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */; };
 		C8DDE3B224DF035200873392 /* SyncStatusLogEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */; };
-		C8DF4AD124E68B4C00F0F74E /* SyncLog.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */; };
-		C8DF4AD224E68B4C00F0F74E /* SyncLog.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */; };
 		C8DF4AD524E69E3B00F0F74E /* ConcurrentCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */; };
 		C8DF4AD624E69E3B00F0F74E /* ConcurrentCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */; };
 		C8DF4AD724E6A19300F0F74E /* ConcurrentCircularBuffer.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */; };
@@ -3131,6 +3109,16 @@
 		C8C73CCD249E42C700B34C8F /* SyncManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncManager.m; sourceTree = "<group>"; };
 		C8C73CD3249E468C00B34C8F /* SyncParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncParameters.h; sourceTree = "<group>"; };
 		C8C7A2C924E54C5E00BCCE40 /* StorageProviderUpdateResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StorageProviderUpdateResult.h; path = StrongBox/StorageProviderUpdateResult.h; sourceTree = "<group>"; };
+		C8DB6C8C24E999D7007C9024 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SyncLog.storyboard; sourceTree = "<group>"; };
+		C8DB6C9124E999EC007C9024 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SyncLog.strings"; sourceTree = "<group>"; };
+		C8DB6C9324E999EE007C9024 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C8DB6C9524E999F0007C9024 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C8DB6C9724E999F1007C9024 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C8DB6C9924E999F2007C9024 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C8DB6C9B24E999F3007C9024 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C8DB6C9D24E999F4007C9024 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C8DB6C9F24E999F5007C9024 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C8DB6CA124E999F6007C9024 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SyncLog.strings; sourceTree = "<group>"; };
 		C8DC76452497B59500C9C443 /* DatabaseModelConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseModelConfig.m; path = model/DatabaseModelConfig.m; sourceTree = "<group>"; };
 		C8DC76462497B59500C9C443 /* DatabaseModelConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModelConfig.h; path = model/DatabaseModelConfig.h; sourceTree = "<group>"; };
 		C8DDE38A24DEB3C600873392 /* SyncAndMergeSequenceManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncAndMergeSequenceManager.h; sourceTree = "<group>"; };
@@ -3148,7 +3136,6 @@
 		C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncStatusLogEntry.m; sourceTree = "<group>"; };
 		C8DDE3B324DF04D600873392 /* SyncOperationState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncOperationState.h; sourceTree = "<group>"; };
 		C8DEE079249A62AB00CF2AFE /* git-version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "git-version.h"; path = "build/git-version.h"; sourceTree = "<group>"; };
-		C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SyncLog.storyboard; path = StrongBox/SyncLog.storyboard; sourceTree = "<group>"; };
 		C8DF4AD324E69E3B00F0F74E /* ConcurrentCircularBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentCircularBuffer.h; path = model/ConcurrentCircularBuffer.h; sourceTree = "<group>"; };
 		C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentCircularBuffer.m; path = model/ConcurrentCircularBuffer.m; sourceTree = "<group>"; };
 		C8E6D4E7246D43EA00AFFE13 /* WordList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = model/WordList.h; sourceTree = "<group>"; };
@@ -5277,7 +5264,7 @@
 		C8D5F02E24E2DD130056B6EE /* Sync */ = {
 			isa = PBXGroup;
 			children = (
-				C8DF4AD024E68B4C00F0F74E /* SyncLog.storyboard */,
+				C8DB6C8D24E999D7007C9024 /* SyncLog.storyboard */,
 				C8053F7024E178FC00416031 /* SyncLogViewController.h */,
 				C8053F7124E178FC00416031 /* SyncLogViewController.m */,
 				C8053F7524E1816100416031 /* SyncLogCell.xib */,
@@ -5610,7 +5597,7 @@
 				4D36B0BA22C94740003E9B68 /* diceware.wordlist.utf8.txt in Resources */,
 				4DAE98B22270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D36B0CA22C94740003E9B68 /* beale.wordlist.utf8.txt in Resources */,
-				C8DF4AD124E68B4C00F0F74E /* SyncLog.storyboard in Resources */,
+				C8DB6C8A24E999D7007C9024 /* SyncLog.storyboard in Resources */,
 				4D47613D2437577400E312D9 /* FreemiumOnboarding.storyboard in Resources */,
 				4D8FCEA423606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DF2997D2243B8020080F9DC /* IconsSectionHeaderReusableView.xib in Resources */,
@@ -5704,7 +5691,7 @@
 				4DC4E14E23488BAA000743C4 /* diceware.wordlist.utf8.txt in Resources */,
 				4DC4E14F23488BAA000743C4 /* NotesTableViewCell.xib in Resources */,
 				4DC4E15023488BAA000743C4 /* beale.wordlist.utf8.txt in Resources */,
-				C8DF4AD224E68B4C00F0F74E /* SyncLog.storyboard in Resources */,
+				C8DB6C8B24E999D7007C9024 /* SyncLog.storyboard in Resources */,
 				4D47613F2437577400E312D9 /* FreemiumOnboarding.storyboard in Resources */,
 				4D8FCEA623606D6F001F2172 /* surnames.us.txt in Resources */,
 				4DC4E15123488BAA000743C4 /* IconsSectionHeaderReusableView.xib in Resources */,
@@ -5897,8 +5884,6 @@
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
-				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
@@ -5907,15 +5892,15 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
+				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
@@ -5924,7 +5909,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -5999,8 +5986,6 @@
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
 				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
-				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
-				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
@@ -6009,15 +5994,15 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleAPIClientForREST/GoogleAPIClientForREST.framework",
 				"${BUILT_PRODUCTS_DIR}/ISMessages/ISMessages.framework",
 				"${BUILT_PRODUCTS_DIR}/MTBBarcodeScanner/MTBBarcodeScanner.framework",
+				"${BUILT_PRODUCTS_DIR}/ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.framework",
 				"${BUILT_PRODUCTS_DIR}/OneDriveSDK/OneDriveSDK.framework",
+				"${BUILT_PRODUCTS_DIR}/Reachability/Reachability.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
@@ -6026,7 +6011,9 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleAPIClientForREST.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ISMessages.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MTBBarcodeScanner.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ObjectiveDropboxOfficial.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OneDriveSDK.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Reachability.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -6913,12 +6900,12 @@
 				4DC4E17723488BAE000743C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4DC4E17823488BAE000743C4 /* ItemMetadataEntry.m in Sources */,
 				4DC4E17923488BAE000743C4 /* Meta.m in Sources */,
+				C8AAD4E124E832B400E941BC /* AppleICloudProvider.m in Sources */,
 				4DC4E17A23488BAE000743C4 /* EditPasswordTableViewCell.m in Sources */,
 				4DC4E17B23488BAE000743C4 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4DC4E17C23488BAE000743C4 /* History.m in Sources */,
 				C8E9DAA1245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4DC4E17D23488BAE000743C4 /* OTPTokenType.m in Sources */,
-				4DC4E17E23488BAE000743C4 /* WebDAVSessionConfiguration.m in Sources */,
 				C872B74524A676D60042CE02 /* Sha256PassThroughOutputStream.m in Sources */,
 				4DC4E17F23488BAE000743C4 /* socket_helper.m in Sources */,
 				4DC4E18023488BAE000743C4 /* BackupsManager.m in Sources */,
@@ -6953,7 +6940,6 @@
 				C872B72A24A64A160042CE02 /* cencode.c in Sources */,
 				4DBBDE3923EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
 				4DC4E19523488BAE000743C4 /* EditAttachmentCell.m in Sources */,
-				4DC4E19623488BAE000743C4 /* WebDAVConfigurationViewController.m in Sources */,
 				C86E907D246D99C80029623A /* DeletedObject.m in Sources */,
 				4DC4E19723488BAE000743C4 /* CompositeKeyFactors.m in Sources */,
 				C872B72624A64A160042CE02 /* cdecode.c in Sources */,
@@ -6963,7 +6949,6 @@
 				4DC4E19A23488BAE000743C4 /* DAVRequestGroup.m in Sources */,
 				4DC4E19B23488BAE000743C4 /* CustomFieldEditorViewController.m in Sources */,
 				4DC4E19C23488BAE000743C4 /* RootXmlDomainObject.m in Sources */,
-				C87A8CD9249520D600356966 /* iCloudSafesCoordinator.m in Sources */,
 				4D526AB124407C8F00B0B700 /* WSTagsField.swift in Sources */,
 				4DC4E19D23488BAE000743C4 /* DatabaseCell.m in Sources */,
 				4DC4E19E23488BAE000743C4 /* AesKdfCipher.m in Sources */,
@@ -6991,7 +6976,6 @@
 				4DC4E1AC23488BAE000743C4 /* regdom.c in Sources */,
 				4DC4E1AD23488BAE000743C4 /* DecryptionParameters.m in Sources */,
 				4DC4E1AE23488BAE000743C4 /* NodeFileAttachment.m in Sources */,
-				C87A8CD724951F9800356966 /* OfflineDetector.m in Sources */,
 				4DC4E1AF23488BAE000743C4 /* AesCipher.m in Sources */,
 				4DC4E1B023488BAE000743C4 /* thread.c in Sources */,
 				4DC4E1B123488BAE000743C4 /* Times.m in Sources */,
@@ -7002,6 +6986,7 @@
 				4DC4E1B723488BAE000743C4 /* V3BinariesList.m in Sources */,
 				C8DDE3AC24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4DC4E1B823488BAE000743C4 /* BrowseItemCell.m in Sources */,
+				C8AAD4E324E832C200E941BC /* iCloudSafesCoordinator.m in Sources */,
 				C872B73324A64B7F0042CE02 /* Base64DecodeOutputStream.m in Sources */,
 				4DC4E1B923488BAE000743C4 /* DAVResponseItem.m in Sources */,
 				4DC4E1BA23488BAE000743C4 /* blake2b.c in Sources */,
@@ -7012,10 +6997,8 @@
 				C8DF4AD724E6A19300F0F74E /* ConcurrentCircularBuffer.m in Sources */,
 				4DC4E1BE23488BAE000743C4 /* QuickTypeRecordIdentifier.m in Sources */,
 				4DC4E1C023488BAE000743C4 /* CustomField.m in Sources */,
-				4DC4E1C123488BAE000743C4 /* WebDAVProviderData.m in Sources */,
 				4DC4E1C223488BAE000743C4 /* KeePassGroup.m in Sources */,
 				4DC4E1C323488BAE000743C4 /* NMSSHHostConfig.m in Sources */,
-				4DC4E1C423488BAE000743C4 /* SFTPSessionConfiguration.m in Sources */,
 				4DC4E1C523488BAE000743C4 /* encoding.c in Sources */,
 				4DC4E1C623488BAE000743C4 /* DAVRequests.m in Sources */,
 				4DC4E1C723488BAE000743C4 /* SerializationData.m in Sources */,
@@ -7025,15 +7008,15 @@
 				4DC4E1CB23488BAE000743C4 /* crypt_argchk.c in Sources */,
 				C8DDE3B224DF035200873392 /* SyncStatusLogEntry.m in Sources */,
 				4DC4E1CC23488BAE000743C4 /* SafeStorageProviderFactory.m in Sources */,
-				4DC4E1CD23488BAE000743C4 /* DropboxV2StorageProvider.m in Sources */,
 				C8ED5DE2248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4DC4E1CE23488BAE000743C4 /* KeePassDatabase.m in Sources */,
 				4DC4E1CF23488BAE000743C4 /* Root.m in Sources */,
 				4DC4E1D023488BAE000743C4 /* twofish.c in Sources */,
 				4DC4E1D123488BAE000743C4 /* PwSafeSerialization.m in Sources */,
 				4D637C5D236187A800C273B3 /* BiometricsManager.m in Sources */,
-				4DC4E1D223488BAE000743C4 /* WebDAVStorageProvider.m in Sources */,
+				C8D87CB724E82B24007E8E54 /* SyncAndMergeSequenceManager.m in Sources */,
 				4DC4E1D323488BAE000743C4 /* KdbSerializationData.m in Sources */,
+				C8AAD4E524E832FB00E941BC /* StorageBrowserItem.m in Sources */,
 				4DC4E1D423488BAE000743C4 /* Kdbx4SerializationData.m in Sources */,
 				4DC4E1D523488BAE000743C4 /* TwoFishCipher.m in Sources */,
 				4DC4E1D623488BAE000743C4 /* Keys.m in Sources */,
@@ -7050,7 +7033,6 @@
 				4DC4E1E023488BAE000743C4 /* CASGParams.m in Sources */,
 				4DC4E1E123488BAE000743C4 /* PasswordHistoryEntry.m in Sources */,
 				4DC4E1E223488BAE000743C4 /* KeePassXmlParser.m in Sources */,
-				4DC4E1E323488BAE000743C4 /* SFTPSessionConfigurationViewController.m in Sources */,
 				4DC4E1E423488BAE000743C4 /* OTPToken.m in Sources */,
 				C8BF569B24A0E092003269C9 /* Constants.m in Sources */,
 				C8B2C6E42493882300F6EA12 /* TwoFishReadStream.m in Sources */,
@@ -7065,7 +7047,6 @@
 				4DC4E1EC23488BAE000743C4 /* Field.m in Sources */,
 				4DC4E1ED23488BAE000743C4 /* NSDictionary+Extensions.m in Sources */,
 				C8991AD924B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
-				C8DDE38F24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */,
 				4DC4E1EE23488BAE000743C4 /* CustomIcon.m in Sources */,
 				C87A8CDD24952A9800356966 /* SharedAppAndAutoFillSettings.m in Sources */,
 				C8BF76EB2472E1820080A808 /* DeletedObjects.m in Sources */,
@@ -7083,7 +7064,6 @@
 				C80E02F0249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC4E1F923488BAE000743C4 /* CASGTableViewController.m in Sources */,
 				4DC4E1FA23488BAE000743C4 /* AppleICloudOrLocalSafeFile.m in Sources */,
-				4DC4E1FB23488BAE000743C4 /* StorageBrowserItem.m in Sources */,
 				4DC4E1FC23488BAE000743C4 /* AutoCompleteTextField.m in Sources */,
 				C88F8136245D90C500B0B998 /* NSData+Extensions.m in Sources */,
 				4DC4E1FE23488BAE000743C4 /* CustomFieldTableCell.m in Sources */,
@@ -7107,6 +7087,7 @@
 				4DC4E20C23488BAE000743C4 /* V3Binary.m in Sources */,
 				4DC4E20D23488BAE000743C4 /* NMSSHSession.m in Sources */,
 				4DC4E20E23488BAE000743C4 /* IOsUtils.m in Sources */,
+				C8D87CB524E82968007E8E54 /* SyncManager.m in Sources */,
 				C8FA2A2124C5B2F500445D8B /* SyncStatus.m in Sources */,
 				4DC4E20F23488BAE000743C4 /* Utils.m in Sources */,
 				4DC4E21023488BAE000743C4 /* NMSSHLogger.m in Sources */,
@@ -7123,8 +7104,6 @@
 				4DC4E21823488BAE000743C4 /* SetNodeIconUiHelper.m in Sources */,
 				4D526AAD24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */,
 				4D160A842452FC9D0097C730 /* QuickViewsBrowseTableDataSource.m in Sources */,
-				4DC4E21923488BAE000743C4 /* AppleICloudProvider.m in Sources */,
-				4DC4E21A23488BAE000743C4 /* SFTPProviderData.m in Sources */,
 				C872B73F24A671A70042CE02 /* AesOutputStream.m in Sources */,
 				C86E9083246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				4DC4E21B23488BAE000743C4 /* core.c in Sources */,
@@ -7153,7 +7132,6 @@
 				4DC4E23023488BAE000743C4 /* SafeMetaData.m in Sources */,
 				4DC4E23123488BAE000743C4 /* FileManager.m in Sources */,
 				4DC4E23223488BAE000743C4 /* SafesList.m in Sources */,
-				4DC4E23323488BAE000743C4 /* SFTPStorageProvider.m in Sources */,
 				4DC4E23423488BAE000743C4 /* NSUUID+Zero.m in Sources */,
 				4DC4E23523488BAE000743C4 /* CredentialProviderViewController.m in Sources */,
 				C8DDE3A024DEE24200873392 /* ConcurrentMutableArray.m in Sources */,
@@ -7161,11 +7139,9 @@
 				4DC4E23723488BAE000743C4 /* SafesListTableViewController.m in Sources */,
 				4D6B5051238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC4E23823488BAE000743C4 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
-				4DC4E23923488BAE000743C4 /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4D160ABC24535D1C0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
 				C8A2204B249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5059238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
-				C8C73CD1249E42C700B34C8F /* SyncManager.m in Sources */,
 				4DC4E23A23488BAE000743C4 /* VariantObject.m in Sources */,
 				4DC4E23B23488BAE000743C4 /* PickCredentialsTableViewController.m in Sources */,
 			);
@@ -7182,12 +7158,12 @@
 				4DAE98AD2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D33FA3B2287210C006C31B2 /* ItemMetadataEntry.m in Sources */,
 				4D47670C217905AB00C4358F /* Meta.m in Sources */,
+				C8AAD4E024E832B300E941BC /* AppleICloudProvider.m in Sources */,
 				4D33FA402287232B006C31B2 /* EditPasswordTableViewCell.m in Sources */,
 				4DC66F3A229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D2962B4223173FC0082897D /* History.m in Sources */,
 				C8E9DA9F245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4D004CEB21F4F7BE00E2B194 /* OTPTokenType.m in Sources */,
-				4D0835CC228474D800CA7405 /* WebDAVSessionConfiguration.m in Sources */,
 				C872B74324A676D60042CE02 /* Sha256PassThroughOutputStream.m in Sources */,
 				4D326E8422302BED00DCD8C7 /* socket_helper.m in Sources */,
 				4D2E47AF233D001500C1DE90 /* BackupsManager.m in Sources */,
@@ -7222,7 +7198,6 @@
 				C872B72824A64A160042CE02 /* cencode.c in Sources */,
 				4DBBDE3723EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
 				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
-				4D0835D2228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
 				C86E907B246D99C80029623A /* DeletedObject.m in Sources */,
 				4D3169A822DE33AF003FAD3F /* CompositeKeyFactors.m in Sources */,
 				C872B72424A64A160042CE02 /* cdecode.c in Sources */,
@@ -7232,7 +7207,6 @@
 				4DF972CB21C01ABF00F384C9 /* DAVRequestGroup.m in Sources */,
 				4D0835B82284742000CA7405 /* CustomFieldEditorViewController.m in Sources */,
 				4D4767082179013900C4358F /* RootXmlDomainObject.m in Sources */,
-				C87A8CD8249520D500356966 /* iCloudSafesCoordinator.m in Sources */,
 				4D526AAF24407C8F00B0B700 /* WSTagsField.swift in Sources */,
 				4DE18BBB22F09A3F007D902D /* DatabaseCell.m in Sources */,
 				4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */,
@@ -7260,7 +7234,6 @@
 				4D3652152184A24700A56519 /* regdom.c in Sources */,
 				4D4766F32178C82B00C4358F /* DecryptionParameters.m in Sources */,
 				4D5F5B94218B6C9D00A0739A /* NodeFileAttachment.m in Sources */,
-				C87A8CD624951F9700356966 /* OfflineDetector.m in Sources */,
 				4D9E08E721822F5C007BA1E7 /* AesCipher.m in Sources */,
 				4D3E149A21832C3000A41CA0 /* thread.c in Sources */,
 				4D2F6C3B21807C7E007931E4 /* Times.m in Sources */,
@@ -7271,6 +7244,7 @@
 				4D74B92E218C438800FC369E /* V3BinariesList.m in Sources */,
 				C8DDE3AA24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4D4554AF2285C0BB0015C236 /* BrowseItemCell.m in Sources */,
+				C8AAD4E224E832C100E941BC /* iCloudSafesCoordinator.m in Sources */,
 				C872B73124A64B7F0042CE02 /* Base64DecodeOutputStream.m in Sources */,
 				4DF972CD21C01ABF00F384C9 /* DAVResponseItem.m in Sources */,
 				4D3E149F21832CC700A41CA0 /* blake2b.c in Sources */,
@@ -7281,10 +7255,8 @@
 				C8DF4AD824E6A19400F0F74E /* ConcurrentCircularBuffer.m in Sources */,
 				4DF14F6B2250F69000B6AF25 /* QuickTypeRecordIdentifier.m in Sources */,
 				4D876B4421AC36F800805DED /* CustomField.m in Sources */,
-				4DF972D421C01E7100F384C9 /* WebDAVProviderData.m in Sources */,
 				4D2F6C3721807C7E007931E4 /* KeePassGroup.m in Sources */,
 				4D326E9022302BED00DCD8C7 /* NMSSHHostConfig.m in Sources */,
-				4DF972BA21BFE63C00F384C9 /* SFTPSessionConfiguration.m in Sources */,
 				4D3E149321832BEF00A41CA0 /* encoding.c in Sources */,
 				4DF972CC21C01ABF00F384C9 /* DAVRequests.m in Sources */,
 				4D4766E12178C82B00C4358F /* SerializationData.m in Sources */,
@@ -7294,15 +7266,15 @@
 				4D1884DA21709E5F001AE6B0 /* crypt_argchk.c in Sources */,
 				C8DDE3B024DF035200873392 /* SyncStatusLogEntry.m in Sources */,
 				4D5F5B7D218B4C4300A0739A /* SafeStorageProviderFactory.m in Sources */,
-				4D5F5B7E218B4C4E00A0739A /* DropboxV2StorageProvider.m in Sources */,
 				C8ED5DE0248E6C6400B84EBD /* HmacBlockStream.m in Sources */,
 				4D9E09AA218251BE007BA1E7 /* KeePassDatabase.m in Sources */,
 				4DC5B9C2217B376F00FE9DD9 /* Root.m in Sources */,
 				4D1884D921709E3C001AE6B0 /* twofish.c in Sources */,
 				4D1884D821709E2D001AE6B0 /* PwSafeSerialization.m in Sources */,
 				4D637C5B236187A800C273B3 /* BiometricsManager.m in Sources */,
-				4D0835D0228474D800CA7405 /* WebDAVStorageProvider.m in Sources */,
+				C8D87CB624E82B23007E8E54 /* SyncAndMergeSequenceManager.m in Sources */,
 				4D5B1EB02194B2D900ECAF0D /* KdbSerializationData.m in Sources */,
+				C8AAD4E424E832FA00E941BC /* StorageBrowserItem.m in Sources */,
 				4DB1B7D52188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
 				4D4598CE2193048400792EF7 /* TwoFishCipher.m in Sources */,
 				4D3AC32421908D4A0010CFCD /* Keys.m in Sources */,
@@ -7319,7 +7291,6 @@
 				4D9597BF22A2CB38008DB224 /* CASGParams.m in Sources */,
 				4D1884D621709E1F001AE6B0 /* PasswordHistoryEntry.m in Sources */,
 				4DF176F323293D1500255CD6 /* KeePassXmlParser.m in Sources */,
-				4D0F122021C1418000C4451D /* SFTPSessionConfigurationViewController.m in Sources */,
 				4D004CE721F4F7B300E2B194 /* OTPToken.m in Sources */,
 				C8BF569924A0E092003269C9 /* Constants.m in Sources */,
 				C8B2C6E22493882300F6EA12 /* TwoFishReadStream.m in Sources */,
@@ -7334,7 +7305,6 @@
 				4D1884D321709E0E001AE6B0 /* Field.m in Sources */,
 				4DDF7C9E225B7D2C000B0114 /* NSDictionary+Extensions.m in Sources */,
 				C8991AD724B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
-				C8DDE38D24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */,
 				4DA12F07219837D10000CEBB /* CustomIcon.m in Sources */,
 				C87A8CDC24952A9700356966 /* SharedAppAndAutoFillSettings.m in Sources */,
 				C8BF76E92472E1820080A808 /* DeletedObjects.m in Sources */,
@@ -7352,7 +7322,6 @@
 				C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */,
 				4DC5C10722A51B7D00E0F740 /* CASGTableViewController.m in Sources */,
 				4D1884CF21709D0F001AE6B0 /* AppleICloudOrLocalSafeFile.m in Sources */,
-				4D1884CD21709CFA001AE6B0 /* StorageBrowserItem.m in Sources */,
 				4D33FA4422872384006C31B2 /* AutoCompleteTextField.m in Sources */,
 				C88F8134245D90C500B0B998 /* NSData+Extensions.m in Sources */,
 				4D33FA412287232E006C31B2 /* CustomFieldTableCell.m in Sources */,
@@ -7376,6 +7345,7 @@
 				4D74B92A218C40B000FC369E /* V3Binary.m in Sources */,
 				4D326E8622302BED00DCD8C7 /* NMSSHSession.m in Sources */,
 				4D1884CA21709CDA001AE6B0 /* IOsUtils.m in Sources */,
+				C8D87CB424E82967007E8E54 /* SyncManager.m in Sources */,
 				C8FA2A1F24C5B2F500445D8B /* SyncStatus.m in Sources */,
 				4D1884C921709CD4001AE6B0 /* Utils.m in Sources */,
 				4D326E8222302BED00DCD8C7 /* NMSSHLogger.m in Sources */,
@@ -7392,8 +7362,6 @@
 				4D33FA3E2287214D006C31B2 /* SetNodeIconUiHelper.m in Sources */,
 				4D526AAB24407C8F00B0B700 /* BackspaceDetectingTextField.swift in Sources */,
 				4D160A822452FC9D0097C730 /* QuickViewsBrowseTableDataSource.m in Sources */,
-				4D1884C621709CB1001AE6B0 /* AppleICloudProvider.m in Sources */,
-				4D0835C22284748200CA7405 /* SFTPProviderData.m in Sources */,
 				C872B73D24A671A70042CE02 /* AesOutputStream.m in Sources */,
 				C86E9081246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				4D3E149621832C1500A41CA0 /* core.c in Sources */,
@@ -7422,7 +7390,6 @@
 				4DE48A6A216F60FE00C9C991 /* SafeMetaData.m in Sources */,
 				4D556F0E22B7F1B300E16027 /* FileManager.m in Sources */,
 				4DE48A66216F558E00C9C991 /* SafesList.m in Sources */,
-				4DF972B621BFD81800F384C9 /* SFTPStorageProvider.m in Sources */,
 				4DDA01572242621400C7F0E2 /* NSUUID+Zero.m in Sources */,
 				4DE48A5A216F54A300C9C991 /* CredentialProviderViewController.m in Sources */,
 				C8DDE39E24DEE24200873392 /* ConcurrentMutableArray.m in Sources */,
@@ -7430,11 +7397,9 @@
 				4D349410216FB87200C411B1 /* SafesListTableViewController.m in Sources */,
 				4D6B504F238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC66F3E229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
-				4D56D91021B803730030E13A /* FilesAppUrlBookmarkProvider.m in Sources */,
 				4D160AB824535D1A0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
 				C8A22049249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5057238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
-				C8C73CCF249E42C700B34C8F /* SyncManager.m in Sources */,
 				4D3AC320219074C40010CFCD /* VariantObject.m in Sources */,
 				4DD7B7ED2173A0F900B4FD98 /* PickCredentialsTableViewController.m in Sources */,
 			);
@@ -8082,6 +8047,24 @@
 			name = AuditDrillDown.storyboard;
 			sourceTree = "<group>";
 		};
+		C8DB6C8D24E999D7007C9024 /* SyncLog.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8DB6C8C24E999D7007C9024 /* Base */,
+				C8DB6C9124E999EC007C9024 /* zh-Hans */,
+				C8DB6C9324E999EE007C9024 /* fr */,
+				C8DB6C9524E999F0007C9024 /* de */,
+				C8DB6C9724E999F1007C9024 /* it */,
+				C8DB6C9924E999F2007C9024 /* nb */,
+				C8DB6C9B24E999F3007C9024 /* ru */,
+				C8DB6C9D24E999F4007C9024 /* es */,
+				C8DB6C9F24E999F5007C9024 /* sv */,
+				C8DB6CA124E999F6007C9024 /* uk */,
+			);
+			name = SyncLog.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -8268,7 +8251,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8358,7 +8341,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8447,7 +8430,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8529,7 +8512,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8614,7 +8597,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8652,10 +8635,6 @@
 					"-framework",
 					"\"LocalAuthentication\"",
 					"-framework",
-					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"Reachability\"",
-					"-framework",
 					"\"SafariServices\"",
 					"-framework",
 					"\"Security\"",
@@ -8691,7 +8670,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8726,10 +8705,6 @@
 					"\"KissXML\"",
 					"-framework",
 					"\"LocalAuthentication\"",
-					"-framework",
-					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"Reachability\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -8766,7 +8741,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8810,10 +8785,6 @@
 					"\"KissXML\"",
 					"-framework",
 					"\"LocalAuthentication\"",
-					"-framework",
-					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"Reachability\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",
@@ -8851,7 +8822,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2950;
+				CURRENT_PROJECT_VERSION = 2952;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8893,10 +8864,6 @@
 					"\"KissXML\"",
 					"-framework",
 					"\"LocalAuthentication\"",
-					"-framework",
-					"\"ObjectiveDropboxOfficial\"",
-					"-framework",
-					"\"Reachability\"",
 					"-framework",
 					"\"SafariServices\"",
 					"-framework",

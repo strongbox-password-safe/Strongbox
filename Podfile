@@ -20,16 +20,16 @@ abstract_target 'common-ios' do
     platform :ios, '10.0'
     use_frameworks!
 
-    pod 'ObjectiveDropboxOfficial'
     pod 'DZNEmptyDataSet'
-    pod 'Reachability'
-    pod 'libsodium'    
+    pod 'libsodium'
     pod 'KissXML'
 
     target 'Strongbox-iOS' do
         use_frameworks!
-      
+
+        pod 'Reachability'
         pod 'ISMessages'
+        pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'
         pod 'GoogleAPIClientForREST/Drive'
@@ -39,7 +39,9 @@ abstract_target 'common-ios' do
     target 'Strongbox-iOS-Family' do
         use_frameworks!
 
+        pod 'Reachability'
         pod 'ISMessages'
+        pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
         pod 'MTBBarcodeScanner'
         pod 'GoogleAPIClientForREST/Drive'

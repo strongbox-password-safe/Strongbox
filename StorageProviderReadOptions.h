@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface StorageProviderReadOptions : NSObject
 
-@property BOOL isAutoFill; // TODO: We can get rid of this in Uber Sync - used only by Files app to read a different bookmark in Auto Fill
 @property (nullable) NSDate* onlyIfModifiedDifferentFrom;
 
 @end

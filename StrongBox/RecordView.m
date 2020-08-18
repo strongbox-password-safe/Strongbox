@@ -1238,7 +1238,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 }
 
 - (void)sync:(void (^)(BOOL userCancelled, NSError * error))completion {
-    [self.viewModel update:self isAutoFill:NO handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+    [self.viewModel update:self handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         if (conflictAndLocalWasChanged) {
             error = [Utils createNSError:@"The underlying local database has changed and so a re-open is now required." errorCode:-1]; // Less than ideal but legacy VC so shortcut by setting an error to force a re-open
         }

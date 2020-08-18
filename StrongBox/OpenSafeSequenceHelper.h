@@ -35,16 +35,6 @@ typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable er
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
-                      openAutoFillCache:(BOOL)openAutoFillCache
-                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
-                         isAutoFillOpen:(BOOL)isAutoFillOpen
-                          openLocalOnly:(BOOL)openLocalOnly
-            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
-                             completion:(CompletionBlock)completion;
-
-+ (void)beginSequenceWithViewController:(UIViewController*)viewController
-                                   safe:(SafeMetaData*)safe
-                      openAutoFillCache:(BOOL)openAutoFillCache
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                 isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen

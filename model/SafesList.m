@@ -25,6 +25,7 @@ static NSString* const kDatabasesFilename = @"databases.json";
 static NSString* const kMigratedToNewStore = @"migratedDatabasesToNewStore";
 
 NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChanged";
+NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotification";
 
 @implementation SafesList
 
@@ -164,7 +165,11 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     }
 }
 
-- (void)serialize:(BOOL)notify {
+- (void)serialize:(BOOL)listChanged {
+    [self serialize:listChanged databaseIdChanged:nil];
+}
+
+- (void)serialize:(BOOL)listChanged databaseIdChanged:(NSString*)databaseIdChanged {
     NSMutableArray<NSDictionary*>* jsonDatabases = NSMutableArray.array;
     
     for (SafeMetaData* database in self.databasesList) {
@@ -201,11 +206,14 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         return;
     }
     
-    if (notify) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (listChanged) {
             [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
-        });
-    }
+        }
+        else if (databaseIdChanged) {
+            [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseUpdatedNotification object:databaseIdChanged];
+        }
+    });
 }
 
 - (void)update:(SafeMetaData *_Nonnull)safe {
@@ -216,7 +224,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         
         if(index != NSNotFound) {
             [self.databasesList replaceObjectAtIndex:index withObject:safe];
-            [self serialize:NO]; // Don't notify if we're just updating an existing DB - no need to refresh DB list
+            [self serialize:NO databaseIdChanged:safe.uuid];
         }
         else {
             NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", safe);
@@ -266,6 +274,8 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         NSError* error;
         NSURL* url = [SyncManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe error:&error];
 
+        safe.lastSyncRemoteModDate = initialCacheModDate; // Also set the lastSyncRemoteDate
+        
         if (error || !url) {
             NSLog(@"ERROR: Error adding database - setWorkingCacheWithData: [%@]", error);
         }

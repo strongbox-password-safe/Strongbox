@@ -86,7 +86,6 @@
 
     if (request) {
         NSUUID* syncId = NSUUID.UUID;
-        SafeMetaData* latestDatabase = [SafesList.sharedInstance getById:database.uuid]; // Get Latest
         
         if (!database) {
             NSLog(@"Could not find latest metadata for this database! [%@]", database);
@@ -102,7 +101,7 @@
             dispatch_group_t group = dispatch_group_create();
             dispatch_group_enter(group);
 
-            [self sync:latestDatabase syncId:syncId interactiveVC:request.parameters.interactiveVC isAutoFill:request.parameters.isAutoFill completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
+            [self sync:database syncId:syncId interactiveVC:request.parameters.interactiveVC completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
                 NSArray<SyncDatabaseRequest*>* alsoWaiting = [opData dequeueAllJoinRequests];
                 if (alsoWaiting.count) {
                     NSLog(@"SYNC: Also found %@ requests waiting on sync for this DB - Completing those also now...", @(alsoWaiting.count));
@@ -123,15 +122,14 @@
     }
 }
 
-- (void)sync:(SafeMetaData *)database syncId:(NSUUID*)syncId interactiveVC:(UIViewController*)interactiveVC isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+- (void)sync:(SafeMetaData *)database syncId:(NSUUID*)syncId interactiveVC:(UIViewController*)interactiveVC completion:(SyncAndMergeCompletionBlock)completion {
     BOOL syncPullEvenIfModifiedDateSame = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
     NSDate* localModDate;
     [self getExistingLocalCopy:database modified:&localModDate];
 
     StorageProviderReadOptions* opts = [[StorageProviderReadOptions alloc] init];
-    opts.isAutoFill = isAutoFill;
     
-    // We should pull data from remote if:
+    // We should pull data from remote to check/merge if:
     //
     // - 1) Forced
     // - 2) Local and Remote Dates differ
@@ -176,7 +174,7 @@
             completion(kSyncAndMergeSuccess, NO, nil);
         }
         else if (result == kReadResultSuccess) {
-            [self onPulledRemoteDatabase:database syncId:syncId localModDate:localModDate remoteData:data remoteModified:dateModified interactiveVC:interactiveVC isAutoFill:isAutoFill completion:completion];
+            [self onPulledRemoteDatabase:database syncId:syncId localModDate:localModDate remoteData:data remoteModified:dateModified interactiveVC:interactiveVC completion:completion];
         }
         else { // Some unknown state
             [self logAndPublishStatusChange:database syncId:syncId state:kSyncOperationStateError message:@"Unknown status returned by Storage Provider"];
@@ -185,7 +183,7 @@
     }];
 }
 
-- (void)onPulledRemoteDatabase:(SafeMetaData *)database syncId:(NSUUID*)syncId localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+- (void)onPulledRemoteDatabase:(SafeMetaData *)database syncId:(NSUUID*)syncId localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC completion:(SyncAndMergeCompletionBlock)completion {
     [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Got Remote OK [remoteMod=%@]", remoteModified.friendlyDateTimeStringBothPrecise]];
         
     // No Outstanding Update or No Local Copy -> Simple pull and set
@@ -197,11 +195,11 @@
         [self setLocalAndComplete:remoteData dateModified:remoteModified database:database syncId:syncId completion:completion];
     }
     else {
-        [self handleOutstandingUpdate:database syncId:syncId remoteData:remoteData remoteModified:remoteModified interactiveVC:interactiveVC isAutoFill:isAutoFill completion:completion];
+        [self handleOutstandingUpdate:database syncId:syncId remoteData:remoteData remoteModified:remoteModified interactiveVC:interactiveVC completion:completion];
     }
 }
 
-- (void)handleOutstandingUpdate:(SafeMetaData *)database syncId:(NSUUID*)syncId remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+- (void)handleOutstandingUpdate:(SafeMetaData *)database syncId:(NSUUID*)syncId remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC completion:(SyncAndMergeCompletionBlock)completion {
     NSDate* localModDate;
     NSURL* localCopy = [self getExistingLocalCopy:database modified:&localModDate];
     NSData* localData;
@@ -228,16 +226,16 @@
         
         if (forcePush || noRemoteChange) { // Simple Overwrite
             [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Update to Push - [Simple Push because Force=%@, Remote Changed=%@]", forcePush ? @"YES" : @"NO", noRemoteChange ? @"NO" : @"YES"]];
-            [self setRemoteAndComplete:localData database:database syncId:syncId interactiveVC:interactiveVC isAutoFill:isAutoFill completion:completion];
+            [self setRemoteAndComplete:localData database:database syncId:syncId interactiveVC:interactiveVC completion:completion];
         }
         else {
             // Merge / Overwrite / Conflict situation!
-            [self handleOutstandingUpdateWithRemoteConflict:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified interactiveVC:interactiveVC isAutoFill:isAutoFill completion:completion];
+            [self handleOutstandingUpdateWithRemoteConflict:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified interactiveVC:interactiveVC completion:completion];
         }
     }
 }
 
-- (void)handleOutstandingUpdateWithRemoteConflict:(SafeMetaData *)database syncId:(NSUUID*)syncId localData:(NSData*)localData localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+- (void)handleOutstandingUpdateWithRemoteConflict:(SafeMetaData *)database syncId:(NSUUID*)syncId localData:(NSData*)localData localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC  completion:(SyncAndMergeCompletionBlock)completion {
     [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Remote has changed since last sync. Last Sync Remote Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
     
     const BOOL mergePossible = NO;
@@ -257,12 +255,12 @@
         }
         else {
             [self logMessage:database syncId:syncId message:@"Update to Push but Remote has changed also. Merge not possible. Requesting User Advice..."];
-            [self promptForManualConflictResolutionStrategy:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified interactiveVC:interactiveVC isAutoFill:isAutoFill completion:completion];
+            [self promptForManualConflictResolutionStrategy:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified interactiveVC:interactiveVC completion:completion];
         }
     }
 }
 
-- (void)promptForManualConflictResolutionStrategy:(SafeMetaData *)database syncId:(NSUUID*)syncId localData:(NSData*)localData localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+- (void)promptForManualConflictResolutionStrategy:(SafeMetaData *)database syncId:(NSUUID*)syncId localData:(NSData*)localData localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC completion:(SyncAndMergeCompletionBlock)completion {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString* useMyLocal = [NSString stringWithFormat:NSLocalizedString(@"sync_conflict_option_use_mine_fmt", @"Use Mine/Local (%@)"), localModDate.friendlyDateString];
         NSString* useTheirRemote = [NSString stringWithFormat:NSLocalizedString(@"sync_conflict_option_use_theirs_fmt", @"Use Theirs/Remote (%@)"), remoteModified.friendlyDateString];
@@ -278,7 +276,7 @@
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
                 if (response == 0) { // Use Local
                     [self logMessage:database syncId:syncId message:@"Sync Conflict Manual Resolution: Use Local - Pushing Local and overwriting Remote."];
-                    [self setRemoteAndComplete:localData database:database syncId:syncId interactiveVC:interactiveVC isAutoFill:isAutoFill completion:completion];
+                    [self setRemoteAndComplete:localData database:database syncId:syncId interactiveVC:interactiveVC completion:completion];
                 }
                 else if (response == 1) { // Use Remote
                     // Don't forget to clear the outstanding flag...
@@ -301,7 +299,7 @@
     });
 }
 
-- (void)setRemoteAndComplete:(NSData*)data database:(SafeMetaData*)database syncId:(NSUUID*)syncId interactiveVC:(UIViewController*)interactiveVC isAutoFill:(BOOL)isAutoFill completion:(SyncAndMergeCompletionBlock)completion {
+- (void)setRemoteAndComplete:(NSData*)data database:(SafeMetaData*)database syncId:(NSUUID*)syncId interactiveVC:(UIViewController*)interactiveVC completion:(SyncAndMergeCompletionBlock)completion {
     if (database.readOnly) {
         NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1];
         [self logAndPublishStatusChange:database
@@ -317,7 +315,6 @@
     [provider pushDatabase:database
              interactiveVC:interactiveVC
                       data:data
-                isAutoFill:isAutoFill
                 completion:^(StorageProviderUpdateResult result, NSDate * _Nullable newRemoteModDate, const NSError * _Nullable error) {
         if (result == kUpdateResultError) {
             [self logAndPublishStatusChange:database
@@ -397,7 +394,7 @@
 
 - (void)publishSyncStatusChangeNotification:(SyncStatus*)info {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kSyncManagerDatabaseSyncStatusChanged object:info];
+        [NSNotificationCenter.defaultCenter postNotificationName:kSyncManagerDatabaseSyncStatusChanged object:info.databaseId];
     });
 }
 

@@ -33,7 +33,6 @@
 
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowAutoFillCache;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFillAlwaysUseCache;
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBiometric;
@@ -190,14 +189,6 @@
     }
 }
 
-- (IBAction)onAlwaysUseAutoFillCache:(id)sender {
-    self.viewModel.metadata.alwaysUseCacheForAutoFill = self.switchAutoFillAlwaysUseCache.on;
-    
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-    
-    [self bindUi];
-}
-
 - (void)bindUi {
     [self bindDatabaseLock];
     
@@ -218,11 +209,8 @@
     
     self.switchAllowBiometric.enabled = [self canToggleTouchId];
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
-
     self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillEnabled;
-
     self.switchReadOnly.on = self.viewModel.metadata.readOnly;
-    self.switchAutoFillAlwaysUseCache.on = self.viewModel.metadata.alwaysUseCacheForAutoFill;
 }
 
 - (IBAction)onDone:(id)sender {

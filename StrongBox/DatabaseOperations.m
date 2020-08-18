@@ -158,7 +158,6 @@
     self.viewModel.database.compositeKeyFactors.yubiKeyCR = newCkf.yubiKeyCR;
     
     [self.viewModel update:self
-                isAutoFill:NO
                    handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         if (userCancelled || error || conflictAndLocalWasChanged) {
             // Rollback

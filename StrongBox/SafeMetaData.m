@@ -92,7 +92,7 @@
 
 + (instancetype)fromJsonSerializationDictionary:(NSDictionary *)jsonDictionary {
     SafeMetaData *ret = [[SafeMetaData alloc] init];
-    
+
     if ( jsonDictionary[@"uuid"] != nil) ret.uuid = jsonDictionary[@"uuid"];
     if ( jsonDictionary[@"nickName"] != nil ) ret.nickName = jsonDictionary[@"nickName"];
     if ( jsonDictionary[@"fileName"] != nil ) ret.fileName = jsonDictionary[@"fileName"];
@@ -134,7 +134,6 @@
     if ( jsonDictionary[@"readOnly"] != nil ) ret.readOnly = ((NSNumber*)jsonDictionary[@"readOnly"]).boolValue;
     if ( jsonDictionary[@"hasBeenPromptedForConvenience"] != nil ) ret.hasBeenPromptedForConvenience = ((NSNumber*)jsonDictionary[@"hasBeenPromptedForConvenience"]).boolValue;
     if ( jsonDictionary[@"hasBeenPromptedForQuickLaunch"] != nil ) ret.hasBeenPromptedForQuickLaunch = ((NSNumber*)jsonDictionary[@"hasBeenPromptedForQuickLaunch"]).boolValue;
-    if ( jsonDictionary[@"alwaysUseCacheForAutoFill"] != nil ) ret.alwaysUseCacheForAutoFill = ((NSNumber*)jsonDictionary[@"alwaysUseCacheForAutoFill"]).boolValue;
     if ( jsonDictionary[@"showQuickViewExpired"] != nil ) ret.showQuickViewExpired = ((NSNumber*)jsonDictionary[@"showQuickViewExpired"]).boolValue;
     if ( jsonDictionary[@"colorizeProtectedCustomFields"] != nil ) ret.colorizeProtectedCustomFields = ((NSNumber*)jsonDictionary[@"colorizeProtectedCustomFields"]).boolValue;
     if ( jsonDictionary[@"promptedForAutoFetchFavIcon"] != nil ) ret.promptedForAutoFetchFavIcon = ((NSNumber*)jsonDictionary[@"promptedForAutoFetchFavIcon"]).boolValue;
@@ -206,7 +205,6 @@
         @"readOnly" : @(self.readOnly),
         @"hasBeenPromptedForConvenience" : @(self.hasBeenPromptedForConvenience),
         @"hasBeenPromptedForQuickLaunch" : @(self.hasBeenPromptedForQuickLaunch),
-        @"alwaysUseCacheForAutoFill" : @(self.alwaysUseCacheForAutoFill),
         @"showQuickViewExpired" : @(self.showQuickViewExpired),
         @"colorizeProtectedCustomFields" : @(self.colorizeProtectedCustomFields),
         @"promptedForAutoFetchFavIcon" : @(self.promptedForAutoFetchFavIcon),
@@ -316,7 +314,6 @@
     //
     
     [encoder encodeBool:self.hasBeenPromptedForQuickLaunch forKey:@"hasBeenPromptedForQuickLaunch"];
-    [encoder encodeBool:self.alwaysUseCacheForAutoFill forKey:@"alwaysUseCacheForAutoFill"];
     
     [encoder encodeBool:self.showExpiredInSearch forKey:@"showExpiredInSearch"];
     [encoder encodeBool:self.showExpiredInBrowse forKey:@"showExpiredInBrowse"];
@@ -476,10 +473,6 @@
         
         if([decoder containsValueForKey:@"hasBeenPromptedForQuickLaunch"]) {
             self.hasBeenPromptedForQuickLaunch = [decoder decodeBoolForKey:@"hasBeenPromptedForQuickLaunch"];
-        }
-
-        if([decoder containsValueForKey:@"alwaysUseCacheForAutoFill"]) {
-            self.alwaysUseCacheForAutoFill = [decoder decodeBoolForKey:@"alwaysUseCacheForAutoFill"];
         }
         
         if([decoder containsValueForKey:@"showExpiredInSearch"]) {

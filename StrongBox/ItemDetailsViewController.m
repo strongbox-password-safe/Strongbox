@@ -983,7 +983,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     // Sync
     
     [self.databaseModel update:self
-                    isAutoFill:self.isAutoFillContext
                        handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         // TODO: centralize updates in this class
         if(userCancelled || conflictAndLocalWasChanged) {
@@ -1022,7 +1021,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     // Sync
     
     [self.databaseModel update:self
-                    isAutoFill:self.isAutoFillContext
                        handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         // TODO: centralize updates in this class
         if(userCancelled || conflictAndLocalWasChanged) {
@@ -1052,7 +1050,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [self performFullReload];
     
     [self.databaseModel update:self
-                    isAutoFill:self.isAutoFillContext
                        handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         // TODO: centralize updates in this class
         dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -1381,7 +1378,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         NSLog(@"SAVE: Icon processed for Save...");
         // TODO: Updates need to be centralized in this class, and then properly managed in Browse View too on failure or local merge/conflict changes
         [self.databaseModel update:self
-                        isAutoFill:self.isAutoFillContext
                            handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self onSaveChangesDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged preSaveCloneOfItem:preSaveCloneOfItem error:error];
@@ -1471,8 +1467,9 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             });
             
 #ifdef IS_APP_EXTENSION
-            [self.autoFillRootViewController exitWithCredential:self.item.fields.username
-                                                       password:self.item.fields.password];
+            if (self.onAutoFillNewItemAdded) {
+                self.onAutoFillNewItemAdded(self.item.fields.username, self.item.fields.password);
+            }
 #endif
         }];
     }
