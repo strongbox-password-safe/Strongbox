@@ -13,6 +13,8 @@
 #import "Alerts.h"
 #import "SVProgressHUD.h"
 #import "Settings.h"
+#import "Model.h"
+#import "SharedAppAndAutoFillSettings.h"
 
 @interface WelcomeFreemiumViewController ()
 
@@ -53,6 +55,17 @@
     [super viewDidLoad];
 
     [self setupUi];
+    
+    // Auto - Dismiss if we pick up Pro during display
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged) name:kProStatusChangedNotificationKey object:nil];
+}
+
+- (void)onProStatusChanged {
+    if (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self onDismiss:nil];
+        });
+    }
 }
 
 - (void)setupUi {
@@ -72,14 +85,16 @@
 }
 
 - (IBAction)onUseFree:(id)sender {
-    self.onDone(NO);
+    [self onDismiss:sender];
 }
 
 - (IBAction)onTryPro:(id)sender {
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     [self performSegueWithIdentifier:@"segueToStartTrial" sender:nil];
 }
 
 - (IBAction)onDismiss:(id)sender {
+    [NSNotificationCenter.defaultCenter removeObserver:self];
     self.onDone(NO);
 }
 

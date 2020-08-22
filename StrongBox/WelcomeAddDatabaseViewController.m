@@ -12,6 +12,7 @@
 #import "Settings.h"
 #import "WelcomeUseICloudViewController.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "AutoFillManager.h"
 
 @interface WelcomeAddDatabaseViewController ()
 
@@ -62,7 +63,7 @@
     [super viewDidLoad];
     
     [self setupUi];
-    
+
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabasesChanged)
                                                name:kDatabasesListChangedNotification
@@ -88,34 +89,17 @@
 }
 
 - (IBAction)onCreate:(id)sender {
-    if(Settings.sharedInstance.iCloudAvailable && !SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
-        [self performSegueWithIdentifier:@"segueToICloudPrompt" sender:@(NO)];
-    }
-    else {
-        [self performSegueWithIdentifier:@"segueToCreate" sender:nil];
-    }
+    [self performSegueWithIdentifier:@"segueToCreate" sender:nil];
 }
 
 - (IBAction)onAdd:(id)sender {
-    if(Settings.sharedInstance.iCloudAvailable && !SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
-        [self performSegueWithIdentifier:@"segueToICloudPrompt" sender:@(YES)];
-    }
-    else {
-        NSInteger count = SafesList.sharedInstance.snapshot.count;
-        self.onDone(count == 0, nil);
-    }
+    NSInteger count = SafesList.sharedInstance.snapshot.count;
+    self.onDone(count == 0, nil);
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToCreate"]) {
         WelcomeCreateDatabaseViewController* vc = (WelcomeCreateDatabaseViewController*)segue.destinationViewController;
-        
-        vc.onDone = self.onDone;
-    }
-    else if([segue.identifier isEqualToString:@"segueToICloudPrompt"]) {
-        WelcomeUseICloudViewController* vc = (WelcomeUseICloudViewController*)segue.destinationViewController;
-        
-        vc.addExisting = ((NSNumber*)sender).boolValue;
         vc.onDone = self.onDone;
     }
 }

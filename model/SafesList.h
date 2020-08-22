@@ -25,6 +25,7 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 - (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
 - (NSString*_Nullable)getSuggestedDatabaseNameUsingDeviceName;
 - (BOOL)isValidNickName:(NSString *_Nonnull)nickName;
+
 - (void)update:(SafeMetaData *_Nonnull)safe;
 
 // Required for Auto-Fill interaction at the moment, since there is some kind of strange caching going on that survives even a

@@ -85,6 +85,34 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
 
+- (BOOL)isPossible {
+    if (@available(iOS 12.0, *)) {
+        return YES;
+    }
+    else {
+        return NO;
+    }
+}
+
+- (BOOL)isOnForStrongbox {
+    __block BOOL ret = NO;
+    
+    if (@available(iOS 12.0, *)) {
+        dispatch_group_t g = dispatch_group_create();
+        dispatch_group_enter(g);
+
+        [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
+            ret = state.enabled;
+            NSLog(@"XXXX - Got AutoFill State = [%ld]", ret);
+            dispatch_group_leave(g);
+        }];
+
+        dispatch_group_wait(g, DISPATCH_TIME_FOREVER);
+    }
+
+    return ret;
+}
+
 - (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentity:(Node*)node database:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid  API_AVAILABLE(ios(12.0)){
     if(!node.fields.username.length) {
         return @[];

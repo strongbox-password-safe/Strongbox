@@ -44,6 +44,7 @@
         _browsableExisting = YES;
         _rootFolderOnly = NO;
         _immediatelyOfferCacheIfOffline = NO; // Could be on LAN - try to connect
+        _supportsConcurrentRequests = NO; // TODO: Possibly
     }
     
     return self;

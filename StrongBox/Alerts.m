@@ -126,24 +126,50 @@
            title:(NSString *)title
          message:(NSString *)message
           action:(void (^) (BOOL response))action {
-    [self twoOptions:viewController
-                    title:title
-                  message:message
-        defaultButtonText:NSLocalizedString(@"alerts_ok", @"OK")
-         secondButtonText:NSLocalizedString(@"generic_cancel", @"Cancel")
-                   action:action];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+
+
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_ok", @"OK")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(YES); }];
+
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) { action(NO); }];
+
+        [alertController addAction:defaultAction];
+        [alertController addAction:noAction];
+
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
 
 + (void)yesNo:(UIViewController *)viewController
         title:(NSString *)title
       message:(NSString *)message
        action:(void (^) (BOOL response))action {
-    [self twoOptions:viewController
-                    title:title
-                  message:message
-        defaultButtonText:NSLocalizedString(@"alerts_yes", @"Yes")
-         secondButtonText:NSLocalizedString(@"alerts_no", @"No")
-                   action:action];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+
+
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_yes", @"Yes")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(YES); }];
+
+        UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"alerts_no", @"No")
+                                                           style:UIAlertActionStyleCancel
+                                                         handler:^(UIAlertAction *a) { action(NO); }];
+
+        [alertController addAction:defaultAction];
+        [alertController addAction:noAction];
+
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
 }
 
 + (void)   twoOptions:(UIViewController *)viewController

@@ -31,7 +31,6 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 @property (nonatomic) UpgradeManagerState readyState;
 @property (nonatomic, strong) NSDictionary<NSString*, SKProduct *> *products;
 @property (nonatomic) RMStoreAppReceiptVerifier* receiptVerifier;
-@property (readonly, nullable) SKProduct* freeTrialProduct;
 
 @end
 

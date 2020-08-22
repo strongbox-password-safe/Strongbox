@@ -34,8 +34,10 @@ extern NSString *const kNotificationNameItemDetailsEditDone;
 #ifdef IS_APP_EXTENSION
 
 @property (nonatomic, copy) void (^onAutoFillNewItemAdded)(NSString* username, NSString* password);
+
 @property (nonatomic, nullable) NSString* autoFillSuggestedTitle;
 @property (nonatomic, nullable) NSString* autoFillSuggestedUrl;
+@property (nonatomic, nullable) NSString* autoFillSuggestedNotes;
 
 #endif
 

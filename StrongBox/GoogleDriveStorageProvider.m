@@ -33,7 +33,8 @@
         _browsableExisting = YES;
         _rootFolderOnly = NO;
         _immediatelyOfferCacheIfOffline = YES; // Avoid long delay if offline
-
+        _supportsConcurrentRequests = NO; // Definitely Not - Keychain error
+        
         _iconsByUrl = [[NSMutableDictionary alloc] init];
         return self;
     }

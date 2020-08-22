@@ -1462,6 +1462,14 @@
 		C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02F0249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
+		C819B4D024EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */; };
+		C819B4D124EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */; };
+		C8400FE324ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8400FE224ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m */; };
+		C8400FE424ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8400FE224ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m */; };
+		C8400FE924ED37C40070849C /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
+		C8400FEA24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		C8400FEB24ED37C40070849C /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
+		C8400FEC24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		C86E907A246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
 		C86E907B246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
 		C86E907C246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
@@ -1531,6 +1539,10 @@
 		C89348C0248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
 		C89348C1248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
 		C89348C2248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */; };
+		C893D4E024EC30E000CEF588 /* GettingStartedInitialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C893D4DF24EC30E000CEF588 /* GettingStartedInitialViewController.m */; };
+		C893D4E124EC30E000CEF588 /* GettingStartedInitialViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C893D4DF24EC30E000CEF588 /* GettingStartedInitialViewController.m */; };
+		C893D4E424EC34C300CEF588 /* TurnOnAutoFillViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C893D4E324EC34C300CEF588 /* TurnOnAutoFillViewController.m */; };
+		C893D4E524EC34C300CEF588 /* TurnOnAutoFillViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C893D4E324EC34C300CEF588 /* TurnOnAutoFillViewController.m */; };
 		C8991AD624B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
 		C8991AD724B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
 		C8991AD824B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8991AD524B0CF7200C2D604 /* StorageProviderReadOptions.m */; };
@@ -1546,10 +1558,6 @@
 		C8A8DBAF2484F68F009C673F /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
 		C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
 		C8A8DBB12484F68F009C673F /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
-		C8AAD4E024E832B300E941BC /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
-		C8AAD4E124E832B400E941BC /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
-		C8AAD4E224E832C100E941BC /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
-		C8AAD4E324E832C200E941BC /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		C8AAD4E424E832FA00E941BC /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C8AAD4E524E832FB00E941BC /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C8B2C6E12493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
@@ -3027,6 +3035,10 @@
 		C8053F8024E1D6E800416031 /* NSDate+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Extensions.m"; path = "model/NSDate+Extensions.m"; sourceTree = "<group>"; };
 		C80E02EB249372D5005A4129 /* ChaCha20ReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ChaCha20ReadStream.h; path = model/ChaCha20ReadStream.h; sourceTree = "<group>"; };
 		C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ChaCha20ReadStream.m; path = model/ChaCha20ReadStream.m; sourceTree = "<group>"; };
+		C819B4CE24EAE0550055CB10 /* AutoFillPreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillPreferencesViewController.h; path = "StrongBox Auto Fill/AutoFillPreferencesViewController.h"; sourceTree = "<group>"; };
+		C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillPreferencesViewController.m; path = "StrongBox Auto Fill/AutoFillPreferencesViewController.m"; sourceTree = "<group>"; };
+		C8400FE124ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AllSetAlreadyHasDatabaseViewController.h; path = StrongBox/AllSetAlreadyHasDatabaseViewController.h; sourceTree = "<group>"; };
+		C8400FE224ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AllSetAlreadyHasDatabaseViewController.m; path = StrongBox/AllSetAlreadyHasDatabaseViewController.m; sourceTree = "<group>"; };
 		C84333372461663200E2E550 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C84333382461663200E2E550 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
 		C84333392461664B00E2E550 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
@@ -3078,6 +3090,10 @@
 		C88F8138245D935A00B0B998 /* NSString+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSString+Extensions.m"; path = "StrongBox/NSString+Extensions.m"; sourceTree = "<group>"; };
 		C89348BD248A4DEF00448A55 /* ExcludedItemsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ExcludedItemsViewController.h; path = StrongBox/ExcludedItemsViewController.h; sourceTree = "<group>"; };
 		C89348BE248A4DEF00448A55 /* ExcludedItemsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ExcludedItemsViewController.m; path = StrongBox/ExcludedItemsViewController.m; sourceTree = "<group>"; };
+		C893D4DE24EC30E000CEF588 /* GettingStartedInitialViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GettingStartedInitialViewController.h; path = StrongBox/GettingStartedInitialViewController.h; sourceTree = "<group>"; };
+		C893D4DF24EC30E000CEF588 /* GettingStartedInitialViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GettingStartedInitialViewController.m; path = StrongBox/GettingStartedInitialViewController.m; sourceTree = "<group>"; };
+		C893D4E224EC34C300CEF588 /* TurnOnAutoFillViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TurnOnAutoFillViewController.h; path = StrongBox/TurnOnAutoFillViewController.h; sourceTree = "<group>"; };
+		C893D4E324EC34C300CEF588 /* TurnOnAutoFillViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TurnOnAutoFillViewController.m; path = StrongBox/TurnOnAutoFillViewController.m; sourceTree = "<group>"; };
 		C8961907246166F1008D4BD1 /* Strongbox-iOS copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox-iOS copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox-iOS copy-Info.plist"; sourceTree = "<group>"; };
 		C8961908246166F1008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
 		C8961909246166F7008D4BD1 /* Strongbox Auto Fill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox Auto Fill copy-Info.plist"; path = "../../../mark/dev/strongbox/Strongbox Auto Fill copy-Info.plist"; sourceTree = "<group>"; };
@@ -3541,6 +3557,10 @@
 			children = (
 				4D4761552437707400E312D9 /* Freemium Onboarding */,
 				4DE7F0D422F89D1D0095F51F /* Welcome.storyboard */,
+				C893D4DE24EC30E000CEF588 /* GettingStartedInitialViewController.h */,
+				C893D4DF24EC30E000CEF588 /* GettingStartedInitialViewController.m */,
+				4DD755ED232F087A00758824 /* WelcomeUseICloudViewController.h */,
+				4DD755EC232F087A00758824 /* WelcomeUseICloudViewController.m */,
 				4D12085222A7A67300139570 /* WelcomeAddDatabaseViewController.h */,
 				4D12085322A7A67300139570 /* WelcomeAddDatabaseViewController.m */,
 				4D12085822A7C26800139570 /* WelcomeCreateDatabaseViewController.h */,
@@ -3549,8 +3569,10 @@
 				4D0AFD2122A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m */,
 				4D0AFD2322A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.h */,
 				4D0AFD2422A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m */,
-				4DD755ED232F087A00758824 /* WelcomeUseICloudViewController.h */,
-				4DD755EC232F087A00758824 /* WelcomeUseICloudViewController.m */,
+				C893D4E224EC34C300CEF588 /* TurnOnAutoFillViewController.h */,
+				C893D4E324EC34C300CEF588 /* TurnOnAutoFillViewController.m */,
+				C8400FE124ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.h */,
+				C8400FE224ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m */,
 			);
 			name = Onboarding;
 			sourceTree = "<group>";
@@ -4867,6 +4889,8 @@
 				4DD7B7EC2173A0F900B4FD98 /* PickCredentialsTableViewController.m */,
 				4DF14F682250F69000B6AF25 /* QuickTypeRecordIdentifier.h */,
 				4DF14F692250F69000B6AF25 /* QuickTypeRecordIdentifier.m */,
+				C819B4CE24EAE0550055CB10 /* AutoFillPreferencesViewController.h */,
+				C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */,
 			);
 			name = "Auto-Fill-Extension";
 			sourceTree = "<group>";
@@ -6180,6 +6204,7 @@
 				4D5F5B76218B39BF00A0739A /* InnerRandomStreamFactory.m in Sources */,
 				4D2F6C1521807C00007931E4 /* XmlStrongboxNodeModelAdaptor.m in Sources */,
 				4D08B5B7234C9613003D1953 /* GCDWebServer.m in Sources */,
+				C893D4E024EC30E000CEF588 /* GettingStartedInitialViewController.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
 				C8BF76E82472E1820080A808 /* DeletedObjects.m in Sources */,
@@ -6223,6 +6248,7 @@
 				C87A8CDF24952CD700356966 /* AutoFillSettings.m in Sources */,
 				4D792A70222EF46A00250086 /* RMAppReceipt.m in Sources */,
 				4DF97F1F21BF101B0090A55E /* DAVSession.m in Sources */,
+				C8400FE324ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m in Sources */,
 				4D2F6C3621807C7E007931E4 /* KeePassGroup.m in Sources */,
 				4D3E149921832C3000A41CA0 /* thread.c in Sources */,
 				4D8C14902074F5F900CE9CAE /* PasswordHistory.m in Sources */,
@@ -6424,6 +6450,7 @@
 				4D6B5056238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */,
 				C8991AD624B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
+				C893D4E424EC34C300CEF588 /* TurnOnAutoFillViewController.m in Sources */,
 				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
 				C8B2C6E72493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */,
@@ -6546,6 +6573,7 @@
 				4DC4E02123488BAA000743C4 /* SortOrderTableViewController.m in Sources */,
 				4DC4E02223488BAA000743C4 /* UIImage+FixOrientation.m in Sources */,
 				4DC4E02323488BAA000743C4 /* DAVRequest.m in Sources */,
+				C893D4E524EC34C300CEF588 /* TurnOnAutoFillViewController.m in Sources */,
 				4DC4E02423488BAA000743C4 /* PinEntryController.m in Sources */,
 				4DC4E02523488BAA000743C4 /* argon2.c in Sources */,
 				C872B72924A64A160042CE02 /* cencode.c in Sources */,
@@ -6613,6 +6641,7 @@
 				C8FA2A1A24C5B0A300445D8B /* ConcurrentMutableDictionary.m in Sources */,
 				4DC4E05023488BAA000743C4 /* NSMutableArray+Extensions.m in Sources */,
 				4DC4E05123488BAA000743C4 /* OneDriveStorageProvider.m in Sources */,
+				C893D4E124EC30E000CEF588 /* GettingStartedInitialViewController.m in Sources */,
 				4DC4E05223488BAA000743C4 /* BackupsBrowserTableViewController.m in Sources */,
 				4DC4E05323488BAA000743C4 /* XmlSerializer.m in Sources */,
 				4DC4E05523488BAA000743C4 /* SelectItemTableViewController.m in Sources */,
@@ -6804,6 +6833,7 @@
 				4DC4E0D523488BAA000743C4 /* KdbxSerializationCommon.m in Sources */,
 				4DC4E0D623488BAA000743C4 /* NodeFileAttachment.m in Sources */,
 				4D9098EE239956BE0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */,
+				C8400FE424ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m in Sources */,
 				4DC4E0D723488BAA000743C4 /* PinsConfigurationController.m in Sources */,
 				4DC4E0D823488BAA000743C4 /* ChaCha20Cipher.m in Sources */,
 				4D160A7D2452F2B80097C730 /* BrowseTableViewCellHelper.m in Sources */,
@@ -6900,7 +6930,6 @@
 				4DC4E17723488BAE000743C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4DC4E17823488BAE000743C4 /* ItemMetadataEntry.m in Sources */,
 				4DC4E17923488BAE000743C4 /* Meta.m in Sources */,
-				C8AAD4E124E832B400E941BC /* AppleICloudProvider.m in Sources */,
 				4DC4E17A23488BAE000743C4 /* EditPasswordTableViewCell.m in Sources */,
 				4DC4E17B23488BAE000743C4 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4DC4E17C23488BAE000743C4 /* History.m in Sources */,
@@ -6986,7 +7015,6 @@
 				4DC4E1B723488BAE000743C4 /* V3BinariesList.m in Sources */,
 				C8DDE3AC24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4DC4E1B823488BAE000743C4 /* BrowseItemCell.m in Sources */,
-				C8AAD4E324E832C200E941BC /* iCloudSafesCoordinator.m in Sources */,
 				C872B73324A64B7F0042CE02 /* Base64DecodeOutputStream.m in Sources */,
 				4DC4E1B923488BAE000743C4 /* DAVResponseItem.m in Sources */,
 				4DC4E1BA23488BAE000743C4 /* blake2b.c in Sources */,
@@ -7072,6 +7100,7 @@
 				4D526AA924407C8F00B0B700 /* Constants.swift in Sources */,
 				4DC4E20123488BAE000743C4 /* NSDateRFC1123.m in Sources */,
 				4DC4E20223488BAE000743C4 /* PinEntryController.m in Sources */,
+				C8400FEC24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */,
 				4DC4E20323488BAE000743C4 /* DAVCredentials.m in Sources */,
 				4DC4E20423488BAE000743C4 /* NMSFTP.m in Sources */,
 				4DC4E20523488BAE000743C4 /* AttachmentsRationalizer.m in Sources */,
@@ -7115,6 +7144,7 @@
 				4DC4E22123488BAE000743C4 /* PasswordGenerationConfig.m in Sources */,
 				4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */,
 				4D7228AE23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
+				C8400FEB24ED37C40070849C /* AppleICloudProvider.m in Sources */,
 				4DC4E22323488BAE000743C4 /* LocalDeviceStorageProvider.m in Sources */,
 				4DC4E22523488BAE000743C4 /* KeePassFile.m in Sources */,
 				4DC4E22623488BAE000743C4 /* TotpCell.m in Sources */,
@@ -7140,6 +7170,7 @@
 				4D6B5051238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC4E23823488BAE000743C4 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D160ABC24535D1C0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
+				C819B4D124EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */,
 				C8A2204B249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5059238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4DC4E23A23488BAE000743C4 /* VariantObject.m in Sources */,
@@ -7158,7 +7189,6 @@
 				4DAE98AD2270B4E200A811C4 /* GenericKeyValueTableViewCell.m in Sources */,
 				4D33FA3B2287210C006C31B2 /* ItemMetadataEntry.m in Sources */,
 				4D47670C217905AB00C4358F /* Meta.m in Sources */,
-				C8AAD4E024E832B300E941BC /* AppleICloudProvider.m in Sources */,
 				4D33FA402287232B006C31B2 /* EditPasswordTableViewCell.m in Sources */,
 				4DC66F3A229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D2962B4223173FC0082897D /* History.m in Sources */,
@@ -7244,7 +7274,6 @@
 				4D74B92E218C438800FC369E /* V3BinariesList.m in Sources */,
 				C8DDE3AA24DEE79100873392 /* DatabaseSyncOperationalData.m in Sources */,
 				4D4554AF2285C0BB0015C236 /* BrowseItemCell.m in Sources */,
-				C8AAD4E224E832C100E941BC /* iCloudSafesCoordinator.m in Sources */,
 				C872B73124A64B7F0042CE02 /* Base64DecodeOutputStream.m in Sources */,
 				4DF972CD21C01ABF00F384C9 /* DAVResponseItem.m in Sources */,
 				4D3E149F21832CC700A41CA0 /* blake2b.c in Sources */,
@@ -7330,6 +7359,7 @@
 				4D526AA724407C8F00B0B700 /* Constants.swift in Sources */,
 				4DF972D021C01AD500F384C9 /* NSDateRFC1123.m in Sources */,
 				4D0835E12284780400CA7405 /* PinEntryController.m in Sources */,
+				C8400FEA24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */,
 				4DF972C821C01ABF00F384C9 /* DAVCredentials.m in Sources */,
 				4D326E8822302BED00DCD8C7 /* NMSFTP.m in Sources */,
 				4DD696A8218F38EC0082DC08 /* AttachmentsRationalizer.m in Sources */,
@@ -7373,6 +7403,7 @@
 				4D216F8022CBCED4000954D0 /* PasswordGenerationConfig.m in Sources */,
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
 				4D7228AC23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
+				C8400FE924ED37C40070849C /* AppleICloudProvider.m in Sources */,
 				4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */,
 				4D2F6C3521807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D33FA47228729A0006C31B2 /* TotpCell.m in Sources */,
@@ -7398,6 +7429,7 @@
 				4D6B504F238BBA1F00DF2F88 /* SVRadialGradientLayer.m in Sources */,
 				4DC66F3E229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D160AB824535D1A0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
+				C819B4D024EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */,
 				C8A22049249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5057238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				4D3AC320219074C40010CFCD /* VariantObject.m in Sources */,
@@ -8251,7 +8283,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8341,7 +8373,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8430,7 +8462,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8512,7 +8544,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8597,7 +8629,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8670,7 +8702,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8741,7 +8773,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8822,7 +8854,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2952;
+				CURRENT_PROJECT_VERSION = 2953;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

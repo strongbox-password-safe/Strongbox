@@ -298,7 +298,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 #endif
     
     NSString* notes = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
-    
+
+#ifdef IS_APP_EXTENSION
+    if(self.autoFillSuggestedNotes.length) {
+        notes = self.autoFillSuggestedNotes;
+    }
+#endif
+
     NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
     
     return [[Node alloc] initAsRecord:title parent:self.parentGroup fields:fields uuid:nil];
@@ -755,8 +761,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                     [self onSetTotp];
                 }
             }
-            
-            if( indexPath.row >= kSimpleRowCount) { // Custom Field
+            else if( indexPath.row >= kSimpleRowCount ) { // Custom Field
                 NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
                 CustomFieldViewModel* customField = virtualRow == self.model.customFields.count ? nil : self.model.customFields[virtualRow];
                 [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:customField];
@@ -953,7 +958,12 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSUInteger oldIdx = -1;
     if (fieldToEdit) { // Remove old existing one...
         oldIdx = [self.model.customFields indexOfObject:fieldToEdit];
-        [self.model removeCustomFieldAtIndex:oldIdx];
+        if (oldIdx != NSNotFound) { // MMcG: One report of this and haven't been able to determine root cause. 17-Aug-2020
+            [self.model removeCustomFieldAtIndex:oldIdx];
+        }
+        else {
+            oldIdx = -1;
+        }
     }
     
     NSUInteger idx = [self.model insertCustomField:field];

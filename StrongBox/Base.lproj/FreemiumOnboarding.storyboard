@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="CrC-m5-whD">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="CrC-m5-whD">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
@@ -257,7 +257,7 @@
                                 <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Bbf-VI-ktD" userLabel="Container View">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="435"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Try Pro" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T0z-9s-FBC" userLabel="Heading">
                                                 <rect key="frame" x="20" y="39" width="374" height="41"/>
@@ -271,22 +271,6 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="95G-Rg-UOC">
-                                                <rect key="frame" x="82" y="266" width="250" height="55"/>
-                                                <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="height" constant="55" id="nfr-gX-4q0"/>
-                                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="oTP-Np-YM8"/>
-                                                </constraints>
-                                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
-                                                <state key="normal" title="Start Trial">
-                                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="onStartTrial:" destination="Jyh-1Y-C6S" eventType="touchUpInside" id="oKq-Ur-JIv"/>
-                                                    <action selector="onTryPro:" destination="poW-vO-HgJ" eventType="touchUpInside" id="0J0-DR-lZw"/>
-                                                </connections>
-                                            </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="746" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="quT-B3-Nd9" userLabel="Message">
                                                 <rect key="frame" x="20" y="154" width="374" height="86.5"/>
                                                 <string key="text">The free trial works through a one-time &amp; completely free In App Purchase. Tap the button below and follow the prompts to begin your Free Trial...</string>
@@ -294,19 +278,8 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hHR-jK-WBQ">
-                                                <rect key="frame" x="178.5" y="383" width="57" height="32"/>
-                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
-                                                <state key="normal" title="Dismiss">
-                                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                </state>
-                                                <connections>
-                                                    <action selector="onDismiss:" destination="Jyh-1Y-C6S" eventType="touchUpInside" id="dwI-kf-maW"/>
-                                                    <action selector="onDismiss:" destination="poW-vO-HgJ" eventType="touchUpInside" id="lGb-BT-nd8"/>
-                                                </connections>
-                                            </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="PMg-nQ-pIC">
-                                                <rect key="frame" x="139" y="341" width="136" height="32"/>
+                                                <rect key="frame" x="139" y="385" width="136" height="32"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                                 <state key="normal" title="Restore Purchases">
                                                     <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -316,24 +289,105 @@
                                                     <action selector="onRestorePurchases:" destination="Jyh-1Y-C6S" eventType="touchUpInside" id="Phi-qt-Clq"/>
                                                 </connections>
                                             </button>
+                                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="D65-CF-Iii" userLabel="Start Free Trial">
+                                                <rect key="frame" x="82" y="260.5" width="250" height="104.5"/>
+                                                <subviews>
+                                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="WqT-BM-TfO">
+                                                        <rect key="frame" x="24.5" y="12" width="201" height="80.5"/>
+                                                        <subviews>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Start Trial" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fdM-km-scK">
+                                                                <rect key="frame" x="44" y="0.0" width="113.5" height="33.5"/>
+                                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;no localization needed&gt;" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RQJ-ZV-Cgm">
+                                                                <rect key="frame" x="0.0" y="39.5" width="201" height="20.5"/>
+                                                                <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                                                <color key="textColor" red="1" green="1" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="&lt;no localization needed&gt;" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="R7X-dU-3k3">
+                                                                <rect key="frame" x="29" y="66" width="143" height="14.5"/>
+                                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                                <nil key="highlightedColor"/>
+                                                            </label>
+                                                        </subviews>
+                                                    </stackView>
+                                                </subviews>
+                                                <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="width" constant="250" id="3h3-2p-NX0"/>
+                                                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="WqT-BM-TfO" secondAttribute="bottom" id="EUL-ll-mug"/>
+                                                    <constraint firstItem="WqT-BM-TfO" firstAttribute="centerX" secondItem="D65-CF-Iii" secondAttribute="centerX" id="LQl-ZE-64e"/>
+                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="WqT-BM-TfO" secondAttribute="trailing" constant="20" symbolic="YES" id="RtQ-4G-bao"/>
+                                                    <constraint firstItem="WqT-BM-TfO" firstAttribute="top" relation="greaterThanOrEqual" secondItem="D65-CF-Iii" secondAttribute="top" id="grU-X0-fpr"/>
+                                                    <constraint firstAttribute="bottom" secondItem="WqT-BM-TfO" secondAttribute="bottom" constant="12" id="hU2-ZY-4qy"/>
+                                                    <constraint firstItem="WqT-BM-TfO" firstAttribute="centerY" secondItem="D65-CF-Iii" secondAttribute="centerY" id="mBn-YZ-nJF"/>
+                                                    <constraint firstItem="WqT-BM-TfO" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="D65-CF-Iii" secondAttribute="leading" constant="20" symbolic="YES" id="vZ5-TF-yun"/>
+                                                    <constraint firstItem="WqT-BM-TfO" firstAttribute="top" secondItem="D65-CF-Iii" secondAttribute="top" constant="12" id="zOA-mD-Xnw"/>
+                                                </constraints>
+                                            </view>
+                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hHR-jK-WBQ">
+                                                <rect key="frame" x="178.5" y="427" width="57" height="32"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
+                                                <state key="normal" title="Dismiss">
+                                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </state>
+                                                <connections>
+                                                    <action selector="onDismiss:" destination="Jyh-1Y-C6S" eventType="touchUpInside" id="dwI-kf-maW"/>
+                                                    <action selector="onDismiss:" destination="poW-vO-HgJ" eventType="touchUpInside" id="lGb-BT-nd8"/>
+                                                </connections>
+                                            </button>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Terms &amp; Conditions" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="opG-01-x0X">
+                                                <rect key="frame" x="151.5" y="649.5" width="111" height="14.5"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
+                                                <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6UF-ed-0bv">
+                                                <rect key="frame" x="8" y="666" width="398" height="150"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="150" id="Eg0-fk-UVt"/>
+                                                </constraints>
+                                                <string key="text">• Free Trial does not use or initiate an Auto-Renewable Subscription • A subscription is not required to upgrade Strongbox. Please see Upgrade screen for other options including a once off Lifetime purchase • Strongbox does offer Auto-Renewable Subscriptions as an Upgrade option. The terms and conditions for those are presented below. • Subscriptions are auto renewable with recurring billing. Cancel anytime. • Payment will be charged to iTunes Account at confirmation of purchase
+• Subscription automatically renews unless auto-renew is turned off at least 24-hours before the end of the current period
+• Account will be charged for renewal within 24-hours prior to the end of the current period, and identify the cost of the renewal
+• Any unused portion of a free trial period, if offered, will be forfeited when the user purchases a subscription where applicable
+• Subscriptions may be managed by the user and auto-renewal may be turned off by going to the user's Account Settings after purchase
+• Privacy Policy may be found here:  https://strongboxsafe.com/privacy-policy
+• Terms of Use may be found here:  https://strongboxsafe.com/terms</string>
+                                                <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleCaption2"/>
+                                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                <dataDetectorType key="dataDetectorTypes" link="YES"/>
+                                            </textView>
                                         </subviews>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <constraints>
                                             <constraint firstAttribute="trailing" secondItem="W8E-eK-8cI" secondAttribute="trailing" constant="20" id="32Y-Po-eFW"/>
+                                            <constraint firstItem="6UF-ed-0bv" firstAttribute="top" secondItem="opG-01-x0X" secondAttribute="bottom" constant="2" id="3Q3-dV-BAz"/>
                                             <constraint firstItem="quT-B3-Nd9" firstAttribute="top" secondItem="W8E-eK-8cI" secondAttribute="bottom" constant="23.5" id="4wr-NP-inH"/>
-                                            <constraint firstItem="95G-Rg-UOC" firstAttribute="centerX" secondItem="Bbf-VI-ktD" secondAttribute="centerX" id="5IL-gT-vUy"/>
-                                            <constraint firstItem="95G-Rg-UOC" firstAttribute="top" secondItem="quT-B3-Nd9" secondAttribute="bottom" constant="25.5" id="8xt-AL-Wbi"/>
+                                            <constraint firstItem="6UF-ed-0bv" firstAttribute="leading" secondItem="Bbf-VI-ktD" secondAttribute="leading" constant="8" id="58b-0c-sly"/>
                                             <constraint firstItem="T0z-9s-FBC" firstAttribute="leading" secondItem="Bbf-VI-ktD" secondAttribute="leading" constant="20" id="EXl-vc-UPV"/>
                                             <constraint firstItem="W8E-eK-8cI" firstAttribute="top" secondItem="T0z-9s-FBC" secondAttribute="bottom" constant="8" id="KP4-tL-6k7"/>
                                             <constraint firstItem="PMg-nQ-pIC" firstAttribute="centerX" secondItem="Bbf-VI-ktD" secondAttribute="centerX" id="KQh-Bl-c2s"/>
                                             <constraint firstAttribute="trailing" secondItem="quT-B3-Nd9" secondAttribute="trailing" constant="20" id="Md3-uh-X0k"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="opG-01-x0X" secondAttribute="trailing" constant="20" symbolic="YES" id="OCW-bt-frn"/>
                                             <constraint firstItem="hHR-jK-WBQ" firstAttribute="centerX" secondItem="Bbf-VI-ktD" secondAttribute="centerX" id="Opo-2j-s0w"/>
                                             <constraint firstItem="hHR-jK-WBQ" firstAttribute="top" secondItem="PMg-nQ-pIC" secondAttribute="bottom" constant="10" id="Oyr-0P-VcI"/>
-                                            <constraint firstAttribute="bottom" secondItem="hHR-jK-WBQ" secondAttribute="bottom" constant="20" id="QD9-C6-cD1"/>
+                                            <constraint firstItem="PMg-nQ-pIC" firstAttribute="top" secondItem="D65-CF-Iii" secondAttribute="bottom" constant="20" id="QQO-Pi-Nv5"/>
                                             <constraint firstItem="W8E-eK-8cI" firstAttribute="leading" secondItem="Bbf-VI-ktD" secondAttribute="leading" constant="20" id="UXB-yc-g9S"/>
-                                            <constraint firstItem="PMg-nQ-pIC" firstAttribute="top" secondItem="95G-Rg-UOC" secondAttribute="bottom" constant="20" id="ZHu-d4-xCs"/>
+                                            <constraint firstItem="D65-CF-Iii" firstAttribute="top" secondItem="quT-B3-Nd9" secondAttribute="bottom" constant="20" id="Xnt-Si-zLn"/>
+                                            <constraint firstAttribute="bottom" secondItem="6UF-ed-0bv" secondAttribute="bottom" constant="2" id="aLN-J4-QoH"/>
                                             <constraint firstAttribute="trailing" secondItem="T0z-9s-FBC" secondAttribute="trailing" constant="20" id="coF-JI-2Fa"/>
+                                            <constraint firstItem="D65-CF-Iii" firstAttribute="centerX" secondItem="Bbf-VI-ktD" secondAttribute="centerX" id="dYQ-T8-a75"/>
+                                            <constraint firstAttribute="trailing" secondItem="6UF-ed-0bv" secondAttribute="trailing" constant="8" id="g7K-M7-x7R"/>
+                                            <constraint firstItem="opG-01-x0X" firstAttribute="centerX" secondItem="Bbf-VI-ktD" secondAttribute="centerX" id="kQW-pU-SOk"/>
                                             <constraint firstItem="quT-B3-Nd9" firstAttribute="leading" secondItem="Bbf-VI-ktD" secondAttribute="leading" constant="20" id="lQV-vC-RNA"/>
+                                            <constraint firstItem="opG-01-x0X" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Bbf-VI-ktD" secondAttribute="leading" constant="20" symbolic="YES" id="p5G-ve-wxj"/>
+                                            <constraint firstItem="opG-01-x0X" firstAttribute="top" relation="greaterThanOrEqual" secondItem="hHR-jK-WBQ" secondAttribute="bottom" id="siQ-85-8Mk"/>
                                             <constraint firstItem="T0z-9s-FBC" firstAttribute="top" secondItem="Bbf-VI-ktD" secondAttribute="top" constant="39" id="wVz-Ym-L3c"/>
                                         </constraints>
                                     </view>
@@ -352,6 +406,7 @@
                             <constraint firstItem="LkL-7I-HZ8" firstAttribute="top" secondItem="30T-wp-vMT" secondAttribute="top" id="62v-bK-5sq"/>
                             <constraint firstItem="30T-wp-vMT" firstAttribute="bottom" secondItem="LkL-7I-HZ8" secondAttribute="bottom" id="GDi-TC-cZf"/>
                             <constraint firstItem="Bbf-VI-ktD" firstAttribute="width" secondItem="BcP-Sn-scn" secondAttribute="width" id="aXy-C0-hBI"/>
+                            <constraint firstItem="30T-wp-vMT" firstAttribute="bottom" secondItem="Bbf-VI-ktD" secondAttribute="bottom" id="bBD-DR-7lE"/>
                             <constraint firstItem="30T-wp-vMT" firstAttribute="trailing" secondItem="LkL-7I-HZ8" secondAttribute="trailing" id="epH-ei-Z6d"/>
                             <constraint firstItem="LkL-7I-HZ8" firstAttribute="leading" secondItem="30T-wp-vMT" secondAttribute="leading" id="t5L-hn-8kZ"/>
                         </constraints>
@@ -360,7 +415,11 @@
                     <navigationItem key="navigationItem" id="heN-R6-rwq"/>
                     <connections>
                         <outlet property="buttonRestorePurchases" destination="PMg-nQ-pIC" id="fBA-RK-AEW"/>
-                        <outlet property="buttonStartTrial" destination="95G-Rg-UOC" id="9bC-or-cT7"/>
+                        <outlet property="startButton" destination="D65-CF-Iii" id="ejO-qD-SQm"/>
+                        <outlet property="startButtonL1" destination="fdM-km-scK" id="FQ4-9R-xKL"/>
+                        <outlet property="startButtonL2" destination="RQJ-ZV-Cgm" id="mOF-Ny-5e7"/>
+                        <outlet property="startButtonL3" destination="R7X-dU-3k3" id="asV-wX-WRq"/>
+                        <outlet property="textViewTC" destination="6UF-ed-0bv" id="YzX-Wo-8dM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="MFL-07-V0Q" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString*)getSupportEmailDebugString;
 + (NSString*)getAboutDebugString;
++ (NSString*)getCrashEmailDebugString;
 
 @end
 

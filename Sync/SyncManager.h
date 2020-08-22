@@ -23,6 +23,7 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 - (SyncStatus*)getSyncStatus:(SafeMetaData*)database;
 
 - (void)backgroundSyncAll;
+- (void)backgroundSyncOutstandingUpdates;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;
 - (void)sync:(SafeMetaData*)database interactiveVC:(UIViewController*)interactiveVC join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error;
@@ -33,7 +34,10 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 - (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database;
 
 - (void)startMonitoringDocumentsDirectory;
+
+#ifndef IS_APP_EXTENSION
 - (BOOL)toggleLocalDatabaseFilesVisibility:(SafeMetaData*)metadata error:(NSError**)error;
+#endif
 
 - (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData*)database;
 

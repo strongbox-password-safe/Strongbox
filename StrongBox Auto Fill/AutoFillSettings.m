@@ -11,6 +11,9 @@
 static NSString* const kAutoFillExitedCleanly = @"autoFillExitedCleanly";
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
 static NSString* const KDontNotifyToSwitchToMainAppForSync = @"dontNotifyToSwitchToMainAppForSync";
+static NSString* const kStoreAutoFillServiceIdentifiersInNotes = @"storeAutoFillServiceIdentifiersInNotes";
+static NSString* const kUseFullUrlAsURLSuggestion = @"useFullUrlAsURLSuggestion";
+static NSString* const kAutoProceedOnSingleMatch = @"autoProceedOnSingleMatch";
 
 @implementation AutoFillSettings
 
@@ -26,6 +29,30 @@ static NSString* const KDontNotifyToSwitchToMainAppForSync = @"dontNotifyToSwitc
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)useFullUrlAsURLSuggestion {
+    return [self getBool:kUseFullUrlAsURLSuggestion];
+}
+
+- (void)setUseFullUrlAsURLSuggestion:(BOOL)useFullUrlAsURLSuggestion {
+    [self setBool:kUseFullUrlAsURLSuggestion value:useFullUrlAsURLSuggestion];
+}
+
+- (BOOL)autoProceedOnSingleMatch {
+    return [self getBool:kAutoProceedOnSingleMatch];
+}
+
+- (void)setAutoProceedOnSingleMatch:(BOOL)autoProceedOnSingleMatch {
+    return [self setBool:kAutoProceedOnSingleMatch value:autoProceedOnSingleMatch];
+}
+
+- (BOOL)storeAutoFillServiceIdentifiersInNotes {
+    return [self getBool:kStoreAutoFillServiceIdentifiersInNotes];
+}
+
+- (void)setStoreAutoFillServiceIdentifiersInNotes:(BOOL)storeAutoFillServiceIdentifiersInNotes {
+    [self setBool:kStoreAutoFillServiceIdentifiersInNotes value:storeAutoFillServiceIdentifiersInNotes];
+}
 
 - (BOOL)autoFillExitedCleanly {
     return [self getBool:kAutoFillExitedCleanly fallback:YES];

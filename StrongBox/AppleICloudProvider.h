@@ -28,8 +28,8 @@
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 @property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline;
+@property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 
-- (void)delete:(SafeMetaData*)safeMetaData
-    completion:(void (^)(NSError *error))completion;
+- (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(NSError *error))completion;
 
 @end

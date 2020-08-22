@@ -10,12 +10,17 @@
 #import "ProUpgradeIAPManager.h"
 #import "SVProgressHUD.h"
 #import "Alerts.h"
-//#import "Settings.h"
 #import "SharedAppAndAutoFillSettings.h"
+
 @interface FreemiumStartFreeTrialViewController ()
 
-@property (weak, nonatomic) IBOutlet UIButton *buttonStartTrial;
 @property (weak, nonatomic) IBOutlet UIButton *buttonRestorePurchases;
+
+@property (weak, nonatomic) IBOutlet UIView *startButton;
+@property (weak, nonatomic) IBOutlet UILabel *startButtonL1;
+@property (weak, nonatomic) IBOutlet UILabel *startButtonL2;
+@property (weak, nonatomic) IBOutlet UILabel *startButtonL3;
+@property (weak, nonatomic) IBOutlet UITextView *textViewTC;
 
 @end
 
@@ -45,19 +50,38 @@
     [self setupUi];
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    [self.textViewTC setContentOffset:CGPointZero animated:NO];
+}
+
 - (void)setupUi {
-    self.buttonStartTrial.layer.cornerRadius = 5.0f;
+    UITapGestureRecognizer *trial = [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                                            action:@selector(onStartTrial:)];
+    [self.startButton addGestureRecognizer:trial];
+
+    NSString* loc2 = NSLocalizedString(@"upgrade_vc_start_your_free_trial_price_free", @"Free");
+    NSString* loc3 = NSLocalizedString(@"onboarding_vc_start_your_free_trial_subtitle_no_subscription", @"No Subscription Required");
+
+    self.startButton.layer.cornerRadius = 5.0f;
+    self.startButtonL2.text = loc2;
+    self.startButtonL3.text = loc3;
 }
 
 - (IBAction)onStartTrial:(id)sender {
     self.buttonRestorePurchases.enabled = NO;
-    self.buttonStartTrial.enabled = NO;
+    self.startButton.userInteractionEnabled = NO;
+    self.startButton.backgroundColor = UIColor.systemGrayColor;
+    
     [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"Loading...")];
     
     [ProUpgradeIAPManager.sharedInstance startFreeTrial:^(NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
-            self.buttonStartTrial.enabled = YES;
+            self.startButton.userInteractionEnabled = YES;
+            self.startButton.backgroundColor = UIColor.systemBlueColor;
+            
             NSLog(@"Purchases done... [%@]", error);
 
             if (!error) {
@@ -72,7 +96,7 @@
 
 - (IBAction)onRestorePurchases:(id)sender {
     self.buttonRestorePurchases.enabled = NO;
-    self.buttonStartTrial.enabled = NO;
+    self.startButton.userInteractionEnabled = NO;
     [SVProgressHUD showWithStatus:NSLocalizedString(@"upgrade_vc_progress_restoring", @"Restoring...")];
     
     BOOL optedInToFreeTrial = SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial;
@@ -80,7 +104,7 @@
     [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.buttonRestorePurchases.enabled = YES;
-            self.buttonStartTrial.enabled = YES;
+            self.startButton.userInteractionEnabled = YES;
             [SVProgressHUD dismiss];
             
             if(error) {

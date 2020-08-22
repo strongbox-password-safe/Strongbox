@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 @property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline;
+@property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 
 @property WebDAVSessionConfiguration* unitTestSessionConfiguration;
 @property BOOL maintainSessionForListings;

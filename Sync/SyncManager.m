@@ -45,6 +45,14 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     return sharedInstance;
 }
 
+- (void)backgroundSyncOutstandingUpdates {
+    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
+        if (database.outstandingUpdateId) {
+            [self backgroundSyncDatabase:database];
+        }
+    }
+}
+
 - (void)backgroundSyncAll {
     for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
         [self backgroundSyncDatabase:database];

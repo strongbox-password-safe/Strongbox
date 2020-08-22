@@ -15,8 +15,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 @property BOOL autoFillExitedCleanly;
+
 @property BOOL haveWarnedAboutAutoFillCrash;
 @property BOOL dontNotifyToSwitchToMainAppForSync;
+@property BOOL storeAutoFillServiceIdentifiersInNotes;
+@property BOOL useFullUrlAsURLSuggestion;
+@property BOOL autoProceedOnSingleMatch;
 
 @end
 

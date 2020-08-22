@@ -3363,3 +3363,6 @@
 
 /* Don't tell me again */
 "autofill_add_entry_sync_required_option_dont_tell_again" = "Don't tell me again";
+
+/* No Subscription Required */
+"onboarding_vc_start_your_free_trial_subtitle_no_subscription" = "No Subscription Required";

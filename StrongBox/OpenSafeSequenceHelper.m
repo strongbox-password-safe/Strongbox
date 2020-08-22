@@ -342,10 +342,8 @@
             }
         }];
 
-        if(!ret) {
-            [Alerts info:self.viewController
-                   title:@"iOS13 Biometric Bug"
-                 message:@"Please try shaking your device to make the Biometric dialog appear. This is expected to be fixed in iOS13.2. Tap OK now and then shake.\nThanks,\n-Mark"];
+        if(!ret) { // No longer an issue - just log
+            NSLog(@"iOS13 Biometric Bug? Please try shaking your device to make the Biometric dialog appear. This is expected to be fixed in iOS13.2. Tap OK now and then shake.");
         }
     }
 }

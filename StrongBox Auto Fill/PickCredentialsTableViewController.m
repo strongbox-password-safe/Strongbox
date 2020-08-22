@@ -21,6 +21,7 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "SafeStorageProviderFactory.h"
 #import "AutoFillSettings.h"
+#import "NSString+Extensions.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -126,6 +127,17 @@
     }
     
     [self smartInitializeSearch];
+    
+    // Auto Proceed...
+    
+    if (AutoFillSettings.sharedInstance.autoProceedOnSingleMatch) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            NSArray<Node *> *items = [self getDataSource];
+            if (self.searchController.isActive && items.count == 1) {
+                [self proceedWithItem:items.firstObject];
+            }
+        });
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -196,38 +208,42 @@
     ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
     if(serviceId) {
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
-            NSURL* url = [NSURL URLWithString:serviceId.identifier];
+            NSURL* url = serviceId.identifier.urlExtendedParse;
             
             //NSLog(@"URL: %@", url);
             
             // Direct URL Match?
             
-            NSArray* items = [self getMatchingItems:url.absoluteString scope:kSearchScopeUrl];
-            if(items.count) {
-                [self.searchController.searchBar setText:url.absoluteString];
-                [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
-                return;
+            if (url) {
+                NSArray* items = [self getMatchingItems:url.absoluteString scope:kSearchScopeUrl];
+                if(items.count) {
+                    [self.searchController.searchBar setText:url.absoluteString];
+                    [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
+                    return;
+                }
+                else {
+                    NSLog(@"No matches for URL: %@", url.absoluteString);
+                }
+                
+                // Host URL Match?
+                
+                items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
+                if(items.count) {
+                    [self.searchController.searchBar setText:url.host];
+                    [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
+                    return;
+                }
+                else {
+                    NSLog(@"No matches for URL: %@", url.host);
+                }
+
+                
+                NSString* domain = getDomain(url.host);
+                [self smartInitializeSearchFromDomain:domain];
             }
             else {
-                NSLog(@"No matches for URL: %@", url.absoluteString);
+                NSLog(@"No matches for URL: %@", url);
             }
-            
-            // Host URL Match?
-            
-            items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
-            if(items.count) {
-                [self.searchController.searchBar setText:url.host];
-                [self.searchController.searchBar setSelectedScopeButtonIndex:kSearchScopeUrl];
-                return;
-            }
-            else {
-                NSLog(@"No matches for URL: %@", url.host);
-            }
-
-            
-            NSString* domain = getDomain(url.host);
-            [self smartInitializeSearchFromDomain:domain];
-
         }
         else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
             [self smartInitializeSearchFromDomain:serviceId.identifier];
@@ -319,43 +335,62 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    NSString* suggestedTitle = nil;
-    NSString* suggestedUrl = nil;
-    
-    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
-    if(serviceId) {
-        if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
-            NSURL* url = [NSURL URLWithString:serviceId.identifier];
-            if(url && url.host.length) {
-                NSString* foo = getCompanyOrOrganisationNameFromDomain(url.host);
-                suggestedTitle = foo.length ? [foo capitalizedString] : foo;
-                suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
+    if ([segue.identifier isEqualToString:@"segueToAddNew"]) {
+        NSString* suggestedTitle = nil;
+        NSString* suggestedUrl = nil;
+        NSString* suggestedNotes = nil;
+        
+        NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
+
+        if (AutoFillSettings.sharedInstance.storeAutoFillServiceIdentifiersInNotes) {
+            suggestedNotes = [[serviceIdentifiers map:^id _Nonnull(ASCredentialServiceIdentifier * _Nonnull obj, NSUInteger idx) {
+                return obj.identifier;
+            }] componentsJoinedByString:@"\n\n"];
+        }
+        
+        ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+        if(serviceId) {
+            if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
+                NSURL* url = serviceId.identifier.urlExtendedParse;
+                if(url && url.host.length) {
+                    NSString* bar = getDomain(url.host);
+                    NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
+                    suggestedTitle = foo.length ? [foo capitalizedString] : foo;
+                    
+                    if (AutoFillSettings.sharedInstance.useFullUrlAsURLSuggestion) {
+                        suggestedUrl = url.absoluteString;
+                    }
+                    else {
+                        suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
+                    }
+                }
             }
-            else {
+            else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
+                NSString* bar = getDomain(serviceId.identifier);
+                NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
+                suggestedTitle = foo.length ? [foo capitalizedString] : foo;
                 suggestedUrl = serviceId.identifier;
             }
         }
-        else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
-            NSString* foo = getCompanyOrOrganisationNameFromDomain(serviceId.identifier);
-            suggestedTitle = foo.length ? [foo capitalizedString] : foo;
-            suggestedUrl = serviceId.identifier;
-        }
-    }
 
-    //UINavigationController* nav = segue.destinationViewController;
-    ItemDetailsViewController* vc = (ItemDetailsViewController*)segue.destinationViewController;
-    
-    vc.createNewItem = YES;
-    vc.item = nil;
-    vc.parentGroup = self.model.database.rootGroup;
-    vc.readOnly = NO;
-    vc.databaseModel = self.model;
-    vc.onAutoFillNewItemAdded = ^(NSString * _Nonnull username, NSString * _Nonnull password) {
-        [self notifyUserToSwitchToAppAfterUpdate:username password:password];
-    };
-    vc.autoFillSuggestedUrl = suggestedUrl;
-    vc.autoFillSuggestedTitle = suggestedTitle;
+        //UINavigationController* nav = segue.destinationViewController;
+        ItemDetailsViewController* vc = (ItemDetailsViewController*)segue.destinationViewController;
+        
+        vc.createNewItem = YES;
+        vc.item = nil;
+        vc.parentGroup = self.model.database.rootGroup;
+        vc.readOnly = NO;
+        vc.databaseModel = self.model;
+        vc.onAutoFillNewItemAdded = ^(NSString * _Nonnull username, NSString * _Nonnull password) {
+            [self notifyUserToSwitchToAppAfterUpdate:username password:password];
+        };
+        vc.autoFillSuggestedUrl = suggestedUrl;
+        vc.autoFillSuggestedTitle = suggestedTitle;
+        vc.autoFillSuggestedNotes = suggestedNotes;
+    }
+    else {
+        
+    }
 }
 
 - (void)notifyUserToSwitchToAppAfterUpdate:(NSString*)username password:(NSString*)password {
@@ -550,20 +585,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     }
     Node *item = arr[indexPath.row];
     if(item) {
-        if(item.fields.otpToken) {
-            NSString* value = item.fields.otpToken.password;
-            if (value.length) {
-                [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
-                NSLog(@"Copied TOTP to Pasteboard...");
-            }
-        }
-        
-        NSString* user = [self dereference:item.fields.username node:item];
-        NSString* password = [self dereference:item.fields.password node:item];
-        
-        //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, record);
-        
-        [self.rootViewController exitWithCredential:user password:password];
+        [self proceedWithItem:item];
     }
     else {
         NSLog(@"WARN: DidSelectRow with no Record?!");
@@ -582,6 +604,23 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     NSLog(@"Fast Username Copy on %@", item.title);
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)proceedWithItem:(Node*)item {
+    if(item.fields.otpToken) {
+        NSString* value = item.fields.otpToken.password;
+        if (value.length) {
+            [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
+            NSLog(@"Copied TOTP to Pasteboard...");
+        }
+    }
+    
+    NSString* user = [self dereference:item.fields.username node:item];
+    NSString* password = [self dereference:item.fields.password node:item];
+    
+    //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, record);
+    
+    [self.rootViewController exitWithCredential:user password:password];
 }
 
 @end

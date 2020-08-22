@@ -1,9 +1,9 @@
 //
-//  WelcomeUseICloudViewController.h
-//  Strongbox-iOS
+//  TurnOnAutoFillViewController.h
+//  Strongbox
 //
-//  Created by Mark on 17/07/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Created by Strongbox on 18/08/2020.
+//  Copyright © 2020 Mark McGuill. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -11,7 +11,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface WelcomeUseICloudViewController : UIViewController
+@interface TurnOnAutoFillViewController : UIViewController
 
 @property (nonatomic, copy) void (^onDone)(BOOL addExisting, SafeMetaData* _Nullable databaseToOpen);
 

@@ -50,6 +50,8 @@
 #import "SyncStatus.h"
 #import "SyncLogViewController.h"
 #import "NSDate+Extensions.h"
+#import "DebugHelper.h"
+#import "GettingStartedInitialViewController.h"
 
 @interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
 
@@ -93,16 +95,21 @@
     
     [self setFreeTrialEndDateBasedOnIapPurchase]; // Update Free Trial Date
 
-    if([Settings.sharedInstance getLaunchCount] == 1) {
+    if([Settings.sharedInstance getLaunchCount] == 1) { 
         [self doFirstLaunchTasks];
     }
+
+    // Crash...
+    //
+    //    NSURL* url = [NSURL URLWithString:@"https://www.strongboxsafe.com"];
+    //    [NSJSONSerialization dataWithJSONObject:@{ @"url" : url } options:NSJSONWritingPrettyPrinted error:nil];
 }
 
 //- (void)setupAutoFillWormhole {
 //    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
 //                                                         optionalDirectory:@"wormhole"
 //                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
-//    
+//
 //    [self.wormhole listenForMessageWithIdentifier:kWormholeAutoFillUpdateMessageId
 //                                         listener:^(id messageObject) {
 //        NSLog(@"AutoFill Wormhole Message: [%@]", messageObject);
@@ -110,9 +117,18 @@
 //    }];
 //}
 
+- (NSString*)getCrashMessage {
+    NSString* loc = NSLocalizedString(@"safes_vc_please_send_crash_report", @"Please send this crash to support@strongboxsafe.com");
+    NSString* message = [NSString stringWithFormat:@"%@\n\n%@", loc, [DebugHelper getCrashEmailDebugString]];
+    
+    return message;
+}
+
 - (void)sharePreviousCrash {
-    NSArray *activityItems = @[FileManager.sharedInstance.archivedCrashFile,
-                               NSLocalizedString(@"safes_vc_please_send_crash_report", @"Please send this crash to support@strongboxsafe.com")];
+    NSString* message = [self getCrashMessage];
+    
+    NSArray *activityItems = @[//FileManager.sharedInstance.archivedCrashFile,
+                               message];
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
 
@@ -127,9 +143,9 @@
 }
 
 - (void)copyPreviousCrashToClipboard {
-    NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
+    NSString* message = [self getCrashMessage];
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
-    [pasteboard setString:[[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding]];
+    [pasteboard setString:message];
  }
 
 - (void)checkForPreviousCrash {
@@ -264,12 +280,10 @@
     // Auto-Fill may have updated databases... Do the reload immediately here and before the sync because if you dispatch it
     // sync will be working with stale data with outstanding update = nil - Losing all changes
     
-    // TODO: What about split screen on iPad? Does this get called?
-
     [SafesList.sharedInstance forceReload];
     self.collection = SafesList.sharedInstance.snapshot;
-    [SyncManager.sharedInstance backgroundSyncAll];
-    [self refresh]; // This is dispatched so will hapeen later
+    [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
+    [self refresh]; // This is dispatched so will happen later
 
     if(!self.hasAppearedOnce) {
         [self doAppFirstActivationProcess];
@@ -487,8 +501,12 @@
 }
 
 - (void)onICloudAvailableContinuation:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
+    BOOL iCloudOn = SharedAppAndAutoFillSettings.sharedInstance.iCloudOn;
+    BOOL iCloudWasOn = Settings.sharedInstance.iCloudWasOn;
+    BOOL hasLocalDatabases = [self getLocalDeviceSafes].count != 0;
+    
     // If iCloud newly switched on, move local docs to iCloud
-    if (SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudWasOn && [self getLocalDeviceSafes].count) {
+    if (iCloudOn && !iCloudWasOn && hasLocalDatabases) {
         [Alerts twoOptions:self
                      title:NSLocalizedString(@"safesvc_icloud_available_title", @"iCloud Available")
                    message:NSLocalizedString(@"safesvc_question_migrate_local_to_icloud", @"Would you like to migrate your current local device databases to iCloud?")
@@ -504,7 +522,9 @@
     }
     
     // If iCloud newly switched off, move iCloud docs to local
-    if (!SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && Settings.sharedInstance.iCloudWasOn && [self getICloudSafes].count) {
+    
+    BOOL hasICloudDatabases = [self getICloudSafes].count != 0;
+    if (!iCloudOn && iCloudWasOn && hasICloudDatabases) {
         [Alerts threeOptions:self
                        title:NSLocalizedString(@"safesvc_icloud_unavailable_title", @"iCloud Unavailable")
                      message:NSLocalizedString(@"safesvc_icloud_unavailable_question", @"What would you like to do with the databases currently on this device?")
@@ -761,7 +781,7 @@
     [SyncManager.sharedInstance backgroundSyncAll];
     
     // Since above call is almost instantaneous - don't end refreshing immediately as it looks odd, delay slightly for more standard behaviour
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.tableView.refreshControl endRefreshing];
     });
 }
@@ -1267,7 +1287,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     else if ([segue.identifier isEqualToString:@"segueToWelcome"]) {
         UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
         
-        WelcomeAddDatabaseViewController* vc = (WelcomeAddDatabaseViewController*)nav.topViewController;
+        GettingStartedInitialViewController* vc = (GettingStartedInitialViewController*)nav.topViewController;
         vc.onDone = ^(BOOL addExisting, SafeMetaData * _Nonnull databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
                 [self onOnboardingDoneWithAddDatabase:addExisting databaseToOpen:databaseToOpen];
@@ -2091,3 +2111,4 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 @end
+

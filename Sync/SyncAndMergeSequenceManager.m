@@ -26,6 +26,7 @@
 @interface SyncAndMergeSequenceManager ()
 
 @property ConcurrentMutableDictionary<NSString*, DatabaseSyncOperationalData*>* operationalStateForDatabase;
+@property NSDictionary<NSNumber*, dispatch_queue_t>* storageProviderSerializedQueues; // Some (Most?) Storage Providers do not take well to multiple simultaneous syncs (reads/writes from different threads so we do one at a time)
 
 @end
 
@@ -46,6 +47,15 @@
     self = [super init];
     if (self) {
         self.operationalStateForDatabase = ConcurrentMutableDictionary.mutableDictionary;
+        
+        NSMutableDictionary* md = NSMutableDictionary.dictionary;
+        for (int i=0;i<kStorageProviderCount;i++) {
+            id<SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:i];
+            NSString* queueName = [NSString stringWithFormat:@"SB-SProv-Queue-%@", [SafeStorageProviderFactory getStorageDisplayNameForProvider:i]];
+            md[@(i)] = dispatch_queue_create(queueName.UTF8String, provider.supportsConcurrentRequests ? DISPATCH_QUEUE_CONCURRENT : DISPATCH_QUEUE_SERIAL);
+        }
+        
+        self.storageProviderSerializedQueues = md.copy;
     }
     return self;
 }
@@ -83,24 +93,17 @@
     DatabaseSyncOperationalData* opData = [self getOperationData:database];
     
     SyncDatabaseRequest* request = [opData dequeueSyncRequest];
-
+    
     if (request) {
         NSUUID* syncId = NSUUID.UUID;
         
-        if (!database) {
-            NSLog(@"Could not find latest metadata for this database! [%@]", database);
-            
-            [self logAndPublishStatusChange:database
-                                     syncId:NSUUID.UUID
-                                      state:kSyncOperationStateError
-                                    message:[NSString stringWithFormat:@"Could not find metadata for this database! [%@]", database]];
-            
-            request.completion(kSyncAndMergeError, NO, nil);
-        }
-        else {
-            dispatch_group_t group = dispatch_group_create();
-            dispatch_group_enter(group);
+        dispatch_group_t group = dispatch_group_create();
+        dispatch_group_enter(group);
 
+        // Get Storage Provider Queue -
+        
+        dispatch_queue_t storageProviderQueue = self.storageProviderSerializedQueues[@(database.storageProvider)];
+        dispatch_async(storageProviderQueue, ^{
             [self sync:database syncId:syncId interactiveVC:request.parameters.interactiveVC completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
                 NSArray<SyncDatabaseRequest*>* alsoWaiting = [opData dequeueAllJoinRequests];
                 if (alsoWaiting.count) {
@@ -118,7 +121,7 @@
             }];
 
             dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-        }
+        });
     }
 }
 

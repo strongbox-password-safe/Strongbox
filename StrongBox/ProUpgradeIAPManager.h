@@ -36,6 +36,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 @property (readonly, nullable) SKProduct* monthlyProduct;
 @property (readonly, nullable) SKProduct* yearlyProduct;
 @property (readonly, nullable) SKProduct* lifeTimeProduct;
+@property (readonly, nullable) SKProduct* freeTrialProduct;
 
 - (void)purchaseAndCheckReceipts:(SKProduct*)product completion:(PurchaseCompletionBlock)completion;
 

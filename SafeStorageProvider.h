@@ -26,6 +26,7 @@ typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
+@property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 
 // MMcG: 25-May-2020 - NB re immediatelyOfferCacheIfOffline
 //
