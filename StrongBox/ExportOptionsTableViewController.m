@@ -295,8 +295,19 @@
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    //NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    
     NSURL* url = [urls objectAtIndex:0];
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    [self documentPicker:controller didPickDocumentAtURL:url];
+    #pragma GCC diagnostic pop
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
     NSError* error;
     NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
     
@@ -330,6 +341,7 @@
     
     [document closeWithCompletionHandler:nil];
 }
+#pragma GCC diagnostic pop
 
 - (IBAction)onDone:(id)sender {
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];

@@ -204,7 +204,23 @@
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    
     NSURL* url = [urls objectAtIndex:0];
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+    [self documentPicker:controller didPickDocumentAtURL:url];
+    
+    #pragma GCC diagnostic pop
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+    NSLog(@"didPickDocumentAtURL: %@", url);
+
     NSError* error;
     
     // https://stackoverflow.com/questions/25520453/ios8-uidocumentpickerviewcontroller-get-nsdata
@@ -260,6 +276,8 @@
         }
     }
 }
+
+#pragma GCC diagnostic pop
 
 - (NSURL*)importToLocal:(NSURL*)url data:(NSData*)data error:(NSError**)error {
     NSURL* destination = [FileManager.sharedInstance.keyFilesDirectory URLByAppendingPathComponent:url.lastPathComponent];

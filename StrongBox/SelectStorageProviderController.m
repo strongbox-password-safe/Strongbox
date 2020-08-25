@@ -193,9 +193,19 @@
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
-    
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    [self documentPicker:controller didPickDocumentAtURL:url];
+    #pragma GCC diagnostic pop
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
     self.onDone([SelectedStorageParameters parametersForFilesApp:url withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
 }
+#pragma GCC diagnostic pop
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSError* error;

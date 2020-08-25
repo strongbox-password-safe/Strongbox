@@ -103,7 +103,7 @@ static NSString* const kMailToScheme = @"mailto";
 
         [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
             ret = state.enabled;
-            NSLog(@"XXXX - Got AutoFill State = [%ld]", ret);
+            NSLog(@"XXXX - Got AutoFill State = [%hhd]", ret);
             dispatch_group_leave(g);
         }];
 

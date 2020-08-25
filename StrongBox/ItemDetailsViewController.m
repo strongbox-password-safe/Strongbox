@@ -43,6 +43,7 @@
 #import "NSData+Extensions.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+#import "AutoFillSettings.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -745,84 +746,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(self.editing) {
-        if(indexPath.section == kAttachmentsSectionIdx) {
-            if(indexPath.row == 0) {
-                [self promptToAddAttachment];
-            }
-            else {
-                [self launchAttachmentPreview:indexPath.row - 1];
-            }
-        }
-        else if (indexPath.section == kSimpleFieldsSectionIdx) {
-            if(indexPath.row == kRowTotp) {
-                if(!self.model.totp) {
-                    [self onSetTotp];
-                }
-            }
-            else if( indexPath.row >= kSimpleRowCount ) { // Custom Field
-                NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
-                CustomFieldViewModel* customField = virtualRow == self.model.customFields.count ? nil : self.model.customFields[virtualRow];
-                [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:customField];
-            }
-        }
-    }
-    else {
-        if(indexPath.section == kAttachmentsSectionIdx) {
-            [self launchAttachmentPreview:indexPath.row];
-        }
-        else if(indexPath.section == kSimpleFieldsSectionIdx) {
-            if (indexPath.row == kRowTitleAndIcon) {
-                [self copyToClipboard:[self dereference:self.model.title]
-                              message:NSLocalizedString(@"item_details_title_copied", @"Title Copied")];
-            }
-            else if (indexPath.row == kRowUsername) {
-                [self copyToClipboard:[self dereference:self.model.username]
-                              message:NSLocalizedString(@"item_details_username_copied", @"Username Copied")];
-            }
-            else if (indexPath.row == kRowPassword) {
-                [self copyToClipboard:[self dereference:self.model.password]
-                              message:NSLocalizedString(@"item_details_password_copied", @"Password Copied")];
-            }
-            else if (indexPath.row == kRowTotp && self.model.totp) {
-                [self copyToClipboard:self.model.totp.password
-                              message:NSLocalizedString(@"item_details_totp_copied", @"One Time Password Copied")];
-            }
-            else if (indexPath.row == kRowURL) {
-                // Handled by Tap/ Double Tap actions on Cell
-            }
-            else if (indexPath.row == kRowEmail) {
-                [self copyToClipboard:self.model.email
-                              message:NSLocalizedString(@"item_details_email_copied", @"Email Copied")];
-            }
-            else if (indexPath.row >= kSimpleRowCount) { // Custom Fields
-                NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
-                
-                CustomFieldViewModel* customField = self.model.customFields[virtualRow];
-                [self copyToClipboard:customField.value
-                              message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), customField.key]];
-            }
-        }
-        else if(indexPath.section == kNotesSectionIdx) {
-            // NOP - Handled by the Text Field
-        }
-        else if(indexPath.section == kOtherSectionIdx && indexPath.row == 0) {
-            [self performSegueWithIdentifier:self.databaseModel.database.format == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
-        }
-    }
-    
-    if(indexPath.section == kMetadataSectionIdx) {
-        ItemMetadataEntry* entry = self.model.metadata[indexPath.row];
-        if(entry.copyable) {
-            [self copyToClipboard:entry.value
-                          message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), entry.key]];
-        }
-    }
-    
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
 - (void)promptToAddAttachment {
     NSArray* usedFilenames = [self.model.attachments map:^id _Nonnull(UiAttachment *obj, NSUInteger idx) {
         return obj.filename;
@@ -958,7 +881,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSUInteger oldIdx = -1;
     if (fieldToEdit) { // Remove old existing one...
         oldIdx = [self.model.customFields indexOfObject:fieldToEdit];
-        if (oldIdx != NSNotFound) { // MMcG: One report of this and haven't been able to determine root cause. 17-Aug-2020
+
+        // MMcG: One report of this and haven't been able to determine root cause. 17-Aug-2020
+        // -[ItemDetailsModel removeCustomFieldAtIndex:] (in Strongbox) (ItemDetailsModel.m:181)
+        // -[ItemDetailsViewController onCustomFieldEditedOrAdded:fieldToEdit:] (in Strongbox) (ItemDetailsViewController.m:955)
+        // -[CustomFieldEditorViewController onDone:] (in Strongbox) (CustomFieldEditorViewController.m:215)
+
+        if (oldIdx != NSNotFound) {
             [self.model removeCustomFieldAtIndex:oldIdx];
         }
         else {
@@ -1210,6 +1139,10 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)copyAndLaunchUrl {
     NSString* urlString = [self dereference:self.model.url];
+    [self copyAndLaunch:urlString];
+}
+
+- (void)copyAndLaunch:(NSString*)urlString {
     if (!urlString.length) {
         return;
     }
@@ -1387,8 +1320,17 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [self processIconBeforeSave:^{ // This is behind a completion because we might go out and download the FavIcon which is async...
         NSLog(@"SAVE: Icon processed for Save...");
         // TODO: Updates need to be centralized in this class, and then properly managed in Browse View too on failure or local merge/conflict changes
+        
+#ifdef IS_APP_EXTENSION
+        AutoFillSettings.sharedInstance.autoFillWroteCleanly = NO;
+#endif
+
         [self.databaseModel update:self
                            handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+            #ifdef IS_APP_EXTENSION
+                    AutoFillSettings.sharedInstance.autoFillWroteCleanly = YES;
+            #endif
+
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self onSaveChangesDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged preSaveCloneOfItem:preSaveCloneOfItem error:error];
             });
@@ -1612,6 +1554,58 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 #endif
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    if(self.editing) {
+        if(indexPath.section == kAttachmentsSectionIdx) {
+            if(indexPath.row == 0) {
+                [self promptToAddAttachment];
+            }
+            else {
+                [self launchAttachmentPreview:indexPath.row - 1];
+            }
+        }
+        else if (indexPath.section == kSimpleFieldsSectionIdx) {
+            NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
+
+            if(indexPath.row == kRowTotp) {
+                if(!self.model.totp) {
+                    [self onSetTotp];
+                }
+            }
+            else if(virtualRow == self.model.customFields.count  ) { // Add Custom Field...
+                [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:nil];
+            }
+        }
+    }
+    else {
+        if(indexPath.section == kAttachmentsSectionIdx) {
+            [self launchAttachmentPreview:indexPath.row];
+        }
+        else if(indexPath.section == kSimpleFieldsSectionIdx) {
+            if (indexPath.row == kRowTitleAndIcon) { // TODO: I don't think this works anymore?
+                [self copyToClipboard:[self dereference:self.model.title]
+                              message:NSLocalizedString(@"item_details_title_copied", @"Title Copied")];
+            }
+            else if (indexPath.row == kRowTotp && self.model.totp) {
+                [self copyToClipboard:self.model.totp.password
+                              message:NSLocalizedString(@"item_details_totp_copied", @"One Time Password Copied")];
+            }
+        }
+        else if(indexPath.section == kNotesSectionIdx) {
+            // NOP - Handled by the Text Field
+        }
+        else if(indexPath.section == kOtherSectionIdx && indexPath.row == 0) {
+            [self performSegueWithIdentifier:self.databaseModel.database.format == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
+        }
+    }
+    
+    if(indexPath.section == kMetadataSectionIdx) {
+        // NOP - Handled by the Cell
+    }
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
 - (UITableViewCell*)getUsernameCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
 
@@ -1641,6 +1635,12 @@ showGenerateButton:YES];
                                                              action:^(NSString * _Nonnull response) {
             [weakCell pokeValue:response];
         }];
+    };
+    
+    cell.onTap = ^{
+        if (!weakSelf.editing) {
+            [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.username] message:NSLocalizedString(@"item_details_username_copied", @"Username Copied")];
+        }
     };
     
     return cell;
@@ -1720,6 +1720,10 @@ showGenerateButton:YES];
             [weakSelf performSegueWithIdentifier:@"segueToAuditDrillDown" sender:nil];
         };
         
+        cell.onTap = ^{
+            [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.password] message:NSLocalizedString(@"item_details_password_copied", @"Password Copied")];
+        };
+        
         return cell;
     }
 }
@@ -1748,9 +1752,9 @@ showGenerateButton:YES];
     __weak ItemDetailsViewController* weakSelf = self;
     
     [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
-         value:[self maybeDereference:self.model.url]
-       editing:self.editing
-    formatAsUrl:isValidUrl(self.model.url) && !self.editing
+           value:[self maybeDereference:self.model.url]
+         editing:self.editing
+     formatAsUrl:isValidUrl(self.model.url) && !self.editing
     suggestionProvider:^NSString*(NSString *text) {
       NSArray* matches = [[[weakSelf.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
             return [obj hasPrefix:text];
@@ -1774,8 +1778,10 @@ showGenerateButton:YES];
       }
     };
     cell.onTap = ^{
-      [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.url]
-                        message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
+        if (!weakSelf.editing) {
+            [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.url]
+                              message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
+        }
     };
 
     return cell;
@@ -1802,7 +1808,14 @@ showGenerateButton:YES];
       weakSelf.model.email = trim(text);
       [weakSelf onModelEdited];
     };
-
+    
+    cell.onTap = ^{
+        if (!weakSelf.editing) {
+            [weakSelf copyToClipboard:self.model.email
+                          message:NSLocalizedString(@"item_details_email_copied", @"Email Copied")];
+        }
+    };
+    
     return cell;
 }
 
@@ -1863,7 +1876,7 @@ showGenerateButton:YES];
 - (UITableViewCell*)getCustomFieldCell:(NSIndexPath*)indexPath {
     NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
     
-//    __weak ItemDetailsViewController* weakSelf = self;
+    __weak ItemDetailsViewController* weakSelf = self;
 
     if(self.editing && virtualRow == self.model.customFields.count) {
         GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
@@ -1894,10 +1907,39 @@ showGenerateButton:YES];
         }
         else {
             NSString* value = [self maybeDereference:cf.value];
-            [cell setKey:cf.key value:value editing:NO useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+            
+            [cell setKey:cf.key
+                   value:value
+                 editing:NO
+             formatAsUrl:isValidUrl(value)
+      suggestionProvider:nil
+         useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+            
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            
+            cell.onDoubleTap = ^{
+              if (isValidUrl(value)) {
+                  [weakSelf copyAndLaunch:value];
+              }
+              else {
+                  [self copyToClipboard:value
+                                message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), cf.key]];
+              }
+            };
         }
+
+        cell.onTap = ^{
+            if (self.editing) {
+                [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:cf];
+            }
+            else {
+                NSString* value = [self maybeDereference:cf.value];
+
+                [self copyToClipboard:value
+                              message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), cf.key]];
+            }
+        };
         
         return cell;
     }
@@ -1975,12 +2017,20 @@ showGenerateButton:YES];
 - (UITableViewCell*)getMetadataCell:(NSIndexPath*)indexPath {
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
     ItemMetadataEntry* entry = self.model.metadata[indexPath.row];
+    
     [cell setKey:entry.key
            value:entry.value
          editing:NO
  useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
     
     cell.selectionStyle = entry.copyable ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
+    
+    cell.onTap = ^{
+        if(entry.copyable && !self.editing) {
+            [self copyToClipboard:entry.value
+                          message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), entry.key]];
+        }
+    };
     
     return cell;
 }

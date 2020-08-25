@@ -77,14 +77,25 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
     
     [viewController presentViewController:vc animated:YES completion:nil];
 }
-
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-//    NSLog(@"Picked: [%@]", urls);
+    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    
+    NSURL* url = [urls objectAtIndex:0];
 
-    [self onCreateDestinationSelected:urls.firstObject];
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    [self documentPicker:controller didPickDocumentAtURL:url];
+    #pragma GCC diagnostic pop
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+    [self onCreateDestinationSelected:url];
     
     [NSFileManager.defaultManager removeItemAtURL:self.createTemporaryDatabaseUrl error:nil];
 }
+#pragma GCC diagnostic pop
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
     [NSFileManager.defaultManager removeItemAtURL:self.createTemporaryDatabaseUrl error:nil];

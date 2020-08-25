@@ -14,26 +14,34 @@
 #import "git-version.h"
 #import "FileManager.h"
 #import <mach-o/arch.h>
+#import "SyncManager.h"
+#import "NSDate+Extensions.h"
 
 @implementation DebugHelper
 
 + (NSString*)getAboutDebugString {
-//    int i=0;
     NSString *safesMessage = @"Databases Collection\n----------------\n";
+
+    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
+        NSDate* mod;
+        unsigned long long fileSize;
+        
+        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
+        
+        NSString* syncState;
+        if (url) {
+            syncState = [NSString stringWithFormat:@"%@ (Sync) => %@ (%@)\n", safe.nickName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
+        }
+        else {
+            syncState = [NSString stringWithFormat:@"%@ (Sync) => Unknown\n", safe.nickName];
+        }
+        
+        safesMessage = [safesMessage stringByAppendingString:syncState];
+    }
+    
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
         NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
         NSString *thisSafe = [jsonDict description];
-        
-        //
-        
-//        NSString *thisSafe = [NSString stringWithFormat:@"%d. [%@]\n   [%@]-[%@]-[%lu%d%d]\n", i++,
-//                              safe.nickName,
-//                              safe.fileName,
-//                              safe.fileIdentifier,
-//                              (unsigned long)safe.storageProvider,
-//                              safe.isTouchIdEnabled,
-//                              safe.isEnrolledForConvenience];
-//        
         safesMessage = [safesMessage stringByAppendingString:thisSafe];
     }
     safesMessage = [safesMessage stringByAppendingString:@"----------------"];
@@ -45,7 +53,7 @@
     NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
 
-    NSString* jsonCrash = @"{}";
+    NSString* jsonCrash = @"";
     if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
         NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
         jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
@@ -83,19 +91,28 @@
 }
 
 + (NSString*)getSupportEmailDebugString {
-//    int i=0;
     NSString *safesMessage = @"Databases Collection<br />----------------<br />";
+    
+    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
+        NSDate* mod;
+        unsigned long long fileSize;
+        
+        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
+        
+        NSString* syncState;
+        if (url) {
+            syncState = [NSString stringWithFormat:@"%@ (Sync) => %@ (%@)<br />", safe.nickName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
+        }
+        else {
+            syncState = [NSString stringWithFormat:@"%@ (Sync) => Unknown<br />", safe.nickName];
+        }
+        
+        safesMessage = [safesMessage stringByAppendingString:syncState];
+    }
+    
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
         NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
         NSString *thisSafe = [jsonDict description];
-//        [NSString stringWithFormat:@"%d. [%@]<br />   [%@]-[%@]-[%lu%d%d]<br />", i++,
-//                              safe.nickName,
-//                              safe.fileName,
-//                              safe.fileIdentifier,
-//                              (unsigned long)safe.storageProvider,
-//                              safe.isTouchIdEnabled,
-//                              json];
-//
         safesMessage = [safesMessage stringByAppendingString:thisSafe];
     }
     
@@ -149,6 +166,24 @@
 
 + (NSString*)getCrashEmailDebugString {
     NSString *safesMessage = @"Databases Collection\n----------------\n";
+    
+    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
+        NSDate* mod;
+        unsigned long long fileSize;
+        
+        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
+        
+        NSString* syncState;
+        if (url) {
+            syncState = [NSString stringWithFormat:@"%@ (Sync) => %@ (%@)\n", safe.nickName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
+        }
+        else {
+            syncState = [NSString stringWithFormat:@"%@ (Sync) => Unknown\n", safe.nickName];
+        }
+        
+        safesMessage = [safesMessage stringByAppendingString:syncState];
+    }
+
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
         NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
         NSString *thisSafe = [jsonDict description];

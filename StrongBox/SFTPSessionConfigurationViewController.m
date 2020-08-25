@@ -102,8 +102,18 @@
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
-
+    
     NSURL* url = [urls objectAtIndex:0];
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    [self documentPicker:controller didPickDocumentAtURL:url];
+    #pragma GCC diagnostic pop
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
     NSData* key = [NSData dataWithContentsOfURL:url];
     NSString* privateKey = [[NSString alloc] initWithData:key encoding:NSUTF8StringEncoding];
 
@@ -119,5 +129,6 @@
     
     [self bindUi];
 }
+#pragma GCC diagnostic pop
 
 @end

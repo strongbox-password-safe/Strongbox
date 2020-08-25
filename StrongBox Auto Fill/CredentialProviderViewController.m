@@ -79,6 +79,9 @@
                                                           openLocalOnly:NO
                                             biometricAuthenticationDone:NO
                                                              completion:^(Model * _Nullable model, NSError * _Nullable error) {
+                    // MMcG: iOS can and does regularly terminate the extension without notice
+                    // in normal situations. Only setting this immediately before Database Open/Unlock
+
                     AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
 
                     NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
@@ -240,7 +243,7 @@
     
     self.quickTypeMode = quickType;
     
-    BOOL lastRunGood = AutoFillSettings.sharedInstance.autoFillExitedCleanly;
+    BOOL lastRunGood = AutoFillSettings.sharedInstance.autoFillExitedCleanly && AutoFillSettings.sharedInstance.autoFillWroteCleanly;
     
     // MMcG: Don't do this here as iOS can and does regularly terminate the extension without notice
     // in normal situations. Only do this immediately before Database Open/Unlock
@@ -255,10 +258,24 @@
 }
 
 - (void)showLastRunCrashedMessage:(void (^)(void))completion {
+    NSLog(@"Exit Clean = %hhd, Wrote Clean = %hhd", AutoFillSettings.sharedInstance.autoFillExitedCleanly, AutoFillSettings.sharedInstance.autoFillWroteCleanly);
+    
+//    if (!AutoFillSettings.sharedInstance.autoFillExitedCleanly) {
+
     NSString* title = NSLocalizedString(@"autofill_did_not_close_cleanly_title", @"Auto Fill Crash Occurred");
     NSString* message = NSLocalizedString(@"autofill_did_not_close_cleanly_message", @"It looks like the last time you used Auto Fill you had a crash. This is usually due to a memory limitation. Please check your database file size and your Argon2 memory settings (should be <= 64MB).");
 
     [Alerts info:self title:title message:message completion:completion];
+
+    // Reset these so we don't continuously get error messages
+    
+    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+    AutoFillSettings.sharedInstance.autoFillWroteCleanly = YES;
+    
+    //    }
+//    else {
+//        [Alerts info:self title:@"Write Failed" message:@"Oops"]; // TODO:
+//    }
 }
 
 - (void)exitWithUserCancelled {

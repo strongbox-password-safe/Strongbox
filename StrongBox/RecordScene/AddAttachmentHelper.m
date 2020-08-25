@@ -113,7 +113,19 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
     
     NSURL* url = [urls objectAtIndex:0];
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+
+    [self documentPicker:controller didPickDocumentAtURL:url];
     
+    #pragma GCC diagnostic pop
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
     NSError* error;
     NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
     
@@ -128,6 +140,8 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
     NSString *filename = [url.absoluteString.lastPathComponent stringByRemovingPercentEncoding];
     [self addAttachment:filename data:data];
 }
+
+#pragma GCC diagnostic pop
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
     NSLog(@"Image Pick did finish: [%@]", info);

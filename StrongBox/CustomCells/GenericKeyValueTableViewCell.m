@@ -35,6 +35,8 @@
 @property BOOL showGenerateButton;
 @property BOOL colorizeValue;
 
+@property (weak, nonatomic) IBOutlet UIView *rightButtonView;
+
 @end
 
 @implementation GenericKeyValueTableViewCell
@@ -73,15 +75,17 @@
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDoubleTap:)];
     [doubleTap setNumberOfTapsRequired:2];
     [doubleTap setNumberOfTouchesRequired:1];
+    doubleTap.delaysTouchesBegan = YES; // Required so that didSelectRowAtIndex is not called!
     [self addGestureRecognizer:doubleTap];
 
     UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
     [singleTap setNumberOfTapsRequired:1];
     [singleTap setNumberOfTouchesRequired:1];
+    singleTap.delaysTouchesBegan = YES; // Required so that didSelectRowAtIndex is not called!
     [self addGestureRecognizer:singleTap];
-    
+
     [singleTap requireGestureRecognizerToFail:doubleTap];
-    
+
     self.labelAudit.userInteractionEnabled = YES;
     UITapGestureRecognizer *tapGesture =
           [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -385,8 +389,18 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 }
 
 - (void)onTap:(id)sender {
-    if(self.onTap && !self.isEditing) {
-        self.onTap();
+    UITapGestureRecognizer* rec = (UITapGestureRecognizer*)sender;
+    CGPoint pnt = [rec locationInView:self.rightButtonView];
+    BOOL inRect = CGRectContainsPoint(self.rightButtonView.bounds, pnt);
+    
+    if (inRect && self.onRightButton) {
+        NSLog(@"XXXX - Splashy Right Button Tap!");
+        [self onRightButton:sender];
+    }
+    else {
+        if(self.onTap) {
+            self.onTap();
+        }
     }
 }
 

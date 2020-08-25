@@ -336,61 +336,65 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToAddNew"]) {
-        NSString* suggestedTitle = nil;
-        NSString* suggestedUrl = nil;
-        NSString* suggestedNotes = nil;
-        
-        NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-
-        if (AutoFillSettings.sharedInstance.storeAutoFillServiceIdentifiersInNotes) {
-            suggestedNotes = [[serviceIdentifiers map:^id _Nonnull(ASCredentialServiceIdentifier * _Nonnull obj, NSUInteger idx) {
-                return obj.identifier;
-            }] componentsJoinedByString:@"\n\n"];
-        }
-        
-        ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
-        if(serviceId) {
-            if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
-                NSURL* url = serviceId.identifier.urlExtendedParse;
-                if(url && url.host.length) {
-                    NSString* bar = getDomain(url.host);
-                    NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
-                    suggestedTitle = foo.length ? [foo capitalizedString] : foo;
-                    
-                    if (AutoFillSettings.sharedInstance.useFullUrlAsURLSuggestion) {
-                        suggestedUrl = url.absoluteString;
-                    }
-                    else {
-                        suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
-                    }
-                }
-            }
-            else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
-                NSString* bar = getDomain(serviceId.identifier);
-                NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
-                suggestedTitle = foo.length ? [foo capitalizedString] : foo;
-                suggestedUrl = serviceId.identifier;
-            }
-        }
-
         //UINavigationController* nav = segue.destinationViewController;
         ItemDetailsViewController* vc = (ItemDetailsViewController*)segue.destinationViewController;
-        
-        vc.createNewItem = YES;
-        vc.item = nil;
-        vc.parentGroup = self.model.database.rootGroup;
-        vc.readOnly = NO;
-        vc.databaseModel = self.model;
-        vc.onAutoFillNewItemAdded = ^(NSString * _Nonnull username, NSString * _Nonnull password) {
-            [self notifyUserToSwitchToAppAfterUpdate:username password:password];
-        };
-        vc.autoFillSuggestedUrl = suggestedUrl;
-        vc.autoFillSuggestedTitle = suggestedTitle;
-        vc.autoFillSuggestedNotes = suggestedNotes;
+        [self addNewEntry:vc];
     }
     else {
-        
+        NSLog(@"Unknown SEGUE!");
     }
+}
+
+- (void)addNewEntry:(ItemDetailsViewController*)vc {
+    NSString* suggestedTitle = nil;
+    NSString* suggestedUrl = nil;
+    NSString* suggestedNotes = nil;
+    
+    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
+
+    if (AutoFillSettings.sharedInstance.storeAutoFillServiceIdentifiersInNotes) {
+        suggestedNotes = [[serviceIdentifiers map:^id _Nonnull(ASCredentialServiceIdentifier * _Nonnull obj, NSUInteger idx) {
+            return obj.identifier;
+        }] componentsJoinedByString:@"\n\n"];
+    }
+    
+    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
+    if(serviceId) {
+        if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
+            NSURL* url = serviceId.identifier.urlExtendedParse;
+            if(url && url.host.length) {
+                NSString* bar = getDomain(url.host);
+                NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
+                suggestedTitle = foo.length ? [foo capitalizedString] : foo;
+                
+                if (AutoFillSettings.sharedInstance.useFullUrlAsURLSuggestion) {
+                    suggestedUrl = url.absoluteString;
+                }
+                else {
+                    suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
+                }
+            }
+        }
+        else if (serviceId.type == ASCredentialServiceIdentifierTypeDomain) {
+            NSString* bar = getDomain(serviceId.identifier);
+            NSString* foo = getCompanyOrOrganisationNameFromDomain(bar);
+            suggestedTitle = foo.length ? [foo capitalizedString] : foo;
+            suggestedUrl = serviceId.identifier;
+        }
+    }
+
+    vc.createNewItem = YES;
+    vc.item = nil;
+    vc.parentGroup = self.model.database.rootGroup;
+    vc.readOnly = NO;
+    vc.databaseModel = self.model;
+    vc.autoFillSuggestedUrl = suggestedUrl;
+    vc.autoFillSuggestedTitle = suggestedTitle;
+    vc.autoFillSuggestedNotes = suggestedNotes;
+        
+    vc.onAutoFillNewItemAdded = ^(NSString * _Nonnull username, NSString * _Nonnull password) {
+        [self notifyUserToSwitchToAppAfterUpdate:username password:password];
+    };
 }
 
 - (void)notifyUserToSwitchToAppAfterUpdate:(NSString*)username password:(NSString*)password {

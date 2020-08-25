@@ -9,6 +9,8 @@
 #import "AutoFillSettings.h"
 
 static NSString* const kAutoFillExitedCleanly = @"autoFillExitedCleanly";
+static NSString* const kAutoFillWroteCleanly = @"autoFillWroteCleanly";
+
 static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
 static NSString* const KDontNotifyToSwitchToMainAppForSync = @"dontNotifyToSwitchToMainAppForSync";
 static NSString* const kStoreAutoFillServiceIdentifiersInNotes = @"storeAutoFillServiceIdentifiersInNotes";
@@ -29,6 +31,14 @@ static NSString* const kAutoProceedOnSingleMatch = @"autoProceedOnSingleMatch";
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)autoFillWroteCleanly {
+    return [self getBool:kAutoFillWroteCleanly fallback:YES]; // Default/Initial is YES
+}
+
+- (void)setAutoFillWroteCleanly:(BOOL)autoFillWroteCleanly {
+    [self setBool:kAutoFillWroteCleanly value:autoFillWroteCleanly];
+}
 
 - (BOOL)useFullUrlAsURLSuggestion {
     return [self getBool:kUseFullUrlAsURLSuggestion];
