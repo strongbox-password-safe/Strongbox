@@ -35,6 +35,7 @@
 #import "FileManager.h"
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
+#import "NSDate+Extensions.h"
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -535,8 +536,8 @@ static NSString* trimField(NSTextField* textField) {
     self.imageViewIcon.showClickableBorder = YES;
     
     self.labelID.stringValue = self.model.format == kPasswordSafe ? self.node.uuid.UUIDString : keePassStringIdFromUuid(self.node.uuid);
-    self.labelCreated.stringValue = friendlyDateString(self.node.fields.created);
-    self.labelModified.stringValue = friendlyDateString(self.node.fields.modified);
+    self.labelCreated.stringValue = self.node.fields.created ? self.node.fields.created.friendlyDateString : @"";
+    self.labelModified.stringValue = self.node.fields.modified ? self.node.fields.modified.friendlyDateString : @"";
     
     self.imageViewIcon.clickable = self.model.format != kPasswordSafe && !self.historical;
     self.textFieldTitle.enabled = !self.historical;

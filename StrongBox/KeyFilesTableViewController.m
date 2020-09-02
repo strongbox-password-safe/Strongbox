@@ -16,6 +16,7 @@
 #import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "FileManager.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "BookmarksHelper.h"
 
 @interface KeyFilesTableViewController () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DZNEmptyDataSetSource>
 
@@ -498,7 +499,13 @@
 
 - (NSArray<SafeMetaData*>*)getAssociatedDatabase:(NSURL*)url {
     return [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-        return [obj.keyFileUrl isEqual:url];
+        if (obj.keyFileBookmark) {
+            NSURL* dbUrl = [BookmarksHelper getExpressReadOnlyUrlFromBookmark:obj.keyFileBookmark];
+            return [dbUrl isEqual:url];
+        }
+        else {
+            return NO;
+        }
     }];
 }
 

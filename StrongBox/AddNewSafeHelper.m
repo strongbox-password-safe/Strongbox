@@ -38,7 +38,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name
-                          keyFileUrl:nil
+                     keyFileBookmark:nil
                             database:database
                             provider:iCloud ? AppleICloudProvider.sharedInstance : LocalDeviceStorageProvider.sharedInstance
                         parentFolder:nil
@@ -49,14 +49,14 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 + (void)createNewDatabase:(UIViewController *)vc
                      name:(NSString *)name
                  password:(NSString *)password
-               keyFileUrl:(NSURL *)keyFileUrl
+          keyFileBookmark:(NSString *)keyFileBookmark
        onceOffKeyFileData:(NSData *)onceOffKeyFileData
             yubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig
             storageParams:(nonnull SelectedStorageParameters *)storageParams
                    format:(DatabaseFormat)format
                completion:(nonnull void (^)(BOOL userCancelled, SafeMetaData * _Nullable, NSData* initialSnapshot, NSError * _Nullable))completion {
     NSError* error;
-    DatabaseModel *database = getNewDatabase(password, keyFileUrl, onceOffKeyFileData, yubiKeyConfig, format, &error);
+    DatabaseModel *database = getNewDatabase(password, keyFileBookmark, onceOffKeyFileData, yubiKeyConfig, format, &error);
     
     if(!database) {
         completion(NO, nil, nil, error);
@@ -65,7 +65,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name
-                          keyFileUrl:keyFileUrl
+                     keyFileBookmark:keyFileBookmark
                             database:database
                             provider:storageParams.provider
                         parentFolder:storageParams.parentFolder
@@ -75,7 +75,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 
 + (void)createDatabase:(UIViewController*)vc
                   name:(NSString*)name
-            keyFileUrl:(NSURL *)keyFileUrl
+       keyFileBookmark:(NSString *)keyFileBookmark
               database:(DatabaseModel*)database
               provider:(id<SafeStorageProvider>)provider
           parentFolder:(NSObject*)parentFolder
@@ -100,26 +100,8 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                             data:data
                     parentFolder:parentFolder
                   viewController:vc
-                      completion:^(SafeMetaData *metadata, NSError *error)
-                 {
-                    if (keyFileUrl) {
-                        NSError* error = nil;
-                        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
-                        if (bookmark && !error) {
-                            metadata.keyFileBookmark = bookmark;
-                        }
-                        else {
-                            metadata.keyFileBookmark = nil;
-                            NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
-                        }
-                        
-                        metadata.keyFileUrl = keyFileUrl;
-                    }
-                    else {
-                        metadata.keyFileBookmark = nil;
-                        metadata.keyFileUrl = nil;
-                    }
-
+                      completion:^(SafeMetaData *metadata, NSError *error) {
+                    metadata.keyFileBookmark = keyFileBookmark;
                     metadata.likelyFormat = database.format;
                     metadata.yubiKeyConfig = yubiKeyConfig;
 
@@ -133,12 +115,12 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 }
 
 static DatabaseModel* getNewDatabase(NSString* password,
-                                     NSURL* keyFileUrl,
+                                     NSString* keyFileBookmark,
                                      NSData* onceOffKeyFileData,
                                      YubiKeyHardwareConfiguration *yubiConfig,
                                      DatabaseFormat format,
                                      NSError** error) {
-    NSData* keyFileDigest = getKeyFileDigest(keyFileUrl, onceOffKeyFileData, format, error);
+    NSData* keyFileDigest = getKeyFileDigest(keyFileBookmark, onceOffKeyFileData, format, error);
     if (*error) {
         return nil;
     }

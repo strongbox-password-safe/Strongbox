@@ -61,7 +61,7 @@
                       google:options.google
         allowInvalidSSLCerts:options.ignoreInvalidSSLCerts
                        error:&error
-                  completion:^(NSArray<UIImage *> * _Nullable images) {
+                  completion:^(NSArray<IMAGE_TYPE_PTR> * _Nullable images) {
             IMAGE_TYPE_PTR best = [self selectBest:images];
             completion(best);
         }];

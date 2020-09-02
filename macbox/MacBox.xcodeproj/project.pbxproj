@@ -358,6 +358,8 @@
 		4DA50D04244DFD2100364781 /* DatabaseAuditReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50CFF244DFD2100364781 /* DatabaseAuditReport.m */; };
 		4DA50D05244DFD2100364781 /* DatabaseAuditorConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50D00244DFD2100364781 /* DatabaseAuditorConfiguration.m */; };
 		4DA50D06244DFD2100364781 /* NSString+Levenshtein.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DA50D02244DFD2100364781 /* NSString+Levenshtein.m */; };
+		4DAC40CE24F68311001B3BE2 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */; };
+		4DAC40CF24F68311001B3BE2 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */; };
 		4DACA5C023CCD40F00891366 /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DACA5BF23CCD40F00891366 /* SecretStore.m */; };
 		4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
 		4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
@@ -896,6 +898,9 @@
 		4DA50D00244DFD2100364781 /* DatabaseAuditorConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseAuditorConfiguration.m; path = ../model/DatabaseAuditorConfiguration.m; sourceTree = "<group>"; };
 		4DA50D01244DFD2100364781 /* DatabaseAuditReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseAuditReport.h; path = ../model/DatabaseAuditReport.h; sourceTree = "<group>"; };
 		4DA50D02244DFD2100364781 /* NSString+Levenshtein.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSString+Levenshtein.m"; path = "../model/NSString+Levenshtein.m"; sourceTree = "<group>"; };
+		4DAC40CB24F682DB001B3BE2 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = ../StorageProvider.h; sourceTree = "<group>"; };
+		4DAC40CC24F68311001B3BE2 /* NSDate+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSDate+Extensions.h"; path = "../model/NSDate+Extensions.h"; sourceTree = "<group>"; };
+		4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Extensions.m"; path = "../model/NSDate+Extensions.m"; sourceTree = "<group>"; };
 		4DACA5BF23CCD40F00891366 /* SecretStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStore.m; path = ../model/SecretStore.m; sourceTree = "<group>"; };
 		4DAF56EA240181480026282C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = ../StrongBox/es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableImageView.h; path = MacBox/ClickableImageView.h; sourceTree = "<group>"; };
@@ -1056,7 +1061,6 @@
 		4DF347F82074FA6C00148741 /* DatabaseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseModel.h; path = ../model/DatabaseModel.h; sourceTree = "<group>"; };
 		4DF347FA2074FA6C00148741 /* NodeFields.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NodeFields.h; path = ../model/NodeFields.h; sourceTree = "<group>"; };
 		4DF347FB2074FA6C00148741 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Utils.m; path = ../model/Utils.m; sourceTree = "<group>"; };
-		4DF347FD2074FA6C00148741 /* StorageProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StorageProvider.h; path = ../Sync/StorageProvider.h; sourceTree = "<group>"; };
 		4DF347FE2074FA6C00148741 /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Node.h; path = ../model/Node.h; sourceTree = "<group>"; };
 		4DF348002074FA6C00148741 /* Node.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Node.m; path = ../model/Node.m; sourceTree = "<group>"; };
 		4DF522B423C8ABEF00CD948E /* ClipboardManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClipboardManager.h; path = MacBox/ClipboardManager.h; sourceTree = "<group>"; };
@@ -1860,6 +1864,7 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4DAC40CB24F682DB001B3BE2 /* StorageProvider.h */,
 				C831366A24A9200A00D475D9 /* Sha256PassThroughOutputStream.h */,
 				C831366924A9200A00D475D9 /* Sha256PassThroughOutputStream.m */,
 				C831366524A91FF200D475D9 /* AesOutputStream.h */,
@@ -1879,7 +1884,6 @@
 				4D4AD4F021A027E5002C33C6 /* AbstractDatabaseFormatAdaptor.h */,
 				4D524CA7219B459A00C22CB4 /* AutoFillNewRecordSettings.h */,
 				4D524CA6219B459A00C22CB4 /* AutoFillNewRecordSettings.m */,
-				4DF347FD2074FA6C00148741 /* StorageProvider.h */,
 				4D4A00382312CC5400B69E09 /* SerializationPackage.h */,
 				4D4A00392312CC5400B69E09 /* SerializationPackage.m */,
 			);
@@ -2030,6 +2034,8 @@
 		C85B9D6F2465435800EEBFC9 /* McGuill */ = {
 			isa = PBXGroup;
 			children = (
+				4DAC40CC24F68311001B3BE2 /* NSDate+Extensions.h */,
+				4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */,
 				C85B9D8E2465463F00EEBFC9 /* UrlRequestOperation.h */,
 				C85B9D8F2465463F00EEBFC9 /* UrlRequestOperation.m */,
 				C85B9D8A2465462200EEBFC9 /* ConcurrentMutableSet.h */,
@@ -2707,6 +2713,7 @@
 				C8DC763C2497A7F800C9C443 /* HmacBlockStream.m in Sources */,
 				4D37D873244E074B00C3182D /* DatabaseAuditorConfiguration.m in Sources */,
 				4D1FFAFD2403030100B75EA2 /* ProgressWindow.m in Sources */,
+				4DAC40CF24F68311001B3BE2 /* NSDate+Extensions.m in Sources */,
 				4D1FFAFE2403030100B75EA2 /* MMcGACTextViewEditor.m in Sources */,
 				C85B9D8D2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
 				4D1FFAFF2403030100B75EA2 /* NSArray+Extensions.m in Sources */,
@@ -2917,6 +2924,7 @@
 				C8DC763B2497A7F800C9C443 /* HmacBlockStream.m in Sources */,
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
+				4DAC40CE24F68311001B3BE2 /* NSDate+Extensions.m in Sources */,
 				4DBFD38E225D156D00290488 /* MMcGACTextViewEditor.m in Sources */,
 				C85B9D8C2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
 				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,
@@ -3238,6 +3246,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -3264,6 +3273,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 34629E3CBC779E0F1547E434 /* Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -3447,6 +3457,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 50F27062B3FD89F6D407C032 /* Pods-common-mac-Strongbox.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -3473,6 +3484,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";

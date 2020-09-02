@@ -822,34 +822,34 @@
 
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
-    return [foo localizedCaseInsensitiveContainsString:searchText];
+    return [foo localizedStandardContainsString:searchText];
 }
 
 - (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.username node:node maybe:dereference];
-    return [foo localizedCaseInsensitiveContainsString:searchText];
+    return [foo localizedStandardContainsString:searchText];
 }
 
 - (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.password node:node maybe:dereference];
-    return [foo localizedCaseInsensitiveContainsString:searchText];
+    return [foo localizedStandardContainsString:searchText];
 }
 
 - (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node {
     return [node.fields.tags.allObjects anyMatch:^BOOL(NSString * _Nonnull obj) {
-        return [obj localizedCaseInsensitiveContainsString:searchText];
+        return [obj localizedStandardContainsString:searchText];
     }];
 }
 
 - (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
-    if([foo localizedCaseInsensitiveContainsString:searchText]) {
+    if([foo localizedStandardContainsString:searchText]) {
         return YES;
     }
 
     for (NSString* altUrl in node.fields.alternativeUrls) {
         NSString* foo = [self maybeDeref:altUrl node:node maybe:dereference];
-        if([foo localizedCaseInsensitiveContainsString:searchText]) {
+        if([foo localizedStandardContainsString:searchText]) {
             return YES;
         }
     }
@@ -865,12 +865,12 @@
     NSString* email = [self maybeDeref:node.fields.email node:node maybe:dereference];
     NSString* notes = [self maybeDeref:node.fields.notes node:node maybe:dereference];
     
-    BOOL simple =   [title localizedCaseInsensitiveContainsString:searchText] ||
-    [username localizedCaseInsensitiveContainsString:searchText] ||
-    [password localizedCaseInsensitiveContainsString:searchText] ||
-    [email localizedCaseInsensitiveContainsString:searchText] ||
-    [url localizedCaseInsensitiveContainsString:searchText] ||
-    [notes localizedCaseInsensitiveContainsString:searchText];
+    BOOL simple =   [title localizedStandardContainsString:searchText] ||
+    [username localizedStandardContainsString:searchText] ||
+    [password localizedStandardContainsString:searchText] ||
+    [email localizedStandardContainsString:searchText] ||
+    [url localizedStandardContainsString:searchText] ||
+    [notes localizedStandardContainsString:searchText];
     
     if(simple) {
         return YES;
@@ -880,7 +880,7 @@
             // Tags
             
             for (NSString* tag in node.fields.tags) {
-                if ([tag localizedCaseInsensitiveContainsString:searchText]) {
+                if ([tag localizedStandardContainsString:searchText]) {
                     return YES;
                 }
             }
@@ -891,7 +891,7 @@
                 NSString* value = node.fields.customFields[key].value;
                 NSString* derefed = [self maybeDeref:value node:node maybe:dereference];
                 
-                if ([key localizedCaseInsensitiveContainsString:searchText] || [derefed localizedCaseInsensitiveContainsString:searchText]) {
+                if ([key localizedStandardContainsString:searchText] || [derefed localizedStandardContainsString:searchText]) {
                     return YES;
                 }
             }
@@ -899,7 +899,7 @@
         
         if (self.format != kPasswordSafe) {
             BOOL attachmentMatch = [node.fields.attachments anyMatch:^BOOL(NodeFileAttachment* _Nonnull obj) {
-                return [obj.filename localizedCaseInsensitiveContainsString:searchText];
+                return [obj.filename localizedStandardContainsString:searchText];
             }];
             
             if (attachmentMatch) {

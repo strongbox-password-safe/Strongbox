@@ -16,6 +16,7 @@
 #import "YubiKeyConfigurationController.h"
 #import "YubiManager.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "BookmarksHelper.h"
 
 @interface CASGTableViewController () <UITextFieldDelegate>
 
@@ -60,7 +61,11 @@
     
     self.selectedName = self.initialName;
     self.selectedFormat = self.initialFormat;
-    self.selectedKeyFileUrl = self.initialKeyFileUrl;
+    
+    if (self.initialKeyFileBookmark) {
+        NSURL* url = [BookmarksHelper getExpressReadOnlyUrlFromBookmark:self.initialKeyFileBookmark];
+        self.selectedKeyFileUrl = url;
+    }
     self.selectedYubiKeyConfig = self.initialYubiKeyConfig;
     
     self.switchReadOnly.on = self.initialReadOnly;
@@ -252,7 +257,20 @@
     
     creds.name = self.selectedName;
     creds.password = self.selectedPassword;
-    creds.keyFileUrl = self.selectedKeyFileUrl;
+    
+    if (self.selectedKeyFileUrl) {
+        NSError* error;
+        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:self.selectedKeyFileUrl readOnly:YES error:&error];
+        if (error) {
+            NSLog(@"Error: Getting bookmark for Key File = [%@]", error);
+            self.onDone(NO, nil);
+            return;
+        }
+        else {
+            creds.keyFileBookmark = bookmark;
+        }
+    }
+    
     creds.oneTimeKeyFileData = self.selectedOneTimeKeyFileData;
     creds.format = self.selectedFormat;
     creds.readOnly = self.switchReadOnly.on;
@@ -341,7 +359,7 @@
             if (success) {
                 self.selectedKeyFileUrl = url;
                 self.selectedOneTimeKeyFileData = oneTimeData;
-                self.autoDetectedKeyFileUrl = NO;
+                self.autoDetectedKeyFile = NO;
                 [self bindUi];
             }
         };
@@ -369,7 +387,7 @@
             self.cellKeyFile.imageView.image = [UIImage imageNamed:@"key"];
             
             if(SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock) {
-                self.cellKeyFile.textLabel.text = self.autoDetectedKeyFileUrl ?
+                self.cellKeyFile.textLabel.text = self.autoDetectedKeyFile ?
                 NSLocalizedString(@"casg_key_file_auto_detected", @"Auto-Detected") :
                 NSLocalizedString(@"casg_key_file_configured", @"Configured");
                 self.cellKeyFile.detailTextLabel.text = nil;
@@ -377,7 +395,7 @@
             }
             else {
                 self.cellKeyFile.textLabel.text = self.selectedKeyFileUrl.lastPathComponent;
-                self.cellKeyFile.detailTextLabel.text = self.autoDetectedKeyFileUrl ?
+                self.cellKeyFile.detailTextLabel.text = self.autoDetectedKeyFile ?
                 NSLocalizedString(@"casg_key_file_auto_detected", @"Auto-Detected") :
                 NSLocalizedString(@"casg_key_file_configured", @"Configured");
                 self.cellKeyFile.detailTextLabel.textColor = nil;

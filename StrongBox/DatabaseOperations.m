@@ -102,16 +102,16 @@
         
         scVc.mode = kCASGModeSetCredentials;
         scVc.initialFormat = self.viewModel.database.format;
-        scVc.initialKeyFileUrl = self.viewModel.metadata.keyFileUrl;
+        scVc.initialKeyFileBookmark = self.viewModel.metadata.keyFileBookmark;
         scVc.initialYubiKeyConfig = self.viewModel.metadata.yubiKeyConfig;
         
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
                         [self setCredentials:creds.password
-                              keyFileUrl:creds.keyFileUrl
-                      oneTimeKeyFileData:creds.oneTimeKeyFileData
-                              yubiConfig:creds.yubiKeyConfig];
+                             keyFileBookmark:creds.keyFileBookmark
+                          oneTimeKeyFileData:creds.oneTimeKeyFileData
+                                  yubiConfig:creds.yubiKeyConfig];
                 }
             }];
         };
@@ -123,16 +123,16 @@
 }
 
 - (void)setCredentials:(NSString*)password
-            keyFileUrl:(NSURL*)keyFileUrl
+       keyFileBookmark:(NSString*)keyFileBookmark
     oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
     CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
     
     // Key File
     
-    if(keyFileUrl != nil || oneTimeKeyFileData != nil) {
+    if(keyFileBookmark != nil || oneTimeKeyFileData != nil) {
         NSError* error;
-        NSData* keyFileDigest = getKeyFileDigest(keyFileUrl, oneTimeKeyFileData, self.viewModel.database.format, &error);
+        NSData* keyFileDigest = getKeyFileDigest(keyFileBookmark, oneTimeKeyFileData, self.viewModel.database.format, &error);
         
         if(keyFileDigest == nil) {
             [Alerts error:self
@@ -172,12 +172,12 @@
             }
         }
         else {
-            [self onSuccessfulCredentialsChanged:keyFileUrl oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
+            [self onSuccessfulCredentialsChanged:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
         }
     }];
 }
 
-- (void)onSuccessfulCredentialsChanged:(NSURL*)keyFileUrl
+- (void)onSuccessfulCredentialsChanged:(NSString*)keyFileBookmark
                     oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
     if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
@@ -194,24 +194,7 @@
         }
     }
     
-    if (keyFileUrl) {
-        NSError* error = nil;
-        NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
-        if (bookmark && !error) {
-            self.viewModel.metadata.keyFileBookmark = bookmark;
-        }
-        else {
-            self.viewModel.metadata.keyFileBookmark = nil;
-            NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
-        }
-        
-        self.viewModel.metadata.keyFileUrl = keyFileUrl;
-    }
-    else {
-        self.viewModel.metadata.keyFileBookmark = nil;
-        self.viewModel.metadata.keyFileUrl = nil;
-    }
-    
+    self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
     self.viewModel.metadata.yubiKeyConfig = yubiConfig;
     [SafesList.sharedInstance update:self.viewModel.metadata];
 

@@ -40,7 +40,8 @@
     }
     
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
+        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
+        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
         NSString *thisSafe = [jsonDict description];
         safesMessage = [safesMessage stringByAppendingString:thisSafe];
     }
@@ -111,7 +112,8 @@
     }
     
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
+        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
+        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
         NSString *thisSafe = [jsonDict description];
         safesMessage = [safesMessage stringByAppendingString:thisSafe];
     }
@@ -185,7 +187,8 @@
     }
 
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSDictionary* jsonDict = [safe getJsonSerializationDictionary];
+        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
+        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
         NSString *thisSafe = [jsonDict description];
         safesMessage = [safesMessage stringByAppendingString:thisSafe];
     }

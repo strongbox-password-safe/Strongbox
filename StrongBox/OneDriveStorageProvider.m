@@ -148,11 +148,8 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 - (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
-            if (self.odClient) {
-                [self.odClient signOutWithCompletion:^(NSError *error) { }]; // Signout if something goes wrong
-            }
-            
             completion(kReadResultError, nil, nil, error);
+            [self signout:^(NSError *error) { }];  // Signout if something
             return;
         }
         

@@ -45,6 +45,7 @@
 #import "FileManager.h"
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
+#import "NSDate+Extensions.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -866,7 +867,7 @@ static NSImage* kStrongBox256Image;
         // Expiry
         
         self.expiresRow.hidden = it.fields.expires == nil;
-        self.labelExpires.stringValue = friendlyDateString(it.fields.expires);
+        self.labelExpires.stringValue = it.fields.expires ? it.fields.expires.friendlyDateString : @"";
         self.labelExpires.textColor = it.expired ? NSColor.redColor : it.nearlyExpired ? NSColor.orangeColor : nil;
         
         // TOTP
@@ -1018,7 +1019,7 @@ static NSImage* kStrongBox256Image;
         return [self getEditableCell:it.fields.email node:it selector:@selector(onOutlineViewItemEmailEdited:)];
     }
     else if([tableColumn.identifier isEqualToString:kExpiresColumn]) {
-        NSString* exp = friendlyDateStringVeryShort(it.fields.expires);
+        NSString* exp = it.fields.expires ? it.fields.expires.friendlyDateStringVeryShort : @"";
         NSTableCellView* cell = [self getReadOnlyCell:exp node:it];
         cell.textField.textColor = it.expired ? NSColor.redColor : it.nearlyExpired ? NSColor.orangeColor : nil;
         

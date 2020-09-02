@@ -18,6 +18,13 @@
     return [BookmarksHelper getUrlFromBookmark:bookmark readOnly:NO updatedBookmark:&updated error:&error];
 }
 
++ (NSURL *)getExpressReadOnlyUrlFromBookmark:(NSString *)bookmark {
+    NSError* error;
+    NSString* updated;
+    
+    return [BookmarksHelper getUrlFromBookmark:bookmark readOnly:YES updatedBookmark:&updated error:&error];
+}
+
 + (NSData *)getBookmarkDataFromUrl:(NSURL *)url error:(NSError * _Nonnull __autoreleasing *)error {
     return [BookmarksHelper getBookmarkDataFromUrl:url readOnly:NO error:error];
 }

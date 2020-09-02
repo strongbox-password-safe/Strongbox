@@ -187,7 +187,7 @@
                         self.viewModel.metadata.duressPin = pin;
                     }
                     else {
-                        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileUrl) {
+                        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) {
                             [Alerts warn:self
                                    title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
                                  message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];

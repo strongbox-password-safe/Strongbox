@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)createNewDatabase:(UIViewController*)vc
                      name:(NSString *)name
                  password:(NSString *)password
-               keyFileUrl:(NSURL*)keyFileUrl
+          keyFileBookmark:(NSString*)keyFileBookmark
        onceOffKeyFileData:(NSData*)onceOffKeyFileData
             yubiKeyConfig:(YubiKeyHardwareConfiguration*_Nullable)yubiKeyConfig
             storageParams:(SelectedStorageParameters*)storageParams

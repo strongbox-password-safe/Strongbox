@@ -1394,7 +1394,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             [self onCreateNewDatabaseDone:storageParams
                                      name:credentials.name
                                  password:credentials.password
-                                      url:credentials.keyFileUrl
+                          keyFileBookmark:credentials.keyFileBookmark
                            onceOffKeyFile:credentials.oneTimeKeyFileData
                             yubiKeyConfig:credentials.yubiKeyConfig
                                    format:credentials.format];
@@ -1460,14 +1460,14 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)onCreateNewDatabaseDone:(SelectedStorageParameters*)storageParams
                            name:(NSString*)name
                        password:(NSString*)password
-                            url:(NSURL*)url
+                keyFileBookmark:(NSString*)keyFileBookmark
                  onceOffKeyFile:(NSData*)onceOffKeyFile
                   yubiKeyConfig:(YubiKeyHardwareConfiguration*)yubiKeyConfig
                          format:(DatabaseFormat)format {
     [AddNewSafeHelper createNewDatabase:self
                                    name:name
                                password:password
-                             keyFileUrl:url
+                        keyFileBookmark:keyFileBookmark
                      onceOffKeyFileData:onceOffKeyFile
                           yubiKeyConfig:yubiKeyConfig
                           storageParams:storageParams

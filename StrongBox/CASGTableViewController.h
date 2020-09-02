@@ -27,14 +27,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property CASGMode mode;
 @property DatabaseFormat initialFormat;
-@property (nullable) NSURL* initialKeyFileUrl;
+@property (nullable) NSString* initialKeyFileBookmark;
 @property BOOL showOpenLocalOnlyOption;
 @property BOOL initialOpenLocalOnly;
 @property BOOL initialReadOnly;
 @property YubiKeyHardwareConfiguration* initialYubiKeyConfig;
 @property BOOL validateCommonKeyFileMistakes;
 
-@property BOOL autoDetectedKeyFileUrl;
+@property BOOL autoDetectedKeyFile;
 @property NSString* initialName;
 
 @property (nonatomic, copy) void (^onDone)(BOOL success, CASGParams * _Nullable creds);

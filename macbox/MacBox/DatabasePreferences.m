@@ -15,6 +15,7 @@
 #import "NSArray+Extensions.h"
 #import "BiometricIdHelper.h"
 #import "Settings.h"
+#import "NSDate+Extensions.h"
 
 @interface DatabasePreferences ()
 
@@ -97,12 +98,12 @@
                         if(SecretStore.sharedInstance.secureEnclaveAvailable) {
                             NSString* loc = NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_expire_fmt", @"Convenience Password is securely stored, protected by your device's Secure Enclave and will expire: %@.");
                             
-                            return [NSString stringWithFormat:loc, friendlyDateString(date)];
+                            return [NSString stringWithFormat:loc, date.friendlyDateString];
                         }
                         else {
                             NSString* loc = NSLocalizedString(@"mac_convenience_summary_keychain_and_will_expire_fmt", @"Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device) and will expire: %@.");
                             
-                            return [NSString stringWithFormat:loc, friendlyDateString(date)];
+                            return [NSString stringWithFormat:loc, date.friendlyDateString];
                         }
                     }
                     else if (mode == kNeverExpires) {

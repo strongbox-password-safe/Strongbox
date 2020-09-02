@@ -229,7 +229,7 @@
                     [SafesList.sharedInstance update:self.safe];
                     
                     [self onGotCredentials:self.safe.convenienceMasterPassword
-                                keyFileUrl:self.safe.keyFileUrl
+                           keyFileBookmark:self.safe.keyFileBookmark
                         oneTimeKeyFileData:nil
                                   readOnly:self.safe.readOnly
                              openLocalOnly:self.openLocalOnly
@@ -363,7 +363,7 @@
         }
         else {
             [self onGotCredentials:self.safe.convenienceMasterPassword
-                        keyFileUrl:self.safe.keyFileUrl
+                   keyFileBookmark:self.safe.keyFileBookmark
                 oneTimeKeyFileData:nil
                           readOnly:self.safe.readOnly
                      openLocalOnly:self.openLocalOnly
@@ -420,7 +420,7 @@
     return  expectedKeyFileName;
 }
 
-- (NSURL*)getAutoDetectedKeyFileUrl {
+- (NSString*)getAutoDetectedKeyFileUrl {
     NSURL *directory = FileManager.sharedInstance.documentsDirectory;
     NSString* expectedKeyFileName = [self getExpectedAssociatedLocalKeyFileName:self.safe.fileName];
  
@@ -435,7 +435,14 @@
     
     for (NSString *file in files) {
         if([file caseInsensitiveCompare:expectedKeyFileName] == NSOrderedSame) {
-            return [directory URLByAppendingPathComponent:file];
+            NSURL* found = [directory URLByAppendingPathComponent:file];
+            NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:found readOnly:YES error:&error];
+            
+            if (error) {
+                NSLog(@"Error while getting auto-detected bookmark -> [%@]", error);
+            }
+            
+            return bookmark;
         }
     }
     
@@ -449,21 +456,11 @@
     
     scVc.mode = kCASGModeGetCredentials;
     
-    // if using URL check it exists and fallback on bookmark if not - TODO: move solely to Bookmark
-    
-    NSURL* keyFileUrl = self.safe.keyFileUrl;
-    if (keyFileUrl) {
-        if (![NSFileManager.defaultManager fileExistsAtPath:keyFileUrl.path] && self.safe.keyFileBookmark ) {
-            keyFileUrl = [BookmarksHelper getExpressUrlFromBookmark:self.safe.keyFileBookmark];
-            NSLog(@"WARNWARN: Key File URL was not available. Fell back on Bookmark... [%@]", keyFileUrl);
-        }
-    }
-    
-    scVc.initialKeyFileUrl = keyFileUrl;
+    scVc.initialKeyFileBookmark = self.safe.keyFileBookmark;
     scVc.initialReadOnly = self.safe.readOnly;
     scVc.initialOpenLocalOnly = self.openLocalOnly;
     scVc.initialYubiKeyConfig = self.safe.yubiKeyConfig;
-    scVc.validateCommonKeyFileMistakes = self.safe.keyFileUrl == nil; // No key file set for this db, then perform some simple checks before accepting it
+    scVc.validateCommonKeyFileMistakes = self.safe.keyFileBookmark == nil; // No key file set for this db, then perform some simple checks before accepting it
     
     // Less than perfect but helpful
     
@@ -478,11 +475,11 @@
     
     // Auto Detect Key File if there's none explicitly set...
     
-    if(!self.safe.keyFileUrl) {
-        NSURL* autoDetectedKeyFileUrl = [self getAutoDetectedKeyFileUrl];
-        if(autoDetectedKeyFileUrl) {
-            scVc.autoDetectedKeyFileUrl = YES;
-            scVc.initialKeyFileUrl = autoDetectedKeyFileUrl;
+    if(!self.safe.keyFileBookmark) {
+        NSString* autoDetectedKeyFileBookmark = [self getAutoDetectedKeyFileUrl];
+        if(autoDetectedKeyFileBookmark) {
+            scVc.autoDetectedKeyFile = YES;
+            scVc.initialKeyFileBookmark = autoDetectedKeyFileBookmark;
         }
     }
     
@@ -490,7 +487,7 @@
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(success) {
                 [self onGotCredentials:creds.password
-                            keyFileUrl:creds.keyFileUrl
+                       keyFileBookmark:creds.keyFileBookmark
                     oneTimeKeyFileData:creds.oneTimeKeyFileData
                               readOnly:creds.readOnly
                          openLocalOnly:creds.openLocalOnly
@@ -509,23 +506,15 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)onGotCredentials:(NSString*)password
-              keyFileUrl:(NSURL*)keyFileUrl
+         keyFileBookmark:(NSString*)keyFileBookmark
       oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                 readOnly:(BOOL)readOnly
            openLocalOnly:(BOOL)openLocalOnly
            yubikeySecret:(NSString*)yubikeySecret
     yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubikeyConfiguration {
-    if(keyFileUrl || oneTimeKeyFileData) {
-        // if using URL check it exists and fallback on bookmark if not - TODO: move solely to Bookmark
-        if (keyFileUrl) {
-            if (![NSFileManager.defaultManager fileExistsAtPath:keyFileUrl.path] && self.safe.keyFileBookmark ) {
-                keyFileUrl = [BookmarksHelper getExpressUrlFromBookmark:self.safe.keyFileBookmark];
-                NSLog(@"WARNWARN: Key File URL was not available. Fell back on Bookmark... [%@]", keyFileUrl);
-            }
-        }
-        
+    if(keyFileBookmark || oneTimeKeyFileData) {
         NSError *error;
-        self.undigestedKeyFileData = getKeyFileData(keyFileUrl, oneTimeKeyFileData, &error);
+        self.undigestedKeyFileData = getKeyFileData(keyFileBookmark, oneTimeKeyFileData, &error);
 
         if(self.undigestedKeyFileData == nil) {
             // Clear convenience unlock settings if we fail to read Key File - Force manual reselection.
@@ -541,7 +530,7 @@
                 [SafesList.sharedInstance update:self.safe];
             }
 
-            if(keyFileUrl && self.isAutoFillOpen) {
+            if(keyFileBookmark && self.isAutoFillOpen) {
                     [Alerts error:self.viewController
                             title:NSLocalizedString(@"open_sequence_error_reading_key_file_autofill_context", @"Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences")
                             error:error
@@ -572,30 +561,11 @@
     // Change in Read-Only or Key File Setting or Yubikey setting? Save
     
     if(self.safe.readOnly != readOnly ||
-       ![self.safe.keyFileUrl isEqual:keyFileUrl] ||
+       ![self.safe.keyFileBookmark isEqual:keyFileBookmark] ||
        ![self.safe.yubiKeyConfig isEqual:yubikeyConfiguration]) {
         self.safe.readOnly = readOnly;
-        
-        if (keyFileUrl) {
-            NSError* error = nil;
-            NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:keyFileUrl readOnly:YES error:&error];
-            if (bookmark && !error) {
-                self.safe.keyFileBookmark = bookmark;
-            }
-            else {
-                self.safe.keyFileBookmark = nil;
-                NSLog(@"WARNWARN: Could not get Key File book for URL: [%@]. Error = [%@]", keyFileUrl, error);
-            }
-            
-            self.safe.keyFileUrl = keyFileUrl;
-        }
-        else {
-            self.safe.keyFileBookmark = nil;
-            self.safe.keyFileUrl = nil;
-        }
-
+        self.safe.keyFileBookmark = keyFileBookmark;
         self.safe.yubiKeyConfig = yubikeyConfiguration;
-
         [SafesList.sharedInstance update:self.safe];
     }
     
@@ -1132,18 +1102,23 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-NSData* getKeyFileDigest(NSURL* keyFileUrl, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
-    NSData* keyFileData = getKeyFileData(keyFileUrl, onceOffKeyFileData, error);
+NSData* getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
+    NSData* keyFileData = getKeyFileData(keyFileBookmark, onceOffKeyFileData, error);
     
     NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:format != kKeePass1] : nil;
 
     return keyFileDigest;
 }
 
-NSData* getKeyFileData(NSURL* keyFileUrl, NSData* onceOffKeyFileData, NSError** error) {
+NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NSError** error) {
     NSData* keyFileData = nil;
-    if (keyFileUrl) {
-        keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
+    
+    if (keyFileBookmark) {
+        NSString* updated;
+        NSURL* keyFileUrl = [BookmarksHelper getUrlFromBookmark:keyFileBookmark readOnly:YES updatedBookmark:&updated error:error];
+        if (keyFileUrl) {
+            keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
+        }
     }
     else if (onceOffKeyFileData) {
         keyFileData = onceOffKeyFileData;

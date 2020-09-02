@@ -21,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSURL*_Nullable)getUrlFromBookmark:(NSString*)bookmarkInB64 readOnly:(BOOL)readOnly updatedBookmark:(NSString*_Nonnull*_Nonnull)updatedBookmark error:(NSError*_Nonnull*_Nonnull)error;
 
 + (NSURL*_Nullable)getExpressUrlFromBookmark:(NSString *)bookmark;
++ (NSURL*_Nullable)getExpressReadOnlyUrlFromBookmark:(NSString *)bookmark;
+
 + (NSData*_Nullable)dataWithContentsOfBookmark:(NSString*)bookmarkInB64 error:(NSError*_Nonnull*_Nonnull)error;
 
 @end
