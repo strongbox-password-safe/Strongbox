@@ -35,7 +35,8 @@
 @property BOOL showGenerateButton;
 @property BOOL colorizeValue;
 
-@property (weak, nonatomic) IBOutlet UIView *rightButtonView;
+@property (weak, nonatomic) IBOutlet UILabel *rightButtonSplashLabel;
+@property UITapGestureRecognizer *rightButtonTap;
 
 @end
 
@@ -72,20 +73,17 @@
     
     self.selectAllOnEdit = NO;
     
-    UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDoubleTap:)];
-    [doubleTap setNumberOfTapsRequired:2];
-    [doubleTap setNumberOfTouchesRequired:1];
-    doubleTap.delaysTouchesBegan = YES; // Required so that didSelectRowAtIndex is not called!
-    [self addGestureRecognizer:doubleTap];
+//    self.doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDoubleTap:)];
+//    [self.doubleTap setNumberOfTapsRequired:2];
+//    [self.doubleTap setNumberOfTouchesRequired:1];
+//    self.doubleTap.delaysTouchesBegan = YES; // Required so that didSelectRowAtIndex is not called!
+//    [self addGestureRecognizer:self.doubleTap];
 
-    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onTap:)];
-    [singleTap setNumberOfTapsRequired:1];
-    [singleTap setNumberOfTouchesRequired:1];
-    singleTap.delaysTouchesBegan = YES; // Required so that didSelectRowAtIndex is not called!
-    [self addGestureRecognizer:singleTap];
-
-    [singleTap requireGestureRecognizerToFail:doubleTap];
-
+    self.rightButtonTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onRightButton:)];
+    [self.rightButtonTap setNumberOfTapsRequired:1];
+    [self.rightButtonTap setNumberOfTouchesRequired:1];
+    [self.rightButtonSplashLabel addGestureRecognizer:self.rightButtonTap];
+    
     self.labelAudit.userInteractionEnabled = YES;
     UITapGestureRecognizer *tapGesture =
           [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -120,9 +118,6 @@
     self.showUiValidationOnEmpty = NO;
     self.suggestionProvider = nil;
     
-    self.onTap = nil;
-    self.onDoubleTap = nil;
-    
     self.accessoryType = UITableViewCellAccessoryNone;
     self.editingAccessoryType = UITableViewCellAccessoryNone;
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
@@ -130,6 +125,9 @@
     self.buttonRightButton.hidden = YES;
     
     self.rightButtonImage = nil;
+    self.onRightButton = nil;
+    
+    self.onGenerate = nil;
     self.showGenerateButton = NO;
 
     self.auditStack.hidden = YES;
@@ -139,17 +137,18 @@
     [self setKey:key value:value editing:editing suggestionProvider:nil useEasyReadFont:useEasyReadFont showGenerateButton:NO];
 }
 
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont showGenerateButton:(BOOL)showGenerateButton {
+- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider
+useEasyReadFont:(BOOL)useEasyReadFont
+showGenerateButton:(BOOL)showGenerateButton {
     [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:showGenerateButton colorizeValue:NO];
-}
-
-
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:selectAllOnEdit formatAsUrl:NO useEasyReadFont:useEasyReadFont];
 }
 
 - (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
     [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:NO colorizeValue:NO];
+}
+
+- (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:NO selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont rightButtonImage:rightButtonImage concealed:NO showGenerateButton:NO colorizeValue:NO audit:nil];
 }
 
 - (void)setKey:(NSString*)key
@@ -253,6 +252,20 @@ showGenerateButton:(BOOL)showGenerateButton
     self.valueText.hidden = !self.editing;
     
     [self bindAudit:audit];
+    
+    // Enable Disable Tap Gesture Recognizers so they don't interfere with didSelectRowAtIndexPath or commitEditingStyle
+
+    self.rightButtonTap.enabled = self.onRightButton != nil || (self.onGenerate != nil && self.editing);
+}
+
+- (void)setOnRightButton:(void (^)(void))onRightButton {
+    _onRightButton = onRightButton;
+    self.rightButtonTap.enabled = self.onRightButton != nil || (self.onGenerate != nil && self.editing);
+}
+
+- (void)setOnGenerate:(void (^)(void))onGenerate {
+    _onGenerate = onGenerate;
+    self.rightButtonTap.enabled = self.onRightButton != nil || (self.onGenerate != nil && self.editing);
 }
 
 - (void)bindAudit:(NSString*)audit {
@@ -385,28 +398,6 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
                 self.horizontalLine.backgroundColor = UIColor.darkGrayColor;
             }
         }
-    }
-}
-
-- (void)onTap:(id)sender {
-    UITapGestureRecognizer* rec = (UITapGestureRecognizer*)sender;
-    CGPoint pnt = [rec locationInView:self.rightButtonView];
-    BOOL inRect = CGRectContainsPoint(self.rightButtonView.bounds, pnt);
-    
-    if (inRect && self.onRightButton) {
-        NSLog(@"XXXX - Splashy Right Button Tap!");
-        [self onRightButton:sender];
-    }
-    else {
-        if(self.onTap) {
-            self.onTap();
-        }
-    }
-}
-
-- (void)onDoubleTap:(id)sender {
-    if(self.onDoubleTap && !self.isEditing) {
-        self.onDoubleTap();
     }
 }
 

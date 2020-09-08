@@ -13,7 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface IconTableCell : UITableViewCell
 
 @property (nonatomic, copy, nullable) void (^onIconTapped)(void);
-@property (nonatomic, copy, nullable) void (^onCellTapped)(void);
 
 - (void)setModel:(NSString*)value
             icon:(UIImage*)icon

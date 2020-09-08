@@ -46,11 +46,6 @@
     self.titleLabel.font = self.configuredValueFont;
 
     self.selectAllOnEdit = NO;
-    
-    UITapGestureRecognizer *cellSingleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onCellTap:)];
-    [cellSingleTap setNumberOfTapsRequired:1];
-    [cellSingleTap setNumberOfTouchesRequired:1];
-    [self addGestureRecognizer:cellSingleTap];
 }
 
 - (void)prepareForReuse {
@@ -161,12 +156,6 @@
 - (void)onIconTap {
     if(self.onIconTapped) {
         self.onIconTapped();
-    }
-}
-
-- (void)onCellTap:(id)sender {
-    if(self.onCellTapped && !self.isEditing) {
-        self.onCellTapped();
     }
 }
 

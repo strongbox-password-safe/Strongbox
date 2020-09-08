@@ -1575,34 +1575,59 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             else if(virtualRow == self.model.customFields.count  ) { // Add Custom Field...
                 [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:nil];
             }
+            else if (virtualRow >= 0 && virtualRow < self.model.customFields.count) {
+                NSInteger idx = virtualRow;
+                CustomFieldViewModel* cf = self.model.customFields[idx];
+                [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:cf];
+            }
         }
     }
     else {
+        NSUInteger virtualRow = indexPath.row - kSimpleRowCount;
+        
         if(indexPath.section == kAttachmentsSectionIdx) {
             [self launchAttachmentPreview:indexPath.row];
         }
         else if(indexPath.section == kSimpleFieldsSectionIdx) {
-            if (indexPath.row == kRowTitleAndIcon) { // TODO: I don't think this works anymore?
-                [self copyToClipboard:[self dereference:self.model.title]
-                              message:NSLocalizedString(@"item_details_title_copied", @"Title Copied")];
+            if (indexPath.row == kRowTitleAndIcon) {
+                [self copyToClipboard:[self dereference:self.model.title] message:NSLocalizedString(@"item_details_title_copied", @"Title Copied")];
+            }
+            else if (indexPath.row == kRowUsername) {
+                [self copyToClipboard:[self dereference:self.model.username] message:NSLocalizedString(@"item_details_username_copied", @"Username Copied")];
+            }
+            else if (indexPath.row == kRowPassword) {
+                [self copyToClipboard:[self dereference:self.model.password] message:NSLocalizedString(@"item_details_password_copied", @"Password Copied")];
+            }
+            else if ( indexPath.row == kRowURL ) {
+                [self copyToClipboard:[self dereference:self.model.url] message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
+            }
+            else if ( indexPath.row == kRowEmail) {
+                [self copyToClipboard:self.model.email message:NSLocalizedString(@"item_details_email_copied", @"Email Copied")];
             }
             else if (indexPath.row == kRowTotp && self.model.totp) {
-                [self copyToClipboard:self.model.totp.password
-                              message:NSLocalizedString(@"item_details_totp_copied", @"One Time Password Copied")];
+                [self copyToClipboard:self.model.totp.password message:NSLocalizedString(@"item_details_totp_copied", @"One Time Password Copied")];
+            }
+            else if (virtualRow >= 0 && virtualRow < self.model.customFields.count) {
+                NSInteger idx = virtualRow;
+                CustomFieldViewModel* cf = self.model.customFields[idx];
+                NSString* value = [self maybeDereference:cf.value];
+                [self copyToClipboard:value message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), cf.key]];
             }
         }
         else if(indexPath.section == kNotesSectionIdx) {
             // NOP - Handled by the Text Field
         }
+        else if(indexPath.section == kMetadataSectionIdx) {
+            ItemMetadataEntry* entry = self.model.metadata[indexPath.row];
+            if(entry.copyable) {
+                [self copyToClipboard:entry.value message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), entry.key]];
+            }
+        }
         else if(indexPath.section == kOtherSectionIdx && indexPath.row == 0) {
             [self performSegueWithIdentifier:self.databaseModel.database.format == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
         }
     }
-    
-    if(indexPath.section == kMetadataSectionIdx) {
-        // NOP - Handled by the Cell
-    }
-    
+        
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
@@ -1628,6 +1653,8 @@ showGenerateButton:YES];
       [weakSelf onModelEdited];
     };
     
+    cell.onRightButton = nil;
+    
     __weak GenericKeyValueTableViewCell* weakCell = cell;
     cell.onGenerate = ^{
         [PasswordMaker.sharedInstance promptWithUsernameSuggestions:weakSelf
@@ -1636,13 +1663,7 @@ showGenerateButton:YES];
             [weakCell pokeValue:response];
         }];
     };
-    
-    cell.onTap = ^{
-        if (!weakSelf.editing) {
-            [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.username] message:NSLocalizedString(@"item_details_username_copied", @"Username Copied")];
-        }
-    };
-    
+        
     return cell;
 }
 
@@ -1719,11 +1740,7 @@ showGenerateButton:YES];
         cell.onAuditTap = ^{
             [weakSelf performSegueWithIdentifier:@"segueToAuditDrillDown" sender:nil];
         };
-        
-        cell.onTap = ^{
-            [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.password] message:NSLocalizedString(@"item_details_password_copied", @"Password Copied")];
-        };
-        
+                
         return cell;
     }
 }
@@ -1750,39 +1767,46 @@ showGenerateButton:YES];
     GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
     
     __weak ItemDetailsViewController* weakSelf = self;
-    
-    [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
-           value:[self maybeDereference:self.model.url]
-         editing:self.editing
-     formatAsUrl:isValidUrl(self.model.url) && !self.editing
-    suggestionProvider:^NSString*(NSString *text) {
-      NSArray* matches = [[[weakSelf.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
-            return [obj hasPrefix:text];
-      }] sortedArrayUsingComparator:finderStringComparator];
-      return matches.firstObject;
-    }
-    useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
 
-    cell.onEdited = ^(NSString * _Nonnull text) {
-      weakSelf.model.url = trim(text);
-      [weakSelf onModelEdited];
-    };
-
-    cell.onDoubleTap = ^{
-      if (isValidUrl(weakSelf.model.url)) {
-          [weakSelf copyAndLaunchUrl];
-      }
-      else {
-          [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.url]
-                            message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
-      }
-    };
-    cell.onTap = ^{
-        if (!weakSelf.editing) {
-            [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.url]
-                              message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
+    if (self.editing) {
+        [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
+               value:[self maybeDereference:self.model.url]
+             editing:self.editing
+         formatAsUrl:isValidUrl(self.model.url) && !self.editing
+        suggestionProvider:^NSString*(NSString *text) {
+          NSArray* matches = [[[weakSelf.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
+                return [obj hasPrefix:text];
+          }] sortedArrayUsingComparator:finderStringComparator];
+          return matches.firstObject;
         }
-    };
+        useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+
+        cell.onEdited = ^(NSString * _Nonnull text) {
+          weakSelf.model.url = trim(text);
+          [weakSelf onModelEdited];
+        };
+    }
+    else {
+        NSString* value = [self maybeDereference:self.model.url];
+        BOOL url = isValidUrl(value);
+        UIImage *launchUrlImage = url ? [UIImage imageNamed:@"link"] : nil;
+        
+        [cell setForUrlOrCustomFieldUrl:NSLocalizedString(@"item_details_url_field_title", @"URL")
+                                  value:value
+                            formatAsUrl:url
+                       rightButtonImage:launchUrlImage
+                        useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+        
+        cell.onRightButton = ^{
+            if (url) {
+                [weakSelf copyAndLaunchUrl];
+            }
+            else {
+                [weakSelf copyToClipboard:[weakSelf dereference:weakSelf.model.url]
+                                  message:NSLocalizedString(@"item_details_url_copied", @"URL Copied")];
+            }
+        };
+    }
 
     return cell;
 }
@@ -1807,13 +1831,6 @@ showGenerateButton:YES];
     cell.onEdited = ^(NSString * _Nonnull text) {
       weakSelf.model.email = trim(text);
       [weakSelf onModelEdited];
-    };
-    
-    cell.onTap = ^{
-        if (!weakSelf.editing) {
-            [weakSelf copyToClipboard:self.model.email
-                          message:NSLocalizedString(@"item_details_email_copied", @"Email Copied")];
-        }
     };
     
     return cell;
@@ -1907,39 +1924,29 @@ showGenerateButton:YES];
         }
         else {
             NSString* value = [self maybeDereference:cf.value];
-            
-            [cell setKey:cf.key
-                   value:value
-                 editing:NO
-             formatAsUrl:isValidUrl(value)
-      suggestionProvider:nil
-         useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
-            
-            cell.accessoryType = UITableViewCellAccessoryNone;
-            cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            
-            cell.onDoubleTap = ^{
-              if (isValidUrl(value)) {
-                  [weakSelf copyAndLaunch:value];
-              }
-              else {
-                  [self copyToClipboard:value
-                                message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), cf.key]];
-              }
-            };
-        }
 
-        cell.onTap = ^{
             if (self.editing) {
-                [self performSegueWithIdentifier:@"segueToCustomFieldEditor" sender:cf];
+                [cell setKey:cf.key
+                       value:value
+                     editing:NO
+                 formatAsUrl:NO
+          suggestionProvider:nil
+             useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+                cell.accessoryType = UITableViewCellAccessoryNone;
+                cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
             }
             else {
-                NSString* value = [self maybeDereference:cf.value];
-
-                [self copyToClipboard:value
-                              message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), cf.key]];
+                BOOL url = isValidUrl(value);
+                UIImage *launchUrlImage = url ? [UIImage imageNamed:@"link"] : nil;
+                [cell setForUrlOrCustomFieldUrl:cf.key value:value formatAsUrl:url rightButtonImage:launchUrlImage useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+                
+                if (url) {
+                    cell.onRightButton = ^{
+                        [weakSelf copyAndLaunch:value];
+                    };
+                }
             }
-        };
+        }
         
         return cell;
     }
@@ -2024,14 +2031,7 @@ showGenerateButton:YES];
  useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
     
     cell.selectionStyle = entry.copyable ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
-    
-    cell.onTap = ^{
-        if(entry.copyable && !self.editing) {
-            [self copyToClipboard:entry.value
-                          message:[NSString stringWithFormat:NSLocalizedString(@"item_details_something_copied_fmt", @"'%@' Copied"), entry.key]];
-        }
-    };
-    
+        
     return cell;
 }
 

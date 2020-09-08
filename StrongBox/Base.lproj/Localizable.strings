@@ -1717,8 +1717,8 @@
 /* Tip displayed at top of screen. Slide left on Database for options */
 "safes_vc_tip" = "Tip: Slide left on database for options";
 
-/* Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes */
-"item_details_tip" = "Tip: Tap to Copy, Double Tap to Launch URL or Copy Notes";
+/* Tip: Tap to Copy, Double Tap to Copy Notes */
+"item_details_tip" = "Tip: Tap to Copy, Double Tap to Copy Notes";
 
 /* Tip: Slide Left for Options or Tap to View */
 "keepass_history_tip" = "Tip: Slide Left for Options or Tap to View";

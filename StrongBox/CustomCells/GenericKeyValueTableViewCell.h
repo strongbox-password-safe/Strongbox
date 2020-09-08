@@ -19,19 +19,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont;
 
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit useEasyReadFont:(BOOL)useEasyReadFont;
-
 - (void)setConfidentialKey:(NSString*)key value:(NSString*)value concealed:(BOOL)concealed colorize:(BOOL)colorize audit:(NSString*_Nullable)audit;
+
+- (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont;
 
 - (void)pokeValue:(NSString *)value;
 
 @property (nonatomic, copy, nullable) void (^onEdited)(NSString* text);
 @property (nonatomic, copy, nullable) SuggestionProvider suggestionProvider;
 
-@property (nonatomic, copy, nullable) void (^onTap)(void);
-@property (nonatomic, copy, nullable) void (^onDoubleTap)(void);
 @property (nonatomic, copy, nullable) void (^onRightButton)(void);
-@property (nonatomic, copy, nullable) void (^onGenerate)(void);
+@property (nonatomic, copy, nullable) void (^onGenerate)(void); // FUTURE: Change to onRightButton
 @property (nonatomic, copy, nullable) void (^onAuditTap)(void);
 
 @property BOOL showUiValidationOnEmpty;

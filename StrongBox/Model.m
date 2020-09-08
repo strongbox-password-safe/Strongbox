@@ -146,16 +146,31 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
 
+    __weak Model* weakSelf = self;
     self.auditor = [[DatabaseAuditor alloc] initWithPro:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial
                                              isExcluded:^BOOL(Node * _Nonnull item) {
-        NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
-        return [set containsObject:sid];
+        NSString* sid = [item getSerializationId:weakSelf.database.format != kPasswordSafe];
+        return [weakSelf isExcludedFromAuditHelper:set sid:sid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
         // We can ignore the actual passed in config because we know it's part of the overall Database SafeMetaData;
-        
-        [SafesList.sharedInstance update:self.metadata];
+        [SafesList.sharedInstance update:weakSelf.metadata];
     }];
+}
+
+- (BOOL)isExcludedFromAudit:(Node *)item {
+    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+
+    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
+    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
+    
+    return [self isExcludedFromAuditHelper:set sid:sid];
+}
+
+- (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set sid:(NSString*)sid {
+    // TODO: Need to allow for exclusion of groups (check if sid is contained in any item of the set)
+    
+    return [set containsObject:sid];
 }
 
 - (void)restartAudit {
@@ -244,15 +259,6 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     }
     
     return NSSet.set;
-}
-
-- (BOOL)isExcludedFromAudit:(Node *)item {
-    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
-    
-    NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
-    NSSet<NSString*> *set = [NSSet setWithArray:excluded];
-    
-    return [set containsObject:sid];
 }
 
 - (void)setItemAuditExclusion:(Node *)item exclude:(BOOL)exclude {
