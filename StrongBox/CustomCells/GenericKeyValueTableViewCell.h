@@ -15,9 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont;
 
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont showGenerateButton:(BOOL)showGenerateButton;
+- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont rightButtonImage:(UIImage*_Nullable)rightButtonImage suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider;
 
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont;
+- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*_Nullable)rightButtonImage suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider;
 
 - (void)setConfidentialKey:(NSString*)key value:(NSString*)value concealed:(BOOL)concealed colorize:(BOOL)colorize audit:(NSString*_Nullable)audit;
 
@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, copy, nullable) SuggestionProvider suggestionProvider;
 
 @property (nonatomic, copy, nullable) void (^onRightButton)(void);
-@property (nonatomic, copy, nullable) void (^onGenerate)(void); // FUTURE: Change to onRightButton
+
 @property (nonatomic, copy, nullable) void (^onAuditTap)(void);
 
 @property BOOL showUiValidationOnEmpty;

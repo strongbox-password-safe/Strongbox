@@ -412,7 +412,7 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (BOOL)clearClipboardEnabled {
-    return [self getBool:kClearClipboardEnabled];
+    return [self getBool:kClearClipboardEnabled fallback:YES]; // Default On
 }
 
 - (void)setClearClipboardEnabled:(BOOL)clearClipboardEnabled {

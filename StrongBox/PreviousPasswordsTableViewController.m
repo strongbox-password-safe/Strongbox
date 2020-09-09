@@ -7,6 +7,13 @@
 //
 
 #import "PreviousPasswordsTableViewController.h"
+#import "ClipboardManager.h"
+
+#ifndef IS_APP_EXTENSION
+
+#import "ISMessages/ISMessages.h"
+
+#endif
 
 @interface PreviousPasswordsTableViewController ()
 
@@ -44,6 +51,29 @@
     cell.detailTextLabel.text = dateString; //entry.password;
 
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    PasswordHistoryEntry *entry = (self.model.entries)[indexPath.row];
+
+    if (entry.password.length) {
+        [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:entry.password];
+        
+        NSString* message = NSLocalizedString(@"item_details_password_copied", @"Password Copied");
+    
+#ifndef IS_APP_EXTENSION
+        [ISMessages showCardAlertWithTitle:message
+                                   message:nil
+                                  duration:3.f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeSuccess
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
+#endif
+    }
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 @end

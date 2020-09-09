@@ -31,10 +31,9 @@
 @property BOOL concealed;
 
 @property NSString* value;
-@property UIImage* rightButtonImage;
-@property BOOL showGenerateButton;
 @property BOOL colorizeValue;
 
+@property UIImage* rightButtonImage;
 @property (weak, nonatomic) IBOutlet UILabel *rightButtonSplashLabel;
 @property UITapGestureRecognizer *rightButtonTap;
 
@@ -126,37 +125,23 @@
     
     self.rightButtonImage = nil;
     self.onRightButton = nil;
-    
-    self.onGenerate = nil;
-    self.showGenerateButton = NO;
 
     self.auditStack.hidden = YES;
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing suggestionProvider:nil useEasyReadFont:useEasyReadFont showGenerateButton:NO];
+    [self setKey:key value:value editing:editing useEasyReadFont:useEasyReadFont rightButtonImage:nil suggestionProvider:nil];
 }
 
-- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing suggestionProvider:(SuggestionProvider)suggestionProvider
-useEasyReadFont:(BOOL)useEasyReadFont
-showGenerateButton:(BOOL)showGenerateButton {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:NO suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:showGenerateButton colorizeValue:NO];
+- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont rightButtonImage:(UIImage *)rightButtonImage suggestionProvider:(SuggestionProvider)suggestionProvider {
+    [self setKey:key value:value editing:editing useEasyReadFont:useEasyReadFont formatAsUrl:NO rightButtonImage:rightButtonImage suggestionProvider:suggestionProvider];
 }
 
-- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing formatAsUrl:(BOOL)formatAsUrl suggestionProvider:(SuggestionProvider)suggestionProvider useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:nil concealed:NO showGenerateButton:NO colorizeValue:NO];
+- (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage *)rightButtonImage suggestionProvider:(SuggestionProvider)suggestionProvider {
+    [self setKey:key value:value editing:editing selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:suggestionProvider useEasyReadFont:useEasyReadFont rightButtonImage:rightButtonImage concealed:NO colorizeValue:NO];
 }
 
-- (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:NO selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont rightButtonImage:rightButtonImage concealed:NO showGenerateButton:NO colorizeValue:NO audit:nil];
-}
-
-- (void)setKey:(NSString*)key
-         value:(NSString*)value
-       editing:(BOOL)editing
-selectAllOnEdit:(BOOL)selectAllOnEdit
-   formatAsUrl:(BOOL)formatAsUrl
-useEasyReadFont:(BOOL)useEasyReadFont {
+- (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing selectAllOnEdit:(BOOL)selectAllOnEdit formatAsUrl:(BOOL)formatAsUrl useEasyReadFont:(BOOL)useEasyReadFont {
     [self setKey:key
            value:value
          editing:editing
@@ -166,7 +151,13 @@ suggestionProvider:nil
  useEasyReadFont:useEasyReadFont
 rightButtonImage:nil
        concealed:NO
-showGenerateButton:NO colorizeValue:NO];
+   colorizeValue:NO];
+}
+
+///
+
+- (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key value:value editing:NO selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont rightButtonImage:rightButtonImage concealed:NO colorizeValue:NO audit:nil];
 }
 
 - (void)setConfidentialKey:(NSString *)key
@@ -187,10 +178,11 @@ suggestionProvider:nil
  useEasyReadFont:YES
  rightButtonImage:image
         concealed:concealed
-showGenerateButton:NO
    colorizeValue:colorize
            audit:audit];
 }
+
+///
 
 - (void)setKey:(NSString*)key
          value:(NSString*)value
@@ -201,7 +193,6 @@ showGenerateButton:NO
     useEasyReadFont:(BOOL)useEasyReadFont
  rightButtonImage:(UIImage*)rightButtonImage
      concealed:(BOOL)concealed
-showGenerateButton:(BOOL)showGenerateButton
  colorizeValue:(BOOL)colorizeValue {
     [self setKey:key value:value
          editing:editing
@@ -211,7 +202,6 @@ suggestionProvider:suggestionProvider
  useEasyReadFont:useEasyReadFont
 rightButtonImage:rightButtonImage
        concealed:concealed
-showGenerateButton:showGenerateButton
    colorizeValue:colorizeValue
            audit:nil];
 }
@@ -225,7 +215,6 @@ showGenerateButton:showGenerateButton
     useEasyReadFont:(BOOL)useEasyReadFont
  rightButtonImage:(UIImage*)rightButtonImage
      concealed:(BOOL)concealed
-showGenerateButton:(BOOL)showGenerateButton
  colorizeValue:(BOOL)colorizeValue
          audit:(NSString*_Nullable)audit {
     [self bindKey:key];
@@ -238,10 +227,7 @@ showGenerateButton:(BOOL)showGenerateButton
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
     self.rightButtonImage = rightButtonImage;
-    self.showGenerateButton = showGenerateButton;
     
-    [self bindRightButton];
-
     self.concealed = concealed;
     self.colorizeValue = colorizeValue;
     
@@ -253,19 +239,12 @@ showGenerateButton:(BOOL)showGenerateButton
     
     [self bindAudit:audit];
     
-    // Enable Disable Tap Gesture Recognizers so they don't interfere with didSelectRowAtIndexPath or commitEditingStyle
-
-    self.rightButtonTap.enabled = self.onRightButton != nil || (self.onGenerate != nil && self.editing);
+    [self bindRightButton];
 }
 
 - (void)setOnRightButton:(void (^)(void))onRightButton {
     _onRightButton = onRightButton;
-    self.rightButtonTap.enabled = self.onRightButton != nil || (self.onGenerate != nil && self.editing);
-}
-
-- (void)setOnGenerate:(void (^)(void))onGenerate {
-    _onGenerate = onGenerate;
-    self.rightButtonTap.enabled = self.onRightButton != nil || (self.onGenerate != nil && self.editing);
+    [self bindRightButton];
 }
 
 - (void)bindAudit:(NSString*)audit {
@@ -430,34 +409,24 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 }
 
 - (IBAction)onRightButton:(id)sender {
-    if(self.editing) {
-        if(self.onGenerate) {
-            self.onGenerate();
-        }
-    }
-    else {
-        if(self.onRightButton) {
-            self.onRightButton();
-        }
+    if(self.onRightButton) {
+        self.onRightButton();
     }
 }
 
 - (void)bindRightButton {
-    if(!self.editing) {
-        if(self.rightButtonImage) {
-            self.buttonRightButton.hidden = NO;
-            [self.buttonRightButton setImage:self.rightButtonImage forState:UIControlStateNormal];
-        }
-        else {
-            self.buttonRightButton.hidden = YES;
-        }
+    if(self.rightButtonImage) {
+        self.buttonRightButton.hidden = NO;
+        self.rightButtonSplashLabel.hidden = NO;
+        [self.buttonRightButton setImage:self.rightButtonImage forState:UIControlStateNormal];
     }
     else {
-        if(self.showGenerateButton) {
-            self.buttonRightButton.hidden = NO;
-            [self.buttonRightButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
-        }
+        self.buttonRightButton.hidden = YES;
+        self.rightButtonSplashLabel.hidden = YES;
+        [self.buttonRightButton setImage:nil forState:UIControlStateNormal];
     }
+
+    self.rightButtonTap.enabled = self.onRightButton != nil;
 }
 
 - (void)pokeValue:(NSString *)value {

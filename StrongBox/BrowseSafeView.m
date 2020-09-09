@@ -282,7 +282,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             return;
         }
         
-        
         NSNumber* lastKnownAuditIssueCount = self.viewModel.metadata.auditConfig.lastKnownAuditIssueCount;
         
         NSLog(@"Audit Complete: Issues = %lu - Last Known = %@", issueCount.unsignedLongValue, lastKnownAuditIssueCount);
@@ -291,7 +290,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [SafesList.sharedInstance update:self.viewModel.metadata];
 
         if ( self.viewModel.metadata.auditConfig.showAuditPopupNotifications) {
-            [self showAuditPopup:issueCount.unsignedLongValue lastKnownAuditIssueCount:lastKnownAuditIssueCount];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self showAuditPopup:issueCount.unsignedLongValue lastKnownAuditIssueCount:lastKnownAuditIssueCount];
+            });
         }
     }
     

@@ -20,7 +20,6 @@
 @property (weak) IBOutlet NSButton *checkboxShowTotpCodes;
 @property (weak) IBOutlet NSButton *checkboxShowRecycleBinInBrowse;
 @property (weak) IBOutlet NSButton *checkboxShowRecycleBinInSearch;
-@property (weak) IBOutlet NSButton *checkboxFloatOnTop;
 @property (weak) IBOutlet NSButton *checkboxAlternatingGrid;
 @property (weak) IBOutlet NSButton *checkboxHorizontalGridLines;
 @property (weak) IBOutlet NSButton *checkboxVerticalGridLines;
@@ -195,7 +194,6 @@
     self.checkboxShowTotpCodes.state = Settings.sharedInstance.doNotShowTotp ? NSOffState : NSOnState;
     self.checkboxShowRecycleBinInBrowse.state = Settings.sharedInstance.doNotShowRecycleBinInBrowse ? NSOffState : NSOnState;
     self.checkboxShowRecycleBinInSearch.state = Settings.sharedInstance.showRecycleBinInSearchResults ? NSOnState : NSOffState;
-    self.checkboxFloatOnTop.state = Settings.sharedInstance.floatOnTop ? NSOnState : NSOffState;
     self.checkboxAlternatingGrid.state = Settings.sharedInstance.noAlternatingRows ? NSOffState : NSOnState;
     self.checkboxHorizontalGridLines.state = Settings.sharedInstance.showHorizontalGrid ? NSOnState : NSOffState;
     self.checkboxVerticalGridLines.state = Settings.sharedInstance.showVerticalGrid ? NSOnState : NSOffState;
@@ -240,7 +238,6 @@
     Settings.sharedInstance.doNotShowTotp = self.checkboxShowTotpCodes.state == NSOffState;
     Settings.sharedInstance.doNotShowRecycleBinInBrowse = self.checkboxShowRecycleBinInBrowse.state == NSOffState;
     Settings.sharedInstance.showRecycleBinInSearchResults = self.checkboxShowRecycleBinInSearch.state == NSOnState;
-    Settings.sharedInstance.floatOnTop = self.checkboxFloatOnTop.state == NSOnState;
     Settings.sharedInstance.noAlternatingRows = self.checkboxAlternatingGrid.state == NSOffState;
     Settings.sharedInstance.showHorizontalGrid = self.checkboxHorizontalGridLines.state == NSOnState;
     Settings.sharedInstance.showVerticalGrid = self.checkboxVerticalGridLines.state == NSOnState;

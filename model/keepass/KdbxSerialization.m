@@ -79,10 +79,16 @@ static BOOL kLogVerbose = NO;
     if(compositeKeyFactors.yubiKeyCR) {
         NSData* challenge = masterSeed;
         compositeKeyFactors.yubiKeyCR(challenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {
-            if(userCancelled || !response || error) {
+            if(userCancelled || error) {
                 completion(userCancelled, nil, error);
             }
             else {
+                if (response == nil) {
+                    error = [Utils createNSError:@"Nil response received from YubiKey" errorCode:-1];
+                    completion(NO, nil, error);
+                    return;
+                }
+
                 self.masterKey = getMaster(masterSeed, transformKey, response);
                 [self stage1point5Serialize:compositeKey transformSeed:transformSeed masterSeed:masterSeed completion:completion];
             }
@@ -230,6 +236,12 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                 completion(userCancelled, nil, error);
             }
             else {
+                if (response == nil) {
+                    error = [Utils createNSError:@"Nil response received from YubiKey" errorCode:-1];
+                    completion(NO, nil, error);
+                    return;
+                }
+                
                 NSData* masterKey = getMaster(decryptionParameters.masterSeed, transformKey, response);
                 [KdbxSerialization deserializeStage2:stream
                                        headerEntries:headerEntries

@@ -761,6 +761,12 @@ typedef void (^GetCompositeKeyCompletionBlock)(BOOL userCancelled, NSData*_Nulla
                 completion(userCancelled, nil, error);
             }
             else {
+                if (response == nil) {
+                    error = [Utils createNSError:@"Nil response received from YubiKey" errorCode:-1];
+                    completion(NO, nil, error);
+                    return;
+                }
+
                 NSMutableArray* factors = @[].mutableCopy;
 
                 if (hashedPassword) [factors addObject:hashedPassword];

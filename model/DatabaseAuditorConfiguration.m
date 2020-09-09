@@ -91,7 +91,7 @@ const int kDefaultMinimumLength = 12;
     }
     
     if( self.lastKnownAuditIssueCount != nil) {
-        ret[@""] = self.lastKnownAuditIssueCount;
+        ret[@"lastKnownAuditIssueCount"] = self.lastKnownAuditIssueCount;
     }
 
     return ret;

@@ -151,9 +151,13 @@ viewController:(UIViewController *)viewController
         path = [root stringByAppendingPathComponent:desiredFilename];
     }
     else {
-        path = [ur URLByAppendingPathComponent:desiredFilename].path;
+        // There is an issue with the underlying library if the root url also has a path (e.g. Sharepoint see issue #394,
+        // then the path gets appended on to the path. However it can take a full URL so we escape out of that situation
+        // by using absolute string if we know we have a URL here.
+
+        path = [ur URLByAppendingPathComponent:desiredFilename].absoluteString; //.path;
     }
-    
+        
     DAVPutRequest *request = [[DAVPutRequest alloc] initWithPath:path];
     request.data = data;
     request.delegate = self;

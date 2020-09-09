@@ -215,17 +215,24 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 - (void)setPassword:(NSString *)password {
-    if([password compare:_password] == NSOrderedSame) {
+    NSString* newPassword = password;
+    NSString* oldPassword = _password;
+    
+    if([newPassword compare:oldPassword] == NSOrderedSame) {
         return;
     }
     
-    _password = password;
+    _password = newPassword;
+    
+    // Password Safe 3 password modified date
+    
     self.passwordModified = [NSDate date];
     
-    PasswordHistory *pwHistory = self.passwordHistory;
+    // Password Safe 3 Password History
     
-    if (pwHistory.enabled && pwHistory.maximumSize > 0 && password) {
-        [pwHistory.entries addObject:[[PasswordHistoryEntry alloc] initWithPassword:password]];
+    PasswordHistory *pwHistory = self.passwordHistory;
+    if (pwHistory.enabled && pwHistory.maximumSize > 0 && newPassword) {
+        [pwHistory.entries addObject:[[PasswordHistoryEntry alloc] initWithPassword:oldPassword]];
         
         if ((pwHistory.entries).count > pwHistory.maximumSize) {
             NSUInteger count = (pwHistory.entries).count;

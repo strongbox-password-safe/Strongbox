@@ -1636,34 +1636,39 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
     __weak ItemDetailsViewController* weakSelf = self;
     
+    UIImage* image = self.editing ? [UIImage imageNamed:@"syncronize"] : nil;
+
     [cell setKey:NSLocalizedString(@"item_details_username_field_title", @"Username")
            value:[self maybeDereference:self.model.username]
          editing:self.editing
+ useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
+rightButtonImage:image
 suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
             NSArray* matches = [[[weakSelf.databaseModel.database.usernameSet allObjects] filter:^BOOL(NSString * obj) {
                 return [obj hasPrefix:text];
             }] sortedArrayUsingComparator:finderStringComparator];
               return matches.firstObject;
-        }
- useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
-showGenerateButton:YES];
+        }];
 
     cell.onEdited = ^(NSString * _Nonnull text) {
       weakSelf.model.username = trim(text);
       [weakSelf onModelEdited];
     };
     
-    cell.onRightButton = nil;
-    
-    __weak GenericKeyValueTableViewCell* weakCell = cell;
-    cell.onGenerate = ^{
-        [PasswordMaker.sharedInstance promptWithUsernameSuggestions:weakSelf
+    if (self.editing) {
+        __weak GenericKeyValueTableViewCell* weakCell = cell;
+        cell.onRightButton = ^{
+            [PasswordMaker.sharedInstance promptWithUsernameSuggestions:weakSelf
                                                              config:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
                                                              action:^(NSString * _Nonnull response) {
-            [weakCell pokeValue:response];
-        }];
-    };
-        
+                [weakCell pokeValue:response];
+            }];
+        };
+    }
+    else {
+        cell.onRightButton = nil;
+    }
+    
     return cell;
 }
 
@@ -1772,14 +1777,15 @@ showGenerateButton:YES];
         [cell setKey:NSLocalizedString(@"item_details_url_field_title", @"URL")
                value:[self maybeDereference:self.model.url]
              editing:self.editing
+     useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
          formatAsUrl:isValidUrl(self.model.url) && !self.editing
+    rightButtonImage:nil
         suggestionProvider:^NSString*(NSString *text) {
           NSArray* matches = [[[weakSelf.databaseModel.database.urlSet allObjects] filter:^BOOL(NSString * obj) {
                 return [obj hasPrefix:text];
           }] sortedArrayUsingComparator:finderStringComparator];
           return matches.firstObject;
-        }
-        useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+        }];
 
         cell.onEdited = ^(NSString * _Nonnull text) {
           weakSelf.model.url = trim(text);
@@ -1819,14 +1825,14 @@ showGenerateButton:YES];
     [cell setKey:NSLocalizedString(@"item_details_email_field_title", @"Email")
            value:self.model.email
          editing:self.editing
-    suggestionProvider:^NSString*(NSString *text) {
+ useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
+rightButtonImage:nil
+suggestionProvider:^NSString*(NSString *text) {
       NSArray* matches = [[[weakSelf.databaseModel.database.emailSet allObjects] filter:^BOOL(NSString * obj) {
             return [obj hasPrefix:text];
       }] sortedArrayUsingComparator:finderStringComparator];
       return matches.firstObject;
-    }
- useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
-     showGenerateButton:NO];
+    }];
 
     cell.onEdited = ^(NSString * _Nonnull text) {
       weakSelf.model.email = trim(text);
@@ -1929,9 +1935,10 @@ showGenerateButton:YES];
                 [cell setKey:cf.key
                        value:value
                      editing:NO
+             useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll
                  formatAsUrl:NO
-          suggestionProvider:nil
-             useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+            rightButtonImage:nil
+          suggestionProvider:nil];
                 cell.accessoryType = UITableViewCellAccessoryNone;
                 cell.editingAccessoryType = UITableViewCellAccessoryDisclosureIndicator;
             }
