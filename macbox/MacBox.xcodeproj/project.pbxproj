@@ -519,6 +519,8 @@
 		C8E6D500246D5C7600AFFE13 /* WordList.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D4FE246D5C7600AFFE13 /* WordList.m */; };
 		C8E6D503246D71E800AFFE13 /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D502246D71E800AFFE13 /* DeletedObject.m */; };
 		C8E6D504246D71E800AFFE13 /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E6D502246D71E800AFFE13 /* DeletedObject.m */; };
+		C8EDCD36250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8EDCD39250B770F00E427CB /* PressYubiKeyWindow.xib */; };
+		C8EDCD37250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8EDCD39250B770F00E427CB /* PressYubiKeyWindow.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1179,6 +1181,16 @@
 		C8E6D4FE246D5C7600AFFE13 /* WordList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = ../model/WordList.m; sourceTree = "<group>"; };
 		C8E6D501246D71E800AFFE13 /* DeletedObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedObject.h; path = ../model/keepass/DeletedObject.h; sourceTree = "<group>"; };
 		C8E6D502246D71E800AFFE13 /* DeletedObject.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedObject.m; path = ../model/keepass/DeletedObject.m; sourceTree = "<group>"; };
+		C8EDCD38250B770F00E427CB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/PressYubiKeyWindow.xib; sourceTree = "<group>"; };
+		C8EDCD3A250B771800E427CB /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/PressYubiKeyWindow.strings"; sourceTree = "<group>"; };
+		C8EDCD3B250B771D00E427CB /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8EDCD3C250B772000E427CB /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8EDCD3D250B772300E427CB /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8EDCD3E250B772700E427CB /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8EDCD3F250B772B00E427CB /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8EDCD40250B772E00E427CB /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8EDCD41250B773100E427CB /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C8EDCD42250B773400E427CB /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
 		EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; sourceTree = "<group>"; };
 		F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -2115,6 +2127,7 @@
 		C85B9D7B2465453A00EEBFC9 /* YubiKey */ = {
 			isa = PBXGroup;
 			children = (
+				C8EDCD39250B770F00E427CB /* PressYubiKeyWindow.xib */,
 				C85B9DAB246548C400EEBFC9 /* lib */,
 				C85B9D9E246547D500EEBFC9 /* include */,
 				C85B9D9A246547B900EEBFC9 /* YubiKeyConfiguration.h */,
@@ -2380,6 +2393,7 @@
 				4D1FFB3F2403030100B75EA2 /* NodeDetails.storyboard in Resources */,
 				4D1FFB402403030100B75EA2 /* SafesMetaDataViewer.xib in Resources */,
 				C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
+				C8EDCD37250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
 				4D1FFB412403030100B75EA2 /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2445,6 +2459,7 @@
 				4D40B08423BFB8AA00BAD0D2 /* NodeDetails.storyboard in Resources */,
 				4DC805A123A116DD001E742E /* SafesMetaDataViewer.xib in Resources */,
 				C85B9DB824655D6A00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
+				C8EDCD36250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
 				4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3239,6 +3254,24 @@
 			path = MacBox;
 			sourceTree = "<group>";
 		};
+		C8EDCD39250B770F00E427CB /* PressYubiKeyWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8EDCD38250B770F00E427CB /* Base */,
+				C8EDCD3A250B771800E427CB /* zh-Hans */,
+				C8EDCD3B250B771D00E427CB /* fr */,
+				C8EDCD3C250B772000E427CB /* de */,
+				C8EDCD3D250B772300E427CB /* it */,
+				C8EDCD3E250B772700E427CB /* nb */,
+				C8EDCD3F250B772B00E427CB /* ru */,
+				C8EDCD40250B772E00E427CB /* es */,
+				C8EDCD41250B773100E427CB /* sv */,
+				C8EDCD42250B773400E427CB /* uk */,
+			);
+			name = PressYubiKeyWindow.xib;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -3252,7 +3285,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2942;
+				CURRENT_PROJECT_VERSION = 2944;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3262,7 +3295,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.18;
+				MARKETING_VERSION = 1.13.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3279,7 +3312,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2942;
+				CURRENT_PROJECT_VERSION = 2944;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3289,7 +3322,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.18;
+				MARKETING_VERSION = 1.13.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3463,7 +3496,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2942;
+				CURRENT_PROJECT_VERSION = 2944;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3473,7 +3506,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.18;
+				MARKETING_VERSION = 1.13.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3490,7 +3523,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2942;
+				CURRENT_PROJECT_VERSION = 2944;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3500,7 +3533,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.18;
+				MARKETING_VERSION = 1.13.19;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

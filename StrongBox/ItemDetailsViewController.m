@@ -1382,8 +1382,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 //    self.item.fields.attachments = preSaveCloneOfItem.fields.attachments;
 //}
 
-- (void)onSaveChangesDone:(BOOL)userCancelled conflictAndLocalWasChanged:(BOOL)conflictAndLocalWasChanged preSaveCloneOfItem:(Node*)preSaveCloneOfItem error:(NSError*)error {
-    if(userCancelled || conflictAndLocalWasChanged) {  // FUTURE: Revert gracefully
+- (void)onSaveChangesDone:(BOOL)userCancelled conflictAndLocalWasChanged:(BOOL)conflictAndLocalWasChanged preSaveCloneOfItem:(Node*)preSaveCloneOfItem error:(NSError*)error {    
+    if(error || userCancelled || conflictAndLocalWasChanged) {  // FUTURE: Revert gracefully
         if (error != nil) {
             [Alerts error:self
                     title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
