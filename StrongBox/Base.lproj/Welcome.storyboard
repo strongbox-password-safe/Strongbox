@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Poa-XB-9Qu">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Poa-XB-9Qu">
     <device id="retina6_5" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -19,7 +20,7 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dxd-7M-Dtr">
                                 <rect key="frame" x="20" y="214.33333333333334" width="374" height="377.66666666666663"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Your First Database" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="maz-SI-Mfw" userLabel="Heading">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="749" text="Your First Database" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="maz-SI-Mfw" userLabel="Heading">
                                         <rect key="frame" x="0.0" y="0.0" width="374" height="40.666666666666664"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <nil key="textColor"/>
@@ -37,9 +38,9 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nuz-n2-EMf">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nuz-n2-EMf">
                                         <rect key="frame" x="62" y="171.33333333333334" width="250" height="55"/>
-                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="MSu-3s-nJg"/>
                                             <constraint firstAttribute="height" constant="55" id="OxJ-GI-DZ2"/>
@@ -53,14 +54,14 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="747" text="or" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lad-AY-Nvo" userLabel="Message">
-                                        <rect key="frame" x="179" y="238.33333333333334" width="16" height="20.333333333333343"/>
+                                        <rect key="frame" x="179.33333333333334" y="238.33333333333334" width="15.666666666666657" height="20.333333333333343"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cff-Dr-iGY">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cff-Dr-iGY">
                                         <rect key="frame" x="62" y="270.66666666666663" width="250" height="55"/>
-                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="55" id="PiO-q5-ruY"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="fc8-4V-IvF"/>
@@ -73,18 +74,18 @@
                                             <action selector="onAdd:" destination="n1n-7g-yga" eventType="touchUpInside" id="dKG-4e-PgE"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NM1-ie-t5q">
+                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NM1-ie-t5q">
                                         <rect key="frame" x="158.66666666666666" y="345.66666666666663" width="57" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <state key="normal" title="Dismiss">
-                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
                                         </state>
                                         <connections>
                                             <action selector="onDismiss:" destination="n1n-7g-yga" eventType="touchUpInside" id="h57-ra-weQ"/>
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="NM1-ie-t5q" firstAttribute="top" secondItem="Cff-Dr-iGY" secondAttribute="bottom" constant="20" id="6MW-ZT-ueD"/>
                                     <constraint firstItem="NwP-5P-0Bq" firstAttribute="top" secondItem="maz-SI-Mfw" secondAttribute="bottom" constant="8" id="ChR-gP-7KW"/>
@@ -109,7 +110,8 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="IVz-Qt-Prw"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="IVz-Qt-Prw" firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="dxd-7M-Dtr" secondAttribute="bottom" id="EXX-fj-dTO"/>
                             <constraint firstItem="dxd-7M-Dtr" firstAttribute="centerY" secondItem="yJs-yi-Gy1" secondAttribute="centerY" multiplier="0.9" id="Ecb-gA-kgx"/>
@@ -117,7 +119,6 @@
                             <constraint firstItem="dxd-7M-Dtr" firstAttribute="top" relation="greaterThanOrEqual" secondItem="IVz-Qt-Prw" secondAttribute="top" id="jpn-kH-T2B"/>
                             <constraint firstItem="dxd-7M-Dtr" firstAttribute="leading" secondItem="IVz-Qt-Prw" secondAttribute="leading" constant="20" id="qeG-0b-pGI"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="IVz-Qt-Prw"/>
                     </view>
                     <navigationItem key="navigationItem" id="cuw-7t-qOv"/>
                     <connections>
@@ -163,9 +164,9 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J4Q-dj-A4t">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="J4Q-dj-A4t">
                                         <rect key="frame" x="62" y="183.33333333333331" width="250" height="55"/>
-                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="2R0-g5-uFi"/>
                                             <constraint firstAttribute="height" constant="55" id="Uqh-87-4Ah"/>
@@ -178,18 +179,18 @@
                                             <action selector="onOKLetsDoIt:" destination="Ol6-IA-fge" eventType="touchUpInside" id="4Cv-ce-3AE"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2fd-SX-28T">
+                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2fd-SX-28T">
                                         <rect key="frame" x="158.66666666666666" y="258.33333333333337" width="57" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <state key="normal" title="Dismiss">
-                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
                                         </state>
                                         <connections>
                                             <action selector="onDismiss:" destination="Ol6-IA-fge" eventType="touchUpInside" id="hOy-zN-kdb"/>
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="2Ig-6I-ZZZ" firstAttribute="leading" secondItem="fhq-qu-VWx" secondAttribute="leading" id="24F-2E-r3P"/>
                                     <constraint firstAttribute="trailing" secondItem="fza-Nf-xoH" secondAttribute="trailing" id="GMd-6C-epJ"/>
@@ -210,7 +211,8 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="a3o-Tt-lIe"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="fhq-qu-VWx" firstAttribute="leading" secondItem="a3o-Tt-lIe" secondAttribute="leading" constant="20" id="02b-LT-qRf"/>
                             <constraint firstItem="fhq-qu-VWx" firstAttribute="centerY" secondItem="Ice-ce-UlM" secondAttribute="centerY" multiplier="0.9" id="Fgp-Ij-dRo"/>
@@ -218,7 +220,6 @@
                             <constraint firstItem="a3o-Tt-lIe" firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="fhq-qu-VWx" secondAttribute="bottom" id="gan-BU-5pY"/>
                             <constraint firstItem="fhq-qu-VWx" firstAttribute="top" relation="greaterThanOrEqual" secondItem="a3o-Tt-lIe" secondAttribute="top" id="kCD-Ky-7pf"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="a3o-Tt-lIe"/>
                     </view>
                     <navigationItem key="navigationItem" id="S4c-8l-849"/>
                     <connections>
@@ -262,9 +263,9 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WTP-2R-oTB">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WTP-2R-oTB">
                                         <rect key="frame" x="62" y="193.33333333333334" width="250" height="55"/>
-                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="55" id="3OI-in-dw6"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="ugs-cP-cBv"/>
@@ -278,14 +279,14 @@
                                         </connections>
                                     </button>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="747" text="or" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="puR-8j-GRT" userLabel="Message">
-                                        <rect key="frame" x="179" y="260.33333333333337" width="16" height="20.333333333333314"/>
+                                        <rect key="frame" x="179.33333333333334" y="260.33333333333337" width="15.666666666666657" height="20.333333333333314"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dbL-uP-DgX">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dbL-uP-DgX">
                                         <rect key="frame" x="62" y="292.66666666666663" width="250" height="55"/>
-                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="55" id="YAY-Vb-Xnc"/>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="oTy-if-ncy"/>
@@ -298,18 +299,18 @@
                                             <action selector="onDoNotUseICloud:" destination="eS1-EV-xF2" eventType="touchUpInside" id="UWK-9A-uL1"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RUg-zZ-USW">
+                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RUg-zZ-USW">
                                         <rect key="frame" x="158.66666666666666" y="367.66666666666663" width="57" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <state key="normal" title="Dismiss">
-                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
                                         </state>
                                         <connections>
                                             <action selector="onDismiss:" destination="eS1-EV-xF2" eventType="touchUpInside" id="lSb-AC-rf1"/>
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="jZz-Dg-Hqg" firstAttribute="leading" secondItem="eA3-ey-Ilg" secondAttribute="leading" id="8YU-Y9-YNM"/>
                                     <constraint firstItem="RUg-zZ-USW" firstAttribute="top" secondItem="dbL-uP-DgX" secondAttribute="bottom" constant="20" id="BHZ-cC-3Km"/>
@@ -334,7 +335,8 @@
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="Fnc-4e-bvg"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="eA3-ey-Ilg" firstAttribute="leading" secondItem="Fnc-4e-bvg" secondAttribute="leading" constant="20" id="H1G-kN-orj"/>
                             <constraint firstItem="Fnc-4e-bvg" firstAttribute="trailing" secondItem="eA3-ey-Ilg" secondAttribute="trailing" constant="20" id="M06-Pe-Be1"/>
@@ -342,7 +344,6 @@
                             <constraint firstItem="Fnc-4e-bvg" firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="eA3-ey-Ilg" secondAttribute="bottom" id="kNo-x4-K3C"/>
                             <constraint firstItem="eA3-ey-Ilg" firstAttribute="centerY" secondItem="9FA-sm-TNl" secondAttribute="centerY" multiplier="0.9" id="rj2-s8-8cq"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="Fnc-4e-bvg"/>
                     </view>
                     <navigationItem key="navigationItem" id="Tc2-GU-4xQ"/>
                     <connections>
@@ -391,9 +392,9 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                 <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Emm-l7-8le" userLabel="Create Button">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Emm-l7-8le" userLabel="Create Button">
                                                 <rect key="frame" x="82" y="239" width="250" height="55"/>
-                                                <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" systemColor="systemBlueColor"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="55" id="lXI-LY-48S"/>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="yPD-2X-fUR"/>
@@ -407,11 +408,11 @@
                                                     <action selector="onNext:" destination="JIT-YM-MTv" eventType="touchUpInside" id="STi-X0-qP2"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wBK-OF-IEY">
+                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wBK-OF-IEY">
                                                 <rect key="frame" x="178.66666666666666" y="314" width="57" height="32"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                                 <state key="normal" title="Dismiss">
-                                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" systemColor="systemBlueColor"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="onDismiss:" destination="JIT-YM-MTv" eventType="touchUpInside" id="A3j-rC-DvG"/>
@@ -420,7 +421,7 @@
                                                 </connections>
                                             </button>
                                         </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="bottom" secondItem="wBK-OF-IEY" secondAttribute="bottom" id="0Qs-1l-qNF"/>
                                             <constraint firstItem="YKw-3t-93B" firstAttribute="leading" secondItem="vyN-Sg-eGd" secondAttribute="leading" constant="20" id="6Xr-Hy-zhu"/>
@@ -447,7 +448,8 @@
                                 </constraints>
                             </scrollView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="nbm-aP-h0d"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="ggk-1l-ury" firstAttribute="leading" secondItem="nbm-aP-h0d" secondAttribute="leading" id="3iq-yh-Iea"/>
                             <constraint firstItem="ggk-1l-ury" firstAttribute="top" secondItem="nbm-aP-h0d" secondAttribute="top" id="IHk-Pb-sbO"/>
@@ -457,7 +459,6 @@
                             <constraint firstItem="nbm-aP-h0d" firstAttribute="trailing" secondItem="ggk-1l-ury" secondAttribute="trailing" id="nYZ-Eo-XcV"/>
                             <constraint firstItem="ggk-1l-ury" firstAttribute="leading" secondItem="nbm-aP-h0d" secondAttribute="leading" id="vh2-mF-YBa"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="nbm-aP-h0d"/>
                     </view>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" title="Create Database" id="d33-lQ-wrZ">
@@ -512,9 +513,9 @@ You will have the chance to print this password out on the next screen for emerg
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                 <textInputTraits key="textInputTraits" enablesReturnKeyAutomatically="YES"/>
                                             </textField>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CeT-uY-c3o" userLabel="Create Button">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="CeT-uY-c3o" userLabel="Create Button">
                                                 <rect key="frame" x="82" y="349" width="250" height="55"/>
-                                                <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" systemColor="systemBlueColor"/>
                                                 <constraints>
                                                     <constraint firstAttribute="height" constant="55" id="67h-Fd-zqX"/>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="gms-E4-vDV"/>
@@ -528,11 +529,11 @@ You will have the chance to print this password out on the next screen for emerg
                                                     <action selector="onCreate:" destination="CjD-Y4-RJY" eventType="touchUpInside" id="i0F-kP-knV"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qLz-La-osG">
+                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qLz-La-osG">
                                                 <rect key="frame" x="178.66666666666666" y="424" width="57" height="32"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                                 <state key="normal" title="Dismiss">
-                                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" systemColor="systemBlueColor"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="onDismiss:" destination="n1n-7g-yga" eventType="touchUpInside" id="azU-ER-SOO"/>
@@ -542,7 +543,7 @@ You will have the chance to print this password out on the next screen for emerg
                                                 </connections>
                                             </button>
                                         </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstItem="HFu-c5-YPy" firstAttribute="leading" secondItem="nbY-4r-107" secondAttribute="leading" constant="20" id="4F5-jw-gYn"/>
                                             <constraint firstItem="qLz-La-osG" firstAttribute="top" secondItem="CeT-uY-c3o" secondAttribute="bottom" constant="20" id="5Sc-1t-cCC"/>
@@ -569,7 +570,8 @@ You will have the chance to print this password out on the next screen for emerg
                                 </constraints>
                             </scrollView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="No2-uL-qpa"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="3hN-8c-Iys" firstAttribute="top" secondItem="No2-uL-qpa" secondAttribute="top" id="6Bj-t4-MQZ"/>
                             <constraint firstItem="nbY-4r-107" firstAttribute="width" secondItem="No2-uL-qpa" secondAttribute="width" id="G1C-cH-mHA"/>
@@ -577,7 +579,6 @@ You will have the chance to print this password out on the next screen for emerg
                             <constraint firstItem="3hN-8c-Iys" firstAttribute="trailing" secondItem="No2-uL-qpa" secondAttribute="trailing" id="i7K-iC-Weg"/>
                             <constraint firstItem="3hN-8c-Iys" firstAttribute="leading" secondItem="No2-uL-qpa" secondAttribute="leading" id="usn-Rb-enb"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="No2-uL-qpa"/>
                     </view>
                     <navigationItem key="navigationItem" title="Master Password" id="d1O-oj-C5A">
                         <barButtonItem key="rightBarButtonItem" title="Create" style="done" id="jCg-Ev-nsF"/>
@@ -592,10 +593,10 @@ You will have the chance to print this password out on the next screen for emerg
             </objects>
             <point key="canvasLocation" x="2364" y="102"/>
         </scene>
-        <!--Turn On Auto Fill-->
+        <!--Turn On AutoFill-->
         <scene sceneID="Gpb-kl-dKA">
             <objects>
-                <viewController title="Turn On AutoFill" id="WAX-Nf-pmA" userLabel="Turn On Auto Fill" customClass="TurnOnAutoFillViewController" sceneMemberID="viewController">
+                <viewController title="Turn On AutoFill" id="WAX-Nf-pmA" customClass="TurnOnAutoFillViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lFe-2k-BZ9">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -606,7 +607,7 @@ You will have the chance to print this password out on the next screen for emerg
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1x2-y3-ciP" userLabel="Container View">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="798"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="Turn On AutoFill" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1Yx-P8-Cz3" userLabel="Heading">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="Turn On AutoFill" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1Yx-P8-Cz3" userLabel="Heading">
                                                 <rect key="frame" x="20" y="19.999999999999996" width="374" height="40.666666666666657"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <nil key="textColor"/>
@@ -619,9 +620,9 @@ You will have the chance to print this password out on the next screen for emerg
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UZv-D9-m3B" userLabel="Create Button">
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="UZv-D9-m3B" userLabel="Create Button">
                                                 <rect key="frame" x="82" y="438.66666666666669" width="250" height="55"/>
-                                                <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="backgroundColor" systemColor="systemBlueColor"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="LKO-RQ-myd"/>
                                                     <constraint firstAttribute="height" constant="55" id="Mbv-3S-v6V"/>
@@ -635,11 +636,11 @@ You will have the chance to print this password out on the next screen for emerg
                                                     <action selector="onDone:" destination="WAX-Nf-pmA" eventType="touchUpInside" id="8RJ-N8-iB2"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lxy-EK-dja">
+                                            <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Lxy-EK-dja">
                                                 <rect key="frame" x="178.66666666666666" y="501.66666666666663" width="57" height="32"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                                 <state key="normal" title="Dismiss">
-                                                    <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <color key="titleColor" systemColor="systemBlueColor"/>
                                                 </state>
                                                 <connections>
                                                     <action selector="onDismiss:" destination="JIT-YM-MTv" eventType="touchUpInside" id="G8s-BM-gSo"/>
@@ -649,7 +650,7 @@ You will have the chance to print this password out on the next screen for emerg
                                                 </connections>
                                             </button>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="748" text="The most secure way to use Strongbox" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qMl-JH-HLw" userLabel="First Message">
-                                                <rect key="frame" x="52.333333333333343" y="68.666666666666671" width="309.66666666666663" height="20.333333333333329"/>
+                                                <rect key="frame" x="53" y="68.666666666666671" width="308" height="20.333333333333329"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -669,10 +670,10 @@ You will have the chance to print this password out on the next screen for emerg
                                                         </subviews>
                                                     </stackView>
                                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="Kls-ee-umH" userLabel="Step 2">
-                                                        <rect key="frame" x="0.0" y="36.333333333333314" width="233" height="20.333333333333329"/>
+                                                        <rect key="frame" x="0.0" y="36.333333333333314" width="233.33333333333334" height="20.333333333333329"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="246" verticalHuggingPriority="251" horizontalCompressionResistancePriority="754" text="2. Tap 'Passwords &amp; Accounts'" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="adE-dp-BcC">
-                                                                <rect key="frame" x="0.0" y="0.0" width="233" height="20.333333333333332"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="233.33333333333334" height="20.333333333333332"/>
                                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                                 <nil key="textColor"/>
                                                                 <nil key="highlightedColor"/>
@@ -680,10 +681,10 @@ You will have the chance to print this password out on the next screen for emerg
                                                         </subviews>
                                                     </stackView>
                                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="mYt-sQ-gPQ" userLabel="Step 2">
-                                                        <rect key="frame" x="0.0" y="72.666666666666686" width="200.33333333333334" height="20.333333333333329"/>
+                                                        <rect key="frame" x="0.0" y="72.666666666666686" width="200.66666666666666" height="20.333333333333329"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="246" verticalHuggingPriority="251" horizontalCompressionResistancePriority="754" text="3. Tap 'AutoFill Passwords'" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jg7-6Y-boJ">
-                                                                <rect key="frame" x="0.0" y="0.0" width="200.33333333333334" height="20.333333333333332"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="200.66666666666666" height="20.333333333333332"/>
                                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                                 <nil key="textColor"/>
                                                                 <nil key="highlightedColor"/>
@@ -702,10 +703,10 @@ You will have the chance to print this password out on the next screen for emerg
                                                         </subviews>
                                                     </stackView>
                                                     <stackView opaque="NO" contentMode="scaleToFill" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="B13-Bw-3Jc" userLabel="Step 2">
-                                                        <rect key="frame" x="0.0" y="145.33333333333331" width="158" height="20.333333333333343"/>
+                                                        <rect key="frame" x="0.0" y="145.33333333333331" width="158.66666666666666" height="20.333333333333343"/>
                                                         <subviews>
                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="246" verticalHuggingPriority="251" horizontalCompressionResistancePriority="754" text="5. Select 'Strongbox'" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ne8-Ez-WLk">
-                                                                <rect key="frame" x="0.0" y="0.0" width="158" height="20.333333333333332"/>
+                                                                <rect key="frame" x="0.0" y="0.0" width="158.66666666666666" height="20.333333333333332"/>
                                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                                 <nil key="textColor"/>
                                                                 <nil key="highlightedColor"/>
@@ -715,7 +716,7 @@ You will have the chance to print this password out on the next screen for emerg
                                                 </subviews>
                                             </stackView>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="Step by Step" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BJ5-ot-YkD" userLabel="Instructions Header">
-                                                <rect key="frame" x="130.33333333333331" y="203.33333333333334" width="153.33333333333331" height="33.666666666666657"/>
+                                                <rect key="frame" x="130.33333333333337" y="203.33333333333334" width="153.66666666666663" height="33.666666666666657"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -727,7 +728,7 @@ You will have the chance to print this password out on the next screen for emerg
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstItem="Lxy-EK-dja" firstAttribute="top" secondItem="UZv-D9-m3B" secondAttribute="bottom" constant="8" id="DFz-Ok-HaX"/>
                                             <constraint firstItem="rEn-7x-wsY" firstAttribute="leading" secondItem="1x2-y3-ciP" secondAttribute="leading" constant="20" id="DMp-3S-kXQ"/>
@@ -736,6 +737,7 @@ You will have the chance to print this password out on the next screen for emerg
                                             <constraint firstItem="5lU-Td-3SH" firstAttribute="leading" secondItem="1x2-y3-ciP" secondAttribute="leading" constant="20" id="GAo-Hq-yL1"/>
                                             <constraint firstItem="7Ou-hA-GZf" firstAttribute="top" secondItem="BJ5-ot-YkD" secondAttribute="bottom" constant="16" id="HyJ-XA-wEj"/>
                                             <constraint firstItem="7Ou-hA-GZf" firstAttribute="centerX" secondItem="1x2-y3-ciP" secondAttribute="centerX" id="Hzz-xK-ndP"/>
+                                            <constraint firstItem="qMl-JH-HLw" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="1x2-y3-ciP" secondAttribute="leading" constant="20" id="Jqc-dY-GTH"/>
                                             <constraint firstItem="BJ5-ot-YkD" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="1x2-y3-ciP" secondAttribute="leading" constant="20" symbolic="YES" id="KIP-uJ-LsM"/>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BJ5-ot-YkD" secondAttribute="trailing" constant="20" symbolic="YES" id="NCs-lL-WnP"/>
                                             <constraint firstItem="1Yx-P8-Cz3" firstAttribute="top" secondItem="1x2-y3-ciP" secondAttribute="top" constant="20" id="PQm-9i-FIj"/>
@@ -748,6 +750,7 @@ You will have the chance to print this password out on the next screen for emerg
                                             <constraint firstItem="1Yx-P8-Cz3" firstAttribute="leading" secondItem="1x2-y3-ciP" secondAttribute="leading" constant="20" id="fmH-w8-v5X"/>
                                             <constraint firstItem="BJ5-ot-YkD" firstAttribute="top" secondItem="5lU-Td-3SH" secondAttribute="bottom" constant="20" id="frU-mK-iEp"/>
                                             <constraint firstItem="UZv-D9-m3B" firstAttribute="top" secondItem="7Ou-hA-GZf" secondAttribute="bottom" constant="20" id="ftZ-Xj-PV7"/>
+                                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="qMl-JH-HLw" secondAttribute="trailing" constant="20" id="n16-gn-AOZ"/>
                                             <constraint firstAttribute="trailing" secondItem="5lU-Td-3SH" secondAttribute="trailing" constant="20" id="oBg-WE-zSA"/>
                                             <constraint firstItem="7Ou-hA-GZf" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="1x2-y3-ciP" secondAttribute="leading" constant="4" id="sen-Vj-YX3"/>
                                             <constraint firstItem="UZv-D9-m3B" firstAttribute="centerX" secondItem="1x2-y3-ciP" secondAttribute="centerX" id="spE-7r-CSd"/>
@@ -764,7 +767,8 @@ You will have the chance to print this password out on the next screen for emerg
                                 </constraints>
                             </scrollView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="2z8-Sp-jds"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="2z8-Sp-jds" firstAttribute="bottom" secondItem="omb-Gg-pcL" secondAttribute="bottom" id="GsA-dD-p7f"/>
                             <constraint firstItem="1x2-y3-ciP" firstAttribute="width" secondItem="2z8-Sp-jds" secondAttribute="width" id="fZX-de-BxX"/>
@@ -773,7 +777,6 @@ You will have the chance to print this password out on the next screen for emerg
                             <constraint firstItem="omb-Gg-pcL" firstAttribute="trailing" secondItem="2z8-Sp-jds" secondAttribute="trailing" id="plY-6C-VSD"/>
                             <constraint firstItem="2z8-Sp-jds" firstAttribute="bottom" secondItem="1x2-y3-ciP" secondAttribute="bottom" constant="20" id="sUf-mt-WkR"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="2z8-Sp-jds"/>
                     </view>
                     <navigationItem key="navigationItem" title="Master Password" id="exd-bs-bIk">
                         <barButtonItem key="rightBarButtonItem" title="Create" style="done" id="BbB-uu-fS0"/>
@@ -807,14 +810,14 @@ You will have the chance to print this password out on the next screen for emerg
                                                 <rect key="frame" x="82" y="343.66666666666669" width="250" height="130.66666666666669"/>
                                                 <subviews>
                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="751" text="You're All Set!" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="6iM-aX-EVG" userLabel="Heading">
-                                                        <rect key="frame" x="25" y="0.0" width="200" height="40.666666666666664"/>
+                                                        <rect key="frame" x="24.333333333333329" y="0.0" width="201.66666666666669" height="40.666666666666664"/>
                                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                         <nil key="textColor"/>
                                                         <nil key="highlightedColor"/>
                                                     </label>
-                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h2p-Lj-ofg" userLabel="Create Button">
+                                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="h2p-Lj-ofg" userLabel="Create Button">
                                                         <rect key="frame" x="0.0" y="75.666666666666657" width="250" height="55"/>
-                                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="55" id="OTW-Px-Cfd"/>
                                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="eLT-oQ-Gtv"/>
@@ -831,7 +834,7 @@ You will have the chance to print this password out on the next screen for emerg
                                                 </subviews>
                                             </stackView>
                                         </subviews>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="Iad-r0-Eog" secondAttribute="trailing" constant="20" symbolic="YES" id="9ec-sp-SPx"/>
                                             <constraint firstItem="Iad-r0-Eog" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="QZa-fA-hFL" secondAttribute="leading" constant="20" symbolic="YES" id="BYf-Fq-NEW"/>
@@ -850,7 +853,8 @@ You will have the chance to print this password out on the next screen for emerg
                                 </constraints>
                             </scrollView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="qtm-Di-pru"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="QZa-fA-hFL" firstAttribute="width" secondItem="qtm-Di-pru" secondAttribute="width" id="24S-7K-gSe"/>
                             <constraint firstItem="op8-jb-tHv" firstAttribute="top" secondItem="qtm-Di-pru" secondAttribute="top" id="5vZ-g2-qZ7"/>
@@ -859,7 +863,6 @@ You will have the chance to print this password out on the next screen for emerg
                             <constraint firstItem="op8-jb-tHv" firstAttribute="leading" secondItem="qtm-Di-pru" secondAttribute="leading" id="Zla-FG-wiU"/>
                             <constraint firstItem="op8-jb-tHv" firstAttribute="trailing" secondItem="qtm-Di-pru" secondAttribute="trailing" id="fbK-tH-5Dc"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="qtm-Di-pru"/>
                     </view>
                     <navigationItem key="navigationItem" title="Master Password" id="KFJ-9A-dhf">
                         <barButtonItem key="rightBarButtonItem" title="Create" style="done" id="lTk-QZ-lp0"/>
@@ -893,7 +896,7 @@ You will have the chance to print this password out on the next screen for emerg
                                         <rect key="frame" x="0.0" y="60.666666666666671" width="374" height="206.66666666666663"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="748" text="Your Database is now ready to go" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5KW-aF-8Kx" userLabel="First Message">
-                                                <rect key="frame" x="59.333333333333329" y="0.0" width="255.66666666666669" height="20.333333333333332"/>
+                                                <rect key="frame" x="60.000000000000014" y="0.0" width="254.33333333333337" height="20.333333333333332"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -908,18 +911,18 @@ You will have the chance to print this password out on the next screen for emerg
                                         </subviews>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="leading" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4av-wA-ATn">
-                                        <rect key="frame" x="60" y="368.33333333333337" width="254" height="33"/>
+                                        <rect key="frame" x="61" y="368.33333333333337" width="252" height="33"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <state key="normal" title="Print Emergency Password Sheet">
-                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
                                         </state>
                                         <connections>
                                             <action selector="onPrintMasterPassword:" destination="jC3-mb-M4m" eventType="touchUpInside" id="YKU-dD-gwd"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ich-NG-HwE" userLabel="Create Button">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Ich-NG-HwE" userLabel="Create Button">
                                         <rect key="frame" x="62" y="297.33333333333337" width="250" height="55"/>
-                                        <color key="backgroundColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <color key="backgroundColor" systemColor="systemBlueColor"/>
                                         <constraints>
                                             <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="250" id="DSG-Yd-OZX"/>
                                             <constraint firstAttribute="height" constant="55" id="bZr-DQ-dbn"/>
@@ -934,11 +937,11 @@ You will have the chance to print this password out on the next screen for emerg
                                             <action selector="onOpen:" destination="jC3-mb-M4m" eventType="touchUpInside" id="Ln4-UY-HXT"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rc5-qF-ste">
+                                    <button opaque="NO" contentMode="scaleToFill" verticalCompressionResistancePriority="760" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Rc5-qF-ste">
                                         <rect key="frame" x="117.66666666666666" y="409.33333333333337" width="138.99999999999997" height="32"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleCallout"/>
                                         <state key="normal" title="View All Databases">
-                                            <color key="titleColor" systemColor="systemBlueColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <color key="titleColor" systemColor="systemBlueColor"/>
                                         </state>
                                         <connections>
                                             <action selector="onDismiss:" destination="n1n-7g-yga" eventType="touchUpInside" id="vzV-Cr-ZUX"/>
@@ -946,7 +949,7 @@ You will have the chance to print this password out on the next screen for emerg
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
                                     <constraint firstItem="ocd-gC-bRp" firstAttribute="top" secondItem="hDB-qH-zSJ" secondAttribute="top" id="0ze-th-2vu"/>
                                     <constraint firstAttribute="trailing" secondItem="XkY-eg-GFU" secondAttribute="trailing" id="3rO-io-uHj"/>
@@ -966,7 +969,8 @@ You will have the chance to print this password out on the next screen for emerg
                                 </constraints>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="VMO-HH-XeX"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="VMO-HH-XeX" firstAttribute="trailing" secondItem="hDB-qH-zSJ" secondAttribute="trailing" constant="20" id="KDw-GW-9nK"/>
                             <constraint firstItem="VMO-HH-XeX" firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="hDB-qH-zSJ" secondAttribute="bottom" id="Mn0-mx-M9x"/>
@@ -974,7 +978,6 @@ You will have the chance to print this password out on the next screen for emerg
                             <constraint firstItem="hDB-qH-zSJ" firstAttribute="top" relation="greaterThanOrEqual" secondItem="VMO-HH-XeX" secondAttribute="top" id="exz-3z-lnW"/>
                             <constraint firstItem="hDB-qH-zSJ" firstAttribute="leading" secondItem="VMO-HH-XeX" secondAttribute="leading" constant="20" id="xJ4-lt-tce"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="VMO-HH-XeX"/>
                     </view>
                     <navigationItem key="navigationItem" id="fuj-cD-gCP">
                         <barButtonItem key="rightBarButtonItem" title="Open" style="done" id="p3d-sF-2RM"/>
@@ -1007,8 +1010,16 @@ You will have the chance to print this password out on the next screen for emerg
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="tb9-n9-4xe"/>
+        <segue reference="Fbp-xl-JtK"/>
         <segue reference="n38-QY-Xe1"/>
-        <segue reference="yre-To-0kY"/>
+        <segue reference="SpB-4E-MlZ"/>
     </inferredMetricsTieBreakers>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>

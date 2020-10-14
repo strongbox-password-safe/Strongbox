@@ -12,7 +12,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable error);
+typedef enum : NSUInteger {
+    kUnlockDatabaseResultError,
+    kUnlockDatabaseResultUserCancelled,
+    kUnlockDatabaseResultSuccess,
+    kUnlockDatabaseResultViewDebugSyncLogRequested,
+} UnlockDatabaseResult;
+
+typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, const NSError*_Nullable error);
 
 @interface OpenSafeSequenceHelper : NSObject
 
@@ -23,7 +30,7 @@ typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable er
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                           openLocalOnly:(BOOL)openLocalOnly
-                             completion:(CompletionBlock)completion;
+                             completion:(UnlockDatabaseCompletionBlock)completion;
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
@@ -31,7 +38,7 @@ typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable er
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
-                             completion:(CompletionBlock)completion;
+                             completion:(UnlockDatabaseCompletionBlock)completion;
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
@@ -40,7 +47,7 @@ typedef void(^CompletionBlock)(Model*_Nullable model, const NSError*_Nullable er
                 isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
-                             completion:(CompletionBlock)completion;
+                             completion:(UnlockDatabaseCompletionBlock)completion;
 
 NSData*_Nullable getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
 NSData*_Nullable getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NSError** error);

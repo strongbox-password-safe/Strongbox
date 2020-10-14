@@ -31,7 +31,7 @@
 #import "DebugHelper.h"
 #import "BiometricsManager.h"
 
-@interface PreferencesTableViewController () <MFMailComposeViewControllerDelegate>
+@interface PreferencesTableViewController ()
 
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAppLock;
 @property (weak, nonatomic) IBOutlet UISwitch *appLockOnPreferences;
@@ -41,7 +41,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelDeleteDataAttemptCount;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutVersion;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAboutHelp;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellEmailSupport;
 @property (weak, nonatomic) IBOutlet UILabel *labelVersion;
 @property (weak, nonatomic) IBOutlet UILabel *labelCloudSessions;
 @property (weak, nonatomic) IBOutlet UISwitch *clearClipboardEnabled;
@@ -52,9 +51,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseICloud;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTips;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellReviewStrongbox;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordGeneration;
-@property (weak, nonatomic) IBOutlet UITableViewCell *tweetStrongbox;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellManageKeyFiles;
 
 @end
@@ -112,14 +109,8 @@
     else if(cell == self.cellAboutVersion) {
         // Auto Segue
     }
-    else if(cell == self.tweetStrongbox) {
-        [self launchStrongboxSafeTwitter];
-    }
     else if(cell == self.cellAboutHelp) {
         [self onFaq];
-    }
-    else if(cell == self.cellEmailSupport) {
-        [self onContactSupport];
     }
     else if (cell == self.cellClearClipboardDelay) {
         [self promptForInteger:NSLocalizedString(@"prefs_vc_clear_clipboard_delay", @"Clear Clipboard Delay")
@@ -145,25 +136,12 @@
                         [self bindAppLock];
                     }];
     }
-    else if (cell == self.cellReviewStrongbox) {
-        [self onReviewInAppStore];
-    }
     else if (cell == self.cellPasswordGeneration) {
         [self performSegueWithIdentifier:@"seguePrefToPasswordPrefs" sender:nil];
     }
     else if (cell == self.cellManageKeyFiles) {
         [self performSegueWithIdentifier:@"segueToManageKeyFiles" sender:nil];
     }
-}
-
--(void)launchTweetAtStrongboxSafe {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"twitter://post?message=@StrongboxSafe%20Hi!"] options:@{} completionHandler:^(BOOL success) {
-        if(!success) {
-            [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https://twitter.com/intent/tweet?text=@StrongboxSafe%20Hi!"]
-                                             options:@{ }
-                                   completionHandler:nil];
-        }
-    }];
 }
 
 - (void)launchStrongboxSafeTwitter {
@@ -329,53 +307,21 @@
 }
 
 - (void)onContactSupport {
-    [Alerts threeOptionsWithCancel:self
-                             title:NSLocalizedString(@"prefs_vc_info_email_support_options_title", @"Support Options")
-                           message:NSLocalizedString(@"prefs_vc_info_email_support_options_message", @"Please make sure you check Twitter, Reddit and the FAQ before you email support to save development resources for improving Strongbox.")
+    [Alerts twoOptionsWithCancel:self
+                           title:NSLocalizedString(@"prefs_vc_info_email_support_options_title", @"Support Options")
+                         message:NSLocalizedString(@"prefs_vc_info_email_support_options_message", @"Please make sure you check Twitter, Reddit and the FAQ before you email support to save development resources for improving Strongbox.")
                defaultButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_check_faq", @"Check FAQ")
-                  secondButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_check_twitter", @"Check Twitter")
-                   thirdButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_mail_support", @"Mail Support (English Only)")
-                            action:^(int response) {
+                secondButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_check_twitter", @"Check Twitter")
+                          action:^(int response) {
         if(response == 0) {
             [self onFaq];
         }
         else if (response == 1) {
             [self launchStrongboxSafeTwitter];
         }
-        else if (response == 2) {
-            [self mailSupport];
-        }
     }];
 }
  
-- (void)mailSupport {
-    if(![MFMailComposeViewController canSendMail]) {
-        [Alerts info:self
-               title:NSLocalizedString(@"prefs_vc_info_email_not_available_title", @"Email Not Available")
-             message:NSLocalizedString(@"prefs_vc_info_email_not_available_message", @"It looks like email is not setup on this device.\n\nContact support@strongboxsafe.com for help.")];
-        
-        return;
-    }
-    
-    NSString* message = [DebugHelper getSupportEmailDebugString];
-    
-    MFMailComposeViewController *picker = [[MFMailComposeViewController alloc] init];
-    
-    [picker setSubject:[NSString stringWithFormat:@"Help with Strongbox %@", [Utils getAppVersion]]];
-    [picker setToRecipients:[NSArray arrayWithObjects:@"support@strongboxsafe.com", nil]];
-    [picker setMessageBody:message isHTML:YES];
-     
-    picker.mailComposeDelegate = self;
-    
-    [self presentViewController:picker animated:YES completion:nil];
-}
-     
-- (void)mailComposeController:(MFMailComposeViewController *)controller
-          didFinishWithResult:(MFMailComposeResult)result
-                        error:(NSError *)error {
-    [self dismissViewControllerAnimated:YES completion:nil];
-}
-
 - (IBAction)onDeleteDataChanged:(id)sender {
     if(self.switchDeleteDataEnabled.on) {
         Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; // Default
@@ -392,7 +338,7 @@
 }
 
 - (void)onFaq {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/faq"] options:@{} completionHandler:nil];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/support/"] options:@{} completionHandler:nil];
 }
 
 - (IBAction)onSwitchClearClipboardEnable:(id)sender {
@@ -469,26 +415,6 @@
         self.labelDeleteDataAttemptCount.textColor = !(deleteOnOff && deleteEnabled) ? UIColor.lightGrayColor : UIColor.darkTextColor;
     }
 }
-
-- (void)onReviewInAppStore {
-    int appId = 897283731;
-    
-    static NSString *const iOS7AppStoreURLFormat = @"itms-apps://itunes.apple.com/app/id%d?action=write-review";
-    static NSString *const iOSAppStoreURLFormat = @"itms-apps://itunes.apple.com/WebObjects/MZStore.woa/wa/viewContentsUserReviews?type=Purple+Software&id=%d&action=write-review";
-    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:([[UIDevice currentDevice].systemVersion floatValue] >= 7.0f)? iOS7AppStoreURLFormat: iOSAppStoreURLFormat, appId]];
-    
-    if ([[UIApplication sharedApplication] canOpenURL:url]) {
-        [[UIApplication sharedApplication] openURL:url options:@{} completionHandler:nil];
-    }
-    else {
-        [Alerts info:self
-               title:NSLocalizedString(@"prefs_vc_info_cannot_open_app_store_title", @"Cannot open App Store")
-             message:NSLocalizedString(@"prefs_vc_info_cannot_open_app_store_message", @"Please find Strongbox in the App Store and you can write a review there. Much appreciated!\n-Mark")];
-    }
-}
-
-//
 
 - (void)promptForInteger:(NSString*)title
                  options:(NSArray<NSNumber*>*)options

@@ -1316,9 +1316,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     [self disableUi];
     
-    NSLog(@"SAVE: Processing Icon for Save...");
     [self processIconBeforeSave:^{ // This is behind a completion because we might go out and download the FavIcon which is async...
-        NSLog(@"SAVE: Icon processed for Save...");
         // TODO: Updates need to be centralized in this class, and then properly managed in Browse View too on failure or local merge/conflict changes
         
 #ifdef IS_APP_EXTENSION

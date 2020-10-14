@@ -18,6 +18,15 @@ static NSString *const kMimeType = @"application/octet-stream";
 
 typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractionRequired, NSError *error);
 
+@interface GoogleDriveManager ()
+
+// Thread Safe just because all sync requests to Google Drive are currently serialized. The underlying library doesn't support concurrency anyway.
+
+@property (copy) Authenticationcompletion pendingAuthCompletion;
+@property BOOL pendingAuthCompletionIsBackgroundSync;
+
+@end
+
 @implementation GoogleDriveManager
 
 + (instancetype)sharedInstance {
@@ -73,13 +82,20 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
         // To make this thread safe, do not use properties but store these on a per thread basis
         
-        NSThread.currentThread.threadDictionary[@"authCompletion"] = completion;
-        NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = @(YES);
+        NSLog(@"Google Drive Sign In - Background Mode - Thread [%@] - completion = [%@]", NSThread.currentThread, completion);
+        
+        self.pendingAuthCompletion = completion;
+        self.pendingAuthCompletionIsBackgroundSync = YES;
+        
+//        NSThread.currentThread.threadDictionary[@"authCompletion"] = completion;
+//        NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = @(YES);
                 
         [signIn restorePreviousSignIn];
     }
     else {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // TODO: Need this for Biometrics but maybe can be moved into inner Sign in so only affected if we actually require a sign in
+            NSLog(@"Google Drive Sign In - Foreground Interactive Mode - Thread [%@]", NSThread.currentThread);
+
             // Must be done on main queue
             GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
@@ -87,9 +103,12 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         
             signIn.scopes = @[kGTLRAuthScopeDrive];
 
-            NSThread.currentThread.threadDictionary[@"authCompletion"] = completion;
-            NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = @(NO);
+            self.pendingAuthCompletion = completion;
+            self.pendingAuthCompletionIsBackgroundSync = NO;
             
+//            NSThread.currentThread.threadDictionary[@"authCompletion"] = completion;
+//            NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = @(NO);
+
             signIn.presentingViewController = viewController;
             
             if(signIn.hasPreviousSignIn) {
@@ -111,15 +130,23 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         self.driveService.authorizer = nil;
     }
     else {
+        NSLog(@"Google Sign In OK - %@", NSThread.currentThread);
         self.driveService.authorizer = user.authentication.fetcherAuthorizer;
     }
     
     SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = NO;
 
-    Authenticationcompletion authCompletion = NSThread.currentThread.threadDictionary[@"authCompletion"];
-    NSNumber *bsacm = NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"];
-    BOOL backgroundSyncAuthCompletionMode = bsacm ? bsacm.boolValue : NO;
+//    Authenticationcompletion authCompletion = NSThread.currentThread.threadDictionary[@"authCompletion"];
+    Authenticationcompletion authCompletion = self.pendingAuthCompletion;
+    
+    // NSNumber *bsacm = NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"];
+    // BOOL backgroundSyncAuthCompletionMode = bsacm ? bsacm.boolValue : NO;
+    BOOL backgroundSyncAuthCompletionMode = self.pendingAuthCompletionIsBackgroundSync;
 
+    // Clean up for next call...
+    
+    self.pendingAuthCompletion = nil;
+    
     if(error.code == kGIDSignInErrorCodeHasNoAuthInKeychain) {
         if(!backgroundSyncAuthCompletionMode) {
             return; // Do not call completion if this is a silenet sign and there is no Auth in Key...
@@ -127,19 +154,22 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         else {
             if (authCompletion) {
                 NSLog(@"User Interaction Required for Google Auth - but in Background Sync mode...");
-                //NSLog(@"Google Callback: %@", authenticationcompletion);
+                NSLog(@"Google Callback: %@", authCompletion);
                 authCompletion(NO, YES, nil);
-                NSThread.currentThread.threadDictionary[@"authCompletion"] = nil;
-                NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = nil;
+//                NSThread.currentThread.threadDictionary[@"authCompletion"] = nil;
+//                NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = nil;
             }
         }
     }
     else {
         if (authCompletion) {
-            //NSLog(@"Google Callback: %@", authenticationcompletion);
+            NSLog(@"Google Callback: %@", authCompletion);
             authCompletion(error.code == kGIDSignInErrorCodeCanceled, NO, error);
-            NSThread.currentThread.threadDictionary[@"authCompletion"] = nil;
-            NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = nil;
+//            NSThread.currentThread.threadDictionary[@"authCompletion"] = nil;
+//            NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = nil;
+        }
+        else {
+            NSLog(@"EEEEEK - Good Sign In but no AutoCompletion!! NOP - [%@]", NSThread.currentThread);
         }
     }
 }
@@ -224,7 +254,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
     [self authenticate:viewController
             completion:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
-        NSLog(@"Google Authenticate done [%hhd]-[%@]", userCancelled, error);
+        NSLog(@"Google Authenticate done [UserCancelled = %hhd]-[error = %@]", userCancelled, error);
         if (error) {
             NSLog(@"%@", error);
             handler(kReadResultError, nil, nil, error);

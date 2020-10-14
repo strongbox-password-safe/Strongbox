@@ -1,6 +1,6 @@
 //
 //  SafesListTableViewController.m
-//  Strongbox Auto Fill
+//  Strongbox AutoFill
 //
 //  Created by Mark on 11/10/2018.
 //  Copyright © 2018 Mark McGuill. All rights reserved.
@@ -178,7 +178,7 @@
                                              isAutoFillOpen:YES
                                               openLocalOnly:NO
                                 biometricAuthenticationDone:NO
-                                                 completion:^(Model * _Nullable model, NSError * _Nullable error) {
+                                                 completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
         // MMcG: iOS can and does regularly terminate the extension without notice
         // in normal situations. Only setting this immediately before Database Open/Unlock
 

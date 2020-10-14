@@ -71,6 +71,9 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.inProgressBehaviour = kInProgressBehaviourJoin;
+    
+    NSLog(@"BACKGROUND SYNC Start: [%@]", database.nickName);
+
     [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
         NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
     }];

@@ -23,6 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline;
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 
+- (NSString*)getJsonFileIdentifier:(NSData*)bookmark;
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData;
 
 @end

@@ -83,7 +83,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 - (NSString *_Nonnull)generatePassword;
 
-// Auto Fill
+// AutoFill
 
 - (void)disableAndClearAutoFill;
 - (void)enableAutoFill;

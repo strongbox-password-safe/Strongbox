@@ -1,6 +1,6 @@
 //
 //  PickCredentialsTableViewController.m
-//  Strongbox Auto Fill
+//  Strongbox AutoFill
 //
 //  Created by Mark on 14/10/2018.
 //  Copyright © 2018 Mark McGuill. All rights reserved.

@@ -654,12 +654,12 @@ static NSImage* kStrongBox256Image;
             [FavIconManager.sharedInstance downloadPreferred:url
                                                      options:FavIconDownloadOptions.express
                                                   completion:^(IMAGE_TYPE_PTR  _Nullable image) {
-                if(image) {
                     NSLog(@"Got FavIcon on Change URL or New Entry: [%@]", image);
                     dispatch_async(dispatch_get_main_queue(), ^{
-                        [self.model setItemIcon:node customImage:image];
+                        if(image) {
+                            [self.model setItemIcon:node customImage:image];
+                        }
                     });
-                }
             }];
         });
     }

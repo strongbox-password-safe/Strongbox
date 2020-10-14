@@ -161,7 +161,7 @@ rotateLastImage:(BOOL)rotateLastImage
         if (autoFill) {
             subtitle2 = database.autoFillEnabled ?
                 NSLocalizedString(@"autofill_vc_item_subtitle_local_copy_unavailable", @"Local Copy Unavailable") :
-                NSLocalizedString(@"autofill_vc_item_subtitle_disabled", @"Auto Fill Disabled");
+                NSLocalizedString(@"autofill_vc_item_subtitle_disabled", @"AutoFill Disabled");
         }
     }
     

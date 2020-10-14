@@ -98,6 +98,13 @@
     if([Settings.sharedInstance getLaunchCount] == 1) { 
         [self doFirstLaunchTasks];
     }
+    else {
+        if (@available(iOS 14.0, *)) { // We miss the AppBecameActive notification on first launch in iOS 14 - some kind of weird re-ordering of events. This may occur on other OS's but for now guard with this ios!4 check - TODO - Expand usage
+            if (!self.hasAppearedOnce) {
+                [self appBecameActive];
+            }
+        }
+    }
 
     // Crash...
     //
@@ -269,7 +276,7 @@
 }
 
 - (void)appBecameActive {
-    NSLog(@"appBecameActive");
+    NSLog(@"XXXXXXXXX - appBecameActive");
     
     if(self.privacyScreenSuppressedForBiometricAuth) {
         NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
@@ -301,12 +308,13 @@
 - (void)doAppFirstActivationProcess {
     if(!self.hasAppearedOnce) {
         self.hasAppearedOnce = YES;
-        NSLog(@"self.hasAppearedOnce = YES");
 
         if (Settings.sharedInstance.appLockMode != kNoLock) {
+            NSLog(@"First App Became Active - App Lock in Place - Showing Privacy Screen...");
             [self showPrivacyScreen:YES];
         }
         else {
+            NSLog(@"First App Became Active - No App Lock...");
             [self doAppActivationTasks:NO];
         }
     }
@@ -908,14 +916,17 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                  isAutoFillOpen:NO
                                                   openLocalOnly:openLocalOnly
                                     biometricAuthenticationDone:userJustCompletedBiometricAuthentication
-                                                     completion:^(Model * _Nullable model, NSError * _Nullable error) {
-            if(model) {
+                                                     completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
+            if (result == kUnlockDatabaseResultSuccess) {
                 if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
                     [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
                 }
                 else {
                     [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
                 }
+            }
+            else if (result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
+                [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
             }
         }];
     }

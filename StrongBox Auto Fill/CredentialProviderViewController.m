@@ -1,6 +1,6 @@
 //
 //  CredentialProviderViewController.m
-//  Strongbox Auto Fill
+//  Strongbox AutoFill
 //
 //  Created by Mark on 11/10/2018.
 //  Copyright © 2018 Mark McGuill. All rights reserved.
@@ -78,7 +78,7 @@
                                                 isAutoFillQuickTypeOpen:YES
                                                           openLocalOnly:NO
                                             biometricAuthenticationDone:NO
-                                                             completion:^(Model * _Nullable model, NSError * _Nullable error) {
+                                                             completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
                     // MMcG: iOS can and does regularly terminate the extension without notice
                     // in normal situations. Only setting this immediately before Database Open/Unlock
 
@@ -251,7 +251,7 @@
     //    Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
 
     if(!lastRunGood) {
-        NSLog(@"Last run of Auto Fill did not exit cleanly! Warn User that a crash occurred...");
+        NSLog(@"Last run of AutoFill did not exit cleanly! Warn User that a crash occurred...");
     }
     
     return lastRunGood;
@@ -260,8 +260,8 @@
 - (void)showLastRunCrashedMessage:(void (^)(void))completion {
     NSLog(@"Exit Clean = %hhd, Wrote Clean = %hhd", AutoFillSettings.sharedInstance.autoFillExitedCleanly, AutoFillSettings.sharedInstance.autoFillWroteCleanly);
     
-    NSString* title = NSLocalizedString(@"autofill_did_not_close_cleanly_title", @"Auto Fill Crash Occurred");
-    NSString* message = NSLocalizedString(@"autofill_did_not_close_cleanly_message", @"It looks like the last time you used Auto Fill you had a crash. This is usually due to a memory limitation. Please check your database file size and your Argon2 memory settings (should be <= 64MB).");
+    NSString* title = NSLocalizedString(@"autofill_did_not_close_cleanly_title", @"AutoFill Crash Occurred");
+    NSString* message = NSLocalizedString(@"autofill_did_not_close_cleanly_message", @"It looks like the last time you used AutoFill you had a crash. This is usually due to a memory limitation. Please check your database file size and your Argon2 memory settings (should be <= 64MB).");
 
     [Alerts info:self title:title message:message completion:completion];
 

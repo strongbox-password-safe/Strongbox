@@ -187,6 +187,11 @@ viewController:(UIViewController *)viewController
     NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     NSLog(@"[Files] File Mod Date: [%@][%@]", attr.fileModificationDate, error);
 
+    if (error) {
+        completion(kReadResultError, nil, nil, error);
+        return;
+    }
+
     dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
         StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
         
@@ -196,7 +201,6 @@ viewController:(UIViewController *)viewController
         }
 
         [document openWithCompletionHandler:^(BOOL success) {
-            NSLog(@"[Files] File Mod Date2: [%@]", document.fileModificationDate);
             completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, nil);
             [url stopAccessingSecurityScopedResource];
             

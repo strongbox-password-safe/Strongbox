@@ -683,7 +683,7 @@
 #ifndef IS_APP_EXTENSION
     return [YubiManager.sharedInstance yubiKeySupportedOnDevice];
 #else
-    // Is MFI Supported in Auto Fill - Yubikey library isn't compatible with App Extensions :/
+    // MFI Support in AutoFill - Yubikey library isn't compatible with App Extensions :/
     return NO;
 #endif
 }

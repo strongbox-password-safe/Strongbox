@@ -61,7 +61,7 @@
 #else
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
-    [NSException raise:@"Storage Provider Called From Auto Fill!!" format:@"Very Bad"];
+    [NSException raise:@"Storage Provider Called From AutoFill!!" format:@"Very Bad"];
     return nil;
 }
 

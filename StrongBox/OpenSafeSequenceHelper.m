@@ -30,6 +30,9 @@
 #import "Kdbx4Serialization.h"
 #import "KeePassCiphers.h"
 #import "NSDate+Extensions.h"
+#import "FilesAppUrlBookmarkProvider.h"
+
+#import <FileProvider/FileProvider.h>
 
 #ifndef IS_APP_EXTENSION
 #import "OfflineDetector.h"
@@ -42,7 +45,7 @@
 @property (nonnull) UIViewController* viewController;
 @property (nonnull) SafeMetaData* safe;
 @property BOOL canConvenienceEnrol;
-@property (nonnull) CompletionBlock completion;
+@property (nonnull) UnlockDatabaseCompletionBlock completion;
 
 @property BOOL isConvenienceUnlock;
 @property BOOL isAutoFillOpen;
@@ -70,7 +73,7 @@
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                           openLocalOnly:(BOOL)openLocalOnly
-                             completion:(CompletionBlock)completion {
+                             completion:(UnlockDatabaseCompletionBlock)completion {
     [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
                                                        safe:safe
                                         canConvenienceEnrol:canConvenienceEnrol
@@ -86,7 +89,7 @@
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
-                             completion:(CompletionBlock)completion {
+                             completion:(UnlockDatabaseCompletionBlock)completion {
     [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
                                                        safe:safe
                                         canConvenienceEnrol:canConvenienceEnrol
@@ -104,7 +107,7 @@
                 isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
                  openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
-                             completion:(CompletionBlock)completion {
+                             completion:(UnlockDatabaseCompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                                                        safe:safe
                                                                         canConvenienceEnrol:canConvenienceEnrol
@@ -124,7 +127,7 @@
                isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
                 openLocalOnly:(BOOL)openLocalOnly
                    biometricPreCleared:(BOOL)biometricPreCleared
-                            completion:(CompletionBlock)completion {
+                            completion:(UnlockDatabaseCompletionBlock)completion {
     self = [super init];
     if (self) {
         self.biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
@@ -274,7 +277,7 @@
                 [self promptForManualCredentials];
             }
             else {
-                self.completion(nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
         }];
     };
@@ -286,14 +289,14 @@
 - (void)performDuressAction {
     if (self.safe.duressAction == kOpenDummy) {
         Model *viewModel = [[Model alloc] initAsDuressDummy:self.isAutoFillOpen templateMetaData:self.safe];
-        self.completion(viewModel, nil);
+        self.completion(kUnlockDatabaseResultSuccess, viewModel, nil);
     }
     else if (self.safe.duressAction == kPresentError) {
         NSError *error = [Utils createNSError:NSLocalizedString(@"open_sequence_duress_technical_error_message", @"There was a technical error opening the database.") errorCode:-1729];
         [Alerts error:self.viewController
                 title:NSLocalizedString(@"open_sequence_duress_technical_error_title",@"Technical Issue")
                 error:error completion:^{
-            self.completion(nil, error);
+            self.completion(kUnlockDatabaseResultError, nil, error);
         }];
     }
     else if (self.safe.duressAction == kRemoveDatabase) {
@@ -301,11 +304,11 @@
         NSError *error = [Utils createNSError:NSLocalizedString(@"open_sequence_duress_technical_error_message",@"There was a technical error opening the database.") errorCode:-1729];
         [Alerts error:self.viewController
                 title:NSLocalizedString(@"open_sequence_duress_technical_error_title",@"Technical Issue") error:error completion:^{
-            self.completion(nil, error);
+            self.completion(kUnlockDatabaseResultError, nil, error);
         }];
     }
     else {
-        self.completion(nil, nil);
+        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
     }
 }
 
@@ -400,7 +403,7 @@
             });
         }
         else {
-            self.completion(nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
     }
 }
@@ -495,7 +498,7 @@
                   yubikeyConfiguration:creds.yubiKeyConfig];
             }
             else {
-                self.completion(nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
         }];
     };
@@ -535,7 +538,7 @@
                             title:NSLocalizedString(@"open_sequence_error_reading_key_file_autofill_context", @"Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences")
                             error:error
                        completion:^{
-                        self.completion(nil, error);
+                        self.completion(kUnlockDatabaseResultError, nil, error);
                     }];
                     return;
             }
@@ -544,7 +547,7 @@
                         title:NSLocalizedString(@"open_sequence_error_reading_key_file", @"Error Reading Key File")
                         error:error
                    completion:^{
-                    self.completion(nil, error);
+                    self.completion(kUnlockDatabaseResultError, nil, error);
                 }];
                 return;
             }
@@ -586,7 +589,7 @@
             [Alerts warn:self.viewController
                    title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Local Copy")
                  message:NSLocalizedString(@"open_sequence_couldnt_open_local_message", @"Could not open Strongbox's local copy of this database. A online sync is required.")];
-            self.completion(nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
         else{
             self.forcedReadOnly = !self.isAutoFillOpen; // Auto-Fill can edit local copy
@@ -615,7 +618,7 @@
                 [self syncAndUnlockLocalCopy];
             }
             else {
-                self.completion(nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
         }];
     }
@@ -647,27 +650,61 @@
             }
             else if (result == kSyncAndMergeResultUserCancelled) {
                 // Can happen when user cancels out of a Sync Conflict without choosing a resolution
-                self.completion(nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
             else if (result == kSyncAndMergeError) {
                 NSLog(@"Unlock Interactive Sync Error: [%@]", error);
 
-                NSString* loc = NSLocalizedString(@"open_sequence_storage_provider_error_open_local_ro_instead", @"A sync error occured. If this happens repeatedly you should try removing and re-adding your database.\n\n%@\nWould you like to open Strongbox's local copy in read-only mode instead?");
+                if (self.safe.storageProvider == kFilesAppUrlBookmark) {
+                    if ( @available(iOS 11.0, *) ) {
+                        // 257 = Permissions Error
+                        
+                        if ( error.code == NSFileProviderErrorNoSuchItem || error.code == 257) {
+                            NSString* message = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db_message", @"Strongbox is having trouble locating your database. This can happen sometimes especially after iOS updates or with some 3rd party providers (e.g.Nextcloud).\n\nYou now need to tell Strongbox where to locate it. Alternatively you can open Strongbox's local copy and fix this later.\n\nFor Nextcloud please use WebDAV instead...");
+                            
+                            NSString* relocateDatabase = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db", @"Locate Database...");
+                            
+                            [Alerts twoOptionsWithCancel:self.viewController
+                                                   title:NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error")
+                                                 message:message
+                                       defaultButtonText:relocateDatabase
+                                        secondButtonText:NSLocalizedString(@"open_sequence_use_local_copy_option", @"Use Local (Read-Only)") 
+                                                  action:^(int response) {
+                                if (response == 0) {
+                                    [self onRelocateFilesBasedDatabase];
+                                }
+                                else if (response == 1) {
+                                    self.forcedReadOnly = YES; // Live Connect - allow editing of local copy - Change for Pro users when offline editing feature in place - TODO
+                                    [self unlockLocalCopy];
+                                }
+                                else {
+                                    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+                                }
+                            }];
 
-                NSString* message = loc;
-                
-                [Alerts twoOptions:self.viewController
-                             title:NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error")
-                           message:message
-                 defaultButtonText:NSLocalizedString(@"open_sequence_yes_use_local_copy_option", @"Yes, Use Local (Read-Only)")
-                  secondButtonText:NSLocalizedString(@"alerts_no", @"No")
-                            action:^(BOOL response) {
-                    if (response) {
-                        self.forcedReadOnly = YES; // Live Connect - allow editing of local copy - Change for Pro users when offline editing feature in place
+                            return;
+                        }
+                    }
+                }
+
+                NSString* message = NSLocalizedString(@"open_sequence_storage_provider_error_open_local_ro_instead", @"A sync error occured. If this happens repeatedly you should try removing and re-adding your database.\n\n%@\nWould you like to open Strongbox's local copy in read-only mode instead?");
+                NSString* viewSyncError = NSLocalizedString(@"open_sequence_storage_provider_view_sync_error_details", @"View Error Details");
+
+                [Alerts twoOptionsWithCancel:self.viewController
+                                       title:NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error")
+                                     message:message
+                           defaultButtonText:NSLocalizedString(@"open_sequence_yes_use_local_copy_option", @"Yes, Use Local (Read-Only)")
+                            secondButtonText:viewSyncError
+                                      action:^(int response) {
+                    if (response == 0) {
+                        self.forcedReadOnly = YES; // Live Connect - allow editing of local copy - Change for Pro users when offline editing feature in place - TODO
                         [self unlockLocalCopy];
                     }
+                    else if (response == 1) { // View Debug Sync Log
+                        self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil);
+                    }
                     else {
-                        self.completion(nil, nil);
+                        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
                     }
                 }];
             }
@@ -687,12 +724,12 @@
         [Alerts warn:self.viewController
                title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Local Copy")
              message:NSLocalizedString(@"open_sequence_couldnt_open_local_message", @"Could not open Strongbox's local copy of this database. A online sync is required.")];
-        self.completion(nil, nil);
+        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
     }
     else if(self.isAutoFillOpen && !AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash && [OpenSafeSequenceHelper isAutoFillLikelyToCrash:localCopyUrl]) {
         [Alerts warn:self.viewController
                title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
-             message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password Auto Fill extensions to be terminated due to excessive resource consumption. This will mean Auto Fill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
+             message:NSLocalizedString(@"open_sequence_autofill_creash_likely_message", @"Your database has encryption settings that may cause iOS Password AutoFill extensions to be terminated due to excessive resource consumption. This will mean AutoFill appears not to work. Unfortunately this is an Apple imposed limit. You could consider reducing the amount of resources consumed by your encryption settings (Memory in particular with Argon2 to below 64MB).")
         completion:^{
             AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
             [self unlockDatabaseAtUrl:localCopyUrl modDate:modDate];
@@ -755,7 +792,7 @@
     }
 #else
     // FUTURE: Is this true for the 5Ci MFI?
-    NSString* loc = NSLocalizedString(@"open_sequence_cannot_use_yubikey_in_autofill_mode", @"YubiKey Unlock is not supported in Auto Fill mode");
+    NSString* loc = NSLocalizedString(@"open_sequence_cannot_use_yubikey_in_autofill_mode", @"YubiKey Unlock is not supported in AutoFill mode");
     NSError* error = [Utils createNSError:loc errorCode:-1];
     completion(NO, nil, error);
 #endif
@@ -857,7 +894,7 @@
         [SVProgressHUD dismiss];
         
         if (userCancelled) {
-            self.completion(nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
         else {
             [self openSafeWithDataDone:error openedSafe:model modDate:modDate];
@@ -875,7 +912,7 @@
             [Alerts error:self.viewController
                     title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
                     error:error];
-            self.completion(nil, error);
+            self.completion(kUnlockDatabaseResultError, nil, error);
             return;
         }
         else if (error.code == kStrongboxErrorCodeIncorrectCredentials) {
@@ -913,7 +950,7 @@
                     error:error];
         }
         
-        self.completion(nil, error);
+        self.completion(kUnlockDatabaseResultError, nil, error);
     }
     else {
         BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
@@ -1089,7 +1126,7 @@
     
     viewModel.openedWithYubiKeySecret = self.yubikeySecret;
     
-    if(self.safe.autoFillEnabled && !self.isAutoFillOpen) { // This is memory heavy ... don't blow it in Auto Fill
+    if(self.safe.autoFillEnabled && !self.isAutoFillOpen) { // This is memory heavy ... don't blow it in AutoFill
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
     }
 
@@ -1097,7 +1134,7 @@
     self.safe.likelyFormat = openedSafe.format;
     [SafesList.sharedInstance update:self.safe];
     
-    self.completion(viewModel, nil);
+    self.completion(kUnlockDatabaseResultSuccess, viewModel, nil);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1196,4 +1233,115 @@ NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NS
     return challengeResponse;
 }
                     
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static OpenSafeSequenceHelper *sharedInstance = nil;
+
+- (void)onRelocateFilesBasedDatabase {
+    // Some Voodoo to keep this instance around otherwise the delegate never gets called... it would be nice to find a better way to do this?
+    
+    sharedInstance = self;
+
+    UIDocumentPickerViewController *vc = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString*)kUTTypeItem] inMode:UIDocumentPickerModeOpen];
+    vc.delegate = sharedInstance;
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+   
+    [self.viewController presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
+    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+    sharedInstance = nil;
+}
+
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    NSLog(@"didPickDocumentsAtURLs: %@", urls);
+    
+    NSURL* url = [urls objectAtIndex:0];
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+    [self documentPicker:controller didPickDocumentAtURL:url];
+    #pragma GCC diagnostic pop
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-implementations"
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+    StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
+    if (!document) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self readReselectedFilesDatabase:NO data:nil url:url];
+        });
+        return;
+    }
+
+    [document openWithCompletionHandler:^(BOOL success) {
+        NSData* data = document.data;
+        
+        [document closeWithCompletionHandler:nil];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self readReselectedFilesDatabase:success data:data url:url];
+        });
+    }];
+    
+    sharedInstance = nil;
+}
+#pragma GCC diagnostic pop
+
+- (void)readReselectedFilesDatabase:(BOOL)success data:(NSData*)data url:(NSURL*)url {
+    if(!success || !data) {
+        [Alerts warn:self.viewController
+               title:@"Error Opening This Database"
+             message:@"Could not access this file."];
+        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+    }
+    else {
+        NSError* error;
+        
+        if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) {
+            [Alerts error:self.viewController
+                    title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
+                    error:error];
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+            return;
+        }
+        
+        if([url.lastPathComponent compare:self.safe.fileName] != NSOrderedSame) {
+            [Alerts yesNo:self.viewController
+                    title:NSLocalizedString(@"open_sequence_database_different_filename_title",@"Different Filename")
+                  message:NSLocalizedString(@"open_sequence_database_different_filename_message",@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?")
+                   action:^(BOOL response) {
+                       if(response) {
+                           [self updateFilesBookmarkWithRelocatedUrl:url];
+                       }
+                   }];
+        }
+        else {
+            [self updateFilesBookmarkWithRelocatedUrl:url];
+        }
+    }
+}
+
+- (void)updateFilesBookmarkWithRelocatedUrl:(NSURL*)url {
+    NSError* error;
+    NSData* bookMark = [BookmarksHelper getBookmarkDataFromUrl:url error:&error];
+    
+    if (error) {
+        [Alerts error:self.viewController
+                title:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
+                error:error];
+        self.completion(kUnlockDatabaseResultError, nil, nil);
+    }
+    else {
+        NSString* identifier = [FilesAppUrlBookmarkProvider.sharedInstance getJsonFileIdentifier:bookMark];
+
+        self.safe.fileIdentifier = identifier;
+        [SafesList.sharedInstance update:self.safe];
+        
+        [self syncAndUnlockLocalCopy]; // Re-try...
+    }
+}
+
 @end

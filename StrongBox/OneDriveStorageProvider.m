@@ -179,6 +179,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
                 
                 NSLog(@"OneDrive Read: %@", error);
                 completion(kReadResultError, nil, nil, error);
+                [self signout:^(NSError *error) { }];  // Signout if something
                 return;
             }
             
@@ -190,9 +191,8 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 - (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
     [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
-            [self.odClient signOutWithCompletion:^(NSError *error) { // Signout if something goes wrong
-                completion(kReadResultError, nil, nil, error);
-            }];
+            completion(kReadResultError, nil, nil, error);
+            [self signout:^(NSError *error) { }];  // Signout if something
             return;
         }
                       
@@ -235,6 +235,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
             if(error) {
                 NSLog(@"%@", error);
                 completion(kReadResultError, nil, nil, error);
+                [self signout:^(NSError *error) { }];  // Signout if something
                 return;
             }
             
@@ -323,6 +324,9 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
             completion(error.code == ODAuthCanceled, nil, error);
+            if (error.code != ODAuthCanceled) {
+                [self signout:^(NSError *error) { }];  // Signout if something
+            }
             return;
         }
                       

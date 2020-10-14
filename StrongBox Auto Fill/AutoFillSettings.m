@@ -94,7 +94,7 @@ static NSString* const kAutoProceedOnSingleMatch = @"autoProceedOnSingleMatch";
     NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
     
     if(defaults == nil) {
-        NSLog(@"ERROR: Could not get Auto Fill NSUserDefaults");
+        NSLog(@"ERROR: Could not get AutoFill NSUserDefaults");
     }
     
     return defaults;
