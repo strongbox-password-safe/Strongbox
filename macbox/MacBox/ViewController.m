@@ -1663,8 +1663,8 @@ static NSImage* kStrongBox256Image;
             }];
         });
     }
-    else {
-        [Alerts info:@"Model is not set! This should never happen. Please contact support@strongboxsafe.com."
+    else { // This can happen - especially on an external file change...
+        [Alerts info:@"Model is not set. Could not unlock. Please close and reopen your database"
               window:self.view.window];
     }
 }

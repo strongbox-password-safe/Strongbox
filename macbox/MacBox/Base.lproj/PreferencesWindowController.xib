@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="16097.3" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16097.3"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -93,32 +93,32 @@
         <window title="Preferences" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <rect key="contentRect" x="196" y="240" width="690" height="654"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1097"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
             <view key="contentView" wantsLayer="YES" misplaced="YES" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="690" height="654"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <tabView translatesAutoresizingMaskIntoConstraints="NO" id="pKR-KL-ngR">
-                        <rect key="frame" x="13" y="26" width="667" height="304"/>
+                        <rect key="frame" x="13" y="26" width="667" height="743"/>
                         <font key="font" metaFont="label" size="13"/>
                         <tabViewItems>
                             <tabViewItem label="General" identifier="" id="yNg-sv-E7G">
                                 <view key="view" id="elx-gC-YoE">
-                                    <rect key="frame" x="10" y="33" width="647" height="530"/>
+                                    <rect key="frame" x="10" y="33" width="647" height="560"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xfc-2q-RkA">
-                                            <rect key="frame" x="18" y="358" width="198" height="18"/>
+                                            <rect key="frame" x="18" y="379" width="202" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Auto Complete on Fields" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yeU-d7-EAN">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="Ig3-Kc-Ptl"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="pxT-nk-uUw">
-                                            <rect key="frame" x="377" y="325" width="56" height="16"/>
+                                            <rect key="frame" x="383" y="344" width="56" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="seconds" id="1oQ-mP-YWU">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -126,27 +126,27 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="d48-A0-G7M">
-                                            <rect key="frame" x="18" y="392" width="243" height="18"/>
+                                            <rect key="frame" x="18" y="415" width="247" height="18"/>
                                             <buttonCell key="cell" type="check" title="Display Popup Notifications for Edits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="CdL-C9-1bi">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="AlS-lG-689"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="0Wy-pB-zM8">
-                                            <rect key="frame" x="18" y="494" width="180" height="18"/>
+                                            <rect key="frame" x="18" y="523" width="183" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show in System Menu Bar" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Gyg-6A-be3">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="SDq-sz-Biy"/>
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wsV-1v-9l4">
-                                            <rect key="frame" x="290" y="322" width="60" height="21"/>
+                                            <rect key="frame" x="296" y="341" width="60" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="60" id="7cT-Z8-M0h"/>
                                             </constraints>
@@ -161,24 +161,24 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="QEg-TP-0kC">
-                                            <rect key="frame" x="18" y="324" width="256" height="18"/>
+                                            <rect key="frame" x="18" y="343" width="260" height="18"/>
                                             <buttonCell key="cell" type="check" title="Auto Clear Clipboard on Exit and After:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="rl3-rd-Ws6">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onAutoClearClipboard:" target="-2" id="kk4-6k-RRg"/>
                                             </connections>
                                         </button>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="XkJ-k9-VXm">
-                                            <rect key="frame" x="355" y="319" width="19" height="28"/>
+                                            <rect key="frame" x="361" y="338" width="19" height="28"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" minValue="15" maxValue="1200" doubleValue="60" id="dVG-hS-h7r"/>
                                             <connections>
                                                 <action selector="onStepperClearClipboard:" target="-2" id="0Zl-NP-05u"/>
                                             </connections>
                                         </stepper>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="a59-6L-N1P">
-                                            <rect key="frame" x="306" y="257" width="56" height="16"/>
+                                            <rect key="frame" x="312" y="272" width="56" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="seconds" id="OGE-ad-bBB">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -186,7 +186,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1QM-ew-ATR">
-                                            <rect key="frame" x="219" y="254" width="60" height="21"/>
+                                            <rect key="frame" x="225" y="269" width="60" height="21"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="60" id="EcX-u2-btP"/>
                                             </constraints>
@@ -201,117 +201,117 @@
                                             </connections>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MZP-ha-yar">
-                                            <rect key="frame" x="18" y="256" width="181" height="18"/>
+                                            <rect key="frame" x="18" y="271" width="185" height="18"/>
                                             <buttonCell key="cell" type="check" title="Auto Lock Database After:" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="uxM-9Q-feq">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onAutolockChange:" target="-2" id="Rgc-MH-zo1"/>
                                             </connections>
                                         </button>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="M1Y-fH-3um">
-                                            <rect key="frame" x="284" y="251" width="19" height="28"/>
+                                            <rect key="frame" x="290" y="266" width="19" height="28"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" maxValue="43200" doubleValue="60" id="X6T-6m-hcs"/>
                                             <connections>
                                                 <action selector="onStepperAutoLockDatabase:" target="-2" id="xQB-Ze-5v6"/>
                                             </connections>
                                         </stepper>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lGm-nA-viI">
-                                            <rect key="frame" x="18" y="222" width="114" height="18"/>
+                                            <rect key="frame" x="18" y="235" width="118" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Auto Save " bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="aJ8-Bc-3q6">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="4C1-Vk-R2y"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hWF-oW-tXl">
-                                            <rect key="frame" x="18" y="188" width="224" height="18"/>
+                                            <rect key="frame" x="18" y="199" width="228" height="18"/>
                                             <buttonCell key="cell" type="check" title="Monitor for External File Changes" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Cd5-R3-hg8">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="RxJ-QV-bDO"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EvG-61-L1Q">
-                                            <rect key="frame" x="18" y="154" width="351" height="18"/>
+                                            <rect key="frame" x="18" y="163" width="355" height="18"/>
                                             <buttonCell key="cell" type="check" title="Auto Reload on External File Changes (When Possible)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="0sC-XX-GhI">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="c7t-qt-TxO"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="8od-gl-hYp">
-                                            <rect key="frame" x="18" y="120" width="314" height="18"/>
+                                            <rect key="frame" x="18" y="127" width="318" height="18"/>
                                             <buttonCell key="cell" type="check" title="Automatically download FavIcon on URL Change" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="UJT-LN-Pgw">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="rDm-X4-vQs"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="piJ-vX-OR4">
-                                            <rect key="frame" x="18" y="86" width="237" height="18"/>
+                                            <rect key="frame" x="18" y="91" width="241" height="18"/>
                                             <buttonCell key="cell" type="check" title="Hide Key File Name on Lock Screen" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="u3F-9c-kC4">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="Z79-R0-oBm"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ia9-41-2Rl">
-                                            <rect key="frame" x="18" y="460" width="335" height="18"/>
+                                            <rect key="frame" x="18" y="487" width="336" height="18"/>
                                             <buttonCell key="cell" type="check" title="Automatically Prompt for Touch ID or Watch Open" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="1BJ-eP-XiH">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="nPT-Pt-tFy"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="05q-E7-GBC">
-                                            <rect key="frame" x="18" y="426" width="225" height="18"/>
+                                            <rect key="frame" x="18" y="451" width="226" height="18"/>
                                             <buttonCell key="cell" type="check" title="Allow Watch Unlock (Catalina+)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wPY-JY-TVX">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="SIh-gD-j3E"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dPS-9l-lnL">
-                                            <rect key="frame" x="18" y="52" width="184" height="18"/>
+                                            <rect key="frame" x="18" y="55" width="188" height="18"/>
                                             <buttonCell key="cell" type="check" title="Do Not Remember Key File" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Ngn-50-skc">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="upv-YE-kg3"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Zd4-sH-oaR">
-                                            <rect key="frame" x="18" y="18" width="318" height="18"/>
+                                            <rect key="frame" x="18" y="19" width="322" height="18"/>
                                             <buttonCell key="cell" type="check" title="Dereference Items during Search (Possibly Slow)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Q4C-wJ-6XA">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="ehc-9f-op4"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="D6H-8T-lFh">
-                                            <rect key="frame" x="18" y="290" width="170" height="18"/>
+                                            <rect key="frame" x="18" y="307" width="174" height="18"/>
                                             <buttonCell key="cell" type="check" title="Allow Clipboard Handoff" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="2DK-wh-0xu">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="SCx-Co-DaW"/>
@@ -389,7 +389,7 @@
                                             <rect key="frame" x="18" y="222" width="135" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show TOTP Codes" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JRW-Zu-b78">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="0YS-xt-tdj"/>
@@ -399,7 +399,7 @@
                                             <rect key="frame" x="18" y="188" width="216" height="18"/>
                                             <buttonCell key="cell" type="check" title="Conceal Empty Protected Fields" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="7Ab-yA-ZGL">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="o4E-Ec-Fys"/>
@@ -409,7 +409,7 @@
                                             <rect key="frame" x="18" y="154" width="141" height="18"/>
                                             <buttonCell key="cell" type="check" title="Colorize Passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="btq-7d-aTQ">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="dTq-Uc-jx1"/>
@@ -419,7 +419,7 @@
                                             <rect key="frame" x="18" y="120" width="315" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Color Blind Palette for Colorizing Passwords" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Ep7-fG-8AB">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="bdA-4D-V76"/>
@@ -429,7 +429,7 @@
                                             <rect key="frame" x="18" y="18" width="297" height="18"/>
                                             <buttonCell key="cell" type="check" title="KeePass: Do Not Sort - Use Custom Ordering" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="LyM-2c-0d1">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="IZr-lo-USE"/>
@@ -439,7 +439,7 @@
                                             <rect key="frame" x="18" y="86" width="304" height="18"/>
                                             <buttonCell key="cell" type="check" title="KeePass: Show 'Recycle Bin' or 'Backup' group" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Jpd-Vh-Gb2">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="w4L-qY-Hqu"/>
@@ -449,7 +449,7 @@
                                             <rect key="frame" x="18" y="52" width="325" height="18"/>
                                             <buttonCell key="cell" type="check" title="KeePass: Show 'Recycle Bin' or 'Backup' in Search" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="xNZ-Zk-Nb1">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="VgP-6z-oD6"/>
@@ -491,7 +491,7 @@
                                             <rect key="frame" x="18" y="52" width="134" height="18"/>
                                             <buttonCell key="cell" type="check" title="Dereference Items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="CaQ-T7-oFx">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="d1T-O0-UTr"/>
@@ -501,7 +501,7 @@
                                             <rect key="frame" x="18" y="154" width="136" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Attachments" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="kSi-gR-Jy7">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="tMq-lf-YyD"/>
@@ -511,7 +511,7 @@
                                             <rect key="frame" x="18" y="120" width="228" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Attachment Image Previews" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Fcw-WL-L3m">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="VDC-es-uB9"/>
@@ -521,7 +521,7 @@
                                             <rect key="frame" x="18" y="86" width="145" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Custom Fields" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="XxN-X4-xIT">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="CbX-xI-5gb"/>
@@ -531,7 +531,7 @@
                                             <rect key="frame" x="18" y="18" width="201" height="18"/>
                                             <buttonCell key="cell" type="check" title="Reveal Password Immediately" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="WDq-o0-s5T">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="Ft9-N4-cDp"/>
@@ -567,7 +567,7 @@
                                             <rect key="frame" x="18" y="120" width="201" height="18"/>
                                             <buttonCell key="cell" type="check" title="Reveal Password Immediately" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="jDh-su-7bB">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="YFS-1a-YLi"/>
@@ -577,7 +577,7 @@
                                             <rect key="frame" x="18" y="52" width="171" height="18"/>
                                             <buttonCell key="cell" type="check" title="Other Fields are Editable" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="b3R-cq-lpF">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="Ta1-cB-ZnJ"/>
@@ -587,7 +587,7 @@
                                             <rect key="frame" x="18" y="154" width="191" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Alternating Grid Rows" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="yUR-zy-Zuh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="U9b-hj-Pvh"/>
@@ -597,7 +597,7 @@
                                             <rect key="frame" x="18" y="188" width="186" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Horizontal Grid Lines" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="dGB-m5-a2Q">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="AL8-Bz-Is1"/>
@@ -607,7 +607,7 @@
                                             <rect key="frame" x="18" y="222" width="170" height="18"/>
                                             <buttonCell key="cell" type="check" title="Show Vertical Grid Lines" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="fHB-gf-XSD">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="VGr-11-ZIa"/>
@@ -617,7 +617,7 @@
                                             <rect key="frame" x="18" y="86" width="115" height="18"/>
                                             <buttonCell key="cell" type="check" title="Title is Editable" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="F1L-We-jkz">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="a5x-ll-NqI"/>
@@ -627,7 +627,7 @@
                                             <rect key="frame" x="18" y="18" width="134" height="18"/>
                                             <buttonCell key="cell" type="check" title="Dereference Items" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wZm-fx-dml">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onGeneralSettingsChange:" target="-2" id="LEk-JH-A7j"/>
@@ -662,91 +662,91 @@
                             </tabViewItem>
                             <tabViewItem label="Password Generation" identifier="" id="WW6-Pn-Ixw">
                                 <view key="view" id="4ag-1n-rL7">
-                                    <rect key="frame" x="10" y="33" width="647" height="689"/>
+                                    <rect key="frame" x="10" y="33" width="647" height="697"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NQT-T4-Biz">
-                                            <rect key="frame" x="16" y="353" width="444" height="18"/>
+                                            <rect key="frame" x="15" y="350" width="443" height="18"/>
                                             <buttonCell key="cell" type="radio" title="Use Diceware (XKCD) Algorithm" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="E9h-Ru-ZSh">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="96S-n9-LQ1"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="J7H-II-Qa5">
-                                            <rect key="frame" x="16" y="581" width="145" height="18"/>
+                                            <rect key="frame" x="15" y="589" width="149" height="18"/>
                                             <buttonCell key="cell" type="radio" title="Use Basic Algorithm" bezelStyle="regularSquare" imagePosition="left" inset="2" id="Yfa-yq-zNC">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="AK6-tN-lVx"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2DG-Am-EOz">
-                                            <rect key="frame" x="182" y="494" width="205" height="18"/>
+                                            <rect key="frame" x="187" y="493" width="209" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use easy read characters only" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="l2X-s0-1mS">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="Qig-tQ-Bd3"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="yFg-qg-zhJ">
-                                            <rect key="frame" x="182" y="472" width="214" height="18"/>
+                                            <rect key="frame" x="187" y="469" width="218" height="18"/>
                                             <buttonCell key="cell" type="check" title="Non ambiguous characters only" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="gVi-YQ-iZC">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="UCf-hp-RAV"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="TvQ-8P-YxV">
-                                            <rect key="frame" x="182" y="560" width="115" height="18"/>
+                                            <rect key="frame" x="187" y="565" width="119" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Uppercase" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="p5m-6K-WQZ">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="lHx-u3-pOf"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="nP6-Q0-au2">
-                                            <rect key="frame" x="182" y="538" width="84" height="18"/>
+                                            <rect key="frame" x="187" y="541" width="88" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Digits" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="kel-O1-056">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="MsH-bG-IUv"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kF8-9A-1QK">
-                                            <rect key="frame" x="182" y="582" width="115" height="18"/>
+                                            <rect key="frame" x="187" y="589" width="119" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Lowercase" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="SHt-Jm-Tym">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="nl0-7m-1AA"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="sEr-GH-iRP">
-                                            <rect key="frame" x="182" y="516" width="102" height="18"/>
+                                            <rect key="frame" x="187" y="517" width="106" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Symbols" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="smi-BA-LgH">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="m6U-Ah-gPg"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1IP-Sw-QEI">
-                                            <rect key="frame" x="483" y="354" width="77" height="16"/>
+                                            <rect key="frame" x="483" y="351" width="77" height="16"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Word Count" id="8sh-Rm-atE">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -754,20 +754,20 @@
                                             </textFieldCell>
                                         </textField>
                                         <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Sh6-f5-1Jt">
-                                            <rect key="frame" x="614" y="348" width="19" height="28"/>
+                                            <rect key="frame" x="614" y="345" width="19" height="28"/>
                                             <stepperCell key="cell" continuous="YES" alignment="left" minValue="1" maxValue="16" doubleValue="4" id="Jau-LJ-Pfz"/>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="Cag-5g-5e0"/>
                                             </connections>
                                         </stepper>
                                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="oZm-W6-pFf">
-                                            <rect key="frame" x="17" y="379" width="613" height="5"/>
+                                            <rect key="frame" x="17" y="375" width="613" height="5"/>
                                         </box>
                                         <box verticalHuggingPriority="750" boxType="separator" translatesAutoresizingMaskIntoConstraints="NO" id="vsT-oH-XRx">
-                                            <rect key="frame" x="17" y="604" width="613" height="5"/>
+                                            <rect key="frame" x="17" y="612" width="613" height="5"/>
                                         </box>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="ZSa-r1-ZwL">
-                                            <rect key="frame" x="563" y="352" width="52" height="20"/>
+                                            <rect key="frame" x="563" y="349" width="52" height="20"/>
                                             <constraints>
                                                 <constraint firstAttribute="width" constant="52" id="hwg-Ut-ux4"/>
                                             </constraints>
@@ -778,7 +778,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="P9l-t1-FvO">
-                                            <rect key="frame" x="15" y="611" width="617" height="58"/>
+                                            <rect key="frame" x="15" y="619" width="617" height="58"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="58" id="FOq-sT-K0p"/>
                                             </constraints>
@@ -790,24 +790,24 @@
                                             </textFieldCell>
                                         </textField>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EXF-t2-lIO">
-                                            <rect key="frame" x="182" y="450" width="224" height="18"/>
+                                            <rect key="frame" x="187" y="445" width="228" height="18"/>
                                             <buttonCell key="cell" type="check" title="Pick characters from every group" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="RjO-D4-8If">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="vMn-33-bgD"/>
                                             </connections>
                                         </button>
                                         <slider verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="9KZ-9l-cam">
-                                            <rect key="frame" x="43" y="392" width="589" height="24"/>
+                                            <rect key="frame" x="37" y="384" width="601" height="28"/>
                                             <sliderCell key="cell" continuous="YES" state="on" alignment="left" minValue="6" maxValue="64" doubleValue="14.631578947368421" tickMarkPosition="above" numberOfTickMarks="40" sliderType="linear" id="MyT-Rg-HxQ"/>
                                             <connections>
                                                 <action selector="onChangePasswordParameters:" target="-2" id="TTG-cg-iGZ"/>
                                             </connections>
                                         </slider>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1g7-rx-VnH">
-                                            <rect key="frame" x="613" y="424" width="19" height="16"/>
+                                            <rect key="frame" x="613" y="418" width="19" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="16" id="Qhb-4F-GjZ">
                                                 <font key="font" usesAppearanceFont="YES"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -815,7 +815,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="PGt-9T-Nnu">
-                                            <rect key="frame" x="43" y="424" width="112" height="16"/>
+                                            <rect key="frame" x="43" y="418" width="112" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Password Length:" id="tNY-6D-USH">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -823,7 +823,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="EiR-Du-pZ3">
-                                            <rect key="frame" x="43" y="105" width="50" height="16"/>
+                                            <rect key="frame" x="43" y="102" width="50" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Casing:" id="aDE-1C-0wm">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -831,7 +831,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="iZ0-fA-BeQ">
-                                            <rect key="frame" x="43" y="64" width="66" height="16"/>
+                                            <rect key="frame" x="43" y="62" width="66" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Hackerify:" id="H0y-HC-izD">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -839,7 +839,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aEu-bB-uqR">
-                                            <rect key="frame" x="148" y="143" width="482" height="21"/>
+                                            <rect key="frame" x="148" y="140" width="482" height="21"/>
                                             <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="wju-iH-CAK">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -847,7 +847,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="WXr-Uc-r1z">
-                                            <rect key="frame" x="43" y="146" width="103" height="16"/>
+                                            <rect key="frame" x="43" y="143" width="103" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Word Separator:" id="CEj-hL-zeZ">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -855,7 +855,7 @@
                                             </textFieldCell>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="bsi-3L-YcA">
-                                            <rect key="frame" x="43" y="23" width="59" height="16"/>
+                                            <rect key="frame" x="43" y="22" width="59" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Add Salt:" id="0cr-Nk-wlR">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -863,10 +863,10 @@
                                             </textFieldCell>
                                         </textField>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Kfk-XF-5ds">
-                                            <rect key="frame" x="45" y="172" width="585" height="150"/>
+                                            <rect key="frame" x="45" y="169" width="585" height="150"/>
                                             <clipView key="contentView" id="fgm-VP-bkg">
                                                 <rect key="frame" x="1" y="1" width="583" height="148"/>
-                                                <autoresizingMask key="autoresizingMask"/>
+                                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" selectionHighlightStyle="none" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" typeSelect="NO" rowSizeStyle="automatic" viewBased="YES" id="jxP-ba-wA1">
                                                         <rect key="frame" x="0.0" y="0.0" width="583" height="148"/>
@@ -888,15 +888,15 @@
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="xZg-Qh-qCt" customClass="NSCheckboxTableCellView">
-                                                                        <rect key="frame" x="1" y="1" width="371" height="17"/>
+                                                                        <rect key="frame" x="11" y="1" width="380" height="17"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dUa-0V-GWV">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="370" height="18"/>
                                                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                                                                <buttonCell key="cell" type="check" title="Testing" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Z8I-pm-wF1">
+                                                                                <buttonCell key="cell" type="check" title="Testing (No need to localize)" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="Z8I-pm-wF1">
                                                                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                                                    <font key="font" metaFont="label" size="13"/>
+                                                                                    <font key="font" metaFont="system"/>
                                                                                 </buttonCell>
                                                                             </button>
                                                                         </subviews>
@@ -920,7 +920,7 @@
                                             </scroller>
                                         </scrollView>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Vwb-bK-uLD">
-                                            <rect key="frame" x="43" y="330" width="69" height="16"/>
+                                            <rect key="frame" x="43" y="327" width="69" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="clipping" title="Word Lists" id="C39-Ei-N25">
                                                 <font key="font" metaFont="label" size="13"/>
                                                 <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -928,10 +928,10 @@
                                             </textFieldCell>
                                         </textField>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jBp-mZ-tir">
-                                            <rect key="frame" x="146" y="99" width="487" height="25"/>
+                                            <rect key="frame" x="145" y="96" width="489" height="25"/>
                                             <popUpButtonCell key="cell" type="push" title="Do Not Change" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="TdW-8Y-fTN" id="8gN-5o-KGp">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="menu"/>
                                                 <menu key="menu" id="Rpn-VE-xBD">
                                                     <items>
                                                         <menuItem title="Do Not Change" state="on" id="TdW-8Y-fTN"/>
@@ -947,10 +947,10 @@
                                             </connections>
                                         </popUpButton>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Dq7-By-xbj">
-                                            <rect key="frame" x="146" y="58" width="487" height="25"/>
+                                            <rect key="frame" x="145" y="56" width="489" height="25"/>
                                             <popUpButtonCell key="cell" type="push" title="No" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="sGb-F9-jKX" id="pch-1N-ldN">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="menu"/>
                                                 <menu key="menu" id="htO-MY-vOF">
                                                     <items>
                                                         <menuItem title="No" state="on" id="sGb-F9-jKX"/>
@@ -966,10 +966,10 @@
                                             </connections>
                                         </popUpButton>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kdn-ov-Ky9">
-                                            <rect key="frame" x="146" y="17" width="487" height="25"/>
+                                            <rect key="frame" x="145" y="16" width="489" height="25"/>
                                             <popUpButtonCell key="cell" type="push" title="No" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="1GA-KH-YXz" id="XeS-3a-EcQ">
                                                 <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="menu"/>
                                                 <menu key="menu" id="UCr-j7-Yv8">
                                                     <items>
                                                         <menuItem title="No" state="on" id="1GA-KH-YXz"/>
@@ -1074,7 +1074,7 @@
                                         <segmentedControl verticalHuggingPriority="750" horizontalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="IJU-Td-FRW" userLabel="TitleSegment">
                                             <rect key="frame" x="90" y="347" width="311" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="Rn9-SM-hyH">
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                                 <segments>
                                                     <segment label="Default" width="101"/>
                                                     <segment label="URL Smart Fill" width="101" selected="YES" tag="1"/>
@@ -1096,7 +1096,7 @@
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wWT-2d-mc5" userLabel="UsernameSegment">
                                             <rect key="frame" x="90" y="286" width="311" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="C0b-2x-jus">
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                                 <segments>
                                                     <segment label="None" width="101"/>
                                                     <segment label="Most Used" width="101" selected="YES" tag="1"/>
@@ -1118,7 +1118,7 @@
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Ygs-Wj-0ju" userLabel="PasswordSegment">
                                             <rect key="frame" x="90" y="225" width="311" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="eSB-Yn-gxe">
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                                 <segments>
                                                     <segment label="None" width="101"/>
                                                     <segment label="Generated" width="101" selected="YES" tag="1"/>
@@ -1140,7 +1140,7 @@
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="aoG-xQ-5ff" userLabel="EmailSegment">
                                             <rect key="frame" x="90" y="164" width="311" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="mGr-7Q-I8c">
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                                 <segments>
                                                     <segment label="None" width="101"/>
                                                     <segment label="Most Used" width="101" selected="YES" tag="1"/>
@@ -1162,7 +1162,7 @@
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="h8h-CX-SRm" userLabel="UrlSegment">
                                             <rect key="frame" x="90" y="103" width="311" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="tVL-lg-pMl">
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                                 <segments>
                                                     <segment label="None" width="101"/>
                                                     <segment label="URL Smart Fill" width="101" selected="YES" tag="1"/>
@@ -1184,7 +1184,7 @@
                                         <segmentedControl verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MIX-wa-Bho" userLabel="NotesSegment">
                                             <rect key="frame" x="90" y="42" width="311" height="24"/>
                                             <segmentedCell key="cell" borderStyle="border" alignment="left" style="rounded" trackingMode="selectOne" id="gZ5-SU-Jkg">
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                                 <segments>
                                                     <segment label="None" width="101"/>
                                                     <segment label="Clipboard" width="101" selected="YES" tag="1"/>
@@ -1313,7 +1313,7 @@
                                             <rect key="frame" x="18" y="120" width="93" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use Google" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="NlC-TB-28E">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangeFavIconSettings:" target="-2" id="THW-zn-Gy1"/>
@@ -1323,7 +1323,7 @@
                                             <rect key="frame" x="18" y="86" width="92" height="18"/>
                                             <buttonCell key="cell" type="check" title="Scan HTML" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="wwm-qE-75b">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangeFavIconSettings:" target="-2" id="Rwm-bZ-ABm"/>
@@ -1333,7 +1333,7 @@
                                             <rect key="frame" x="18" y="52" width="128" height="18"/>
                                             <buttonCell key="cell" type="check" title="Ignore SSL Errors" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="vMi-tX-UVp">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangeFavIconSettings:" target="-2" id="NRS-tZ-RIy"/>
@@ -1343,7 +1343,7 @@
                                             <rect key="frame" x="18" y="18" width="241" height="18"/>
                                             <buttonCell key="cell" type="check" title="Scan Exhaustively for Common Files" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="oWR-Xa-EpH">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangeFavIconSettings:" target="-2" id="5FR-7C-Iz6"/>
@@ -1353,7 +1353,7 @@
                                             <rect key="frame" x="18" y="188" width="129" height="18"/>
                                             <buttonCell key="cell" type="check" title="Use DuckDuckGo" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="ckd-lP-Z3W">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangeFavIconSettings:" target="-2" id="C1h-c9-UkT"/>
@@ -1363,7 +1363,7 @@
                                             <rect key="frame" x="18" y="154" width="142" height="18"/>
                                             <buttonCell key="cell" type="check" title="Check Domain Only" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="QsP-bU-EmA">
                                                 <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                                <font key="font" metaFont="label" size="13"/>
+                                                <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
                                                 <action selector="onChangeFavIconSettings:" target="-2" id="Eg2-k6-osN"/>

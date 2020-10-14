@@ -95,13 +95,17 @@
     
     [self setFreeTrialEndDateBasedOnIapPurchase]; // Update Free Trial Date
 
-    if([Settings.sharedInstance getLaunchCount] == 1) { 
-        [self doFirstLaunchTasks];
+    if([Settings.sharedInstance getLaunchCount] == 1) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self doFirstLaunchTasks]; // Give everything a change to initialize
+        });
     }
     else {
         if (@available(iOS 14.0, *)) { // We miss the AppBecameActive notification on first launch in iOS 14 - some kind of weird re-ordering of events. This may occur on other OS's but for now guard with this ios!4 check - TODO - Expand usage
             if (!self.hasAppearedOnce) {
-                [self appBecameActive];
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    [self appBecameActive];
+                });
             }
         }
     }
@@ -287,19 +291,24 @@
     // Auto-Fill may have updated databases... Do the reload immediately here and before the sync because if you dispatch it
     // sync will be working with stale data with outstanding update = nil - Losing all changes
     
-    [SafesList.sharedInstance forceReload];
+    [SafesList.sharedInstance reloadIfChangedByOtherComponent];
     self.collection = SafesList.sharedInstance.snapshot;
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     [self refresh]; // This is dispatched so will happen later
 
     if(!self.hasAppearedOnce) {
+        NSLog(@"XXXXXXXXX - appBecameActive - First Appearance - Doing First Activation Process");
         [self doAppFirstActivationProcess];
     }
     else {
         if(self.privacyAndLockVc) {
+            NSLog(@"XXXXXXXXX - appBecameActive - Privacy Screen is present - telling it that the app has become active.");
+
             [self.privacyAndLockVc onAppBecameActive];
         }
         else {
+            NSLog(@"XXXXXXXXX - appBecameActive - Privacy Screen is NOT present - Doing App Activation Tasks.");
+
             [self doAppActivationTasks:NO];
         }
     }

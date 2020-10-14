@@ -44,8 +44,6 @@
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     NSLog(@"prepareInterfaceToProvideCredentialForIdentity = %@", credentialIdentity);
     
-    [SafesList.sharedInstance forceReload];
-    
     BOOL lastRunGood = [self enterWithLastCrashCheck:YES];
     
     if (!lastRunGood) {
@@ -163,7 +161,6 @@
 
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
-    [SafesList.sharedInstance forceReload];
     
     self.serviceIdentifiers = serviceIdentifiers;
     
@@ -199,6 +196,8 @@
         }];
     }
     else {
+        [SafesList.sharedInstance reloadIfChangedByOtherComponent];
+
         SafesListTableViewController* databasesList = ((SafesListTableViewController*)(self.databasesListNavController.topViewController));
 
         self.databasesListNavController.presentationController.delegate = self;

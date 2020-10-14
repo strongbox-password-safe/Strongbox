@@ -44,6 +44,9 @@ static NSString* const kShowDatabasesSeparator = @"showDatabasesSeparator";
 static NSString* const kSyncPullEvenIfModifiedDateSame = @"syncPullEvenIfModifiedDateSame";
 static NSString* const kSyncForcePushDoNotCheckForConflicts = @"syncForcePushDoNotCheckForConflicts";
 
+static NSString* const kMainAppDidChangeDatabases = @"mainAppDidChangeDatabases";
+static NSString* const kAutoFillDidChangeDatabases = @"autoFillDidChangeDatabases";
+
 @implementation SharedAppAndAutoFillSettings
 
 + (void)initialize {
@@ -84,6 +87,23 @@ static NSString* const kSyncForcePushDoNotCheckForConflicts = @"syncForcePushDoN
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)mainAppDidChangeDatabases {
+    return [self getBool:kMainAppDidChangeDatabases];
+}
+
+- (void)setMainAppDidChangeDatabases:(BOOL)mainAppDidChangeDatabases {
+    return [self setBool:kMainAppDidChangeDatabases value:mainAppDidChangeDatabases];
+}
+
+- (BOOL)autoFillDidChangeDatabases {
+    return [self getBool:kAutoFillDidChangeDatabases];
+    
+}
+
+- (void)setAutoFillDidChangeDatabases:(BOOL)autoFillDidChangeDatabases {
+    [self setBool:kAutoFillDidChangeDatabases value:autoFillDidChangeDatabases];
+}
 
 - (BOOL)syncForcePushDoNotCheckForConflicts {
     return [self getBool:kSyncForcePushDoNotCheckForConflicts];

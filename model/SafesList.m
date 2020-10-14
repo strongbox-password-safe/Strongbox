@@ -19,6 +19,8 @@
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
 @property BOOL migratedToNewStore;
 
+@property (readonly) BOOL changedDatabaseSettingsFlag;
+
 @end
 
 static NSString* const kDatabasesFilename = @"databases.json";
@@ -50,8 +52,40 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     return self;
 }
 
-- (void)forceReload {
-    self.databasesList = [self deserialize];
+- (BOOL)changedDatabaseSettingsFlag {
+#ifndef IS_APP_EXTENSION
+    return SharedAppAndAutoFillSettings.sharedInstance.autoFillDidChangeDatabases;
+#else
+    return SharedAppAndAutoFillSettings.sharedInstance.mainAppDidChangeDatabases;
+#endif
+}
+
+- (void)setChangedDatabaseSettings {
+#ifndef IS_APP_EXTENSION
+    SharedAppAndAutoFillSettings.sharedInstance.mainAppDidChangeDatabases = YES;
+#else
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillDidChangeDatabases = YES;
+#endif
+}
+
+- (void)clearChangedDatabaseSettings { // Set the other flag to no (counter-intuitive)
+#ifndef IS_APP_EXTENSION
+    SharedAppAndAutoFillSettings.sharedInstance.autoFillDidChangeDatabases = NO;
+#else
+    SharedAppAndAutoFillSettings.sharedInstance.mainAppDidChangeDatabases = NO;
+#endif
+}
+
+- (void)reloadIfChangedByOtherComponent {
+    if ( self.changedDatabaseSettingsFlag ) { 
+        NSLog(@"reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by alternative App...");
+
+        [self clearChangedDatabaseSettings];
+        self.databasesList = [self deserialize];
+    }
+    else {
+        NSLog(@"reloadIfChangedByAutoFillOrMainApp: Databases List NOT changed by alternative App...");
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,11 +166,17 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         __block NSError* readError;
         __block NSData* json = nil;
         NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+        
+        NSLog(@"SafesList - File Coordinator - Begin");
         [fileCoordinator coordinateReadingItemAtURL:fileUrl
                                             options:kNilOptions
                                               error:&error
                                          byAccessor:^(NSURL * _Nonnull newURL) {
+            NSLog(@"SafesList - File Coordinator - Reading");
+
             json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
+            
+            NSLog(@"SafesList - File Coordinator - Done");
         }];
         
         if (!json || error || readError) {
@@ -144,7 +184,9 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
             return @[].mutableCopy;
         }
 
+        NSLog(@"SafesList - JSONObjectWithData - Begin");
         NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
+        NSLog(@"SafesList - JSONObjectWithData - Done");
 
         if (error) {
             NSLog(@"Error getting json dictionaries for databases: [%@]", error);
@@ -205,6 +247,8 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         NSLog(@"Error writing Databases file: [%@]-[%@]", error, writeError);
         return;
     }
+    
+    [self setChangedDatabaseSettings];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if (listChanged) {

@@ -62,6 +62,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL syncPullEvenIfModifiedDateSame; // Emergency use, probably never useful
 @property BOOL syncForcePushDoNotCheckForConflicts; // Emergency use, probably never useful
 
+@property BOOL autoFillDidChangeDatabases;
+@property BOOL mainAppDidChangeDatabases;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -46,8 +46,11 @@
         self.autoLockTimeoutSeconds = @60;
         self.showQuickViewFavourites = YES;
         self.showQuickViewNearlyExpired = YES;
-        self.favourites = @[];
-        self.auditExcludedItems = @[];
+
+        // PERF: Do Not set these - as this massively slows down item creation - They are ok to be created on demand
+        //        self.favourites = nil; //@[];
+        //        self.auditExcludedItems = nil; // @[];
+        
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
         self.hideTotpCustomFieldsInViewMode = YES;

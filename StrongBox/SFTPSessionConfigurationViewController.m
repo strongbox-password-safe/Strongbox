@@ -52,14 +52,34 @@
     
     NSString* host = [self.textFieldHost.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
     
-    self.configuration.host = host;
-    self.configuration.username = self.textFieldUsername.text;
-    self.configuration.password = self.textFieldPassword.text;
-    self.configuration.authenticationMode = self.switchUsePrivateKey.on ? kPrivateKey : kUsernamePassword;
-    self.configuration.privateKey = self.privateKey;
-    self.configuration.initialDirectory = self.textFieldPath.text;
-    
-    self.onDone(YES);
+    NSString* path = self.textFieldPath.text;
+    if (path.pathExtension.length != 0) {
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"sftp_path_may_be_invalid", @"Path may be Invalid")
+              message:NSLocalizedString(@"sftp_path_are_you_sure", @"Are you sure the path is correct? It should be a path to a parent folder. Not the database file.")
+               action:^(BOOL response) {
+            if (response) {
+                self.configuration.host = host;
+                self.configuration.username = self.textFieldUsername.text;
+                self.configuration.password = self.textFieldPassword.text;
+                self.configuration.authenticationMode = self.switchUsePrivateKey.on ? kPrivateKey : kUsernamePassword;
+                self.configuration.privateKey = self.privateKey;
+                self.configuration.initialDirectory = self.textFieldPath.text;
+                
+                self.onDone(YES);
+            }
+        }];
+    }
+    else {
+        self.configuration.host = host;
+        self.configuration.username = self.textFieldUsername.text;
+        self.configuration.password = self.textFieldPassword.text;
+        self.configuration.authenticationMode = self.switchUsePrivateKey.on ? kPrivateKey : kUsernamePassword;
+        self.configuration.privateKey = self.privateKey;
+        self.configuration.initialDirectory = self.textFieldPath.text;
+        
+        self.onDone(YES);
+    }
 }
 
 - (IBAction)onUsePrivateKey:(id)sender {
@@ -80,7 +100,7 @@
         self.buttonConnect.enabled = NO;
         return;
     }
-    
+        
     if(self.switchUsePrivateKey.on && self.privateKey.length == 0) {
         self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_select_private_key", @"Select a Private Key...");
         self.labelValidation.textColor = [UIColor systemRedColor];
@@ -88,8 +108,16 @@
         return;
     }
 
-    self.labelValidation.text = @"";
-    self.buttonConnect.enabled = YES;
+    NSString* path = self.textFieldPath.text;
+    if (path.pathExtension.length != 0) {
+        self.labelValidation.text = NSLocalizedString(@"sftp_path_are_you_sure", @"Are you sure the path is correct? It should be a path to a parent folder. Not the database file.");
+        self.labelValidation.textColor = [UIColor systemOrangeColor];
+        self.buttonConnect.enabled = YES;
+    }
+    else {
+        self.labelValidation.text = @"";
+        self.buttonConnect.enabled = YES;
+    }
     return;
 }
 

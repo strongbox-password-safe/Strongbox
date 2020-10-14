@@ -39,6 +39,8 @@
 #import "ISMessages/ISMessages.h"
 #endif
 
+#import <Foundation/FoundationErrors.h>
+
 @interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate>
 
 @property (nonatomic, strong) NSString* biometricIdName;
@@ -228,8 +230,11 @@
             if(response == kOk) {
                 if([pin isEqualToString:self.safe.conveniencePin]) {
                     self.isConvenienceUnlock = YES;
-                    self.safe.failedPinAttempts = 0;
-                    [SafesList.sharedInstance update:self.safe];
+                    
+                    if (self.safe.failedPinAttempts != 0) { // Don't write unless necessary - PERF
+                        self.safe.failedPinAttempts = 0;
+                        [SafesList.sharedInstance update:self.safe];
+                    }
                     
                     [self onGotCredentials:self.safe.convenienceMasterPassword
                            keyFileBookmark:self.safe.keyFileBookmark
@@ -522,7 +527,7 @@
         if(self.undigestedKeyFileData == nil) {
             // Clear convenience unlock settings if we fail to read Key File - Force manual reselection.
             
-            if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
+            if(self.isConvenienceUnlock) {
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
                 self.safe.convenenienceYubikeySecret = nil;
@@ -562,10 +567,14 @@
     }
     
     // Change in Read-Only or Key File Setting or Yubikey setting? Save
+
+    BOOL readOnlyChanged = self.safe.readOnly != readOnly;
     
-    if(self.safe.readOnly != readOnly ||
-       ![self.safe.keyFileBookmark isEqual:keyFileBookmark] ||
-       ![self.safe.yubiKeyConfig isEqual:yubikeyConfiguration]) {
+    BOOL keyFileChanged = (!(self.safe.keyFileBookmark == nil && keyFileBookmark == nil)) && (![self.safe.keyFileBookmark isEqual:keyFileBookmark]);
+    
+    BOOL yubikeyChanged = (!(self.safe.yubiKeyConfig == nil && yubikeyConfiguration == nil)) && (![self.safe.yubiKeyConfig isEqual:yubikeyConfiguration]);
+    
+    if(readOnlyChanged || keyFileChanged || yubikeyChanged) {
         self.safe.readOnly = readOnly;
         self.safe.keyFileBookmark = keyFileBookmark;
         self.safe.yubiKeyConfig = yubikeyConfiguration;
@@ -657,9 +666,9 @@
 
                 if (self.safe.storageProvider == kFilesAppUrlBookmark) {
                     if ( @available(iOS 11.0, *) ) {
-                        // 257 = Permissions Error
-                        
-                        if ( error.code == NSFileProviderErrorNoSuchItem || error.code == 257) {
+                        if ( error.code == NSFileProviderErrorNoSuchItem ||
+                             error.code == NSFileReadNoPermissionError ||   // 257
+                             error.code == NSFileNoSuchFileError) {         // 4
                             NSString* message = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db_message", @"Strongbox is having trouble locating your database. This can happen sometimes especially after iOS updates or with some 3rd party providers (e.g.Nextcloud).\n\nYou now need to tell Strongbox where to locate it. Alternatively you can open Strongbox's local copy and fix this later.\n\nFor Nextcloud please use WebDAV instead...");
                             
                             NSString* relocateDatabase = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db", @"Locate Database...");
@@ -802,7 +811,9 @@
                                                format:(DatabaseFormat)format
                                               modDate:(NSDate*)modDate
                                             yubiKeyCR:(YubiKeyCRHandlerBlock)yubiKeyCR {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
+    });
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword
@@ -1131,8 +1142,11 @@
     }
 
     NSLog(@"Setting likelyFormat to [%ld]", (long)openedSafe.format);
-    self.safe.likelyFormat = openedSafe.format;
-    [SafesList.sharedInstance update:self.safe];
+    
+    if (!self.isAutoFillOpen) { // No need to set this everytime and force a reload - No update needed - PERF
+        self.safe.likelyFormat = openedSafe.format;
+        [SafesList.sharedInstance update:self.safe];
+    }
     
     self.completion(kUnlockDatabaseResultSuccess, viewModel, nil);
 }

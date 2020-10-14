@@ -350,7 +350,7 @@
 /*  Copy */
 "browse_vc_duplicate_title_suffix" = " Copy";
 
-/* '%@' Email Copied */
+/* '%@' Email Copied - Translators Note: 1st param is the title of the item for which the email was just copied. This string appears in a quick tooltip style popup */
 "browse_vc_email_copied_fmt" = "'%@' Email Copied";
 
 /* Enter Group Name */
@@ -371,16 +371,16 @@
 /* Group Name */
 "browse_vc_group_name" = "Group Name";
 
-/* (in %@) */
+/* (in %@) - Translator's note, the 1st param is the name of the group that this search result is found in, e.g. 'Finance' or 'Work' */
 "browse_vc_group_path_string_fmt" = "(in %@)";
 
 /* '%@': No TOTP setup to Copy! */
 "browse_vc_no_totp_to_copy_fmt" = "'%@': No TOTP setup to Copy!";
 
-/* '%@' Notes Copied */
+/* '%@' Notes Copied  - Translators Note: 1st param is the title of the item for which the email was just copied. This string appears in a quick tooltip style popup */
 "browse_vc_notes_copied_fmt" = "'%@' Notes Copied";
 
-/* '%@' Password Copied */
+/* '%@' Password Copied  - Translators Note: 1st param is the title of the item for which the email was just copied. This string appears in a quick tooltip style popup  */
 "browse_vc_password_copied_fmt" = "'%@' Password Copied";
 
 /*  (Read Only) */
@@ -407,17 +407,16 @@
 /* Fast Tap Actions */
 "browse_vc_tip_fast_tap_title" = "Fast Tap Actions";
 
-/* '%@' Title Copied */
+/* '%@' Title Copied  - Translators Note: 1st param is the title of the item for which the email was just copied. This string appears in a quick tooltip style popup  */
 "browse_vc_title_copied_fmt" = "'%@' Title Copied";
 
-/* '%@' OTP Code Copied
-   '%@' TOTP Copied */
+/* '%@' OTP Code Copied - Translators Note: 1st param is the title of the item for which the email was just copied. This string appears in a quick tooltip style popup */
 "browse_vc_totp_copied_fmt" = "'%@' OTP Code Copied";
 
-/* '%@' URL Copied */
+/* '%@' URL Copied - Translators Note: 1st param is the title of the item for which the email was just copied. This string appears in a quick tooltip style popup */
 "browse_vc_url_copied_fmt" = "'%@' URL Copied";
 
-/* '%@' Username Copied */
+/* '%@' Username Copied - Translators Note: 1st param is the title of the item for which the email was just copied. This string appears in a quick tooltip style popup */
 "browse_vc_username_copied_fmt" = "'%@' Username Copied";
 
 /* No Entries */
@@ -726,7 +725,7 @@
 /* Email Not Available */
 "prefs_vc_info_email_not_available_title" = "Email Not Available";
 
-/* It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings? */
+/* It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings? - Translators Note - the parameters are the name of the biometric ID, so either "Face ID" or "Touch ID" depending on the device */
 "prefs_vc_master_password_icloud_migration_yesno_warning_message_fmt" = "It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings?";
 
 /* Master Password Warning */
@@ -3390,3 +3389,15 @@
 
 /* Delete (Translators Note: Verb - To Delete an item) */
 "generic_action_delete" = "Delete";
+
+/* Are you sure the URL is correct? It should be a path to a parent folder. Not the database file. */
+"webdav_vc_validation_url_are_you_sure" = "Are you sure the URL is correct? It should be a URL to a parent folder. Not the database file.";
+
+/* Are you sure the path is correct? It should be a path to a parent folder. Not the database file. */
+"sftp_path_are_you_sure" = "Are you sure the path is correct? It should be a path to a parent folder. Not the database file.";
+
+/* Path may be Invalid */
+"sftp_path_may_be_invalid" = "Path May Be Invalid";
+
+/* URL May Be Invalid */
+"webdav_vc_validation_url_maybe_invalid" = "URL May Be Invalid";
