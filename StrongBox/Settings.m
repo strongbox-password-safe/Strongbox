@@ -36,6 +36,7 @@ static NSString* const kBackupIncludeImportedKeyFiles = @"backupIncludeImportedK
 static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSettings";
 
 static NSString* const kHasMigratedDatabaseSubtitles = @"hasMigratedDatabaseSubtitlesAug2020";
+static NSString* const kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys = @"kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys";
 
 // TODO: Don't use shared settings for these...
 
@@ -97,6 +98,14 @@ static NSString* const kHasMigratedDatabaseSubtitles = @"hasMigratedDatabaseSubt
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)migratedYubiKeyEmergencyWorkaroundsToVirtualKeys {
+    return [self getBool:kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys];
+}
+
+- (void)setMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys:(BOOL)migratedYubiKeyEmergencyWorkaroundsToVirtualKeys {
+    [self setBool:kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys value:migratedYubiKeyEmergencyWorkaroundsToVirtualKeys];
+}
 
 - (BOOL)hasMigratedDatabaseSubtitles {
     return [self getBool:kHasMigratedDatabaseSubtitles];

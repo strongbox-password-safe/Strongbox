@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)mutableArray;
 
 - (void)addObject:(ObjectType)object;
-
+- (void)removeObject:(id)object;
 
 - (id _Nullable)dequeueHead;
 - (NSArray<ObjectType>*)dequeueAllMatching:(BOOL (^)(ObjectType obj))block;

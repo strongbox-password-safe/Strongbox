@@ -37,7 +37,7 @@
         _browsableExisting = NO;
         _rootFolderOnly = NO;
         _immediatelyOfferCacheIfOffline = NO; // Works even if offline (presumably an Apple iCloud cache)
-        _supportsConcurrentRequests = NO; // TODO: This could be yes?
+        _supportsConcurrentRequests = NO; // This could be yes?
         
         return self;
     }

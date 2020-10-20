@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong, nullable) NSString* convenienceMasterPassword;
-@property (nonatomic, strong, nullable) NSString* convenenienceYubikeySecret;
+@property (nonatomic, strong, nullable) NSString* convenenienceYubikeySecret;  // TODO: Kill with fire
 
 @property (nonatomic) BOOL isTouchIdEnabled;
 
@@ -116,7 +116,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL hideTotpCustomFieldsInViewMode;
 
-@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
+// The YubiKey configuration can be different in AutoFill mode - to allow users to use Hardware key in Main App and Virtual in Auto Fill
+@property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
+@property (readonly) BOOL mainAppAndAutoFillYubiKeyConfigsIncoherent;
+@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig; // TODO: Remove access after migration of emergency workaround field
+
 @property DatabaseAuditorConfiguration* auditConfig;
 
 @property BOOL colorizePasswords;

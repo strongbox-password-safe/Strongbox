@@ -35,7 +35,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)deleteAllLocalAndAppGroupFiles;
 - (void)deleteAllInboxItems;
+
 - (void)deleteAllTmpAttachmentPreviewFiles;
+- (void)deleteAllTmpEncryptedAttachmentFiles;
 
 @end
 

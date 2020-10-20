@@ -12,6 +12,12 @@
 #import "FileManager.h"
 #import "ItemDetailsViewController.h"
 
+@interface SafeMetaData ()
+
+@property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
+
+@end
+
 @implementation SafeMetaData
 
 - (instancetype)init {
@@ -153,7 +159,10 @@
     if ( jsonDictionary[@"storageProvider"] != nil ) ret.storageProvider = ((NSNumber*)jsonDictionary[@"storageProvider"]).unsignedIntegerValue;
     if ( jsonDictionary[@"duressAction"] != nil ) ret.duressAction = ((NSNumber*)jsonDictionary[@"duressAction"]).unsignedIntegerValue;
     if ( jsonDictionary[@"failedPinAttempts"] != nil ) ret.failedPinAttempts = ((NSNumber*)jsonDictionary[@"failedPinAttempts"]).intValue;
+    
     if ( jsonDictionary[@"yubiKeyConfig"] != nil ) ret.yubiKeyConfig = [YubiKeyHardwareConfiguration fromJsonSerializationDictionary:jsonDictionary[@"yubiKeyConfig"]];
+    if ( jsonDictionary[@"autoFillYubiKeyConfig"] != nil ) ret.autoFillYubiKeyConfig = [YubiKeyHardwareConfiguration fromJsonSerializationDictionary:jsonDictionary[@"autoFillYubiKeyConfig"]];
+
     if ( jsonDictionary[@"auditConfig"] != nil ) ret.auditConfig = [DatabaseAuditorConfiguration fromJsonSerializationDictionary:jsonDictionary[@"auditConfig"]];
 
     if ( jsonDictionary[@"outstandingUpdateId"] != nil) ret.outstandingUpdateId = [[NSUUID alloc] initWithUUIDString:jsonDictionary[@"outstandingUpdateId"]];
@@ -237,6 +246,11 @@
     if (self.yubiKeyConfig != nil) {
         ret[@"yubiKeyConfig"] = [self.yubiKeyConfig getJsonSerializationDictionary];
     }
+
+    if (self.autoFillYubiKeyConfig != nil) {
+        ret[@"autoFillYubiKeyConfig"] = [self.autoFillYubiKeyConfig getJsonSerializationDictionary];
+    }
+
     if (self.auditConfig != nil) {
         ret[@"auditConfig"] = [self.auditConfig getJsonSerializationDictionary];
     }
@@ -651,6 +665,29 @@
     [FileManager.sharedInstance createIfNecessary:url];
     
     return url;
+}
+
+- (YubiKeyHardwareConfiguration *)contextAwareYubiKeyConfig {
+#ifndef IS_APP_EXTENSION
+    return self.yubiKeyConfig;
+#else
+    return self.autoFillYubiKeyConfig;
+#endif
+}
+
+- (BOOL)mainAppAndAutoFillYubiKeyConfigsIncoherent {
+    BOOL mainAppUsesYubiKey = self.yubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
+    BOOL autoFillUsesYubiKey = self.autoFillYubiKeyConfig != nil && self.yubiKeyConfig.mode != kNoYubiKey;
+
+    return !(!mainAppUsesYubiKey && !autoFillUsesYubiKey) && !(mainAppUsesYubiKey && autoFillUsesYubiKey);
+}
+
+- (void)setContextAwareYubiKeyConfig:(YubiKeyHardwareConfiguration *)contextAwareYubiKeyConfig {
+#ifndef IS_APP_EXTENSION
+    self.yubiKeyConfig = contextAwareYubiKeyConfig;
+#else
+    self.autoFillYubiKeyConfig = contextAwareYubiKeyConfig;
+#endif
 }
 
 - (NSString *)description {

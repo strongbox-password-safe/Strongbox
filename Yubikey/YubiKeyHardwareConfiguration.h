@@ -12,6 +12,7 @@ typedef NS_ENUM (NSInteger, YubiKeyHardwareMode) {
     kNoYubiKey,
     kNfc,
     kMfi,
+    kVirtual,
 };
 
 typedef NS_ENUM (NSInteger, YubiKeyHardwareSlot) {
@@ -31,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property YubiKeyHardwareMode mode;
 @property YubiKeyHardwareSlot slot;
+@property (nullable) NSString* virtualKeyIdentifier;
 
 @end
 

@@ -40,7 +40,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         _browsableExisting = YES;
         _rootFolderOnly = NO;
         _immediatelyOfferCacheIfOffline = YES; // Avoid long delay
-        _supportsConcurrentRequests = NO; // TODO: Possibly
+        _supportsConcurrentRequests = NO; // Possibly
         
         [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite", @"offline_access"]];
         

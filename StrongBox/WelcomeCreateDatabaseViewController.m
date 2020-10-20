@@ -7,7 +7,6 @@
 //
 
 #import "WelcomeCreateDatabaseViewController.h"
-#import "CASGTableViewController.h"
 #import "WelcomeMasterPasswordViewController.h"
 #import "SafesList.h"
 #import "Utils.h"

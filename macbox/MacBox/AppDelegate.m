@@ -29,6 +29,7 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.mac.pro";
 
 static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
+static const NSInteger kTopLevelMenuItemTagFile = 1111;
 static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 @interface AppDelegate ()
@@ -302,6 +303,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)removeUnwantedMenuItems {
     [self removeMenuItem:kTopLevelMenuItemTagView action:@selector(onViewDebugDatabasesList:)];
+    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(duplicateDocument:)];
 }
 
 - (void)removeUpgradeMenuItem {

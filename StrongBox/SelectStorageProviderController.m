@@ -171,7 +171,9 @@
                                NSURL *url = text.urlExtendedParse;
                                NSLog(@"URL: %@", url);
                                
-                               [self importFromManualUiUrl:url];
+                               if (url) {
+                                   [self importFromManualUiUrl:url];
+                               }
                            }
                        }];
 }

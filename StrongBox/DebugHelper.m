@@ -16,185 +16,29 @@
 #import <mach-o/arch.h>
 #import "SyncManager.h"
 #import "NSDate+Extensions.h"
+#import "NSArray+Extensions.h"
+#import "SafeStorageProviderFactory.h"
 
 @implementation DebugHelper
 
 + (NSString*)getAboutDebugString {
-    NSString *safesMessage = @"Databases Collection\n----------------\n";
-
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSDate* mod;
-        unsigned long long fileSize;
-        
-        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
-        
-        NSString* syncState;
-        if (url) {
-            syncState = [NSString stringWithFormat:@"%@ (Sync) => %@ (%@)\n", safe.nickName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
-        }
-        else {
-            syncState = [NSString stringWithFormat:@"%@ (Sync) => Unknown\n", safe.nickName];
-        }
-        
-        safesMessage = [safesMessage stringByAppendingString:syncState];
-    }
-    
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
-        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
-        NSString *thisSafe = [jsonDict description];
-        safesMessage = [safesMessage stringByAppendingString:thisSafe];
-    }
-    safesMessage = [safesMessage stringByAppendingString:@"----------------"];
-
-    NSString* model = [[UIDevice currentDevice] model];
-    NSString* systemName = [[UIDevice currentDevice] systemName];
-    NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
-    NSString* pro = [[SharedAppAndAutoFillSettings sharedInstance] isPro] ? @"P" : @"";
-    NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
-    long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
-
-    NSString* jsonCrash = @"";
-    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
-        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
-        jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
-    }
-
-    const NXArchInfo *info = NXGetLocalArchInfo();
-    NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
-
-    NSString* message = [NSString stringWithFormat:
-                         @"Model: %@\n"
-                         @"CPU: %@\n"
-                         @"System Name: %@\n"
-                         @"System Version: %@\n"
-                         @"Ep: %ld\n"
-                         @"Flags: %@%@%@\n"
-                         @"App Version: %@ [%@ (%@)@%@]\n"
-                         @"JSON Crash:\n%@"
-                         @"%@\n",
-                         model,
-                         typeOfCpu,
-                         systemName,
-                         systemVersion,
-                         epoch,
-                         pro,
-                         isFreeTrial,
-                         [Settings.sharedInstance getFlagsStringForDiagnostics],
-                         [Utils getAppBundleId],
-                         [Utils getAppVersion],
-                         [Utils getAppBuildNumber],
-                         GIT_SHA_VERSION,
-                         jsonCrash,
-                         safesMessage];
-
-    return message;
-}
-
-+ (NSString*)getSupportEmailDebugString {
-    NSString *safesMessage = @"Databases Collection<br />----------------<br />";
-    
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSDate* mod;
-        unsigned long long fileSize;
-        
-        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
-        
-        NSString* syncState;
-        if (url) {
-            syncState = [NSString stringWithFormat:@"%@ (Sync) => %@ (%@)<br />", safe.nickName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
-        }
-        else {
-            syncState = [NSString stringWithFormat:@"%@ (Sync) => Unknown<br />", safe.nickName];
-        }
-        
-        safesMessage = [safesMessage stringByAppendingString:syncState];
-    }
-    
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
-        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
-        NSString *thisSafe = [jsonDict description];
-        safesMessage = [safesMessage stringByAppendingString:thisSafe];
-    }
-    
-    safesMessage = [safesMessage stringByAppendingString:@"----------------"];
-
-    NSString* model = [[UIDevice currentDevice] model];
-    NSString* systemName = [[UIDevice currentDevice] systemName];
-    NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
-    NSString* pro = [[SharedAppAndAutoFillSettings sharedInstance] isPro] ? @"P" : @"";
-    NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
-    long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
-
-    NSString* jsonCrash = @"{}";
-    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
-        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
-        jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
-    }
-    
-    const NXArchInfo *info = NXGetLocalArchInfo();
-    NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
-
-    NSString* message = [NSString stringWithFormat:@"I'm having some trouble with Strongbox... <br /><br />"
-                         @"Please include as much detail as possible and screenshots if appropriate...<br /><br />"
-                         @"Here is some debug information which might help:<br />"
-                         @"Model: %@<br />"
-                         @"CPU: %@<br />"
-                         @"System Name: %@<br />"
-                         @"System Version: %@<br />"
-                         @"Ep: %ld<br />"
-                         @"App Version: %@ [%@ (%@)@%@]<br />"
-                         @"Flags: %@%@%@<br />"
-                         @"JSON Crash:<br />%@"
-                         @"%@<br />",
-                         model,
-                         typeOfCpu,
-                         systemName,
-                         systemVersion,
-                         epoch,
-                         [Utils getAppBundleId],
-                         [Utils getAppVersion],
-                         [Utils getAppBuildNumber],
-                         GIT_SHA_VERSION,
-                         pro,
-                         isFreeTrial,
-                         [Settings.sharedInstance getFlagsStringForDiagnostics],
-                         jsonCrash,
-                         safesMessage];
-    
-    return message;
+    NSArray* lines = [self getDebugLines];
+    return [lines componentsJoinedByString:@"\n"];
 }
 
 + (NSString*)getCrashEmailDebugString {
-    NSString *safesMessage = @"Databases Collection\n----------------\n";
-    
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSDate* mod;
-        unsigned long long fileSize;
-        
-        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
-        
-        NSString* syncState;
-        if (url) {
-            syncState = [NSString stringWithFormat:@"%@ (Sync) => %@ (%@)\n", safe.nickName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
-        }
-        else {
-            syncState = [NSString stringWithFormat:@"%@ (Sync) => Unknown\n", safe.nickName];
-        }
-        
-        safesMessage = [safesMessage stringByAppendingString:syncState];
-    }
+    NSArray* lines = [self getDebugLines];
+    return [lines componentsJoinedByString:@"\n"];
+}
 
-    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
-        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
-        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
-        NSString *thisSafe = [jsonDict description];
-        safesMessage = [safesMessage stringByAppendingString:thisSafe];
-    }
++ (NSArray<NSString*>*)getDebugLines {
+    NSMutableArray<NSString*>* debugLines = [NSMutableArray array];
     
-    safesMessage = [safesMessage stringByAppendingString:@"----------------"];
+    [debugLines addObject:[NSString stringWithFormat:@"Strongbox Debug Information at %@", NSDate.date.friendlyDateTimeStringBothPrecise]];
+    [debugLines addObject:@"--------------------"];
 
+    // Architecture, Version, Device, Flags etc
+    
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
@@ -202,43 +46,147 @@
     NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
     long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
 
-    NSString* jsonCrash = @"{}";
-    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
-        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
-        jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
-    }
-    
     const NXArchInfo *info = NXGetLocalArchInfo();
     NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
+
+    [debugLines addObject:[NSString stringWithFormat:@"Model: %@", model]];
+    [debugLines addObject:[NSString stringWithFormat:@"CPU: %@", typeOfCpu]];
+    [debugLines addObject:[NSString stringWithFormat:@"System Name: %@", systemName]];
+    [debugLines addObject:[NSString stringWithFormat:@"System Version: %@", systemVersion]];
+    [debugLines addObject:[NSString stringWithFormat:@"Ep: %ld", epoch]];
+    [debugLines addObject:[NSString stringWithFormat:@"Flags: %@%@%@", pro, isFreeTrial, [Settings.sharedInstance getFlagsStringForDiagnostics]]];
+    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION]];
+
+    if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
+        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
+        NSString* jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
+        [debugLines addObject:[NSString stringWithFormat:@"JSON Crash:%@", jsonCrash]];
+    }
+
+    [debugLines addObject:@"--------------------"];
+
+    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
+        SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
+
+        NSMutableArray<NSArray*>* mutableSyncs = NSMutableArray.array;
+        NSMutableSet<NSUUID*>* set = NSMutableSet.set;
+        NSMutableArray *currentSync;
+        for (SyncStatusLogEntry* entry in syncStatus.changeLog) {
+            if (![set containsObject:entry.syncId]) {
+                currentSync = NSMutableArray.array;
+                [mutableSyncs addObject:currentSync];
+                [set addObject:entry.syncId];
+            }
+            
+            [currentSync addObject:entry];
+        }
+        
+        NSArray<NSArray<SyncStatusLogEntry*>*> *syncs = [[mutableSyncs reverseObjectEnumerator] allObjects];
+        
+        // Filter out good syncs - we don't care
+        
+        NSArray* failedSyncs = [syncs filter:^BOOL(NSArray<SyncStatusLogEntry *> * _Nonnull sync) {
+            return [sync anyMatch:^BOOL(SyncStatusLogEntry * _Nonnull status) {
+                return status.state == kSyncOperationStateError;
+            }];
+        }];
+        
+
+        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+        
+        for (NSArray* failed in failedSyncs) {
+            [debugLines addObject:[NSString stringWithFormat:@"============== [%@] Failed Sync to [%@] ===============", safe.nickName, spName]];
+            [debugLines addObjectsFromArray:failed];
+            [debugLines addObject:@"=========================================="];
+        }
+        
+        // Local Cache status...
+        
+        NSDate* mod;
+        unsigned long long fileSize;
+        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
+        
+        NSString* syncState;
+        if (url) {
+            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => %@ (%@)", safe.nickName, spName, mod.friendlyDateTimeStringBothPrecise, friendlyFileSizeString(fileSize)];
+        }
+        else {
+            syncState = [NSString stringWithFormat:@"%@ (%@ Sync) => Unknown", safe.nickName, spName];
+        }
+        
+        [debugLines addObject:syncState];
+    }
+
+    [debugLines addObject:@"--------------------"];
+
+    // File system metadata
     
-    NSString* message = [NSString stringWithFormat:
-                         @"Model: %@\n"
-                         @"CPU: %@\n"
-                         @"System Name: %@\n"
-                         @"System Version: %@\n"
-                         @"Ep: %ld\n"
-                         @"App Version: %@ [%@ (%@)@%@]\n"
-                         @"Flags: %@%@%@\n"
-                         @"JSON Crash:\n%@"
-                         @"%@\n",
-                         model,
-                         typeOfCpu,
-                         systemName,
-                         systemVersion,
-                         epoch,
-                         [Utils getAppBundleId],
-                         [Utils getAppVersion],
-                         [Utils getAppBuildNumber],
-                         GIT_SHA_VERSION,
-                         pro,
-                         isFreeTrial,
-                         [Settings.sharedInstance getFlagsStringForDiagnostics],
-                         jsonCrash,
-                         safesMessage];
-    
-    return message;
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.appSupportDirectory]];
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.documentsDirectory]];
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.sharedAppGroupDirectory]];
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpEncryptedAttachmentPath isDirectory:YES]]];
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpAttachmentPreviewPath isDirectory:YES]]];
+
+    //  Database Configs
+
+    [debugLines addObject:@"--------------------"];
+
+    for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
+        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+        [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
+
+        NSMutableDictionary* jsonDict = [safe getJsonSerializationDictionary].mutableCopy;
+        jsonDict[@"keyFileBookmark"] = jsonDict[@"keyFileBookmark"] ? @"<redacted>" : @"<Not Set>";
+        NSString *thisSafe = [jsonDict description];
+        [debugLines addObject:thisSafe];
+    }
+
+    [debugLines addObject:@"--------------------"];
+
+    return debugLines;
 }
 
++ (NSArray<NSString*>*)listDirectoryRecursive:(NSURL*)URL {
+    return [DebugHelper listDirectoryRecursive:URL listRelativeToURL:URL];
+}
 
++ (NSArray<NSString*>*)listDirectoryRecursive:(NSURL*)URL listRelativeToURL:(NSURL*)listRelativeToURL {
+    NSMutableArray<NSString*>* ret = [NSMutableArray array];
+        
+    NSArray<NSURL*>* contents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:URL
+                                                              includingPropertiesForKeys:@[NSURLIsDirectoryKey]
+                                                                                               options:kNilOptions
+                                                                                                 error:NULL];
+    
+    for (NSURL *file in contents) {
+        NSString* relativePath = file.path.length > listRelativeToURL.path.length ? [file.path substringFromIndex:listRelativeToURL.path.length + 1] : file.path;
+
+        NSError *error;
+        NSNumber *isDirectory = nil;
+
+        if (![file getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
+            [ret addObject:[NSString stringWithFormat:@"Error %@", file]];
+        }
+        else {
+            if (![isDirectory boolValue]) {
+                NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:file.path error:&error];
+                
+                if (error) {
+                    [ret addObject:[NSString stringWithFormat:@"%@ - %@", relativePath, error]];
+                }
+                else {
+                    [ret addObject:[NSString stringWithFormat:@"[%@] %@ - %@", relativePath, friendlyFileSizeString(attributes.fileSize), attributes.fileModificationDate.friendlyDateTimeStringPrecise]];
+                }
+            }
+            else{
+//                [ret addObject:[NSString stringWithFormat:@"[DIR] %@", relativePath]];
+                NSArray* subdir = [self listDirectoryRecursive:file listRelativeToURL:listRelativeToURL];
+                [ret addObjectsFromArray:subdir];
+            }
+        }
+    }
+    
+    return ret;
+}
 
 @end

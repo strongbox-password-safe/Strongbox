@@ -33,6 +33,7 @@
 #import "FilesAppUrlBookmarkProvider.h"
 
 #import <FileProvider/FileProvider.h>
+#import "VirtualYubiKeys.h"
 
 #ifndef IS_APP_EXTENSION
 #import "OfflineDetector.h"
@@ -57,7 +58,9 @@
 @property NSString* masterPassword;
 @property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
 @property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
-@property NSString* yubikeySecret;
+
+@property NSString* yubikeySecret; // TODO: Remove this and cleanup the safe meta data... after say 3 months? so => 17 Jan 2021
+
 @property YubiKeyHardwareConfiguration* yubiKeyConfiguration;
 
 @property BOOL biometricPreCleared; // App Lock has just authorized the user via Bio - No need to ask again
@@ -180,7 +183,7 @@
                 
         if(biometricPossible && biometricAllowed) {
             BOOL bioDbHasChanged = [BiometricsManager.sharedInstance isBiometricDatabaseStateHasChanged:self.isAutoFillOpen];
-                        
+
             if(bioDbHasChanged) {
                 [self clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState];
                 
@@ -193,12 +196,20 @@
                     }];
                 });
             }
+            else if (self.isAutoFillOpen && self.safe.mainAppAndAutoFillYubiKeyConfigsIncoherent) { // Give user a chance to specify a Virtual Key in AutoFill mode without blowing away Convenience Unlock
+                [self promptForManualCredentials];
+            }
             else {
                 [self showBiometricAuthentication];
             }
         }
         else if(!SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
-            [self promptForConveniencePin];
+            if (self.isAutoFillOpen && self.safe.mainAppAndAutoFillYubiKeyConfigsIncoherent) { // Give user a chance to specify a Virtual Key in AutoFill mode
+                [self promptForManualCredentials];
+            }
+            else {
+                [self promptForConveniencePin];
+            }
         }
         else {
             [self promptForManualCredentials];
@@ -242,7 +253,7 @@
                                   readOnly:self.safe.readOnly
                              openLocalOnly:self.openLocalOnly
                              yubikeySecret:self.safe.convenenienceYubikeySecret
-                      yubikeyConfiguration:self.safe.yubiKeyConfig];
+                      yubikeyConfiguration:self.safe.contextAwareYubiKeyConfig];
                 }
                 else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
                     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
@@ -376,7 +387,7 @@
                           readOnly:self.safe.readOnly
                      openLocalOnly:self.openLocalOnly
                      yubikeySecret:self.safe.convenenienceYubikeySecret
-              yubikeyConfiguration:self.safe.yubiKeyConfig];
+              yubikeyConfiguration:self.safe.contextAwareYubiKeyConfig];
         }
     }
     else {
@@ -467,7 +478,9 @@
     scVc.initialKeyFileBookmark = self.safe.keyFileBookmark;
     scVc.initialReadOnly = self.safe.readOnly;
     scVc.initialOpenLocalOnly = self.openLocalOnly;
-    scVc.initialYubiKeyConfig = self.safe.yubiKeyConfig;
+    
+    scVc.initialYubiKeyConfig = self.safe.contextAwareYubiKeyConfig;
+    
     scVc.validateCommonKeyFileMistakes = self.safe.keyFileBookmark == nil; // No key file set for this db, then perform some simple checks before accepting it
     
     // Less than perfect but helpful
@@ -562,7 +575,7 @@
     if(yubikeyConfiguration && yubikeyConfiguration.mode != kNoYubiKey) {
         self.yubiKeyConfiguration = yubikeyConfiguration;
     }
-    else { // Only use the secret workaround if we're not directly using an actual YubiKey
+    else { // Only use the secret workaround if we're not directly using an actual YubiKey - TODO: Kill with fire
         self.yubikeySecret = yubikeySecret;
     }
     
@@ -572,12 +585,13 @@
     
     BOOL keyFileChanged = (!(self.safe.keyFileBookmark == nil && keyFileBookmark == nil)) && (![self.safe.keyFileBookmark isEqual:keyFileBookmark]);
     
-    BOOL yubikeyChanged = (!(self.safe.yubiKeyConfig == nil && yubikeyConfiguration == nil)) && (![self.safe.yubiKeyConfig isEqual:yubikeyConfiguration]);
+    BOOL yubikeyChanged = (!(self.safe.contextAwareYubiKeyConfig == nil && yubikeyConfiguration == nil)) && (![self.safe.contextAwareYubiKeyConfig isEqual:yubikeyConfiguration]);
     
     if(readOnlyChanged || keyFileChanged || yubikeyChanged) {
         self.safe.readOnly = readOnly;
         self.safe.keyFileBookmark = keyFileBookmark;
-        self.safe.yubiKeyConfig = yubikeyConfiguration;
+        self.safe.contextAwareYubiKeyConfig = yubikeyConfiguration;
+        
         [SafesList.sharedInstance update:self.safe];
     }
     
@@ -763,8 +777,6 @@
         self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:self.undigestedKeyFileData checkForXml:format != kKeePass1];
     }
 
-    // Yubikey?
-  
     if (self.yubiKeyConfiguration && self.yubiKeyConfiguration != kNoYubiKey) {
         [self unlockValidDatabaseWithAllCompositeKeyFactors:url
                                                      format:format
@@ -789,7 +801,7 @@
 
 - (void)getYubiKeyChallengeResponse:(NSData*)challenge completion:(YubiKeyCRResponseBlock)completion {
 #ifndef IS_APP_EXTENSION
-    if([SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial]) {
+    if([SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial] || self.yubiKeyConfiguration.mode == kVirtual) {
         [YubiManager.sharedInstance getResponse:self.yubiKeyConfiguration
                                       challenge:challenge
                                      completion:completion];
@@ -800,10 +812,24 @@
         completion(NO, nil, error);
     }
 #else
-    // FUTURE: Is this true for the 5Ci MFI?
-    NSString* loc = NSLocalizedString(@"open_sequence_cannot_use_yubikey_in_autofill_mode", @"YubiKey Unlock is not supported in AutoFill mode");
-    NSError* error = [Utils createNSError:loc errorCode:-1];
-    completion(NO, nil, error);
+    if(self.yubiKeyConfiguration.mode == kVirtual) {
+        VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:self.yubiKeyConfiguration.virtualKeyIdentifier];
+        
+        if (!key) {
+            NSError* error = [Utils createNSError:@"Could not find Virtual Yubikey!" errorCode:-1];
+            completion(NO, nil, error);
+        }
+        else {
+            NSLog(@"Doing Virtual Challenge Response...");
+            NSData* response = [key doChallengeResponse:challenge];
+            completion(NO, response, nil);
+        }
+    }
+    else {
+        NSString* loc = NSLocalizedString(@"open_sequence_cannot_use_yubikey_in_autofill_mode", @"YubiKey Unlock is not supported in AutoFill mode");
+        NSError* error = [Utils createNSError:loc errorCode:-1];
+        completion(NO, nil, error);
+    }
 #endif
 }
 
@@ -1126,7 +1152,7 @@
     [self.viewController presentViewController:pinEntryVc animated:YES completion:nil];
 }
 
--(void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe {
+- (void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe {
     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
     [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
 
@@ -1213,38 +1239,9 @@ NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NS
     return NO;
 }
 
+// TODO: Remove along with Emergency Workaround field
 - (NSData*)getDummyYubikeyResponse:(NSData*)challenge {
-    // Some people program the Yubikey with Fixed Length "Fixed 64 byte input" and others with "Variable Input"
-    // To cover both cases the KeePassXC model appears to be to always send 64 bytes with extraneous bytes above
-    // and beyond the actual challenge padded PKCS#7 style-ish... MMcG - 1-Mar-2020
-    //
-    // Further Reading: https://github.com/Yubico/yubikey-personalization-gui/issues/86
-    
-    // May need to pad challenge
-    
-    const NSInteger kChallengeSize = 64;
-    const NSInteger paddingLengthAndCharacter = kChallengeSize - challenge.length;
-    uint8_t challengeBuffer[kChallengeSize];
-    for(int i=0;i<kChallengeSize;i++) {
-        challengeBuffer[i] = paddingLengthAndCharacter;
-    }
-    [challenge getBytes:challengeBuffer length:challenge.length];
-    NSData* paddedChallenge = [NSData dataWithBytes:challengeBuffer length:kChallengeSize];
-    
-    // Get actual secret
-    
-    BOOL paddingRequired = [self.yubikeySecret hasPrefix:@"P"];
-    NSString* sec = self.yubikeySecret;
-    if (paddingRequired) {
-        sec = [sec substringFromIndex:1];
-    }
-    NSData* yubikeySecretData = [Utils dataFromHexString:sec];
-    
-    NSData *actualChallenge = paddingRequired ? paddedChallenge : challenge;
-    
-    NSData* challengeResponse = hmacSha1(actualChallenge, yubikeySecretData);
-    
-    return challengeResponse;
+    return [VirtualYubiKey getDummyYubikeyResponse:challenge secret:self.yubikeySecret];
 }
                     
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1357,5 +1354,8 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
         [self syncAndUnlockLocalCopy]; // Re-try...
     }
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 @end

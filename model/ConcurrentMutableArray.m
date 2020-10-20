@@ -37,6 +37,12 @@
     });
 }
 
+- (void)removeObject:(id)object {
+    dispatch_barrier_async(self.dataQueue, ^{
+        [self.data removeObject:object];
+    });
+}
+
 - (id)dequeueHead {
     __block id headObject = nil;
 

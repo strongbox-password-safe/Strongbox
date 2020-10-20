@@ -56,6 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL haveAskedAboutBackupSettings;
 
 @property BOOL hasMigratedDatabaseSubtitles;
+@property BOOL migratedYubiKeyEmergencyWorkaroundsToVirtualKeys;
 
 NS_ASSUME_NONNULL_END
 

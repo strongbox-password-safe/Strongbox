@@ -34,6 +34,25 @@ static NSString* const kDefaultScheme = @"https";
     return _regex;
 }
 
++ (NSRegularExpression *)isHexStringRegex {
+    static NSRegularExpression *_regex;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        NSError* error;
+
+        _regex = [NSRegularExpression regularExpressionWithPattern:@"^[0-9A-Fa-f]*$"
+                                                           options:kNilOptions
+                                                             error:&error];
+
+        if(error) {
+            NSLog(@"Error compiling Regex: %@", error);
+        }
+    });
+    
+    return _regex;
+}
+
 + (NSRegularExpression *)hostRegex {
     static NSRegularExpression *_hostRegex;
     static dispatch_once_t onceToken;
@@ -156,6 +175,16 @@ static NSString* const kDefaultScheme = @"https";
     NSLog(@"Built: [%@]", components.URL);
     
     return components.URL;
+}
+
+- (BOOL)isHexString {
+    NSTextCheckingResult* result = [[NSString isHexStringRegex] firstMatchInString:self options:kNilOptions range:NSMakeRange(0, self.length)];
+    
+    if (!result) {
+        return NO;
+    }
+
+    return YES;
 }
 
 @end

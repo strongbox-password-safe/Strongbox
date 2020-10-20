@@ -144,18 +144,23 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             NSLog(@"WARN: Storage info/Bookmark unavailable! Falling back solely on fileURL");
         }
         
-        [url startAccessingSecurityScopedResource];
-        [self openDocumentWithContentsOfURL:url
-                                    display:YES
-                          completionHandler:^(NSDocument * _Nullable document,
-                                             BOOL documentWasAlreadyOpen,
-                                             NSError * _Nullable error) {
-            if(error) {
-                NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
-            }
-            
-            completion(error);
-        }];
+        if (url) {
+            [url startAccessingSecurityScopedResource];
+            [self openDocumentWithContentsOfURL:url
+                                        display:YES
+                              completionHandler:^(NSDocument * _Nullable document,
+                                                 BOOL documentWasAlreadyOpen,
+                                                 NSError * _Nullable error) {
+                if(error) {
+                    NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
+                }
+                
+                completion(error);
+            }];
+        }
+        else {
+            completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
+        }
     }
 }
 

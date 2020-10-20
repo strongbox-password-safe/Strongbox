@@ -53,7 +53,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
     if (self.encryptedSessionFilePath) {
         NSError* error;
         [NSFileManager.defaultManager removeItemAtPath:self.encryptedSessionFilePath error:&error];
-        NSLog(@"DEALLOC - Removed temporary encrypted attachment [%@]-[%@]", self.encryptedSessionFilePath, error);
+//        NSLog(@"DEALLOC - Removed temporary encrypted attachment [%@]-[%@]", self.encryptedSessionFilePath, error);
     }
     
     self.encryptedSessionFilePath = nil;
@@ -125,7 +125,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
         self.encryptionIV = getRandomData(kCCBlockSizeAES128);
         self.encryptedSessionFilePath = [self getUniqueFileName];
         
-        NSLog(@"Initialized with Encrypted Session File Path = [%@]", self.encryptedSessionFilePath);
+//        NSLog(@"Initialized with E    ncrypted Session File Path = [%@]", self.encryptedSessionFilePath);
         
         self.attachmentLength = 0;
         _sha256Hex = kEmptyDataDigest;

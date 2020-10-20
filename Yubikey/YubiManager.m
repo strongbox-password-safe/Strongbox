@@ -12,6 +12,7 @@
 #import "Utils.h"
 #import "Strongbox-Swift.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "VirtualYubiKeys.h"
 
 typedef NS_ENUM (NSInteger, YubiKeyManagerInProgressState) {
     kInProgressStateInitial,
@@ -89,6 +90,21 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
     if (configuration.mode == kNoYubiKey) {
         NSError* error = [Utils createNSError:@"Mode == kNoYubiKey" errorCode:-1];
         completion(NO, nil, error);
+        return;
+    }
+    
+    if (configuration.mode == kVirtual) {
+        VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:configuration.virtualKeyIdentifier];
+        
+        if (!key) {
+            NSError* error = [Utils createNSError:@"Could not find Virtual Yubikey!" errorCode:-1];
+            completion(NO, nil, error);
+        }
+        else {
+            NSLog(@"Doing Virtual Challenge Response...");
+            NSData* response = [key doChallengeResponse:challenge];
+            completion(NO, response, nil);
+        }
         return;
     }
     

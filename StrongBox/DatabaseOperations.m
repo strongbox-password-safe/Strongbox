@@ -103,7 +103,7 @@
         scVc.mode = kCASGModeSetCredentials;
         scVc.initialFormat = self.viewModel.database.format;
         scVc.initialKeyFileBookmark = self.viewModel.metadata.keyFileBookmark;
-        scVc.initialYubiKeyConfig = self.viewModel.metadata.yubiKeyConfig;
+        scVc.initialYubiKeyConfig = self.viewModel.metadata.contextAwareYubiKeyConfig;
         
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
             [self dismissViewControllerAnimated:YES completion:^{
@@ -172,7 +172,9 @@
             }
         }
         else {
-            [self onSuccessfulCredentialsChanged:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self onSuccessfulCredentialsChanged:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
+            });
         }
     }];
 }
@@ -195,7 +197,7 @@
     }
     
     self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
-    self.viewModel.metadata.yubiKeyConfig = yubiConfig;
+    self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
     [SafesList.sharedInstance update:self.viewModel.metadata];
 
     [ISMessages showCardAlertWithTitle:self.viewModel.database.format == kPasswordSafe ?

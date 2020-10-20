@@ -94,7 +94,7 @@
         if(existingUuid != nil) {
             NSData* existingIconData = customIcons[existingUuid];
             if([existingIconData isEqualToData:currentIconData]) {
-//                NSLog(@"Found Duplicate Custom Icon - [%@] => [%@]", currentCustomIconUuid, existingUuid);
+                NSLog(@"Found Duplicate Custom Icon - [%@] => [%@]", currentCustomIconUuid, existingUuid);
                 [remappings setObject:existingUuid forKey:currentCustomIconUuid]; // Current Icon UUID should be remapped to our original as we have an exact match
             }
         }
@@ -109,7 +109,7 @@
         NSUUID *remapTo = remappings[node.customIconUuid];
     
         if(remapTo) {
-            NSLog(@"Remapping Custom Icon of [%@] with UUID=[%@] to [%@]", node.title, node.customIconUuid, remapTo);
+//            NSLog(@"Remapping Custom Icon of [%@] with UUID=[%@] to [%@]", node.title, node.customIconUuid, remapTo);
             node.customIconUuid = remapTo;
         }
     }

@@ -1614,6 +1614,8 @@ static NSImage* kStrongBox256Image;
                         
                         [self reloadAndUnlock:self.model.compositeKeyFactors isBiometricOpen:NO];
                     }
+                    
+                    self.isPromptingAboutUnderlyingFileChange = NO;
                 }];
                 return;
             }
@@ -1624,6 +1626,9 @@ static NSImage* kStrongBox256Image;
 
                 self.model.selectedItem = [self selectedItemSerializationId];
                 [self reloadAndUnlock:self.model.compositeKeyFactors isBiometricOpen:NO];
+                
+                self.isPromptingAboutUnderlyingFileChange = NO;
+
                 return;
             }
         }

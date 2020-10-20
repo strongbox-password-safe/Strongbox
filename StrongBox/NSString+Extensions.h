@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, nullable) NSURL* urlExtendedParse;
 
+@property (readonly) BOOL isHexString;
+
 @end
 
 NS_ASSUME_NONNULL_END

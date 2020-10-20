@@ -27,6 +27,8 @@
 #import "iCloudSafesCoordinator.h"
 #import "SecretStore.h"
 #import "Alerts.h"
+#import "SafesList.h"
+#import "VirtualYubiKeys.h"
 
 @interface AppDelegate ()
 
@@ -51,8 +53,8 @@
     
     [self markDirectoriesForBackupInclusion];
     
-    [self cleanupInbox:launchOptions];
-    
+    [self cleanupWorkingDirectories:launchOptions];
+        
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
     [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
@@ -107,14 +109,44 @@
             SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2 = kDatabaseCellSubtitleFieldLastModifiedDate;
         }
     }
+    
+    if (!Settings.sharedInstance.migratedYubiKeyEmergencyWorkaroundsToVirtualKeys) {
+        [self migrateYubiKeyEmergencyWorkaroundsToVirtualKeys];
+    }
 }
 
-- (void)cleanupInbox:(NSDictionary *)launchOptions {
+- (void)migrateYubiKeyEmergencyWorkaroundsToVirtualKeys {
+    int i = 2;
+    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
+        if (database.convenenienceYubikeySecret.length) {
+            NSString* name = i == 2 ? @"Workaround Virtual YubiKey" : [NSString stringWithFormat:@"Workaround Virtual YubiKey %d", i++];
+            VirtualYubiKey* key = [VirtualYubiKey keyWithName:name secret:database.convenenienceYubikeySecret autoFillOnly:NO];
+            [VirtualYubiKeys.sharedInstance addKey:key];
+            
+            YubiKeyHardwareConfiguration *config = YubiKeyHardwareConfiguration.defaults;
+            
+            config.mode = kVirtual;
+            config.virtualKeyIdentifier = key.identifier;
+            
+            database.contextAwareYubiKeyConfig = config;
+            database.autoFillYubiKeyConfig = config;
+            
+            [SafesList.sharedInstance update:database];
+        }
+    }
+
+    Settings.sharedInstance.migratedYubiKeyEmergencyWorkaroundsToVirtualKeys = YES;
+}
+
+- (void)cleanupWorkingDirectories:(NSDictionary *)launchOptions {
     if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
         // Inbox should be empty whenever possible so that we can detect the
         // re-importation of a certain file and ask if user wants to create a
         // new copy or just update an old one...
         [FileManager.sharedInstance deleteAllInboxItems];
+         
+        [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+        [FileManager.sharedInstance deleteAllTmpEncryptedAttachmentFiles];
     }
 }
 

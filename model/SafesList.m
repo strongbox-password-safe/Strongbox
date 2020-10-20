@@ -167,16 +167,11 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         __block NSData* json = nil;
         NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
         
-        NSLog(@"SafesList - File Coordinator - Begin");
         [fileCoordinator coordinateReadingItemAtURL:fileUrl
                                             options:kNilOptions
                                               error:&error
                                          byAccessor:^(NSURL * _Nonnull newURL) {
-            NSLog(@"SafesList - File Coordinator - Reading");
-
             json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
-            
-            NSLog(@"SafesList - File Coordinator - Done");
         }];
         
         if (!json || error || readError) {
@@ -184,9 +179,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
             return @[].mutableCopy;
         }
 
-        NSLog(@"SafesList - JSONObjectWithData - Begin");
         NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
-        NSLog(@"SafesList - JSONObjectWithData - Done");
 
         if (error) {
             NSLog(@"Error getting json dictionaries for databases: [%@]", error);

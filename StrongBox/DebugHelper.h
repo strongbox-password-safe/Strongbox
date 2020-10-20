@@ -12,7 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DebugHelper : NSObject
 
-+ (NSString*)getSupportEmailDebugString;
 + (NSString*)getAboutDebugString;
 + (NSString*)getCrashEmailDebugString;
 

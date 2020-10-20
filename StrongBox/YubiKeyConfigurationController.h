@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface YubiKeyConfigurationController : StaticDataTableViewController
+@interface YubiKeyConfigurationController : UITableViewController
 
 @property (nonatomic, copy) void (^onDone)(YubiKeyHardwareConfiguration* config);
 @property (nullable) YubiKeyHardwareConfiguration* initialConfiguration;

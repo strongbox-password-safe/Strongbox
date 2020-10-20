@@ -44,7 +44,7 @@ typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *err
         _browsableExisting = NO;
         _rootFolderOnly = NO;
         _immediatelyOfferCacheIfOffline = NO; // Local on device files are available even if offline! Some third parties may provide cached files... - 25-May-2020
-        _supportsConcurrentRequests = NO; // TODO: Possibly
+        _supportsConcurrentRequests = NO; // Possibly
     }
     
     return self;

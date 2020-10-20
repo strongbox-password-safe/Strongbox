@@ -570,7 +570,7 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (BOOL)autoReloadAfterForeignChanges {
-    return [self getBool:kAutoReloadAfterForeignChanges fallback:NO];
+    return [self getBool:kAutoReloadAfterForeignChanges fallback:YES];
 }
 
 - (void)setAutoReloadAfterForeignChanges:(BOOL)autoReloadAfterForeignChanges {

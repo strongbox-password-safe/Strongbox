@@ -15,6 +15,7 @@
     
     ret.mode = kNoYubiKey;
     ret.slot = kSlot1;
+    ret.virtualKeyIdentifier = nil;
     
     return ret;
 }
@@ -27,7 +28,8 @@
     
     if (jsonDictionary[@"mode"] != nil ) ret.mode = ((NSNumber*)(jsonDictionary[@"mode"])).unsignedIntegerValue;
     if (jsonDictionary[@"slot"] != nil ) ret.slot = ((NSNumber*)(jsonDictionary[@"slot"])).unsignedIntegerValue;
-
+    if (jsonDictionary[@"virtualKeyIdentifier"] != nil ) ret.virtualKeyIdentifier = jsonDictionary[@"virtualKeyIdentifier"];
+    
     return ret;
 }
 
@@ -36,7 +38,11 @@
         @"mode" : @(self.mode),
         @"slot" : @(self.slot),
     }];
-    
+
+    if (self.virtualKeyIdentifier) {
+        ret[@"virtualKeyIdentifier"] = self.virtualKeyIdentifier;
+    }
+
     return ret;
 }
 
@@ -47,6 +53,10 @@
     if((self = [self init])) {
         self.mode = [coder decodeIntegerForKey:@"mode"];
         self.slot = [coder decodeIntegerForKey:@"slot"];
+        
+        if ( [coder containsValueForKey:@"virtualKeyIdentifier"] ) {
+            self.virtualKeyIdentifier = [coder decodeObjectForKey:@"virtualKeyIdentifier"];
+        }
     }
     
     return self;
@@ -55,6 +65,7 @@
 - (void)encodeWithCoder:(NSCoder *)coder {
     [coder encodeInteger:self.mode forKey:@"mode"];
     [coder encodeInteger:self.slot forKey:@"slot"];
+    [coder encodeObject:self.virtualKeyIdentifier forKey:@"virtualKeyIdentifier"];
 }
 
 - (instancetype)clone {
@@ -62,6 +73,7 @@
     
     ret.mode = self.mode;
     ret.slot = self.slot;
+    ret.virtualKeyIdentifier = self.virtualKeyIdentifier;
     
     return ret;
 }
@@ -79,7 +91,20 @@
     }
 
     YubiKeyHardwareConfiguration* oth = (YubiKeyHardwareConfiguration*)other;
-    return self.mode == oth.mode && (self.mode == kNoYubiKey || self.slot == oth.slot);
+    
+    if (self.mode != oth.mode) {
+        return NO;
+    }
+    
+    if (self.mode == kNoYubiKey) {
+        return YES;
+    }
+    
+    if (self.mode == kVirtual) {
+        return self.virtualKeyIdentifier == oth.virtualKeyIdentifier;
+    }
+    
+    return self.slot == oth.slot;
 }
 
 - (NSString *)description

@@ -17,6 +17,7 @@
 #import "YubiManager.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "BookmarksHelper.h"
+#import "VirtualYubiKeys.h"
 
 @interface CASGTableViewController () <UITextFieldDelegate>
 
@@ -649,23 +650,45 @@
 
 - (void)bindYubiKey {
     if(self.selectedYubiKeyConfig != nil && self.selectedYubiKeyConfig.mode != kNoYubiKey) {
-        if (self.selectedYubiKeyConfig.mode == kMfi) {
-            self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
-                NSLocalizedString(@"casg_yubikey_configured_mfi", @"Lightning") :
-                NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-            self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+        if (self.selectedYubiKeyConfig.mode == kVirtual) {
+            self.cellYubiKey.textLabel.text = NSLocalizedString(@"casg_yubikey_configured_virtual", @"Virtual");
+            self.cellYubiKey.textLabel.textColor = nil;
+            
+            VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:self.selectedYubiKeyConfig.virtualKeyIdentifier];
+            
+            if (!key) {
+                self.selectedYubiKeyConfig.mode = kNoYubiKey;
+                self.selectedYubiKeyConfig.virtualKeyIdentifier = @"";
+                
+                self.cellYubiKey.textLabel.text = NSLocalizedString(@"casg_yubikey_configure_action", @"Configure...");
+                self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];
+                self.cellYubiKey.detailTextLabel.text = nil;
+                self.cellYubiKey.detailTextLabel.textColor = nil;
+            }
+            else {
+                self.cellYubiKey.detailTextLabel.text = key.name;
+                self.cellYubiKey.detailTextLabel.textColor = nil;
+            }
         }
         else {
-            self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
-                NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
-                NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-            self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+            if (self.selectedYubiKeyConfig.mode == kMfi) {
+                self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
+                    NSLocalizedString(@"casg_yubikey_configured_mfi", @"Lightning") :
+                    NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
+                self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+            }
+            else {
+                self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
+                    NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
+                    NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
+                self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+            }
+    
+            self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
+                NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
+            self.cellYubiKey.detailTextLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
         }
-
-        self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
-            NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
-        self.cellYubiKey.detailTextLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
-
+        
         self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];
     }
     else {
@@ -676,28 +699,11 @@
 }
 
 - (BOOL)yubiKeyAvailable:(DatabaseFormat)format {
-    return [self deviceSupportsYubiKey] && [self formatSupportsYubiKey:format];
-}
-
-- (BOOL)deviceSupportsYubiKey {
-#ifndef IS_APP_EXTENSION
-    return [YubiManager.sharedInstance yubiKeySupportedOnDevice];
-#else
-    // MFI Support in AutoFill - Yubikey library isn't compatible with App Extensions :/
-    return NO;
-#endif
+    return [self formatSupportsYubiKey:format];
 }
 
 - (BOOL)formatSupportsYubiKey:(DatabaseFormat)format {
     return format == kKeePass || format == kKeePass4;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 3 && !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
-        return NSLocalizedString(@"casg_section_header_yubikey_pro_only", @"Yubikey (Pro Edition Only)");
-    }
-    
-    return [super tableView:tableView titleForHeaderInSection:section];
 }
 
 @end

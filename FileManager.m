@@ -265,7 +265,16 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 
 - (void)deleteAllTmpAttachmentPreviewFiles {
     NSString* tmpPath = [self tmpAttachmentPreviewPath];
-    
+    [self deleteAllFoo:tmpPath];
+}
+
+- (void)deleteAllTmpEncryptedAttachmentFiles { // WARN: Never call this when database is open
+    NSString* tmpPath = [self tmpEncryptedAttachmentPath];
+
+    [self deleteAllFoo:tmpPath];
+}
+
+- (void)deleteAllFoo:(NSString*)tmpPath {
     NSArray* tmpDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpPath error:NULL];
     
     for (NSString *file in tmpDirectoryContents) {

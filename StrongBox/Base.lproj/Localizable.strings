@@ -2774,13 +2774,10 @@
 "casg_yubikey_configured_slot2" = "Slot 2";
 
 /* YubiKey Unlock is not supported in AutoFill mode */
-"open_sequence_cannot_use_yubikey_in_autofill_mode" = "YubiKey Unlock is not supported in AutoFill mode";
+"open_sequence_cannot_use_yubikey_in_autofill_mode" = "Hardware YubiKey Unlock is not supported in AutoFill mode due to system constraints. You can configure a virtual YubiKey instead.";
 
 /* YubiKey Unlock is only available in the Pro edition of Strongbox */
 "open_sequence_yubikey_only_available_in_pro" = "YubiKey Unlock is only available in the Pro edition of Strongbox";
-
-/* NFC Yubikey (Pro Edition Only) */
-"yubikey_config_section_header_nfc_pro_only" = "NFC Yubikey (Pro Edition Only)";
 
 /* Disabled (Pro Edition Only) */
 "casg_yubikey_configured_disabled_pro_only" = "Disabled (Pro Edition Only)";
@@ -3396,8 +3393,38 @@
 /* Are you sure the path is correct? It should be a path to a parent folder. Not the database file. */
 "sftp_path_are_you_sure" = "Are you sure the path is correct? It should be a path to a parent folder. Not the database file.";
 
+/* Are you sure the path is correct? It should be a path to a parent folder. Not the database file. */
+"sftp_path_are_you_sure" = "Are you sure the path is correct? It should be a path to a parent folder. Not the database file.";
+
 /* Path may be Invalid */
 "sftp_path_may_be_invalid" = "Path May Be Invalid";
 
 /* URL May Be Invalid */
 "webdav_vc_validation_url_maybe_invalid" = "URL May Be Invalid";
+
+/* NFC Yubikey (Pro Edition Only) */
+"yubikey_config_section_header_nfc_pro_only" = "NFC Yubikey (Pro Edition Only)";
+
+/* NFC Yubikey (NFC Not Supported on Device) */
+"yubikey_config_section_header_nfc_device_not_supported" = "NFC Yubikey (NFC Not Supported on Device)";
+
+/* NFC Yubikey (AutoFill Mode - NFC Unavailable) */
+"yubikey_config_section_header_nfc_autofill_unavailable" = "NFC Yubikey (NFC Unavailable in AutoFill)";
+
+/* Lightning Yubikey (Pro Edition Only) */
+"yubikey_config_section_header_lightning_pro_only" = "Lightning Yubikey (Pro Edition Only)";
+
+/* Lightning Yubikey (Lightning Not Supported on Device) */
+"yubikey_config_section_header_lightning_device_not_supported" = "Lightning Yubikey (Lightning Not Supported on Device)";
+
+/* Lightning Yubikey (AutoFill Mode - Lightning Unavailable) */
+"yubikey_config_section_header_lightning_autofill_unavailable" = "Lightning Yubikey (Lightning Unavailable in AutoFill)";
+
+/* Are you sure you want to delete this Virtual YubiKey? */
+"yubikey_config_are_you_sure_delete" = "Are you sure you want to delete this Virtual YubiKey?";
+
+/* %@ (AutoFill Only) - Translator's note, the 1st parameter is the name of the virtual yubikey, e.g. Mark's Virtual Yubikey - This string indicates that that key can only be used in AutoFill mode only, not regualr App mode */
+"yubikeys_virtual_autofill_only" = "%@ (AutoFill Only)";
+
+/* Virtual YubiKey */
+"casg_yubikey_configured_virtual" = "Virtual YubiKey";

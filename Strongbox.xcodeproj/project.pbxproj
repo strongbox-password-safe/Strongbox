@@ -1462,6 +1462,14 @@
 		C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02F0249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
+		C8166635253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8166633253A1A1F00FB4E4C /* VirtualYubiKeyCell.m */; };
+		C8166636253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8166633253A1A1F00FB4E4C /* VirtualYubiKeyCell.m */; };
+		C8166637253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8166633253A1A1F00FB4E4C /* VirtualYubiKeyCell.m */; };
+		C8166638253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8166633253A1A1F00FB4E4C /* VirtualYubiKeyCell.m */; };
+		C8166639253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8166634253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib */; };
+		C816663A253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8166634253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib */; };
+		C816663B253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8166634253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib */; };
+		C816663C253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8166634253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib */; };
 		C819B4D024EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */; };
 		C819B4D124EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */; };
 		C8400FE324ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8400FE224ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m */; };
@@ -1525,6 +1533,10 @@
 		C8855FBE24854F93001EE933 /* SwitchTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8855FBC24854F93001EE933 /* SwitchTableViewCell.m */; };
 		C8855FD924857D24001EE933 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8855FD724857D24001EE933 /* AuditDrillDown.storyboard */; };
 		C8855FDA24857D24001EE933 /* AuditDrillDown.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8855FD724857D24001EE933 /* AuditDrillDown.storyboard */; };
+		C88D10C1253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */ = {isa = PBXBuildFile; fileRef = C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */; };
+		C88D10C2253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */ = {isa = PBXBuildFile; fileRef = C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */; };
+		C88D10C3253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */ = {isa = PBXBuildFile; fileRef = C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */; };
+		C88D10C4253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */ = {isa = PBXBuildFile; fileRef = C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */; };
 		C88F812D245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
 		C88F812E245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
 		C88F812F245D8C7C00B0B998 /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */; };
@@ -1570,6 +1582,14 @@
 		C8B2C6E82493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
 		C8B2C6E92493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
 		C8B2C6EA2493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
+		C8B8C7752539DDD400164B73 /* VirtualYubiKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */; };
+		C8B8C7762539DDD400164B73 /* VirtualYubiKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */; };
+		C8B8C7772539DDD400164B73 /* VirtualYubiKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */; };
+		C8B8C7782539DDD400164B73 /* VirtualYubiKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */; };
+		C8B8C7852539DED300164B73 /* VirtualYubiKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7842539DED300164B73 /* VirtualYubiKey.m */; };
+		C8B8C7862539DED300164B73 /* VirtualYubiKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7842539DED300164B73 /* VirtualYubiKey.m */; };
+		C8B8C7872539DED300164B73 /* VirtualYubiKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7842539DED300164B73 /* VirtualYubiKey.m */; };
+		C8B8C7882539DED300164B73 /* VirtualYubiKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7842539DED300164B73 /* VirtualYubiKey.m */; };
 		C8BEF17324600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17424600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
 		C8BEF17524600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */; };
@@ -3037,6 +3057,9 @@
 		C8053F8024E1D6E800416031 /* NSDate+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Extensions.m"; path = "model/NSDate+Extensions.m"; sourceTree = "<group>"; };
 		C80E02EB249372D5005A4129 /* ChaCha20ReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ChaCha20ReadStream.h; path = model/ChaCha20ReadStream.h; sourceTree = "<group>"; };
 		C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ChaCha20ReadStream.m; path = model/ChaCha20ReadStream.m; sourceTree = "<group>"; };
+		C8166632253A1A1F00FB4E4C /* VirtualYubiKeyCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VirtualYubiKeyCell.h; path = StrongBox/VirtualYubiKeyCell.h; sourceTree = "<group>"; };
+		C8166633253A1A1F00FB4E4C /* VirtualYubiKeyCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VirtualYubiKeyCell.m; path = StrongBox/VirtualYubiKeyCell.m; sourceTree = "<group>"; };
+		C8166634253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = VirtualYubiKeyCell.xib; path = StrongBox/VirtualYubiKeyCell.xib; sourceTree = "<group>"; };
 		C819B4CE24EAE0550055CB10 /* AutoFillPreferencesViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillPreferencesViewController.h; path = "StrongBox Auto Fill/AutoFillPreferencesViewController.h"; sourceTree = "<group>"; };
 		C819B4CF24EAE0550055CB10 /* AutoFillPreferencesViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillPreferencesViewController.m; path = "StrongBox Auto Fill/AutoFillPreferencesViewController.m"; sourceTree = "<group>"; };
 		C8400FE124ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AllSetAlreadyHasDatabaseViewController.h; path = StrongBox/AllSetAlreadyHasDatabaseViewController.h; sourceTree = "<group>"; };
@@ -3084,6 +3107,8 @@
 		C8855FEA24857D47001EE933 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = StrongBox/es.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
 		C8855FEC24857D48001EE933 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = StrongBox/sv.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
 		C8855FEE24857D4C001EE933 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = StrongBox/uk.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C88D10BF253AF82A008D606A /* AddNewVirtualYubiKeyController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AddNewVirtualYubiKeyController.h; path = StrongBox/AddNewVirtualYubiKeyController.h; sourceTree = "<group>"; };
+		C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddNewVirtualYubiKeyController.m; path = StrongBox/AddNewVirtualYubiKeyController.m; sourceTree = "<group>"; };
 		C88F812B245D8C7C00B0B998 /* ConcurrentMutableSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ConcurrentMutableSet.h; sourceTree = "<group>"; };
 		C88F812C245D8C7C00B0B998 /* ConcurrentMutableSet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ConcurrentMutableSet.m; sourceTree = "<group>"; };
 		C88F8131245D90C500B0B998 /* NSData+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSData+Extensions.h"; path = "StrongBox/NSData+Extensions.h"; sourceTree = "<group>"; };
@@ -3116,6 +3141,10 @@
 		C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TwoFishReadStream.m; path = model/TwoFishReadStream.m; sourceTree = "<group>"; };
 		C8B2C6E52493A4BA00F6EA12 /* KP31HashedBlockStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KP31HashedBlockStream.h; path = model/KP31HashedBlockStream.h; sourceTree = "<group>"; };
 		C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KP31HashedBlockStream.m; path = model/KP31HashedBlockStream.m; sourceTree = "<group>"; };
+		C8B8C7732539DDD400164B73 /* VirtualYubiKeys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VirtualYubiKeys.h; path = model/VirtualYubiKeys.h; sourceTree = "<group>"; };
+		C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VirtualYubiKeys.m; path = model/VirtualYubiKeys.m; sourceTree = "<group>"; };
+		C8B8C7832539DED300164B73 /* VirtualYubiKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VirtualYubiKey.h; path = model/VirtualYubiKey.h; sourceTree = "<group>"; };
+		C8B8C7842539DED300164B73 /* VirtualYubiKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VirtualYubiKey.m; path = model/VirtualYubiKey.m; sourceTree = "<group>"; };
 		C8BEF17224600C4700C27318 /* norwegian-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "norwegian-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
 		C8BF569624A0E092003269C9 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = StrongBox/Constants.h; sourceTree = "<group>"; };
 		C8BF569724A0E092003269C9 /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Constants.m; path = StrongBox/Constants.m; sourceTree = "<group>"; };
@@ -3550,6 +3579,11 @@
 				4D9597BD22A2CB38008DB224 /* CASGParams.m */,
 				4D7228A923F2168000A0A833 /* YubiKeyConfigurationController.h */,
 				4D7228AA23F2168000A0A833 /* YubiKeyConfigurationController.m */,
+				C8166632253A1A1F00FB4E4C /* VirtualYubiKeyCell.h */,
+				C8166633253A1A1F00FB4E4C /* VirtualYubiKeyCell.m */,
+				C8166634253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib */,
+				C88D10BF253AF82A008D606A /* AddNewVirtualYubiKeyController.h */,
+				C88D10C0253AF82A008D606A /* AddNewVirtualYubiKeyController.m */,
 			);
 			name = CASG;
 			sourceTree = "<group>";
@@ -4162,6 +4196,7 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C8B8C77C2539DEB300164B73 /* Virtual YubiKeys */,
 				C88F812A245D8C5E00B0B998 /* McGuill */,
 				4D556F0B22B7F1B300E16027 /* FileManager.h */,
 				4D556F0C22B7F1B300E16027 /* FileManager.m */,
@@ -5263,6 +5298,17 @@
 			name = Audit;
 			sourceTree = "<group>";
 		};
+		C8B8C77C2539DEB300164B73 /* Virtual YubiKeys */ = {
+			isa = PBXGroup;
+			children = (
+				C8B8C7732539DDD400164B73 /* VirtualYubiKeys.h */,
+				C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */,
+				C8B8C7832539DED300164B73 /* VirtualYubiKey.h */,
+				C8B8C7842539DED300164B73 /* VirtualYubiKey.m */,
+			);
+			name = "Virtual YubiKeys";
+			sourceTree = "<group>";
+		};
 		C8C73CCB249E429D00B34C8F /* Sync */ = {
 			isa = PBXGroup;
 			children = (
@@ -5571,6 +5617,7 @@
 				C8855FB924854E8E001EE933 /* SwitchTableCell.xib in Resources */,
 				4D6C854E239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
+				C8166639253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
 				4D8A99A9230AF31700AB98DC /* RMStore.strings in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4DE7F0E822F89D680095F51F /* SelectStorage.storyboard in Resources */,
@@ -5665,6 +5712,7 @@
 				C8855FBA24854E8E001EE933 /* SwitchTableCell.xib in Resources */,
 				4D6C8550239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4DC4E12823488BAA000743C4 /* french-diceware.wordlist.utf8.txt in Resources */,
+				C816663B253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
 				4DC4E12923488BAA000743C4 /* RMStore.strings in Resources */,
 				4DC4E12A23488BAA000743C4 /* ViewAttachmentCell.xib in Resources */,
 				4DC4E12B23488BAA000743C4 /* SelectStorage.storyboard in Resources */,
@@ -5774,6 +5822,7 @@
 				4DC4E25523488BAE000743C4 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4D8FCEAC23606D78001F2172 /* first.names.us.txt in Resources */,
 				4DC4E25623488BAE000743C4 /* securedrop.wordlist.utf8.txt in Resources */,
+				C816663C253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
 				4DC4E25723488BAE000743C4 /* EditPasswordCell.xib in Resources */,
 				4D7F5A52236021C5003ED785 /* Backups.storyboard in Resources */,
 				4D7F5A442360204C003ED785 /* PasswordSafeHistory.storyboard in Resources */,
@@ -5849,6 +5898,7 @@
 				4D36B0CF22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4D8FCEAA23606D78001F2172 /* first.names.us.txt in Resources */,
 				4D36B0B522C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
+				C816663A253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
 				4D770F872303249D00CBE244 /* EditPasswordCell.xib in Resources */,
 				4D7F5A51236021C4003ED785 /* Backups.storyboard in Resources */,
 				4D7F5A432360204B003ED785 /* PasswordSafeHistory.storyboard in Resources */,
@@ -6312,6 +6362,7 @@
 				C8855FBD24854F93001EE933 /* SwitchTableViewCell.m in Sources */,
 				4DF97F2121BF101B0090A55E /* DAVBaseRequest.m in Sources */,
 				4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */,
+				C88D10C1253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */,
 				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
 				C8DDE39724DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
@@ -6344,6 +6395,7 @@
 				4D915D7A1EDC4B77002615F6 /* Alerts.m in Sources */,
 				4D08B5C7234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
 				4D526AB224407C8F00B0B700 /* WSTag.swift in Sources */,
+				C8B8C7752539DDD400164B73 /* VirtualYubiKeys.m in Sources */,
 				4D24C76D238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
 				4D556F2422B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8322302BED00DCD8C7 /* socket_helper.m in Sources */,
@@ -6493,6 +6545,7 @@
 				4DB1B7C82188972600CF1663 /* CryptoParameters.m in Sources */,
 				4DA12F06219837D10000CEBB /* CustomIcon.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
+				C8166635253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */,
 				4DE0DA872351E7A500B4319F /* AboutViewController.m in Sources */,
 				4DF97F2421BF101B0090A55E /* DAVRequests.m in Sources */,
 				4DAE98BE2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
@@ -6535,6 +6588,7 @@
 				4D1A5C021F7927D60036684C /* VersionConflictController.m in Sources */,
 				4D01BA2722BD2A4F0044226F /* DatabaseSearchAndSorter.m in Sources */,
 				4DF97F2B21BF10EB0090A55E /* NSDateRFC1123.m in Sources */,
+				C8B8C7852539DED300164B73 /* VirtualYubiKey.m in Sources */,
 				C872B72324A64A160042CE02 /* cdecode.c in Sources */,
 				4D08B5C5234C9613003D1953 /* GCDWebServerMultiPartFormRequest.m in Sources */,
 				C86E9080246D9A120029623A /* KeePassDatabaseWideProperties.m in Sources */,
@@ -6565,6 +6619,7 @@
 				4DC4E01823488BAA000743C4 /* OpenSafeSequenceHelper.m in Sources */,
 				4DC4E01923488BAA000743C4 /* KeePass2TagPackage.m in Sources */,
 				4DC4E01A23488BAA000743C4 /* Record.m in Sources */,
+				C8B8C7772539DDD400164B73 /* VirtualYubiKeys.m in Sources */,
 				4DC4E01B23488BAA000743C4 /* PrivacyViewController.m in Sources */,
 				4DC4E01C23488BAA000743C4 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4DC4E01D23488BAA000743C4 /* InnerRandomStreamFactory.m in Sources */,
@@ -6740,6 +6795,7 @@
 				4DC4E09023488BAA000743C4 /* GoogleDriveStorageProvider.m in Sources */,
 				4DC4E09123488BAA000743C4 /* SFTPStorageProvider.m in Sources */,
 				4DC4E09223488BAA000743C4 /* NMSFTP.m in Sources */,
+				C8B8C7872539DED300164B73 /* VirtualYubiKey.m in Sources */,
 				4DC4E09323488BAA000743C4 /* DropboxV2StorageProvider.m in Sources */,
 				4DD72BFA24264B1F009F4091 /* DatabasePreferencesController.m in Sources */,
 				4DC4E09423488BAA000743C4 /* ClipboardManager.m in Sources */,
@@ -6807,10 +6863,12 @@
 				4DC4E0C223488BAA000743C4 /* UiAttachment.m in Sources */,
 				4DC4E0C323488BAA000743C4 /* StrongboxDatabase.m in Sources */,
 				4D9AFB192449B0E700376240 /* DatabaseAuditorConfiguration.m in Sources */,
+				C8166637253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */,
 				C8053F8324E1D6E800416031 /* NSDate+Extensions.m in Sources */,
 				4DC4E0C423488BAA000743C4 /* WebDAVProviderData.m in Sources */,
 				C8991AD824B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */,
+				C88D10C3253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */,
 				4DC4E0C523488BAA000743C4 /* OTPToken.m in Sources */,
 				4DC4E0C623488BAA000743C4 /* WelcomeCreateDatabaseViewController.m in Sources */,
 				4DC4E0C723488BAA000743C4 /* SerializationData.m in Sources */,
@@ -6935,6 +6993,7 @@
 				4DC4E17A23488BAE000743C4 /* EditPasswordTableViewCell.m in Sources */,
 				4DC4E17B23488BAE000743C4 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4DC4E17C23488BAE000743C4 /* History.m in Sources */,
+				C8B8C7782539DDD400164B73 /* VirtualYubiKeys.m in Sources */,
 				C8E9DAA1245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4DC4E17D23488BAE000743C4 /* OTPTokenType.m in Sources */,
 				C872B74524A676D60042CE02 /* Sha256PassThroughOutputStream.m in Sources */,
@@ -6950,6 +7009,7 @@
 				C87A8CC924950B5A00356966 /* AutoFillSettings.m in Sources */,
 				4DC4E18723488BAE000743C4 /* Model.m in Sources */,
 				C89348C2248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */,
+				C88D10C4253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */,
 				4DC4E18823488BAE000743C4 /* NSArray+Extensions.m in Sources */,
 				4D44983423926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
 				4DC4E18923488BAE000743C4 /* UiAttachment.m in Sources */,
@@ -7140,6 +7200,7 @@
 				4DC4E21B23488BAE000743C4 /* core.c in Sources */,
 				4DC4E21C23488BAE000743C4 /* LocalDatabaseIdentifier.m in Sources */,
 				4DC4E21D23488BAE000743C4 /* NMSSHConfig.m in Sources */,
+				C8166638253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */,
 				4DC4E21E23488BAE000743C4 /* argon2.c in Sources */,
 				C8DDE3A624DEE32100873392 /* ConcurrentMutableQueue.m in Sources */,
 				4DC4E21F23488BAE000743C4 /* DatabaseAttachment.m in Sources */,
@@ -7159,6 +7220,7 @@
 				4DC4E22A23488BAE000743C4 /* Alerts.m in Sources */,
 				4DC4E22B23488BAE000743C4 /* FileAttachmentsViewControllerTableViewController.m in Sources */,
 				4DC4E22C23488BAE000743C4 /* NodeIconHelper.m in Sources */,
+				C8B8C7882539DED300164B73 /* VirtualYubiKey.m in Sources */,
 				4DC4E22D23488BAE000743C4 /* NSData+GZIP.m in Sources */,
 				4DC4E22E23488BAE000743C4 /* NSURL+QueryItems.m in Sources */,
 				4D526AB524407C8F00B0B700 /* WSTag.swift in Sources */,
@@ -7195,6 +7257,7 @@
 				4D33FA402287232B006C31B2 /* EditPasswordTableViewCell.m in Sources */,
 				4DC66F3A229E708A00EC83C6 /* TPKeyboardAvoidingScrollView.m in Sources */,
 				4D2962B4223173FC0082897D /* History.m in Sources */,
+				C8B8C7762539DDD400164B73 /* VirtualYubiKeys.m in Sources */,
 				C8E9DA9F245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4D004CEB21F4F7BE00E2B194 /* OTPTokenType.m in Sources */,
 				C872B74324A676D60042CE02 /* Sha256PassThroughOutputStream.m in Sources */,
@@ -7210,6 +7273,7 @@
 				C87A8CC824950B5A00356966 /* AutoFillSettings.m in Sources */,
 				4D1885632170E260001AE6B0 /* Model.m in Sources */,
 				C89348C0248A4DEF00448A55 /* ExcludedItemsViewController.m in Sources */,
+				C88D10C2253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */,
 				4D18855E2170D22B001AE6B0 /* NSArray+Extensions.m in Sources */,
 				4D44983223926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
 				4D0835BE2284744B00CA7405 /* UiAttachment.m in Sources */,
@@ -7400,6 +7464,7 @@
 				4D3E149621832C1500A41CA0 /* core.c in Sources */,
 				4D556F2522B817AA00E16027 /* LocalDatabaseIdentifier.m in Sources */,
 				4D326E8A22302BED00DCD8C7 /* NMSSHConfig.m in Sources */,
+				C8166636253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */,
 				4D3E148E21832B7400A41CA0 /* argon2.c in Sources */,
 				C8DDE3A424DEE32100873392 /* ConcurrentMutableQueue.m in Sources */,
 				4D5F5B73218B350C00A0739A /* DatabaseAttachment.m in Sources */,
@@ -7419,6 +7484,7 @@
 				4DEF7B94216FC6F500A3EE12 /* Alerts.m in Sources */,
 				4D5F5B8C218B5A7000A0739A /* FileAttachmentsViewControllerTableViewController.m in Sources */,
 				4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */,
+				C8B8C7862539DED300164B73 /* VirtualYubiKey.m in Sources */,
 				4D326EA7223037AE00DCD8C7 /* NSData+GZIP.m in Sources */,
 				4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */,
 				4D526AB324407C8F00B0B700 /* WSTag.swift in Sources */,
@@ -8287,7 +8353,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8378,7 +8444,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8468,11 +8534,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
-				EXCLUDED_ARCHS = arm64;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8551,11 +8617,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = 4326J8XDF2;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				EXCLUDED_ARCHS = arm64;
+				EXCLUDED_ARCHS = "";
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8637,10 +8703,10 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
-				EXCLUDED_ARCHS = arm64;
+				EXCLUDED_ARCHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -8711,10 +8777,10 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
-				EXCLUDED_ARCHS = arm64;
+				EXCLUDED_ARCHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -8783,10 +8849,10 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
-				EXCLUDED_ARCHS = arm64;
+				EXCLUDED_ARCHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -8865,10 +8931,10 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2974;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = 4326J8XDF2;
-				EXCLUDED_ARCHS = arm64;
+				DEVELOPMENT_TEAM = "";
+				EXCLUDED_ARCHS = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
