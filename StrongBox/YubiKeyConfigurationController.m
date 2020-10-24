@@ -36,10 +36,6 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
 
     self.currentConfig = self.initialConfiguration ? [self.initialConfiguration clone] : [YubiKeyHardwareConfiguration defaults];
     
-    if (!SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
-        self.currentConfig.mode = kNoYubiKey;
-    }
-    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(reloadVirtualYubiKeys)
                                                name:kVirtualYubiKeysChangedNotification
@@ -75,7 +71,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
 - (void)reloadVirtualYubiKeys {
     self.virtualKeys = VirtualYubiKeys.sharedInstance.snapshot;
 
-    NSLog(@"Reloading Virtual YubiKeys after changed: [%lu]", (unsigned long)self.virtualKeys.count);
+    NSLog(@"Reloading Virtual Hardware Keys after changed: [%lu]", (unsigned long)self.virtualKeys.count);
     
     [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:3] withRowAnimation:UITableViewRowAnimationAutomatic];
 }
@@ -279,7 +275,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
                                                                               handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
             [Alerts yesNo:self
                     title:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
-                  message:NSLocalizedString(@"yubikey_config_are_you_sure_delete", @"Are you sure you want to delete this Virtual YubiKey?")
+                  message:NSLocalizedString(@"yubikey_config_are_you_sure_delete", @"Are you sure you want to delete this Virtual Hardware Key?")
                    action:^(BOOL response) {
                 if (response) {
                     NSUInteger row = indexPath.row - 1;

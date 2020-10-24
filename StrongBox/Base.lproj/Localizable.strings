@@ -2774,7 +2774,7 @@
 "casg_yubikey_configured_slot2" = "Slot 2";
 
 /* YubiKey Unlock is not supported in AutoFill mode */
-"open_sequence_cannot_use_yubikey_in_autofill_mode" = "Hardware YubiKey Unlock is not supported in AutoFill mode due to system constraints. You can configure a virtual YubiKey instead.";
+"open_sequence_cannot_use_yubikey_in_autofill_mode" = "Hardware Key Unlock is not supported in AutoFill mode due to system constraints. You can configure a Virtual Hardware Key instead.";
 
 /* YubiKey Unlock is only available in the Pro edition of Strongbox */
 "open_sequence_yubikey_only_available_in_pro" = "YubiKey Unlock is only available in the Pro edition of Strongbox";
@@ -3420,11 +3420,11 @@
 /* Lightning Yubikey (AutoFill Mode - Lightning Unavailable) */
 "yubikey_config_section_header_lightning_autofill_unavailable" = "Lightning Yubikey (Lightning Unavailable in AutoFill)";
 
-/* Are you sure you want to delete this Virtual YubiKey? */
-"yubikey_config_are_you_sure_delete" = "Are you sure you want to delete this Virtual YubiKey?";
+/* Are you sure you want to delete this Virtual Hardware Key? */
+"yubikey_config_are_you_sure_delete" = "Are you sure you want to delete this Virtual Hardware Key?";
 
-/* %@ (AutoFill Only) - Translator's note, the 1st parameter is the name of the virtual yubikey, e.g. Mark's Virtual Yubikey - This string indicates that that key can only be used in AutoFill mode only, not regualr App mode */
+/* %@ (AutoFill Only) - Translator's note, the 1st parameter is the name of the virtual hardware key, e.g. Mark's Virtual Hardware Key - This string indicates that that key can only be used in AutoFill mode only, not regualr App mode */
 "yubikeys_virtual_autofill_only" = "%@ (AutoFill Only)";
 
-/* Virtual YubiKey */
-"casg_yubikey_configured_virtual" = "Virtual YubiKey";
+/* Virtual Hardware Key */
+"casg_yubikey_configured_virtual" = "Virtual Hardware Key";

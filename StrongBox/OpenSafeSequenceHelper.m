@@ -680,8 +680,9 @@
 
                 if (self.safe.storageProvider == kFilesAppUrlBookmark) {
                     if ( @available(iOS 11.0, *) ) {
-                        if ( error.code == NSFileProviderErrorNoSuchItem ||
+                        if ( error.code == NSFileProviderErrorNoSuchItem || // -1005
                              error.code == NSFileReadNoPermissionError ||   // 257
+                             error.code == NSFileReadNoSuchFileError ||     // 260
                              error.code == NSFileNoSuchFileError) {         // 4
                             NSString* message = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db_message", @"Strongbox is having trouble locating your database. This can happen sometimes especially after iOS updates or with some 3rd party providers (e.g.Nextcloud).\n\nYou now need to tell Strongbox where to locate it. Alternatively you can open Strongbox's local copy and fix this later.\n\nFor Nextcloud please use WebDAV instead...");
                             
@@ -816,7 +817,7 @@
         VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:self.yubiKeyConfiguration.virtualKeyIdentifier];
         
         if (!key) {
-            NSError* error = [Utils createNSError:@"Could not find Virtual Yubikey!" errorCode:-1];
+            NSError* error = [Utils createNSError:@"Could not find Virtual Hardware Key!" errorCode:-1];
             completion(NO, nil, error);
         }
         else {

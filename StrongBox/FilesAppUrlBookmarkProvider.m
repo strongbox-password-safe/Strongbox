@@ -180,28 +180,26 @@ viewController:(UIViewController *)viewController
 
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
     if (!securitySucceeded) {
-        NSLog(@"Could not access secure scoped resource!");
-        return;
+        // MMcG: try anyway - this is not always a blocker.
+        NSLog(@"Could not access secure scoped resource! Will try get attributes anyway...");
     }
 
     NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-    NSLog(@"[Files] File Mod Date: [%@][%@]", attr.fileModificationDate, error);
-
     if (error) {
-        completion(kReadResultError, nil, nil, error);
-        return;
+        // MMcG: Sometimes this will fail - e.g. FE File Explorer Pro issue - but opening leads to success... so try to open anyway... Log the error here...
+        NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
         StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
         
         if (!document) {
-            completion(kReadResultError, nil, nil, [Utils createNSError:@"Invalid Files URL" errorCode:-6]);
+            completion(kReadResultError, nil, nil, error ? error : [Utils createNSError:@"Invalid Files URL" errorCode:-6]);
             return;
         }
 
         [document openWithCompletionHandler:^(BOOL success) {
-            completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, nil);
+            completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, success ? nil : error);
             [url stopAccessingSecurityScopedResource];
             
             [document closeWithCompletionHandler:nil];

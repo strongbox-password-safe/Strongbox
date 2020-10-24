@@ -1478,6 +1478,12 @@
 		C8400FEA24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		C8400FEB24ED37C40070849C /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		C8400FEC24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		C85DC89B253CA7C5004E51C9 /* DatabaseSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */; };
+		C85DC89C253CA7C5004E51C9 /* DatabaseSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */; };
+		C85DC8A1253CB0F8004E51C9 /* SynchronizerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC8A0253CB0F8004E51C9 /* SynchronizerTests.m */; };
+		C85DC8A5253CB16E004E51C9 /* DatabaseSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */; };
+		C85DC8A9253CB23E004E51C9 /* DatabaseSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */; };
+		C85DC8AD253CB23F004E51C9 /* DatabaseSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */; };
 		C86495CB2524F2C10030522B /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
 		C86495CF2524F2C20030522B /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
 		C86E907A246D99C80029623A /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
@@ -3071,6 +3077,45 @@
 		C843333B2461666C00E2E550 /* Deliverfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; fileEncoding = 4; name = Deliverfile; path = fastlane/Deliverfile; sourceTree = "<group>"; };
 		C843333E2461668F00E2E550 /* Fastfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Fastfile; path = fastlane/Fastfile; sourceTree = "<group>"; };
 		C84333402461668F00E2E550 /* Appfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Appfile; path = fastlane/Appfile; sourceTree = "<group>"; };
+		C849D1DA253C815A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SyncLog.strings; sourceTree = "<group>"; };
+		C849D1DB253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = StrongBox/ja.lproj/Main.strings; sourceTree = "<group>"; };
+		C849D1DC253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
+		C849D1DD253C818800E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MasterDetail.strings; sourceTree = "<group>"; };
+		C849D1DE253C818900E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Audit.strings; sourceTree = "<group>"; };
+		C849D1DF253C818900E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = StrongBox/ja.lproj/AuditDrillDown.strings; sourceTree = "<group>"; };
+		C849D1E0253C818900E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Browse.strings; sourceTree = "<group>"; };
+		C849D1E1253C818900E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/EditPasswordCell.strings; sourceTree = "<group>"; };
+		C849D1E2253C818900E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/IconTableCell.strings; sourceTree = "<group>"; };
+		C849D1E3253C818900E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/ItemDetails.strings; sourceTree = "<group>"; };
+		C849D1E4253C818A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/QRCodeScannerViewController.strings; sourceTree = "<group>"; };
+		C849D1E5253C818A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = "StrongBox Auto Fill/ja.lproj/MainInterface.strings"; sourceTree = "<group>"; };
+		C849D1E6253C818A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Preferences.strings; sourceTree = "<group>"; };
+		C849D1E7253C818A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SelectItem.strings; sourceTree = "<group>"; };
+		C849D1E8253C818A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/DatabaseOperations.strings; sourceTree = "<group>"; };
+		C849D1E9253C818B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = StrongBox/ja.lproj/Export.strings; sourceTree = "<group>"; };
+		C849D1EA253C818B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/FreemiumOnboarding.strings; sourceTree = "<group>"; };
+		C849D1EB253C818B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Welcome.strings; sourceTree = "<group>"; };
+		C849D1EC253C818B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Upgrade.strings; sourceTree = "<group>"; };
+		C849D1ED253C818B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/FavIconBulk.strings; sourceTree = "<group>"; };
+		C849D1EE253C818C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Backups.strings; sourceTree = "<group>"; };
+		C849D1EF253C818C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/KeePassHistory.strings; sourceTree = "<group>"; };
+		C849D1F0253C818C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PasswordSafeHistory.strings; sourceTree = "<group>"; };
+		C849D1F1253C818C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CreateDatabaseOrSetCredentials.strings; sourceTree = "<group>"; };
+		C849D1F2253C818C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SelectKeyFile.strings; sourceTree = "<group>"; };
+		C849D1F3253C818C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SelectStorage.strings; sourceTree = "<group>"; };
+		C849D1F4253C818D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PinEntry.strings; sourceTree = "<group>"; };
+		C849D1F5253C818D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PasswordGenerationPreferences.strings; sourceTree = "<group>"; };
+		C849D1F6253C818D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/IconsCollectionViewController.strings; sourceTree = "<group>"; };
+		C849D1F7253C818D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		C849D1F8253C818D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/WebDAVConfigurationViewController.strings; sourceTree = "<group>"; };
+		C849D1F9253C818D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SFTPSessionConfigurationViewController.strings; sourceTree = "<group>"; };
+		C849D1FA253C818E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = StrongBox/ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C849D1FB253C818E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		C849D1FC253C818E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		C849D1FD253C818E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/RMStore.strings; sourceTree = "<group>"; };
+		C85DC899253CA7C5004E51C9 /* DatabaseSynchronizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DatabaseSynchronizer.h; sourceTree = "<group>"; };
+		C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DatabaseSynchronizer.m; sourceTree = "<group>"; };
+		C85DC8A0253CB0F8004E51C9 /* SynchronizerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SynchronizerTests.m; path = StrongboxTests/SynchronizerTests.m; sourceTree = "<group>"; };
 		C86E9078246D99C80029623A /* DeletedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DeletedObject.h; path = model/keepass/DeletedObject.h; sourceTree = "<group>"; };
 		C86E9079246D99C80029623A /* DeletedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DeletedObject.m; path = model/keepass/DeletedObject.m; sourceTree = "<group>"; };
 		C86E907E246D9A110029623A /* KeePassDatabaseWideProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseWideProperties.h; path = model/keepass/KeePassDatabaseWideProperties.h; sourceTree = "<group>"; };
@@ -3697,6 +3742,7 @@
 		4D25E8EC2175F4CE00ACF108 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				C85DC8A0253CB0F8004E51C9 /* SynchronizerTests.m */,
 				C89BA19C2494F0A800CC8579 /* KdbxStreamingTests.m */,
 				C8E8B957249100920008A7B7 /* DatabaseAttachmentTests.m */,
 				C8ED5DDB248E6BF600B84EBD /* KDBX4StreamingTests.m */,
@@ -5329,6 +5375,8 @@
 				C8DDE3AE24DF035200873392 /* SyncStatusLogEntry.m */,
 				C8DDE3B324DF04D600873392 /* SyncOperationState.h */,
 				C8053F7C24E1ACA100416031 /* SyncOperationState.m */,
+				C85DC899253CA7C5004E51C9 /* DatabaseSynchronizer.h */,
+				C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -5538,6 +5586,7 @@
 				es,
 				it,
 				nb,
+				ja,
 			);
 			mainGroup = 4DBE5B281C8356C700C310BC;
 			productRefGroup = 4DBE5B321C8356C700C310BC /* Products */;
@@ -6231,6 +6280,7 @@
 				4D19679B217F22E90057DF06 /* PwSafeSerializationTests.m in Sources */,
 				4D1967AD217F7F4B0057DF06 /* KeePassDatabaseTests.m in Sources */,
 				C8E8B958249100920008A7B7 /* DatabaseAttachmentTests.m in Sources */,
+				C85DC8A5253CB16E004E51C9 /* DatabaseSynchronizer.m in Sources */,
 				4D4766FE2178CDCF00C4358F /* KeePassXmlParsingTests.m in Sources */,
 				C8ED5DDC248E6BF600B84EBD /* KDBX4StreamingTests.m in Sources */,
 				4D18F23322577FB100768E18 /* FieldReferenceTests.m in Sources */,
@@ -6239,6 +6289,7 @@
 				4DD696A7218F13C80082DC08 /* AttachmentsRationalizerTests.m in Sources */,
 				4D098B9F2429186F006D9430 /* TagsTests.m in Sources */,
 				4DFF3FFF2180622F00B69383 /* PwSafeModelTests.m in Sources */,
+				C85DC8A1253CB0F8004E51C9 /* SynchronizerTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -6464,6 +6515,7 @@
 				4D47670B217905AB00C4358F /* Meta.m in Sources */,
 				4D1E77EB23AFEDC3007240FA /* CustomIconsRationalizer.m in Sources */,
 				4DE268A022A67A6200A1D158 /* MasterDetailViewController.m in Sources */,
+				C85DC89B253CA7C5004E51C9 /* DatabaseSynchronizer.m in Sources */,
 				4DB574002274913E001BB13C /* ItemMetadataEntry.m in Sources */,
 				4D326EA6223037AE00DCD8C7 /* NSData+GZIP.m in Sources */,
 				4DB1B7D82188B22500CF1663 /* ChaCha20Stream.m in Sources */,
@@ -6885,6 +6937,7 @@
 				4DC4E0CF23488BAA000743C4 /* V3BinariesList.m in Sources */,
 				4D08B5CE234C97DC003D1953 /* LocalHttpServerViewController.m in Sources */,
 				4DC4E0D023488BAA000743C4 /* DatabaseAttachment.m in Sources */,
+				C85DC89C253CA7C5004E51C9 /* DatabaseSynchronizer.m in Sources */,
 				4DC4E0D123488BAA000743C4 /* WelcomeMasterPasswordViewController.m in Sources */,
 				4DC4E0D223488BAA000743C4 /* OTPTokenType.m in Sources */,
 				4D6B5058238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
@@ -7045,6 +7098,7 @@
 				4DC4E19E23488BAE000743C4 /* AesKdfCipher.m in Sources */,
 				4DC4E19F23488BAE000743C4 /* OTPToken+Generation.m in Sources */,
 				4DFD46D5240DC217001F1209 /* ColoredStringHelper.m in Sources */,
+				C85DC8AD253CB23F004E51C9 /* DatabaseSynchronizer.m in Sources */,
 				4DC4E1A023488BAE000743C4 /* AutoFillManager.m in Sources */,
 				4DC4E1A123488BAE000743C4 /* ClipboardManager.m in Sources */,
 				4DC4E1A223488BAE000743C4 /* Kdb1Database.m in Sources */,
@@ -7309,6 +7363,7 @@
 				4D108BFF224A40EC00C17095 /* AesKdfCipher.m in Sources */,
 				4D004CE821F4F7B600E2B194 /* OTPToken+Generation.m in Sources */,
 				4DFD46D3240DC217001F1209 /* ColoredStringHelper.m in Sources */,
+				C85DC8A9253CB23E004E51C9 /* DatabaseSynchronizer.m in Sources */,
 				4D8C72BA22525E160016A5CC /* AutoFillManager.m in Sources */,
 				4D2CB4922332CBE400C2E084 /* ClipboardManager.m in Sources */,
 				4D6FE2C12194451D00EB9997 /* Kdb1Database.m in Sources */,
@@ -7541,6 +7596,7 @@
 				4D160AB0245354870097C730 /* sv */,
 				4D160AB22453548A0097C730 /* uk */,
 				C803E1B724649778001EB9A5 /* nb */,
+				C849D1DE253C818900E05714 /* ja */,
 			);
 			name = Audit.storyboard;
 			path = StrongBox;
@@ -7559,6 +7615,7 @@
 				4D8B36E423FAD4AB00A81725 /* es */,
 				4D95483A24004F7D008D2BE1 /* it */,
 				C803E1BD24649779001EB9A5 /* nb */,
+				C849D1ED253C818B00E05714 /* ja */,
 			);
 			name = FavIconBulk.storyboard;
 			path = StrongBox;
@@ -7577,6 +7634,7 @@
 				4D840201243B79ED0068BFEF /* sv */,
 				4D840203243B79F20068BFEF /* uk */,
 				C803E1BA24649778001EB9A5 /* nb */,
+				C849D1EA253C818B00E05714 /* ja */,
 			);
 			name = FreemiumOnboarding.storyboard;
 			path = StrongBox;
@@ -7595,6 +7653,7 @@
 				4D92F1E72440BE0800C737D5 /* sv */,
 				4D92F1E92440BE0B00C737D5 /* uk */,
 				C803E1B924649778001EB9A5 /* nb */,
+				C849D1E9253C818B00E05714 /* ja */,
 			);
 			name = Export.storyboard;
 			sourceTree = "<group>";
@@ -7612,6 +7671,7 @@
 				4D8B36E023FAD4A500A81725 /* es */,
 				4D95485324004F88008D2BE1 /* it */,
 				C803E1B424649777001EB9A5 /* nb */,
+				C849D1E5253C818A00E05714 /* ja */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -7629,6 +7689,7 @@
 				4D8B36E223FAD4A600A81725 /* es */,
 				4D95483824004F7C008D2BE1 /* it */,
 				C803E1AE24649775001EB9A5 /* nb */,
+				C849D1DB253C815B00E05714 /* ja */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -7646,6 +7707,7 @@
 				4D8B36E823FAD4AC00A81725 /* es */,
 				4D95485424004F88008D2BE1 /* it */,
 				C803E1B024649776001EB9A5 /* nb */,
+				C849D1E1253C818900E05714 /* ja */,
 			);
 			name = EditPasswordCell.xib;
 			sourceTree = "<group>";
@@ -7663,6 +7725,7 @@
 				4D8B36E923FAD4AC00A81725 /* es */,
 				4D95485524004F88008D2BE1 /* it */,
 				C803E1B124649776001EB9A5 /* nb */,
+				C849D1E2253C818900E05714 /* ja */,
 			);
 			name = IconTableCell.xib;
 			sourceTree = "<group>";
@@ -7680,6 +7743,7 @@
 				4D8B36EB23FAD4AD00A81725 /* es */,
 				4D95483F24004F81008D2BE1 /* it */,
 				C803E1B324649777001EB9A5 /* nb */,
+				C849D1E4253C818A00E05714 /* ja */,
 			);
 			name = QRCodeScannerViewController.xib;
 			path = StrongBox;
@@ -7698,6 +7762,7 @@
 				4D8B36F323FAD4AF00A81725 /* es */,
 				4D95484724004F82008D2BE1 /* it */,
 				C803E1AC24649774001EB9A5 /* nb */,
+				C849D1DC253C815B00E05714 /* ja */,
 			);
 			name = PrivacyViewController.xib;
 			path = StrongBox;
@@ -7716,6 +7781,7 @@
 				4D8B36F923FAD4B000A81725 /* es */,
 				4D95484D24004F83008D2BE1 /* it */,
 				C803E1C62464977B001EB9A5 /* nb */,
+				C849D1F6253C818D00E05714 /* ja */,
 			);
 			name = IconsCollectionViewController.xib;
 			path = StrongBox;
@@ -7734,6 +7800,7 @@
 				4D8B36FB23FAD4B100A81725 /* es */,
 				4D95484F24004F83008D2BE1 /* it */,
 				C803E1AB24649774001EB9A5 /* nb */,
+				C849D1F9253C818D00E05714 /* ja */,
 			);
 			name = SFTPSessionConfigurationViewController.xib;
 			path = StrongBox;
@@ -7752,6 +7819,7 @@
 				4D8B36FA23FAD4B100A81725 /* es */,
 				4D95484E24004F83008D2BE1 /* it */,
 				C803E1AA24649773001EB9A5 /* nb */,
+				C849D1F8253C818D00E05714 /* ja */,
 			);
 			name = WebDAVConfigurationViewController.xib;
 			path = StrongBox;
@@ -7770,6 +7838,7 @@
 				4D8B36E523FAD4AC00A81725 /* es */,
 				4D95483B24004F7D008D2BE1 /* it */,
 				C803E1BE24649779001EB9A5 /* nb */,
+				C849D1EE253C818C00E05714 /* ja */,
 			);
 			name = Backups.storyboard;
 			path = StrongBox;
@@ -7788,6 +7857,7 @@
 				4D8B36FD23FAD4B100A81725 /* es */,
 				4D95485024004F88008D2BE1 /* it */,
 				C803E1CA2464977C001EB9A5 /* nb */,
+				C849D1FC253C818E00E05714 /* ja */,
 			);
 			name = InfoPlist.strings;
 			path = "Strongbox Auto Fill";
@@ -7806,6 +7876,7 @@
 				4D8B36FF23FAD4B200A81725 /* es */,
 				4D95485224004F88008D2BE1 /* it */,
 				C803E1CB2464977C001EB9A5 /* nb */,
+				C849D1FD253C818E00E05714 /* ja */,
 			);
 			name = RMStore.strings;
 			path = StrongBox;
@@ -7824,6 +7895,7 @@
 				4D95485124004F88008D2BE1 /* it */,
 				4DB2CE0B24045E5F00E3E2EF /* en */,
 				C803E1C92464977B001EB9A5 /* nb */,
+				C849D1FB253C818E00E05714 /* ja */,
 			);
 			name = InfoPlist.strings;
 			path = StrongBox;
@@ -7842,6 +7914,7 @@
 				4D8B36F823FAD4B000A81725 /* es */,
 				4D95484C24004F82008D2BE1 /* it */,
 				C803E1BC24649779001EB9A5 /* nb */,
+				C849D1EC253C818B00E05714 /* ja */,
 			);
 			name = Upgrade.storyboard;
 			path = StrongBox;
@@ -7860,6 +7933,7 @@
 				4D8B36EF23FAD4AE00A81725 /* es */,
 				4D95484324004F81008D2BE1 /* it */,
 				C803E1C12464977A001EB9A5 /* nb */,
+				C849D1F1253C818C00E05714 /* ja */,
 			);
 			name = CreateDatabaseOrSetCredentials.storyboard;
 			path = StrongBox;
@@ -7878,6 +7952,7 @@
 				4D8B36E123FAD4A500A81725 /* es */,
 				4D95483724004F7C008D2BE1 /* it */,
 				C803E1AD24649775001EB9A5 /* nb */,
+				C849D1DD253C818800E05714 /* ja */,
 			);
 			name = MasterDetail.storyboard;
 			path = StrongBox;
@@ -7895,6 +7970,7 @@
 				4D8B36E323FAD4AB00A81725 /* es */,
 				4D95483924004F7D008D2BE1 /* it */,
 				C803E1C72464977B001EB9A5 /* nb */,
+				C849D1F7253C818D00E05714 /* ja */,
 			);
 			name = LaunchScreen.storyboard;
 			path = StrongBox;
@@ -7913,6 +7989,7 @@
 				4D8B36E623FAD4AC00A81725 /* es */,
 				4D95483C24004F7D008D2BE1 /* it */,
 				C803E1BB24649779001EB9A5 /* nb */,
+				C849D1EB253C818B00E05714 /* ja */,
 			);
 			name = Welcome.storyboard;
 			path = StrongBox;
@@ -7931,6 +8008,7 @@
 				4D8B36E723FAD4AC00A81725 /* es */,
 				4D95483D24004F7E008D2BE1 /* it */,
 				C803E1AF24649776001EB9A5 /* nb */,
+				C849D1E0253C818900E05714 /* ja */,
 			);
 			name = Browse.storyboard;
 			path = StrongBox;
@@ -7949,6 +8027,7 @@
 				4D8B36EA23FAD4AD00A81725 /* es */,
 				4D95483E24004F81008D2BE1 /* it */,
 				C803E1B224649776001EB9A5 /* nb */,
+				C849D1E3253C818900E05714 /* ja */,
 			);
 			name = ItemDetails.storyboard;
 			path = StrongBox;
@@ -7967,6 +8046,7 @@
 				4D8B36ED23FAD4AD00A81725 /* es */,
 				4D95484124004F81008D2BE1 /* it */,
 				C803E1BF2464977A001EB9A5 /* nb */,
+				C849D1EF253C818C00E05714 /* ja */,
 			);
 			name = KeePassHistory.storyboard;
 			path = StrongBox;
@@ -7985,6 +8065,7 @@
 				4D8B36EE23FAD4AE00A81725 /* es */,
 				4D95484224004F81008D2BE1 /* it */,
 				C803E1C02464977A001EB9A5 /* nb */,
+				C849D1F0253C818C00E05714 /* ja */,
 			);
 			name = PasswordSafeHistory.storyboard;
 			path = StrongBox;
@@ -8003,6 +8084,7 @@
 				4D8B36F023FAD4AE00A81725 /* es */,
 				4D95484424004F82008D2BE1 /* it */,
 				C803E1C22464977A001EB9A5 /* nb */,
+				C849D1F2253C818C00E05714 /* ja */,
 			);
 			name = SelectKeyFile.storyboard;
 			path = StrongBox;
@@ -8021,6 +8103,7 @@
 				4D8B36F123FAD4AF00A81725 /* es */,
 				4D95484524004F82008D2BE1 /* it */,
 				C803E1C32464977A001EB9A5 /* nb */,
+				C849D1F3253C818C00E05714 /* ja */,
 			);
 			name = SelectStorage.storyboard;
 			path = StrongBox;
@@ -8039,6 +8122,7 @@
 				4D8B36F223FAD4AF00A81725 /* es */,
 				4D95484624004F82008D2BE1 /* it */,
 				C803E1C42464977B001EB9A5 /* nb */,
+				C849D1F4253C818D00E05714 /* ja */,
 			);
 			name = PinEntry.storyboard;
 			path = StrongBox;
@@ -8057,6 +8141,7 @@
 				4D8B36F423FAD4AF00A81725 /* es */,
 				4D95484824004F82008D2BE1 /* it */,
 				C803E1B824649778001EB9A5 /* nb */,
+				C849D1E8253C818A00E05714 /* ja */,
 			);
 			name = DatabaseOperations.storyboard;
 			path = StrongBox;
@@ -8075,6 +8160,7 @@
 				4D8B36F523FAD4B000A81725 /* es */,
 				4D95484924004F82008D2BE1 /* it */,
 				C803E1B524649777001EB9A5 /* nb */,
+				C849D1E6253C818A00E05714 /* ja */,
 			);
 			name = Preferences.storyboard;
 			path = StrongBox;
@@ -8092,6 +8178,7 @@
 				4D8B36F623FAD4B000A81725 /* es */,
 				4D95484A24004F82008D2BE1 /* it */,
 				C803E1B624649777001EB9A5 /* nb */,
+				C849D1E7253C818A00E05714 /* ja */,
 			);
 			name = SelectItem.storyboard;
 			path = StrongBox;
@@ -8110,6 +8197,7 @@
 				4D8B36F723FAD4B000A81725 /* es */,
 				4D95484B24004F82008D2BE1 /* it */,
 				C803E1C52464977B001EB9A5 /* nb */,
+				C849D1F5253C818D00E05714 /* ja */,
 			);
 			name = PasswordGenerationPreferences.storyboard;
 			path = StrongBox;
@@ -8128,6 +8216,7 @@
 				4D8B36FC23FAD4B100A81725 /* es */,
 				4DAF56E9240181080026282C /* it */,
 				C803E1C82464977B001EB9A5 /* nb */,
+				C849D1FA253C818E00E05714 /* ja */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -8145,6 +8234,7 @@
 				C8855FEA24857D47001EE933 /* es */,
 				C8855FEC24857D48001EE933 /* sv */,
 				C8855FEE24857D4C001EE933 /* uk */,
+				C849D1DF253C818900E05714 /* ja */,
 			);
 			name = AuditDrillDown.storyboard;
 			sourceTree = "<group>";
@@ -8162,6 +8252,7 @@
 				C8DB6C9D24E999F4007C9024 /* es */,
 				C8DB6C9F24E999F5007C9024 /* sv */,
 				C8DB6CA124E999F6007C9024 /* uk */,
+				C849D1DA253C815A00E05714 /* ja */,
 			);
 			name = SyncLog.storyboard;
 			path = StrongBox;
@@ -8353,7 +8444,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8444,7 +8535,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8534,7 +8625,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -8617,7 +8708,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -8703,7 +8794,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -8777,7 +8868,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -8849,7 +8940,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -8931,7 +9022,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2974;
+				CURRENT_PROJECT_VERSION = 2976;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";

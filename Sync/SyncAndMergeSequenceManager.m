@@ -20,6 +20,9 @@
 #import "SafesList.h"
 #import "Alerts.h"
 #import "NSDate+Extensions.h"
+#import "FileManager.h"
+#import "DatabaseModel.h"
+#import "DatabaseSynchronizer.h"
 
 // Future: Overlapping/Multiple updates not possible, they need to be serialized so the Local copy can be matched with remote - Not a big deal right now
 
@@ -238,14 +241,23 @@
     }
 }
 
-- (void)handleOutstandingUpdateWithRemoteConflict:(SafeMetaData *)database syncId:(NSUUID*)syncId localData:(NSData*)localData localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC  completion:(SyncAndMergeCompletionBlock)completion {
+- (void)handleOutstandingUpdateWithRemoteConflict:(SafeMetaData *)database
+                                           syncId:(NSUUID*)syncId
+                                        localData:(NSData*)localData
+                                     localModDate:(NSDate*)localModDate
+                                       remoteData:(NSData*)remoteData
+                                   remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC  completion:(SyncAndMergeCompletionBlock)completion {
     [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Remote has changed since last sync. Last Sync Remote Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
     
     const BOOL mergePossible = NO;
     if (mergePossible) {
         [self logMessage:database syncId:syncId message:@"Update to Push but Remote has changed also... Attempting Merge..."];
+
+        // TODO:
         // NB: if format == keepass2
-        // NB: Don't forget to set the conflictAndLocalChanged flag
+        // NB: Don't forget to set the conflictAndLocalChanged flag  TODO
+
+        [self synchronizeDatabases:localData remoteData:remoteData];
     }
     else {
         if (!interactiveVC) {
@@ -417,6 +429,46 @@
     [operationalData.status updateStatus:state syncId:syncId error:(NSError*)error];
     
     [self publishSyncStatusChangeNotification:operationalData.status];
+}
+
+- (void)synchronizeDatabases:(NSData*)localData remoteData:(NSData*)remoteData {
+    NSUUID* syncMergeId = NSUUID.UUID;
+    
+    NSString* local = [FileManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.local", syncMergeId.UUIDString]];
+    NSString* remote = [FileManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.local", syncMergeId.UUIDString]];
+    
+    BOOL writeOk = [localData writeToFile:local atomically:YES] && [remoteData writeToFile:remote atomically:YES]; // TODO: Deal with failure
+
+    NSURL* localUrl = [NSURL fileURLWithPath:local];
+    NSURL* remoteUrl = [NSURL fileURLWithPath:remote];
+    
+    // TODO: interactive required?
+    // TODO: use convenience CKFs?
+    // TODO: different CKFs?
+    
+    [DatabaseModel fromUrl:localUrl
+                       ckf:nil // TODO: ?
+                    config:DatabaseModelConfig.defaults
+                completion:^(BOOL userCancelled, DatabaseModel * _Nullable mine, const NSError * _Nullable error) {
+        // TODO: Check errors
+        
+        [DatabaseModel fromUrl:remoteUrl
+                           ckf:nil // TODO: ?
+                        config:DatabaseModelConfig.defaults
+                    completion:^(BOOL userCancelled, DatabaseModel * _Nullable theirs, const NSError * _Nullable error) {
+            // TODO: Check errors
+
+//            [self sync]
+            
+            [self synchronizeModels:mine theirs:theirs];
+        }];
+    }];
+}
+
+- (void)synchronizeModels:(DatabaseModel*)mine theirs:(DatabaseModel*)theirs {
+    DatabaseSynchronizer *synchronzier = [DatabaseSynchronizer newSynchronizerFor:mine theirs:theirs];
+    
+    // TODO:
 }
 
 @end

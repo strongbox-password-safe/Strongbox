@@ -97,7 +97,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
         VirtualYubiKey* key = [VirtualYubiKeys.sharedInstance getById:configuration.virtualKeyIdentifier];
         
         if (!key) {
-            NSError* error = [Utils createNSError:@"Could not find Virtual Yubikey!" errorCode:-1];
+            NSError* error = [Utils createNSError:@"Could not find Virtual Hardware Key!" errorCode:-1];
             completion(NO, nil, error);
         }
         else {

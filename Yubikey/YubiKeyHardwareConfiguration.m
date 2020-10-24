@@ -101,7 +101,7 @@
     }
     
     if (self.mode == kVirtual) {
-        return self.virtualKeyIdentifier == oth.virtualKeyIdentifier;
+        return [self.virtualKeyIdentifier isEqualToString:oth.virtualKeyIdentifier];
     }
     
     return self.slot == oth.slot;

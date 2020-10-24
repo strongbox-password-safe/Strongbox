@@ -1121,6 +1121,23 @@
 		C831367024A9203A00D475D9 /* cdecode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cdecode.h; sourceTree = "<group>"; };
 		C831367224A9203A00D475D9 /* cdecode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cdecode.c; sourceTree = "<group>"; };
 		C831367324A9203A00D475D9 /* cencode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cencode.c; sourceTree = "<group>"; };
+		C849D1FE253C836C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
+		C849D1FF253C836D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
+		C849D200253C836D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
+		C849D201253C836D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
+		C849D202253C836D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
+		C849D203253C836E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/NodeDetails.strings; sourceTree = "<group>"; };
+		C849D204253C836E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CustomFieldTableCellView.strings; sourceTree = "<group>"; };
+		C849D205253C836E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/AttachmentItem.strings; sourceTree = "<group>"; };
+		C849D206253C836F00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
+		C849D207253C836F00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/ChangeMasterPasswordWindowController.strings; sourceTree = "<group>"; };
+		C849D208253C836F00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
+		C849D209253C836F00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/DownloadFavIcons.strings; sourceTree = "<group>"; };
+		C849D20A253C837000E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/MacKeePassHistory.strings; sourceTree = "<group>"; };
+		C849D20B253C837000E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SafesMetaDataViewer.strings; sourceTree = "<group>"; };
+		C849D20C253C837000E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
+		C849D20D253C837000E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
+		C849D20E253C837100E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
 		C85B9D73246544C600EEBFC9 /* NSString+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSString+Extensions.h"; path = "../StrongBox/NSString+Extensions.h"; sourceTree = "<group>"; };
 		C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+Extensions.m"; path = "../StrongBox/NSData+Extensions.m"; sourceTree = "<group>"; };
 		C85B9D75246544C600EEBFC9 /* NSData+Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+Extensions.h"; path = "../StrongBox/NSData+Extensions.h"; sourceTree = "<group>"; };
@@ -2325,6 +2342,7 @@
 				es,
 				it,
 				nb,
+				ja,
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
 			productRefGroup = 4DF59F521F30DB7A00D68BFE /* Products */;
@@ -2987,6 +3005,7 @@
 				4D8B370823FAD61100A81725 /* es */,
 				4D95482E24004F5E008D2BE1 /* it */,
 				C803E1D62464978E001EB9A5 /* nb */,
+				C849D209253C836F00E05714 /* ja */,
 			);
 			name = DownloadFavIcons.storyboard;
 			path = MacBox;
@@ -3005,6 +3024,7 @@
 				4D8B370923FAD61100A81725 /* es */,
 				4D95482F24004F5F008D2BE1 /* it */,
 				C803E1D72464978E001EB9A5 /* nb */,
+				C849D20A253C837000E05714 /* ja */,
 			);
 			name = MacKeePassHistory.storyboard;
 			path = MacBox;
@@ -3023,6 +3043,7 @@
 				4D8B370223FAD61000A81725 /* es */,
 				4D95482824004F5E008D2BE1 /* it */,
 				C803E1D02464978D001EB9A5 /* nb */,
+				C849D203253C836E00E05714 /* ja */,
 			);
 			name = NodeDetails.storyboard;
 			path = MacBox;
@@ -3057,6 +3078,7 @@
 				4D8B370023FAD61000A81725 /* es */,
 				4D95482624004F5E008D2BE1 /* it */,
 				C803E1CE2464978D001EB9A5 /* nb */,
+				C849D202253C836D00E05714 /* ja */,
 			);
 			name = DatabaseProperties.storyboard;
 			path = MacBox;
@@ -3075,6 +3097,7 @@
 				4D8B370723FAD61100A81725 /* es */,
 				4D95482D24004F5E008D2BE1 /* it */,
 				C803E1D52464978E001EB9A5 /* nb */,
+				C849D208253C836F00E05714 /* ja */,
 			);
 			name = PreferencesWindowController.xib;
 			path = MacBox;
@@ -3093,6 +3116,7 @@
 				4D8B370A23FAD61100A81725 /* es */,
 				4D95483024004F5F008D2BE1 /* it */,
 				C803E1D82464978E001EB9A5 /* nb */,
+				C849D20B253C837000E05714 /* ja */,
 			);
 			name = SafesMetaDataViewer.xib;
 			path = MacBox;
@@ -3111,6 +3135,7 @@
 				4D8B370E23FAD61200A81725 /* es */,
 				4D95483424004F5F008D2BE1 /* it */,
 				C803E1CD2464978D001EB9A5 /* nb */,
+				C849D201253C836D00E05714 /* ja */,
 			);
 			name = UpgradeWindowController.xib;
 			path = MacBox;
@@ -3129,6 +3154,7 @@
 				4D8B370623FAD61100A81725 /* es */,
 				4D95482C24004F5E008D2BE1 /* it */,
 				C803E1D42464978E001EB9A5 /* nb */,
+				C849D207253C836F00E05714 /* ja */,
 			);
 			name = ChangeMasterPasswordWindowController.xib;
 			path = MacBox;
@@ -3147,6 +3173,7 @@
 				4D8B370B23FAD61200A81725 /* es */,
 				4D95483124004F5F008D2BE1 /* it */,
 				C803E1D92464978E001EB9A5 /* nb */,
+				C849D20C253C837000E05714 /* ja */,
 			);
 			name = ProgressWindow.xib;
 			path = MacBox;
@@ -3165,6 +3192,7 @@
 				4D8B370523FAD61100A81725 /* es */,
 				4D95482B24004F5E008D2BE1 /* it */,
 				C803E1D32464978D001EB9A5 /* nb */,
+				C849D206253C836F00E05714 /* ja */,
 			);
 			name = SelectPredefinedIconController.xib;
 			path = MacBox;
@@ -3177,6 +3205,7 @@
 				4D8B370D23FAD61200A81725 /* es */,
 				4D95483324004F5F008D2BE1 /* it */,
 				C803E1DB2464978E001EB9A5 /* nb */,
+				C849D20E253C837100E05714 /* ja */,
 			);
 			name = CollectionViewHeader.xib;
 			path = MacBox;
@@ -3195,6 +3224,7 @@
 				4D8B370C23FAD61200A81725 /* es */,
 				4D95483224004F5F008D2BE1 /* it */,
 				C803E1DA2464978E001EB9A5 /* nb */,
+				C849D20D253C837000E05714 /* ja */,
 			);
 			name = PredefinedKeePassIcon.xib;
 			path = MacBox;
@@ -3207,6 +3237,7 @@
 				4D8B370423FAD61000A81725 /* es */,
 				4D95482A24004F5E008D2BE1 /* it */,
 				C803E1D22464978D001EB9A5 /* nb */,
+				C849D205253C836E00E05714 /* ja */,
 			);
 			name = AttachmentItem.xib;
 			path = MacBox;
@@ -3219,6 +3250,7 @@
 				4D8B370323FAD61000A81725 /* es */,
 				4D95482924004F5E008D2BE1 /* it */,
 				C803E1D12464978D001EB9A5 /* nb */,
+				C849D204253C836E00E05714 /* ja */,
 			);
 			name = CustomFieldTableCellView.xib;
 			path = MacBox;
@@ -3231,6 +3263,7 @@
 				4D8B370F23FAD61200A81725 /* es */,
 				4D95483524004F5F008D2BE1 /* it */,
 				C803E1DC2464978F001EB9A5 /* nb */,
+				C849D200253C836D00E05714 /* ja */,
 			);
 			name = CheckboxCell.xib;
 			path = MacBox;
@@ -3249,6 +3282,7 @@
 				4D8B370123FAD61000A81725 /* es */,
 				4D95482724004F5E008D2BE1 /* it */,
 				C803E1CF2464978D001EB9A5 /* nb */,
+				C849D1FF253C836D00E05714 /* ja */,
 			);
 			name = Main.storyboard;
 			path = MacBox;
@@ -3267,6 +3301,7 @@
 				C8EDCD40250B772E00E427CB /* es */,
 				C8EDCD41250B773100E427CB /* sv */,
 				C8EDCD42250B773400E427CB /* uk */,
+				C849D1FE253C836C00E05714 /* ja */,
 			);
 			name = PressYubiKeyWindow.xib;
 			path = MacBox;

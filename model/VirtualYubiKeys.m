@@ -47,14 +47,14 @@ NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeys
     }];
     
     if (!json || error || readError) {
-        NSLog(@"Error reading file for Virtual YubiKeys: [%@] - [%@]", error, readError);
+        NSLog(@"Error reading file for Virtual Hardware Keys: [%@] - [%@]", error, readError);
         return ret;
     }
 
     NSArray* jsonArray = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
 
     if (error) {
-        NSLog(@"Error getting json Virtual YubiKeys: [%@]", error);
+        NSLog(@"Error getting json Virtual Hardware Keys: [%@]", error);
         return ret;
     }
 
@@ -99,7 +99,7 @@ NSString* _Nonnull const kVirtualYubiKeysChangedNotification = @"VirtualYubiKeys
     }];
 
     if (!success || error || writeError) {
-        NSLog(@"Error writing Virtual YubiKeys file: [%@]-[%@]", error, writeError);
+        NSLog(@"Error writing Virtual Hardware Keys file: [%@]-[%@]", error, writeError);
         return;
     }
     else {

@@ -119,7 +119,7 @@
     int i = 2;
     for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
         if (database.convenenienceYubikeySecret.length) {
-            NSString* name = i == 2 ? @"Workaround Virtual YubiKey" : [NSString stringWithFormat:@"Workaround Virtual YubiKey %d", i++];
+            NSString* name = i == 2 ? @"Workaround Virtual Hardware Key" : [NSString stringWithFormat:@"Workaround Virtual Hardware Key %d", i++];
             VirtualYubiKey* key = [VirtualYubiKey keyWithName:name secret:database.convenenienceYubikeySecret autoFillOnly:NO];
             [VirtualYubiKeys.sharedInstance addKey:key];
             
