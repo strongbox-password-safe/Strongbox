@@ -27,6 +27,30 @@
     return interval < epsilon;
 }
 
+- (BOOL)isLaterThan:(NSDate*)other {
+    if (other == nil) {
+        return NO;
+    }
+    
+    if ([self isEqualToDate:other]) {
+        return NO;
+    }
+
+    return [self compare:other] == NSOrderedDescending;
+}
+
+- (BOOL)isEarlierThan:(NSDate*)other {
+    if (other == nil) {
+        return NO;
+    }
+    
+    if ([self isEqualToDate:other]) {
+        return NO;
+    }
+
+    return [self compare:other] == NSOrderedAscending;
+}
+
 - (NSString *)friendlyDateString {
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     df.timeStyle = NSDateFormatterShortStyle;

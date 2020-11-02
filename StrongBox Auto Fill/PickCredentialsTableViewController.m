@@ -22,6 +22,7 @@
 #import "SafeStorageProviderFactory.h"
 #import "AutoFillSettings.h"
 #import "NSString+Extensions.h"
+#import "UITableView+EmptyDataSet.h"
 
 @interface PickCredentialsTableViewController () <UISearchBarDelegate, UISearchResultsUpdating>
 
@@ -31,12 +32,14 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddCredential;
 @property NSTimer* timerRefreshOtp;
 
-@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
-@property (nonatomic) NSInteger tapCount;
-@property (nonatomic) NSIndexPath *tappedIndexPath;
-@property (strong, nonatomic) NSTimer *tapTimer;
+//@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
+//@property (nonatomic) NSInteger tapCount;
+//@property (nonatomic) NSIndexPath *tappedIndexPath;
+//@property (strong, nonatomic) NSTimer *tapTimer;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 
 @property BrowseTableViewCellHelper* cellHelper;
+@property BOOL doneFirstAppearanceTasks;
 
 @end
 
@@ -49,6 +52,10 @@
         self.navigationItem.prompt = nil;
     }
 
+    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
+        [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
+    }
+    
     [self setupTableview];
 
     self.buttonAddCredential.enabled = [self canCreateNewCredential];
@@ -85,15 +92,14 @@
 - (void)setupTableview {
     self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.model tableView:self.tableView];
     
-    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                                initWithTarget:self
-                                action:@selector(handleLongPress:)];
-    self.longPressRecognizer.minimumPressDuration = 1;
-    self.longPressRecognizer.cancelsTouchesInView = YES;
+//    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+//                                initWithTarget:self
+//                                action:@selector(handleLongPress:)];
+//    self.longPressRecognizer.minimumPressDuration = 1;
+//    self.longPressRecognizer.cancelsTouchesInView = YES;
     
-    [self.tableView addGestureRecognizer:self.longPressRecognizer];
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
+//    [self.tableView addGestureRecognizer:self.longPressRecognizer];
+
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     
@@ -101,43 +107,13 @@
 }
 
 - (void)loadItems {
-    self.items = self.model.database.allRecords;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model];
     
-    // Filter KeePass1 Backup Group if so configured...
-    
-    if(!self.model.metadata.showKeePass1BackupGroup) {
-        if (self.model.database.format == kKeePass1) {
-            Node* backupGroup = self.model.database.keePass1BackupNode;
-            
-            if(backupGroup) {
-                self.items = [self.model.database.allRecords filter:^BOOL(Node * _Nonnull obj) {
-                    return ![backupGroup contains:obj];
-                }];
-            }
-        }
-    }
-    
-    // Filter Recycle Bin...
-    
-    Node* recycleBin = self.model.database.recycleBinNode;
-    if(recycleBin) {
-        self.items = [self.items filter:^BOOL(Node * _Nonnull obj) {
-            return ![recycleBin contains:obj];
-        }];
-    }
-    
-    [self smartInitializeSearch];
-    
-    // Auto Proceed...
-    
-    if (AutoFillSettings.sharedInstance.autoProceedOnSingleMatch) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            NSArray<Node *> *items = [self getDataSource];
-            if (self.searchController.isActive && items.count == 1) {
-                [self proceedWithItem:items.firstObject];
-            }
-        });
-    }
+    self.items = [searcher filterAndSortForBrowse:self.model.database.allRecords.mutableCopy
+                            includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
+                                includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
+                                   includeExpired:self.model.metadata.showExpiredInSearch
+                                    includeGroups:NO];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
@@ -173,9 +149,28 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        [self.searchController.searchBar becomeFirstResponder];
-    });
+    // Try to workaround Apple's disappearing keyboard problem...
+    
+    if (!self.doneFirstAppearanceTasks) {
+        self.doneFirstAppearanceTasks = YES;
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self smartInitializeSearch];
+
+            [self.searchController.searchBar becomeFirstResponder];
+
+            // Auto Proceed...
+            
+            if (AutoFillSettings.sharedInstance.autoProceedOnSingleMatch) {
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    NSArray<Node *> *items = [self getDataSource];
+                    if (self.searchController.isActive && items.count == 1) {
+                        [self proceedWithItem:items.firstObject];
+                    }
+                });
+            }
+        });
+    }
 }
 
 - (NSArray<Node *> *)getDataSource {
@@ -313,7 +308,21 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [self getDataSource].count;
+    NSInteger ret = [self getDataSource].count;
+    __weak id weakSelf = self;
+    if (ret == 0) {
+        [self.tableView setEmptyTitle:[self getTitleForEmptyDataSet]
+                          description:[self getDescriptionForEmptyDataSet]
+                          buttonTitle:[self getButtonTitleForEmptyDataSet]
+                         buttonAction:^{
+            [weakSelf emptyDataSetDidTapButton];
+        }];
+    }
+    else {
+        [self.tableView setEmptyTitle:nil];
+    }
+    
+    return ret;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -336,9 +345,13 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToAddNew"]) {
-        //UINavigationController* nav = segue.destinationViewController;
         ItemDetailsViewController* vc = (ItemDetailsViewController*)segue.destinationViewController;
         [self addNewEntry:vc];
+    }
+    else if ([segue.identifier isEqualToString:@"segueToPreferences"]) { //     // Try to workaround Apple's disappearing keyboard problem...
+
+        NSLog(@"segueToPreferences");
+        [self.searchController.searchBar resignFirstResponder];
     }
     else {
         NSLog(@"Unknown SEGUE!");
@@ -426,7 +439,7 @@
     return !self.model.isReadOnly;
 }
 
-- (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {
+- (void)emptyDataSetDidTapButton {
     if([self canCreateNewCredential]) {
         [self segueToCreateNew];
     }
@@ -437,7 +450,7 @@
     }
 }
 
-- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
+- (NSAttributedString *)getButtonTitleForEmptyDataSet {
     NSDictionary *attributes = @{
                                  NSFontAttributeName : [UIFont systemFontOfSize:16.0f],
                                  NSForegroundColorAttributeName : UIColor.systemBlueColor
@@ -447,7 +460,7 @@
                                            attributes:attributes];
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
+- (NSAttributedString *)getTitleForEmptyDataSet
 {
     NSString *text = self.searchController.isActive ?
         NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Records") :
@@ -459,7 +472,7 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
+- (NSAttributedString *)getDescriptionForEmptyDataSet
 {
     NSString *text = self.searchController.isActive ?
         NSLocalizedString(@"pick_creds_vc_empty_search_dataset_subtitle", @"Could not find any matching records") :
@@ -520,69 +533,33 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Long Press
 
-- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
-    if (sender.state != UIGestureRecognizerStateBegan) {
-        return;
-    }
-    
-    CGPoint tapLocation = [self.longPressRecognizer locationInView:self.tableView];
-    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
-    
-    if (!indexPath || indexPath.row >= [self getDataSource].count) {
-        NSLog(@"Not on a cell");
-        return;
-    }
-    
-    Node *item = [self getDataSource][indexPath.row];
-    
-    if (item.isGroup) {
-        NSLog(@"Item is group, cannot Fast PW Copy...");
-        return;
-    }
-    
-    NSLog(@"Fast Password Copy on %@", item.title);
-
-    BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item]];
-}
+//- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
+//    if (sender.state != UIGestureRecognizerStateBegan) {
+//        return;
+//    }
+//
+//    CGPoint tapLocation = [self.longPressRecognizer locationInView:self.tableView];
+//    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
+//
+//    if (!indexPath || indexPath.row >= [self getDataSource].count) {
+//        NSLog(@"Not on a cell");
+//        return;
+//    }
+//
+//    Node *item = [self getDataSource][indexPath.row];
+//
+//    if (item.isGroup) {
+//        NSLog(@"Item is group, cannot Fast PW Copy...");
+//        return;
+//    }
+//
+//    NSLog(@"Fast Password Copy on %@", item.title);
+//
+//    BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
+//    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item]];
+//}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(self.tapCount == 1 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]){
-        [self.tapTimer invalidate];
-        
-        self.tapTimer = nil;
-        self.tapCount = 0;
-        self.tappedIndexPath = nil;
-        
-        [self handleDoubleTap:indexPath];
-    }
-    else if(self.tapCount == 0){
-        //This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
-        self.tapCount = self.tapCount + 1;
-        self.tappedIndexPath = indexPath;
-        self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
-    }
-    else if(![self.tappedIndexPath isEqual:indexPath]){
-        //tap on new row
-        self.tapCount = 0;
-        self.tappedIndexPath = indexPath;
-        if(self.tapTimer != nil){
-            [self.tapTimer invalidate];
-            self.tapTimer = nil;
-        }
-    }
-}
-
-- (void)tapTimerFired:(NSTimer *)aTimer{
-    //timer fired, there was a single tap on indexPath.row = tappedRow
-    [self tapOnCell:self.tappedIndexPath];
-    
-    self.tapCount = 0;
-    self.tappedIndexPath = nil;
-    self.tapTimer = nil;
-}
-
-- (void)tapOnCell:(NSIndexPath *)indexPath  {
     NSArray* arr = [self getDataSource];
     if(indexPath.row >= arr.count) {
         return;
@@ -594,21 +571,68 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     else {
         NSLog(@"WARN: DidSelectRow with no Record?!");
     }
+//    if(self.tapCount == 1 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]){
+//        [self.tapTimer invalidate];
+//
+//        self.tapTimer = nil;
+//        self.tapCount = 0;
+//        self.tappedIndexPath = nil;
+//
+//        [self handleDoubleTap:indexPath];
+//    }
+//    else if(self.tapCount == 0){
+//        //This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
+//        self.tapCount = self.tapCount + 1;
+//        self.tappedIndexPath = indexPath;
+//        self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
+//    }
+//    else if(![self.tappedIndexPath isEqual:indexPath]){
+//        //tap on new row
+//        self.tapCount = 0;
+//        self.tappedIndexPath = indexPath;
+//        if(self.tapTimer != nil){
+//            [self.tapTimer invalidate];
+//            self.tapTimer = nil;
+//        }
+//    }
 }
 
-- (void)handleDoubleTap:(NSIndexPath *)indexPath {
-    NSArray* arr = [self getDataSource];
-    if(indexPath.row >= arr.count) {
-        return;
-    }
-    Node *item = arr[indexPath.row];
+//- (void)tapTimerFired:(NSTimer *)aTimer{
+//    //timer fired, there was a single tap on indexPath.row = tappedRow
+//    [self tapOnCell:self.tappedIndexPath];
+//
+//    self.tapCount = 0;
+//    self.tappedIndexPath = nil;
+//    self.tapTimer = nil;
+//}
+//
+//- (void)tapOnCell:(NSIndexPath *)indexPath  {
+//    NSArray* arr = [self getDataSource];
+//    if(indexPath.row >= arr.count) {
+//        return;
+//    }
+//    Node *item = arr[indexPath.row];
+//    if(item) {
+//        [self proceedWithItem:item];
+//    }
+//    else {
+//        NSLog(@"WARN: DidSelectRow with no Record?!");
+//    }
+//}
 
-    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.username node:item]];
-    
-    NSLog(@"Fast Username Copy on %@", item.title);
-    
-    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
+//- (void)handleDoubleTap:(NSIndexPath *)indexPath {
+//    NSArray* arr = [self getDataSource];
+//    if(indexPath.row >= arr.count) {
+//        return;
+//    }
+//    Node *item = arr[indexPath.row];
+//
+//    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.username node:item]];
+//
+//    NSLog(@"Fast Username Copy on %@", item.title);
+//
+//    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+//}
 
 - (void)proceedWithItem:(Node*)item {
     if(item.fields.otpToken) {

@@ -8,13 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import "OTPToken.h"
-//#import "SWTableViewCell.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface BrowseItemCell : UITableViewCell
-
-@property (weak, nonatomic) IBOutlet UILabel *otpLabel;
 
 - (void)setGroup:(NSString *)title
             icon:(UIImage*)icon

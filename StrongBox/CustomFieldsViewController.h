@@ -7,12 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "CustomField.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CustomFieldsViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
+@interface CustomFieldsViewController : UITableViewController
 
 @property NSArray<CustomField*> *items;
 @property (nonatomic, copy) dispatch_block_t onDoneWithChanges;

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DatabaseModel.h"
+#import "SyncDiffReport.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -15,7 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)newSynchronizerFor:(DatabaseModel *)mine theirs:(DatabaseModel *)theirs;
 
-- (void)getDiff;
+- (SyncDiffReport*)getDiff;
+- (void)applyDiff:(SyncDiffReport*)diff;
 
 @end
 

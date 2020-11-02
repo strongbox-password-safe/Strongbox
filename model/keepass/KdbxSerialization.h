@@ -30,6 +30,7 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, SerializationData
 + (void)deserialize:(NSInputStream*)stream
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
       xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
+sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
          completion:(DeserializeCompletionBlock)completion;
 
 - (instancetype)init:(SerializationData*)serializationData;

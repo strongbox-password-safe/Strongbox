@@ -75,24 +75,31 @@ NS_ASSUME_NONNULL_BEGIN
                  format:(DatabaseFormat)format
                  config:(DatabaseModelConfig*)config;
 
-- (BOOL)isDereferenceableText:(NSString*)text;
-- (NSString*)dereference:(NSString*)text node:(Node*)node;
+// Simple Field Edits
+
+- (BOOL)setItemTitle:(Node*)item title:(NSString*)title;
+
+// Attachments
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment;
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
-
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
+
+// Custom Icons
+
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
+- (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
 
-//
+- (void)setNodeCustomIconUuid:(Node*)node uuid:(NSUUID*)uuid rationalize:(BOOL)rationalize;
+- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID*)uuid rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
 
-- (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
+- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize;
+- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
 
 // Deletions
 
 @property (readonly) NSDictionary<NSUUID*, NSDate*>* deletedObjects;
-
 - (void)deleteItems:(const NSArray<Node *> *)items;
 - (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
 - (void)unDelete:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
@@ -117,42 +124,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)addChild:(Node*)item destination:(Node*)destination;
 - (void)unAddChild:(Node*)item;
 
-@property (nonatomic, readonly, nonnull) Node* rootGroup;
-@property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
-@property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
-@property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
-
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeRecords;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeGroups;
-
-@property (nonatomic, nonnull, readonly) CompositeKeyFactors* compositeKeyFactors;
-
-@property (nonatomic, readonly) DatabaseFormat format;
-@property (nonatomic, readonly, nonnull) NSString* fileExtension;
-
 // Helpers
 
-@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull usernameSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull urlSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull passwordSet;
-@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull tagSet;
+- (BOOL)isDereferenceableText:(NSString*)text;
+- (NSString*)dereference:(NSString*)text node:(Node*)node;
 
-@property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
-@property (nonatomic, readonly) NSString* _Nonnull mostPopularEmail;
-@property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword; 
-@property (nonatomic, readonly) NSInteger numberOfRecords;
-@property (nonatomic, readonly) NSInteger numberOfGroups;
-
-// TODO: Combine KP1 and KP2 Recycle Bin / Backup Group?
-@property BOOL recycleBinEnabled;
-@property (readonly, nullable) Node* recycleBinNode;
-@property (nullable, readonly) Node* keePass1BackupNode;
-
+- (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
 - (NSString *)getGroupPathDisplayString:(Node *)vm;
+
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
 
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference;
@@ -164,6 +143,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText;
 
 - (NSString*)getHtmlPrintString:(NSString*)databaseName;
+
+@property (nonatomic, readonly, nonnull) Node* rootGroup;
+@property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
+@property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
+@property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
+
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeRecords;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeGroups;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull usernameSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull urlSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull passwordSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull tagSet;
+@property (nonatomic, readonly) NSString* _Nonnull mostPopularUsername;
+@property (nonatomic, readonly) NSString* _Nonnull mostPopularEmail;
+@property (nonatomic, readonly) NSString* _Nonnull mostPopularPassword;
+@property (nonatomic, readonly) NSInteger numberOfRecords;
+@property (nonatomic, readonly) NSInteger numberOfGroups;
+
+// TODO: Combine KP1 and KP2 Recycle Bin / Backup Group?
+@property BOOL recycleBinEnabled;
+@property (readonly, nullable) Node* recycleBinNode;
+@property (nullable, readonly) Node* keePass1BackupNode;
+
+@property (nonatomic, nonnull, readonly) CompositeKeyFactors* compositeKeyFactors;
+@property (nonatomic, readonly) DatabaseFormat format;
+@property (nonatomic, readonly, nonnull) NSString* fileExtension;
 
 @end
 

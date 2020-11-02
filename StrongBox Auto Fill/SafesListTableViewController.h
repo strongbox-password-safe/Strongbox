@@ -7,12 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "CredentialProviderViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SafesListTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
+@interface SafesListTableViewController : UITableViewController
 
 @property (nonatomic, weak) CredentialProviderViewController *rootViewController;
 @property BOOL lastRunGood;

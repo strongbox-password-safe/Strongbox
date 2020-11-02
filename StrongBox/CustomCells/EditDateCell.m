@@ -27,10 +27,14 @@
 
     self.datePicker = [[UIDatePicker alloc] init];
     self.datePicker.datePickerMode = UIDatePickerModeDate;
-
     self.timePicker = [[UIDatePicker alloc] init];
     self.timePicker.datePickerMode = UIDatePickerModeTime;
 
+    if (@available(iOS 13.4, *)) { // TODO: Use modern compact style if possible - this is necessary so the expiry isn't messed up :(
+        self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
+        self.timePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
+    }
+        
     // Toolbar with done/cancel buttons
     
     UIToolbar* toolbarDate = [[UIToolbar alloc] init];

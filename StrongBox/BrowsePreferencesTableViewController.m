@@ -13,7 +13,7 @@
 #import "Settings.h"
 #import "Model.h"
 
-@interface BrowsePreferencesTableViewController ()
+@interface BrowsePreferencesTableViewController () <UIAdaptivePresentationControllerDelegate> // Detect iOS13 swipe down dismiss
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchStartWithSearch;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpBrowseView;
@@ -72,6 +72,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    self.navigationController.presentationController.delegate = self;
+    
     [self bindPreferences];
     
     [self bindTableviewToFormat];
@@ -85,6 +87,21 @@
     [self cell:self.cellDerefenceDuringSearch setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellIconSet setHidden:self.format == kPasswordSafe];
     
+    if (@available(iOS 13, *)) {
+//        [self cell:self.cellSingleTapAction setHidden:YES];
+        
+        // Fast tap replaces with context menus and slide actions - 24-Oct-2020
+
+        [self cell:self.cellDoubleTapAction setHidden:YES];
+        [self cell:self.cellTripleTapAction setHidden:YES];
+        [self cell:self.cellLongPressAction setHidden:YES];
+
+        // TODO: Remove soon...
+        // Pretty Niche and unneeded - remove eventually from metadata - should just be on all the time
+        [self cell:self.cellDereference setHidden:YES];
+        [self cell:self.cellDerefenceDuringSearch setHidden:YES];
+    }
+    
     [self reloadDataAnimated:NO];
 }
 
@@ -96,8 +113,10 @@
     self.databaseMetaData.showFlagsInBrowse = self.showFlagsInBrowse.on;
     self.databaseMetaData.immediateSearchOnBrowse = self.switchStartWithSearch.on;
     
-    self.databaseMetaData.viewDereferencedFields = self.switchViewDereferenced.on;
-    self.databaseMetaData.searchDereferencedFields = self.switchSearchDereferenced.on;
+    // TODO: Remove soon...
+//    self.databaseMetaData.viewDereferencedFields = self.switchViewDereferenced.on;
+//    self.databaseMetaData.searchDereferencedFields = self.switchSearchDereferenced.on;
+    
     self.databaseMetaData.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
     self.databaseMetaData.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
 
@@ -139,8 +158,10 @@
     self.showFlagsInBrowse.on = self.databaseMetaData.showFlagsInBrowse;
     self.switchStartWithSearch.on = self.databaseMetaData.immediateSearchOnBrowse;
     
-    self.switchViewDereferenced.on = self.databaseMetaData.viewDereferencedFields;
-    self.switchSearchDereferenced.on = self.databaseMetaData.searchDereferencedFields;
+    // TODO: Remove soon...
+//    self.switchViewDereferenced.on = self.databaseMetaData.viewDereferencedFields;
+//    self.switchSearchDereferenced.on = self.databaseMetaData.searchDereferencedFields;
+    
     self.switchShowKeePass1BackupFolder.on = self.databaseMetaData.showKeePass1BackupGroup;
     self.switchShowRecycleBinInSearch.on = self.databaseMetaData.showRecycleBinInSearchResults;
     
@@ -509,8 +530,18 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
+    if (self.onDone) {
+        self.onDone();
+    }
+}
+
 - (IBAction)onDone:(id)sender {
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    
+    if (self.onDone) {
+        self.onDone();
+    }
 }
 
 @end

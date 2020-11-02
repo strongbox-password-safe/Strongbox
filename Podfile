@@ -20,7 +20,6 @@ abstract_target 'common-ios' do
     platform :ios, '10.0'
     use_frameworks!
 
-    pod 'DZNEmptyDataSet'
     pod 'libsodium'
     pod 'KissXML'
 

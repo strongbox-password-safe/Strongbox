@@ -1434,21 +1434,15 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         self.iconExplicitlyChanged = NO;
         if(self.model.icon.customImage) {
             NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
-            [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
+            [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES addHistory:NO]; // History is added above
         }
         else if(self.model.icon.customUuid != nil) {
             if(![self.model.icon.customUuid isEqual:self.item.customIconUuid]) {
-                self.item.customIconUuid = self.model.icon.customUuid;
+                [self.databaseModel.database setNodeCustomIconUuid:self.item uuid:self.item.customIconUuid rationalize:YES addHistory:NO];
             }
         }
         else if(self.model.icon.index != nil) {
-            if(self.model.icon.index.intValue == -1) {
-                self.item.iconId = @(0); // Default
-            }
-            else {
-                self.item.iconId = self.model.icon.index;
-            }
-            self.item.customIconUuid = nil;
+            [self.databaseModel.database setNodeIconId:self.item iconId:self.model.icon.index rationalize:YES addHistory:NO];
         }
     }
     else {

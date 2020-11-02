@@ -13,12 +13,12 @@
 #import "IOsUtils.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
-#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "FileManager.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "BookmarksHelper.h"
+#import "UITableView+EmptyDataSet.h"
 
-@interface KeyFilesTableViewController () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, DZNEmptyDataSetSource>
+@interface KeyFilesTableViewController () <UIDocumentPickerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @property NSArray<NSURL*>* keyFiles;
 @property NSArray<NSURL*>* otherFiles;
@@ -34,7 +34,6 @@
     
     self.clearsSelectionOnViewWillAppear = NO;
     self.tableView.tableFooterView = [UIView new];
-    self.tableView.emptyDataSetSource = self;
     
     self.title = self.manageMode ?
     NSLocalizedString(@"key_files_vc_manage_title", @"Manage Key Files") :
@@ -45,7 +44,7 @@
     [self refresh];
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+- (NSAttributedString *)getTitleForEmptyDataSet {
     NSString *text = NSLocalizedString(@"key_files_vc_empty_key_files_title", @"No Key Files Found. Tap '+' to import one.");
     
     NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleBody],
@@ -327,6 +326,10 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    NSInteger totalRows = (self.manageMode ? 0 : 1) + self.keyFiles.count + self.otherFiles.count;
+    
+    [self.tableView setEmptyTitle:(totalRows == 0) ? [self getTitleForEmptyDataSet] : nil];
+    
     if(section == 0) {
         return self.manageMode ? 0 : 1;
     }

@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface NSDate (Extensions)
 
 - (BOOL)isEqualToDateWithinEpsilon:(NSDate*)other;
+- (BOOL)isLaterThan:(NSDate*)other;
+- (BOOL)isEarlierThan:(NSDate*)other;
 
 @property (readonly) NSString* friendlyDateString;
 @property (readonly) NSString* friendlyDateStringVeryShort;

@@ -38,8 +38,10 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
 - (void)buildFonts {
     _regularFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     _title2Font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle2];
+    _title3Font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle3];
     _caption1Font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
-    
+    _caption2Font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption2];
+
     UIFontDescriptor* desc = [self.regularFont.fontDescriptor fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitItalic];
     _italicFont = [UIFont fontWithDescriptor:desc size:0];
 

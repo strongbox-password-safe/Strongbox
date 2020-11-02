@@ -12,10 +12,13 @@
 
 @implementation KeePassGroup
 
+- (BOOL)isGroup {
+    return YES;
+}
+
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kGroupElementName context:context]) {
-        self.groups = [NSMutableArray array];
-        self.entries = [NSMutableArray array];
+        self.groupsAndEntries = [NSMutableArray array];
         self.name = @"";
         self.uuid = NSUUID.UUID;
         self.times = [[Times alloc] initWithXmlElementName:kTimesElementName context:context];
@@ -52,7 +55,11 @@
 
 - (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kGroupElementName]) {
-        [self.groups addObject:(KeePassGroup*)completedObject];
+        [self.groupsAndEntries addObject:(KeePassGroup*)completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kEntryElementName]) {
+        [self.groupsAndEntries addObject:(Entry*)completedObject];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kTimesElementName]) {
@@ -65,10 +72,6 @@
     }
     else if([withXmlElementName isEqualToString:kUuidElementName]) {
         self.uuid = [SimpleXmlValueExtractor getUuid:completedObject];
-        return YES;
-    }
-    else if([withXmlElementName isEqualToString:kEntryElementName]) {
-        [self.entries addObject:(Entry*)completedObject];
         return YES;
     }
     else if([withXmlElementName isEqualToString:kIconIdElementName]) {
@@ -96,23 +99,16 @@
     if (self.customIcon && ![serializer writeElement:kCustomIconUuidElementName uuid:self.customIcon]) return NO;
 
     if(self.times && ![self.times writeXml:serializer]) return NO;
-    
-    if(self.groups) {
-        for (KeePassGroup *group in self.groups) {
-            if(![group writeXml:serializer]) {
+
+    if (self.groupsAndEntries) {
+        for (id<KeePassGroupOrEntry> groupOrEntry in self.groupsAndEntries) {
+            BaseXmlDomainObjectHandler *handler = (BaseXmlDomainObjectHandler*)groupOrEntry;
+            if(![handler writeXml:serializer]) {
                 return NO;
             }
         }
     }
-    
-    if(self.entries) {
-        for (Entry *entry in self.entries) {
-            if(![entry writeXml:serializer]) {
-                return NO;
-            }
-        }
-    }
-    
+
     if(![super writeUnmanagedChildren:serializer]) {
         return NO;
     }
@@ -151,34 +147,25 @@
     if (![self.times isEqual:other.times]) {
         return NO;
     }
-    if(self.entries.count != other.entries.count) {
-        return NO;
-    }
-    if(self.groups.count != other.groups.count) {
-        return NO;
-    }
-
-    for (int i=0; i < self.groups.count; i++) {
-        KeePassGroup* a = self.groups[i];
-        KeePassGroup* b = other.groups[i];
-        if(![a isEqual:b]) {
-            return NO;
-        }
-    }
-
-    for (int i=0; i < self.entries.count; i++) {
-        Entry* a = self.entries[i];
-        Entry* b = other.entries[i];
-        if(![a isEqual:b]) {
-            return NO;
-        }
-    }
     
+    if (self.groupsAndEntries.count != other.groupsAndEntries.count) {
+        return NO;
+    }
+
+    for (int i=0; i < self.groupsAndEntries.count; i++) {
+        id<KeePassGroupOrEntry> a = self.groupsAndEntries[i];
+        id<KeePassGroupOrEntry> b = other.groupsAndEntries[i];
+        
+        if(![a isEqual:b]) {
+            return NO;
+        }
+    }
+        
     return YES;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Name = [%@], Entries = [%@], Groups = [%@], Times = [%@], iconId=[%@]/[%@]\nUUID = [%@]", self.name, self.entries, self.groups, self.times, self.icon, self.customIcon, self.uuid];
+    return [NSString stringWithFormat:@"Name = [%@], Children = [%@], Times = [%@], iconId=[%@]/[%@]\nUUID = [%@]", self.name, self.groupsAndEntries, self.times, self.icon, self.customIcon, self.uuid];
 }
 
 @end

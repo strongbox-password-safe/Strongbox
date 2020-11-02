@@ -367,9 +367,9 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
             title = @""; // Possible for empty groups in KeePass - particular when entries are selectively exported to a new database :(
         }
     }
-    else {
+    else if (self.isGroup) {
         if(![title length]) {
-            NSLog(@"setTitle: Cannot have empty title.");
+            NSLog(@"setTitle: Cannot have empty group title in non KeePass database.");
             return NO;
         }
     }

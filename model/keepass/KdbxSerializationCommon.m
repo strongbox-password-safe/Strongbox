@@ -325,11 +325,22 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
                               XmlProcessingContext* context,
                               NSInputStream* stream,
                               NSOutputStream* xmlDumpStream,
+                              BOOL sanityCheckStreamDecryption,
                               NSError** error) {
     KeePassXmlParser *parser =
         [[KeePassXmlParser alloc] initWithProtectedStreamId:innerRandomStreamId
                                                         key:innerRandomStreamKey
+                                sanityCheckStreamDecryption:sanityCheckStreamDecryption
                                                     context:context];
+    
+    if (!parser) {
+        if (error) {
+            NSString* msg = [NSString stringWithFormat:@"Parser Error - Please send this error to support@strongboxsafe.com: [%d]-[%lu]-[%@]", innerRandomStreamId, (unsigned long)innerRandomStreamKey.length, innerRandomStreamKey.hex];
+            *error = [Utils createNSError:msg errorCode:-1];
+        }
+        
+        return nil;
+    }
     
     xmlSAXHandler *my_handler = malloc(sizeof(xmlSAXHandler));
     memset(my_handler, 0, sizeof(xmlSAXHandler));
@@ -400,16 +411,16 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         }
         else {
             err = xmlParseChunk(ctxt, (char*)chnk, (int)read, 0);
-            if (err != XML_ERR_OK) {
+            if (err != XML_ERR_OK || parser.error) {
                 break;
             }
         }
     } while((read = [stream read:chnk maxLength:kChunkSize]));
     
-    if(err != XML_ERR_OK) {
+    if(err != XML_ERR_OK || parser.error) {
         NSLog(@"XML Error: %d", err);
         if (error) {
-            *error = [Utils createNSError:@"Error reading XML" errorCode:err];
+            *error = parser.error ? parser.error : [Utils createNSError:@"Error reading XML" errorCode:err];
         }
         
         xmlFreeParserCtxt(ctxt);
@@ -418,12 +429,13 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     }
     
     err = xmlParseChunk(ctxt, NULL, 0, 1);
-    if(err != XML_ERR_OK) {
+    if(err != XML_ERR_OK || parser.error) {
         NSLog(@"XML Error: %d", err);
         if (error) {
             NSData* foo = [NSData dataWithBytes:chnk length:20];
             NSString* hex = foo.hex;
-            *error = [Utils createNSError:[NSString stringWithFormat:@"Error reading Final XML Hex = [%@]", hex]
+            
+            *error = parser.error ? parser.error : [Utils createNSError:[NSString stringWithFormat:@"Error reading Final XML Hex = [%@]", hex]
                                 errorCode:err];
         }
 
@@ -443,7 +455,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         if (error) {
             NSData* foo = [NSData dataWithBytes:chnk length:20];
             NSString* hex = foo.hex;
-           *error = [Utils createNSError:[NSString stringWithFormat:@"Could not find any valid XML. Hex = [%@]", hex]
+            *error = [Utils createNSError:[NSString stringWithFormat:@"Could not find any valid XML. Hex = [%@]", hex]
                                errorCode:-1];
         }
     }

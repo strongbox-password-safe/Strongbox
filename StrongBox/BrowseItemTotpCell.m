@@ -66,12 +66,7 @@
         uint64_t remainingSeconds = self.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.otpToken.period);
         self.labelOtp.text = [NSString stringWithFormat:@"%@", self.otpToken.password];
         
-        if (@available(iOS 13.0, *)) {
-            self.labelOtp.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.labelColor;
-        }
-        else {
-            self.labelOtp.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.systemBlueColor;
-        }
+        self.labelOtp.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.systemBlueColor;
         
         self.labelOtp.alpha = 1;
         

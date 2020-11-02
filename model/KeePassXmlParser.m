@@ -12,49 +12,39 @@
 #import "XmlProcessingContext.h"
 #import "KeePassConstants.h"
 #import "InnerRandomStreamFactory.h"
+#import "Utils.h"
+#import "NSData+Extensions.h"
 
 @interface KeePassXmlParser ()
 
 @property NSMutableArray<id<XmlParsingDomainObject>> *handlerStack;
 @property (nonatomic) id<InnerRandomStream> innerRandomStream;
-@property (nonatomic) BOOL errorParsing;
+@property (nonatomic) NSError *errorParse;
 @property XmlProcessingContext* context;
 @property NSMutableString* mutableText;
+@property BOOL sanityCheckStreamDecryption;
 
 @end
 
 @implementation KeePassXmlParser
 
-- (instancetype)initV3Plaintext  {
-    return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil context:[XmlProcessingContext standardV3Context]];
-}
-
-- (instancetype)initV4Plaintext  {
-    return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil context:[XmlProcessingContext standardV4Context]];
-}
-
-- (instancetype)initPlaintext:(XmlProcessingContext*)context  {
-    return [self initWithProtectedStreamId:kInnerStreamPlainText key:nil context:context];
-}
-
-- (instancetype)initV3WithProtectedStreamId:(uint32_t)innerRandomStreamId
-                                        key:(nullable NSData*)protectedStreamKey
-{
-    return [self initWithProtectedStreamId:innerRandomStreamId key:protectedStreamKey context:[XmlProcessingContext standardV3Context]];
-}
-
-- (instancetype)initV4WithProtectedStreamId:(uint32_t)innerRandomStreamId
-                                        key:(nullable NSData*)protectedStreamKey
-{
-    return [self initWithProtectedStreamId:innerRandomStreamId key:protectedStreamKey context:[XmlProcessingContext standardV4Context]];
-}
-
 - (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId
-                                      key:(nullable NSData*)protectedStreamKey
-                                  context:(XmlProcessingContext*)context {
+                                      key:(NSData *)protectedStreamKey
+              sanityCheckStreamDecryption:(BOOL)sanityCheckStreamDecryption
+                                  context:(XmlProcessingContext *)context {
     if(self = [super init]) {
         self.context = context;
-        self.innerRandomStream = [InnerRandomStreamFactory getStream:innerRandomStreamId key:protectedStreamKey];
+                
+        self.innerRandomStream = [InnerRandomStreamFactory getStream:innerRandomStreamId
+                                                                 key:protectedStreamKey
+                                                createNewKeyIfAbsent:NO];
+        
+        if (!self.innerRandomStream) {
+            NSLog(@"WARNWARNWARN: Could not create inner stream cipher: [%d]-[%lu]-[%@]", innerRandomStreamId, (unsigned long)protectedStreamKey.length, protectedStreamKey);
+            return nil;
+        }
+        
+        self.sanityCheckStreamDecryption = sanityCheckStreamDecryption;
         self.handlerStack = [NSMutableArray array];
         [self.handlerStack addObject:[[RootXmlDomainObject alloc] initWithContext:context]];
         self.mutableText = [[NSMutableString alloc] initWithCapacity:32 * 1024]; // Too High/Low?
@@ -64,7 +54,7 @@
 }
 
 - (RootXmlDomainObject *)rootElement {
-    if(self.errorParsing) {
+    if(self.errorParse) {
         return nil;
     }
     
@@ -94,12 +84,14 @@
     [self.handlerStack addObject:nextHandler];
 }
 
--(void)foundCharacters:(NSString *)string {
+- (void)foundCharacters:(NSString *)string {
     id<XmlParsingDomainObject> currentHandler = [self.handlerStack lastObject];
     
     if (currentHandler.handlesStreamingText) {
         BOOL streamOk = [currentHandler appendStreamedText:string];
-        self.errorParsing = !streamOk;
+        if (!streamOk) {
+            self.errorParse = [Utils createNSError:@"Error during foundCharacters streaming" errorCode:-1];
+        }
     }
     else {
         [self.mutableText appendString:string];
@@ -120,7 +112,16 @@
         if(protected) {
             NSString *string = self.mutableText;
             NSString* decrypted = [self decryptProtected:string];
-            [completedObject setXmlText:decrypted];
+
+            if (self.sanityCheckStreamDecryption && !decrypted) {
+                NSLog(@"WARN: Could not decrypt CipherText...");
+                NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt stream. Sanity Check failed: [%@].\n\nPlease Upgrade DB to KDBX4", self.innerRandomStream.key.hex];
+                self.errorParse = [Utils createNSError:msg errorCode:-1];
+                return;
+            }
+            else {
+                [completedObject setXmlText:decrypted];
+            }
         }
         else {
             [completedObject setXmlText:self.mutableText.copy];
@@ -139,7 +140,7 @@
         if(!knownObjectType) {
             if(![completedObject isKindOfClass:[BaseXmlDomainObjectHandler class]]) {
                 NSLog(@"WARN: Unknown Object Type but not BaseDictionaryHandler?!");
-                self.errorParsing = YES;
+                self.errorParse = [Utils createNSError:@"Unknown Object Type but not BaseDictionaryHandler." errorCode:-1];
             }
             else {
                 BaseXmlDomainObjectHandler *bdh = completedObject;
@@ -149,11 +150,13 @@
     }
     else {
         NSLog(@"WARN: No Handler on stack available for element! Unbalanced XML?");
-        self.errorParsing = YES;
+        self.errorParse = [Utils createNSError:@"No Handler on stack available for element! Unbalanced XML." errorCode:-1];
     }
 }
 
 - (NSString*)decryptProtected:(NSString*)ct {
+//    NSLog(@"XXXXX - Decrypting Ciphertext: [%@]", ct);
+    
     if(self.innerRandomStream == nil) { // Plaintext or for testing
         return ct;
     }
@@ -161,8 +164,21 @@
     NSData *ctData = [[NSData alloc] initWithBase64EncodedString:ct options:NSDataBase64DecodingIgnoreUnknownCharacters];
     
     NSData* plaintext = [self.innerRandomStream xor:ctData];
+
+    NSString* ret = [[NSString alloc] initWithData:plaintext encoding:NSUTF8StringEncoding];
     
-    return [[NSString alloc] initWithData:plaintext encoding:NSUTF8StringEncoding];
+    if (self.sanityCheckStreamDecryption) {
+        if (ct.length && ret.length == 0) {
+            NSLog(@"WARNWARN - Decrypting Ciphertext led to null or empty string - likely incorrect key: [%@] => [%@]", ct, ret);
+            return nil;
+        }
+    }
+    
+    return ret;
+}
+
+- (NSError*)error {
+    return self.errorParse;
 }
 
 @end

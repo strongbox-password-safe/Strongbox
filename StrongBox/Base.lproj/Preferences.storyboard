@@ -3,7 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -1130,6 +1130,96 @@
                                             </constraints>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="h6Q-ue-uXt" userLabel="Hide Export on Database Menu">
+                                        <rect key="frame" x="0.0" y="918" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="h6Q-ue-uXt" id="vgo-eT-RZh">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Hide Export on Database Menu" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RK7-TX-JX5">
+                                                    <rect key="frame" x="20" y="11" width="237" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VxW-KZ-94n">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="6M3-Pg-hqc"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="VxW-KZ-94n" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="RK7-TX-JX5" secondAttribute="trailing" constant="8" symbolic="YES" id="6Ut-Tn-msF"/>
+                                                <constraint firstItem="RK7-TX-JX5" firstAttribute="centerY" secondItem="VxW-KZ-94n" secondAttribute="centerY" id="HCu-RY-nji"/>
+                                                <constraint firstItem="RK7-TX-JX5" firstAttribute="bottom" secondItem="vgo-eT-RZh" secondAttribute="bottomMargin" id="L43-BN-Hbo"/>
+                                                <constraint firstItem="RK7-TX-JX5" firstAttribute="leading" secondItem="vgo-eT-RZh" secondAttribute="leading" constant="20" id="R7N-zo-guf"/>
+                                                <constraint firstItem="VxW-KZ-94n" firstAttribute="trailing" secondItem="vgo-eT-RZh" secondAttribute="trailing" constant="-20" id="llt-F4-cKc"/>
+                                                <constraint firstItem="RK7-TX-JX5" firstAttribute="top" secondItem="vgo-eT-RZh" secondAttribute="topMargin" id="pPE-PH-rwO"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="XN4-hf-KTK" userLabel="Allow Third Party Keyboards">
+                                        <rect key="frame" x="0.0" y="962" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="XN4-hf-KTK" id="GvV-e4-g0n">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Allow Third Party Keyboards" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f29-sb-TJn" userLabel="Allow Third Party Keyboards">
+                                                    <rect key="frame" x="20" y="11" width="214.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H0l-l1-9KY">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="dmW-cT-MtG"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="H0l-l1-9KY" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="f29-sb-TJn" secondAttribute="trailing" constant="8" symbolic="YES" id="JZt-Ra-OHT"/>
+                                                <constraint firstItem="f29-sb-TJn" firstAttribute="centerY" secondItem="H0l-l1-9KY" secondAttribute="centerY" id="Oh4-0M-O0X"/>
+                                                <constraint firstItem="f29-sb-TJn" firstAttribute="top" secondItem="GvV-e4-g0n" secondAttribute="topMargin" id="TWf-Bx-fKJ"/>
+                                                <constraint firstItem="f29-sb-TJn" firstAttribute="bottom" secondItem="GvV-e4-g0n" secondAttribute="bottomMargin" id="bws-TM-N9h"/>
+                                                <constraint firstItem="f29-sb-TJn" firstAttribute="leading" secondItem="GvV-e4-g0n" secondAttribute="leading" constant="20" id="i6f-Ng-roa"/>
+                                                <constraint firstItem="H0l-l1-9KY" firstAttribute="trailing" secondItem="GvV-e4-g0n" secondAttribute="trailing" constant="-20" id="uBg-Bj-Nsr"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" id="RII-TT-lJN" userLabel="Debug: Sanity Check Inner Stream">
+                                        <rect key="frame" x="0.0" y="1006" width="414" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="RII-TT-lJN" id="eSN-wF-JeM">
+                                            <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Debug: Sanity Check Inner Stream" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="51g-KO-wbh" userLabel="Debug: Sanity Check Inner Stream">
+                                                    <rect key="frame" x="20" y="11" width="261.5" height="22"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Bej-vI-bne">
+                                                    <rect key="frame" x="345" y="6.5" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="onPreferencesChanged:" destination="hwI-HO-qLt" eventType="valueChanged" id="6Ev-Sj-01Q"/>
+                                                    </connections>
+                                                </switch>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="Bej-vI-bne" firstAttribute="trailing" secondItem="eSN-wF-JeM" secondAttribute="trailing" constant="-20" id="6Cf-aC-L5R"/>
+                                                <constraint firstItem="Bej-vI-bne" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="51g-KO-wbh" secondAttribute="trailing" constant="8" symbolic="YES" id="epu-VG-TUS"/>
+                                                <constraint firstItem="51g-KO-wbh" firstAttribute="bottom" secondItem="eSN-wF-JeM" secondAttribute="bottomMargin" id="fZB-pz-3Gf"/>
+                                                <constraint firstItem="51g-KO-wbh" firstAttribute="centerY" secondItem="Bej-vI-bne" secondAttribute="centerY" id="hzJ-uJ-e9B"/>
+                                                <constraint firstItem="51g-KO-wbh" firstAttribute="top" secondItem="eSN-wF-JeM" secondAttribute="topMargin" id="lvH-9E-sq4"/>
+                                                <constraint firstItem="51g-KO-wbh" firstAttribute="leading" secondItem="eSN-wF-JeM" secondAttribute="leading" constant="20" id="wQD-8R-vl8"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -1155,9 +1245,12 @@
                         <outlet property="switchAllowBiometric" destination="nkv-fb-Yh2" id="dkh-kz-RcF"/>
                         <outlet property="switchAllowClipboardHandoff" destination="7ik-ek-3YY" id="gYt-Eo-KcE"/>
                         <outlet property="switchAllowPinCodeOpen" destination="GPl-5V-wkN" id="b0u-l2-XWr"/>
+                        <outlet property="switchAllowThirdPartyKeyboards" destination="H0l-l1-9KY" id="Tde-rD-Tzv"/>
                         <outlet property="switchBackupFiles" destination="biU-AQ-YbQ" id="d4k-NS-glb"/>
                         <outlet property="switchBackupImportedKeyFiles" destination="wsP-PL-hvr" id="LFO-ZI-1PI"/>
+                        <outlet property="switchDebugSanityCheckInnerStream" destination="Bej-vI-bne" id="mfm-CH-1yU"/>
                         <outlet property="switchDetectOffline" destination="mv1-aw-VkP" id="soa-LJ-fjs"/>
+                        <outlet property="switchHideExportOnDatabaseMenu" destination="VxW-KZ-94n" id="DVo-oi-hmI"/>
                         <outlet property="switchHideKeyFileName" destination="G1j-ld-CDQ" id="Ca0-EJ-krQ"/>
                         <outlet property="switchShowAllFilesInKeyFilesLocal" destination="NUW-RD-8sG" id="eS2-52-5yN"/>
                         <outlet property="switchShowYubikeySecretWorkaround" destination="wGm-bI-fp3" id="rcC-7N-efl"/>

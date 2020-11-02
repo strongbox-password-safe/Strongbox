@@ -11,12 +11,22 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "ChaCha20Stream.h"
 #import "Salsa20Stream.h"
+#import "PlaintextInnerStream.h"
 
 @implementation InnerRandomStreamFactory
 
 +(id<InnerRandomStream>)getStream:(uint32_t)streamId key:(NSData *)key {
+    return [InnerRandomStreamFactory getStream:streamId key:key createNewKeyIfAbsent:YES];
+}
+
++ (id<InnerRandomStream>)getStream:(uint32_t)streamId key:(NSData *)key createNewKeyIfAbsent:(BOOL)createNewKeyIfAbsent {
     if(streamId == kInnerStreamSalsa20) {
-        return [[Salsa20Stream alloc] initWithKey:key];
+        if (key != nil || createNewKeyIfAbsent) {
+            return [[Salsa20Stream alloc] initWithKey:key];
+        }
+        else {
+            return nil;
+        }
     }
     else if (streamId == kInnerStreamArc4) {
         NSLog(@"ARC4 not supported = %d", streamId);
@@ -24,10 +34,15 @@
         return nil;
     }
     else if (streamId == kInnerStreamChaCha20) {
-        return [[ChaCha20Stream alloc] initWithKey:key];
+        if (key != nil || createNewKeyIfAbsent) {
+            return [[ChaCha20Stream alloc] initWithKey:key];
+        }
+        else {
+            return nil;
+        }
     }
     else if (streamId == kInnerStreamPlainText) {
-        return nil;
+        return [[PlaintextInnerStream alloc] init];
     }
     else {
         NSLog(@"Unknown innerRandomStreamId = %d", streamId);

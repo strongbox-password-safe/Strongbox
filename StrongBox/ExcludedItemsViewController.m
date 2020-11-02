@@ -8,10 +8,10 @@
 
 #import "ExcludedItemsViewController.h"
 #import "BrowseTableViewCellHelper.h"
-#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "FontManager.h"
+#import "UITableView+EmptyDataSet.h"
 
-@interface ExcludedItemsViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
+@interface ExcludedItemsViewController ()
 
 @property BrowseTableViewCellHelper* browseCellHelper;
 @property NSArray<Node*> *items;
@@ -24,23 +24,13 @@
     [super viewDidLoad];
 
     self.tableView.tableFooterView = UIView.new;
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
     
     self.browseCellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.model tableView:self.tableView];
     
     [self refreshItems];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
-    if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
-        self.tableView.contentOffset = CGPointZero;
-    }
-}
-
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView
+- (NSAttributedString *)getEmptyDatasetTitle
 {
     NSString *text = NSLocalizedString(@"audit_drill_down_no_excluded_items_title", @"No Excluded Items");
     
@@ -50,7 +40,7 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
+- (NSAttributedString *)getEmptyDatasetDescription
 {
     NSString *text = NSLocalizedString(@"audit_drill_down_no_excluded_items_subtitle", @"You have not explicitly excluded any items from the audit. You can exclude an item by sliding right on it and tapping the Audit button.");
 
@@ -72,6 +62,14 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (self.items.count == 0) {
+        [self.tableView setEmptyTitle:[self getEmptyDatasetTitle]
+                          description:[self getEmptyDatasetDescription]];
+    }
+    else {
+        [self.tableView setEmptyTitle:nil];
+    }
+    
     return self.items.count;
 }
 

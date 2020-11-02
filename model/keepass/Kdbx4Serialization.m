@@ -116,7 +116,8 @@ static const BOOL kLogVerbose = NO;
                  cipher:(id<Cipher>)cipher
              masterSeed:(NSData*)masterSeed
              completion:(Serialize4CompletionBlock)completion {
-    //NSLog(@"SERIALIZE KEYS: [%@]", keys);
+//    NSLog(@"SERIALIZE KEYS: [%@] - [%@]", keys, xml); // XML dump
+    
     NSData* encryptionIv = [cipher generateIv];
     
     if(kLogVerbose) {
@@ -204,6 +205,7 @@ static BOOL readFileHeader(NSInputStream* stream, KeepassFileHeader *pFileHeader
 + (void)deserialize:(NSInputStream *)stream
 compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
       xmlDumpStream:(NSOutputStream*)xmlDumpStream
+sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
          completion:(Deserialize4CompletionBlock)completion {
     NSMutableData* headerDataForIntegrityCheck = [NSMutableData data];
     
@@ -261,6 +263,7 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                                     headerEntries:headerEntries
                                      cryptoParams:cryptoParams
                                     xmlDumpStream:xmlDumpStream
+                           sanityCheckInnerStream:sanityCheckInnerStream
                                        completion:completion];
         }
     }];
@@ -272,6 +275,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
             headerEntries:(NSDictionary<NSNumber*, NSObject*> *)headerEntries
              cryptoParams:(CryptoParameters*)cryptoParams
             xmlDumpStream:(NSOutputStream*)xmlDumpStream
+   sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
                completion:(Deserialize4CompletionBlock)completion {
     if(!checkHeaderHash(headerDataForIntegrityCheck, inputStream)) {
         NSError* error = [Utils createNSError:@"Actual Header HMAC or Hash does not match expected. Header has been corrupted." errorCode:-3];
@@ -303,7 +307,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
     [decompressedStream open];
     
     NSError* error;
-    Kdbx4SerializationData* ret = readDecrypted(decompressedStream, xmlDumpStream, &error);
+    Kdbx4SerializationData* ret = readDecrypted(decompressedStream, xmlDumpStream, sanityCheckInnerStream, &error);
 
     [decompressedStream close];
 
@@ -407,7 +411,7 @@ static void appendInnerHeader(NSMutableData* base, uint8_t type, NSData* data) {
     }
 }
 
-static Kdbx4SerializationData* readDecrypted(NSInputStream* stream, NSOutputStream* xmlDumpStream, NSError** ppError) {
+static Kdbx4SerializationData* readDecrypted(NSInputStream* stream, NSOutputStream* xmlDumpStream, BOOL sanityCheckInnerStream, NSError** ppError) {
     Kdbx4SerializationData* ret = readInnerHeaders(stream);
     
     if (!ret) {
@@ -419,8 +423,8 @@ static Kdbx4SerializationData* readDecrypted(NSInputStream* stream, NSOutputStre
     }
     
     ret.rootXmlObject = parseXml(ret.innerRandomStreamId, ret.innerRandomStreamKey,
-                                 XmlProcessingContext.standardV4Context, stream, xmlDumpStream, ppError);
-    
+                                 XmlProcessingContext.standardV4Context, stream, xmlDumpStream, sanityCheckInnerStream, ppError);
+
     if(ret.rootXmlObject == nil) {
         NSLog(@"Error parsing xml: %@", *ppError);
         return nil;
@@ -432,7 +436,6 @@ static Kdbx4SerializationData* readDecrypted(NSInputStream* stream, NSOutputStre
 static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
     NSMutableArray* attachments = [NSMutableArray array];
     Kdbx4SerializationData* ret = [[Kdbx4SerializationData alloc] init];
-    int attachmentCount = 0;
     
     while(YES) {
         uint8_t header[SIZE_OF_INNER_HEADER_ENTRY_HEADER];
@@ -478,7 +481,7 @@ static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
             }
             BOOL protectedInMemory = block[0] == 1;
             
-            NSLog(@"Reading Attachment %d [%ld]", attachmentCount++, headerLength - 1);
+//            NSLog(@"Reading Attachment %d [%ld]", attachmentCount++, headerLength - 1);
             DatabaseAttachment *attachment = [[DatabaseAttachment alloc] initWithStream:stream length:headerLength - 1 protectedInMemory:protectedInMemory];
             
             if (attachment == nil) {
@@ -588,6 +591,9 @@ static BOOL checkHeaderHash(NSData* headerData, NSInputStream* stream) {
     }
     
     uint8_t expectedHash[CC_SHA256_DIGEST_LENGTH];
+    
+    NSLog(@"Bytes Available: %d", stream.hasBytesAvailable);
+    
     NSInteger read = [stream read:expectedHash maxLength:CC_SHA256_DIGEST_LENGTH];
     if (read != CC_SHA256_DIGEST_LENGTH) {
         NSLog(@"Could not read expected Header Hash KDBX4");
@@ -680,6 +686,8 @@ static NSData* getHeaderHmac(NSData *header, NSData* hmacKey) {
 static NSDictionary<NSNumber *,NSObject *>* readHeaderEntries(NSInputStream* stream, NSMutableData* headerDataForIntegrityCheck) {
     NSMutableDictionary<NSNumber *,NSObject *> *headerEntries = [NSMutableDictionary dictionary];
     
+    NSUInteger total = 0;
+    
     do {
         HeaderEntryHeader headerEntry;
         NSInteger bytesRead = [stream read:(uint8_t*)&headerEntry maxLength:SIZE_OF_HEADER_ENTRY_HEADER];
@@ -690,35 +698,46 @@ static NSDictionary<NSNumber *,NSObject *>* readHeaderEntries(NSInputStream* str
         if(bytesRead < SIZE_OF_HEADER_ENTRY_HEADER) {
             break;
         }
-                
+        
+        total += bytesRead;
+        
         int32_t length = littleEndian4BytesToInt32(headerEntry.lengthBytes);
         if(kLogVerbose) {
             NSLog(@"Found Header Entry of Type %d and length %d", headerEntry.id, length);
         }
-        
-        NSMutableData* headerData = [NSMutableData dataWithLength:length];
-        bytesRead = [stream read:headerData.mutableBytes maxLength:length];
-        if (bytesRead > 0 && headerDataForIntegrityCheck) {
-            [headerDataForIntegrityCheck appendBytes:headerData.bytes length:bytesRead];
-        }
-        
-        if (bytesRead < length) {
-            NSLog(@"This safe appears to be corrupt. Header entry found with length of [%d]", length);
-            return nil;
-        }
-                
-        if(END_OF_ENTRIES == headerEntry.id) {
-            break;
-        }
-        else {
+
+        if (length > 0) { // Only read from stream if > 0 - Reading 0 bytes can mess up NSInputStream!!! - NB: Even the END_OF_ENTRIES header can have a positive length (often \r\n\r\n :/)
+            NSMutableData* headerData = [NSMutableData dataWithLength:length];
+
+            bytesRead = [stream read:headerData.mutableBytes maxLength:length];
+            if (bytesRead > 0 && headerDataForIntegrityCheck) {
+                [headerDataForIntegrityCheck appendBytes:headerData.bytes length:bytesRead];
+            }
+            
+            if (bytesRead < length) {
+                NSLog(@"This safe appears to be corrupt. Header entry found with length of [%d]", length);
+                return nil;
+            }
+         
+            total += bytesRead;
+
+            if(END_OF_ENTRIES == headerEntry.id) { // Required - Do not remove
+                break;
+            }
+            
             NSObject* obj = getHeaderEntryObject(headerEntry.id, headerData);
             if(obj) {
                 [headerEntries setObject:obj forKey:@(headerEntry.id)];
             }
         }
+        
+        if(END_OF_ENTRIES == headerEntry.id) {
+            break;
+        }
     } while (YES);
    
     if(kLogVerbose) {
+        NSLog(@"Bytes Read of Headers: %lu", (unsigned long)total);
         dumpHeaderEntries(headerEntries);
     }
     

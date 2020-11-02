@@ -20,22 +20,22 @@
 "safes_vc_cached_date_time_fmt" = "Cached: %@";
 
 /* Open ths database offline table action */
-"safes_vc_slide_left_open_offline_action" = "Open Local...";
+"safes_vc_slide_left_open_offline_action" = "Open Local";
 
 /* Title of the 'More Actions' alert/action sheet */
 "safes_vc_database_actions_sheet_title" = "Database Actions";
 
 /* Button Title to Unset Quick Launch */
-"safes_vc_action_unset_as_quick_launch" = "Unset as Quick Launch...";
+"safes_vc_action_unset_as_quick_launch" = "Unset Quick Launch";
 
 /* Button Title to Set Quick Launch */
-"safes_vc_action_set_as_quick_launch" = "Set as Quick Launch...";
+"safes_vc_action_set_as_quick_launch" = "Set Quick Launch";
 
 /* Button Title to Show in Files */
-"safes_vc_show_in_files" = "Make Visible in Files...";
+"safes_vc_show_in_files" = "Show in Files";
 
 /* Button Title to Hide from Files */
-"safes_vc_make_autofillable" = "Hide from Files...";
+"safes_vc_make_autofillable" = "Hide in Files";
 
 /* Title of Prompt about setting Quick Launch */
 "safes_vc_about_quick_launch_title" = "About Quick Launch";
@@ -44,10 +44,10 @@
 "safes_vc_about_setting_quick_launch_and_confirm" = "Setting this database as your Quick Launch database means you will be automatically prompted to unlock this database as soon as you launch or re-activate Strongbox. This can save you one precious tap!\n\nSet as Quick Launch Database?";
 
 /* Button title to Show Database in iOS Files App */
-"safes_vc_show_database_in_files_info" = "Making this database visible in the Files App will also make the database available for access via Finder on your Mac. However the database will no longer be write-able in AutoFill mode. This is due to iOS system design.\n\nNB: You can always reverse this action";
+"safes_vc_show_database_in_files_info" = "Making this database visible in the Files App will also make the database available for access via Finder on your Mac.";
 
 /* Button title to Hide Database from the iOS Files App */
-"safes_vc_make_database_auto_fill_info" = "Hiding this database from the Files App also means it will no longer be visible via Finder on your Mac. As a side-effect, this also means you get full (read/write) AutoFill functionality (not just a read-only cache).\n\nNB: You can always reverse this action";
+"safes_vc_make_database_auto_fill_info" = "Hiding this database from the Files App also means it will no longer be visible via Finder on your Mac.";
 
 /* OK/Cancel prompt title for changing local storage mode */
 "safes_vc_change_local_device_storage_mode_title" = "Change Files Visibility";
@@ -315,7 +315,7 @@
 "browse_prefs_view_as_flat_list" = "Flat List";
 
 /* Group Hierarchy */
-"browse_prefs_view_as_folders" = "Group Hierarchy";
+"browse_prefs_view_as_folders" = "Hierarchy";
 
 /* TOTP List */
 "browse_prefs_view_as_totp_list" = "TOTP List";
@@ -1711,7 +1711,7 @@
 "pwgen_salt_mode_suffix" = "Suffix";
 
 /* Button Title to start reordering */
-"safes_vc_action_reorder_database" = "Reorder...";
+"safes_vc_action_reorder_database" = "Reorder Databases";
 
 /* Tip displayed at top of screen. Slide left on Database for options */
 "safes_vc_tip" = "Tip: Slide left on database for options";
@@ -1825,7 +1825,7 @@
 "model_error_cannot_write_backup" = "Could not write backup, will not proceed with write of database!";
 
 /* Button Title to view backup settings of this database */
-"safes_vc_action_backups" = "Backups...";
+"safes_vc_action_backups" = "Backups";
 
 /* Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences */
 "open_sequence_error_reading_key_file_autofill_context" = "Could not read Key File. Has it been imported properly? Check Key Files Management in Preferences";
@@ -1947,8 +1947,11 @@
 /* Export */
 "generic_export" = "Export";
 
-/* Remove */
+/* Remove - Translators Note: Verb - To Remove something, e.g. an item from a collection */
 "generic_remove" = "Remove";
+
+/* Rename - Translators Note: Verb - To rename something, e.g. an item in a collection, to give it different title */
+"generic_rename" = "Rename";
 
 /* Set */
 "generic_set" = "Set";
@@ -2149,8 +2152,8 @@
 /* Download FavIcon (Pro Only) */
 "set_icon_vc_icon_source_download_favicons_pro_only" = "Download Child FavIcons (Pro Only)";
 
-/* Set Icons */
-"browse_vc_action_set_icons" = "Icons...";
+/* Set Icon(s) */
+"browse_vc_action_set_icons" = "Set Icon(s)";
 
 /* Tap Play to start search */
 "favicon_status_initial" = "Tap Play to start search";
@@ -3277,7 +3280,7 @@
 "backup_settings_prompt_no_dont_backup_anything" = "No, do NOT backup anything";
 
 /* View Sync Status */
-"safes_vc_action_view_sync_status" = "View Debug Sync Log";
+"safes_vc_action_view_sync_status" = "View Sync Log";
 
 /* Please send this crash report to support@strongboxsafe.com */
 "safes_vc_please_send_crash_report" = "Please send this crash report to support@strongboxsafe.com";
@@ -3428,3 +3431,51 @@
 
 /* Virtual Hardware Key */
 "casg_yubikey_configured_virtual" = "Virtual Hardware Key";
+
+/* Manual Unlock - Translators Note: This is an option available to users of Face/Touch ID or PIN Code Unlock - Instead of using these convenience unlock methods, display the manual entry standard unlock screen to enter Master Password manually */
+"safes_vc_unlock_manual_action" = "Manual Unlock";
+
+/* TIP: Tap and hold item to see options - Translators Note: Hint or Tip text usually displayed at the top of the screen, to indicate the user can or should tap and hold down to see a useful context menu with options they can perform on the items they are currently working with. */
+"hint_tap_and_hold_to_see_options" = "Tip: Tap and hold to see options";
+
+/* Launch URL & Copy */
+"browse_action_launch_url_copy_password" = "Launch URL & Copy Password";
+
+/* Copy Other Field... */
+"browse_context_menu_copy_other_field" = "Copy Other Field...";
+
+/* Move - Translators Note: Verb - To move something e.g. an entry or group somewhere else in the hierarchy */
+"generic_move" = "Move";
+
+/* New Entry - Translators Note: Menu option to add a new entry */
+"browse_context_menu_new_entry" = "New Entry";
+
+/* New Group Translators Note: Menu option to add a new group */
+"browse_context_menu_new_group" = "New Group";
+
+/* Select Translators Note: Verb to select an item in Browse view - it will have a select beside it */
+"generic_select" = "Select";
+
+/* Start with Search - Translators Note: Option to start with the search field focused immediately upon unlock */
+"browse_context_menu_start_with_search" = "Start with Search";
+
+/* Sort - Translators Note: Verb - to sort items by title or other field */
+"generic_sort" = "Sort";
+
+/* Customize View */
+"browse_context_menu_customize_view" = "Customize View";
+
+/* Database Settings */
+"browse_context_menu_database_settings" = "Database Settings";
+
+/* Set Master Credentials */
+"browse_context_menu_set_master_credentials" = "Set Master Credentials";
+
+/* Show Password - Translators Note: On Browse screen - context menu item - This option will display the password in a large full screen font for easy reading with a QR Code */
+"browse_context_menu_show_password" = "Show Password";
+
+/* Read Only */
+"databases_toggle_read_only_context_menu" = "Read Only";
+
+/* Quick Launch */
+"databases_toggle_quick_launch_context_menu" = "Quick Launch";

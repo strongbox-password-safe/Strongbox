@@ -253,9 +253,8 @@
     if (mergePossible) {
         [self logMessage:database syncId:syncId message:@"Update to Push but Remote has changed also... Attempting Merge..."];
 
-        // TODO:
-        // NB: if format == keepass2
-        // NB: Don't forget to set the conflictAndLocalChanged flag  TODO
+        // TODO: if format == keepass2
+        // TODO: NB: Don't forget to set the conflictAndLocalChanged flag
 
         [self synchronizeDatabases:localData remoteData:remoteData];
     }

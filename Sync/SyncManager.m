@@ -182,7 +182,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 }
 
 ///////////////////////////////
-
 // TODO: can this model be used to pick up Auto-Fill writes in new uber sync system?! DISPATCH_VNODE_ATTRIB?
 
 - (void)startMonitoringDocumentsDirectory {

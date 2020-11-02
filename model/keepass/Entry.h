@@ -13,10 +13,11 @@
 #import "Binary.h"
 #import "History.h"
 #import "StringValue.h"
+#import "KeePassGroupOrEntry.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface Entry : BaseXmlDomainObjectHandler
+@interface Entry : BaseXmlDomainObjectHandler <KeePassGroupOrEntry>
 
 + (const NSSet<NSString*>*)reservedCustomFieldKeys;
 

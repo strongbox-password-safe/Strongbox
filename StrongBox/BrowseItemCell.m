@@ -17,16 +17,16 @@
 @property (weak, nonatomic) IBOutlet UIView *bottomRow;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
 @property (weak, nonatomic) IBOutlet UILabel *pathLabel;
 @property (weak, nonatomic) IBOutlet UILabel *childCount;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag1;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag2;
 @property (weak, nonatomic) IBOutlet UIImageView *imageFlag3;
 @property (weak, nonatomic) IBOutlet UILabel *labelAudit;
+@property (weak, nonatomic) IBOutlet UILabel *otpLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *iconImageView;
 
 @property OTPToken* otpToken;
-
 
 @end
 
@@ -113,7 +113,7 @@
          otpToken:(OTPToken *)otpToken
          hideIcon:(BOOL)hideIcon
             audit:(NSString*_Nullable)audit {
-    self.titleLabel.text = title;
+    self.titleLabel.text = title.length ? title : @" ";
     self.titleLabel.font = FontManager.sharedInstance.regularFont;
     
     self.iconImageView.image = hideIcon ? nil :icon;

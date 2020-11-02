@@ -58,6 +58,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hasMigratedDatabaseSubtitles;
 @property BOOL migratedYubiKeyEmergencyWorkaroundsToVirtualKeys;
 
+@property BOOL hideExportFromDatabaseContextMenu;
+//@property BOOL useLegacyBrowseUiWithQuickActions;
+@property BOOL allowThirdPartyKeyboards;
+
 NS_ASSUME_NONNULL_END
 
 @end

@@ -141,6 +141,10 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
+- (IBAction)onSystemTrayQuitStrongbox:(id)sender {
+    [NSApplication.sharedApplication terminate:nil];
+}
+
 - (IBAction)onSystemTrayShow:(id)sender {
     [NSApp arrangeInFront:sender];
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:sender];
@@ -251,7 +255,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     [self.productsRequest start];
 }
 
--(void)productsRequest:(SKProductsRequest *)request
+- (void)productsRequest:(SKProductsRequest *)request
     didReceiveResponse:(SKProductsResponse *)response
 {
     dispatch_async(dispatch_get_main_queue(), ^{

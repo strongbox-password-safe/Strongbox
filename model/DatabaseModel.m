@@ -18,6 +18,8 @@
 #import "NSData+Extensions.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+#import "StreamUtils.h"
+#import "LoggingInputStream.h"
 
 @interface DatabaseModel ()
 
@@ -220,6 +222,7 @@
     [adaptor read:stream
               ckf:[CompositeKeyFactors password:password]
     xmlDumpStream:nil
+sanityCheckInnerStream:config.sanityCheckInnerStream
      completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
         [stream close];
       
@@ -284,7 +287,11 @@
      completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
     DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
      
-    NSInputStream* stream = [NSInputStream inputStreamWithURL:url]; 
+    NSInputStream* stream = [NSInputStream inputStreamWithURL:url];
+    
+    // NSData* foo = [StreamUtils readAll:stream];
+    //    LoggingInputStream* lis = [[LoggingInputStream alloc] initWithStream:stream];
+    
     [DatabaseModel fromStreamWithFormat:stream
                                     ckf:ckf
                                  config:config
@@ -313,6 +320,7 @@
     [adaptor read:stream
               ckf:ckf
     xmlDumpStream:xmlDumpStream
+     sanityCheckInnerStream:config.sanityCheckInnerStream
        completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
         
         [stream close];
@@ -425,6 +433,32 @@
                                          fields:fields
                                            uuid:nil]
                          keePassGroupTitleRules:NO];
+}
+
+//
+
+- (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
+    BOOL shouldAddHistory = YES; // FUTURE: Config on/off? only valid for KeePass 2+ also...
+    
+    if(shouldAddHistory && !item.isGroup && originalNodeForHistory != nil) {
+        [item.fields.keePassHistory addObject:originalNodeForHistory];
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Simple Field Edits
+
+- (BOOL)setItemTitle:(Node *)item title:(NSString *)title {
+    Node* originalNodeForHistory = [item cloneForHistory];
+
+    BOOL ret = [item setTitle:title keePassGroupTitleRules:self.format != kPasswordSafe];
+
+    if (ret) {
+        [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
+        [item touch:YES touchParents:NO];
+    }
+    
+    return ret;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -544,8 +578,57 @@
 }
 
 - (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize {
+    [self setNodeCustomIcon:node data:data rationalize:rationalize addHistory:YES];
+}
+
+- (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory {
+    if (addHistory) {
+        Node* originalNodeForHistory = [node cloneForHistory];
+        [self addHistoricalNode:node originalNodeForHistory:originalNodeForHistory];
+    }
+    
+    [node touch:YES touchParents:NO];
     [self.theSafe setNodeCustomIcon:node data:data rationalize:rationalize];
 }
+
+- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID *)uuid rationalize:(BOOL)rationalize {
+    [self setNodeCustomIconUuid:node uuid:uuid rationalize:rationalize addHistory:YES];
+}
+
+- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID *)uuid rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory {
+    if (addHistory) {
+        Node* originalNodeForHistory = [node cloneForHistory];
+        [self addHistoricalNode:node originalNodeForHistory:originalNodeForHistory];
+    }
+    
+    [node touch:YES touchParents:NO];
+
+    [self.theSafe setNodeCustomIconUuid:node uuid:uuid rationalize:rationalize];
+}
+
+
+- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize {
+    [self setNodeIconId:node iconId:iconId rationalize:rationalize addHistory:YES];
+}
+
+- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory {
+    if (addHistory) {
+        Node* originalNodeForHistory = [node cloneForHistory];
+        [self addHistoricalNode:node originalNodeForHistory:originalNodeForHistory];
+    }
+    
+    [node touch:YES touchParents:NO];
+
+    if(iconId.intValue == -1) {
+        node.iconId = !node.isGroup ? @(0) : @(48); // Default
+    }
+    else {
+        node.iconId = iconId;
+    }
+    node.customIconUuid = nil;
+}
+
+////////////////////////////////
 
 - (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
     self.theSafe.recycleBinEnabled = recycleBinEnabled;

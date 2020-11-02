@@ -46,6 +46,7 @@ static NSString* const kSyncForcePushDoNotCheckForConflicts = @"syncForcePushDoN
 
 static NSString* const kMainAppDidChangeDatabases = @"mainAppDidChangeDatabases";
 static NSString* const kAutoFillDidChangeDatabases = @"autoFillDidChangeDatabases";
+static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStream";
 
 @implementation SharedAppAndAutoFillSettings
 
@@ -87,6 +88,14 @@ static NSString* const kAutoFillDidChangeDatabases = @"autoFillDidChangeDatabase
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)debugSanityCheckInnerStream {
+    return [self getBool:kDebugSanityCheckInnerStream fallback:YES];
+}
+
+- (void)setDebugSanityCheckInnerStream:(BOOL)debugSanityCheckInnerStream {
+    [self setBool:kDebugSanityCheckInnerStream value:debugSanityCheckInnerStream];
+}
 
 - (BOOL)mainAppDidChangeDatabases {
     return [self getBool:kMainAppDidChangeDatabases];

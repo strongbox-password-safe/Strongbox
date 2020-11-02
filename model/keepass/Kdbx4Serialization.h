@@ -43,6 +43,7 @@ typedef void (^Serialize4CompletionBlock)(BOOL userCancelled, NSData *_Nullable 
 + (void)deserialize:(NSInputStream*)stream
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
       xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
+sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
          completion:(Deserialize4CompletionBlock)completion;
 
 + (void)serialize:(Kdbx4SerializationData*)serializationData

@@ -10,16 +10,16 @@
 #import "BaseXmlDomainObjectHandler.h"
 #import "Times.h"
 #import "Entry.h"
+#import "KeePassGroupOrEntry.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface KeePassGroup : BaseXmlDomainObjectHandler
+@interface KeePassGroup : BaseXmlDomainObjectHandler <KeePassGroupOrEntry>
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 - (instancetype)initAsKeePassRoot:(XmlProcessingContext*)context;
 
-@property (nonatomic) NSMutableArray<KeePassGroup*>* groups;
-@property (nonatomic) NSMutableArray<Entry*>* entries;
+@property (nonatomic) NSMutableArray<id<KeePassGroupOrEntry>>* groupsAndEntries;
 @property (nonatomic) NSString* name;
 @property (nonatomic) NSUUID* uuid;
 @property (nonatomic, nullable) NSNumber* icon;

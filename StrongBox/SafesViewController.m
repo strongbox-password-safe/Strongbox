@@ -44,7 +44,6 @@
 #import "YubiManager.h"
 #import "WelcomeFreemiumViewController.h"
 #import "MasterDetailViewController.h"
-#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 #import "SharedAppAndAutoFillSettings.h"
 #import "SyncManager.h"
 #import "SyncStatus.h"
@@ -52,12 +51,14 @@
 #import "NSDate+Extensions.h"
 #import "DebugHelper.h"
 #import "GettingStartedInitialViewController.h"
+#import "UITableView+EmptyDataSet.h"
 
-@interface SafesViewController () <DZNEmptyDataSetDelegate, DZNEmptyDataSetSource>
+@interface SafesViewController ()
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 
 - (IBAction)onAddSafe:(id)sender;
 - (IBAction)onUpgrade:(id)sender;
@@ -81,7 +82,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
+    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
+        [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
+    }
+
     [self checkForPreviousCrash];
 
     self.collection = [NSArray array];
@@ -101,7 +106,8 @@
         });
     }
     else {
-        if (@available(iOS 14.0, *)) { // We miss the AppBecameActive notification on first launch in iOS 14 - some kind of weird re-ordering of events. This may occur on other OS's but for now guard with this ios!4 check - TODO - Expand usage
+        if (@available(iOS 14.0, *)) { // We miss the AppBecameActive notification on first launch in iOS 14 - some kind of weird re-ordering of events. This may occur on other OS's but for now guard with this ios!4 check - // FUTURE: Expand usage?
+            
             if (!self.hasAppearedOnce) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                     [self appBecameActive];
@@ -238,14 +244,6 @@
     }
     
     [self bindProOrFreeTrialUi];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-
-    if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
-        self.tableView.contentOffset = CGPointZero;
-    }
 }
 
 - (void)refresh {
@@ -770,19 +768,22 @@
 
 - (void)setupTableview {
     [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
+    
     self.tableView.tableFooterView = [UIView new];
     self.tableView.rowHeight = UITableViewAutomaticDimension;
-    
-    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-                                initWithTarget:self
-                                action:@selector(handleLongPress)];
-    self.longPressRecognizer.minimumPressDuration = 1;
-    self.longPressRecognizer.cancelsTouchesInView = YES;
-    
-    [self.tableView addGestureRecognizer:self.longPressRecognizer];
 
+    if (@available(iOS 13.0, *)) { // Replaced with context menu in iOS 13+
+        // NOP
+    }
+    else {
+        self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
+                                    initWithTarget:self
+                                    action:@selector(handleLongPress)];
+        self.longPressRecognizer.minimumPressDuration = 1;
+        self.longPressRecognizer.cancelsTouchesInView = YES;
+        [self.tableView addGestureRecognizer:self.longPressRecognizer];
+    }
+    
     UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
     [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
     
@@ -817,11 +818,16 @@
         self.navigationItem.prompt = nil;
     }
     else {
-        self.navigationItem.prompt = NSLocalizedString(@"safes_vc_tip", @"Tip displayed at top of screen. Slide left on Database for options");
+        if (@available(iOS 13.0, *)) {
+            self.navigationItem.prompt = NSLocalizedString(@"hint_tap_and_hold_to_see_options", @"TIP: Tap and hold item to see options");
+        }
+        else {
+            self.navigationItem.prompt = NSLocalizedString(@"safes_vc_tip", @"Tip displayed at top of screen. Slide left on Database for options");
+        }
     }
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+- (NSAttributedString*)getEmptyDatasetTitle {
     NSString *text = NSLocalizedString(@"safes_vc_empty_databases_list_tableview_title", @"Title displayed in tableview when there are no databases setup");
     
     NSDictionary *attributes = @{NSFontAttributeName:[UIFont preferredFontForTextStyle:UIFontTextStyleHeadline],
@@ -830,8 +836,7 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
-{
+- (NSAttributedString*)getEmptyDatasetDescription {
     NSString *text = NSLocalizedString(@"safes_vc_empty_databases_list_tableview_subtitle", @"Subtitle displayed in tableview when there are no databases setup");
 
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
@@ -845,17 +850,13 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)buttonTitleForEmptyDataSet:(UIScrollView *)scrollView forState:(UIControlState)state {
+- (NSAttributedString*)getEmptyDatasetButtonTitle {
     NSDictionary *attributes = @{
                                     NSFontAttributeName : FontManager.sharedInstance.regularFont,
                                     NSForegroundColorAttributeName : UIColor.systemBlueColor,
                                     };
     
     return [[NSAttributedString alloc] initWithString:NSLocalizedString(@"safes_vc_empty_databases_list_get_started_button_title", @"Subtitle displayed in tableview when there are no databases setup") attributes:attributes];
-}
-
-- (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button {
-    [self startOnboarding];
 }
 
 #pragma mark - Table view data source
@@ -877,6 +878,19 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (self.collection.count == 0) {
+        __weak id weakSelf = self;
+        [self.tableView setEmptyTitle:[self getEmptyDatasetTitle]
+                          description:[self getEmptyDatasetDescription]
+                          buttonTitle:[self getEmptyDatasetButtonTitle]
+                         buttonAction:^{
+            [weakSelf startOnboarding];
+        }];
+    }
+    else {
+        [self.tableView setEmptyTitle:nil];
+    }
+    
     return self.collection.count;
 }
 
@@ -902,16 +916,27 @@
     [self openSafeAtIndexPath:indexPath openLocalOnly:NO];
 }
 
-- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath openLocalOnly:(BOOL)offline {
+- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath openLocalOnly:(BOOL)openLocalOnly {
+    [self openSafeAtIndexPath:indexPath openLocalOnly:openLocalOnly manualUnlock:NO];
+}
+
+- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath openLocalOnly:(BOOL)openLocalOnly manualUnlock:(BOOL)manualUnlock {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    [self openDatabase:safe openLocalOnly:offline userJustCompletedBiometricAuthentication:NO];
+    [self openDatabase:safe openLocalOnly:openLocalOnly noConvenienceUnlock:manualUnlock userJustCompletedBiometricAuthentication:NO];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)openDatabase:(SafeMetaData*)safe
        openLocalOnly:(BOOL)openLocalOnly
+userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthentication {
+    [self openDatabase:safe openLocalOnly:openLocalOnly noConvenienceUnlock:NO userJustCompletedBiometricAuthentication:userJustCompletedBiometricAuthentication];
+}
+
+- (void)openDatabase:(SafeMetaData*)safe
+       openLocalOnly:(BOOL)openLocalOnly
+ noConvenienceUnlock:(BOOL)noConvenienceUnlock
 userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthentication {
     NSLog(@"======================== OPEN DATABASE: %@ ============================", safe);
     
@@ -925,6 +950,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                  isAutoFillOpen:NO
                                                   openLocalOnly:openLocalOnly
                                     biometricAuthenticationDone:userJustCompletedBiometricAuthentication
+                                            noConvenienceUnlock:noConvenienceUnlock
                                                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
             if (result == kUnlockDatabaseResultSuccess) {
                 if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
@@ -939,6 +965,304 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             }
         }];
     }
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// Context Menu
+//
+
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)){
+    return [UIContextMenuConfiguration configurationWithIdentifier:nil
+                                                   previewProvider:nil
+                                                    actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
+        return [UIMenu menuWithTitle:@""
+                               image:nil
+                          identifier:nil
+                             options:kNilOptions
+                            children:@[
+            [self getContextualMenuDatabaseNonMutatatingActions:indexPath],
+            [self getContextualMenuDatabaseStateActions:indexPath],
+            [self getContextualMenuDatabaseActions:indexPath]
+        ]];
+    }];
+}
+
+- (UIAction*)getContextualViewBackupsAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
+                                    systemImage:@"clock" // @"archivebox" // clock
+                                    destructive:NO
+                                        handler:^(__kindof UIAction * _Nonnull action) {
+        [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
+    }];
+
+    return ret;
+}
+
+- (UIAction*)getContextualViewSyncLogAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
+                                    systemImage:@"arrow.clockwise.icloud" // @"antenna.radiowaves.left.and.right" // arrow.up.arrow.down
+                                    destructive:NO
+                                        handler:^(__kindof UIAction * _Nonnull action) {
+        [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
+    }];
+
+    return ret;
+}
+
+- (UIMenu*)getContextualMenuDatabaseNonMutatatingActions:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    NSMutableArray<UIAction*>* ma = [NSMutableArray array];
+
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
+    
+    BOOL conveniencePossible = safe.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    if (conveniencePossible) [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
+
+    NSURL* localCopyUrl = [SyncManager.sharedInstance getLocalWorkingCache:safe];
+
+    BOOL localCopyAvailable = safe.storageProvider != kLocalDevice && localCopyUrl != nil;
+    if (localCopyAvailable) [ma addObject:[self getContextualMenuOpenLocalAction:indexPath]];
+
+    [ma addObject:[self getContextualViewBackupsAction:indexPath]];
+    
+    BOOL shareAllowed = !Settings.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil;
+    if (shareAllowed) [ma addObject:[self getContextualShareAction:indexPath]];
+
+    BOOL syncLogAvailable = syncStatus.changeLog.firstObject != nil;
+    if (syncLogAvailable) [ma addObject:[self getContextualViewSyncLogAction:indexPath]];
+
+    if (self.collection.count > 1) {
+        [ma addObject:[self getContextualReOrderDatabasesAction:indexPath]];
+    }
+    
+    return [UIMenu menuWithTitle:@""
+                           image:nil
+                      identifier:nil options:UIMenuOptionsDisplayInline
+                        children:ma];
+}
+
+- (UIAction*)getContextualReOrderDatabasesAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
+                                    systemImage:@"arrow.up.arrow.down"
+                                    destructive:NO
+                                        handler:^(__kindof UIAction * _Nonnull action) {
+        [self setEditing:YES];
+    }];
+
+    return ret;
+}
+
+- (UIMenu*)getContextualMenuDatabaseStateActions:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    NSMutableArray<UIAction*>* ma = [NSMutableArray array];
+    
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    BOOL makeVisible = safe.storageProvider == kLocalDevice;
+    if (makeVisible) [ma addObject:[self getContextualMenuMakeVisibleAction:indexPath]];
+
+    [ma addObject:[self getContextualMenuQuickLaunchAction:indexPath]];
+    
+    [ma addObject:[self getContextualMenuReadOnlyAction:indexPath]];
+
+    return [UIMenu menuWithTitle:@""
+                           image:nil
+                      identifier:nil options:UIMenuOptionsDisplayInline
+                        children:ma];
+}
+
+- (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    NSMutableArray<UIAction*>* ma = [NSMutableArray array];
+
+    [ma addObject:[self getContextualMenuRenameAction:indexPath]];
+
+    [ma addObject:[self getContextualMenuRemoveAction:indexPath]];
+
+    return [UIMenu menuWithTitle:@""
+                           image:nil
+                      identifier:nil
+                         options:UIMenuOptionsDisplayInline
+                        children:ma];
+}
+
+- (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"generic_export", @"Export")
+                                    systemImage:@"square.and.arrow.up"
+                                    destructive:NO
+                                        handler:^(__kindof UIAction * _Nonnull action) {
+        [self onShare:indexPath];
+    }];
+
+    return ret;
+}
+
+- (UIAction*)getContextualMenuMakeVisibleAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    
+    BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
+    NSString* localDeviceActionTitle = shared ?
+        NSLocalizedString(@"safes_vc_show_in_files", @"Button Title to Show in iOS Files Browser") :
+        NSLocalizedString(@"safes_vc_make_autofillable", @"Button Title to Hide from iOS Files Browser");
+
+    UIAction* ret = [self getContextualMenuItem:localDeviceActionTitle
+                                    systemImage:shared ? @"eye" : @"eye.slash"
+                                    destructive:NO
+                                        handler:^(__kindof UIAction * _Nonnull action) {
+        [self promptAboutToggleLocalStorage:indexPath shared:shared];
+    }];
+   
+    return ret;
+}
+
+- (UIAction*)getContextualMenuQuickLaunchAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    BOOL isAlreadyQuickLaunch = [SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
+    
+    NSString* title = NSLocalizedString(@"databases_toggle_quick_launch_context_menu", @"Quick Launch");
+    
+    UIAction* ret = [self getContextualMenuItem:title
+                                 image:[UIImage imageNamed:@"rocket"]
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self toggleQuickLaunch:safe];
+    }];
+   
+    ret.state = isAlreadyQuickLaunch ? UIMenuElementStateOn : UIMenuElementStateOff;
+   
+    return ret;
+}
+
+- (UIAction*)getContextualMenuReadOnlyAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    
+    NSString* title = NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read Only");
+    
+    UIAction* ret = [self getContextualMenuItem:title
+                                 image:[UIImage systemImageNamed:@"eyeglasses"]
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self toggleReadOnly:safe];
+    }];
+    
+    ret.state = safe.readOnly ? UIMenuElementStateOn : UIMenuElementStateOff;
+   
+    return ret;
+}
+
+- (UIAction*)getContextualMenuUnlockManualAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_unlock_manual_action", @"Open ths database manually bypassing any convenience unlock")
+                           systemImage:@"lock.open"
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self manualUnlock:indexPath];
+    }];
+}
+
+- (UIAction*)getContextualMenuOpenLocalAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
+                           systemImage:@"house"
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self openLocalOnly:indexPath];
+    }];
+}
+
+- (UIAction*)getContextualMenuRenameAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    return [self getContextualMenuItem:NSLocalizedString(@"generic_rename", @"Rename")
+                           systemImage:@"pencil"
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self renameSafe:indexPath];
+    }];
+}
+
+- (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    return [self getContextualMenuItem:NSLocalizedString(@"generic_remove", @"Remove")
+                           systemImage:@"trash"
+                           destructive:YES
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self removeSafe:indexPath];
+    }];
+}
+
+- (UIAction*)getContextualMenuItem:(NSString*)title systemImage:(NSString*)systemImage destructive:(BOOL)destructive handler:(UIActionHandler)handler
+  API_AVAILABLE(ios(13.0)){
+    return [self getContextualMenuItem:title
+                                 image:[UIImage systemImageNamed:systemImage]
+                           destructive:destructive
+                               handler:handler];
+}
+
+- (UIAction*)getContextualMenuItem:(NSString*)title image:(UIImage*)image destructive:(BOOL)destructive handler:(UIActionHandler)handler
+  API_AVAILABLE(ios(13.0)){
+    UIAction *ret = [UIAction actionWithTitle:title
+                                        image:image
+                                   identifier:nil
+                                      handler:handler];
+    
+    if (destructive) {
+        ret.attributes = UIMenuElementAttributesDestructive;
+    }
+    
+    return ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+- (void)onShare:(NSIndexPath*)indexPath {
+    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
+
+    if (!database) {
+        return;
+    }
+    
+    NSString* filename = database.fileName;
+    NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    
+    [NSFileManager.defaultManager removeItemAtPath:f error:nil];
+    
+    NSURL* localCopyUrl = [SyncManager.sharedInstance getLocalWorkingCache:database];
+    if (!localCopyUrl) {
+        [Alerts error:self error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
+        return;
+    }
+    
+    NSError* err;
+    NSData* data = [NSData dataWithContentsOfURL:localCopyUrl options:kNilOptions error:&err];
+    if (err) {
+        [Alerts error:self error:err];
+        return;
+    }
+
+    [data writeToFile:f options:kNilOptions error:&err];
+    if (err) {
+        [Alerts error:self error:err];
+        return;
+    }
+    
+    NSURL* url = [NSURL fileURLWithPath:f];
+    NSArray *activityItems = @[url];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+    
+    // Required for iPad...
+
+    CGRect rect = [self.tableView rectForRowAtIndexPath:indexPath];
+    activityViewController.popoverPresentationController.sourceView = self.tableView;
+    activityViewController.popoverPresentationController.sourceRect = rect;
+    activityViewController.popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirectionAny;
+    
+    [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+        NSError *errorBlock;
+        if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
+            NSLog(@"error deleting file %@", errorBlock);
+            return;
+        }
+    }];
+    
+    [self presentViewController:activityViewController animated:YES completion:nil];
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -998,7 +1322,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [alertController addAction:quickLaunchAction];
 
     // Start Re-ordering... Replaced with Long Press
-    
+   
 //    UIAlertAction *reorderAction = [UIAlertAction actionWithTitle:
 //            NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
 //                                                            style:UIAlertActionStyleDefault
@@ -1008,6 +1332,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 //
 //    [alertController addAction:reorderAction];
 //
+
     // Local Device options
     
     BOOL localDeviceOption = safe.storageProvider == kLocalDevice;
@@ -1074,6 +1399,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 }
 
+- (void)toggleReadOnly:(SafeMetaData*)database {
+    database.readOnly = !database.readOnly;
+    [SafesList.sharedInstance update:database];
+}
+
 - (void)promptAboutToggleLocalStorage:(NSIndexPath*)indexPath shared:(BOOL)shared {
     NSString* message = shared ?
         NSLocalizedString(@"safes_vc_show_database_in_files_info", @"Button title to Show Database in iOS Files App") :
@@ -1096,16 +1426,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     if (![SyncManager.sharedInstance toggleLocalDatabaseFilesVisibility:metadata error:&error]) {
         [Alerts error:self title:NSLocalizedString(@"safes_vc_could_not_change_storage_location_error", @"error message could not change local storage") error:error];
     }
-    else {
-        BOOL previouslyShared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:metadata];
+}
 
-        NSString* message = !previouslyShared ?
-            NSLocalizedString(@"safes_vc_database_made_visible_in_files", @"informational message - made the file visible in iOS Files") :
-            NSLocalizedString(@"safes_vc_database_made_fully_autofillable", @"informational message - made the database fully autofillable");
-        [Alerts info:self
-               title:NSLocalizedString(@"safes_vc_local_storage_mode_changed", @"information message = title changed storage mode")
-             message:message];
-    }
+- (void)manualUnlock:(NSIndexPath*)indexPath {
+    [self openSafeAtIndexPath:indexPath openLocalOnly:NO manualUnlock:YES];
 }
 
 - (void)openLocalOnly:(NSIndexPath*)indexPath {
@@ -1664,21 +1988,6 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
 - (IBAction)onUpgrade:(id)sender {
     [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
-}
-
--(void)addToolbarButton:(UIBarButtonItem*)button {
-    NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
-
-    if (![toolbarButtons containsObject:button]) {
-        [toolbarButtons addObject:button];
-        [self setToolbarItems:toolbarButtons animated:NO];
-    }
-}
-
--(void)removeToolbarButton:(UIBarButtonItem*)button {
-    NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
-    [toolbarButtons removeObject:button];
-    [self setToolbarItems:toolbarButtons animated:NO];
 }
 
 - (void)onProStatusChanged:(id)param {

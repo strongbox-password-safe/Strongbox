@@ -76,7 +76,7 @@
 }
 
 - (BOOL)isValid {
-    return self.title.length > 0;
+    return YES;
 }
 
 - (BOOL)isDifferentFrom:(ItemDetailsModel *)other {

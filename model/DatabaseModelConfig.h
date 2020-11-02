@@ -15,8 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)defaults;
 + (instancetype)withPasswordConfig:(PasswordGenerationConfig*)passwordConfig;
++ (instancetype)withPasswordConfig:(PasswordGenerationConfig*)passwordConfig sanityCheckInnerStream:(BOOL)sanityCheckInnerStream;
 
 @property (readonly) PasswordGenerationConfig *passwordGeneration;
+@property (readonly) BOOL sanityCheckInnerStream;
 
 @end
 

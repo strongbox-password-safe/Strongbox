@@ -56,6 +56,7 @@ RootXmlDomainObject*_Nullable parseXml(uint32_t innerRandomStreamId,
                               XmlProcessingContext* context,
                               NSInputStream* lib,
                               NSOutputStream*_Nullable xmlDumpStream,
+                              BOOL sanityCheckStreamDecryption,
                               NSError** error);
 
 NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument);

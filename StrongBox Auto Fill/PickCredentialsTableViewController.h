@@ -9,11 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "Model.h"
 #import "CredentialProviderViewController.h"
-#import <DZNEmptyDataSet/UIScrollView+EmptyDataSet.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PickCredentialsTableViewController : UITableViewController<DZNEmptyDataSetSource, DZNEmptyDataSetDelegate>
+@interface PickCredentialsTableViewController : UITableViewController
 
 @property (nonatomic, strong) Model *model;
 @property (nonatomic, strong) CredentialProviderViewController *rootViewController;

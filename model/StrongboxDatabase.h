@@ -69,7 +69,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment;
 - (void)addNodeAttachment:(Node*)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
+
+// Custom Icons
+
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
+- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID*)uuid rationalize:(BOOL)rationalize;
 
 // Recycle Bin
 @property BOOL recycleBinEnabled;

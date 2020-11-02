@@ -15,18 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initV3Plaintext;
-
-- (instancetype)initV4Plaintext;
-
-- (instancetype)initV3WithProtectedStreamId:(uint32_t)innerRandomStreamId
-                                        key:(nullable NSData*)protectedStreamKey;
-
-- (instancetype)initV4WithProtectedStreamId:(uint32_t)innerRandomStreamId
-                                        key:(nullable NSData*)protectedStreamKey;
-
 - (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId
                                       key:(nullable NSData*)protectedStreamKey
+              sanityCheckStreamDecryption:(BOOL)sanityCheckStreamDecryption
                                   context:(XmlProcessingContext*)context;
 
 @property (nonatomic, readonly, nullable) RootXmlDomainObject* rootElement;
@@ -34,9 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didStartElement:(NSString *)elementName
              attributes:(NSDictionary *_Nullable)attributeDict;
 
--(void)foundCharacters:(NSString *)string;
+- (void)foundCharacters:(NSString *)string;
 
 - (void)didEndElement:(NSString *)elementName;
+
+@property (readonly, nullable) NSError* error;
 
 @end
 

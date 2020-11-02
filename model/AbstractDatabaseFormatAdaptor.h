@@ -41,6 +41,7 @@ typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSData*_Nullable data, N
 - (void)read:(NSInputStream*)stream
          ckf:(CompositeKeyFactors*)ckf
 xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
+sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
   completion:(OpenCompletionBlock)completion;
 
 - (void)save:(StrongboxDatabase*)database completion:(SaveCompletionBlock)completion;

@@ -65,6 +65,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL autoFillDidChangeDatabases;
 @property BOOL mainAppDidChangeDatabases;
 
+@property BOOL debugSanityCheckInnerStream; // TODO: Eventually remove and default always on
+
 @end
 
 NS_ASSUME_NONNULL_END

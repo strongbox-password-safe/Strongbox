@@ -38,6 +38,10 @@ static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSet
 static NSString* const kHasMigratedDatabaseSubtitles = @"hasMigratedDatabaseSubtitlesAug2020";
 static NSString* const kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys = @"kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys";
 
+static NSString* const kHideExportFromDatabaseContextMenu = @"hideExportFromDatabaseContextMenu";
+//static NSString* const kUseLegacyBrowseUiWithQuickActions = @"useLegacyBrowseUiWithQuickActions";
+static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
+
 // TODO: Don't use shared settings for these...
 
 @implementation Settings
@@ -98,6 +102,30 @@ static NSString* const kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys = @"kMi
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+- (BOOL)allowThirdPartyKeyboards {
+    return [self getBool:kAllowThirdPartyKeyboards];
+}
+
+- (void)setAllowThirdPartyKeyboards:(BOOL)allowThirdPartyKeyboards {
+    [self setBool:kAllowThirdPartyKeyboards value:allowThirdPartyKeyboards];
+}
+
+//- (BOOL)useLegacyBrowseUiWithQuickActions {
+//    return [self getBool:kUseLegacyBrowseUiWithQuickActions];
+//}
+//
+//- (void)setUseLegacyBrowseUiWithQuickActions:(BOOL)useLegacyBrowseUiWithQuickActions {
+//    [self setBool:kUseLegacyBrowseUiWithQuickActions value:useLegacyBrowseUiWithQuickActions];
+//}
+
+- (BOOL)hideExportFromDatabaseContextMenu {
+    return [self getBool:kHideExportFromDatabaseContextMenu];
+}
+
+- (void)setHideExportFromDatabaseContextMenu:(BOOL)hideExportFromDatabaseContextMenu {
+    [self setBool:kHideExportFromDatabaseContextMenu value:hideExportFromDatabaseContextMenu];
+}
 
 - (BOOL)migratedYubiKeyEmergencyWorkaroundsToVirtualKeys {
     return [self getBool:kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys];

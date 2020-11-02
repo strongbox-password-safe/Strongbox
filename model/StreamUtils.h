@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface StreamUtils : NSObject
 
 + (BOOL)pipeFromStream:(NSInputStream*)inputStream to:(NSOutputStream*)outputStream;
++ (NSData*)readAll:(NSInputStream*)inputStream;
 
 @end
 

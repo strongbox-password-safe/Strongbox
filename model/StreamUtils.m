@@ -28,4 +28,21 @@
     return (read == 0);
 }
 
+
++ (NSData*)readAll:(NSInputStream*)inputStream {
+    [inputStream open];
+    
+    NSInteger read;
+    const NSUInteger kChunkLength = 32 * 1024;
+    uint8_t chunk[kChunkLength];
+    
+    NSMutableData* ret = NSMutableData.data;
+    
+    while ( (read = [inputStream read:chunk maxLength:kChunkLength]) > 0 ) {
+        [ret appendBytes:chunk length:read];
+    }
+    [inputStream close];
+
+    return ret.copy;
+}
 @end

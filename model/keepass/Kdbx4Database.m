@@ -58,16 +58,18 @@ static const BOOL kLogVerbose = NO;
 }
 
 - (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
-    [self read:stream ckf:ckf xmlDumpStream:nil completion:completion];
+    [self read:stream ckf:ckf xmlDumpStream:nil sanityCheckInnerStream:YES completion:completion];
 }
 
 - (void)read:(NSInputStream *)stream
          ckf:(CompositeKeyFactors *)ckf
 xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
+sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
   completion:(OpenCompletionBlock)completion {
     [Kdbx4Serialization deserialize:stream
                 compositeKeyFactors:ckf
                       xmlDumpStream:xmlDumpStream
+             sanityCheckInnerStream:sanityCheckInnerStream
                          completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable error) {
         onDeserialized(userCancelled, serializationData, error, ckf, completion);
     }];

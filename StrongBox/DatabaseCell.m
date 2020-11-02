@@ -194,7 +194,12 @@ rotateLastImage:(BOOL)rotateLastImage
         }
         
         if(database.readOnly) {
-            [ret addObject:[UIImage imageNamed:@"glasses"]];
+            if (@available(iOS 13.0, *)) {
+                [ret addObject:[UIImage systemImageNamed:@"eyeglasses"]];
+            } else {
+                [ret addObject:[UIImage imageNamed:@"glasses"]];
+            }
+
             [tnts addObject:NSNull.null];
         }
     }

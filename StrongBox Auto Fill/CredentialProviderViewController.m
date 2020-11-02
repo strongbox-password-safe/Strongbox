@@ -76,6 +76,7 @@
                                                 isAutoFillQuickTypeOpen:YES
                                                           openLocalOnly:NO
                                             biometricAuthenticationDone:NO
+                                                    noConvenienceUnlock:NO
                                                              completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
                     // MMcG: iOS can and does regularly terminate the extension without notice
                     // in normal situations. Only setting this immediately before Database Open/Unlock

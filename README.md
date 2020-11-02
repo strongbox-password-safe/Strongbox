@@ -13,14 +13,11 @@ This software provided here on Github is licensed under the GNU AGPL by default,
 If you are interested in using the code, commercially, or in some other fashion for which the GPL is unsuitable, or if you would simply like to discuss an alternative licence or custom builds for your organization, then please get in touch.
 
 # Supporting Development
-There are several ways you can help support continuous development. Obviously if you purchase a subscription or lifetime licence that's really helpful. But there are a few other options if you like the app and you are feeling generous! You can help by contributing financially here:
+There are several ways you can help support continuous development. Obviously if you purchase a subscription or lifetime licence that's really helpful. But there are a few other options if you like the app and you are feeling generous... You can help by contributing financially here:
 
 - Patreon: https://www.patreon.com/strongboxpasswordsafe
 
-Obviously the more support I get here the more time I can allocate to development, I rely on the community to support the work as in-app purchases are a one off payment and just about cover Apple's yearly developer program fee. If you can chip in the price of a cup of coffee every month I'd be very grateful.
-
-# Non Financial Ways to Support Strongbox
-If you like the app, you can always help out by leaving a 5 star review in the App Store. This is very helpful, and helps get the word out about Strongbox. If you can please leave a positive comment too. You can review the App here:
+If you like the app, you can always help out by leaving a 5 star review in the App Store. This is very helpful, and helps get the word out about Strongbox. If you can, please leave a positive comment too. You can review the App here:
 
 https://apps.apple.com/app/strongbox-password-safe/id897283731
 
@@ -29,27 +26,24 @@ Of course it is also great if you can tell your friends and family about the App
 # Help / Tech Support
 If you're having trouble, please checkout the following sources:
 
-- [FAQ](https://strongboxsafe.com/faq/) 
-- [How-To Guide](https://strongboxsafe.com/how-to-guide/). 
+- [Online Support](https://strongboxsafe.com/support/) 
 - [Twitter @StrongboxSafe](https://twitter.com/StrongboxSafe "@StrongboxSafe") 
 - [Reddit r/strongbox](https://www.reddit.com/r/strongbox/ "r/strongbox")
 
 Another important step is to restart your device, it's surprising how often this can fix issues. If you are having iCloud trouble, then signing in and out of iCloud/iCloud Drive can help.
 
-Lastly if all of the above don't help you can email (in English only) [support@strongboxsafe.com](mailto:support@strongboxsafe.com). It is important to only email after checking the above avenues as more time spent on support means less time spent on development.
-
-# Localization (Help Wanted)
+# Localization (Volunteers Welcome)
 Localization and translation is managed through the parallel Babel project here:
 
 https://github.com/strongbox-password-safe/babel
 
-This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch (support@strongboxsafe.com) and we'll try to set you up. Currently we are using Crowd In to manage things and it seems to be working well. Get in touch to get an invite to that system and being work on your language.
+This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch and we'll try to set you up. Currently we are using Crowd In to manage things and it seems to be working well. Get in touch to get an invite to that system and being work on your language.
 
 You can submit Pull Requests any way you choose, and it will be much appreciated, but please get in touch first so I can make sure the Repo is setup correctly for your language.
 
 Big thank you to all the localization contributors
 
-- Chinese - GY & Attis
+- Chinese - GY & Attis & Anonymous
 - French - Charles-Ivan Chesneau
 - German - @Slummi
 - Italian - Marco Ermini
@@ -58,6 +52,7 @@ Big thank you to all the localization contributors
 - Spanish - Wishes to remain anonymous
 - Swedish - Jari Häkkinen
 - Ukrainian - Artem Polivanchuk
+- Japanese - Anonymous
 
 # Build Issues
 The code is provided here for reasons of security, transparency and openness. Anyone can view the code and verify that everything is above board, the algorithms are correct and there are no backdoors or other malicious features present. You will need Google Drive, OneDrive and Dropbox developer accounts (with keys/secrets) before building. Familiarity with Cocoapods and other build tools is a prerequisite. Please do not file issues about build issues, I can't guarantee what is here will build in your environment. What is here is all of the functional code used in building Strongbox. XCode Interface Builder UI files, XCode project/solution/workspace, and other non functional code files may be removed to hinder copy cat apps. Translation strings files are managed in the separate Babel repository. 
@@ -67,7 +62,7 @@ If instead of examining the code, you simply want to use the app, please downloa
 # Contributions or Pull Requests
 I cannot accept outside pull requests from the community for licensing reasons. To release to Apple's App Store I have to manage Strongbox under a dual licence. The code here is under the GPL which Apple will not allow in the App Store. As mentioned above the code is provided here for transparency and openness, something I consider a prerequisite for a Password Manager. I need to maintain full ownership of the code so that I can licence to Apple separately, and also any outside/other licencing that might come along, commercial or otherwise. Accepting contributions (no matter how awesome) would involve the contributer signing their life and probably first born child away... There is probably a way to do this but I believe it will involve legally binding documents and other bureaucracies so to keep things simple I'm just going to manage the development myself. Other people's code sucks anyway, right? 
 
-Sorry. :(
+Sorry... :(
 
 # Acknowledgements
 The crypto is mostly from TomCrypt and libsodium. PasswordSafe & KeePass DB parsing/navigation/UI/Cloud interaction is my own work. 
@@ -105,7 +100,6 @@ I use many different libraries in the app here are just a few:
 - Reachability
 - ISMessages
 - libsodium
-- DZNEmptyDataSet
 - XWSI
 - DAVKit
 - NMSSH

@@ -68,6 +68,7 @@
 @property UIDocumentPickerViewController *documentPicker;
 
 @property BOOL forcedReadOnly;
+@property BOOL noConvenienceUnlock;
 
 @end
 
@@ -99,9 +100,28 @@
                                                        safe:safe
                                         canConvenienceEnrol:canConvenienceEnrol
                                              isAutoFillOpen:isAutoFillOpen
+                                              openLocalOnly:openLocalOnly
+                                biometricAuthenticationDone:biometricAuthenticationDone
+                                        noConvenienceUnlock:NO
+                                                 completion:completion];
+}
+
++ (void)beginSequenceWithViewController:(UIViewController*)viewController
+                                   safe:(SafeMetaData*)safe
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
+                          openLocalOnly:(BOOL)openLocalOnly
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                    noConvenienceUnlock:(BOOL)noConvenienceUnlock
+                             completion:(UnlockDatabaseCompletionBlock)completion {
+    [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
+                                                       safe:safe
+                                        canConvenienceEnrol:canConvenienceEnrol
+                                             isAutoFillOpen:isAutoFillOpen
                                     isAutoFillQuickTypeOpen:NO
                                      openLocalOnly:openLocalOnly
                                 biometricAuthenticationDone:biometricAuthenticationDone
+                                        noConvenienceUnlock:noConvenienceUnlock
                                                  completion:completion];
 }
 
@@ -110,8 +130,9 @@
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
                 isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
-                 openLocalOnly:(BOOL)openLocalOnly
+                          openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                    noConvenienceUnlock:(BOOL)noConvenienceUnlock
                              completion:(UnlockDatabaseCompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                                                        safe:safe
@@ -120,6 +141,7 @@
                                                                     isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
                                                                               openLocalOnly:openLocalOnly
                                                                         biometricPreCleared:biometricAuthenticationDone
+                                                                        noConvenienceUnlock:noConvenienceUnlock
                                                                                  completion:completion];
     
     [helper beginSeq];
@@ -130,8 +152,9 @@
                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
                         isAutoFillOpen:(BOOL)isAutoFillOpen
                isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
-                openLocalOnly:(BOOL)openLocalOnly
+                         openLocalOnly:(BOOL)openLocalOnly
                    biometricPreCleared:(BOOL)biometricPreCleared
+                   noConvenienceUnlock:(BOOL)noConvenienceUnlock
                             completion:(UnlockDatabaseCompletionBlock)completion {
     self = [super init];
     if (self) {
@@ -144,6 +167,7 @@
         self.isAutoFillQuickTypeOpen = isAutoFillQuickTypeOpen;
         self.openLocalOnly = openLocalOnly;
         self.biometricPreCleared = biometricPreCleared;
+        self.noConvenienceUnlock = noConvenienceUnlock;
     }
     
     return self;
@@ -175,7 +199,7 @@
 }
 
 - (void)beginSeq {
-    if (self.safe.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+    if (!self.noConvenienceUnlock && self.safe.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
         BOOL biometricPossible = self.safe.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
         BOOL biometricAllowed = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
         
@@ -847,8 +871,8 @@
                                                    keyFileDigest:self.keyFileDigest
                                                        yubiKeyCR:yubiKeyCR];
         
-
-        DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+        DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
+                                                            sanityCheckInnerStream:SharedAppAndAutoFillSettings.sharedInstance.debugSanityCheckInnerStream];
     
         if(!self.isConvenienceUnlock &&
            (format == kKeePass || format == kKeePass4) &&

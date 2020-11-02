@@ -13,6 +13,7 @@
 #import "Entry.h"
 #import "CustomFieldTableCell.h"
 #import "ClipboardManager.h"
+#import "UITableView+EmptyDataSet.h"
 
 @interface CustomFieldsViewController ()
 
@@ -28,9 +29,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
-
     self.tableView.tableFooterView = [UIView new];
     
     self.tableView.rowHeight = UITableViewAutomaticDimension;
@@ -84,7 +82,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+- (NSAttributedString *)getTitleForEmptyDataSet {
     NSString *text = @"No Custom Fields";
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
@@ -93,8 +91,7 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
-{
+- (NSAttributedString *)getDescriptionForEmptyDataSet {
     NSString *text = @"Tap the + button in the top right corner to add a custom field";
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
@@ -286,6 +283,13 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (self.workingItems.count == 0) {
+        [self.tableView setEmptyTitle:[self getTitleForEmptyDataSet] description:[self getDescriptionForEmptyDataSet]];
+    }
+    else {
+        [self.tableView setEmptyTitle:nil];
+    }
+    
     return self.workingItems.count;
 }
 

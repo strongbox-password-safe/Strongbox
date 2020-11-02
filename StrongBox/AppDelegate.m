@@ -67,6 +67,14 @@
     return YES;
 }
 
+- (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
+    if (extensionPointIdentifier == UIApplicationKeyboardExtensionPointIdentifier) {
+        return Settings.sharedInstance.allowThirdPartyKeyboards;
+    }
+
+    return YES;
+}
+
 - (void)markDirectoriesForBackupInclusion {
     [FileManager.sharedInstance setDirectoryInclusionFromBackup:Settings.sharedInstance.backupFiles
                                                importedKeyFiles:Settings.sharedInstance.backupIncludeImportedKeyFiles];
@@ -164,9 +172,13 @@
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-//    NSLog(@"openURL: [%@] => [%@]", options, url);
+    NSLog(@"openURL: [%@] => [%@] - Source App: [%@]", options, url, options[UIApplicationOpenURLOptionsSourceApplicationKey]);
     
-    if ([url.absoluteString hasPrefix:@"db"]) {
+    if ([url.scheme isEqualToString:@"strongbox"]) {
+        NSLog(@"Strongbox URL Scheme: NOP - [%@]", url);
+        return YES;
+    }
+    else if ([url.absoluteString hasPrefix:@"db"]) {
         [DBClientsManager handleRedirectURL:url completion:^(DBOAuthResult * _Nullable authResult) {
             if (authResult != nil) {
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"isDropboxLinked" object:authResult];

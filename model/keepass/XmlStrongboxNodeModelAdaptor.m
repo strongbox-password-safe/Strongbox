@@ -88,14 +88,14 @@
     ret.icon = group.iconId;
     ret.customIcon = group.customIconUuid;
     
-    [ret.groups removeAllObjects];
-    for(Node* childGroup in group.childGroups) {
-        [ret.groups addObject:[self buildXmlGroup:childGroup]];
-    }
-
-    [ret.entries removeAllObjects];
-    for(Node* childEntry in group.childRecords) {
-        [ret.entries addObject:[self buildXmlEntry:childEntry stripHistory:NO]];
+    [ret.groupsAndEntries removeAllObjects];
+    for(Node* child in group.children) {
+        if (child.isGroup) {
+            [ret.groupsAndEntries addObject:[self buildXmlGroup:child]];
+        }
+        else {
+            [ret.groupsAndEntries addObject:[self buildXmlEntry:child stripHistory:NO]];
+        }
     }
     
     ret.name = group.title;
@@ -181,22 +181,23 @@
     if(group.customIcon) groupNode.customIconUuid = group.customIcon;
     if(group.icon != nil) groupNode.iconId = group.icon;
 
-    for (KeePassGroup *childGroup in group.groups) {
-        if(![self buildGroup:childGroup parentNode:groupNode]) {
-            NSLog(@"Error Builing Child Group: [%@]", childGroup);
-            return NO;
+    for (id<KeePassGroupOrEntry> child in group.groupsAndEntries) {
+        if (child.isGroup) {
+            if(![self buildGroup:(KeePassGroup*)child parentNode:groupNode]) {
+                NSLog(@"Error Builing Child Group: [%@]", child);
+                return NO;
+            }
         }
-    }
-
-    for (Entry *childEntry in group.entries) {
-        Node * entryNode = [self nodeFromEntry:childEntry groupNode:groupNode]; // Original KeePass Document Group...
-        
-        if( entryNode == nil ) {
-            NSLog(@"Error building node from Entry: [%@]", childEntry);
-            return NO;
+        else {
+            Node * entryNode = [self nodeFromEntry:(Entry*)child groupNode:groupNode]; // Original KeePass Document Group...
+            
+            if( entryNode == nil ) {
+                NSLog(@"Error building node from Entry: [%@]", child);
+                return NO;
+            }
+            
+            [groupNode addChild:entryNode keePassGroupTitleRules:YES];
         }
-        
-        [groupNode addChild:entryNode keePassGroupTitleRules:YES];
     }
     
     [parentNode addChild:groupNode keePassGroupTitleRules:YES];

@@ -26,7 +26,12 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    
+  
+    // TOO Small...
+//    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
+//        [self.buttonGenerationSettings setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
+//    }
+
     self.valueTextView.delegate = self;
     self.valueTextView.font = FontManager.sharedInstance.easyReadFont;
     self.valueTextView.adjustsFontForContentSizeCategory = YES;

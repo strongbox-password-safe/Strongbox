@@ -11,6 +11,7 @@
 #import "DatabaseModel.h"
 #import "Utils.h"
 #import "NodeIconHelper.h"
+#import "UITableView+EmptyDataSet.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -54,8 +55,6 @@
         [self setToolbarItems:toolbarButtons animated:YES];
     }
 
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
     self.tableView.tableFooterView = [UIView new];
     
     self.navigationItem.prompt = self.existing ?
@@ -108,13 +107,12 @@
         }] mutableCopy];
         
         dispatch_async(dispatch_get_main_queue(), ^(void) {
-            [self.tableView reloadEmptyDataSet];
             [self.tableView reloadData];
         });
     }
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+- (NSAttributedString *)getTitleForEmptyDataSet {
     NSString *text =  self.listDone ?
     NSLocalizedString(@"sbtvc_empty_table_no_files_found", @"No Files or Folders Found") :
         NSLocalizedString(@"generic_loading", @"Loading...");
@@ -124,11 +122,9 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    [self.tableView setEmptyTitle:(_items.count == 0) ? [self getTitleForEmptyDataSet] : nil];
+    
     return _items.count;
 }
 

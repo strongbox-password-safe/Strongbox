@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong, nullable) NSString* convenienceMasterPassword;
-@property (nonatomic, strong, nullable) NSString* convenenienceYubikeySecret;  // TODO: Kill with fire
+@property (nonatomic, strong, nullable) NSString* convenenienceYubikeySecret;  // TODO: Kill with fire and UI
 
 @property (nonatomic) BOOL isTouchIdEnabled;
 

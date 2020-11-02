@@ -75,7 +75,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 - (BOOL)setSecureObject:(id)object forIdentifier:(NSString *)identifier expiryMode:(SecretExpiryMode)expiryMode expiresAt:(NSDate *)expiresAt {
     if ([SecretStore isUnsupportedOS]) {
-        NSLog(@"Unsupported OS...");
+        NSLog(@"SecretStore: Cannot set secure object - Unsupported OS...");
         return NO;
     }
 

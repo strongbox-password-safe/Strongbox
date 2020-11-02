@@ -63,6 +63,8 @@
         self.hideIconInBrowse = NO;
         
         self.tapAction = kBrowseTapActionOpenDetails;
+
+        // Deprecated Tap Actions
         self.doubleTapAction = kBrowseTapActionCopyPassword;
         self.tripleTapAction = kBrowseTapActionCopyTotp;
         self.longPressTapAction = kBrowseTapActionCopyUsername;

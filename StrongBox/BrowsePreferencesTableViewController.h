@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property DatabaseFormat format;
 @property SafeMetaData* databaseMetaData;
+@property (nonatomic, copy) void (^onDone)(void);
 
 @end
 

@@ -194,6 +194,7 @@ static BOOL readFileHeader(NSInputStream* stream, KeepassFileHeader *pFileHeader
 + (void)deserialize:(NSInputStream *)stream
 compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
       xmlDumpStream:(NSOutputStream*)xmlDumpStream
+sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
          completion:(DeserializeCompletionBlock)completion {
     NSMutableData* headerDataForIntegrityCheck = [NSMutableData data];
     
@@ -249,6 +250,7 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                                 decryptionParameters:decryptionParameters
                                            masterKey:masterKey
                                        xmlDumpStream:xmlDumpStream
+                              sanityCheckInnerStream:sanityCheckInnerStream
                                           completion:completion];
             }
         });
@@ -261,6 +263,7 @@ compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                         decryptionParameters:decryptionParameters
                                    masterKey:masterKey
                                xmlDumpStream:xmlDumpStream
+                      sanityCheckInnerStream:sanityCheckInnerStream
                                   completion:completion];
     }
 }
@@ -271,6 +274,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
      decryptionParameters:(DecryptionParameters*)decryptionParameters
                 masterKey:(NSData*)masterKey
             xmlDumpStream:(NSOutputStream*)xmlDumpStream
+   sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
                completion:(DeserializeCompletionBlock)completion {
     NSMutableData* headerHash = [[NSMutableData alloc] initWithLength:CC_SHA256_DIGEST_LENGTH];
     CC_SHA256(headerDataForIntegrityCheck.bytes, (CC_LONG)headerDataForIntegrityCheck.length, headerHash.mutableBytes);
@@ -296,9 +300,15 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
     
     [plaintextStream open];
     NSInteger bytesReadFromStartStream = [plaintextStream read:start maxLength:decryptionParameters.streamStartBytes.length];
-    
+
     if(bytesReadFromStartStream != decryptionParameters.streamStartBytes.length ||
        memcmp(start, decryptionParameters.streamStartBytes.bytes, decryptionParameters.streamStartBytes.length) != 0) {
+      
+//        NSLog(@"======================================================================");
+//        hexdump(start, decryptionParameters.streamStartBytes.length, decryptionParameters.streamStartBytes.length);
+//        hexdump(decryptionParameters.streamStartBytes.bytes, decryptionParameters.streamStartBytes.length, decryptionParameters.streamStartBytes.length);
+//        NSLog(@"======================================================================");
+
         free(start);
         NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
         completion(NO, nil, error);
@@ -319,6 +329,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
                                                 innerRandomStreamId:decryptionParameters.innerRandomStreamId
                                                  protectedStreamKey:decryptionParameters.protectedStreamKey
                                                       xmlDumpStream:xmlDumpStream
+                                             sanityCheckInnerStream:sanityCheckInnerStream
                                                               error:&error];
 
     [decompressedStream close];
@@ -350,10 +361,10 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
             innerRandomStreamId:(uint32_t)innerRandomStreamId
              protectedStreamKey:(NSData*)protectedStreamKey
                   xmlDumpStream:(NSOutputStream*)xmlDumpStream
+         sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
                           error:(NSError**)error {
     RootXmlDomainObject* rootXmlObject = parseXml(innerRandomStreamId, protectedStreamKey,
-                                                XmlProcessingContext.standardV3Context, stream, xmlDumpStream, error);
-    
+                                                XmlProcessingContext.standardV3Context, stream, xmlDumpStream, sanityCheckInnerStream, error);
     return rootXmlObject;
 }
 
@@ -557,60 +568,6 @@ static DecryptionParameters *getDecryptionParameters(NSDictionary *headerEntries
     
     return decryptionParameters;
 }
-
-//static NSData* deblockify(uint8_t* blockified) {
-//    BlockHeader* block = (BlockHeader*)blockified;
-//
-//    NSMutableDictionary<NSNumber*, NSData*> *unorderedBlocks = [NSMutableDictionary dictionary];
-//    while(YES) {
-//        uint32_t size = littleEndian4BytesToInt32(block->size);
-//        uint32_t blockId = littleEndian4BytesToInt32(block->id);
-//
-//        if(kLogVerbose) {
-//            NSLog(@"Found block id [%d] and size=[%d]", blockId, size);
-//        }
-//
-//        if(size == 0) {
-//            break;
-//        }
-//
-//        uint8_t* data = (((uint8_t*)block) + SIZE_OF_BLOCK_HEADER);
-//        NSData *blockData = [NSData dataWithBytes:data length:size];
-//
-//        uint8_t actualHashBytes[CC_SHA256_DIGEST_LENGTH];
-//        CC_SHA256(blockData.bytes, (uint32_t)blockData.length, actualHashBytes);
-//        NSData* actualHash = [NSData dataWithBytes:actualHashBytes length:CC_SHA256_DIGEST_LENGTH];
-//        NSData* expectedHash = [NSData dataWithBytes:block->hash length:CC_SHA256_DIGEST_LENGTH];
-//
-//        if(![actualHash isEqualToData:expectedHash]) {
-//            NSLog(@"Block Header Hash does not match content. This safe is possibly corrupt.");
-//            NSLog(@"%@ != %@", [actualHash base64EncodedDataWithOptions:kNilOptions], [expectedHash base64EncodedDataWithOptions:kNilOptions]);
-//            return nil;
-//        }
-//
-//        [unorderedBlocks setObject:blockData forKey:@(blockId)];
-//
-//        block = (BlockHeader*)(((uint8_t*)block) + SIZE_OF_BLOCK_HEADER + size);
-//    }
-//
-//    NSMutableData* deblockified = [NSMutableData data];
-//    for(int i=0;i<unorderedBlocks.count;i++) {
-//        NSData* blockData = [unorderedBlocks objectForKey:@(i)];
-//
-//        if(!blockData) {
-//            NSLog(@"Could not find block %d in unordered blocks list. Cannot deblockify.", i);
-//            return nil;
-//        }
-//
-//        if(kLogVerbose) {
-//            NSLog(@"Adding Block %d", i);
-//        }
-//
-//        [deblockified appendData:blockData];
-//    }
-//
-//    return [deblockified copy];
-//}
 
 // MMcG: Because of the funky KDBX 3.1 YubiKey Challenge Response Design :(
 

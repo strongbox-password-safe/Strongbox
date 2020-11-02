@@ -1478,6 +1478,18 @@
 		C8400FEA24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		C8400FEB24ED37C40070849C /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		C8400FEC24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
+		C8453EDA254DCA2A006BE885 /* LoggingInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */; };
+		C8453EDB254DCA2A006BE885 /* LoggingInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */; };
+		C8453EDC254DCA2A006BE885 /* LoggingInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */; };
+		C8453EDD254DCA2A006BE885 /* LoggingInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */; };
+		C84F5C4C2543463E00961671 /* CustomizeView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84F5C512543463E00961671 /* CustomizeView.storyboard */; };
+		C84F5C4D2543463E00961671 /* CustomizeView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84F5C512543463E00961671 /* CustomizeView.storyboard */; };
+		C84F5C4E2543463E00961671 /* CustomizeView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84F5C512543463E00961671 /* CustomizeView.storyboard */; };
+		C84F5C4F2543463E00961671 /* CustomizeView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84F5C512543463E00961671 /* CustomizeView.storyboard */; };
+		C85D9BBB254D8820000482C8 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C85D9BBA254D8820000482C8 /* PlaintextInnerStream.m */; };
+		C85D9BBC254D8820000482C8 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C85D9BBA254D8820000482C8 /* PlaintextInnerStream.m */; };
+		C85D9BBD254D8820000482C8 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C85D9BBA254D8820000482C8 /* PlaintextInnerStream.m */; };
+		C85D9BBE254D8820000482C8 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C85D9BBA254D8820000482C8 /* PlaintextInnerStream.m */; };
 		C85DC89B253CA7C5004E51C9 /* DatabaseSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */; };
 		C85DC89C253CA7C5004E51C9 /* DatabaseSynchronizer.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */; };
 		C85DC8A1253CB0F8004E51C9 /* SynchronizerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = C85DC8A0253CB0F8004E51C9 /* SynchronizerTests.m */; };
@@ -1519,6 +1531,10 @@
 		C872B74324A676D60042CE02 /* Sha256PassThroughOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C872B74124A676D60042CE02 /* Sha256PassThroughOutputStream.m */; };
 		C872B74424A676D60042CE02 /* Sha256PassThroughOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C872B74124A676D60042CE02 /* Sha256PassThroughOutputStream.m */; };
 		C872B74524A676D60042CE02 /* Sha256PassThroughOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C872B74124A676D60042CE02 /* Sha256PassThroughOutputStream.m */; };
+		C878A55125497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C878A55025497A3D00C0EB67 /* UITableView+EmptyDataSet.m */; };
+		C878A55225497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C878A55025497A3D00C0EB67 /* UITableView+EmptyDataSet.m */; };
+		C878A55325497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C878A55025497A3D00C0EB67 /* UITableView+EmptyDataSet.m */; };
+		C878A55425497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C878A55025497A3D00C0EB67 /* UITableView+EmptyDataSet.m */; };
 		C87A8CC824950B5A00356966 /* AutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CC724950B5A00356966 /* AutoFillSettings.m */; };
 		C87A8CC924950B5A00356966 /* AutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CC724950B5A00356966 /* AutoFillSettings.m */; };
 		C87A8CD02495101100356966 /* SharedAppAndAutoFillSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A8CCF2495101100356966 /* SharedAppAndAutoFillSettings.m */; };
@@ -1578,6 +1594,10 @@
 		C8A8DBAF2484F68F009C673F /* FreeProChartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D23DBED241ABF9A002471D7 /* FreeProChartViewController.m */; };
 		C8A8DBB02484F68F009C673F /* UpgradeAnswerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D989241D36BF00267D49 /* UpgradeAnswerViewController.m */; };
 		C8A8DBB12484F68F009C673F /* UpgradeQuestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD9D98C241D377900267D49 /* UpgradeQuestionsViewController.m */; };
+		C8AA7795253F266C00C9CED5 /* SyncDiffReport.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AA7794253F266C00C9CED5 /* SyncDiffReport.m */; };
+		C8AA7796253F266C00C9CED5 /* SyncDiffReport.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AA7794253F266C00C9CED5 /* SyncDiffReport.m */; };
+		C8AA7797253F266C00C9CED5 /* SyncDiffReport.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AA7794253F266C00C9CED5 /* SyncDiffReport.m */; };
+		C8AA7798253F266C00C9CED5 /* SyncDiffReport.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AA7794253F266C00C9CED5 /* SyncDiffReport.m */; };
 		C8AAD4E424E832FA00E941BC /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C8AAD4E524E832FB00E941BC /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C8B2C6E12493882300F6EA12 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
@@ -1588,6 +1608,12 @@
 		C8B2C6E82493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
 		C8B2C6E92493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
 		C8B2C6EA2493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
+		C8B3AB9925443352006056D2 /* PreviewItemViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B3AB9825443352006056D2 /* PreviewItemViewController.m */; };
+		C8B3AB9A25443352006056D2 /* PreviewItemViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B3AB9825443352006056D2 /* PreviewItemViewController.m */; };
+		C8B3AB9C2544652A006056D2 /* LargeTextView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B3AB9B2544652A006056D2 /* LargeTextView.storyboard */; };
+		C8B3AB9D2544652A006056D2 /* LargeTextView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B3AB9B2544652A006056D2 /* LargeTextView.storyboard */; };
+		C8B3AB9E254465B9006056D2 /* LargeTextView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B3AB9B2544652A006056D2 /* LargeTextView.storyboard */; };
+		C8B3AB9F254465BA006056D2 /* LargeTextView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8B3AB9B2544652A006056D2 /* LargeTextView.storyboard */; };
 		C8B8C7752539DDD400164B73 /* VirtualYubiKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */; };
 		C8B8C7762539DDD400164B73 /* VirtualYubiKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */; };
 		C8B8C7772539DDD400164B73 /* VirtualYubiKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */; };
@@ -3077,6 +3103,9 @@
 		C843333B2461666C00E2E550 /* Deliverfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; fileEncoding = 4; name = Deliverfile; path = fastlane/Deliverfile; sourceTree = "<group>"; };
 		C843333E2461668F00E2E550 /* Fastfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Fastfile; path = fastlane/Fastfile; sourceTree = "<group>"; };
 		C84333402461668F00E2E550 /* Appfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; name = Appfile; path = fastlane/Appfile; sourceTree = "<group>"; };
+		C8453ED8254DCA2A006BE885 /* LoggingInputStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LoggingInputStream.h; path = model/LoggingInputStream.h; sourceTree = "<group>"; };
+		C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LoggingInputStream.m; path = model/LoggingInputStream.m; sourceTree = "<group>"; };
+		C8467D16254307BC00DAC0DB /* KeePassGroupOrEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeePassGroupOrEntry.h; sourceTree = "<group>"; };
 		C849D1DA253C815A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SyncLog.strings; sourceTree = "<group>"; };
 		C849D1DB253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = StrongBox/ja.lproj/Main.strings; sourceTree = "<group>"; };
 		C849D1DC253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
@@ -3113,6 +3142,11 @@
 		C849D1FB253C818E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C849D1FC253C818E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C849D1FD253C818E00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/RMStore.strings; sourceTree = "<group>"; };
+		C84F5C502543463E00961671 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/CustomizeView.storyboard; sourceTree = "<group>"; };
+		C84F5C55254346B700961671 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/CustomizeView.strings"; sourceTree = "<group>"; };
+		C84F5C57254346E800961671 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C85D9BB9254D8820000482C8 /* PlaintextInnerStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PlaintextInnerStream.h; path = model/PlaintextInnerStream.h; sourceTree = "<group>"; };
+		C85D9BBA254D8820000482C8 /* PlaintextInnerStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PlaintextInnerStream.m; path = model/PlaintextInnerStream.m; sourceTree = "<group>"; };
 		C85DC899253CA7C5004E51C9 /* DatabaseSynchronizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DatabaseSynchronizer.h; sourceTree = "<group>"; };
 		C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DatabaseSynchronizer.m; sourceTree = "<group>"; };
 		C85DC8A0253CB0F8004E51C9 /* SynchronizerTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SynchronizerTests.m; path = StrongboxTests/SynchronizerTests.m; sourceTree = "<group>"; };
@@ -3133,6 +3167,8 @@
 		C872B73B24A671A70042CE02 /* AesOutputStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesOutputStream.m; path = StrongBox/AesOutputStream.m; sourceTree = "<group>"; };
 		C872B74024A676D60042CE02 /* Sha256PassThroughOutputStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Sha256PassThroughOutputStream.h; path = StrongBox/Sha256PassThroughOutputStream.h; sourceTree = "<group>"; };
 		C872B74124A676D60042CE02 /* Sha256PassThroughOutputStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Sha256PassThroughOutputStream.m; path = StrongBox/Sha256PassThroughOutputStream.m; sourceTree = "<group>"; };
+		C878A54F25497A3D00C0EB67 /* UITableView+EmptyDataSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UITableView+EmptyDataSet.h"; path = "StrongBox/UITableView+EmptyDataSet.h"; sourceTree = "<group>"; };
+		C878A55025497A3D00C0EB67 /* UITableView+EmptyDataSet.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "UITableView+EmptyDataSet.m"; path = "StrongBox/UITableView+EmptyDataSet.m"; sourceTree = "<group>"; };
 		C87A8CC624950B5A00356966 /* AutoFillSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillSettings.h; path = "StrongBox Auto Fill/AutoFillSettings.h"; sourceTree = "<group>"; };
 		C87A8CC724950B5A00356966 /* AutoFillSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillSettings.m; path = "StrongBox Auto Fill/AutoFillSettings.m"; sourceTree = "<group>"; };
 		C87A8CCE2495101100356966 /* SharedAppAndAutoFillSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SharedAppAndAutoFillSettings.h; path = StrongBox/SharedAppAndAutoFillSettings.h; sourceTree = "<group>"; };
@@ -3182,10 +3218,16 @@
 		C8A22047249158AD0025B8B0 /* AesInputStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AesInputStream.m; path = model/AesInputStream.m; sourceTree = "<group>"; };
 		C8A8DBA82484F024009C673F /* AuditDrillDownController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AuditDrillDownController.h; path = StrongBox/AuditDrillDownController.h; sourceTree = "<group>"; };
 		C8A8DBA92484F024009C673F /* AuditDrillDownController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AuditDrillDownController.m; path = StrongBox/AuditDrillDownController.m; sourceTree = "<group>"; };
+		C8AA778F253F22FE00C9CED5 /* Strongbox-iOS.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Strongbox-iOS.xctestplan"; sourceTree = "<group>"; };
+		C8AA7793253F266C00C9CED5 /* SyncDiffReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SyncDiffReport.h; sourceTree = "<group>"; };
+		C8AA7794253F266C00C9CED5 /* SyncDiffReport.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SyncDiffReport.m; sourceTree = "<group>"; };
 		C8B2C6DF2493882300F6EA12 /* TwoFishReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TwoFishReadStream.h; path = model/TwoFishReadStream.h; sourceTree = "<group>"; };
 		C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TwoFishReadStream.m; path = model/TwoFishReadStream.m; sourceTree = "<group>"; };
 		C8B2C6E52493A4BA00F6EA12 /* KP31HashedBlockStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KP31HashedBlockStream.h; path = model/KP31HashedBlockStream.h; sourceTree = "<group>"; };
 		C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KP31HashedBlockStream.m; path = model/KP31HashedBlockStream.m; sourceTree = "<group>"; };
+		C8B3AB9725443352006056D2 /* PreviewItemViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PreviewItemViewController.h; path = StrongBox/PreviewItemViewController.h; sourceTree = "<group>"; };
+		C8B3AB9825443352006056D2 /* PreviewItemViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PreviewItemViewController.m; path = StrongBox/PreviewItemViewController.m; sourceTree = "<group>"; };
+		C8B3AB9B2544652A006056D2 /* LargeTextView.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LargeTextView.storyboard; path = StrongBox/LargeTextView.storyboard; sourceTree = "<group>"; };
 		C8B8C7732539DDD400164B73 /* VirtualYubiKeys.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VirtualYubiKeys.h; path = model/VirtualYubiKeys.h; sourceTree = "<group>"; };
 		C8B8C7742539DDD400164B73 /* VirtualYubiKeys.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = VirtualYubiKeys.m; path = model/VirtualYubiKeys.m; sourceTree = "<group>"; };
 		C8B8C7832539DED300164B73 /* VirtualYubiKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = VirtualYubiKey.h; path = model/VirtualYubiKey.h; sourceTree = "<group>"; };
@@ -3230,6 +3272,14 @@
 		C8DEE079249A62AB00CF2AFE /* git-version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "git-version.h"; path = "build/git-version.h"; sourceTree = "<group>"; };
 		C8DF4AD324E69E3B00F0F74E /* ConcurrentCircularBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentCircularBuffer.h; path = model/ConcurrentCircularBuffer.h; sourceTree = "<group>"; };
 		C8DF4AD424E69E3B00F0F74E /* ConcurrentCircularBuffer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentCircularBuffer.m; path = model/ConcurrentCircularBuffer.m; sourceTree = "<group>"; };
+		C8E05E0125434777006041F1 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C8E05E03254347AF006041F1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C8E05E052543480B006041F1 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C8E05E072543485C006041F1 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C8E05E09254348A9006041F1 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C8E05E0B25434959006041F1 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C8E05E0D25434990006041F1 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/CustomizeView.strings; sourceTree = "<group>"; };
+		C8E05E0F254349C1006041F1 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/CustomizeView.strings; sourceTree = "<group>"; };
 		C8E6D4E7246D43EA00AFFE13 /* WordList.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WordList.h; path = model/WordList.h; sourceTree = "<group>"; };
 		C8E6D4E8246D43EA00AFFE13 /* WordList.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WordList.m; path = model/WordList.m; sourceTree = "<group>"; };
 		C8E6D4ED246D5BBE00AFFE13 /* icelandic-diceware.wordlist.utf8.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "icelandic-diceware.wordlist.utf8.txt"; path = "resources/wordlists/icelandic-diceware.wordlist.utf8.txt"; sourceTree = "<group>"; };
@@ -3398,6 +3448,7 @@
 		4D0835DD2284769900CA7405 /* Browse */ = {
 			isa = PBXGroup;
 			children = (
+				C8B3AB9625443325006056D2 /* Preview */,
 				4D160A862452FFE20097C730 /* Data Sources */,
 				4D160A852452FFC60097C730 /* Custom Cells */,
 				4DE7F0D722F89D270095F51F /* Browse.storyboard */,
@@ -4132,6 +4183,8 @@
 				4DFD46D0240DC217001F1209 /* ColoredStringHelper.h */,
 				4DE7F0D122F89D120095F51F /* LaunchScreen.storyboard */,
 				4DFD46D1240DC217001F1209 /* ColoredStringHelper.m */,
+				C878A54F25497A3D00C0EB67 /* UITableView+EmptyDataSet.h */,
+				C878A55025497A3D00C0EB67 /* UITableView+EmptyDataSet.m */,
 			);
 			name = UI;
 			sourceTree = "<group>";
@@ -4332,6 +4385,7 @@
 				4DDA01552242621400C7F0E2 /* NSUUID+Zero.m */,
 				4D305764224B4F8F00C36287 /* StringValue.h */,
 				4D305765224B4F8F00C36287 /* StringValue.m */,
+				C8467D16254307BC00DAC0DB /* KeePassGroupOrEntry.h */,
 			);
 			name = Keepass;
 			sourceTree = "<group>";
@@ -4707,6 +4761,7 @@
 				4DBC7A492279DC1600CA534D /* CollapsibleTableViewHeader.m */,
 				4D7F5A39236013D2003ED785 /* LargeTextViewController.h */,
 				4D7F5A3A236013D2003ED785 /* LargeTextViewController.m */,
+				C8B3AB9B2544652A006056D2 /* LargeTextView.storyboard */,
 			);
 			name = "Item Details";
 			sourceTree = "<group>";
@@ -4771,11 +4826,12 @@
 			children = (
 				4DE7F0F122F89D790095F51F /* DatabaseOperations.storyboard */,
 				4DD72BF724264B18009F4091 /* DatabasePreferencesController.h */,
+				C84F5C512543463E00961671 /* CustomizeView.storyboard */,
+				4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */,
+				4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */,
 				4DD72BF824264B18009F4091 /* DatabasePreferencesController.m */,
 				4D6C51961F6407580035640E /* DatabaseOperations.h */,
 				4D6C51971F6407580035640E /* DatabaseOperations.m */,
-				4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */,
-				4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */,
 				4D526AB92440BA4400B0B700 /* Export.storyboard */,
 				4DD755EA232F084900758824 /* ExportOptionsTableViewController.h */,
 				4DD755E9232F084900758824 /* ExportOptionsTableViewController.m */,
@@ -4792,6 +4848,7 @@
 		4DBE5B281C8356C700C310BC = {
 			isa = PBXGroup;
 			children = (
+				C8AA778F253F22FE00C9CED5 /* Strongbox-iOS.xctestplan */,
 				4D3652162184A34600A56519 /* AppDelegate.m */,
 				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				C87A8CD5249513BC00356966 /* App Settings */,
@@ -5109,6 +5166,8 @@
 				4D9E09AC218251D0007BA1E7 /* Salsa20Stream.m */,
 				4DB1B7D62188B22500CF1663 /* ChaCha20Stream.h */,
 				4DB1B7D72188B22500CF1663 /* ChaCha20Stream.m */,
+				C85D9BB9254D8820000482C8 /* PlaintextInnerStream.h */,
+				C85D9BBA254D8820000482C8 /* PlaintextInnerStream.m */,
 			);
 			name = "Inner Random Stream";
 			sourceTree = "<group>";
@@ -5209,6 +5268,8 @@
 				C872B73B24A671A70042CE02 /* AesOutputStream.m */,
 				C872B74024A676D60042CE02 /* Sha256PassThroughOutputStream.h */,
 				C872B74124A676D60042CE02 /* Sha256PassThroughOutputStream.m */,
+				C8453ED8254DCA2A006BE885 /* LoggingInputStream.h */,
+				C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */,
 				C87F792124AA4A3000C90A1B /* StreamUtils.h */,
 				C87F792224AA4A3000C90A1B /* StreamUtils.m */,
 			);
@@ -5344,6 +5405,15 @@
 			name = Audit;
 			sourceTree = "<group>";
 		};
+		C8B3AB9625443325006056D2 /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				C8B3AB9725443352006056D2 /* PreviewItemViewController.h */,
+				C8B3AB9825443352006056D2 /* PreviewItemViewController.m */,
+			);
+			name = Preview;
+			sourceTree = "<group>";
+		};
 		C8B8C77C2539DEB300164B73 /* Virtual YubiKeys */ = {
 			isa = PBXGroup;
 			children = (
@@ -5377,6 +5447,8 @@
 				C8053F7C24E1ACA100416031 /* SyncOperationState.m */,
 				C85DC899253CA7C5004E51C9 /* DatabaseSynchronizer.h */,
 				C85DC89A253CA7C5004E51C9 /* DatabaseSynchronizer.m */,
+				C8AA7793253F266C00C9CED5 /* SyncDiffReport.h */,
+				C8AA7794253F266C00C9CED5 /* SyncDiffReport.m */,
 			);
 			path = Sync;
 			sourceTree = "<group>";
@@ -5732,10 +5804,12 @@
 				4D66953D242E6185005A98D7 /* TagsViewCell.xib in Resources */,
 				4D8FCEA923606D78001F2172 /* first.names.us.txt in Resources */,
 				4D770F862303249D00CBE244 /* EditPasswordCell.xib in Resources */,
+				C8B3AB9C2544652A006056D2 /* LargeTextView.storyboard in Resources */,
 				4DAE98A42270B4E200A811C4 /* GenericBasicCell.xib in Resources */,
 				4DE7F0F522F89D870095F51F /* SelectItem.storyboard in Resources */,
 				4DE7F0CE22F89D120095F51F /* LaunchScreen.storyboard in Resources */,
 				4DE7F0F822F89D8D0095F51F /* PasswordGenerationPreferences.storyboard in Resources */,
+				C84F5C4C2543463E00961671 /* CustomizeView.storyboard in Resources */,
 				C8E6D4F3246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4D36B0C022C94740003E9B68 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D31925F1ECF528B00DF6ED0 /* GoogleService-Info.plist in Resources */,
@@ -5827,10 +5901,12 @@
 				4D66953F242E6185005A98D7 /* TagsViewCell.xib in Resources */,
 				4D8FCEAB23606D78001F2172 /* first.names.us.txt in Resources */,
 				4DC4E15623488BAA000743C4 /* EditPasswordCell.xib in Resources */,
+				C8B3AB9D2544652A006056D2 /* LargeTextView.storyboard in Resources */,
 				4DC4E15723488BAA000743C4 /* GenericBasicCell.xib in Resources */,
 				4DC4E15823488BAA000743C4 /* SelectItem.storyboard in Resources */,
 				4DC4E15923488BAA000743C4 /* LaunchScreen.storyboard in Resources */,
 				4DC4E15A23488BAA000743C4 /* PasswordGenerationPreferences.storyboard in Resources */,
+				C84F5C4E2543463E00961671 /* CustomizeView.storyboard in Resources */,
 				C8E6D4F5246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E15B23488BAA000743C4 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E15C23488BAA000743C4 /* GoogleService-Info.plist in Resources */,
@@ -5848,6 +5924,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8B3AB9F254465BA006056D2 /* LargeTextView.storyboard in Resources */,
 				4DC4E24623488BAE000743C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 				4D6C8549239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */,
 				4DC4E24823488BAE000743C4 /* EditAttachmentCell.xib in Resources */,
@@ -5883,6 +5960,7 @@
 				4DC4E25C23488BAE000743C4 /* MainInterface.storyboard in Resources */,
 				4D669540242E6185005A98D7 /* TagsViewCell.xib in Resources */,
 				4DC4E25D23488BAE000743C4 /* TotpCell.xib in Resources */,
+				C84F5C4F2543463E00961671 /* CustomizeView.storyboard in Resources */,
 				C8EE24922486B0CE00D41935 /* AuditDrillDown.storyboard in Resources */,
 				4DC4E25E23488BAE000743C4 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4D6C8555239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */,
@@ -5924,6 +6002,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8B3AB9E254465B9006056D2 /* LargeTextView.storyboard in Resources */,
 				4D6B503D238BAF4100DF2F88 /* InfoPlist.strings in Resources */,
 				4DAE98B52270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 				4D6C8547239630A300008391 /* star_trek_8k_2018.utf8.txt in Resources */,
@@ -5959,6 +6038,7 @@
 				4D5F5B83218B4C9300A0739A /* MainInterface.storyboard in Resources */,
 				4D66953E242E6185005A98D7 /* TagsViewCell.xib in Resources */,
 				4D33FA462287299C006C31B2 /* TotpCell.xib in Resources */,
+				C84F5C4D2543463E00961671 /* CustomizeView.storyboard in Resources */,
 				C8EE24912486B0CE00D41935 /* AuditDrillDown.storyboard in Resources */,
 				4DE7F0C822F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
 				4D6C8553239630A300008391 /* starwars_8k_2018.utf8.txt in Resources */,
@@ -6008,7 +6088,6 @@
 				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Family/Pods-common-ios-Strongbox-iOS-Family-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
-				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
@@ -6025,7 +6104,6 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
@@ -6110,7 +6188,6 @@
 				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/KissXML-iOS/KissXML.framework",
 				"${BUILT_PRODUCTS_DIR}/libsodium-iOS/libsodium.framework",
-				"${BUILT_PRODUCTS_DIR}/DZNEmptyDataSet/DZNEmptyDataSet.framework",
 				"${BUILT_PRODUCTS_DIR}/ADAL/ADAL.framework",
 				"${BUILT_PRODUCTS_DIR}/AppAuth/AppAuth.framework",
 				"${BUILT_PRODUCTS_DIR}/Base32/Base32.framework",
@@ -6127,7 +6204,6 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/KissXML.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/DZNEmptyDataSet.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ADAL.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/AppAuth.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Base32.framework",
@@ -6413,11 +6489,13 @@
 				C8855FBD24854F93001EE933 /* SwitchTableViewCell.m in Sources */,
 				4DF97F2121BF101B0090A55E /* DAVBaseRequest.m in Sources */,
 				4D8354CA2389141F00E264E0 /* FavIconManager.m in Sources */,
+				C8B3AB9925443352006056D2 /* PreviewItemViewController.m in Sources */,
 				C88D10C1253AF82A008D606A /* AddNewVirtualYubiKeyController.m in Sources */,
 				4DE498C32271F85B007EF98C /* TotpCell.m in Sources */,
 				4D19678A217F0CAE0057DF06 /* KeePassDatabaseMetadata.m in Sources */,
 				C8DDE39724DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
 				4D2E35691F62C9CB0064B5D5 /* SelectStorageProviderController.m in Sources */,
+				C8AA7795253F266C00C9CED5 /* SyncDiffReport.m in Sources */,
 				4DE46659233D2BBD00398A65 /* BackupItem.m in Sources */,
 				4DB1B7D42188ABCB00CF1663 /* Kdbx4SerializationData.m in Sources */,
 				4D9AC55622A153FA00449F3F /* StaticDataTableViewController.m in Sources */,
@@ -6456,6 +6534,7 @@
 				4DB7D520229C1C1A00F2A6EB /* AdvancedPreferencesTableViewController.m in Sources */,
 				4DCF5FBC1F7294A800011756 /* StrongboxUIDocument.m in Sources */,
 				4D2E47AE233CFD8D00C1DE90 /* BackupsManager.m in Sources */,
+				C878A55125497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */,
 				4D08B5C9234C9613003D1953 /* GCDWebServerFileRequest.m in Sources */,
 				4DFF34C4238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DF2997B2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
@@ -6536,6 +6615,7 @@
 				4D0835D52284750900CA7405 /* StrongboxDatabase.m in Sources */,
 				4DF972D321C01E7100F384C9 /* WebDAVProviderData.m in Sources */,
 				4D23DBEE241ABF9A002471D7 /* FreeProChartViewController.m in Sources */,
+				C8453EDA254DCA2A006BE885 /* LoggingInputStream.m in Sources */,
 				4D004CE021F4C26700E2B194 /* OTPToken.m in Sources */,
 				4D12085A22A7C26800139570 /* WelcomeCreateDatabaseViewController.m in Sources */,
 				4D4766E02178C82B00C4358F /* SerializationData.m in Sources */,
@@ -6596,6 +6676,7 @@
 				4D1D6FD71F38760F00D2B8EC /* Model.m in Sources */,
 				4DB1B7C82188972600CF1663 /* CryptoParameters.m in Sources */,
 				4DA12F06219837D10000CEBB /* CustomIcon.m in Sources */,
+				C85D9BBB254D8820000482C8 /* PlaintextInnerStream.m in Sources */,
 				4D915D771EDC06A0002615F6 /* PreviousPasswordsTableViewController.m in Sources */,
 				C8166635253A1A1F00FB4E4C /* VirtualYubiKeyCell.m in Sources */,
 				4DE0DA872351E7A500B4319F /* AboutViewController.m in Sources */,
@@ -6697,6 +6778,7 @@
 				4DC4E02923488BAA000743C4 /* KdbGroup.m in Sources */,
 				4DC4E02A23488BAA000743C4 /* main.m in Sources */,
 				4DC4E02B23488BAA000743C4 /* CustomIconList.m in Sources */,
+				C8B3AB9A25443352006056D2 /* PreviewItemViewController.m in Sources */,
 				4D160ABA24535D1B0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
 				4DC4E02C23488BAA000743C4 /* MBAutoGrowingTextView.m in Sources */,
 				4DC4E02D23488BAA000743C4 /* PasswordHistoryViewController.m in Sources */,
@@ -6833,6 +6915,7 @@
 				C8DDE38E24DEB3C600873392 /* SyncAndMergeSequenceManager.m in Sources */,
 				4DC4E08823488BAA000743C4 /* LocalDatabaseIdentifier.m in Sources */,
 				4DC4E08923488BAA000743C4 /* socket_helper.m in Sources */,
+				C878A55325497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */,
 				4DC4E08A23488BAA000743C4 /* WebDAVSessionConfiguration.m in Sources */,
 				4DC4E08B23488BAA000743C4 /* NMSSHSession.m in Sources */,
 				C8BFECC02478206D0051D21E /* NodeHierarchyReconstructionData.m in Sources */,
@@ -6853,11 +6936,13 @@
 				4DC4E09423488BAA000743C4 /* ClipboardManager.m in Sources */,
 				4DC4E09523488BAA000743C4 /* IconsCollectionViewController.m in Sources */,
 				4D526AA424407C8F00B0B700 /* WSTagView.swift in Sources */,
+				C8AA7797253F266C00C9CED5 /* SyncDiffReport.m in Sources */,
 				4DC4E09623488BAA000743C4 /* KdfParameters.m in Sources */,
 				4DC4E09723488BAA000743C4 /* PasswordGenerationConfig.m in Sources */,
 				4DC4E09823488BAA000743C4 /* NodeFields.m in Sources */,
 				4DC4E09923488BAA000743C4 /* StorageBrowserItem.m in Sources */,
 				4DC4E09A23488BAA000743C4 /* BrowsePreferencesTableViewController.m in Sources */,
+				C85D9BBD254D8820000482C8 /* PlaintextInnerStream.m in Sources */,
 				4DC4E09B23488BAA000743C4 /* GZipInputStream.m in Sources */,
 				C8B2C6E32493882300F6EA12 /* TwoFishReadStream.m in Sources */,
 				4DC4E09C23488BAA000743C4 /* Keys.m in Sources */,
@@ -6984,6 +7069,7 @@
 				4DC4E0F223488BAA000743C4 /* RMStoreAppReceiptVerifier.m in Sources */,
 				4DC4E0F323488BAA000743C4 /* iCloudSafesCoordinator.m in Sources */,
 				4DC4E0F423488BAA000743C4 /* ExportOptionsTableViewController.m in Sources */,
+				C8453EDC254DCA2A006BE885 /* LoggingInputStream.m in Sources */,
 				4D4D3FD02409CD990056A7E2 /* MFIKeyInteractionViewController.swift in Sources */,
 				4DC4E0F523488BAA000743C4 /* CHCSVParser.m in Sources */,
 				4DC4E0F623488BAA000743C4 /* EditAttachmentCell.m in Sources */,
@@ -7053,6 +7139,7 @@
 				4DC4E17F23488BAE000743C4 /* socket_helper.m in Sources */,
 				4DC4E18023488BAE000743C4 /* BackupsManager.m in Sources */,
 				4DC4E18123488BAE000743C4 /* XMLWriter.m in Sources */,
+				C85D9BBE254D8820000482C8 /* PlaintextInnerStream.m in Sources */,
 				4DC4E18223488BAE000743C4 /* ItemDetailsModel.m in Sources */,
 				4DC4E18323488BAE000743C4 /* String.m in Sources */,
 				4DC4E18423488BAE000743C4 /* DAVListingParser.m in Sources */,
@@ -7091,6 +7178,7 @@
 				4DC4E19823488BAE000743C4 /* XmlSerializer.m in Sources */,
 				4DC4E19923488BAE000743C4 /* ref.c in Sources */,
 				4DC4E19A23488BAE000743C4 /* DAVRequestGroup.m in Sources */,
+				C8453EDD254DCA2A006BE885 /* LoggingInputStream.m in Sources */,
 				4DC4E19B23488BAE000743C4 /* CustomFieldEditorViewController.m in Sources */,
 				4DC4E19C23488BAE000743C4 /* RootXmlDomainObject.m in Sources */,
 				4D526AB124407C8F00B0B700 /* WSTagsField.swift in Sources */,
@@ -7108,6 +7196,7 @@
 				4DC4E1A523488BAE000743C4 /* SprCompilation.m in Sources */,
 				4D7F5A3E236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4DC4E1A723488BAE000743C4 /* NMSSHChannel.m in Sources */,
+				C8AA7798253F266C00C9CED5 /* SyncDiffReport.m in Sources */,
 				4DC4E1A823488BAE000743C4 /* ISO8601DateFormatter.m in Sources */,
 				4DC4E1A923488BAE000743C4 /* OTPAlgorithm.m in Sources */,
 				4D160ABB24535D1C0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
@@ -7262,6 +7351,7 @@
 				4DC4E22223488BAE000743C4 /* CryptoParameters.m in Sources */,
 				4D7228AE23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
 				C8400FEB24ED37C40070849C /* AppleICloudProvider.m in Sources */,
+				C878A55425497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */,
 				4DC4E22323488BAE000743C4 /* LocalDeviceStorageProvider.m in Sources */,
 				4DC4E22523488BAE000743C4 /* KeePassFile.m in Sources */,
 				4DC4E22623488BAE000743C4 /* TotpCell.m in Sources */,
@@ -7318,6 +7408,7 @@
 				4D326E8422302BED00DCD8C7 /* socket_helper.m in Sources */,
 				4D2E47AF233D001500C1DE90 /* BackupsManager.m in Sources */,
 				4D2F6C1E21807C25007931E4 /* XMLWriter.m in Sources */,
+				C85D9BBC254D8820000482C8 /* PlaintextInnerStream.m in Sources */,
 				4D33FA3A2287210C006C31B2 /* ItemDetailsModel.m in Sources */,
 				4D2F6C3921807C7E007931E4 /* String.m in Sources */,
 				4DF972C921C01ABF00F384C9 /* DAVListingParser.m in Sources */,
@@ -7356,6 +7447,7 @@
 				4D2F6C2021807C25007931E4 /* XmlSerializer.m in Sources */,
 				4D3E14A221832D5500A41CA0 /* ref.c in Sources */,
 				4DF972CB21C01ABF00F384C9 /* DAVRequestGroup.m in Sources */,
+				C8453EDB254DCA2A006BE885 /* LoggingInputStream.m in Sources */,
 				4D0835B82284742000CA7405 /* CustomFieldEditorViewController.m in Sources */,
 				4D4767082179013900C4358F /* RootXmlDomainObject.m in Sources */,
 				4D526AAF24407C8F00B0B700 /* WSTagsField.swift in Sources */,
@@ -7373,6 +7465,7 @@
 				4D18F2372257987F00768E18 /* SprCompilation.m in Sources */,
 				4D7F5A3C236013D2003ED785 /* LargeTextViewController.m in Sources */,
 				4D326E8E22302BED00DCD8C7 /* NMSSHChannel.m in Sources */,
+				C8AA7796253F266C00C9CED5 /* SyncDiffReport.m in Sources */,
 				4DF972CF21C01AD500F384C9 /* ISO8601DateFormatter.m in Sources */,
 				4D004CEC21F4F7C300E2B194 /* OTPAlgorithm.m in Sources */,
 				4D160AB724535D1A0097C730 /* ConfiguredBrowseTableDatasource.m in Sources */,
@@ -7527,6 +7620,7 @@
 				4DB1B7C92188972600CF1663 /* CryptoParameters.m in Sources */,
 				4D7228AC23F2168000A0A833 /* YubiKeyConfigurationController.m in Sources */,
 				C8400FE924ED37C40070849C /* AppleICloudProvider.m in Sources */,
+				C878A55225497A3D00C0EB67 /* UITableView+EmptyDataSet.m in Sources */,
 				4D1884C521709CA9001AE6B0 /* LocalDeviceStorageProvider.m in Sources */,
 				4D2F6C3521807C7E007931E4 /* KeePassFile.m in Sources */,
 				4D33FA47228729A0006C31B2 /* TotpCell.m in Sources */,
@@ -8221,6 +8315,25 @@
 			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
+		C84F5C512543463E00961671 /* CustomizeView.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C84F5C502543463E00961671 /* Base */,
+				C84F5C55254346B700961671 /* zh-Hans */,
+				C84F5C57254346E800961671 /* fr */,
+				C8E05E0125434777006041F1 /* de */,
+				C8E05E03254347AF006041F1 /* it */,
+				C8E05E052543480B006041F1 /* ja */,
+				C8E05E072543485C006041F1 /* nb */,
+				C8E05E09254348A9006041F1 /* ru */,
+				C8E05E0B25434959006041F1 /* es */,
+				C8E05E0D25434990006041F1 /* sv */,
+				C8E05E0F254349C1006041F1 /* uk */,
+			);
+			name = CustomizeView.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
 		C8855FD724857D24001EE933 /* AuditDrillDown.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -8444,11 +8557,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8479,8 +8593,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"GTMSessionFetcher\"",
 					"-framework",
@@ -8535,11 +8647,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8570,8 +8683,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"GTMSessionFetcher\"",
 					"-framework",
@@ -8625,11 +8736,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8658,8 +8770,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"ISMessages\"",
 					"-framework",
@@ -8708,11 +8818,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -8741,8 +8852,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"ISMessages\"",
 					"-framework",
@@ -8794,10 +8903,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -8826,8 +8936,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"KissXML\"",
 					"-framework",
@@ -8868,10 +8976,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -8898,8 +9007,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"KissXML\"",
 					"-framework",
@@ -8940,10 +9047,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -8979,8 +9087,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"KissXML\"",
 					"-framework",
@@ -9022,10 +9128,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2976;
+				CURRENT_PROJECT_VERSION = 2983;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -9059,8 +9166,6 @@
 					"\"CoreGraphics\"",
 					"-framework",
 					"\"CoreText\"",
-					"-framework",
-					"\"DZNEmptyDataSet\"",
 					"-framework",
 					"\"KissXML\"",
 					"-framework",

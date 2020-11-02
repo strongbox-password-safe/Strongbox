@@ -25,10 +25,12 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "SyncManager.h"
 #import "NSDate+Extensions.h"
+#import "UITableView+EmptyDataSet.h"
 
 @interface SafesListTableViewController ()
 
 @property NSArray<SafeMetaData*> *safes;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 
 @end
 
@@ -63,13 +65,15 @@
 
 - (void)setupUi {
     [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
     self.tableView.tableFooterView = [UIView new];
     
     [SVProgressHUD setViewForExtension:self.view];
+    
+    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
+        [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
+    }
 }
 
 //- (void)setupAutoFillWormhole {
@@ -94,32 +98,15 @@
     self.navigationController.toolbarHidden = NO;
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-   
-    if (self.tableView.contentOffset.y < 0 && self.tableView.emptyDataSetVisible) {
-        self.tableView.contentOffset = CGPointZero;
-    }
-}
-
 - (IBAction)onCancel:(id)sender {
     [[self getInitialViewController] exitWithUserCancelled];
 }
 
-- (void)emptyDataSet:(UIScrollView *)scrollView didTapView:(UIView *)view {
-    [[self getInitialViewController] exitWithUserCancelled];
-}
+        //- (void)emptyDataSetDidTapButton {
+        //    [[self getInitialViewController] exitWithUserCancelled];
+        //}
 
-- (void)emptyDataSet:(UIScrollView *)scrollView didTapButton:(UIButton *)button
-{
-    [[self getInitialViewController] exitWithUserCancelled];
-}
-
-- (UIImage *)imageForEmptyDataSet:(UIScrollView *)scrollView {
-    return [UIImage imageNamed:@"AppIcon-2019-bw-180"];
-}
-
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+- (NSAttributedString *)getTitleForEmptyDataSet {
     NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_title", @"You Have No Databases Yet :(");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
@@ -128,7 +115,7 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView {
+- (NSAttributedString *)getDescriptionForEmptyDataSet {
     NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_subtitle", @"To use Strongbox for Password Autofill you need to add a database. You can do this in the Strongbox App.");
     
     NSMutableParagraphStyle *paragraph = [NSMutableParagraphStyle new];
@@ -143,6 +130,13 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (self.safes.count == 0) {
+        [self.tableView setEmptyTitle:[self getTitleForEmptyDataSet] description:[self getDescriptionForEmptyDataSet]];
+    }
+    else {
+        [self.tableView setEmptyTitle:nil];
+    }
+    
     return self.safes.count;
 }
 

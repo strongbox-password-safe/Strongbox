@@ -451,6 +451,8 @@
 		C831367524A9203A00D475D9 /* cdecode.c in Sources */ = {isa = PBXBuildFile; fileRef = C831367224A9203A00D475D9 /* cdecode.c */; };
 		C831367624A9203A00D475D9 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C831367324A9203A00D475D9 /* cencode.c */; };
 		C831367724A9203A00D475D9 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C831367324A9203A00D475D9 /* cencode.c */; };
+		C8453ED6254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED4254DC0A7006BE885 /* PlaintextInnerStream.m */; };
+		C8453ED7254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED4254DC0A7006BE885 /* PlaintextInnerStream.m */; };
 		C85B9D77246544C600EEBFC9 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
 		C85B9D78246544C600EEBFC9 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
 		C85B9D79246544C600EEBFC9 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D76246544C600EEBFC9 /* NSString+Extensions.m */; };
@@ -1107,6 +1109,9 @@
 		C803E1DA2464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
 		C803E1DB2464978E001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CollectionViewHeader.strings; sourceTree = "<group>"; };
 		C803E1DC2464978F001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
+		C8055EF82544BF16005D7748 /* KeePassGroupOrEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassGroupOrEntry.h; path = ../KeePassGroupOrEntry.h; sourceTree = "<group>"; };
+		C8055EF92544BFD2005D7748 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ../StrongBox/ja.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C8055EFA2544BFD5005D7748 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = ../StrongBox/nb.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C831365924A91F2300D475D9 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../StrongBox/Constants.h; sourceTree = "<group>"; };
 		C831365A24A91F2300D475D9 /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Constants.m; path = ../StrongBox/Constants.m; sourceTree = "<group>"; };
 		C831365D24A91FC200D475D9 /* Base64DecodeOutputStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Base64DecodeOutputStream.h; path = ../StrongBox/Base64DecodeOutputStream.h; sourceTree = "<group>"; };
@@ -1121,6 +1126,8 @@
 		C831367024A9203A00D475D9 /* cdecode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = cdecode.h; sourceTree = "<group>"; };
 		C831367224A9203A00D475D9 /* cdecode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cdecode.c; sourceTree = "<group>"; };
 		C831367324A9203A00D475D9 /* cencode.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = cencode.c; sourceTree = "<group>"; };
+		C8453ED4254DC0A7006BE885 /* PlaintextInnerStream.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PlaintextInnerStream.m; path = ../model/PlaintextInnerStream.m; sourceTree = "<group>"; };
+		C8453ED5254DC0A7006BE885 /* PlaintextInnerStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PlaintextInnerStream.h; path = ../model/PlaintextInnerStream.h; sourceTree = "<group>"; };
 		C849D1FE253C836C00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
 		C849D1FF253C836D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		C849D200253C836D00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/CheckboxCell.strings; sourceTree = "<group>"; };
@@ -1438,6 +1445,8 @@
 		4D524CDB219B47EA00C22CB4 /* Crypto */ = {
 			isa = PBXGroup;
 			children = (
+				C8453ED5254DC0A7006BE885 /* PlaintextInnerStream.h */,
+				C8453ED4254DC0A7006BE885 /* PlaintextInnerStream.m */,
 				4D0835A7228472FC00CA7405 /* KeyDerivationCipher.h */,
 				4D524D14219B4B1600C22CB4 /* Argon2 */,
 				4D9E097F21825107007BA1E7 /* InnerRandomStream.h */,
@@ -1893,6 +1902,7 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C8055EF82544BF16005D7748 /* KeePassGroupOrEntry.h */,
 				4DAC40CB24F682DB001B3BE2 /* StorageProvider.h */,
 				C831366A24A9200A00D475D9 /* Sha256PassThroughOutputStream.h */,
 				C831366924A9200A00D475D9 /* Sha256PassThroughOutputStream.m */,
@@ -1923,12 +1933,12 @@
 			isa = PBXGroup;
 			children = (
 				C8B9D494247E9F3800F6B9F5 /* Build */,
+				4D524D2B219B503F00C22CB4 /* View */,
+				4DF347EF2074FA5A00148741 /* Model */,
 				C8B45C8B24ACC97700318562 /* StreamUtils.h */,
 				C8B45C8A24ACC97700318562 /* StreamUtils.m */,
 				C831365924A91F2300D475D9 /* Constants.h */,
 				C831365A24A91F2300D475D9 /* Constants.m */,
-				4DF347EF2074FA5A00148741 /* Model */,
-				4D524D2B219B503F00C22CB4 /* View */,
 				C8DC76412497AFA600C9C443 /* DatabaseModelConfig.h */,
 				C8DC76422497AFA600C9C443 /* DatabaseModelConfig.m */,
 				C8DC763D2497A90700C9C443 /* FileManager.h */,
@@ -2626,6 +2636,7 @@
 				4D1FFA972403030100B75EA2 /* ref.c in Sources */,
 				4D1FFA982403030100B75EA2 /* KdbxSerializationCommon.m in Sources */,
 				4D1FFA992403030100B75EA2 /* NSDictionary+Extensions.m in Sources */,
+				C8453ED7254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */,
 				4D1FFA9A2403030100B75EA2 /* OTPToken.m in Sources */,
 				C831366C24A9200A00D475D9 /* Sha256PassThroughOutputStream.m in Sources */,
 				4D1FFA9B2403030100B75EA2 /* KdbSerializationData.m in Sources */,
@@ -2837,6 +2848,7 @@
 				4D4AD4F921A02B0A002C33C6 /* KeePass2TagPackage.m in Sources */,
 				4D524D28219B4B2A00C22CB4 /* ref.c in Sources */,
 				4D524D02219B48D300C22CB4 /* KdbxSerializationCommon.m in Sources */,
+				C8453ED6254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */,
 				4DBFD387225CFE2F00290488 /* NSDictionary+Extensions.m in Sources */,
 				C831366B24A9200A00D475D9 /* Sha256PassThroughOutputStream.m in Sources */,
 				4D8DE9C021F898470043DDC0 /* OTPToken.m in Sources */,
@@ -3061,6 +3073,8 @@
 				4DD8D57723CC9D4000E7F57B /* zh-Hans */,
 				4D95483624004F5F008D2BE1 /* it */,
 				4DAF56EA240181480026282C /* es */,
+				C8055EF92544BFD2005D7748 /* ja */,
+				C8055EFA2544BFD5005D7748 /* nb */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -3320,7 +3334,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2946;
+				CURRENT_PROJECT_VERSION = 2951;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3330,7 +3344,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.20;
+				MARKETING_VERSION = 1.13.21;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3347,7 +3361,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2946;
+				CURRENT_PROJECT_VERSION = 2951;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -3357,7 +3371,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.20;
+				MARKETING_VERSION = 1.13.21;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3531,7 +3545,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2946;
+				CURRENT_PROJECT_VERSION = 2951;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3541,7 +3555,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.20;
+				MARKETING_VERSION = 1.13.21;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -3558,7 +3572,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2946;
+				CURRENT_PROJECT_VERSION = 2951;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -3568,7 +3582,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.13.20;
+				MARKETING_VERSION = 1.13.21;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";

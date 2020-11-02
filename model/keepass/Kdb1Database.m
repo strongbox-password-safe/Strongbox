@@ -105,7 +105,7 @@ static const BOOL kLogVerbose = NO;
     completion(NO, ret, nil);
 }
 
-- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream *)xmlDumpStream completion:(OpenCompletionBlock)completion {
+- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream *)xmlDumpStream sanityCheckInnerStream:(BOOL)sanityCheckInnerStream completion:(OpenCompletionBlock)completion {
     [self read:stream ckf:ckf completion:completion];
 }
 

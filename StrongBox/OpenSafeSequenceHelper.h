@@ -44,9 +44,19 @@ typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*
                                    safe:(SafeMetaData*)safe
                     canConvenienceEnrol:(BOOL)canConvenienceEnrol
                          isAutoFillOpen:(BOOL)isAutoFillOpen
+                          openLocalOnly:(BOOL)openLocalOnly
+            biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                    noConvenienceUnlock:(BOOL)noConvenienceUnlock
+                             completion:(UnlockDatabaseCompletionBlock)completion;
+
++ (void)beginSequenceWithViewController:(UIViewController*)viewController
+                                   safe:(SafeMetaData*)safe
+                    canConvenienceEnrol:(BOOL)canConvenienceEnrol
+                         isAutoFillOpen:(BOOL)isAutoFillOpen
                 isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
+                    noConvenienceUnlock:(BOOL)noConvenienceUnlock
                              completion:(UnlockDatabaseCompletionBlock)completion;
 
 NSData*_Nullable getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);

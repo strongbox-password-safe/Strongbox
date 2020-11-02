@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface InnerRandomStreamFactory : NSObject
 
-+(nullable id<InnerRandomStream>)getStream:(uint32_t)streamId key:(nullable NSData*)key;
++ (nullable id<InnerRandomStream>)getStream:(uint32_t)streamId key:(nullable NSData*)key;
++ (nullable id<InnerRandomStream>)getStream:(uint32_t)streamId key:(nullable NSData*)key createNewKeyIfAbsent:(BOOL)createNewKeyIfAbsent;
 
 @end
 

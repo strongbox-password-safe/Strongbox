@@ -43,6 +43,10 @@ const static NSSet<NSString*> *wellKnownKeys;
     return wellKnownKeys;
 }
 
+- (BOOL)isGroup {
+    return NO;
+}
+
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kEntryElementName context:context]) {
         self.uuid = NSUUID.UUID;

@@ -556,6 +556,14 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
     }
 }
 
+- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID*)uuid rationalize:(BOOL)rationalize {
+    node.customIconUuid = uuid;
+    
+    if(rationalize) {
+        [self rationalizeCustomIcons];
+    }
+}
+
 - (void)rationalizeCustomIcons {
     self.mutableCustomIcons = [CustomIconsRationalizer rationalize:self.customIcons root:self.rootGroup];
 }
@@ -564,11 +572,11 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
 // Recycle Bin (KeePass 2) -
 
 - (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
-    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
+    if ( [self.metadata isKindOfClass:[KeePassDatabaseMetadata class]] ) {
         KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
         metadata.recycleBinEnabled = recycleBinEnabled;
     }
-    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
+    else if ( [self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]] ) {
         KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
         metadata.recycleBinEnabled = recycleBinEnabled;
     }

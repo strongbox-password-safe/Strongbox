@@ -20,6 +20,7 @@
 #import "StreamUtils.h"
 #import "NSData+Extensions.h"
 #import "Constants.h"
+#import "UITableView+EmptyDataSet.h"
 
 @interface FileAttachmentsViewControllerTableViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate>
 
@@ -33,10 +34,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.tableView.emptyDataSetSource = self;
-    self.tableView.emptyDataSetDelegate = self;
-    
+        
     self.tableView.tableFooterView = [UIView new];
     
     self.tableView.rowHeight = 55.0f;
@@ -72,7 +70,7 @@
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (NSAttributedString *)titleForEmptyDataSet:(UIScrollView *)scrollView {
+- (NSAttributedString *)getTitleForEmptyDataSet {
     NSString *text = NSLocalizedString(@"file_attachments_view_controller_empty_attachments_text", @"No Attachments");
     
     NSDictionary *attributes = @{NSFontAttributeName: [UIFont boldSystemFontOfSize:18.0f],
@@ -81,7 +79,7 @@
     return [[NSAttributedString alloc] initWithString:text attributes:attributes];
 }
 
-- (NSAttributedString *)descriptionForEmptyDataSet:(UIScrollView *)scrollView
+- (NSAttributedString *)getDescriptionForEmptyDataSet
 {
     NSString *text = NSLocalizedString(@"file_attachments_view_controller_empty_attachments_description", @"Tap the + button in the top right corner to add an attachment");
     
@@ -185,6 +183,14 @@
 #pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    if (self.workingAttachments.count == 0) {
+        [self.tableView setEmptyTitle:[self getTitleForEmptyDataSet] description:[self getDescriptionForEmptyDataSet]];
+
+    }
+    else {
+        [self.tableView setEmptyTitle:nil];
+    }
+
     return self.workingAttachments.count;
 }
 

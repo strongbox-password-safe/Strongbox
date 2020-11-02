@@ -1,0 +1,216 @@
+//
+//  PreviewItemViewController.m
+//  Strongbox
+//
+//  Created by Strongbox on 24/10/2020.
+//  Copyright © 2020 Mark McGuill. All rights reserved.
+//
+
+#import "PreviewItemViewController.h"
+#import "NodeIconHelper.h"
+#import "OTPToken+Generation.h"
+#import "FontManager.h"
+#import "BasicOrderedDictionary.h"
+#import "Utils.h"
+
+@interface PreviewItemViewController ()
+
+@property UILabel *totpLabel;
+@property OTPToken* otpToken;
+@property NSTimer* timerRefreshOtp;
+
+@end
+
+@implementation PreviewItemViewController
+
++ (instancetype)forItem:(Node *)item andModel:(Model *)model {
+    return [[PreviewItemViewController alloc] initForItem:item andModel:model];
+}
+
+- (instancetype)initForItem:(Node *)item andModel:(Model *)model API_AVAILABLE(ios(13.0)) {
+    self = [super initWithNibName:nil bundle:nil];
+    if (self) {
+        UIImage* icon = [NodeIconHelper getIconForNode:item model:model];
+
+        UIImageView *imageView = [[UIImageView alloc] init];
+        imageView.image = icon;
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        
+        UILabel *labelTitle = [[UILabel alloc] init];
+        labelTitle.text = item.title;
+        labelTitle.font = FontManager.sharedInstance.title3Font;
+        
+        UIStackView* stackViewTitle = [[UIStackView alloc] initWithArrangedSubviews:@[imageView, labelTitle]];
+        
+        stackViewTitle.spacing = 8;
+        stackViewTitle.axis = UILayoutConstraintAxisHorizontal;
+        stackViewTitle.alignment = UIStackViewAlignmentCenter;
+        stackViewTitle.distribution = UIStackViewDistributionFill; // This respects label intrinsic content size
+        stackViewTitle.layoutMarginsRelativeArrangement = YES;
+        stackViewTitle.translatesAutoresizingMaskIntoConstraints = NO;
+
+        [NSLayoutConstraint activateConstraints:@[
+            [imageView.widthAnchor constraintEqualToConstant:32],
+            [imageView.heightAnchor constraintEqualToConstant:32],
+        ]];
+        
+        // Gather Fields
+        
+        BasicOrderedDictionary<NSString*, NSString*> *orderedFields = [[BasicOrderedDictionary alloc] init];
+        
+        if (item.fields.username.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_username", @"Username") andValue:item.fields.username];
+        if (item.fields.email.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_email", @"Email") andValue:item.fields.email];
+
+        // Custom Fields
+        
+        NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
+        for(NSString* key in sortedKeys) {
+            if ( ![NodeFields isTotpCustomFieldKey:key] ) {
+                StringValue* sv = item.fields.customFields[key];
+                if ( !sv.protected && sv.value.length ) {
+                    [orderedFields addKey:key andValue:sv.value];
+                }
+            }
+        }
+
+        // Notes always last
+        
+        if (item.fields.notes.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_notes", @"Notes") andValue:item.fields.notes];
+
+        // Title and TOTP always at top
+
+        NSMutableArray<UIView*>* fieldViews = [NSMutableArray array];
+
+        if (item.fields.otpToken) {
+            self.otpToken = item.fields.otpToken;
+            [self createTotpLabel];
+            [fieldViews addObject:self.totpLabel];
+        }
+        [fieldViews addObject:stackViewTitle];
+
+        int fieldsStartIndex = (int) fieldViews.count;
+        
+        for (NSString* key in orderedFields.allKeys) {
+            NSString* value = [orderedFields objectForKey:key];
+        
+            [fieldViews addObject:[self createHeaderLabel:key]];
+            [fieldViews addObject:[self createFieldLabel:value]];
+        }
+        
+        // Main Vertical Stack View
+        
+        UIStackView* stackView = [[UIStackView alloc] initWithArrangedSubviews:fieldViews];
+        
+        stackView.spacing = 10;
+        stackView.axis = UILayoutConstraintAxisVertical;
+        stackView.alignment = UIStackViewAlignmentLeading;
+        stackView.distribution = UIStackViewDistributionFill; // This respects label intrinsic content size
+        stackView.layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8);
+        stackView.layoutMarginsRelativeArrangement = YES;
+        stackView.translatesAutoresizingMaskIntoConstraints = NO;
+        
+        // Tighten Field and Header Spacing
+        
+        for (int i=0;i<orderedFields.count;i++) {
+            [stackView setCustomSpacing:2 afterView:fieldViews[fieldsStartIndex + (i*2)]];
+        }
+        
+        [self.view addSubview:stackView];
+        
+        [NSLayoutConstraint activateConstraints:@[
+            [imageView.widthAnchor constraintEqualToConstant:32],
+            [imageView.heightAnchor constraintEqualToConstant:32],
+            [stackView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
+            [stackView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+            [stackView.widthAnchor constraintGreaterThanOrEqualToConstant:250], // Min Width
+        ]];
+        
+        CGSize size = [stackView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
+        self.preferredContentSize = size;
+    }
+    
+    return self;
+}
+
+- (UILabel*)createFieldLabel:(NSString*)value API_AVAILABLE(ios(13.0)) {
+    UILabel *ret = [[UILabel alloc] init];
+    
+    ret.font = FontManager.sharedInstance.regularFont;
+    ret.textColor = UIColor.labelColor;
+    ret.text = value;
+    
+    [ret.widthAnchor constraintLessThanOrEqualToConstant:300].active = YES;
+    
+    return ret;
+}
+
+- (UILabel*)createHeaderLabel:(NSString*)heading API_AVAILABLE(ios(13.0)) {
+    UILabel *ret = [[UILabel alloc] init];
+    
+    ret.font = FontManager.sharedInstance.caption2Font;
+    ret.textColor = UIColor.secondaryLabelColor;
+    ret.text = heading;
+    
+    [ret.widthAnchor constraintLessThanOrEqualToConstant:300].active = YES;
+    
+    return ret;
+}
+
+- (void)createTotpLabel API_AVAILABLE(ios(13.0)) {
+    self.totpLabel = [[UILabel alloc] init];
+    
+    self.totpLabel.font = FontManager.sharedInstance.easyReadFontForTotp;
+    self.totpLabel.textAlignment = NSTextAlignmentCenter;
+    [self.totpLabel.widthAnchor constraintEqualToConstant:300].active = YES;
+    
+    [self updateTotpLabel];
+}
+
+- (void)updateTotpLabel {
+    uint64_t remainingSeconds = self.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.otpToken.period);
+    self.totpLabel.text = [NSString stringWithFormat:@"%@", self.otpToken.password];
+    self.totpLabel.textColor = (remainingSeconds < 5) ? UIColor.systemRedColor : (remainingSeconds < 9) ? UIColor.systemOrangeColor : UIColor.systemBlueColor;
+    self.totpLabel.alpha = 1;
+    
+    if(remainingSeconds < 16) {
+        [UIView animateWithDuration:0.45 delay:0.0 options:UIViewAnimationOptionRepeat | UIViewAnimationOptionAutoreverse animations:^{
+            self.totpLabel.alpha = 0.5;
+        } completion:nil];
+    }
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    [self startOtpRefresh];
+}
+
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
+    [self killOtpTimer];
+}
+
+- (void)killOtpTimer {
+    if(self.timerRefreshOtp) {
+        NSLog(@"Kill Preview OTP Timer");
+        [self.timerRefreshOtp invalidate];
+        self.timerRefreshOtp = nil;
+    }
+}
+
+- (void)startOtpRefresh {
+    if (!self.otpToken) {
+        return;
+    }
+    
+    NSLog(@"Starting Preview OTP Timer");
+
+    self.timerRefreshOtp =  [NSTimer scheduledTimerWithTimeInterval:1.0f repeats:YES block:^(NSTimer * _Nonnull timer) {
+        [self updateTotpLabel];
+    }];
+    
+    [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
+}
+
+@end

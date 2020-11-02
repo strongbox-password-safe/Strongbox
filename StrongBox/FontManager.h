@@ -22,8 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) UIFont* easyReadFontForLargeTextView;
 @property (readonly) UIFont* regularFont;
 @property (readonly) UIFont* title2Font;
+@property (readonly) UIFont* title3Font;
 @property (readonly) UIFont* italicFont;
 @property (readonly) UIFont* caption1Font;
+@property (readonly) UIFont* caption2Font;
 
 @end
 

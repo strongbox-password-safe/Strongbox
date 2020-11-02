@@ -36,6 +36,9 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
+@property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
+@property (weak, nonatomic) IBOutlet UISwitch *switchDebugSanityCheckInnerStream;
 
 @end
 
@@ -89,6 +92,10 @@
     SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
     SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
     SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
+    Settings.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
+    Settings.sharedInstance.allowThirdPartyKeyboards = self.switchAllowThirdPartyKeyboards.on;
+
+    SharedAppAndAutoFillSettings.sharedInstance.debugSanityCheckInnerStream = self.switchDebugSanityCheckInnerStream.on;
     
     if(SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
@@ -114,6 +121,10 @@
 
     self.switchBackupFiles.on = Settings.sharedInstance.backupFiles;
     self.switchBackupImportedKeyFiles.on = Settings.sharedInstance.backupIncludeImportedKeyFiles;
+    self.switchHideExportOnDatabaseMenu.on = Settings.sharedInstance.hideExportFromDatabaseContextMenu;
+    self.switchAllowThirdPartyKeyboards.on = Settings.sharedInstance.allowThirdPartyKeyboards;
+    
+    self.switchDebugSanityCheckInnerStream.on = SharedAppAndAutoFillSettings.sharedInstance.debugSanityCheckInnerStream;
 }
 
 - (void)bindAllowPinCodeOpen {
