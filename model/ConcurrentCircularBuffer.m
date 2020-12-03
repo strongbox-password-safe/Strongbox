@@ -32,7 +32,7 @@
 }
 
 - (void)addObject:(id)object {
-    dispatch_barrier_async(self.dataQueue, ^{ // Serialized Write with Barrier
+    dispatch_barrier_async(self.dataQueue, ^{ 
         if (self.headIndex < self.data.count) {
             [self.data replaceObjectAtIndex:self.headIndex withObject:object];
         }
@@ -67,7 +67,7 @@
 }
 
 - (void)resetBuffer {
-    dispatch_barrier_async(self.dataQueue, ^{ // Serialized Write with Barrier
+    dispatch_barrier_async(self.dataQueue, ^{ 
         self.data = [NSMutableArray arrayWithCapacity:self.capacity];
         self.headIndex = 0;
     });

@@ -140,7 +140,6 @@
                        if(!self.viewModel.metadata.isTouchIdEnabled) {
                            self.viewModel.metadata.isEnrolledForConvenience = NO;
                            self.viewModel.metadata.convenienceMasterPassword = nil;
-                           self.viewModel.metadata.convenenienceYubikeySecret = nil;
                        }
                        
                        [[SafesList sharedInstance] update:self.viewModel.metadata];
@@ -196,9 +195,7 @@
                         }
 
                         self.viewModel.metadata.conveniencePin = pin;
-                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
-                        self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
-                        
+                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;                        
                         self.viewModel.metadata.isEnrolledForConvenience = YES;
                     }
                     

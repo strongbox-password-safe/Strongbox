@@ -42,8 +42,8 @@
 
 -(void)associateConstraints
 {
-    // iterate through all text view's constraints and identify
-    // height, max height and min height constraints.
+    
+    
     
     for (NSLayoutConstraint *constraint in self.constraints) {
         if (constraint.firstAttribute == NSLayoutAttributeHeight) {
@@ -66,9 +66,9 @@
 
 - (void) layoutSubviews
 {
-    // Attempting simplest solution from below first here with a lock var. This crash only occurs every now and then :(
-    //
-    // https://github.com/MatejBalantic/MBAutoGrowingTextView/issues/4
+    
+    
+    
     
     if(self.layoutSubviewsCrashAvoidanceHack){
            return;
@@ -82,21 +82,21 @@
              needs a Auto-layout environment to function. Make sure you are using Auto Layout and that UITextView is enclosed in\
              a view with valid auto-layout constraints.");
     
-    // calculate size needed for the text to be visible without scrolling
+    
     CGSize sizeThatFits = [self sizeThatFits:self.frame.size];
     float newHeight = sizeThatFits.height;
 
-    // if there is any minimal height constraint set, make sure we consider that
+    
     if (self.maxHeightConstraint) {
         newHeight = MIN(newHeight, self.maxHeightConstraint.constant);
     }
 
-    // if there is any maximal height constraint set, make sure we consider that
+    
     if (self.minHeightConstraint) {
         newHeight = MAX(newHeight, self.minHeightConstraint.constant);
     }
     
-    // update the height constraint
+    
     self.heightConstraint.constant = newHeight;
     
     self.layoutSubviewsCrashAvoidanceHack = NO;

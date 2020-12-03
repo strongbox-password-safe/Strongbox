@@ -31,7 +31,7 @@ void crypt_argchk(char *v, char *s, int d);
 
 #define LTC_ARGCHKVD(x) if (!(x)) return;
 
-#endif // if ARGTYPE == 0
+#endif 
 
 
 /* $Source: /cvs/libtom/libtomcrypt/src/headers/tomcrypt_argchk.h,v $ */

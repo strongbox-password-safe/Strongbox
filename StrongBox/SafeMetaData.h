@@ -48,7 +48,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong, nullable) NSString* convenienceMasterPassword;
-@property (nonatomic, strong, nullable) NSString* convenenienceYubikeySecret;  // TODO: Kill with fire and UI
 
 @property (nonatomic) BOOL isTouchIdEnabled;
 
@@ -72,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BrowseTapAction tripleTapAction;
 @property BrowseTapAction longPressTapAction;
 
-// Browse View
+
 
 @property BrowseSortField browseSortField;
 @property BOOL browseSortOrderDescending;
@@ -85,13 +84,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL showFlagsInBrowse;
 @property BOOL doNotShowRecycleBinInBrowse;
 @property BOOL showRecycleBinInSearchResults;
-@property BOOL viewDereferencedFields;
-@property BOOL searchDereferencedFields;
+
+
+@property (readonly) BOOL viewDereferencedFields;
+@property (readonly) BOOL searchDereferencedFields;
+
 @property BOOL showExpiredInSearch;
 @property BOOL showExpiredInBrowse;
 @property BOOL hideIconInBrowse;
 
-// Details View
+
 @property BOOL showEmptyFieldsInDetailsView;
 @property NSArray<NSNumber*>* detailsViewCollapsedSections;
 @property BOOL easyReadFontForAll;
@@ -99,7 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL tryDownloadFavIconForNewRecord;
 @property BOOL showPasswordByDefaultOnEditScreen;
 
-///
+
 
 @property NSNumber *autoLockTimeoutSeconds;
 
@@ -116,10 +118,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL hideTotpCustomFieldsInViewMode;
 
-// The YubiKey configuration can be different in AutoFill mode - to allow users to use Hardware key in Main App and Virtual in Auto Fill
+
 @property (nullable) YubiKeyHardwareConfiguration* contextAwareYubiKeyConfig;
 @property (readonly) BOOL mainAppAndAutoFillYubiKeyConfigsIncoherent;
-@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig; // TODO: Remove access after migration of emergency workaround field
 
 @property DatabaseAuditorConfiguration* auditConfig;
 
@@ -131,7 +132,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL promptedForAutoFetchFavIcon;
 
 @property (nullable) NSUUID* outstandingUpdateId;
-@property (nullable) NSDate* lastSyncRemoteModDate; // Last time we got a remote sync (pulled from remote)
+@property (nullable) NSDate* lastSyncRemoteModDate; 
 
 @end
 

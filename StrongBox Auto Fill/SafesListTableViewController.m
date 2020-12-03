@@ -39,7 +39,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
  
-    //[self setupAutoFillWormhole];
+    
     
     [self setupUi];
     
@@ -57,10 +57,10 @@
         }
     }
     
-    //  Debug
-    //    NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers = [self.rootViewController getCredentialServiceIdentifiers];
-    //    ASCredentialServiceIdentifier *serviceId = [serviceIdentifiers firstObject];
-    //    [Alerts info:self title:@"Blah" message:@(serviceId.identifier).stringValue];
+    
+    
+    
+    
 }
 
 - (void)setupUi {
@@ -71,16 +71,16 @@
     
     [SVProgressHUD setViewForExtension:self.view];
     
-    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
+    if (@available(iOS 13.0, *)) { 
         [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
     }
 }
 
-//- (void)setupAutoFillWormhole {
-//    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
-//                                                         optionalDirectory:@"wormhole"
-//                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
-//}
+
+
+
+
+
 
 - (void)refreshSafes {
     self.safes = SafesList.sharedInstance.snapshot;
@@ -102,9 +102,9 @@
     [[self getInitialViewController] exitWithUserCancelled];
 }
 
-        //- (void)emptyDataSetDidTapButton {
-        //    [[self getInitialViewController] exitWithUserCancelled];
-        //}
+        
+        
+        
 
 - (NSAttributedString *)getTitleForEmptyDataSet {
     NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_title", @"You Have No Databases Yet :(");
@@ -164,24 +164,24 @@
 }
 
 - (void)openDatabase:(SafeMetaData*)safe {
-    AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
+    AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
 
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                        safe:safe
-                                        canConvenienceEnrol:NO // MMcG: There appears to be problems with trying to sync from App Extensions here... just have user properly enrol in the main app...
+                                        canConvenienceEnrol:NO 
                                              isAutoFillOpen:YES
                                               openLocalOnly:NO
                                 biometricAuthenticationDone:NO
                                                  completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
-        // MMcG: iOS can and does regularly terminate the extension without notice
-        // in normal situations. Only setting this immediately before Database Open/Unlock
+        
+        
 
         AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
         
           if(model) {
               [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
           }
-          [self refreshSafes]; // Duress may have removed one
+          [self refreshSafes]; 
       }];
 }
 

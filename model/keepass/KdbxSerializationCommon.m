@@ -42,15 +42,15 @@ BOOL keePassSignatureAndVersionMatch(NSData * prefix, uint32_t majorVersion, uin
     
     KeepassFileHeader header = getKeePassFileHeader(prefix);
     
-    // https://gist.github.com/msmuenchen/9318327
     
-    //[0x03,0xD9,0xA2,0x9A];
+    
+    
     
     if (header.signature1[0] != 0x03 ||
         header.signature1[1] != 0xD9 ||
         header.signature1[2] != 0xA2 ||
         header.signature1[3] != 0x9A) {
-        //NSLog(@"No Keepass magic");
+        
         if(error) {
             *error = [Utils createNSError:@"No Keepass magic [0x03,0xD9,0xA2,0x9A]" errorCode:-1];
         }
@@ -58,14 +58,14 @@ BOOL keePassSignatureAndVersionMatch(NSData * prefix, uint32_t majorVersion, uin
         return NO;
     }
     
-    // 0xB54BFB67 - * for kdbx file of KeePass 2.x pre-release (alpha & beta) : 0xB54BFB66 ,
-    // * for kdbx file of KeePass post-release : 0xB54BFB67 .
+    
+    
     
     if (header.signature2[0] != 0x67 ||
         header.signature2[1] != 0xFB ||
         header.signature2[2] != 0x4B ||
         header.signature2[3] != 0xB5) {
-        //NSLog(@"No Keepass magic 2");
+        
         if(error) {
             *error = [Utils createNSError:@"No Keepass magic: 0xB54BFB67" errorCode:-1];
         }
@@ -172,7 +172,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
             }
             break;
         case KDFPARAMETERS:
-            //NSLog(@"KDFPARAMS (b64): [%@]", [data base64EncodedStringWithOptions:kNilOptions]);
+            
             return [VariantDictionary fromData:data];
             break;
         default:
@@ -231,14 +231,14 @@ NSString* headerEntryIdentifierString(HeaderEntryIdentifier identifier) {
 }
 
 NSData *getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds) {
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    //    1. create an AES cipher, taking Transform Seed as its key/seed,
-    //    2. initialize the transformed key value with the composite key value (transformed_key = composite_key),
-    //    3. use this cipher to encrypt the transformed_key N times ( transformed_key = AES(transformed_key), N times),
-    //    4. hash (with SHA-256) the transformed_key (transformed_key = sha256(transformed_key) ),
-    //    5. concatenate the Master Seed to the transformed_key (transformed_key = concat(Master Seed, transformed_key) ),
-    //    6. hash (with SHA-256) the transformed_key to get the final master key (final_master_key = sha256(transformed_key) ).
-    //    You now have the final master key, you can finally decrypt the database (the part of the file after the header for .kdb, and after the End of Header field for .kdbx).
+    
+    
+    
+    
+    
+    
+    
+    
     
     CCCryptorRef cryptorRef;
     CCCryptorStatus status = CCCryptorCreate(kCCEncrypt, kCCAlgorithmAES, kCCOptionECBMode, transformSeed.bytes, transformSeed.length, NULL, &cryptorRef);
@@ -297,7 +297,7 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey) {
     return [masterKey copy];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 void dumpXml(NSInputStream* lib) {
     NSInteger read;
@@ -314,7 +314,7 @@ void dumpXml(NSInputStream* lib) {
     NSError* error;
     NSString* file = [NSHomeDirectory() stringByAppendingPathComponent:@"dump.xml"];
     
-    // @"/Users/mark/Desktop/dump.xml"
+    
     [xml writeToFile:file atomically:YES encoding:NSUTF8StringEncoding error:&error];
     
     NSLog(@"XML Dumped: [%@]", error);
@@ -363,7 +363,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         return nil;
     }
     
-    // Find Start of XML
+    
     
     NSInteger xmlMarker = findXmlMarker(chnk, read);
     if(xmlMarker != 0) {
@@ -381,10 +381,10 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     }
     else if (xmlMarker < 0) {
         NSLog(@"Could not find start of XML! Will try parse anyway...");
-        // MMcG: Continue trying to read - could just be missing header...
+        
     }
     
-    // Parse XML
+    
     
     xmlParserCtxtPtr ctxt = nil;
     int err = XML_ERR_OK;
@@ -450,7 +450,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     RootXmlDomainObject* ret = parser.rootElement;
 
     if(ret == nil && xmlMarker != 0) {
-        // Could not parse and xmlMarker wasn't found... Set error
+        
         
         if (error) {
             NSData* foo = [NSData dataWithBytes:chnk length:20];
@@ -478,14 +478,14 @@ void startElement(void *ctx, const xmlChar *fullname, const xmlChar **atts) {
         }
     }
     
-    //NSLog(@"startElement: %s - %@", fullname, attributes);
+    
     KeePassXmlParser* parser = (__bridge KeePassXmlParser*)ctx;
     [parser didStartElement:elementName attributes:attributes];
 }
 
 void endElement(void *ctx, const xmlChar *name) {
     NSString* elementName = @((char*)name);
-    //NSLog(@"endElement: [%@]", elementName);
+    
     
     KeePassXmlParser* parser = (__bridge KeePassXmlParser*)ctx;
     [parser didEndElement:elementName];
@@ -493,13 +493,13 @@ void endElement(void *ctx, const xmlChar *name) {
 
 void characters (void *ctx, const xmlChar *ch, int len) {
     NSString* text = [[NSString alloc] initWithBytes:ch length:len encoding:NSUTF8StringEncoding];
-    //NSLog(@"characters: [%@]", text);
+    
 
     KeePassXmlParser* parser = (__bridge KeePassXmlParser*)ctx;
     [parser foundCharacters:text];
 }
 
-//
+
 
 static char* const marker = "<?xml";
 static NSUInteger const kMarkerSize = 5;
@@ -516,7 +516,7 @@ NSInteger findXmlMarker(uint8_t* chars, NSUInteger length) {
 }
 
 
-///
+
 
 NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
     if (existingRootXmlDocument) {
@@ -533,7 +533,7 @@ NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Non
                         NSArray<DeletedObject*>* sortedDeletes = [deletes sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
                             DeletedObject* d1 = (DeletedObject*)obj1;
                             DeletedObject* d2 = (DeletedObject*)obj2;
-                            return [d2.deletionTime compare:d1.deletionTime]; // Latest first
+                            return [d2.deletionTime compare:d1.deletionTime]; 
                         }];
                         
                         ret[uuid] = sortedDeletes.firstObject.deletionTime;
@@ -547,40 +547,40 @@ NSDictionary<NSUUID*, NSDate*>* safeGetDeletedObjects(RootXmlDomainObject * _Non
     
     return @{};
 }
-//
-//    NSInteger offset = 0;
-//
-//    while(offset < length && offset < kScanLengthForXmlMarker) {
-//        if(memcmp(&chars[offset], marker, kMarkerSize) == 0) {
-//            return offset;
-//        }
-//        offset++;
-//    }
-//
-//    return -1;
-//}
 
-//BOOL xmlNeedsCleanup(NSString* foo) {
-//    return (![foo hasPrefix:kXmlPrefix]);
-//}
-//
-//NSString* xmlCleanupAndTrim(NSString* foo) {
-//    // Some apps (KeeWeb) seem to prefix crap to the XML :( NSXMLParser is extremely strict about this, so if the XML
-//    // Doesn't being with <?xml we do a quick search for it a small prefix at the start and start there instead if it's
-//    // present
-//
-//    if(xmlNeedsCleanup(foo)) {
-//        NSLog(@"WARNING: XML does not conform to XML Standard, does not being with \"<?xml\". Searching short initial prefix for this string for this prefix...");
-//
-//        NSUInteger bounds = MIN(foo.length, 16);
-//        NSRange foundPrefix = [[foo substringWithRange:NSMakeRange(0, bounds)] rangeOfString:kXmlPrefix];
-//        if(foundPrefix.location != NSNotFound) {
-//            NSLog(@"WARNING: Found prefix at %lu, starting from here instead...", (unsigned long)foundPrefix.location);
-//            return [foo substringFromIndex:foundPrefix.location];
-//        }
-//    }
-//
-//    return foo;
-//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

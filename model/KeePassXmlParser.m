@@ -14,6 +14,7 @@
 #import "InnerRandomStreamFactory.h"
 #import "Utils.h"
 #import "NSData+Extensions.h"
+#import "NSString+Extensions.h"
 
 @interface KeePassXmlParser ()
 
@@ -47,7 +48,7 @@
         self.sanityCheckStreamDecryption = sanityCheckStreamDecryption;
         self.handlerStack = [NSMutableArray array];
         [self.handlerStack addObject:[[RootXmlDomainObject alloc] initWithContext:context]];
-        self.mutableText = [[NSMutableString alloc] initWithCapacity:32 * 1024]; // Too High/Low?
+        self.mutableText = [[NSMutableString alloc] initWithCapacity:32 * 1024]; 
     }
     
     return self;
@@ -102,12 +103,16 @@
     id<XmlParsingDomainObject> completedObject = [self.handlerStack lastObject];
     [self.handlerStack removeLastObject];
     
-    // Decrypt Now that we have the full text if necessary
+    
     
     if (self.mutableText.length) {
-        BOOL protected = completedObject.originalAttributes &&
-        (completedObject.originalAttributes[kAttributeProtected] &&
-         ([completedObject.originalAttributes[kAttributeProtected] isEqualToString:kAttributeValueTrue]));
+        BOOL protected = NO;
+        
+        if ( completedObject.originalAttributes &&
+            (completedObject.originalAttributes[kAttributeProtected] )) {
+            NSString* protectedString = completedObject.originalAttributes[kAttributeProtected];
+            protected = protectedString.isKeePassXmlBooleanStringTrue;
+        }
         
         if(protected) {
             NSString *string = self.mutableText;
@@ -155,9 +160,9 @@
 }
 
 - (NSString*)decryptProtected:(NSString*)ct {
-//    NSLog(@"XXXXX - Decrypting Ciphertext: [%@]", ct);
+
     
-    if(self.innerRandomStream == nil) { // Plaintext or for testing
+    if(self.innerRandomStream == nil) { 
         return ct;
     }
     

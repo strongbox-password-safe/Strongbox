@@ -52,8 +52,9 @@
     
     BackupItem* item = self.items[indexPath.row];
     
-    cell.textLabel.text = item.date.friendlyDateString;
-    cell.detailTextLabel.text = friendlyFileSizeString(item.fileSize.unsignedIntegerValue);
+    cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_title_fmt", @"Backup %ld (%@)"), (long)indexPath.row + 1, item.modDate.friendlyDateString];
+    cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_subtitle_fmt", @"%@ (Created %@)"), friendlyFileSizeString(item.fileSize.unsignedIntegerValue), item.backupCreatedDate.friendlyDateString];
+    cell.imageView.image = [UIImage imageNamed:@"file"];
     
     return cell;
 }
@@ -91,7 +92,7 @@
     
     addLocalAction.backgroundColor = [UIColor systemTealColor];
 
-    // Other Options
+    
     
     return @[removeAction, exportAction, addLocalAction];
 }

@@ -96,7 +96,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 
         ret = [test stringByReplacingCharactersInRange:match.range withString:compiled];
         
-        if(depth < 10) { // Prevent endless self references killing us
+        if(depth < 10) { 
             ret = [self sprCompile:ret node:node rootNode:rootNode error:error depth:depth+1];
         }
         else {
@@ -108,16 +108,16 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 }
 
 - (NSString*)sprCompileRegexMatch:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node rootNode:(Node *)rootNode error:(NSError**)error {
-//    // Debug
-//    for(int i = 0;i < match.numberOfRanges;i++) {
-//        NSRange range = [match rangeAtIndex:i];
-//        if(range.location != NSNotFound) {
-//            NSLog(@"Range %d: (%lu,%lu) [%@]", i, (unsigned long)range.location, (unsigned long)range.length, [test substringWithRange:range]);
-//        }
-//        else {
-//            NSLog(@"Range %d: <Not Found>", i);
-//        }
-//    }
+
+
+
+
+
+
+
+
+
+
 
     if(match.numberOfRanges != 9) {
         if(error) {
@@ -150,15 +150,15 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         NSString* key = ([match rangeAtIndex:4].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:4]];
         
         if(key) {
-            StringValue* string = [node.fields.customFields objectForCaseInsensitiveKey:key]; // KeePass is case insensitive on keys here!
-            return string ? string.value : test; // KeePass Windows client returns the original string, not blank/empty
+            StringValue* string = [node.fields.customFields objectForCaseInsensitiveKey:key]; 
+            return string ? string.value : test; 
         }
         else {
             return test;
         }
     }
     else if([operation hasPrefix:kUrlOperation]) {
-        return [self sprCompileUrl:match test:test node:node rootNode:rootNode error:error]; // error:error];
+        return [self sprCompileUrl:match test:test node:node rootNode:rootNode error:error]; 
     }
     else if([operation hasPrefix:kReferenceOperation]) {
         return [self sprCompileReference:match test:test node:node rootNode:rootNode error:error];
@@ -190,7 +190,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     Node* target = [self findReferencedNode:searchByField searchTarget:searchTarget rootNode:rootNode error:error];
     
     if(!target) {
-        return test; // No Match? Return As Is
+        return test; 
     }
     
     if([desiredField isEqualToString:kReferenceFieldTitle]) {
@@ -281,14 +281,14 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 
 -(NSString*)sprCompileUrl:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node rootNode:(Node*)rootNode error:(NSError**)error {
     NSString* subOperation = ([match rangeAtIndex:3].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:3]];
-    //NSLog(@"%@", components);
+    
     
     if(!subOperation) {
         return node.fields.url;
     }
 
-    // This is a bit of a hack :( but using parts of a url doesn't fit in super well here. We need to fully dereference
-    // This field before attempting to break it up... but we need to be careful to limit it too.
+    
+    
     
     NSString* dereferencedUrl = [self sprCompile:node.fields.url node:node rootNode:rootNode error:error];
     NSURLComponents* components = [NSURLComponents componentsWithString:dereferencedUrl];
@@ -319,7 +319,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     else if([subOperation isEqualToString:kUrlSubOperationRemoveScheme]) {
         if(components && components.rangeOfScheme.location != NSNotFound) {
             NSString* foo = [dereferencedUrl stringByReplacingCharactersInRange:components.rangeOfScheme withString:@""];
-            if([foo hasPrefix:@"://"]) {
+            if([foo hasPrefix:@":
                 return [foo stringByReplacingCharactersInRange:NSMakeRange(0, 3) withString:@""];
             }
             return foo;

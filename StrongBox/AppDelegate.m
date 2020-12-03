@@ -42,24 +42,22 @@
     [self installTopLevelExceptionHandlers];
     
     [self initializeDropbox];
-
+    
     [self performEarlyBasicICloudInitialization];
     
     [self initializeInstallSettingsAndLaunchCount];   
     
     [self initializeProFamilyEdition];
-    
-    [self performMigrations];
-    
+        
     [self markDirectoriesForBackupInclusion];
     
     [self cleanupWorkingDirectories:launchOptions];
         
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
-    [ProUpgradeIAPManager.sharedInstance initialize]; // Be ready for any In-App Purchase messages
+    [ProUpgradeIAPManager.sharedInstance initialize]; 
         
-    [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; // Watch for iTunes File Sharing or other local documents
+    [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
         
     NSLog(@"STARTUP - Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
     NSLog(@"STARTUP - Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
@@ -81,10 +79,10 @@
 }
 
 - (void)performEarlyBasicICloudInitialization {
-    // MMcG: 18-Dec-2019 - Doing this because app activation doesn't work well with iPadOS Split Screen - The
-    // Initialization doesn't happen properly from a cold start if the app is launched via iPADOS split screen... If
-    // this is not initialized then, the calls to the READ api will fail... This silent initialization should helps keep
-    // the app ready for such a situation... H/T: Manuel!
+    
+    
+    
+    
     
     [iCloudSafesCoordinator.sharedInstance initializeiCloudAccessWithCompletion:^(BOOL available) {
         NSLog(@"Early iCloud Initialization Done: Available = [%d]", available);
@@ -99,58 +97,11 @@
     }
 }
 
-- (void)performMigrations {
-    if (!Settings.sharedInstance.hasMigratedDatabaseSubtitles) {
-        Settings.sharedInstance.hasMigratedDatabaseSubtitles = YES;
-        
-        // If these subtitle fields are unused then default them to display file size and mod date...
-        
-        if (SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle == kDatabaseCellSubtitleFieldNone) {
-            SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle = kDatabaseCellSubtitleFieldFileSize;
-        }
-
-        if (SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1 == kDatabaseCellSubtitleFieldNone) {
-            SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1 = kDatabaseCellSubtitleFieldStorage;
-        }
-
-        if (SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2 == kDatabaseCellSubtitleFieldNone) {
-            SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2 = kDatabaseCellSubtitleFieldLastModifiedDate;
-        }
-    }
-    
-    if (!Settings.sharedInstance.migratedYubiKeyEmergencyWorkaroundsToVirtualKeys) {
-        [self migrateYubiKeyEmergencyWorkaroundsToVirtualKeys];
-    }
-}
-
-- (void)migrateYubiKeyEmergencyWorkaroundsToVirtualKeys {
-    int i = 2;
-    for (SafeMetaData* database in SafesList.sharedInstance.snapshot) {
-        if (database.convenenienceYubikeySecret.length) {
-            NSString* name = i == 2 ? @"Workaround Virtual Hardware Key" : [NSString stringWithFormat:@"Workaround Virtual Hardware Key %d", i++];
-            VirtualYubiKey* key = [VirtualYubiKey keyWithName:name secret:database.convenenienceYubikeySecret autoFillOnly:NO];
-            [VirtualYubiKeys.sharedInstance addKey:key];
-            
-            YubiKeyHardwareConfiguration *config = YubiKeyHardwareConfiguration.defaults;
-            
-            config.mode = kVirtual;
-            config.virtualKeyIdentifier = key.identifier;
-            
-            database.contextAwareYubiKeyConfig = config;
-            database.autoFillYubiKeyConfig = config;
-            
-            [SafesList.sharedInstance update:database];
-        }
-    }
-
-    Settings.sharedInstance.migratedYubiKeyEmergencyWorkaroundsToVirtualKeys = YES;
-}
-
 - (void)cleanupWorkingDirectories:(NSDictionary *)launchOptions {
     if(!launchOptions || launchOptions[UIApplicationLaunchOptionsURLKey] == nil) {
-        // Inbox should be empty whenever possible so that we can detect the
-        // re-importation of a certain file and ask if user wants to create a
-        // new copy or just update an old one...
+        
+        
+        
         [FileManager.sharedInstance deleteAllInboxItems];
          
         [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
@@ -168,7 +119,7 @@
     self.appLaunchTime = [NSDate date];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
@@ -210,11 +161,11 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-    //    [OfflineDetector.sharedInstance stopMonitoringConnectivitity]; // Don't stop monitoring here as it will reset when Touch/Face ID happens :(
+    
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    [OfflineDetector.sharedInstance startMonitoringConnectivitity]; // Restart/Refresh our monitor
+    [OfflineDetector.sharedInstance startMonitoringConnectivitity]; 
     [self performedScheduledEntitlementsCheck];
 }
 
@@ -223,11 +174,11 @@
     double minutes = timeDifference / 60;
     double hoursSinceLaunch = minutes / 60;
 
-    if(hoursSinceLaunch > 2) { // Stuff we'd like to do, but definitely not immediately on first launch...
-        // Do not request review immediately on launch but after a while and after user has used app for a bit
+    if(hoursSinceLaunch > 2) { 
+        
         NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
 
-        if (launchCount > 30) { // Don't bother any new / recent users - no need for entitlements check until user is regular user
+        if (launchCount > 30) { 
             if (@available( iOS 10.3,*)) {
                 [SKStoreReviewController requestReview];
             }
@@ -249,12 +200,12 @@ void uncaughtExceptionHandler(NSException *exception) {
         @"callStackReturnAddresses" :  exception.callStackReturnAddresses != nil ? exception.callStackReturnAddresses : NSNull.null
     };
                 
-    //        NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
-    //        NSDictionary* jsonDict = [NSJSONSerialization JSONObjectWithData:crashFileData options:kNilOptions error:nil];
-    //        NSString* reason = jsonDict[@"reason"];
-    //        NSString* name = jsonDict[@"name"];
-    //        NSArray* callStackReturnAddresses = jsonDict[@"callStackReturnAddresses"];
-    //        NSArray* callStackSymbols = jsonDict[@"callStackSymbols"];
+    
+    
+    
+    
+    
+    
 
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonDict options:NSJSONWritingPrettyPrinted error:nil];
     if (json) {
@@ -265,19 +216,19 @@ void uncaughtExceptionHandler(NSException *exception) {
 - (void)installTopLevelExceptionHandlers {
     NSSetUncaughtExceptionHandler(&uncaughtExceptionHandler);
     
-    // MMcG: Sample code to cause a crash (based on a true story)... :/
-    //
     
-//    NSURL* url = [NSURL URLWithString:@"https://www.strongboxsafe.com"];
-//    [NSJSONSerialization dataWithJSONObject:@{ @"url" : url } options:NSJSONWritingPrettyPrinted error:nil];
+    
+    
 
-    // FUTURE?
-//    signal(SIGABRT, SignalHandler);
-//    signal(SIGILL, SignalHandler);
-//    signal(SIGSEGV, SignalHandler);
-//    signal(SIGFPE, SignalHandler);
-//    signal(SIGBUS, SignalHandler);
-//    signal(SIGPIPE, SignalHandler);
+
+
+    
+
+
+
+
+
+
 }
 
 @end

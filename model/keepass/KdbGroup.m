@@ -19,7 +19,7 @@
         self.creation = [NSDate date];
         self.modification = [NSDate date];
         self.lastAccess = [NSDate date];
-        self.imageId = @(48); // Default group image
+        self.imageId = @(48); 
         self.level = 0;
         self.flags = 0;
     }

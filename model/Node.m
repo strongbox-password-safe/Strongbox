@@ -13,6 +13,7 @@
 #import "NSURL+QueryItems.h"
 #import "MMcG_MF_Base32Additions.h"
 #import "NSArray+Extensions.h"
+#import "NSDate+Extensions.h"
 
 @interface Node ()
 
@@ -70,7 +71,7 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
                                   uuid:(NSUUID*)uuid {
     if (keePassGroupTitleRules) {
         if (!title) {
-            title = @""; // Possible for empty groups in KeePass - particular when entries are selectively exported to a new database :(
+            title = @""; 
         }
     }
     else {
@@ -134,7 +135,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     NSNumber *isGroup = dict[@"isGroup"];
     NSNumber *iconId = dict[@"iconId"];
     NSArray<NSDictionary*> *children = dict[@"children"];
-    NSString* customIconUuid = dict[@"customIconUuid"]; // Needs to be corrected in destination database pool
+    NSString* customIconUuid = dict[@"customIconUuid"]; 
     
     NodeFields* nodeFields = [NodeFields deserialize:nodeFieldsDict];
     
@@ -164,7 +165,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
             return nil;
         }
         
-        // Error Check not necessary as done in deserialization above
+        
         [ret addChild:childNode keePassGroupTitleRules:allowDuplicateGroupTitle];
     }
     
@@ -194,29 +195,34 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (Node*)duplicate:(NSString*)newTitle {
-    return [self cloneOrDuplicate:YES cloneMetadataDates:NO cloneUuid:NO cloneRecursive:NO newTitle:newTitle];
+    return [self cloneOrDuplicate:YES cloneMetadataDates:NO cloneUuid:NO cloneRecursive:NO newTitle:newTitle parentNode:nil];
 }
 
 - (Node *)clone {
     return [self clone:NO];
 }
 
+- (Node *)cloneAsChildOf:(Node*)parentNode {
+    return [self cloneOrDuplicate:NO cloneMetadataDates:YES cloneUuid:YES cloneRecursive:NO newTitle:nil parentNode:parentNode];
+}
+
 - (Node *)clone:(BOOL)recursive {
-    return [self cloneOrDuplicate:NO cloneMetadataDates:YES cloneUuid:YES cloneRecursive:recursive newTitle:nil];
+    return [self cloneOrDuplicate:NO cloneMetadataDates:YES cloneUuid:YES cloneRecursive:recursive newTitle:nil parentNode:nil];
 }
 
 - (Node *)cloneForHistory {
-    return [self cloneOrDuplicate:YES cloneMetadataDates:YES cloneUuid:YES cloneRecursive:NO newTitle:nil];
+    return [self cloneOrDuplicate:YES cloneMetadataDates:YES cloneUuid:YES cloneRecursive:NO newTitle:nil parentNode:nil];
 }
 
 - (Node*)cloneOrDuplicate:(BOOL)clearHistory
        cloneMetadataDates:(BOOL)cloneMetadataDates
                 cloneUuid:(BOOL)cloneUuid
            cloneRecursive:(BOOL)cloneRecursive
-                 newTitle:(NSString*)newTitle {
+                 newTitle:(NSString*)newTitle
+               parentNode:(Node*)parentNode {
     NodeFields* clonedFields = [self.fields cloneOrDuplicate:clearHistory cloneTouchProperties:cloneMetadataDates];
     
-    Node* ret = [[Node alloc] initWithParent:self.parent
+    Node* ret = [[Node alloc] initWithParent:parentNode ? parentNode : self.parent
                                        title:newTitle.length ? newTitle : self.title
                                      isGroup:self.isGroup
                                         uuid:cloneUuid ? self.uuid : nil
@@ -233,7 +239,8 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                                      cloneMetadataDates:cloneMetadataDates
                                               cloneUuid:cloneUuid
                                          cloneRecursive:cloneRecursive
-                                               newTitle:newTitle];
+                                               newTitle:newTitle
+                                             parentNode:nil];
         
             [ret addChild:clonedChild keePassGroupTitleRules:YES];
         }
@@ -267,7 +274,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return NO;
 }
 
-/////////////
+
 
 - (BOOL)expired {
     return self.fields.expired;
@@ -321,7 +328,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
 }
 
-- (void)setModifiedDateExplicit:(NSDate *)modDate setParents:(BOOL)setParents { // Used for Undo's in Mac...
+- (void)setModifiedDateExplicit:(NSDate *)modDate setParents:(BOOL)setParents { 
     [self.fields setModifiedDateExplicit:modDate];
     
     if(setParents && self.parent) {
@@ -346,7 +353,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 - (NSArray<Node *> *)childRecords {
     return self.isGroup ? [self filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
-    }] : [NSArray array];
+    }] : @[];
 }
 
 - (NSArray<Node *> *)allChildGroups {
@@ -364,7 +371,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 - (BOOL)setTitle:(NSString*_Nonnull)title keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     if (keePassGroupTitleRules) {
         if (!title) {
-            title = @""; // Possible for empty groups in KeePass - particular when entries are selectively exported to a new database :(
+            title = @""; 
         }
     }
     else if (self.isGroup) {
@@ -459,7 +466,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if([parent addChild:self keePassGroupTitleRules:keePassGroupTitleRules]) {
         return YES;
     }
-    else { // Should pretty much never happen because we validate above...
+    else { 
         _parent = rollbackParent;
         [rollbackParent addChild:self keePassGroupTitleRules:keePassGroupTitleRules];
         return NO;
@@ -480,9 +487,9 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (NSString*)getSerializationId:(BOOL)groupCanUseUuid {
-    // Try to come up with a way to identify this node across serializations -
-    // UUID works for KeePass in both cases, but for Password Safe Groups there
-    // is no equivalent of UUID so we use the path
+    
+    
+    
 
     NSString *identifier;
     if(self.isGroup && !groupCanUseUuid) {
@@ -539,7 +546,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 - (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive
                                 predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate {
     if(!self.isGroup) {
-        return [NSArray array];
+        return @[];
     }
 
     NSMutableArray<Node*>* matching = [[NSMutableArray alloc] init];
@@ -565,6 +572,53 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
     
     return matching;
+}
+
+- (BOOL)preOrderTraverse:(BOOL (^)(Node*))function {
+    for ( Node* child in self.childRecords ) {
+        if ( !function ( child ) ) {
+            return NO;
+        }
+    }
+
+    for ( Node* child in self.childGroups ) {
+        if( !function ( child ) ) {
+            return NO;
+        }
+        
+        if ( ![child preOrderTraverse:function] ) {
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
+- (BOOL)isSyncEqualTo:(Node *)other { 
+    if (other == nil) {
+        return NO;
+    }
+    
+    if ( ![self.uuid isEqual:other.uuid] ) {
+        return NO;
+    }
+    
+    if (self.isGroup) {
+        return ![self.fields.modified isLaterThan:other.fields.modified];
+    }
+    else {
+        if (!( ( self.iconId == nil && other.iconId == nil ) ||
+              (self.iconId && other.iconId && ([self.iconId isEqual:other.iconId])))) {
+            return NO;
+        }
+
+        if( ! ( (self.customIconUuid == nil && other.customIconUuid == nil)  ||
+               (self.customIconUuid && other.customIconUuid && [self.customIconUuid isEqual:other.customIconUuid]))) {
+            return NO;
+        }
+
+        return [self.fields isSyncEqualTo:other.fields];
+    }
 }
 
 - (NSArray<NSString*>*)getTitleHierarchy {

@@ -33,13 +33,13 @@
     NSURLBookmarkCreationOptions options = kNilOptions;
     
     #if !TARGET_OS_IPHONE
-        options |= readOnly ? NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess : kNilOptions; // NSURLBookmarkCreationMinimalBookmark;
+        options |= readOnly ? NSURLBookmarkCreationSecurityScopeAllowOnlyReadAccess : kNilOptions; 
         options |= NSURLBookmarkCreationWithSecurityScope;
     #else
-        options |= NSURLBookmarkCreationMinimalBookmark; // iOS
+        options |= NSURLBookmarkCreationMinimalBookmark; 
     #endif
 
-    [url startAccessingSecurityScopedResource]; // MMcG: Do not check return here explicitly because it will fail if the URL was not generated from a bookmark - i.e. if it was just passed in by the system - This is fine we will continue and successfully generate a bookmark (or not).
+    [url startAccessingSecurityScopedResource]; 
 
     NSData *bookmark = [url bookmarkDataWithOptions:options
                      includingResourceValuesForKeys:nil
@@ -96,7 +96,7 @@
 }
 
 + (NSURL *)getUrlFromBookmarkData:(NSData *)bookmark readOnly:(BOOL)readOnly updatedBookmark:(NSData * _Nonnull __autoreleasing *)updatedBookmark error:(NSError * _Nonnull __autoreleasing *)error {
-    NSURLBookmarkResolutionOptions options = NSURLBookmarkResolutionWithoutUI; // MMcG: 8-May-2020 - Attempt to improve stale bookmark issues...
+    NSURLBookmarkResolutionOptions options = NSURLBookmarkResolutionWithoutUI; 
     #if !TARGET_OS_IPHONE
         options |= NSURLBookmarkResolutionWithSecurityScope;
     #endif
@@ -109,7 +109,7 @@
                                                          error:error];
 
     if(!bookmarkFileURL) {
-        NSLog(@"Could not get bookmark URL.");
+        
         return nil;
     }
     
@@ -147,7 +147,7 @@
     NSURL* url = [BookmarksHelper getUrlFromBookmark:bookmarkInB64 readOnly:NO updatedBookmark:&updatedBookmark error:error];
 
     if(url && [url startAccessingSecurityScopedResource]) {
-        //NSLog(@"Reading File at [%@]", url);
+        
         NSData* ret = [NSData dataWithContentsOfURL:url options:kNilOptions error:error];
         
         [url stopAccessingSecurityScopedResource];

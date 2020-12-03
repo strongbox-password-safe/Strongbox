@@ -59,6 +59,29 @@ static NSString* const kCustomIconDataElementName = @"Data";
 static NSString* const kAttributeProtected = @"Protected";
 static NSString* const kAttributeValueTrue = @"True";
 
+static NSString* const kCustomDataElementName = @"CustomData";
+static NSString* const kCustomDataItemElementName = @"Item";
+static NSString* const kNotesElementName = @"Notes";
+
+static NSString* const kDefaultAutoTypeSequenceElementName = @"DefaultAutoTypeSequence";
+static NSString* const kEnableAutoTypeElementName = @"EnableAutoType";
+static NSString* const kEnableSearchingElementName = @"EnableSearching";
+static NSString* const kLastTopVisibleElementName = @"LastTopVisibleEntry";
+
+static NSString* const kAutoTypeAssociationElementName = @"Association";
+static NSString* const kAutoTypeElementName = @"AutoType";
+
+static NSString* const kEnabledElementName = @"Enabled";
+static NSString* const kDataTransferObfuscationElementName = @"DataTransferObfuscation";
+static NSString* const kAssociationElementName = @"Association";
+static NSString* const kDefaultSequenceElementName = @"DefaultSequence";
+static NSString* const kForegroundColorElementName = @"ForegroundColor";
+static NSString* const kBackgroundColorElementName = @"BackgroundColor";
+static NSString* const kOverrideURLElementName = @"OverrideURL";
+
+static NSString* const kWindowElementName = @"Window";
+static NSString* const kKeystrokeSequenceElementName = @"KeystrokeSequence";
+
 static NSString* const kBinaryCompressedAttribute = @"Compressed";
 static NSString* const kBinaryIdAttribute = @"ID";
 
@@ -71,9 +94,9 @@ static const uint32_t kGzipCompressionFlag = 1;
 static const uint32_t kMasterSeedLength = 32;
 static const uint32_t kDefaultTransformSeedLength = 32;
 
-static NSString* const kEndOfHeaderEntriesMagicString = @"\r\n\r\n"; // Not sure why they bother with this, maybe to spot it in a plain text editor? Let's Cargo cult it...
+static NSString* const kEndOfHeaderEntriesMagicString = @"\r\n\r\n"; 
 
-static const uint64_t kDefaultBlockifySize = 1 << 20; // 1 MB seems to be the Keepass Default
+static const uint64_t kDefaultBlockifySize = 1 << 20; 
 
 static NSString* const kKdfParametersKeyUuid = @"$UUID";
 

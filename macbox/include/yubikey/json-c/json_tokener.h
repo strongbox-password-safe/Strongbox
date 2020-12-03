@@ -177,21 +177,21 @@ const char *mystring = NULL;
 int stringlen = 0;
 enum json_tokener_error jerr;
 do {
-	mystring = ...  // get JSON string, e.g. read from file, etc...
+	mystring = ...  
 	stringlen = strlen(mystring);
 	jobj = json_tokener_parse_ex(tok, mystring, stringlen);
 } while ((jerr = json_tokener_get_error(tok)) == json_tokener_continue);
 if (jerr != json_tokener_success)
 {
 	fprintf(stderr, "Error: %s\n", json_tokener_error_desc(jerr));
-	// Handle errors, as appropriate for your application.
+	
 }
-if (tok->char_offset < stringlen) // XXX shouldn't access internal fields
+if (tok->char_offset < stringlen) 
 {
-	// Handle extra characters after parsed object as desired.
-	// e.g. issue an error, parse another object from that point, etc...
+	
+	
 }
-// Success, use jobj here.
+
 
 @endcode
  *

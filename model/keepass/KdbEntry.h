@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSDate *expired;
 @property NSString *binaryFileName;
 @property NSData* binaryData;
-//@property NSData* extData;
+
 
 @property (readonly) BOOL isMetaEntry;
 

@@ -14,18 +14,20 @@
 @interface DatabaseSynchronizer ()
 
 @property DatabaseModel* mine; // Mine, local here, containing changes that I have made and the copy Strongbox works with
-@property DatabaseModel* theirs; // Theirs, remote, the one out there we need to push to and sync up with if 'they' have made any changes
+@property DatabaseModel* theirs; 
 
 @property NSArray<Node*> *myEntries;
 @property NSArray<Node*> *theirEntries;
 @property NSArray<Node*> *myGroups;
 @property NSArray<Node*> *theirGroups;
+
 @property NSDictionary<NSUUID*, Node*>* myIdToNodeMap;
 @property NSDictionary<NSUUID*, Node*>* theirIdToNodeMap;
-@property NSSet<NSUUID*>* allMyEntryIds;
-@property NSSet<NSUUID*>* allTheirEntryIds;
-@property NSSet<NSUUID*>* allMyGroupIds;
-@property NSSet<NSUUID*>* allTheirGroupIds;
+
+
+
+
+
 
 @end
 
@@ -41,8 +43,8 @@
         self.mine = mine;
         self.theirs = theirs;
         
-        // TODO: Is root group the right base? or should we be doing it from the very root?
-        // Fast Access Read-Only
+        
+        
         
         self.myEntries = self.mine.allRecords;
         self.theirEntries = self.theirs.allRecords;
@@ -61,88 +63,86 @@
         }
         self.theirIdToNodeMap = mutTheirIdToNodeMap.copy;
         
-        self.allMyEntryIds = [NSSet setWithArray:[self.myEntries map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-            return obj.uuid;
-        }]];
 
-        self.allTheirEntryIds = [NSSet setWithArray:[self.theirEntries map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-            return obj.uuid;
-        }]];
-        
-        self.allMyGroupIds = [NSSet setWithArray:[self.myGroups map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-            return obj.uuid;
-        }]];
 
-        self.allTheirGroupIds = [NSSet setWithArray:[self.theirGroups map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-            return obj.uuid;
-        }]];
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     return self;
 }
 
 - (SyncDiffReport *)getDiff {
     SyncDiffReport* ret = [[SyncDiffReport alloc] init];
+    NSMutableArray<NSUUID*> *changedNodes = NSMutableArray.array;
     
-    // New Groups from 'theirs'
+    [self.theirs preOrderTraverse:^BOOL(Node * _Nonnull node) {
+        Node* myVersion = self.myIdToNodeMap[node.uuid];
 
-    NSMutableSet<NSUUID*>* mutTheirNewGroups = self.allTheirGroupIds.mutableCopy;
-    [mutTheirNewGroups minusSet:self.allMyGroupIds];
-    ret.theirNewGroups = mutTheirNewGroups.copy;
+        if ( !myVersion ) {
+            [changedNodes addObject:node.uuid];
+        }
+        else if ( ![myVersion isSyncEqualTo:node] ) {
+            [changedNodes addObject:node.uuid];
+        }
+        
+        return YES;
+    }];
+    ret.changes = changedNodes;
     
-    // New Entries from 'theirs' that are not in mine
     
-    NSMutableSet<NSUUID*>* mutTheirNewEntries = self.allTheirEntryIds.mutableCopy;
-    [mutTheirNewEntries minusSet:self.allMyEntryIds];
-    ret.theirNewEntries = mutTheirNewEntries.copy;
     
-    // Edited Groups
     
-    NSMutableSet<NSUUID*> *groupsInCommon = self.allMyGroupIds.mutableCopy;
-    [groupsInCommon intersectSet:self.allTheirGroupIds];
-    ret.theirEditedGroups = [self getEditedSet:groupsInCommon];
     
-    // Edited Entries
+    
+    
 
-    NSMutableSet<NSUUID*> *entriesInCommon = self.allMyEntryIds.mutableCopy;
-    [entriesInCommon intersectSet:self.allTheirEntryIds];
-    ret.theirEditedEntries = [self getEditedSet:entriesInCommon];
-
-    // Moves
-
-    // Deletions
-
-    // Attachments?
     
-    // Custom Icons?
+
     
-    // Database Properties
     
-    // Credentials Changed
+    
+    
+    
+    
+    
 
     return ret;
 }
 
 - (void)applyDiff:(SyncDiffReport*)diff {
     
+    
+
+
+
 }
 
-- (NSSet<NSUUID*>*)getEditedSet:(NSSet<NSUUID*>*)itemsForComparison {
-    NSArray<NSUUID*>* edited = [itemsForComparison.allObjects filter:^BOOL(NSUUID * _Nonnull obj) {
-        Node* mine = self.myIdToNodeMap[obj];
-        Node* theirs = self.theirIdToNodeMap[obj];
-
-        if (mine == nil || theirs == nil) {
-            NSLog(@"WARNWARN: Unexpected result - mine or theirs not found in checking for edited groups [%@] - [%@]", mine, theirs);
-        }
-        else {
-            NSLog(@"%@ => %@", mine.fields.modified, theirs.fields.modified);
-            return [theirs.fields.modified isLaterThan:mine.fields.modified];
-        }
-        
-        return NO;
-    }];
+- (void)addTheirNewGroupToMine:(NSUUID*)uuid {
+    Node* theirNewGroup = self.theirIdToNodeMap[uuid];
     
-    return [NSSet setWithArray:edited];
+    
+    
+    
+    Node* ourParentGroup = self.mine.rootGroup;
+    Node* found = self.myIdToNodeMap[theirNewGroup.parent.uuid];
+    if (theirNewGroup.parent != nil && theirNewGroup.parent != self.theirs.rootGroup && found) {
+        ourParentGroup = found;
+    }
+    
+    Node* ourNewGroup = [theirNewGroup cloneAsChildOf:ourParentGroup];
+    
+    [ourParentGroup addChild:ourNewGroup keePassGroupTitleRules:YES]; 
 }
 
 @end

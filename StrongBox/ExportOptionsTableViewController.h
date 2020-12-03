@@ -17,13 +17,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL backupMode;
 
-// Open / Unlocked Database Export Mode
 
-@property (nullable) Model *viewModel; // TODO: This should be sufficient and remove use of below encrpted/metadata?
 
-// Backup Export mode
+@property (nullable) Model *viewModel; 
 
-@property (nullable) NSData *encrypted; // Can we use URL instead? TODO:
+
+
+@property (nullable) NSData *encrypted; 
 @property (nullable) SafeMetaData* metadata;
 @property (nullable) BackupItem* backupItem;
 

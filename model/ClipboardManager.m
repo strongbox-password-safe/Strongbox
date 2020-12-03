@@ -46,8 +46,8 @@
     
     if(@available(iOS 10.0, *)) {
         if(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled && SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds > 0) {
-            // Belt and braces approach here we can use the built in iOS 10+ expiry along with our
-            // more manual clipboard watch task to catch other cases where we don't directly copy via this function
+            
+            
             
             NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds];
             
@@ -72,12 +72,15 @@
 - (void)onClipboardChangedNotification:(NSNotification*)note {
     NSLog(@"onClipboardChangedNotification: [%@]", note);
     
-    if(![UIPasteboard.generalPasteboard hasStrings] &&
-       ![UIPasteboard.generalPasteboard hasImages] &&
-       ![UIPasteboard.generalPasteboard hasURLs]) {
-        return;
+    if (@available(ios 10.0, *)) {
+        if(![UIPasteboard.generalPasteboard hasStrings] &&
+           ![UIPasteboard.generalPasteboard hasImages] &&
+           ![UIPasteboard.generalPasteboard hasURLs]) {
+            return;
+        }
     }
 
+        
     UIApplication* app = [UIApplication sharedApplication];
     if(self.clearClipboardTask) {
         NSLog(@"Clearing existing clear clipboard tasks");
@@ -109,7 +112,7 @@
 - (void)clearClipboardDelayedTask:(NSInteger)clipboardChangeCount {
     if(!SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled) {
         [self unobserveClipboardChangeNotifications];
-        return; // In case a setting change has be made
+        return; 
     }
     
     if(clipboardChangeCount == UIPasteboard.generalPasteboard.changeCount) {
@@ -136,7 +139,7 @@
 - (void)observeClipboardChangeNotifications {
     if(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled) {
         if(!self.clipboardNotificationIdentifier) {
-            // Delay by a small bit because we're definitely getting an odd crash or two somehow due to infinite loop now
+            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 self.clipboardNotificationIdentifier =
                 [NSNotificationCenter.defaultCenter addObserverForName:UIPasteboardChangedNotification
@@ -157,6 +160,6 @@
     }
 }
 
-#endif // !IS_APP_EXTENSION
+#endif 
 
 @end

@@ -39,48 +39,48 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = YES; // Avoid long delay
-        _supportsConcurrentRequests = NO; // Possibly
+        _immediatelyOfferCacheIfOffline = YES; 
+        _supportsConcurrentRequests = NO; 
         
         [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite", @"offline_access"]];
         
-        // MMcG: 10-Oct-2018 - Originally had OneDrive for Business as a separate provider but it turns out you can do
-        // this, and set it up as both personal and business. Deciding for simplicity to keep it to only one procider
-        // and not support multi accounting. Also, the underlying cookies are shared so it would be difficult to manage
-        // this...
+        
+        
+        
+        
         
         static NSString * const kBusinessApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
-        static NSString * const kBusinessRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
+        static NSString * const kBusinessRedirectUri = @"https:
 
-        //[ODClient setActiveDirectoryAppId:kBusinessApplicationId redirectURL:kBusinessRedirectUri];
+        
         
         [ODClient setActiveDirectoryAppId:kBusinessApplicationId
-                               resourceId:@"https://graph.microsoft.com/"
-                              apiEndpoint:@"https://graph.microsoft.com/v1.0/me"
+                               resourceId:@"https:
+                              apiEndpoint:@"https:
                               redirectURL:kBusinessRedirectUri];
         
-//        [ODClient setActiveDirectoryAppId:kBusinessApplicationId
-//                               resourceId:kBusinessApplicationId
-//                              apiEndpoint:@"https://graph.microsoft.com/v1.0/me"
-//                              redirectURL:kBusinessRedirectUri];
 
-        // Testing Code...
+
+
+
+
         
-//        ODClient* blah = [ODClient loadCurrentClient];
-//
-//        if(blah) {
-//            [blah signOutWithCompletion:^(NSError *error) {
-//                NSLog(@"Signed Out");
-//                NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-//                for (NSHTTPCookie *each in cookieStorage.cookies) {
-//                    NSLog(@"%@", each);
-//                    [cookieStorage deleteCookie:each]; }
-//            }];
-//        }
-//        else {
-//            NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
-//            for (NSHTTPCookie *each in cookieStorage.cookies) { NSLog(@"%@", each); [cookieStorage deleteCookie:each]; }
-//        }
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         
         return self;
     }
@@ -128,7 +128,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
             });
             
             if (error == nil) {
-                //NSLog(@"%@ - %@", response, error);
+                
                 
                 SafeMetaData *metadata = [self getSafeMetaData:nickName
                                                   providerData:response];
@@ -149,7 +149,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
             completion(kReadResultError, nil, nil, error);
-            [self signout:^(NSError *error) { }];  // Signout if something
+            [self signout:^(NSError *error) { }];  
             return;
         }
         
@@ -179,7 +179,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
                 
                 NSLog(@"OneDrive Read: %@", error);
                 completion(kReadResultError, nil, nil, error);
-                [self signout:^(NSError *error) { }];  // Signout if something
+                [self signout:^(NSError *error) { }];  
                 return;
             }
             
@@ -192,7 +192,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     [self authWrapperWithCompletion:viewController completion:^(BOOL userInteractionRequired, NSError *error) {
         if(error) {
             completion(kReadResultError, nil, nil, error);
-            [self signout:^(NSError *error) { }];  // Signout if something
+            [self signout:^(NSError *error) { }];  
             return;
         }
                       
@@ -235,21 +235,21 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
             if(error) {
                 NSLog(@"%@", error);
                 completion(kReadResultError, nil, nil, error);
-                [self signout:^(NSError *error) { }];  // Signout if something
+                [self signout:^(NSError *error) { }];  
                 return;
             }
             
-            // The file path to the item on disk. This is a temporary file and will be removed
-            // after the block is done executing.
             
-            //        NSLog(@"File Url: %@", filePath);
-            //        NSLog(@"File Path: %@", filePath.path);
-            //        NSLog(@"Exists: %hhd", [[NSFileManager defaultManager] fileExistsAtPath:filePath.path]);
+            
+            
+            
+            
+            
     
             
             NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath.path];
             
-            //NSLog(@"OneDrive Read %lu bytes.", (unsigned long)data.length);
+            
             
             completion(kReadResultSuccess, data, item.lastModifiedDateTime, nil);
         }];
@@ -325,7 +325,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         if(error) {
             completion(error.code == ODAuthCanceled, nil, error);
             if (error.code != ODAuthCanceled) {
-                [self signout:^(NSError *error) { }];  // Signout if something
+                [self signout:^(NSError *error) { }];  
             }
             return;
         }
@@ -392,7 +392,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     }
    
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    //NSLog(@"%@", json);
+    
     NSString *parent = json;
     
     return [[SafeMetaData alloc] initWithNickName:nickName
@@ -415,7 +415,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     NSString* driveId = [dictionary objectForKey:@"driveId"];
     NSString* parentFolderId = [dictionary objectForKey:@"parentFolderId"];
     
-    //NSLog(@"Searching for drive:[%@] parent:[%@] name:[%@]", driveId, parentFolderId, metadata.fileName);
+    
     
     ODChildrenCollectionRequest *request = [[[[self.odClient drives:driveId] items:parentFolderId] children] request];
     
@@ -451,25 +451,25 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
       completion:(void (^)(UIImage *image))completionHandler {
-    // NOTSUPPORTED
+    
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
-    // NOTIMPL
+    
 }
 
 - (NSArray *)mapToBrowserItems:(NSArray<ODItem *> *)entries {
     NSMutableArray<StorageBrowserItem *> *ret = [[NSMutableArray alloc] init];
     
     for (ODItem *entry in entries) {
-        //NSLog(@"Entry: %@", entry);
-        //NSLog(@"-------------------------------------------------------------------------------------------------------");
         
-        //        if(entry.remoteItem) {
-        //            NSLog(@"OneDrive Skipping Remote Item: [%@]", entry.name);
-        //            continue;
-        //        }
-        //
+        
+        
+        
+        
+        
+        
+        
         
         StorageBrowserItem *item = [[StorageBrowserItem alloc] init];
         
@@ -516,7 +516,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     if(!self.odClient) {
         NSLog(@"OneDrive Signout: No Active Session.");
         
-        // NB: Necessary so that you can choose a different account.
+        
         
         NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
         for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }
@@ -527,7 +527,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         [self.odClient signOutWithCompletion:^(NSError *error) {
             self.odClient = nil;
 
-            // NB: Necessary so that you can choose a different account.
+            
 
             NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
             for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }

@@ -9,10 +9,17 @@
 #import "SelectDestinationGroupController.h"
 #import "Alerts.h"
 #import "Utils.h"
+#import "BrowseTableViewCellHelper.h"
 
-@implementation SelectDestinationGroupController {
-    NSArray<Node*> *_items;
-}
+@interface SelectDestinationGroupController ()
+
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonMove;
+@property NSArray<Node*> *items;
+@property BrowseTableViewCellHelper* cellHelper;
+
+@end
+
+@implementation SelectDestinationGroupController
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -28,11 +35,13 @@
     [super viewDidLoad];
     
     self.tableView.tableFooterView = [UIView new];
+    
+    self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.viewModel tableView:self.tableView];
 }
-/////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)refresh {
-    _items = [self.currentGroup filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
+    self.items = [self.currentGroup filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
         return node.isGroup;
     }];
 
@@ -73,10 +82,10 @@
         return;
     }
 
-    // TODO: This should probably not be done here but in Browse View so we can centralize the handling of the update
+    
     
     [self.viewModel update:self handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will crash BrowseSafeView dismiss.
+        dispatch_async(dispatch_get_main_queue(), ^{ 
             [self dismissViewControllerAnimated:YES completion:^{
                 self.onDone(userCancelled, conflictAndLocalWasChanged, error);
             }];
@@ -102,7 +111,7 @@
                            }}];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 #pragma mark - Table view data source
 
@@ -111,33 +120,37 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return _items.count;
+    return self.items.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Check to see whether the normal table or search results table is being displayed and set the Candy object from the appropriate array
-
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"OpenSafeViewCell" forIndexPath:indexPath];
-
-    Node* vm = _items[indexPath.row];
-
-    cell.textLabel.text = vm.title;
-
+    Node* vm = self.items[indexPath.row];
     BOOL validMove = [self moveOfItemsIsValid:vm subgroupsValid:YES];
 
-    cell.accessoryType = validMove ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
+    UITableViewCell* cell = [self.cellHelper getBrowseCellForNode:vm
+                                                        indexPath:indexPath
+                                                showLargeTotpCell:NO
+                                                showGroupLocation:NO
+                                            groupLocationOverride:nil
+                                                    accessoryType:validMove ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone          noFlags:YES
+                                              showGroupChildCount:NO];
+
     cell.selectionStyle = validMove ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
     cell.userInteractionEnabled = validMove;
     cell.contentView.alpha = validMove ? 1.0f : 0.5f;
 
-    cell.imageView.image = [UIImage imageNamed:@"folder"];
-
     return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    Node* vm = self.items[indexPath.row];
+
+    [self performSegueWithIdentifier:@"segueRecurse" sender:vm];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueRecurse"]) {
-        Node *item = _items[self.tableView.indexPathForSelectedRow.row];
+        Node *item = (Node*)sender;
 
         SelectDestinationGroupController *vc = segue.destinationViewController;
 

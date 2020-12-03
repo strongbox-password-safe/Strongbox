@@ -13,10 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SyncDiffReport : NSObject
 
-@property NSSet<NSUUID*> * theirNewEntries;
-@property NSSet<NSUUID*> * theirNewGroups;
-@property NSSet<NSUUID*> * theirEditedEntries;
-@property NSSet<NSUUID*> * theirEditedGroups;
+@property NSArray<NSUUID*> * changes;
 
 @end
 

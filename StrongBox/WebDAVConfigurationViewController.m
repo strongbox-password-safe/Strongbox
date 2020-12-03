@@ -37,7 +37,7 @@
 
     NSString* hostStr = trim(self.textFieldRootUrl.text);
 
-    // Trim trailing Slash as library doesn't like it...
+    
     
     if([hostStr hasSuffix:@"/"]) {
         hostStr = [hostStr substringToIndex:hostStr.length - 1];

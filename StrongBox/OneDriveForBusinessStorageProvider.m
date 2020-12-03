@@ -18,7 +18,7 @@
 @end
 
 static NSString *kApplicationId = @"8c10a31a-0f4b-4931-a450-c2959b0a7169";
-static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
+static NSString *kRedirectUri = @"https:
 
 @implementation OneDriveForBusinessStorageProvider
 
@@ -45,7 +45,7 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
         
         [ODClient setActiveDirectoryAppId:kApplicationId redirectURL:kRedirectUri];
         
-        // TODO: Remove
+        
 
         ODClient* blah = [ODClient loadCurrentClient];
 
@@ -103,7 +103,7 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
             });
             
             if (error == nil) {
-                //NSLog(@"%@ - %@", response, error);
+                
                 
                 SafeMetaData *metadata = [self getSafeMetaData:nickName
                                                   providerData:response];
@@ -154,7 +154,7 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
     [self authWrapperWithCompletion:^(NSError *error) {
         ODItem* item = (ODItem*)providerData;
         
-        //NSLog(@"OneDrive Reading: [%@]", item);
+        
         
         ODItemContentRequest *request;
         
@@ -175,12 +175,12 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
                 return;
             }
             
-            // The file path to the item on disk. This is a temporary file and will be removed
-            // after the block is done executing.
             
-            //        NSLog(@"File Url: %@", filePath);
-            //        NSLog(@"File Path: %@", filePath.path);
-            //        NSLog(@"Exists: %hhd", [[NSFileManager defaultManager] fileExistsAtPath:filePath.path]);
+            
+            
+            
+            
+            
             
             
             NSData *data = [[NSFileManager defaultManager] contentsAtPath:filePath.path];
@@ -298,7 +298,7 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
     }
     
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    //NSLog(@"%@", json);
+    
     NSString *parent = json;
     
     return [[SafeMetaData alloc] initWithNickName:nickName
@@ -359,25 +359,25 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
       completion:(void (^)(UIImage *image))completionHandler {
-    // NOTSUPPORTED
+    
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(NSError *))completion {
-    // NOTIMPL
+    
 }
 
 - (NSArray *)mapToBrowserItems:(NSArray<ODItem *> *)entries {
     NSMutableArray<StorageBrowserItem *> *ret = [[NSMutableArray alloc] init];
     
     for (ODItem *entry in entries) {
-        //NSLog(@"Entry: %@", entry);
-        //NSLog(@"-------------------------------------------------------------------------------------------------------");
         
-        //        if(entry.remoteItem) {
-        //            NSLog(@"OneDrive Skipping Remote Item: [%@]", entry.name);
-        //            continue;
-        //        }
-        //
+        
+        
+        
+        
+        
+        
+        
         
         StorageBrowserItem *item = [[StorageBrowserItem alloc] init];
         
@@ -409,7 +409,7 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
     if(!self.odClient) {
         NSLog(@"OneDrive Signout: No Active Session.");
         
-        // NB: Necessary so that you can choose a different account.
+        
         
         NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
         for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }
@@ -420,7 +420,7 @@ static NSString *kRedirectUri = @"https://azure-redirect-uri.strongboxsafe.com";
         [self.odClient signOutWithCompletion:^(NSError *error) {
             self.odClient = nil;
             
-            // NB: Necessary so that you can choose a different account.
+            
             
             NSHTTPCookieStorage *cookieStorage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
             for (NSHTTPCookie *each in cookieStorage.cookies) { [cookieStorage deleteCookie:each]; }

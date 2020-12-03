@@ -18,6 +18,8 @@
 #import "NSArray+Extensions.h"
 #import "NodeDetailsViewController.h"
 #import "BiometricIdHelper.h"
+#import "DatabasesManagerView.h"
+#import "AutoFillManager.h"
 
 @interface Document ()
 
@@ -56,7 +58,7 @@
 - (void)makeWindowControllers {
     self.windowController = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"Document Window Controller"];
     [self addWindowController:self.windowController];
-    [[self getViewController] setInitialModel:self.model]; // DO this here without dispatching to avoid a flicker/delay in load...
+    [[self getViewController] setInitialModel:self.model]; 
 }
 
 - (IBAction)saveDocument:(id)sender {
@@ -70,15 +72,27 @@
     
     if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
         AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-        [appDelegate showUpgradeModal:3];
+        [appDelegate randomlyShowUpgradeMessage];
     }
 }
 
 - (void)saveToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError *error) {
         completionHandler(error);
-        //self.lastKnownModifiedDate = self.fileModificationDate;
+        
         NSLog(@"saveToURL: %lu - [%@]", (unsigned long)saveOperation, self.fileModificationDate);
+        
+        
+        
+        if (self.model && self.model.databaseMetadata.autoFillEnabled && self.model.databaseMetadata.quickTypeEnabled) {
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database databaseUuid:self.model.databaseMetadata.uuid];
+        }
+        
+        
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListViewForceRefreshNotification object:nil];
+        });
     }];
 }
 
@@ -127,8 +141,8 @@
         self.model = [[ViewModel alloc] initLocked:self];
         NSLog(@"Model initialized [%@]", self.model);
         
-        // Make Window Controllers will get called, which will now instantiate the ViewController... once that's done
-        // we will call resetModel with the above
+        
+        
     }
 
     self.credentialsForUnlock = nil;
@@ -142,7 +156,7 @@
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
-    if(fileWrapper.isDirectory) { // Strongbox crashes unless we check if someone is trying to open a package/wrapper...
+    if(fileWrapper.isDirectory) { 
         if(outError != nil) {
             NSString* loc = NSLocalizedString(@"mac_strongbox_cant_open_file_wrappers", @"Strongbox cannot open File Wrappers, Directories or Compressed Packages like this. Please directly select a KeePass or Password Safe database file.");
             *outError = [Utils createNSError:loc errorCode:-1];
@@ -200,12 +214,12 @@
     
     NSError* error;
     
-    // The natural option here would be revertToContents... but it breaks sometimes with Google Drive :(
-    // So we try to do all the things it would do...
     
-    //    BOOL success = [self revertToContentsOfURL:self.fileURL ofType:self.fileType error:&error];
     
-    [self.undoManager removeAllActions]; // Clear undo stack
+    
+    
+    
+    [self.undoManager removeAllActions]; 
     NSFileWrapper* wrapper = [[NSFileWrapper alloc] initWithURL:self.fileURL options:NSFileWrapperReadingImmediate error:&error];
     
     if(!wrapper) {
@@ -233,8 +247,8 @@
     [self.model setDatabaseMetadata:databaseMetadata];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Synchronous Wrappers using dispatch groups
+
+
 
 - (NSData*)getDataFromModel:(ViewModel*)model error:(NSError **)outError {
     __block NSData *ret = nil;
@@ -243,8 +257,8 @@
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
 
-    [self.model getPasswordDatabaseAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-        // NSLog(@"[%@][%@] dataOfType: Got Data...", [NSThread currentThread], NSThread.mainThread);
+    [self.model getPasswordDatabaseAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        
         ret = data;
         retError = error;
         dispatch_group_leave(group);
@@ -272,7 +286,7 @@
                               ckf:self.credentialsForUnlock
                            config:modelConfig
                        completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
-        // NSLog(@"[%@][%@] readFromData: Completion...", [NSThread currentThread], NSThread.mainThread);
+        
         db = model;
         retError = error;
         dispatch_group_leave(group);
@@ -283,6 +297,6 @@
     return db;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 @end

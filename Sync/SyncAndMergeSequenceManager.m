@@ -24,12 +24,12 @@
 #import "DatabaseModel.h"
 #import "DatabaseSynchronizer.h"
 
-// Future: Overlapping/Multiple updates not possible, they need to be serialized so the Local copy can be matched with remote - Not a big deal right now
+
 
 @interface SyncAndMergeSequenceManager ()
 
 @property ConcurrentMutableDictionary<NSString*, DatabaseSyncOperationalData*>* operationalStateForDatabase;
-@property NSDictionary<NSNumber*, dispatch_queue_t>* storageProviderSerializedQueues; // Some (Most?) Storage Providers do not take well to multiple simultaneous syncs (reads/writes from different threads so we do one at a time)
+@property NSDictionary<NSNumber*, dispatch_queue_t>* storageProviderSerializedQueues; 
 
 @end
 
@@ -103,7 +103,7 @@
         dispatch_group_t group = dispatch_group_create();
         dispatch_group_enter(group);
 
-        // Get Storage Provider Queue -
+        
         
         dispatch_queue_t storageProviderQueue = self.storageProviderSerializedQueues[@(database.storageProvider)];
         dispatch_async(storageProviderQueue, ^{
@@ -135,11 +135,11 @@
 
     StorageProviderReadOptions* opts = [[StorageProviderReadOptions alloc] init];
     
-    // We should pull data from remote to check/merge if:
-    //
-    // - 1) Forced
-    // - 2) Local and Remote Dates differ
-    // - 3) There is an outstanding update (this will almost certainly be handled by 2) above but just in case we include this check)
+    
+    
+    
+    
+    
     
     opts.onlyIfModifiedDifferentFrom = syncPullEvenIfModifiedDateSame || (database.outstandingUpdateId != nil) ? nil : localModDate;
     
@@ -171,18 +171,12 @@
         else if (result == kReadResultModifiedIsSameAsLocal) {
             [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Pull Database - Modified same as Local"]];
             [self logAndPublishStatusChange:database syncId:syncId state:kSyncOperationStateDone error:error];
-            
-            // TODO: This is temporary to avoid an initial Conflict on release of 2 way sync where lastSyncRemoteModeDate is null - set it now if our local copy matches the remore
-            // TODO: Remove in a few months, say 13-Nov-2020
-            database.lastSyncRemoteModDate = localModDate;
-            [SafesList.sharedInstance update:database];
-
             completion(kSyncAndMergeSuccess, NO, nil);
         }
         else if (result == kReadResultSuccess) {
             [self onPulledRemoteDatabase:database syncId:syncId localModDate:localModDate remoteData:data remoteModified:dateModified interactiveVC:interactiveVC completion:completion];
         }
-        else { // Some unknown state
+        else { 
             [self logAndPublishStatusChange:database syncId:syncId state:kSyncOperationStateError message:@"Unknown status returned by Storage Provider"];
             completion(kSyncAndMergeError, NO, nil);
         }
@@ -192,9 +186,9 @@
 - (void)onPulledRemoteDatabase:(SafeMetaData *)database syncId:(NSUUID*)syncId localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified interactiveVC:(UIViewController*)interactiveVC completion:(SyncAndMergeCompletionBlock)completion {
     [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Got Remote OK [remoteMod=%@]", remoteModified.friendlyDateTimeStringBothPrecise]];
         
-    // No Outstanding Update or No Local Copy -> Simple pull and set
-    //
-    // The check for local copy is to handle weird edge case where a user migrates databases from a backup and Outstanding Update is set but there is no actual update.
+    
+    
+    
     
     if (!database.outstandingUpdateId || localModDate == nil) {
         [self logMessage:database syncId:syncId message:@"No Updates to Push, syncing local from remote."];
@@ -225,17 +219,17 @@
         completion(kSyncAndMergeError, NO, error);
     }
     else {
-        // It shouldn't be possible for lastSyncRemoteModDate to be nil here but just to be safe, if that happens go to the conflict situation
+        
         
         BOOL forcePush = SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts;
         BOOL noRemoteChange = (database.lastSyncRemoteModDate && [database.lastSyncRemoteModDate isEqualToDateWithinEpsilon:remoteModified]);
         
-        if (forcePush || noRemoteChange) { // Simple Overwrite
+        if (forcePush || noRemoteChange) { 
             [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Update to Push - [Simple Push because Force=%@, Remote Changed=%@]", forcePush ? @"YES" : @"NO", noRemoteChange ? @"NO" : @"YES"]];
             [self setRemoteAndComplete:localData database:database syncId:syncId interactiveVC:interactiveVC completion:completion];
         }
         else {
-            // Merge / Overwrite / Conflict situation!
+            
             [self handleOutstandingUpdateWithRemoteConflict:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified interactiveVC:interactiveVC completion:completion];
         }
     }
@@ -253,8 +247,8 @@
     if (mergePossible) {
         [self logMessage:database syncId:syncId message:@"Update to Push but Remote has changed also... Attempting Merge..."];
 
-        // TODO: if format == keepass2
-        // TODO: NB: Don't forget to set the conflictAndLocalChanged flag
+        
+        
 
         [self synchronizeDatabases:localData remoteData:remoteData];
     }
@@ -288,12 +282,12 @@
                    defaultButtonText:useMyLocal
                     secondButtonText:useTheirRemote action:^(int response) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-                if (response == 0) { // Use Local
+                if (response == 0) { 
                     [self logMessage:database syncId:syncId message:@"Sync Conflict Manual Resolution: Use Local - Pushing Local and overwriting Remote."];
                     [self setRemoteAndComplete:localData database:database syncId:syncId interactiveVC:interactiveVC completion:completion];
                 }
-                else if (response == 1) { // Use Remote
-                    // Don't forget to clear the outstanding flag...
+                else if (response == 1) { 
+                    
                     database.outstandingUpdateId = nil;
                     [SafesList.sharedInstance update:database];
                     
@@ -382,7 +376,7 @@
         [self logMessage:database syncId:syncId message:@"Local copy successfully synced with remote."];
         [self logAndPublishStatusChange:database syncId:syncId state:kSyncOperationStateDone error:nil];
 
-        // Mark last Sync with Remote
+        
         
         database.lastSyncRemoteModDate = dateModified;
         [SafesList.sharedInstance update:database];
@@ -391,8 +385,8 @@
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Helpers
+
+
 
 - (NSURL*_Nullable)getExistingLocalCopy:(SafeMetaData*)database modified:(NSDate**)modified {
     return [SyncManager.sharedInstance getLocalWorkingCache:database modified:modified];
@@ -434,30 +428,30 @@
     NSUUID* syncMergeId = NSUUID.UUID;
     
     NSString* local = [FileManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.local", syncMergeId.UUIDString]];
-    NSString* remote = [FileManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.local", syncMergeId.UUIDString]];
-    
-    BOOL writeOk = [localData writeToFile:local atomically:YES] && [remoteData writeToFile:remote atomically:YES]; // TODO: Deal with failure
+        NSString* remote = [FileManager.sharedInstance.tmpEncryptedAttachmentPath stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.local", syncMergeId.UUIDString]];
+        
+    BOOL writeOk = [localData writeToFile:local atomically:YES] && [remoteData writeToFile:remote atomically:YES]; 
 
     NSURL* localUrl = [NSURL fileURLWithPath:local];
     NSURL* remoteUrl = [NSURL fileURLWithPath:remote];
     
-    // TODO: interactive required?
-    // TODO: use convenience CKFs?
-    // TODO: different CKFs?
+    
+    
+    
     
     [DatabaseModel fromUrl:localUrl
-                       ckf:nil // TODO: ?
+                       ckf:nil 
                     config:DatabaseModelConfig.defaults
                 completion:^(BOOL userCancelled, DatabaseModel * _Nullable mine, const NSError * _Nullable error) {
-        // TODO: Check errors
+        
         
         [DatabaseModel fromUrl:remoteUrl
-                           ckf:nil // TODO: ?
+                           ckf:nil 
                         config:DatabaseModelConfig.defaults
                     completion:^(BOOL userCancelled, DatabaseModel * _Nullable theirs, const NSError * _Nullable error) {
-            // TODO: Check errors
+            
 
-//            [self sync]
+
             
             [self synchronizeModels:mine theirs:theirs];
         }];
@@ -467,7 +461,7 @@
 - (void)synchronizeModels:(DatabaseModel*)mine theirs:(DatabaseModel*)theirs {
     DatabaseSynchronizer *synchronzier = [DatabaseSynchronizer newSynchronizerFor:mine theirs:theirs];
     
-    // TODO:
+    
 }
 
 @end

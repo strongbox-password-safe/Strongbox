@@ -43,8 +43,8 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = NO; // Could be on LAN - try to connect
-        _supportsConcurrentRequests = NO; // Possibly
+        _immediatelyOfferCacheIfOffline = NO; 
+        _supportsConcurrentRequests = NO; 
     }
     
     return self;
@@ -56,7 +56,7 @@
   parentFolder:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
     completion:(void (^)(SafeMetaData *, const NSError *))completion {
-    if(self.maintainSessionForListing && self.maintainedSessionForListing) { // Create New
+    if(self.maintainSessionForListing && self.maintainedSessionForListing) { 
         [self createWithSession:nickName extension:extension data:data
                    parentFolder:parentFolder sftp:self.maintainedSessionForListing
                   configuration:self.maintainedConfigurationForFastListing completion:completion];
@@ -207,17 +207,17 @@ viewController:(UIViewController *)viewController
     }];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
-    // NOTIMPL
+    
 }
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(UIImage *))completionHandler {
-    // NOTIMPL
+    
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (SFTPProviderData*)getProviderDataFromMetaData:(SafeMetaData*)metaData {
     NSString* json = metaData.fileIdentifier;
@@ -326,9 +326,9 @@ viewController:(UIViewController *)viewController
 - (void)connectAndAuthenticate:(SFTPSessionConfiguration*)sessionConfiguration
                 viewController:(UIViewController*)viewController
                     completion:(void (^)(BOOL userCancelled, NMSFTP* sftp, SFTPSessionConfiguration* configuration, NSError* error))completion {
-    // 1. Use the specified Session if available, otherwise
-    // 2. Use the current/last session if available, otherwise
-    // 3. Ask for a session config and use that...
+    
+    
+    
     
     if(sessionConfiguration == nil) {
         if(self.unitTestingSessionConfiguration != nil) {

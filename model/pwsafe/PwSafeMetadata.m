@@ -11,8 +11,7 @@
 
 @implementation PwSafeMetadata
 
-- (instancetype)init
-{
+- (instancetype)init {
     return [self initWithVersion:[NSString stringWithFormat:@"%ld.%ld", (long)kDefaultVersionMajor, (long)kDefaultVersionMinor]];
 }
 
@@ -25,8 +24,8 @@
     return self;
 }
 
-- (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi {
-    BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
+- (MutableOrderedDictionary<NSString*, NSString*>*)kvpForUi {
+    MutableOrderedDictionary<NSString*, NSString*>* kvps = [[MutableOrderedDictionary alloc] init];
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_format", @"Database Format")
         andValue:@"Password Safe 3"];
@@ -38,8 +37,12 @@
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_time", @"Last Update Time")
         andValue:[self formatDate:self.lastUpdateTime]];
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_user", @"Last Update User")
-        andValue:self.lastUpdateUser];
+    
+    if (self.lastUpdateUser.length) {
+        [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_user", @"Last Update User")
+            andValue:self.lastUpdateUser];
+    }
+    
     [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_host", @"Last Update Host")
         andValue:self.lastUpdateHost];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_app", @"Last Update App")

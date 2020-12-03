@@ -55,7 +55,7 @@ static UpgradeWindowController *sharedInstance = nil;
     [self.window close];
 }
 
-- (void)cancel:(id)sender { // Pick up escape key
+- (void)cancel:(id)sender { 
     if (self.cancelDelay == 0) {
         [self close];
     }
@@ -66,7 +66,7 @@ static UpgradeWindowController *sharedInstance = nil;
 
     [self.window makeKeyAndOrderFront:nil];
     [self.window center];
-    [self.window setLevel:NSModalPanelWindowLevel]; //NSFloatingWindowLevel];
+    [self.window setLevel:NSModalPanelWindowLevel]; 
     [self.window setHidesOnDeactivate:YES];
     
     [self customizeButtonsBasedOnProduct];
@@ -100,17 +100,17 @@ static UpgradeWindowController *sharedInstance = nil;
     
     NSString *osxMode = [[NSUserDefaults standardUserDefaults] stringForKey:@"AppleInterfaceStyle"];
     
-    // * If osxMode is nil then it isn't in dark mode, but if osxMode is @"Dark" then it is in dark mode.
+    
     
     NSColor *upgradeButtonSubtitleColor;
     NSColor *upgradeButtonTitleColor;
     
     if([osxMode isEqualToString:@"Dark"]) {
-        upgradeButtonSubtitleColor = [NSColor colorWithRed:255/255 green:255/255 blue:0/255 alpha:1]; // Lemon
+        upgradeButtonSubtitleColor = [NSColor colorWithRed:255/255 green:255/255 blue:0/255 alpha:1]; 
         upgradeButtonTitleColor = [NSColor whiteColor];
     }
     else {
-        upgradeButtonSubtitleColor = [NSColor controlTextColor]; //[NSColor colorWithRed:255/255 green:255/255 blue:0/255 alpha:1]; // Lemon
+        upgradeButtonSubtitleColor = [NSColor controlTextColor]; 
         upgradeButtonTitleColor = [NSColor controlTextColor];
     }
     
@@ -119,12 +119,12 @@ static UpgradeWindowController *sharedInstance = nil;
         dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                   NSFontAttributeName:font1,
                   NSForegroundColorAttributeName: upgradeButtonTitleColor,
-                  NSParagraphStyleAttributeName:style}; // Added line
+                  NSParagraphStyleAttributeName:style}; 
     }
     else {
         dict1 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                   NSForegroundColorAttributeName:upgradeButtonTitleColor,
-                  NSParagraphStyleAttributeName:style}; // Added line
+                  NSParagraphStyleAttributeName:style}; 
     }
     
     NSDictionary *dict2;
@@ -132,12 +132,12 @@ static UpgradeWindowController *sharedInstance = nil;
         dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                   NSFontAttributeName:font2,
                   NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                  NSParagraphStyleAttributeName:style}; // Added line
+                  NSParagraphStyleAttributeName:style}; 
     }
     else {
         dict2 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                   NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                  NSParagraphStyleAttributeName:style}; // Added line
+                  NSParagraphStyleAttributeName:style}; 
     }
     
     if(self.product != nil) {
@@ -156,8 +156,8 @@ static UpgradeWindowController *sharedInstance = nil;
         self.buttonUpgrade.stringValue = attString.string;
         
         [self.buttonUpgrade setAttributedTitle:attString];
-        //[[self.buttonUpgrade titleLabel] setNumberOfLines:2];
-        //[[self.buttonUpgrade titleLabel] setLineBreakMode:NSLineBreakByWordWrapping];
+        
+        
     }
     else {
         NSFont *font3 = [NSFont fontWithName:kFontName size:16.0f];
@@ -167,12 +167,12 @@ static UpgradeWindowController *sharedInstance = nil;
             dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                       NSFontAttributeName:font3,
                       NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                      NSParagraphStyleAttributeName:style}; // Added line
+                      NSParagraphStyleAttributeName:style}; 
         }
         else {
             dict3 = @{NSUnderlineStyleAttributeName:@(NSUnderlineStyleNone),
                       NSForegroundColorAttributeName: upgradeButtonSubtitleColor,
-                      NSParagraphStyleAttributeName:style}; // Added line
+                      NSParagraphStyleAttributeName:style}; 
         }
 
         NSMutableAttributedString *attString = [[NSMutableAttributedString alloc] init];
@@ -213,7 +213,7 @@ static UpgradeWindowController *sharedInstance = nil;
 }
 
 - (void)updateNoThanksCountdown {
-//    NSLog(@"timer: %ld", (long)self.secondsRemaining);
+
     self.secondsRemaining--;
 
     if(self.secondsRemaining < 1) {
@@ -378,7 +378,7 @@ updatedTransactions:(NSArray *)transactions {
 
 - (IBAction)onAppleFamilySharing:(id)sender {
     [[NSWorkspace sharedWorkspace] openURL:
-    [NSURL URLWithString:@"macappstore://apps.apple.com/gb/app/strongbox-family-sharing/id1500040999?mt=12"]];
+    [NSURL URLWithString:@"macappstore:
 }
 
 @end

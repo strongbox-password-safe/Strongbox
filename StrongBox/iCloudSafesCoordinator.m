@@ -47,13 +47,13 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         _iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:kStrongboxICloudContainerIdentifier];
         if (_iCloudRoot != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                //NSLog(@"iCloud available at: %@", _iCloudRoot);
+                
                 completion(TRUE);
             });
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
-                //NSLog(@"iCloud not available");
+                
                 completion(FALSE);
             });
         }
@@ -201,7 +201,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 
 - (void)stopQuery {
     if (_query) {
-        //NSLog(@"No longer watching iCloud dir...");
+        
         
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidFinishGatheringNotification object:nil];
         [[NSNotificationCenter defaultCenter] removeObserver:self name:NSMetadataQueryDidUpdateNotification object:nil];
@@ -216,7 +216,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     _iCloudURLsReady = NO;
     [_iCloudFiles removeAllObjects];
     
-    //NSLog(@"Starting to watch iCloud dir...");
+    
     
     _query = [self documentQuery];
     
@@ -248,7 +248,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     for (NSMetadataItem * result in queryResults) {
         [self logAllCloudStorageKeysForMetadataItem:result];
         
-        // Don't include hidden files or directories
+        
         
         NSNumber * hidden = nil;
         NSURL * fileURL = [result valueForAttribute:NSMetadataItemURLKey];
@@ -268,7 +268,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
             
             AppleICloudOrLocalSafeFile* iCloudFile = [[AppleICloudOrLocalSafeFile alloc] initWithDisplayName:dn fileUrl:fileURL hasUnresolvedConflicts:huc];
             
-            //NSLog(@"Found on iCloud: %@", iCloudFile);
+            
             
             [_iCloudFiles addObject:iCloudFile];
         }
@@ -312,7 +312,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSInteger docCount = 0;
     NSString* newDocName = nil;
     
-    // At this point, the document list should be up-to-date.
+    
     BOOL done = NO;
     BOOL first = YES;
     while (!done) {
@@ -343,8 +343,8 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     BOOL added = [self addAnyNewICloudSafes:files];
     
     if(added || removed || updated) {
-        // This is now done via NSNotificationCenter
-        // self.onSafesCollectionUpdated();
+        
+        
     }
 }
 
@@ -390,7 +390,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         NSLog(@"Got New iCloud Safe... Adding [%@]", newSafe.nickName);
       
-        // Unfortunately the iCloud URL doesn't exist at this point so we can't provide an initial cache...
+        
         
         [[SafesList sharedInstance] addWithDuplicateCheck:newSafe initialCache:nil initialCacheModDate:nil];
         
@@ -433,7 +433,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSMutableDictionary<NSString*, AppleICloudOrLocalSafeFile*>* ret = [NSMutableDictionary dictionary];
     
     for(AppleICloudOrLocalSafeFile *item in files) {
-        if(item.fileUrl && item.fileUrl.lastPathComponent) { // There was a crash here somehow... so protect against
+        if(item.fileUrl && item.fileUrl.lastPathComponent) { 
             [ret setObject:item forKey:item.fileUrl.lastPathComponent];
         }
     }
@@ -444,42 +444,42 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 
 - (void)logAllCloudStorageKeysForMetadataItem:(NSMetadataItem *)item
 {
-//    NSString* displayName = [item valueForAttribute:NSMetadataItemDisplayNameKey];
-//    NSDate* contentChangeDate = [item valueForAttribute:NSMetadataItemFSContentChangeDateKey];
-//    NSNumber *isUbiquitous = [item valueForAttribute:NSMetadataItemIsUbiquitousKey];
-//    NSNumber *hasUnresolvedConflicts = [item valueForAttribute:NSMetadataUbiquitousItemHasUnresolvedConflictsKey];
-//    NSNumber *downloadStatus = [item valueForAttribute:NSMetadataUbiquitousItemDownloadingStatusKey];
-//    NSNumber *isUploaded = [item valueForAttribute:NSMetadataUbiquitousItemIsUploadedKey];
-//    NSNumber *isUploading = [item valueForAttribute:NSMetadataUbiquitousItemIsUploadingKey];
-//    NSNumber *percentDownloaded = [item valueForAttribute:NSMetadataUbiquitousItemPercentDownloadedKey];
-//    NSNumber *percentUploaded = [item valueForAttribute:NSMetadataUbiquitousItemPercentUploadedKey];
-//    NSURL *url = [item valueForAttribute:NSMetadataItemURLKey];
-//
-//    NSNumber * hidden = nil;
-//    [url getResourceValue:&hidden forKey:NSURLIsHiddenKey error:nil];
-//
-//    //BOOL documentExists = [[NSFileManager defaultManager] fileExistsAtPath:[url path]];
-//
-//    NSLog(@"%@ change:%@ hidden:%@ isUbiquitous:%@ hasUnresolvedConflicts:%@ downloadStatus:%@(%@%%) isUploaded:%@ isUploading:%@ (%@%%) - %@",
-//          displayName, contentChangeDate, hidden, isUbiquitous, hasUnresolvedConflicts, downloadStatus, percentDownloaded, isUploaded, isUploading, percentUploaded, url);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)logUpdateNotification:(NSNotification *)notification {
-    //The query reports all files found, every time.
-//
-//    NSLog(@"*********************************************************************************************************");
-//
-//    NSArray* added = [notification.userInfo objectForKey:NSMetadataQueryUpdateAddedItemsKey];
-//    NSArray* changed = [notification.userInfo objectForKey:NSMetadataQueryUpdateChangedItemsKey];
-//    NSArray* removed = [notification.userInfo objectForKey:NSMetadataQueryUpdateRemovedItemsKey];
-//
-//    NSLog(@"+%lu /%lu -%lu", (unsigned long)added.count, (unsigned long)changed.count, (unsigned long)removed.count);
-//
-//    for(NSMetadataItem *item in changed) {
-//        NSLog(@"Changed: %@", item);
-//    }
-//
-//    NSLog(@"*********************************************************************************************************");
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 @end

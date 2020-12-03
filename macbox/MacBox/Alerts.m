@@ -78,10 +78,10 @@ disableEscapeKey:(BOOL)disableEscapeKey
     [alert addButtonWithTitle:loc2];
     
     if (!disableEscapeKey) {
-        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
     }
     
-    [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; // ENTER
+    [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; 
     
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
         completion(returnCode == NSAlertSecondButtonReturn);
@@ -136,7 +136,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
     
     NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
     self.okButton = [alert addButtonWithTitle:loc];
-    self.okButton.enabled = self.allowEmptyInput || defaultValue.length;// ? YES :NO;
+    self.okButton.enabled = self.allowEmptyInput || defaultValue.length;
 
     NSString* loc2 = NSLocalizedString(@"generic_cancel", @"Cancel");
     [alert addButtonWithTitle:loc2];
@@ -149,7 +149,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
     
     [[alert window] setInitialFirstResponder: self.simpleInputTextField];
     
-    //[input becomeFirstResponder];
+    
     
     NSInteger button = [alert runModal];
     
@@ -171,7 +171,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
            completion:(void (^)(BOOL yesNo, NSString* key, NSString* value, BOOL protected))completion {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:prompt];
-    //alert.informativeText = @"Informative?";
+    
     
     NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
     self.okButton = [alert addButtonWithTitle:loc];
@@ -180,7 +180,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
     NSString* loc2 = NSLocalizedString(@"generic_cancel", @"Cancel");
     [alert addButtonWithTitle:loc2];
     
-    // Accessory View
+    
 
     self.checkboxProtected = [[NSButton alloc] initWithFrame:NSMakeRect(40, 0, 100, 30)];
     
@@ -244,7 +244,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification {
-    //NSLog(@"controlTextDidChange");
+    
     
     NSTextField* textField = (NSTextField*)notification.object;
     
@@ -279,13 +279,13 @@ disableEscapeKey:(BOOL)disableEscapeKey
     [alert setAlertStyle:NSAlertStyleInformational];
     
     [alert addButtonWithTitle:option1AndDefault];
-    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; // ENTER
+    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
     
     [alert addButtonWithTitle:option2];
     
     NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
     [alert addButtonWithTitle:localizedCancel];
-    [[[alert buttons] objectAtIndex:2] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; // ESC
+    [[[alert buttons] objectAtIndex:2] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
     
     [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
         if(returnCode == NSAlertThirdButtonReturn) {
@@ -296,6 +296,35 @@ disableEscapeKey:(BOOL)disableEscapeKey
         }
         else {
             completion(2);
+        }
+    }];
+}
+
++ (void)customOptionWithCancel:(NSString *)messageText
+               informativeText:(NSString*)informativeText
+             option1AndDefault:(NSString*)option1AndDefault
+                        window:(NSWindow*)window
+                    completion:(void (^)(BOOL go))completion {
+    NSAlert *alert = [[NSAlert alloc] init];
+    
+    if (informativeText) [alert setInformativeText:informativeText];
+    if (messageText) [alert setMessageText:messageText];
+    
+    [alert setAlertStyle:NSAlertStyleInformational];
+    
+    [alert addButtonWithTitle:option1AndDefault];
+    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+        
+    NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
+    [alert addButtonWithTitle:localizedCancel];
+    [[[alert buttons] objectAtIndex:1] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
+    
+    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+        if(returnCode == NSAlertFirstButtonReturn) {
+            completion(YES);
+        }
+        else {
+            completion(NO);
         }
     }];
 }

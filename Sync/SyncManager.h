@@ -28,7 +28,7 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 - (void)sync:(SafeMetaData*)database interactiveVC:(UIViewController*)interactiveVC join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error;
 
-///////////////////
+
 
 - (NSString*)getPrimaryStorageDisplayName:(SafeMetaData*)database;
 - (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database;
@@ -46,7 +46,7 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 - (NSURL*_Nullable)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate *_Nullable*_Nullable)modified;
 - (NSURL*_Nullable)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate *_Nullable*_Nullable)modified fileSize:(unsigned long long*_Nullable)fileSize;
 
-// Used to set the initial cache when DB is newly added...
+
 - (NSURL*_Nullable)setWorkingCacheWithData:(NSData*)data dateModified:(NSDate*)dateModified database:(SafeMetaData*)database error:(NSError**)error;
 
 - (NSURL*)getLocalWorkingCacheUrlForDatabase:(SafeMetaData*)database;

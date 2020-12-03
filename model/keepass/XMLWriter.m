@@ -29,32 +29,32 @@
 #define NSBOOL(_X_) ((_X_) ? (id)kCFBooleanTrue : (id)kCFBooleanFalse)
 
 @interface XMLWriter (UtilityMethods)
-// methods for internal use only
-// pop the namespace stack, removing any namespaces which become out-of-scope
+
+
 - (void) popNamespaceStack;
-// push the namespace stack, denoting the namespaces whihch are in-scope
+
 - (void) pushNamespaceStack;
 
-// add namespace and local name to the top of the element stack
+
 - (void) pushElementStack:(NSString*)namespaceURI localName:(NSString*)localName;
-// remove the top member of the element stack
+
 - (void) popElementStack;
 
-// write close element, optionally as empty element
+
 - (void) writeCloseElement:(BOOL)empty;
-// write namespace attribute to stream
+
 - (void) writeNamespaceToStream:(NSString*)prefix namespaceURI:(NSString*)namespaceURI;
-// write a length of text to the stream with escaping
+
 - (void) writeEscapeCharacters:(const UniChar*)characters length:(NSUInteger)length;
 @end
 
 
 static NSString *const EMPTY_STRING = @"";
-static NSString *const XML_NAMESPACE_URI = @"http://www.w3.org/XML/1998/namespace";
+static NSString *const XML_NAMESPACE_URI = @"http:
 static NSString *const XML_NAMESPACE_URI_PREFIX = @"xml";
-static NSString *const XMLNS_NAMESPACE_URI = @"http://www.w3.org/2000/xmlns/";
+static NSString *const XMLNS_NAMESPACE_URI = @"http:
 static NSString *const XMLNS_NAMESPACE_URI_PREFIX = @"xmlns";
-static NSString *const XSI_NAMESPACE_URI = @"http://www.w3.org/2001/XMLSchema/";
+static NSString *const XSI_NAMESPACE_URI = @"http:
 static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 
 @implementation XMLWriter
@@ -64,7 +64,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 - (XMLWriter*) init {
 	self = [super init];
 	if (self != nil) {
-		// intialize variables
+		
 		writer = [[NSMutableString alloc] init];
 		level = 0;
 		openElement = NO;
@@ -80,10 +80,10 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		namespaceURIPrefixMap = [[NSMutableDictionary alloc] init];
 		prefixNamespaceURIMap = [[NSMutableDictionary alloc] init];
 		
-		// load default custom behaviour
+		
 		automaticEmptyElements = YES;
 		
-		// setup default xml namespaces. assume both are previously known.
+		
 		[namespaceCounts addObject:[NSNumber numberWithInt:2]];
 		[self setPrefix:XML_NAMESPACE_URI_PREFIX namespaceURI:XML_NAMESPACE_URI];
 		[self setPrefix:XMLNS_NAMESPACE_URI_PREFIX namespaceURI:XMLNS_NAMESPACE_URI];
@@ -92,13 +92,13 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 - (void) pushNamespaceStack {
-	// step namespace count - add the current namespace count
+	
 	NSNumber* previousCount = [namespaceCounts lastObject];
 	if([namespaceURIs count] == [previousCount unsignedIntegerValue]) {
-		// the count is still the same
+		
 		[namespaceCounts addObject:previousCount];
 	} else {
-		// the count has changed, save the it
+		
 		NSNumber* count = [NSNumber numberWithInt:(int)[namespaceURIs count]];
         
 		[namespaceCounts addObject:count];
@@ -107,14 +107,14 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 
 - (void) writeNamespaceAttributes {
 	if(openElement) {
-		// write namespace attributes in the namespace stack
+		
 		NSNumber* previousCount = [namespaceCounts lastObject];
 		for(NSUInteger i = [previousCount unsignedIntegerValue]; i < [namespaceURIs count]; i++) {
 			
-			// did we already write this namespace?
+			
 			id written = [namespaceWritten objectAtIndex:i];
 			if(written == NSBOOL(NO)) {
-				// write namespace
+				
 				NSString* namespaceURI = [namespaceURIs objectAtIndex:i];
 				NSString* prefix = [namespaceURIPrefixMap objectForKey:namespaceURI];
 				
@@ -122,7 +122,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 				
 				[namespaceWritten replaceObjectAtIndex:i withObject:NSBOOL(YES)];
 			} else {
-				// already written namespace
+				
 			}
 		}
 	} else {
@@ -131,9 +131,9 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 - (void) popNamespaceStack {
-	// step namespaces one level down
+	
 	if([namespaceCounts lastObject] != [namespaceCounts objectAtIndex:([namespaceCounts count] - 2)]) {
-		// remove namespaces which now are out of scope, i.e. between the current and the previus count
+		
 		NSNumber* previousCount = [namespaceCounts lastObject];
 		NSNumber* currentCount = [namespaceCounts objectAtIndex:([namespaceCounts count] - 2)];
 		for(NSUInteger i = [previousCount unsignedIntegerValue] - 1; i >= [currentCount unsignedIntegerValue]; i--) {
@@ -148,26 +148,26 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 			[namespaceWritten removeLastObject];
 		}
 	} else {
-		// not necessary to remove any namespaces
+		
 	}
 	[namespaceCounts removeLastObject];
 }
 
 - (void)setPrefix:(NSString*)prefix namespaceURI:(NSString *)namespaceURI {
 	if(!namespaceURI) {
-		// raise exception
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:@"Namespace cannot be NULL" userInfo:NULL]);
 	}
 	if(!prefix) {
-		// raise exception
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:@"Prefix cannot be NULL" userInfo:NULL]);
 	}
 	if([namespaceURIPrefixMap objectForKey:namespaceURI]) {
-		// raise exception
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Name namespace %@ has already been set", namespaceURI] userInfo:NULL]);
 	}
 	if([prefixNamespaceURIMap objectForKey:prefix]) {
-		// raise exception
+		
 		if([prefix length]) {
 			@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Prefix %@ has already been set", prefix] userInfo:NULL]);
 		} else {
@@ -175,17 +175,17 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		}
 	}
 	
-	// increase the namespaces and add prefix mapping
+	
 	[namespaceURIs addObject:namespaceURI];
 	[namespaceURIPrefixMap setObject:prefix forKey:namespaceURI];
 	[prefixNamespaceURIMap setObject:namespaceURI forKey:prefix];
 	
-	if(openElement) { // write the namespace now
+	if(openElement) { 
 		[self writeNamespaceToStream:prefix namespaceURI:namespaceURI];
 		
 		[namespaceWritten addObject:NSBOOL(YES)];
 	} else {
-		// write the namespace as the next start element is closed
+		
 		[namespaceWritten addObject:NSBOOL(NO)];
 	}
 }
@@ -195,7 +195,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 - (void) pushElementStack:(NSString*)namespaceURI localName:(NSString*)localName {
-	// save for end elements
+	
 	[elementLocalNames addObject:localName];
 	if(namespaceURI) {
 		[elementNamespaceURIs addObject:namespaceURI];
@@ -205,7 +205,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 - (void) popElementStack {
-	// remove element traces
+	
 	[elementNamespaceURIs removeLastObject];
 	[elementLocalNames removeLastObject];
 }
@@ -220,14 +220,14 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 
 - (void) writeStartDocumentWithEncodingAndVersion:(NSString*)aEncoding version:(NSString*)version {
 	if([writer length] != 0) {
-		// raise exception - Starting document which is not empty
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:@"Document has already been started" userInfo:NULL]);
 	} else {
 		[self write:@"<?xml version=\""];
 		if(version) {
 			[self write:version];
 		} else {
-			// default to 1.0
+			
 			[self write:@"1.0"];
 		}
 		[self write:@"\""];
@@ -258,7 +258,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 	if(openElement) {
 		[self writeCloseElement:NO];
 	} else {
-		// raise exception
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:@"No open start element" userInfo:NULL]);
 	}
 }
@@ -282,8 +282,8 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 
 - (void) writeEndElement {
 	if(openElement && automaticEmptyElements) {
-		// go for <START />
-		[self writeCloseElement:YES]; // write empty end element
+		
+		[self writeCloseElement:YES]; 
 		
 		[self popNamespaceStack];
 		[self popElementStack];
@@ -317,7 +317,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		NSString* prefix = [namespaceURIPrefixMap objectForKey:namespaceURI];
 		
 		if(!prefix) {
-			// raise exception
+			
 			@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Unknown namespace URI %@", namespaceURI] userInfo:NULL]);
 		}
 		
@@ -338,33 +338,33 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 
 - (void) writeEndElementWithNamespace:(NSString *)namespaceURI localName:(NSString *)localName {
 	if(level <= 0) {
-		// raise exception
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:@"Cannot write more end elements than start elements." userInfo:NULL]);
 	}
 	
 	level -= 1;
 	
 	if(openElement) {
-		// go for <START><END>
+		
 		[self writeCloseElement:NO];
 	} else {
 		if(emptyElement) {
-			// go for linebreak + indentation + <END>
+			
 			[self writeLinebreak];
 			[self writeIndentation];
 		} else {
-			// go for <START>characters<END>
+			
 		}
 	}
 	
-	// write standard end element
+	
 	[self write:@"</"];
 	
 	if(namespaceURI) {
 		NSString* prefix = [namespaceURIPrefixMap objectForKey:namespaceURI];
 		
 		if(!prefix) {
-			// raise exception
+			
 			@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Unknown namespace URI %@", namespaceURI] userInfo:NULL]);
 		}
 		
@@ -414,7 +414,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		NSString* prefix = [namespaceURIPrefixMap objectForKey:namespaceURI];
 		
 		if(!prefix) {
-			// raise exception
+			
 			@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Unknown namespace URI %@", namespaceURI] userInfo:NULL]);
 		}
 		
@@ -442,7 +442,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		if(namespaceURI) {
 			NSString* prefix = [namespaceURIPrefixMap objectForKey:namespaceURI];
 			if(!prefix) {
-				// raise exception
+				
 				@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Unknown namespace URI %@", namespaceURI] userInfo:NULL]);
 			}
 			
@@ -456,7 +456,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		[self writeEscape:value];
 		[self write:@"\""];
 	} else {
-		// raise expection
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:@"No open start element" userInfo:NULL]);
 	}
 }
@@ -469,7 +469,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 	if(openElement) {
 		[self setPrefix:prefix namespaceURI:namespaceURI];
 	} else {
-		// raise exception
+		
 		@throw([NSException exceptionWithName:@"XMLWriterException" reason:@"No open start element" userInfo:NULL]);
 	}
 }
@@ -483,23 +483,23 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 -(void) writeNamespaceToStream:(NSString*)prefix namespaceURI:(NSString*)namespaceURI {
-	if(openElement) { // write the namespace now
+	if(openElement) { 
 		[self write:@" "];
         
 		NSString* xmlnsPrefix = [self getPrefix:XMLNS_NAMESPACE_URI];
 		if(!xmlnsPrefix) {
-			// raise exception
+			
 			@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Cannot declare namespace without namespace %@", XMLNS_NAMESPACE_URI] userInfo:NULL]);
 		}
 		
-		[self write:xmlnsPrefix]; // xmlns
+		[self write:xmlnsPrefix]; 
 		if([prefix length]) {
-			// write xmlns:prefix="namespaceURI" attribute
+			
             
-			[self write:@":"]; // colon
-			[self write:prefix]; // prefix
+			[self write:@":"]; 
+			[self write:prefix]; 
 		} else {
-			// write xmlns="namespaceURI" attribute
+			
 		}
 		[self write:@"=\""];
 		[self writeEscape:namespaceURI];
@@ -524,7 +524,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		[self writeCloseElement:NO];
 	}
 	[self write:@"<!--"];
-	[self write:comment]; // no escape
+	[self write:comment]; 
 	[self write:@"-->"];
 	
 	emptyElement = NO;
@@ -535,9 +535,9 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		[self writeCloseElement:NO];
 	}
 	[self write:@"<![CDATA["];
-	[self write:target]; // no escape
+	[self write:target]; 
 	[self write:@" "];
-	[self write:data]; // no escape
+	[self write:data]; 
 	[self write:@"]]>"];
 	
 	emptyElement = NO;
@@ -548,7 +548,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		[self writeCloseElement:NO];
 	}
 	[self write:@"<![CDATA["];
-	[self write:cdata]; // no escape
+	[self write:cdata]; 
 	[self write:@"]]>"];
 	
 	emptyElement = NO;
@@ -566,18 +566,18 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 	const UniChar *characters = CFStringGetCharactersPtr((CFStringRef)value);
 	
 	if (characters) {
-		// main flow
+		
 		[self writeEscapeCharacters:characters length:[value length]];
 	} else {
-		// we need to read/copy the characters for some reason, from the docs of CFStringGetCharactersPtr:
-		// A pointer to a buffer of Unicode character or NULL if the internal storage of the CFString does not allow this to be returned efficiently.
-		// Whether or not this function returns a valid pointer or NULL depends on many factors, all of which depend on how the string was created and its properties. In addition, the function result might change between different releases and on different platforms. So do not count on receiving a non- NULL result from this function under any circumstances (except when the object is created with CFStringCreateMutableWithExternalCharactersNoCopy).
 		
-		// we dont need the whole data length at once
+		
+		
+		
+		
 		NSMutableData *data = [NSMutableData dataWithLength:256 * sizeof(UniChar)];
 		
 		if(!data) {
-			// raise exception - no more memory
+			
 			@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Could not allocate data buffer of %i unicode characters", 256] userInfo:NULL]);
 		}
 		
@@ -597,7 +597,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 			count += length;
 		} while(count < [value length]);
 		
-		// buffers autorelease
+		
 	}
 }
 
@@ -612,7 +612,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 			if (c >= 0x20) {
 				switch (c) {
 					case 34: {
-						// write range if any
+						
 						if(rangeLength) {
 							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
 						}
@@ -620,9 +620,9 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
                         
 						break;
 					}
-                        // apos
+                        
                     case 39: {
-                        // write range if any
+                        
                         if(rangeLength) {
                             CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
                         }
@@ -630,9 +630,9 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
                         
                         break;
                     }
-                        // quot
+                        
 					case 38: {
-						// write range if any
+						
 						if(rangeLength) {
 							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
 						}
@@ -640,9 +640,9 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 						
 						break;
 					}
-						// amp;
+						
 					case 60: {
-						// write range if any
+						
 						if(rangeLength) {
 							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
 						}
@@ -651,9 +651,9 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 						
 						break;
 					}
-						// lt;
+						
 					case 62: {
-						// write range if any
+						
 						if(rangeLength) {
 							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
 						}
@@ -662,50 +662,50 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 						
 						break;
 					}
-						// gt;
+						
 					default: {
-						// valid
+						
 						rangeLength++;
 						continue;
 					}
 				}
 				
-				// set range start to next
+				
 				rangeLength = 0;
 				rangeStart = i + 1;
 				
 			} else {
 				if (c == '\n' || c == '\r' || c == '\t') {
-					// valid;
+					
 					rangeLength++;
 					
 					continue;
 				} else {
-					// invalid, skip
+					
 				}
 			}
 		} else if (c <= 0xFFFD) {
-			// valid
+			
 			rangeLength++;
 			
 			continue;
 		} else {
-			// invalid, skip
+			
 		}
 		
-		// write range if any
+		
 		if(rangeLength) {
 			CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
 		}
 		
-		// set range start to next
+		
 		rangeLength = 0;
 		rangeStart = i + 1;
 	}
 	
-	// write range if any
+	
 	if(rangeLength) {
-		// main flow will probably write all characters here
+		
 		CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
 	}
 }
@@ -725,11 +725,11 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 - (void) flush {
-	// do nothing
+	
 }
 
 - (void) close {
-	// do nothing
+	
 }
 
 - (NSMutableString*) toString {

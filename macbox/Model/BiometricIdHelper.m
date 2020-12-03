@@ -23,13 +23,13 @@
     return sharedInstance;
 }
 
-//- (instancetype)init {
-//    self = [super init];
-//    if (self) {
-//        self.dummyMode = NO; 
-//    }
-//    return self;
-//}
+
+
+
+
+
+
+
 
 - (BOOL)biometricIdAvailable {
     if(self.dummyMode) {
@@ -44,7 +44,7 @@
         
         BOOL ret = [localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError];
         
-        NSLog(@"DEBUG: Biometric available: [%d][%@]", ret, authError);
+        
         
         return ret;
     }
@@ -68,6 +68,10 @@
 }
 
 - (void)authorize:(void (^)(BOOL success, NSError *error))completion {
+    [self authorize:nil completion:completion];
+}
+
+- (void)authorize:(NSString *)fallbackTitle completion:(void (^)(BOOL, NSError *))completion {
     if(self.dummyMode) {
         completion(YES, nil);
         return;
@@ -81,7 +85,11 @@
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];
 
-        NSString* loc = NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Open Database");
+        if (fallbackTitle.length) {
+            localAuthContext.localizedFallbackTitle = fallbackTitle;
+        }
+            
+        NSString* loc = NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Unlock Database");
         
         NSError *authError;
         if([localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError]) {

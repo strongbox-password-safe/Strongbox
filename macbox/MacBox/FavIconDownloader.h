@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^FavIconBulkDoneBlock)(BOOL go, NSDictionary<NSUUID*, NSImage*> * _Nullable selectedFavIcons);
 
-//+ (instancetype)instantiate:(NSArray<Node *> *)nodes viewModel:(ViewModel *)viewModel onDone:(FavIconBulkDoneBlock)onDone;
+
 
 + (instancetype)showUi:(NSViewController*)parentVc nodes:(NSArray<Node*>*)nodes viewModel:(ViewModel*)viewModel onDone:(FavIconBulkDoneBlock)onDone;
 

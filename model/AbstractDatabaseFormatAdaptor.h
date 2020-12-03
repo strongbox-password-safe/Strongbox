@@ -24,7 +24,7 @@ typedef NS_ENUM (NSInteger, DatabaseFormat) {
 };
 
 typedef void (^OpenCompletionBlock)(BOOL userCancelled, StrongboxDatabase*_Nullable database, NSError*_Nullable error);
-typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSData*_Nullable data, NSError*_Nullable error);
+typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error);
 
 @protocol AbstractDatabaseFormatAdaptor <NSObject>
 

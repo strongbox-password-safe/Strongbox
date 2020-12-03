@@ -40,8 +40,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // This must be done in code as Interface builder setting is not respected on iPhones
-    // until cell gets selected
+    
+    
 
     self.cellChangeMasterCredentials.imageView.image = [UIImage imageNamed:@"key"];
     self.cellExport.imageView.image = [UIImage imageNamed:@"upload"];
@@ -128,7 +128,7 @@
             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
     CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
     
-    // Key File
+    
     
     if(keyFileBookmark != nil || oneTimeKeyFileData != nil) {
         NSError* error;
@@ -144,7 +144,7 @@
         newCkf.keyFileDigest = keyFileDigest;
     }
 
-    // Yubi Key
+    
     
     if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
         newCkf.yubiKeyCR = ^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
@@ -160,7 +160,7 @@
     [self.viewModel update:self
                    handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
         if (userCancelled || error || conflictAndLocalWasChanged) {
-            // Rollback
+            
             self.viewModel.database.compositeKeyFactors.password = rollbackCkf.password;
             self.viewModel.database.compositeKeyFactors.keyFileDigest = rollbackCkf.keyFileDigest;
             self.viewModel.database.compositeKeyFactors.yubiKeyCR = rollbackCkf.yubiKeyCR;
@@ -185,13 +185,11 @@
     if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
         if(!oneTimeKeyFileData) {
             self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
-            self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
             NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
         }
         else {
-            // We can't support Convenience unlock with a one time key file...
+            
             self.viewModel.metadata.convenienceMasterPassword = nil;
-            self.viewModel.metadata.convenenienceYubikeySecret = nil;
             self.viewModel.metadata.isEnrolledForConvenience = NO;
         }
     }
@@ -241,7 +239,7 @@
         [self dismissViewControllerAnimated:YES completion:nil];
         
         if(go && selectedFavIcons) {
-            self.onDatabaseBulkIconUpdate(selectedFavIcons); // Browse will take care of updating itself here...
+            self.onDatabaseBulkIconUpdate(selectedFavIcons); 
         }
     }];
 }

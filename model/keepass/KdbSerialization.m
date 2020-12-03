@@ -61,7 +61,7 @@ static const BOOL kLogVerbose = NO;
         header->signature1[1] != 0xD9 ||
         header->signature1[2] != 0xA2 ||
         header->signature1[3] != 0x9A) {
-        //NSLog(@"No Keepass magic");
+        
         if(error) {
             *error = [Utils createNSError:@"No Keepass magic" errorCode:-1];
         }
@@ -77,7 +77,7 @@ static const BOOL kLogVerbose = NO;
             *error = [Utils createNSError:@"No Keepass magic (2)" errorCode:-1];
         }
 
-        //NSLog(@"No Keepass magic 2");
+        
         return NO;
     }
 
@@ -153,8 +153,8 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
         return nil;
     }
     
-    // MMcG: This is incorrect. Need to remove the contentshash field from the header and then hash...
-    //NSLog(@"HEADERHASH: %@", [sha256([data subdataWithRange:NSMakeRange(0, SIZE_OF_KDB_HEADER)]) base64EncodedStringWithOptions:kNilOptions]);
+    
+    
     
     size_t length = data.length - SIZE_OF_KDB_HEADER;
     
@@ -169,7 +169,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     NSData* compositeKey = getComposite(password, keyFileDigest);
     
     
-    //NSLog(@"DESERIALIZE: COMPOSITE KEY: [%@]", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
+    
     
     NSData *transformKey = getAesTransformKey(compositeKey, transformSeed, transformRounds);
     NSData *masterKey = getMasterKey(masterSeed, transformKey);
@@ -186,7 +186,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     
     NSData *pt = [cipher decrypt:ct iv:encryptionIv key:masterKey];
 
-    //NSLog(@"DESERIALIZE: [%@] - %lu", [sha256(pt) base64EncodedStringWithOptions:kNilOptions], (unsigned long)pt.length);
+    
 
     if(![pt.sha256 isEqualToData:contentsSha256]) {
         NSLog(@"Actual Database Contents Hash does not match expected. This file is corrupt or the password is incorect.");
@@ -265,11 +265,11 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     }
     
     NSData* contentsHash = pt.sha256;
-    //NSLog(@"SERIALIZE: [%@] - %lu", [contentsHash base64EncodedStringWithOptions:kNilOptions], (unsigned long)pt.length);
+    
     
     NSData *compositeKey = getComposite(password, keyFileDigest);
     
-    //NSLog(@"SERIALIZE: COMPOSITE KEY: [%@]", [compositeKey base64EncodedStringWithOptions:kNilOptions]);
+    
     
     NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);
     NSData* transformKey = getAesTransformKey(compositeKey, transformSeed, serializationData.transformRounds);
@@ -282,7 +282,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
 
     NSData *ct = [cipher encrypt:pt iv:encryptionIv key:masterKey];
 
-    // Header
+    
 
     if(kLogVerbose) {
         NSLog(@"SERIALIZE");
@@ -329,7 +329,7 @@ static id<Cipher> getCipher(uint32_t flags) {
         return nil;
     }
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 NSData* writeField(uint16_t type, NSData* data) {
     NSMutableData *ret = [NSMutableData data];
@@ -395,14 +395,14 @@ static NSData* stringtoKeePassData(NSString* str) {
     const char *utf8 = foo.UTF8String;
     size_t len = strlen(utf8);
     
-    return [NSData dataWithBytes:utf8 length:len + 1]; // Null Term
+    return [NSData dataWithBytes:utf8 length:len + 1]; 
 }
 
 static NSString* keePassDataToString(uint8_t *data) {
     return [[NSString alloc] initWithCString:(char*)data encoding:NSUTF8StringEncoding];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 typedef void (*updateItemWithFieldFn)(uint16_t type, uint32_t length, uint8_t *data, NSObject* item);
 
@@ -450,15 +450,15 @@ NSObject* readItem(uint8_t** position, uint8_t* eof, NSObject* item, updateItemW
 void updateGroupWithField(uint16_t type, uint32_t length, uint8_t *data, KdbGroup* group) {
     switch (type) {
         case 0x0000:
-//            if(length) {
-//                FieldHeader *foo = (FieldHeader*)data;
-//                uint16_t t = littleEndian2BytesToUInt16(foo->type);
-//                uint32_t l = littleEndian4BytesToUInt32(foo->length);
-//                NSData *bar = [NSData dataWithBytes:foo->data length:l];
-//
-//                NSLog(@"EXT DATA: %d = %@", t, [bar base64EncodedStringWithOptions:kNilOptions]);
-//            }
-//            group.extData = [NSData dataWithBytes:data length:length];
+
+
+
+
+
+
+
+
+
             break;
         case 0x0001:
             group.groupId = littleEndian4BytesToInt32(data);
@@ -495,7 +495,7 @@ void updateGroupWithField(uint16_t type, uint32_t length, uint8_t *data, KdbGrou
 void updateEntryWithField(uint16_t type, uint32_t length, uint8_t *data, KdbEntry* entry) {
     switch (type) {
         case 0x0000:
-            //entry.extData = [NSData dataWithBytes:data length:length];
+            
             break;
         case 0x0001:
             entry.uuid = [[NSUUID alloc] initWithUUIDBytes:data];

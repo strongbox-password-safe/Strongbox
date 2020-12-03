@@ -80,7 +80,7 @@
                 return -1;
             }
             
-            if (self.workingBlockLength == 0) { // EOF
+            if (self.workingBlockLength == 0) { 
                 break;
             }
         }
@@ -102,7 +102,7 @@
 }
 
 - (BOOL)loadNextBlock {
-    if (self.finished) { // EOF
+    if (self.finished) { 
         if (self.workingBlock) {
             free(self.workingBlock);
         }
@@ -118,7 +118,7 @@
     }
     
     size_t blockLength = littleEndian4BytesToInt32(blockHeader.lengthBytes);
-    // NSLog(@"DEBUG: Un-HMAC Block %d of length [%zu] - [%zu]", self.workingBlockIndex, blockLength, self.readSoFar);
+    
     
     if (blockLength > 0) {
         if (self.workingBlock != nil) {
@@ -161,7 +161,7 @@
     
     self.readSoFar += blockLength;
     
-    // NSLog(@"DEBUG: Un-HMACed Block %d of length [%zu] - [%zu]", self.workingBlockIndex, blockLength, self.readSoFar);
+    
 
     self.workingBlockIndex++;
     self.workingBlockOffset = 0;

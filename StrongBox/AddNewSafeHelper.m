@@ -81,18 +81,18 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
           parentFolder:(NSObject*)parentFolder
          yubiKeyConfig:(YubiKeyHardwareConfiguration *)yubiKeyConfig
            completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
-    dispatch_async(dispatch_get_main_queue(), ^(void) { // Saving Has to be done on main thread :(
+    dispatch_async(dispatch_get_main_queue(), ^(void) { 
         [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     });
                    
     dispatch_async(dispatch_get_global_queue(0L, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
-        [database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        [database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
             if (userCancelled || data == nil || error) {
                 completion(userCancelled, nil, nil, error);
                 return;
             }
             
-            dispatch_async(dispatch_get_main_queue(), ^(void) { // Saving Has to be done on main thread :(
+            dispatch_async(dispatch_get_main_queue(), ^(void) { 
                 [SVProgressHUD dismiss];
                 
                 [provider create:name

@@ -41,7 +41,7 @@ static const BOOL kLogVerbose = NO;
 
 - (void)addKeePassDefaultRootGroup:(Node*)rootGroup {
     NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
-    if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+    if ([rootGroupName isEqualToString:@"generic_database"]) { 
       rootGroupName = kDefaultRootGroupName;
     }
     Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
@@ -88,11 +88,11 @@ static const BOOL kLogVerbose = NO;
         NSLog(@"Attachments: %@", attachments);
     }
 
-    // Metadata
+    
 
     Kdb1DatabaseMetadata *metadata = [[Kdb1DatabaseMetadata alloc] init];
 
-    metadata.version = serializationData.version;
+    metadata.versionInt = serializationData.version;
     metadata.transformRounds = serializationData.transformRounds;
     metadata.flags = serializationData.flags;
 
@@ -136,16 +136,16 @@ static const BOOL kLogVerbose = NO;
 
 - (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
     if(!database.compositeKeyFactors.password.length && !database.compositeKeyFactors.keyFileDigest) {
-        // KeePass 1 does not allow empty Password
+        
         NSError* error = [Utils createNSError:@"Master Password or Key File not set." errorCode:-3];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
     KdbSerializationData *serializationData = [[KdbSerializationData alloc] init];
     
     if(database.rootGroup.childGroups.count == 0) {
-        // KDB1 Requires at least one group at the top
+        
         [self addKeePassDefaultRootGroup:database.rootGroup];
     }
     
@@ -158,7 +158,7 @@ static const BOOL kLogVerbose = NO;
     Kdb1DatabaseMetadata* metadata = (Kdb1DatabaseMetadata*)database.metadata;
     
     serializationData.flags = metadata.flags;
-    serializationData.version = metadata.version;
+    serializationData.version = metadata.versionInt;
     serializationData.transformRounds = metadata.transformRounds;
     
     NSMutableArray<KdbEntry*>* metaEntries = (NSMutableArray<KdbEntry*>*)database.adaptorTag;
@@ -172,10 +172,10 @@ static const BOOL kLogVerbose = NO;
                          keyFileDigest:database.compositeKeyFactors.keyFileDigest
                                ppError:&error];
     
-    completion(NO, ret, error);
+    completion(NO, ret, nil, error);
 }
 
-+ (NSData *_Nullable)getYubikeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
++ (NSData *_Nullable)getYubiKeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
     return nil;
 }
 
@@ -248,7 +248,7 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         
         NSInputStream* inputStream = [attachments[theAttachment.index] getPlainTextInputStream];
 
-        // FUTURE: Stream this write
+        
         NSData* data = [NSData dataWithContentsOfStream:inputStream];
 
         if (!data) {
@@ -318,7 +318,7 @@ void normalizeLevels(NSArray<KdbGroup*> *groups) {
         node.linkedData = group;
         [parentNode addChild:node keePassGroupTitleRules:YES];
         
-        // Add Entries/Records for this group
+        
         
         NSArray<KdbEntry*> *entries = [serializationData.entries filter:^BOOL(KdbEntry * _Nonnull obj) {
             return obj.groupId == group.groupId;

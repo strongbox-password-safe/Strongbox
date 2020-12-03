@@ -71,8 +71,8 @@ NSDateFormatter* _dateFormatter;
     static NSString *CellIdentifier = @"versionCellIdentifier";
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
-    // Configure the cell...
-    //UIImageView * imageView = (UIImageView *) [cell viewWithTag:1];
+    
+    
     
     NSFileVersion * fileVersion = [self.versions objectAtIndex:indexPath.row];
     

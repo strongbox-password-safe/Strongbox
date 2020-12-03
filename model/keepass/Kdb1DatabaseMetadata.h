@@ -14,10 +14,19 @@ NS_ASSUME_NONNULL_BEGIN
 @interface Kdb1DatabaseMetadata : NSObject<AbstractDatabaseMetadata>
 
 @property uint32_t flags;
-@property uint32_t version;
+@property uint32_t versionInt;
 @property uint32_t transformRounds;
 
-- (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi;
+- (MutableOrderedDictionary<NSString*, NSString*>*)kvpForUi;
+
+@property (nonatomic, nullable) NSString* version;
+@property (nonatomic, nullable) NSString *generator;
+@property (nullable, nonatomic) NSDate* recycleBinChanged;
+@property (nullable, nonatomic) NSUUID* recycleBinGroup;
+@property BOOL recycleBinEnabled;
+@property (nonatomic, nullable) NSNumber *historyMaxItems;
+@property (nonatomic, nullable) NSNumber *historyMaxSize;
+@property (nonatomic) MutableOrderedDictionary* customData;
 
 @end
 

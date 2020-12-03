@@ -102,7 +102,7 @@
    #define LTC_NO_PK
    #define LTC_MRSA
    #define LTC_MECC
-#endif // ifdef LTC_EASY
+#endif 
 
 /* Use small code where possible */
 /* #define LTC_SMALL_CODE */
@@ -399,7 +399,7 @@
 /* define this if you use Valgrind, note: it CHANGES the way SOBER-128 and LTC_RC4 work (see the code) */
 /* #define LTC_VALGRIND */
 
-#endif // ifndef TOMCRYPT_CUSTOM_H_
+#endif 
 
 
 

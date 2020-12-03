@@ -46,7 +46,7 @@
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField {
-//    NSLog(@"WSTagsField End Editing...");
+
     [self.tagsField acceptCurrentTextAsTag];
 }
 

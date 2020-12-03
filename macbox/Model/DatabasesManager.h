@@ -11,6 +11,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const kDatabasesListChangedNotification;
+
 @interface DatabasesManager : NSObject
 
 + (instancetype _Nullable)sharedInstance;

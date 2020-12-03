@@ -14,17 +14,10 @@
     self = [super init];
     
     if (self) {
-        self.theirNewEntries = [NSSet set];
-        self.theirNewGroups = [NSSet set];
-        self.theirEditedEntries = [NSSet set];
-        self.theirEditedGroups = [NSSet set];
+        self.changes = @[];
     }
     
     return self;
-}
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"theirNewGroups = [%@], theirNewEntries = [%@], theirEditedGroups = [%@], theirEditedEntries = [%@]", self.theirNewGroups, self.theirNewEntries, self.theirEditedGroups, self.theirEditedEntries];
 }
 
 @end

@@ -9,6 +9,8 @@
 #import "KeePassGroup.h"
 #import "KeePassDatabase.h"
 #import "SimpleXmlValueExtractor.h"
+#import "CustomData.h"
+#import "NSUUID+Zero.h"
 
 @implementation KeePassGroup
 
@@ -22,16 +24,22 @@
         self.name = @"";
         self.uuid = NSUUID.UUID;
         self.times = [[Times alloc] initWithXmlElementName:kTimesElementName context:context];
+        self.notes = nil;
+        self.customData = [[CustomData alloc] initWithContext:context];
+        self.defaultAutoTypeSequence = nil;
+        self.enableAutoType = nil;
+        self.enableSearching = nil;
+        self.lastTopVisibleEntry = nil;
     }
     
     return self;
 }
 
--(instancetype)initAsKeePassRoot:(XmlProcessingContext*)context {
+- (instancetype)initAsKeePassRoot:(XmlProcessingContext*)context {
     self = [self initWithContext:context];
     if (self) {
         NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
-        if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+        if ([rootGroupName isEqualToString:@"generic_database"]) { 
             rootGroupName = kDefaultRootGroupName;
         }
         self.name = rootGroupName;
@@ -49,7 +57,10 @@
     else if([xmlElementName isEqualToString:kEntryElementName]) {
         return [[Entry alloc] initWithContext:self.context];
     }
-    
+    else if ([xmlElementName isEqualToString:kCustomDataElementName]) {
+        return [[CustomData alloc] initWithContext:self.context];
+    }
+
     return [super getChildHandler:xmlElementName];
 }
 
@@ -82,6 +93,30 @@
         self.customIcon = [SimpleXmlValueExtractor getUuid:completedObject];
         return YES;
     }
+    else if([withXmlElementName isEqualToString:kCustomDataElementName]) {
+        self.customData = (CustomData*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kNotesElementName]) {
+        self.notes = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kDefaultAutoTypeSequenceElementName]) {
+        self.defaultAutoTypeSequence = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kEnableAutoTypeElementName]) {
+        self.enableAutoType = [SimpleXmlValueExtractor getOptionalBool:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kEnableSearchingElementName]) {
+        self.enableSearching = [SimpleXmlValueExtractor getOptionalBool:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kLastTopVisibleElementName]) {
+        self.lastTopVisibleEntry = [SimpleXmlValueExtractor getUuid:completedObject];
+        return YES;
+    }
     
     return NO;
 }
@@ -109,7 +144,31 @@
         }
     }
 
-    if(![super writeUnmanagedChildren:serializer]) {
+    if (self.customData && self.customData.orderedDictionary.count) {
+        if ( ![self.customData writeXml:serializer] ) return NO;
+    }
+
+    if (self.notes.length) {
+        if (![serializer writeElement:kNotesElementName text:self.notes]) return NO;
+    }
+
+    if ( self.defaultAutoTypeSequence.length ) {
+        if ( ![serializer writeElement:kDefaultAutoTypeSequenceElementName text:self.defaultAutoTypeSequence] ) return NO;
+    }
+    
+    if ( self.enableAutoType ) {
+        if ( ![serializer writeElement:kEnableAutoTypeElementName boolean:self.enableAutoType.boolValue]) return NO;
+    }
+    
+    if ( self.enableSearching ) {
+        if ( ![serializer writeElement:kEnableSearchingElementName boolean:self.enableSearching.boolValue]) return NO;
+    }
+    
+    if ( self.lastTopVisibleEntry && ![self.lastTopVisibleEntry isEqual:NSUUID.zero]) {
+        if ( ![serializer writeElement:kLastTopVisibleElementName uuid:self.lastTopVisibleEntry]) return NO;
+    }
+    
+    if( ![super writeUnmanagedChildren:serializer]) {
         return NO;
     }
     
@@ -148,6 +207,31 @@
         return NO;
     }
     
+    if (![self.customData isEqual:other.customData]) {
+        return NO;
+    }
+    
+    if ( self.notes.length && other.notes.length && ![self.notes isEqualToString:other.notes] ) {
+        return NO;
+    }
+    
+    if ( self.defaultAutoTypeSequence.length && other.defaultAutoTypeSequence.length && ![self.defaultAutoTypeSequence isEqualToString:other.defaultAutoTypeSequence] ) {
+        return NO;
+    }
+
+    if ( !(self.enableAutoType == nil && other.enableAutoType == nil) && self.enableAutoType.boolValue != other.enableAutoType.boolValue ) {
+        return NO;
+    }
+    if ( !(self.enableSearching == nil && other.enableSearching == nil) && self.enableSearching.boolValue != other.enableSearching.boolValue ) {
+        return NO;
+    }
+        
+    if ( !(self.lastTopVisibleEntry == nil && other.lastTopVisibleEntry == nil) && ![self.lastTopVisibleEntry isEqual:other.lastTopVisibleEntry] ) {
+        return NO;
+    }
+
+    
+    
     if (self.groupsAndEntries.count != other.groupsAndEntries.count) {
         return NO;
     }
@@ -165,7 +249,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Name = [%@], Children = [%@], Times = [%@], iconId=[%@]/[%@]\nUUID = [%@]", self.name, self.groupsAndEntries, self.times, self.icon, self.customIcon, self.uuid];
+    return [NSString stringWithFormat:@"Name = [%@], Notes = [%@], Children = [%@], Times = [%@], iconId=[%@]/[%@]\nUUID = [%@]", self.name, self.notes, self.groupsAndEntries, self.times, self.icon, self.customIcon, self.uuid];
 }
 
 @end

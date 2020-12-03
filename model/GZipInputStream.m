@@ -98,7 +98,7 @@
     return self;
 }
 
-//////////////////////////////////////////////////////
+
 
 - (void)open {
     if (self.innerStream) {
@@ -156,7 +156,7 @@
     
     self.debugDecompresedTotal += ret;
     
-    //NSLog(@"GZIP DEBUG: Read so far => [%zu]", self.debugDecompresedTotal);
+    
     
     return ret;
 }

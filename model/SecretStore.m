@@ -15,7 +15,7 @@
 
 #import "SecretStore.h"
 
-// NB: OSX 10.11 (El Capitan) is NOT supported
+
 
 static NSString* const kKeyApplicationLabel = @"Strongbox-Credential-Store-Key";
 static NSString* const kEncryptedBlobServiceName = @"Strongbox-Credential-Store";
@@ -54,8 +54,8 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return self;
 }
 
-///////////////////////////////////////////////////////////////////
-// Public API
+
+
 
 - (BOOL)setSecureObject:(id)object forIdentifier:(NSString *)identifier {
     return [self setSecureObject:object forIdentifier:identifier expiryMode:kNeverExpires expiresAt:nil];
@@ -79,12 +79,37 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return NO;
     }
 
-    [self deleteSecureItem:identifier]; // Clear any existing password first...
+    [self deleteSecureItem:identifier]; 
 
-    if(object == nil) { // Nil is equivalent to delete
+    if(object == nil) { 
         return YES;
     }
     
+#if TARGET_OS_IPHONE
+    if (@available(ios 10.0, *)) {
+        return [self wrapSerializeAndEncryptObject:object forIdentifier:identifier expiryMode:expiryMode expiresAt:expiresAt];
+    }
+    else {
+        return [self wrapAndSerializeObject:object forIdentifier:identifier expiryMode:expiryMode expiresAt:expiresAt];
+    }
+#else
+    return [self wrapSerializeAndEncryptObject:object forIdentifier:identifier expiryMode:expiryMode expiresAt:expiresAt];
+#endif
+}
+
+- (BOOL)wrapAndSerializeObject:(id)object forIdentifier:(NSString *)identifier expiryMode:(SecretExpiryMode)expiryMode expiresAt:(NSDate *)expiresAt {
+    NSDictionary* wrapper = [self wrapObject:object expiryMode:expiryMode expiry:expiresAt identifier:identifier];
+    NSData* clearData = [NSKeyedArchiver archivedDataWithRootObject:wrapper];
+
+    if(![self storeKeychainBlob:identifier encrypted:clearData]) {
+        NSLog(@"Error storing encrypted blob in Keychain...");
+        return NO;
+    }
+    
+    return YES;
+}
+
+- (BOOL)wrapSerializeAndEncryptObject:(id)object forIdentifier:(NSString *)identifier expiryMode:(SecretExpiryMode)expiryMode expiresAt:(NSDate *)expiresAt {
     SecAccessControlRef access = [SecretStore createAccessControl:self.secureEnclaveAvailable];
     if(!access) {
         return NO;
@@ -92,7 +117,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     
     NSDictionary *attributes = [SecretStore createKeyPairAttributes:identifier accessControl:access requestSecureEnclaveStorage:self.secureEnclaveAvailable];
     
-    // Create the Key Pair...
+    
     
     CFErrorRef cfError = nil;
     SecKeyRef privateKey = SecKeyCreateRandomKey((__bridge CFDictionaryRef)attributes, &cfError);
@@ -103,7 +128,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return NO;
     }
 
-    // Now get the matching Public Key
+    
     
     SecKeyRef publicKey = SecKeyCopyPublicKey(privateKey);
     if (!publicKey) {
@@ -125,7 +150,6 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     }
 
     NSDictionary* wrapper = [self wrapObject:object expiryMode:expiryMode expiry:expiresAt identifier:identifier];
-    
     NSData* clearData = [NSKeyedArchiver archivedDataWithRootObject:wrapper];
 
     CFDataRef cipherText = SecKeyCreateEncryptedData(publicKey, algorithm, (CFDataRef)clearData, &cfError);
@@ -138,7 +162,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return NO;
     }
         
-    if(![self storeEncryptedBlob:identifier encrypted:(__bridge NSData*)cipherText]) {
+    if(![self storeKeychainBlob:identifier encrypted:(__bridge NSData*)cipherText]) {
         if (privateKey) { CFRelease(privateKey); }
         if (publicKey)  { CFRelease(publicKey);  }
         if (access)     { CFRelease(access);     }
@@ -168,7 +192,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
     NSDictionary* wrapped = [self getWrappedObject:identifier];
     if(wrapped == nil) {
-//        NSLog(@"Could not get wrapped object.");
+
         return nil;
     }
 
@@ -229,14 +253,14 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return;
     }
 
-    [self deleteEncryptedBlob:identifier];
+    [self deleteKeychainBlob:identifier];
     [self.ephemeralObjectStore removeObjectForKey:identifier];
     
     NSDictionary* query = [SecretStore getPrivateKeyQuery:identifier];
     SecItemDelete((__bridge CFDictionaryRef)query);
 }
 
-///////////////////////////////////////////////////////////////////
+
 
 - (SecretExpiryMode)getSecureObjectExpiryMode:(NSString *)identifier {
     if ([SecretStore isUnsupportedOS]) {
@@ -274,7 +298,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return nil;
 }
 
-///////////////////////////////////////////////////////////////////
+
 
 + (CFStringRef)accessibility {
     return kSecAttrAccessibleWhenUnlockedThisDeviceOnly;
@@ -282,7 +306,12 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 + (CFStringRef)keyType {
 #if TARGET_OS_IPHONE
-    return kSecAttrKeyTypeECSECPrimeRandom;
+    if (@available(iOS 10.0, *)) {
+        return kSecAttrKeyTypeECSECPrimeRandom;
+    }
+    else {
+        return kSecAttrKeyTypeEC;
+    }
 #else
     if (@available(macOS 10.12, *)) {
         return kSecAttrKeyTypeECSECPrimeRandom;
@@ -318,7 +347,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 + (BOOL)isUnsupportedOS {
 #if TARGET_OS_OSX
     if (@available(macOS 10.12, *)) { } else {
-        NSLog(@"Mac OSX < 10.12 is not supported");
+        NSLog(@"Mac OSX < 10.12 is not supported by the Strongbox Secret Store");
         return YES;
     }
 #endif
@@ -327,7 +356,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 + (BOOL)isSecureEnclaveAvailable {
-    if (TARGET_OS_SIMULATOR != 0) { // Check here because we get a crash if we try to run below code on a sim
+    if (TARGET_OS_SIMULATOR != 0) { 
         NSLog(@"Secure Enclave not available on Simulator");
         return NO;
     }
@@ -337,19 +366,23 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return NO;
     }
 
-    // It seems the only right way to check outside of device checks is to try create a secure enclave key...
+    if (@available(iOS 10.0, *)) { } else {
+        NSLog(@"Secure Enclave unavailable on iOS < 10.0");
+        return NO;
+    }
+    
+    
 
     SecAccessControlRef accessControl = [SecretStore createAccessControl:YES];
     if(!accessControl) {
         return NO;
     }
     
-    
     NSString* identifier = NSUUID.UUID.UUIDString;
     
     NSDictionary* attributes = [SecretStore createKeyPairAttributes:identifier accessControl:accessControl requestSecureEnclaveStorage:YES];
     
-    // Try to create the Key Pair...
+    
 
     CFErrorRef cfError = nil;
     SecKeyRef privateKey = SecKeyCreateRandomKey((__bridge CFDictionaryRef)attributes, &cfError);
@@ -388,7 +421,9 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return access;
 }
 
-+ (NSDictionary*)createKeyPairAttributes:(NSString*)identifier accessControl:(SecAccessControlRef)accessControl requestSecureEnclaveStorage:(BOOL)requestSecureEnclaveStorage {
++ (NSDictionary*)createKeyPairAttributes:(NSString*)identifier
+                           accessControl:(SecAccessControlRef)accessControl
+             requestSecureEnclaveStorage:(BOOL)requestSecureEnclaveStorage {
     NSDictionary* attributes =
         @{ (id)kSecAttrKeyType:             (id)[SecretStore keyType],
            (id)kSecAttrKeySizeInBits:       @256,
@@ -449,13 +484,35 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 - (id)getWrappedObject:(NSString *)identifier {
+    NSData* keychainBlob = [self getKeychainBlob:identifier];
+    if(!keychainBlob) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{ 
+
+            [self deleteSecureItem:identifier];
+        });
+        return nil;
+    }
+    
+#if TARGET_OS_IPHONE
+    if (@available(ios 10.0, *)) {
+        return [self decryptAndDeserializeKeychainBlob:keychainBlob identifier:identifier];
+    }
+    else {
+        return [self deserializeKeychainBlob:keychainBlob identifier:identifier];
+    }
+#else
+    return [self decryptAndDeserializeKeychainBlob:keychainBlob identifier:identifier];
+#endif
+}
+
+- (id)decryptAndDeserializeKeychainBlob:(NSData*)encrypted identifier:(NSString *)identifier {
     NSDictionary* query = [SecretStore getPrivateKeyQuery:identifier];
     
     CFTypeRef pk;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &pk);
 
     if(status != errSecSuccess) {
-       //NSLog(@"Error getting key....");
+       
        return nil;
     }
 
@@ -464,13 +521,6 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     if(!SecKeyIsAlgorithmSupported(privateKey, kSecKeyOperationTypeDecrypt, algorithm)) {
        NSLog(@"Error algorithm is not available....");
        return nil;
-    }
-    
-    NSData* encrypted = [self getEncryptedBlob:identifier];
-    if(!encrypted) {
-        NSLog(@"No encrypted blob present... Cleaning Up...");
-        [self deleteSecureItem:identifier];
-        return nil;
     }
     
     NSDictionary * wrapped = [self decryptWrappedObject:encrypted privateKey:privateKey];
@@ -488,8 +538,27 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return wrapped;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// //
-// Encrypted Blob Storage...
+- (id)deserializeKeychainBlob:(NSData*)plaintext identifier:(NSString *)identifier {
+    NSDictionary *wrapped = nil;
+    @try {
+        wrapped = [NSKeyedUnarchiver unarchiveObjectWithData:plaintext];
+    }
+    @catch (NSException *e) {
+        NSLog(@"Error Ubarchiving: %@", e);
+    }
+    @finally {}
+
+    if(!wrapped) {
+        NSLog(@"Could not unwrap secure item. Cleaning it up.");
+        [self deleteSecureItem:identifier];
+        return nil;
+    }
+    
+    return wrapped;
+}
+
+
+
 
 - (NSDictionary*)wrapObject:(id)object expiryMode:(SecretExpiryMode)expiryMode expiry:(NSDate*_Nullable)expiry identifier:(NSString*)identifier {
     NSMutableDictionary *wrapped = @{
@@ -510,7 +579,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return wrapped;
 }
 
-- (BOOL)storeEncryptedBlob:(NSString*)identifier encrypted:(NSData*)encrypted {
+- (BOOL)storeKeychainBlob:(NSString*)identifier encrypted:(NSData*)encrypted {
     NSDictionary* searchQuery = [self getBlobQuery:identifier];
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)searchQuery, nil);
     
@@ -538,7 +607,9 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return (status == errSecSuccess);
 }
 
-- (NSData*)getEncryptedBlob:(NSString*)identifier {
+- (NSData*)getKeychainBlob:(NSString*)identifier {
+
+        
     NSMutableDictionary *query = [self getBlobQuery:identifier];
     
     [query setObject:@YES forKey:(__bridge id)kSecReturnData];
@@ -547,6 +618,10 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     CFTypeRef result = NULL;
     OSStatus status = SecItemCopyMatching((__bridge CFDictionaryRef)query, &result);
 
+
+
+
+    
     if (status != errSecSuccess) {
         return nil;
     }
@@ -554,7 +629,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return (__bridge_transfer NSData *)result;
 }
 
-- (void)deleteEncryptedBlob:(NSString*)identifier {
+- (void)deleteKeychainBlob:(NSString*)identifier {
     NSMutableDictionary *query = [self getBlobQuery:identifier];
     SecItemDelete((__bridge CFDictionaryRef)query);
 }
@@ -567,7 +642,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     [dictionary setObject:(__bridge id)kSecClassGenericPassword forKey:(__bridge id)kSecClass];
     [dictionary setObject:kEncryptedBlobServiceName forKey:(__bridge id)kSecAttrService];
     [dictionary setObject:blobId forKey:(__bridge id)kSecAttrAccount];
-    [dictionary setObject:@NO forKey:(__bridge id)(kSecAttrSynchronizable)]; // No iCloud Sync
+    [dictionary setObject:@NO forKey:(__bridge id)(kSecAttrSynchronizable)]; 
     
 #if TARGET_OS_OSX
     if (@available(macOS 10.15, *)) {

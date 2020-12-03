@@ -76,11 +76,11 @@
 - (void)onCompleted { }
 
 - (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
-    return NO; // We don't know any specific child objects, returning NO leads to a call to the above addUnknownChildObject
+    return NO; 
 }
 
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
-    return nil; // We don't have any special child handlers, returning nil here just leads to us being used again anyway
+    return nil; 
 }
 
 - (void)addUnknownChildObject:(id<XmlParsingDomainObject>)xmlItem {

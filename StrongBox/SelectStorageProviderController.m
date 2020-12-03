@@ -62,19 +62,19 @@
                                                     webDavProvider,
                                                     sftpProviderWithFastListing].mutableCopy;
     
-    // iCloud on Top if available and want to add new
+    
     
     if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn && !self.existing) {
         [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
     
-    // iOS Files on iOS 11+ option at bottom near Local Device
+    
     
     if (@available(iOS 11.0, *)) {
         [sp addObject:FilesAppUrlBookmarkProvider.sharedInstance];
     }
     
-    // Local Device for Create New
+    
     
     if (!self.existing) {
         [sp addObject:LocalDeviceStorageProvider.sharedInstance];
@@ -188,8 +188,8 @@
     [self presentViewController:vc animated:YES completion:nil];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Three different methods of adding/creating
+
+
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
@@ -204,14 +204,14 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     self.onDone([SelectedStorageParameters parametersForFilesApp:url withProvider:FilesAppUrlBookmarkProvider.sharedInstance]);
 }
 #pragma GCC diagnostic pop
 
 - (void)importFromManualUiUrl:(NSURL *)importURL {
     NSError* error;
-    NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];  // FUTURE: Would be good not to have to read all file
+    NSData *importedData = [NSData dataWithContentsOfURL:importURL options:kNilOptions error:&error];  
     
     if(error) {
         [Alerts error:self
@@ -243,7 +243,7 @@
                    title:@"Error Selecting Storage Provider"
                  message:@"Please contact support@strongboxsafe.com if you receive this message. It looks like there is a problem with this Storage provider"
               completion:^{
-                self.onDone(SelectedStorageParameters.userCancelled); // Pretty sure this is unreachable...
+                self.onDone(SelectedStorageParameters.userCancelled); 
             }];
         }
         else {

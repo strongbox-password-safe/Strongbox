@@ -28,7 +28,7 @@
             _fields[type] = field;
         }
         
-        // Give record a UUID if it's not set
+        
         if (![self getFieldForType:FIELD_TYPE_UUID]) {
             [self generateNewUUID];
         }
@@ -44,7 +44,7 @@
     return _fields.allValues;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (PasswordHistory *)passwordHistory {
     Field *field = [self getFieldForType:FIELD_TYPE_PWHIST];
@@ -197,7 +197,7 @@
     [self setField:FIELD_TYPE_GROUP string:group.escapedPathString];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)setFieldWithData:(FieldType)type data:(NSData *)data {
     Field *field = [self getFieldForType:type];

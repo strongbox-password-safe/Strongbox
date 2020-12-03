@@ -68,7 +68,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 #endif
 }
 
-- (void)clearChangedDatabaseSettings { // Set the other flag to no (counter-intuitive)
+- (void)clearChangedDatabaseSettings { 
 #ifndef IS_APP_EXTENSION
     SharedAppAndAutoFillSettings.sharedInstance.autoFillDidChangeDatabases = NO;
 #else
@@ -88,8 +88,8 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TODO: Eventually delete these - 14-Jun-2020 +12 months - 14-Jun-2021
+
+
 
 - (BOOL)migratedToNewStore {
     NSNumber* obj = [getSharedAppGroupDefaults() objectForKey:kMigratedToNewStore];
@@ -102,8 +102,8 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 }
 
 - (void)migrateToNewStore {
-#ifndef IS_APP_EXTENSION // AUTO-FILL component cannot perform migration (might be stale) so where this fails,
-                         // load below will return an empty list but not affect anything important - a restart/launch of main app will then migrate
+#ifndef IS_APP_EXTENSION 
+                         
     if (self.migratedToNewStore) {
         NSLog(@"Already Migrated to new store - not migrating");
         return;
@@ -121,16 +121,16 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 #endif
 }
 
-//- (void)legacySerialize {
-//    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.databasesList];
-//    NSUserDefaults * defaults = getSharedAppGroupDefaults();
-//    [defaults setObject:encodedObject forKey:kSafesList];
-//    [defaults synchronize];
-//
-//    dispatch_async(dispatch_get_main_queue(), ^{
-//        [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
-//    });
-//}
+
+
+
+
+
+
+
+
+
+
 
 - (NSMutableArray<SafeMetaData*>*)legacyLoad {
     NSUserDefaults * defaults = getSharedAppGroupDefaults();
@@ -150,7 +150,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     return SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSArray<SafeMetaData *> *)snapshot {
     __block NSArray<SafeMetaData *> *result;
@@ -288,11 +288,11 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
             
             NSString* name1 = obj.fileName;
             NSString* name2 = safe.fileName;
-            BOOL names = [name1 compare:name2] == NSOrderedSame; // Do not use isEqualToString - doesn't work with Umlauts!
+            BOOL names = [name1 compare:name2] == NSOrderedSame; 
 
             NSString* id1 = obj.fileIdentifier;
             NSString* id2 = safe.fileIdentifier;
-            BOOL ids = [id1 compare:id2] == NSOrderedSame;  // Do not use isEqualToString - doesn't work with Umlauts!
+            BOOL ids = [id1 compare:id2] == NSOrderedSame;  
 
             return storage && names && ids;
         }];
@@ -311,7 +311,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         NSError* error;
         NSURL* url = [SyncManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe error:&error];
 
-        safe.lastSyncRemoteModDate = initialCacheModDate; // Also set the lastSyncRemoteDate
+        safe.lastSyncRemoteModDate = initialCacheModDate; 
         
         if (error || !url) {
             NSLog(@"ERROR: Error adding database - setWorkingCacheWithData: [%@]", error);

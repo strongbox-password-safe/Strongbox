@@ -58,19 +58,19 @@
     
     return ret;
 }
-//
-//- (NSURL *)host {
-//    return self.root;
-//}
-//
-//- (void)setHost:(NSString *)host {
-//    if(host.length && [host hasSuffix:@"/"]) {
-//        self.root = [host substringToIndex:host.length - 1];
-//    }
-//    else {
-//        self.root = host;
-//    }
-//}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -(NSString*)getKeyChainKey:(NSString*)propertyName {
     return [NSString stringWithFormat:@"Strongbox-WebDAV-%@-%@", self.keyChainUuid, propertyName];

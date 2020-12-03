@@ -20,7 +20,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
 @interface GoogleDriveManager ()
 
-// Thread Safe just because all sync requests to Google Drive are currently serialized. The underlying library doesn't support concurrency anyway.
+
 
 @property (copy) Authenticationcompletion pendingAuthCompletion;
 @property BOOL pendingAuthCompletionIsBackgroundSync;
@@ -74,29 +74,26 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
 - (void)authenticate:(UIViewController*)viewController
           completion:(Authenticationcompletion)completion {
-    if (!viewController) { // Background Sync - Try to
+    if (!viewController) { 
         GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
         signIn.delegate = self;
         signIn.scopes = @[kGTLRAuthScopeDrive];
 
-        // To make this thread safe, do not use properties but store these on a per thread basis
+        
         
         NSLog(@"Google Drive Sign In - Background Mode - Thread [%@] - completion = [%@]", NSThread.currentThread, completion);
         
         self.pendingAuthCompletion = completion;
         self.pendingAuthCompletionIsBackgroundSync = YES;
-        
-//        NSThread.currentThread.threadDictionary[@"authCompletion"] = completion;
-//        NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = @(YES);
-                
+            
         [signIn restorePreviousSignIn];
     }
     else {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ // TODO: Need this for Biometrics but maybe can be moved into inner Sign in so only affected if we actually require a sign in
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
             NSLog(@"Google Drive Sign In - Foreground Interactive Mode - Thread [%@]", NSThread.currentThread);
 
-            // Must be done on main queue
+            
             GIDSignIn *signIn = [GIDSignIn sharedInstance];
 
             signIn.delegate = self;
@@ -105,9 +102,6 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
 
             self.pendingAuthCompletion = completion;
             self.pendingAuthCompletionIsBackgroundSync = NO;
-            
-//            NSThread.currentThread.threadDictionary[@"authCompletion"] = completion;
-//            NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = @(NO);
 
             signIn.presentingViewController = viewController;
             
@@ -136,28 +130,28 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     
     SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = NO;
 
-//    Authenticationcompletion authCompletion = NSThread.currentThread.threadDictionary[@"authCompletion"];
+
     Authenticationcompletion authCompletion = self.pendingAuthCompletion;
     
-    // NSNumber *bsacm = NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"];
-    // BOOL backgroundSyncAuthCompletionMode = bsacm ? bsacm.boolValue : NO;
+    
+    
     BOOL backgroundSyncAuthCompletionMode = self.pendingAuthCompletionIsBackgroundSync;
 
-    // Clean up for next call...
+    
     
     self.pendingAuthCompletion = nil;
     
     if(error.code == kGIDSignInErrorCodeHasNoAuthInKeychain) {
         if(!backgroundSyncAuthCompletionMode) {
-            return; // Do not call completion if this is a silenet sign and there is no Auth in Key...
+            return; 
         }
         else {
             if (authCompletion) {
                 NSLog(@"User Interaction Required for Google Auth - but in Background Sync mode...");
                 NSLog(@"Google Callback: %@", authCompletion);
                 authCompletion(NO, YES, nil);
-//                NSThread.currentThread.threadDictionary[@"authCompletion"] = nil;
-//                NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = nil;
+
+
             }
         }
     }
@@ -165,8 +159,8 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         if (authCompletion) {
             NSLog(@"Google Callback: %@", authCompletion);
             authCompletion(error.code == kGIDSignInErrorCodeCanceled, NO, error);
-//            NSThread.currentThread.threadDictionary[@"authCompletion"] = nil;
-//            NSThread.currentThread.threadDictionary[@"backgroundSyncAuthCompletionMode"] = nil;
+
+
         }
         else {
             NSLog(@"EEEEEK - Good Sign In but no AutoCompletion!! NOP - [%@]", NSThread.currentThread);
@@ -174,7 +168,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 + (NSString *)sanitizeNickNameForNewFileName:(NSString *)string {
     NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
@@ -212,7 +206,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
             fileName = [Utils insertTimestampInFilename:title];
         }
 
-        // New
+        
 
         GTLRDrive_File *metadata = [GTLRDrive_File object];
         metadata.name = fileName;
@@ -418,7 +412,7 @@ viewController:(UIViewController*)viewController
             NSMutableArray *driveFolders = [[NSMutableArray alloc] init];
             NSMutableArray *driveFiles = [[NSMutableArray alloc] init];
 
-            //NSLog(@"%@", fileList.files);
+            
             
             for (GTLRDrive_File *file in fileList.files) {
                 if ([file.mimeType isEqual:@"application/vnd.google-apps.folder"]) {
@@ -481,7 +475,7 @@ viewController:(UIViewController*)viewController
     fileName = [fileName stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
 
     query.q = [NSString stringWithFormat:@"name = '%@' and '%@' in parents and trashed=false", fileName, parentFileIdentifier ? parentFileIdentifier : @"root" ];
-    query.fields = @"files(id,name,modifiedTime)"; // @"*";
+    query.fields = @"files(id,name,modifiedTime)"; 
     
     [[self driveService] executeQuery:query
                     completionHandler:^(GTLRServiceTicket *ticket,

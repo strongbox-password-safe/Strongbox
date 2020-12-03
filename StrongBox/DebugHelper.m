@@ -37,7 +37,7 @@
     [debugLines addObject:[NSString stringWithFormat:@"Strongbox Debug Information at %@", NSDate.date.friendlyDateTimeStringBothPrecise]];
     [debugLines addObject:@"--------------------"];
 
-    // Architecture, Version, Device, Flags etc
+    
     
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
@@ -83,7 +83,7 @@
         
         NSArray<NSArray<SyncStatusLogEntry*>*> *syncs = [[mutableSyncs reverseObjectEnumerator] allObjects];
         
-        // Filter out good syncs - we don't care
+        
         
         NSArray* failedSyncs = [syncs filter:^BOOL(NSArray<SyncStatusLogEntry *> * _Nonnull sync) {
             return [sync anyMatch:^BOOL(SyncStatusLogEntry * _Nonnull status) {
@@ -100,7 +100,7 @@
             [debugLines addObject:@"=========================================="];
         }
         
-        // Local Cache status...
+        
         
         NSDate* mod;
         unsigned long long fileSize;
@@ -119,7 +119,7 @@
 
     [debugLines addObject:@"--------------------"];
 
-    // File system metadata
+    
     
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.appSupportDirectory]];
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.documentsDirectory]];
@@ -127,7 +127,7 @@
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpEncryptedAttachmentPath isDirectory:YES]]];
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpAttachmentPreviewPath isDirectory:YES]]];
 
-    //  Database Configs
+    
 
     [debugLines addObject:@"--------------------"];
 
@@ -179,7 +179,7 @@
                 }
             }
             else{
-//                [ret addObject:[NSString stringWithFormat:@"[DIR] %@", relativePath]];
+
                 NSArray* subdir = [self listDirectoryRecursive:file listRelativeToURL:listRelativeToURL];
                 [ret addObjectsFromArray:subdir];
             }

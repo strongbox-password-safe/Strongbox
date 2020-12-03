@@ -45,7 +45,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 @property NSArray<Node*> *nodes;
 @property (nonatomic, copy) FavIconBulkDoneBlock onDone;
 
-// Used in Item Details edit mode - where the URL can be different (new compared with whats in the Node?)
+
 @property NSURL* singleNodeUrlOverride;
 
 @end
@@ -66,7 +66,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
               onDone:(FavIconBulkDoneBlock)onDone {
     UIStoryboard *sb = [UIStoryboard storyboardWithName:@"FavIconBulk" bundle:nil];
     UINavigationController *nav = [sb instantiateInitialViewController];
-//    nav.modalPresentationStyle = UIModalPresentationFullScreen;
+
     
     FavIconBulkViewController* vc = (FavIconBulkViewController*)nav.topViewController;
     
@@ -126,7 +126,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     [super viewDidLoad];
 
     if (@available(iOS 13.0, *)) {
-        [self.navigationController setModalInPresentation:YES]; // Prevent Swipe down easy dismissal...
+        [self.navigationController setModalInPresentation:YES]; 
     }
     
     UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onStartStop)];
@@ -145,7 +145,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     [self bindUi];
     
     if(self.validUniqueUrls.count == 1) {
-        // Express kick off if only 1 item
+        
         
         [self onStartStop];
     }
@@ -339,7 +339,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (void)pause {
-    // Pause is actually a full on cancel... Resume/Start just finds items that we don't have results for and queues them up
+    
     [self.queue cancelAllOperations];
     
     self.status = kFavIconBulkStatusPausing;
@@ -371,7 +371,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
                 return obj.count == 0;
             }].count;
             
-            if (errored == 0) { // Auto Segue if everything was successful
+            if (errored == 0) { 
                 [self onPreviewResults:nil];
             }
         }

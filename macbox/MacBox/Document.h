@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
             selectedItem:(NSString*_Nullable)selectedItem
               completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
 
-- (void)setDatabaseMetadata:(DatabaseMetadata*)databaseMetadata; // Called on new database creation once a successful save - because we can't create a database metadata entry without a file reference at the moment 
+- (void)setDatabaseMetadata:(DatabaseMetadata*)databaseMetadata; 
 
 @end
 

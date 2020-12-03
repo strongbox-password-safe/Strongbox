@@ -123,8 +123,8 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
     }
 
     if (self.inProgressState != kInProgressStateInitial) {
-        NSLog(@"Yubikey session already in progress. Cannot start another!");
-        NSError* error = [Utils createNSError:@"Yubikey session already in progress..." errorCode:-1];
+        NSLog(@"YubiKey session already in progress. Cannot start another!");
+        NSError* error = [Utils createNSError:@"YubiKey session already in progress..." errorCode:-1];
         completion(NO, nil, error);
         return;
     }
@@ -217,7 +217,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
         NSString* loc = NSLocalizedString(@"yubikey_communicating_with_key_ellipsis", @"Communicating with YubiKey...");
         [self.mfiActionSheetView animateProcessingWithMessage:loc];
         
-        // If we're still around in 0.75 seconds ask user to touch
+        
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.75 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             if(self.mfiActionSheetView) {
@@ -226,7 +226,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
         });
     }
     
-    // We probably need to update this whenever we can? viewWillTransition ?
+    
     [self.mfiActionSheetView updateInterfaceOrientationWithOrientation:UIApplication.sharedApplication.statusBarOrientation];
 }
 
@@ -318,14 +318,14 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
 
     [self closeMfiActionSheet];
      
-    YubiKeyCRResponseBlock completionCopy = self.completion; // Reset state but call the completion afterwards so we don't block a follow on scan request
+    YubiKeyCRResponseBlock completionCopy = self.completion; 
     self.configuration = nil;
     self.challenge = nil;
     self.completion = nil;
     self.inProgressState = kInProgressStateInitial;
 
     if(completionCopy) {
-        completionCopy(YES, nil, nil); // User Cancelled
+        completionCopy(YES, nil, nil); 
     }
 }
 
@@ -350,14 +350,14 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
     if (self.inProgressState != kInProgressStateCommsOpenAndWaitingOnHmacSha1Response) {
         NSLog(@"Resetting YubiManager state due to close outside of normal scan/open state.");
         
-        YubiKeyCRResponseBlock completionCopy = self.completion; // Reset state but call the completion afterwards so we don't block a follow on scan request
+        YubiKeyCRResponseBlock completionCopy = self.completion; 
         self.configuration = nil;
         self.challenge = nil;
         self.completion = nil;
         self.inProgressState = kInProgressStateInitial;
 
         if(completionCopy) {
-            completionCopy(YES, nil, nil); // User Cancelled
+            completionCopy(YES, nil, nil); 
         }        
     }
 }
@@ -365,11 +365,11 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
 - (void)onSessionOpened:(void (^)(NSData *response, NSError *error))completion {
     YKFKeyChallengeResponseService *service = [[YKFKeyChallengeResponseService alloc] init];
 
-    // Some people program the Yubikey with Fixed Length "Fixed 64 byte input" and others with "Variable Input"
-    // To cover both cases the KeePassXC model appears to be to always send 64 bytes with extraneous bytes above
-    // and beyond the actual challenge padded PKCS#7 style-ish... MMcG - 1-Mar-2020
-    //
-    // Further Reading: https://github.com/Yubico/yubikey-personalization-gui/issues/86
+    
+    
+    
+    
+    
 
     const NSInteger kChallengeSize = 64;
     const NSInteger paddingLengthAndCharacter = kChallengeSize - self.challenge.length;
@@ -394,7 +394,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
         YKFNFCSession* nfcSession = YubiKitManager.shared.nfcSession;
         [nfcSession stopIso7816Session];
 
-        YubiKeyCRResponseBlock completionCopy = self.completion; // Reset state but call the completion afterwards so we don't block a follow on scan request
+        YubiKeyCRResponseBlock completionCopy = self.completion; 
         
         self.configuration = nil;
         self.challenge = nil;
@@ -420,7 +420,7 @@ static NSString* const kAccessorySessionStateKvoKey = @"sessionState";
     YKFAccessorySession *accSession = YubiKitManager.shared.accessorySession;
     [accSession stopSession];
     
-    YubiKeyCRResponseBlock completionCopy = self.completion; // Reset state but call the completion afterwards so we don't block a follow on scan request
+    YubiKeyCRResponseBlock completionCopy = self.completion; 
     
     self.configuration = nil;
     self.challenge = nil;

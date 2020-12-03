@@ -26,7 +26,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+    
 
     if(self.history == nil) {
         self.history = @[];
@@ -142,15 +142,15 @@
     return dateString;
 }
 
-//- (id)tableView:(NSTableView *)tableView objectValueForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
-//    if(tableView != self.tableViewSummary) {
-//        CustomField* field = [self.customFields objectAtIndex:row];
-//        return [tableColumn.identifier isEqualToString:@"CustomFieldKeyColumn"] ? field.key : field.value;
-//    }
-//    else {
-//        return nil;
-//    }
-//}
+
+
+
+
+
+
+
+
+
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
     [self enableDisableButtons];
@@ -177,7 +177,7 @@
        completion:^(BOOL yesNo) {
         if(yesNo) {
             self.onDeleteHistoryItem(node);
-            // [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
+            
             [self.tableViewHistory removeRowsAtIndexes:[NSIndexSet indexSetWithIndex:row] withAnimation:NSTableViewAnimationSlideUp];
         }
     }];

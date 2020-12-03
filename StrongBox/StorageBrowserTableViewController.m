@@ -61,7 +61,7 @@
     NSLocalizedString(@"sbtvc_select_database_file", @"Please Select Database File") :
     NSLocalizedString(@"sbtvc_select_new_database_location", @"Select Folder For New Database");
 
-    // HACK: This seems to be necessary for Dropbox sign-in - Not super clear on why :(
+    
     
     if(self.safeStorageProvider.storageId == kDropbox && self.parentFolder == nil) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 750 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
@@ -189,8 +189,8 @@
 }
 
 - (BOOL)shouldPerformSegueWithIdentifier:(NSString *)identifier sender:(id)sender {
-    // Should just use a manual segue instead of a Cell Segue to avoid this?
-    // ignore segue from cell since we we are calling manually in didSelectRowAtIndexPath
+    
+    
     return (sender == self);
 }
 
@@ -208,7 +208,7 @@
     }
 }
 
-//
+
 
 - (void)validateSelectedDatabase:(StorageBrowserItem *)file indexPath:(NSIndexPath *)indexPath  {
     StorageProviderReadOptions *options = [[StorageProviderReadOptions alloc] init];
@@ -225,7 +225,7 @@
           initialDateModified:(NSDate*)initialDateModified error:(const NSError *)error {
     if (result == kReadResultSuccess) {
         NSError* err;
-        if ([DatabaseModel isValidDatabaseWithPrefix:data error:&err]) {  //    : Would be good not to have to read all file
+        if ([DatabaseModel isValidDatabaseWithPrefix:data error:&err]) {  
             DatabaseFormat likelyFormat = [DatabaseModel getDatabaseFormatWithPrefix:data];
             self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider
                                                                                   file:file

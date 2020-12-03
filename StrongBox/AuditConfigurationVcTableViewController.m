@@ -15,8 +15,8 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "NSDate+Extensions.h"
 
-static const int kSectionIdxHibp = 2; // Careful if sections move around
-static const int kSectionIdxSimilarPasswords = 5; // Careful if sections move around 
+static const int kSectionIdxHibp = 2; 
+static const int kSectionIdxSimilarPasswords = 5; 
 
 static const int kHibpAlwaysCheck = 0;
 static const int kHibpOnceADay = 24 * 60 * 60;
@@ -79,7 +79,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
                                                 name:kAuditCompletedNotificationKey
                                              object:nil];
     
-    [self cell:self.cellViewAllAuditIssues setHidden:self.hideShowAllAuditIssues]; // Some times, from Details view for example it is an awkward or unnatural transition to show all audit issues so we hide
+    [self cell:self.cellViewAllAuditIssues setHidden:self.hideShowAllAuditIssues]; 
 }
 
 - (void)bindUi {
@@ -91,26 +91,26 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     self.switchShowPopups.on = self.model.metadata.auditConfig.showAuditPopupNotifications;
     self.switchAuditInBackground.on = self.model.metadata.auditConfig.auditInBackground;
     
-    // Simple
+    
     
     self.switchNoPassword.on = self.model.metadata.auditConfig.checkForNoPasswords;
     self.switchCommon.on = self.model.metadata.auditConfig.checkForCommonPasswords;
 
-    // Duplicates
+    
     
     self.switchDuplicates.on = self.model.metadata.auditConfig.checkForDuplicatedPasswords;
     self.switchCaseInsenstiveDupes.on = self.model.metadata.auditConfig.caseInsensitiveMatchForDuplicates;
     self.switchCaseInsenstiveDupes.enabled = self.switchDuplicates.on;
     self.labelCaseInsensitiveDupes.textColor = self.switchDuplicates.on ? nil : secondary;
     
-    // Similar
+    
     
     self.switchSimilar.on = self.model.metadata.auditConfig.checkForSimilarPasswords;
     int sim = self.model.metadata.auditConfig.levenshteinSimilarityThreshold * 100.0f;
     self.labelSimilar.text = [NSString stringWithFormat:@"%d%%", sim];
     self.sliderSimilar.value = sim;
     
-    // Minimum Length
+    
     
     self.switchMinLength.on = self.model.metadata.auditConfig.checkForMinimumLength;
     self.sliderMinLength.value = self.model.metadata.auditConfig.minimumLength;
@@ -119,14 +119,14 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     self.labelLengthOfMinimumLength.textColor = self.switchMinLength.on ? nil : secondary;
     self.minLengthLabel.textColor = self.switchMinLength.on ? nil : secondary;
     
-    // HIBP
+    
     
     self.switchHibp.on = self.model.metadata.auditConfig.checkHibp;
     self.switchShowCached.on = self.model.metadata.auditConfig.showCachedHibpHits;
     [self bindLastOnlineCheckUi];
     self.cellOnlineHibpInterval.userInteractionEnabled = self.switchHibp.on;
 
-    // HIBP Enabled/Disabled based on Pro and on/off status
+    
     
     self.switchHibp.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
     self.switchShowCached.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
@@ -136,7 +136,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     self.labelCheckOfflinePwnedCache.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
     self.labelCheckHaveIBeenPwned.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
 
-    // Similarity Enabled/Disabled based on Pro and on/off status
+    
 
     self.switchSimilar.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
     self.sliderSimilar.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on;
@@ -238,7 +238,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
             break;
     }
     
-    // Resize Cells
+    
     [self.tableView beginUpdates];
     [self.tableView endUpdates];
 }
@@ -298,13 +298,13 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
         NSString* locYes = NSLocalizedString(@"audit_hibp_warning_yes", @"Yes, I understand and agree");
         
         [Alerts twoOptionsWithCancel:self title:loc1 message:loc2 defaultButtonText:locNo secondButtonText:locYes action:^(int response) {
-            if (response == 1) { // Yes go for it
+            if (response == 1) { 
                 self.model.metadata.auditConfig.hibpCaveatAccepted = YES;
                 [SafesList.sharedInstance update:self.model.metadata];
                 
                 [self onPreferenceChanged:nil];
             }
-            else { // No or cancel
+            else { 
                 [self bindUi];
             }
         }];

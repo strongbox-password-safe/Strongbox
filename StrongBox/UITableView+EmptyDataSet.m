@@ -89,7 +89,7 @@
                 ClosureSleeve* sleeve = [[ClosureSleeve alloc] initWithAction:buttonAction];
                 [button addTarget:sleeve action:@selector(act) forControlEvents:UIControlEventTouchUpInside];
                 
-                // Funky trick to keep the closure around for the lifetime of the button... :(
+                
                 objc_setAssociatedObject (button, [NSUUID.UUID.UUIDString cStringUsingEncoding:NSUTF8StringEncoding], sleeve, OBJC_ASSOCIATION_RETAIN);
             }
             

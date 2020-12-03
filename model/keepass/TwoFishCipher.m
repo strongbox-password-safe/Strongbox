@@ -17,7 +17,7 @@ static const uint32_t kIvSize = kBlockSize;
 @implementation TwoFishCipher
 
 - (NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
-    //int err;
+    
     symmetric_key skey;
     
     if ((twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
@@ -46,7 +46,7 @@ static const uint32_t kIvSize = kBlockSize;
         ct += kBlockSize;
     }
     
-    // PKCS#7 Padding
+    
 
     twofish_ecb_decrypt(ct, pt, &skey);
 
@@ -79,7 +79,7 @@ static const uint32_t kIvSize = kBlockSize;
 }
 
 - (NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
-    //int err;
+    
     symmetric_key skey;
     
     if ((twofish_setup(key.bytes, kKeySize, 0, &skey)) != CRYPT_OK) {
@@ -94,7 +94,7 @@ static const uint32_t kIvSize = kBlockSize;
     uint8_t *pt = (uint8_t*)data.bytes;
     uint8_t ptBar[kBlockSize];
     unsigned char ct[kBlockSize];
-    memcpy(ct, iv.bytes, kBlockSize); // Initialize CT with IV
+    memcpy(ct, iv.bytes, kBlockSize); 
     
     for (int i = 0; i < numBlocks; i++) {
         for (int j = 0; j < kBlockSize; j++) {
@@ -107,7 +107,7 @@ static const uint32_t kIvSize = kBlockSize;
         pt += kBlockSize;
     }
     
-    // PKCS#7 Padding
+    
     
     uint8_t padLen = kBlockSize - (data.length - (kBlockSize * numBlocks));
  

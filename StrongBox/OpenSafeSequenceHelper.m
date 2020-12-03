@@ -56,14 +56,12 @@
 @property BOOL openLocalOnly;
 
 @property NSString* masterPassword;
-@property NSData* undigestedKeyFileData; // We cannot digest Key File until after we discover the Database Format (because KeePass 2 allows for a special XML format of Key File)
-@property NSData* keyFileDigest; // Or we may directly set the digest from the convenience secure store
-
-@property NSString* yubikeySecret; // TODO: Remove this and cleanup the safe meta data... after say 3 months? so => 17 Jan 2021
+@property NSData* undigestedKeyFileData; 
+@property NSData* keyFileDigest; 
 
 @property YubiKeyHardwareConfiguration* yubiKeyConfiguration;
 
-@property BOOL biometricPreCleared; // App Lock has just authorized the user via Bio - No need to ask again
+@property BOOL biometricPreCleared; 
 
 @property UIDocumentPickerViewController *documentPicker;
 
@@ -176,9 +174,9 @@
 - (void)clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState {
     NSArray<SafeMetaData*>* databases = SafesList.sharedInstance.snapshot;
     
-    // Unenrol/Remove Convenience Unlock secrets for all DBs protected by Biometric ID...
-    // All because if an attacker adds a dummy db and successfully Bio authenticates -
-    // good state will change and allow access to previously enrolled dbs
+    
+    
+    
 
     for (SafeMetaData* database in databases) {
         if(database.isTouchIdEnabled) {
@@ -186,11 +184,9 @@
             
             database.isEnrolledForConvenience = NO;
             database.convenienceMasterPassword = nil;
-            database.convenenienceYubikeySecret = nil;
             
-            // database.conveniencePin = nil; // KEEP PIN for users who use both...
             
-            database.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful manual open
+            database.hasBeenPromptedForConvenience = NO; 
             [SafesList.sharedInstance update:database];
         }
     }
@@ -220,7 +216,7 @@
                     }];
                 });
             }
-            else if (self.isAutoFillOpen && self.safe.mainAppAndAutoFillYubiKeyConfigsIncoherent) { // Give user a chance to specify a Virtual Key in AutoFill mode without blowing away Convenience Unlock
+            else if (self.isAutoFillOpen && self.safe.mainAppAndAutoFillYubiKeyConfigsIncoherent) { 
                 [self promptForManualCredentials];
             }
             else {
@@ -228,7 +224,7 @@
             }
         }
         else if(!SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens && self.safe.conveniencePin != nil) {
-            if (self.isAutoFillOpen && self.safe.mainAppAndAutoFillYubiKeyConfigsIncoherent) { // Give user a chance to specify a Virtual Key in AutoFill mode
+            if (self.isAutoFillOpen && self.safe.mainAppAndAutoFillYubiKeyConfigsIncoherent) { 
                 [self promptForManualCredentials];
             }
             else {
@@ -244,7 +240,7 @@
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)promptForConveniencePin {
     const int maxFailedPinAttempts = 3;
@@ -266,7 +262,7 @@
                 if([pin isEqualToString:self.safe.conveniencePin]) {
                     self.isConvenienceUnlock = YES;
                     
-                    if (self.safe.failedPinAttempts != 0) { // Don't write unless necessary - PERF
+                    if (self.safe.failedPinAttempts != 0) { 
                         self.safe.failedPinAttempts = 0;
                         [SafesList.sharedInstance update:self.safe];
                     }
@@ -276,7 +272,6 @@
                         oneTimeKeyFileData:nil
                                   readOnly:self.safe.readOnly
                              openLocalOnly:self.openLocalOnly
-                             yubikeySecret:self.safe.convenenienceYubikeySecret
                       yubikeyConfiguration:self.safe.contextAwareYubiKeyConfig];
                 }
                 else if (self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin]) {
@@ -298,7 +293,6 @@
                         self.safe.conveniencePin = nil;
                         self.safe.isEnrolledForConvenience = NO;
                         self.safe.convenienceMasterPassword = nil;
-                        self.safe.convenenienceYubikeySecret = nil;
                         
                         [SafesList.sharedInstance update:self.safe];
                         
@@ -358,17 +352,17 @@
     [[SafesList sharedInstance] remove:self.safe.uuid];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)showBiometricAuthentication {
-    //NSLog(@"REQUEST-BIOMETRIC: Open Safe");
+    
     
     if(self.biometricPreCleared) {
         NSLog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
         [self onBiometricAuthenticationDone:YES error:nil];
     }
     else {
-        // Cool transparency if using biometric - no need for any overlay/UI
+        
 
         CGFloat previousAlpha = self.viewController.view.alpha;
         if (self.isAutoFillQuickTypeOpen) {
@@ -385,7 +379,7 @@
             }
         }];
 
-        if(!ret) { // No longer an issue - just log
+        if(!ret) { 
             NSLog(@"iOS13 Biometric Bug? Please try shaking your device to make the Biometric dialog appear. This is expected to be fixed in iOS13.2. Tap OK now and then shake.");
         }
     }
@@ -395,7 +389,7 @@
                                 error:(NSError *)error {
     if (success) {
         if(![BiometricsManager.sharedInstance isBiometricDatabaseStateRecorded:self.isAutoFillOpen]) {
-            [BiometricsManager.sharedInstance recordBiometricDatabaseState:self.isAutoFillOpen]; // Successful Auth and no good previous state recorded, record Biometrics database state now...
+            [BiometricsManager.sharedInstance recordBiometricDatabaseState:self.isAutoFillOpen]; 
         }
 
         self.isConvenienceUnlock = YES;
@@ -410,7 +404,6 @@
                 oneTimeKeyFileData:nil
                           readOnly:self.safe.readOnly
                      openLocalOnly:self.openLocalOnly
-                     yubikeySecret:self.safe.convenenienceYubikeySecret
               yubikeyConfiguration:self.safe.contextAwareYubiKeyConfig];
         }
     }
@@ -448,7 +441,7 @@
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)promptForManualCredentials {
     self.isConvenienceUnlock = NO;
@@ -505,12 +498,12 @@
     
     scVc.initialYubiKeyConfig = self.safe.contextAwareYubiKeyConfig;
     
-    scVc.validateCommonKeyFileMistakes = self.safe.keyFileBookmark == nil; // No key file set for this db, then perform some simple checks before accepting it
+    scVc.validateCommonKeyFileMistakes = self.safe.keyFileBookmark == nil; 
     
-    // Less than perfect but helpful
+    
     
     BOOL probablyPasswordSafe = [self.safe.fileName.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
-    DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; // Not Ideal
+    DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; 
     
     scVc.initialFormat = self.safe.likelyFormat != kFormatUnknown ? self.safe.likelyFormat : heuristicFormat;
     
@@ -518,7 +511,7 @@
     [SyncManager.sharedInstance isLocalWorkingCacheAvailable:self.safe modified:&modDate];
     scVc.showOpenLocalOnlyOption = self.safe.storageProvider != kLocalDevice && modDate != nil;
     
-    // Auto Detect Key File if there's none explicitly set...
+    
     
     if(!self.safe.keyFileBookmark) {
         NSString* autoDetectedKeyFileBookmark = [self getAutoDetectedKeyFileUrl];
@@ -536,7 +529,6 @@
                     oneTimeKeyFileData:creds.oneTimeKeyFileData
                               readOnly:creds.readOnly
                          openLocalOnly:creds.openLocalOnly
-                         yubikeySecret:creds.yubiKeySecret
                   yubikeyConfiguration:creds.yubiKeyConfig];
             }
             else {
@@ -548,29 +540,27 @@
     [self.viewController presentViewController:nav animated:YES completion:nil];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)onGotCredentials:(NSString*)password
          keyFileBookmark:(NSString*)keyFileBookmark
       oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                 readOnly:(BOOL)readOnly
            openLocalOnly:(BOOL)openLocalOnly
-           yubikeySecret:(NSString*)yubikeySecret
     yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubikeyConfiguration {
     if(keyFileBookmark || oneTimeKeyFileData) {
         NSError *error;
         self.undigestedKeyFileData = getKeyFileData(keyFileBookmark, oneTimeKeyFileData, &error);
 
         if(self.undigestedKeyFileData == nil) {
-            // Clear convenience unlock settings if we fail to read Key File - Force manual reselection.
+            
             
             if(self.isConvenienceUnlock) {
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
-                self.safe.convenenienceYubikeySecret = nil;
                 self.safe.conveniencePin = nil;
                 self.safe.isTouchIdEnabled = NO;
-                self.safe.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful open
+                self.safe.hasBeenPromptedForConvenience = NO; 
                 
                 [SafesList.sharedInstance update:self.safe];
             }
@@ -599,11 +589,8 @@
     if(yubikeyConfiguration && yubikeyConfiguration.mode != kNoYubiKey) {
         self.yubiKeyConfiguration = yubikeyConfiguration;
     }
-    else { // Only use the secret workaround if we're not directly using an actual YubiKey - TODO: Kill with fire
-        self.yubikeySecret = yubikeySecret;
-    }
     
-    // Change in Read-Only or Key File Setting or Yubikey setting? Save
+    
 
     BOOL readOnlyChanged = self.safe.readOnly != readOnly;
     
@@ -625,7 +612,7 @@
     [self beginUnlockWithCredentials];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)beginUnlockWithCredentials {
     NSDate* localCopyModDate;
@@ -639,7 +626,7 @@
             self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
         else{
-            self.forcedReadOnly = !self.isAutoFillOpen; // Auto-Fill can edit local copy
+            self.forcedReadOnly = !self.isAutoFillOpen; 
             [self unlockLocalCopy];
         }
     }
@@ -657,11 +644,11 @@
                    defaultButtonText:NSLocalizedString(@"open_sequence_yes_use_local_copy_option", @"Yes, Use Local (Read-Only)")
                     secondButtonText:NSLocalizedString(@"open_sequence_yesno_use_offline_cache_no_try_connect_option", @"No, Try to connect anyway")
                               action:^(int response) {
-            if (response == 0) { // Local
-                self.forcedReadOnly = YES;  // Change for Pro users when offline editing feature in place
+            if (response == 0) { 
+                self.forcedReadOnly = YES;  
                 [self unlockLocalCopy];
             }
-            else if (response == 1) { // Try anyway
+            else if (response == 1) { 
                 [self syncAndUnlockLocalCopy];
             }
             else {
@@ -676,7 +663,7 @@
 }
 
 - (void)syncAndUnlockLocalCopy {
-    [self syncAndUnlockLocalCopy:YES]; // By default try to join an existing sync to speed things up
+    [self syncAndUnlockLocalCopy:YES]; 
 }
 
 - (void)syncAndUnlockLocalCopy:(BOOL)join {
@@ -692,11 +679,11 @@
             [SVProgressHUD dismiss];
              
             if (result == kSyncAndMergeResultUserInteractionRequired) {
-                // Can happen if we join an existing Sync and it requires user interaction - just re-sync without joining
+                
                 [self syncAndUnlockLocalCopy:NO];
             }
             else if (result == kSyncAndMergeResultUserCancelled) {
-                // Can happen when user cancels out of a Sync Conflict without choosing a resolution
+                
                 self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
             }
             else if (result == kSyncAndMergeError) {
@@ -704,10 +691,10 @@
 
                 if (self.safe.storageProvider == kFilesAppUrlBookmark) {
                     if ( @available(iOS 11.0, *) ) {
-                        if ( error.code == NSFileProviderErrorNoSuchItem || // -1005
-                             error.code == NSFileReadNoPermissionError ||   // 257
-                             error.code == NSFileReadNoSuchFileError ||     // 260
-                             error.code == NSFileNoSuchFileError) {         // 4
+                        if ( error.code == NSFileProviderErrorNoSuchItem || 
+                             error.code == NSFileReadNoPermissionError ||   
+                             error.code == NSFileReadNoSuchFileError ||     
+                             error.code == NSFileNoSuchFileError) {         
                             NSString* message = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db_message", @"Strongbox is having trouble locating your database. This can happen sometimes especially after iOS updates or with some 3rd party providers (e.g.Nextcloud).\n\nYou now need to tell Strongbox where to locate it. Alternatively you can open Strongbox's local copy and fix this later.\n\nFor Nextcloud please use WebDAV instead...");
                             
                             NSString* relocateDatabase = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db", @"Locate Database...");
@@ -722,7 +709,7 @@
                                     [self onRelocateFilesBasedDatabase];
                                 }
                                 else if (response == 1) {
-                                    self.forcedReadOnly = YES; // Live Connect - allow editing of local copy - Change for Pro users when offline editing feature in place - TODO
+                                    self.forcedReadOnly = YES; 
                                     [self unlockLocalCopy];
                                 }
                                 else {
@@ -745,10 +732,10 @@
                             secondButtonText:viewSyncError
                                       action:^(int response) {
                     if (response == 0) {
-                        self.forcedReadOnly = YES; // Live Connect - allow editing of local copy - Change for Pro users when offline editing feature in place - TODO
+                        self.forcedReadOnly = YES; 
                         [self unlockLocalCopy];
                     }
-                    else if (response == 1) { // View Debug Sync Log
+                    else if (response == 1) { 
                         self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil);
                     }
                     else {
@@ -756,8 +743,8 @@
                     }
                 }];
             }
-            else { // SUCCESS
-                self.forcedReadOnly = NO; // Live Connect - allow editing of local copy
+            else { 
+                self.forcedReadOnly = NO; 
                 [self unlockLocalCopy];
             }
         });
@@ -808,15 +795,6 @@
                                                     modDate:modDate
                                                   yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
             [self getYubiKeyChallengeResponse:challenge completion:completion];
-        }];
-    }
-    else if (self.yubikeySecret.length) {
-        [self unlockValidDatabaseWithAllCompositeKeyFactors:url
-                                                     format:format
-                                                    modDate:modDate
-                                                  yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
-            NSData* yubikeyResponse = [self getDummyYubikeyResponse:challenge];
-            completion(NO, yubikeyResponse, nil);
         }];
     }
     else {
@@ -872,20 +850,20 @@
                                                        yubiKeyCR:yubiKeyCR];
         
         DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
-                                                            sanityCheckInnerStream:SharedAppAndAutoFillSettings.sharedInstance.debugSanityCheckInnerStream];
+                                                            sanityCheckInnerStream:YES];
     
         if(!self.isConvenienceUnlock &&
            (format == kKeePass || format == kKeePass4) &&
            self.masterPassword.length == 0 &&
            (self.keyFileDigest || yubiKeyCR)) {
-            // KeePass 2 allows empty and nil/none...
-            // we need to try both to figure out what the user meant.
-            // We will try empty first which is what will have come from the View Controller and then nil.
             
-            // NB: We can't do this with Yubikey because it will require at least 2 scans, so we explicitly ask
-            // NB: self.masterPassword will be @"" initially just due to the way CASG handles things
+            
+            
+            
+            
+            
 
-            if (!yubiKeyCR) { // Auto Figure it out
+            if (!yubiKeyCR) { 
                 [DatabaseModel fromUrl:url
                                    ckf:cpf
                                 config:modelConfig
@@ -895,7 +873,7 @@
                                                                    keyFileDigest:self.keyFileDigest
                                                                        yubiKeyCR:yubiKeyCR];
                         
-                        // FUTURE: For Yubikey users this is an issue because they will be asked twice... maybe explicitly ask them if they mean nil or empty
+                        
                         
                         [DatabaseModel fromUrl:url
                                ckf:ckf
@@ -913,7 +891,7 @@
                     }
                 }];
             }
-            else { // YubiKey open - Just ask
+            else { 
                 [Alerts twoOptionsWithCancel:self.viewController
                                        title:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
                                      message:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
@@ -978,13 +956,12 @@
             return;
         }
         else if (error.code == kStrongboxErrorCodeIncorrectCredentials) {
-            if(self.isConvenienceUnlock) { // Password incorrect - Either in our Keychain or on initial entry. Remove safe from Touch ID enrol.
+            if(self.isConvenienceUnlock) { 
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
-                self.safe.convenenienceYubikeySecret = nil;
                 self.safe.conveniencePin = nil;
                 self.safe.isTouchIdEnabled = NO;
-                self.safe.hasBeenPromptedForConvenience = NO; // Ask if user wants to enrol on next successful open
+                self.safe.hasBeenPromptedForConvenience = NO; 
                 
                 [SafesList.sharedInstance update:self.safe];
             
@@ -1059,7 +1036,6 @@
 
     self.safe.isEnrolledForConvenience = YES;
     self.safe.convenienceMasterPassword = compositeKeyFactors.password;
-    self.safe.convenenienceYubikeySecret = self.yubikeySecret;
     self.safe.hasBeenPromptedForConvenience = YES;
     
     [SafesList.sharedInstance update:self.safe];
@@ -1070,7 +1046,6 @@
 
     self.safe.isEnrolledForConvenience = YES;
     self.safe.convenienceMasterPassword = compositeKeyFactors.password;
-    self.safe.convenenienceYubikeySecret = self.yubikeySecret;
     self.safe.hasBeenPromptedForConvenience = YES;
 
     [SafesList.sharedInstance update:self.safe];
@@ -1082,7 +1057,6 @@
 
     self.safe.isEnrolledForConvenience = NO;
     self.safe.convenienceMasterPassword = nil;
-    self.safe.convenenienceYubikeySecret = nil;
     self.safe.hasBeenPromptedForConvenience = YES;
 
     [SafesList.sharedInstance update:self.safe];
@@ -1186,15 +1160,13 @@
                                             forcedReadOnly:self.forcedReadOnly
                                                 isAutoFill:self.isAutoFillOpen];
     
-    viewModel.openedWithYubiKeySecret = self.yubikeySecret;
-    
-    if(self.safe.autoFillEnabled && !self.isAutoFillOpen) { // This is memory heavy ... don't blow it in AutoFill
+    if(self.safe.autoFillEnabled && !self.isAutoFillOpen) { 
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
     }
 
     NSLog(@"Setting likelyFormat to [%ld]", (long)openedSafe.format);
     
-    if (!self.isAutoFillOpen) { // No need to set this everytime and force a reload - No update needed - PERF
+    if (!self.isAutoFillOpen) { 
         self.safe.likelyFormat = openedSafe.format;
         [SafesList.sharedInstance update:self.safe];
     }
@@ -1202,7 +1174,7 @@
     self.completion(kUnlockDatabaseResultSuccess, viewModel, nil);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 NSData* getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
     NSData* keyFileData = getKeyFileData(keyFileBookmark, onceOffKeyFileData, error);
@@ -1232,7 +1204,7 @@ NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NS
 + (BOOL)isAutoFillLikelyToCrash:(NSURL*)url {
     DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
     
-    if(format == kKeePass4) {     // Argon 2 Memory Consumption
+    if(format == kKeePass4) {     
         NSInputStream* inputStream = [NSInputStream inputStreamWithURL:url];
         CryptoParameters* params = [Kdbx4Serialization getCryptoParams:inputStream];
         
@@ -1250,9 +1222,9 @@ NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NS
         }
     }
     
-    // Very large DBs
+    
 
-    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 15 * 1024 * 1024; // TODO: Reconsider params (argon2 mem and size) with Uber Sync and streamed writes
+    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 15 * 1024 * 1024; 
 
     NSError* error;
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
@@ -1263,18 +1235,13 @@ NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NS
 
     return NO;
 }
-
-// TODO: Remove along with Emergency Workaround field
-- (NSData*)getDummyYubikeyResponse:(NSData*)challenge {
-    return [VirtualYubiKey getDummyYubikeyResponse:challenge secret:self.yubikeySecret];
-}
                     
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 static OpenSafeSequenceHelper *sharedInstance = nil;
 
 - (void)onRelocateFilesBasedDatabase {
-    // Some Voodoo to keep this instance around otherwise the delegate never gets called... it would be nice to find a better way to do this?
+    
     
     sharedInstance = self;
 
@@ -1303,7 +1270,7 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
     if (!document) {
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -1376,11 +1343,11 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
         self.safe.fileIdentifier = identifier;
         [SafesList.sharedInstance update:self.safe];
         
-        [self syncAndUnlockLocalCopy]; // Re-try...
+        [self syncAndUnlockLocalCopy]; 
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 @end

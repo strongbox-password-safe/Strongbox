@@ -36,8 +36,8 @@
         _browsableNew = NO;
         _browsableExisting = NO;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = NO; // Works even if offline (presumably an Apple iCloud cache)
-        _supportsConcurrentRequests = NO; // This could be yes?
+        _immediatelyOfferCacheIfOffline = NO; 
+        _supportsConcurrentRequests = NO; 
         
         return self;
     }
@@ -91,18 +91,18 @@ suggestedFilename:nil
     }
 
     if(!fileURL || fileURL.absoluteString.length == 0) {
-        // Not sure how this can happen but apparently it can...
+        
         completion(nil, [Utils createNSError:@"Could not create an iCloud database because could not find a good path for it!" errorCode:-1]);
         return;
     }
     
     NSLog(@"Want to create file at %@", fileURL);
     
-    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+    dispatch_async(dispatch_get_main_queue(), ^{ 
         [SVProgressHUD showWithStatus:@"Uploading..."];
         
         StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithData:data fileUrl:fileURL];
-        //NSLog(@"Loaded File URL: %@ in state: [%@]", [doc.fileURL lastPathComponent], [self stringForDocumentState:doc.documentState]);
+        
 
         [doc saveToURL:fileURL forSaveOperation:UIDocumentSaveForCreating completionHandler:^(BOOL success) {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -134,7 +134,7 @@ suggestedFilename:nil
 }
 
 - (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
-    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+    dispatch_async(dispatch_get_main_queue(), ^{ 
         NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
 
         StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithFileURL:fileUrl];
@@ -162,7 +162,7 @@ suggestedFilename:nil
                 return;
             }
 
-            //NSLog(@"Loaded File URL: %@ in state: [%@]", [doc.fileURL lastPathComponent], [self stringForDocumentState:doc.documentState]);
+            
             
             NSData* data = doc.data;
             
@@ -182,7 +182,7 @@ suggestedFilename:nil
 - (void)pushDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
     NSURL *fileUrl = [NSURL URLWithString:safeMetaData.fileIdentifier];
     
-    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+    dispatch_async(dispatch_get_main_queue(), ^{ 
         StrongboxUIDocument * doc = [[StrongboxUIDocument alloc] initWithData:data fileUrl:fileUrl];
         
         NSLog(@"Opened File URL: %@ in state: [%@]", [doc.fileURL lastPathComponent], [self stringForDocumentState:doc.documentState]);
@@ -225,9 +225,9 @@ suggestedFilename:nil
         return;
     }
  
-//    NSURL *url = [NSURL URLWithString:safeMetaData.fileIdentifier];
-//    NSURL *ubiq = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:nil];
-//    NSURL *ubiquitousPackage = [ubiq URLByAppendingPathComponent:safeMetaData.fileName];
+
+
+
     
     NSURL * url = [self getFullICloudURLWithFileName:safeMetaData.fileName];
     
@@ -235,7 +235,7 @@ suggestedFilename:nil
 }
 
 - (void)deleteICloudUrl:(NSURL*)url safeMetaData:(SafeMetaData*)safeMetaData secondAttempt:(BOOL)secondAttempt completion:(void (^)(NSError *error))completion {
-    // Wrap in file coordinator
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
         NSFileCoordinator* fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
         [fileCoordinator coordinateWritingItemAtURL:url
@@ -245,7 +245,7 @@ suggestedFilename:nil
                                              NSFileManager* fileManager = [[NSFileManager alloc] init];
                                              NSError *error2;
                                              [fileManager removeItemAtURL:writingURL error:&error2];
-            if(error2 && !secondAttempt) { // Try to delete by fileIdentifier if fileName failed... could be in a subdirectory
+            if(error2 && !secondAttempt) { 
                 NSURL* urlSecondAttempt = [NSURL URLWithString:safeMetaData.fileIdentifier];
                 [self deleteICloudUrl:urlSecondAttempt safeMetaData:safeMetaData secondAttempt:YES completion:completion];
             }
@@ -281,7 +281,7 @@ suggestedFilename:nil
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
-    // NOTIMPL
+    
     NSLog(@"NOTIMPL: list");
 }
 

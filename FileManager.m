@@ -104,7 +104,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     return url;
 }
 
-- (NSURL*)sharedLocalDeviceDatabasesDirectory { // This is the new Uber Sync Local Directory
+- (NSURL*)sharedLocalDeviceDatabasesDirectory { 
     NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"local-databases"];
 
@@ -121,21 +121,21 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 }
 
 - (void)setDirectoryInclusionFromBackup:(BOOL)localDocuments importedKeyFiles:(BOOL)importedKeyFiles {
-    // Exclude Local working caches
+    
     
     [self setIncludeExcludeFromBackup:self.syncManagerLocalWorkingCachesDirectory include:NO];
 
     [self setIncludeExcludeFromBackup:self.documentsDirectory include:localDocuments];
     [self setIncludeExcludeFromBackup:self.sharedLocalDeviceDatabasesDirectory include:localDocuments];
             
-    // Old Local Database files must be included/excluded individually as there is a permissions error on setting shared app group
+    
     
     [self setIncludeExcludeSharedLocalFilesFromBackup:self.sharedAppGroupDirectory include:localDocuments];
     
     [self setIncludeExcludeFromBackup:self.backupFilesDirectory include:localDocuments];
     [self setIncludeExcludeFromBackup:self.preferencesDirectory include:localDocuments];
 
-    // Imported Key Files
+    
     
     [self setIncludeExcludeFromBackup:self.keyFilesDirectory include:importedKeyFiles];
 }
@@ -152,7 +152,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
         NSError *error;
         NSNumber *isDirectory = nil;
         if (![file getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
-            // handle error
+            
             NSLog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
@@ -182,7 +182,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     [self deleteAllInDirectory:self.backupFilesDirectory];
     [self deleteAllInDirectory:self.preferencesDirectory];
     [self deleteAllInDirectory:self.syncManagerLocalWorkingCachesDirectory];
-    [self deleteAllInDirectory:self.sharedAppGroupDirectory recursive:NO]; // Remove any files but leave directories don't know about
+    [self deleteAllInDirectory:self.sharedAppGroupDirectory recursive:NO]; 
 }
 
 - (void)deleteAllInDirectory:(NSURL*)url {
@@ -268,7 +268,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     [self deleteAllFoo:tmpPath];
 }
 
-- (void)deleteAllTmpEncryptedAttachmentFiles { // WARN: Never call this when database is open
+- (void)deleteAllTmpEncryptedAttachmentFiles { 
     NSString* tmpPath = [self tmpEncryptedAttachmentPath];
 
     [self deleteAllFoo:tmpPath];

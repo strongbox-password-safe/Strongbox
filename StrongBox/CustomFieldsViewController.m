@@ -24,6 +24,8 @@
 
 @end
 
+static NSString* const kOldCustomFieldCellId = @"OldCustomFieldCell";
+
 @implementation CustomFieldsViewController
 
 - (void)viewDidLoad {
@@ -34,6 +36,8 @@
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.estimatedRowHeight = 55.0f;
     
+    [self.tableView registerNib:[UINib nibWithNibName:kOldCustomFieldCellId bundle:nil] forCellReuseIdentifier:kOldCustomFieldCellId];
+
     self.workingItems = self.items ? [self.items mutableCopy] : [NSMutableArray array];
     
     self.buttonAdd.enabled = !self.readOnly;
@@ -296,11 +300,11 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     CustomField* field = [self.workingItems objectAtIndex:indexPath.row];
 
-    CustomFieldTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CustomFieldsReuseIdentifier" forIndexPath:indexPath];
+    CustomFieldTableCell *cell = [tableView dequeueReusableCellWithIdentifier:kOldCustomFieldCellId forIndexPath:indexPath];
 
     cell.key = field.key;
     cell.value = field.value;
-    cell.hidden = field.protected;
+    cell.concealed = field.protected;
     cell.isHideable = field.protected;
     
     return cell;

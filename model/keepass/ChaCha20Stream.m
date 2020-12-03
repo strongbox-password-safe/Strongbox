@@ -61,8 +61,8 @@ static const uint32_t kKeySize = 32;
         
         self.bytesProcessed = 0;
         
-        //NSLog(@"ChaCha20 Generated IV: %@", [self.generatedIv base64EncodedStringWithOptions:kNilOptions]);
-        //NSLog(@"ChaCha20 Generated Key: %@", [self.generatedKey base64EncodedStringWithOptions:kNilOptions]);
+        
+        
     }
     
     return self;

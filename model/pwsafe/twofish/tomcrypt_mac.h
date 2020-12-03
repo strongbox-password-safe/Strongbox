@@ -21,7 +21,7 @@ int hmac_memory_multi(int hash,
 int hmac_file(int hash, const char *fname, const unsigned char *key,
               unsigned long keylen,
               unsigned char *dst, unsigned long *dstlen);
-#endif // ifdef LTC_HMAC
+#endif 
 
 #ifdef LTC_OMAC
 
@@ -341,7 +341,7 @@ int xcbc_file(int cipher,
               unsigned char *out, unsigned long *outlen);
 int xcbc_test(void);
 
-#endif // ifdef LTC_XCBC
+#endif 
 
 #ifdef LTC_F9_MODE
 
@@ -375,7 +375,7 @@ int f9_file(int cipher,
             unsigned char *out, unsigned long *outlen);
 int f9_test(void);
 
-#endif // ifdef LTC_F9_MODE
+#endif 
 
 
 /* $Source: /cvs/libtom/libtomcrypt/src/headers/tomcrypt_mac.h,v $ */

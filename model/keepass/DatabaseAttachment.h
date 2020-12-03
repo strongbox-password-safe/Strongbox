@@ -24,16 +24,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly) NSUInteger estimatedStorageBytes;
 @property (readonly) NSUInteger length;
-@property (readonly) NSString* digestHash; // Use native hash/equals
+@property (readonly) NSString* digestHash; 
 
-@property BOOL compressed; // Keepass v3
-@property BOOL protectedInMemory; // Keepass v4
+@property BOOL compressed; 
+@property BOOL protectedInMemory; 
 
 - (NSInputStream*)getPlainTextInputStream;
 
-// Unit Test only
 
-- (instancetype)initWithData:(NSData*)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory; // never use in prod. unit testing convenience only
+
+- (instancetype)initWithData:(NSData*)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory; 
 @property (readonly) NSData* unitTestDataOnly;
 
 @end

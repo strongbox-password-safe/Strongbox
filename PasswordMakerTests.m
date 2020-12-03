@@ -50,15 +50,15 @@
     XCTAssertNotNil(password);
 }
 
-//- (void)testEmojis {
-//    PasswordGenerationConfig* config = [PasswordGenerationConfig defaults];
-//    
-//    config.useCharacterGroups = @[@(kPasswordGenerationCharacterPoolEmoji)];
-//    NSString* password = [PasswordMaker.sharedInstance generateForConfig:config];
-//    
-//    NSLog(@"Generated: [%@]", password);
-//    
-//    XCTAssertNotNil(password);
-//}
+
+
+
+
+
+
+
+
+
+
 
 @end

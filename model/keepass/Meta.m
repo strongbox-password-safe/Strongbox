@@ -28,6 +28,8 @@
         self.recycleBinEnabled = YES;
         _recycleBinChanged = [NSDate date];
         _recycleBinGroup = NSUUID.zero;
+        
+        self.customData = [[CustomData alloc] initWithContext:context];
     }
     
     return self;
@@ -40,7 +42,10 @@
     else if ([xmlElementName isEqualToString:kCustomIconListElementName]) {
         return [[CustomIconList alloc] initWithContext:self.context];
     }
-    
+    else if ([xmlElementName isEqualToString:kCustomDataElementName]) {
+        return [[CustomData alloc] initWithContext:self.context];
+    }
+
     return [super getChildHandler:xmlElementName];
 }
 
@@ -81,6 +86,10 @@
         self.recycleBinChanged = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
         return YES;
     }
+    else if([withXmlElementName isEqualToString:kCustomDataElementName]) {
+        self.customData = (CustomData*)completedObject;
+        return YES;
+    }
     else {
         return NO;
     }
@@ -104,6 +113,12 @@
     
     if(self.customIconList && ![self.customIconList writeXml:serializer]) return NO;
 
+    if (self.customData && self.customData.orderedDictionary.count) {
+        if ( ![self.customData writeXml:serializer] ) return NO;
+    }
+
+    
+    
     if(![super writeUnmanagedChildren:serializer]) {
         return NO;
     }
@@ -114,8 +129,8 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nV3 Binaries = [%@], historyMaxItems = [%@], historyMaxSize = [%@], Recycle Bin enabled = [%d], Recycle Bin Group = [%@], Recycle Bin Changed = [%@]",
-            self.generator, self.headerHash, self.v3binaries, self.historyMaxItems, self.historyMaxSize, self.recycleBinEnabled, self.recycleBinGroup, self.recycleBinChanged];
+    return [NSString stringWithFormat:@"Generator = [%@]\nHeader Hash=[%@]\nV3 Binaries = [%@], historyMaxItems = [%@], historyMaxSize = [%@], Recycle Bin enabled = [%d], Recycle Bin Group = [%@], Recycle Bin Changed = [%@], customDate = [%@]",
+            self.generator, self.headerHash, self.v3binaries, self.historyMaxItems, self.historyMaxSize, self.recycleBinEnabled, self.recycleBinGroup, self.recycleBinChanged, self.customData];
 }
 
 @end

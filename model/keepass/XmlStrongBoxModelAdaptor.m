@@ -50,7 +50,7 @@
         }
     }
     
-    // 2. Convert from Strongbox Node Model back to Keepass Xml model respecting any existing tags/attributes etc
+    
     
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     KeePassGroup* rootXmlGroup = [adaptor fromModel:rootNode context:context error:error];
@@ -60,12 +60,12 @@
         return nil;
     }
 
-    // 3. Metadata
+    
 
     ret.keePassFile.meta.generator = kStrongboxGenerator;
     ret.keePassFile.root.rootGroup = rootXmlGroup;
 
-    // Deleted Objects
+    
     
     if (databaseProperties.deletedObjects.count && !ret.keePassFile.root.deletedObjects) {
         ret.keePassFile.root.deletedObjects = [[DeletedObjects alloc] initWithContext:XmlProcessingContext.standardV3Context];
@@ -83,7 +83,7 @@
         [ret.keePassFile.root.deletedObjects.deletedObjects addObject:dob];
     }
         
-    // 4. Custom Icons
+    
 
     if(customIcons.count && !ret.keePassFile.meta.customIconList) {
         ret.keePassFile.meta.customIconList = [[CustomIconList alloc] initWithContext:[XmlProcessingContext standardV3Context]];
@@ -106,7 +106,7 @@
 }
 
 static KeePassGroup *getExistingRootKeePassGroup(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
-    // Possible that one of these intermediates are nil... safety
+    
     
     KeePassFile *keepassFileElement = existingRootXmlDocument == nil ? nil : existingRootXmlDocument.keePassFile;
     Root* rootXml = keepassFileElement == nil ? nil : keepassFileElement.root;

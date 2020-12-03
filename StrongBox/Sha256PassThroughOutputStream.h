@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initToOutputStream:(NSOutputStream *)outputStream;
 
-@property (readonly) NSData* digest; // Only available on close:
-@property (readonly) NSUInteger length; // Only available on close:
+@property (readonly) NSData* digest; 
+@property (readonly) NSUInteger length; 
 
 @end
 

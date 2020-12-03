@@ -13,14 +13,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^GetAvailableYubikeyCompletion)(YubiKeyData* yubiKeyData);
+typedef void (^GetAvailableYubiKeyCompletion)(YubiKeyData* yubiKeyData);
 typedef void (^ChallengeResponseCompletion)(NSData* response, NSError* error);
 
 @interface MacYubiKeyManager : NSObject
 
 + (instancetype)sharedInstance;
 
-- (void)getAvailableYubikey:(GetAvailableYubikeyCompletion)completion;
+- (void)getAvailableYubiKey:(GetAvailableYubiKeyCompletion)completion;
 - (void)challengeResponse:(NSData*)challenge slot:(NSInteger)slot completion:(ChallengeResponseCompletion)completion;
 
 - (void)compositeKeyFactorCr:(NSData*)challenge

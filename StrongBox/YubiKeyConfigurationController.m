@@ -90,7 +90,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
         cell.userInteractionEnabled = YES;
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
         
-        if (indexPath.row == 0) { // Not sure why this is necessary but it is...
+        if (indexPath.row == 0) { 
             UITableViewCell* oldStaticCell = [super tableView:tableView cellForRowAtIndexPath:indexPath];
             cell.textLabel.text = oldStaticCell.textLabel.text;
 
@@ -182,7 +182,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.section == 3) {
         if (indexPath.row == 0) {
-#ifndef IS_APP_EXTENSION // Creating a secret in App Extension doesn't work back in the main app! - Don't allow it...
+#ifndef IS_APP_EXTENSION 
             [self performSegueWithIdentifier:@"segueToAddVirtual" sender:nil];
             [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 #else
@@ -249,7 +249,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
     }
 }
 
-// Required because we are mixing dynamic and static in a single table...
+
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
     if (indexPath.section == 3) {
         NSIndexPath* ip = [NSIndexPath indexPathForRow:0 inSection:indexPath.section];
@@ -296,7 +296,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
 #ifndef IS_APP_EXTENSION
     return [YubiManager.sharedInstance yubiKeySupportedOnDevice];
 #else
-    // MFI Support in AutoFill - Yubikey library isn't compatible with App Extensions :/
+    
     return NO;
 #endif
 }

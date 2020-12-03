@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) Model *viewModel;
 @property Node * _Nonnull currentGroup;
 @property NSArray<Node*> * _Nonnull itemsToMove;
-@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonMove;
 
 @property (nonatomic, copy, nonnull) void (^onDone)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError* error);
 

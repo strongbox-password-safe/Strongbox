@@ -64,12 +64,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (Node *_Nullable)deserialize:(NSDictionary *)dict
                         parent:(Node*)parent
-     keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
+        keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                          error:(NSError**)error;
 
-- (NSDictionary *)serialize:(SerializationPackage*)serialization; // Serializes this node and all children (all fields) - This can be used interprocess - for duplications/copy/paste - drag & drop
+- (NSDictionary *)serialize:(SerializationPackage*)serialization; 
 
-- (NSString*)getSerializationId:(BOOL)groupCanUseUuid; // This is an ID which should hopefully remain the same across saves
+- (NSString*)getSerializationId:(BOOL)groupCanUseUuid; 
 
 - (BOOL)contains:(Node*)test;
 - (BOOL)setTitle:(NSString*_Nonnull)title keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
@@ -80,16 +80,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)changeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 
 - (void)moveChild:(NSUInteger)from to:(NSUInteger)to;
-- (void)removeChild:(Node* _Nonnull)node; 
+- (void)removeChild:(Node*)node; 
 
 - (Node*)clone;
+- (Node*)cloneAsChildOf:(Node*)parentNode;
 - (Node*)clone:(BOOL)recursive;
 - (Node*)cloneForHistory;
-- (Node*)duplicate:(NSString*)newTitle; // NB: Must be added to parent to take effect
+- (Node*)duplicate:(NSString*)newTitle; 
 
 - (void)sortChildren:(BOOL)ascending;
 
-- (NSArray<NSString*>*_Nonnull)getTitleHierarchy;
+- (NSArray<NSString*>*)getTitleHierarchy;
 
 - (Node*_Nullable)getChildGroupWithTitle:(NSString*_Nonnull)title;
 
@@ -98,32 +99,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)restoreFromHistoricalNode:(Node*)historicalItem;
 
-- (void)touch; // Recursive Non Modified Touch
-- (void)touchAt:(NSDate*)date; // Recursive Non Modified Touch
+- (void)touch; 
+- (void)touchAt:(NSDate*)date; 
 - (void)touchAt:(BOOL)modified date:(NSDate *)date;
 
-- (void)touch:(BOOL)modified; // Recursive Touch
+- (void)touch:(BOOL)modified; 
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents;
 - (void)touch:(BOOL)modified touchParents:(BOOL)touchParents date:(NSDate*)date;
 
 - (void)touchLocationChanged;
 - (void)touchLocationChanged:(NSDate*)date;
 
-- (void)setModifiedDateExplicit:(NSDate*)modDate setParents:(BOOL)setParents; // Used mostly for undo...
+- (void)setModifiedDateExplicit:(NSDate*)modDate setParents:(BOOL)setParents; 
 
 - (BOOL)setTotpWithString:(NSString *)string
          appendUrlToNotes:(BOOL)appendUrlToNotes
                forceSteam:(BOOL)forceSteam;
 
-///////////////////////////////////////////////
-// For use by any Safe Format Provider
-//
-// PWSafe uses this to store original record so we don't overwrite unknown fields
-// KeePass to store a link back to the original Xml element so we retain unknown attributes/text/elements
+
+
+
+
+
 
 @property (nonatomic, strong, nullable) NSObject *linkedData;
 
 extern NSComparator finderStyleNodeComparator;
+
+- (BOOL)isSyncEqualTo:(Node*)other;
+- (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 
 @end
 

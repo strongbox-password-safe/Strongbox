@@ -17,6 +17,7 @@
 #import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "NSString+Extensions.h"
+#import "AutoFillManager.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -38,9 +39,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 @interface ViewModel ()
 
-// This is the initial load of an existing db uses encryptedDatabase. A new Database uses passwordDatabase
-// It will be decrypted and released on unlock. A lock discards the database and a full revert is required to unlock
-// again (loading the file from the original location)
+
+
+
 
 @property (strong, nonatomic) DatabaseModel* passwordDatabase;
 
@@ -60,11 +61,15 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         self.passwordDatabase = database;
         self.selectedItem = selectedItem;
         
-        if(self.document.fileURL) { // When we create a new database this can be null... 
+        if(self.document.fileURL) { 
             _databaseMetadata = [DatabasesManager.sharedInstance addOrGet:self.document.fileURL];
             
             if(self.databaseMetadata == nil) {
                 NSLog(@"WARN: Could not add or get metadata for [%@]", document.fileURL);
+            }
+            else if ( database && self.databaseMetadata.autoFillEnabled && self.databaseMetadata.quickTypeEnabled ) {
+                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:database
+                                                                   databaseUuid:self.databaseMetadata.uuid];
             }
         }
     }
@@ -81,7 +86,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         NSLog(@"Cannot lock document with edits!");
         return;
     }
-    // Clear the UNDO stack otherwise the operations will fail
+    
     
     [self.document.undoManager removeAllActions];
     self.passwordDatabase = nil;
@@ -92,10 +97,14 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
              completion:(void (^)(BOOL, NSError * _Nullable))completion {
     [self.document revertWithUnlock:compositeKeyFactors
                        selectedItem:self.selectedItem
-                         completion:completion]; // Full Reload from Disk to get latest version
+                         completion:completion]; 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+- (DatabaseModel *)database {
+    return self.passwordDatabase;
+}
 
 - (NSArray<DatabaseAttachment *> *)attachments {
     return self.passwordDatabase.attachments;
@@ -142,7 +151,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 - (void)getPasswordDatabaseAsData:(SaveCompletionBlock)completion {
     if (self.locked) {
         NSLog(@"Attempt to get safe data while locked?");
-        completion(NO, nil, nil);
+        completion(NO, nil, nil, nil);
     }
     
     [self.passwordDatabase getAsData:completion];
@@ -152,7 +161,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return [self.document fileURL];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)isDereferenceableText:(NSString *)text {
     return [self.passwordDatabase isDereferenceableText:text];
@@ -162,7 +171,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return [self.passwordDatabase dereference:text node:node];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 -(CompositeKeyFactors *)compositeKeyFactors {
     return self.locked ? nil : self.passwordDatabase.compositeKeyFactors;
@@ -185,7 +194,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     self.passwordDatabase.compositeKeyFactors.yubiKeyCR = compositeKeyFactors.yubiKeyCR;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)recycleBinEnabled {
     return self.passwordDatabase.recycleBinEnabled;
@@ -203,7 +212,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return self.passwordDatabase.keePass1BackupNode;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title {
     return [self setItemTitle:item title:title modified:nil];
@@ -233,7 +242,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self setItemExpires:item expiry:expiry modified:nil];
 }
 
-/// ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom {
     [self setItemIcon:item index:index existingCustom:existingCustom custom:custom rationalize:NO batchUpdate:NO];
@@ -274,7 +283,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager endUndoGrouping];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)setItemTitle:(Node* _Nonnull)item title:(NSString* _Nonnull)title modified:(NSDate*)modified {
     if(self.locked) {
@@ -502,7 +511,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 - (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage rationalize:(BOOL)rationalize batchUpdate:(BOOL)batchUpdate {
     CGImageRef cgRef = [customImage CGImageForProposedRect:NULL context:nil hints:nil];
     
-    if (cgRef) { // Has caused crash so check here... 
+    if (cgRef) { 
         NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
         NSData *selectedImageData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
         [self setItemIcon:item index:nil existingCustom:nil custom:selectedImageData modified:nil rationalize:rationalize batchUpdate:batchUpdate];
@@ -531,7 +540,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         index = item.isGroup ? @(48) : @(0);
     }
     
-    // Manage History
+    
     
     if(self.document.undoManager.isUndoing) {
         if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
@@ -541,7 +550,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
 
-    // Change...
+    
     
     item.iconId = index;
     if(existingCustom) {
@@ -553,7 +562,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     [self touchAndModify:item modDate:modified];
     
-    // Save data rather than existing custom icon here, as custom icon could be rationalized away, holding data guarantees we can undo...
+    
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item
                                                                         index:oldIndex
@@ -588,7 +597,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self touchAndModify:item modDate:modified];
     
     if(!self.document.undoManager.isUndoing) {
-        index = [item.fields.keePassHistory indexOfObject:historicalItem]; // removeObjectAtIndex:index];
+        index = [item.fields.keePassHistory indexOfObject:historicalItem]; 
         [item.fields.keePassHistory removeObjectAtIndex:index];
     }
     else {
@@ -622,11 +631,11 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
     [self touchAndModify:item modDate:modified];
     
-    // Record History
+    
     
     [item.fields.keePassHistory addObject:originalNode];
     
-    // Make Changes
+    
     
     [item touch:YES touchParents:NO date:NSDate.date];
     
@@ -713,7 +722,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     [self touchAndModify:item modDate:modified];
     
-    // To Undo we need to find this attachment's index!
+    
     
     int i=0;
     NSUInteger foundIndex = -1;
@@ -730,7 +739,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     if(foundIndex == -1) {
         NSLog(@"WARN: Could not find added Attachment index!");
-        // Something very wrong...
+        
         return;
     }
     
@@ -865,7 +874,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     OTPToken* oldOtpToken = item.fields.otpToken;
-    if(oldOtpToken == nil) { // NOP
+    if(oldOtpToken == nil) { 
         NSLog(@"Attempt to clear non existent OTP token");
         return;
     }
@@ -898,8 +907,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return [self.passwordDatabase getMinimalNodeSet:nodes];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Deletes, Moves and Additions
+
+
 
 - (BOOL)addNewRecord:(Node *_Nonnull)parentGroup {
     Node* record = [self getDefaultNewEntryNode:parentGroup];
@@ -1012,7 +1021,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
                                                     userInfo:nil];
 }
 
-// Recycle
+
 
 - (BOOL)recycleItems:(const NSArray<Node *> *)items {
     if(self.locked) {
@@ -1060,8 +1069,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
                                                     userInfo:nil];
 }
 
-////////////////////////////////////////////
-// Moves
+
+
 
 - (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination {
     return [self.passwordDatabase validateMoveItems:items destination:destination];
@@ -1149,41 +1158,41 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager endUndoGrouping];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (Node*)getDefaultNewEntryNode:(Node *_Nonnull)parentGroup {
     AutoFillNewRecordSettings *autoFill = Settings.sharedInstance.autoFillNewRecordSettings;
     
-    // Title
+    
     
     NSString *actualTitle = autoFill.titleAutoFillMode == kDefault ? [self getDefaultTitle] :
             autoFill.titleAutoFillMode == kSmartUrlFill ? [self getSmartFillTitle] : autoFill.titleCustomAutoFill;
 
-    // Username
+    
     
     NSString *actualUsername = autoFill.usernameAutoFillMode == kNone ? @"" :
             autoFill.usernameAutoFillMode == kMostUsed ? [self getAutoFillMostPopularUsername] : autoFill.usernameCustomAutoFill;
     
-    // Password
+    
     
     NSString *actualPassword = autoFill.passwordAutoFillMode == kNone ? @"" : autoFill.passwordAutoFillMode == kGenerated ? [self generatePassword] : autoFill.passwordCustomAutoFill;
     
-    // Email
+    
     
     NSString *actualEmail = autoFill.emailAutoFillMode == kNone ? @"" :
             autoFill.emailAutoFillMode == kMostUsed ? [self getAutoFillMostPopularEmail] : autoFill.emailCustomAutoFill;
     
-    // URL
+    
     
     NSString *actualUrl = autoFill.urlAutoFillMode == kNone ? @"" :
         autoFill.urlAutoFillMode == kSmartUrlFill ? [self getSmartFillUrl] : autoFill.urlCustomAutoFill;
     
-    // Notes
+    
 
     NSString *actualNotes = autoFill.notesAutoFillMode == kNone ? @"" :
         autoFill.notesAutoFillMode == kClipboard ? [self getSmartFillNotes] : autoFill.notesCustomAutoFill;
     
-    /////////////////////////////////////
+    
     
     NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
                                                           url:actualUrl
@@ -1216,7 +1225,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSString* clipboardText = [myPasteboard  stringForType:NSPasteboardTypeString];
     
     if(clipboardText) {
-        // h/t: https://stackoverflow.com/questions/3811996/how-to-determine-if-a-string-is-a-url-in-objective-c
+        
         
         NSURL *url = clipboardText.urlExtendedParse;
         

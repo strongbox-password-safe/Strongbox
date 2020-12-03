@@ -28,21 +28,21 @@ typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 
-// MMcG: 25-May-2020 - NB re immediatelyOfferCacheIfOffline
-//
-// Sometimes we don't want to try to read if we know we're offline because of a long delay (Dropbox)
-//
-// or
-//
-// Sometimes we don't know if the provider can offer it's own cached version (iOS Files via Third Party) or (iOS Files Local files)
-// even if we're offline so we should try to read even if we know we're offline - This switch allows us to customize how quickly we offer
-// a cached version if it's available
-//
-// or
-//
-// Our Offline Detector detects Internet connectivity (DuckDuckGo) but user could be using database on local LAN which could work fine (WebDAV, SFTP, maybe even iOS Files?)
 
-@property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline; // TODO: This is also something we probably want to allow user to override per safe (e.g. Dropbox via Files sucks when this is off, but local device files via Files works well)
+
+
+
+
+
+
+
+
+
+
+
+
+
+@property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline; 
 
 - (void)    create:(NSString *)nickName
          extension:(NSString *)extension

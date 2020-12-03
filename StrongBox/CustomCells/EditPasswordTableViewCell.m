@@ -27,14 +27,18 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
   
-    // TOO Small...
-//    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
-//        [self.buttonGenerationSettings setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
-//    }
+    
+
+
+
 
     self.valueTextView.delegate = self;
     self.valueTextView.font = FontManager.sharedInstance.easyReadFont;
-    self.valueTextView.adjustsFontForContentSizeCategory = YES;
+    
+    if (@available(iOS 10.0, *)) {
+        self.valueTextView.adjustsFontForContentSizeCategory = YES;
+    }
+    
     self.valueTextView.accessibilityLabel = NSLocalizedString(@"edit_password_cell_value_textfield_accessibility_label", @"Password Text Field");
     
     self.buttonGenerationSettings.hidden = !self.showGenerationSettings;
@@ -99,7 +103,7 @@
 }
 
 - (void)notifyChangedAndLayout {
-//    NSLog(@"EditPasswordCell: notifyChangedAndLayout");
+
       
     if(self.onPasswordEdited) {
         self.onPasswordEdited(self.password);
@@ -113,19 +117,19 @@
     NSMutableCharacterSet *set = [[NSCharacterSet newlineCharacterSet] mutableCopy];
     [set formUnionWithCharacterSet:[NSCharacterSet characterSetWithCharactersInString:@"\t"]];
 
-    // Filter new lines and tabs
+    
     
     if( [text rangeOfCharacterFromSet:set].location == NSNotFound ) {
-        // Remember Cursor Position...
+        
         
         UITextPosition *beginning = textView.beginningOfDocument;
         UITextPosition *cursorLocation = [textView positionFromPosition:beginning offset:(range.location + text.length)];
 
-        // Change our password - this updates the textview and colorizes and notifies listeners...
+        
         
         self.password = [textView.text stringByReplacingCharactersInRange:range withString:text];
 
-        // Reset Cursor
+        
         
         if(cursorLocation) {
             [textView setSelectedTextRange:[textView textRangeFromPosition:cursorLocation toPosition:cursorLocation]];
@@ -133,11 +137,11 @@
 
         return NO;
     }
-//    else if ([text isEqualToString:@"\t"]) {
-//        NSLog(@"tab...");
-//        [textView resignFirstResponder];
-//        [textView.nextResponder becomeFirstResponder];
-//    }
+
+
+
+
+
     
     return NO;
 }

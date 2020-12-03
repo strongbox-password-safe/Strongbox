@@ -1,5 +1,5 @@
 //
-//  YubikeyHardwareConfiguration.h
+//  YubiKeyHardwareConfiguration.h
 //  Strongbox
 //
 //  Created by Mark on 07/02/2020.

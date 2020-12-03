@@ -28,13 +28,13 @@ const int kDefaultMinimumLength = 12;
         self.minimumLength = kDefaultMinimumLength;
         self.checkForMinimumLength = NO;
 
-        self.checkForSimilarPasswords = NO; // CPU Heavy
-        self.checkHibp = NO; // Online Access
+        self.checkForSimilarPasswords = NO; 
+        self.checkHibp = NO; 
         
         self.lastKnownAuditIssueCount = nil;
         self.showAuditPopupNotifications = YES;
         self.hibpCaveatAccepted = NO;
-        self.hibpCheckForNewBreachesIntervalSeconds = 24 * 60 * 60; // Once a day check for newly compromised passwords
+        self.hibpCheckForNewBreachesIntervalSeconds = 24 * 60 * 60; 
         self.lastHibpOnlineCheck = nil;
         self.showCachedHibpHits = YES;
     }
@@ -42,8 +42,8 @@ const int kDefaultMinimumLength = 12;
     return self;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+
+
 
 + (instancetype)fromJsonSerializationDictionary:(NSDictionary *)jsonDictionary {
     DatabaseAuditorConfiguration* ret = DatabaseAuditorConfiguration.defaults;
@@ -97,8 +97,8 @@ const int kDefaultMinimumLength = 12;
     return ret;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Legacy Serialization - Remove eventually
+
+
 
 - (instancetype)initWithCoder:(NSCoder *)coder {
     if((self = [self init])) {

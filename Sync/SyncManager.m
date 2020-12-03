@@ -96,7 +96,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     if (localWorkingCache) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
-            // This should not be possible, something is very wrong if it is, because we will have loaded model
+            
             NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
             NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
             
@@ -120,7 +120,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     return [SyncAndMergeSequenceManager.sharedInstance getSyncStatus:database];
 }
 
-//////////////////////
+
 
 - (NSURL*)setWorkingCacheWithData:(NSData*)data dateModified:(NSDate*)dateModified database:(SafeMetaData*)database error:(NSError**)error {
     if (!data || !dateModified) {
@@ -161,12 +161,12 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     return [SafeStorageProviderFactory getStorageDisplayName:database];
 }
 
-- (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData *)database { // TODO: This should be a database property - smart set initially based on provider but ultimately configurable... and doesn't belogn in here but in the OpenSequenceManager
+- (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData *)database { 
 #ifndef IS_APP_EXTENSION
     id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
     return provider.immediatelyOfferCacheIfOffline;
 #else
-    return NO; // TODO: Remove this from SafeStorageProvider
+    return NO; 
 #endif
 }
 
@@ -181,8 +181,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     [self deleteLocalWorkingCache:database];
 }
 
-///////////////////////////////
-// TODO: can this model be used to pick up Auto-Fill writes in new uber sync system?! DISPATCH_VNODE_ATTRIB?
+
+
 
 - (void)startMonitoringDocumentsDirectory {
     NSString * homeDirectory = FileManager.sharedInstance.documentsDirectory.path;
@@ -191,7 +191,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     _dispatchQueue = dispatch_queue_create("FileMonitorQueue", 0);
     
-    // Write covers - adding a file, renaming a file and deleting a file...
+    
     _source = dispatch_source_create(DISPATCH_SOURCE_TYPE_VNODE, filedes, DISPATCH_VNODE_WRITE, _dispatchQueue);
     
     dispatch_source_set_event_handler(_source, ^(){
@@ -240,7 +240,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                     [newSafes addObject:item];
                 }
                 else {
-                    //NSLog(@"None Safe File:%@ is a not valid safe", item.name);
+                    
                 }
             }
         }
@@ -289,7 +289,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 }
 
 - (void)syncLocalSafesWithFileSystem {
-    // Add any new
+    
     NSArray<StorageBrowserItem*> *items = [self scanForNewDatabases];
     
     for(StorageBrowserItem* item in items) {
@@ -306,7 +306,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         [[SafesList sharedInstance] addWithDuplicateCheck:safe initialCache:snapshot initialCacheModDate:att.fileModificationDate];
     }
     
-    // Remove deleted
+    
     
     NSArray<SafeMetaData*> *localSafes = [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
     
@@ -318,7 +318,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         }
     }
     
-    // Pick up any updates and notify...
+    
     
     [SyncManager.sharedInstance backgroundSyncLocalDeviceDatabasesOnly];
 }
@@ -333,7 +333,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     NSString* extension = [identifier.filename pathExtension];
     NSString* baseFileName = [identifier.filename stringByDeletingPathExtension];
     
-    // Avoid Race Conditions
+    
     
     [self stopMonitoringDocumentsDirectory];
     
@@ -385,7 +385,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     return [folder URLByAppendingPathComponent:filename];
 }
 
-///////////////////////////////////////////////////////////////////////
+
 
 - (void)deleteLocalWorkingCache:(SafeMetaData*)database {
     NSURL* localCache = [self getLocalWorkingCache:database];
@@ -423,7 +423,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     
     if (error) {
-        //NSLog(@"Could not get local working cache at [%@]-[%@]", url, error);
+        
         if (modified) {
             *modified = nil;
         }
@@ -441,7 +441,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     return url;
 }
 
-//////////
+
 
 static NSString* syncResultToString(SyncAndMergeResult result) {
     switch(result) {

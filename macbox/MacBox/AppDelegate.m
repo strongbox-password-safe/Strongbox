@@ -18,7 +18,7 @@
 #import "BiometricIdHelper.h"
 #import "ViewController.h"
 #import "DatabasesManager.h"
-//#import "DAVKit.h"
+
 
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
 
@@ -51,12 +51,12 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 - (id)init {
     self = [super init];
     
-    // Bizarre but to subclass NSDocumentController you must instantiate your document here, no need to assign
-    // it anywhere it just picks it up by "magic" very strange...
+    
+    
     
     DocumentController *dc = [[DocumentController alloc] init];
     
-    if(dc) {} // Unused Warning evasion...
+    if(dc) {} 
     
     return self;
 }
@@ -66,13 +66,13 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self removeUnwantedMenuItems];
     
-    [self initializeProFamilyEdition];
-
+    [self initializeProFamilyEdition];    
+    
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
         if(![Settings sharedInstance].freeTrial) {
-            // Do not message for Upgrade until at least a while after initial open (per Apple guidelines)
+            
 
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(180 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^ {
                 [self randomlyShowUpgradeMessage];
@@ -89,16 +89,16 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self showHideSystemStatusBarIcon];
     
-    //    DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:@"" password:@""];
-    //    DAVSession *session = [[DAVSession alloc] initWithRootURL:@"" credentials:credentials];
-    //    self.applicationHasFinishedLaunching = YES;
+    
+    
+    
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onPreferencesChanged:)
                                                  name:kPreferencesChangedNotification
                                                object:nil];
     
-    // Auto Open Primary...
+    
 
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         DocumentController* dc = NSDocumentController.sharedDocumentController;
@@ -150,7 +150,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:sender];
     [NSApp activateIgnoringOtherApps:YES];
     
-    for(NSWindow* win in [NSApp windows]) { // Unminiturize any windows
+    for(NSWindow* win in [NSApp windows]) { 
         if([win isMiniaturized]) {
             [win deminiaturize:self];
         }
@@ -168,22 +168,22 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
         [self clearClipboardWhereAppropriate];
     }
     
-    // Clear Custom Clipboard no matter what
+    
     [self clearAppCustomClipboard];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-//    NSLog(@"Activated!");
+
 
     if(self.autoLockWorkBlock) {
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
     }
 
-//    ViewController* viewController = [self getActiveViewController];
-//    if(viewController) { // && !BiometricIdHelper.sharedInstance.biometricsInProgress) {
-////        [viewController autoPromptForTouchIdIfDesired];
-//    }
+
+
+
+
 }
 
 - (ViewController*)getActiveViewController {
@@ -241,12 +241,13 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)randomlyShowUpgradeMessage {
     NSUInteger random = arc4random_uniform(100);
     
-    if(random % 3 == 0) {
-        [((AppDelegate*)[[NSApplication sharedApplication] delegate]) showUpgradeModal:3];
+    NSUInteger showPercentage = 15;
+    if(random < showPercentage) {
+        [((AppDelegate*)[[NSApplication sharedApplication] delegate]) showUpgradeModal:1];
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)getValidIapProducts {
     NSSet *productIdentifiers = [NSSet setWithObjects:kIapFullVersionStoreId, nil];
@@ -283,8 +284,8 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
         }
     }
     else {
-        // Do not do this, violates Apple's rules at startup... no messaging
-        // [Alerts error:@"Error Contacting App Store for Upgrade Info" error:error window:[NSApplication sharedApplication].mainWindow];
+        
+        
     }
 }
 
@@ -303,7 +304,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     return YES;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)removeUnwantedMenuItems {
     [self removeMenuItem:kTopLevelMenuItemTagView action:@selector(onViewDebugDatabasesList:)];
@@ -322,7 +323,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }];
     
     if(index != NSNotFound) {
-//        NSLog(@"Removing %@ from %ld Menu", NSStringFromSelector(action), (long)topLevelTag);
+
         [topLevelMenuItem removeItemAtIndex:index];
     }
     else {
@@ -331,30 +332,30 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
-//    if(!self.applicationHasFinishedLaunching) {
-//        // Get the recent documents
-//        NSDocumentController *controller =
-//        [NSDocumentController sharedDocumentController];
-//        NSArray *documents = [controller recentDocumentURLs];
-//
-//        // If there is a recent document, try to open it.
-//        if ([documents count] > 0)
-//        {
-//            [controller openDocumentWithContentsOfURL:[documents objectAtIndex:0] display:YES completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) { ; }];
-//
-//            return NO;
-//        }
-//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     return NO;
 }
 
 - (IBAction)onViewDatabases:(id)sender {
-    [DatabasesManagerView show:NO]; // Debug: YES
+    [DatabasesManagerView show:NO]; 
 }
 
 - (IBAction)onViewDebugDatabasesList:(id)sender {
-    [DatabasesManagerView show:YES]; // Debug: YES
+    [DatabasesManagerView show:YES]; 
 }
 
 - (IBAction)onPreferences:(id)sender {
@@ -403,8 +404,8 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Clipboard Clearing
+
+
 
 - (void)onPreferencesChanged:(NSNotification*)notification {
     NSLog(@"Preferences Have Changed Notification Received... Resetting Clipboard Clearing Tasks");
@@ -414,7 +415,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationWillBecomeActive:(NSNotification *)notification {
-//    NSLog(@"applicationWillBecomeActive");
+
     [self initializeClipboardWatchingTask];
 }
 
@@ -427,12 +428,12 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)applicationWillResignActive:(NSNotification *)notification {
-//    NSLog(@"applicationWillResignActive");
+
     [self killClipboardWatchingTask];
 }
 
 - (void)startClipboardWatchingTask {
-//    NSLog(@"startClipboardWatchingTask...");
+
     self.currentClipboardVersion = -1;
     
     self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f
@@ -441,16 +442,16 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
                                    userInfo:nil
                                     repeats:YES];
 
-    // MMcG: Do not use the block version as it only works OSX-10.12+
-//    self.clipboardChangeWatcher = [NSTimer scheduledTimerWithTimeInterval:0.5f
-//                                                                  repeats:YES
-//                                                                    block:^(NSTimer * _Nonnull timer) {
-//        [self checkClipboardForChangesAndNotify];
-//    }];
+    
+
+
+
+
+
 }
 
 - (void)killClipboardWatchingTask {
-//    NSLog(@"killClipboardWatchingTask...");
+
     
     self.currentClipboardVersion = -1;
     
@@ -461,9 +462,9 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)checkClipboardForChangesAndNotify {
-    //NSLog(@"Checking Clipboard = [%ld]", (long)NSPasteboard.generalPasteboard.changeCount);
     
-    if(self.currentClipboardVersion == -1) { // Initial Watch - Record the current count and watch for changes from this
+    
+    if(self.currentClipboardVersion == -1) { 
         self.currentClipboardVersion = NSPasteboard.generalPasteboard.changeCount;
     }
     if(self.currentClipboardVersion != NSPasteboard.generalPasteboard.changeCount) {
@@ -503,7 +504,7 @@ static NSInteger clipboardChangeCount;
         [NSPasteboard.generalPasteboard clearContents];
     }
     else {
-//        NSLog(@"General Clipboard change count DOES NOT matches after time delay... NOP");
+
     }
     
     [self clearAppCustomClipboard];

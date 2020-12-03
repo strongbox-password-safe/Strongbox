@@ -54,7 +54,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
 - (void)stop;
 
-// Lightweight Performant Queries
+
 
 - (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item;
 - (NSString*)getQuickAuditSummaryForNode:(Node*)item;
@@ -62,7 +62,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditIssueCount;
 
-// Heavy Weight Reporting
+
 - (DatabaseAuditReport*)getAuditReport;
 
 - (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node;

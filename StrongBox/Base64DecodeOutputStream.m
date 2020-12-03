@@ -54,7 +54,7 @@
 }
 
 - (NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
-    uint8_t* plaintext = malloc(len); // Plenty of room 3/4 would suffice
+    uint8_t* plaintext = malloc(len); 
     
     int decoded = base64_decode_block((const char*)buffer, (int)len, (char*)plaintext, self.decodeState);
     

@@ -14,17 +14,17 @@
 //        mm = 2 hexadecimal digits max size of history list (i.e. max = 255)
 //        nn = 2 hexadecimal digits current size of history list
 //        T  = Time password was set (time_t written out in %08x)
-//        L  = 4 hexadecimal digit password length (in TCHAR)
-//        P  = Password
-//        No history being kept for a record can be represented either by the lack of
-//            the PWH field (preferred), or by a header of _T("00000"):
-//            flag = 0, max = 00, num = 00
-//            Note that 0aabb, where bb <= aa, is possible if password history was enabled
-//                in the past and has then been disabled but the history hasn't been cleared.
-//
 
-// PWHIST => 10603592b151b0003abc592b153d0003def592b154f0003ghi =>
-// bytes[<31303630 33353932 62313531 62303030 33616263 35393262 31353364 30303033 64656635 39326231 35346630 30303367 6869>]
+
+
+
+
+
+
+
+
+
+
 
 #import "PasswordHistory.h"
 
@@ -53,7 +53,7 @@
         Header header;
         [data getBytes:&header length:5];
 
-        //NSLog(@"PWHIST Header: %@", header);
+        
 
         _enabled = (header.enabled == '1');
         

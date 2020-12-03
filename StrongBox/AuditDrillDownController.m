@@ -58,7 +58,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 }
 
 - (void)refreshItems {
-    // Throttle Updates - There was a crash here on certain architectures that seemed to be somehow related to multiple updates
+    
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(refreshItemsDoIt) object:nil];
     [self performSelector:@selector(refreshItemsDoIt) withObject:nil afterDelay:0.1f];
@@ -216,7 +216,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
             [self performSegueWithIdentifier:@"segueToItemDetails" sender:node];
         }
         else {
-            // FUTURE?: iOS 10
+            
         }
     }
     else if (indexPath.section == kSectionSettingsIdx) {
@@ -308,9 +308,9 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     else if (section == kSectionSimalarIdx && !self.similars.count) {
         return 0.1;
     }
-//    else if (section == kSectionBasicIdx || section == kSectionActionsIdx) {
-//        return 0.1;
-//    }
+
+
+
 
     return UITableViewAutomaticDimension;
 }
@@ -342,14 +342,14 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     else if (section == kSectionSimalarIdx && !self.similars.count) {
         return [self sectionFiller];
     }
-//    else if (section == kSectionBasicIdx || section == kSectionActionsIdx) {
-//        return [self sectionFiller];
-//    }
+
+
+
 
     return [super tableView:tableView viewForFooterInSection:section];
 }
 
-//////////////////////////////////////////////////////
+
 
 - (void)onAuditOnOff:(BOOL)on {
     [self.model setItemAuditExclusion:self.item exclude:!on];
@@ -392,7 +392,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     return NSLocalizedString(@"generic_unknown", @"Unknown");
 }
 
-//
+
 
 - (void)hibpWarning {
     NSString* loc1 = NSLocalizedString(@"audit_hibp_warning_title", @"HIBP Disclaimer");
@@ -401,7 +401,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     NSString* locYes = NSLocalizedString(@"audit_hibp_warning_yes", @"Yes, I understand and agree");
     
     [Alerts twoOptionsWithCancel:self title:loc1 message:loc2 defaultButtonText:locNo secondButtonText:locYes action:^(int response) {
-        if (response == 1) { // Yes go for it
+        if (response == 1) { 
             self.model.metadata.auditConfig.hibpCaveatAccepted = YES;
             [SafesList.sharedInstance update:self.model.metadata];
                           
@@ -432,7 +432,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
                            title:NSLocalizedString(@"audit_manual_pwn_check_result_title", @"Manual HIBP Result")
                          message:NSLocalizedString(@"audit_manual_pwn_check_result_pwned", @"This password is pwned and is vulnerable") completion:nil];
 
-                    [self.model restartBackgroundAudit]; // We've got a new entry in HIBP cache - update audit
+                    [self.model restartBackgroundAudit]; 
                 }
             }
         });

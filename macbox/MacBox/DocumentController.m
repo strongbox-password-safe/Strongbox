@@ -23,7 +23,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 
 @implementation DocumentController
 
-// Allow open any file type/extension...
+
 
 - (NSInteger)runModalOpenPanel:(NSOpenPanel *)openPanel forTypes:(nullable NSArray<NSString *> *)types {
     return [super runModalOpenPanel:openPanel forTypes:nil];
@@ -93,8 +93,8 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 }
 
 - (void)openDocument:(id)sender {
-//    NSLog(@"openDocument: document count = [%ld]", self.documents.count);
-    if(self.documents.count == 0) { // Empty Launch...
+
+    if(self.documents.count == 0) { 
         [self performEmptyLaunchTasksIfNecessary];
     }
     else {
@@ -106,13 +106,13 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     return [super openDocument:sender];
 }
 
-//- (void)openDatabase:(DatabaseMetadata *)database {
-//    [self openDatabase:database completion:^(NSError *error) {
-//        if(error) {
-//            [DatabasesManagerView show:NO];
-//        }
-//    }];
-//}
+
+
+
+
+
+
+
 
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     if(database.storageProvider == kLocalDevice) {
@@ -131,7 +131,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
                 url = database.fileUrl;
             }
             else {
-                // URL / Bookmark may have changed...
+                
                 
                 if (updatedBookmark) {
                     database.storageInfo = updatedBookmark;
@@ -165,22 +165,23 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 }
 
 - (void)onAppStartup {
-//    NSLog(@"onAppStartup: document count = [%ld]", self.documents.count);
-    
+
+    [DatabasesManagerView show:NO];
+
     if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
        Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
         [self openPrimaryDatabase];
     }
-    else if(self.documents.count == 0) {
-        [DatabasesManagerView show:NO];
-    }
+
+
+
 }
 
 - (void)performEmptyLaunchTasksIfNecessary {
-//    NSLog(@"performEmptyLaunchTasks...");
+
     
-    if(self.documents.count == 0) { // Empty Launch...
-//        NSLog(@"performEmptyLaunchTasks: document count = [%ld]", self.documents.count);
+    if(self.documents.count == 0) { 
+
         
         if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
            Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {

@@ -3,3 +3,6 @@
 //
 
 #import <YubiKit.h>
+
+#import "HTMLDocument.h"
+#import "XMLDocument.h"

@@ -15,7 +15,7 @@
 
 @end
 
-@implementation ConcurrentMutableSet // Multiple Readers, Serialized Writes 
+@implementation ConcurrentMutableSet 
 
 + (instancetype)mutableSet {
     return [[ConcurrentMutableSet alloc] init];
@@ -31,19 +31,19 @@
 }
 
 - (void)addObject:(id)object {
-    dispatch_barrier_async(self.dataQueue, ^{ // Serialized Write with Barrier
+    dispatch_barrier_async(self.dataQueue, ^{ 
         [self.data addObject:object];
     });
 }
 
 - (void)addObjectsFromArray:(NSArray*)array {
-    dispatch_barrier_async(self.dataQueue, ^{  // Serialized Write with Barrier
+    dispatch_barrier_async(self.dataQueue, ^{  
         [self.data addObjectsFromArray:array];
     });
 }
 
 - (void)removeObject:(id)object {
-    dispatch_barrier_async(self.dataQueue, ^{  // Serialized Write with Barrier
+    dispatch_barrier_async(self.dataQueue, ^{  
         [self.data removeObject:object];
     });
 }
@@ -51,7 +51,7 @@
 - (NSSet*)snapshot {
     __block NSSet *result;
 
-    dispatch_sync(self.dataQueue, ^{ // Multiple concurrent readers fine no need for barrier
+    dispatch_sync(self.dataQueue, ^{ 
         result = self.data.copy;
     });
     
@@ -61,7 +61,7 @@
 - (NSArray*)arraySnapshot {
     __block NSArray *result;
 
-    dispatch_sync(self.dataQueue, ^{ // Multiple concurrent readers fine no need for barrier
+    dispatch_sync(self.dataQueue, ^{ 
         result = self.data.allObjects.copy;
     });
     
@@ -71,7 +71,7 @@
 - (NSUInteger)count {
     __block NSUInteger result;
 
-    dispatch_sync(self.dataQueue, ^{  // Multiple concurrent readers fine no need for barrier
+    dispatch_sync(self.dataQueue, ^{  
         result = self.data.count;
     });
     
@@ -81,7 +81,7 @@
 - (id)anyObject {
     __block id result;
 
-    dispatch_sync(self.dataQueue, ^{  // Multiple concurrent readers fine no need for barrier
+    dispatch_sync(self.dataQueue, ^{  
         result = self.data.anyObject;
     });
     
@@ -91,7 +91,7 @@
 - (BOOL)containsObject:(id)object {
     __block BOOL result;
 
-    dispatch_sync(self.dataQueue, ^{ // Multiple concurrent readers fine no need for barrier
+    dispatch_sync(self.dataQueue, ^{ 
         result = [self.data containsObject:object];
     });
     

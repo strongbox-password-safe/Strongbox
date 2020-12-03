@@ -29,9 +29,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 @property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
 @property (nonatomic, readonly) BOOL isReadOnly;
 
-@property (nullable, nonatomic) NSString* openedWithYubiKeySecret; // Used for Convenience Setting if this database was opened with a Yubikey workaround
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
@@ -43,7 +41,6 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 - (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen templateMetaData:(SafeMetaData*)templateMetaData;
 
 - (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error))handler;
-
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
 - (void)stopAndClearAuditor;
@@ -67,7 +64,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 - (void)closeAndCleanup;
 
-// Operations
+
 
 - (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
 
@@ -79,11 +76,11 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 - (void)togglePin:(Node*)item;
 @property (readonly) NSSet<NSString*>* pinnedSet;
 
--(void)encrypt:(void (^)(BOOL userCancelled, NSData*_Nullable data, NSError*_Nullable error))completion;
+-(void)encrypt:(void (^)(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
 
 - (NSString *_Nonnull)generatePassword;
 
-// AutoFill
+
 
 - (void)disableAndClearAutoFill;
 - (void)enableAutoFill;

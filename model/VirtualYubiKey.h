@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDictionary*)getJsonSerializationDictionary;
 + (instancetype)fromJsonSerializationDictionary:(NSDictionary*)dictionary;
 
-+ (NSData*)getDummyYubikeyResponse:(NSData*)challenge secret:(NSString*)secret; // Used by Emergency workaround in OSSH - Remove and make private once those workarounds are migrated to virtual keys
++ (NSData*)getDummyYubiKeyResponse:(NSData*)challenge secret:(NSString*)secret; 
 
 - (void)clearSecret;
 

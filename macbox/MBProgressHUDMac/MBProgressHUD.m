@@ -42,7 +42,7 @@ attributes:@{NSFontAttributeName:font} context:nil].size : CGSizeZero;
 sizeWithFont:font constrainedToSize:maxSize lineBreakMode:mode] : CGSizeZero;
 #endif
 
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 
 #define MBLabelAlignmentCenter NSCenterTextAlignment
 #define MB_TEXTSIZE(text, font) [text length] > 0 ? [text \
@@ -51,7 +51,7 @@ sizeWithAttributes:@{NSFontAttributeName:font}] : CGSizeZero;
 boundingRectWithSize:maxSize options:(NSStringDrawingUsesLineFragmentOrigin) \
 attributes:@{NSFontAttributeName:font} context:nil].size : CGSizeZero;
 
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 
 static const CGFloat kPadding = 4.0f;
@@ -73,9 +73,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 - (void)done;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (void)singleTap:(UITapGestureRecognizer*)sender;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 - (void)mouseDown:(NSEvent *)theEvent;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 - (void)updateIndicators;
 - (void)handleGraceTimer:(NSTimer *)theTimer;
 - (void)handleMinShowTimer:(NSTimer *)theTimer;
@@ -87,9 +87,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (atomic, MB_STRONG) UIView *indicator;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
-@property (atomic, MB_STRONG) NSView *indicator;    // YRKSpinningProgressIndicator
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
+@property (atomic, MB_STRONG) NSView *indicator;    
+#endif  
 @property (atomic, MB_STRONG) NSTimer *graceTimer;
 @property (atomic, MB_STRONG) NSTimer *minShowTimer;
 @property (atomic, MB_STRONG) NSDate *showStarted;
@@ -106,10 +106,10 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	UILabel *label;
 	UILabel *detailsLabel;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     NSText *label;
     NSText *detailsLabel;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	BOOL isFinished;
 	CGAffineTransform rotationTransform;
 }
@@ -154,9 +154,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (MB_INSTANCETYPE)showHUDAddedTo:(UIView *)view animated:(BOOL)animated
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (MB_INSTANCETYPE)showHUDAddedTo:(NSView *)view animated:(BOOL)animated
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 {
     NSAssert(view, @"View must not be nil.");
 	MBProgressHUD *hud = [[self alloc] initWithView:view];
@@ -167,9 +167,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (BOOL)hideHUDForView:(NSView *)view animated:(BOOL)animated
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 {
     NSAssert(view, @"View must not be nil.");
 	MBProgressHUD *hud = [self HUDForView:view];
@@ -183,9 +183,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (NSUInteger)hideAllHUDsForView:(UIView *)view animated:(BOOL)animated
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (NSUInteger)hideAllHUDsForView:(NSView *)view animated:(BOOL)animated
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 {
     NSAssert(view, @"View must not be nil.");
 	NSArray *huds = [MBProgressHUD allHUDsForView:view];
@@ -198,17 +198,17 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (MB_INSTANCETYPE)HUDForView:(UIView *)view
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (MB_INSTANCETYPE)HUDForView:(NSView *)view
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 {
     NSAssert(view, @"View must not be nil.");
 	NSEnumerator *subviewsEnum = [view.subviews reverseObjectEnumerator];
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	for (UIView *subview in subviewsEnum)
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     for (NSView *subview in subviewsEnum)
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
     {
 		if ([subview isKindOfClass:self]) {
 			return (MBProgressHUD *)subview;
@@ -219,18 +219,18 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (NSArray *)allHUDsForView:(UIView *)view
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (NSArray *)allHUDsForView:(NSView *)view
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 {
     NSAssert(view, @"View must not be nil.");
 	NSMutableArray *huds = [NSMutableArray array];
 	NSArray *subviews = view.subviews;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	for (UIView *aView in subviews)
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     for (NSView *aView in subviews)
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
     {
 		if ([aView isKindOfClass:self]) {
 			[huds addObject:aView];
@@ -253,7 +253,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     _cgColorFromNSColor = CGColorCreate(colorSpace, components);
     return _cgColorFromNSColor;
 }
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 #pragma mark - Lifecycle
 
@@ -261,7 +261,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 {
 	self = [super initWithFrame:frame];
 	if (self) {
-		// Set default values for properties
+		
 		self.animationType = MBProgressHUDAnimationFade;
 		self.mode = MBProgressHUDModeIndeterminate;
 		self.labelText = nil;
@@ -273,21 +273,21 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
         self.labelColor = [UIColor whiteColor];
 		self.detailsLabelFont = [UIFont boldSystemFontOfSize:kDetailsLabelFontSize];
         self.detailsLabelColor = [UIColor whiteColor];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 		self.labelFont = [NSFont boldSystemFontOfSize:kLabelFontSize];
         self.labelColor = [NSColor whiteColor];
 		self.detailsLabelFont = [NSFont boldSystemFontOfSize:kDetailsLabelFontSize];
         self.detailsLabelColor = [NSColor whiteColor];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		self.xOffset = 0.0f;
 		self.yOffset = 0.0f;
 		self.dimBackground = NO;
         self.dismissible = NO;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
         self.spinsize = 37.0f;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
-        self.spinsize = 60.0f;      // Applicable to Mac OS X ONLY
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
+        self.spinsize = 60.0f;      
+#endif  
 		self.margin = 20.0f;
         self.cornerRadius = 10.0f;
 		self.graceTime = 0.0f;
@@ -298,16 +298,16 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		self.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
         | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         /*
          typedef NS_OPTIONS(NSUInteger, UIViewAutoresizing) {
-            UIViewAutoresizingNone                 = 0,         // 0
-            UIViewAutoresizingFlexibleLeftMargin   = 1 << 0,    // 1
-            UIViewAutoresizingFlexibleWidth        = 1 << 1,    // 2
-            UIViewAutoresizingFlexibleRightMargin  = 1 << 2,    // 4
-            UIViewAutoresizingFlexibleTopMargin    = 1 << 3,    // 8
-            UIViewAutoresizingFlexibleHeight       = 1 << 4,    // 16
-            UIViewAutoresizingFlexibleBottomMargin = 1 << 5     // 32
+            UIViewAutoresizingNone                 = 0,         
+            UIViewAutoresizingFlexibleLeftMargin   = 1 << 0,    
+            UIViewAutoresizingFlexibleWidth        = 1 << 1,    
+            UIViewAutoresizingFlexibleRightMargin  = 1 << 2,    
+            UIViewAutoresizingFlexibleTopMargin    = 1 << 3,    
+            UIViewAutoresizingFlexibleHeight       = 1 << 4,    
+            UIViewAutoresizingFlexibleBottomMargin = 1 << 5     
          };
          enum {
             NSViewNotSizable			=  0,
@@ -330,27 +330,27 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
          */
         self.autoresizingMask = NSViewAutoresizingFlexibleTopMargin | NSViewAutoresizingFlexibleBottomMargin
         | NSViewAutoresizingFlexibleLeftMargin | NSViewAutoresizingFlexibleRightMargin;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
         
-		// Transparent background
+		
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		self.opaque = NO;
 		self.backgroundColor = [UIColor clearColor];
-		// Make it invisible for now
+		
 		self.alpha = 0.0f;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 		self.layer.opaque = NO;
 		self.layer.backgroundColor = [self NSColorToCGColor:[NSColor clearColor]];
         (void)(CGColorRelease(_cgColorFromNSColor)), _cgColorFromNSColor = nil;
-		// Make it invisible for now
+		
 		self.alphaValue = 0.0f;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
         
 		taskInProgress = NO;
 		rotationTransform = CGAffineTransformIdentity;
 		
 		[self setupLabels];
-		// [self updateIndicators];
+		
 		[self registerForKVO];
 		[self registerForNotifications];
 	}
@@ -359,9 +359,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (id)initWithView:(UIView *)view
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 - (id)initWithView:(NSView *)view
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 {
 	NSAssert(view, @"View must not be nil.");
     CGRect bounds = view.frame;
@@ -375,12 +375,12 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 {
 	return [self initWithView:(UIView *)window];
 }
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 - (id)initWithWindow:(NSWindow *)window
 {
 	return [self initWithView:(NSView *)window];
 }
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 - (void)dealloc
 {
@@ -409,30 +409,30 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #endif
 
 	[super dealloc];
-#endif  // !__has_feature(objc_arc)
+#endif  
 }
 
 #pragma mark - Show & hide
 
 - (void)show:(BOOL)animated
 {
-    [self updateIndicators];    // allow self.spinsize to be effective
+    [self updateIndicators];    
 
 	useAnimation = animated;
-	// If the grace time is set postpone the HUD display
+	
 	if (self.graceTime > 0.0) {
 		self.graceTimer = [NSTimer scheduledTimerWithTimeInterval:self.graceTime target:self
                                                          selector:@selector(handleGraceTimer:) userInfo:nil repeats:NO];
 	}
-	// ... otherwise show the HUD imediately
+	
 	else {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		[self setNeedsDisplay];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         self.wantsLayer = YES;
         self.canDrawSubviewsIntoLayer = YES;
         [self setNeedsDisplay:YES];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		[self showUsingAnimation:useAnimation];
 	}
 }
@@ -441,8 +441,8 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 {
 	useAnimation = animated;
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	// If the minShow time is set, calculate how long the hud was shown,
-	// and pospone the hiding operation if necessary
+	
+	
 	if (self.minShowTime > 0.0 && showStarted) {
 		NSTimeInterval interv = [[NSDate date] timeIntervalSinceDate:showStarted];
 		if (interv < self.minShowTime) {
@@ -451,7 +451,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 			return;
 		}
 	}
-	// ... otherwise hide the HUD immediately
+	
 	[self hideUsingAnimation:useAnimation];
 }
 
@@ -481,13 +481,13 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 - (void)handleGraceTimer:(NSTimer *)theTimer
 {
-	// Show the HUD only if the task is still running
+	
 	if (taskInProgress) {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		[self setNeedsDisplay];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         [self setNeedsDisplay:YES];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		[self showUsingAnimation:useAnimation];
 	}
 }
@@ -501,12 +501,12 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 - (void)didMoveToSuperview
 {
-	// We need to take care of rotation ourselfs if we're adding the HUD to a window
+	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	if ([self.superview isKindOfClass:[UIWindow class]])
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     if ([self.superview isKindOfClass:[NSWindow class]])
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
     {
 		[self setTransformForCurrentOrientation:NO];
 	}
@@ -522,16 +522,16 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	} else if (animated && animationType == MBProgressHUDAnimationZoomOut) {
 		self.transform = CGAffineTransformConcat(rotationTransform, CGAffineTransformMakeScale(1.5f, 1.5f));
 	}
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 	if (animated && animationType == MBProgressHUDAnimationZoomIn) {
 		self.layer.affineTransform = CGAffineTransformConcat(rotationTransform, CGAffineTransformMakeScale(0.5f, 0.5f));
 	} else if (animated && animationType == MBProgressHUDAnimationZoomOut) {
 		self.layer.affineTransform = CGAffineTransformConcat(rotationTransform, CGAffineTransformMakeScale(1.5f, 1.5f));
 	}
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	self.showStarted = [NSDate date];
 
-	// Fade in
+	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	if (animated) {
 		[UIView beginAnimations:nil context:NULL];
@@ -545,7 +545,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	else {
 		self.alpha = 1.0f;
 	}
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     self.hidden = NO;
 	if (animated) {
         [NSAnimationContext beginGrouping];
@@ -561,21 +561,21 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	else {
 		self.alphaValue = 1.0f;
 	}
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 - (void)hideUsingAnimation:(BOOL)animated
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
-	// Fade out
+	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	if (animated && showStarted) {
 		[UIView beginAnimations:nil context:NULL];
 		[UIView setAnimationDuration:0.30];
 		[UIView setAnimationDelegate:self];
 		[UIView setAnimationDidStopSelector:@selector(animationFinished:finished:context:)];
-		// 0.02 prevents the hud from passing through touches during the animation the hud will get completely hidden
-		// in the done method
+		
+		
 		if (animationType == MBProgressHUDAnimationZoomIn) {
 			self.transform = CGAffineTransformConcat(rotationTransform, CGAffineTransformMakeScale(1.5f, 1.5f));
 		} else if (animationType == MBProgressHUDAnimationZoomOut) {
@@ -589,7 +589,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		self.alpha = 0.0f;
 		[self done];
 	}
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 	if (animated && showStarted) {
         [NSAnimationContext beginGrouping];
         [[NSAnimationContext currentContext] setDuration:0.30];
@@ -608,7 +608,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		self.alphaValue = 0.0f;
 		[self done];
 	}
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	self.showStarted = nil;
 }
 
@@ -622,11 +622,11 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	isFinished = YES;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	self.alpha = 0.0f;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     self.alphaValue = 0.0f;
-    // self.acceptsTouchEvents = NO;
+    
     self.hidden = YES;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	if (self.removeFromSuperViewOnHide) {
 		[self removeFromSuperview];
 	}
@@ -646,16 +646,16 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (void)singleTap:(UITapGestureRecognizer*)sender
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 - (void)mouseDown:(NSEvent *)theEvent
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 {
 #if !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
     if (isFinished) {
         [super mouseDown:theEvent];
         return;
     }
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
     if (self.dismissible) {
         [self performSelectorOnMainThread:@selector(cleanUp) withObject:nil waitUntilDone:YES];
         if (self.delegate) {
@@ -673,10 +673,10 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	methodForExecution = method;
 	targetForExecution = MB_RETAIN(target);
 	objectForExecution = MB_RETAIN(object);
-	// Launch execution in new thread
+	
 	self.taskInProgress = YES;
 	[NSThread detachNewThreadSelector:@selector(launchExecution) toTarget:self withObject:nil];
-	// Show HUD view
+	
 	[self show:animated];
 }
 
@@ -720,11 +720,11 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	@autoreleasepool {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-		// Start executing the requested task
+		
 		[targetForExecution performSelector:methodForExecution withObject:objectForExecution];
 #pragma clang diagnostic pop
-		// Task completed, update view in main thread (note: view operations should
-		// be done only in the main thread)
+		
+		
 		[self performSelectorOnMainThread:@selector(cleanUp) withObject:nil waitUntilDone:NO];
 	}
 }
@@ -757,18 +757,18 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	label.font = self.labelFont;
 	label.text = self.labelText;
     [label addGestureRecognizer:singleTapGesture];
-#else   // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     label = [[NSText alloc] initWithFrame:self.bounds];
-	// label.adjustsFontSizeToFitWidth = NO;
+	
     label.editable = NO;
-    // label.bezeled = NO;  // if NSTextView
+    
 	label.alignment = MBLabelAlignmentCenter;
 	label.layer.opaque = NO;
 	label.backgroundColor = [NSColor clearColor];
 	label.textColor = self.labelColor;
 	label.font = self.labelFont;
 	if (self.labelText) label.string = self.labelText;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	[self addSubview:label];
 	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
@@ -783,63 +783,63 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	detailsLabel.font = self.detailsLabelFont;
 	detailsLabel.text = self.detailsLabelText;
     [detailsLabel addGestureRecognizer:singleTapGesture];
-#else   // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 	detailsLabel = [[NSText alloc] initWithFrame:self.bounds];
 	detailsLabel.font = self.detailsLabelFont;
-	// detailsLabel.adjustsFontSizeToFitWidth = NO;
+	
     detailsLabel.editable = NO;
-    // detailsLabel.bezeled = NO;  // if NSTextView
+    
 	detailsLabel.alignment = MBLabelAlignmentCenter;
 	detailsLabel.layer.opaque = NO;
 	detailsLabel.backgroundColor = [NSColor clearColor];
 	detailsLabel.textColor = self.detailsLabelColor;
-	// detailsLabel.numberOfLines = 0;
+	
 	detailsLabel.font = self.detailsLabelFont;
 	if (self.detailsLabelText) detailsLabel.string = self.detailsLabelText;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	[self addSubview:detailsLabel];
     
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
     [self addGestureRecognizer:singleTapGesture];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 - (void)updateIndicators
 {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	BOOL isActivityIndicator = [indicator isKindOfClass:[UIActivityIndicatorView class]];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     BOOL isActivityIndicator = [indicator isKindOfClass:[YRKSpinningProgressIndicator class]];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	BOOL isRoundIndicator = [indicator isKindOfClass:[MBRoundProgressView class]];
 	
 	if (mode == MBProgressHUDModeIndeterminate &&  !isActivityIndicator) {
-		// Update to indeterminate indicator
+		
 		[indicator removeFromSuperview];
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		self.indicator = MB_AUTORELEASE([[UIActivityIndicatorView alloc]
 										 initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge]);
 		[(UIActivityIndicatorView *)indicator startAnimating];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         self.indicator = MB_AUTORELEASE([[YRKSpinningProgressIndicator alloc] initWithFrame:NSMakeRect(20, 20, self.spinsize, self.spinsize)]);
-        // [(YRKSpinningProgressIndicator *)self.indicator setStyle:NSProgressIndicatorSpinningStyle];
+        
         [(YRKSpinningProgressIndicator *)self.indicator setColor:[NSColor whiteColor]];
         [(YRKSpinningProgressIndicator *)self.indicator setUsesThreadedAnimation:NO];
         [(YRKSpinningProgressIndicator *)self.indicator startAnimation:self];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		[self addSubview:indicator];
 	}
 	else if (mode == MBProgressHUDModeDeterminateHorizontalBar) {
-		// Update to bar determinate indicator
+		
 		[indicator removeFromSuperview];
         self.indicator = MB_AUTORELEASE([[MBBarProgressView alloc] init]);
 		[self addSubview:indicator];
 	}
 	else if (mode == MBProgressHUDModeDeterminate || mode == MBProgressHUDModeAnnularDeterminate) {
 		if (!isRoundIndicator) {
-			// Update to determinante indicator
+			
 			[indicator removeFromSuperview];
-			// self.indicator = [MB_AUTORELEASE([[MBRoundProgressView alloc] init]);
+			
             self.indicator = MB_AUTORELEASE([[MBRoundProgressView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, self.spinsize, self.spinsize)]);
 			[self addSubview:indicator];
 		}
@@ -848,7 +848,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		}
 	}
 	else if (mode == MBProgressHUDModeCustomView && customView != indicator) {
-		// Update custom view indicator
+		
 		[indicator removeFromSuperview];
 		self.indicator = customView;
 		[self addSubview:indicator];
@@ -863,18 +863,18 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 - (void)layoutSubviews
 {
 	
-	// Entirely cover the parent view
+	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	UIView *parent = self.superview;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     NSView *parent = self.superview;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	if (parent) {
 		self.frame = parent.bounds;
 	}
 	CGRect bounds = self.bounds;
 	
-	// Determine the total widt and height needed
+	
 	CGFloat maxWidth = bounds.size.width - 4 * margin;
 	CGSize totalSize = CGSizeZero;
 	
@@ -885,10 +885,10 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	CGSize labelSize = MB_TEXTSIZE(label.text, label.font);
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     CGSize labelSize = MB_TEXTSIZE(label.string, label.font);
     if (labelSize.width > 0.0f) labelSize.width += 10.0f;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	labelSize.width = MIN(labelSize.width, maxWidth);
 	totalSize.width = MAX(totalSize.width, labelSize.width);
 	totalSize.height += labelSize.height;
@@ -900,10 +900,10 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	CGFloat remainingHeight = bounds.size.height - totalSize.height - kPadding - 4 * margin;
    	CGSize maxSize = CGSizeMake(maxWidth, remainingHeight);
 	CGSize detailsLabelSize = MB_MULTILINE_TEXTSIZE(detailsLabel.text, detailsLabel.font, maxSize, detailsLabel.lineBreakMode);
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     CGSize detailsLabelSize = MB_TEXTSIZE(detailsLabel.string, detailsLabel.font);
     if (detailsLabelSize.width > 0.0f) detailsLabelSize.width += 10.0f;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
     detailsLabelSize.width = MIN(detailsLabelSize.width, maxWidth);
 	totalSize.width = MAX(totalSize.width, detailsLabelSize.width);
 	totalSize.height += detailsLabelSize.height;
@@ -914,11 +914,11 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	totalSize.width += 2 * margin;
 	totalSize.height += 2 * margin;
 	
-	// Position elements
+	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
    	CGFloat yPos = round(((bounds.size.height - totalSize.height) / 2)) + margin + yOffset;
 #else
-    // in OS X yAxis is inverted! So Top Down Must build from bottom up...
+    
     CGFloat yPos = round(((bounds.size.height - totalSize.height) / 2)) + margin - yOffset;
     if (labelSize.height > 0.0f && indicatorF.size.height > 0.0f) {
 		yPos += kPadding + labelSize.height;
@@ -938,7 +938,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		yPos += kPadding;
 	}
 #else
-    // in OS X yAxis is inverted! So Top Down Must build from bottom up...
+    
     if (labelSize.height > 0.0f && indicatorF.size.height > 0.0f) {
 		yPos -= (kPadding + labelSize.height);
 	}
@@ -955,7 +955,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		yPos += kPadding;
 	}
 #else
-    // in OS X yAxis is inverted! So Top Down Must build from bottom up...
+    
     if (detailsLabelSize.height > 0.0f && (indicatorF.size.height > 0.0f || labelSize.height > 0.0f)) {
 		yPos -= (kPadding + detailsLabelSize.height);
 	}
@@ -966,7 +966,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	detailsLabelF.size = detailsLabelSize;
 	detailsLabel.frame = detailsLabelF;
 	
-	// Enforce minsize and quare rules
+	
 	if (square) {
 		CGFloat max = MAX(totalSize.width, totalSize.height);
 		if (max <= bounds.size.width - 2 * margin) {
@@ -992,47 +992,47 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	CGContextRef context = UIGraphicsGetCurrentContext();
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     [self layoutSubviews];
-    //CGContextRef context =  [[NSGraphicsContext currentContext] graphicsPort];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+    
+#endif  
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	UIGraphicsPushContext(context);
 	context = UIGraphicsGetCurrentContext();
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     [NSGraphicsContext saveGraphicsState];
     CGContextRef context =  [[NSGraphicsContext currentContext] graphicsPort];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
     
 	if (self.dimBackground) {
-		//Gradient colours
+		
 		size_t gradLocationsNum = 2;
 		CGFloat gradLocations[2] = {0.0f, 1.0f};
 		CGFloat gradColors[8] = {0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.0f,0.75f};
 		CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
 		CGGradientRef gradient = CGGradientCreateWithColorComponents(colorSpace, gradColors, gradLocations, gradLocationsNum);
 		CGColorSpaceRelease(colorSpace);
-		//Gradient center
+		
 		CGPoint gradCenter= CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
-		//Gradient radius
+		
 		float gradRadius = MIN(self.bounds.size.width , self.bounds.size.height) ;
-		//Gradient draw
+		
 		CGContextDrawRadialGradient (context, gradient, gradCenter,
 									 0, gradCenter, gradRadius,
 									 kCGGradientDrawsAfterEndLocation);
 		CGGradientRelease(gradient);
 	}
     
-    // Set background rect color
+    
     if (self.color) {
         if (context > 0) {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
             CGContextSetFillColorWithColor(context, self.color.CGColor);
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
             CGContextSetFillColorWithColor(context, [self NSColorToCGColor:self.color]);
             (void)(CGColorRelease(_cgColorFromNSColor)), _cgColorFromNSColor = nil;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
         }
     } else {
         if (context > 0) {
@@ -1041,10 +1041,10 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     }
     
 	
-	// Center HUD
+	
 	CGRect allRect = self.bounds;
 
-	// Draw rounded HUD backgroud rect
+	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	CGRect boxRect = CGRectMake(round((allRect.size.width - size.width) / 2) + self.xOffset,
 								round((allRect.size.height - size.height) / 2) + self.yOffset, size.width, size.height);
@@ -1065,9 +1065,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	UIGraphicsPopContext();
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     [NSGraphicsContext restoreGraphicsState];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 #pragma mark - KVO
@@ -1108,9 +1108,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	} else if ([keyPath isEqualToString:@"labelText"]) {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		label.text = self.labelText;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         label.string = self.labelText;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	} else if ([keyPath isEqualToString:@"labelFont"]) {
 		label.font = self.labelFont;
 	} else if ([keyPath isEqualToString:@"labelColor"]) {
@@ -1118,9 +1118,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	} else if ([keyPath isEqualToString:@"detailsLabelText"]) {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		detailsLabel.text = self.detailsLabelText;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         detailsLabel.string = self.detailsLabelText;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	} else if ([keyPath isEqualToString:@"detailsLabelFont"]) {
 		detailsLabel.font = self.detailsLabelFont;
 	} else if ([keyPath isEqualToString:@"detailsLabelColor"]) {
@@ -1134,10 +1134,10 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	[self setNeedsLayout];
 	[self setNeedsDisplay];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     [self setNeedsLayout:YES];
 	[self setNeedsDisplay:YES];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 #pragma mark - Notifications
@@ -1148,7 +1148,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 	[nc addObserver:self selector:@selector(deviceOrientationDidChange:)
 			   name:UIDeviceOrientationDidChangeNotification object:nil];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 - (void)unregisterFromNotifications
@@ -1168,13 +1168,13 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		self.frame = self.superview.bounds;
 		[self setNeedsDisplay];
 	}
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 - (void)setTransformForCurrentOrientation:(BOOL)animated
 {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
-	// Stay in sync with the superview
+	
 	if (self.superview) {
 		self.bounds = self.superview.bounds;
 		[self setNeedsDisplay];
@@ -1185,7 +1185,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	if (UIInterfaceOrientationIsLandscape(orientation)) {
 		if (orientation == UIInterfaceOrientationLandscapeLeft) { radians = -(CGFloat)M_PI_2; }
 		else { radians = (CGFloat)M_PI_2; }
-		// Window coordinates differ!
+		
 		self.bounds = CGRectMake(0, 0, self.bounds.size.height, self.bounds.size.width);
 	} else {
 		if (orientation == UIInterfaceOrientationPortraitUpsideDown) { radians = (CGFloat)M_PI; }
@@ -1200,7 +1200,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	if (animated) {
 		[UIView commitAnimations];
 	}
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 @end
@@ -1226,7 +1226,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		_annular = NO;
 		_progressTintColor = [[UIColor alloc] initWithWhite:1.0f alpha:1.0f];
 		_backgroundTintColor = [[UIColor alloc] initWithWhite:1.0f alpha:0.1f];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 		self.layer.backgroundColor = [self NSColorToCGColor:[NSColor clearColor]];
         (void)(CGColorRelease(_cgColorFromNSColor)), _cgColorFromNSColor = nil;
 		self.layer.opaque = NO;
@@ -1234,7 +1234,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		_annular = NO;
 		_progressTintColor = [NSColor colorWithDeviceWhite:1.0f alpha:1.0f];
 		_backgroundTintColor = [NSColor colorWithDeviceWhite:1.0f alpha:0.1f];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		[self registerForKVO];
 	}
 	return self;
@@ -1268,7 +1268,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     _cgColorFromNSColor = CGColorCreate(colorSpace, components);
     return _cgColorFromNSColor;
 }
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 #pragma mark - Drawing
 
@@ -1280,68 +1280,68 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	CGContextRef context = UIGraphicsGetCurrentContext();
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     CGContextRef context =  [[NSGraphicsContext currentContext] graphicsPort];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	
 	if (_annular) {
-		// Draw background
+		
 		CGFloat lineWidth = 5.0f;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		UIBezierPath *processBackgroundPath = [UIBezierPath bezierPath];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         NSBezierPath *processBackgroundPath = [NSBezierPath bezierPath];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		processBackgroundPath.lineWidth = lineWidth;
 		processBackgroundPath.lineCapStyle = kCGLineCapRound;
 		CGPoint center = CGPointMake(self.bounds.size.width/2, self.bounds.size.height/2);
 		CGFloat radius = (self.bounds.size.width - lineWidth)/2;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
-        CGFloat startAngle = - ((float)M_PI / 2); // 90 degrees
+        CGFloat startAngle = - ((float)M_PI / 2); 
 		CGFloat endAngle = (2 * (float)M_PI) + startAngle;
 		[processBackgroundPath addArcWithCenter:center radius:radius startAngle:startAngle endAngle:endAngle clockwise:YES];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
-        CGFloat startAngle = ((float)M_PI / 2); // 90 degrees
+#else   
+        CGFloat startAngle = ((float)M_PI / 2); 
 		CGFloat endAngle = startAngle - (2 * (float)M_PI);
         [processBackgroundPath appendBezierPathWithArcWithCenter:center radius:radius startAngle:startAngle endAngle:endAngle clockwise:NO];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		[_backgroundTintColor set];
 		[processBackgroundPath stroke];
-		// Draw progress
+		
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		UIBezierPath *processPath = [UIBezierPath bezierPath];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         NSBezierPath *processPath = [NSBezierPath bezierPath];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		processPath.lineCapStyle = kCGLineCapRound;
 		processPath.lineWidth = lineWidth;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
         endAngle = (self.progress * 2 * (float)M_PI) + startAngle;
 		[processPath addArcWithCenter:center radius:radius startAngle:startAngle endAngle:endAngle clockwise:YES];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         endAngle = startAngle - (self.progress * 2 * (float)M_PI);
         [processPath appendBezierPathWithArcWithCenter:center radius:radius startAngle:startAngle endAngle:endAngle clockwise:YES];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		[_progressTintColor set];
 		[processPath stroke];
 	} else {
-		// Draw background
+		
 		[_progressTintColor setStroke];
 		[_backgroundTintColor setFill];
 		CGContextSetLineWidth(context, 2.0f);
 		CGContextFillEllipseInRect(context, circleRect);
 		CGContextStrokeEllipseInRect(context, circleRect);
-		// Draw progress
+		
 		CGPoint center = CGPointMake(allRect.size.width / 2, allRect.size.height / 2);
 		CGFloat radius = (allRect.size.width - 4) / 2;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
-		CGFloat startAngle = - ((float)M_PI / 2); // 90 degrees
+		CGFloat startAngle = - ((float)M_PI / 2); 
 		CGFloat endAngle = (self.progress * 2 * (float)M_PI) + startAngle;
 #else
-		CGFloat startAngle = ((float)M_PI / 2); // 90 degrees
+		CGFloat startAngle = ((float)M_PI / 2); 
 		CGFloat endAngle = startAngle - (self.progress * 2 * (float)M_PI);
 #endif
-		CGContextSetRGBFillColor(context, 1.0f, 1.0f, 1.0f, 1.0f); // white
+		CGContextSetRGBFillColor(context, 1.0f, 1.0f, 1.0f, 1.0f); 
 		CGContextMoveToPoint(context, center.x, center.y);
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 		CGContextAddArc(context, center.x, center.y, radius, startAngle, endAngle, 0);
@@ -1378,9 +1378,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	[self setNeedsDisplay];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     [self setNeedsDisplay:YES];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 @end
@@ -1406,14 +1406,14 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		_progressRemainingColor = [UIColor clearColor];
 		self.backgroundColor = [UIColor clearColor];
 		self.opaque = NO;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
         _lineColor = [NSColor whiteColor];
 		_progressColor = [NSColor whiteColor];
 		_progressRemainingColor = [NSColor clearColor];
 		self.layer.backgroundColor = [self NSColorToCGColor:[NSColor clearColor]];
         (void)(CGColorRelease(_cgColorFromNSColor)), _cgColorFromNSColor = nil;
 		self.layer.opaque = NO;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 		[self registerForKVO];
     }
     return self;
@@ -1448,7 +1448,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     _cgColorFromNSColor = CGColorCreate(colorSpace, components);
     return _cgColorFromNSColor;
 }
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 #pragma mark - Drawing
 
@@ -1457,22 +1457,22 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	CGContextRef context = UIGraphicsGetCurrentContext();
 	
-	// setup properties
+	
 	CGContextSetLineWidth(context, 2);
 	CGContextSetStrokeColorWithColor(context,[_lineColor CGColor]);
 	CGContextSetFillColorWithColor(context, [_progressRemainingColor CGColor]);
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 	CGContextRef context =  [[NSGraphicsContext currentContext] graphicsPort];
 	
-	// setup properties
+	
 	CGContextSetLineWidth(context, 2);
 	CGContextSetStrokeColorWithColor(context,[self NSColorToCGColor:_lineColor]);
     (void)(CGColorRelease(_cgColorFromNSColor)), _cgColorFromNSColor = nil;
 	CGContextSetFillColorWithColor(context, [self NSColorToCGColor:_progressRemainingColor]);
     (void)(CGColorRelease(_cgColorFromNSColor)), _cgColorFromNSColor = nil;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
-	// draw line border
+	
 	float radius = (rect.size.height / 2) - 2;
 	CGContextMoveToPoint(context, 2, rect.size.height/2);
 	CGContextAddArcToPoint(context, 2, 2, radius + 2, 2, radius);
@@ -1483,7 +1483,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	CGContextAddArcToPoint(context, 2, rect.size.height - 2, 2, rect.size.height/2, radius);
 	CGContextFillPath(context);
 	
-	// draw progress background
+	
 	CGContextMoveToPoint(context, 2, rect.size.height/2);
 	CGContextAddArcToPoint(context, 2, 2, radius + 2, 2, radius);
 	CGContextAddLineToPoint(context, rect.size.width - radius - 2, 2);
@@ -1493,25 +1493,25 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 	CGContextAddArcToPoint(context, 2, rect.size.height - 2, 2, rect.size.height/2, radius);
 	CGContextStrokePath(context);
 	
-	// setup to draw progress color
+	
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	CGContextSetFillColorWithColor(context, [_progressColor CGColor]);
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     CGContextSetFillColorWithColor(context, [self NSColorToCGColor:_progressColor]);
     (void)(CGColorRelease(_cgColorFromNSColor)), _cgColorFromNSColor = nil;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 	radius = radius - 2;
 	float amount = self.progress * rect.size.width;
 	
-	// if progress is in the middle area
+	
 	if (amount >= radius + 4 && amount <= (rect.size.width - radius - 4)) {
-		// top
+		
 		CGContextMoveToPoint(context, 4, rect.size.height/2);
 		CGContextAddArcToPoint(context, 4, 4, radius + 4, 4, radius);
 		CGContextAddLineToPoint(context, amount, 4);
 		CGContextAddLineToPoint(context, amount, radius + 4);
 		
-		// bottom
+		
 		CGContextMoveToPoint(context, 4, rect.size.height/2);
 		CGContextAddArcToPoint(context, 4, rect.size.height - 4, radius + 4, rect.size.height - 4, radius);
 		CGContextAddLineToPoint(context, amount, rect.size.height - 4);
@@ -1520,11 +1520,11 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		CGContextFillPath(context);
 	}
 	
-	// progress is in the right arc
+	
 	else if (amount > radius + 4) {
 		float x = amount - (rect.size.width - radius - 4);
 		
-		// top
+		
 		CGContextMoveToPoint(context, 4, rect.size.height/2);
 		CGContextAddArcToPoint(context, 4, 4, radius + 4, 4, radius);
 		CGContextAddLineToPoint(context, rect.size.width - radius - 4, 4);
@@ -1533,7 +1533,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		CGContextAddArc(context, rect.size.width - radius - 4, rect.size.height/2, radius, M_PI, angle, 0);
 		CGContextAddLineToPoint(context, amount, rect.size.height/2);
 		
-		// bottom
+		
 		CGContextMoveToPoint(context, 4, rect.size.height/2);
 		CGContextAddArcToPoint(context, 4, rect.size.height - 4, radius + 4, rect.size.height - 4, radius);
 		CGContextAddLineToPoint(context, rect.size.width - radius - 4, rect.size.height - 4);
@@ -1545,14 +1545,14 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 		CGContextFillPath(context);
 	}
 	
-	// progress is in the left arc
+	
 	else if (amount < radius + 4 && amount > 0) {
-		// top
+		
 		CGContextMoveToPoint(context, 4, rect.size.height/2);
 		CGContextAddArcToPoint(context, 4, 4, radius + 4, 4, radius);
 		CGContextAddLineToPoint(context, radius + 4, rect.size.height/2);
 		
-		// bottom
+		
 		CGContextMoveToPoint(context, 4, rect.size.height/2);
 		CGContextAddArcToPoint(context, 4, rect.size.height - 4, radius + 4, rect.size.height - 4, radius);
 		CGContextAddLineToPoint(context, radius + 4, rect.size.height/2);
@@ -1586,9 +1586,9 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 {
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 	[self setNeedsDisplay];
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
     [self setNeedsDisplay:YES];
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 }
 
 @end
@@ -1597,13 +1597,13 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 @implementation MBSpinnerProgressView
 
-// Create subclass of NSProgressIndicator inside method do like this
+
 
 #pragma mark - Drawing
 
 - (void)drawRect:(NSRect)dirtyRect
 {
-    // Drawing code here.
+    
     [self setControlTint:NSGraphiteControlTint];
     CGContextSetBlendMode((CGContextRef)[[NSGraphicsContext currentContext] graphicsPort], kCGBlendModeSoftLight);
     [[[NSColor whiteColor] colorWithAlphaComponent:1] set];
@@ -1613,14 +1613,14 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 @end
 
-//
-//  YRKSpinningProgressIndicator.m
-//
-//  Copyright 2009 Kelan Champagne. All rights reserved.
-//
-//  Modified for ObjC-ARC compatibility by Wayne Fox 2014
 
-// Some constants to control the animation
+
+
+
+
+
+
+
 #define kAlphaWhenStopped   0.15
 #define kFadeMultiplier     0.85
 
@@ -1705,7 +1705,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     [super viewDidMoveToWindow];
     
     if ([self window] == nil) {
-        // No window?  View hierarchy may be going away.  Dispose timer to clear circular retain of timer to self to timer.
+        
         [self actuallyStopAnimation];
     }
     else if (_isAnimating) {
@@ -1715,7 +1715,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 - (void)drawRect:(NSRect)rect
 {
-    // Determine size based on current bounds
+    
     NSSize size = [self bounds].size;
     CGFloat theMaxSize;
     if(size.width >= size.height)
@@ -1723,7 +1723,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     else
         theMaxSize = size.width;
     
-    // fill the background, if set
+    
     if(_drawsBackground) {
         [_backColor set];
         [NSBezierPath fillRect:[self bounds]];
@@ -1732,14 +1732,14 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     CGContextRef currentContext = (CGContextRef)[[NSGraphicsContext currentContext] graphicsPort];
     [NSGraphicsContext saveGraphicsState];
     
-    // Move the CTM so 0,0 is at the center of our bounds
+    
     CGContextTranslateCTM(currentContext,[self bounds].size.width/2,[self bounds].size.height/2);
     
     if (_isIndeterminate) {
         NSBezierPath *path = [[NSBezierPath alloc] init];
-        CGFloat lineWidth = 0.0859375 * theMaxSize; // should be 2.75 for 32x32
-        CGFloat lineStart = 0.234375 * theMaxSize; // should be 7.5 for 32x32
-        CGFloat lineEnd = 0.421875 * theMaxSize;  // should be 13.5 for 32x32
+        CGFloat lineWidth = 0.0859375 * theMaxSize; 
+        CGFloat lineStart = 0.234375 * theMaxSize; 
+        CGFloat lineEnd = 0.421875 * theMaxSize;  
         [path setLineWidth:lineWidth];
         [path setLineCapStyle:NSRoundLineCapStyle];
         [path moveToPoint:NSMakePoint(0,lineStart)];
@@ -1748,7 +1748,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
         for (int i=0; i<_numFins; i++) {
             if(_isAnimating) {
 #if __has_feature(objc_arc)
-                [(NSColor *)[_finColors objectAtIndex:i] set];  // Sets the fill and stroke colors in the current drawing context.
+                [(NSColor *)[_finColors objectAtIndex:i] set];  
 #else
                 [_finColors[i] set];
 #endif
@@ -1759,7 +1759,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
             
             [path stroke];
             
-            // we draw all the fins by rotating the CTM, then just redraw the same segment again
+            
             CGContextRotateCTM(currentContext, 6.282185/_numFins);
         }
 #if !__has_feature(objc_arc)
@@ -1803,11 +1803,11 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 - (void)stopAnimation:(id)sender
 {
-    // animate to stopped state
+    
     _isFadingOut = YES;
 }
 
-/// Only the spinning style is implemented
+
 - (void)setStyle:(NSProgressIndicatorStyle)style
 {
     if (NSProgressIndicatorSpinningStyle != style) {
@@ -1826,8 +1826,8 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #endif
         _foreColor = MB_RETAIN(value);
         
-        // generate all the fin colors, with the alpha components
-        // they already have
+        
+        
         for (int i=0; i<_numFins; i++) {
 #if __has_feature(objc_arc)
             CGFloat alpha = [[_finColors objectAtIndex:i] alphaComponent];
@@ -1874,7 +1874,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 - (void)setDoubleValue:(double)doubleValue
 {
-    // Automatically put it into determinate mode if it's not already.
+    
     if (_isIndeterminate) {
         [self setIndeterminate:NO];
     }
@@ -1894,7 +1894,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
         _usesThreadedAnimation = useThreaded;
         
         if (_isAnimating) {
-            // restart the timer to use the new mode
+            
             [self stopAnimation:self];
             [self startAnimation:self];
         }
@@ -1905,7 +1905,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 {
 	_displayedWhenStopped = displayedWhenStopped;
 	
-	// Show/hide ourself if necessary
+	
 	if (!_isAnimating) {
 		if (_displayedWhenStopped && [self isHidden]) {
 			[self setHidden:NO];
@@ -1928,10 +1928,10 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
         _position = _numFins - 1;
     }
     
-    // update the colors
+    
     CGFloat minAlpha = _displayedWhenStopped ? kAlphaWhenStopped : 0.01;
     for (int i=0; i<_numFins; i++) {
-        // want each fin to fade exponentially over _numFins frames of animation
+        
 #if __has_feature(objc_arc)
         CGFloat newAlpha = [[_finColors objectAtIndex:i] alphaComponent] * kFadeMultiplier;
 #else
@@ -1951,7 +1951,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     }
     
     if (_isFadingOut) {
-        // check if the fadeout is done
+        
         BOOL done = YES;
         for (int i=0; i<_numFins; i++) {
 #if __has_feature(objc_arc)
@@ -1971,7 +1971,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
         }
     }
     else {
-        // "light up" the next fin (with full alpha)
+        
 #if !__has_feature(objc_arc)
         NSColor *oldColor = _finColors[_position];
 #endif
@@ -1984,8 +1984,8 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
     }
     
     if (_usesThreadedAnimation) {
-        // draw now instead of waiting for setNeedsDisplay (that's the whole reason
-        // we're animating from background thread)
+        
+        
         [self display];
     }
     else {
@@ -1995,20 +1995,20 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 - (void)actuallyStartAnimation
 {
-    // Just to be safe kill any existing timer.
+    
     [self actuallyStopAnimation];
     
     _isAnimating = YES;
     _isFadingOut = NO;
     
-    // always start from the top
+    
     _position = 1;
     
 	if (!_displayedWhenStopped)
 		[self setHidden:NO];
     
     if ([self window]) {
-        // Why animate if not visible?  viewDidMoveToWindow will re-call this method when needed.
+        
         if (_usesThreadedAnimation) {
             _animationThread = [[NSThread alloc] initWithTarget:self selector:@selector(animateInBackgroundThread) object:nil];
             [_animationThread start];
@@ -2036,7 +2036,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
         [self setHidden:YES];
     
     if (_animationThread) {
-        // we were using threaded animation
+        
 		[_animationThread cancel];
 		if (![_animationThread isFinished]) {
 			[[NSRunLoop currentRunLoop] runMode:NSModalPanelRunLoopMode beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];
@@ -2047,7 +2047,7 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
         _animationThread = nil;
 	}
     else if (_animationTimer) {
-        // we were using timer-based animation
+        
         [_animationTimer invalidate];
 #if !__has_feature(objc_arc)
         [_animationTimer release];
@@ -2082,11 +2082,11 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 #else
         NSAutoreleasePool *animationPool = [[NSAutoreleasePool alloc] init];
 #endif
-        // Set up the animation speed to subtly change with size > 32.
-        // int animationDelay = 38000 + (2000 * ([self bounds].size.height / 32));
         
-        // Set the rev per minute here
-        int omega = 100; // RPM
+        
+        
+        
+        int omega = 100; 
         int animationDelay = 60*1000000/omega/_numFins;
         int poolFlushCounter = 0;
         
@@ -2111,4 +2111,4 @@ static const CGFloat kDetailsLabelFontSize = 12.0f;
 
 @end
 
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  

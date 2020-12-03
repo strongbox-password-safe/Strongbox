@@ -55,12 +55,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL backupIncludeImportedKeyFiles;
 @property BOOL haveAskedAboutBackupSettings;
 
-@property BOOL hasMigratedDatabaseSubtitles;
-@property BOOL migratedYubiKeyEmergencyWorkaroundsToVirtualKeys;
-
 @property BOOL hideExportFromDatabaseContextMenu;
-//@property BOOL useLegacyBrowseUiWithQuickActions;
 @property BOOL allowThirdPartyKeyboards;
+
+@property BOOL appLockAllowDevicePasscodeFallbackForBio;
 
 NS_ASSUME_NONNULL_END
 

@@ -7,8 +7,11 @@
 //
 
 #import "KeyFileParser.h"
-#import "KissXML.h"
 #import "NSData+Extensions.h"
+
+#if TARGET_OS_IPHONE
+#import "KissXML.h" // Drop in replacements for the NSXML stuff available on Mac
+#endif
 
 static NSString* const kKeyFileRootElementName = @"KeyFile";
 static NSString* const kKeyElementName = @"Key";
@@ -21,9 +24,9 @@ static NSString* const kDataElementName = @"Data";
         return nil;
     }
 
-    // The Key File can be provided in 4 formats:
     
-    // 1. XML file with 32-byte key encoded as Base64 string
+    
+    
     
     if(checkForXml) {
         NSData* xml = [KeyFileParser getXmlKey:data];
@@ -32,20 +35,20 @@ static NSString* const kDataElementName = @"Data";
         }
     }
     
-    // 2. 32 byte binary file - this is the digest directly
+    
 
     if (data.length == 32) {
         return data;
     }
 
-    // 3. Text file with a 32-byte key encoded as a hex string (64 characters)
+    
 
     NSData* textHex = [KeyFileParser getHexTextKey:data];
     if(textHex) {
         return textHex;
     }
     
-    // 4. Any other file is hashed by sha256, which again produces a 32-byte key.
+    
 
     return data.sha256;
 }
@@ -105,21 +108,21 @@ BOOL isAll64CharactersAreHex(NSData* data) {
 }
 
 + (NSData*)getXmlKey:(NSData*)data {
-    // <?xml version="1.0" encoding="utf-8"?>
-    // <KeyFile>
-    //    <Meta>
-    //        <Version>1.00</Version>
-    //    </Meta>
-    //    <Key>
-    //        <Data>qoqpuidtJAbJZI8XL3DxGqQkxEo6HZbxnhCStAZIYsE=</Data>
-    //    </Key>
-    // </KeyFile>
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     NSError *error;
     NSXMLDocument *document = [[NSXMLDocument alloc] initWithData:data options:kNilOptions error:&error];
     
     if(!document || error != nil) {
-        //NSLog(@"Error opening Key File: %@", error);
+        
         return nil;
     }
     
@@ -131,7 +134,7 @@ BOOL isAll64CharactersAreHex(NSData* data) {
     
     NSXMLNode *keyFileNode = document.rootDocument.children[0];
     
-    if(keyFileNode.childCount < 2) { // Must contain Meta and Key elements
+    if(keyFileNode.childCount < 2) { 
         NSLog(@"Does not contain 2 child elements... not an xml key file");
         return nil;
     }
@@ -140,7 +143,7 @@ BOOL isAll64CharactersAreHex(NSData* data) {
         if([node.name isEqualToString:kKeyElementName]) {
             for (NSXMLNode* childNode in node.children) {
                 if([childNode.name isEqualToString:kDataElementName]) {
-                    //NSLog(@"%@", childNode.stringValue);
+                    
                     
                     NSData* key = [[NSData alloc] initWithBase64EncodedString:childNode.stringValue options:NSDataBase64DecodingIgnoreUnknownCharacters];
                     

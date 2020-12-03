@@ -9,15 +9,18 @@
 #import "DatabasesManager.h"
 #import "BookmarksHelper.h"
 #import "NSArray+Extensions.h"
+#import "Settings.h"
 
 @interface DatabasesManager()
 
-@property (strong, nonatomic) NSMutableArray<DatabaseMetadata*> *data;
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
 
 @end
 
 static NSString* kDatabasesDefaultsKey = @"databases";
+static NSString* const kMigratedToNewStore = @"migratedDatabasesToNewStore";
+
+NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotification";
 
 @implementation DatabasesManager
 
@@ -32,16 +35,14 @@ static NSString* kDatabasesDefaultsKey = @"databases";
 }
 
 - (instancetype)init {
-    if (self = [super init]) {        
+    if (self = [super init]) {
         _dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
-        _data = [self load];
     }
     
     return self;
 }
 
-- (NSMutableArray<DatabaseMetadata*>*)load {
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+- (NSMutableArray<DatabaseMetadata*>*)deserializeFromUserDefaults:(NSUserDefaults*)defaults {
     NSData *encodedObject = [defaults objectForKey:kDatabasesDefaultsKey];
     
     if(encodedObject == nil) {
@@ -49,44 +50,56 @@ static NSString* kDatabasesDefaultsKey = @"databases";
     }
     
     NSArray<DatabaseMetadata*> *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
-    return [[NSMutableArray<DatabaseMetadata*> alloc]initWithArray:object];
+    return [[NSMutableArray<DatabaseMetadata*> alloc] initWithArray:object];
 }
 
-- (void)serialize {
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:self.data];
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+- (void)serializeToUserDefaults:(NSUserDefaults*)defaults data:(NSArray<DatabaseMetadata*>*)data {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:data];
     [defaults setObject:encodedObject forKey:kDatabasesDefaultsKey];
     [defaults synchronize];
 }
 
-- (void)add:(DatabaseMetadata *_Nonnull)safe {
-    dispatch_barrier_async(self.dataQueue, ^{
-        [self.data addObject:safe];
-        [self serialize];
-    });
+- (NSMutableArray<DatabaseMetadata*>*)deserialize {
+    return [self deserializeFromUserDefaults:Settings.sharedInstance.sharedAppGroupDefaults];
 }
 
-- (void)save {
+- (void)serialize:(NSArray<DatabaseMetadata*>*)data {
+    [self serializeToUserDefaults:Settings.sharedInstance.sharedAppGroupDefaults data:data];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListChangedNotification object:nil];
+    });
+}
+    
+
+
+- (void)add:(DatabaseMetadata *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
-        [self serialize];
+        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
+        [databases addObject:safe];
+        [self serialize:databases];
     });
 }
 
 - (NSArray<DatabaseMetadata *> *)snapshot {
     __block NSArray<DatabaseMetadata *> *result;
-    dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.data]; });
+
+    dispatch_sync(self.dataQueue, ^{ result = [self deserialize].copy; });
+
     return result;
 }
 
 - (void)remove:(NSString*_Nonnull)uuid {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
+
+        NSUInteger index = [databases indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             return [obj.uuid isEqualToString:uuid];
         }];
         
         if(index != NSNotFound) {
-            [self.data removeObjectAtIndex:index];
-            [self serialize];
+            [databases removeObjectAtIndex:index];
+            [self serialize:databases];
         }
         else {
             NSLog(@"WARN: Attempt to remove a safe not found in list... [%@]", uuid);
@@ -96,13 +109,15 @@ static NSString* kDatabasesDefaultsKey = @"databases";
 
 - (void)update:(DatabaseMetadata *_Nonnull)safe {
     dispatch_barrier_async(self.dataQueue, ^{
-        NSUInteger index = [self.data indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
+
+        NSUInteger index = [databases indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             return [obj.uuid isEqualToString:safe.uuid];
         }];
         
         if(index != NSNotFound) {
-            [self.data replaceObjectAtIndex:index withObject:safe];
-            [self serialize];
+            [databases replaceObjectAtIndex:index withObject:safe];
+            [self serialize:databases];
         }
         else {
             NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", safe);
@@ -112,13 +127,15 @@ static NSString* kDatabasesDefaultsKey = @"databases";
 
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex {
     dispatch_barrier_async(self.dataQueue, ^{
-        DatabaseMetadata* item = [self.data objectAtIndex:sourceIndex];
+        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
+
+        DatabaseMetadata* item = [databases objectAtIndex:sourceIndex];
         
-        [self.data removeObjectAtIndex:sourceIndex];
+        [databases removeObjectAtIndex:sourceIndex];
         
-        [self.data insertObject:item atIndex:destinationIndex];
+        [databases insertObject:item atIndex:destinationIndex];
         
-        [self serialize];
+        [self serialize:databases];
     });
 }
 
@@ -152,7 +169,7 @@ static NSString* kDatabasesDefaultsKey = @"databases";
 }
 
 - (DatabaseMetadata *)getDatabaseByFileUrl:(NSURL *)url {
-    // FUTURE: Check Storage type when impl sftp or webdav
+    
     
     return [self.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
         return [obj.fileUrl isEqual:url];
@@ -181,7 +198,5 @@ static NSString* kDatabasesDefaultsKey = @"databases";
 
     return safe;
 }
-
-
 
 @end

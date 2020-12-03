@@ -54,18 +54,18 @@
     }
 }
 
-//- (BOOL)acceptsFirstResponder {
-//    return YES;
-//}
+
+
+
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
-    // NB: Required for mouse up to work that we override here...
+    
 }
 
 - (void)mouseUp:(NSEvent *)theEvent
 {
-    //NSLog(@"mouseUp");
+    
     if(self.clickable && self.onClick) {
         self.onClick();
     }

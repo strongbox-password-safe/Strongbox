@@ -74,7 +74,7 @@
         }
         
         CGFloat blah = remainingSeconds / self.otpToken.period;
-        //        NSLog(@"%llu/%f = %f", remainingSeconds, self.otpToken.period, blah);
+        
         
         [UIView animateWithDuration:1.3 delay:0.0 options:UIViewAnimationOptionRepeat animations:^{
             [self.progressView setProgress:blah animated:YES];

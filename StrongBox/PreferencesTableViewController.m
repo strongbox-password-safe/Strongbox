@@ -53,6 +53,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTips;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordGeneration;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellManageKeyFiles;
+@property (weak, nonatomic) IBOutlet UISwitch *appLockPasscodeFallback;
+@property (weak, nonatomic) IBOutlet UILabel *labelAppLockPasscodeFallback;
 
 @end
 
@@ -66,15 +68,17 @@
     NSLog(@"Generic Preference Changed: [%@]", sender);
 
     Settings.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
+    Settings.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
     
     [self bindGenericPreferencesChanged];
 }
 
 - (void)bindGenericPreferencesChanged {
     self.appLockOnPreferences.on = Settings.sharedInstance.appLockAppliesToPreferences;
+    self.appLockPasscodeFallback.on = Settings.sharedInstance.appLockAllowDevicePasscodeFallbackForBio;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -107,7 +111,7 @@
                     }];
     }
     else if(cell == self.cellAboutVersion) {
-        // Auto Segue
+        
     }
     else if(cell == self.cellAboutHelp) {
         [self onFaq];
@@ -144,16 +148,10 @@
     }
 }
 
-- (void)launchStrongboxSafeTwitter {
-    [UIApplication.sharedApplication openURL:[NSURL URLWithString:@"https://twitter.com/strongboxsafe"]
-                                     options:@{ }
-                           completionHandler:nil];
-}
-
 - (void)customizeAppLockSectionFooter {
     [self.segmentAppLock setEnabled:BiometricsManager.isBiometricIdAvailable forSegmentAtIndex:2];
     [self.segmentAppLock setTitle:[BiometricsManager.sharedInstance getBiometricIdName] forSegmentAtIndex:2];
-    [self.segmentAppLock setEnabled:BiometricsManager.isBiometricIdAvailable forSegmentAtIndex:3]; // Both
+    [self.segmentAppLock setEnabled:BiometricsManager.isBiometricIdAvailable forSegmentAtIndex:3]; 
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -161,7 +159,7 @@
 
     [self.navigationController setNavigationBarHidden:NO];
 
-    //self.navigationController.toolbar.hidden = YES;
+    
     
     [self bindCloudSessions];
 }
@@ -306,39 +304,45 @@
     }
 }
 
-- (void)onContactSupport {
-    [Alerts twoOptionsWithCancel:self
-                           title:NSLocalizedString(@"prefs_vc_info_email_support_options_title", @"Support Options")
-                         message:NSLocalizedString(@"prefs_vc_info_email_support_options_message", @"Please make sure you check Twitter, Reddit and the FAQ before you email support to save development resources for improving Strongbox.")
-               defaultButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_check_faq", @"Check FAQ")
-                secondButtonText:NSLocalizedString(@"prefs_vc_info_email_support_options_check_twitter", @"Check Twitter")
-                          action:^(int response) {
-        if(response == 0) {
-            [self onFaq];
-        }
-        else if (response == 1) {
-            [self launchStrongboxSafeTwitter];
-        }
-    }];
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  
 - (IBAction)onDeleteDataChanged:(id)sender {
     if(self.switchDeleteDataEnabled.on) {
-        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; // Default
+        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; 
         
         [Alerts info:self
                title:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_title", @"DATA DELETION: Care Required")
              message:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_message", @"Please be extremely careful as this will delete permanently any local device databases and all preferences.")];
     }
     else {
-        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; // Off
+        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; 
     }
     
     [self bindAppLock];
 }
 
 - (void)onFaq {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://strongboxsafe.com/support/"] options:@{} completionHandler:nil];
+    NSURL* url = [NSURL URLWithString:@"https:
+    if (@available (iOS 10.0, *)) {
+        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+    }
+    else {
+        [UIApplication.sharedApplication openURL:url];
+    }
 }
 
 - (IBAction)onSwitchClearClipboardEnable:(id)sender {
@@ -364,7 +368,7 @@
     }
 }
 
-//////
+
 
 - (void)bindAppLock {
     NSInteger mode = Settings.sharedInstance.appLockMode;
@@ -393,7 +397,8 @@
     self.cellAppLockDelay.userInteractionEnabled = effectiveMode != kNoLock;
     
     self.appLockOnPreferences.enabled = effectiveMode != kNoLock;
-    
+    self.appLockPasscodeFallback.enabled = effectiveMode == kBiometric || effectiveMode == kBoth;
+
     NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
     
     BOOL deleteOnOff = Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
@@ -414,6 +419,9 @@
     else {
         self.labelDeleteDataAttemptCount.textColor = !(deleteOnOff && deleteEnabled) ? UIColor.lightGrayColor : UIColor.darkTextColor;
     }
+    
+    NSString* fmt = NSLocalizedString(@"app_lock_allow_device_passcode_fallback_for_biometric_fmt", @"Passcode Fallback for %@");
+    self.labelAppLockPasscodeFallback.text = [NSString stringWithFormat:fmt, BiometricsManager.sharedInstance.biometricIdName];
 }
 
 - (void)promptForInteger:(NSString*)title
@@ -447,10 +455,10 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"seguePrefToPasswordPrefs"]) {
-        //UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
-//        PasswordGenerationSettingsTableView* vc = (PasswordGenerationSettingsTableView*)nav.topViewController;
-//        vc.onDone = self.onDone;
-//
+        
+
+
+
         PasswordGenerationViewController* vc = (PasswordGenerationViewController*)segue.destinationViewController;
         vc.onDone = self.onDone;
     }

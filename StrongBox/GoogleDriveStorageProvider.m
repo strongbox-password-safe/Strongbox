@@ -32,8 +32,8 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = YES; // Avoid long delay if offline
-        _supportsConcurrentRequests = NO; // Definitely Not - Keychain error
+        _immediatelyOfferCacheIfOffline = YES; 
+        _supportsConcurrentRequests = NO; 
         
         _iconsByUrl = [[NSMutableDictionary alloc] init];
         return self;
@@ -232,7 +232,7 @@
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
-    // NOTIMPL
+    
 }
 
 @end

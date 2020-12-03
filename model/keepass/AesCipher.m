@@ -15,17 +15,17 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
 
 @implementation AesCipher
 
-// This class does standard AES CBC with PKCS7 padding using the Common Crypto library
+
 
 - (NSData*)crypt:(CCOperation)operation data:(NSData *)data iv:(NSData*)iv key:(NSData*)key {
-    // 1. Get Required Buffer Size by Calling with 0 length out buffer
+    
     
     size_t bufferSize;
-    //CCCryptorStatus status =
+    
     CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
                                      data.bytes, data.length, nil, 0, &bufferSize);
 
-    // 2. Perform actually with right sized buffer.
+    
     
     NSMutableData *ret = [NSMutableData dataWithLength:bufferSize];
     CCCryptorStatus status = CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,

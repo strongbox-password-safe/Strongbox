@@ -94,15 +94,15 @@ BOOL isValidUrl(NSString* urlString) {
     return [[NSHost currentHost] localizedName];
 #endif
 }
-//    char baseHostName[256];
-//    int success = gethostname(baseHostName, 255);
-//
-//    if (success != 0) return nil;
-//
-//    baseHostName[255] = '\0';
-//
-//    return [NSString stringWithFormat:@"%s.local", baseHostName];
-//}
+
+
+
+
+
+
+
+
+
 
 + (NSString*)getUsername {
     return NSFullUserName();
@@ -125,8 +125,12 @@ NSString* friendlyFileSizeString(long long byteCount) {
     return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleFile];
 }
 
+NSString* friendlyMemorySizeString(long long byteCount) {
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleMemory];
+}
+
 NSString* keePassStringIdFromUuid(NSUUID* uuid) {
-    // 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C => 46C9B1FFBD4ABC4BBB260C6190BAD20C
+    
     
     uuid_t uid;
     [uuid getUUIDBytes:(uint8_t*)&uid];
@@ -139,7 +143,7 @@ NSUUID* uuidFromKeePassStringId(NSString* stringId) {
         return nil;
     }
     
-    // 46C9B1FFBD4ABC4BBB260C6190BAD20C => 46C9B1FF-BD4A-BC4B-BB26-0C6190BAD20C;
+    
     
     NSData* uuidData = [Utils dataFromHexString:stringId];
     return [[NSUUID alloc] initWithUUIDBytes:uuidData.bytes];
@@ -164,8 +168,8 @@ NSComparator finderStringComparator = ^(id obj1, id obj2)
 }
 
 NSComparisonResult finderStringCompare(NSString* string1, NSString* string2) {
-    // Finder Like String Sort
-    // https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Strings/Articles/SearchingStrings.html#//apple_ref/doc/uid/20000149-SW1
+    
+    
     
     static NSStringCompareOptions comparisonOptions =
     NSCaseInsensitiveSearch | NSNumericSearch |
@@ -279,7 +283,7 @@ NSData* IntToLittleEndianData(int64_t integer, uint8_t byteCount) {
     return ret;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
     unsigned long i;
@@ -303,7 +307,7 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
 }
 
 + (NSData *)dataFromHexString:(NSString*)string {
-    // Remove any and all spaces
+    
     string = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
     
     const char *chars = [string UTF8String];
@@ -365,7 +369,7 @@ UIImage* scaleImage(UIImage* image, CGSize newSize) {
     newSize2.width = image.size.width * scaleFactor;
     newSize2.height = image.size.height * scaleFactor;
     
-    @autoreleasepool { // Prevent App Extension Crash
+    @autoreleasepool { 
         UIGraphicsBeginImageContext(newSize2);
         [image drawInRect:CGRectMake(0,0,newSize2.width,newSize2.height)];
         UIImage* newImage = UIGraphicsGetImageFromCurrentImageContext();
@@ -400,7 +404,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
     [ret lockFocus];
     
     NSRect thumbnailRect = { 0 };
-    //thumbnailRect.origin = thumbnailPoint;
+    
     thumbnailRect.size.width = newSize2.width;
     thumbnailRect.size.height = newSize2.height;
     
@@ -472,7 +476,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
     NSData *stringData = [qrString dataUsingEncoding:NSISOLatin1StringEncoding];
     CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
     
-    // Set the message content and error-correction level
+    
     
     [qrFilter setValue:stringData forKey:@"inputMessage"];
     [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
@@ -488,20 +492,20 @@ NSString* localizedYesOrNoFromBool(BOOL george) {
     NSLocalizedString(@"alerts_no", @"No");
 }
 
-//    [[Settings sharedInstance] setPro:NO];
-//    [[Settings sharedInstance] setEndFreeTrialDate:nil];
-//    [[Settings sharedInstance] setHavePromptedAboutFreeTrial:NO];
-//    [[Settings sharedInstance] resetLaunchCount];
-//    NSCalendar *cal = [NSCalendar currentCalendar];
-//    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:9 toDate:[NSDate date] options:0];
-//    [[Settings sharedInstance] setEndFreeTrialDate:date];
 
 
-//    [[Settings sharedInstance] setFullVersion:NO];
-//[[Settings sharedInstance] setEndFreeTrialDate:nil];
-//    NSCalendar *cal = [NSCalendar currentCalendar];
-//    NSDate *date = [cal dateByAddingUnit:NSCalendarUnitDay value:-10 toDate:[NSDate date] options:0];
-//    [[Settings sharedInstance] setEndFreeTrialDate:date];
-//
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

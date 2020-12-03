@@ -59,7 +59,7 @@
 }
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer {
-    // There is possible a protected flag on this, so we need to merge with original attributes
+    
     NSMutableDictionary* attributes = self.originalAttributes ? self.originalAttributes.mutableCopy : @{}.mutableCopy;
     attributes[kBinaryIdAttribute] = @(self.id).stringValue;
     if(self.compressed) {
@@ -71,7 +71,7 @@
     
     NSInputStream* inputStream = [self.dbAttachment getPlainTextInputStream];
 
-    // FUTURE: Stream this write
+    
     NSData* data = [NSData dataWithContentsOfStream:inputStream];
 
     if (!data) {

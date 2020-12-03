@@ -9,6 +9,7 @@
 #import "BaseXmlDomainObjectHandler.h"
 #import "V3BinariesList.h"
 #import "CustomIconList.h"
+#import "CustomData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) V3BinariesList *v3binaries;
 @property (nonatomic) CustomIconList *customIconList;
+@property (nonatomic, nullable) CustomData* customData;
 
 @end
 

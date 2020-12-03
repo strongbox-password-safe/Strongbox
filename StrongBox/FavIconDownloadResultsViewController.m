@@ -43,7 +43,7 @@
         NSArray<UIImage*>* images = [self getImagesForNode:node];
         
         if(images == nil) {
-            continue; // Unprocessed
+            continue; 
         }
         else if (images.count == 0) {
             [fail addObject:node];

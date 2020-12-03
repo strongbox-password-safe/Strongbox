@@ -14,27 +14,27 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
+
+
+
+
+
+
+
+
+
+
+
 
 #import <Foundation/Foundation.h>
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
     #import <CoreGraphics/CoreGraphics.h>
     #if __IPHONE
         #import <UIKit/UIKit.h>
-    #endif  // __IPHONE
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+    #endif  
+#else   
     #import <Cocoa/Cocoa.h>
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 @protocol MBProgressHUDDelegate;
 
@@ -42,7 +42,7 @@
  NSProgressIndicator* indicator = [[[NSProgressIndicator alloc] initWithFrame:NSMakeRect(20, 20, 30, 30)] autorelease];
  [indicator setStyle:NSProgressIndicatorSpinningStyle];
  
- https://developer.apple.com/library/mac/documentation/cocoa/conceptual/ProgIndic/Concepts/AboutProgIndic.html
+ https:
  
  */
 
@@ -136,12 +136,12 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @interface MBProgressHUD : UIView
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @interface MBProgressHUD : NSView
 {
     CGColorRef _cgColorFromNSColor;
 }
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 #pragma mark - Class methods
 
@@ -158,9 +158,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (MB_INSTANCETYPE)showHUDAddedTo:(UIView *)view animated:(BOOL)animated;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (MB_INSTANCETYPE)showHUDAddedTo:(NSView *)view animated:(BOOL)animated;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Finds the top-most HUD subview and hides it. The counterpart to this method is showHUDAddedTo:animated:.
@@ -175,9 +175,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (BOOL)hideHUDForView:(UIView *)view animated:(BOOL)animated;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (BOOL)hideHUDForView:(NSView *)view animated:(BOOL)animated;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Finds all the HUD subviews and hides them.
@@ -192,9 +192,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (NSUInteger)hideAllHUDsForView:(UIView *)view animated:(BOOL)animated;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (NSUInteger)hideAllHUDsForView:(NSView *)view animated:(BOOL)animated;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Finds the top-most HUD subview and returns it.
@@ -204,9 +204,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (MB_INSTANCETYPE)HUDForView:(UIView *)view;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (MB_INSTANCETYPE)HUDForView:(NSView *)view;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Finds all HUD subviews and returns them.
@@ -216,9 +216,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 + (NSArray *)allHUDsForView:(UIView *)view;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 + (NSArray *)allHUDsForView:(NSView *)view;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * OS X Helper method to convert NSColor value to CGColorRef value.
@@ -228,7 +228,7 @@ enum {
  */
 #if !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (CGColorRef)NSColorToCGColor:(NSColor *)nscolor;
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 #pragma mark - Lifecycle
 
@@ -241,9 +241,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (id)initWithWindow:(UIWindow *)window;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 - (id)initWithWindow:(NSWindow *)window;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * A convenience constructor that initializes the HUD with the view's bounds. Calls the designated constructor with
@@ -254,9 +254,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (id)initWithView:(UIView *)view;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 - (id)initWithView:(NSView *)view;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 #pragma mark - Show & hide
 
@@ -360,7 +360,7 @@ enum {
  */
 @property (copy) MBProgressHUDCompletionBlock completionBlock;
 
-#endif  // NS_BLOCKS_AVAILABLE
+#endif  
 
 /**
  * MBProgressHUD operation mode. The default is MBProgressHUDModeIndeterminate.
@@ -382,9 +382,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (MB_STRONG) UIView *customView;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (MB_STRONG) NSView *customView;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * The HUD delegate object.
@@ -418,9 +418,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (MB_STRONG) UIColor *color;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (MB_STRONG) NSColor *color;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 /**
  * The x-axis offset of the HUD relative to the centre of the superview.
  */
@@ -500,36 +500,36 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (MB_STRONG) UIFont* labelFont;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (MB_STRONG) NSFont* labelFont;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Color to be used for the main label. Set this property if the default is not adequate.
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (MB_STRONG) UIColor* labelColor;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (MB_STRONG) NSColor* labelColor;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Font to be used for the details label. Set this property if the default is not adequate.
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (MB_STRONG) UIFont* detailsLabelFont;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (MB_STRONG) NSFont* detailsLabelFont;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Color to be used for the details label. Set this property if the default is not adequate.
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (MB_STRONG) UIColor* detailsLabelColor;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (MB_STRONG) NSColor* detailsLabelColor;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * The progress of the progress indicator, from 0.0 to 1.0. Defaults to 0.0.
@@ -576,7 +576,7 @@ enum {
  */
 #if !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (CGColorRef)NSColorToCGColor:(NSColor *)nscolor;
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 @end
 
@@ -586,12 +586,12 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @interface MBRoundProgressView : UIView
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @interface MBRoundProgressView : NSView
 {
     CGColorRef _cgColorFromNSColor;
 }
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Progress (0.0 to 1.0)
@@ -604,9 +604,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (nonatomic, MB_STRONG) UIColor *progressTintColor;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (nonatomic, MB_STRONG) NSColor *progressTintColor;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Indicator background (non-progress) color.
@@ -614,9 +614,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (nonatomic, MB_STRONG) UIColor *backgroundTintColor;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (nonatomic, MB_STRONG) NSColor *backgroundTintColor;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /*
  * Display mode - NO = round or YES = annular. Defaults to round.
@@ -631,12 +631,12 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @interface MBBarProgressView : UIView
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @interface MBBarProgressView : NSView
 {
     CGColorRef _cgColorFromNSColor;
 }
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Progress (0.0 to 1.0)
@@ -649,9 +649,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (nonatomic, MB_STRONG) UIColor *lineColor;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (nonatomic, MB_STRONG) NSColor *lineColor;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Bar background color.
@@ -659,9 +659,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (nonatomic, MB_STRONG) UIColor *progressRemainingColor;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (nonatomic, MB_STRONG) NSColor *progressRemainingColor;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * Bar progress color.
@@ -669,9 +669,9 @@ enum {
  */
 #if (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 @property (nonatomic, MB_STRONG) UIColor *progressColor;
-#else   // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#else   
 @property (nonatomic, MB_STRONG) NSColor *progressColor;
-#endif  // (TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 /**
  * OS X Helper method to convert NSColor value to CGColorRef value.
@@ -681,7 +681,7 @@ enum {
  */
 #if !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
 - (CGColorRef)NSColorToCGColor:(NSColor *)nscolor;
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  
 
 @end
 
@@ -693,12 +693,12 @@ enum {
 
 @end
 
-//
-//  YRKSpinningProgressIndicator.h
-//
-//  Copyright 2009 Kelan Champagne. All rights reserved.
-//
-//  Modified for ObjC-ARC compatibility by Wayne Fox 2014
+
+
+
+
+
+
 
 @interface YRKSpinningProgressIndicator : NSView {
     int _position;
@@ -721,7 +721,7 @@ enum {
     BOOL _displayedWhenStopped;
     BOOL _usesThreadedAnimation;
 	
-    // For determinate mode
+    
     BOOL _isIndeterminate;
     double _currentValue;
     double _maxValue;
@@ -743,4 +743,4 @@ enum {
 
 @end
 
-#endif  // !(TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE)
+#endif  

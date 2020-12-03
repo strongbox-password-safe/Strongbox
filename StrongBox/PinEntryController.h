@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) void (^onDone)(PinEntryResponse response, NSString* _Nullable pin);
 
-@property NSUInteger pinLength; // Used for Instant PIN Open
+@property NSUInteger pinLength; 
 
 @property NSString* info;
 @property NSString* warning;

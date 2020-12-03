@@ -19,6 +19,7 @@ extern NSString* const kDragAndDropExternalUti;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
 
+- (void)randomlyShowUpgradeMessage;
 - (void)showUpgradeModal:(NSInteger)delay;
 - (void)clearClipboardWhereAppropriate;
 

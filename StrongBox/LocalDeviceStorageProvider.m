@@ -61,13 +61,13 @@
        modDate:(NSDate *)modDate
 suggestedFilename:(NSString *)suggestedFilename
     completion:(void (^)(SafeMetaData * _Nonnull, NSError *))completion {
-    // Is the suggested a valid file name?
-    // YES -> Does it exist
-    //     Yes -> Are we allow to overwrite
-    //        Yes -> Overwirte
-    //        No -> Come up with new File Name and Write
-    //     No -> Write
-    // NO -> Come up with new File Name and Write
+    
+    
+    
+    
+    
+    
+    
     
     if(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data]) {
         suggestedFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
@@ -82,7 +82,7 @@ suggestedFilename:(NSString *)suggestedFilename
     
     SafeMetaData *metadata = [self getSafeMetaData:nickName providerData:identifier];
     
-    // Set Date Modified
+    
     
     NSURL* url = [self getFileUrl:metadata];
     
@@ -100,22 +100,22 @@ suggestedFilename:(NSString *)suggestedFilename
     NSLog(@"Trying to write local file with filename [%@]", filename);
     NSString *path = [self getDefaultStorageFileUrl:filename].path;
 
-    // Does it exist?
+    
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
-        //     Yes -> Are we allow to overwrite
+        
         if(overwrite) {
-            //        Yes -> Write
+            
             return [self write:data path:path overwrite:overwrite];
         }
         else {
-            //        No -> Come up with new File Name and Write
+            
             NSLog(@"File [%@] but not allowed to overwrite...", filename);
             return NO;
         }
     }
     else {
-        // No -> Write
+        
         return [self write:data path:path overwrite:overwrite];
     }
 }
@@ -169,17 +169,17 @@ suggestedFilename:(NSString *)suggestedFilename
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
       completion:(void (^)(UIImage *image))completionHandler {
-    // NOTIMPL
+    
 }
 
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
-    // NOTIMPL
+    
 }
 
 - (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
-    // NOTIMPL
+    
 }
 
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
@@ -217,7 +217,7 @@ suggestedFilename:(NSString *)suggestedFilename
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (LocalDatabaseIdentifier*)getIdentifierFromMetadata:(SafeMetaData*)metaData {
     NSString* json = metaData.fileIdentifier;

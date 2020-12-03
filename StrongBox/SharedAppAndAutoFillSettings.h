@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, readonly) NSUserDefaults* sharedAppGroupDefaults;
 @property (readonly) NSString* appGroupName;
-@property BOOL suppressPrivacyScreen; // Used by Biometric Auth and Google Drive to suppress privacy screen which interferes with their operation - Not actually stored or serialized - belongs elsewhere
+@property BOOL suppressPrivacyScreen; 
 
 @property BOOL colorizeUseColorBlindPalette;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
@@ -29,7 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* quickLaunchUuid;
 @property BOOL allowEmptyOrNoPasswordEntry;
 @property BOOL hideKeyFileOnUnlock;
-@property BOOL showYubikeySecretWorkaroundField;
 @property (nonatomic, strong) AutoFillNewRecordSettings* autoFillNewRecordSettings;
 @property (nonatomic) BOOL hideTips;
 @property BOOL clipboardHandoff;
@@ -59,13 +58,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property DatabaseCellSubtitleField databaseCellSubtitle2;
 @property BOOL showDatabaseIcon;
 
-@property BOOL syncPullEvenIfModifiedDateSame; // Emergency use, probably never useful
-@property BOOL syncForcePushDoNotCheckForConflicts; // Emergency use, probably never useful
+@property BOOL syncPullEvenIfModifiedDateSame; 
+@property BOOL syncForcePushDoNotCheckForConflicts; 
 
 @property BOOL autoFillDidChangeDatabases;
 @property BOOL mainAppDidChangeDatabases;
 
-@property BOOL debugSanityCheckInnerStream; // TODO: Eventually remove and default always on
+@property BOOL legacyShowMetadataOnDetailsScreen;
 
 @end
 

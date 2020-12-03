@@ -34,15 +34,11 @@ static NSString* const kLastFreeTrialNudge = @"lastFreeTrialNudge";
 static NSString* const kBackupFiles = @"backupFiles";
 static NSString* const kBackupIncludeImportedKeyFiles = @"backupIncludeImportedKeyFiles";
 static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSettings";
-
-static NSString* const kHasMigratedDatabaseSubtitles = @"hasMigratedDatabaseSubtitlesAug2020";
-static NSString* const kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys = @"kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys";
-
 static NSString* const kHideExportFromDatabaseContextMenu = @"hideExportFromDatabaseContextMenu";
-//static NSString* const kUseLegacyBrowseUiWithQuickActions = @"useLegacyBrowseUiWithQuickActions";
 static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
+static NSString* const kAppLockAllowDevicePasscodeFallbackForBio = @"appLockAllowDevicePasscodeFallbackForBio";
 
-// TODO: Don't use shared settings for these...
+
 
 @implementation Settings
 
@@ -57,7 +53,17 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
     return sharedInstance;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+- (BOOL)appLockAllowDevicePasscodeFallbackForBio {
+    return [self getBool:kAppLockAllowDevicePasscodeFallbackForBio fallback:YES]; 
+}
+
+- (void)setAppLockAllowDevicePasscodeFallbackForBio:(BOOL)appLockAllowDevicePasscodeFallbackForBio {
+    [self setBool:kAppLockAllowDevicePasscodeFallbackForBio value:appLockAllowDevicePasscodeFallbackForBio];
+}
+
+
 
 - (NSString*)getString:(NSString*)key {
     return [self getString:key fallback:nil];
@@ -101,7 +107,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
     [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)allowThirdPartyKeyboards {
     return [self getBool:kAllowThirdPartyKeyboards];
@@ -111,36 +117,12 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
     [self setBool:kAllowThirdPartyKeyboards value:allowThirdPartyKeyboards];
 }
 
-//- (BOOL)useLegacyBrowseUiWithQuickActions {
-//    return [self getBool:kUseLegacyBrowseUiWithQuickActions];
-//}
-//
-//- (void)setUseLegacyBrowseUiWithQuickActions:(BOOL)useLegacyBrowseUiWithQuickActions {
-//    [self setBool:kUseLegacyBrowseUiWithQuickActions value:useLegacyBrowseUiWithQuickActions];
-//}
-
 - (BOOL)hideExportFromDatabaseContextMenu {
     return [self getBool:kHideExportFromDatabaseContextMenu];
 }
 
 - (void)setHideExportFromDatabaseContextMenu:(BOOL)hideExportFromDatabaseContextMenu {
     [self setBool:kHideExportFromDatabaseContextMenu value:hideExportFromDatabaseContextMenu];
-}
-
-- (BOOL)migratedYubiKeyEmergencyWorkaroundsToVirtualKeys {
-    return [self getBool:kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys];
-}
-
-- (void)setMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys:(BOOL)migratedYubiKeyEmergencyWorkaroundsToVirtualKeys {
-    [self setBool:kMigratedYubiKeyEmergencyWorkaroundsToVirtualKeys value:migratedYubiKeyEmergencyWorkaroundsToVirtualKeys];
-}
-
-- (BOOL)hasMigratedDatabaseSubtitles {
-    return [self getBool:kHasMigratedDatabaseSubtitles];
-}
-
-- (void)setHasMigratedDatabaseSubtitles:(BOOL)hasMigratedDatabaseSubtitles {
-    [self setBool:kHasMigratedDatabaseSubtitles value:hasMigratedDatabaseSubtitles];
 }
 
 - (BOOL)haveAskedAboutBackupSettings {
@@ -168,7 +150,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
 }
 - (NSDate *)lastFreeTrialNudge {
     NSDate* date = [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:kLastFreeTrialNudge];
-    return date ? date : NSDate.date; // App Install will count as first nudge in a technical sense
+    return date ? date : NSDate.date; 
 }
 
 - (void)setLastFreeTrialNudge:(NSDate *)lastFreeTrialNudge {
@@ -262,7 +244,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
     [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
-//
+
 
 - (NSString*)getFlagsStringForDiagnostics {
     return [NSString stringWithFormat:@"[%d[%ld]%d%d%d[%ld]%d%d%d%d]",
@@ -290,7 +272,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
 - (NSDate *)lastEntitlementCheckAttempt {
     NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
     
-    //[userDefaults removeObjectForKey:kEndFreeTrialDate];
+    
     
     return [userDefaults objectForKey:kLastEntitlementCheckAttempt];
 }
@@ -314,7 +296,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
     [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (AppLockMode)appLockMode {
     return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults integerForKey:kAppLockMode];
@@ -370,7 +352,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
     [self setBool:kAppLockAppliesToPreferences value:appLockAppliesToPreferences];
 }
 
-// Initial Implementation of Provision Profile Extraction (To try automatically determine app group id initially)
+
 
 + (NSString*)getAppGroupFromProvisioningProfile {
     NSString* profilePath = [NSBundle.mainBundle pathForResource:@"embedded" ofType:@"mobileprovision"];
@@ -421,15 +403,15 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
 }
 
 + (NSString*)extractPlist:(NSString*)str {
-    // Remove brackets at beginning and end
-    if(!str || str.length < 10) { // Some kind of sensible minimum
+    
+    if(!str || str.length < 10) { 
         return nil;
     }
     
     str = [str substringWithRange:NSMakeRange(1, str.length-2)];
     str = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
     
-    // convert hex to ascii
+    
     
     NSString* profileText = [self hexStringtoAscii:str];
     return profileText;
@@ -455,7 +437,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
         if(obj.numberOfRanges > 1) {
             NSRange range = [obj rangeAtIndex:2];
             NSString *sub = [hexString substringWithRange:range];
-            //NSLog(@"Match: %@", sub);
+            
             
             NSScanner *scanner = [NSScanner scannerWithString:sub];
             uint32_t u32;
@@ -464,7 +446,7 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
         }
         else {
             NSLog(@"Do not know how to decode.");
-            return @(32); // Space ASCII
+            return @(32); 
         }
     }];
     

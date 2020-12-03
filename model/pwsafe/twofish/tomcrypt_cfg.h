@@ -41,7 +41,7 @@ LTC_EXPORT void * LTC_CALL XMEMSET(void *s, int c, size_t n);
 
 LTC_EXPORT int LTC_CALL XSTRCMP(const char *s1, const char *s2);
 
-#endif // ifndef LTC_NO_PROTOTYPES
+#endif 
 
 /* type of argument checking, 0=default, 1=fatal and 2=error+continue, 3=nothing */
 #ifndef ARGTYPE
@@ -128,7 +128,7 @@ LTC_EXPORT int LTC_CALL XSTRCMP(const char *s1, const char *s2);
    #define ENDIAN_NEUTRAL
 #endif
 
-#endif // ifndef TOMCRYPT_CFG_H
+#endif 
 
 
 /* $Source: /cvs/libtom/libtomcrypt/src/headers/tomcrypt_cfg.h,v $ */

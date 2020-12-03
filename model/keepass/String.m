@@ -12,8 +12,7 @@
 
 @implementation String
 
-- (instancetype)initWithContext:(XmlProcessingContext*)context
-{
+- (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kStringElementName context:context]) {
         self.key = @"";
         self.value = @"";
@@ -38,7 +37,7 @@
 }
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer {
-    return NO; // We do not use this for writing... it is inlined in Entry...
+    return NO; 
 }
 
 - (NSString *)description {

@@ -10,7 +10,6 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "SafesListTableViewController.h"
-//#import "iCloudSafesCoordinator.h"
 #import "Alerts.h"
 #import "mach/mach.h"
 #import "QuickTypeRecordIdentifier.h"
@@ -34,9 +33,9 @@
 
 @implementation CredentialProviderViewController
 
-// QuickType Support...
 
--(void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
+
+- (void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     NSLog(@"provideCredentialWithoutUserInteractionForIdentity: [%@]", credentialIdentity);
     [self exitWithUserInteractionRequired];
 }
@@ -66,9 +65,9 @@
         }];
         
         if(safe) {
-            // Delay a litte to avoid UI Weirdness glitch
+            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
+                AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
                 [OpenSafeSequenceHelper beginSequenceWithViewController:self
                                                                    safe:safe
                                                     canConvenienceEnrol:NO
@@ -78,18 +77,18 @@
                                             biometricAuthenticationDone:NO
                                                     noConvenienceUnlock:NO
                                                              completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
-                    // MMcG: iOS can and does regularly terminate the extension without notice
-                    // in normal situations. Only setting this immediately before Database Open/Unlock
+                    
+                    
 
                     AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
 
                     NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
                     
                     if(model) {
-                        [self onOpenedQuickType:model identifier:identifier];
+                        [self onUnlockedDatabase:model quickTypeIdentifier:identifier];
                     }
                     else if(error == nil) {
-                        [self cancel:nil]; // User cancelled
+                        [self cancel:nil]; 
                     }
                     else {
                         [Alerts error:self
@@ -126,18 +125,18 @@
     }
 }
 
-- (void)onOpenedQuickType:(Model*)model identifier:(QuickTypeRecordIdentifier*)identifier {
+- (void)onUnlockedDatabase:(Model*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)identifier {
     Node* node = [model.database.rootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
-        return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; // PERF
+        return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
     }];
     
     if(node) {
         NSString* user = [model.database dereference:node.fields.username node:node];
         NSString* password = [model.database dereference:node.fields.password node:node];
         
-        //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, node);
+        
 
-        // Copy TOTP code if configured to do so...
+        
         
         if(node.fields.otpToken) {
             NSString* value = node.fields.otpToken.password;
@@ -189,12 +188,13 @@
     }
     
     if(!self.databasesListNavController) {
-        [Alerts warn:self
-               title:@"Error"
-             message:@"There was an error loading the Safes List View. Please mail support@strongboxsafe.com to inform the developer."
-          completion:^{
+        
+
+
+
+
             [self exitWithErrorOccurred:[Utils createNSError:@"There was an error loading the Safes List View" errorCode:-1]];
-        }];
+
     }
     else {
         [SafesList.sharedInstance reloadIfChangedByOtherComponent];
@@ -235,8 +235,8 @@
     [self exitWithUserCancelled];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// All Entry/Exits through these 4 points...
+
+
 
 - (BOOL)enterWithLastCrashCheck:(BOOL)quickType {
     NSLog(@"Auto-Fill Entered - Quick Type Mode = [%d]", quickType);
@@ -245,10 +245,10 @@
     
     BOOL lastRunGood = AutoFillSettings.sharedInstance.autoFillExitedCleanly && AutoFillSettings.sharedInstance.autoFillWroteCleanly;
     
-    // MMcG: Don't do this here as iOS can and does regularly terminate the extension without notice
-    // in normal situations. Only do this immediately before Database Open/Unlock
-    //
-    //    Settings.sharedInstance.autoFillExitedCleanly = NO; // Crash will mean this stays at no
+    
+    
+    
+    
 
     if(!lastRunGood) {
         NSLog(@"Last run of AutoFill did not exit cleanly! Warn User that a crash occurred...");
@@ -265,7 +265,7 @@
 
     [Alerts info:self title:title message:message completion:completion];
 
-    // Reset these so we don't continuously get error messages
+    
     
     AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
     AutoFillSettings.sharedInstance.autoFillWroteCleanly = YES;
@@ -287,7 +287,7 @@
 
 - (void)exitWithErrorOccurred:(NSError*)error {
     NSLog(@"EXIT: Error Occured [%@]", error);
-    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES; // Still a clean exit - no crash
+    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES; 
     
     [self.extensionContext cancelRequestWithError:error];
 }
@@ -300,29 +300,29 @@
     [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-//- (void)didReceiveMemoryWarning {
-//    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-//    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-//    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX MEMORY WARNING RECEIVED: %f XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX", [self __getMemoryUsedPer1]);
-//    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-//    NSLog(@"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-//}
-//
-//- (float)__getMemoryUsedPer1
-//{
-//    struct mach_task_basic_info info;
-//    mach_msg_type_number_t size = sizeof(info);
-//    kern_return_t kerr = task_info(mach_task_self(), MACH_TASK_BASIC_INFO, (task_info_t)&info, &size);
-//    if (kerr == KERN_SUCCESS)
-//    {
-//        float used_bytes = info.resident_size;
-//        float total_bytes = [NSProcessInfo processInfo].physicalMemory;
-//        //NSLog(@"Used: %f MB out of %f MB (%f%%)", used_bytes / 1024.0f / 1024.0f, total_bytes / 1024.0f / 1024.0f, used_bytes * 100.0f / total_bytes);
-//        return used_bytes / total_bytes;
-//    }
-//    return 1;
-//}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

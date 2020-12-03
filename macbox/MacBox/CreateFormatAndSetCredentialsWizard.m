@@ -118,7 +118,7 @@
 - (IBAction)onBrowse:(id)sender {
     NSOpenPanel *openPanel = [NSOpenPanel openPanel];
     
-    if (self.selectedKeyFileBookmark) { // Initialize in the key file dir if we have one
+    if (self.selectedKeyFileBookmark) { 
         NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:self.selectedKeyFileBookmark];
         openPanel.directoryURL = [url URLByDeletingLastPathComponent];
     }
@@ -226,10 +226,10 @@
     [self bindUi];
 }
 
-//
+
 
 - (void)bindUi {
-    // Password...
+    
     
     if(self.checkboxUseAPassword.state == NSOnState) {
         self.textFieldNew.enabled = YES;
@@ -240,7 +240,7 @@
         self.textFieldConfirm.enabled = NO;
     }
     
-    // Key File...
+    
     
     self.checkboxUseAKeyFile.state = self.useAKeyFile ? NSOnState : NSOffState;
     self.buttonBrowse.enabled = self.useAKeyFile;
@@ -250,12 +250,12 @@
     self.labelKeyFilePath.stringValue = self.useAKeyFile && url ? url.path : @"";
     self.labelKeyFilePath.placeholderString = !self.useAKeyFile ? @"" : NSLocalizedString(@"mac_click_browse_select_key_file", @"Click Browse to Select a Key File");
     
-    // YubiKey
+    
     
     self.checkboxUseYubiKey.state = self.useAYubiKey ? NSOnState : NSOffState;
     self.popupYubiKey.enabled = self.useAYubiKey;
     
-    // Validation
+    
     
     self.buttonOk.enabled = [self validateUi];
 }
@@ -268,7 +268,7 @@
                                       action:nil
                                keyEquivalent:@""];
     
-    [MacYubiKeyManager.sharedInstance getAvailableYubikey:^(YubiKeyData * _Nonnull yubiKeyData) {
+    [MacYubiKeyManager.sharedInstance getAvailableYubiKey:^(YubiKeyData * _Nonnull yubiKeyData) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self onGotAvailableYubiKeyResponse:yubiKeyData];
         });
@@ -295,7 +295,7 @@
         NSString* locBlocking = NSLocalizedString(@"mac_yubikey_serial_number_slot_n_touch_required_fmt", @"Yubikey %@ Slot %ld (Touch Required)");
         NSString* locNonBlocking = NSLocalizedString(@"mac_yubikey_serial_number_slot_n_fmt", @"Yubikey %@ Slot %ld");
 
-        // Slot 1
+        
         
         NSMenuItem* slot1MenuItem = nil;
         if (yubiKeyData.slot1CrStatus == YubiKeySlotCrStatusSupportedBlocking) {
@@ -315,7 +315,7 @@
             yubiKeyPossible = YES;
         }
 
-        // Slot 2
+        
         
         NSMenuItem* slot2MenuItem = nil;
         if (yubiKeyData.slot2CrStatus == YubiKeySlotCrStatusSupportedBlocking) {
@@ -334,8 +334,8 @@
             yubiKeyPossible = YES;
         }
         
-        // Possible?
-        if (yubiKeyPossible) { // Can we auto select the previously selected?
+        
+        if (yubiKeyPossible) { 
             BOOL selectedItem = NO;
             
             if (self.selectedYubiKeyConfiguration &&
@@ -344,7 +344,7 @@
                 
                 if (slotStatus == YubiKeySlotCrStatusSupportedNonBlocking ||
                     slotStatus == YubiKeySlotCrStatusSupportedBlocking) {
-                    // Select Slot
+                    
                     if (self.selectedYubiKeyConfiguration.slot == 1 && slot1MenuItem) {
                         [self.popupYubiKey selectItem:slot1MenuItem];
                         selectedItem = YES;
@@ -356,7 +356,7 @@
                 }
             }
             
-            if (!selectedItem) { // Auto Select first item
+            if (!selectedItem) { 
                 [self.popupYubiKey selectItemAtIndex:0];
                 
                 YubiKeyConfiguration* config = [[YubiKeyConfiguration alloc] init];
@@ -395,7 +395,7 @@
         }
     }
 
-    // KeePass 1 and Password Safe don't allow empty
+    
     
     if(self.selectedDatabaseFormat == kKeePass1 || self.selectedDatabaseFormat == kPasswordSafe) {
         if(self.checkboxUseAPassword.state == NSOnState) {
@@ -407,7 +407,7 @@
         }
     }
 
-    // Key File?
+    
     
     if(self.useAKeyFile) {
         if (self.selectedKeyFileBookmark == nil) {
@@ -423,9 +423,9 @@
         }
     }
         
-    // Yubikey - No validation required... done in UI Update
     
-    // Minimum Composite Key Factors?
+    
+    
     
     if (self.checkboxUseAPassword.state == NSOffState && !self.useAKeyFile && !self.useAYubiKey) {
         NSString* loc = NSLocalizedString(@"mac_you_must_use_at_least_a_password_or_key_file", @"You must at least one of either a Password, Key File or YubiKey for your master credentials.");
@@ -434,7 +434,7 @@
         return NO;
     }
     
-    // Warn on simple weak password
+    
     
     BOOL justAPassword = !self.useAKeyFile && !self.useAYubiKey;
 
@@ -453,7 +453,7 @@
 }
 
 - (IBAction)onOk:(id)sender {
-    // Password
+    
     
     _selectedPassword = nil;
     if(self.checkboxUseAPassword.state == NSOnState) {
@@ -462,7 +462,7 @@
         }
     }
 
-    // Key File
+    
     
     if(self.useAKeyFile && self.selectedKeyFileBookmark) {
         NSError* error;

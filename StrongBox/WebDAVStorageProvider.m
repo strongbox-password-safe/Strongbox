@@ -43,8 +43,8 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = NO; // Could be on LAN - try to connect
-        _supportsConcurrentRequests = NO; // Possibly
+        _immediatelyOfferCacheIfOffline = NO; 
+        _supportsConcurrentRequests = NO; 
     }
     
     return self;
@@ -70,7 +70,7 @@
 viewController:(UIViewController*)viewController
     completion:(void (^)(BOOL userCancelled, DAVSession* session, WebDAVSessionConfiguration* configuration, NSError* error))completion {
     if(config == nil) {
-        if(self.unitTestSessionConfiguration != nil) { // handy for unit testing
+        if(self.unitTestSessionConfiguration != nil) { 
             config = self.unitTestSessionConfiguration;
         }
         else {
@@ -104,7 +104,7 @@ viewController:(UIViewController*)viewController
     completion(NO, session, config, nil);
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)create:(NSString *)nickName
      extension:(NSString *)extension
@@ -112,7 +112,7 @@ viewController:(UIViewController*)viewController
   parentFolder:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
     completion:(void (^)(SafeMetaData *, const NSError *))completion {
-    if(self.maintainSessionForListings && self.maintainedSessionForListings) { // Create New
+    if(self.maintainSessionForListings && self.maintainedSessionForListings) { 
         [self createWithSession:nickName extension:extension data:data
                    parentFolder:parentFolder session:self.maintainedSessionForListings
                   configuration:self.maintainedConfigurationForListings completion:completion];
@@ -151,11 +151,11 @@ viewController:(UIViewController *)viewController
         path = [root stringByAppendingPathComponent:desiredFilename];
     }
     else {
-        // There is an issue with the underlying library if the root url also has a path (e.g. Sharepoint see issue #394,
-        // then the path gets appended on to the path. However it can take a full URL so we escape out of that situation
-        // by using absolute string if we know we have a URL here.
+        
+        
+        
 
-        path = [ur URLByAppendingPathComponent:desiredFilename].absoluteString; //.path;
+        path = [ur URLByAppendingPathComponent:desiredFilename].absoluteString; 
     }
         
     DAVPutRequest *request = [[DAVPutRequest alloc] initWithPath:path];
@@ -183,11 +183,11 @@ viewController:(UIViewController *)viewController
     [session enqueueRequest:request];
 }
 
-//static NSString *getPathFromParentFolderObject(NSObject *parentFolder) {
-//    WebDAVProviderData* providerData = (WebDAVProviderData*)parentFolder;
-//    NSString* path = providerData ? (providerData.href.length ? providerData.href : @"/") : @"/";
-//    return path;
-//}
+
+
+
+
+
 
 - (void)list:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
@@ -294,12 +294,12 @@ viewController:(UIViewController *)viewController
             return;
         }
         
-        // Get Metadata Request - Will actually be performed first - Some WebDAV servers do not respond to PROPFIND on a single file
-        // So we do the listing on the parent folder and find the file in there... sigh
-                    
-        //        NSURL* url = pd.href.urlExtendedParse; - Using URL like commented out below leads to an error 404 on Nextcloud which requires the full server path
         
-        NSString* path = pd.href.stringByDeletingLastPathComponent; // url ? url.path.stringByDeletingLastPathComponent : pd.href.stringByDeletingLastPathComponent;
+        
+                    
+        
+        
+        NSString* path = pd.href.stringByDeletingLastPathComponent; 
         
         DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
         listingRequest.delegate = self;
@@ -315,7 +315,7 @@ viewController:(UIViewController *)viewController
             }
             else {
                 NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
-                NSString* targetFileName = pd.href.lastPathComponent;       //url ? url.path.lastPathComponent : pd.href.lastPathComponent;
+                NSString* targetFileName = pd.href.lastPathComponent;       
                 NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
                             
                 DAVResponseItem* responseItem = [listingResponse firstOrDefault:^BOOL(DAVResponseItem * _Nonnull obj) {
@@ -422,7 +422,7 @@ viewController:(UIViewController *)viewController
 - (void)onPutDone:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController session:(DAVSession*)session completion:(StorageProviderUpdateCompletionBlock)completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     
-    NSString* path = providerData.href.stringByDeletingLastPathComponent; // url ? url.path.stringByDeletingLastPathComponent : pd.href.stringByDeletingLastPathComponent;
+    NSString* path = providerData.href.stringByDeletingLastPathComponent; 
     DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
     listingRequest.delegate = self;
     listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
@@ -437,7 +437,7 @@ viewController:(UIViewController *)viewController
         }
         else {
             NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
-            NSString* targetFileName = providerData.href.lastPathComponent;       //url ? url.path.lastPathComponent : pd.href.lastPathComponent;
+            NSString* targetFileName = providerData.href.lastPathComponent;       
             NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
                         
             DAVResponseItem* responseItem = [listingResponse firstOrDefault:^BOOL(DAVResponseItem * _Nonnull obj) {
@@ -473,7 +473,7 @@ viewController:(UIViewController *)viewController
     [session enqueueRequest:listingRequest];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfiguration* sessionConfiguration) {
     WebDAVProviderData* ret = [[WebDAVProviderData alloc] init];
@@ -516,14 +516,14 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
                                    fileIdentifier:json];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
-    // NOTIMPL
+    
 }
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(UIImage *))completionHandler {
-    // NOTIMPL
+    
 }
     
 @end

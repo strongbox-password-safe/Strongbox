@@ -12,13 +12,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BackupItem : NSObject
 
-+ (instancetype)withUrl:(NSURL*)url date:(NSDate*)date fileSize:(NSNumber*)fileSize;
++ (instancetype)withUrl:(NSURL*)url backupCreatedDate:(NSDate*)backupCreatedDate modDate:(NSDate*)modDate fileSize:(NSNumber*)fileSize;
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithUrl:(NSURL*)url date:(NSDate*)date fileSize:(NSNumber*)fileSize NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithUrl:(NSURL*)url backupCreatedDate:(NSDate*)backupCreatedDate modDate:(NSDate*)modDate fileSize:(NSNumber*)fileSize NS_DESIGNATED_INITIALIZER;
 
 @property (readonly) NSURL* url;
-@property (readonly) NSDate* date;
+@property (readonly) NSDate* backupCreatedDate;
+@property (readonly) NSDate* modDate;
 @property (readonly) NSNumber *fileSize;
 
 @end

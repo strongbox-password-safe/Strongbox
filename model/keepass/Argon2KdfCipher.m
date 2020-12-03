@@ -21,7 +21,7 @@ static NSString* const kParameterSecretKey = @"K";
 static NSString* const kParameterAssocData = @"A";
 static NSString* const kParameterMemory = @"M";
 
-static const uint64_t kDefaultIterations = 6; // KeePassXC default is 10 but it is quite heavy/slow on devices
+static const uint64_t kDefaultIterations = 6; 
 static const uint64_t kDefaultMemory = 16 * 1024 * 1024;
 static const uint32_t kDefaultParallelism = 2;
 static const uint32_t kDefaultVersion = 19;
@@ -63,7 +63,7 @@ static const BOOL kLogVerbose = NO;
 - (instancetype)initWithParametersDictionary:(KdfParameters*)parameters {
     self = [super init];
     if (self) {
-        //NSLog(@"ARGON2: %@", parameters);
+        
         VariantObject *salt = [parameters.parameters objectForKey:kParameterSalt];
         if(!salt) {
             return nil;
@@ -104,7 +104,7 @@ static const BOOL kLogVerbose = NO;
             _version = ((NSNumber*)version.theObject).unsignedIntValue;
         }
         
-        // Optional
+        
         
         VariantObject *secretKey = [parameters.parameters objectForKey:kParameterSecretKey];
         VariantObject *assocData = [parameters.parameters objectForKey:kParameterAssocData];
@@ -134,9 +134,9 @@ static const BOOL kLogVerbose = NO;
     ctx.secretlen = self.secretKey ? (uint32_t)self.secretKey.length : 0;
     ctx.ad = self.assocData ? (uint8_t*)self.assocData.bytes : nil;
     ctx.adlen = self.assocData ? (uint32_t) self.assocData.length : 0;
-    ctx.threads = self.parallelism; // UNSURE but looks ok: Correct or should it be constant 4?
-    ctx.allocate_cbk = nil; // Important - got caught with a bug here due to initialization values. Must be nil
-    ctx.free_cbk = nil; // Important - got caught with a bug here due to initialization values. Must be nil
+    ctx.threads = self.parallelism; 
+    ctx.allocate_cbk = nil; 
+    ctx.free_cbk = nil; 
         
     argon2d_ctx(&ctx);
     

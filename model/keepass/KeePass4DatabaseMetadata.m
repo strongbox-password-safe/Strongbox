@@ -8,7 +8,7 @@
 
 #import "KeePass4DatabaseMetadata.h"
 #import "KeePassConstants.h"
-#import "BasicOrderedDictionary.h"
+#import "MutableOrderedDictionary.h"
 #import "KdbxSerializationCommon.h"
 #import "KeePassCiphers.h"
 #import "Argon2KdfCipher.h"
@@ -29,7 +29,7 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
         self.compressionFlags = kGzipCompressionFlag;
         self.innerRandomStreamId = kDefaultInnerRandomStreamId;
         self.kdfParameters = [[Argon2KdfCipher alloc] initWithDefaults].kdfParameters;
-        self.cipherUuid = aesCipherUuid(); // chaCha20CipherUuid();
+        self.cipherUuid = aesCipherUuid(); 
         self.historyMaxItems = @(kDefaultHistoryMaxItems);
         self.historyMaxSize = @(kDefaultHistoryMaxSize);
         self.recycleBinEnabled = YES;
@@ -40,8 +40,8 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
     return self;
 }
 
-- (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi {
-    BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
+- (MutableOrderedDictionary<NSString*, NSString*>*)kvpForUi {
+    MutableOrderedDictionary<NSString*, NSString*>* kvps = [[MutableOrderedDictionary alloc] init];
 
     [kvps addKey:NSLocalizedString(@"database_metadata_field_format", @"Database Format") andValue:@"KeePass 2"];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_keepass_version", @"KeePass File Version")  andValue:self.version];
@@ -55,7 +55,7 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
         if(vo && vo.theObject) {
             uint64_t memory = ((NSNumber*)vo.theObject).longLongValue;
 
-            [kvps addKey:NSLocalizedString(@"database_metadata_field_argon2_memory", @"Argon 2 Memory") andValue:friendlyFileSizeString(memory)];
+            [kvps addKey:NSLocalizedString(@"database_metadata_field_argon2_memory", @"Argon 2 Memory") andValue:friendlyMemorySizeString(memory)];
         }
     }
     
@@ -68,7 +68,7 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamChaCha20;
     }
     
     if(self.historyMaxSize != nil) {
-        NSString* size = friendlyFileSizeString(self.historyMaxSize.integerValue);
+        NSString* size = friendlyMemorySizeString(self.historyMaxSize.integerValue);
         [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_size", @"Max History Size") andValue:size];
     }
     

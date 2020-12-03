@@ -57,6 +57,11 @@ const static NSSet<NSString*> *wellKnownKeys;
         self.tags = [NSMutableSet set];
         self.icon = nil;
         self.customIcon = nil;
+        self.customData = [[CustomData alloc] initWithContext:context];
+        self.foregroundColor = nil;
+        self.backgroundColor = nil;
+        self.overrideURL = nil;
+        self.autoType = nil;
     }
     
     return self;
@@ -74,6 +79,12 @@ const static NSSet<NSString*> *wellKnownKeys;
     }
     else if([xmlElementName isEqualToString:kBinaryElementName]) {
         return [[Binary alloc] initWithContext:self.context];
+    }
+    else if ([xmlElementName isEqualToString:kCustomDataElementName]) {
+        return [[CustomData alloc] initWithContext:self.context];
+    }
+    else if ([xmlElementName isEqualToString:kAutoTypeElementName] ) {
+        return [[KeePassXmlAutoType alloc] initWithContext:self.context];
     }
     
     return [super getChildHandler:xmlElementName];
@@ -112,7 +123,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     else if([withXmlElementName isEqualToString:kTagsElementName]) {
         NSString* tagsString = [SimpleXmlValueExtractor getStringFromText:completedObject];
         
-        NSArray<NSString*>* tags = [tagsString componentsSeparatedByString:@";"]; // how do you get a semi-colon into a tag? You do not...
+        NSArray<NSString*>* tags = [tagsString componentsSeparatedByString:@";"]; 
         
         NSArray<NSString*>* trimmed = [tags map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
             return [Utils trim:obj];
@@ -124,6 +135,26 @@ const static NSSet<NSString*> *wellKnownKeys;
         
         [self.tags addObjectsFromArray:filtered];
         
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kCustomDataElementName]) {
+        self.customData = (CustomData*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kAutoTypeElementName]) {
+        self.autoType = (KeePassXmlAutoType*)completedObject;
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kForegroundColorElementName]) {
+        self.foregroundColor = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kBackgroundColorElementName]) {
+        self.backgroundColor = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kOverrideURLElementName]) {
+        self.overrideURL = [SimpleXmlValueExtractor getStringFromText:completedObject];
         return YES;
     }
 
@@ -143,11 +174,11 @@ const static NSSet<NSString*> *wellKnownKeys;
     
     for (NSString* key in self.strings.allKeys) {
         StringValue* value = self.strings[key];
-        // Strip Empty "Predefined or Well Known Fields"
-        // Verify it's ok to strip empty strings. Looks like it is:
-        // https://sourceforge.net/p/keepass/discussion/329221/thread/fd78ba87/
-        //
-        // MMcG: Don't strip custom emptys, it is useful to allow empty values in the custom fields
+        
+        
+        
+        
+        
 
         if(value.protected == NO && value.value.length == 0 && [wellKnownKeys containsObject:key]) {
             continue;
@@ -159,7 +190,7 @@ const static NSSet<NSString*> *wellKnownKeys;
         
         if(![serializer writeElement:kKeyElementName text:key]) return NO;
         
-        // Don't trim Values - Whitespace might be important...
+        
         
         if(![serializer writeElement:kValueElementName text:value.value protected:value.protected trimWhitespace:NO]) {
             return NO;
@@ -176,10 +207,6 @@ const static NSSet<NSString*> *wellKnownKeys;
     
     if(self.times && ![self.times writeXml:serializer]) return NO;
     
-    if(self.history && self.history.entries && self.history.entries.count) {
-        [self.history writeXml:serializer];
-    }
-    
     if (self.tags && self.tags.count) {
         NSArray<NSString*>* trimmed = [self.tags.allObjects map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
             return [Utils trim:obj];
@@ -190,7 +217,34 @@ const static NSSet<NSString*> *wellKnownKeys;
         }];
 
         NSString* str = [[NSSet setWithArray:filtered].allObjects componentsJoinedByString:@";"];
-        [serializer writeElement:kTagsElementName text:str];
+        if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
+    }
+    
+    if ( self.customData && self.customData.orderedDictionary.count ) {
+        if ( ![self.customData writeXml:serializer] ) return NO;
+    }
+
+    if ( self.foregroundColor.length ) {
+        if ( ![serializer writeElement:kForegroundColorElementName text:self.foregroundColor] ) return NO;
+    }
+    
+    if ( self.backgroundColor.length ) {
+        if ( ![serializer writeElement:kBackgroundColorElementName text:self.backgroundColor] ) return NO;
+    }
+        
+    if ( self.overrideURL.length ) {
+        if ( ![serializer writeElement:kOverrideURLElementName text:self.overrideURL] ) return NO;
+    }
+    
+    if ( self.autoType ) {
+        
+        if (!self.autoType.enabled || self.autoType.dataTransferObfuscation || self.autoType.defaultSequence.length || self.autoType.asssociations.count) {
+            if ( ![self.autoType writeXml:serializer] ) return NO;
+        }
+    }
+    
+    if(self.history && self.history.entries && self.history.entries.count) {
+        [self.history writeXml:serializer];
     }
     
     if(![super writeUnmanagedChildren:serializer]) {
@@ -202,8 +256,8 @@ const static NSSet<NSString*> *wellKnownKeys;
     return YES;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Strings
+
+
 
 - (StringValue*)getString:(NSString*)key {
     return self.strings[key];
@@ -237,15 +291,15 @@ const static NSSet<NSString*> *wellKnownKeys;
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Well Known Strings
+
+
 
 - (NSString *)title {
     return [self getStringOrDefault:kTitleStringKey];
 }
 
 -(void)setTitle:(NSString *)title {
-    [self setString:kTitleStringKey value:title protected:NO]; // FUTURE: Default Protection can be specified in the header
+    [self setString:kTitleStringKey value:title protected:NO]; 
 }
 
 - (NSString *)username {
@@ -253,7 +307,7 @@ const static NSSet<NSString*> *wellKnownKeys;
 }
 
 - (void)setUsername:(NSString *)username {
-    [self setString:kUserNameStringKey value:username protected:NO];  // FUTURE: Default Protection can be specified in the header
+    [self setString:kUserNameStringKey value:username protected:NO];  
 }
 
 - (NSString *)password {
@@ -261,7 +315,7 @@ const static NSSet<NSString*> *wellKnownKeys;
 }
 
 - (void)setPassword:(NSString *)password {
-    [self setString:kPasswordStringKey value:password protected:YES];  // FUTURE: Default Protection can be specified in the header
+    [self setString:kPasswordStringKey value:password protected:YES];  
 }
 
 - (NSString *)url {
@@ -269,7 +323,7 @@ const static NSSet<NSString*> *wellKnownKeys;
 }
 
 - (void)setUrl:(NSString *)url {
-    [self setString:kUrlStringKey value:url protected:NO];  // FUTURE: Default Protection can be specified in the header
+    [self setString:kUrlStringKey value:url protected:NO];  
 }
 
 - (NSString *)notes {
@@ -277,11 +331,11 @@ const static NSSet<NSString*> *wellKnownKeys;
 }
 
 - (void)setNotes:(NSString *)notes {
-    [self setString:kNotesStringKey value:notes protected:NO];  // FUTURE: Default Protection can be specified in the header
+    [self setString:kNotesStringKey value:notes protected:NO];  
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Custom Strings Readonly
+
+
 
 - (void)removeAllStrings {
     [self.strings removeAllObjects];
@@ -340,7 +394,22 @@ const static NSSet<NSString*> *wellKnownKeys;
     if (![self.tags isEqualToSet:other.tags]) {
         return NO;
     }
-    
+    if ((self.customData == nil && other.customData != nil) || (self.customData != nil && ![self.customData isEqual:other.customData])) {
+        return NO;
+    }
+    if ((self.foregroundColor == nil && other.foregroundColor != nil) || (self.foregroundColor != nil && ![self.foregroundColor isEqual:other.foregroundColor] )) {
+        return NO;
+    }
+    if ((self.backgroundColor == nil && other.backgroundColor != nil) || (self.backgroundColor != nil && ![self.backgroundColor isEqual:other.backgroundColor] )) {
+        return NO;
+    }
+    if ((self.overrideURL == nil && other.overrideURL != nil) || (self.overrideURL != nil && ![self.overrideURL isEqual:other.overrideURL] )) {
+        return NO;
+    }
+    if ((self.autoType == nil && other.autoType != nil) || (self.autoType != nil && ![self.autoType isEqual:other.autoType])) {
+        return NO;
+    }
+
     return YES;
 }
 

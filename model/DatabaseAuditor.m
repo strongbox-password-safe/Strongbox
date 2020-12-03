@@ -31,7 +31,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 @property BOOL stopRequested;
 @property DatabaseAuditorConfiguration* config;
 
-// Results
+
 
 @property NSSet<Node*>* commonPasswords;
 @property NSDictionary<NSString*, NSSet<Node*>*>* duplicatedPasswords;
@@ -39,8 +39,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 @property NSDictionary<NSUUID*, NSSet<Node*>*>* similar;
 @property NSSet<Node*>* tooShort;
 
-@property NSSet<Node*>* duplicatedPasswordsNodeSet; // PERF
-@property NSSet<Node*>* similarPasswordsNodeSet; // PERF
+@property NSSet<Node*>* duplicatedPasswordsNodeSet; 
+@property NSSet<Node*>* similarPasswordsNodeSet; 
 
 @property BOOL isPro;
 
@@ -137,7 +137,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     
     self.progress(1.0);
 
-    if (self.state == kAuditStateRunning) { // Don't overwrite stopped incomplete
+    if (self.state == kAuditStateRunning) { 
         self.state = kAuditStateDone;
     }
     
@@ -161,8 +161,8 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return report;
 }
 
-/////////////////////////////////////////
-// Lightweight Fast Queries
+
+
 
 - (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item {
     NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
@@ -285,8 +285,8 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
 - (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node {
     if ([self.similarPasswordsNodeSet containsObject:node]) {
-        // Because of how we store similars (for computational efficiency reasons we may not always have direct 2 way map between similars so need to trawl
-        // linearly in some cases but these lists should be small so perf should be fine.
+        
+        
         
         NSArray<NSSet<Node*>*>* containedInOthers = [self.similar.allValues filter:^BOOL(NSSet<Node *> * _Nonnull obj) {
             return [obj containsObject:node];
@@ -298,14 +298,14 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         
         NSMutableSet* simSet = [NSMutableSet setWithArray:allSimilarTo];
 
-        // We may also have the straightforward set of direct similars
+        
         
         NSSet<Node*>* directSimilars = self.similar[node.uuid];
         if (directSimilars) {
             [simSet addObjectsFromArray:directSimilars.allObjects];
         }
         
-        // Remove ourselves
+        
         
         [simSet removeObject:node];
         
@@ -318,8 +318,8 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
 - (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(Node*)node {
     if ([self.duplicatedPasswordsNodeSet containsObject:node]) {
-        // Because of how we store similars (for computational efficiency reasons we may not always have direct 2 way map between similars so need to trawl
-        // linearly in some cases but these lists should be small so perf should be fine.
+        
+        
         
         NSArray<NSSet<Node*>*>* containedInOthers = [self.duplicatedPasswords.allValues filter:^BOOL(NSSet<Node *> * _Nonnull obj) {
             return [obj containsObject:node];
@@ -331,14 +331,14 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         
         NSMutableSet* dupeSet = [NSMutableSet setWithArray:allDuplicatesOf];
 
-        // We may also have the straightforward set of direct similars
+        
         
         NSSet<Node*>* directDuplicates = self.duplicatedPasswords[node.fields.password];
         if (directDuplicates) {
             [dupeSet addObjectsFromArray:directDuplicates.allObjects];
         }
         
-        // Remove ourselves
+        
         
         [dupeSet removeObject:node];
         
@@ -349,42 +349,42 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     }
 }
 
-/////////////////////////////////////////
-// Audits
+
+
 
 - (void)performAudits {
-    // No Passwords
+    
     
     self.noPasswords = [self checkForNoPasswords];
 
-    // Duplicated Passwords within DB
+    
 
     self.duplicatedPasswords = [self checkForDuplicatedPasswords];
     self.duplicatedPasswordsNodeSet = [NSSet setWithArray:[self.duplicatedPasswords.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
         return obj.allObjects;
     }]];
 
-    // Common Weak/Popular Passwords
+    
 
     self.commonPasswords = [self checkForCommonPasswords];
 
-    // Too Short
+    
     
     self.tooShort = [self checkForTooShort];
     
-    // Batch up these fast ones into a single notification
+    
     
     if (self.tooShort.anyObject || self.noPasswords.anyObject || self.duplicatedPasswordsNodeSet.anyObject || self.commonPasswords.anyObject) {
          self.nodesChanged();
     }
 
-    // Have I Been Pwned
+    
         
     if (self.isPro) {
-        [self checkHibp]; // Notification is done inline asynchronously
+        [self checkHibp]; 
     }
 
-    // Similar
+    
 
     if (self.isPro) {
         self.similar = [self checkForSimilarPasswords];
@@ -397,9 +397,9 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         }
     }
 
-    // Future Extensions
-    // Weak (Low Entropy)
-    // Weak Master Creds (Low Entropy & no Key File/YubiKey)
+    
+    
+    
 }
 
 - (NSSet<Node*>*)checkForNoPasswords {
@@ -420,7 +420,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     }
     
     NSArray<Node*>* results = [self.auditableNonEmptyPasswordNodes filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.password.length < self.config.minimumLength; // Exclude  empties
+        return obj.fields.password.length < self.config.minimumLength; 
     }];
 
     return [NSSet setWithArray:results];
@@ -434,7 +434,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     NSMutableDictionary<NSString*, NSMutableSet<Node*>*>* possibleDupes = NSMutableDictionary.dictionary;
     
     for (Node* entry in self.auditableNonEmptyPasswordNodes) {
-        // FUTURE: Detect historical entries with same passwords?
+        
         NSString* password = entry.fields.password;
         
         if (self.config.caseInsensitiveMatchForDuplicates) {
@@ -450,7 +450,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         }
     }
     
-    // Filter out singles...
+    
     
     NSMutableDictionary<NSString*, NSSet<Node*>*> *dupes = NSMutableDictionary.dictionary;
     for (NSString* password in possibleDupes.allKeys) {
@@ -480,13 +480,13 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         return NSDictionary.dictionary;
     }
     
-    NSMutableArray<Node*>* uncheckedOthers = self.auditableNonEmptyPasswordNodes.mutableCopy; // Avoid N^2 Cartesian Product... eeek - Can we then rejoin and normalize?
+    NSMutableArray<Node*>* uncheckedOthers = self.auditableNonEmptyPasswordNodes.mutableCopy; 
 
     NSMutableDictionary<NSUUID*, NSMutableSet<Node*>*>* similarGroups = NSMutableDictionary.dictionary;
     
     int i=0;
     int n = (int)self.auditableNonEmptyPasswordNodes.count - 1;
-    int totalComparisons = (n * (n + 1)) / 2; // Good olde Carl Gauss
+    int totalComparisons = (n * (n + 1)) / 2; 
     
     NSLog(@"AUDIT: Similarity Comparisons required = %d", totalComparisons);
     for (Node* entry in self.auditableNonEmptyPasswordNodes) {
@@ -496,7 +496,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
         for (Node* other in uncheckedOthers) {
             if (i % 1000 == 0) {
-                //                NSLog(@"%d/%d", i, totalComparisons);
+                
                 self.similarProgress = (CGFloat)i/(CGFloat)totalComparisons;
                 [self publishPartialProgress];
             }
@@ -507,18 +507,18 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
                 return similarGroups.copy;
             }
             
-            // (Levenstein) -     // Levenshtein distance (https://en.wikipedia.org/wiki/Levenshtein_distance).
+            
 
             NSString* otherPassword = other.fields.password;
             
             if ([password compare:otherPassword] == NSOrderedSame) {
-                continue; // Skip exact duplicates - FUTURE maybe we should include?
+                continue; 
             }
             
             double similarity = [password levenshteinSimilarityRatio:otherPassword];
 
             if (similarity >= self.config.levenshteinSimilarityThreshold) {
-                // NSLog(@"[%@] - [%@] - Levenshtein Similarity = [%f]", password, otherPassword, similarity);
+                
 
                 if(!similarGroups[entry.uuid]) {
                     similarGroups[entry.uuid] = [NSMutableSet setWithObject:entry];
@@ -536,7 +536,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     NSLog(@"AUDIT: Checking HaveIBeenPwned...");
 
     if(!self.config.showCachedHibpHits && !self.config.checkHibp) {
-        // HIBP is totally off
+        
         return;
     }
     
@@ -588,7 +588,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         }
     }
         
-    // Publish any cache hits before making the network calls..
+    
 
     if (self.hibpCompletedCount) {
         self.hibpProgress = ((CGFloat)self.hibpCompletedCount / self.hibpTotalCount);
@@ -596,7 +596,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         self.nodesChanged();
     }
     
-    // Free the Network Calls..
+    
     
     self.hibpQueue.suspended = NO;
     [self.hibpQueue waitUntilAllOperationsAreFinished];
@@ -655,10 +655,10 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 - (NSMutableURLRequest*)getHibpUrlRequest:(NSString*)sha1HexPassword {
     NSURL* url = [self buildHibpUrl:sha1HexPassword];
     
-    const NSTimeInterval kUrlRequestTimeout = 5.0f; // 5 second timeout - probably could go lower
+    const NSTimeInterval kUrlRequestTimeout = 5.0f; 
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestUseProtocolCachePolicy timeoutInterval:kUrlRequestTimeout];
-    [request addValue:@"true" forHTTPHeaderField:@"Add-Padding"]; // Enhance Privacy - Pads out responses to ensure all results contain a random number of records between 800 and 1,000.
+    [request addValue:@"true" forHTTPHeaderField:@"Add-Padding"]; 
     
     return request;
 }
@@ -679,7 +679,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
                              error:(NSError*)error {
     self.hibpCompletedCount++;
     
-    if (self.hibpCompletedCount % 10 == 0) { // Don't peg the UI
+    if (self.hibpCompletedCount % 10 == 0) { 
         self.hibpProgress = ((CGFloat)self.hibpCompletedCount / self.hibpTotalCount);
         [self publishPartialProgress];
     }
@@ -724,7 +724,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
     NSURL* url = components.URL;
     
-    // NSLog(@"Built URL as [%@]", url);
+    
     
     return url;
 }
@@ -741,7 +741,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         return obj.length != 0;
     }];
         
-    //    NSLog(@"HIBP - Lines Received: %lu", (unsigned long)nonEmpty.count);
+    
     
     for (NSString* line in nonEmpty) {
         NSArray<NSString*>* components = [line componentsSeparatedByString:@":"];
@@ -751,7 +751,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         }
         
         NSString* hash = components[0];
-        NSString* count = components[1]; // Can be zero with padding enabled
+        NSString* count = components[1]; 
         
         if (![count isEqualToString:@"0"] && [hash isEqualToString:suffix]) {
             return YES;
@@ -762,7 +762,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 }
 
 - (void)publishPartialProgress {
-    const CGFloat hibp = 0.8; // HIBP is much slower than Similar
+    const CGFloat hibp = 0.8; 
     const CGFloat sim = 1.0 - hibp;
     
     CGFloat hibpWeight = self.config.checkHibp ? (self.config.checkForSimilarPasswords ? hibp : 1.0) : 0;

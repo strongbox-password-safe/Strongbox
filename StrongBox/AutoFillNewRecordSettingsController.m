@@ -143,37 +143,37 @@
     if(indexPath.section == 0 && indexPath.row == 1)
     {
         if(settings.titleAutoFillMode != kCustom) {
-            return 0; //set the hidden cell's height to 0
+            return 0; 
         }
     }
     else if(indexPath.section == 1 && indexPath.row == 1)
     {
         if(settings.usernameAutoFillMode != kCustom) {
-            return 0; //set the hidden cell's height to 0
+            return 0; 
         }
     }
     else if(indexPath.section == 2 && indexPath.row == 1)
     {
         if(settings.passwordAutoFillMode != kCustom) {
-            return 0; //set the hidden cell's height to 0
+            return 0; 
         }
     }
     else if(indexPath.section == 3 && indexPath.row == 1)
     {
         if(settings.emailAutoFillMode != kCustom) {
-            return 0; //set the hidden cell's height to 0
+            return 0; 
         }
     }
     else if(indexPath.section == 4 && indexPath.row == 1)
     {
         if(settings.urlAutoFillMode != kCustom) {
-            return 0; //set the hidden cell's height to 0
+            return 0; 
         }
     }
     else if(indexPath.section == 5 && indexPath.row == 1)
     {
         if(settings.notesAutoFillMode != kCustom) {
-            return 0; //set the hidden cell's height to 0
+            return 0; 
         }
     }
     
@@ -183,43 +183,43 @@
 - (void)bindToSettings {
     AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
-    // Title Options: Default / Custom
+    
     
     int index = [self autoFillModeToSegmentIndex:settings.titleAutoFillMode];
     self.segmentTitle.selectedSegmentIndex = index != -1 ? index : 1;
     
     self.labelTitle.text = settings.titleAutoFillMode == kCustom ? settings.titleCustomAutoFill : @"";
 
-    // Username Options: None / Most Used / Custom
     
-    // KLUDGE: This is a bit hacky but saves some RSI typing... :/
+    
+    
     index = [self autoFillModeToSegmentIndex:settings.usernameAutoFillMode];
     self.segmentUsername.selectedSegmentIndex = index != -1 ? index : 2;
     
     self.labelUsername.text = settings.usernameAutoFillMode == kCustom ? settings.usernameCustomAutoFill : @"";
 
-    // Password Options: None / Most Used / Generated / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.passwordAutoFillMode];
     self.segmentPassword.selectedSegmentIndex = index != -1 ? index : 2;
     
     self.labelPassword.text = settings.passwordAutoFillMode == kCustom ? settings.passwordCustomAutoFill : @"";
 
-    // Email Options: None / Most Used / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.emailAutoFillMode];
     self.segmentEmail.selectedSegmentIndex = index != -1 ? index : 2;
     
     self.labelEmail.text = settings.emailAutoFillMode == kCustom ? settings.emailCustomAutoFill : @"";
 
-    // URL Options: None / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.urlAutoFillMode];
     self.segmentUrl.selectedSegmentIndex = index != -1 ? index : 1;
     
     self.labelUrl.text = settings.urlAutoFillMode == kCustom ? settings.urlCustomAutoFill : @"";
 
-    // Notes Options: None / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.notesAutoFillMode];
     self.segmentNotes.selectedSegmentIndex = index != -1 ? index : 1;
@@ -230,7 +230,7 @@
 }
 
 - (int)autoFillModeToSegmentIndex:(AutoFillMode)mode {
-    // KLUDGE: This is a bit hacky but saves some RSI typing... :/
+    
     
     switch (mode) {
         case kNone:
@@ -292,13 +292,13 @@
     AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentPassword.selectedSegmentIndex) {
-        case 0: // None
+        case 0: 
             settings.passwordAutoFillMode = kNone;
             break;
-        case 1: // Generated
+        case 1: 
             settings.passwordAutoFillMode = kGenerated;
             break;
-        case 2: // Custom
+        case 2: 
             settings.passwordAutoFillMode = kCustom;
             break;
         default:
@@ -342,10 +342,10 @@
     AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentUrl.selectedSegmentIndex) {
-        case 0: // None
+        case 0: 
             settings.urlAutoFillMode = kNone;
             break;
-        case 1: // Custom
+        case 1: 
             settings.urlAutoFillMode = kCustom;
             break;
         default:
@@ -364,10 +364,10 @@
     AutoFillNewRecordSettings *settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
     
     switch (self.segmentNotes.selectedSegmentIndex) {
-        case 0: // None
+        case 0: 
             settings.notesAutoFillMode = kNone;
             break;
-        case 1: // Custom
+        case 1: 
             settings.notesAutoFillMode = kCustom;
             break;
         default:

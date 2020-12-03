@@ -30,7 +30,7 @@ typedef struct _HeaderEntryHeader {
 } HeaderEntryHeader;
 #define SIZE_OF_HEADER_ENTRY_HEADER      3
 
-static const struct _BlockHeader EndOfBlocksHeaderTemplate; // Useful way to zero everything out. Id needs to be set on use.
+static const struct _BlockHeader EndOfBlocksHeaderTemplate; 
 
 static const uint32_t kDefaultStartStreamBytesLength = 32;
 
@@ -69,7 +69,7 @@ static BOOL kLogVerbose = NO;
     KeepassFileHeader header = getNewFileHeader(self.serializationData.fileVersion);
     [self.headerData appendBytes:&header length:SIZE_OF_KEEPASS_HEADER];
     
-    // 2. Generate Encryption Parameters To Be Serialized in the Headers
+    
     
     NSData* compositeKey = getCompositeKey(compositeKeyFactors);
     NSData* transformSeed = getRandomData(kDefaultTransformSeedLength);
@@ -124,7 +124,7 @@ static BOOL kLogVerbose = NO;
         NSLog(@"Serialize: StartStream = [%@]", self.startStream);
     }
     
-    // 3. Headers
+    
     
     NSMutableDictionary<NSNumber *,NSData *>* headers = [[NSMutableDictionary alloc] initWithDictionary:self.serializationData.extraUnknownHeaders];
     
@@ -154,12 +154,12 @@ static BOOL kLogVerbose = NO;
 - (NSData *)stage2Serialize:(NSString *)xml error:(NSError **)error {
     NSMutableData *ret = [[NSMutableData alloc] initWithData:self.headerData];
     
-    // 4. Xml to Payload Data (optional GZIP compression)
+    
     
     NSData* payload = [xml dataUsingEncoding:NSUTF8StringEncoding];
     payload = self.serializationData.compressionFlags == kGzipCompressionFlag ? [payload gzippedData] : payload;
     
-    // 5. Get Encrypted Data Blob
+    
     
     NSData * toBeEncrypted = getEncryptionBlob(payload, self.startStream);
     
@@ -198,7 +198,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
          completion:(DeserializeCompletionBlock)completion {
     NSMutableData* headerDataForIntegrityCheck = [NSMutableData data];
     
-    // File Header
+    
     
     KeepassFileHeader fileHeader = {0};
     if (!readFileHeader(stream, &fileHeader)) {
@@ -209,7 +209,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
     }
     [headerDataForIntegrityCheck appendBytes:&fileHeader length:SIZE_OF_KEEPASS_HEADER];
     
-    // Header Entries
+    
     
     NSDictionary<NSNumber *,NSObject *> *headerEntries = getHeaderEntries3(stream, headerDataForIntegrityCheck);
     
@@ -220,7 +220,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
         return;
     }
     
-    // Get Keys
+    
     
     DecryptionParameters * decryptionParameters = getDecryptionParameters(headerEntries);
     if(kLogVerbose) {
@@ -283,7 +283,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
         NSLog(@"HEADERHASH (ACTUAL): %@", [headerHash base64EncodedStringWithOptions:kNilOptions]);
     }
         
-    // Decrypt
+    
     
     id<Cipher> cipher = getCipher(decryptionParameters.cipherId);
     
@@ -304,10 +304,10 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
     if(bytesReadFromStartStream != decryptionParameters.streamStartBytes.length ||
        memcmp(start, decryptionParameters.streamStartBytes.bytes, decryptionParameters.streamStartBytes.length) != 0) {
       
-//        NSLog(@"======================================================================");
-//        hexdump(start, decryptionParameters.streamStartBytes.length, decryptionParameters.streamStartBytes.length);
-//        hexdump(decryptionParameters.streamStartBytes.bytes, decryptionParameters.streamStartBytes.length, decryptionParameters.streamStartBytes.length);
-//        NSLog(@"======================================================================");
+
+
+
+
 
         free(start);
         NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
@@ -341,7 +341,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
     }
     
     SerializationData* ret = [[SerializationData alloc] init];
-    KeepassFileHeader keePassFileHeader = getKeePassFileHeader(headerDataForIntegrityCheck); // A little dirty
+    KeepassFileHeader keePassFileHeader = getKeePassFileHeader(headerDataForIntegrityCheck); 
     
     ret.fileVersion = [NSString stringWithFormat:@"%hu.%hu", keePassFileHeader.major, keePassFileHeader.minor];
     ret.transformRounds = decryptionParameters.transformRounds;
@@ -432,7 +432,7 @@ static NSData * _Nonnull getEncryptionBlob(NSData *payload, NSData* startStream)
     
     [blockified appendBytes:&endBlockHeader length:SIZE_OF_BLOCK_HEADER];
     
-    // 3. We prefix our blockified data with random Start Stream Bytes (Used to check we've got the right password only I believe)
+    
     
     NSMutableData* ret = [NSMutableData dataWithData:startStream];
     [ret appendData:blockified];
@@ -484,7 +484,7 @@ NSDictionary<NSNumber *,NSObject *>* getHeaderEntries3(NSInputStream* stream, NS
         }
         
         if(END_OF_ENTRIES == headerEntry.id) {
-            //NSLog(@"END_OF_ENTRIES: %@", headerData);
+            
             break;
         }
         else {
@@ -569,7 +569,7 @@ static DecryptionParameters *getDecryptionParameters(NSDictionary *headerEntries
     return decryptionParameters;
 }
 
-// MMcG: Because of the funky KDBX 3.1 YubiKey Challenge Response Design :(
+
 
 static NSData *getMaster(NSData* masterSeed, NSData *transformKey, NSData* yubiResponse) {
     NSMutableData *masterKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
@@ -597,7 +597,7 @@ static NSData *getMaster(NSData* masterSeed, NSData *transformKey, NSData* yubiR
 static NSData *getCompositeKey(CompositeKeyFactors* compositeKeyFactors) {
     NSData *hashedPassword = compositeKeyFactors.password != nil ? compositeKeyFactors.password.sha256 : nil;
         
-    // Concatenate together in one big sha256...
+    
     
     NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
     CC_SHA256_CTX context;
@@ -611,13 +611,13 @@ static NSData *getCompositeKey(CompositeKeyFactors* compositeKeyFactors) {
         CC_SHA256_Update(&context, compositeKeyFactors.keyFileDigest.bytes, (CC_LONG)compositeKeyFactors.keyFileDigest.length);
     }
 
-    // Not done here as in KDBX4.0 - Handled in get Master :(
     
-//    if(compositeKeyFactors.yubiKeyResponse) {
-//        NSLog(@"YUBI: Adding YubiKey Challenge Response to Composite Key");
-//        NSData *hashed = sha256(compositeKeyFactors.yubiKeyResponse);
-//        CC_SHA256_Update(&context, hashed.bytes, (CC_LONG)hashed.length);
-//    }
+    
+
+
+
+
+
     
     CC_SHA256_Final(compositeKey.mutableBytes, &context);
     

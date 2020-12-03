@@ -35,7 +35,7 @@
         self.navigationItem.title = about;
     }
 
-    self.upgradeOptions.hidden = ProUpgradeIAPManager.isProFamilyEdition || ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime; // If we know user is lifetime don't show option to change license
+    self.upgradeOptions.hidden = ProUpgradeIAPManager.isProFamilyEdition || ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime; 
     
     self.debugTextView.layer.cornerRadius = 2.0f;
     if (@available(iOS 13.0, *)) {

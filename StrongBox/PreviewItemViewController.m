@@ -10,7 +10,7 @@
 #import "NodeIconHelper.h"
 #import "OTPToken+Generation.h"
 #import "FontManager.h"
-#import "BasicOrderedDictionary.h"
+#import "MutableOrderedDictionary.h"
 #import "Utils.h"
 
 @interface PreviewItemViewController ()
@@ -45,7 +45,7 @@
         stackViewTitle.spacing = 8;
         stackViewTitle.axis = UILayoutConstraintAxisHorizontal;
         stackViewTitle.alignment = UIStackViewAlignmentCenter;
-        stackViewTitle.distribution = UIStackViewDistributionFill; // This respects label intrinsic content size
+        stackViewTitle.distribution = UIStackViewDistributionFill; 
         stackViewTitle.layoutMarginsRelativeArrangement = YES;
         stackViewTitle.translatesAutoresizingMaskIntoConstraints = NO;
 
@@ -54,14 +54,14 @@
             [imageView.heightAnchor constraintEqualToConstant:32],
         ]];
         
-        // Gather Fields
         
-        BasicOrderedDictionary<NSString*, NSString*> *orderedFields = [[BasicOrderedDictionary alloc] init];
+        
+        MutableOrderedDictionary<NSString*, NSString*> *orderedFields = [[MutableOrderedDictionary alloc] init];
         
         if (item.fields.username.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_username", @"Username") andValue:item.fields.username];
         if (item.fields.email.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_email", @"Email") andValue:item.fields.email];
 
-        // Custom Fields
+        
         
         NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
         for(NSString* key in sortedKeys) {
@@ -73,11 +73,11 @@
             }
         }
 
-        // Notes always last
+        
         
         if (item.fields.notes.length) [orderedFields addKey:NSLocalizedString(@"generic_fieldname_notes", @"Notes") andValue:item.fields.notes];
 
-        // Title and TOTP always at top
+        
 
         NSMutableArray<UIView*>* fieldViews = [NSMutableArray array];
 
@@ -91,25 +91,25 @@
         int fieldsStartIndex = (int) fieldViews.count;
         
         for (NSString* key in orderedFields.allKeys) {
-            NSString* value = [orderedFields objectForKey:key];
+            NSString* value = orderedFields[key];
         
             [fieldViews addObject:[self createHeaderLabel:key]];
             [fieldViews addObject:[self createFieldLabel:value]];
         }
         
-        // Main Vertical Stack View
+        
         
         UIStackView* stackView = [[UIStackView alloc] initWithArrangedSubviews:fieldViews];
         
         stackView.spacing = 10;
         stackView.axis = UILayoutConstraintAxisVertical;
         stackView.alignment = UIStackViewAlignmentLeading;
-        stackView.distribution = UIStackViewDistributionFill; // This respects label intrinsic content size
+        stackView.distribution = UIStackViewDistributionFill; 
         stackView.layoutMargins = UIEdgeInsetsMake(8, 8, 8, 8);
         stackView.layoutMarginsRelativeArrangement = YES;
         stackView.translatesAutoresizingMaskIntoConstraints = NO;
         
-        // Tighten Field and Header Spacing
+        
         
         for (int i=0;i<orderedFields.count;i++) {
             [stackView setCustomSpacing:2 afterView:fieldViews[fieldsStartIndex + (i*2)]];
@@ -122,7 +122,7 @@
             [imageView.heightAnchor constraintEqualToConstant:32],
             [stackView.centerXAnchor constraintEqualToAnchor:self.view.centerXAnchor],
             [stackView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
-            [stackView.widthAnchor constraintGreaterThanOrEqualToConstant:250], // Min Width
+            [stackView.widthAnchor constraintGreaterThanOrEqualToConstant:250], 
         ]];
         
         CGSize size = [stackView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];

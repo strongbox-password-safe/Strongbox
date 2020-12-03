@@ -78,7 +78,7 @@
         NSError *error;
         NSNumber *isDirectory = nil;
         if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
-            // handle error
+            
             NSLog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
@@ -106,7 +106,7 @@
         NSError *error;
         NSNumber *isDirectory = nil;
         if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
-            // handle error
+            
             NSLog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
@@ -218,12 +218,12 @@
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
 
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     NSLog(@"didPickDocumentAtURL: %@", url);
 
     NSError* error;
     
-    // https://stackoverflow.com/questions/25520453/ios8-uidocumentpickerviewcontroller-get-nsdata
+    
     
     [url startAccessingSecurityScopedResource];
     
@@ -245,7 +245,7 @@
         return;
     }
 
-    if (controller == self.importDocPicker) { // Import / copy Local?
+    if (controller == self.importDocPicker) { 
         NSURL* localUrl = [self importToLocal:url data:data error:&error];
         
         if(!localUrl) {
@@ -305,7 +305,7 @@
     return nil;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 3;
@@ -469,7 +469,7 @@
     NSURL* url;
     
     if(indexPath.section == 0) {
-        return; // WTF
+        return; 
     }
     else if(indexPath.section == 1) {
         url = self.keyFiles[indexPath.row];

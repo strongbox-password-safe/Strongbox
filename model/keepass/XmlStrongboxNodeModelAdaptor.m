@@ -22,8 +22,8 @@
 - (KeePassGroup*)fromModel:(Node*)rootNode context:(XmlProcessingContext*)context error:(NSError**)error {
     self.xmlParsingContext = context;
     
-    // Strongbox uses the Root Node as a dummy but KeePass the actual root node is serialized and entries are not allowed
-    // to be added to it.
+    
+    
     
     if(rootNode.children.count != 1 || ![rootNode.children objectAtIndex:0].isGroup) {
        if(error) {
@@ -51,10 +51,10 @@
         }
     }
     else {
-        // No Proper Root Group found in Xml Model. We'll create one
+        
         
         NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
-        if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+        if ([rootGroupName isEqualToString:@"generic_database"]) { 
           rootGroupName = kDefaultRootGroupName;
         }
 
@@ -75,19 +75,27 @@
         }
     }
 
-    // Times
+    
     
     ret.times.lastAccessTime = group.fields.accessed;
     ret.times.lastModificationTime = group.fields.modified;
     ret.times.creationTime = group.fields.created;
     ret.times.usageCount = group.fields.usageCount;
     ret.times.locationChangedTime = group.fields.locationChanged;
+    ret.times.expiryTime = group.fields.expires;
+    ret.times.expires = group.fields.expires != nil;
 
-    //
+    
     
     ret.icon = group.iconId;
     ret.customIcon = group.customIconUuid;
-    
+    ret.customData.orderedDictionary = group.fields.customData;
+    ret.notes = group.fields.notes;
+    ret.defaultAutoTypeSequence = group.fields.defaultAutoTypeSequence;
+    ret.enableAutoType = group.fields.enableAutoType;
+    ret.enableSearching = group.fields.enableSearching;
+    ret.lastTopVisibleEntry = group.fields.lastTopVisibleEntry;
+
     [ret.groupsAndEntries removeAllObjects];
     for(Node* child in group.children) {
         if (child.isGroup) {
@@ -117,8 +125,29 @@
     ret.uuid = node.uuid;
     ret.icon = node.iconId;
     ret.customIcon = node.customIconUuid;
+    ret.customData.orderedDictionary = node.fields.customData;
+    ret.foregroundColor = node.fields.foregroundColor;
+    ret.backgroundColor = node.fields.backgroundColor;
+    ret.overrideURL = node.fields.overrideURL;
+    
+    if (node.fields.autoType) {
+        ret.autoType = [[KeePassXmlAutoType alloc] initWithContext:self.xmlParsingContext];
 
-    // Times
+        ret.autoType.enabled = node.fields.autoType.enabled;
+        ret.autoType.dataTransferObfuscation = node.fields.autoType.dataTransferObfuscation;
+        ret.autoType.defaultSequence = node.fields.autoType.defaultSequence;
+        
+        if (node.fields.autoType.asssociations.count) {
+            for (AutoTypeAssociation* ass in node.fields.autoType.asssociations) {
+                KeePassXmlAutoTypeAssociation* kp = [[KeePassXmlAutoTypeAssociation alloc] initWithContext:self.xmlParsingContext];
+                kp.window = ass.window;
+                kp.keystrokeSequence = ass.keystrokeSequence;
+                [ret.autoType.asssociations addObject:kp];
+            }
+        }
+    }
+
+    
     
     ret.times.lastAccessTime = node.fields.accessed;
     ret.times.lastModificationTime = node.fields.modified;
@@ -128,7 +157,7 @@
     ret.times.usageCount = node.fields.usageCount;
     ret.times.locationChangedTime = node.fields.locationChanged;
     
-    // Strings
+    
     
     [ret removeAllStrings];
     for (NSString* key in node.fields.customFields.allKeys) {
@@ -142,7 +171,7 @@
     ret.url = node.fields.url;
     ret.notes = node.fields.notes;
     
-    // Binaries
+    
     
     [ret.binaries removeAllObjects];
     for (NodeFileAttachment *attachment in node.fields.attachments) {
@@ -154,12 +183,12 @@
         [ret.binaries addObject:xmlBinary];
     }
     
-    // History
+    
  
     [ret.history.entries removeAllObjects];
     if(!stripHistory) {
         for(Node* historicalNode in node.fields.keePassHistory) {
-            Entry* historicalEntry = [self buildXmlEntry:historicalNode stripHistory:YES]; // Just in case we have accidentally left history on a historical entry itself...
+            Entry* historicalEntry = [self buildXmlEntry:historicalNode stripHistory:YES]; 
             [ret.history.entries addObject:historicalEntry];
         }
     }
@@ -177,10 +206,19 @@
                                            modified:group.times.lastModificationTime
                                     locationChanged:group.times.locationChangedTime
                                          usageCount:group.times.usageCount];
-    
-    if(group.customIcon) groupNode.customIconUuid = group.customIcon;
-    if(group.icon != nil) groupNode.iconId = group.icon;
 
+    groupNode.fields.expires = group.times.expires ? group.times.expiryTime : nil;
+
+    if (group.customIcon) groupNode.customIconUuid = group.customIcon;
+    if (group.icon != nil) groupNode.iconId = group.icon;
+    if (group.customData) [groupNode.fields.customData addAll:group.customData.orderedDictionary];
+    
+    groupNode.fields.notes = group.notes;
+    groupNode.fields.defaultAutoTypeSequence = group.defaultAutoTypeSequence;
+    groupNode.fields.enableAutoType = group.enableAutoType;
+    groupNode.fields.enableSearching = group.enableSearching;
+    groupNode.fields.lastTopVisibleEntry = group.lastTopVisibleEntry;
+    
     for (id<KeePassGroupOrEntry> child in group.groupsAndEntries) {
         if (child.isGroup) {
             if(![self buildGroup:(KeePassGroup*)child parentNode:groupNode]) {
@@ -189,7 +227,7 @@
             }
         }
         else {
-            Node * entryNode = [self nodeFromEntry:(Entry*)child groupNode:groupNode]; // Original KeePass Document Group...
+            Node * entryNode = [self nodeFromEntry:(Entry*)child groupNode:groupNode]; 
             
             if( entryNode == nil ) {
                 NSLog(@"Error building node from Entry: [%@]", child);
@@ -212,7 +250,7 @@
                                                           url:childEntry.url
                                                      password:childEntry.password
                                                         notes:childEntry.notes
-                                                        email:@""]; // Not an official Keepass Field!
+                                                        email:@""]; 
 
     [fields setTouchPropertiesWithCreated:childEntry.times.creationTime
                                  accessed:childEntry.times.lastAccessTime
@@ -231,16 +269,44 @@
         [fields.attachments addObject:attachment];
     }
     
-    // Tags
+    
     
     fields.tags = childEntry.tags;
     
-    // Custom Fields
+    
     
     for (NSString* key in childEntry.customStrings.allKeys) {
         StringValue* value = childEntry.customStrings[key];
         [fields setCustomField:key value:value];
     }
+
+    
+    
+    if (childEntry.customData) [fields.customData addAll:childEntry.customData.orderedDictionary];
+
+    fields.foregroundColor = childEntry.foregroundColor;
+    fields.backgroundColor = childEntry.backgroundColor;
+    fields.overrideURL = childEntry.overrideURL;
+    
+    if (childEntry.autoType) {
+        fields.autoType = [[AutoType alloc] init];
+        
+        fields.autoType.enabled = childEntry.autoType.enabled;
+        fields.autoType.dataTransferObfuscation = childEntry.autoType.dataTransferObfuscation;
+        fields.autoType.defaultSequence = childEntry.autoType.defaultSequence;
+        
+        if (childEntry.autoType.asssociations.count) {
+            NSMutableArray* ma = NSMutableArray.array;
+            for (KeePassXmlAutoTypeAssociation* kpa in childEntry.autoType.asssociations) {
+                AutoTypeAssociation* assoc = [[AutoTypeAssociation alloc] init];
+                assoc.window = kpa.window;
+                assoc.keystrokeSequence = kpa.keystrokeSequence;
+                [ma addObject:assoc];
+            }
+            fields.autoType.asssociations = ma.copy;
+        }
+    }
+    
     
     Node* entryNode = [[Node alloc] initAsRecord:childEntry.title
                                           parent:groupNode
@@ -256,6 +322,8 @@
             [fields.keePassHistory addObject:historicalEntryNode];
         }
     }
+    
+    
     
     entryNode.linkedData = childEntry.unmanagedChildren;
     

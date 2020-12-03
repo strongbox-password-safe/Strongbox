@@ -12,6 +12,8 @@
 #import "StringValue.h"
 #import "OTPToken.h"
 #import "SerializationPackage.h"
+#import "MutableOrderedDictionary.h"
+#import "AutoType.h"
 
 @class Node;
 
@@ -32,22 +34,27 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) NSString *email;
 @property (nonatomic, strong, nonnull) NSString *url;
 @property (nonatomic, strong, nonnull) NSString *notes;
-
 @property (readonly, nonatomic, strong, nullable) NSDate *created;
 @property (readonly, nonatomic, strong, nullable) NSDate *modified;
 @property (readonly, nonatomic, strong, nullable) NSDate *accessed;
 @property (readonly, nonatomic, strong, nullable) NSDate *locationChanged;
 @property (readonly, nonatomic, strong, nullable, readonly) NSNumber *usageCount;
-
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
 @property (nonatomic, strong, nullable) NSDate *expires;
-
 @property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
-
 @property (nonatomic, strong, nonnull) NSMutableSet<NSString*> *tags;
-
-@property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; // Password Safe History
+@property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; 
 @property NSMutableArray<Node*> *keePassHistory;
+@property MutableOrderedDictionary<NSString*, NSString*> *customData;
+
+@property (nonatomic, nullable) NSString* defaultAutoTypeSequence;
+@property (nonatomic, nullable) NSNumber* enableAutoType;
+@property (nonatomic, nullable) NSNumber* enableSearching;
+@property (nonatomic, nullable) NSUUID* lastTopVisibleEntry;
+@property (nullable) NSString* foregroundColor;
+@property (nullable) NSString* backgroundColor;
+@property (nullable) NSString* overrideURL;
+@property (nullable) AutoType* autoType;
 
 + (BOOL)isTotpCustomFieldKey:(NSString*)key;
 
@@ -56,10 +63,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneTouchProperties:(BOOL)cloneTouchProperties;
 
+- (BOOL)isSyncEqualTo:(NodeFields*)other;
+
 - (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;
 - (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;
 
-// Custom Fields
+
 
 @property (nonatomic, strong, nonnull) NSDictionary<NSString*, StringValue*> *customFields;
 - (void)removeAllCustomFields;
@@ -77,12 +86,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setTouchPropertiesWithAccessed:(const NSDate*)accessed modified:(const NSDate*)modified usageCount:(const NSNumber*)usageCount;
 - (void)setTouchPropertiesWithCreated:(const NSDate*_Nullable)created accessed:(const NSDate*_Nullable)accessed modified:(const NSDate*_Nullable)modified locationChanged:(const NSDate*_Nullable)locationChanged usageCount:(const NSNumber*_Nullable)usageCount;
 
-///////////////////////////////////////////////
-// TOTP
+
+
 
 @property (nonatomic, readonly) OTPToken* otpToken;
 
-+ (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes; // Unit Testing
++ (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes; 
 
 + (OTPToken*_Nullable)getOtpTokenFromString:(NSString *)string
                                  forceSteam:(BOOL)forceSteam
@@ -93,12 +102,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)clearTotp;
 
-//
+
 
 @property (readonly) BOOL expired;
 @property (readonly) BOOL nearlyExpired;
 
-// Alternative URLs - Just a view on Custom Fields with Keys matching (KP2A_URL[_*])
+
 
 @property (readonly) NSArray<NSString*> *alternativeUrls;
 

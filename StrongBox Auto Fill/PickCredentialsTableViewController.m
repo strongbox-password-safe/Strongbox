@@ -31,11 +31,6 @@
 @property (strong, nonatomic) UISearchController *searchController;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddCredential;
 @property NSTimer* timerRefreshOtp;
-
-//@property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
-//@property (nonatomic) NSInteger tapCount;
-//@property (nonatomic) NSIndexPath *tappedIndexPath;
-//@property (strong, nonatomic) NSTimer *tapTimer;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 
 @property BrowseTableViewCellHelper* cellHelper;
@@ -52,7 +47,7 @@
         self.navigationItem.prompt = nil;
     }
 
-    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
+    if (@available(iOS 13.0, *)) { 
         [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
     }
     
@@ -79,27 +74,20 @@
     
     if (@available(iOS 11.0, *)) {
         self.navigationItem.searchController = self.searchController;
-        // We want the search bar visible all the time.
+        
         self.navigationItem.hidesSearchBarWhenScrolling = NO;
     } else {
         self.tableView.tableHeaderView = self.searchController.searchBar;
         [self.searchController.searchBar sizeToFit];
     }
-    
+    self.searchController.searchBar.enablesReturnKeyAutomatically = NO; 
+        
     [self loadItems];
 }
 
 - (void)setupTableview {
     self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.model tableView:self.tableView];
     
-//    self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
-//                                initWithTarget:self
-//                                action:@selector(handleLongPress:)];
-//    self.longPressRecognizer.minimumPressDuration = 1;
-//    self.longPressRecognizer.cancelsTouchesInView = YES;
-    
-//    [self.tableView addGestureRecognizer:self.longPressRecognizer];
-
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     
@@ -107,8 +95,17 @@
 }
 
 - (void)loadItems {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model];
-    
+    BrowseSortField sortField = self.model.metadata.browseSortField;
+    BOOL descending = self.model.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model.database
+                                                                       browseSortField:sortField
+                                                                            descending:descending
+                                                                     foldersSeparately:foldersSeparately
+                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+        return [self.model isFlaggedByAudit:node];
+    }];
+
     self.items = [searcher filterAndSortForBrowse:self.model.database.allRecords.mutableCopy
                             includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
                                 includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
@@ -149,17 +146,17 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
 
-    // Try to workaround Apple's disappearing keyboard problem...
+    
     
     if (!self.doneFirstAppearanceTasks) {
         self.doneFirstAppearanceTasks = YES;
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self smartInitializeSearch];
 
             [self.searchController.searchBar becomeFirstResponder];
 
-            // Auto Proceed...
+            
             
             if (AutoFillSettings.sharedInstance.autoProceedOnSingleMatch) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -205,9 +202,9 @@
         if(serviceId.type == ASCredentialServiceIdentifierTypeURL) {
             NSURL* url = serviceId.identifier.urlExtendedParse;
             
-            //NSLog(@"URL: %@", url);
             
-            // Direct URL Match?
+            
+            
             
             if (url) {
                 NSArray* items = [self getMatchingItems:url.absoluteString scope:kSearchScopeUrl];
@@ -220,7 +217,7 @@
                     NSLog(@"No matches for URL: %@", url.absoluteString);
                 }
                 
-                // Host URL Match?
+                
                 
                 items = [self getMatchingItems:url.host scope:kSearchScopeUrl];
                 if(items.count) {
@@ -247,7 +244,7 @@
 }
 
 - (void)smartInitializeSearchFromDomain:(NSString*)domain {
-    // Domain URL Match?
+    
     
     NSArray* items = [self getMatchingItems:domain scope:kSearchScopeUrl];
     if(items.count) {
@@ -259,7 +256,7 @@
         NSLog(@"No matches in URLs for Domain: %@", domain);
     }
     
-    // Broad Search across all fields for domain...
+    
     
     items = [self getMatchingItems:domain scope:kSearchScopeAll];
     if(items.count) {
@@ -271,7 +268,7 @@
         NSLog(@"No matches across all fields for Domain: %@", domain);
     }
 
-    // Broadest general search (try grab the company/organisation name from the host)
+    
     
     NSString * searchTerm = getCompanyOrOrganisationNameFromDomain(domain);
     [self.searchController.searchBar setText:searchTerm];
@@ -279,8 +276,13 @@
 }
 
 - (NSArray<Node*>*)getMatchingItems:(NSString*)searchText scope:(SearchScope)scope {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model];
-    
+    BrowseSortField sortField = self.model.metadata.browseSortField;
+    BOOL descending = self.model.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+        return [self.model isFlaggedByAudit:node];
+    }];
+
     return [searcher search:searchText
                       scope:scope
                 dereference:self.model.metadata.searchDereferencedFields
@@ -295,7 +297,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return UITableViewAutomaticDimension;  // Required for iOS 9 and 10
+    return UITableViewAutomaticDimension;  
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -304,7 +306,7 @@
      * estimated height dynamically on information
      * that makes sense in your case.
      */
-    return 60.0f; // Required for iOS 9 and 10
+    return 60.0f; 
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -348,7 +350,7 @@
         ItemDetailsViewController* vc = (ItemDetailsViewController*)segue.destinationViewController;
         [self addNewEntry:vc];
     }
-    else if ([segue.identifier isEqualToString:@"segueToPreferences"]) { //     // Try to workaround Apple's disappearing keyboard problem...
+    else if ([segue.identifier isEqualToString:@"segueToPreferences"]) { 
 
         NSLog(@"segueToPreferences");
         [self.searchController.searchBar resignFirstResponder];
@@ -384,7 +386,7 @@
                     suggestedUrl = url.absoluteString;
                 }
                 else {
-                    suggestedUrl = [[url.scheme stringByAppendingString:@"://"] stringByAppendingString:url.host];
+                    suggestedUrl = [[url.scheme stringByAppendingString:@":
                 }
             }
         }
@@ -530,34 +532,6 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     return searchTerm;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Long Press
-
-//- (void)handleLongPress:(UILongPressGestureRecognizer *)sender {
-//    if (sender.state != UIGestureRecognizerStateBegan) {
-//        return;
-//    }
-//
-//    CGPoint tapLocation = [self.longPressRecognizer locationInView:self.tableView];
-//    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:tapLocation];
-//
-//    if (!indexPath || indexPath.row >= [self getDataSource].count) {
-//        NSLog(@"Not on a cell");
-//        return;
-//    }
-//
-//    Node *item = [self getDataSource][indexPath.row];
-//
-//    if (item.isGroup) {
-//        NSLog(@"Item is group, cannot Fast PW Copy...");
-//        return;
-//    }
-//
-//    NSLog(@"Fast Password Copy on %@", item.title);
-//
-//    BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
-//    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item]];
-//}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     NSArray* arr = [self getDataSource];
@@ -571,68 +545,31 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     else {
         NSLog(@"WARN: DidSelectRow with no Record?!");
     }
-//    if(self.tapCount == 1 && self.tapTimer != nil && [self.tappedIndexPath isEqual:indexPath]){
-//        [self.tapTimer invalidate];
-//
-//        self.tapTimer = nil;
-//        self.tapCount = 0;
-//        self.tappedIndexPath = nil;
-//
-//        [self handleDoubleTap:indexPath];
-//    }
-//    else if(self.tapCount == 0){
-//        //This is the first tap. If there is no tap till tapTimer is fired, it is a single tap
-//        self.tapCount = self.tapCount + 1;
-//        self.tappedIndexPath = indexPath;
-//        self.tapTimer = [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(tapTimerFired:) userInfo:nil repeats:NO];
-//    }
-//    else if(![self.tappedIndexPath isEqual:indexPath]){
-//        //tap on new row
-//        self.tapCount = 0;
-//        self.tappedIndexPath = indexPath;
-//        if(self.tapTimer != nil){
-//            [self.tapTimer invalidate];
-//            self.tapTimer = nil;
-//        }
-//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
-
-//- (void)tapTimerFired:(NSTimer *)aTimer{
-//    //timer fired, there was a single tap on indexPath.row = tappedRow
-//    [self tapOnCell:self.tappedIndexPath];
-//
-//    self.tapCount = 0;
-//    self.tappedIndexPath = nil;
-//    self.tapTimer = nil;
-//}
-//
-//- (void)tapOnCell:(NSIndexPath *)indexPath  {
-//    NSArray* arr = [self getDataSource];
-//    if(indexPath.row >= arr.count) {
-//        return;
-//    }
-//    Node *item = arr[indexPath.row];
-//    if(item) {
-//        [self proceedWithItem:item];
-//    }
-//    else {
-//        NSLog(@"WARN: DidSelectRow with no Record?!");
-//    }
-//}
-
-//- (void)handleDoubleTap:(NSIndexPath *)indexPath {
-//    NSArray* arr = [self getDataSource];
-//    if(indexPath.row >= arr.count) {
-//        return;
-//    }
-//    Node *item = arr[indexPath.row];
-//
-//    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.username node:item]];
-//
-//    NSLog(@"Fast Username Copy on %@", item.title);
-//
-//    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-//}
 
 - (void)proceedWithItem:(Node*)item {
     if(item.fields.otpToken) {
@@ -646,9 +583,47 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     NSString* user = [self dereference:item.fields.username node:item];
     NSString* password = [self dereference:item.fields.password node:item];
     
-    //NSLog(@"Return User/Pass from Node: [%@] - [%@] [%@]", user, password, record);
+    
     
     [self.rootViewController exitWithCredential:user password:password];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar {
+    NSArray* arr = [self getDataSource];
+    Node *item = arr.firstObject;
+
+    if (item) {
+        [self proceedWithItem:item];
+    }
 }
 
 @end

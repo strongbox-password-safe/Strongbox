@@ -22,7 +22,7 @@ static NSUInteger const kTagSectionIdx = 1;
 @property Model* viewModel;
 @property UITableView* tableView;
 @property NSArray<QuickViewConfig*> *quickViews;
-//@property NSArray<NSString*> *tags;
+
 
 @end
 
@@ -86,7 +86,7 @@ static NSUInteger const kTagSectionIdx = 1;
         cell.imageView.image = config.image;
         cell.imageView.tintColor = config.imageTint;
     }
-    else { // Tags
+    else { 
         NSArray<NSString*>* tags = [self.viewModel.database.tagSet.allObjects sortedArrayUsingComparator:finderStringComparator];
         NSString* tag = tags[indexPath.row];
 
@@ -128,7 +128,7 @@ static NSUInteger const kTagSectionIdx = 1;
         searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
         searchController.searchBar.text = config.searchTerm;
         
-        [searchController.searchBar endEditing:YES]; // Hide Keyboard after search
+        [searchController.searchBar endEditing:YES]; 
     }
     else if (indexPath.section == kTagSectionIdx) {
         NSArray<NSString*>* tags = [self.viewModel.database.tagSet.allObjects sortedArrayUsingComparator:finderStringComparator];
@@ -137,7 +137,7 @@ static NSUInteger const kTagSectionIdx = 1;
         searchController.searchBar.selectedScopeButtonIndex = kSearchScopeTags;
         searchController.searchBar.text = tag;
 
-        [searchController.searchBar endEditing:YES]; // Hide Keyboard after search
+        [searchController.searchBar endEditing:YES]; 
     }
 }
 

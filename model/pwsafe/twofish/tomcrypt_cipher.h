@@ -279,7 +279,7 @@ typedef struct {
     /** The scheduled key */
     symmetric_key key;
 } symmetric_CTR;
-#endif // ifdef LTC_CTR_MODE
+#endif 
 
 
 #ifdef LTC_LRW_MODE
@@ -305,7 +305,7 @@ typedef struct {
     unsigned char PC[16][256][16];
 #endif
 } symmetric_LRW;
-#endif // ifdef LTC_LRW_MODE
+#endif 
 
 #ifdef LTC_F8_MODE
 /** A block cipher F8 structure */
@@ -637,7 +637,7 @@ void rijndael_enc_done(symmetric_key *skey);
 int rijndael_enc_keysize(int *keysize);
 extern const struct ltc_cipher_descriptor rijndael_desc, aes_desc;
 extern const struct ltc_cipher_descriptor rijndael_enc_desc, aes_enc_desc;
-#endif // ifdef LTC_RIJNDAEL
+#endif 
 
 #ifdef LTC_XTEA
 int xtea_setup(const unsigned char *key, int keylen, int num_rounds, symmetric_key *skey);
@@ -875,7 +875,7 @@ int xts_decrypt(
 void xts_done(symmetric_xts *xts);
 int  xts_test(void);
 void xts_mult_x(unsigned char *I);
-#endif // ifdef LTC_XTS_MODE
+#endif 
 
 int find_cipher(const char *name);
 int find_cipher_any(const char *name, int blocklen, int keylen);

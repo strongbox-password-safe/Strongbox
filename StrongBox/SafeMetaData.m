@@ -15,10 +15,19 @@
 @interface SafeMetaData ()
 
 @property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
+@property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
 
 @end
 
 @implementation SafeMetaData
+
+- (BOOL)viewDereferencedFields {
+    return YES;
+}
+
+- (BOOL)searchDereferencedFields {
+    return YES;
+}
 
 - (instancetype)init {
     self = [super init];
@@ -39,8 +48,6 @@
         self.showFlagsInBrowse = YES;
         self.doNotShowRecycleBinInBrowse = NO;
         self.showRecycleBinInSearchResults = NO;
-        self.viewDereferencedFields = YES;
-        self.searchDereferencedFields = YES;
         self.showEmptyFieldsInDetailsView = NO;
         self.detailsViewCollapsedSections = ItemDetailsViewController.defaultCollapsedSections;
         self.easyReadFontForAll = NO;
@@ -53,9 +60,9 @@
         self.showQuickViewFavourites = YES;
         self.showQuickViewNearlyExpired = YES;
 
-        // PERF: Do Not set these - as this massively slows down item creation - They are ok to be created on demand
-        //        self.favourites = nil; //@[];
-        //        self.auditExcludedItems = nil; // @[];
+        
+        
+        
         
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
@@ -64,7 +71,7 @@
         
         self.tapAction = kBrowseTapActionOpenDetails;
 
-        // Deprecated Tap Actions
+        
         self.doubleTapAction = kBrowseTapActionCopyPassword;
         self.tripleTapAction = kBrowseTapActionCopyTotp;
         self.longPressTapAction = kBrowseTapActionCopyUsername;
@@ -98,8 +105,8 @@
     return self;
 }
 
-////////////////////////
-// Serialization
+
+
 
 + (instancetype)fromJsonSerializationDictionary:(NSDictionary *)jsonDictionary {
     SafeMetaData *ret = [[SafeMetaData alloc] init];
@@ -123,8 +130,8 @@
     if ( jsonDictionary[@"showFlagsInBrowse"] != nil ) ret.showFlagsInBrowse = ((NSNumber*)jsonDictionary[@"showFlagsInBrowse"]).boolValue;
     if ( jsonDictionary[@"doNotShowRecycleBinInBrowse"] != nil ) ret.doNotShowRecycleBinInBrowse = ((NSNumber*)jsonDictionary[@"doNotShowRecycleBinInBrowse"]).boolValue;
     if ( jsonDictionary[@"showRecycleBinInSearchResults"] != nil ) ret.showRecycleBinInSearchResults = ((NSNumber*)jsonDictionary[@"showRecycleBinInSearchResults"]).boolValue;
-    if ( jsonDictionary[@"viewDereferencedFields"] != nil ) ret.viewDereferencedFields = ((NSNumber*)jsonDictionary[@"viewDereferencedFields"]).boolValue;
-    if ( jsonDictionary[@"searchDereferencedFields"] != nil ) ret.searchDereferencedFields = ((NSNumber*)jsonDictionary[@"searchDereferencedFields"]).boolValue;
+
+
     if ( jsonDictionary[@"showEmptyFieldsInDetailsView"] != nil ) ret.showEmptyFieldsInDetailsView = ((NSNumber*)jsonDictionary[@"showEmptyFieldsInDetailsView"]).boolValue;
     if ( jsonDictionary[@"easyReadFontForAll"] != nil ) ret.easyReadFontForAll = ((NSNumber*)jsonDictionary[@"easyReadFontForAll"]).boolValue;
     if ( jsonDictionary[@"hideTotp"] != nil ) ret.hideTotp = ((NSNumber*)jsonDictionary[@"hideTotp"]).boolValue;
@@ -191,8 +198,8 @@
         @"showFlagsInBrowse" : @(self.showFlagsInBrowse),
         @"doNotShowRecycleBinInBrowse" : @(self.doNotShowRecycleBinInBrowse),
         @"showRecycleBinInSearchResults" : @(self.showRecycleBinInSearchResults),
-        @"viewDereferencedFields" : @(self.viewDereferencedFields),
-        @"searchDereferencedFields" : @(self.searchDereferencedFields),
+
+
         @"showEmptyFieldsInDetailsView" : @(self.showEmptyFieldsInDetailsView),
         @"easyReadFontForAll" : @(self.easyReadFontForAll),
         @"hideTotp" : @(self.hideTotp),
@@ -268,8 +275,8 @@
     return ret;
 }
 
-////////////////////////
-// TODO: Eventually delete these - 14-Jun-2020 +12 months - 14-Jun-2021
+
+
 
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:self.uuid forKey:@"uuid"];
@@ -300,7 +307,7 @@
     [encoder encodeInteger:self.tripleTapAction forKey:@"tripleTapAction"];
     [encoder encodeInteger:self.longPressTapAction forKey:@"longPressTapAction"];
         
-    // Browse View
+    
 
     [encoder encodeInteger:self.browseSortField forKey:@"browseSortField"];
     [encoder encodeBool:self.browseSortOrderDescending forKey:@"browseSortOrderDescending"];
@@ -316,7 +323,7 @@
     [encoder encodeBool:self.viewDereferencedFields forKey:@"viewDereferencedFields"];
     [encoder encodeBool:self.searchDereferencedFields forKey:@"searchDereferencedFields"];
 
-    // Details View
+    
     
     [encoder encodeBool:self.showEmptyFieldsInDetailsView forKey:@"showEmptyFieldsInDetailsView"];
     [encoder encodeObject:self.detailsViewCollapsedSections forKey:@"detailsViewCollapsedSections"];    
@@ -325,7 +332,7 @@
     [encoder encodeBool:self.tryDownloadFavIconForNewRecord forKey:@"tryDownloadFavIconForNewRecord"];
     [encoder encodeBool:self.showPasswordByDefaultOnEditScreen forKey:@"showPasswordByDefaultOnEditScreen"];
     
-    //
+    
     
     [encoder encodeBool:self.hasBeenPromptedForQuickLaunch forKey:@"hasBeenPromptedForQuickLaunch"];
     
@@ -422,7 +429,7 @@
             self.longPressTapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"longPressTapAction"];
         }
         
-        // Migrate from Global Settings - 23-Jun-2019
+        
         
         if([decoder containsValueForKey:@"browseSortField"]) {
             self.browseSortField = (BrowseSortField)[decoder decodeIntegerForKey:@"browseSortField"];
@@ -456,12 +463,6 @@
         }
         if([decoder containsValueForKey:@"showRecycleBinInSearchResults"]) {
             self.showRecycleBinInSearchResults = [decoder decodeBoolForKey:@"showRecycleBinInSearchResults"];
-        }
-        if([decoder containsValueForKey:@"viewDereferencedFields"]) {
-            self.viewDereferencedFields = [decoder decodeBoolForKey:@"viewDereferencedFields"];
-        }
-        if([decoder containsValueForKey:@"searchDereferencedFields"]) {
-            self.searchDereferencedFields = [decoder decodeBoolForKey:@"searchDereferencedFields"];
         }
         if([decoder containsValueForKey:@"showEmptyFieldsInDetailsView"]) {
             self.showEmptyFieldsInDetailsView = [decoder decodeBoolForKey:@"showEmptyFieldsInDetailsView"];
@@ -552,7 +553,7 @@
     return self;
 }
 
-////////////////////////
+
 
 - (NSArray<NSString *> *)auditExcludedItems {
     NSString *key = [NSString stringWithFormat:@"%@-auditExcludedItems", self.uuid];
@@ -605,22 +606,6 @@
     }
 }
 
-- (NSString *)convenenienceYubikeySecret {
-    NSString *key = [NSString stringWithFormat:@"%@-yubikey-secret", self.uuid];
-    return [SecretStore.sharedInstance getSecureString:key];
-}
-
-- (void)setConvenenienceYubikeySecret:(NSString *)convenenienceYubikeySecret {
-    NSString *key = [NSString stringWithFormat:@"%@-yubikey-secret", self.uuid];
-    
-    if(convenenienceYubikeySecret) {
-        [SecretStore.sharedInstance setSecureString:convenenienceYubikeySecret forIdentifier:key];
-    }
-    else {
-        [SecretStore.sharedInstance deleteSecureItem:key];
-    }
-}
-
 - (NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
     return [SecretStore.sharedInstance getSecureString:key];
@@ -655,7 +640,7 @@
 
 - (void)clearKeychainItems {
     self.convenienceMasterPassword = nil;
-    self.convenenienceYubikeySecret = nil;
+    
     self.favourites = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;

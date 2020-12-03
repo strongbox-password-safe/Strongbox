@@ -38,8 +38,8 @@
             return NO;
         }
         
-        // Set the created date to now - this is used to display when the backup was made - Otherwise it copies metadata
-        // from the passed in Snapshot which can be wrong
+        
+        
         
         [NSFileManager.defaultManager setAttributes:@{ NSFileCreationDate : now } ofItemAtPath:url.path error:&error];
         if(!success) {
@@ -72,7 +72,7 @@
 - (NSArray<BackupItem*>*)getAvailableBackups:(SafeMetaData*)metadata {
     NSError* error;
     
-    NSArray<NSURLResourceKey>* keys = @[NSURLCreationDateKey, NSURLFileSizeKey];
+    NSArray<NSURLResourceKey>* keys = @[NSURLCreationDateKey, NSURLContentModificationDateKey, NSURLFileSizeKey];
     
     NSArray<NSURL*> *files = [NSFileManager.defaultManager contentsOfDirectoryAtURL:metadata.backupsDirectory
                                                          includingPropertiesForKeys:keys
@@ -92,9 +92,10 @@
         NSDictionary* attributesDictionary = [file resourceValuesForKeys:keys error:&error];
         if(attributesDictionary) {
             NSDate* dateCreate = attributesDictionary[NSURLCreationDateKey];
+            NSDate* modDate = attributesDictionary[NSURLContentModificationDateKey];
             NSNumber* fileSize = attributesDictionary[NSURLFileSizeKey];
             
-            [ret addObject:[BackupItem withUrl:file date:dateCreate fileSize:fileSize]];
+            [ret addObject:[BackupItem withUrl:file backupCreatedDate:dateCreate modDate:modDate fileSize:fileSize]];
             NSLog(@"Found file with create date: [%@] Size: [%@]", dateCreate, friendlyFileSizeString(fileSize.unsignedIntegerValue));
         }
         else {
@@ -103,7 +104,7 @@
     }
     
     return [ret sortedArrayUsingComparator:^NSComparisonResult(BackupItem*  _Nonnull obj1, BackupItem*  _Nonnull obj2) {
-        return [obj2.date compare:obj1.date];
+        return [obj2.backupCreatedDate compare:obj1.backupCreatedDate];
     }];
 }
 
@@ -113,7 +114,7 @@
     if(backups.count > metadata.maxBackupKeepCount) {
         NSArray* toBeTrimmed = [backups subarrayWithRange:NSMakeRange(metadata.maxBackupKeepCount, backups.count - metadata.maxBackupKeepCount)];
      
-        //NSLog(@"To be trimmed Backups: %@", toBeTrimmed);
+        
         
         for (BackupItem* backup in toBeTrimmed) {
             [self deleteBackup:backup];

@@ -48,7 +48,7 @@
     NSString *dateString = [_dateFormatter stringFromDate:entry.timestamp];
 
     cell.textLabel.text = entry.password;
-    cell.detailTextLabel.text = dateString; //entry.password;
+    cell.detailTextLabel.text = dateString; 
 
     return cell;
 }

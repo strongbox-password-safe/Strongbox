@@ -23,7 +23,7 @@
 }
 
 - (void)copyConcealedString:(NSString *)string {
-    [NSPasteboard.generalPasteboard clearContents]; // NB: Must be called!
+    [NSPasteboard.generalPasteboard clearContents]; 
     
     if (@available(macOS 10.12, *)) {
         if (!Settings.sharedInstance.clipboardHandoff) {
@@ -31,7 +31,7 @@
         }
     }
     
-    [NSPasteboard.generalPasteboard setString:(string ? string : @"") forType:NSStringPboardType];
+    [NSPasteboard.generalPasteboard setString:(string ? string : @"") forType:NSPasteboardTypeString];
 }
 
 @end

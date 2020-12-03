@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
 #import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN

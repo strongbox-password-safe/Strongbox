@@ -49,7 +49,7 @@
         }
     };
     
-//    [self.stackView setCustomSpacing:4 afterView:self.icon];
+
 
     [self bindUi];
 }

@@ -34,19 +34,19 @@ static COLOR_PTR defaultNonColorizedColor;
 
 + (void)initialize {
     if (self == [ColoredStringHelper class]) {
-        // From Barrier-free color palette
-        // Source: Okabe & Ito (2002): Color Universal Design (CUD):
-        // Fig. 16 of <https://jfly.uni-koeln.de/color/>
         
-        lightColorBlind.numberColor = ColorFromRGB(0xCC79A7); // Purple
-        lightColorBlind.symbolColor = ColorFromRGB(0x0072B2); // Blue
-        lightColorBlind.upperLetterColor = ColorFromRGB(0x009E63); // Green
-        lightColorBlind.lowerLetterColor = ColorFromRGB(0x000000); // Black
+        
+        
+        
+        lightColorBlind.numberColor = ColorFromRGB(0xCC79A7); 
+        lightColorBlind.symbolColor = ColorFromRGB(0x0072B2); 
+        lightColorBlind.upperLetterColor = ColorFromRGB(0x009E63); 
+        lightColorBlind.lowerLetterColor = ColorFromRGB(0x000000); 
 
-        darkColorBlind.numberColor = ColorFromRGB(0xD55E00); // Vermillion
-        darkColorBlind.symbolColor = ColorFromRGB(0x56B4E9); // Sky Blue
-        darkColorBlind.upperLetterColor = ColorFromRGB(0xF0E442); // Yellow
-        darkColorBlind.lowerLetterColor = ColorFromRGB(0x009E63); // Green
+        darkColorBlind.numberColor = ColorFromRGB(0xD55E00); 
+        darkColorBlind.symbolColor = ColorFromRGB(0x56B4E9); 
+        darkColorBlind.upperLetterColor = ColorFromRGB(0xF0E442); 
+        darkColorBlind.lowerLetterColor = ColorFromRGB(0x009E63); 
 
 #if TARGET_OS_IPHONE
         light.numberColor = UIColor.systemBlueColor;
@@ -129,7 +129,7 @@ static COLOR_PTR defaultNonColorizedColor;
     return @{
         NSForegroundColorAttributeName : colorize ? [ColoredStringHelper getColorForCharacterType:type palette:palette] : defaultNonColorizedColor,
         NSFontAttributeName : font,
-        NSKernAttributeName : @(1.4) // Menlo Default spacing is v tight
+        NSKernAttributeName : @(1.4) 
     };
 }
 
@@ -167,7 +167,7 @@ static COLOR_PTR defaultNonColorizedColor;
 }
 
 + (NSArray<NSString*>*)getStringCharacters:(NSString*)composite {
-    // MMcG: Based on: https://stackoverflow.com/a/25938062
+    
     
     if (!composite.length) {
         return @[];
@@ -181,7 +181,7 @@ static COLOR_PTR defaultNonColorizedColor;
         [chars addObject: inSubstring];
     }];
 
-//    NSLog(@"%@ = %@", composite, [chars componentsJoinedByString: @", "]);
+
 
     return chars.copy;
 }

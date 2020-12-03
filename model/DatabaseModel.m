@@ -12,7 +12,6 @@
 #import "NSMutableArray+Extensions.h"
 #import "Kdbx4Serialization.h"
 #import "KeePassCiphers.h"
-#import "KissXML.h"
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
 #import "NSData+Extensions.h"
@@ -20,6 +19,10 @@
 #import "NSDate+Extensions.h"
 #import "StreamUtils.h"
 #import "LoggingInputStream.h"
+
+#if TARGET_OS_IPHONE
+#import "KissXML.h" 
+#endif
 
 @interface DatabaseModel ()
 
@@ -82,7 +85,7 @@
         
         NSString* prefix = prefixBytes.hex;
         
-        if([prefix hasPrefix:@"004D534D414D415250435259"]) { // MSMAMARPCRY - https://github.com/strongbox-password-safe/Strongbox/issues/303
+        if([prefix hasPrefix:@"004D534D414D415250435259"]) { 
             NSString* loc = NSLocalizedString(@"error_database_is_encrypted_ms_intune", @"It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.");
             
             errorSummary = loc;
@@ -182,8 +185,8 @@
     return nil;
 }
 
-//////
-// Mostly shouldn't be used in normal course of events - used by Duress Dummy to simplify coding...
+
+
 
 - (NSData*)expressToData {
     __block NSData* ret;
@@ -191,7 +194,7 @@
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
 
-    [self getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+    [self getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled || error) {
             NSLog(@"Error: expressToData [%@]", error);
         }
@@ -243,7 +246,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 }
 
 
-//////
+
 + (void)fromUrlOrLegacyData:(NSURL *)url
                  legacyData:(NSData *)legacyData
                         ckf:(CompositeKeyFactors *)ckf
@@ -289,8 +292,8 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
      
     NSInputStream* stream = [NSInputStream inputStreamWithURL:url];
     
-    // NSData* foo = [StreamUtils readAll:stream];
-    //    LoggingInputStream* lis = [[LoggingInputStream alloc] initWithStream:stream];
+    
+    
     
     [DatabaseModel fromStreamWithFormat:stream
                                     ckf:ckf
@@ -339,7 +342,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     }];
 }
 
-//
+
 
 - (instancetype)initWithDatabase:(StrongboxDatabase*)database
                          adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor
@@ -354,6 +357,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         
         self.adaptor = adaptor;
         self.theSafe = database;
+        self.config = config;
     }
     return self;
 }
@@ -403,7 +407,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 }
 
 - (void)getAsData:(SaveCompletionBlock)completion {
-    [self.theSafe performPreSerializationTidy]; // Tidy up attachments, custom icons, trim history
+    [self.theSafe performPreSerializationTidy]; 
     
     [self.adaptor save:self.theSafe completion:completion];
 }
@@ -423,7 +427,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     [parent addChild:sampleFolder keePassGroupTitleRules:NO];
     
     NodeFields *fields = [[NodeFields alloc] initWithUsername:NSLocalizedString(@"model_sample_entry_username", @"username")
-                                                          url:@"https://strongboxsafe.com"
+                                                          url:@"https:
                                                      password:password
                                                         notes:@""
                                                         email:@"user@gmail.com"];
@@ -435,18 +439,18 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
                          keePassGroupTitleRules:NO];
 }
 
-//
+
 
 - (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
-    BOOL shouldAddHistory = YES; // FUTURE: Config on/off? only valid for KeePass 2+ also...
+    BOOL shouldAddHistory = YES; 
     
     if(shouldAddHistory && !item.isGroup && originalNodeForHistory != nil) {
         [item.fields.keePassHistory addObject:originalNodeForHistory];
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Simple Field Edits
+
+
 
 - (BOOL)setItemTitle:(Node *)item title:(NSString *)title {
     Node* originalNodeForHistory = [item cloneForHistory];
@@ -461,7 +465,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     return ret;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)isDereferenceableText:(NSString*)text {
     return self.format != kPasswordSafe && [SprCompilation.sharedInstance isSprCompilable:text];
@@ -486,10 +490,16 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
     }
     
-    return compiled ? compiled : @""; // Never return nil... just not expected at UI layer
+    return compiled ? compiled : @""; 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+- (void)preOrderTraverse:(BOOL (^)(Node * _Nonnull))function {
+    [self.rootGroup preOrderTraverse:function]; 
+}
+
+
 
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
     NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
@@ -523,17 +533,17 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 
 - (Node*)rootGroup {
     if(self.format == kKeePass || self.format == kKeePass4) {
-        // Hide the root group - Can not add entries and not really useful - Perhaps make this optional?
-        // Later discovery: KeePass 1 allows multiple root groups but no entries to root, Had to put in
-        // Code to block root entry additions, meaning that we could display the root group here if we
-        // wanted to, and block entries. For the moment, happy to hide the root group for KeePass 3 and 4
-        // we'll see if there is some feedback on this. Root Group seems to be pretty useless
+        
+        
+        
+        
+        
         
         if(self.theSafe.rootGroup.children.count > 0) {
             return [self.theSafe.rootGroup.children objectAtIndex:0];
         }
         else {
-            return self.theSafe.rootGroup; // This should never be able to happen but for safety
+            return self.theSafe.rootGroup; 
         }
     }
     else {
@@ -620,7 +630,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     [node touch:YES touchParents:NO];
 
     if(iconId.intValue == -1) {
-        node.iconId = !node.isGroup ? @(0) : @(48); // Default
+        node.iconId = !node.isGroup ? @(0) : @(48); 
     }
     else {
         node.iconId = iconId;
@@ -628,7 +638,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     node.customIconUuid = nil;
 }
 
-////////////////////////////////
+
 
 - (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
     self.theSafe.recycleBinEnabled = recycleBinEnabled;
@@ -650,8 +660,8 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     return [self.theSafe getMinimalNodeSet:nodes];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Delete
+
+
 
 - (NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
     return self.theSafe.deletedObjects;
@@ -669,8 +679,8 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     [self.theSafe unDelete:undoData];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Recycle
+
+
 
 - (BOOL)canRecycle:(Node *)item {
     return [self.theSafe canRecycle:item];
@@ -688,8 +698,8 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     [self.theSafe undoRecycle:undoData];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
-// Moves
+
+
 
 - (BOOL)validateMoveItems:(const NSArray<Node *> *)items destination:(Node *)destination {
     return [self.theSafe validateMoveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
@@ -707,8 +717,8 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     [self.theSafe undoMove:undoData];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// Add
+
+
 
 - (BOOL)validateAddChild:(Node *)item destination:(Node *)destination {
     return [self.theSafe validateAddChild:item destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
@@ -722,8 +732,8 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     return [self.theSafe unAddChild:item];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////
-// Convenience
+
+
 
 - (NSArray<Node *>*)allNodes {
     return [self.rootGroup filterChildren:YES predicate:nil];
@@ -746,13 +756,13 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         return self.allGroups;
     }
     else if(self.format == kKeePass1) {
-        // Filter Backup Group
+        
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
             return node.isGroup && (self.keePass1BackupNode == nil || (node != self.keePass1BackupNode && ![self.keePass1BackupNode contains:node]));
         }];
     }
     else {
-        // Filter Recycle Bin
+        
         Node* recycleBin = self.recycleBinNode;
         
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
@@ -766,13 +776,13 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         return self.allRecords;
     }
     else if(self.format == kKeePass1) {
-        // Filter Backup Group
+        
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
             return !node.isGroup && (self.keePass1BackupNode == nil || ![self.keePass1BackupNode contains:node]);
         }];
     }
     else {
-        // Filter Recycle Bin
+        
         Node* recycleBin = self.recycleBinNode;
         
         return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
@@ -887,7 +897,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     return self.allGroups.count;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSString*)mostFrequentInCountedSet:(NSCountedSet<NSString*>*)bag {
     NSString *mostOccurring = nil;
@@ -960,7 +970,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     }
     else {
         if (self.format == kKeePass4 || self.format == kKeePass) {
-            // Tags
+            
             
             for (NSString* tag in node.fields.tags) {
                 if ([tag localizedStandardContainsString:searchText]) {
@@ -968,7 +978,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
                 }
             }
 
-            // Custom Fields
+            
             
             for (NSString* key in node.fields.customFields.allKeys) {
                 NSString* value = node.fields.customFields[key].value;
@@ -999,7 +1009,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     NSMutableSet<NSString*>* unique = [NSMutableSet setWithArray:split];
     [unique removeObject:@""];
     
-    // Split into words and sort by longest word first to eliminate most entries...
+    
     
     return [unique.allObjects sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
         return [@(((NSString*)obj2).length) compare:@(((NSString*)obj1).length)];
@@ -1011,7 +1021,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 }
 
 - (NSString*)getHtmlPrintString:(NSString*)databaseName {
-    // MMcG: This isn't great - in future use a css resource file and find a better way to build this... functional for now.
+    
     NSString* stylesheet = @"<head><style type=\"text/css\"> \
     body { width: 800px; } \
     .database-title { font-size: 36pt; text-align: center; } \
@@ -1084,14 +1094,14 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         [str appendString:@"\n"];
     }
     
-    // Expiry
+    
     
     if(entry.fields.expires) {
         [str appendString:[self getHtmlEntryFieldRow:@"Expires" value:entry.fields.expires.iso8601DateString]];
         [str appendString:@"\n"];
     }
 
-    // Custom Fields
+    
     
     if(entry.fields.customFields.count) {
         for (NSString* key in entry.fields.customFields.allKeys) {

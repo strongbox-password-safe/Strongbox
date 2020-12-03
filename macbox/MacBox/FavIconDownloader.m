@@ -101,7 +101,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     
     [self bindUi];
   
-    // Express kick off if only 1 item
+    
     
     if(self.validUniqueUrls.count == 1) {
         [self onStartStop:nil];
@@ -289,7 +289,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (void)pause {
-    // Pause is actually a full on cancel... Resume/Start just finds items that we don't have results for and queues them up
+    
     [self.queue cancelAllOperations];
 
     self.status = kFavIconBulkStatusPausing;
@@ -306,8 +306,8 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     [self bindUi];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Table View Data Source
+
+
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     return tableView == self.tableViewResults ? self.validNodes.count : (self.nodeToChoosePreferredIconsFor ? [self getImagesForNode:self.nodeToChoosePreferredIconsFor].count : 0);
@@ -330,7 +330,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     cell.title.stringValue = node.title;
     
     NSNumber* selectedIndex = self.nodeSelected[node.uuid];
-//    NSLog(@"cell: %@ => %@", node.title, selectedIndex.stringValue);
+
     
     NSArray<IMAGE_TYPE_PTR> *images = [self getImagesForNode:node];
     IMAGE_TYPE_PTR selectedImage = selectedIndex != nil ? images[selectedIndex.intValue] : nil;
@@ -339,7 +339,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     cell.checkable = images.count > 0;
     
     if (images.count > 0) {
-        // Choose Alternate icon
+        
         
         cell.showIconChooseButton = images.count > 1;
         
@@ -348,7 +348,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
             [self refreshAndShowPreferredIconChooserTab];
         };
 
-        // Check Changed...
+        
 
         __weak FavIconResultTableCellView* weakCell = cell;
         cell.onCheckChanged = ^{
@@ -402,12 +402,12 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     return cell;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)onProgressUpdate:(NSURL*)url images:(NSArray<NSImage *>* _Nonnull)images {
     self.results[url] = images;
     
-    // Auto Select Best Image for any nodes with this URL
+    
     
     if(images.count) {
         for (Node* node in self.validNodes) {
@@ -420,13 +420,13 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         }
     }
     
-    // Done?
+    
     
     if(self.results.count == self.validUniqueUrls.count) {
         self.status = kFavIconBulkStatusDone;
     }
     
-    // Update UI....
+    
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [self bindUi];
@@ -436,7 +436,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
                 return obj.count == 0;
             }].count;
             
-            if (errored == 0) { // Auto Segue if everything was successful
+            if (errored == 0) { 
                 [self refreshAndDisplaySearchResults];
             }
         }
@@ -482,14 +482,14 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     [self.tabView selectTabViewItemAtIndex:1];
 }
 
-//////
+
 
 - (void)refreshAndShowPreferredIconChooserTab {
     [self.tableViewSelectPreferred reloadData];
     
     NSNumber* currentlySelected = self.nodeSelected[self.nodeToChoosePreferredIconsFor.uuid];
     
-    //NSLog(@"refresh: %@ => %@", self.nodeToChoosePreferredIconsFor.title, currentlySelected.stringValue);
+    
       
     if(currentlySelected != nil) {
         NSArray<IMAGE_TYPE_PTR>* images = [self getImagesForNode:self.nodeToChoosePreferredIconsFor];
@@ -612,7 +612,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         }
     }
 
-    // Confirm Alert? X icons will be changed?
+    
     
     if(selected.count > 1) {
         NSString* loc = NSLocalizedString(@"set_favicons_are_you_sure_yes_no_fmt", @"This will set the icons for %d items to your selected FavIcons. Are you sure you want to continue?");

@@ -68,7 +68,7 @@
 
 - (void)startEditing:(id)sender
 {
-    //NSLog(@"AutoComplete: Start");
+    
     
     self.tableView.hidden = YES;
     [self.viewController.view addSubview:self.tableView];
@@ -76,7 +76,7 @@
 
 - (void)endEditing:(id)sender
 {
-    //NSLog(@"AutoComplete: End");
+    
     
     self.tableView.hidden = YES;
     [self.tableView removeFromSuperview];
@@ -90,7 +90,7 @@
     
     CGRect rectWithinController;
     
-    // Is the textfield embedded in a subview? If so adjust coordinates to our view controller
+    
     
     if(self.textField.superview != self.viewController.view) {
         rectWithinController = [self.textField.superview convertRect:self.textField.frame toView:self.viewController.view];
@@ -105,7 +105,7 @@
     
     self.tableView.hidden = !(self.suggestions.count);
     
-    //NSLog(@"Height %f", height);
+    
     
     self.tableView.frame = CGRectMake(rectWithinController.origin.x,
                                       rectWithinController.origin.y + rectWithinController.size.height,

@@ -16,11 +16,23 @@ static NSString* const kAllLowercase = @"abcdefghijklmnopqrstuvwxyz";
 static NSString* const kAllDigits = @"0123456789";
 static NSString* const kDifficultToRead = @"0125lIOSZ;:,.[](){}!|";
 static NSString* const kAmbiguous = @"{}[]()/\\'\"`~,;:.<>";
+static NSString* const kLatin1Supplement = 
+                @"\u00A1\u00A2\u00A3\u00A4\u00A5\u00A6\u00A7"
+                "\u00A8\u00A9\u00AA\u00AB\u00AC\u00AE\u00AF"
+                "\u00B0\u00B1\u00B2\u00B3\u00B4\u00B5\u00B6\u00B7"
+                "\u00B8\u00B9\u00BA\u00BB\u00BC\u00BD\u00BE\u00BF"
+                "\u00C0\u00C1\u00C2\u00C3\u00C4\u00C5\u00C6\u00C7"
+                "\u00C8\u00C9\u00CA\u00CB\u00CC\u00CD\u00CE\u00CF"
+                "\u00D0\u00D1\u00D2\u00D3\u00D4\u00D5\u00D6\u00D7"
+                "\u00D8\u00D9\u00DA\u00DB\u00DC\u00DD\u00DE\u00DF"
+                "\u00E0\u00E1\u00E2\u00E3\u00E4\u00E5\u00E6\u00E7"
+                "\u00E8\u00E9\u00EA\u00EB\u00EC\u00ED\u00EE\u00EF"
+                "\u00F0\u00F1\u00F2\u00F3\u00F4\u00F5\u00F6\u00F7"
+                "\u00F8\u00F9\u00FA\u00FB\u00FC\u00FD\u00FE\u00FF";
+
+static NSString* const kEmojis = @"😀😃😄😁😆😅";
 
 @interface PasswordMaker ()
-
-//@property NSString* allEmojis;
-//@property NSString* allExtendedAscii;
 
 @property NSMutableDictionary<NSString*, NSArray<NSString*>*> *wordListsCache;
 @property NSSet<NSString*>* allWordsCacheKey;
@@ -127,11 +139,6 @@ const static NSArray<NSString*> *kEmailDomains;
     return self;
 }
 
-//static NSString *stringFromUnicodeCharacter(uint32_t character) {
-//    uint32_t bytes = htonl(character); // Convert the character to a known ordering
-//    return [[NSString alloc] initWithBytes:&bytes length:sizeof(uint32_t) encoding:NSUTF32StringEncoding];
-//}
-
 #if TARGET_OS_IPHONE
     
 - (void)promptWithUsernameSuggestions:(UIViewController *)viewController
@@ -168,7 +175,7 @@ const static NSArray<NSString*> *kEmailDomains;
             [suggestions addObject:[self generateRandomWord]];
         }
         else {
-            config.algorithm = config.algorithm == kBasic ? kXkcd : kBasic; // Alternate method
+            config.algorithm = config.algorithm == kBasic ? kXkcd : kBasic; 
             [suggestions addObject:[self generateForConfigOrDefault:config]];
             [suggestions addObject:[self generateUsername].lowercaseString];
 
@@ -235,7 +242,7 @@ const static NSArray<NSString*> *kEmailDomains;
         self.commonPasswordsSetCache = [NSSet setWithArray:common];
     }
     
-    return [self.commonPasswordsSetCache containsObject:password.lowercaseString]; // Ignore casing
+    return [self.commonPasswordsSetCache containsObject:password.lowercaseString]; 
 }
 
 - (NSString*)generateName {
@@ -307,7 +314,7 @@ const static NSArray<NSString*> *kEmailDomains;
 - (NSString *)generateDicewareForConfig:(PasswordGenerationConfig *)config {
     NSSet<NSString*>* currentWordListsCacheKey = [NSSet setWithArray:config.wordLists];
     if(self.allWordsCache && [currentWordListsCacheKey isEqual:self.allWordsCacheKey]) {
-        //NSLog(@"All Words Cache Hit! Yay");
+        
     }
     else {
         NSLog(@"All Words Cache Miss! Boo");
@@ -324,7 +331,7 @@ const static NSArray<NSString*> *kEmailDomains;
     }
     NSArray<NSString*>* allWords = self.allWordsCache;
     
-    if(allWords.count < 128) { // Bare minimum
+    if(allWords.count < 128) { 
         NSLog(@"Not enough words in word list(s) to generate a reasonable passphrase");
         return nil;
     }
@@ -335,13 +342,13 @@ const static NSArray<NSString*> *kEmailDomains;
         [words addObject:allWords[index]];
     }
     
-    // Perform Casing...
+    
     
     NSArray<NSString*>* cased = [words map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
         return [self changeWordCasing:config.wordCasing word:obj];
     }];
     
-    // Perform Hackerification
+    
     
     if(config.hackerify != kPasswordGenerationHackerifyLevelNone) {
         cased = [cased map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
@@ -351,7 +358,7 @@ const static NSArray<NSString*> *kEmailDomains;
     
     NSString* passphrase = [cased componentsJoinedByString:config.wordSeparator];
     
-    // Add Salt?
+    
     
     if (config.saltConfig != kPasswordGenerationSaltConfigNone) {
         return [self addSalt:passphrase config:config];
@@ -393,7 +400,7 @@ const static NSArray<NSString*> *kEmailDomains;
 - (NSString*)hackerify:(NSString*)word level:(PasswordGenerationHackerifyLevel)level {
     BOOL all = level == kPasswordGenerationHackerifyLevelProAll || level == kPasswordGenerationHackerifyLevelBasicAll;
     
-    if(!all && arc4random_uniform(10) < 6) { // Only do 40% of words if we're not doing all
+    if(!all && arc4random_uniform(10) < 6) { 
         return word;
     }
     
@@ -434,7 +441,7 @@ const static NSArray<NSString*> *kEmailDomains;
 }
 
 - (NSString*)randomiseCase:(NSString*)word {
-    uint32_t lettersToRandomize = (uint32_t)word.length / 2; // 50%
+    uint32_t lettersToRandomize = (uint32_t)word.length / 2; 
     
     NSMutableString* ret = [NSMutableString stringWithString:word];
     for(int i=0;i<lettersToRandomize;i++) {
@@ -508,14 +515,14 @@ const static NSArray<NSString*> *kEmailDomains;
         allCharacters = [[allCharacters componentsSeparatedByCharactersInSet:trim] componentsJoinedByString:@""];
     }
 
-    // Empty Set?
+    
     
     if(![allCharacters length]) {
         NSLog(@"WARN: Could not generate password using config. Empty Character Pool.");
         return nil;
     }
     
-    // Take one from each group... is it possible?
+    
     
     if(config.pickFromEveryGroup && ![self containsCharactersFromEveryGroup:allCharacters config:config]) {
         NSLog(@"WARN: Could not generate password using config. Not possible to pick from every group.");
@@ -531,7 +538,7 @@ const static NSArray<NSString*> *kEmailDomains;
             [mut appendString:character];
         }
         ret = [mut copy];
-//        NSLog(@"Checking: [%@]-%lu", ret, (unsigned long)ret.length);
+
     } while(config.pickFromEveryGroup && ![self containsCharactersFromEveryGroup:ret config:config]);
     
     return ret;
@@ -544,7 +551,7 @@ const static NSArray<NSString*> *kEmailDomains;
         NSRange range = [ret rangeOfCharacterFromSet:poolCharSet];
         
         if(range.location == NSNotFound) {
-            //NSLog(@"Does not contain characters from group [%@].", group);
+            
             return NO;
         }
     }
@@ -566,12 +573,12 @@ const static NSArray<NSString*> *kEmailDomains;
         case kPasswordGenerationCharacterPoolSymbols:
             return kAllSymbols;
             break;
-//        case kPasswordGenerationCharacterPoolEmoji:
-//            return self.allEmojis;
-//            break;
-//        case kPasswordGenerationCharacterPoolExtendedAscii:
-//            return self.allExtendedAscii;
-//            break;
+        case kPasswordGenerationCharacterPoolLatin1Supplement:
+            return kLatin1Supplement;
+            break;
+        case kPasswordGenerationCharacterPoolEmojis:
+            return kEmojis;
+            break;
         default:
             return @"";
             break;

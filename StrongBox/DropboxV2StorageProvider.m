@@ -32,8 +32,8 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = YES; // Dropbox has a long delay if offline and unreachable - offer immediately if offline detected
-        _supportsConcurrentRequests = NO; // Possible OK?
+        _immediatelyOfferCacheIfOffline = YES; 
+        _supportsConcurrentRequests = NO; 
         
         return self;
     }
@@ -113,7 +113,7 @@
 
     DBUserClient *client = DBClientsManager.authorizedClient;
     
-    // Check Metadata:
+    
     
     [[client.filesRoutes getMetadata:path] setResponseBlock:^(DBFILESMetadata * _Nullable result, DBFILESGetMetadataError * _Nullable routeError, DBRequestError * _Nullable networkError) {
         if (result) {
@@ -152,7 +152,7 @@
                 }
             }]
              setProgressBlock:^(int64_t bytesDownloaded, int64_t totalBytesDownloaded, int64_t totalBytesExpectedToDownload) {
-                 //NSLog(@"Dropbox Read Progress: %lld\n%lld\n%lld\n", bytesDownloaded, totalBytesDownloaded, totalBytesExpectedToDownload);
+                 
              }];
         }
         else {
@@ -204,7 +204,7 @@
             completion(kUpdateResultError, nil, [Utils createNSError:message errorCode:-1]);
         }
     }] setProgressBlock:^(int64_t bytesUploaded, int64_t totalBytesUploaded, int64_t totalBytesExpectedToUploaded) {
-          //NSLog(@"Dropbox Progress: %lld\n%lld\n%lld\n", bytesUploaded, totalBytesUploaded, totalBytesExpectedToUploaded);
+          
     }];
 }
 
@@ -246,18 +246,23 @@
         }];
 
 
-        // Sigh... required to ignore warning about unused variable... which is actually used. Bad design of addObserverForName
+        
         (void)token;
         
-        // Needs to be done on main queue...
+        
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss]; // Hide any progress indicator
+            [SVProgressHUD dismiss]; 
             
             [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
                                            controller:viewController
                                               openURL:^(NSURL *url) {
-                [UIApplication.sharedApplication openURL:url options:@{ } completionHandler:nil];
+                if (@available (iOS 10.0, *)) {
+                    [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+                }
+                else {
+                    [UIApplication.sharedApplication openURL:url];
+                }
             }];
         });
     }
@@ -382,11 +387,11 @@
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
       completion:(void (^)(UIImage *image))completionHandler {
-    // NOTSUPPORTED
+    
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
-    // NOTIMPL
+    
 }
 
 @end

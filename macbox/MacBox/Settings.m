@@ -62,7 +62,6 @@ static NSString* const kAllowWatchUnlock = @"allowWatchUnlock";
 static NSString* const kShowAttachmentsOnQuickViewPanel = @"showAttachmentsOnQuickViewPanel";
 static NSString* const kShowAttachmentImagePreviewsOnQuickViewPanel = @"showAttachmentImagePreviewsOnQuickViewPanel";
 static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmediatelyInOutline";
-
 static NSString* const kHideKeyFileNameOnLockScreen = @"hideKeyFileNameOnLockScreen";
 static NSString* const kDoNotRememberKeyFile = @"doNotRememberKeyFile";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
@@ -70,11 +69,111 @@ static NSString* const kHasDoneProFamilyCheck = @"hasDoneProFamilyCheck";
 static NSString* const kColorizePasswords = @"colorizePasswords";
 static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
+static NSString* const kMigratedToNewSettings = @"migratedToNewSettings";
+static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
+
+
+
+static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
+
+
 
 @implementation Settings
 
++ (instancetype)sharedInstance {
+    static Settings *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[Settings alloc] init];
+    });
+    return sharedInstance;
+}
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        [self migrateToNewStore];
+    }
+    return self;
+}
+
+- (BOOL)migratedToNewStore {
+    NSNumber* obj = [self.sharedAppGroupDefaults objectForKey:kMigratedToNewSettings];
+    return obj != nil ? obj.boolValue : NO;
+}
+
+- (void)setMigratedToNewStore:(BOOL)migratedToNewStore {
+    [self.sharedAppGroupDefaults setBool:migratedToNewStore forKey:kMigratedToNewSettings];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (void)migrateToNewStore {
+#ifndef IS_APP_EXTENSION
+    if (self.migratedToNewStore) {
+        NSLog(@"Already Migrated to new store - not migrating");
+        return;
+    }
+    
+    NSArray *keys = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys];
+    for(NSString* key in keys){
+        id value = [[NSUserDefaults standardUserDefaults] valueForKey:key];
+        NSLog(@"Migrating... value: %@ forKey: %@", [[NSUserDefaults standardUserDefaults] valueForKey:key],key);
+        [self.sharedAppGroupDefaults setValue:value forKey:key];
+    }
+
+    self.migratedToNewStore = YES;
+#endif
+}
+
+- (NSString *)appGroupName {
+    return kDefaultAppGroupName;
+}
+
+- (NSUserDefaults *)sharedAppGroupDefaults {
+    NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:kDefaultAppGroupName];
+    
+    if(defaults == nil) {
+        NSLog(@"ERROR: Could not get NSUserDefaults for Suite Name: [%@]", kDefaultAppGroupName);
+    }
+    
+    return defaults;
+}
+
+- (NSUserDefaults*)userDefaults {
+    return self.sharedAppGroupDefaults; 
+}
+
+- (BOOL)getBool:(NSString*)key {
+    return [self getBool:key fallback:NO];
+}
+
+- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
+    NSNumber* obj = [self.userDefaults objectForKey:key];
+    
+    return obj != nil ? obj.boolValue : fallback;
+}
+
+- (void)setBool:(NSString*)key value:(BOOL)value {
+    
+    
+    [self.userDefaults setBool:value forKey:key];
+    
+    [self.userDefaults synchronize];
+}
+
+
+
+- (BOOL)showAdvancedUnlockOptions {
+    return [self getBool:kShowAdvancedUnlockOptions];
+}
+
+- (void)setShowAdvancedUnlockOptions:(BOOL)showAdvancedUnlockOptions {
+    [self setBool:kShowAdvancedUnlockOptions value:showAdvancedUnlockOptions];
+}
+
 - (BOOL)clipboardHandoff {
-    return [self getBool:kClipboardHandoff fallback:NO]; // Default disallow clipboard handoff
+    return [self getBool:kClipboardHandoff fallback:NO]; 
 }
 
 - (void)setClipboardHandoff:(BOOL)clipboardHandoff {
@@ -154,8 +253,7 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (FavIconDownloadOptions *)favIconDownloadOptions {
-    NSUserDefaults *defaults = [self getUserDefaults];
-    NSData *encodedObject = [defaults objectForKey:kFavIconDownloadOptions];
+    NSData *encodedObject = [self.userDefaults objectForKey:kFavIconDownloadOptions];
 
     if(encodedObject == nil) {
         return FavIconDownloadOptions.defaults;
@@ -168,9 +266,8 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 
 - (void)setFavIconDownloadOptions:(FavIconDownloadOptions *)favIconDownloadOptions {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:favIconDownloadOptions];
-    NSUserDefaults *defaults = [self getUserDefaults];
-    [defaults setObject:encodedObject forKey:kFavIconDownloadOptions];
-    [defaults synchronize];
+    [self.userDefaults setObject:encodedObject forKey:kFavIconDownloadOptions];
+    [self.userDefaults synchronize];
 }
 
 - (BOOL)showSystemTrayIcon {
@@ -198,8 +295,7 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (PasswordGenerationConfig *)passwordGenerationConfig {
-    NSUserDefaults *defaults = [self getUserDefaults];
-    NSData *encodedObject = [defaults objectForKey:kPasswordGenerationConfig];
+    NSData *encodedObject = [self.userDefaults objectForKey:kPasswordGenerationConfig];
     
     if(encodedObject == nil) {
         return [PasswordGenerationConfig defaults];
@@ -212,23 +308,8 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 
 - (void)setPasswordGenerationConfig:(PasswordGenerationConfig *)passwordGenerationConfig {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationConfig];
-    NSUserDefaults *defaults = [self getUserDefaults];
-    [defaults setObject:encodedObject forKey:kPasswordGenerationConfig];
-    [defaults synchronize];
-}
-
-- (NSUserDefaults*)getUserDefaults {
-    return [NSUserDefaults standardUserDefaults];
-}
-
-+ (instancetype)sharedInstance {
-    static Settings *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[Settings alloc] init];
-    });
-    return sharedInstance;
+    [self.userDefaults setObject:encodedObject forKey:kPasswordGenerationConfig];
+    [self.userDefaults synchronize];
 }
 
 + (NSArray<NSString*> *)kDefaultVisibleColumns
@@ -253,26 +334,6 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
     });
     
     return _arr;
-}
-
-- (BOOL)getBool:(NSString*)key {
-    return [self getBool:key fallback:NO];
-}
-
-- (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    NSNumber* obj = [userDefaults objectForKey:key];
-    
-    return obj != nil ? obj.boolValue : fallback;
-}
-
-- (void)setBool:(NSString*)key value:(BOOL)value {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    
-    [userDefaults setBool:value forKey:key];
-    
-    [userDefaults synchronize];
 }
 
 - (BOOL)revealDetailsImmediately {
@@ -339,34 +400,33 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (NSDate*)endFreeTrialDate {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
-    return [userDefaults objectForKey:kEndFreeTrialDate];
+    
+    return [self.userDefaults objectForKey:kEndFreeTrialDate];
 }
 
 - (void)setEndFreeTrialDate:(NSDate *)endFreeTrialDate {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
-    [userDefaults setObject:endFreeTrialDate forKey:kEndFreeTrialDate];
     
-    [userDefaults synchronize];
+    [self.userDefaults setObject:endFreeTrialDate forKey:kEndFreeTrialDate];
+    
+    [self.userDefaults synchronize];
 }
 
 - (NSInteger)autoLockTimeoutSeconds {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    return [userDefaults integerForKey:kAutoLockTimeout];
+    return [self.userDefaults integerForKey:kAutoLockTimeout];
 }
 
 - (void)setAutoLockTimeoutSeconds:(NSInteger)autoLockTimeoutSeconds {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
-    [userDefaults setInteger:autoLockTimeoutSeconds forKey:kAutoLockTimeout];
     
-    [userDefaults synchronize];
+    [self.userDefaults setInteger:autoLockTimeoutSeconds forKey:kAutoLockTimeout];
+    
+    [self.userDefaults synchronize];
 }
 
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
-    NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:kAutoFillNewRecordSettings];
+    NSData *data = [self.userDefaults objectForKey:kAutoFillNewRecordSettings];
     
     if(data) {
         return (AutoFillNewRecordSettings *)[NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -378,18 +438,18 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 - (void)setAutoFillNewRecordSettings:(AutoFillNewRecordSettings *)autoFillNewRecordSettings {
     NSData *encoded = [NSKeyedArchiver archivedDataWithRootObject:autoFillNewRecordSettings];
     
-    [[NSUserDefaults standardUserDefaults] setObject:encoded forKey:kAutoFillNewRecordSettings];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self.userDefaults setObject:encoded forKey:kAutoFillNewRecordSettings];
+    [self.userDefaults synchronize];
 }
 
 -(BOOL)autoSave {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
-    NSObject* autoSave = [userDefaults objectForKey:kAutoSave];
+    
+    NSObject* autoSave = [self.userDefaults objectForKey:kAutoSave];
 
     BOOL ret = TRUE;
     if(!autoSave) {
-        //        NSLog(@"No Autosave settings... defaulting to Yes");
+        
     }
     else {
         NSNumber* num = (NSNumber*)autoSave;
@@ -412,7 +472,7 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (BOOL)clearClipboardEnabled {
-    return [self getBool:kClearClipboardEnabled fallback:YES]; // Default On
+    return [self getBool:kClearClipboardEnabled fallback:YES]; 
 }
 
 - (void)setClearClipboardEnabled:(BOOL)clearClipboardEnabled {
@@ -420,19 +480,19 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (NSInteger)clearClipboardAfterSeconds {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    NSInteger ret = [userDefaults integerForKey:kClearClipboardAfterSeconds];
+    
+    NSInteger ret = [self.userDefaults integerForKey:kClearClipboardAfterSeconds];
 
     return ret == 0 ? kDefaultClearClipboardTimeout : ret;
 }
 
 
 - (void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
-    [userDefaults setInteger:clearClipboardAfterSeconds forKey:kClearClipboardAfterSeconds];
     
-    [userDefaults synchronize];
+    [self.userDefaults setInteger:clearClipboardAfterSeconds forKey:kClearClipboardAfterSeconds];
+    
+    [self.userDefaults synchronize];
 }
 
 - (BOOL)doNotShowTotp {
@@ -512,9 +572,9 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (NSArray<NSString *> *)visibleColumns {
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
     
-    NSArray<NSString*>* ret = [userDefaults objectForKey:kVisibleColumns];
+    
+    NSArray<NSString*>* ret = [self.userDefaults objectForKey:kVisibleColumns];
     
     return ret ? ret : [Settings kDefaultVisibleColumns];
 }
@@ -524,9 +584,8 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
         visibleColumns = [Settings kDefaultVisibleColumns];
     }
     
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:visibleColumns forKey:kVisibleColumns];
-    [userDefaults synchronize];
+    [self.userDefaults setObject:visibleColumns forKey:kVisibleColumns];
+    [self.userDefaults synchronize];
 }
 
 - (BOOL)outlineViewTitleIsReadonly {
@@ -590,7 +649,7 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 }
 
 - (void)setConcealEmptyProtectedFields:(BOOL)concealEmptyProtectedFields {
-//    NSLog(@"Setting: %d", concealEmptyProtectedFields);
+
     [self setBool:kConcealEmptyProtectedFields value:concealEmptyProtectedFields];
 }
 

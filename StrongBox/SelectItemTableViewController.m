@@ -66,7 +66,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    // Toggle Select and reload row - if allowed
+    
 
     NSMutableIndexSet* sectionSet = self.selected[indexPath.section];
 

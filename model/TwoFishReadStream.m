@@ -77,7 +77,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
 }
 
 - (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
-    if (self.workChunk != nil && self.workChunkLength == 0) { // EOF
+    if (self.workChunk != nil && self.workChunkLength == 0) { 
         return 0L;
     }
     
@@ -96,7 +96,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
         
             workingAvailable = self.workChunkLength - self.workingChunkOffset;
             if (workingAvailable == 0) {
-                return bufferWritten; // EOS
+                return bufferWritten; 
             }
         }
 
@@ -109,7 +109,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
         memcpy(dst, src, bytesToWrite);
     
         self.writtenToStreamSoFar += bytesToWrite;
-        //NSLog(@"DEBUG: Written to stream so far: %zu", self.writtenToStreamSoFar);
+        
 
         bufferWritten += bytesToWrite;
         bufferOffset += bytesToWrite;
@@ -127,7 +127,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
     NSInteger bytesRead = [self.inputStream read:block maxLength:kWorkingChunkSize];
     if (bytesRead < 0) {
         NSLog(@"TwoFishReadStream Could not read input stream");
-        self.error = self.inputStream.streamError; // [Utils createNSError:@"TwoFishReadStream Could not read input stream" errorCode:-1];
+        self.error = self.inputStream.streamError; 
         self.workChunkLength = 0;
         return;
     }
@@ -146,24 +146,24 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
             self.error = [Utils createNSError:@"TwoFishReadStream: bytesRead != 0 && bytesRead != remainder" errorCode:-1];
             self.workChunkLength = 0;
             return;
-            // This should never happen!
-            // PKCS#7 Padding
-            //BOOL isLastBlock = NO;
-            //if (isLastBlock) {
-            //    int paddingLength = pt[kBlockSize-1];
-            //    if(paddingLength <= 0 || paddingLength > kBlockSize)  {
-            //        NSLog(@"TWOFISH: Padding Byte Out of Range! Assuming Not Padded...");
-            //        padding = NO;
-            //    }
-            //
-            //    for(int i = kBlockSize - paddingLength; i < kBlockSize; i++) {
-            //        if(pt[i] != paddingLength) {
-            //            NSLog(@"TWOFISH: Padding byte not equal expected! Assuming Not Padded...");
-            //            padding = NO;
-            //        }
-            //    }
-            //    [decData appendBytes:pt length:kBlockSize - paddingLength];
-            //}
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
         }
         
         self.writtenSoFar += self.workChunkLength;
@@ -186,7 +186,7 @@ static const size_t kWorkingChunkSize = kBlockSize * 1024 * 8; // NB: Must be a 
             
         self.workChunkLength = bytesRead;
         self.writtenSoFar += self.workChunkLength;
-        //NSLog(@"DECRYPT: bytesRead = %zu, decWritten = %zu, totalRead = [%zu], writtenSoFar = %zu", bytesRead, self.workChunkLength, self.readFromStreamTotal, self.writtenSoFar);
+        
     }
 }
 

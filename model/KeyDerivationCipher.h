@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSData*)deriveKey:(NSData*)data;
 
 @property (readonly, nonatomic) KdfParameters* kdfParameters;
-@property (readonly, nonatomic) NSData* transformSeed; // Used in conjunction with Yubikey as the challenge
+@property (readonly, nonatomic) NSData* transformSeed; 
 
 @end
 

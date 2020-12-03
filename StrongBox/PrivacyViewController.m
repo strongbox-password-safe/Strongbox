@@ -35,15 +35,15 @@
     self.startTime = [[NSDate alloc] init];
     
     if(!self.startupLockMode) {
-        self.buttonUnlock.hidden = YES; // Will be show on re-activation
+        self.buttonUnlock.hidden = YES; 
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            self.buttonUnlock.hidden = NO; // Just in case
+            self.buttonUnlock.hidden = NO; 
         });
     }
     else {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self beginUnlockSequence]; // Face ID / TOuch ID seems to require a little delay
+            [self beginUnlockSequence]; 
         });
     }
     
@@ -79,16 +79,16 @@
 - (void)onAppBecameActive {
     if(self.startupLockMode) {
         NSLog(@"Ignore App Active events for startup lock screen...");
-        return; // Ignore App Active events for startup lock screen
+        return; 
     }
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.buttonUnlock.hidden = NO; // Unhide the fallback button
+        self.buttonUnlock.hidden = NO; 
     });
 
     [self beginUnlockSequence];
 }
 
-- (IBAction)onUnlock:(id)sender { // Manual Initiation / Fallback
+- (IBAction)onUnlock:(id)sender { 
     [self beginUnlockSequence];
 }
 
@@ -121,9 +121,10 @@
 }
 
 - (void)requestBiometric {
-    //NSLog(@"REQUEST-BIOMETRIC: Privacy Screen");
+    
     [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"privacy_vc_prompt_identify_to_open", @"Identify to Open Strongbox")
-                                     completion:^(BOOL success, NSError * _Nullable error) {
+                                           fallbackTitle:Settings.sharedInstance.appLockAllowDevicePasscodeFallbackForBio ? nil : @""
+                                              completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
@@ -138,6 +139,9 @@
         else {
             if (error.code == LAErrorUserCancel) {
                 NSLog(@"User Cancelled - Not Incrementing Fail Count...");
+            }
+            else  if ( error.code == LAErrorUserFallback ) {
+                NSLog(@"LAErrorUserFallback");
             }
             else {
                 [self incrementFailedUnlockCount];
@@ -216,9 +220,9 @@
 - (void)deleteAllData {
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
-    [FileManager.sharedInstance deleteAllLocalAndAppGroupFiles]; // Key Files, Caches, etc
+    [FileManager.sharedInstance deleteAllLocalAndAppGroupFiles]; 
 
-    [SafesList.sharedInstance deleteAll]; // This also removes Key Chain Entries
+    [SafesList.sharedInstance deleteAll]; 
 }
 
 @end

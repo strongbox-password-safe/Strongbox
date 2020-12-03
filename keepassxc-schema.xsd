@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema targetNamespace="https://keepassxc.org/schema/kdbx/4.0/"
+           xmlns="https://keepassxc.org/schema/kdbx/4.0/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+    <!-- Root element with global keyref relationships -->
+    <xs:element name="KeePassFile">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Meta" type="MetaType"/>
+                <xs:element name="Root">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Group" type="GroupType"/>
+                            <xs:element name="DeletedObjects" type="DeletedObjectsType" minOccurs="0"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+
+        <xs:unique name="UniqueUUID">
+            <xs:selector xpath=".//UUID"/>
+            <xs:field xpath="." />
+        </xs:unique>
+
+        <xs:key name="CustomIconKey">
+            <xs:selector xpath="./Meta/CustomIcons/Icon/UUID"/>
+            <xs:field xpath="."/>
+        </xs:key>
+        <xs:keyref name="CustomIconRef" refer="CustomIconKey">
+            <xs:selector xpath=".//CustomIconUUID"/>
+            <xs:field xpath="."/>
+        </xs:keyref>
+
+        <xs:key name="BinaryKey">
+            <xs:selector xpath="./Meta/Binaries/Binary"/>
+            <xs:field xpath="@ID"/>
+        </xs:key>
+        <xs:keyref name="BinaryKeyRef" refer="BinaryKey">
+            <xs:selector xpath=".//Entry/Binary/Value"/>
+            <xs:field xpath="@Ref"/>
+        </xs:keyref>
+    </xs:element>
+
+    <!-- Various re-usable element types -->
+    <xs:simpleType name="BooleanType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="True"/>
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="False"/>
+            <xs:enumeration value="false"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OptionalBooleanType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="True"/>
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="False"/>
+            <xs:enumeration value="false"/>
+            <xs:enumeration value="Null"/>
+            <xs:enumeration value="null"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="HexColorType">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(|#[0-9A-Fa-f]{6})"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="TimesType">
+        <xs:all>
+            <xs:element name="CreationTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="LastModificationTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="LastAccessTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="LocationChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="ExpiryTime" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="Expires" type="BooleanType" minOccurs="0"/>
+            <xs:element name="UsageCount" type="xs:nonNegativeInteger" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+
+    <!-- Global attribute for encrypted data -->
+    <xs:attribute name="Protected" type="BooleanType"/>
+
+    <!-- Memory-protectable string map -->
+    <xs:complexType name="ProtectableString">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="ProtectInMemory" type="BooleanType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="ProtectableKeyValueType">
+        <xs:sequence>
+            <xs:element name="Key" type="xs:string"/>
+            <xs:element name="Value" type="ProtectableString"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="KeyValueType">
+        <xs:sequence>
+            <xs:element name="Key" type="xs:string"/>
+            <xs:element name="Value" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ProtectableBinaryKeyValueType">
+        <xs:sequence>
+            <xs:element name="Key" type="xs:string"/>
+            <xs:element name="Value">
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:base64Binary">
+                            <xs:attributeGroup ref="ProtectionAttributes"/>
+                            <xs:attribute name="Ref" type="xs:integer"/>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CustomDataType">
+        <xs:sequence>
+            <xs:element name="Item" type="KeyValueType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Database meta data -->
+    <xs:complexType name="MetaType">
+        <xs:all>
+            <xs:element name="HeaderHash" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="SettingsChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="Generator" type="xs:string" minOccurs="0"/>
+            <xs:element name="DatabaseName" type="xs:string" minOccurs="0"/>
+            <xs:element name="DatabaseNameChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="DatabaseDescription" type="xs:string" minOccurs="0"/>
+            <xs:element name="DatabaseDescriptionChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="DefaultUserName" type="xs:string" minOccurs="0"/>
+            <xs:element name="DefaultUserNameChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="MaintenanceHistoryDays" type="xs:nonNegativeInteger" minOccurs="0"/>
+            <xs:element name="Color" type="HexColorType" minOccurs="0"/>
+            <xs:element name="MasterKeyChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="MasterKeyChangeRec" type="xs:integer" minOccurs="0"/>
+            <xs:element name="MasterKeyChangeForce" type="xs:integer" minOccurs="0"/>
+            <xs:element name="MasterKeyChangeForceOnce" type="BooleanType" minOccurs="0"/>
+            <xs:element name="MemoryProtection" minOccurs="0">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="ProtectTitle" type="BooleanType" minOccurs="0"/>
+                        <xs:element name="ProtectUserName" type="BooleanType" minOccurs="0"/>
+                        <xs:element name="ProtectPassword" type="BooleanType" minOccurs="0"/>
+                        <xs:element name="ProtectURL" type="BooleanType" minOccurs="0"/>
+                        <xs:element name="ProtectNotes" type="BooleanType" minOccurs="0"/>
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="CustomIcons">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Icon" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="UUID" type="xs:base64Binary"/>
+                                    <xs:element name="Data" type="xs:base64Binary"/>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="RecycleBinEnabled" type="BooleanType" minOccurs="0"/>
+            <xs:element name="RecycleBinUUID" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="RecycleBinChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="EntryTemplatesGroup" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="EntryTemplatesGroupChanged" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="HistoryMaxItems" type="xs:integer" minOccurs="0"/>
+            <xs:element name="HistoryMaxSize" type="xs:integer" minOccurs="0"/>
+            <xs:element name="LastSelectedGroup" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="LastTopVisibleGroup" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="Binaries" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Binary" minOccurs="0" maxOccurs="unbounded">
+                            <xs:complexType>
+                                <xs:simpleContent>
+                                    <xs:extension base="xs:base64Binary">
+                                        <xs:attribute name="ID" id="BinaryID" type="xs:nonNegativeInteger" use="required"/>
+                                        <xs:attribute name="Compressed" type="BooleanType" use="required"/>
+                                    </xs:extension>
+                                </xs:simpleContent>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+
+                <xs:unique name="UniqueID">
+                    <xs:selector xpath="./*" />
+                    <xs:field xpath="@ID" />
+                </xs:unique>
+            </xs:element>
+            <xs:element name="CustomData" type="CustomDataType" minOccurs="0"/>
+        </xs:all>
+    </xs:complexType>
+
+    <!-- Groups -->
+    <xs:complexType name="GroupType">
+        <xs:sequence>
+            <xs:element name="UUID" type="xs:base64Binary"/>
+
+            <xs:element name="Name" type="xs:string" minOccurs="0"/>
+            <xs:element name="Notes" type="xs:string" minOccurs="0"/>
+            <xs:element name="IconID" type="xs:nonNegativeInteger" minOccurs="0"/>
+            <xs:element name="CustomIconUUID" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="Times" type="TimesType" minOccurs="0"/>
+            <xs:element name="IsExpanded" type="BooleanType" minOccurs="0"/>
+            <xs:element name="DefaultAutoTypeSequence" type="xs:string" minOccurs="0"/>
+            <xs:element name="EnableAutoType" type="OptionalBooleanType" minOccurs="0"/>
+            <xs:element name="EnableSearching" type="OptionalBooleanType" minOccurs="0"/>
+            <xs:element name="LastTopVisibleEntry" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="CustomData" type="CustomDataType" minOccurs="0"/>
+
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Group" type="GroupType"/>
+                <xs:element name="Entry" type="EntryType"/>
+            </xs:choice>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AutoTypeAssociationType">
+        <xs:sequence>
+            <xs:element name="Window" type="xs:string"/>
+            <xs:element name="KeystrokeSequence" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Entries -->
+    <xs:complexType name="EntryType">
+        <xs:sequence>
+            <xs:element name="UUID" type="xs:base64Binary"/>
+
+            <xs:element name="IconID" type="xs:nonNegativeInteger" minOccurs="0"/>
+            <xs:element name="CustomIconUUID" type="xs:base64Binary" minOccurs="0"/>
+            <xs:element name="ForegroundColor" type="HexColorType" minOccurs="0"/>
+            <xs:element name="BackgroundColor" type="HexColorType" minOccurs="0"/>
+            <xs:element name="OverrideURL" type="xs:string" minOccurs="0"/>
+            <xs:element name="Tags" type="xs:string" minOccurs="0"/>
+            <xs:element name="Times" type="TimesType" minOccurs="0"/>
+            <xs:element name="CustomData" type="CustomDataType" minOccurs="0"/>
+
+            <xs:element name="String" type="ProtectableKeyValueType" minOccurs="0" maxOccurs="unbounded"/>
+            <xs:element name="Binary" type="ProtectableBinaryKeyValueType" minOccurs="0" maxOccurs="unbounded"/>
+
+            <xs:element name="AutoType" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Enabled" type="BooleanType"/>
+                        <xs:element name="DataTransferObfuscation" type="BooleanType"/>
+                        <xs:element name="DefaultSequence" type="xs:string" minOccurs="0"/>
+                        <xs:element name="Association" type="AutoTypeAssociationType" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+            <xs:element name="History" minOccurs="0">
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="Entry" type="EntryType"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- Deleted objects -->
+    <xs:complexType name="DeletedObjectsType">
+        <xs:sequence>
+            <xs:element name="DeletedObject" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:all>
+                        <xs:element name="UUID" type="xs:base64Binary"/>
+                        <xs:element name="DeletionTime" type="xs:dateTime"/>
+                    </xs:all>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>

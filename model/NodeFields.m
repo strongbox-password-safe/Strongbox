@@ -15,6 +15,7 @@
 #import "OTPToken+Generation.h"
 #import "NSURL+QueryItems.h"
 #import "MMcG_MF_Base32Additions.h"
+#import "NSDate+Extensions.h"
 
 static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
@@ -81,6 +82,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         self.mutableCustomFields = [NSMutableDictionary dictionary];
         self.keePassHistory = [NSMutableArray array];
         self.tags = [NSMutableSet set];
+        self.customData = [[MutableOrderedDictionary alloc] init];
     }
     
     return self;
@@ -103,6 +105,89 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return ret;
 }
 
+- (MutableOrderedDictionary<NSString*, NSString*>*)cloneCustomData {
+    MutableOrderedDictionary<NSString*, NSString*>* ret = [[MutableOrderedDictionary alloc] init];
+    
+    for (NSString* key in self.customData.allKeys) {
+        NSString* value = self.customData[key];
+        ret[key] = value;
+    }
+    
+    return ret;
+}
+
+- (BOOL)isSyncEqualTo:(NodeFields *)other {
+    BOOL simpleEqual =  [self.username compare:other.username] == NSOrderedSame &&
+                        [self.password compare:other.password] == NSOrderedSame &&
+                        [self.url compare:other.url] == NSOrderedSame &&
+                        [self.notes compare:other.notes] == NSOrderedSame &&
+                        [self.email compare:other.email] == NSOrderedSame;
+
+    if ( !simpleEqual ) return NO;
+    
+    
+    
+    if(self.customFields.count != other.customFields.count) {
+        return YES;
+    }
+
+    for (NSString* key in self.customFields.allKeys) {
+        StringValue* a = self.customFields[key];
+        StringValue* b = other.customFields[key];
+        
+        if(![a isEqual:b]) {
+            return NO;
+        }
+    }
+
+    if(self.attachments.count != other.attachments.count) {
+        return NO;
+    }
+    
+    for (NodeFileAttachment* att in self.attachments) {
+        [self attachmentIsSyncEqualTo:att.filename];
+    }
+
+    
+    
+    if ( ![self.created isEqualToDate:other.created] ) return NO;
+    if ( ![self.modified isEqualToDate:other.modified] ) return NO;
+    if ( ![self.expires isEqualToDate:other.expires] ) return NO;
+    
+    
+
+    if ( ![self.tags isEqualToSet:other.tags]) return NO; 
+
+    if ( ![self.customData isEqual:other.customData] ) return NO; 
+    
+    if ((self.foregroundColor == nil && other.foregroundColor != nil) || (self.foregroundColor != nil && ![self.foregroundColor isEqual:other.foregroundColor] )) {
+        return NO;
+    }
+    if ((self.backgroundColor == nil && other.backgroundColor != nil) || (self.backgroundColor != nil && ![self.backgroundColor isEqual:other.backgroundColor] )) {
+        return NO;
+    }
+    if ((self.overrideURL == nil && other.overrideURL != nil) || (self.overrideURL != nil && ![self.overrideURL isEqual:other.overrideURL] )) {
+        return NO;
+    }
+    if ((self.autoType == nil && other.autoType != nil) || (self.autoType != nil && ![self.autoType isEqual:other.autoType])) {
+        return NO;
+    }
+    
+    return NO;
+}
+
+- (BOOL)attachmentIsSyncEqualTo:(NSString*)attachmentName {
+    
+    
+    
+
+    
+    
+    
+    
+    return NO;
+}
+
 + (NodeFields *)deserialize:(NSDictionary *)dict {
     NSString* username = dict[@"username"];
     NSString* url = dict[@"url"];
@@ -111,12 +196,22 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     NSString* email = dict[@"email"];
     NSNumber* passwordModified = dict[@"passwordModified"];
     NSNumber* expires = dict[@"expires"];
-    
     NSArray<NSDictionary*>* attachments = dict[@"attachments"];
     NSArray<NSDictionary*>* customFields = dict[@"customFields"];
-
-    NSArray<NSString*>* tagsArray = dict[@"tags"]; // Must be an array to serialize correctly to JSON!
-
+    NSArray<NSDictionary*>* customData = dict[@"customData"];
+    NSString* defaultAutoTypeSequence = dict[@"defaultAutoTypeSequence"];
+    NSNumber* enableAutoType = dict[@"enableAutoType"];
+    NSNumber* enableSearching = dict[@"enableSearching"];
+    NSString* lastTopVisibleEntry = dict[@"lastTopVisibleEntry"];
+    NSArray<NSString*>* tagsArray = dict[@"tags"]; 
+    NSString* foregroundColor = dict[@"foregroundColor"];
+    NSString* backgroundColor = dict[@"backgroundColor"];
+    NSString* overrideURL = dict[@"overrideURL"];
+    NSNumber* autoTypeEnabled = dict[@"autoTypeEnabled"];
+    NSNumber* autoTypeDataTransferObfuscation = dict[@"autoTypeDataTransferObfuscation"];
+    NSString* autoTypeDefaultSequence = dict[@"autoTypeDefaultSequence"];
+    NSArray<NSDictionary*>* autoTypeAssoc = dict[@"autoTypeAssoc"];
+    
     NodeFields* ret = [[NodeFields alloc] initWithUsername:username
                                                        url:url
                                                   password:password
@@ -128,7 +223,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     ret.passwordModified = passwordModified != nil ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
     ret.expires = expires != nil ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
     
-    // Attachments... These need to be fixed up to fit into destination
+    
     
     NSArray<NodeFileAttachment*>* nfas = [attachments map:^id _Nonnull(NSDictionary * _Nonnull obj, NSUInteger idx) {
         NSString* filename = obj.allKeys.firstObject;
@@ -138,7 +233,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     }];
     [ret.attachments addObjectsFromArray:nfas];
     
-    // Custom Fields
+    
     
     for (NSDictionary* obj in customFields) {
         NSString* key = obj[@"key"];
@@ -147,6 +242,44 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         [ret setCustomField:key value:[StringValue valueWithString:value protected:protected.boolValue]];
     }
     
+    
+    
+    for (NSDictionary* obj in customData) {
+        NSString* key = obj[@"key"];
+        NSString* value = obj[@"value"];
+        ret.customData[key] = value;
+    }
+    
+    ret.defaultAutoTypeSequence = defaultAutoTypeSequence; 
+    ret.enableAutoType = enableAutoType; 
+    ret.enableSearching = enableSearching; 
+    ret.lastTopVisibleEntry = lastTopVisibleEntry ? [[NSUUID alloc] initWithUUIDString:lastTopVisibleEntry] : nil; 
+    
+    
+    
+    ret.foregroundColor = foregroundColor;
+    ret.backgroundColor = backgroundColor;
+    ret.overrideURL = overrideURL;
+
+    if (autoTypeEnabled != nil) {
+        ret.autoType = [[AutoType alloc] init];
+        ret.autoType.enabled = autoTypeEnabled.boolValue;
+        ret.autoType.dataTransferObfuscation = autoTypeDataTransferObfuscation == nil ? NO : autoTypeDataTransferObfuscation.boolValue;
+        ret.autoType.defaultSequence = autoTypeDefaultSequence;
+
+        if (autoTypeAssoc) {
+            NSMutableArray *ma = NSMutableArray.array;
+            
+            for (NSDictionary* obj in autoTypeAssoc) {
+                AutoTypeAssociation* ata = [[AutoTypeAssociation alloc] init];
+                ata.window = obj[@"window"];
+                ata.keystrokeSequence = obj[@"keystrokeSequence"];
+                [ma addObject:ata];
+            }
+            ret.autoType.asssociations = ma.copy;
+        }
+    }
+
     return ret;
 }
 
@@ -166,20 +299,67 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         ret[@"expires"] = @((NSUInteger)[self.expires timeIntervalSince1970]);
     }
 
+    
+    
     NSArray<NSDictionary*>* attachments = [self.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
         [serialization.usedAttachmentIndices addObject:@(obj.index)];
         return @{ obj.filename : @(obj.index) };
     }];
     ret[@"attachments"] = attachments;
     
+    
+    
     NSArray<NSDictionary*>* customFields = [self.customFields.allKeys map:^id _Nonnull(NSString * _Nonnull key, NSUInteger idx) {
         StringValue* value = self.customFields[key];
         return @{ @"key" : key, @"value" : value.value, @"protected" : @(value.protected) };
     }];
-    
     ret[@"customFields"] = customFields;
     
-    // Tags
+    
+    
+    NSArray<NSDictionary*>* customData = [self.customData.allKeys map:^id _Nonnull(NSString * _Nonnull key, NSUInteger idx) {
+        NSString* value = self.customData[key];
+        return @{ @"key" : key, @"value" : value };
+    }];
+    ret[@"customData"] = customData;
+  
+    if (self.defaultAutoTypeSequence) {
+        ret[@"defaultAutoTypeSequence"] = self.defaultAutoTypeSequence;
+    }
+    if (self.enableAutoType != nil) {
+        ret[@"enableAutoType"] = self.enableAutoType;
+    }
+    if (self.enableSearching != nil) {
+        ret[@"enableSearching"] = self.enableSearching;
+    }
+    if (self.defaultAutoTypeSequence) {
+        ret[@"lastTopVisibleEntry"] = self.lastTopVisibleEntry.UUIDString;
+    }
+    if (self.foregroundColor) {
+        ret[@"foregroundColor"] = self.foregroundColor;
+    }
+    if (self.backgroundColor) {
+        ret[@"backgroundColor"] = self.backgroundColor;
+    }
+    if (self.overrideURL) {
+        ret[@"overrideURL"] = self.overrideURL;
+    }
+
+    if (self.autoType) {
+        ret[@"autoTypeEnabled"] = @(self.autoType.enabled);
+        ret[@"autoTypeDataTransferObfuscation"] = @(self.autoType.dataTransferObfuscation);
+        
+        if (self.autoType.defaultSequence) {
+            ret[@"autoTypeDefaultSequence"] = self.autoType.defaultSequence;
+        }
+        
+        NSArray<NSDictionary*>* autoTypeAssoc = [self.autoType.asssociations map:^id _Nonnull(AutoTypeAssociation * _Nonnull obj, NSUInteger idx) {
+            return @{ @"window" : obj.window, @"keystrokeSequence" : obj.keystrokeSequence };
+        }];
+        ret[@"autoTypeAssoc"] = autoTypeAssoc;
+    }
+    
+    
     
     ret[@"tags"] = self.tags.allObjects;
     
@@ -195,14 +375,40 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     ret.expires = self.expires;
     ret.passwordModified = self.passwordModified;
-
-    if (cloneMetadataDates) {
-        [ret setTouchPropertiesWithCreated:self.created accessed:self.accessed modified:self.modified locationChanged:self.locationChanged usageCount:self.usageCount];
-    }
-
+    ret.defaultAutoTypeSequence = self.defaultAutoTypeSequence;
+    ret.enableSearching = self.enableSearching;
+    ret.enableAutoType = self.enableAutoType;
+    ret.lastTopVisibleEntry = self.lastTopVisibleEntry;
+    ret.tags = self.tags.mutableCopy;
+    ret.foregroundColor = self.foregroundColor;
+    ret.backgroundColor = self.backgroundColor;
+    ret.overrideURL = self.overrideURL;
     ret.attachments = [self cloneAttachments];
     ret.mutableCustomFields = [self cloneCustomFields];
-    ret.tags = self.tags.mutableCopy;
+    ret.customData = [self cloneCustomData];
+    
+    if (self.autoType) {
+        ret.autoType = [[AutoType alloc] init];
+        ret.autoType.enabled = self.autoType.enabled;
+        ret.autoType.dataTransferObfuscation = self.autoType.dataTransferObfuscation;
+        ret.autoType.defaultSequence = self.autoType.defaultSequence;
+        
+        ret.autoType.asssociations = self.autoType.asssociations;
+        
+        if (self.autoType.asssociations) {
+            NSMutableArray *ma = NSMutableArray.array;
+            
+            for (AutoTypeAssociation* assoc in self.autoType.asssociations) {
+                AutoTypeAssociation* ata = [[AutoTypeAssociation alloc] init];
+                ata.window = assoc.window;
+                ata.keystrokeSequence = assoc.keystrokeSequence;
+                [ma addObject:ata];
+            }
+            
+            ret.autoType.asssociations = ma.copy;
+        }
+
+    }
 
     if (clearHistory) {
         ret.keePassHistory = [NSMutableArray array];
@@ -210,7 +416,15 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     else {
         ret.keePassHistory = self.keePassHistory.mutableCopy;
     }
-    
+
+    if (cloneMetadataDates) {
+        [ret setTouchPropertiesWithCreated:self.created
+                                  accessed:self.accessed
+                                  modified:self.modified
+                           locationChanged:self.locationChanged
+                                usageCount:self.usageCount];
+    }
+
     return ret;
 }
 
@@ -224,11 +438,11 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     _password = newPassword;
     
-    // Password Safe 3 password modified date
+    
     
     self.passwordModified = [NSDate date];
     
-    // Password Safe 3 Password History
+    
     
     PasswordHistory *pwHistory = self.passwordHistory;
     if (pwHistory.enabled && pwHistory.maximumSize > 0 && newPassword) {
@@ -242,7 +456,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         }
     }
     
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 - (void)setNotes:(NSString *)notes {
@@ -251,7 +465,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     }
     
     _notes = notes;
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 - (NSDictionary<NSString *,StringValue *> *)customFields {
@@ -260,22 +474,22 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
 - (void)setCustomFields:(NSDictionary<NSString *,StringValue *> *)customFields {
     self.mutableCustomFields = [customFields mutableCopy];
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 - (void)removeAllCustomFields {
     [self.mutableCustomFields removeAllObjects];
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 - (void)removeCustomField:(NSString*)key {
     [self.mutableCustomFields removeObjectForKey:key];
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 - (void)setCustomField:(NSString*)key value:(StringValue*)value {
     self.mutableCustomFields[key] = value;
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 - (void)touch:(BOOL)modified {
@@ -320,8 +534,8 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     if (usageCount != nil) _usageCount = usageCount;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// TOTP
+
+
 
 - (OTPToken *)otpToken {
     if(!self.hasCachedOtpToken) {
@@ -361,14 +575,14 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 - (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes {
-    // Notes Field if it's a Password Safe/KeePass1 database
+    
     
     if(appendUrlToNotes) {
         self.notes = [self.notes stringByAppendingFormat:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: [%@]", [token url:YES]];
     }
     else {
-        // Set Common TOTP Fields..
-        // KeePassXC Legacy...
+        
+        
         
         self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:[token.secret mmcg_base32String] protected:YES];
         
@@ -381,16 +595,16 @@ static NSString* const kKeeOtpPluginKey = @"otp";
             self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
         }
         
-        // KeeOtp Plugin (And now new KeePassXC Style)...
-        //
-        // MMcG: 22-Nov-2019 - KeePassXC now uses this key and stores an OTPAUTH URL in there...
-        // If the style is old KeeOTP then keep it like that, otherwise if it's new/empty or using
-        // and OTPAuth then use that new style... hopefully KeeOTP guys will move to new OTP System...
-        //
-        // * otp="key=2GQFLXXUBJQELC&step=31"
+        
+        
+        
+        
+        
+        
+        
         
         if(self.usingLegacyKeeOtpStyle) {
-            NSURLComponents *components = [NSURLComponents componentsWithString:@"http://strongboxsafe.com"];
+            NSURLComponents *components = [NSURLComponents componentsWithString:@"http:
             NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret mmcg_base32String]];
             
             if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
@@ -409,23 +623,23 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         }
     }
     
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 - (void)clearTotp {
-    // Set Common TOTP Fields.. and append to Notes if asked to (usually for Password Safe dbs)
     
-    // KeePassXC Otp
+    
+    
     
     self.mutableCustomFields[kKeePassXcTotpSeedKey] = nil;
     self.mutableCustomFields[kKeePassXcTotpSettingsKey] = nil;
     
-    // KeeOtp Plugin
-    // * otp="key=2GQFLXXUBJQELC&step=31"
+    
+    
     
     self.mutableCustomFields[kKeeOtpPluginKey] = nil;
     
-    // Notes Field if it's a Password Safe database
+    
     
     NSTextCheckingResult *result = [[NodeFields totpNotesRegex] firstMatchInString:self.notes options:kNilOptions range:NSMakeRange(0, self.notes.length)];
     
@@ -434,7 +648,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         self.notes = [self.notes stringByReplacingCharactersInRange:result.range withString:@""];
     }
     
-    self.hasCachedOtpToken = NO; // Force Reload of TOTP as may have changed with this change
+    self.hasCachedOtpToken = NO; 
 }
 
 + (NSDictionary<NSString*, NSString*>*)getQueryParams:(NSString*)queryString {
@@ -454,7 +668,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         OTPToken* ret = [OTPToken tokenWithURL:url];
         NSDictionary *params = [NodeFields getQueryParams:url.query];
         if(params[@"encoder"] && [params[@"encoder"] isEqualToString:@"steam"]) {
-            //            NSLog(@"Steam Encoder on OTPAuth URL Found");
+            
             ret.algorithm = OTPAlgorithmSteam;
             ret.digits = 5;
         }
@@ -469,9 +683,9 @@ static NSString* const kKeeOtpPluginKey = @"otp";
                             fields:(NSDictionary<NSString*, StringValue*>*)fields
                              notes:(NSString*)notes
             usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
-    // Good reference for OTPAuth URL here: https://github.com/google/google-authenticator/wiki/Key-Uri-Format
     
-    // KyPass and others... - OTPAuth url in the Password field…
+    
+    
     
     NSURL *otpUrl = [NSURL URLWithString:password];
     OTPToken* ret = [NodeFields getOtpTokenFromUrl:otpUrl];
@@ -479,21 +693,21 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         return ret;
     }
 
-    // KeeOtp Plugin and new KeePassXC system...
+    
     
     ret = [NodeFields getKeeOtpAndNewKeePassXCToken:fields usingLegacyKeeOtpStyle:usingLegacyKeeOtpStyle];
     if(ret) {
         return ret;
     }
 
-    // KeePassXC Legacy
+    
     
     ret = [NodeFields getKeePassXCLegacyOTPToken:fields];
     if(ret) {
         return ret;
     }
 
-    // Lastly... See if we can find an OTPAuth URL in the Notes field...
+    
     
     NSURL *url = [NodeFields findOtpUrlInString:notes];
     
@@ -501,10 +715,10 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 + (OTPToken*)getKeePassXCLegacyOTPToken:(NSDictionary<NSString*, StringValue*>*)fields {
-    // KeePassXC - MMcG 22-Nov-2019 - This seems to have become legacy and the KeePassXC Crew have moved to using the "OTP" (formerly KeeOTP owned) field to store an OTPAUTH URL...
-    //
-    // * []TOTP Seed=<seed>
-    // * []TOTP Settings=30;6 - time and digits - can be 30;S for “Steam”
+    
+    
+    
+    
     
     StringValue* keePassXcOtpSecretEntry = fields[kKeePassXcTotpSeedKey];
     
@@ -523,7 +737,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
                         token.period = [params[0] integerValue];
                     }
                     if(params.count > 1) {
-                        if(![params[1] isEqualToString:@"S"]) { // S = Steam
+                        if(![params[1] isEqualToString:@"S"]) { 
                             token.digits = [params[1] integerValue];
                         }
                         else {
@@ -550,18 +764,18 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 }
 
 + (OTPToken*)getKeeOtpAndNewKeePassXCToken:(NSDictionary<NSString*, StringValue*>*)fields usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
-    // KeeOtp Plugin
-    // * otp="key=2GQFLXXUBJQELC&step=31"
-    // * otp="key=2GQFLXXUBJQELC&size=8"
-    //
-    // MMcG: 22-Nov-2019 - Unfortunately this field has now been overloaded so that it can contain either the above style
-    // query params or, as of KeePassXC 2.5 (ish) it can contain an OTPAUTH URL...
-    // We need to check which it is here... we also need to remember the style used so we don't break KeeOTP users :(
+    
+    
+    
+    
+    
+    
+    
     
     StringValue* keeOtpSecretEntry = fields[kKeeOtpPluginKey];
     
     if(keeOtpSecretEntry) {
-        // New KeePassXC Style... URL in the OTP Field - Ideally everyone should use this...
+        
         
         NSURL *url = [NSURL URLWithString:keeOtpSecretEntry.value];
         OTPToken* t = [NodeFields getOtpTokenFromUrl:url];
@@ -570,7 +784,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
             return t;
         }
 
-        // Old KeeOTP Plugin Style...
+        
         
         NSString* keeOtpSecret = keeOtpSecretEntry.value;
         if(keeOtpSecret) {
@@ -578,9 +792,9 @@ static NSString* const kKeeOtpPluginKey = @"otp";
             NSString* secret = params[@"key"];
             
             if(secret.length) {
-                *usingLegacyKeeOtpStyle = YES; // We need to keep this crappy state around so we can save in legacy style if necessary... :(
+                *usingLegacyKeeOtpStyle = YES; 
                 
-                // KeeOTP sometimes URL escapes '+' in this base32 encoded string, check for that and decode
+                
                 
                 if([secret containsString:@"%3d"]) {
                     secret = [secret stringByRemovingPercentEncoding];
@@ -601,15 +815,15 @@ static NSString* const kKeeOtpPluginKey = @"otp";
                 }
             }
             
-            // Could just be a raw token in here...
-            // Examples from a user on Github:
-            //            otp: ZOFHRYXNSJDUGHSJ
-            //
-            //            otp: ZOFH RYXN SJDU GHSJ
-            //
-            //            otp: zofhryxnsjdughsj
-            //
-            //            otp: zofh ryxn sjdu ghsj
+            
+            
+            
+            
+            
+            
+            
+            
+            
 
             OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer
                                                secret:[NSData secretWithString:keeOtpSecret]
@@ -655,7 +869,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return nil;
 }
 
-//
+
 
 - (BOOL)expired {
     return self.expires != nil && [NSDate.date compare:self.expires] == NSOrderedDescending;

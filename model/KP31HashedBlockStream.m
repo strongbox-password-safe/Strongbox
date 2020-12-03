@@ -57,7 +57,7 @@
                 return -1;
             }
             
-            if (self.workingBlockLength == 0) { // EOF
+            if (self.workingBlockLength == 0) { 
                 break;
             }
         }
@@ -89,7 +89,7 @@
         return NO;
     }
     
-    if (read == 0) { // EOF
+    if (read == 0) { 
         [self cleanupWorkingBlock];
         return YES;
     }
@@ -125,11 +125,11 @@
         }
     }
     else {
-        [self cleanupWorkingBlock]; // EOF
+        [self cleanupWorkingBlock]; 
     }
     
     self.readSoFar += blockLength;
-    //NSLog(@"DEBUG: Decrypted Block %d of length [%zu] - [%zu]", self.workingBlockIndex, blockLength, self.readSoFar);
+    
     self.workingBlockIndex++;
     self.workingBlockOffset = 0;
     

@@ -28,7 +28,7 @@ typedef struct _PasswordSafe3Header {
     unsigned char b2[16];
     unsigned char b3[16];
     unsigned char b4[16];
-    unsigned char iv[16];   // 152
+    unsigned char iv[16];   
 } PasswordSafe3Header;
 
 typedef struct _FieldHeader {

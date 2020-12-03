@@ -68,7 +68,7 @@
     self.buttonCreate.layer.cornerRadius = 5.0f;
     
     PasswordGenerationConfig* config = [PasswordGenerationConfig defaults];
-    config.algorithm = kPasswordGenerationAlgorithmDiceware; // Default is EFF Large with 5 words
+    config.algorithm = kPasswordGenerationAlgorithmDiceware; 
     
     [self addShowHideToTextField:self.textFieldPw tag:100 show:YES];
     
@@ -143,32 +143,32 @@
 }
 
 - (void)addShowHideToTextField:(UITextField*)textField tag:(NSInteger)tag show:(BOOL)show {
-    // Create button
+    
     UIButton *checkbox = [UIButton buttonWithType:UIButtonTypeCustom];
-    [checkbox setFrame:CGRectMake(2 , 2, 24, 24)];  // Not sure about size
-    [checkbox setTag:tag]; // hacky :(
+    [checkbox setFrame:CGRectMake(2 , 2, 24, 24)];  
+    [checkbox setTag:tag]; 
     
     [checkbox addTarget:self action:@selector(toggleShowHidePasswordText:) forControlEvents:UIControlEventTouchUpInside];
     
     [checkbox setAccessibilityLabel:NSLocalizedString(@"welcome_vc_accessibility_show_hide_password", @"Show/Hide Password")];
     
-    // Setup image for button
+    
     [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
     [checkbox setImage:[UIImage imageNamed:@"visible"] forState:UIControlStateNormal];
     [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateSelected];
     [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateHighlighted];
     [checkbox setAdjustsImageWhenHighlighted:TRUE];
-    checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); // Image is too close to border otherwise
-                                                              //    checkbox.layer.borderColor = UIColor.redColor.CGColor;
-                                                              //    checkbox.layer.borderWidth = 1;
+    checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); 
+                                                              
+                                                              
 
-    // Setup the right view in the text field
+    
     [textField setClearButtonMode:UITextFieldViewModeAlways];
     [textField setRightViewMode:UITextFieldViewModeAlways];
     [textField setRightView:checkbox];
     
-    // Setup Tag so the textfield can be identified
-    //    [textField setTag:-1];
+    
+    
     
     if(show) {
         [checkbox setSelected:YES];

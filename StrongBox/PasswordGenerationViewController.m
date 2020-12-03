@@ -183,9 +183,9 @@
     self.cellNoneAmbiguousOnly.accessoryType = self.config.nonAmbiguousOnly ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     self.cellPickFromEveryGroup.accessoryType = self.config.pickFromEveryGroup ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     
-    // Word Lists
     
-    // This can happen if we change the key (mostly during development) but for safety include here...
+    
+    
     
     NSArray* knownWordLists = [self.config.wordLists filter:^BOOL(NSString * _Nonnull obj) {
         return PasswordGenerationConfig.wordListsMap[obj] != nil;
@@ -214,7 +214,7 @@
 }
 
 - (void)bindTableView {
-    // Basic
+    
     
     [self cell:self.cellBasicLength setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellUseCharacterGroups setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
@@ -222,7 +222,7 @@
     [self cell:self.cellNoneAmbiguousOnly setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellPickFromEveryGroup setHidden:(self.config.algorithm != kPasswordGenerationAlgorithmBasic)];
     
-    // Diceware
+    
 
     [self cell:self.cellWordCount setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
     [self cell:self.cellWordLists setHidden:(self.config.algorithm == kPasswordGenerationAlgorithmBasic)];
@@ -233,7 +233,7 @@
     
     
 #ifdef IS_APP_EXTENSION
-    // Hide These info cells for App Extensions as we cannot launch a url from there...
+    
     [self cell:self.cellInfoXkcd setHidden:YES];
     [self cell:self.cellInfoDiceware setHidden:YES];
 #endif
@@ -299,15 +299,27 @@
     }
     else if (cell == self.cellInfoDiceware) {
 #ifndef IS_APP_EXTENSION
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"http://world.std.com/~reinhold/diceware.html"] options:@{} completionHandler:nil];
+        NSURL* url = [NSURL URLWithString:@"http:
+        if (@available (iOS 10.0, *)) {
+            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+        }
+        else {
+            [UIApplication.sharedApplication openURL:url];
+        }
 #endif
     }
     else if (cell == self.cellInfoXkcd) {
 #ifndef IS_APP_EXTENSION
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://xkcd.com/936/"] options:@{} completionHandler:nil];
+        NSURL* url = [NSURL URLWithString:@"https:
+        if (@available (iOS 10.0, *)) {
+            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+        }
+        else {
+            [UIApplication.sharedApplication openURL:url];
+        }
 #endif
     }
-    else { // if(cell == self.cellWordCount) {
+    else { 
         [self refreshGenerated];
     }
 }
@@ -475,7 +487,10 @@
     NSArray<NSNumber*>* pools = @[    @(kPasswordGenerationCharacterPoolUpper),
                                       @(kPasswordGenerationCharacterPoolLower),
                                       @(kPasswordGenerationCharacterPoolNumeric),
-                                      @(kPasswordGenerationCharacterPoolSymbols)];
+                                      @(kPasswordGenerationCharacterPoolSymbols),
+                                      @(kPasswordGenerationCharacterPoolLatin1Supplement),
+
+    ];
     
     NSArray<NSString*> *poolsStrings = [pools map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return [PasswordGenerationConfig characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];

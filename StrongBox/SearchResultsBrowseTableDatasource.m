@@ -9,6 +9,8 @@
 #import "SearchResultsBrowseTableDatasource.h"
 #import "DatabaseSearchAndSorter.h"
 #import "BrowseTableViewCellHelper.h"
+#import "BrowseSortField.h"
+#import "DatabaseModel.h"
 
 @interface SearchResultsBrowseTableDatasource ()
 
@@ -63,7 +65,12 @@
 }
 
 - (void)updateSearchResults:(UISearchController*)searchController {
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel];
+    BrowseSortField sortField = self.viewModel.metadata.browseSortField;
+    BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+        return [self.viewModel isFlaggedByAudit:node];
+    }];
 
     self.searchResults = [searcher search:searchController.searchBar.text
                                     scope:(SearchScope)searchController.searchBar.selectedScopeButtonIndex

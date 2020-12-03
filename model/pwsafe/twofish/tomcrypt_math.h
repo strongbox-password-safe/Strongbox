@@ -493,7 +493,7 @@ extern const ltc_math_descriptor gmp_desc;
 
 #define mp_tohex(a, b)                    mp_toradix(a, b, 16)
 
-#endif // if !defined(DESC_DEF_ONLY) && defined(LTC_SOURCE)
+#endif 
 
 /* $Source: /cvs/libtom/libtomcrypt/src/headers/tomcrypt_math.h,v $ */
 /* $Revision: 1.44 $ */

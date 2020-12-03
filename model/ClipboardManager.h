@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)observeClipboardChangeNotifications;
 
-#endif // !IS_APP_EXTENSION
+#endif 
 
 @end
 

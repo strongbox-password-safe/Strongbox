@@ -15,7 +15,7 @@
 #import "UIImage+FixOrientation.h"
 #import "NSDate+Extensions.h"
 
-const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
+const int kMaxRecommendedAttachmentSize = 512 * 1024; 
 
 @interface AddAttachmentHelper () <UIImagePickerControllerDelegate, UIDocumentPickerDelegate, UINavigationControllerDelegate>
 
@@ -41,7 +41,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
 - (void)beginAddAttachmentUi:(UIViewController *)vc usedFilenames:(NSArray<NSString *> *)usedFilenames onAdd:(void (^)(UiAttachment * _Nonnull))onAdd {
     self.parentViewController = vc;
     self.onAdd = onAdd;
-    self.usedFilenames = [NSSet setWithArray:usedFilenames]; // Not case sensitive in original app - no need to lowercase
+    self.usedFilenames = [NSSet setWithArray:usedFilenames]; 
     
     UIAlertController *alertController =
     [UIAlertController alertControllerWithTitle:NSLocalizedString(@"add_attachment_vc_prompt_title", @"Attachment Location")
@@ -125,7 +125,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
 
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     NSError* error;
     NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
     
@@ -231,10 +231,10 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024; // KB
         NSMutableDictionary<NSString*, NSData*> *resized = [NSMutableDictionary dictionary];
         NSMutableArray<NSString*> *sortedKeys = [NSMutableArray array];
         for(int i=0;i<4;i++) {
-            int size = 1 << (9 + i); // Start at 512px
+            int size = 1 << (9 + i); 
             
             UIImage* rescaled = scaleImage(image, CGSizeMake(size, size));
-            NSData* rescaledData = UIImageJPEGRepresentation(rescaled, 0.95f); // Decent Quality
+            NSData* rescaledData = UIImageJPEGRepresentation(rescaled, 0.95f); 
             
             if(rescaledData.length > data.length) {
                 break;

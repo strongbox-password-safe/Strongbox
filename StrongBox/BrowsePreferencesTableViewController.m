@@ -22,8 +22,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *showFlagsInBrowse;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowIcons;
 
-@property (weak, nonatomic) IBOutlet UISwitch *switchSearchDereferenced;
-@property (weak, nonatomic) IBOutlet UISwitch *switchViewDereferenced;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowRecycleBinInSearch;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowKeePass1BackupFolder;
 
@@ -32,8 +30,6 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowBackupFolder;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowRecycleBin;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShowRecycleBinInSearch;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellDereference;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellDerefenceDuringSearch;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAs;
 @property (weak, nonatomic) IBOutlet UILabel *labelViewAs;
 
@@ -83,23 +79,14 @@
     [self cell:self.cellShowBackupFolder setHidden:self.format != kKeePass1];
     [self cell:self.cellShowRecycleBin setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellShowRecycleBinInSearch setHidden:self.format != kKeePass && self.format != kKeePass4];
-    [self cell:self.cellDereference setHidden:self.format != kKeePass && self.format != kKeePass4];
-    [self cell:self.cellDerefenceDuringSearch setHidden:self.format != kKeePass && self.format != kKeePass4];
     [self cell:self.cellIconSet setHidden:self.format == kPasswordSafe];
     
     if (@available(iOS 13, *)) {
-//        [self cell:self.cellSingleTapAction setHidden:YES];
         
-        // Fast tap replaces with context menus and slide actions - 24-Oct-2020
 
         [self cell:self.cellDoubleTapAction setHidden:YES];
         [self cell:self.cellTripleTapAction setHidden:YES];
         [self cell:self.cellLongPressAction setHidden:YES];
-
-        // TODO: Remove soon...
-        // Pretty Niche and unneeded - remove eventually from metadata - should just be on all the time
-        [self cell:self.cellDereference setHidden:YES];
-        [self cell:self.cellDerefenceDuringSearch setHidden:YES];
     }
     
     [self reloadDataAnimated:NO];
@@ -112,10 +99,6 @@
     self.databaseMetaData.showChildCountOnFolderInBrowse = self.showChildCountOnFolder.on;
     self.databaseMetaData.showFlagsInBrowse = self.showFlagsInBrowse.on;
     self.databaseMetaData.immediateSearchOnBrowse = self.switchStartWithSearch.on;
-    
-    // TODO: Remove soon...
-//    self.databaseMetaData.viewDereferencedFields = self.switchViewDereferenced.on;
-//    self.databaseMetaData.searchDereferencedFields = self.switchSearchDereferenced.on;
     
     self.databaseMetaData.showKeePass1BackupGroup = self.switchShowKeePass1BackupFolder.on;
     self.databaseMetaData.showRecycleBinInSearchResults = self.switchShowRecycleBinInSearch.on;
@@ -157,11 +140,7 @@
     self.showChildCountOnFolder.on = self.databaseMetaData.showChildCountOnFolderInBrowse;
     self.showFlagsInBrowse.on = self.databaseMetaData.showFlagsInBrowse;
     self.switchStartWithSearch.on = self.databaseMetaData.immediateSearchOnBrowse;
-    
-    // TODO: Remove soon...
-//    self.switchViewDereferenced.on = self.databaseMetaData.viewDereferencedFields;
-//    self.switchSearchDereferenced.on = self.databaseMetaData.searchDereferencedFields;
-    
+        
     self.switchShowKeePass1BackupFolder.on = self.databaseMetaData.showKeePass1BackupGroup;
     self.switchShowRecycleBinInSearch.on = self.databaseMetaData.showRecycleBinInSearchResults;
     
@@ -174,19 +153,19 @@
 
     self.labelViewAs.text = [BrowsePreferencesTableViewController getBrowseViewTypeName:self.databaseMetaData.browseViewType];
     
-    // Expired
+    
     
     self.swtichShowExpiredInBrowse.on = self.databaseMetaData.showExpiredInBrowse;
     self.switchShowExpiredInSearch.on = self.databaseMetaData.showExpiredInSearch;
     
-    // Tap Actions
+    
     
     self.labelSingleTapAction.text = [self getTapActionString:(self.databaseMetaData.tapAction)];
     self.labelDoubleTapAction.text = [self getTapActionString:(self.databaseMetaData.doubleTapAction)];
     self.labelTripleTapAction.text = [self getTapActionString:(self.databaseMetaData.tripleTapAction)];
     self.labelLongPressAction.text = [self getTapActionString:(self.databaseMetaData.longPressTapAction)];
     
-    // Quick View Sections
+    
     
     self.switchShowNearlyExpired.on = self.databaseMetaData.showQuickViewNearlyExpired;
     self.switchShowFavourites.on = self.databaseMetaData.showQuickViewFavourites;
@@ -517,7 +496,7 @@
     SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
     vc.groupItems = @[options];
-//    vc.groupHeaders = @[@""];
+
     vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentIndex]];
     vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
         NSIndexSet* set = selectedIndices.firstObject;

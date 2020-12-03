@@ -14,7 +14,7 @@
 
 @property (nonatomic, strong) Reachability *internetReachabilityDetector;
 @property (nonatomic) BOOL offline; // Global Online/Offline variable
-
+    
 @end
 
 @implementation OfflineDetector
@@ -33,10 +33,10 @@
 - (void) stopMonitoringConnectivitity {
     NSLog(@"STOP monitoring Internet Connectivity...");
     
-    // TODO: dispatch_async() - There are some crashes here apparently, duspatch this to main queue
-    // but not yet... Similarly Start below should be on main thread.
-    //
-    // https://stackoverflow.com/questions/15554135/reachability-classes-crashing-program-not-sure-why
+    
+    
+    
+    
     
     [self.internetReachabilityDetector stopNotifier];
     self.internetReachabilityDetector = nil;
@@ -49,13 +49,13 @@
         return;
     }
    
-    if(!self.internetReachabilityDetector) { // Do not reset if we already have a monitor
+    if(!self.internetReachabilityDetector) { 
         self.offline = NO;
     }
     
     self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"duckduckgo.com"];
     
-    // Internet is reachable
+    
     
     __weak typeof(self) weakSelf = self;
     self.internetReachabilityDetector.reachableBlock = ^(Reachability *reach)
@@ -64,7 +64,7 @@
         weakSelf.offline = NO;
     };
     
-    // Internet is not reachable
+    
     
     self.internetReachabilityDetector.unreachableBlock = ^(Reachability *reach)
     {

@@ -66,8 +66,8 @@
 
 - (void)enableICloudAndContinue:(BOOL)enable {
     if (enable) {
-        SharedAppAndAutoFillSettings.sharedInstance.iCloudOn = enable; // No need to set if user chooses NO because we can only get here if already NO
-        Settings.sharedInstance.iCloudWasOn = enable; // SO we get the right behaviour in App Preferences if users switches back off
+        SharedAppAndAutoFillSettings.sharedInstance.iCloudOn = enable; 
+        Settings.sharedInstance.iCloudWasOn = enable; 
 
         [iCloudSafesCoordinator.sharedInstance startQuery];
         

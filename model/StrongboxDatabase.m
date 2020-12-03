@@ -84,7 +84,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         
         _mutableDeletedObjects = deletedObjects.mutableCopy;
         
-        //NSLog(@"Got Deleted Objects: [%@]", deletedObjects);
+        
     }
     
     return self;
@@ -107,14 +107,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (void)trimKeePassHistory {
-    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
-        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
-        [self trimKeePassHistory:metadata.historyMaxItems maxSize:metadata.historyMaxSize];
-    }
-    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
-        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
-        [self trimKeePassHistory:metadata.historyMaxItems maxSize:metadata.historyMaxSize];
-    }
+    [self trimKeePassHistory:self.metadata.historyMaxItems maxSize:self.metadata.historyMaxSize];
 }
 
 - (void)trimKeePassHistory:(NSNumber*)maxItems maxSize:(NSNumber*)maxSize {
@@ -163,7 +156,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (NSUInteger)getEstimatedSize:(Node*)node {
-    // Try to get a decent estimate of size but really this is not very precise...
+    
     NSUInteger fixedStructuralSizeGuess = 256;
     
     NSUInteger basicFields = node.title.length +
@@ -177,14 +170,14 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         customFields += key.length + node.fields.customFields[key].value.length;
     }
     
-    // History
+    
     
     NSUInteger historySize = 0;
     for (Node* historyNode in node.fields.keePassHistory) {
         historySize += [self getEstimatedSize:historyNode];
     }
     
-    // Custom Icon
+    
     
     NSUInteger iconSize = 0;
     if(node.customIconUuid) {
@@ -192,7 +185,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         iconSize = data == nil ? 0 : data.length;
     }
     
-    // Binary
+    
     
     NSUInteger binariesSize = 0;
     for (NodeFileAttachment* attachments in node.fields.attachments) {
@@ -200,11 +193,11 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         binariesSize += dbA == nil ? 0 : dbA.estimatedStorageBytes;
     }
     
-    NSUInteger textSize = (basicFields + customFields) * 2; // Unicode in memory probably?
+    NSUInteger textSize = (basicFields + customFields) * 2; 
     
     NSUInteger ret = fixedStructuralSizeGuess + textSize + historySize + iconSize + binariesSize;
 
-    //NSLog(@"Estimated Size: %@ -> [%lu]", node, (unsigned long)ret);
+    
     
     return ret;
 }
@@ -222,8 +215,8 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Attachments
+
+
 
 - (NSArray<DatabaseAttachment *> *)attachments {
     return [self.mutableAttachments copy];
@@ -257,8 +250,8 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes {
-    // Filter out children that are already included because the group is included,
-    // so we're not copying/moving/deleting twice
+    
+    
     
     NSArray<Node*>* groups = [nodes filter:^BOOL(Node * _Nonnull obj) {
         return obj.isGroup;
@@ -274,8 +267,8 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     return [NSSet setWithArray:minimalNodeSet];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Deletions
+
+
 
 - (NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
     return self.mutableDeletedObjects.copy;
@@ -321,7 +314,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         Node* parent = recon.clonedNode.parent;
         
         if (!parent) {
-            continue; // Should never happen
+            continue; 
         }
         
         [parent addChild:recon.clonedNode keePassGroupTitleRules:YES];
@@ -337,7 +330,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     [self reconstruct:undoData];
     
     for (NodeHierarchyReconstructionData* recon in undoData) {
-        // Remove all children and self from deleted Objects
+        
         NSArray<NSUUID*>* childIds = [recon.clonedNode.allChildren map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
             return obj.uuid;
         }];
@@ -360,7 +353,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     }
     
     for (Node* item in minimalNodeSet) {
-        if (item.parent == nil || ![item.parent contains:item]) { // Very very strange if this ever happens we're in trouble
+        if (item.parent == nil || ![item.parent contains:item]) { 
             NSLog(@"WARNWARN: Attempt to delete item with no parent");
             return;
         }
@@ -384,7 +377,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
         return NO;
     }
     
-    if(self.recycleBinNode == nil) {     // UUID is NIL/Non Existent or Zero? - Create
+    if(self.recycleBinNode == nil) {     
         [self createNewRecycleBinNode];
     }
     
@@ -394,8 +387,8 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     BOOL ret = [self moveItems:minimalNodeSet.allObjects destination:self.recycleBinNode keePassGroupTitleRules:YES date:now undoData:undoData];
     
     if (ret) {
-        for (Node* item in minimalNodeSet) { // Confirmed correct - touch should only be done on minimal node set - 22-May-2020
-            [item touchAt:now]; // NB: accessed/usage count recursively (weirdly I think but following KeePass original)
+        for (Node* item in minimalNodeSet) { 
+            [item touchAt:now]; 
         }
     }
 
@@ -406,8 +399,8 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
     [self undoMove:undoData];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Moves
+
+
 
 - (BOOL)validateMoveItems:(const NSArray<Node*>*)items destination:(Node*)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     NSArray<Node*>* minimalItems = [self getMinimalNodeSet:items].allObjects;
@@ -446,8 +439,8 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
         *undoData = [self getHierarchyCloneForReconstruction:items];
     }
 
-    // Attempt the move now - this could break despite the above check because someone tries to
-    // insert a group with the same name as one we've already inserted for example
+    
+    
     
     BOOL rollback = NO;
     
@@ -469,8 +462,8 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
         }
     }
     else {
-        for(Node* itemToMove in minimalItems) { // Confirmed correct - touch should only be done on minimal node set - 22-May-2020
-            [itemToMove touchLocationChanged:date]; // NB: Only LocationChanged (Date Mod/Accessed not changed) nor parents in keeping with KeePass original
+        for(Node* itemToMove in minimalItems) { 
+            [itemToMove touchLocationChanged:date]; 
         }
     }
     
@@ -478,9 +471,9 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
 }
 
 - (void)undoMove:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
-    // Find the items that were moved based on the undo data and delete them completely from the hierarchy
-    // then reconstruct the hierarcjy based on the undo data and clones in there. This completely reverses
-    // the move (including Location Changed and all touch properties.
+    
+    
+    
     
     for (NodeHierarchyReconstructionData* reconItem in undoData) {
         Node* originalMovedItem = [self findById:reconItem.clonedNode.uuid];
@@ -489,18 +482,18 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
             [originalMovedItem.parent removeChild:originalMovedItem];
         }
         else {
-            // Should never happen but WARN
+            
             NSLog(@"WARNWARN: Could not find original moved item! [%@]", reconItem);
         }
     }
     
-    // Now rebuild with the undo clone...
+    
     
     [self reconstruct:undoData];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Add
+
+
 
 - (BOOL)validateAddChild:(Node *)item destination:(Node *)destination keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     return [destination validateAddChild:item keePassGroupTitleRules:keePassGroupTitleRules];
@@ -518,8 +511,8 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
     [item.parent removeChild:item];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Custom Icons
+
+
 
 - (NSDictionary<NSUUID *,NSData *> *)customIcons {
     return [self.mutableCustomIcons copy];
@@ -568,84 +561,30 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
     self.mutableCustomIcons = [CustomIconsRationalizer rationalize:self.customIcons root:self.rootGroup];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Recycle Bin (KeePass 2) -
+
+
 
 - (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
-    if ( [self.metadata isKindOfClass:[KeePassDatabaseMetadata class]] ) {
-        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
-        metadata.recycleBinEnabled = recycleBinEnabled;
-    }
-    else if ( [self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]] ) {
-        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
-        metadata.recycleBinEnabled = recycleBinEnabled;
-    }
+    self.metadata.recycleBinEnabled = recycleBinEnabled;
 }
 
 - (BOOL)recycleBinEnabled {
-    // TODO: Move the adaptor specific metadata checks into the adaptors, shouldn't be here at all
-    
-    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
-        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
-        return metadata.recycleBinEnabled;
-    }
-    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
-        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
-        return metadata.recycleBinEnabled;
-    }
-    else {
-        return NO;
-    }
+    return self.metadata.recycleBinEnabled;
 }
 
 - (NSUUID *)recycleBinNodeUuid {
-    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
-        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
-        return metadata.recycleBinGroup;
-    }
-    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
-        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
-        return metadata.recycleBinGroup;
-    }
-    else {
-        return nil;
-    }
+    return self.metadata.recycleBinGroup;
 }
 
 - (void)setRecycleBinNodeUuid:(NSUUID *)recycleBinNode {
-    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
-        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
-        metadata.recycleBinGroup = recycleBinNode;
-    }
-    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
-        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
-        metadata.recycleBinGroup = recycleBinNode;
-    }
+    self.metadata.recycleBinGroup = recycleBinNode;
 }
-
 - (NSDate *)recycleBinChanged {
-    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
-        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
-        return metadata.recycleBinChanged;
-    }
-    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
-        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
-        return metadata.recycleBinChanged;
-    }
-    else {
-        return nil;
-    }
+    return self.metadata.recycleBinChanged;
 }
 
 - (void)setRecycleBinChanged:(NSDate *)recycleBinChanged {
-    if([self.metadata isKindOfClass:[KeePassDatabaseMetadata class]]) {
-        KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)self.metadata;
-        metadata.recycleBinChanged = recycleBinChanged;
-    }
-    else if([self.metadata isKindOfClass:[KeePass4DatabaseMetadata class]]) {
-        KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)self.metadata;
-        metadata.recycleBinChanged = recycleBinChanged;
-    }
+    self.metadata.recycleBinChanged = recycleBinChanged;
 }
 
 - (Node *)recycleBinNode {
@@ -666,14 +605,14 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
 }
 
 - (void)createNewRecycleBinNode {
-    // KeePass funky root/non-root group! - Slight abstractioon leak here... this will only work for KeePass
+    
 
     Node* effectiveRoot;
     if(self.rootGroup.children.count > 0) {
         effectiveRoot = [self.rootGroup.children objectAtIndex:0];
     }
     else {
-        effectiveRoot = self.rootGroup; // This should never be able to happen but for safety
+        effectiveRoot = self.rootGroup; 
     }
 
     Node* recycleBin = [[Node alloc] initAsGroup:@"Recycle Bin" parent:effectiveRoot keePassGroupTitleRules:YES uuid:nil];
@@ -684,8 +623,7 @@ keePassGroupTitleRules:(BOOL)keePassGroupTitleRules
     self.recycleBinChanged = [NSDate date];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+
 
 -(NSString *)description {
     return [NSString stringWithFormat:@"masterPassword = %@, metadata=%@, rootGroup = %@",

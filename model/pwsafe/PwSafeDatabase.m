@@ -56,7 +56,7 @@
         return;
     }
     
-    // Records and Groups
+    
     
     Node* rootGroup = [self buildModel:records headers:headerFields];
     if(!rootGroup) {
@@ -109,14 +109,14 @@
 - (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
     if(!database.compositeKeyFactors.password) {
         NSError* error = [Utils createNSError:@"Master Password not set." errorCode:-3];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
     PwSafeMetadata* metadata = (PwSafeMetadata*)database.metadata;
     [self defaultLastUpdateFieldsToNow:database.metadata];
     
-    // File Header
+    
     
     NSMutableData *ret = [[NSMutableData alloc] init];
     
@@ -131,7 +131,7 @@
     NSMutableData *toBeEncrypted = [[NSMutableData alloc] init];
     NSMutableData *hmacData = [[NSMutableData alloc] init];
     
-    // Headers
+    
     
     NSMutableArray<Field*>* headerFields = database.adaptorTag ? (NSMutableArray<Field*>*)database.adaptorTag : [NSMutableArray array];
     
@@ -142,43 +142,43 @@
     [toBeEncrypted appendData:[self serializeHeaderFields:headerFields]];
     [hmacData appendData:[self getHeaderFieldHmacData:headerFields]];
     
-    // Records
+    
     
     NSArray<Record*>* records = [self getRecordsForSerialization:database.rootGroup];
     
     [toBeEncrypted appendData:[self serializeRecords:records]];
     [hmacData appendData:[self getRecordsHmacData:records]];
     
-    // Encrypt
+    
     
     NSData *ct = [PwSafeSerialization encryptCBC:K ptData:toBeEncrypted iv:hdr.iv];
     [ret appendData:ct];
     
-    // EOF marker
+    
     
     NSData *eofMarker = [EOF_MARKER dataUsingEncoding:NSUTF8StringEncoding];
     [ret appendData:eofMarker];
     
-    // HMAC
+    
     
     NSData *hmac = [PwSafeSerialization calculateRFC2104Hmac:hmacData key:L];
     [ret appendData:hmac];
     
-    completion(NO, ret, nil);
+    completion(NO, ret, nil, nil);
 }
 
-+ (NSData *_Nullable)getYubikeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
++ (NSData *_Nullable)getYubiKeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
     return nil;
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Deserialization
+
+
 
 - (Node*)buildModel:(NSArray<Record*>*)records headers:(NSArray<Field*>*)headers  {
     Node* root = [[Node alloc] initAsRoot:nil];
     
-    // Group Records by their group
+    
     
     NSMutableDictionary<NSArray<NSString*>*, NSMutableArray<Record*>*> *groupedByGroup =
         [[NSMutableDictionary<NSArray<NSString*>*, NSMutableArray<Record*>*> alloc] init];
@@ -227,7 +227,7 @@
     fields.email = record.email;
     fields.expires = record.expires;
     
-    [fields setTouchPropertiesWithCreated:record.created accessed:record.accessed modified:record.modified locationChanged:nil usageCount:nil]; // PwSafe doesn't support usage count or location changed
+    [fields setTouchPropertiesWithCreated:record.created accessed:record.accessed modified:record.modified locationChanged:nil usageCount:nil]; 
     
     fields.passwordModified = record.passwordModified;
     
@@ -320,16 +320,16 @@
         return nil;
     }
     
-    //[SafeTools dumpDbHeaderAndRecords:headerFields records:records];
+    
 
     return records;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Serialization
+
+
 
 - (void)addDefaultHeaderFieldsIfNotSet:(NSMutableArray<Field*>*)headers {
-    // Version
+    
     
     if(![self getFirstHeaderFieldOfType:HDR_VERSION headers:headers]) {
         unsigned char versionBytes[2];
@@ -340,7 +340,7 @@
         [headers addObject:version];
     }
 
-    // UUID
+    
 
     if(![self getFirstHeaderFieldOfType:HDR_UUID headers:headers]) {
         NSUUID *unique = [[NSUUID alloc] init];
@@ -447,13 +447,13 @@
     NSMutableData *toBeEncrypted = [[NSMutableData alloc] init];
     
     for (Field *dbHeaderField in headers) {
-        //NSLog(@"SAVE HDR: %@ -> %@", dbHeaderField.prettyTypeString, dbHeaderField.prettyDataString);
+        
         NSData* serializedField = [PwSafeSerialization serializeField:dbHeaderField];
         
         [toBeEncrypted appendData:serializedField];
     }
     
-    // Write HDR_END
+    
     
     Field *hdrEnd = [[Field alloc] initEmptyDbHeaderField:HDR_END];
     NSData *serializedField = [PwSafeSerialization serializeField:hdrEnd];
@@ -470,7 +470,7 @@
             [toBeEncrypted appendData:[PwSafeSerialization serializeField:field]];
         }
         
-        // Write RECORD_END
+        
         
         Field *end = [[Field alloc] initEmptyWithType:FIELD_TYPE_END];
         [toBeEncrypted appendData:[PwSafeSerialization serializeField:end]];
@@ -579,7 +579,7 @@
     }
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////
+
 
 -(Field*_Nullable) getFirstHeaderFieldOfType:(HeaderFieldType)type headers:(NSMutableArray<Field*>*)headers {
     for (Field *field in headers) {

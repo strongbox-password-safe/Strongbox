@@ -88,7 +88,7 @@ const NSUInteger kSectionIdxLast = 3;
     return nil;
 }
 
-//
+
 
 - (NSArray<Node*>*)loadPinnedItems {
     if(!self.viewModel.metadata.showQuickViewFavourites || !self.viewModel.pinnedSet.count) {
@@ -103,7 +103,12 @@ const NSUInteger kSectionIdxLast = 3;
         return [set containsObject:sid];
     }];
     
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel];
+    BrowseSortField sortField = self.viewModel.metadata.browseSortField;
+    BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+        return [self.viewModel isFlaggedByAudit:node];
+    }];
 
     return [searcher filterAndSortForBrowse:pinned.mutableCopy
                       includeKeePass1Backup:YES
@@ -121,8 +126,12 @@ const NSUInteger kSectionIdxLast = 3;
         return obj.fields.nearlyExpired;
     }];
 
-
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel];
+    BrowseSortField sortField = self.viewModel.metadata.browseSortField;
+    BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+        return [self.viewModel isFlaggedByAudit:node];
+    }];
 
     return [searcher filterAndSortForBrowse:ne.mutableCopy
                       includeKeePass1Backup:NO
@@ -140,7 +149,12 @@ const NSUInteger kSectionIdxLast = 3;
         return obj.fields.expired;
     }];
 
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel];
+    BrowseSortField sortField = self.viewModel.metadata.browseSortField;
+    BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+        return [self.viewModel isFlaggedByAudit:node];
+    }];
 
     return [searcher filterAndSortForBrowse:exp.mutableCopy
                       includeKeePass1Backup:NO
@@ -168,8 +182,13 @@ const NSUInteger kSectionIdxLast = 3;
             break;
     }
     
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel];
-    
+    BrowseSortField sortField = self.viewModel.metadata.browseSortField;
+    BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
+    BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+        return [self.viewModel isFlaggedByAudit:node];
+    }];
+
     return [searcher filterAndSortForBrowse:ret.mutableCopy
                       includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
                           includeRecycleBin:!self.viewModel.metadata.doNotShowRecycleBinInBrowse
@@ -180,14 +199,14 @@ const NSUInteger kSectionIdxLast = 3;
 - (void)refreshItems:(Node*)currentGroup {
     self.standardItemsCache = [self loadStandardItems:currentGroup];
     
-    // PERF: These can only appear in Root Group...
+    
     
     self.pinnedItemsCache = self.isDisplayingRootGroup ? [self loadPinnedItems] : @[];
     self.nearlyExpiredItemsCache = self.isDisplayingRootGroup ? [self loadNearlyExpiredItems] : @[];
     self.expiredItemsCache = self.isDisplayingRootGroup ? [self loadExpiredItems] : @[];
 }
 
-//
+
 
 - (NSUInteger)getQuickViewRowCount {
     return [self getDataSourceForSection:kSectionIdxPinned].count +

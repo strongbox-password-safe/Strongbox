@@ -94,7 +94,7 @@ typedef unsigned long        ulong32;
           ((unsigned long)((y)[2] & 255) << 8)  | \
           ((unsigned long)((y)[3] & 255)); }
 
-#endif // if !defined(LTC_NO_BSWAP) && (defined(INTEL_CC) || (defined(__GNUC__) && (defined(__DJGPP__) || defined(__CYGWIN__) || defined(__MINGW32__) || defined(__i386__) || defined(__x86_64__))))
+#endif 
 
 
 /* x86_64 processor */
@@ -127,7 +127,7 @@ typedef unsigned long        ulong32;
           (((ulong64)((y)[4] & 255)) << 24) | (((ulong64)((y)[5] & 255)) << 16) | \
           (((ulong64)((y)[6] & 255)) << 8) | (((ulong64)((y)[7] & 255))); }
 
-#endif // if !defined(LTC_NO_BSWAP) && (defined(__GNUC__) && defined(__x86_64__))
+#endif 
 
 #ifdef ENDIAN_32BITWORD
 
@@ -322,7 +322,7 @@ static inline unsigned RORc(unsigned word, const int i) {
 #endif
 
 
-#else // if defined(_MSC_VER)
+#else 
 
 /* rotates the hard way */
 #define ROL(x, y)  ((((unsigned long)(x) << (unsigned long)((y) & 31)) | (((unsigned long)(x) & 0xFFFFFFFFUL) >> (unsigned long)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
@@ -330,7 +330,7 @@ static inline unsigned RORc(unsigned word, const int i) {
 #define ROLc(x, y) ((((unsigned long)(x) << (unsigned long)((y) & 31)) | (((unsigned long)(x) & 0xFFFFFFFFUL) >> (unsigned long)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
 #define RORc(x, y) (((((unsigned long)(x) & 0xFFFFFFFFUL) >> (unsigned long)((y) & 31)) | ((unsigned long)(x) << (unsigned long)(32 - ((y) & 31)))) & 0xFFFFFFFFUL)
 
-#endif // if defined(_MSC_VER)
+#endif 
 
 
 /* 64-bit Rotates */
@@ -371,7 +371,7 @@ static inline unsigned long ROR64c(unsigned long word, const int i) {
 #define ROL64c ROL64
 #define ROR64c ROR64
 
-#endif // ifndef LTC_NO_ROLC
+#endif 
 
 #else /* Not x86_64  */
 
@@ -391,7 +391,7 @@ static inline unsigned long ROR64c(unsigned long word, const int i) {
     (((((x) & CONST64(0xFFFFFFFFFFFFFFFF)) >> ((ulong64)(y) & CONST64(63))) | \
       ((x) << ((ulong64)(64 - ((y) & CONST64(63)))))) & CONST64(0xFFFFFFFFFFFFFFFF))
 
-#endif // if !defined(__STRICT_ANSI__) && defined(__GNUC__) && defined(__x86_64__) && !defined(LTC_NO_ASM)
+#endif 
 
 #ifndef MAX
    #define MAX(x, y)  (((x) > (y)) ? (x) : (y))

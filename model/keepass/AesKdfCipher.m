@@ -20,7 +20,7 @@ static const uint32_t kDefaultSeedLength = 32;
 
 @interface AesKdfCipher ()
 
-@property (nonatomic, readonly) NSUUID *uuid; // Maintain whatever we are initialized with...
+@property (nonatomic, readonly) NSUUID *uuid; 
 @property (nonatomic, readonly) NSData *seed;
 @property (nonatomic, readonly) uint64_t rounds;
 
@@ -42,13 +42,13 @@ static const uint32_t kDefaultSeedLength = 32;
 - (instancetype)initWithParametersDictionary:(KdfParameters*)parameters {
     self = [super init];
     if (self) {
-        //NSLog(@"AES KDF: %@", parameters);
+        
 
-//        2019-03-26 12:17:39.119800+0100 Strongbox[15451:171707] AES KDF: {
-//            "$UUID" = "Type-66: <c9d9f39a 628a4460 bf740d08 c18a4fea>";
-//            R = "Type-5: 23255814";
-//            S = "Type-66: <9814438c 07d99382 8a3971f6 39e534e7 2a5a46a6 244b2972 28177eae 81717638>";
-//        }
+
+
+
+
+
 
         _uuid = parameters.uuid;
         
@@ -74,7 +74,7 @@ static const uint32_t kDefaultSeedLength = 32;
 }
 
 - (NSData*)deriveKey:(NSData*)data {
-    return getAesTransformKey(data, self.seed, self.rounds); // Standard KDBX 3 KDF Function
+    return getAesTransformKey(data, self.seed, self.rounds); 
 }
 
 - (KdfParameters *)kdfParameters {

@@ -62,9 +62,9 @@
     }];
 }
 
-- (void)getAvailableYubikey:(GetAvailableYubikeyCompletion)completion {
+- (void)getAvailableYubiKey:(GetAvailableYubiKeyCompletion)completion {
     dispatch_async(self.queue, ^{
-        YubiKeyData* ret = [self internalGetAvailableYubikey];
+        YubiKeyData* ret = [self internalGetAvailableYubiKey];
         completion(ret);
     });
 }
@@ -77,7 +77,7 @@
     });
 }
 
-- (YubiKeyData*)internalGetAvailableYubikey {
+- (YubiKeyData*)internalGetAvailableYubiKey {
     if (!yk_init()) {
         NSLog(@"YubiKey Init Failed");
         return nil;
@@ -95,7 +95,7 @@
         return nil;
     }
 
-    // Test CR on both slots
+    
     
     YubiKeyData* ret = [[YubiKeyData alloc] init];
     
@@ -174,11 +174,11 @@ typedef NS_ENUM(NSInteger, YubiKeyChallengeResponseResult) {
                                               allowBlocking:(BOOL)allowBlocking
                                                   challenge:(NSData*)challenge
                                                    response:(NSData**)response {
-    // Some people program the Yubikey with Fixed Length "Fixed 64 byte input" and others with "Variable Input"
-    // To cover both cases the KeePassXC model appears to be to always send 64 bytes with extraneous bytes above
-    // and beyond the actual challenge padded PKCS#7 style-ish... MMcG - 1-Mar-2020
-    //
-    // Further Reading: https://github.com/Yubico/yubikey-personalization-gui/issues/86
+    
+    
+    
+    
+    
 
     const NSInteger kChallengeSize = 64;
     const NSInteger padLen = kChallengeSize - challenge.length;
@@ -208,7 +208,7 @@ typedef NS_ENUM(NSInteger, YubiKeyChallengeResponseResult) {
         if (yk_errno == YK_EWOULDBLOCK) {
             return YubiKeyChallengeResponseResultWouldBlock;
         }
-        else if (yk_errno == YK_ETIMEOUT) { } // This seems to be the general not available error return not just timeout
+        else if (yk_errno == YK_ETIMEOUT) { } 
         else if (yk_errno == YK_EUSBERR) {
             NSLog(@"CR Error: %s", yk_strerror(yk_errno));
             NSLog(@"Challenge Response USB Error?");

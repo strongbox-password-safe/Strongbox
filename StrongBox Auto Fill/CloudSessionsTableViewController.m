@@ -52,7 +52,7 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cloudSessionsCellIdentifier" forIndexPath:indexPath];
  
     cell.textLabel.text = self.rows[indexPath.row];
-    //cell.textLabel.textColor = UIColor.blueColor;
+    
     
     return cell;
 }

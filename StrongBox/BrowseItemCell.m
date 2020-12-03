@@ -188,7 +188,7 @@
 }
 
 - (IBAction)updateOtpCode {
-//    NSLog(@"Updating OTP Codes from Notification");
+
     if(self.otpToken) {
         uint64_t remainingSeconds = self.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.otpToken.period);
         self.otpLabel.text = [NSString stringWithFormat:@"%@", self.otpToken.password];

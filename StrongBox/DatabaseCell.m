@@ -40,7 +40,7 @@ NSString* const kDatabaseCell = @"DatabaseCell";
 - (void)prepareForReuse {
     [super prepareForReuse];
     
-//    NSLog(@"XXXXXXXXXXXXXX - prepareForReuse [%@]", self.name.text);
+
 
     self.bottomRow.hidden = NO;
     self.subtitle1.hidden = NO;
@@ -86,7 +86,7 @@ statusImages:(NSArray<UIImage*>*)statusImages
 rotateLastImage:(BOOL)rotateLastImage
       tints:(nonnull NSArray *)tints
    disabled:(BOOL)disabled {
-//    NSLog(@"XXXXXXXXXXXXXX - SET Database Cell for db [%@]", name);
+
     
     self.name.text = name;
 
@@ -119,7 +119,7 @@ rotateLastImage:(BOOL)rotateLastImage
 }
 
 - (void)runSpinAnimationOnView:(UIView*)view doIt:(BOOL)doIt duration:(CGFloat)duration rotations:(CGFloat)rotations repeat:(float)repeat {
-//    NSLog(@"XXXXXXXXXXXXXX - runSpinAnimationOnView for db [%@]-[%@]", self.name.text, doIt ? @"YUP" : @"Nope");
+
 
     [view.layer removeAllAnimations];
     
@@ -130,13 +130,13 @@ rotateLastImage:(BOOL)rotateLastImage
         rotationAnimation.duration = duration;
         rotationAnimation.cumulative = YES;
         rotationAnimation.repeatCount = repeat ? HUGE_VALF : 0;
-        [rotationAnimation setRemovedOnCompletion:NO]; // Required or animation stops if the app deactivates or another view controller is pushed on the nav stack :(
+        [rotationAnimation setRemovedOnCompletion:NO]; 
         
         [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)populateCell:(SafeMetaData*)database {
     [self populateCell:database disabled:NO autoFill:NO];
@@ -176,7 +176,7 @@ rotateLastImage:(BOOL)rotateLastImage
      disabled:disabled];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSArray<UIImage*>*)getStatusImages:(SafeMetaData*)database syncState:(SyncOperationState)syncState tints:(NSArray**)tints {
     NSMutableArray<UIImage*> *ret = NSMutableArray.array;

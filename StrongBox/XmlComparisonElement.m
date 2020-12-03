@@ -68,7 +68,7 @@
         for (XmlComparisonElement* otherChild in othersRemaining) {
             if ([child isEqual:otherChild probe:NO]) {
                 foundMatchingChild = YES;
-                [othersRemaining removeObject:otherChild]; // Do not match this one again
+                [othersRemaining removeObject:otherChild]; 
                 break;
             }
         }

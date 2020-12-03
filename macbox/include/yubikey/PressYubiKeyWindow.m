@@ -38,12 +38,12 @@ static PressYubiKeyWindow* instance;
 
 - (void)showAsSheet:(NSWindow*)parent {
     if (!parent) {
-        // Try to auto detect parent if none provide...
+        
         
         parent = NSApplication.sharedApplication.mainWindow ? NSApplication.sharedApplication.mainWindow : NSApplication.sharedApplication.keyWindow;
 
         if (!parent) {
-            //        NSLog(@"windows = [%@] - main = [%@], key = [%@]", NSApplication.sharedApplication.windows, parent, NSApplication.sharedApplication.keyWindow);
+            
 
             parent = NSApplication.sharedApplication.windows.firstObject;
         }

@@ -32,7 +32,7 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     
-    // Tips - Must be done here to avoid jumpy initial animation
+    
     
     if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
@@ -47,7 +47,7 @@
 
     self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.viewModel tableView:self.tableView];
     
-    // A little trick for removing the cell separators
+    
     self.tableView.tableFooterView = [UIView new];
     
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
@@ -59,7 +59,7 @@
     self.df.doesRelativeDateFormatting = YES;
     self.df.locale = NSLocale.currentLocale;
     
-    // Sort ascending, oldest to newest
+    
     
     self.items = self.historicalItems == nil ? @[] : [self.historicalItems sortedArrayUsingComparator:^NSComparisonResult(Node*  _Nonnull obj1, Node*  _Nonnull obj2) {
         return [obj1.fields.modified compare:obj2.fields.modified];
@@ -167,7 +167,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return UITableViewAutomaticDimension;  // Required for iOS 9 and 10
+    return UITableViewAutomaticDimension;  
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -176,7 +176,7 @@
      * estimated height dynamically on information
      * that makes sense in your case.
      */
-    return 60.0f; // Required for iOS 9 and 10
+    return 60.0f; 
 }
 
 @end

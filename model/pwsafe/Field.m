@@ -16,7 +16,7 @@
     BOOL _isHeaderField;
 }
 
-////////////////////////////////////////
+
 
 - (Field *)initEmptyDbHeaderField:(HeaderFieldType)type {
     return [self initWithData:[[NSData alloc] init] type:type header:YES];
@@ -51,7 +51,7 @@
     }
 }
 
-///////////////////////////////////////////////////
+
 
 - (NSData *)data {
     return _data;
@@ -156,11 +156,11 @@
 
                 break;
 
-            case FIELD_TYPE_CTIME:       // Entry 'C'reation time
-            case FIELD_TYPE_PMTIME: // last 'P'assword 'M'odification time
-            case FIELD_TYPE_ATIME:  // last 'A'ccess time
-            case FIELD_TYPE_XTIME:  // password e'X'piry time
-            case FIELD_TYPE_RMTIME: // last 'R'ecord 'M'odification time
+            case FIELD_TYPE_CTIME:       
+            case FIELD_TYPE_PMTIME: 
+            case FIELD_TYPE_ATIME:  
+            case FIELD_TYPE_XTIME:  
+            case FIELD_TYPE_RMTIME: 
                 return [Field dateString:self.dataAsDate];
 
                 break;
@@ -171,27 +171,27 @@
             }
                                        break;
 
-            //        case FIELD_TYPE_START:
-            //        case FIELD_TYPE_GROUP:
-            //        case FIELD_TYPE_TITLE:
-            //        case FIELD_TYPE_USER:
-            //        case FIELD_TYPE_NOTES:
-            //        case FIELD_TYPE_PASSWORD:
-            //        case FIELD_TYPE_RESERVED:
-            //        case FIELD_TYPE_URL:
-            //        case FIELD_TYPE_AUTOTYPE:
-            //        case FIELD_TYPE_PWHIST:
-            //        case FIELD_TYPE_POLICY: // string encoding of item-specific password polic
-            //        case FIELD_TYPE_RUNCMD:
-            //        case FIELD_TYPE_DCA:    // doubleclick action (enum)
-            //        case FIELD_TYPE_EMAIL:
-            //        case FIELD_TYPE_PROTECTED:
-            //        case FIELD_TYPE_SYMBOLS:    // string of item-specific password symbols
-            //        case FIELD_TYPE_SHIFTDCA:   // shift-doubleclick action (enum)
-            //        case FIELD_TYPE_POLICYNAME: // named non-default password policy for item
-            //        case FIELD_TYPE_KBSHORTCUT: // Keyboard shortcuts
-            //        case FIELD_TYPE_LAST:        // Start of unknown fields!
-            //        case FIELD_TYPE_END:
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
             default:
                 return [[NSString alloc]initWithData:self->_data encoding:NSUTF8StringEncoding];
 
@@ -294,7 +294,7 @@
                 break;
 
             default:
-                return @"<Unknown>"; //[[NSString alloc]initWithData:self->_data encoding:NSUTF8StringEncoding];
+                return @"<Unknown>"; 
 
                 break;
         }

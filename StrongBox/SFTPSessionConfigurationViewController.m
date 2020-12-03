@@ -141,7 +141,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     NSData* key = [NSData dataWithContentsOfURL:url];
     NSString* privateKey = [[NSString alloc] initWithData:key encoding:NSUTF8StringEncoding];
 

@@ -12,15 +12,16 @@
 
 @implementation BackupItem
 
-+ (instancetype)withUrl:(NSURL *)url date:(NSDate *)date fileSize:(NSNumber *)fileSize {
-    return [[BackupItem alloc] initWithUrl:url date:date fileSize:fileSize];
++ (instancetype)withUrl:(NSURL *)url backupCreatedDate:(NSDate *)backupCreatedDate modDate:(NSDate *)modDate fileSize:(NSNumber *)fileSize {
+    return [[BackupItem alloc] initWithUrl:url backupCreatedDate:backupCreatedDate modDate:modDate fileSize:fileSize];
 }
 
-- (instancetype)initWithUrl:(NSURL *)url date:(NSDate *)date fileSize:(NSNumber *)fileSize {
+- (instancetype)initWithUrl:(NSURL *)url backupCreatedDate:(NSDate *)backupCreatedDate modDate:(NSDate *)modDate fileSize:(NSNumber *)fileSize {
     self = [super init];
     if (self) {
         _url = url;
-        _date = date;
+        _backupCreatedDate = backupCreatedDate;
+        _modDate = modDate;
         _fileSize = fileSize;
     }
     return self;
@@ -28,7 +29,7 @@
     
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@-%@", self.date.friendlyDateString, friendlyFileSizeString(self.fileSize.unsignedIntValue)];
+    return [NSString stringWithFormat:@"%@-%@", self.backupCreatedDate.friendlyDateString, friendlyFileSizeString(self.fileSize.unsignedIntValue)];
 }
 
 @end

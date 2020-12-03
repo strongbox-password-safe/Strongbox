@@ -293,7 +293,7 @@ static NSArray<UIImage*>* loadKeePassIconSet() {
     NSData* data = customIcons[uuid];
     
     if(data) {
-        //NSLog(@"Custom: [%@]", [data base64EncodedStringWithOptions:kNilOptions]);
+        
         UIImage* img = [UIImage imageWithData:data];
         if(!img) {
             return nil;

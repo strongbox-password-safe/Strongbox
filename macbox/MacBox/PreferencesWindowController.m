@@ -43,6 +43,7 @@
 @property (weak) IBOutlet NSButton *checkboxUseUpper;
 @property (weak) IBOutlet NSButton *checkboxUseDigits;
 @property (weak) IBOutlet NSButton *checkboxUseSymbols;
+@property (weak) IBOutlet NSButton *checkboxUseLatin1Supplement;
 @property (weak) IBOutlet NSButton *checkboxUseEasy;
 @property (weak) IBOutlet NSButton *checkboxNonAmbiguous;
 @property (weak) IBOutlet NSButton *checkboxPickFromEveryGroup;
@@ -126,7 +127,7 @@
     return sharedInstance;
 }
 
-- (void)cancel:(id)sender { // Pick up escape key
+- (void)cancel:(id)sender { 
     [self close];
 }
 
@@ -283,32 +284,32 @@
     self.segmentTitle.selectedSegment = index;
     self.labelCustomTitle.stringValue = settings.titleAutoFillMode == kCustom ? settings.titleCustomAutoFill : @"";
     
-    // Username Options: None / Most Used / Custom
     
-    // KLUDGE: This is a bit hacky but saves some RSI typing... :/
+    
+    
     index = [self autoFillModeToSegmentIndex:settings.usernameAutoFillMode];
     self.segmentUsername.selectedSegment = index;
     self.labelCustomUsername.stringValue = settings.usernameAutoFillMode == kCustom ? settings.usernameCustomAutoFill : @"";
     
-    // Password Options: None / Most Used / Generated / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.passwordAutoFillMode];
     self.segmentPassword.selectedSegment = index;
     self.labelCustomPassword.stringValue = settings.passwordAutoFillMode == kCustom ? settings.passwordCustomAutoFill : @"";
     
-    // Email Options: None / Most Used / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.emailAutoFillMode];
     self.segmentEmail.selectedSegment = index;
     self.labelCustomEmail.stringValue = settings.emailAutoFillMode == kCustom ? settings.emailCustomAutoFill : @"";
     
-    // URL Options: None / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.urlAutoFillMode];
     self.segmentUrl.selectedSegment = index;
     self.labelCustomUrl.stringValue = settings.urlAutoFillMode == kCustom ? settings.urlCustomAutoFill : @"";
     
-    // Notes Options: None / Custom
+    
     
     index = [self autoFillModeToSegmentIndex:settings.notesAutoFillMode];
     self.segmentNotes.selectedSegment = index;
@@ -344,8 +345,8 @@
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Password Generation
+
+
 
 - (void)bindPasswordUiToSettings {
     PasswordGenerationConfig *params = Settings.sharedInstance.passwordGenerationConfig;
@@ -353,23 +354,27 @@
     self.radioBasic.state = params.algorithm == kPasswordGenerationAlgorithmBasic ? NSOnState : NSOffState;
     self.radioXkcd.state = params.algorithm == kPasswordGenerationAlgorithmDiceware ? NSOnState : NSOffState;
 
-    // Basic - Enabled
+    
+    
     self.checkboxUseLower.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.checkboxUseUpper.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.checkboxUseDigits.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.checkboxUseSymbols.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
+    self.checkboxUseLatin1Supplement.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.checkboxUseEasy.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.checkboxNonAmbiguous.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.checkboxPickFromEveryGroup.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.sliderPasswordLength.enabled = params.algorithm == kPasswordGenerationAlgorithmBasic;
     self.labelPasswordLength.textColor = params.algorithm == kBasic ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
     
-    // Basic - Values
+    
     
     self.checkboxUseLower.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolLower)] ? NSOnState : NSOffState;
     self.checkboxUseUpper.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolUpper)] ? NSOnState : NSOffState;
     self.checkboxUseDigits.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolNumeric)] ? NSOnState : NSOffState;
     self.checkboxUseSymbols.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolSymbols)] ? NSOnState : NSOffState;
+    self.checkboxUseLatin1Supplement.state = [params.useCharacterGroups containsObject:@(kPasswordGenerationCharacterPoolLatin1Supplement)] ? NSOnState : NSOffState;
+
     self.checkboxUseEasy.state = params.easyReadCharactersOnly ? NSOnState : NSOffState;
 
     self.checkboxNonAmbiguous.state = params.nonAmbiguousOnly ? NSOnState : NSOffState;
@@ -377,7 +382,7 @@
     self.sliderPasswordLength.integerValue = params.basicLength;
     self.labelPasswordLength.stringValue = @(params.basicLength).stringValue;
 
-    // Diceware - Enabled
+    
     
     self.labelXkcdWordCount.enabled = params.algorithm == kXkcd;
     self.labelWordcount.textColor = params.algorithm == kXkcd ? [NSColor controlTextColor] : [NSColor disabledControlTextColor];
@@ -387,7 +392,7 @@
     self.popupHackerify.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
     self.popupAddSalt.enabled = params.algorithm == kPasswordGenerationAlgorithmDiceware;
     
-    // Diceware - Values
+    
     
     [self.tableViewWordLists reloadData];
     self.labelXkcdWordCount.stringValue = @(params.wordCount).stringValue;
@@ -405,7 +410,7 @@
 
     params.algorithm = self.radioBasic.state == NSOnState ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
 
-    // Lower
+    
     
     NSMutableArray<NSNumber*> *newGroups = params.useCharacterGroups.mutableCopy;
     if(self.checkboxUseLower.state == NSOnState) {
@@ -415,7 +420,7 @@
         [newGroups removeObject:@(kPasswordGenerationCharacterPoolLower)];
     }
 
-    // Upper
+    
     
     if(self.checkboxUseUpper.state == NSOnState) {
         [newGroups addObject:@(kPasswordGenerationCharacterPoolUpper)];
@@ -424,7 +429,7 @@
         [newGroups removeObject:@(kPasswordGenerationCharacterPoolUpper)];
     }
 
-    // Numeric
+    
     
     if(self.checkboxUseDigits.state == NSOnState) {
         [newGroups addObject:@(kPasswordGenerationCharacterPoolNumeric)];
@@ -433,7 +438,7 @@
         [newGroups removeObject:@(kPasswordGenerationCharacterPoolNumeric)];
     }
 
-    // Symbols
+    
     
     if(self.checkboxUseSymbols.state == NSOnState) {
         [newGroups addObject:@(kPasswordGenerationCharacterPoolSymbols)];
@@ -441,6 +446,16 @@
     else {
         [newGroups removeObject:@(kPasswordGenerationCharacterPoolSymbols)];
     }
+
+    
+    
+    if(self.checkboxUseLatin1Supplement.state == NSOnState) {
+        [newGroups addObject:@(kPasswordGenerationCharacterPoolLatin1Supplement)];
+    }
+    else {
+        [newGroups removeObject:@(kPasswordGenerationCharacterPoolLatin1Supplement)];
+    }
+    
     params.useCharacterGroups = newGroups;
 
     params.easyReadCharactersOnly = self.checkboxUseEasy.state == NSOnState;
@@ -448,7 +463,7 @@
     params.pickFromEveryGroup = self.checkboxPickFromEveryGroup.state == NSOnState;
     params.basicLength = self.sliderPasswordLength.integerValue;
 
-    // Diceware
+    
     
     params.wordCount = (int)self.stepperXkcdWordCount.integerValue;
     params.wordSeparator = self.textFieldWordSeparator.stringValue;
@@ -457,7 +472,7 @@
     params.hackerify = [self.popupHackerify.menu.itemArray indexOfObject:self.popupHackerify.selectedItem];
     params.saltConfig = [self.popupAddSalt.menu.itemArray indexOfObject:self.popupAddSalt.selectedItem];
 
-    // Save
+    
     
     Settings.sharedInstance.passwordGenerationConfig = params;
     
@@ -503,7 +518,7 @@
     return result;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (IBAction)onTitleSegment:(id)sender {
     AutoFillNewRecordSettings* settings = Settings.sharedInstance.autoFillNewRecordSettings;
@@ -645,7 +660,7 @@
 }
 
 - (int)autoFillModeToSegmentIndex:(AutoFillMode)mode {
-    // KLUDGE: This is a bit hacky but saves some RSI typing... :/
+    
     
     switch (mode) {
         case kNone:
@@ -667,7 +682,7 @@
     }
 }
 
-// Auto Lock DB
+
 
 -(void) bindAutoLockToSettings {
     NSInteger alt = Settings.sharedInstance.autoLockTimeoutSeconds;
@@ -707,7 +722,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 
-// Auto Clear Clipboard
+
 
 - (void)bindAutoClearClipboard {
     self.switchAutoClearClipboard.state = Settings.sharedInstance.clearClipboardEnabled ? NSOnState : NSOffState;
@@ -732,7 +747,7 @@
 - (IBAction)onClearClipboardTextFieldEdited:(id)sender {
     self.stepperClearClipboard.integerValue = self.textFieldClearClipboard.integerValue;
     
-    // Use the stepper to validate...
+    
     
     Settings.sharedInstance.clearClipboardAfterSeconds =     self.stepperClearClipboard.integerValue;
     

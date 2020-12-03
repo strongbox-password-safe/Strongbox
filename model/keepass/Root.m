@@ -37,9 +37,9 @@
 - (id<XmlParsingDomainObject>)getChildHandler:(nonnull NSString *)xmlElementName {
     if([xmlElementName isEqualToString:kGroupElementName]) {
         if(self.rootGroup == nil) {
-            // Little extra safety here in case somehow multiple root groups exist,
-            // we only look at the first (which is I believe how the model works. If
-            // somehow this isn't the case, we will not overwrite the other groups but just ignore them
+            
+            
+            
             
             return [[KeePassGroup alloc] initWithContext:self.context];
         }

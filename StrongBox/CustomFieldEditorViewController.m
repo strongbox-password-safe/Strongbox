@@ -55,7 +55,7 @@ const static NSSet<NSString*> *keePassReservedNames;
                           action:@selector(textFieldDidChange:)
                 forControlEvents:UIControlEventEditingChanged];
     
-//    UIColor *borderColor = [UIColor colorWithRed:204.0/255.0 green:204.0/255.0 blue:204.0/255.0 alpha:1.0];
+
     
     if (@available(iOS 13.0, *)) {
         self.textView.layer.borderColor = UIColor.labelColor.CGColor;
@@ -112,8 +112,8 @@ const static NSSet<NSString*> *keePassReservedNames;
     }
     
     if(keyIsValid) {
-        if(self.customField) { // Existing Custom Field
-            if([candidate compare:self.customField.key] != NSOrderedSame) { // Custom Field and they've changed the key
+        if(self.customField) { 
+            if([candidate compare:self.customField.key] != NSOrderedSame) { 
                 NSMutableSet<NSString*> *otherKeys = [self.customFieldsKeySet mutableCopy];
                 [otherKeys removeObject:self.customField.key];
                 
@@ -162,8 +162,8 @@ const static NSSet<NSString*> *keePassReservedNames;
     self.scrollView.contentInset = contentInsets;
     self.scrollView.scrollIndicatorInsets = contentInsets;
     
-    // If active text field is hidden by keyboard, scroll it so it's visible
-    // Your app might not need or want this behavior.
+    
+    
     
     CGRect aRect = self.view.frame;
     
@@ -184,27 +184,27 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
-    //NSLog(@"textFieldDidBeginEditing");
+    
     self.activeField = textField;
 }
 
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
-//    NSLog(@"textFieldDidEndEditing");
+
     self.activeField = nil;
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-//    NSLog(@"textViewDidBeginEditing");
+
     self.activeField = textView;
 }
 
 - (void)textViewDidEndEditing:(UITextView *)textView {
-//    NSLog(@"textViewDidEndEditing");
+
     self.activeField = nil;
 }
 
-////////////////////////////////////////////////////////////////////////
+
 
 - (IBAction)onDone:(id)sender {
     NSString* key = trim(self.keyTextField.text);

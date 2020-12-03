@@ -200,10 +200,10 @@
     [self.xmlWriter writeEndElement];
 }
 
-// IXmlSerializer
+
 
 - (NSString *)encryptProtected:(NSString *)pt {
-    if(self.innerRandomStream == nil) { // Plaintext or for testing
+    if(self.innerRandomStream == nil) { 
         return pt;
     }
     

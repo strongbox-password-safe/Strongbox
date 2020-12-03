@@ -31,6 +31,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEmailCsv;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellCopy;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellHtml;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellXml;
 
 @property NSURL* temporaryExportUrl;
 
@@ -49,8 +50,18 @@
         [self cell:self.cellEmailCsv setHidden:YES];
         [self cell:self.cellCopy setHidden:YES];
         [self cell:self.cellHtml setHidden:YES];
+        [self cell:self.cellXml setHidden:YES];
 
         [self reloadDataAnimated:YES];
+    }
+    else {
+        if (!( self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4 )) {
+            [self cell:self.cellXml setHidden:YES];
+        }
+        
+        if (TARGET_OS_SIMULATOR == 0) { 
+            [self cell:self.cellXml setHidden:YES];
+        }
     }
 }
 
@@ -63,6 +74,7 @@
     self.cellEmailCsv.imageView.image = [UIImage imageNamed:@"message"];
     self.cellCopy.imageView.image = [UIImage imageNamed:@"copy"];
     self.cellHtml.imageView.image = [UIImage imageNamed:@"document"];
+    self.cellXml.imageView.image = [UIImage imageNamed:@"document"];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -87,6 +99,9 @@
     else if(cell == self.cellHtml) {
         [self exportHtmlByEmail];
     }
+    else if(cell == self.cellXml) {
+        [self copyXml];
+    }
 }
 
 - (void)onShare {
@@ -94,8 +109,10 @@
         [self onShareWithData:self.encrypted];
     }
     else {
-        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-            if (userCancelled) { }
+        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            if (userCancelled) {
+                
+            }
             else if (!data) {
                 [Alerts error:self
                         title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
@@ -123,15 +140,15 @@
     }
     
     NSURL* url = [NSURL fileURLWithPath:f];
-    NSArray *activityItems = @[url]; // NB: Do not add NSString or NSData here it messes up the available apps
+    NSArray *activityItems = @[url]; 
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
-    // Required for iPad... Center Popover
+    
     
     activityViewController.popoverPresentationController.sourceView = self.view;
     activityViewController.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds),0,0);
-    activityViewController.popoverPresentationController.permittedArrowDirections = 0L; // Don't show the arrow as it's not really anchored
+    activityViewController.popoverPresentationController.permittedArrowDirections = 0L; 
     
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
         NSError *errorBlock;
@@ -167,6 +184,31 @@
                                didHide:nil];
 }
 
+- (void)copyXml {
+    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        if (userCancelled) {
+            return;
+        }
+        else if(!data) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
+                    error:error];
+            return;
+        }
+        
+        [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:debugXml];
+        
+        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"export_vc_message_xml_copied", @"Database KeePass XML Copied to Clipboard")
+                                   message:nil
+                                  duration:3.f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeSuccess
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
+    }];
+}
+
 - (void)exportCsvByEmail {
     NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
     NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
@@ -183,7 +225,7 @@
 
 - (void)exportEncryptedSafeByEmail {
     if(!self.backupMode) {
-        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
             if (userCancelled) {
                 return;
             }
@@ -207,7 +249,7 @@
     else {
         NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.metadata.likelyFormat];
         NSString* appendExtension = self.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
-        NSString *attachmentName = [NSString stringWithFormat:@"%@-%@-%@", self.metadata.fileName, self.backupItem.date.iso8601DateString, appendExtension];
+        NSString *attachmentName = [NSString stringWithFormat:@"%@-%@-%@", self.metadata.fileName, self.backupItem.backupCreatedDate.iso8601DateString, appendExtension];
 
         [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:self.encrypted nickname:self.metadata.nickName];
     }
@@ -259,8 +301,10 @@
         [self onFilesGotData:self.encrypted  metadata:self.metadata];
     }
     else {
-        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-            if (userCancelled) { }
+        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            if (userCancelled) {
+                
+            }
             else if (!data) {
                 [Alerts error:self
                         title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
@@ -307,7 +351,7 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     NSError* error;
     NSData* data = [NSData dataWithContentsOfURL:self.temporaryExportUrl options:kNilOptions error:&error];
     

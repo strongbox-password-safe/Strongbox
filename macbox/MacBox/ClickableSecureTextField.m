@@ -15,7 +15,7 @@
 }
 
 - (void)mouseUp:(NSEvent *)event {
-//    NSLog(@"mouseUp");
+
     
     if(self.onClick) {
         self.onClick();

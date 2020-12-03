@@ -53,6 +53,7 @@ NSString* trim(NSString* str);
 + (NSString*)formatTimeInterval:(NSInteger)seconds;
 
 NSString* friendlyFileSizeString(long long byteCount);
+NSString* friendlyMemorySizeString(long long byteCount);
 
 extern NSComparator finderStringComparator;
 NSComparisonResult finderStringCompare(NSString* string1, NSString* string2);

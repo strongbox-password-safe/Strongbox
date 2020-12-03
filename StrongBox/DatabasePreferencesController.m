@@ -95,7 +95,6 @@
                        if(self.viewModel.metadata.conveniencePin == nil) {
                            self.viewModel.metadata.isEnrolledForConvenience = NO;
                            self.viewModel.metadata.convenienceMasterPassword = nil;
-                           self.viewModel.metadata.convenenienceYubikeySecret = nil;
                        }
                        
                        [[SafesList sharedInstance] update:self.viewModel.metadata];
@@ -128,7 +127,6 @@
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.isEnrolledForConvenience = YES;
         self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
-        self.viewModel.metadata.convenenienceYubikeySecret = self.viewModel.openedWithYubiKeySecret;
         
         [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindUi];
@@ -282,13 +280,13 @@
     if(seconds.integerValue == -1) {
         self.switchDatabaseAutoLockEnabled.on = NO;
         self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-//        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkGrayColor;
+
         self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
     }
     else {
         self.switchDatabaseAutoLockEnabled.on = YES;
         self.labelDatabaseAutoLockDelay.text = [Utils formatTimeInterval:seconds.integerValue];
-//        self.labelDatabaseAutoLockDelay.textColor = UIColor.darkTextColor;
+
         self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
     }
 }

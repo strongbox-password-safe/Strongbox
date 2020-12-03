@@ -10,7 +10,7 @@
 #import "DatabaseModel.h"
 #import "Node.h"
 #import "SearchScope.h"
-#import "Model.h"
+#import "BrowseSortField.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,10 +18,23 @@ extern NSString* const kSpecialSearchTermAllEntries;
 extern NSString* const kSpecialSearchTermAuditEntries;
 extern NSString* const kSpecialSearchTermTotpEntries;
           
+typedef BOOL (^FlaggedByAuditPredicate)(Node* node);
+ 
 @interface DatabaseSearchAndSorter : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithModel:(Model*)model;
+
+- (instancetype)initWithModel:(DatabaseModel*)databaseModel
+              browseSortField:(BrowseSortField)browseSortField
+                   descending:(BOOL)descending
+            foldersSeparately:(BOOL)foldersSeparately;
+
+- (instancetype)initWithModel:(DatabaseModel*)databaseModel
+              browseSortField:(BrowseSortField)browseSortField
+                   descending:(BOOL)descending
+            foldersSeparately:(BOOL)foldersSeparately
+             isFlaggedByAudit:(FlaggedByAuditPredicate _Nullable)isFlaggedByAudit;
+
 
 - (NSArray<Node*>*)search:(NSString *)searchText
                     scope:(SearchScope)scope
@@ -45,8 +58,6 @@ extern NSString* const kSpecialSearchTermTotpEntries;
                         includeRecycleBin:(BOOL)includeRecycleBin
                            includeExpired:(BOOL)includeExpired
                             includeGroups:(BOOL)includeGroups;
-
-- (NSString*)getBrowseItemSubtitle:(Node*)node;
 
 @end
 

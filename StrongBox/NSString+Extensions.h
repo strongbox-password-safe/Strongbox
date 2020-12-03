@@ -21,6 +21,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* urlExtendedParse;
 
 @property (readonly) BOOL isHexString;
+@property (readonly) BOOL isKeePassXmlBooleanStringTrue;
+@property (readonly) BOOL isKeePassXmlBooleanStringFalse;
+@property (readonly) BOOL isKeePassXmlBooleanStringNull;
 
 @end
 

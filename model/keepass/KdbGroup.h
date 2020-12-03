@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSNumber* imageId;
 @property (nonatomic) uint16_t level;
 @property (nonatomic) uint32_t flags;
-//@property NSData* extData;
+
 
 @end
 

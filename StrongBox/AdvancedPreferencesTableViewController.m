@@ -23,7 +23,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
-@property (weak, nonatomic) IBOutlet UISwitch *switchShowYubikeySecretWorkaround;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowMetadataOnDetailsScreen;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowPinCodeOpen;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
@@ -38,7 +38,6 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
-@property (weak, nonatomic) IBOutlet UISwitch *switchDebugSanityCheckInnerStream;
 
 @end
 
@@ -88,14 +87,13 @@
     SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
-    SharedAppAndAutoFillSettings.sharedInstance.showYubikeySecretWorkaroundField = self.switchShowYubikeySecretWorkaround.on;
     SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
     SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
     SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
     Settings.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
     Settings.sharedInstance.allowThirdPartyKeyboards = self.switchAllowThirdPartyKeyboards.on;
 
-    SharedAppAndAutoFillSettings.sharedInstance.debugSanityCheckInnerStream = self.switchDebugSanityCheckInnerStream.on;
+    SharedAppAndAutoFillSettings.sharedInstance.legacyShowMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
     
     if(SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
@@ -114,7 +112,6 @@
     self.instantPinUnlock.on = SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
     self.switchHideKeyFileName.on = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles;
-    self.switchShowYubikeySecretWorkaround.on = SharedAppAndAutoFillSettings.sharedInstance.showYubikeySecretWorkaroundField;
     self.switchDetectOffline.on = SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity;
     self.switchAllowClipboardHandoff.on = SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff;
     self.switchUseColorBlindPalette.on = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
@@ -124,7 +121,7 @@
     self.switchHideExportOnDatabaseMenu.on = Settings.sharedInstance.hideExportFromDatabaseContextMenu;
     self.switchAllowThirdPartyKeyboards.on = Settings.sharedInstance.allowThirdPartyKeyboards;
     
-    self.switchDebugSanityCheckInnerStream.on = SharedAppAndAutoFillSettings.sharedInstance.debugSanityCheckInnerStream;
+    self.switchShowMetadataOnDetailsScreen.on = SharedAppAndAutoFillSettings.sharedInstance.legacyShowMetadataOnDetailsScreen;
 }
 
 - (void)bindAllowPinCodeOpen {
@@ -149,7 +146,7 @@
                     if(response) {
                         SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
 
-                        // Clear any Convenience Enrolled PIN Using Safes
+                        
 
                         NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
                             return obj.conveniencePin != nil && obj.isEnrolledForConvenience;
@@ -159,10 +156,9 @@
                             safe.isEnrolledForConvenience = NO;
                             safe.isTouchIdEnabled = NO;
                             safe.convenienceMasterPassword = nil;
-                            safe.convenenienceYubikeySecret = nil;
                             safe.conveniencePin = nil;
                             safe.duressPin = nil;
-                            safe.hasBeenPromptedForConvenience = NO; // If switched back on we can ask if they want to enrol
+                            safe.hasBeenPromptedForConvenience = NO; 
 
                             [SafesList.sharedInstance update:safe];
                         }
@@ -191,7 +187,7 @@
 
                         SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
 
-                        // Clear any Convenience Enrolled Biometric Using Safes
+                        
 
                         NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
                         return obj.isTouchIdEnabled && obj.isEnrolledForConvenience;
@@ -200,11 +196,10 @@
                         for (SafeMetaData* safe in clear) {
                             safe.isEnrolledForConvenience = NO;
                             safe.convenienceMasterPassword = nil;
-                            safe.convenenienceYubikeySecret = nil;
                             safe.conveniencePin = nil;
                             safe.isTouchIdEnabled = NO;
                             safe.duressPin = nil;
-                            safe.hasBeenPromptedForConvenience = NO; // If switched back on we can ask if they want to enrol
+                            safe.hasBeenPromptedForConvenience = NO; 
 
                             [SafesList.sharedInstance update:safe];
                         }

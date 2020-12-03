@@ -11,6 +11,8 @@
 #import "DatabaseSearchAndSorter.h"
 #import "BrowseItemCell.h"
 #import "BrowseItemTotpCell.h"
+#import "NSDate+Extensions.h"
+#import "Utils.h"
 
 static NSString* const kBrowseItemCell = @"BrowseItemCell";
 static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
@@ -44,13 +46,24 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (UITableViewCell *)getBrowseCellForNode:(Node*)node
-            indexPath:(NSIndexPath*)indexPath
-    showLargeTotpCell:(BOOL)showLargeTotpCell
-    showGroupLocation:(BOOL)showGroupLocation
-groupLocationOverride:(NSString*)groupLocationOverride
-        accessoryType:(UITableViewCellAccessoryType)accessoryType {
+                                indexPath:(NSIndexPath*)indexPath
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
+                        showGroupLocation:(BOOL)showGroupLocation
+                    groupLocationOverride:(NSString*)groupLocationOverride
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType {
     return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:groupLocationOverride accessoryType:accessoryType noFlags:NO];
 }
+
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node
+                                indexPath:(NSIndexPath*)indexPath
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
+                        showGroupLocation:(BOOL)showGroupLocation
+                    groupLocationOverride:(NSString*)groupLocationOverride
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType
+                                  noFlags:(BOOL)noFlags {
+    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:groupLocationOverride accessoryType:accessoryType noFlags:NO showGroupChildCount:YES];
+}
+
 
 - (UITableViewCell *)getBrowseCellForNode:(Node*)node
                                 indexPath:(NSIndexPath*)indexPath
@@ -58,15 +71,16 @@ groupLocationOverride:(NSString*)groupLocationOverride
                         showGroupLocation:(BOOL)showGroupLocation
                     groupLocationOverride:(NSString*)groupLocationOverride
                             accessoryType:(UITableViewCellAccessoryType)accessoryType
-                                  noFlags:(BOOL)noFlags {
+                                  noFlags:(BOOL)noFlags
+                      showGroupChildCount:(BOOL)showGroupChildCount {
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
 
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel];
+
 
     if(totp) {
         BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
-        NSString* subtitle = [searcher getBrowseItemSubtitle:node];
+        NSString* subtitle = [self getBrowseItemSubtitle:node];
         
         [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken];
         
@@ -85,7 +99,7 @@ groupLocationOverride:(NSString*)groupLocationOverride
         if(node.isGroup) {
             BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
 
-            NSString* childCount = self.viewModel.metadata.showChildCountOnFolderInBrowse ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
+            NSString* childCount = self.viewModel.metadata.showChildCountOnFolderInBrowse && showGroupChildCount ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
             
             [cell setGroup:title
                       icon:icon
@@ -97,7 +111,7 @@ groupLocationOverride:(NSString*)groupLocationOverride
                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }
         else {
-            NSString* subtitle = [searcher getBrowseItemSubtitle:node];
+            NSString* subtitle = [self getBrowseItemSubtitle:node];
             
             [cell setRecord:title
                    subtitle:subtitle
@@ -173,6 +187,46 @@ groupLocationOverride:(NSString*)groupLocationOverride
 - (NSString *)getGroupPathDisplayString:(Node *)vm {
     return [NSString stringWithFormat:NSLocalizedString(@"browse_vc_group_path_string_fmt", @"(in %@)"),
             [self.viewModel.database getSearchParentGroupPathDisplayString:vm]];
+}
+
+- (NSString*)getBrowseItemSubtitle:(Node*)node {
+    switch (self.viewModel.metadata.browseItemSubtitleField) {
+        case kBrowseItemSubtitleNoField:
+            return @"";
+            break;
+        case kBrowseItemSubtitleUsername:
+            return self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.fields.username node:node] : node.fields.username;
+            break;
+        case kBrowseItemSubtitlePassword:
+            return self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.fields.password node:node] : node.fields.password;
+            break;
+        case kBrowseItemSubtitleUrl:
+            return self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.fields.url node:node] : node.fields.url;
+            break;
+        case kBrowseItemSubtitleEmail:
+            return node.fields.email;
+            break;
+        case kBrowseItemSubtitleModified:
+            return node.fields.modified ? node.fields.modified.friendlyDateString : @"";
+            break;
+        case kBrowseItemSubtitleCreated:
+            return node.fields.created ? node.fields.created.friendlyDateString : @"";
+            break;
+        case kBrowseItemSubtitleNotes:
+            return self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;
+            break;
+        case kBrowseItemSubtitleTags:
+            return sortedTagsString(node);
+            break;
+        default:
+            return @"";
+            break;
+    }
+}
+
+NSString* sortedTagsString(Node* node) {
+    NSArray<NSString*> *sortedTags = [node.fields.tags.allObjects sortedArrayUsingComparator:finderStringComparator];
+    return [sortedTags componentsJoinedByString:@", "];
 }
 
 @end

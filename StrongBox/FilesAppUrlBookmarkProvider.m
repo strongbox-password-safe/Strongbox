@@ -43,8 +43,8 @@ typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *err
         _browsableNew = NO;
         _browsableExisting = NO;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = NO; // Local on device files are available even if offline! Some third parties may provide cached files... - 25-May-2020
-        _supportsConcurrentRequests = NO; // Possibly
+        _immediatelyOfferCacheIfOffline = NO; 
+        _supportsConcurrentRequests = NO; 
     }
     
     return self;
@@ -90,7 +90,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     [self onCreateDestinationSelected:url];
     
     [NSFileManager.defaultManager removeItemAtURL:self.createTemporaryDatabaseUrl error:nil];
@@ -119,7 +119,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
     BOOL isStrongboxICloudFile = strongboxICloudDocumentsPath ? [fileParentPath isEqualToString:strongboxICloudDocumentsPath] : NO;
 
     if (isLocalSandboxFile || isStrongboxICloudFile) {
-        // Nop - Don't do anything Background watcher will pick up this new DB
+        
         NSLog(@"New Database is actually local to Sandbox or iCloud - using simplified non iOS Files Storage Provider. [%d][%d]", isLocalSandboxFile, isStrongboxICloudFile);
     }
     else {
@@ -140,7 +140,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
 }
 
 - (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
-    // NOTIMPL
+    
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
     return;
 }
@@ -157,17 +157,17 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
 - (void)list:(NSObject *)parentFolder
 viewController:(UIViewController *)viewController
   completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
-    // NOTIMPL
+    
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
     return;
 }
 
 - (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(UIImage *))completionHandler {
-    // NOTIMPL
+    
 }
 
 - (void)pullDatabase:(SafeMetaData *)safeMetaData interactiveVC:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
-    //NSLog(@"READ! %@", safeMetaData);
+    
     
     NSError *error;
     NSURL* url = [self filesAppUrlFromMetaData:safeMetaData ppError:&error];
@@ -180,17 +180,17 @@ viewController:(UIViewController *)viewController
 
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
     if (!securitySucceeded) {
-        // MMcG: try anyway - this is not always a blocker.
+        
         NSLog(@"Could not access secure scoped resource! Will try get attributes anyway...");
     }
 
     NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
     if (error) {
-        // MMcG: Sometimes this will fail - e.g. FE File Explorer Pro issue - but opening leads to success... so try to open anyway... Log the error here...
+        
         NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
     }
 
-    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+    dispatch_async(dispatch_get_main_queue(), ^{ 
         StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
         
         if (!document) {
@@ -208,7 +208,7 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
-    // NOTIMPL:
+    
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
 }
 
@@ -229,7 +229,7 @@ viewController:(UIViewController *)viewController
         return;
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+    dispatch_async(dispatch_get_main_queue(), ^{ 
         StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithData:data fileUrl:url];
         
         [document saveToURL:url forSaveOperation:UIDocumentSaveForOverwriting completionHandler:^(BOOL success) {
@@ -248,14 +248,14 @@ viewController:(UIViewController *)viewController
 }
 
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
-    // NOTIMPL
+    
     
     NSLog(@"WARN: FilesAppUrlBookmarkProvider NOTIMPL");
     
     return nil;
 }
 
-//
+
 
 - (NSString*)getJsonFileIdentifier:(NSData*)bookmark {
     NSString *base64 = [bookmark base64EncodedStringWithOptions:kNilOptions];

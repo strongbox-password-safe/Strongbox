@@ -292,7 +292,7 @@
                                                                                  message:message
                                                                           preferredStyle:UIAlertControllerStyleAlert];
 
-        // this is the center of the screen currently but it can be any point in the view
+        
         
         
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
@@ -326,7 +326,7 @@
                                                                                  message:message
                                                                           preferredStyle:UIAlertControllerStyleAlert];
         
-        // this is the center of the screen currently but it can be any point in the view
+        
         
         
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
@@ -361,7 +361,7 @@
                                                                                  message:message
                                                                           preferredStyle:UIAlertControllerStyleAlert];
         
-        // this is the center of the screen currently but it can be any point in the view
+        
         
         
         UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText

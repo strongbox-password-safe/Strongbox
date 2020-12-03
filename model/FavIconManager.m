@@ -10,7 +10,11 @@
 #import "Node.h"
 #import "NSString+Extensions.h"
 
-@import FavIcon;
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @implementation FavIconManager
 
@@ -30,7 +34,7 @@
               withProgress:(void (^)(NSURL *url, NSArray<IMAGE_TYPE_PTR>* images))withProgress {
     for (NSURL* url in urls) {
         [queue addOperationWithBlock:^{
-            // This is a little hacky but better than re-architecting the Library to be fully async, cancellable etc
+            
             dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
             NSLog(@"Downloading FavIcon for... %@", url);
@@ -109,27 +113,27 @@
         IMAGE_TYPE_PTR imageA = (IMAGE_TYPE_PTR)obj1;
         IMAGE_TYPE_PTR imageB = (IMAGE_TYPE_PTR)obj2;
         
-//        NSLog(@"Comparing A and B: (%dx%d) : (%dx%d)", (int)imageA.size.width, (int)imageA.size.height, (int)imageB.size.width, (int)imageB.size.height);
 
-        // Filter out ones that don't have dimensions
+
+        
         
         if(imageA.size.width == 0) {
-//            NSLog(@"Result: No Dimensions - NSOrderedAscending");
+
             return NSOrderedAscending;
         }
         if(imageB.size.width == 0) {
-//            NSLog(@"Result: No Dimensions - NSOrderedDescending");
+
             return NSOrderedDescending;
         }
         
-        // Filter for square dimensions
+        
         
         if(imageA.size.width != imageA.size.height) {
-//            NSLog(@"Result: Not Square - NSOrderedAscending");
+
             return NSOrderedDescending;
         }
         else if(imageB.size.width != imageB.size.height) {
-//            NSLog(@"Result: Not Square - NSOrderedDescending");
+
             return NSOrderedAscending;
         }
         
@@ -138,7 +142,7 @@
         int distanceA = imageA.size.width - kIdealFavIconDimension;
         int distanceB = imageB.size.width - kIdealFavIconDimension;
 
-//        NSLog(@"Distance from ideal - (%d) : (%d)", distanceA, distanceB);
+
 
         if(abs(distanceA) == abs(distanceB)) {
             return distanceA > 0 ? NSOrderedAscending : NSOrderedDescending;
@@ -150,34 +154,34 @@
         return NSOrderedSame;
     }];
     
-//    for (IMAGE_TYPE_PTR item in sorted) {
-//        NSLog(@"%dx%d", (int)item.size.width, (int)item.size.height);
-//    }
+
+
+
     
     return sorted.firstObject;
 }
 
 - (NSURL*)cleanupUrl:(NSURL*)url trimToDomainOnly:(BOOL)trimToDomainOnly {
-    // No scheme? use default https
+    
 
     if(url.scheme.length == 0) {
-        NSString* foo = [@"https://" stringByAppendingString:url.absoluteString];
+        NSString* foo = [@"https:
         url = foo.urlExtendedParse;
-//        NSLog(@"Cleaned Up URL: [%@]", url);
+
     }
     
     if(trimToDomainOnly) {
         NSURLComponents* components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
     
         if(components) {
-            components.path = nil; //@"";
-            components.query = nil; //@"";
-            components.user = nil; //@"";
-            components.password = nil; //@"";
-            components.fragment = nil; //@"";
+            components.path = nil; 
+            components.query = nil; 
+            components.user = nil; 
+            components.password = nil; 
+            components.fragment = nil; 
                         
             if(components.URL.absoluteString.length && ![components.URL.absoluteString isEqualToString:url.absoluteString]) {
-//                NSLog(@"Cleaned Up URL: [%@]", components.URL);
+
             }
             url = components.URL.absoluteString.length ? components.URL : url;
         }

@@ -20,7 +20,7 @@
 @end
 
 static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey";
-static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricDatabaseStateKey"; // AutoFill has a different value... :(
+static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricDatabaseStateKey"; 
 
 @implementation BiometricsManager
 
@@ -202,7 +202,7 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
 }
 
 - (BOOL)requestBiometricId:(NSString*)reason
-             fallbackTitle:(NSString*)fallbackTitle // Setting this means you handle the case of error == LAErrorUserFallback
+             fallbackTitle:(NSString*)fallbackTitle 
                 completion:(void(^)(BOOL success, NSError * __nullable error))completion {
     LAContext *localAuthContext = [[LAContext alloc] init];
     
@@ -212,13 +212,13 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
     
     NSLog(@"REQUEST-BIOMETRIC: %d", SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen);
     
-    // MMcG: NB
-    //
-    // LAPolicyDeviceOwnerAuthentication -> This allows user to enter Device Passcode - which is normally what we want
-    // LAPolicyDeviceOwnerAuthenticationWithBiometrics -> Does not auto fall back to device passcode but allows for custom fallback mechanism
+    
+    
+    
+    
     
     if(self.requestInProgress) {
-        // This should never happen but with iOS 13 bug it does if the user re-taps the database...
+        
         NSLog(@"WARN: WARN: Biometric Request is already in Progress - Not launching again...");
         return NO;
     }

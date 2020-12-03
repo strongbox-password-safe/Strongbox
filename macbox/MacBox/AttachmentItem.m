@@ -27,7 +27,7 @@
 
 - (void) viewDidAppear
 {
-    // seems the inital selection state is not done by Apple in a KVO compliant manner, update background color manually
+    
     [self updateBackgroundColorForSelectionState:self.isSelected];
 }
 

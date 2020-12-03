@@ -15,7 +15,7 @@ const NSInteger kStorageProviderUserInteractionRequiredErrorCode = 17292412;
 NSString* const kStorageProviderUserInteractionRequiredErrorMessage = @"User Interaction Required";
 const NSError* kUserInteractionRequiredError;
 const NSUInteger kMinimumDatabasePrefixLengthForValidation = 192;
-const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; // 128 KB - Maybe play with this but this seems to have decent perf for now
+const NSUInteger kStreamingSerializationChunkSize = 128 * 1024; 
 const size_t kMaxAttachmentTableviewIconImageSize = 4 * 1024 * 1024;
 
 +(void)initialize {

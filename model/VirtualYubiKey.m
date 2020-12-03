@@ -78,21 +78,21 @@
 }
 
 - (NSData *)doChallengeResponse:(NSData *)challenge {
-    return [VirtualYubiKey getDummyYubikeyResponse:challenge secret:self.secret];
+    return [VirtualYubiKey getDummyYubiKeyResponse:challenge secret:self.secret];
 }
 
-+ (NSData*)getDummyYubikeyResponse:(NSData*)challenge secret:(NSString*)secret {
++ (NSData*)getDummyYubiKeyResponse:(NSData*)challenge secret:(NSString*)secret {
     if (challenge == nil || secret == nil) {
         NSLog(@"WARNWARN: NIL Secret or Challenge to Dummy YubiKey: Challenge = [%@] - Secret = [%@]", challenge, secret);
         return nil;
     }
-    // Some people program the Yubikey with Fixed Length "Fixed 64 byte input" and others with "Variable Input"
-    // To cover both cases the KeePassXC model appears to be to always send 64 bytes with extraneous bytes above
-    // and beyond the actual challenge padded PKCS#7 style-ish... MMcG - 1-Mar-2020
-    //
-    // Further Reading: https://github.com/Yubico/yubikey-personalization-gui/issues/86
     
-    // May need to pad challenge
+    
+    
+    
+    
+    
+    
     
     const NSInteger kChallengeSize = 64;
     const NSInteger paddingLengthAndCharacter = kChallengeSize - challenge.length;
@@ -103,7 +103,7 @@
     [challenge getBytes:challengeBuffer length:challenge.length];
     NSData* paddedChallenge = [NSData dataWithBytes:challengeBuffer length:kChallengeSize];
     
-    // Get actual secret
+    
     
     BOOL paddingRequired = [secret hasPrefix:@"P"];
     NSString* sec = secret;

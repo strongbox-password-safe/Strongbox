@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="1ud-dC-1he">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="1ud-dC-1he">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
-        <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -88,61 +87,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="CustomFieldsReuseIdentifier" rowHeight="165" id="v5b-iD-1gA" customClass="CustomFieldTableCell">
-                                <rect key="frame" x="0.0" y="28" width="414" height="165"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="v5b-iD-1gA" id="ipY-HG-wPR">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="165"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Key" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="b91-ZE-hHu">
-                                            <rect key="frame" x="20" y="11" width="31.5" height="21.5"/>
-                                            <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                        <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="pb1-vM-9ZM">
-                                            <rect key="frame" x="20" y="40.5" width="374" height="113.5"/>
-                                            <subviews>
-                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Izi-qw-SDs" userLabel="Value">
-                                                    <rect key="frame" x="0.0" y="16" width="334" height="81.5"/>
-                                                    <string key="text">Value that can get very very long and then wrap around and so things will automatically size based on the length of this values text etc</string>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                                    <nil key="textColor"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                                <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="255" verticalCompressionResistancePriority="745" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uDJ-et-6Ez">
-                                                    <rect key="frame" x="342" y="41" width="32" height="32"/>
-                                                    <constraints>
-                                                        <constraint firstAttribute="height" constant="32" id="55t-p5-VpA"/>
-                                                        <constraint firstAttribute="width" constant="32" id="XPJ-vB-BqL"/>
-                                                    </constraints>
-                                                    <state key="normal" image="show-24"/>
-                                                    <connections>
-                                                        <action selector="toggleShowHide:" destination="v5b-iD-1gA" eventType="touchUpInside" id="MMK-Kb-Xdy"/>
-                                                    </connections>
-                                                </button>
-                                            </subviews>
-                                        </stackView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="pb1-vM-9ZM" firstAttribute="leading" secondItem="ipY-HG-wPR" secondAttribute="leadingMargin" id="0Ks-eH-WUz"/>
-                                        <constraint firstItem="b91-ZE-hHu" firstAttribute="top" secondItem="ipY-HG-wPR" secondAttribute="topMargin" id="5aC-pb-Ztz"/>
-                                        <constraint firstItem="pb1-vM-9ZM" firstAttribute="top" secondItem="b91-ZE-hHu" secondAttribute="bottom" constant="8" id="Bzj-vn-1NP"/>
-                                        <constraint firstItem="b91-ZE-hHu" firstAttribute="leading" secondItem="ipY-HG-wPR" secondAttribute="leadingMargin" id="IIz-DH-3qY"/>
-                                        <constraint firstAttribute="trailingMargin" relation="greaterThanOrEqual" secondItem="b91-ZE-hHu" secondAttribute="trailing" id="fJh-4v-zbv"/>
-                                        <constraint firstAttribute="bottomMargin" secondItem="pb1-vM-9ZM" secondAttribute="bottom" id="shR-bI-ZAG"/>
-                                        <constraint firstAttribute="trailingMargin" secondItem="pb1-vM-9ZM" secondAttribute="trailing" id="yRd-8T-vLd"/>
-                                    </constraints>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <outlet property="buttonShowHide" destination="uDJ-et-6Ez" id="5gz-Gs-ela"/>
-                                    <outlet property="keyLabel" destination="b91-ZE-hHu" id="2Tv-8p-hnH"/>
-                                    <outlet property="valueLabel" destination="Izi-qw-SDs" id="nOM-ae-M1C"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="U8J-er-THM" id="ftm-eq-Um7"/>
                             <outlet property="delegate" destination="U8J-er-THM" id="jFz-Kf-pEQ"/>
@@ -266,7 +210,7 @@
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="186"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1WI-OO-ZCE" userLabel="Password Generation Settings">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1WI-OO-ZCE" userLabel="Password Generation Settings">
                                                     <rect key="frame" x="306" y="11" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="40" id="DZn-2x-QDe"/>
@@ -278,7 +222,7 @@
                                                         <segue destination="ZhN-ba-edd" kind="presentation" identifier="segueToPwSettings" id="aPY-AO-AOK"/>
                                                     </connections>
                                                 </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kgX-Wp-dMK" userLabel="History">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="kgX-Wp-dMK" userLabel="History">
                                                     <rect key="frame" x="20" y="11" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="40" id="Inj-kd-EQh"/>
@@ -290,7 +234,7 @@
                                                         <action selector="onViewHistory:" destination="1ud-dC-1he" eventType="touchUpInside" id="wYJ-8l-m0D"/>
                                                     </connections>
                                                 </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w1M-FW-zXj" userLabel="Generate or Copy">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w1M-FW-zXj" userLabel="Generate or Copy">
                                                     <rect key="frame" x="354" y="11" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="40" id="d5c-Bl-yMR"/>
@@ -326,7 +270,7 @@
                                                     <color key="textColor" red="0.50196078430000002" green="0.0" blue="0.49803921569999998" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lef-cn-Pa9" userLabel="Show OTP">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lef-cn-Pa9" userLabel="Show OTP">
                                                     <rect key="frame" x="168" y="11" width="78" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="ah5-na-GdM"/>
@@ -338,9 +282,9 @@
                                                     </connections>
                                                 </button>
                                                 <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="EbN-pb-4zb">
-                                                    <rect key="frame" x="20" y="169" width="326" height="2"/>
+                                                    <rect key="frame" x="20" y="169" width="326" height="4"/>
                                                 </progressView>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4hm-Qp-22S">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4hm-Qp-22S">
                                                     <rect key="frame" x="354" y="121" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="KGi-Gw-Q9p"/>
@@ -401,7 +345,7 @@
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                 </textField>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uQU-re-gbF">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uQU-re-gbF">
                                                     <rect key="frame" x="354" y="16" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="KOV-DB-38i"/>
@@ -442,7 +386,7 @@
                                                     <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="17"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                 </textField>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GOE-E9-6zf">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GOE-E9-6zf">
                                                     <rect key="frame" x="354" y="16" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="40" id="fh2-IG-qA5"/>
@@ -484,7 +428,7 @@
                                                     <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="14"/>
                                                     <textInputTraits key="textInputTraits"/>
                                                 </textField>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aXA-Op-gVa" userLabel="Hidden Copy and Launch">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="aXA-Op-gVa" userLabel="Hidden Copy and Launch">
                                                     <rect key="frame" x="20" y="17" width="326" height="38"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                                     <state key="normal" title="Copy and Launch Hidden Button"/>
@@ -492,7 +436,7 @@
                                                         <action selector="onCopyAndLaunchUrl:" destination="1ud-dC-1he" eventType="touchUpInside" id="BUv-nK-HKE"/>
                                                     </connections>
                                                 </button>
-                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tX1-H7-hJi" userLabel="Button Copy URL Link">
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tX1-H7-hJi" userLabel="Button Copy URL Link">
                                                     <rect key="frame" x="354" y="16" width="40" height="40"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="40" id="ADL-xd-Qzr"/>
@@ -687,7 +631,6 @@
         <image name="copy_64" width="64" height="64"/>
         <image name="document" width="30" height="30"/>
         <image name="services" width="30" height="30"/>
-        <image name="show-24" width="24" height="24"/>
         <image name="syncronize" width="30" height="30"/>
     </resources>
 </document>

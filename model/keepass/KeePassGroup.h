@@ -11,6 +11,8 @@
 #import "Times.h"
 #import "Entry.h"
 #import "KeePassGroupOrEntry.h"
+#import "MutableOrderedDictionary.h"
+#import "CustomData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,8 +26,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSUUID* uuid;
 @property (nonatomic, nullable) NSNumber* icon;
 @property (nonatomic, nullable) NSUUID* customIcon;
-
 @property (nonatomic) Times* times;
+@property (nonatomic, nullable) CustomData* customData;
+@property (nonatomic, nullable) NSString* notes; 
+@property (nonatomic, nullable) NSString* defaultAutoTypeSequence; 
+@property (nonatomic, nullable) NSNumber* enableAutoType; 
+@property (nonatomic, nullable) NSNumber* enableSearching; 
+@property (nonatomic, nullable) NSUUID* lastTopVisibleEntry; 
+
+
 
 @end
 

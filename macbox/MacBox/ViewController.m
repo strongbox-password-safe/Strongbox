@@ -38,7 +38,7 @@
 #import "DocumentController.h"
 #import "ClipboardManager.h"
 #import "BookmarksHelper.h"
-#import "DatabasePropertiesController.h"
+#import "DatabaseSettingsTabViewController.h"
 #import "MacYubiKeyManager.h"
 #import "ColoredStringHelper.h"
 #import "NSString+Extensions.h"
@@ -46,6 +46,13 @@
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "NSDate+Extensions.h"
+#import "DatabaseOnboardingTabViewController.h"
+#import "DatabasesManagerView.h"
+#import "AutoFillManager.h"
+#import "MMWormhole.h"
+#import "AutoFillWormhole.h"
+#import "QuickTypeRecordIdentifier.h"
+#import "SecretStore.h"
 
 static const int kMaxRecommendCustomIconSize = 128*1024;
 static const int kMaxCustomIconDimension = 256;
@@ -97,16 +104,12 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property (weak) IBOutlet NSSegmentedControl *searchSegmentedControl;
 @property (weak) IBOutlet NSSearchField *searchField;
 @property (unsafe_unretained) IBOutlet NSTextView *textViewNotes;
-
 @property (weak) IBOutlet NSButton *buttonUnlockWithPassword;
 
-// Group View Fields
+
 
 @property (weak) IBOutlet NSTextField *textFieldSummaryTitle;
-
 @property (weak) IBOutlet NSButton *buttonUnlockWithTouchId;
-
-@property (weak) IBOutlet ClickableImageView *imageViewShowHidePassword;
 @property (weak) IBOutlet NSTextField *textFieldTotp;
 @property (weak) IBOutlet NSProgressIndicator *progressTotp;
 @property (strong) IBOutlet NSMenu *outlineHeaderColumnsMenu;
@@ -114,13 +117,20 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property (weak) IBOutlet NSTableView *customFieldsTable;
 @property (weak) IBOutlet NSImageView *imageViewIcon;
 @property (weak) IBOutlet NSView *containerViewForEnterMasterCredentials;
-
 @property (weak) IBOutlet NSView *attachmentsRow;
 @property (weak) IBOutlet NSTableView *attachmentsTable;
 @property NSDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
-
 @property (weak) IBOutlet NSView *expiresRow;
 @property (weak) IBOutlet NSTextField *labelExpires;
+
+@property (weak) IBOutlet NSStackView *stackViewUnlock;
+@property (weak) IBOutlet NSStackView *stackViewMasterPasswordHeader;
+@property (weak) IBOutlet NSTextField *labelUnlockKeyFileHeader;
+@property (weak) IBOutlet NSTextField *labelUnlockYubiKeyHeader;
+@property (weak) IBOutlet NSButton *checkboxShowAdvanced;
+@property (weak) IBOutlet NSImageView *unlockImageViewLogo;
+
+
 
 @property NSArray* attachments;
 
@@ -130,11 +140,11 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
 
 
-// TODO: Consider using the performSelector model...
-// Throttle changes - Only set after user leaves it for .5 seconds...
-// [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setExpiryDate:) object:nil];
-// [self performSelector:@selector(setExpiryDate:) withObject:nil afterDelay:0.5f];
-@property NSDate* lastAutoPromptForTouchIdThrottle; // HACK: Sigh
+
+
+
+
+@property NSDate* lastAutoPromptForTouchIdThrottle; 
 
 @property (weak) IBOutlet NSPopUpButton *keyFilePopup;
 @property NSString* selectedKeyFileBookmark;
@@ -149,6 +159,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property BOOL currentYubiKeySlot1IsBlocking;
 @property BOOL currentYubiKeySlot2IsBlocking;
 @property NSString* currentYubiKeySerial;
+@property MMWormhole* wormhole;
 
 @end
 
@@ -165,8 +176,8 @@ static NSImage* kStrongBox256Image;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Note: Nothing really important can happen here because we can't access the Document or the View Model
-    // The real action kicks off after this function finishes and setInitialModel is called...
+    
+    
     
     self.detailsViewControllers = @{}.mutableCopy;
     
@@ -174,8 +185,66 @@ static NSImage* kStrongBox256Image;
 
     [self customizeUi];
     
+    [self listenToAutoFillWormhole];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+}
+
+- (void)listenToAutoFillWormhole {
+    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
+                                                         optionalDirectory:kAutoFillWormholeName];
+
+    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeRequestId
+                                         listener:^(id messageObject) {
+        if ( self.model && !self.model.locked ) {
+            NSDictionary *dict = (NSDictionary*)messageObject;
+            NSString* json = dict[@"id"];
+            QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
+            
+            if( identifier && self.model.databaseMetadata && [self.model.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
+                if (!self.model.databaseMetadata.quickWormholeFillEnabled) {
+                    return;
+                }
+                
+                
+
+                
+                
+                DatabaseModel* model = self.model.database;
+                Node* node = [model.rootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
+                    return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
+                }];
+
+                NSString* secretStoreId = NSUUID.UUID.UUIDString;
+
+                if(node) {
+
+
+                    NSString* user = [model dereference:node.fields.username node:node];
+                    NSString* password = [model dereference:node.fields.password node:node];
+                    NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
+                    
+                    NSDictionary* securePayload = @{
+                        @"user" : user,
+                        @"password" : password,
+                        @"totp" : totp,
+                    };
+                    
+                    NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
+                    
+                    [SecretStore.sharedInstance setSecureObject:securePayload forIdentifier:secretStoreId expiresAt:expiry];
+                }
+                else {
+                    NSLog(@"[%@] - AutoFill could not find matching node - returning", self.model.databaseMetadata.nickName);
+                }
+                
+                [self.wormhole passMessageObject:@{@"success" : @(node != nil),
+                                                   @"secret-store-id" : secretStoreId }
+                                      identifier:kAutoFillWormholeResponseId];
+            }
+        }
+    }];
 }
 
 - (void)updateModel:(ViewModel *)model {
@@ -187,7 +256,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)setInitialModel:(ViewModel*)model {
-    // MUST be called on main thread...
+    
     NSLog(@"setInitialModel [%@]", model);
 
     [self setModelFromMainThread:model];
@@ -222,13 +291,13 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
-    NSLog(@"[%@] Window Became Key!", self.model.databaseMetadata.nickName);
+    
 
     if(self.model && self.model.locked) {
         [self bindLockScreenUi];
     }
 
-    // MMcG: Seems to be unfortunately required - as key window is not set if we call straight away... hack :(
+    
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self autoPromptForTouchIdIfDesired];
@@ -254,7 +323,7 @@ static NSImage* kStrongBox256Image;
     NSArray<NodeDetailsViewController*>* vcs = [self.detailsViewControllers.allValues copy];
     [self.detailsViewControllers removeAllObjects];
 
-    // Copy as race condition of windows closing and calling into us will lead to crash
+    
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
 
@@ -304,10 +373,10 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
-    NSDictionary<NSString*, id> *params = sender;
-    Node* item = params[kItemKey];
-
     if([segue.identifier isEqualToString:@"segueToShowItemDetails"]) {
+        NSDictionary<NSString*, id> *params = sender;
+        Node* item = params[kItemKey];
+
         NSNumber* newEntry = params[kNewEntryKey];
         
         NSWindowController *wc = segue.destinationController;
@@ -328,6 +397,9 @@ static NSImage* kStrongBox256Image;
         self.detailsViewControllers[item.uuid] = vc;
     }
     else if([segue.identifier isEqualToString:@"segueToItemHistory"]) {
+        NSDictionary<NSString*, id> *params = sender;
+        Node* item = params[kItemKey];
+
         MacKeePassHistoryViewController* vc = (MacKeePassHistoryViewController*)segue.destinationController;
         
         vc.onDeleteHistoryItem = ^(Node * _Nonnull node) {
@@ -341,20 +413,57 @@ static NSImage* kStrongBox256Image;
         vc.history = item.fields.keePassHistory;
     }
     else if([segue.identifier isEqualToString:@"segueToDatabasePreferences"]) {
-        NSWindowController *wc = segue.destinationController;
-        [wc.window center];
-
-        DatabasePropertiesController *vc = (DatabasePropertiesController*)wc.contentViewController;
-        [vc setModel:self.model];
+        DatabaseSettingsTabViewController *vc = (DatabaseSettingsTabViewController*)segue.destinationController;
         
+        NSNumber* tab = (NSNumber*)sender;
+        [vc setModel:self.model initialTab:tab.intValue];
     }
+    else if ([segue.identifier isEqualToString:@"segueToDatabaseOnboarding"]) {
+        DatabaseOnboardingTabViewController *vc = (DatabaseOnboardingTabViewController*)segue.destinationController;
+        
+        NSDictionary<NSString*, id>* foo = sender;
+        
+        vc.convenienceUnlock = ((NSNumber*)foo[@"convenienceUnlock"]).boolValue;
+        vc.autoFill = ((NSNumber*)foo[@"autoFill"]).boolValue;
+        vc.ckfs = foo[@"compositeKeyFactors"];
+        vc.database = self.model.databaseMetadata;
+        vc.model = foo[@"model"];
+    }
+}
+
+- (void)bindShowAdvancedOnUnlockScreen {
+    BOOL show = Settings.sharedInstance.showAdvancedUnlockOptions;
+    
+    self.checkboxShowAdvanced.state = show ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    self.checkboxAllowEmpty.hidden = !show;
+    self.labelUnlockKeyFileHeader.hidden = !show;
+    self.keyFilePopup.hidden = !show;
+    self.labelUnlockYubiKeyHeader.hidden = !show;
+    self.yubiKeyPopup.hidden = !show;
+}
+
+- (IBAction)onShowAdvancedOnUnlockScreen:(id)sender {
+    Settings.sharedInstance.showAdvancedUnlockOptions = !Settings.sharedInstance.showAdvancedUnlockOptions;
+    
+    [self bindShowAdvancedOnUnlockScreen];
+}
+
+- (void)customizeLockStackViewSpacing {
+    [self.stackViewUnlock setCustomSpacing:3 afterView:self.stackViewMasterPasswordHeader];
+    [self.stackViewUnlock setCustomSpacing:4 afterView:self.labelUnlockKeyFileHeader];
+    [self.stackViewUnlock setCustomSpacing:4 afterView:self.labelUnlockYubiKeyHeader];
 }
 
 - (void)customizeUi {
     [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
     
-    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch"); // FUTURE: if only one method available then word this more precisely
+    [self customizeLockStackViewSpacing];
+    
+    [self bindShowAdvancedOnUnlockScreen];
+    
+    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch"); 
     
     self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
     self.buttonUnlockWithTouchId.hidden = YES;
@@ -368,12 +477,6 @@ static NSImage* kStrongBox256Image;
     self.textFieldMasterPassword.delegate = self;
     
     self.showPassword = Settings.sharedInstance.alwaysShowPassword;
-
-    self.imageViewShowHidePassword.clickable = YES;
-    self.imageViewShowHidePassword.showClickableBorder = NO;
-    self.imageViewShowHidePassword.onClick = ^{
-        [self toggleRevealMasterPasswordTextField:nil];
-    };
 
     self.tableViewSummary.dataSource = self;
     self.tableViewSummary.delegate = self;
@@ -392,7 +495,7 @@ static NSImage* kStrongBox256Image;
     self.quickViewColumn.hidden = !Settings.sharedInstance.revealDetailsImmediately;
     [self bindQuickViewButton];
     
-    // Search Enabled for all...
+    
     
     NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
     [self.searchField setPlaceholderString:loc];
@@ -402,9 +505,9 @@ static NSImage* kStrongBox256Image;
 }
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
-    if(control == self.searchField) { // On Down in Search Field - go to first result if available
+    if(control == self.searchField) { 
         if (commandSelector == @selector(moveDown:)) {
-//            NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
+
             if (self.outlineView.numberOfRows > 0) {
                 [self.view.window makeFirstResponder:self.outlineView];
                 return YES;
@@ -416,8 +519,8 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)customizeOutlineView {
-    // FUTURE: Sorting...
-    //self.outlineView.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"title" ascending:YES] ];
+    
+    
     
     NSNib* nib = [[NSNib alloc] initWithNibNamed:@"CustomFieldTableCellView" bundle:nil];
     [self.outlineView registerNib:nib forIdentifier:kPasswordCellIdentifier];
@@ -437,45 +540,45 @@ static NSImage* kStrongBox256Image;
 - (void)bindColumnsToSettings {
     NSArray<NSString*>* visible = Settings.sharedInstance.visibleColumns;
     
-    // Show / Hide...
+    
     
     for (NSString* column in [Settings kAllColumns]) {
         [self showHideOutlineViewColumn:column show:[visible containsObject:column] && [self isColumnAvailableForModel:column]];
     }
     
-    // Order...
+    
     
     int i=0;
     for (NSString* column in visible) {
         NSInteger colIdx = [self.outlineView columnWithIdentifier:column];
-        if(colIdx != -1) { // Perhaps we removed a column?!
+        if(colIdx != -1) { 
             NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
             
-            if(!col.hidden) { // Maybe hidden because it isn't available in this Model Format (Password Safe/KeePass)
+            if(!col.hidden) { 
                 [self.outlineView moveColumn:colIdx toColumn:i++];
             }
         }
     }
     
-//    [self.outlineView setColumnAutoresizingStyle:NSTableViewUniformColumnAutoresizingStyle];
+
 }
 
 - (IBAction)onOutlineHeaderColumnsChanged:(id)sender {
     NSMenuItem* menuItem = (NSMenuItem*)sender;
     
-    //NSLog(@"Columns Changed: %@-%d", menuItem.identifier, menuItem.state == NSOnState);
+    
     
     NSMutableArray<NSString*>* newColumns = [Settings.sharedInstance.visibleColumns mutableCopy];
     
-    if(menuItem.state == NSOnState) // We are request to removing an existing column
+    if(menuItem.state == NSOnState) 
     {
         [newColumns removeObject:menuItem.identifier];
         Settings.sharedInstance.visibleColumns = newColumns;
         [self showHideOutlineViewColumn:menuItem.identifier show:NO];
         [self.outlineView reloadData];
     }
-    else { // We're adding a column
-        if(![newColumns containsObject:menuItem.identifier]) { // Don't add a duplicate somehow
+    else { 
+        if(![newColumns containsObject:menuItem.identifier]) { 
             [newColumns addObject:menuItem.identifier];
             Settings.sharedInstance.visibleColumns = newColumns;
         }
@@ -488,7 +591,7 @@ static NSImage* kStrongBox256Image;
     NSInteger colIdx = [self.outlineView columnWithIdentifier:identifier];
     NSTableColumn *col = [self.outlineView.tableColumns objectAtIndex:colIdx];
     
-    //NSLog(@"Set hidden: %@->%d", col.identifier, !show);
+    
     if(col.hidden != !show) {
         col.hidden = !show;
     }
@@ -507,7 +610,7 @@ static NSImage* kStrongBox256Image;
         ret = ![identifier isEqualToString:kEmailColumn];
     }
     
-    //NSLog(@"isColumnAvailableForModel: %d = %@ -> %d", self.model.format == kPasswordSafe, identifier, ret);
+    
     
     return ret;
 }
@@ -516,50 +619,35 @@ static NSImage* kStrongBox256Image;
     return [Settings.sharedInstance.visibleColumns containsObject:identifier];
 }
 
-- (void)disableFeaturesForLiteVersion {
-//    NSString* loc = NSLocalizedString(@"mac_search_disabled_please_upgrade", @"Search Disabled - Please Upgrade");
-//    [self.searchField setPlaceholderString:loc];
-//    self.searchField.enabled = NO;
-//    self.searchSegmentedControl.enabled = NO;
-}
-
-- (void)enableFeaturesForFullVersion {
-//    NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
-//
-//    [self.searchField setPlaceholderString:loc];
-//    self.searchField.enabled = YES;
-//    self.searchSegmentedControl.enabled = YES;
-}
-
 - (void)initializeFullOrTrialOrLiteUI {
     if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial) {
-        [self disableFeaturesForLiteVersion];
+
     }
     else {
-        [self enableFeaturesForFullVersion];
+
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSImage * )getIconForNode:(Node *)vm large:(BOOL)large {
-    return [MacNodeIconHelper getIconForNode:self.model vm:vm large:large];
+    return [MacNodeIconHelper getIconForNode:self.model.database vm:vm large:large];
 }
 
 - (void)onDeleteHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
-    // NOP - Not displayed in main view...
+    
     NSLog(@"Deleted History Item... no need to update UI");
 }
 
 - (void)onRestoreHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
-    self.itemsCache = nil; // Clear items cache
+    self.itemsCache = nil; 
     Node* selectionToMaintain = [self getCurrentSelectedItem];
-    [self.outlineView reloadData]; // Full Reload required as item could be sorted to a different location
+    [self.outlineView reloadData]; 
     NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
     
     if(row != -1) {
         [self.outlineView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-        // This selection change will lead to a full reload of the details pane via selectionDidChange
+        
     }
 }
 
@@ -582,24 +670,24 @@ static NSImage* kStrongBox256Image;
         });
     }
     
-    self.itemsCache = nil; // Clear items cache
-    [self.outlineView reloadData]; // Full reload in case we're in search and things have changed removing this item...
+    self.itemsCache = nil; 
+    [self.outlineView reloadData]; 
     [self bindDetailsPane];
 }
 
 - (void)onItemsUnDeletedNotification:(NSNotification*)param {
-    self.itemsCache = nil; // Clear items cache
-    [self.outlineView reloadData]; // Full reload in case we're in search and things have changed removing this item...
+    self.itemsCache = nil; 
+    [self.outlineView reloadData]; 
     [self bindDetailsPane];
 }
 
 - (void)onItemsMovedNotification:(NSNotificationCenter*)param {
-    self.itemsCache = nil; // Clear items cache
+    self.itemsCache = nil; 
     [self.outlineView reloadData];
     [self bindDetailsPane];
 }
 
-//////////////
+
 
 - (void)onItemIconChanged:(NSNotification*)notification {
     NSString *loc = NSLocalizedString(@"generic_fieldname_icon", @"Icon");
@@ -696,10 +784,10 @@ static NSImage* kStrongBox256Image;
         return;
     }
     
-    self.itemsCache = nil; // Clear items cache
+    self.itemsCache = nil; 
     
     Node* selectionToMaintain = [self getCurrentSelectedItem];
-    [self.outlineView reloadData]; // Full Reload required as item could be sorted to a different location
+    [self.outlineView reloadData]; 
     
     if(selectionToMaintain) {
         NSInteger row = [self.outlineView rowForItem:selectionToMaintain];
@@ -716,13 +804,13 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)bindToModel {
     [self stopObservingModelChanges];
     [self closeAllDetailsWindows:nil];
     
-    self.itemsCache = nil; // Clear items cache
+    self.itemsCache = nil; 
     
     if(self.model == nil || self.model.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
@@ -832,7 +920,7 @@ static NSImage* kStrongBox256Image;
         self.imageViewIcon.image = [self getIconForNode:it large:YES];
         self.imageViewIcon.hidden = self.model.format == kPasswordSafe;
 
-        //NSLog(@"Setting Text fields");
+        
         self.labelTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
         
         NSString* pw = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
@@ -854,7 +942,7 @@ static NSImage* kStrongBox256Image;
         self.labelEmail.stringValue = it.fields.email;
         self.textViewNotes.string = [self maybeDereference:it.fields.notes node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
 
-        // Necessary to pick up links... :/
+        
         
         [self.textViewNotes setEditable:YES];
         [self.textViewNotes checkTextInDocument:nil];
@@ -864,17 +952,17 @@ static NSImage* kStrongBox256Image;
         self.showPassword = Settings.sharedInstance.alwaysShowPassword || (self.labelPassword.stringValue.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
         [self showOrHideQuickViewPassword];
         
-        // Expiry
+        
         
         self.expiresRow.hidden = it.fields.expires == nil;
         self.labelExpires.stringValue = it.fields.expires ? it.fields.expires.friendlyDateString : @"";
         self.labelExpires.textColor = it.expired ? NSColor.redColor : it.nearlyExpired ? NSColor.orangeColor : nil;
         
-        // TOTP
+        
 
         [self refreshOtpCode:nil];
         
-        // Custom Fields
+        
         
         NSArray* sortedKeys = [it.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
         
@@ -892,7 +980,7 @@ static NSImage* kStrongBox256Image;
         self.customFieldsRow.hidden = self.model.format == kPasswordSafe || self.customFields.count == 0 || !Settings.sharedInstance.showCustomFieldsOnQuickViewPanel;
         [self.customFieldsTable reloadData];
         
-        // Attachments
+        
         
         self.attachments = [it.fields.attachments sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
             NodeFileAttachment* f1 = obj1;
@@ -923,7 +1011,7 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
@@ -999,7 +1087,7 @@ static NSImage* kStrongBox256Image;
     }
     else if([tableColumn.identifier isEqualToString:kTOTPColumn]) {
         NSString* totp = it.fields.otpToken ? it.fields.otpToken.password : @"";
-        //NSLog(@"TOTP: %@", totp);
+        
         NSTableCellView* cell = [self getReadOnlyCell:totp node:it];
 
         if(it.fields.otpToken) {
@@ -1056,29 +1144,29 @@ static NSImage* kStrongBox256Image;
 - (NSTableCellView*)getUrlCell:(NSString*)text node:(Node*)node {
     NSTableCellView* cell = [self getEditableCell:text node:node selector:@selector(onOutlineViewItemUrlEdited:)];
 
-    // MMcG: Valiant attempt but does not work well after edit, or indeed looks poor while selected...
-    // no click functionality either... or selection of browser...
     
-//    if(text.length) { // Absolutely required because NSDataDetector will die and kill us in strange ways otherwise...
-//        NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-//        if(detector) {
-//            NSTextCheckingResult* result = [detector firstMatchInString:it.fields.url options:kNilOptions range:NSMakeRange(0, text.length)];
-//            if (result.resultType == NSTextCheckingTypeLink && result.range.location == 0 && result.range.length == text.length) {
-//                NSMutableAttributedString* attrString = [[NSMutableAttributedString alloc] initWithString:text];
-//                NSRange range = NSMakeRange(0, [attrString length]);
-//
-//                [attrString beginEditing];
-//
-//                [attrString addAttribute:NSLinkAttributeName value:it.fields.url range:range];
-//                [attrString addAttribute:NSForegroundColorAttributeName value:[NSColor systemBlueColor] range:range];
-//                [attrString addAttribute:NSUnderlineStyleAttributeName value:[NSNumber numberWithInt:NSUnderlineStyleSingle] range:range];
-//
-//                [attrString endEditing];
-//
-//                cell.textField.attributedStringValue = attrString;
-//            }
-//        }
-//    }
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     cell.alphaValue = node.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
 
@@ -1090,7 +1178,7 @@ static NSImage* kStrongBox256Image;
     
     cell.textField.stringValue = [self maybeDereference:text node:node maybe:Settings.sharedInstance.dereferenceInOutlineView];
     
-    // Do not allow editing of dereferenced text in Outline View... impossible to work UI wise at the moment
+    
     
     BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.model isDereferenceableText:text];
     
@@ -1128,7 +1216,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)outlineViewSelectionDidChange:(NSNotification *)notification {
-    //NSLog(@"Selection Change Outline View");
+    
     [self bindDetailsPane];
 }
 
@@ -1147,7 +1235,7 @@ static NSImage* kStrongBox256Image;
         textField.stringValue = newString;
     }
     
-    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+    [self.view.window makeFirstResponder:self.outlineView]; 
 }
 
 - (IBAction)onOutlineViewItemNotesEdited:(id)sender {
@@ -1165,7 +1253,7 @@ static NSImage* kStrongBox256Image;
         textField.stringValue = newString;
     }
     
-    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+    [self.view.window makeFirstResponder:self.outlineView]; 
 }
 
 - (IBAction)onOutlineViewItemUrlEdited:(id)sender {
@@ -1183,7 +1271,7 @@ static NSImage* kStrongBox256Image;
         textField.stringValue = newString;
     }
     
-    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+    [self.view.window makeFirstResponder:self.outlineView]; 
 }
 
 - (IBAction)onOutlineViewItemUsernameEdited:(id)sender {
@@ -1201,7 +1289,7 @@ static NSImage* kStrongBox256Image;
         textField.stringValue = newString;
     }
     
-    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+    [self.view.window makeFirstResponder:self.outlineView]; 
 }
 
 - (IBAction)onOutlineViewItemTitleEdited:(id)sender {
@@ -1222,11 +1310,11 @@ static NSImage* kStrongBox256Image;
         textField.stringValue = newTitle;
     }
 
-    [self.view.window makeFirstResponder:self.outlineView]; // Our TAB order is messed up... don't tab into next cell
+    [self.view.window makeFirstResponder:self.outlineView]; 
 }
 
 - (void)outlineView:(NSOutlineView *)outlineView sortDescriptorsDidChange:(NSArray<NSSortDescriptor *> *)oldDescriptors {
-    // FUTURE: Sorting...
+    
     NSLog(@"sortDescriptors did change!");
 }
 
@@ -1235,7 +1323,7 @@ static NSImage* kStrongBox256Image;
 
     NSTableColumn* column = self.outlineView.tableColumns[newNum.intValue];
     
-    //NSLog(@"tableViewColumnDidMove: %@ -> %@", column.identifier, newNum);
+    
     
     NSMutableArray<NSString*>* newColumns = [Settings.sharedInstance.visibleColumns mutableCopy];
    
@@ -1277,7 +1365,7 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSArray<Node*> *)getItems:(Node*)parentGroup {
     if(!self.model || self.model.locked) {
@@ -1298,8 +1386,8 @@ static NSImage* kStrongBox256Image;
 }
 
 -(NSArray<Node*>*)loadItems:(Node*)parentGroup {
-    //NSLog(@"loadSafeItems for [%@]", parentGroup.uuid);
-    if(!parentGroup.isGroup) { // This can actually happen somehow - onAttachmentsChanged
+    
+    if(!parentGroup.isGroup) { 
         return @[];
     }
     
@@ -1327,7 +1415,7 @@ static NSImage* kStrongBox256Image;
         }
     }
 
-    // Filter by Search term if necessary
+    
      
     NSArray<Node*> *matches = !isSearching ? filtered : [filtered filter:^BOOL(Node * _Nonnull obj) {
         return [self isSafeItemMatchesSearchCriteria:obj recurse:YES];
@@ -1362,7 +1450,7 @@ static NSImage* kStrongBox256Image;
 
     NSArray<NSString*> *terms = [self.model getSearchTerms:searchText];
     
-    //NSLog(@"Searching for Terms: [%@]", terms);
+    
     
     for (NSString* term in terms) {
         if (scope == kSearchScopeTitle) {
@@ -1381,7 +1469,7 @@ static NSImage* kStrongBox256Image;
             immediateMatch = [self.model isAllFieldsMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         
-        if(!immediateMatch) { // MUST match all terms...
+        if(!immediateMatch) { 
             return NO;
         }
     }
@@ -1389,7 +1477,7 @@ static NSImage* kStrongBox256Image;
     return immediateMatch;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSString*)selectedItemSerializationId {
     Node* item = [self getCurrentSelectedItem];
@@ -1422,7 +1510,7 @@ static NSImage* kStrongBox256Image;
                 
         if(data) {
             keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.model.format != kKeePass1];
-            // NSLog(@"Got key file digest: [%@]", [keyFileDigest base64EncodedStringWithOptions:kNilOptions]);
+            
         }
         else {
             if (error) {
@@ -1487,7 +1575,7 @@ static NSImage* kStrongBox256Image;
                               keyFileDigest:keyFileDigest];
     }
     else {
-        NSWindow* windowHint = self.view.window; // Do here as must be called on Main Thread...
+        NSWindow* windowHint = self.view.window; 
 
         NSInteger slot = self.selectedYubiKeyConfiguration.slot;
         BOOL blocking = slot == 1 ? self.currentYubiKeySlot1IsBlocking : self.currentYubiKeySlot2IsBlocking;
@@ -1504,7 +1592,7 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)biometricOpenIsAvailableForSafe {
     DatabaseMetadata* metaData = self.model.databaseMetadata;
@@ -1519,16 +1607,16 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)autoPromptForTouchIdIfDesired {
-//    NSLog(@"autoPromptForTouchIdIfDesired: [%@]", self.model);
+
     
     if(self.model && self.model.locked) {
         BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
 
-//        NSLog(@"autoPromptForTouchIdIfDesired: weAreKeyWindow = [%d]", weAreKeyWindow);
+
 
         if(weAreKeyWindow && [self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) {
             NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.lastAutoPromptForTouchIdThrottle];
-//            NSLog(@"seconds: %f", secondsBetween);
+
             if(self.lastAutoPromptForTouchIdThrottle != nil && secondsBetween < 1.5) {
                 NSLog(@"Too many auto biometric requests too soon - ignoring...");
                 return;
@@ -1668,7 +1756,7 @@ static NSImage* kStrongBox256Image;
             }];
         });
     }
-    else { // This can happen - especially on an external file change...
+    else { 
         [Alerts info:@"Model is not set. Could not unlock. Please close and reopen your database"
               window:self.view.window];
     }
@@ -1679,31 +1767,37 @@ static NSImage* kStrongBox256Image;
 compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
  isBiometricUnlock:(BOOL)isBiometricUnlock {
     [self enableMasterCredentialsEntry:YES];
-
+    
     if(success) {
-        if(!isBiometricUnlock) {
-            DatabaseMetadata* metaData = self.model.databaseMetadata;
-            
-            BOOL bioAvail = BiometricIdHelper.sharedInstance.biometricIdAvailable;
-            BOOL touchIdEnabledAndPossible = metaData.isTouchIdEnabled && bioAvail && (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
-            if(touchIdEnabledAndPossible) {
-                if(!metaData.isTouchIdEnrolled)
-                    if(!self.model.databaseMetadata.hasPromptedForTouchIdEnrol) {
-                        [self maybePromptForBiometricEnrol:compositeKeyFactors];
-                    }
-                    else {
-                        [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.model.compositeKeyFactors.password];
-                    }
-                else if(metaData.conveniencePassword == nil) { // Biometric ID has probably expired - reset in configured expiry mode...
-                    [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.model.compositeKeyFactors.password];
-                }
-            }
+        DatabaseMetadata* metaData = self.model.databaseMetadata;
+        
+        BOOL pro = (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
+        BOOL bioAvail = BiometricIdHelper.sharedInstance.biometricIdAvailable;
+        BOOL touchIdIsPossible = bioAvail && pro;
+        BOOL shouldPromptForBiometricEnrol = touchIdIsPossible && !metaData.hasPromptedForTouchIdEnrol && !metaData.isTouchIdEnabled;
+        
+        BOOL autoFillAvailable = NO;
+        if ( @available(macOS 11.0, *) ) {
+            autoFillAvailable = YES;
         }
         
-        // Record Key File if one was used...
+        BOOL shouldPromptForAutoFillEnrol = pro && autoFillAvailable && !metaData.autoFillEnabled && !metaData.hasPromptedForAutoFillEnrol;
+        
+        if(shouldPromptForBiometricEnrol || shouldPromptForAutoFillEnrol) {
+            [self onboardForBiometricsAndOrAutoFill:shouldPromptForBiometricEnrol
+                       shouldPromptForAutoFillEnrol:shouldPromptForAutoFillEnrol
+                                compositeKeyFactors:compositeKeyFactors];
+        }
+        
+        NSString* password = self.model.compositeKeyFactors.password;
+        if( !isBiometricUnlock && touchIdIsPossible && metaData.isTouchIdEnabled && metaData.isTouchIdEnrolled && metaData.conveniencePassword == nil && password.length) {
+            
+            [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:password];
+        }
+    
+        
         
         self.model.databaseMetadata.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
-        
         self.model.databaseMetadata.yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
         
         [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
@@ -1720,72 +1814,20 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
 }
 
-- (void)maybePromptForBiometricEnrol:(CompositeKeyFactors*)compositeKeyFactors {
-    NSLog(@"hasPromptedForTouchIdEnrol: %d",self.model.databaseMetadata.hasPromptedForTouchIdEnrol);
+- (void)onboardForBiometricsAndOrAutoFill:(BOOL)shouldPromptForBiometricEnrol
+             shouldPromptForAutoFillEnrol:(BOOL)shouldPromptForAutoFillEnrol
+                      compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
+    NSDictionary* foo = @ {
+        @"convenienceUnlock" : @(shouldPromptForBiometricEnrol),
+        @"autoFill" : @(shouldPromptForAutoFillEnrol),
+        @"compositeKeyFactors" : compositeKeyFactors,
+        @"model" : self.model.database,
+    };
     
-    if ( BiometricIdHelper.sharedInstance.biometricIdAvailable) {
-        if( (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) && !self.model.databaseMetadata.hasPromptedForTouchIdEnrol) {
-            
-        NSLog(@"Biometric ID is available on Device. Should we enrol?");
-
-        NSInteger expiryPeriodInHours = self.model.databaseMetadata.touchIdPasswordExpiryPeriodHours;
-        
-        NSString* message;
-        if (expiryPeriodInHours < 0) { // Forever
-            NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_simple_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be stored securely.");
-            
-            message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName];
-        }
-        else if(expiryPeriodInHours == 0) { // 0 - App Exit
-            NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_simple_app_exit_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be stored securely until you exit Strongbox");
-            
-            message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName];
-        }
-        else {
-            NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
-
-            fmt.allowedUnits = expiryPeriodInHours > 23 ? (NSCalendarUnitDay | NSCalendarUnitWeekOfMonth) : (NSCalendarUnitHour | NSCalendarUnitDay | NSCalendarUnitWeekOfMonth);
-            fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
-            fmt.maximumUnitCount = 2;
-            fmt.collapsesLargestUnit = YES;
-            
-            NSString* timeSpan = [fmt stringFromTimeInterval:expiryPeriodInHours * 60 * 60];
-
-            NSString* loc = NSLocalizedString(@"mac_use_biometric_to_open_in_future_fmt", @"Would you like to use %@ or your Apple Watch to unlock this database in the future? Your master password will be securely stored for %@ before you need to re-enter it.");
-    
-            message = [NSString stringWithFormat:loc, BiometricIdHelper.sharedInstance.biometricIdName, timeSpan];
-        }
- 
-        [Alerts yesNo:message
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-               if(yesNo) {
-                   self.model.databaseMetadata.isTouchIdEnabled = YES;
-                   self.model.databaseMetadata.isTouchIdEnrolled = YES;
-                   [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:compositeKeyFactors.password];
-                   [self caveatAboutTouchId];
-               }
-               else {
-                   self.model.databaseMetadata.isTouchIdEnabled = NO;
-               }
-           
-               self.model.databaseMetadata.hasPromptedForTouchIdEnrol = YES;
-               [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
-           }];
-        }}
+    [self performSegueWithIdentifier:@"segueToDatabaseOnboarding" sender:foo];
 }
 
-- (void)caveatAboutTouchId {
-    if(!Settings.sharedInstance.warnedAboutTouchId) { // First Time? Display Touch ID Caveat
-        Settings.sharedInstance.warnedAboutTouchId = YES;
-        
-        NSString* loc = NSLocalizedString(@"mac_touch_id_one_time_warning", @"Touch ID Considerations\n\nWhile this is very convenient, it is not a perfect system for protecting your passwords. It is provided for convenience only. It is within the realm of possibilities that someone with access to your device or your fingerprint, can produce a good enough fake fingerprint to fool Apple’s Touch ID. In addition, on your Mac, your master password will be securely stored in the Keychain. This means it is possible for someone with administrative privileges to search your Keychain for your master password. You should be aware that a strong passphrase held only in your mind provides the most secure experience with StrongBox.\n\nPlease take all of this into account, and make your decision to use Touch ID based on your preferred balance of convenience and security.");
-      
-        [Alerts info:loc window:self.view.window];
-    }
-}
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 - (void)onAutoLock:(NSNotification*)notification {
     if(self.model && !self.model.locked && !self.model.document.isDocumentEdited) {
@@ -1812,10 +1854,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             }];
         }
         else {
-            // MMcG: Causes Dock Icon to Bounce which isn't great... Just forget about it...
             
-            // NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
-            //[self showProgressModal:loc];
+            
+            
+            
 
             [self lockSafeContinuation:nil];
         }
@@ -1844,7 +1886,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     [self.view setNeedsDisplay:YES];
     
-    // Finally Clear Clipboard if so configured...
+    
     
     if(Settings.sharedInstance.clearClipboardEnabled) {
         AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
@@ -1916,37 +1958,37 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (IBAction)onFind:(id)sender {
     [self.view.window makeFirstResponder:self.searchField];
 }
 
 - (IBAction)onSearch:(id)sender {    
-    self.itemsCache = nil; // Clear items cache
+    self.itemsCache = nil; 
     
     Node* currentSelection = [self getCurrentSelectedItem];
     
     [self.outlineView reloadData];
     
     if( self.searchField.stringValue.length > 0) {
-        // Select first match...
+        
         
         [self.outlineView expandItem:nil expandChildren:YES];
 
         for(int i=0;i < [self.outlineView numberOfRows];i++) {
-            //NSLog(@"Searching: %d", i);
+            
             Node* node = [self.outlineView itemAtRow:i];
 
             if([self isSafeItemMatchesSearchCriteria:node recurse:NO]) {
-                //NSLog(@"Found: %@", node.title);
+                
                 [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: i] byExtendingSelection: NO];
                 break;
             }
         }
     }
     else {
-        // Search cleared - can we maintain the selection?
+        
         
         [self selectItem:currentSelection];
     }
@@ -1959,13 +2001,16 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)bindRevealMasterPasswordTextField {
-    NSString* title = !self.textFieldMasterPassword.showsText ?
-        NSLocalizedString(@"mac_button_reveal_master_password_title", @"⌘R to Reveal") :
-        NSLocalizedString(@"mac_button_conceal_master_password_title", @"⌘R to Conceal");
-
-    [self.buttonToggleRevealMasterPasswordTip setTitle:title];
+    NSImage* img = nil;
     
-    self.imageViewShowHidePassword.image = !self.textFieldMasterPassword.showsText ? [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
+    if (@available(macOS 11.0, *)) {
+        img = [NSImage imageWithSystemSymbolName:!self.textFieldMasterPassword.showsText ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""];
+    } else {
+        img = !self.textFieldMasterPassword.showsText ?
+         [NSImage imageNamed:@"show"] : [NSImage imageNamed:@"hide"];
+    }
+    
+    [self.buttonToggleRevealMasterPasswordTip setImage:img];
 }
 
 - (IBAction)onToggleShowHideQuickViewPassword:(id)sender {
@@ -1979,7 +2024,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     self.imageViewTogglePassword.image = [NSImage imageNamed:self.showPassword ? @"hide" : @"show"];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 -(void)dereferenceAndCopyToPasteboard:(NSString*)text item:(Node*)item {
     if(!item || !text.length) {
@@ -2122,7 +2167,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"TOTP")]];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)expandParentsOfItem:(Node*)item {
     NSMutableArray *stack = [[NSMutableArray alloc] init];
@@ -2130,7 +2175,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     while (item.parent != nil) {
         item = item.parent;
         
-        //NSLog(@"Got Parent == %@", i.title);
+        
         
         [stack addObject:item];
     }
@@ -2138,7 +2183,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     while ([stack count]) {
         Node *group = [stack lastObject];
         
-        //NSLog(@"Expanding %@", group.title);
+        
         [self.outlineView expandItem:group];
         
         [stack removeObject:group];
@@ -2174,7 +2219,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)enableDragDrop {
     [self.outlineView registerForDraggedTypes:@[kDragAndDropInternalUti]];
@@ -2184,7 +2229,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (Node*)getCurrentSelectedItem {
     NSInteger selectedRow = [self.outlineView selectedRow];
     
-    //NSLog(@"Selected Row: %ld", (long)selectedRow);
+    
     
     return [self.outlineView itemAtRow:selectedRow];
 }
@@ -2240,12 +2285,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     NSArray<Node*>* minimalNodeSet = [self.model getMinimalNodeSet:items].allObjects;
     
-    // Internal -> Moves
+    
     
     NSArray<NSString*>* internalSerializationIds = [self getInternalSerializationIds:minimalNodeSet];
     [pasteboard setPropertyList:internalSerializationIds forType:kDragAndDropInternalUti];
     
-    // External -> Copies
+    
     
     NSData* json = [self getJsonForNodes:minimalNodeSet];
     [pasteboard setData:json forType:kDragAndDropExternalUti];
@@ -2262,13 +2307,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (NSData*)getJsonForNodes:(NSArray<Node*>*)nodes {
     SerializationPackage *serializationPackage = [[SerializationPackage alloc] init];
     
-    // Node Hierarchy
+    
     
     NSArray<NSDictionary*>* nodeDictionaries = [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return [obj serialize:serializationPackage];
     }];
     
-    // Attachments
+    
     
     NSMutableDictionary<NSString*, NSString*> *attachmentsMap = [NSMutableDictionary dictionaryWithCapacity:serializationPackage.usedAttachmentIndices.count];
     
@@ -2279,7 +2324,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         [attachmentsMap setValue:base64 forKey:index.stringValue];
     }
     
-    // Custom Icons
+    
     
     NSMutableDictionary<NSString*, NSString*> *customIconsMap = [NSMutableDictionary dictionaryWithCapacity:serializationPackage.usedCustomIcons.count];
     
@@ -2289,14 +2334,14 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         [customIconsMap setValue:iconB64 forKey:icon.UUIDString];
     }
     
-    // Package
+    
     
     NSDictionary *serialized = @{ @"sourceFormat" : @(self.model.format),
                                   @"nodes" : nodeDictionaries,
                                   @"attachmentsMap" : attachmentsMap,
                                   @"customIconsMap" : customIconsMap };
     
-    // JSON
+    
     
     NSError* error;
     NSData* data = [NSJSONSerialization dataWithJSONObject:serialized options:kNilOptions error:&error];
@@ -2361,7 +2406,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         
         return result;
     }
-    else if(destinationItem.isGroup) { // External
+    else if(destinationItem.isGroup) { 
         NSData* json = [pasteboard dataForType:kDragAndDropExternalUti];
         if(json && destinationItem.isGroup) {
             BOOL ret = [self pasteFromExternal:json destinationItem:destinationItem];
@@ -2394,7 +2439,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     BOOL keePassGroupTitleRules = self.model.format != kPasswordSafe;
     
-    // Rebuild Node Hierarchy
+    
     
     NSMutableArray<Node*>* nodes = @[].mutableCopy;
     NSError* err;
@@ -2418,7 +2463,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                 nodes:(NSArray<Node*>*)nodes
                       destinationItem:(Node*)destinationItem
                          sourceFormat:(DatabaseFormat)sourceFormat {
-    // Password Safe -> KeePass 2 (Emails -> Custom Field)
+    
     
     NSArray<Node*>* allRecords = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.allChildRecords;
@@ -2453,7 +2498,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                 nodes:(NSArray<Node*>*)nodes
                       destinationItem:(Node*)destinationItem
                          sourceFormat:(DatabaseFormat)sourceFormat {
-    // Password Safe -> KeePass 1 (Emails -> Appended To End of Notes, No Entries at Root)
+    
    
     NSArray<Node*>* allRecords = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.allChildRecords;
@@ -2503,7 +2548,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                 nodes:(NSArray<Node*>*)nodes
                       destinationItem:(Node*)destinationItem
                          sourceFormat:(DatabaseFormat)sourceFormat {
-    // KeePass 2 -> Password Safe (Loss of Icons, Attachments, Custom Fields?)
+    
     
     NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.children;
@@ -2546,7 +2591,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                 nodes:(NSArray<Node*>*)nodes
                       destinationItem:(Node*)destinationItem
                          sourceFormat:(DatabaseFormat)sourceFormat {
-    // KeePass 2 -> KeePass 1 (Only 1 Attachment! No Entries at Root!)
+    
     
     NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.children;
@@ -2604,7 +2649,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                 nodes:(NSArray<Node*>*)nodes
                       destinationItem:(Node*)destinationItem
                          sourceFormat:(DatabaseFormat)sourceFormat {
-    // KeePass 1 -> Password Safe (Loss of Icons & Attachment)
+    
     
     NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.children;
@@ -2675,11 +2720,11 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     [self rebuildAttachments:nodes attachmentsMap:attachmentsMap];
     
-    // Rebuild Custom Icons
+    
 
     [self rebuildCustomIcons:nodes customIconsMap:customIconsMap];
     
-    // Add Items to our Model...
+    
     
     BOOL keePassGroupTitleRules = self.model.format != kPasswordSafe;
     
@@ -2707,10 +2752,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         NSString* b64Data = customIconsMap[original.UUIDString];
         NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
         
-        [self.model setItemIcon:node index:nil existingCustom:nil custom:data rationalize:NO batchUpdate:NO]; // Make sure not to rationalize
+        [self.model setItemIcon:node index:nil existingCustom:nil custom:data rationalize:NO batchUpdate:NO]; 
     }
     
-    // Recurse into children
+    
     
     [self rebuildCustomIcons:node.children customIconsMap:customIconsMap];
 }
@@ -2722,7 +2767,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)rebuildAttachmentsForSerializedNode:(Node*)node attachmentsMap:(NSDictionary<NSString*, NSString*>*)attachmentsMap {
-    // Make a copy and clear this items attachments - we will re-add below with the right indices etc
+    
     
     NSArray* originalAttachments = node.fields.attachments.copy;
     [node.fields.attachments removeAllObjects];
@@ -2735,15 +2780,15 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithStream:stream protectedInMemory:YES compressed:YES];
         UiAttachment* uiAttachment = [UiAttachment attachmentWithFilename:attachment.filename dbAttachment:dbA];
     
-        [self.model addItemAttachment:node attachment:uiAttachment rationalize:NO]; // DO Not Rationalize since these attachments are not officially linked to the database yet!
+        [self.model addItemAttachment:node attachment:uiAttachment rationalize:NO]; 
     }
     
-    // Recurse into children
+    
     
     [self rebuildAttachments:node.children attachmentsMap:attachmentsMap];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (IBAction)onCreateRecord:(id)sender {
     Node *item = [self getCurrentSelectedItem];
@@ -2769,8 +2814,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)onNewItemAdded:(Node*)node openEntryDetailsWindowWhenDone:(BOOL)openEntryDetailsWindowWhenDone {
-    self.itemsCache = nil; // Clear items cache
-    self.searchField.stringValue = @""; // Clear any ongoing search...
+    self.itemsCache = nil; 
+    self.searchField.stringValue = @""; 
     [self.outlineView reloadData];
     NSInteger row = [self findRowForItemExpandIfNecessary:node];
     
@@ -2808,7 +2853,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         if ( toBeRecycled == nil ) {
             [self postValidationDeleteAllItemsWithConfirmPrompt:toBeDeleted];
         }
-        else { // Mixed delete and recycle
+        else { 
             [self postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:toBeDeleted toBeRecycled:toBeRecycled];
         }
     }
@@ -2820,8 +2865,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
            window:self.view.window
        completion:^(BOOL yesNo) {
         if (yesNo) {
-                   // Delete first, then recycly because the item to be deleted could be the recycle bin, and if we recycle first then we will actually
-                   // permanently delete the items we wanted to recycle! This is more conservative and a better outcome.
+                   
+                   
                    
                    [self.model deleteItems:toBeDeleted];
                    
@@ -2893,9 +2938,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return;
     }
     
-    if (![urlString.lowercaseString hasPrefix:@"http://"] &&
-        ![urlString.lowercaseString hasPrefix:@"https://"]) {
-        urlString = [NSString stringWithFormat:@"http://%@", urlString];
+    if (![urlString.lowercaseString hasPrefix:@"http:
+        ![urlString.lowercaseString hasPrefix:@"https:
+        urlString = [NSString stringWithFormat:@"http:
     }
     
     [[NSWorkspace sharedWorkspace] openURL:urlString.urlExtendedParse];
@@ -2904,7 +2949,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
     SEL theAction = [anItem action];
 
-//    NSLog(@"validating UI Item [%@]", NSStringFromSelector(theAction));
+
 
     Node* item = nil;
     
@@ -2952,7 +2997,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
     else if (theAction == @selector(onFind:)) {
         return self.model && !self.model.locked;
-            // ([Settings sharedInstance].fullVersion || [Settings sharedInstance].freeTrial);
+            
     }
     else if(theAction == @selector(onLaunchUrl:) ||
             theAction == @selector(onCopyUrl:)) {
@@ -2981,6 +3026,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
     else if (theAction == @selector(onDatabaseProperties:)) {
         return self.model && !self.model.locked;
+    }
+    else if (theAction == @selector(onAutoFillSettings:)) {
+        return self.model && !self.model.locked && AutoFillManager.sharedInstance.isPossible;
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.model.locked;
@@ -3025,7 +3073,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)clearTouchId {
     NSLog(@"Clearing Touch ID data...");
     
-    self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO; // We can ask again on next open
+    self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO; 
     self.model.databaseMetadata.isTouchIdEnrolled = NO;
     [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:nil];
     [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
@@ -3033,8 +3081,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self bindLockScreenUi];
 }
 
+- (IBAction)onAutoFillSettings:(id)sender {
+    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(1)];
+}
+
 - (IBAction)onDatabaseProperties:(id)sender {
-    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:nil];
+    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(0)];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {
@@ -3090,7 +3142,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         NSArray *rows = [NSArray arrayWithContentsOfCSVURL:url options:CHCSVParserOptionsSanitizesFields | CHCSVParserOptionsUsesFirstLineAsKeys];
         
         if (rows == nil) {
-            //something went wrong; log the error and exit
+            
             NSLog(@"error parsing file: %@", error);
             [Alerts error:error window:self.view.window];
             return;
@@ -3158,7 +3210,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         else {
             Node* currentSelection = [self getCurrentSelectedItem];
                   
-            self.itemsCache = nil; // Clear items cache
+            self.itemsCache = nil; 
 
             [self bindColumnsToSettings];
             [self customizeOutlineView];
@@ -3170,11 +3222,11 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     });
 }
 
-static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
-    BasicOrderedDictionary *ret = [[BasicOrderedDictionary alloc] init];
+static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
+    MutableOrderedDictionary *ret = [[MutableOrderedDictionary alloc] init];
     
     for (NSString* key in [model.metadata kvpForUi].allKeys) {
-        NSString *value = [[model.metadata kvpForUi] objectForKey:key];
+        NSString *value = [model.metadata kvpForUi][key];
         [ret addKey:key andValue:value];
     }
     
@@ -3193,12 +3245,12 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (IBAction)onShowSafeSummary:(id)sender {
-    [self.outlineView deselectAll:nil]; // Funky side effect, no selection -> show safe summary
+    [self.outlineView deselectAll:nil]; 
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     if (tableView == self.tableViewSummary) {
-        BasicOrderedDictionary* dictionary = getSummaryDictionary(self.model);
+        MutableOrderedDictionary* dictionary = getSummaryDictionary(self.model);
         return dictionary.count;
     }
     else if (tableView == self.attachmentsTable) {
@@ -3213,12 +3265,12 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     if(tableView == self.tableViewSummary) {
         NSTableCellView* cell = [self.tableViewSummary makeViewWithIdentifier:@"KeyCellIdentifier" owner:nil];
 
-        BasicOrderedDictionary *dict = getSummaryDictionary(self.model);
+        MutableOrderedDictionary *dict = getSummaryDictionary(self.model);
         
         NSString *key = dict.allKeys[row];
-        NSString *value = [dict objectForKey:key];
+        NSString *value = dict[key];
         
-        value = value == nil ? @"" : value; // Safety Only
+        value = value == nil ? @"" : value; 
         
         cell.textField.stringValue = [tableColumn.identifier isEqualToString:@"KeyColumn"] ? key : value;
         
@@ -3269,7 +3321,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             
             cell.value = derefed;
             cell.protected = field.protected && !(derefed.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-            cell.valueHidden = field.protected && !(derefed.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); // Initially Hide the Value if it is protected
+            cell.valueHidden = field.protected && !(derefed.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); 
             
             return cell;
         }
@@ -3303,7 +3355,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     });
 }
 
-// Preview Attachments
+
 
 - (NSInteger)numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel *)panel {
     NSUInteger idx = self.attachmentsTable.selectedRow;
@@ -3373,7 +3425,7 @@ static BasicOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return;
     }
     
-    // Save As Dialog...
+    
     
     NSSavePanel * savePanel = [NSSavePanel savePanel];
     savePanel.nameFieldStringValue = nodeAttachment.filename;
@@ -3523,7 +3575,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     if(!Settings.sharedInstance.doNotShowTotp && item.fields.otpToken) {
         self.totpRow.hidden = NO;
         
-        //NSLog(@"Token: [%@] - Password: %@", item.otpToken, item.otpToken.password);
+        
         
         self.textFieldTotp.stringValue = item.fields.otpToken.password;
         
@@ -3622,16 +3674,16 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     NSString* databaseName = [NSString stringWithFormat:loc, self.model.databaseMetadata.nickName];
     NSString* htmlString = [self.model getHtmlPrintString:databaseName];
 
-    //    NSError* error;
-    //    NSString* path = [NSTemporaryDirectory() stringByAppendingPathComponent:@"print.html"];
-    //    NSLog(@"Path: %@", path);
-    //    if (![htmlString writeToFile:path atomically:YES encoding:NSUTF8StringEncoding error:&error]) {
-    //        NSLog(@"EEEEEEEEEEEEEEEK - %@", error);
-    //    }
+    
+    
+    
+    
+    
+    
 
-    // Print not supported:
-    // WKWebView *webView = [[WKWebView alloc] init];
-    // [webView loadHTMLString:htmlString baseURL:nil];
+    
+    
+    
     
     WebView *webView = [[WebView alloc] init];
     [webView.mainFrame loadHTMLString:htmlString baseURL:nil];
@@ -3660,12 +3712,12 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     }];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)refreshKeyFileDropdown {
     [self.keyFilePopup.menu removeAllItems];
     
-    // None & Browse
+    
     
     [self.keyFilePopup.menu addItemWithTitle:NSLocalizedString(@"mac_key_file_none", @"None")
                                       action:@selector(onSelectNoneKeyFile)
@@ -3675,7 +3727,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
                                       action:@selector(onBrowseForKeyFile)
                                keyEquivalent:@""];
     
-    // Configured URL
+    
 
     DatabaseMetadata *database = self.model.databaseMetadata;
     NSURL* configuredUrl;
@@ -3690,7 +3742,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
             NSLog(@"getUrlFromBookmark: [%@]", error);
         }
         else {
-           // NSLog(@"getUrlFromBookmark: [%@]", configuredUrl);
+           
         }
         
         if(updatedBookmark) {
@@ -3699,7 +3751,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         }
     }
 
-    // Currently Selected Bookmark...
+    
     
     NSString* bookmark = self.selectedKeyFileBookmark;
     NSURL* currentlySelectedUrl;
@@ -3777,7 +3829,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     [self refreshKeyFileDropdown];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)keyFileIsSet {
     return self.selectedKeyFileBookmark != nil;
@@ -3785,7 +3837,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 
 - (DatabaseFormat)getHeuristicFormat {
     BOOL probablyPasswordSafe = [self.model.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
-    DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; // Not Ideal
+    DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; 
 
     return heuristicFormat;
 }
@@ -3802,7 +3854,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 }
 
 - (IBAction)controlTextDidChange:(NSSecureTextField *)obj {
-//    NSLog(@"controlTextDidChange");
+
     BOOL enabled = [self manualCredentialsAreValid];
     [self.buttonUnlockWithPassword setEnabled:enabled];
 }
@@ -3829,7 +3881,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         
     [self refreshKeyFileDropdown];
     
-    [self bindYubikeyOnLockScreen];
+    [self bindYubiKeyOnLockScreen];
 }
 
 - (void)bindBiometricButtonsOnLockScreen {
@@ -3881,12 +3933,12 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     [appDelegate showUpgradeModal:0];
 }
             
-- (void)bindYubikeyOnLockScreen {
+- (void)bindYubiKeyOnLockScreen {
     self.currentYubiKeySerial = nil;
     self.currentYubiKeySlot1IsBlocking = NO;
     self.currentYubiKeySlot2IsBlocking = NO;
     
-    //    NSLog(@"Binding: [selectedYubiKeyConfiguration = [%@]]", self.selectedYubiKeyConfiguration);
+    
 
     [self.yubiKeyPopup.menu removeAllItems];
 
@@ -3896,7 +3948,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
                                keyEquivalent:@""];
     self.yubiKeyPopup.enabled = NO;
     
-    [MacYubiKeyManager.sharedInstance getAvailableYubikey:^(YubiKeyData * _Nonnull yk) {
+    [MacYubiKeyManager.sharedInstance getAvailableYubiKey:^(YubiKeyData * _Nonnull yk) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self onGotAvailableYubiKey:yk];
         });}];
@@ -3920,7 +3972,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         return;
     }
     
-    // Always have option to select None...
+    
     
     NSString* loc = NSLocalizedString(@"generic_none", @"None");
     NSMenuItem* noneMenuItem = [self.yubiKeyPopup.menu addItemWithTitle:loc
@@ -3930,7 +3982,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     NSMenuItem* slot1MenuItem;
     NSMenuItem* slot2MenuItem;
     
-    // Available Slots...
+    
     
     BOOL availableSlots = NO;
     NSString* loc1 = NSLocalizedString(@"mac_yubikey_slot_n_touch_required_fmt", @"Yubikey Slot %ld (Touch Required)");
@@ -3940,7 +3992,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         NSString* loc = self.currentYubiKeySlot1IsBlocking ? loc1 : loc2;
         NSString* locFmt = [NSString stringWithFormat:loc, 1];
         slot1MenuItem = [self.yubiKeyPopup.menu addItemWithTitle:locFmt
-                                                          action:@selector(onSelectYubikeySlot1)
+                                                          action:@selector(onSelectYubiKeySlot1)
                                                    keyEquivalent:@""];
         availableSlots = YES;
     }
@@ -3950,7 +4002,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         NSString* locFmt = [NSString stringWithFormat:loc, 2];
         
         slot2MenuItem = [self.yubiKeyPopup.menu addItemWithTitle:locFmt
-                                                          action:@selector(onSelectYubikeySlot2)
+                                                          action:@selector(onSelectYubiKeySlot2)
                                                    keyEquivalent:@""];
         availableSlots = YES;
     }
@@ -3959,12 +4011,12 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
 
     if (availableSlots) {
         if (self.selectedYubiKeyConfiguration && ([self.selectedYubiKeyConfiguration.deviceSerial isEqualToString:yk.serial])) {
-            // Matching Device!
+            
             
             YubiKeySlotCrStatus slotStatus = self.selectedYubiKeyConfiguration.slot == 1 ? yk.slot1CrStatus : yk.slot2CrStatus;
             
             if ([self yubiKeyCrIsSupported:slotStatus]) {
-                // Select Slot
+                
                 if (self.selectedYubiKeyConfiguration.slot == 1 && slot1MenuItem) {
                     [self.yubiKeyPopup selectItem:slot1MenuItem];
                     selectedItem = YES;
@@ -3977,7 +4029,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
         }
     }
     
-    if (!selectedItem) { // Auto Select 'None'
+    if (!selectedItem) { 
         [self.yubiKeyPopup selectItem:noneMenuItem];
         self.selectedYubiKeyConfiguration = nil;
     }
@@ -3993,16 +4045,20 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* da
     self.selectedYubiKeyConfiguration = nil;
 }
 
-- (void)onSelectYubikeySlot1 {
+- (void)onSelectYubiKeySlot1 {
     self.selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
     self.selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
     self.selectedYubiKeyConfiguration.slot = 1;
 }
 
-- (void)onSelectYubikeySlot2 {
+- (void)onSelectYubiKeySlot2 {
     self.selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
     self.selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
     self.selectedYubiKeyConfiguration.slot = 2;
+}
+
+- (IBAction)onViewAllDatabases:(id)sender {
+    [DatabasesManagerView show:NO];
 }
 
 @end

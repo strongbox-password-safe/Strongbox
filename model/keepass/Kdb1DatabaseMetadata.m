@@ -19,19 +19,21 @@ static const uint32_t kDefaultVersion = 0x00030004;
     
     if (self) {
         self.flags = kFlagsAes | kFlagsSha2;
-        self.version = kDefaultVersion;
+        self.versionInt = kDefaultVersion;
         self.transformRounds = kDefaultTransformRounds;
     }
     
     return self;
 }
 
-- (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi {
-    BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
+- (MutableOrderedDictionary<NSString*, NSString*>*)kvpForUi {
+    MutableOrderedDictionary<NSString*, NSString*>* kvps = [[MutableOrderedDictionary alloc] init];
     
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_format", @"Database Format") andValue:@"KeePass 1"];
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption") andValue:((self.flags & kFlagsAes) == kFlagsAes) ? @"AES-256" : @"TwoFish"];
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds") andValue:[NSString stringWithFormat:@"%u", self.transformRounds]];
+    kvps[NSLocalizedString(@"database_metadata_field_format", @"Database Format")] = @"KeePass 1";
+    
+    kvps[NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption")] = ((self.flags & kFlagsAes) == kFlagsAes) ? @"AES-256" : @"TwoFish";
+    
+    kvps[NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds")] = [NSString stringWithFormat:@"%u", self.transformRounds];
     
     return kvps;
 }

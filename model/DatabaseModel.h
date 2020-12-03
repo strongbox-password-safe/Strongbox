@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseModel : NSObject
 
 + (BOOL)isValidDatabase:(NSURL*)url error:(NSError**)error;
-+ (BOOL)isValidDatabaseWithPrefix:(nullable NSData *)prefix error:(NSError**)error; // TODO: Eventually remove - URL only
++ (BOOL)isValidDatabaseWithPrefix:(nullable NSData *)prefix error:(NSError**)error; 
 
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)prefix;
 
@@ -23,13 +23,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format;
 
-//
+
 
 - (NSData*)expressToData;
 + (instancetype _Nullable)expressFromData:(NSData*)data password:(NSString*)password config:(DatabaseModelConfig*)config;
 
-////////////
-// FROM
+
+
 
 + (void)fromLegacyData:legacyData
                    ckf:(CompositeKeyFactors *)ckf
@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
                      config:(DatabaseModelConfig*)config
                  completion:(void (^)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error))completion;
 
-//////
+
 
 - (void)getAsData:(SaveCompletionBlock)completion;
 
@@ -75,18 +75,18 @@ NS_ASSUME_NONNULL_BEGIN
                  format:(DatabaseFormat)format
                  config:(DatabaseModelConfig*)config;
 
-// Simple Field Edits
+
 
 - (BOOL)setItemTitle:(Node*)item title:(NSString*)title;
 
-// Attachments
+
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment;
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
 
-// Custom Icons
+
 
 - (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
 - (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
@@ -97,34 +97,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize;
 - (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
 
-// Deletions
+
 
 @property (readonly) NSDictionary<NSUUID*, NSDate*>* deletedObjects;
 - (void)deleteItems:(const NSArray<Node *> *)items;
 - (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
 - (void)unDelete:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
 
-// Recycle
+
 
 - (BOOL)canRecycle:(Node*)item;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
 - (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
 
-// Move
+
 
 - (BOOL)validateMoveItems:(const NSArray<Node*>*)items destination:(Node*)destination;
 - (BOOL)moveItems:(const NSArray<Node*>*)items destination:(Node*)destination;
 - (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
 - (void)undoMove:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
 
-// Add
+
 
 - (BOOL)validateAddChild:(Node*)item destination:(Node*)destination;
 - (BOOL)addChild:(Node*)item destination:(Node*)destination;
 - (void)unAddChild:(Node*)item;
 
-// Helpers
+
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
@@ -165,7 +165,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
-// TODO: Combine KP1 and KP2 Recycle Bin / Backup Group?
+
 @property BOOL recycleBinEnabled;
 @property (readonly, nullable) Node* recycleBinNode;
 @property (nullable, readonly) Node* keePass1BackupNode;
@@ -174,8 +174,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, readonly, nonnull) NSString* fileExtension;
 
+- (void)preOrderTraverse:(BOOL (^)(Node* node))function; 
+
 @end
 
-#endif // ifndef _DatabaseModel_h
+#endif 
 
 NS_ASSUME_NONNULL_END

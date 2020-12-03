@@ -32,9 +32,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    //    self.collectionView.layer.borderWidth = 1.0f;
-    //    self.collectionView.layer.cornerRadius = 5;
-    //    self.collectionView.layer.borderColor = [UIColor lightGrayColor].CGColor;
+    
+    
+    
     
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;

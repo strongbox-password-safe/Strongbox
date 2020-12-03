@@ -87,24 +87,24 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 - (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
 - (void)clearTotp:(Node *)item;
 
-// Additions
+
 
 - (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 - (BOOL)addNewRecord:(Node *)parentGroup;
 - (BOOL)addNewGroup:(Node *)parentGroup title:(NSString*)title;
 
-// Delete
+
 
 - (void)deleteItems:(const NSArray<Node *>*)items;
 - (BOOL)recycleItems:(const NSArray<Node *>*)items;
 - (BOOL)canRecycle:(Node*_Nonnull)item;
 
-// Moves
+
 
 - (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination;
 - (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination;
 
-//
+
 
 - (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
 - (Node*_Nullable)getItemFromSerializationId:(NSString*)serializationId;
@@ -132,13 +132,13 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 @property (nonatomic) CompositeKeyFactors* compositeKeyFactors;
 
-@property (readonly) BOOL recycleBinEnabled; // Read-Only until we allow config
+@property (readonly) BOOL recycleBinEnabled; 
 @property (readonly) Node* recycleBinNode;
 - (void)createNewRecycleBinNode;
 
 @property (readonly) Node* keePass1BackupNode;
 
-// Convenience / Summary
+
 
 @property (readonly) NSArray<Node*>* activeRecords;
 @property (readonly) NSArray<Node*>* activeGroups;
@@ -152,7 +152,7 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
-// TODO: Move to notificationcenter 
+
 @property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL openEntryDetailsWindowWhenDone);
 @property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
 @property (nonatomic, copy, nullable) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
@@ -162,8 +162,10 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
 
 @property (readonly, nonatomic) DatabaseMetadata* databaseMetadata;
+@property (readonly, nonatomic) DatabaseModel* database;
 
 - (void)setDatabaseMetadata:(DatabaseMetadata * _Nonnull)databaseMetadata;
+
 
 @end
 

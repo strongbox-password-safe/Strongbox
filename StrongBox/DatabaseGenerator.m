@@ -59,7 +59,7 @@
     NSString* password = [PasswordMaker.sharedInstance generateWithDefaultConfig];
     NSString* email = [PasswordMaker.sharedInstance generateEmail];
 
-    NSString* url = [NSString stringWithFormat:@"https://www.website-%d.com/path", index];
+    NSString* url = [NSString stringWithFormat:@"https:
     NSString* notes = [NSString stringWithFormat:@"notes could be quite long too-%d", index];
 
     NodeFields *fields = [[NodeFields alloc] initWithUsername:username
@@ -70,7 +70,7 @@
     
     Node* childEntry = [[Node alloc] initAsRecord:title parent:parentGroup fields:fields uuid:nil];
     
-    // FUTURE: Add Custom Fields, Dates, Attachments, Expiry, Icons, Custom Icons, etc
+    
     
     return childEntry;
 }

@@ -8,8 +8,8 @@
 
 #import "SimpleXmlValueExtractor.h"
 #import "KeePassConstants.h"
-
 #import "Utils.h"
+#import "NSString+Extensions.h"
 
 // 2018-10-17T19:28:42Z
 
@@ -27,16 +27,16 @@ static NSDate* dotNetBaseEpochDate;
 
 + (void) initialize {
     if (self == [SimpleXmlValueExtractor class]) {
-        // MMcG: Weirdly the way Microsoft and Apple calculate their intervals from the reference date
-        // is different (off by exactly 2 days) - This led to an issue where dates were being displayed
-        // as 2 days behind when edited in Windows (KeePass) and then displayed on Windows as being
-        // 2 days in the future when edited with Strongbox. This also only happened for KDBX4 files
-        // Bit of a cryptic one but for reference:
-        //
-        // https://github.com/mmcguill/Strongbox/issues/117
-        //
-        // We now use the below Midnight 3rd January 0001 as the base epoch for .Net Dates to keep in line
-        // with KeePass on Windows (.NET)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         formatter = [[NSISO8601DateFormatter alloc] init];
         formatter.formatOptions = kFormatOptions;
@@ -45,7 +45,7 @@ static NSDate* dotNetBaseEpochDate;
     }
 }
 
-// Strings
+
 
 + (NSString *)getStringFromText:(id<XmlParsingDomainObject>)xmlObject {
     return xmlObject.originalText;
@@ -53,10 +53,14 @@ static NSDate* dotNetBaseEpochDate;
 
 + (StringValue *)getStringValueFromText:(id<XmlParsingDomainObject>)xmlObject {
     NSString* text = xmlObject.originalText;
-    BOOL protected = xmlObject.originalAttributes &&
-    (xmlObject.originalAttributes[kAttributeProtected] &&
-     ([xmlObject.originalAttributes[kAttributeProtected] isEqualToString:kAttributeValueTrue]));
-
+    
+    BOOL protected = NO;
+    
+    if (xmlObject.originalAttributes && (xmlObject.originalAttributes[kAttributeProtected])) {
+        NSString* protectedString = xmlObject.originalAttributes[kAttributeProtected];
+        protected = protectedString.isKeePassXmlBooleanStringTrue;
+    }
+        
     return [StringValue valueWithString:text protected:protected];
 }
 
@@ -65,7 +69,7 @@ static NSDate* dotNetBaseEpochDate;
     return ref ? ref.integerValue : 0;
 }
 
-// Dates
+
 
 + (NSDate *)getDate:(id<XmlParsingDomainObject>)xmlObject v4Format:(BOOL)v4Format {
     if(v4Format) {
@@ -95,7 +99,7 @@ static NSDate* dotNetBaseEpochDate;
     return [formatter stringFromDate:date];
 }
 
-// UUID
+
 
 + (NSUUID *)getUuid:(id<XmlParsingDomainObject>)xmlObject {
     NSData *uuidData = xmlObject.originalText ? [[NSData alloc] initWithBase64EncodedString:xmlObject.originalText
@@ -109,16 +113,34 @@ static NSDate* dotNetBaseEpochDate;
     }
 }
 
-// Numbers
+
 
 + (NSNumber*)getNumber:(id<XmlParsingDomainObject>)xmlObject {
     return xmlObject.originalText.length ? @(xmlObject.originalText.integerValue) : nil;
 }
 
-// Boolean
+
+
++ (NSNumber*)getOptionalBool:(id<XmlParsingDomainObject>)xmlObject {
+    if (xmlObject.originalText.length) {
+        if (xmlObject.originalText.isKeePassXmlBooleanStringTrue) {
+            return @YES;
+        }
+        
+        if (xmlObject.originalText.isKeePassXmlBooleanStringFalse) {
+            return @NO;
+        }
+        
+        if (xmlObject.originalText.isKeePassXmlBooleanStringNull) {
+            return nil;
+        }
+    }
+    
+    return nil;
+}
 
 + (BOOL)getBool:(id<XmlParsingDomainObject>)xmlObject {
-    return (xmlObject.originalText.length && [xmlObject.originalText isEqualToString:@"True"]);
+    return (xmlObject.originalText.length && xmlObject.originalText.isKeePassXmlBooleanStringTrue);
 }
 
 @end

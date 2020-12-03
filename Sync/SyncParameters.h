@@ -18,8 +18,8 @@ typedef NS_ENUM (NSUInteger, SyncInProgressBehaviour) {
     
 @interface SyncParameters : NSObject
 
-@property (nullable) UIViewController* interactiveVC; // If null -> This is a background sync
-@property SyncInProgressBehaviour inProgressBehaviour; // What to do if sync is already in progress
+@property (nullable) UIViewController* interactiveVC; 
+@property SyncInProgressBehaviour inProgressBehaviour; 
 
 @end
 

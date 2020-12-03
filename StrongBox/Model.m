@@ -93,24 +93,24 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSData*)getDuressDummyData {
-    return SharedAppAndAutoFillSettings.sharedInstance.duressDummyData; // Less than ideal place to store?
+    return SharedAppAndAutoFillSettings.sharedInstance.duressDummyData; 
 }
 
 - (void)setDuressDummyData:(NSData*)data {
     SharedAppAndAutoFillSettings.sharedInstance.duressDummyData = data;
 }
 
-//
+
 - (void)dealloc {
     NSLog(@"=====================================================================");
     NSLog(@"Model DEALLOC...");
     NSLog(@"=====================================================================");
 }
 
-- (void)closeAndCleanup { // Called when user is done/finised with model... // TODO: Call on Exit Mac!
+- (void)closeAndCleanup { 
     NSLog(@"Model closeAndCleanup...");
     if (self.auditor) {
         [self.auditor stop];
@@ -153,7 +153,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
         return [weakSelf isExcludedFromAuditHelper:set sid:sid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
-        // We can ignore the actual passed in config because we know it's part of the overall Database SafeMetaData;
+        
         [SafesList.sharedInstance update:weakSelf.metadata];
     }];
 }
@@ -168,7 +168,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 }
 
 - (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set sid:(NSString*)sid {
-    // TODO: Need to allow for exclusion of groups (check if sid is contained in any item of the set)
+    
     
     return [set containsObject:sid];
 }
@@ -188,7 +188,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
         });
     }
                progress:^(CGFloat progress) {
-//        NSLog(@"Audit Progress Callback: %f", progress);
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
         });
@@ -293,7 +293,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)isReadOnly {
     return self.metadata.readOnly || self.forcedReadOnly;
@@ -305,7 +305,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
         return;
     }
 
-    [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+    [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled || data == nil || error) {
             handler(userCancelled, NO, error);
             return;
@@ -322,7 +322,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
         return;
     }
     else {
-        // FUTURE: Make this block atomic so multiple updates can't intertwine... Should be pretty safe as is with UI blocked.
+        
         
         NSError* error;
         BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata data:data error:&error];
@@ -332,7 +332,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
             return;
         }
 
-        if (self.isAutoFillOpen) { // Auto-Fill doesn't ever sync
+        if (self.isAutoFillOpen) { 
             completion(NO, NO, nil);
         }
         else {
@@ -342,7 +342,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
                         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
                     }
 
-                    // Re-audit - FUTURE - Make this more incremental?
+                    
                     if (self.metadata.auditConfig.auditInBackground) {
                         [self restartAudit];
                     }
@@ -352,12 +352,12 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
                     completion(NO, NO, error);
                 }
                 else if (result == kSyncAndMergeResultUserCancelled) {
-                    // Can happen if user cancels a conflict resolution request - The sync will fail because it doesn't know how to resolve a conflict...
+                    
                     NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
                     error = [Utils createNSError:message errorCode:-1];
-                    completion(NO, NO, error); // TODO: This causes the Browse dialog to disappear - not losing the changes but it's still not great - might be best to allow continued editing here
+                    completion(NO, NO, error); 
                 }
-                else { // Impossible but catch (Only possible enum is User Interaction Required but that can't happen because this is an interactive sync)
+                else { 
                     error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
                     completion(NO, NO, error);
                 }
@@ -377,8 +377,8 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     [[SafesList sharedInstance] update:self.metadata];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// Operations
+
+
 
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title {
     BOOL keePassGroupTitleRules = self.database.format != kPasswordSafe;
@@ -398,7 +398,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 - (void)deleteItems:(const NSArray<Node *> *)items {
     [self.database deleteItems:items];
 
-    // Also Unpin
+    
     
     for (Node* item in items) {
         if([self isPinned:item]) {
@@ -410,7 +410,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 - (BOOL)recycleItems:(const NSArray<Node *> *)items {
     BOOL ret = [self.database recycleItems:items];
     
-    if (ret) { // Also Unpin
+    if (ret) { 
         for (Node* item in items) {
             if([self isPinned:item]) {
                 [self togglePin:item];
@@ -421,7 +421,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return ret;
 }
 
-// Pinned or Not?
+
 
 - (NSSet<NSString*>*)pinnedSet {
     return self.cachedPinned;
@@ -449,7 +449,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
         [favs addObject:sid];
     }
     
-    // Trim - by search DB and mapping back...
+    
     
     NSArray<Node*>* pinned = [self.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         NSString* sid = [node getSerializationId:self.database.format != kPasswordSafe];
@@ -466,16 +466,16 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     [SafesList.sharedInstance update:self.metadata];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSError* error))completion {
+
+- (void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSString*_Nullable debugXml, NSError* error))completion {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+        [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^(void){
                 [SVProgressHUD dismiss];
-                completion(userCancelled, data, error);
+                completion(userCancelled, data, debugXml, error);
             });
         }];
     });
@@ -486,10 +486,10 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 }
 
-//
+
 
 - (NSArray<Node*>*)getNodesFromSerializationIds:(NSSet<NSString*>*)set {
-    // Got to be a better way to do things than this full search... FUTURE
+    
     
     NSArray<Node*>* ret = [self.database.rootGroup filterChildren:YES
                                                         predicate:^BOOL(Node * _Nonnull node) {

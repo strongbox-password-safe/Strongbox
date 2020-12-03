@@ -65,7 +65,7 @@
 
     self.buttonFallback.hidden = !self.showFallbackOption;
     
-    // If we're not in auto mode or we're setting PIN then show the done button
+    
     
     self.buttonDone.hidden = self.pinLength > 0 && SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
     
@@ -76,7 +76,7 @@
             [self.stackView setCustomSpacing:8 afterView:self.logo];
         }
         else {
-            [self.stackView setSpacing:4]; // Some small screens pre ios 11 might make the cancel button unreachable / warning invisible
+            [self.stackView setSpacing:4]; 
         }
     }
     
@@ -100,7 +100,7 @@
 }
 
 - (void)styleKeyPadButton:(UIButton*)button {
-    CGFloat ROUND_BUTTON_WIDTH_HEIGHT = 65.0; // Must Match Storyboard constraints
+    CGFloat ROUND_BUTTON_WIDTH_HEIGHT = 65.0; 
     
     button.clipsToBounds = YES;
     button.layer.cornerRadius = ROUND_BUTTON_WIDTH_HEIGHT/2.0f;
@@ -147,7 +147,7 @@
         [self performLightHapticFeedback];
     }
     else {
-        // Assume it's the del button
+        
         if(self.enteredText.length > 0) {
             self.enteredText = [self.enteredText substringToIndex:self.enteredText.length-1];
             [self performLightHapticFeedback];
@@ -159,9 +159,9 @@
     [self validateButtonsUi];
     
     if(self.pinLength > 0 && self.enteredText.length == self.pinLength && SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking) {
-        // We auto submit at the matching length - This prevents repeated attempts bny using the 3 strikes failure mode
-        // If we didn't do this then an attacker could try as many combinations as he liked if he knew you were using
-        // Instant PIN mode...
+        
+        
+        
         
         self.onDone(kOk, self.enteredText);
     }

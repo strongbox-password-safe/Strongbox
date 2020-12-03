@@ -14,7 +14,10 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
     self.textField.font = FontManager.sharedInstance.regularFont;
-    self.textField.adjustsFontForContentSizeCategory = YES;
+    
+    if (@available(iOS 10.0, *)) {
+        self.textField.adjustsFontForContentSizeCategory = YES;
+    }
     
     [self prepareForReuse];
 }

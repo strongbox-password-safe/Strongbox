@@ -39,7 +39,10 @@
     }
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
-    self.titleLabel.adjustsFontForContentSizeCategory = YES;
+    if (@available(iOS 10.0, *)) {
+        self.titleLabel.adjustsFontForContentSizeCategory = YES;
+    }
+    
     self.titleLabel.onEdited = ^(NSString * _Nonnull text) {
         [self onTitleValueEdited];
     };
@@ -103,7 +106,7 @@
     self.iconImage.image = icon;
     self.iconImage.hidden = icon == nil;
 
-    //
+    
     
 #ifndef IS_APP_EXTENSION
     if(editing) {
@@ -147,8 +150,8 @@
         self.horizontalLine.backgroundColor = UIColor.systemOrangeColor;
         self.titleLabel.placeholder = NSLocalizedString(@"generic_fieldname_title", @"Title");
         
-        //[NSString stringWithFormat:NSLocalizedString(@"generic_kv_cell_value_empty_value_validation_fmt", @"%@ (Required)"),
-          //                             NSLocalizedString(@"generic_fieldname_title", @"Title")];
+        
+          
     }
     else {
         self.horizontalLine.backgroundColor = UIColor.darkGrayColor;

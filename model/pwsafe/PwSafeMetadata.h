@@ -23,7 +23,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSString *lastUpdateHost;
 @property (nonatomic, nullable) NSString *lastUpdateApp;
 @property (nonatomic) NSInteger keyStretchIterations;
-@property (nonatomic, readonly) NSString * _Nonnull version;
+@property (nonatomic, nullable) NSString *version;
+
+@property (nonatomic, nullable) NSString *generator;
+@property (nullable, nonatomic) NSDate* recycleBinChanged;
+@property (nullable, nonatomic) NSUUID* recycleBinGroup;
+@property BOOL recycleBinEnabled;
+@property (nonatomic, nullable) NSNumber *historyMaxItems;
+@property (nonatomic, nullable) NSNumber *historyMaxSize;
+@property (nonatomic) MutableOrderedDictionary* customData;
 
 @end
 

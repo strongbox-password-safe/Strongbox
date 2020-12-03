@@ -14,9 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DeletedObject : BaseXmlDomainObjectHandler
 
 // <DeletedObject>
-//     <UUID>OjDGBkygSXyeOh33r/aDJQ==</UUID>
-//     <DeletionTime>2018-10-17T14:06:27Z</DeletionTime>
-// </DeletedObject>
+
+
+
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 

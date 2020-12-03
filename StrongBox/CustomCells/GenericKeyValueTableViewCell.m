@@ -16,8 +16,8 @@
 
 @property (weak, nonatomic) IBOutlet UIView *horizontalLine;
 @property (weak, nonatomic) IBOutlet UILabel *keyLabel;
-@property (weak, nonatomic) IBOutlet AutoCompleteTextField *valueText; // allows for inline editing
-@property (weak, nonatomic) IBOutlet UILabel *valueLabel; // Allows for multiline display in non edit mode
+@property (weak, nonatomic) IBOutlet AutoCompleteTextField *valueText; 
+@property (weak, nonatomic) IBOutlet UILabel *valueLabel; 
 @property (weak, nonatomic) IBOutlet UIButton *buttonRightButton;
 
 @property (weak, nonatomic) IBOutlet UIStackView *auditStack;
@@ -55,28 +55,31 @@
     self.selectionStyle = UITableViewCellSelectionStyleDefault;
     
     self.keyLabel.font = FontManager.sharedInstance.caption1Font;
-    self.keyLabel.adjustsFontForContentSizeCategory = YES;
     
-    self.valueText.adjustsFontForContentSizeCategory = YES;
     self.valueText.onEdited = ^(NSString * _Nonnull text) {
         [self onValueEdited];
     };
     self.valueText.font = self.configuredValueFont;
 
-    self.valueLabel.adjustsFontForContentSizeCategory = YES;
     
     self.auditStack.hidden = YES;
     if (@available(iOS 11.0, *)) {
         [self.linesStack setCustomSpacing:10.0f afterView:self.valueLabel];
     }
     
+    if (@available(iOS 10.0, *)) {
+        self.keyLabel.adjustsFontForContentSizeCategory = YES;
+        self.valueText.adjustsFontForContentSizeCategory = YES;
+        self.valueLabel.adjustsFontForContentSizeCategory = YES;
+    }
+    
     self.selectAllOnEdit = NO;
     
-//    self.doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDoubleTap:)];
-//    [self.doubleTap setNumberOfTapsRequired:2];
-//    [self.doubleTap setNumberOfTouchesRequired:1];
-//    self.doubleTap.delaysTouchesBegan = YES; // Required so that didSelectRowAtIndex is not called!
-//    [self addGestureRecognizer:self.doubleTap];
+
+
+
+
+
 
     self.rightButtonTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onRightButton:)];
     [self.rightButtonTap setNumberOfTapsRequired:1];
@@ -154,7 +157,7 @@ rightButtonImage:nil
    colorizeValue:NO];
 }
 
-///
+
 
 - (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont {
     [self setKey:key value:value editing:NO selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont rightButtonImage:rightButtonImage concealed:NO colorizeValue:NO audit:nil];
@@ -165,7 +168,7 @@ rightButtonImage:nil
                  concealed:(BOOL)concealed
                   colorize:(BOOL)colorize
                      audit:(NSString *)audit {
-    // Only for viewing - special cells required for edit...
+    
         
     UIImage* image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
 
@@ -182,7 +185,7 @@ suggestionProvider:nil
            audit:audit];
 }
 
-///
+
 
 - (void)setKey:(NSString*)key
          value:(NSString*)value

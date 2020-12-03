@@ -34,6 +34,12 @@ disableEscapeKey:(BOOL)disableEscapeKey
                       window:(NSWindow*)window
                   completion:(void (^)(NSUInteger zeroForCancel))completion;
 
++ (void)customOptionWithCancel:(NSString *)messageText
+               informativeText:(NSString*)informativeText
+             option1AndDefault:(NSString*)option1AndDefault
+                        window:(NSWindow*)window
+                    completion:(void (^)(BOOL go))completion;
+
 - (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty;
 
 - (void)inputKeyValue:(NSString*)prompt

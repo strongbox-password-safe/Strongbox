@@ -70,7 +70,7 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
         });
     };
     
-    [ProUpgradeIAPManager.sharedInstance initialize]; // Not sure if we need to do this?
+    [ProUpgradeIAPManager.sharedInstance initialize]; 
 }
 
 - (void)setupUi {
@@ -102,13 +102,13 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
                                                                             action:@selector(onStartFreeTrial)];
     [self.buttonStartFreeTrial addGestureRecognizer:trial];
 
-    // Developer Message...
+    
 
     [self bindDeveloperMessage];
 
     [self bindFreeTrialInfo];
     
-    // Fix weird Interface Builder localization issue with Terms & Conditions TextView... :/
+    
     
     static NSString* const kTextViewInterfaceBuilderId = @"k2u-lE-LrX.text";
     NSString *tc = NSLocalizedStringFromTable(kTextViewInterfaceBuilderId, @"Upgrade", @"");
@@ -395,7 +395,7 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
             [SVProgressHUD dismiss];
 
             if (error == nil) {
-                // Pro is ready to go...
+                
                 
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
                     [self dismiss];

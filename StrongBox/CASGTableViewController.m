@@ -39,9 +39,6 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowEmpty;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowEmpty;
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellYubiKeySecret;
-@property (weak, nonatomic) IBOutlet UITextField *textFieldYubikeySecret;
-
 @property (nullable) NSString* selectedName;
 @property (nullable) NSString* selectedPassword;
 @property (nullable) NSURL* selectedKeyFileUrl;
@@ -131,7 +128,7 @@
     [self bindKeyFile];
     [self bindYubiKey];
     [self bindPasswordFields];
-    [self bindTableView]; // Show / Hide Key File if password safe selected!
+    [self bindTableView]; 
     [self validateUi];
 }
 
@@ -186,13 +183,13 @@
         return;
     }
     
-    // Password is Empty... A few  different scenarios here
+    
     
     if(self.selectedFormat == kKeePass1 && [self keyFileIsSet]) {
-        self.selectedPassword = nil; // Cannot ever have empty password in KeePass 1
+        self.selectedPassword = nil; 
     }
     else if(([self keyFileIsSet]|| [self yubiKeyIsSet]) && (self.mode != kCASGModeGetCredentials)) {
-        // Must be KeePass 2 can have empty or none in this situation - Get mode will auto figure this out, but for set/create we need to ask
+        
         [self askAboutEmptyOrNonePasswordAndContinue];
         return;
     }
@@ -212,15 +209,15 @@
                                   [self checkKeyFileForCommonMistake];
                               }
                               else if(response == 1) {
-                                  self.selectedPassword = nil; // None
+                                  self.selectedPassword = nil; 
                                   [self checkKeyFileForCommonMistake];
                               }
                           }];
 }
 
 - (void)checkKeyFileForCommonMistake {
-    // Common mistake to set the key file to the database file for naive users... warn them... This check is only done if the key file was not previously
-    // set as part of an open... i.e. if the user really is using a key file with the same filename as the database, that's ok.
+    
+    
     
     if ([self keyFileIsSet] && self.validateCommonKeyFileMistakes) {
         NSSet* commonDbExts = [NSSet setWithArray:@[@"kdbx", @"kdb", @"psafe3"]];
@@ -276,7 +273,6 @@
     creds.format = self.selectedFormat;
     creds.readOnly = self.switchReadOnly.on;
     creds.openLocalOnly = self.switchOpenOffline.on;
-    creds.yubiKeySecret = self.textFieldYubikeySecret.text;
     creds.yubiKeyConfig = self.selectedYubiKeyConfig;
     
     self.onDone(YES, creds);
@@ -297,7 +293,6 @@
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
         [self cell:self.cellAllowEmpty setHidden:YES];
-        [self cell:self.cellYubiKeySecret setHidden:YES];
     }
     else if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         [self cell:self.cellDatabaseName setHidden:!(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
@@ -309,7 +304,6 @@
         [self cell:self.cellFormat setHidden:self.mode == kCASGModeCreateExpress];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
-        [self cell:self.cellYubiKeySecret setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:self.mode == kCASGModeCreateExpress || !showAllowEmpty];
     }
@@ -320,7 +314,6 @@
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellOpenOffline setHidden:YES];
-        [self cell:self.cellYubiKeySecret setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
     }
@@ -331,9 +324,6 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
-        [self cell:self.cellYubiKeySecret setHidden:!SharedAppAndAutoFillSettings.sharedInstance.showYubikeySecretWorkaroundField ||
-                                                     self.initialFormat == kPasswordSafe ||
-                                                     self.initialFormat == kKeePass1];
 
         if(!self.showOpenLocalOnlyOption) {
             [self cell:self.cellOpenOffline setHidden:YES];
@@ -532,32 +522,32 @@
 }
 
 - (void)addShowHideToTextField:(UITextField*)textField tag:(NSInteger)tag {
-    // Create button
+    
     UIButton *checkbox = [UIButton buttonWithType:UIButtonTypeCustom];
-    [checkbox setFrame:CGRectMake(2 , 2, 24, 24)];  // Not sure about size
-    [checkbox setTag:tag]; // hacky :(
+    [checkbox setFrame:CGRectMake(2 , 2, 24, 24)];  
+    [checkbox setTag:tag]; 
     
     [checkbox addTarget:self action:@selector(toggleShowHidePasswordText:) forControlEvents:UIControlEventTouchUpInside];
     
     [checkbox setAccessibilityLabel:NSLocalizedString(@"casg_accessibility_label_show_hide_pw", @"Show/Hide Password")];
     
-    // Setup image for button
+    
     [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
     [checkbox setImage:[UIImage imageNamed:@"visible"] forState:UIControlStateNormal];
     [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateSelected];
     [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateHighlighted];
     [checkbox setAdjustsImageWhenHighlighted:TRUE];
-    checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); // Image is too close to border otherwise
-                                                              //    checkbox.layer.borderColor = UIColor.redColor.CGColor;
-                                                              //    checkbox.layer.borderWidth = 1;
+    checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); 
+                                                              
+                                                              
     
-    // Setup the right view in the text field
+    
     [textField setClearButtonMode:UITextFieldViewModeAlways];
     [textField setRightViewMode:UITextFieldViewModeAlways];
     [textField setRightView:checkbox];
     
-    // Setup Tag so the textfield can be identified
-//    [textField setTag:-1];
+    
+
     textField.secureTextEntry = YES;
 }
 

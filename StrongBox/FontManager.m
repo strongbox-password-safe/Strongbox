@@ -50,7 +50,7 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
     UIFont* customFont = [UIFont fontWithName:kEasyReadFontName size:UIFont.labelFontSize];
     UIFont* customBoldFont = [UIFont fontWithName:kEasyReadBoldFontName size:UIFont.labelFontSize];
     
-//    NSLog(@"%@", [UIFont fontNamesForFamilyName:@"Menlo"]);
+
     
     
     if (@available(iOS 11.0, *)) {

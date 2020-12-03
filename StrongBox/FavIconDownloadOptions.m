@@ -65,7 +65,7 @@
     return self;
 }
 
-- (BOOL)isValid { // At least one of these must be on...
+- (BOOL)isValid { 
     return self.duckDuckGo || self.google || self.scanHtml || self.checkCommonFavIconFiles;
 }
 

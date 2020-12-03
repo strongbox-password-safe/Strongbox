@@ -8,7 +8,7 @@
 
 #import "KeePassDatabaseMetadata.h"
 #import "KeePassConstants.h"
-#import "BasicOrderedDictionary.h"
+#import "MutableOrderedDictionary.h"
 #import "KdbxSerializationCommon.h"
 #import "KeePassCiphers.h"
 #import "NSUUID+Zero.h"
@@ -41,8 +41,8 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
     return self;
 }
 
-- (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi {
-    BasicOrderedDictionary<NSString*, NSString*>* kvps = [[BasicOrderedDictionary alloc] init];
+- (MutableOrderedDictionary<NSString*, NSString*>*)kvpForUi {
+    MutableOrderedDictionary<NSString*, NSString*>* kvps = [[MutableOrderedDictionary alloc] init];
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_format", @"Database Format") andValue:@"KeePass 2"];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_keepass_version", @"KeePass File Version")  andValue:self.version];
@@ -58,7 +58,7 @@ static const uint32_t kDefaultInnerRandomStreamId = kInnerStreamSalsa20;
     }
     
     if(self.historyMaxSize != nil) {
-        NSString* size = friendlyFileSizeString(self.historyMaxSize.integerValue);
+        NSString* size = friendlyMemorySizeString(self.historyMaxSize.integerValue);
         [kvps addKey:NSLocalizedString(@"database_metadata_field_max_history_size", @"Max History Size") andValue:size];
     }
     

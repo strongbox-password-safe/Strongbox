@@ -82,7 +82,7 @@
 @property NSArray<Node*>* groups;
 @property NSMutableDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
 
-// Below STRONG connection outlets required for the custom menus on Storyboard... Not sure why but crash if not present. :(
+
 
 @property (strong) IBOutlet NSMenu *customFieldsContextMenu;
 @property (strong) IBOutlet NSMenu *attachmentsContextMenu;
@@ -109,13 +109,13 @@ static NSString* trimField(NSTextField* textField) {
     return [Utils trim:textField.stringValue];
 }
 
-- (void)cancel:(id)sender { // Pick up escape key
+- (void)cancel:(id)sender { 
     [self closeWithCompletion:nil];
 }
 
 - (void)closeWithCompletion:(void (^)(void))completion {
-    if(self.newEntry) { // New Entry just save
-        [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+    if(self.newEntry) { 
+        [self stopObservingModelChanges]; 
         [self setModelForEditField:self.currentlyEditingUIControl];
         [self.view.window close];
         [self onWindowClosed];
@@ -137,7 +137,7 @@ static NSString* trimField(NSTextField* textField) {
 - (BOOL)shouldPromptToSaveSimpleChanges {
     BOOL changes = NO;
     
-    if(self.tabView.selectedTabViewItem == self.tabView.tabViewItems[0]) { // Simple Tab
+    if(self.tabView.selectedTabViewItem == self.tabView.tabViewItems[0]) { 
         if(self.currentlyEditingUIControl == self.textFieldTitle) {
             if(![self.node.title isEqualToString:trimField(self.textFieldTitle)]) {
                 changes = YES;
@@ -197,7 +197,7 @@ static NSString* trimField(NSTextField* textField) {
     [self stopObservingModelChanges];
     
     if(self.onClosed) {
-        self.onClosed(); // Allows parent VC to remove reference to this
+        self.onClosed(); 
     }
 }
 
@@ -215,7 +215,7 @@ static NSString* trimField(NSTextField* textField) {
        completion:^(BOOL yesNo) {
         if(self.newEntry) {
             if(yesNo) {
-                [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                [self stopObservingModelChanges]; 
                 [self setModelForEditField:self.currentlyEditingUIControl];
                 [self.view.window close];
                 [self onWindowClosed];
@@ -225,10 +225,10 @@ static NSString* trimField(NSTextField* textField) {
                 }
             }
             else {
-                // Delete New Entry if discarding changes
                 
-                [self stopObservingModelChanges]; // Prevent any kind of race condition on close
-//                [self.model deleteItems:@[self.node]]   ; // TODO: Broken - can we change to only add node if successful?
+                
+                [self stopObservingModelChanges]; 
+
                 [self.view.window close];
                 [self onWindowClosed];
 
@@ -239,7 +239,7 @@ static NSString* trimField(NSTextField* textField) {
         }
         else {
             if(yesNo) {
-                [self stopObservingModelChanges]; // Prevent any kind of race condition on close
+                [self stopObservingModelChanges]; 
                 [self setModelForEditField:self.currentlyEditingUIControl];
                 [self.view.window close];
                 [self onWindowClosed];
@@ -275,11 +275,11 @@ static NSString* trimField(NSTextField* textField) {
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
     
-    [self.view.window makeFirstResponder:self.newEntry ? self.textFieldTitle : self.imageViewIcon]; // Take focus off Title so that edits require some effort...
+    [self.view.window makeFirstResponder:self.newEntry ? self.textFieldTitle : self.imageViewIcon]; 
 
     [self updateTitle];
     
-    [self.view.window setFrameAutosaveName:self.node.uuid.UUIDString]; // Remember window sizing
+    [self.view.window setFrameAutosaveName:self.node.uuid.UUIDString]; 
 }
 
 - (void)updateTitle {
@@ -292,7 +292,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)newWindowForTab:(id)sender {
-    // Disable the tab button
+    
 }
 
 - (void)viewWillAppear {
@@ -331,7 +331,7 @@ static NSString* trimField(NSTextField* textField) {
     if(obj == self.textFieldTitle) {
         if(![self.node.title isEqualToString:trimField(self.textFieldTitle)]) {
             if(![self.model setItemTitle:self.node title:trimField(self.textFieldTitle)]) {
-                self.textFieldTitle.stringValue = self.node.title; // Title Rename Failed
+                self.textFieldTitle.stringValue = self.node.title; 
             }
         }
     }
@@ -355,7 +355,7 @@ static NSString* trimField(NSTextField* textField) {
             [self.model setItemPassword:self.node password:trimField(self.revealedPasswordField)];
         }
         else {
-            [self bindRevealedPassword]; // Do this anyway so we get the nice Colorized Password
+            [self bindRevealedPassword]; 
         }
     }
     else if(obj == self.textViewNotes) {
@@ -368,13 +368,13 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)setupUi {
     NSUInteger doc = [NSDocumentController.sharedDocumentController.documents indexOfObject:self.model.document];
-//    NSLog(@"doc = %lu", (unsigned long)doc);
+
     
     if (@available(macOS 10.12, *)) {
         self.view.window.tabbingIdentifier = @(doc).stringValue;
     }
     
-    self.view.window.delegate = self; // Catch Window events like close / undo manager etc
+    self.view.window.delegate = self; 
     
     [self showHideForDatabaseFormat];
     [self setupSimpleUI];
@@ -396,11 +396,11 @@ static NSString* trimField(NSTextField* textField) {
     self.tagsStack.hidden = self.model.format == kPasswordSafe || self.model.format == kKeePass1;
     
     if(self.model.format == kPasswordSafe) {
-        [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; // Remove Custom Fields
-        [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; // Remove Atachments
+        [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; 
+        [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; 
     }
     else if (self.model.format == kKeePass1) {
-        [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; // Remove Custom Fields
+        [self.tabView removeTabViewItem:self.tabView.tabViewItems[1]]; 
     }
 }
 
@@ -408,7 +408,7 @@ static NSString* trimField(NSTextField* textField) {
     self.attachments = [NSArray array];
     self.attachmentsView.dataSource = self;
     self.attachmentsView.delegate = self;
-    self.attachmentsView.onSpaceBar = self.attachmentsView.onDoubleClick = ^{ // Funky
+    self.attachmentsView.onSpaceBar = self.attachmentsView.onDoubleClick = ^{ 
         [self onPreviewAttachment:nil];
     };
 }
@@ -418,7 +418,7 @@ static NSString* trimField(NSTextField* textField) {
     self.revealedPasswordField.delegate = self;
     self.textViewNotes.delegate = self;
     
-    // MMcG: Cannot set delegate on these as it is used to do AutoComplete...
+    
     
     self.textFieldUsername.onBeginEditing = ^{
         self.currentlyEditingUIControl = self.textFieldUsername;
@@ -463,7 +463,7 @@ static NSString* trimField(NSTextField* textField) {
     
     [self bindRevealedConcealedPassword];
     
-    //
+    
     
     NSMutableArray* groups = [self.model.activeGroups mutableCopy];
     [groups addObject:self.model.rootGroup];
@@ -483,7 +483,7 @@ static NSString* trimField(NSTextField* textField) {
     
     [self syncComboGroupWithNode];
     
-    self.comboGroup.delegate = self; // Do This after the select - so we don't see it as a user effected change!
+    self.comboGroup.delegate = self; 
 }
 
 - (void)revealPassword {
@@ -649,8 +649,8 @@ static NSString* trimField(NSTextField* textField) {
     });
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Model Changes...
+
+
 
 - (void)onSimpleFieldsChanged:(NSNotification*)notification {
     if(notification.object != self.model) {
@@ -700,19 +700,19 @@ static NSString* trimField(NSTextField* textField) {
             [self showPopupToastNotification:foo];
         }
         else if(notification.name == kModelUpdateNotificationPasswordChanged){
-            // Blocks UI if we notify... couldn't find a really satisfactory solution to get this working without blcok UI :(
             
-            //            if(self.passwordChangedNotifyTask) {
-//                dispatch_block_cancel(self.passwordChangedNotifyTask);
-//            }
-//
-//            self.passwordChangedNotifyTask = dispatch_block_create(0, ^{
-//                self.passwordChangedNotifyTask = nil;
-//                [self showPopupToastNotification:@"Password Changed" duration:0.35];
-//            });
-//
-//            dispatch_time_t when = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC));
-//            dispatch_after(when, dispatch_get_main_queue(), self.passwordChangedNotifyTask);
+            
+            
+
+
+
+
+
+
+
+
+
+
         }
         else if(notification.name == kModelUpdateNotificationIconChanged){
             NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
@@ -728,7 +728,7 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
 
-    [self bindUiToSimpleFields]; // Update Modified Date
+    [self bindUiToSimpleFields]; 
     [self bindUiToCustomFields];
     
     self.newEntry = NO;
@@ -744,7 +744,7 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    [self bindUiToSimpleFields]; // Update Modified Date
+    [self bindUiToSimpleFields]; 
     [self bindUiToAttachments];
     
     self.newEntry = NO;
@@ -760,7 +760,7 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    [self bindUiToSimpleFields]; // Update Modified Date
+    [self bindUiToSimpleFields]; 
     [self initializeTotp];
     
     self.newEntry = NO;
@@ -982,7 +982,7 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    [self setModelForEditField:self.currentlyEditingUIControl]; // Save any ongoing current edit
+    [self setModelForEditField:self.currentlyEditingUIControl]; 
     
     __weak NodeDetailsViewController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
@@ -1077,7 +1077,7 @@ static NSString* trimField(NSTextField* textField) {
     return 1;
 }
 
-// Combo Group
+
 
 - (NSInteger)numberOfItemsInComboBox:(NSComboBox *)comboBox {
     return self.groups.count;
@@ -1091,10 +1091,10 @@ static NSString* trimField(NSTextField* textField) {
     NSInteger idx = [self.comboGroup indexOfSelectedItem];
     Node* group = self.groups[idx];
     
-    //NSLog(@"Selected Group: [%@]", group.title);
+    
     
     if(self.node.parent != group) {
-        if(![self.model validateMove:@[self.node] destination:group]) { // Should never happen - but safety in case we someday cover groups?
+        if(![self.model validateMove:@[self.node] destination:group]) { 
             NSString* loc = NSLocalizedString(@"mac_node_details_could_not_change_group", @"Could not change group! Validate failed...");
             [Alerts info:loc window:self.view.window];
             [self syncComboGroupWithNode];
@@ -1105,7 +1105,7 @@ static NSString* trimField(NSTextField* textField) {
         }
     }
     else {
-        //NSLog(@"Ignoring Combo change to identical parent group");
+        
     }
 }
 
@@ -1125,7 +1125,7 @@ static NSString* trimField(NSTextField* textField) {
         
         cell.value = field.value;
         cell.protected = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-        cell.valueHidden = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); // Initially Hide the Value if it is protected
+        cell.valueHidden = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); 
         
         return cell;
     }
@@ -1135,7 +1135,7 @@ static NSString* trimField(NSTextField* textField) {
     return self.customFields.count;
 }
 
-// Text Fields
+
 
 - (void)controlTextDidBeginEditing:(NSNotification *)obj {
     self.currentlyEditingUIControl = obj.object;
@@ -1161,7 +1161,7 @@ static NSString* trimField(NSTextField* textField) {
     [self setModelForEditField:notification.object];
 }
 
-// Preview Attachments
+
 
 - (NSInteger)numberOfPreviewItemsInPreviewPanel:(QLPreviewPanel *)panel {
     NSUInteger idx = [self.attachmentsView.selectionIndexes firstIndex];
@@ -1211,7 +1211,7 @@ static NSString* trimField(NSTextField* textField) {
     [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
 }
 
-//
+
 
 - (void)copyToPasteboard:(NSString*)text {
     [[NSPasteboard generalPasteboard] clearContents];
@@ -1223,7 +1223,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onCopyTitle:(id)sender {
-    [self.view.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    [self.view.window makeFirstResponder:nil]; 
     [self copyToPasteboard:self.node.title];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
@@ -1233,7 +1233,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onCopyUsername:(id)sender {
-    [self.view.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    [self.view.window makeFirstResponder:nil]; 
     [self copyToPasteboard:self.node.fields.username];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
@@ -1243,7 +1243,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onCopyEmail:(id)sender {
-    [self.view.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    [self.view.window makeFirstResponder:nil]; 
     [self copyToPasteboard:self.node.fields.email];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
@@ -1253,7 +1253,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onCopyUrl:(id)sender {
-    [self.view.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    [self.view.window makeFirstResponder:nil]; 
     [self copyToPasteboard:self.node.fields.url];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
@@ -1263,7 +1263,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onCopyNotes:(id)sender {
-    [self.view.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    [self.view.window makeFirstResponder:nil]; 
     [self copyToPasteboard:self.node.fields.notes];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
@@ -1273,7 +1273,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onCopyPassword:(id)sender {
-    [self.view.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    [self.view.window makeFirstResponder:nil]; 
     [self copyToPasteboard:self.node.fields.password];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
@@ -1283,7 +1283,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onCopyPasswordAndLaunchUrl:(id)sender {
-    [self.view.window makeFirstResponder:nil]; // Force end editing of fields and set to model... then copy
+    [self.view.window makeFirstResponder:nil]; 
     
     [self copyToPasteboard:self.node.fields.password];
 
@@ -1292,9 +1292,9 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    if (![urlString.lowercaseString hasPrefix:@"http://"] &&
-        ![urlString.lowercaseString hasPrefix:@"https://"]) {
-        urlString = [NSString stringWithFormat:@"http://%@", urlString];
+    if (![urlString.lowercaseString hasPrefix:@"http:
+        ![urlString.lowercaseString hasPrefix:@"https:
+        urlString = [NSString stringWithFormat:@"http:
     }
     
     [[NSWorkspace sharedWorkspace] openURL:urlString.urlExtendedParse];
@@ -1322,7 +1322,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onGenerate:(id)sender {
-    [self.view.window makeFirstResponder:self.imageViewIcon]; // text doesn't change unless we do this!
+    [self.view.window makeFirstResponder:self.imageViewIcon]; 
     
     [self.model setItemPassword:self.node password:[self.model generatePassword]];
 
@@ -1333,7 +1333,7 @@ static NSString* trimField(NSTextField* textField) {
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     SEL theAction = [menuItem action];
     
-//    NSLog(@"validateMenuItem [%@]", NSStringFromSelector(theAction));
+
 
     if(theAction == @selector(onAddCustomField:) ||
        theAction == @selector(onRemoveCustomField:) ||
@@ -1376,7 +1376,7 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    // Save As Dialog...
+    
     
     NSSavePanel * savePanel = [NSSavePanel savePanel];
     savePanel.nameFieldStringValue = nodeAttachment.filename;
@@ -1443,7 +1443,7 @@ static NSString* trimField(NSTextField* textField) {
 
     CIFilter *qrFilter = [CIFilter filterWithName:@"CIQRCodeGenerator"];
     
-    // Set the message content and error-correction level
+    
     
     [qrFilter setValue:stringData forKey:@"inputMessage"];
     [qrFilter setValue:@"H" forKey:@"inputCorrectionLevel"];
@@ -1454,14 +1454,14 @@ static NSString* trimField(NSTextField* textField) {
 - (NSImage*)generateTheQRCodeImageFromDataBaseInfo:(NSString*)string {
     CIImage *input = [self createQRForString:string];
 
-    // Scale it up to 2x Image View size (retina)
+    
 
     static NSUInteger kImageViewSize = 256;
     CGFloat scale = kImageViewSize / input.extent.size.width;
 
-    // NSLog(@"Scaling by %f to %f pixels", scale, size);
+    
 
-    //CGAffineTransform transform = CGAffineTransformMakeScale(5.0f, 5.0f); // Scale by 5 times along both dimensions CIImage *output = [image imageByApplyingTransform: transform];
+    
     
     CGAffineTransform transform = CGAffineTransformMakeScale(scale, scale);
 
@@ -1485,7 +1485,7 @@ static NSString* trimField(NSTextField* textField) {
         
         NSURL *totpUrl = [self.node.fields.otpToken url:YES];
         
-//        NSLog(@"Showing QR Code for totp url [%@]", totpUrl);
+
         
         NSImage* image = [self generateTheQRCodeImageFromDataBaseInfo:totpUrl.absoluteString];
         
@@ -1505,7 +1505,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onDatePickerChanged:(id)sender {
-    // Throttle changes - Only set after user leaves it for .5 seconds...
+    
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(setExpiryDate:) object:nil];
     [self performSelector:@selector(setExpiryDate:) withObject:nil afterDelay:0.5f];
@@ -1516,7 +1516,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)saveDocument:(id)sender {
-    // Save Current State as is...
+    
     [self setModelForEditField:self.currentlyEditingUIControl];
     [self save:nil];
 }

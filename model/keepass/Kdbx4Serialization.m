@@ -38,9 +38,9 @@ static const BOOL kLogVerbose = NO;
 
 @implementation Kdbx4Serialization
 
-+ (NSData *)getYubikeyChallenge:(KdfParameters *)kdfParameters error:(NSError * _Nullable __autoreleasing *)error {
-//    CryptoParameters* cp = [Kdbx4Serialization getCryptoParams:candidate];
-//
++ (NSData *)getYubiKeyChallenge:(KdfParameters *)kdfParameters error:(NSError * _Nullable __autoreleasing *)error {
+
+
     id<KeyDerivationCipher> kdf = getKeyDerivationCipher(kdfParameters, error);
     
     if(!kdf) {
@@ -59,14 +59,14 @@ static const BOOL kLogVerbose = NO;
         NSLog(@"Serializing with [%@] and password [%@]", serializationData, ckf);
     }
     
-    // 1. File Header
+    
     
     KeepassFileHeader header = getNewFileHeader(serializationData.fileVersion);
     
     NSMutableData* headerData = [NSMutableData data];
     [headerData appendBytes:&header length:SIZE_OF_KEEPASS_HEADER];
     
-    // 2. Generate Encryption Parameters To Be Serialized in the Headers
+    
     
     NSData* masterSeed = getRandomData(kMasterSeedLength);
     id<Cipher> cipher = getCipher(serializationData.cipherUuid);
@@ -79,7 +79,7 @@ static const BOOL kLogVerbose = NO;
     }
     
     NSError* error;
-    NSData* yubiKeyChallenge = [Kdbx4Serialization getYubikeyChallenge:serializationData.kdfParameters error:&error];
+    NSData* yubiKeyChallenge = [Kdbx4Serialization getYubiKeyChallenge:serializationData.kdfParameters error:&error];
     if(error) {
         completion(NO, nil, error);
         return;
@@ -116,7 +116,7 @@ static const BOOL kLogVerbose = NO;
                  cipher:(id<Cipher>)cipher
              masterSeed:(NSData*)masterSeed
              completion:(Serialize4CompletionBlock)completion {
-//    NSLog(@"SERIALIZE KEYS: [%@] - [%@]", keys, xml); // XML dump
+
     
     NSData* encryptionIv = [cipher generateIv];
     
@@ -126,7 +126,7 @@ static const BOOL kLogVerbose = NO;
         NSLog(@"Serialize: encryptionIv = [%@]", encryptionIv);
     }
     
-    // 3. Headers
+    
     
     NSMutableDictionary<NSNumber *,NSData *>* headers = [[NSMutableDictionary alloc] initWithDictionary:serializationData.extraUnknownHeaders];
     
@@ -143,34 +143,34 @@ static const BOOL kLogVerbose = NO;
     NSData* headerEntriesData = getHeadersData(headers);
     [headerData appendData:headerEntriesData];
 
-    // Header Hash (SHA256)
+    
   
     NSMutableData *ret = [[NSMutableData alloc] initWithData:headerData];
     [ret appendData:headerData.sha256];
     
-    // HEADER SHA256 HMAC
     
-    NSData* blockKey = getHmacKeyForBlock(keys.hmacKey, 0xFFFFFFFFFFFFFFFF); // Header HMAC Magic Block Number... Constantify?!
+    
+    NSData* blockKey = getHmacKeyForBlock(keys.hmacKey, 0xFFFFFFFFFFFFFFFF); 
     NSMutableData *hmac = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
     CCHmac(kCCHmacAlgSHA256, blockKey.bytes, blockKey.length, headerData.bytes, (CC_LONG)headerData.length, hmac.mutableBytes);
 
     [ret appendData:hmac];
     
-    // 4. Main Payload
     
-    // 4.1 Create Inner Headers (Inner Stream Id, and Inner Stream Key, and Attachments/Binaries)
+    
+    
     
     NSMutableData* inner = createInnerHeaders(serializationData.attachments, serializationData.innerRandomStreamId, serializationData.innerRandomStreamKey);
     
-    // 4.2 Append XML after the inner headers
+    
     
     [inner appendData:[xml dataUsingEncoding:NSUTF8StringEncoding]];
     
-    // 4.3 Optional Compression
+    
     
     NSData* encryptionPayload = serializationData.compressionFlags == kGzipCompressionFlag ? [inner gzippedData] : inner;
     
-    // 4.3 HMAC Blockify
+    
     
     NSData* encrypted = hmacBlockifyAndEncrypt(encryptionPayload, encryptionIv, keys, cipher);
     
@@ -200,7 +200,7 @@ static BOOL readFileHeader(NSInputStream* stream, KeepassFileHeader *pFileHeader
     return [[CryptoParameters alloc] initFromHeaders:headerEntries];
 }
 
-//
+
 
 + (void)deserialize:(NSInputStream *)stream
 compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
@@ -209,7 +209,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
          completion:(Deserialize4CompletionBlock)completion {
     NSMutableData* headerDataForIntegrityCheck = [NSMutableData data];
     
-    // File Header
+    
     
     KeepassFileHeader fileHeader = {0};
     if (!readFileHeader(stream, &fileHeader)) {
@@ -221,7 +221,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
 
     [headerDataForIntegrityCheck appendBytes:&fileHeader length:SIZE_OF_KEEPASS_HEADER];
     
-    // Header Entries
+    
     
     NSDictionary<NSNumber*, NSObject*> *headerEntries = readHeaderEntries(stream, headerDataForIntegrityCheck);
     
@@ -239,10 +239,10 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
         return;
     }
     
-    // Check Yubikey
+    
     
     NSError* error;
-    NSData* yubiKeyChallenge = [Kdbx4Serialization getYubikeyChallenge:cryptoParams.kdfParameters error:&error];
+    NSData* yubiKeyChallenge = [Kdbx4Serialization getYubiKeyChallenge:cryptoParams.kdfParameters error:&error];
     if(error) {
         completion(NO, nil, error);
         return;
@@ -290,16 +290,16 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
         return;
     }
 
-    // Deblockify
+    
 
     HmacBlockStream* hmacedBlockStream = [[HmacBlockStream alloc] initWithStream:inputStream hmacKey:keys.hmacKey];
 
-    // Decrypt
+    
 
     id<Cipher> cipher = getCipher(cryptoParams.cipherUuid);
     NSInputStream* plainTextStream = [cipher getDecryptionStreamForStream:hmacedBlockStream key:keys.masterKey iv:cryptoParams.iv];
 
-    // Decompress
+    
 
     BOOL compressed = cryptoParams.compressionFlags == 1;
     NSInputStream* decompressedStream = compressed ? [[GZipInputStream alloc] initWithStream:plainTextStream] : plainTextStream;
@@ -321,9 +321,9 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
         NSLog(@"Got Inner Safe Serialization Data: [%@]", ret);
     }
 
-    // Misc Extra  Serialization Info
+    
 
-    KeepassFileHeader keePassFileHeader = getKeePassFileHeader(headerDataForIntegrityCheck); // This is a little dirty - maintain versioning using tengrity check data :(
+    KeepassFileHeader keePassFileHeader = getKeePassFileHeader(headerDataForIntegrityCheck); 
 
     ret.fileVersion = [NSString stringWithFormat:@"%hu.%hu", keePassFileHeader.major, keePassFileHeader.minor];
     ret.kdfParameters = cryptoParams.kdfParameters;
@@ -382,7 +382,7 @@ static NSMutableData* createInnerHeaders(NSArray<DatabaseAttachment*> *attachmen
         
         NSInputStream* inputStream = [attachment getPlainTextInputStream];
 
-        // FUTURE: Stream this write
+        
         NSData* data = [NSData dataWithContentsOfStream:inputStream];
 
         if (!data) {
@@ -462,7 +462,7 @@ static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
             
             ret.innerRandomStreamId = littleEndian4BytesToUInt32((uint8_t*)headerBuffer.bytes);
         }
-        else if (innerHeader->type == kInnerHeaderTypeInnerRandomStreamKey) { // Inner Random Stream Key
+        else if (innerHeader->type == kInnerHeaderTypeInnerRandomStreamKey) { 
             NSMutableData *headerBuffer = [NSMutableData dataWithLength:headerLength];
             read = [stream read:headerBuffer.mutableBytes maxLength:headerLength];
             if (read < headerLength) {
@@ -472,7 +472,7 @@ static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
             
             ret.innerRandomStreamKey = headerBuffer;
         }
-        else if(innerHeader->type == kInnerHeaderTypeBinary) { // Binary
+        else if(innerHeader->type == kInnerHeaderTypeBinary) { 
             uint8_t block[1];
             NSInteger bytesRead = [stream read:block maxLength:1];
             if (bytesRead != 1) {
@@ -481,7 +481,7 @@ static Kdbx4SerializationData* readInnerHeaders(NSInputStream *stream) {
             }
             BOOL protectedInMemory = block[0] == 1;
             
-//            NSLog(@"Reading Attachment %d [%ld]", attachmentCount++, headerLength - 1);
+
             DatabaseAttachment *attachment = [[DatabaseAttachment alloc] initWithStream:stream length:headerLength - 1 protectedInMemory:protectedInMemory];
             
             if (attachment == nil) {
@@ -572,8 +572,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             ret.transformKey = [kdf deriveKey:ret.compositeKey];
             ret.masterKey = getMasterKey(masterSeed, ret.transformKey);
 
-            // FUTURE: Need to handle different size master keys for different ciphers...
-            // Code in KdbxFile.cs ComputeKeys provides example.
+            
+            
             
             ret.hmacKey = getHmacKey(masterSeed, ret.transformKey);
 
@@ -592,7 +592,7 @@ static BOOL checkHeaderHash(NSData* headerData, NSInputStream* stream) {
     
     uint8_t expectedHash[CC_SHA256_DIGEST_LENGTH];
     
-    NSLog(@"Bytes Available: %d", stream.hasBytesAvailable);
+    
     
     NSInteger read = [stream read:expectedHash maxLength:CC_SHA256_DIGEST_LENGTH];
     if (read != CC_SHA256_DIGEST_LENGTH) {
@@ -706,7 +706,7 @@ static NSDictionary<NSNumber *,NSObject *>* readHeaderEntries(NSInputStream* str
             NSLog(@"Found Header Entry of Type %d and length %d", headerEntry.id, length);
         }
 
-        if (length > 0) { // Only read from stream if > 0 - Reading 0 bytes can mess up NSInputStream!!! - NB: Even the END_OF_ENTRIES header can have a positive length (often \r\n\r\n :/)
+        if (length > 0) { 
             NSMutableData* headerData = [NSMutableData dataWithLength:length];
 
             bytesRead = [stream read:headerData.mutableBytes maxLength:length];
@@ -721,7 +721,7 @@ static NSDictionary<NSNumber *,NSObject *>* readHeaderEntries(NSInputStream* str
          
             total += bytesRead;
 
-            if(END_OF_ENTRIES == headerEntry.id) { // Required - Do not remove
+            if(END_OF_ENTRIES == headerEntry.id) { 
                 break;
             }
             

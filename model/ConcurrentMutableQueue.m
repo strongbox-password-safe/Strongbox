@@ -49,7 +49,7 @@
 }
 
 - (void)enqueue:(id)anObject {
-    dispatch_barrier_async(self.dataQueue, ^{ // Serialized Write with Barrier
+    dispatch_barrier_async(self.dataQueue, ^{ 
         [self.data addObject:anObject];
     });
 }

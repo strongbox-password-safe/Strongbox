@@ -8,6 +8,8 @@
 
 #import <Cocoa/Cocoa.h>
 
+extern NSString* const kDatabasesListViewForceRefreshNotification;
+
 @interface DatabasesManagerView : NSWindowController
 
 + (void)show:(BOOL)debug;

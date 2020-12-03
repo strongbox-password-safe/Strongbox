@@ -28,7 +28,7 @@
         NSError *error;
         NSNumber *isDirectory = nil;
         if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
-            // handle error
+            
             NSLog(@"%@", error);
             XCTAssert(NO);
         }
@@ -42,7 +42,7 @@
 }
 
 - (void)testIndividual {
-//    [self test:@"/Users/strongbox/strongbox-test-files/random-tests/abc-key.key"];
+
     [self test:@"/Users/strongbox/strongbox-test-files/Database.kdbx"];
 }
 

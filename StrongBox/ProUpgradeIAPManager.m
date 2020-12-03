@@ -24,7 +24,7 @@ static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.month
 static NSString* const k3Monthly =  @"com.strongbox.markmcguill.upgrade.pro.3monthly";
 static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
 static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial";
-//kTestConsumable @"com.markmcguill.strongbox.testconsumable"
+
 
 @interface ProUpgradeIAPManager ()
 
@@ -54,7 +54,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [self loadAppStoreProducts];
         
-        // See if we can auto upgrade the app if Pro is available
+        
         
         RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
         if ([verificator verifyAppReceipt]) {
@@ -80,12 +80,12 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         
         NSLog(@"%ld days since last entitlement check... [%@]", (long)days, Settings.sharedInstance.lastEntitlementCheckAttempt);
         
-        if(days == 0) { // Already checked today...
+        if(days == 0) { 
             NSLog(@"Already checked entitlements today... not rechecking...");
             return;
         }
         
-        // Last check was successful and was less than a week ago... no need to check again so soon
+        
         
         if(Settings.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 5) {
             NSLog(@"We had a successful check recently, not rechecking...");
@@ -102,7 +102,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         [self checkReceiptForTrialAndProEntitlements:vc];
     }
     else {
-        // For now - we will warn and ask to message support so we can handle this gracefully if someone is struggling...
+        
         [Alerts info:vc
                title:NSLocalizedString(@"upgrade_mgr_entitlements_error_title", @"Strongbox Entitlements Error")
              message:NSLocalizedString(@"upgrade_mgr_entitlements_error_message", @"Strongbox is having trouble verifying its App Store entitlements. This means the App must be downgraded to the Free version. Please contact support@strongboxsafe.com if you think this is in error.")];
@@ -111,7 +111,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }
 }
 
-- (void)checkReceiptForTrialAndProEntitlements:(UIViewController*)vc { // Don't want to do a refresh if we're launching...
+- (void)checkReceiptForTrialAndProEntitlements:(UIViewController*)vc { 
     Settings.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
     
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
@@ -147,7 +147,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         NSDate* endDate = [SharedAppAndAutoFillSettings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
         SharedAppAndAutoFillSettings.sharedInstance.freeTrialEnd = endDate;
 
-        // This should update the main screen
+        
         [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
     }
     
@@ -177,7 +177,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 }
 
 - (BOOL)receiptHasProEntitlements {
-    BOOL lifetime = [[RMAppReceipt bundleReceipt] containsInAppPurchaseOfProductIdentifier:kIapProId]; // What about cancellation?
+    BOOL lifetime = [[RMAppReceipt bundleReceipt] containsInAppPurchaseOfProductIdentifier:kIapProId]; 
     
     NSDate* now = [NSDate date];
     BOOL monthly = [[RMAppReceipt bundleReceipt] containsActiveAutoRenewableSubscriptionOfProductIdentifier:kMonthly forDate:now];
@@ -270,7 +270,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     return [bundleId isEqualToString:kProFamilyEditionBundleId];
 }
 
-//
+
 
 - (BOOL)hasPurchasedFreeTrial {
     return self.freeTrialPurchaseDate != nil;
@@ -327,7 +327,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }
 }
 
-//
+
 
 - (SKProduct *)monthlyProduct {
     return self.availableProducts[kMonthly];

@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setInitialModel:(ViewModel*)model;
 - (void)updateModel:(ViewModel *)model;
 
-// Used by Node Details too...
+
 void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window);
 
 - (void)autoPromptForTouchIdIfDesired;

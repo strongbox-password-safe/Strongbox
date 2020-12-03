@@ -56,7 +56,7 @@
 
     [self setupUi];
     
-    // Auto - Dismiss if we pick up Pro during display
+    
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onProStatusChanged) name:kProStatusChangedNotificationKey object:nil];
 }
 
@@ -72,7 +72,7 @@
     self.buttonTryPro.layer.cornerRadius = 5.0f;
     self.buttonUseFree.layer.cornerRadius = 5.0f;
     
-    // MMcG: Must be done to have the color tint come out ok... at least on iOS 10.x
+    
     
     self.imageViewOK1.image = [UIImage imageNamed:@"ok"];
     self.imageViewOK2.image = [UIImage imageNamed:@"ok"];

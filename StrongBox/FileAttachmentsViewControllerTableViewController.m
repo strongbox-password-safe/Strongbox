@@ -209,7 +209,7 @@
         UIImage* img = [UIImage imageWithData:data];
 
         if(img) {
-            @autoreleasepool { // Prevent App Extension Crash
+            @autoreleasepool { 
                 UIGraphicsBeginImageContextWithOptions(cell.imageView.bounds.size, NO, 0.0);
                 
                 CGRect imageRect = cell.imageView.bounds;

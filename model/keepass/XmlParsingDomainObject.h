@@ -21,18 +21,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL handlesStreamingText;
 @property (readonly) NSString* originalElementName;
 @property (readonly) NSString* originalText;
-@property (readonly) NSDictionary* originalAttributes;
+@property (readonly) NSDictionary<NSString*, NSString*> *originalAttributes;
 @property (readonly, nullable) NSArray<id<XmlParsingDomainObject>>* unmanagedChildren;
 
 - (void)onCompleted;
 
 - (nullable id<XmlParsingDomainObject>)getChildHandler:(NSString*)xmlElementName;
 
-- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(NSString*)withXmlElementName; // return YES
+- (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(NSString*)withXmlElementName; 
 
 - (void)addUnknownChildObject:(id<XmlParsingDomainObject>)xmlItem;
 
-// Performance Critical Functions
+
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer;
 

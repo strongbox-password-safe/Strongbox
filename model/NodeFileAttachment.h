@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property NSString* filename;
 @property uint32_t index;
-@property NSObject* linkedObject; // Used to link back to creation object (from Keepass) so that we can recreate xml properly
+@property NSObject* linkedObject; 
 
 @end
 

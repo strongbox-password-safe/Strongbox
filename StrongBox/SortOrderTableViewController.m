@@ -32,7 +32,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Effective Settings based on format
+    
     
     if(self.field == kBrowseSortFieldEmail && self.format != kPasswordSafe) {
         self.field = kBrowseSortFieldTitle;
@@ -60,7 +60,7 @@
 
     self.cellFolders.accessoryType = self.foldersSeparately ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
 
-    // Show / Hide based on format and select field
+    
     
     [self cell:self.cellEmail setHidden:self.format != kPasswordSafe];
     [self cell:self.cellCustom setHidden:self.format == kPasswordSafe];

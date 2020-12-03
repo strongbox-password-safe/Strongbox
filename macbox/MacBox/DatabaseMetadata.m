@@ -18,17 +18,21 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
                          fileUrl:(NSURL*)fileUrl
                      storageInfo:(NSString*)storageInfo {
     if(self = [super init]) {
-        _nickName = nickName;
+        _nickName = nickName ? nickName : @"<Unknown>";
         _uuid = [[NSUUID UUID] UUIDString];
         self.storageProvider = storageProvider;
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
-        self.isTouchIdEnabled = YES;
-        self.isTouchIdEnrolled = NO;
         self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
     }
     
     return self;
+}
+
+- (void)clearSecureItems {
+    [self setConveniencePassword:nil expiringAfterHours:-1];
+    self.keyFileBookmark = nil;
+    self.autoFillKeyFileBookmark = nil;
 }
 
 - (NSString*)getConveniencePasswordIdentifier {
@@ -83,6 +87,16 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
     return [SecretStore.sharedInstance getSecureObjectExpiryDate:identifier];
 }
 
+- (NSString *)autoFillKeyFileBookmark {
+    NSString* account = [NSString stringWithFormat:@"autoFill-keyFileBookmark-%@", self.uuid];
+    return [SecretStore.sharedInstance getSecureString:account];
+}
+
+- (void)setAutoFillKeyFileBookmark:(NSString *)autoFillKeyFileBookmark {
+    NSString* account = [NSString stringWithFormat:@"autoFill-keyFileBookmark-%@", self.uuid];
+    [SecretStore.sharedInstance setSecureString:autoFillKeyFileBookmark forIdentifier:account];
+}
+
 - (NSString *)keyFileBookmark {
     NSString* account = [NSString stringWithFormat:@"keyFileBookmark-%@", self.uuid];
     return [SecretStore.sharedInstance getSecureString:account];
@@ -108,12 +122,19 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
     [encoder encodeInteger:self.touchIdPasswordExpiryPeriodHours forKey:@"touchIdPasswordExpiryPeriodHours"];
     [encoder encodeBool:self.isTouchIdEnrolled forKey:@"isTouchIdEnrolled"];
     [encoder encodeObject:self.yubiKeyConfiguration forKey:@"yubiKeyConfiguration"];
+    [encoder encodeObject:self.autoFillStorageInfo forKey:@"autoFillStorageInfo"];
+    [encoder encodeBool:self.autoFillEnabled forKey:@"autoFillEnabled"];
+    [encoder encodeBool:self.quickTypeEnabled forKey:@"quickTypeEnabled"];
+    [encoder encodeBool:self.hasPromptedForAutoFillEnrol forKey:@"hasPromptedForAutoFillEnrol"];
+    [encoder encodeBool:self.quickWormholeFillEnabled forKey:@"quickWormholeFillEnabled"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
     if((self = [self init])) {
         self.uuid = [decoder decodeObjectForKey:@"uuid"];
         self.nickName = [decoder decodeObjectForKey:@"nickName"];
+        self.nickName = self.nickName ? self.nickName : @"<Unknown>";
+        
         self.fileUrl = [decoder decodeObjectForKey:@"fileUrl"];
         self.storageInfo = [decoder decodeObjectForKey:@"fileIdentifier"];
         self.storageProvider = (int)[decoder decodeIntegerForKey:@"storageProvider"];
@@ -136,6 +157,26 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
         
         if ([decoder containsValueForKey:@"yubiKeyConfiguration"]) {
             self.yubiKeyConfiguration = [decoder decodeObjectForKey:@"yubiKeyConfiguration"];
+        }
+        
+        if ( [decoder containsValueForKey:@"autoFillStorageInfo"] ) {
+            self.autoFillStorageInfo = [decoder decodeObjectForKey:@"autoFillStorageInfo"];
+        }
+
+        if([decoder containsValueForKey:@"quickTypeEnabled"]) {
+            self.quickTypeEnabled = [decoder decodeBoolForKey:@"quickTypeEnabled"];
+        }
+
+        if([decoder containsValueForKey:@"autoFillEnabled"]) {
+            self.autoFillEnabled = [decoder decodeBoolForKey:@"autoFillEnabled"];
+        }
+        
+        if([decoder containsValueForKey:@"hasPromptedForAutoFillEnrol"]) {
+            self.hasPromptedForAutoFillEnrol = [decoder decodeBoolForKey:@"hasPromptedForAutoFillEnrol"];
+        }
+
+        if([decoder containsValueForKey:@"quickWormholeFillEnabled"]) {
+            self.quickWormholeFillEnabled = [decoder decodeBoolForKey:@"quickWormholeFillEnabled"];
         }
     }
     

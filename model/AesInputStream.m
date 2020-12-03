@@ -67,7 +67,7 @@
 }
 
 - (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
-    if (self.workChunk != nil && self.workChunkLength == 0) { // EOF
+    if (self.workChunk != nil && self.workChunkLength == 0) { 
         return 0L;
     }
     
@@ -86,7 +86,7 @@
         
             workingAvailable = self.workChunkLength - self.workingChunkOffset;
             if (workingAvailable == 0) {
-                return bufferWritten; // EOS
+                return bufferWritten; 
             }
         }
 
@@ -99,7 +99,7 @@
         memcpy(dst, src, bytesToWrite);
     
         self.writtenToStreamSoFar += bytesToWrite;
-        //NSLog(@"DEBUG: Written to stream so far: %zu", self.writtenToStreamSoFar);
+        
 
         bufferWritten += bytesToWrite;
         bufferOffset += bytesToWrite;
@@ -133,8 +133,8 @@
         CCCryptorStatus status = CCCryptorFinal(*self.cryptor, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
         if (status != kCCSuccess) {
             size_t req = CCCryptorGetOutputLength(*self.cryptor, bytesRead, YES);
-            if (status == kCCBufferTooSmall && req == 0) { // Weird and sporadic but safe to ignore... :/ - MMcG - 20-Jun-2020
-//                NSLog(@"Not really a crypto Error: %d-%zu", status, req);
+            if (status == kCCBufferTooSmall && req == 0) { 
+
             }
             else {
                 NSLog(@"Crypto Error: %d-%zu", status, req);
@@ -147,7 +147,7 @@
         }
         
         self.writtenSoFar += self.workChunkLength;
-        // NSLog(@"DECRYPT FINAL: bytesRead = %zu, decWritten = %zu, totalRead = [%zu], writtenSoFar = %zu", bytesRead, self.workChunkLength, self.readFromStreamTotal, self.writtenSoFar);
+        
     }
     else {
         CCCryptorStatus status = CCCryptorUpdate(*self.cryptor, block, bytesRead, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
@@ -162,7 +162,7 @@
         }
 
         self.writtenSoFar += self.workChunkLength;
-        //NSLog(@"DECRYPT: bytesRead = %zu, decWritten = %zu, totalRead = [%zu], writtenSoFar = %zu", bytesRead, self.workChunkLength, self.readFromStreamTotal, self.writtenSoFar);
+        
     }
     
     free(block);

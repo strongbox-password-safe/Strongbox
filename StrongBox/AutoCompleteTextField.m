@@ -31,9 +31,9 @@
 }
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
-//    NSLog(@"shouldChangeCharactersInRange: %lu-%lu-%lu", (unsigned long)range.location, (unsigned long)range.length, (unsigned long)textField.text.length);
 
-    if((range.location + range.length) != textField.text.length) { // Only perform autocompletion on end of string edits
+
+    if((range.location + range.length) != textField.text.length) { 
         NSLog(@"Not autocompleting as edit is inside string...");
         return YES;
     }
@@ -41,10 +41,10 @@
     BOOL autoCompleted = [self autoCompleteText:string];
     
     if(autoCompleted) {
-        [self onTextFieldChanged:nil]; // AutoCompletes do not send UIControlEventEditingChanged so we call it here manually if there was an autocomplete
+        [self onTextFieldChanged:nil]; 
     }
     
-    return !autoCompleted; // Do not change text if it's been autocompleted already
+    return !autoCompleted; 
 }
 
 - (void)onTextFieldChanged:(id)sender {

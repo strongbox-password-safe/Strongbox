@@ -28,7 +28,6 @@ static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings"
 static NSString* const kQuickLaunchUuid = @"quickLaunchUuid";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
 static NSString* const kHideKeyFileOnUnlock = @"hideKeyFileOnUnlock";
-static NSString* const kShowYubikeySecretWorkaroundField = @"showYubikeySecretWorkaroundField";
 static NSString* const kShowAllFilesInLocalKeyFiles = @"showAllFilesInLocalKeyFiles";
 static NSString* const kMonitorInternetConnectivity = @"monitorInternetConnectivity";
 static NSString* const kInstantPinUnlocking = @"instantPinUnlocking";
@@ -46,15 +45,15 @@ static NSString* const kSyncForcePushDoNotCheckForConflicts = @"syncForcePushDoN
 
 static NSString* const kMainAppDidChangeDatabases = @"mainAppDidChangeDatabases";
 static NSString* const kAutoFillDidChangeDatabases = @"autoFillDidChangeDatabases";
-static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStream";
+static NSString* const kLegacyShowMetadataOnDetailsScreen  = @"legacyShowMetadataOnDetailsScreen";
 
 @implementation SharedAppAndAutoFillSettings
 
 + (void)initialize {
     if(self == [SharedAppAndAutoFillSettings class]) {
-        // NSString* appGroupPP = [Settings getAppGroupFromProvisioningProfile];
-        // cachedAppGroupName = appGroupPP ? appGroupPP : kDefaultAppGroupName;
-        //NSLog(@"App Group Name: [%@] (Auto Detected : [%@])", cachedAppGroupName, appGroupPP);
+        
+        
+        
 
         cachedAppGroupName = kDefaultAppGroupName;
     }
@@ -71,7 +70,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
     return sharedInstance;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSString *)appGroupName {
     return cachedAppGroupName;
@@ -87,14 +86,14 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
     return defaults;
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-- (BOOL)debugSanityCheckInnerStream {
-    return [self getBool:kDebugSanityCheckInnerStream fallback:YES];
+
+- (BOOL)legacyShowMetadataOnDetailsScreen {
+    return [self getBool:kLegacyShowMetadataOnDetailsScreen];
 }
 
-- (void)setDebugSanityCheckInnerStream:(BOOL)debugSanityCheckInnerStream {
-    [self setBool:kDebugSanityCheckInnerStream value:debugSanityCheckInnerStream];
+- (void)setLegacyShowMetadataOnDetailsScreen:(BOOL)legacyShowMetadataOnDetailsScreen {
+    [self setBool:kLegacyShowMetadataOnDetailsScreen value:legacyShowMetadataOnDetailsScreen];
 }
 
 - (BOOL)mainAppDidChangeDatabases {
@@ -130,7 +129,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
     [self setBool:kSyncPullEvenIfModifiedDateSame value:syncPullEvenIfModifiedDateSame];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSData *)duressDummyData {
     return [self.sharedAppGroupDefaults objectForKey:@"dd-safe"];
@@ -142,7 +141,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
     [defaults synchronize];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)setPro:(BOOL)value {
     NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
@@ -171,7 +170,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
     NSDate* date = self.freeTrialEnd;
     
     if(date == nil) {
-        // NSLog(@"No Free Trial date set yet. Not in free trial. User has not opted in to Free Trial.");
+        
         return NO;
     }
     
@@ -216,7 +215,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
 - (NSDate *)freeTrialEnd {
     NSUserDefaults *userDefaults = self.sharedAppGroupDefaults;
     
-    //[userDefaults removeObjectForKey:kEndFreeTrialDate];
+    
     
     return [userDefaults objectForKey:kEndFreeTrialDate];
 }
@@ -231,7 +230,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
     [userDefaults synchronize];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)colorizeUseColorBlindPalette {
     return [self getBool:kColorizeUseColorBlindPalette];
@@ -296,7 +295,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
 - (NSInteger)clearClipboardAfterSeconds {
     NSInteger ret = [self getInteger:kClearClipboardAfterSeconds fallback:kDefaultClearClipboardTimeout];
 
-    if(ret <= 0) { // This seems to have occurred somehow on some devices :(
+    if(ret <= 0) { 
         [self setClearClipboardAfterSeconds:kDefaultClearClipboardTimeout];
         return kDefaultClearClipboardTimeout;
     }
@@ -355,14 +354,6 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
 
 - (void)setHideKeyFileOnUnlock:(BOOL)hideKeyFileOnUnlock {
     [self setBool:kHideKeyFileOnUnlock value:hideKeyFileOnUnlock];
-}
-
-- (BOOL)showYubikeySecretWorkaroundField {
-    return [self getBool:kShowYubikeySecretWorkaroundField];
-}
-
-- (void)setShowYubikeySecretWorkaroundField:(BOOL)showYubikeySecretWorkaroundField {
-    [self setBool:kShowYubikeySecretWorkaroundField value:showYubikeySecretWorkaroundField];
 }
 
 - (BOOL)showAllFilesInLocalKeyFiles {
@@ -463,7 +454,7 @@ static NSString* const kDebugSanityCheckInnerStream = @"debugSanityCheckInnerStr
     [self setInteger:kDatabaseCellSubtitle2 value:databaseCellSubtitle2];
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSString*)getString:(NSString*)key {
     return [self getString:key fallback:nil];

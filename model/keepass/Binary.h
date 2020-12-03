@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 // <Binary>
     // <Key>bash_profile</Key>
     // <Value Ref="0" />
-// </Binary>
+
 
 @interface Binary :  BaseXmlDomainObjectHandler
 

@@ -5,7 +5,6 @@ abstract_target 'common-mac' do
     platform :osx, '10.9'
     use_frameworks!
 
-    pod 'KissXML'   
     pod 'libsodium'
 
     target 'Strongbox' do
@@ -13,24 +12,27 @@ abstract_target 'common-mac' do
 
     target 'Strongbox-Outright-Pro' do
     end
+
+    target 'Strongbox AutoFill' do
+    end
 end
 
 abstract_target 'common-ios' do
     project 'Strongbox.xcodeproj'
-    platform :ios, '10.0'
+    platform :ios, '9.3'
     use_frameworks!
 
     pod 'libsodium'
-    pod 'KissXML'
 
     target 'Strongbox-iOS' do
         use_frameworks!
+
+        pod 'MTBBarcodeScanner'
 
         pod 'Reachability'
         pod 'ISMessages'
         pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
-        pod 'MTBBarcodeScanner'
         pod 'GoogleAPIClientForREST/Drive'
         pod 'GoogleSignIn'
     end
@@ -38,11 +40,12 @@ abstract_target 'common-ios' do
     target 'Strongbox-iOS-Family' do
         use_frameworks!
 
+        pod 'MTBBarcodeScanner'
+
         pod 'Reachability'
         pod 'ISMessages'
         pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
-        pod 'MTBBarcodeScanner'
         pod 'GoogleAPIClientForREST/Drive'
         pod 'GoogleSignIn'
     end

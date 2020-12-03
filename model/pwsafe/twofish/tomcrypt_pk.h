@@ -86,7 +86,7 @@ int rsa_verify_hash_ex(const unsigned char *sig,      unsigned long siglen,
 int rsa_export(unsigned char *out, unsigned long *outlen, int type, rsa_key *key);
 int rsa_import(const unsigned char *in, unsigned long inlen, rsa_key *key);
 
-#endif // ifdef LTC_MRSA
+#endif 
 
 /* ---- Katja ---- */
 #ifdef MKAT
@@ -141,7 +141,7 @@ int katja_decrypt_key(const unsigned char *in,       unsigned long inlen,
 int katja_export(unsigned char *out, unsigned long *outlen, int type, katja_key *key);
 int katja_import(const unsigned char *in, unsigned long inlen, katja_key *key);
 
-#endif // ifdef MKAT
+#endif 
 
 /* ---- ECC Routines ---- */
 #ifdef LTC_MECC
@@ -296,7 +296,7 @@ int ltc_ecc_fp_mul2add(ecc_point *A, void *kA,
 /* map P to affine from projective */
 int ltc_ecc_map(ecc_point *P, void *modulus, void *mp);
 
-#endif // ifdef LTC_MECC
+#endif 
 
 #ifdef LTC_MDSA
 
@@ -365,7 +365,7 @@ int dsa_verify_key(dsa_key *key, int *stat);
 int dsa_shared_secret(void *private_key, void *base,
                       dsa_key *public_key,
                       unsigned char *out,         unsigned long *outlen);
-#endif // ifdef LTC_MDSA
+#endif 
 
 #ifdef LTC_DER
 /* DER handling */
@@ -545,7 +545,7 @@ int der_decode_utctime(const unsigned char *in, unsigned long *inlen,
 int der_length_utctime(ltc_utctime *utctime, unsigned long *outlen);
 
 
-#endif // ifdef LTC_DER
+#endif 
 
 /* $Source: /cvs/libtom/libtomcrypt/src/headers/tomcrypt_pk.h,v $ */
 /* $Revision: 1.81 $ */

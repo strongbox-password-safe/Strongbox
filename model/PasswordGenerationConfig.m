@@ -200,6 +200,12 @@ const static NSDictionary<NSString*, WordList*> *wordListsMap;
         case kPasswordGenerationCharacterPoolSymbols:
             return NSLocalizedString(@"pwgen_casing_symbols", @"Symbols");
             break;
+        case kPasswordGenerationCharacterPoolLatin1Supplement:
+            return NSLocalizedString(@"pwgen_casing_latin1_supplement", @"Latin-1 Supplement");
+            break;
+        case kPasswordGenerationCharacterPoolEmojis:
+            return NSLocalizedString(@"pwgen_casing_emojis", @"Emojis");
+            break;
         default:
             return @"Unknown";
             break;

@@ -22,7 +22,7 @@
 @property NSString* initialKeyFileBookmark;
 @property YubiKeyConfiguration *initialYubiKeyConfiguration;
 
-// Return Properties
+
 
 @property (nonatomic, readonly) DatabaseFormat selectedDatabaseFormat;
 

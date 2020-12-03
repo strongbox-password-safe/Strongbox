@@ -9,12 +9,17 @@
 #import "AutoFillManager.h"
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "QuickTypeRecordIdentifier.h"
-#import "SafesList.h"
 #import "NSArray+Extensions.h"
-#import "SVProgressHUD.h"
 #import "SprCompilation.h"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+#if TARGET_OS_IPHONE
+#import "SVProgressHUD.h"
+#import "SafesList.h"
+#else
+#import "DatabasesManager.h"
+#endif
+
+
 
 static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kMailToScheme = @"mailto";
@@ -33,60 +38,89 @@ static NSString* const kMailToScheme = @"mailto";
 }
 
 - (void)clearAutoFillQuickTypeDatabase {
+#if TARGET_OS_IPHONE
     if (@available(iOS 12.0, *)) {
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
         NSLog(@"Clearing Quick Type AutoFill Database...");
         
         [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
             if(state.enabled) {
                 [ASCredentialIdentityStore.sharedStore removeAllCredentialIdentitiesWithCompletion:nil];
+                NSLog(@"Cleared Quick Type AutoFill Database...");
+            }
+            else {
+                NSLog(@"AutoFill QuickType store not enabled. Not Clearing Quick Type AutoFill Database...");
             }
         }];
     }
 }
 
 - (void)    updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid {
+#if TARGET_OS_IPHONE
     if (@available(iOS 12.0, *)) {
-        NSLog(@"Updating Quick Type AutoFill Database...");
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
+        if (database == nil) {
+            return;
+        }
         
         [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
+#if TARGET_OS_IPHONE
             if(state.enabled) {
-                // We cannot really support incremental updates - because we do not own/control update mechanisms...
+                
+
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [SVProgressHUD showWithStatus:@"Populating AutoFill..."];
                 });
+#else
+            if(state.enabled) {
+                
+#endif
+                NSLog(@"Updating Quick Type AutoFill Database...");
                 
                 NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
-                
-                for (Node* node in database.activeRecords) { 
+                for (Node* node in database.activeRecords) {
                     [identities addObjectsFromArray:[self getPasswordCredentialIdentity:node database:database databaseUuid:databaseUuid]];
                 }
-                
+#if TARGET_OS_IPHONE
                 NSInteger databasesUsingQuickType = SafesList.sharedInstance.snapshot.count;
-                
-                if(databasesUsingQuickType < 2) { // We can safely replace all, otherwise must append... This isn't ideal in the multiple scenario as we end up with stales :(
+#else
+                NSInteger databasesUsingQuickType = DatabasesManager.sharedInstance.snapshot.count;
+#endif
+                if(databasesUsingQuickType < 2) { 
                     [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
                         NSLog(@"Replaced All Credential Identities... [%d] - [%@]", success, error);
                     }];
                 }
                 else {
                     [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
-                        NSLog(@"Saved Credential Identities... [%d] - [%@]", success, error);
+                        NSLog(@"Saved Credential Identities (%lu items)... [%d] - [%@]", identities.count, success, error);
                     }];
                 }
-                
+#if TARGET_OS_IPHONE
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [SVProgressHUD dismiss];
                 });
+#endif
             }
             else {
                 NSLog(@"AutoFill Credential Store Disabled...");
             }
         }];
+    } else {
+        
     }
 }
 
 - (BOOL)isPossible {
+#if TARGET_OS_IPHONE
     if (@available(iOS 12.0, *)) {
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
         return YES;
     }
     else {
@@ -97,7 +131,11 @@ static NSString* const kMailToScheme = @"mailto";
 - (BOOL)isOnForStrongbox {
     __block BOOL ret = NO;
     
+#if TARGET_OS_IPHONE
     if (@available(iOS 12.0, *)) {
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
         dispatch_group_t g = dispatch_group_create();
         dispatch_group_enter(g);
 
@@ -112,52 +150,65 @@ static NSString* const kMailToScheme = @"mailto";
 
     return ret;
 }
+    
+- (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentity:(Node*)node
+                                                                database:(DatabaseModel*)database
+                                                            databaseUuid:(NSString*)databaseUuid
+    API_AVAILABLE(ios(12.0), macos(11.0)) {
+#if TARGET_OS_IPHONE
+    if (@available(iOS 12.0, *)) {
+#else
+    if (@available(macOS 11.0, *)) {
+#endif
 
-- (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentity:(Node*)node database:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid  API_AVAILABLE(ios(12.0)){
-    if(!node.fields.username.length) {
+        if(!node.fields.username.length) {
+            return @[];
+        }
+        
+        NSMutableArray<NSString*> *urls = [NSMutableArray array];
+        
+        NSString* urlField = [database dereference:node.fields.url node:node];
+        if(urlField.length) {
+            [urls addObject:urlField];
+        }
+        
+        
+        
+        for(NSString* key in node.fields.customFields.allKeys) {
+            StringValue* strValue = node.fields.customFields[key];
+            NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
+            [urls addObjectsFromArray:foo];
+        }
+        
+        
+
+        NSString* notesField = [database dereference:node.fields.notes node:node];
+
+        if(notesField.length) {
+            NSArray<NSString*> *foo = [self findUrlsInString:notesField];
+            [urls addObjectsFromArray:foo];
+        }
+        
+        NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
+    
+        for (NSString* url in urls) {
+            QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString];
+            
+            ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
+            
+            NSString* usernameField = [database dereference:node.fields.username node:node];
+
+            
+            
+            ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:usernameField recordIdentifier:[recordIdentifier toJson]];
+            [identities addObject:iden];
+        }
+        
+        return identities;
+    }
+    else {
         return @[];
     }
-    
-    NSMutableArray<NSString*> *urls = [NSMutableArray array];
-    
-    NSString* urlField = [database dereference:node.fields.url node:node];
-    if(urlField.length) {
-        [urls addObject:urlField];
-    }
-    
-    // Custom Fields?
-    
-    for(NSString* key in node.fields.customFields.allKeys) {
-        StringValue* strValue = node.fields.customFields[key];
-        NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
-        [urls addObjectsFromArray:foo];
-    }
-    
-    // Notes?
-
-    NSString* notesField = [database dereference:node.fields.notes node:node];
-
-    if(notesField.length) {
-        NSArray<NSString*> *foo = [self findUrlsInString:notesField];
-        [urls addObjectsFromArray:foo];
-    }
-    
-    NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
-    
-    for (NSString* url in urls) {
-        QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString];
-        
-        ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
-        
-        NSString* usernameField = [database dereference:node.fields.username node:node];
-
-        // NSLog(@"Adding [%@ [%@]] to Quick Type DB", url, usernameField);
-        
-        ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:usernameField recordIdentifier:[recordIdentifier toJson]];
-        [identities addObject:iden];
-    }
-    
-    return identities;
 }
 
 - (NSArray<NSString*>*)findUrlsInString:(NSString*)target {

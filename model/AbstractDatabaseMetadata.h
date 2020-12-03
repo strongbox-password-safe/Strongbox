@@ -7,13 +7,25 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "BasicOrderedDictionary.h"
+#import "MutableOrderedDictionary.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol AbstractDatabaseMetadata <NSObject>
 
-- (BasicOrderedDictionary<NSString*, NSString*>*)kvpForUi;
+- (MutableOrderedDictionary<NSString*, NSString*>*)kvpForUi;
+
+@property (nonatomic, nullable) NSString* version;
+@property (nonatomic, nullable) NSString *generator;
+
+@property (nullable, nonatomic) NSDate* recycleBinChanged;
+@property (nullable, nonatomic) NSUUID* recycleBinGroup;
+@property BOOL recycleBinEnabled;
+
+@property (nonatomic, nullable) NSNumber *historyMaxItems;
+@property (nonatomic, nullable) NSNumber *historyMaxSize;
+
+@property (nonatomic) MutableOrderedDictionary* customData;
 
 @end
 

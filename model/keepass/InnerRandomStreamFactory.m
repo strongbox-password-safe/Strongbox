@@ -30,7 +30,7 @@
     }
     else if (streamId == kInnerStreamArc4) {
         NSLog(@"ARC4 not supported = %d", streamId);
-        // FUTURE: Support this for older DBs? Hard to find any samples... Low Priority
+        
         return nil;
     }
     else if (streamId == kInnerStreamChaCha20) {

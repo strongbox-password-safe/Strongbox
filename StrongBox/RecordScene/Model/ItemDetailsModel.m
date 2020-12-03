@@ -88,32 +88,32 @@
                         [self.email compare:other.email] == NSOrderedSame;
    
     if(!simpleEqual) {
-        // NSLog(@"Model: Simply Different");
+        
         return YES;
     }
     
-    // Expiry
+    
     
     if(!((self.expires == nil && other.expires == nil) || (self.expires && other.expires && [self.expires isEqual:other.expires]))) {
         return YES;
     }
     
-    // Tags
+    
     
     if (![self.mutableTags isEqualToSet:other.mutableTags]) {
         return YES;
     }
     
-    // TOTP
+    
     
     if([OTPToken areDifferent:self.totp b:other.totp]) {
         return YES;
     }
 
-    // Icon
+    
     
     if(self.icon.customImage) {
-        return YES; // Any custom image is always new
+        return YES; 
     }
     
     if(!((self.icon.customUuid == nil && other.icon.customUuid == nil)  || (self.icon.customUuid && other.icon.customUuid && [self.icon.customUuid isEqual:other.icon.customUuid]))) {
@@ -124,7 +124,7 @@
         return YES;
     }
     
-    // Custom Fields
+    
     
     if(self.customFields.count != other.customFields.count) {
         return YES;
@@ -139,7 +139,7 @@
         }
     }
     
-    // Attachments
+    
     
     if(self.attachments.count != other.attachments.count) {
         return YES;
@@ -256,7 +256,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     ItemDetailsModel* ret = [[ItemDetailsModel alloc] initWithTitle:@"Acme Inc."
                                                            username:@"mark.mc"
                                                            password:@"very very secret that is waaaaaay too long to fit on one line"
-                                                                url:@"https://www.strongboxsafe.com"
+                                                                url:@"https:
                                                               notes:notes
                                                               email:@"markmc@gmail.com"
                                                             expires:nil

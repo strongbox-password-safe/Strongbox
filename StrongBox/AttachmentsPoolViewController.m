@@ -89,8 +89,8 @@
         NSData* data = [NSData dataWithContentsOfStream:attStream];
         UIImage* img = [UIImage imageWithData:data];
         
-        if(img) { // Trick to keep all images to a fixed size
-            @autoreleasepool { // Prevent App Extension Crash
+        if(img) { 
+            @autoreleasepool { 
                 UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
                 
                 CGRect imageRect = CGRectMake(0, 0, 48, 48);
@@ -112,7 +112,7 @@
     
     if(fa) {
         return forDisplay ? fa.filename :
-        [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  // Use a index as a prefix here because filenames can occur many times and preview won't work it will point to the last written file
+        [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  
     }
     
     fa = [self.historicalFileAttachments firstOrDefault:^BOOL(NodeFileAttachment * _Nonnull obj) {
@@ -122,7 +122,7 @@
     if(fa) {
         return forDisplay ?
             [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_historical_fmt", @"%@ (Historical)"), fa.filename] :
-            [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  // Use a index as a prefix here because filenames can occur many times and preview won't work it will point to the last written file
+            [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  
     }
     
     NSString* unknown = [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_orphan_fmt", @"<Orphan Attachment> [%lu]"), (unsigned long)poolIndex];

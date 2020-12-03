@@ -22,7 +22,7 @@
 static const int kBlockSize = 32 * 1024;
 static NSString* kEmptyDataDigest;
 
-static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
+static const BOOL kEncrypt = YES; 
 
 @interface DatabaseAttachment ()
 
@@ -41,7 +41,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
 
 + (void)initialize {
     if(self == [DatabaseAttachment class]) {
-        kEmptyDataDigest = NSData.data.sha256.hex; // Empty data
+        kEmptyDataDigest = NSData.data.sha256.hex; 
     }
 }
 
@@ -53,7 +53,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
     if (self.encryptedSessionFilePath) {
         NSError* error;
         [NSFileManager.defaultManager removeItemAtPath:self.encryptedSessionFilePath error:&error];
-//        NSLog(@"DEALLOC - Removed temporary encrypted attachment [%@]-[%@]", self.encryptedSessionFilePath, error);
+
     }
     
     self.encryptedSessionFilePath = nil;
@@ -125,7 +125,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
         self.encryptionIV = getRandomData(kCCBlockSizeAES128);
         self.encryptedSessionFilePath = [self getUniqueFileName];
         
-//        NSLog(@"Initialized with E    ncrypted Session File Path = [%@]", self.encryptedSessionFilePath);
+
         
         self.attachmentLength = 0;
         _sha256Hex = kEmptyDataDigest;
@@ -134,7 +134,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
     return self;
 }
 
-- (NSInteger)writeStreamWithPlainDecompressedBytes:(const uint8_t*)buffer maxLength:(NSUInteger)len { // KeePass v4
+- (NSInteger)writeStreamWithPlainDecompressedBytes:(const uint8_t*)buffer maxLength:(NSUInteger)len { 
     if (self.incrementalWriteStream == nil) {
         [self createOutputPipeline:NO gzipDecompress:NO];
         [self.incrementalWriteStream open];
@@ -163,7 +163,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
         NSString* prefixStr = [text substringToIndex:4];
         NSData* prefix = [[NSData alloc] initWithBase64EncodedString:prefixStr options:kNilOptions];
         uint8_t* foo = (uint8_t*)prefix.bytes;
-        ret = (foo[0] == 0x1f) && (foo[1] == 0x8b); // GZIP Magic
+        ret = (foo[0] == 0x1f) && (foo[1] == 0x8b); 
     }
         
     return ret;
@@ -176,7 +176,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
         [self.incrementalWriteStream open];
     }
 
-    // Do not do text.UTF8String the pointer is not released!!
+    
     
     size_t len = [text lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
     
@@ -204,8 +204,8 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
 - (void)closeWriteStream {
     [self.incrementalWriteStream close];
     
-    // If it's for some reason an empty attachment then self.digested stream won't have been created - cater for this...
-    // Handle weird edge case empty attachment
+    
+    
     
     self.attachmentLength = self.digested ? self.digested.length : 0;
     _sha256Hex = self.digested ? self.digested.digest.hex : kEmptyDataDigest;
@@ -213,7 +213,7 @@ static const BOOL kEncrypt = YES; // Encrypt output file - debug helper
 
 - (NSInputStream *)getPlainTextInputStream {
     if (self.digested == nil) {
-        return [NSInputStream inputStreamWithData:NSData.data]; // Handle weird edge case empty attachment
+        return [NSInputStream inputStreamWithData:NSData.data]; 
     }
  
     NSInputStream* inStream = [NSInputStream inputStreamWithFileAtPath:self.encryptedSessionFilePath];

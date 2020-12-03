@@ -19,6 +19,6 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
 
 @end
 
-#endif // ifndef _KeypassDatabase_h
+#endif 
 
 NS_ASSUME_NONNULL_END

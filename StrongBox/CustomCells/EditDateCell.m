@@ -30,12 +30,12 @@
     self.timePicker = [[UIDatePicker alloc] init];
     self.timePicker.datePickerMode = UIDatePickerModeTime;
 
-    if (@available(iOS 13.4, *)) { // TODO: Use modern compact style if possible - this is necessary so the expiry isn't messed up :(
+    if (@available(iOS 13.4, *)) { 
         self.datePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
         self.timePicker.preferredDatePickerStyle = UIDatePickerStyleWheels;
     }
         
-    // Toolbar with done/cancel buttons
+    
     
     UIToolbar* toolbarDate = [[UIToolbar alloc] init];
     UIToolbar* toolbarTime = [[UIToolbar alloc] init];
@@ -93,7 +93,7 @@
     toolbarDate.userInteractionEnabled = YES;
     toolbarTime.userInteractionEnabled = YES;
     
-    // Add to Text Fields...
+    
     
     self.dateTextField.inputView = self.datePicker;
     self.dateTextField.placeholder = NSLocalizedString(@"edit_date_cell_date_field_placeholder", @"Date");

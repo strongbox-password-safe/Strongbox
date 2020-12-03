@@ -72,7 +72,7 @@ static const uint32_t kBlockSize = 64;
 }
 
 - (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)len {
-    if (self.workChunk != nil && self.workChunkLength == 0) { // EOF
+    if (self.workChunk != nil && self.workChunkLength == 0) { 
         return 0L;
     }
     
@@ -91,7 +91,7 @@ static const uint32_t kBlockSize = 64;
         
             workingAvailable = self.workChunkLength - self.workingChunkOffset;
             if (workingAvailable == 0) {
-                return bufferWritten; // EOS
+                return bufferWritten; 
             }
         }
 
@@ -104,7 +104,7 @@ static const uint32_t kBlockSize = 64;
         memcpy(dst, src, bytesToWrite);
     
         self.writtenToStreamSoFar += bytesToWrite;
-        //NSLog(@"DEBUG: Written to stream so far: %zu", self.writtenToStreamSoFar);
+        
 
         bufferWritten += bytesToWrite;
         bufferOffset += bytesToWrite;
@@ -126,7 +126,7 @@ static const uint32_t kBlockSize = 64;
     
     if (bytesRead < 0) {
         NSLog(@"ChaCha20ReadStream Could not read input stream");
-        self.error = self.inputStream.streamError; // [Utils createNSError:@"ChaCha20ReadStream Could not read input stream" errorCode:-1];
+        self.error = self.inputStream.streamError; 
         self.workChunk = nil;
         self.workChunkLength = 0;
         free(block);
@@ -142,7 +142,7 @@ static const uint32_t kBlockSize = 64;
     }
     else {
         [self decryptAnotherChunk:block length:bytesRead];
-        //NSLog(@"DECRYPT: bytesRead = %zu, decWritten = %zu, totalRead = [%zu], writtenSoFar = %zu", bytesRead, self.workChunkLength, self.readFromStreamTotal, self.writtenSoFar);
+        
     }
     
     free(block);

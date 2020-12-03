@@ -26,8 +26,8 @@ typedef NS_ENUM (NSInteger, PasswordGenerationCharacterPool) {
     kPasswordGenerationCharacterPoolLower,
     kPasswordGenerationCharacterPoolNumeric,
     kPasswordGenerationCharacterPoolSymbols,
-//    kPasswordGenerationCharacterPoolEmoji,
-//    kPasswordGenerationCharacterPoolExtendedAscii,
+    kPasswordGenerationCharacterPoolLatin1Supplement,
+    kPasswordGenerationCharacterPoolEmojis,
 };
 
 typedef NS_ENUM (NSInteger, PasswordGenerationWordCasing) {

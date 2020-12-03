@@ -20,7 +20,7 @@
 #import "NSArray+Extensions.h"
 
 static const uint32_t kKdbx4MajorVersionNumber = 4;
-static const uint32_t kKdbx4MaximumAcceptableMinorVersionNumber = 1; // MMcG - 10-Apr-2020 - KeeWeb had originally set a few of its files to 4.1 - now fixed but some users will have 4.1 in header - accept them
+static const uint32_t kKdbx4MaximumAcceptableMinorVersionNumber = 1; 
 
 static const BOOL kLogVerbose = NO;
 
@@ -46,7 +46,7 @@ static const BOOL kLogVerbose = NO;
     Node* rootGroup = [[Node alloc] initAsRoot:nil];
     
     NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
-    if ([rootGroupName isEqualToString:@"generic_database"]) { // If it's not translated use default...
+    if ([rootGroupName isEqualToString:@"generic_database"]) { 
       rootGroupName = kDefaultRootGroupName;
     }
     Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
@@ -71,24 +71,23 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
                       xmlDumpStream:xmlDumpStream
              sanityCheckInnerStream:sanityCheckInnerStream
                          completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable error) {
-        onDeserialized(userCancelled, serializationData, error, ckf, completion);
+        if(userCancelled || serializationData == nil || serializationData.rootXmlObject == nil || error) {
+            if(error) {
+                NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", error);
+            }
+            completion(userCancelled, nil, error);
+            return;
+        }
+
+        onDeserialized(serializationData, ckf, completion);
     }];
 }
 
-static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable error, CompositeKeyFactors* ckf, OpenCompletionBlock completion) {
-    if(userCancelled || serializationData == nil || serializationData.rootXmlObject == nil || error) {
-        if(error) {
-            NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", error);
-        }
-        completion(userCancelled, nil, error);
-        return;
-    }
-            
-    // Convert the Xml Model to the Strongbox Model
+static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData, CompositeKeyFactors* ckf, OpenCompletionBlock completion) {
+    
     
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(serializationData.rootXmlObject);
-    
     NSError* err;
     Node* rootGroup = [adaptor toModel:rootXmlGroup error:&err];
     if(rootGroup == nil) {
@@ -101,23 +100,27 @@ static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullabl
     NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
     NSDictionary<NSUUID*, NSDate*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
    
-    // Metadata
+    
     
     KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
     
     if(xmlMeta) {
         metadata.generator = xmlMeta.generator ? xmlMeta.generator : @"<Unknown>";
         
-        // History Settings
+        
         
         metadata.historyMaxItems = xmlMeta.historyMaxItems;
         metadata.historyMaxSize = xmlMeta.historyMaxSize;
     
-        // Recycle Bin Settings
+        
         
         metadata.recycleBinEnabled = xmlMeta.recycleBinEnabled;
         metadata.recycleBinGroup = xmlMeta.recycleBinGroup;
         metadata.recycleBinChanged = xmlMeta.recycleBinChanged;
+        
+        
+
+        metadata.customData = xmlMeta.customData.orderedDictionary;
     }
     
     metadata.cipherUuid = serializationData.cipherUuid;
@@ -147,13 +150,13 @@ static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullabl
        !database.compositeKeyFactors.keyFileDigest &&
        !database.compositeKeyFactors.yubiKeyCR) {
         NSError *error = [Utils createNSError:@"A least one composite key factor is required to encrypt database." errorCode:-3];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
 
     KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
     
-    // From Strongbox to Xml Model
+    
     
     XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
     
@@ -171,27 +174,28 @@ static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullabl
     if(!rootXmlDocument) {
         NSLog(@"Could not convert Database to Xml Model.");
         error = [Utils createNSError:@"Could not convert Database to Xml Model." errorCode:-4];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
-    // Metadata
     
-    rootXmlDocument.keePassFile.meta.headerHash = nil; // Do not serialize this, we do not calculate it
+    
+    rootXmlDocument.keePassFile.meta.headerHash = nil; 
     KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)database.metadata;
     
-    // Write Back any changed Metadata
+    
     
     rootXmlDocument.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
     rootXmlDocument.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
     rootXmlDocument.keePassFile.meta.recycleBinChanged = metadata.recycleBinChanged;
     rootXmlDocument.keePassFile.meta.historyMaxItems = metadata.historyMaxItems;
     rootXmlDocument.keePassFile.meta.historyMaxSize = metadata.historyMaxSize;
+    rootXmlDocument.keePassFile.meta.customData.orderedDictionary = metadata.customData; 
     
-    // From Xml Model to Xml String (including inner stream encryption)
+    
     
     id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
-                                                                                    key:nil // Auto generated new key
+                                                                                    key:nil 
                                                                                v4Format:YES
                                                                             prettyPrint:NO];
     
@@ -202,7 +206,7 @@ static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullabl
     if(!xml || !writeXmlOk) {
         NSLog(@"Could not serialize Xml to Document.:\n%@", xml);
         error = [Utils createNSError:@"Could not serialize Xml to Document." errorCode:-5];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
@@ -210,7 +214,7 @@ static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullabl
         NSLog(@"Serializing XML Document:\n%@", xml);
     }
     
-    // KDBX serialize this Xml Document...
+    
 
     NSDictionary* unknownHeaders = tag ? tag.unknownHeaders : @{ };
     
@@ -230,20 +234,20 @@ static void onDeserialized(BOOL userCancelled, Kdbx4SerializationData * _Nullabl
                               ckf:database.compositeKeyFactors
                        completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
         if (userCancelled) {
-            completion(userCancelled, nil, nil);
+            completion(userCancelled, nil, nil, nil);
         }
         else if (!data || error) {
             NSLog(@"Could not serialize Document to KDBX.");
-            completion(NO, nil, error);
+            completion(NO, nil, nil, error);
         }
         else {
-            completion(NO, data, nil);
+            completion(NO, data, xml, nil);
         }
     }];
 }
 
 static KeePassGroup *getExistingRootKeePassGroup(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
-    // Possible that one of these intermediates are nil... safety
+    
     
     KeePassFile *keepassFileElement = existingRootXmlDocument == nil ? nil : existingRootXmlDocument.keePassFile;
     Root* rootXml = keepassFileElement == nil ? nil : keepassFileElement.root;
@@ -258,7 +262,7 @@ static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(Meta* meta) {
             NSArray<CustomIcon*> *icons = meta.customIconList.icons;
             NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
             for (CustomIcon* icon in icons) {
-                if(icon.data != nil) { // Android KeePass DX seems some how to include no data sometimes? Causes crash
+                if(icon.data != nil) { 
                     [ret setObject:icon.data forKey:icon.uuid];
                 }
             }

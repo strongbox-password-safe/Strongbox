@@ -14,8 +14,8 @@
 
 // <DeletedObject>
 //     <UUID>OjDGBkygSXyeOh33r/aDJQ==</UUID>
-//     <DeletionTime>2018-10-17T14:06:27Z</DeletionTime>
-// </DeletedObject>
+
+
 
 - (instancetype)initWithContext:(XmlProcessingContext *)context {
     return [self initWithXmlElementName:kDeletedObjectElementName context:context];

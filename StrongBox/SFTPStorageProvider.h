@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-@property (nullable) SFTPSessionConfiguration *unitTestingSessionConfiguration; // Keep Session across Listing/Create operations, otherwise use the specified SafeMetaData config 
+@property (nullable) SFTPSessionConfiguration *unitTestingSessionConfiguration; 
 
 @property (nonatomic, readonly) StorageProvider storageId;
 @property (nonatomic, readonly) BOOL providesIcons;

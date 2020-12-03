@@ -22,7 +22,7 @@
 - (void)testHmacBlockStream {
     NSString* b64Key = @"ubUOkhrw8MdxdfPgENNmDDgAPIgdJUI9zqTw0G9woW2OF/5XZy0XEocccln9tpmuS5cUbkTMG7I5tiPDtH3PFQ==";
     NSData* hmacKey = [[NSData alloc] initWithBase64EncodedString:b64Key options:kNilOptions];
-//    NSString* masterb64Key = "TQxZ44nwA3k9RNJpOl6Zf2LfUw9wcQ5tM6Xm2orCAgo=";
+
     
     NSURL* url = [NSURL fileURLWithPath:@"/Users/strongbox/strongbox-test-files/sample.hmac.blocks"];
     NSInputStream *inputStream = [NSInputStream inputStreamWithURL:url];
@@ -39,7 +39,7 @@
 
     while((bytesRead = [stream read:buf maxLength:kSize]) > 0) {
         totalRead += bytesRead;
-        //NSLog(@"Read: %ld", (long)bytesRead);
+        
         NSLog(@"%ld => %ld", totalRead, (long)bytesRead);
     }
     
@@ -72,20 +72,20 @@
     NSInteger bytesRead = 0;
     NSInteger totalRead = 0;
 
-    //NSMutableData* decrypted = [NSMutableData data];
+    
     
     while((bytesRead = [stream read:buf maxLength:kSize]) > 0) {
         totalRead += bytesRead;
-        //[decrypted appendBytes:buf length:bytesRead];
-        //NSLog(@"Read and appended - %ld => %ld/%ld", totalRead, (long)bytesRead, decrypted.length);
+        
+        
     }
     
     [stream close];
     
     NSLog(@"%ld", (long)totalRead);
-    //NSLog(@"Decrypted Hash = [%@]", decrypted.sha256.hex);
     
-    //XCTAssertTrue([decrypted.sha256.hex isEqualToString:@"43931E6737489D8F8E074C746B7BA1DE60CCB0A92E2CB85BE2E612C159E0CC06"]);
+    
+    
     XCTAssertEqual(totalRead, 242344710);
 }
 
@@ -98,7 +98,7 @@
     HmacBlockStream *innerStream = [[HmacBlockStream alloc] initWithStream:inputStream hmacKey:hmacKey];
     XCTAssertNotNil(innerStream);
     
-    // AES Stream
+    
     
     NSString* masterb64Key = @"TQxZ44nwA3k9RNJpOl6Zf2LfUw9wcQ5tM6Xm2orCAgo=";
     NSData* masterKey = [[NSData alloc] initWithBase64EncodedString:masterb64Key options:kNilOptions];
@@ -107,7 +107,7 @@
     
     AesInputStream* aesStream = [[AesInputStream alloc] initWithStream:innerStream key:masterKey iv:iv];
     
-    // GZIP
+    
     
     GZipInputStream *stream = [[GZipInputStream alloc] initWithStream:aesStream];
     [stream open];
@@ -120,7 +120,7 @@
 
     while((bytesRead = [stream read:buf maxLength:kSize]) > 0) {
         totalRead += bytesRead;
-        //NSLog(@"Read: %ld", (long)bytesRead);
+        
         NSLog(@"%ld => %ld", totalRead, (long)bytesRead);
     }
     
@@ -128,7 +128,7 @@
     
     NSLog(@"%ld", (long)totalRead);
     
-//    276475637
+
     
     XCTAssertEqual(totalRead, 276498543);
 }

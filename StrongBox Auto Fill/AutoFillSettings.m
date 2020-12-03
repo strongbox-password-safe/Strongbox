@@ -30,10 +30,10 @@ static NSString* const kAutoProceedOnSingleMatch = @"autoProceedOnSingleMatch";
     return sharedInstance;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (BOOL)autoFillWroteCleanly {
-    return [self getBool:kAutoFillWroteCleanly fallback:YES]; // Default/Initial is YES
+    return [self getBool:kAutoFillWroteCleanly fallback:YES]; 
 }
 
 - (void)setAutoFillWroteCleanly:(BOOL)autoFillWroteCleanly {
@@ -88,7 +88,7 @@ static NSString* const kAutoProceedOnSingleMatch = @"autoProceedOnSingleMatch";
     [self setBool:KDontNotifyToSwitchToMainAppForSync value:dontNotifyToSwitchToMainAppForSync];
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSUserDefaults*)getDefaults {
     NSUserDefaults *defaults = NSUserDefaults.standardUserDefaults;
@@ -100,7 +100,7 @@ static NSString* const kAutoProceedOnSingleMatch = @"autoProceedOnSingleMatch";
     return defaults;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (NSString*)getString:(NSString*)key {
     return [self getString:key fallback:nil];

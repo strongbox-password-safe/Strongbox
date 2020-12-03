@@ -59,6 +59,7 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonUpgrade;
 @property (weak, nonatomic) IBOutlet UINavigationItem *navItemHeader;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonCustomizeView;
 
 - (IBAction)onAddSafe:(id)sender;
 - (IBAction)onUpgrade:(id)sender;
@@ -71,8 +72,8 @@
 @property BOOL enqueuedImportCanOpenInPlace;
 @property BOOL privacyScreenSuppressedForBiometricAuth;
 
-@property BOOL hasAppearedOnce; // Used for App Lock initial load
-@property SafeMetaData* lastOpenedDatabase; // Used for Auto Lock
+@property BOOL hasAppearedOnce; 
+@property SafeMetaData* lastOpenedDatabase; 
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
@@ -83,10 +84,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    if (@available(iOS 13.0, *)) { // Upgrade to fancy SF Symbols Preferences Icon if we can...
+    if (@available(iOS 13.0, *)) { 
         [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
     }
 
+    [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"audit_drill_down_section_header_preferences", @"Preferences")];
+    [self.buttonCustomizeView setAccessibilityLabel:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")];
+    [self.buttonAddSafe setAccessibilityLabel:NSLocalizedString(@"casg_add_action", @"Add")];
+    
     [self checkForPreviousCrash];
 
     self.collection = [NSArray array];
@@ -96,17 +101,17 @@
     
     [self listenToNotifications];
     
-    // [self setupAutoFillWormhole];
     
-    [self setFreeTrialEndDateBasedOnIapPurchase]; // Update Free Trial Date
+    
+    [self setFreeTrialEndDateBasedOnIapPurchase]; 
 
     if([Settings.sharedInstance getLaunchCount] == 1) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self doFirstLaunchTasks]; // Give everything a change to initialize
+            [self doFirstLaunchTasks]; 
         });
     }
     else {
-        if (@available(iOS 14.0, *)) { // We miss the AppBecameActive notification on first launch in iOS 14 - some kind of weird re-ordering of events. This may occur on other OS's but for now guard with this ios!4 check - // FUTURE: Expand usage?
+        if (@available(iOS 14.0, *)) { 
             
             if (!self.hasAppearedOnce) {
                 dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -116,23 +121,23 @@
         }
     }
 
-    // Crash...
-    //
-    //    NSURL* url = [NSURL URLWithString:@"https://www.strongboxsafe.com"];
-    //    [NSJSONSerialization dataWithJSONObject:@{ @"url" : url } options:NSJSONWritingPrettyPrinted error:nil];
+    
+    
+    
+    
 }
 
-//- (void)setupAutoFillWormhole {
-//    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName
-//                                                         optionalDirectory:@"wormhole"
-//                                                            transitingType:MMWormholeTransitingTypeCoordinatedFile];
-//
-//    [self.wormhole listenForMessageWithIdentifier:kWormholeAutoFillUpdateMessageId
-//                                         listener:^(id messageObject) {
-//        NSLog(@"AutoFill Wormhole Message: [%@]", messageObject);
-////        [SafesList.sharedInstance forceReload];
-//    }];
-//}
+
+
+
+
+
+
+
+
+
+
+
 
 - (NSString*)getCrashMessage {
     NSString* loc = NSLocalizedString(@"safes_vc_please_send_crash_report", @"Please send this crash to support@strongboxsafe.com");
@@ -144,17 +149,17 @@
 - (void)sharePreviousCrash {
     NSString* message = [self getCrashMessage];
     
-    NSArray *activityItems = @[//FileManager.sharedInstance.archivedCrashFile,
+    NSArray *activityItems = @[
                                message];
     
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
 
-    // Required for iPad...
-    activityViewController.popoverPresentationController.barButtonItem = self.buttonAddSafe; // Weird spot but can't think of a better location
+    
+    activityViewController.popoverPresentationController.barButtonItem = self.buttonAddSafe; 
     
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) { }];
 
-//    [activityViewController setValue:@"My Subject Text" forKey:@"subject"]; Doesn't work :(
+
     
     [self presentViewController:activityViewController animated:YES completion:nil];
 }
@@ -191,7 +196,7 @@
         NSLog(@"New User is already Pro or in Free Trial... Standard Onboarding");
         [self startOnboarding];
     }
-    else { // Only if not pro, free trial and no free trial purchase do we prompt to Opt-In to free trial...
+    else { 
         NSLog(@"New User is not pro or in a free trial... Prompt for free trial opt in");
 
         [self promptToOptInToFreeTrial];
@@ -209,7 +214,7 @@
         [self bindProOrFreeTrialUi];
     }
     
-    // Standard Onboarding...
+    
     
     [self performSegueWithIdentifier:@"segueToWelcome" sender:nil];
 }
@@ -286,13 +291,13 @@
         return;
     }
 
-    // Auto-Fill may have updated databases... Do the reload immediately here and before the sync because if you dispatch it
-    // sync will be working with stale data with outstanding update = nil - Losing all changes
+    
+    
     
     [SafesList.sharedInstance reloadIfChangedByOtherComponent];
     self.collection = SafesList.sharedInstance.snapshot;
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
-    [self refresh]; // This is dispatched so will happen later
+    [self refresh]; 
 
     if(!self.hasAppearedOnce) {
         NSLog(@"XXXXXXXXX - appBecameActive - First Appearance - Doing First Activation Process");
@@ -341,16 +346,16 @@
         [weakSelf hidePrivacyScreen:userJustCompletedBiometricAuthentication];
     };
     privacyVc.startupLockMode = startupLockMode;
-    privacyVc.modalPresentationStyle = UIModalPresentationOverFullScreen; // This stops the view controller interfering with UIAlertController if we happen to present on that. Less than Ideal?
+    privacyVc.modalPresentationStyle = UIModalPresentationOverFullScreen; 
 
-    // Visible will be top most - usually the current nav top controller but can be another modal like Custom Fields editor
+    
     
 
     UIViewController* visible = [self getVisibleViewController];
     NSLog(@"Presenting Privacy Screen on [%@]", [visible class]);
     [visible presentViewController:privacyVc animated:NO completion:^{
         NSLog(@"Presented Privacy Screen Successfully...");
-        self.privacyAndLockVc = privacyVc; // Only set this if we succeed in displaying...
+        self.privacyAndLockVc = privacyVc; 
     }];
 }
 
@@ -362,12 +367,12 @@
         if ([self shouldLockOpenDatabase]) {
             NSLog(@"Should Lock Database now...");
 
-            self.lastOpenedDatabase = nil; // Clear
+            self.lastOpenedDatabase = nil; 
             
             UINavigationController* nav = self.navigationController;
             [nav popToRootViewControllerAnimated:NO];
             
-            // This dismisses all modals including the privacy screen which is what we want
+            
             [self dismissViewControllerAnimated:NO completion:^{
                 [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
             }];
@@ -381,8 +386,8 @@
                     [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
                 }];
             }
-            else { // Fallback
-                // This dismisses all modals including the privacy screen which is what we want
+            else { 
+                
                 [self dismissViewControllerAnimated:NO completion:^{
                     [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
                 }];
@@ -392,8 +397,8 @@
         self.enterBackgroundTime = nil;
     }
     else {
-        // I don't think this is possible but would like to know about it if it ever somehow could occur
-        // This is weirdly possible but should now be handled by Fallback check on visible screen above 13-Aug-2020
+        
+        
         NSLog(@"XXXXX - Interesting Situation - hidePrivacyScreen but no Privacy Screen was up? - XXXX");
     }
 }
@@ -406,7 +411,7 @@
         
         NSLog(@"Autolock Time [%@s] - background Time: [%f].", seconds, secondsBetween);
         
-        if (seconds.longValue != -1  && secondsBetween > seconds.longValue) // -1 = never
+        if (seconds.longValue != -1  && secondsBetween > seconds.longValue) 
         {
             NSLog(@"Locking Database...");
             return YES;
@@ -416,7 +421,7 @@
     return NO;
 }
 
-// App Activation Sequence....
+
 
 - (void)onPrivacyScreenDismissed:(BOOL)userJustCompletedBiometricAuthentication {
     self.privacyAndLockVc = nil;
@@ -429,7 +434,7 @@
 }
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
-    //NSLog(@"doAppActivationTasks");
+    
 
     if(!self.enqueuedImportUrl) {
         [self checkICloudAvailabilityAndPerformAppActivationTasks:userJustCompletedBiometricAuthentication];
@@ -460,7 +465,7 @@
 }
 
 - (void)onICloudNotAvailable:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
-    // If iCloud isn't available, set promoted to no (so we can ask them next time it becomes available)
+    
     [Settings sharedInstance].iCloudPrompted = NO;
     
     if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
@@ -471,7 +476,7 @@
         [self removeAllICloudSafes];
     }
     
-    // No matter what, iCloud isn't available so switch it to off.???
+    
     [SharedAppAndAutoFillSettings sharedInstance].iCloudOn = NO;
     [Settings sharedInstance].iCloudWasOn = NO;
     
@@ -483,8 +488,8 @@
         BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
         BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
         
-        if (!existingLocalDeviceSafes && !hasOtherCloudSafes) { // Empty Databases - Possibly first time user - onboarding will ask
-                                                                //Settings.sharedInstance.iCloudOn = YES; // Empty
+        if (!existingLocalDeviceSafes && !hasOtherCloudSafes) { 
+                                                                
             [self onICloudAvailableContinuation:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
             return;
         }
@@ -520,7 +525,7 @@
     BOOL iCloudWasOn = Settings.sharedInstance.iCloudWasOn;
     BOOL hasLocalDatabases = [self getLocalDeviceSafes].count != 0;
     
-    // If iCloud newly switched on, move local docs to iCloud
+    
     if (iCloudOn && !iCloudWasOn && hasLocalDatabases) {
         [Alerts twoOptions:self
                      title:NSLocalizedString(@"safesvc_icloud_available_title", @"iCloud Available")
@@ -536,7 +541,7 @@
                     }];
     }
     
-    // If iCloud newly switched off, move iCloud docs to local
+    
     
     BOOL hasICloudDatabases = [self getICloudSafes].count != 0;
     if (!iCloudOn && iCloudWasOn && hasICloudDatabases) {
@@ -547,11 +552,11 @@
             secondButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_make_local", @"Make Local Copies")
              thirdButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_icloud_on", @"Switch iCloud Back On")
                       action:^(int response) {
-                          if(response == 2) {           // @"Switch iCloud Back On"
+                          if(response == 2) {           
                               [SharedAppAndAutoFillSettings sharedInstance].iCloudOn = YES;
                               [Settings sharedInstance].iCloudWasOn = [SharedAppAndAutoFillSettings sharedInstance].iCloudOn;
                           }
-                          else if(response == 1) {      // @"Keep a Local Copy"
+                          else if(response == 1) {      
                               [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
                                   [self showiCloudMigrationUi:show];
                               }];
@@ -626,7 +631,7 @@
         if ([visibleSoFar isKindOfClass:UINavigationController.class]) {
             UINavigationController* nav = (UINavigationController*)visibleSoFar;
             
-            // NSLog(@"VISIBLE: [%@] is Nav Controller, moving to Visisble: [%@]", visibleSoFar, nav.visibleViewController);
+            
 
             if (nav.visibleViewController) {
                 visibleSoFar = nav.visibleViewController;
@@ -636,7 +641,7 @@
             }
         }
         else {
-            // NSLog(@"VISIBLE: [%@] is regular VC checking is it's presenting anything: [%@]", visibleSoFar, visibleSoFar.presentedViewController);
+            
 
             if (visibleSoFar.presentedViewController) {
                 visibleSoFar = visibleSoFar.presentedViewController;
@@ -645,7 +650,7 @@
                 break;
             }
         }
-    } while (--attempts); // Prevent any kind of infinite regress
+    } while (--attempts); 
 
     NSLog(@"VISIBLE: [%@]", visibleSoFar);
     
@@ -666,7 +671,7 @@
         return;
     }
     
-    // Clear Nav Stack and any modals...
+    
     
     [self.navigationController popToRootViewControllerAnimated:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -714,11 +719,11 @@
         
     NSArray<SafeMetaData*>* newColl = SafesList.sharedInstance.snapshot;
     
-    if (newColl.count != self.collection.count) { // Full refresh required if somehow number of items have changed
+    if (newColl.count != self.collection.count) { 
         [self refresh];
     }
     else {
-        self.collection = newColl; // Required because our collection is old?
+        self.collection = newColl; 
 
         NSUInteger index = [self.collection indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
             return [obj.uuid isEqualToString:databaseId];
@@ -772,8 +777,8 @@
     self.tableView.tableFooterView = [UIView new];
     self.tableView.rowHeight = UITableViewAutomaticDimension;
 
-    if (@available(iOS 13.0, *)) { // Replaced with context menu in iOS 13+
-        // NOP
+    if (@available(iOS 13.0, *)) { 
+        
     }
     else {
         self.longPressRecognizer = [[UILongPressGestureRecognizer alloc]
@@ -798,7 +803,7 @@
 - (void)onManualPulldownRefresh {
     [SyncManager.sharedInstance backgroundSyncAll];
     
-    // Since above call is almost instantaneous - don't end refreshing immediately as it looks odd, delay slightly for more standard behaviour
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.tableView.refreshControl endRefreshing];
     });
@@ -953,7 +958,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                             noConvenienceUnlock:noConvenienceUnlock
                                                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
             if (result == kUnlockDatabaseResultSuccess) {
-                if (@available(iOS 11.0, *)) { // iOS 11 required as only new Item Details is supported
+                if (@available(iOS 11.0, *)) { 
                     [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
                 }
                 else {
@@ -967,9 +972,9 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////
-// Context Menu
-//
+
+
+
 
 - (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)){
     return [UIContextMenuConfiguration configurationWithIdentifier:nil
@@ -991,7 +996,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
-                                    systemImage:@"clock" // @"archivebox" // clock
+                                    systemImage:@"clock" 
                                     destructive:NO
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
@@ -1004,7 +1009,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
-                                    systemImage:@"arrow.clockwise.icloud" // @"antenna.radiowaves.left.and.right" // arrow.up.arrow.down
+                                    systemImage:@"arrow.clockwise.icloud" 
                                     destructive:NO
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
@@ -1210,7 +1215,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)onShare:(NSIndexPath*)indexPath {
     SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
@@ -1247,7 +1252,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     NSArray *activityItems = @[url];
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
     
-    // Required for iPad...
+    
 
     CGRect rect = [self.tableView rectForRowAtIndexPath:indexPath];
     activityViewController.popoverPresentationController.sourceView = self.tableView;
@@ -1279,7 +1284,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }];
     offlineAction.backgroundColor = [UIColor darkGrayColor];
 
-    // Other Options
+    
     
     UITableViewRowAction *moreActions = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                            title:NSLocalizedString(@"safes_vc_slide_left_more_actions", @"View more actions table action")
@@ -1299,7 +1304,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleAlert];
 
-    // Rename Action...
+    
     
     UIAlertAction *renameAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_rename_database", @"Button to Rename the Database")
                                                            style:UIAlertActionStyleDefault
@@ -1308,7 +1313,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                          } ];
     [alertController addAction:renameAction];
     
-    // Quick Launch Option
+    
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
@@ -1321,19 +1326,19 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                           } ];
     [alertController addAction:quickLaunchAction];
 
-    // Start Re-ordering... Replaced with Long Press
+    
    
-//    UIAlertAction *reorderAction = [UIAlertAction actionWithTitle:
-//            NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
-//                                                            style:UIAlertActionStyleDefault
-//                                                          handler:^(UIAlertAction *a) {
-//                                                              [self setEditing:YES];
-//                                                        } ];
-//
-//    [alertController addAction:reorderAction];
-//
 
-    // Local Device options
+
+
+
+
+
+
+
+
+
+    
     
     BOOL localDeviceOption = safe.storageProvider == kLocalDevice;
     if(localDeviceOption) {
@@ -1348,7 +1353,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [alertController addAction:secondAction];
     }
     
-    // Backups
+    
     
     UIAlertAction *viewBackupsOption = [UIAlertAction actionWithTitle:
             NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
@@ -1359,7 +1364,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     [alertController addAction:viewBackupsOption];
 
-    // Sync Status
+    
     UIAlertAction *viewSyncStatus = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
                                                              style:UIAlertActionStyleDefault
                                                            handler:^(UIAlertAction *a) {
@@ -1367,7 +1372,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }];
     [alertController addAction:viewSyncStatus];
     
-    // Cancel
+    
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel Button")
                                                            style:UIAlertActionStyleCancel
@@ -1375,8 +1380,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     [alertController addAction:cancelAction];
     
-//    alertController.popoverPresentationController.sourceView = self.view;
-//    alertController.popoverPresentationController.sourceRect = sender;
+
+
     
     [self presentViewController:alertController animated:YES completion:nil];
 }
@@ -1493,19 +1498,19 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
-    // Clear Quick Launch if it was set...
+    
     if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
         SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = nil;
     }
     
-    // Delete all backups...
+    
     
     [BackupsManager.sharedInstance deleteAllBackups:safe];
     
     [[SafesList sharedInstance] remove:safe.uuid];
 }
 
-//////////////////////////////////////////////////////////////////////////////////
+
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToMasterDetail"] || [segue.identifier isEqualToString:@"segueToOpenSafeView"]) {
@@ -1651,7 +1656,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     else if ([segue.identifier isEqualToString:@"segueToCreateExpressDone"]) {
         WelcomeCreateDoneViewController* wcdvc = (WelcomeCreateDoneViewController*)segue.destinationViewController;
         
-        NSDictionary *d = sender; // @{@"database" : metadata, @"password" : password}
+        NSDictionary *d = sender; 
         
         wcdvc.database = d[@"database"];
         wcdvc.password = d[@"password"];
@@ -1699,8 +1704,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)onOnboardingDoneWithAddDatabase:(BOOL)addExisting
                          databaseToOpen:(SafeMetaData*)databaseToOpen {
     if(addExisting) {
-        // Here we can check if the user enabled iCloud and we've found an existing database and ask if they
-        // want to continue adding the database...
+        
+        
 
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 if([SafesList.sharedInstance getSafesOfProvider:kiCloud].count) {
@@ -1783,10 +1788,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)onAddExistingDatabaseUiDone:(SelectedStorageParameters*)storageParams
                                name:(NSString*)name {
     if(storageParams.method == kStorageMethodManualUrlDownloadedData) {
-        // Manual URL Download and Add
+        
         [self addManuallyDownloadedUrlDatabase:name modDate:NSDate.date data:storageParams.data];
     }
-    else { // Standard Native Storage add
+    else { 
         SafeMetaData* database = [storageParams.provider getSafeMetaData:name providerData:storageParams.file.providerData];
         database.likelyFormat = storageParams.likelyFormat;
         
@@ -1818,7 +1823,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                  format:format
                              completion:^(BOOL userCancelled, SafeMetaData * _Nullable metadata, NSData * _Nonnull initialSnapshot, NSError * _Nullable error) {
         if (userCancelled) {
-            // NOP?
+            
         }
         else if (error || !metadata) {
             [Alerts error:self
@@ -1838,7 +1843,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                       password:password
                                     completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
         if (userCancelled) {
-            // NOP
+            
         }
         else if(error || !metadata) {
             [Alerts error:self
@@ -1859,7 +1864,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             return obj.storageProvider == kiCloud && [obj.fileName compare:metadata.fileName] == NSOrderedSame;
         }];
         
-        if(existing) { // May have already been added by our iCloud watch thread.
+        if(existing) { 
             NSLog(@"Not Adding as this iCloud filename is already present. Probably picked up by Watch Thread.");
             return existing;
         }
@@ -1902,7 +1907,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];  // FUTURE: Would be good not to have to read all file
+    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];  
     
     [provider create:nickName
            extension:extension
@@ -1922,8 +1927,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
      }];
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-// Add / Import
+
+
 
 - (IBAction)onAddSafe:(id)sender {
     UIAlertController *alertController =
@@ -1938,7 +1943,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                    }];
     [alertController addAction:action];
     
-    // Create New
+    
     
     UIAlertAction *createNewAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_new_database_advanced", @"")
                                                      style:UIAlertActionStyleDefault
@@ -1947,21 +1952,21 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                    }];
     [alertController addAction:createNewAction];
     
-    // Express
     
-//    if(Settings.sharedInstance.iCloudAvailable && Settings.sharedInstance.iCloudOn) {
+    
+
         UIAlertAction *quickAndEasyAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_new_database_express", @"")
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {
                                                                     [self onNewExpressDatabase];
                                                                 }];
         
-        // [quickAndEasyAction setValue:[UIColor greenColor] forKey:@"titleTextColor"];
-        // [quickAndEasyAction setValue:[UIImage imageNamed:@"fast-forward-2-32"] forKey:@"image"];
+        
+        
         [alertController addAction:quickAndEasyAction];
-  //  }
+  
     
-    // Cancel
+    
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"")
                                                            style:UIAlertActionStyleCancel
@@ -1984,7 +1989,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [self performSegueWithIdentifier:@"segueToCreateDatabase" sender:nil];
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 - (IBAction)onUpgrade:(id)sender {
     [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
@@ -2115,7 +2120,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)internalOpenQuickLaunchDatabase:(BOOL)userJustCompletedBiometricAuthentication {
-    // Only do this if we are the currently visible VC
+    
 
     if(![self isVisibleViewController]) {
         NSLog(@"Not opening Quick Launch database as not at top of the Nav Stack");
@@ -2123,7 +2128,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     
     if(!SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
-        // NSLog(@"Not opening Quick Launch database as not configured");
+        
         return;
     }
     
@@ -2139,7 +2144,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [self openDatabase:safe openLocalOnly:NO userJustCompletedBiometricAuthentication:userJustCompletedBiometricAuthentication];
 }
 
-// iCloud Availability and Import / Export
+
 
 - (NSArray<SafeMetaData*>*)getLocalDeviceSafes {
     return [SafesList.sharedInstance getSafesOfProvider:kLocalDevice];
@@ -2174,10 +2179,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
 }
 
-// Importation
+
 
 - (void)import:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace {
-    dispatch_async(dispatch_get_main_queue(), ^{ // Must be done on main or will hang indefinitely
+    dispatch_async(dispatch_get_main_queue(), ^{ 
         StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
 
         if(!document) {
@@ -2191,7 +2196,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [document openWithCompletionHandler:^(BOOL success) {
             [SVProgressHUD dismiss];
             
-            NSData* data = document.data ? document.data.copy : nil; // MMcG: Attempt to fix a crash
+            NSData* data = document.data ? document.data.copy : nil; 
             
             NSError* error;
             NSDictionary* att = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
@@ -2199,9 +2204,9 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             
             [document closeWithCompletionHandler:nil];
             
-            // Inbox should be empty whenever possible so that we can detect the
-            // re-importation of a certain file and ask if user wants to create a
-            // new copy or just update an old one...
+            
+            
+            
             [FileManager.sharedInstance deleteAllInboxItems];
                     
             [self onReadImportedFile:success data:data url:url canOpenInPlace:canOpenInPlace forceOpenInPlace:forceOpenInPlace modDate:mod];
@@ -2216,8 +2221,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
           forceOpenInPlace:(BOOL)forceOpenInPlace
                    modDate:(NSDate*)modDate {
     if(!success || !data) {
-        if ([url.absoluteString isEqualToString:@"auth://"]) {
-            // IGNORE - sent by Launcher app for some reason - just ignore...
+        if ([url.absoluteString isEqualToString:@"auth:
+            
             NSLog(@"IGNORE - sent by Launcher app for some reason - just ignore...");
         }
         else {
@@ -2257,7 +2262,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace modDate:(NSDate*)modDate {
     NSError* error;
     
-    if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) { // FUTURE: Stream? use URL?
+    if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) { 
         [Alerts error:self
                 title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                 error:error];
@@ -2334,7 +2339,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                               }];
 }
 
-/////////////
+
 
 - (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace {
     self.enqueuedImportUrl = url;
@@ -2345,7 +2350,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     NSString* extension = [DatabaseModel getLikelyFileExtension:data];
     DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
     
-//    NSLog(@"Importing URL: [%@]", url);
+
     
     if(SharedAppAndAutoFillSettings.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
@@ -2370,7 +2375,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)importToICloud:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
     NSString *suggestedFilename = url.lastPathComponent;
     
-     // Do we need to set the iCloud file mod date to match?
+     
     
     [AppleICloudProvider.sharedInstance create:nickName
                                      extension:extension
@@ -2394,7 +2399,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)importToLocalDevice:(NSURL*)url format:(DatabaseFormat)format nickName:(NSString*)nickName extension:(NSString*)extension data:(NSData*)data modDate:(NSDate*)modDate {
-    // Try to keep the filename the same... but don't overwrite any existing, will have asked previously above if the user wanted to
+    
     
     NSString *suggestedFilename = url.lastPathComponent;
         

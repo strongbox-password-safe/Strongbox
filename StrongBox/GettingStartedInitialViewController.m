@@ -72,7 +72,7 @@
             [self performSegueWithIdentifier:@"segueToTurnOnAutoFill" sender:nil];
         }
         else {
-            if (SafesList.sharedInstance.snapshot.count != 0) { // Should almost never happen but for completeness!
+            if (SafesList.sharedInstance.snapshot.count != 0) { 
                 [self performSegueWithIdentifier:@"segueToAllSetDone" sender:nil];
             }
             else {

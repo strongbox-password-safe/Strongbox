@@ -33,7 +33,7 @@
         else {
             long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
             
-            if(daysLeft < 1 || daysLeft > 70) {
+            if(daysLeft < 1 || daysLeft > 88) {
                 NSString* loc = NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
                 freeTrialLiteSuffix = loc;
             }

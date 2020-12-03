@@ -55,7 +55,7 @@
              NSLocalizedString(@"set_icon_vc_select_icon_source_message", @"Select the source of the icon you would like to use for this entry")
                                          preferredStyle:UIAlertControllerStyleAlert];
             
-            // this is the center of the screen currently but it can be any point in the view
+            
             
             
             UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:
@@ -123,7 +123,7 @@
                        [self presentCustomIconImagePicker];
                    }
                    else {
-                       self.completionBlock(NO, nil, nil,  NO, nil); // Cancelled
+                       self.completionBlock(NO, nil, nil,  NO, nil); 
                    }}];
         }
     }
@@ -208,25 +208,25 @@
               components.query,
               components.fragment);
         
-        if(!components.scheme.length) { // facebook.com/whatever.php or just even Facebook!
+        if(!components.scheme.length) { 
             NSURLComponents* newComponents = [[NSURLComponents alloc] init];
             newComponents.scheme = @"http";
             NSArray* comp = [urlHint componentsSeparatedByString:@"/"];
             NSString* host = comp[0];
-            if(![host containsString:@"."]) { // maybe just Facebook
+            if(![host containsString:@"."]) { 
                 host = [host stringByAppendingString:@".com"];
             }
             
             newComponents.host = host;
             url = newComponents.URL;
         }
-        else if (![components.scheme hasPrefix:@"http"]) { // ftp://facebook.com
+        else if (![components.scheme hasPrefix:@"http"]) { 
             NSURLComponents* newComponents = [[NSURLComponents alloc] init];
             newComponents.scheme = @"http";
             newComponents.host = components.host;
             url = newComponents.URL;
         }
-        else { // http://facebook.com/whatever.php - strip the path, just use the host
+        else { 
             NSURLComponents* newComponents = [[NSURLComponents alloc] init];
             newComponents.scheme = components.scheme;
             newComponents.host = components.host;
@@ -324,11 +324,11 @@ static const int kMaxRecommendedCustomIconDimension = 256;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         UIImage* image = [UIImage imageWithData:data];
         NSData* dataOriginal = UIImagePNGRepresentation(image);
-        //NSLog(@"before: %f - %f - %lu", image.size.width, image.size.height, (unsigned long)dataOriginal.length);
+        
         if(image.size.height > kMaxRecommendedCustomIconDimension || image.size.width > kMaxRecommendedCustomIconDimension) {
             UIImage* rescaled = scaleImage(image, CGSizeMake(kMaxRecommendedCustomIconDimension, kMaxRecommendedCustomIconDimension));
             NSData* rescaledData = UIImagePNGRepresentation(rescaled);
-            //NSLog(@"after: %f - %f - %lu", rescaled.size.width, rescaled.size.height, (unsigned long)rescaledData.length);
+            
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 [SVProgressHUD dismiss];
@@ -354,7 +354,7 @@ static const int kMaxRecommendedCustomIconDimension = 256;
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [SVProgressHUD dismiss];
-                self.completionBlock(YES, nil, nil, NO, @{ NSUUID.UUID : image } ); // SO hacky - split entry functions up so we don't need to do this badness
+                self.completionBlock(YES, nil, nil, NO, @{ NSUUID.UUID : image } ); 
             });
         }
     });
@@ -381,7 +381,7 @@ static const int kMaxRecommendedCustomIconDimension = 256;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-implementations"
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { // Need to implement this for iOS 10 devices
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url { 
     NSError* error;
     NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
     

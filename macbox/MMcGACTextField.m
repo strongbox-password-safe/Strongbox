@@ -60,7 +60,7 @@
         self.isAutoCompleting = YES;
         NSControl* control = [[obj userInfo] objectForKey:@"NSFieldEditor"];
 
-        [control complete:nil]; // This is synchronous and the BOOL blocks re-entry
+        [control complete:nil]; 
         
         self.isAutoCompleting = NO;
     }
