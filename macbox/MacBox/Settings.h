@@ -110,6 +110,7 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL clipboardHandoff;
 
 @property BOOL showAdvancedUnlockOptions;
+@property BOOL startWithSearch;
 
 @end
 

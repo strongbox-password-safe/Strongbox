@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "RootXmlDomainObject.h"
-#import "KeePassDatabaseMetadata.h"
 #import "Node.h"
 #import "KeePassDatabaseWideProperties.h"
 

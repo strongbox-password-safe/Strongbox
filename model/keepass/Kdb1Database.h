@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "AbstractDatabaseFormatAdaptor.h"
-#import "Kdb1DatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -8,20 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "AbstractDatabaseMetadata.h"
 #import "DatabaseAttachment.h"
 #import "StrongboxDatabase.h"
 #import "CompositeKeyFactors.h"
 
 NS_ASSUME_NONNULL_BEGIN
-
-typedef NS_ENUM (NSInteger, DatabaseFormat) {
-    kPasswordSafe,
-    kKeePass,
-    kKeePass4,
-    kKeePass1,
-    kFormatUnknown,
-};
 
 typedef void (^OpenCompletionBlock)(BOOL userCancelled, StrongboxDatabase*_Nullable database, NSError*_Nullable error);
 typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error);

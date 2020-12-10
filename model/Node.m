@@ -594,7 +594,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return YES;
 }
 
-- (BOOL)isSyncEqualTo:(Node *)other { 
+- (BOOL)isSyncEqualTo:(Node *)other params:(SyncComparisonParams *)params { 
     if (other == nil) {
         return NO;
     }
@@ -604,7 +604,12 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
     
     if (self.isGroup) {
-        return ![self.fields.modified isLaterThan:other.fields.modified];
+        
+        BOOL ret = [other.fields.modified isLaterThan:self.fields.modified]; 
+
+        NSLog(@"%@ = %@ ? %d", self.fields.modified, other.fields.modified, ret);
+
+        return !ret;
     }
     else {
         if (!( ( self.iconId == nil && other.iconId == nil ) ||
@@ -617,7 +622,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
             return NO;
         }
 
-        return [self.fields isSyncEqualTo:other.fields];
+        return [self.fields isSyncEqualTo:other.fields params:params];
     }
 }
 

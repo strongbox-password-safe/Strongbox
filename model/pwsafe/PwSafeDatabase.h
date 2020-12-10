@@ -5,14 +5,16 @@
 #import <Foundation/Foundation.h>
 #import "Node.h"
 #import "AbstractDatabaseFormatAdaptor.h"
-#import "PwSafeMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
+extern const NSInteger kPwSafeDefaultVersionMajor;
+extern const NSInteger kPwSafeDefaultVersionMinor;
 
 @interface PwSafeDatabase : NSObject <AbstractDatabaseFormatAdaptor>
 
 @end
 
-#endif // ifndef _PwSafeDatabase_h
+#endif 
 
 NS_ASSUME_NONNULL_END

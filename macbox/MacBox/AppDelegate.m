@@ -32,7 +32,7 @@ static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 static const NSInteger kTopLevelMenuItemTagFile = 1111;
 static const NSInteger kTopLevelMenuItemTagView = 1113;
 
-@interface AppDelegate ()
+@interface AppDelegate () 
 
 @property (strong) IBOutlet NSMenu *systemTraymenu;
 @property NSStatusItem* statusItem;
@@ -64,8 +64,10 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self performMigrations];
     
-    [self removeUnwantedMenuItems];
+    [self customizeMenu];
     
+    [self installAppWideKeyDownInterceptor];
+
     [self initializeProFamilyEdition];    
     
     if(!Settings.sharedInstance.fullVersion) {
@@ -141,7 +143,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-- (IBAction)onSystemTrayQuitStrongbox:(id)sender {
+- (IBAction)onSystemTrayQuitStrongbox:  (id)sender {
     [NSApplication.sharedApplication terminate:nil];
 }
 
@@ -306,6 +308,28 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 
+- (void)installAppWideKeyDownInterceptor {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
+- (void)customizeMenu {
+   [self removeUnwantedMenuItems];  
+    
+}
+
 - (void)removeUnwantedMenuItems {
     [self removeMenuItem:kTopLevelMenuItemTagView action:@selector(onViewDebugDatabasesList:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(duplicateDocument:)];
@@ -330,6 +354,8 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
         NSLog(@"WARN: Menu Item %@ not found to remove.", NSStringFromSelector(action));
     }
 }
+
+
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
 

@@ -18,6 +18,7 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "BookmarksHelper.h"
 #import "VirtualYubiKeys.h"
+#import "FontManager.h"
 
 @interface CASGTableViewController () <UITextFieldDelegate>
 
@@ -71,6 +72,9 @@
     
     self.textFieldName.text = self.selectedName.length ? self.selectedName : [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
   
+    self.textFieldPassword.font = FontManager.sharedInstance.easyReadFont;
+    self.textFieldConfirmPassword.font = FontManager.sharedInstance.easyReadFont;
+    
     [self bindUi];
 }
 

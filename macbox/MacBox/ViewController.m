@@ -831,6 +831,13 @@ static NSImage* kStrongBox256Image;
         [self selectItem:selectedItem];
         
         [self bindDetailsPane];
+        
+        if (Settings.sharedInstance.startWithSearch) {
+            [self.view.window makeFirstResponder:self.searchField];
+        }
+        else {
+            [self.view.window makeFirstResponder:self.outlineView];
+        }
     }
 }
 
@@ -1786,9 +1793,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         if(shouldPromptForBiometricEnrol || shouldPromptForAutoFillEnrol) {
             [self onboardForBiometricsAndOrAutoFill:shouldPromptForBiometricEnrol
                        shouldPromptForAutoFillEnrol:shouldPromptForAutoFillEnrol
-                                compositeKeyFactors:compositeKeyFactors];
+                                compositeKeyFactors:compositeKeyFactors];            
         }
-        
+                
         NSString* password = self.model.compositeKeyFactors.password;
         if( !isBiometricUnlock && touchIdIsPossible && metaData.isTouchIdEnabled && metaData.isTouchIdEnrolled && metaData.conveniencePassword == nil && password.length) {
             
@@ -1797,10 +1804,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
         
         
-        self.model.databaseMetadata.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
-        self.model.databaseMetadata.yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
-        
-        [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
+        metaData.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
+        metaData.yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+
+        [DatabasesManager.sharedInstance update:metaData];
     }
     else {
         if(isBiometricUnlock) {
@@ -3225,8 +3232,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     MutableOrderedDictionary *ret = [[MutableOrderedDictionary alloc] init];
     
-    for (NSString* key in [model.metadata kvpForUi].allKeys) {
-        NSString *value = [model.metadata kvpForUi][key];
+    MutableOrderedDictionary<NSString *,NSString *> *kvp = [model.metadata filteredKvpForUIWithFormat:model.format];
+    
+    for (NSString* key in kvp.allKeys) {
+        NSString *value = kvp[key];
         [ret addKey:key andValue:value];
     }
     

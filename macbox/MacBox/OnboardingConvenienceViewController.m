@@ -35,9 +35,6 @@
         self.buttonNext.hidden = YES;
     }
     
-    self.database.hasPromptedForTouchIdEnrol = YES;
-    [DatabasesManager.sharedInstance update:self.database];
-
     [self bindUI];
 }
 
@@ -63,10 +60,16 @@
 }
 
 - (IBAction)onDone:(id)sender {
+    self.database.hasPromptedForTouchIdEnrol = YES;
+    [DatabasesManager.sharedInstance update:self.database];
+
     [self.view.window close];
 }
 
 - (IBAction)onNext:(id)sender {
+    self.database.hasPromptedForTouchIdEnrol = YES;
+    [DatabasesManager.sharedInstance update:self.database];
+
     self.onNext();
 }
 

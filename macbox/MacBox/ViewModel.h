@@ -12,6 +12,7 @@
 #import "CHCSVParser.h"
 #import "DatabaseModel.h"
 #import "DatabaseMetadata.h"
+#import "UnifiedDatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -126,7 +127,7 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 @property (nonatomic, readonly) Node*  rootGroup;
 @property (nonatomic, readonly) BOOL masterCredentialsSet;
 @property (nonatomic, readonly) DatabaseFormat format;
-@property (nonatomic, readonly) id<AbstractDatabaseMetadata> metadata;
+@property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
 @property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
 

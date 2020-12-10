@@ -6,6 +6,9 @@
 #import "Record.h"
 #import "Constants.h"
 
+const NSInteger kPwSafeDefaultVersionMajor = 0x03;
+const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
+
 @interface PwSafeDatabase ()
 
 @end
@@ -29,9 +32,9 @@
 }
 
 - (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[[PwSafeMetadata alloc] init] compositeKeyFactors:ckf];
+    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[UnifiedDatabaseMetadata withDefaultsForFormat:kPasswordSafe] compositeKeyFactors:ckf];
     
-    [self defaultLastUpdateFieldsToNow:(PwSafeMetadata*)ret.metadata];
+    [self defaultLastUpdateFieldsToNow:ret.metadata];
     
     return ret;
 }
@@ -66,7 +69,8 @@
         return;
     }
     
-    PwSafeMetadata* metadata = [[PwSafeMetadata alloc] initWithVersion:[self getVersion:headerFields]];
+    UnifiedDatabaseMetadata* metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kPasswordSafe];
+    metadata.version = [self getVersion:headerFields];
     metadata.keyStretchIterations = [PwSafeSerialization getKeyStretchIterations:data];
 
     [self syncLastUpdateFieldsFromHeaders:metadata headers:headerFields];
@@ -113,7 +117,6 @@
         return;
     }
     
-    PwSafeMetadata* metadata = (PwSafeMetadata*)database.metadata;
     [self defaultLastUpdateFieldsToNow:database.metadata];
     
     
@@ -121,7 +124,7 @@
     NSMutableData *ret = [[NSMutableData alloc] init];
     
     NSData *K, *L;
-    PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)metadata.keyStretchIterations
+    PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)database.metadata.keyStretchIterations
                                                       masterPassword:database.compositeKeyFactors.password
                                                                    K:&K
                                                                    L:&L];
@@ -137,7 +140,7 @@
     
     [self addDefaultHeaderFieldsIfNotSet:headerFields];
     [self syncEmptyGroupsToHeaders:headerFields rootGroup:database.rootGroup];
-    [self syncLastUpdateFieldsToHeaders:metadata headers:headerFields];
+    [self syncLastUpdateFieldsToHeaders:database.metadata headers:headerFields];
     
     [toBeEncrypted appendData:[self serializeHeaderFields:headerFields]];
     [hmacData appendData:[self getHeaderFieldHmacData:headerFields]];
@@ -333,8 +336,8 @@
     
     if(![self getFirstHeaderFieldOfType:HDR_VERSION headers:headers]) {
         unsigned char versionBytes[2];
-        versionBytes[0] = kDefaultVersionMinor;
-        versionBytes[1] = kDefaultVersionMajor;
+        versionBytes[0] = kPwSafeDefaultVersionMinor;
+        versionBytes[1] = kPwSafeDefaultVersionMajor;
         NSData *versionData = [[NSData alloc] initWithBytes:&versionBytes length:2];
         Field *version = [[Field alloc] initNewDbHeaderField:HDR_VERSION withData:versionData];
         [headers addObject:version];
@@ -491,14 +494,14 @@
     return hmacData;
 }
 
-- (void)syncLastUpdateFieldsToHeaders:(PwSafeMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
+- (void)syncLastUpdateFieldsToHeaders:(UnifiedDatabaseMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
     [self setHeaderFieldString:HDR_LASTUPDATEAPPLICATION value:metadata.lastUpdateApp headers:headers];
     [self setHeaderFieldString:HDR_LASTUPDATEHOST value:metadata.lastUpdateHost headers:headers];
     [self setHeaderFieldString:HDR_LASTUPDATEUSER value:metadata.lastUpdateUser headers:headers];
     [self setHeaderFieldDate:HDR_LASTUPDATETIME value:metadata.lastUpdateTime headers:headers];
 }
 
-- (void)syncLastUpdateFieldsFromHeaders:(PwSafeMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
+- (void)syncLastUpdateFieldsFromHeaders:(UnifiedDatabaseMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
     Field *appField = [self getFirstHeaderFieldOfType:HDR_LASTUPDATETIME headers:headers];
     if(appField) {
         metadata.lastUpdateTime = appField.dataAsDate;
@@ -562,7 +565,7 @@
     return dump;
 }
 
-- (void)defaultLastUpdateFieldsToNow:(PwSafeMetadata*)metadata {
+- (void)defaultLastUpdateFieldsToNow:(UnifiedDatabaseMetadata*)metadata {
     metadata.lastUpdateTime = [[NSDate alloc] init];
     metadata.lastUpdateUser = [Utils getUsername];
     metadata.lastUpdateHost = [Utils hostname];
@@ -572,7 +575,7 @@
 -(NSString*)getVersion:(NSMutableArray<Field*>*)headers {
     Field *version = [self getFirstHeaderFieldOfType:HDR_VERSION headers:headers];
     if(!version) {
-        return [NSString stringWithFormat:@"%ld.%ld", (long)kDefaultVersionMajor, (long)kDefaultVersionMinor];
+        return [NSString stringWithFormat:@"%ld.%ld", (long)kPwSafeDefaultVersionMajor, (long)kPwSafeDefaultVersionMinor];
     }
     else {
         return [version prettyDataString];

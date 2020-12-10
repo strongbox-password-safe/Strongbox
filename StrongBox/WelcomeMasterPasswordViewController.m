@@ -12,6 +12,7 @@
 #import "AddNewSafeHelper.h"
 #import "Alerts.h"
 #import "SafesList.h"
+#import "FontManager.h"
 
 @interface WelcomeMasterPasswordViewController () <UITextFieldDelegate>
 
@@ -79,6 +80,7 @@
                  forControlEvents:UIControlEventEditingChanged];
     
     self.textFieldPw.delegate = self;
+    self.textFieldPw.font = FontManager.sharedInstance.easyReadFont;
 }
 
 - (IBAction)onDismiss:(id)sender {

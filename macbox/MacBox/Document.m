@@ -299,4 +299,14 @@
 
 
 
+- (void)close {
+    [super close];
+
+    
+    
+    if (NSDocumentController.sharedDocumentController.documents.count == 0) {
+        [DatabasesManagerView show:NO];
+    }
+}
+
 @end

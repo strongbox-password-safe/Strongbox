@@ -16,7 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)newSynchronizerFor:(DatabaseModel *)mine theirs:(DatabaseModel *)theirs;
 
-- (SyncDiffReport*)getDiff;
+- (SyncDiffReport *)getDiff;
+
 - (void)applyDiff:(SyncDiffReport*)diff;
 
 @end

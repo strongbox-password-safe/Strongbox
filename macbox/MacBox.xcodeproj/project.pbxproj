@@ -23,7 +23,6 @@
 		4D1FFA742403030100B75EA2 /* DatabaseAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CAA219B45F700C22CB4 /* DatabaseAttachment.m */; };
 		4D1FFA752403030100B75EA2 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5896224BFA7200013808 /* AesKdfCipher.m */; };
 		4D1FFA762403030100B75EA2 /* crypt_argchk.c in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347EB2074FA3F00148741 /* crypt_argchk.c */; };
-		4D1FFA772403030100B75EA2 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF408F21807A0200B69383 /* PwSafeMetadata.m */; };
 		4D1FFA782403030100B75EA2 /* MMcGACTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD38A225D12A300290488 /* MMcGACTextField.m */; };
 		4D1FFA792403030100B75EA2 /* Record.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347E22074FA3500148741 /* Record.m */; };
 		4D1FFA7A2403030100B75EA2 /* Kdb1Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB1219B479800C22CB4 /* Kdb1Database.m */; };
@@ -63,12 +62,10 @@
 		4D1FFA9D2403030100B75EA2 /* DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA320750D1D009856E3 /* DatabaseMetadata.m */; };
 		4D1FFA9E2403030100B75EA2 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */; };
 		4D1FFA9F2403030100B75EA2 /* argon2.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D17219B4B2900C22CB4 /* argon2.c */; };
-		4D1FFAA02403030100B75EA2 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCC219B47DA00C22CB4 /* KeePass4DatabaseMetadata.m */; };
 		4D1FFAA12403030100B75EA2 /* FavIconResultTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3F190223AE5A2E008A58AF /* FavIconResultTableCellView.m */; };
 		4D1FFAA22403030100B75EA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
 		4D1FFAA32403030100B75EA2 /* NodeFileAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D08219B490100C22CB4 /* NodeFileAttachment.m */; };
 		4D1FFAA42403030100B75EA2 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4A32332D92900C2E084 /* XmlSerializer.m */; };
-		4D1FFAA52403030100B75EA2 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */; };
 		4D1FFAA62403030100B75EA2 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
 		4D1FFAA72403030100B75EA2 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
 		4D1FFAA82403030100B75EA2 /* KeePassCiphers.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CDE219B481200C22CB4 /* KeePassCiphers.m */; };
@@ -95,7 +92,6 @@
 		4D1FFABD2403030100B75EA2 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
 		4D1FFABE2403030100B75EA2 /* String.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096221825104007BA1E7 /* String.m */; };
 		4D1FFABF2403030100B75EA2 /* ClipboardManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF522B523C8ABEF00CD948E /* ClipboardManager.m */; };
-		4D1FFAC02403030100B75EA2 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB8219B479900C22CB4 /* Kdb1DatabaseMetadata.m */; };
 		4D1FFAC12403030100B75EA2 /* FavIconManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8354C22389086E00E264E0 /* FavIconManager.m */; };
 		4D1FFAC22403030100B75EA2 /* PredefinedKeePassIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */; };
 		4D1FFAC32403030100B75EA2 /* KdbxSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099B21825134007BA1E7 /* KdbxSerialization.m */; };
@@ -269,12 +265,10 @@
 		4D524CBD219B479900C22CB4 /* KdbGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB4219B479800C22CB4 /* KdbGroup.m */; };
 		4D524CBE219B479900C22CB4 /* KdbEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB6219B479800C22CB4 /* KdbEntry.m */; };
 		4D524CBF219B479900C22CB4 /* KdbSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB7219B479800C22CB4 /* KdbSerialization.m */; };
-		4D524CC0219B479900C22CB4 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB8219B479900C22CB4 /* Kdb1DatabaseMetadata.m */; };
 		4D524CC1219B479900C22CB4 /* KdbSerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CBB219B479900C22CB4 /* KdbSerializationData.m */; };
 		4D524CD3219B47DB00C22CB4 /* Argon2KdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CC3219B47DA00C22CB4 /* Argon2KdfCipher.m */; };
 		4D524CD4219B47DB00C22CB4 /* Kdbx4Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CC4219B47DA00C22CB4 /* Kdbx4Serialization.m */; };
 		4D524CD5219B47DB00C22CB4 /* Kdbx4SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCB219B47DA00C22CB4 /* Kdbx4SerializationData.m */; };
-		4D524CD6219B47DB00C22CB4 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCC219B47DA00C22CB4 /* KeePass4DatabaseMetadata.m */; };
 		4D524CD7219B47DB00C22CB4 /* Binary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCD219B47DA00C22CB4 /* Binary.m */; };
 		4D524CD8219B47DB00C22CB4 /* VariantObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD0219B47DB00C22CB4 /* VariantObject.m */; };
 		4D524CD9219B47DB00C22CB4 /* KdfParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD1219B47DB00C22CB4 /* KdfParameters.m */; };
@@ -339,7 +333,6 @@
 		4D9E099121825108007BA1E7 /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097121825106007BA1E7 /* Meta.m */; };
 		4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097921825107007BA1E7 /* KeePassGroup.m */; };
 		4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
-		4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */; };
 		4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097C21825107007BA1E7 /* Kdbx4Database.m */; };
 		4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097E21825107007BA1E7 /* XMLWriter.m */; };
 		4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099B21825134007BA1E7 /* KdbxSerialization.m */; };
@@ -353,6 +346,7 @@
 		4DAC40CE24F68311001B3BE2 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */; };
 		4DAC40CF24F68311001B3BE2 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */; };
 		4DACA5C023CCD40F00891366 /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DACA5BF23CCD40F00891366 /* SecretStore.m */; };
+		4DB3DD2E257E7A4000DC6560 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DB3DD2D257E7A4000DC6560 /* CloudKit.framework */; };
 		4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */; };
 		4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
 		4DBCE22722241D6700A2AFA2 /* PredefinedKeePassIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */; };
@@ -390,6 +384,14 @@
 		4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
 		4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCA65AE1F4B45800078B962 /* DocumentController.m */; };
 		4DCA65B11F4B4A000078B962 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 4DCA65B01F4B4A000078B962 /* Credits.rtf */; };
+		4DCAE884257E6E8500072D4B /* SyncComparisonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE883257E6E8500072D4B /* SyncComparisonParams.m */; };
+		4DCAE885257E6E8500072D4B /* SyncComparisonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE883257E6E8500072D4B /* SyncComparisonParams.m */; };
+		4DCAE886257E6E8500072D4B /* SyncComparisonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE883257E6E8500072D4B /* SyncComparisonParams.m */; };
+		4DCAE887257E6E8500072D4B /* SyncComparisonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE883257E6E8500072D4B /* SyncComparisonParams.m */; };
+		4DCAE8B9257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE8B8257E711A00072D4B /* UnifiedDatabaseMetadata.m */; };
+		4DCAE8BA257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE8B8257E711A00072D4B /* UnifiedDatabaseMetadata.m */; };
+		4DCAE8BB257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE8B8257E711A00072D4B /* UnifiedDatabaseMetadata.m */; };
+		4DCAE8BC257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE8B8257E711A00072D4B /* UnifiedDatabaseMetadata.m */; };
 		4DCE899D255D99FE002C02D9 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCE899B255D99FE002C02D9 /* AutoFillManager.m */; };
 		4DCE899E255D99FE002C02D9 /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCE899B255D99FE002C02D9 /* AutoFillManager.m */; };
 		4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD0328E22CD1B4400F33328 /* NSCheckboxTableCellView.m */; };
@@ -431,9 +433,10 @@
 		4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5E1F30DB7A00D68BFE /* Document.m */; };
 		4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F601F30DB7A00D68BFE /* Assets.xcassets */; };
 		4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F621F30DB7A00D68BFE /* Main.storyboard */; };
-		4DFF409021807A0200B69383 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF408F21807A0200B69383 /* PwSafeMetadata.m */; };
 		519C2CAA704EB1D2C41D0116 /* Pods_common_mac_Strongbox_Outright_Pro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */; };
+		631EEDB2B882A43EE4887BCF /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */; };
 		6B9B902F795918EE0444B2D8 /* Pods_common_mac_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */; };
+		9B9F816C1BF4C9C272AEADB5 /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1B19F3B8933C37A37BB3CF /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework */; };
 		C80798322562DEEC00FE0CA7 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
 		C80798332562DEEC00FE0CA7 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */; };
 		C80798342562DEEC00FE0CA7 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */; };
@@ -530,7 +533,6 @@
 		C86E602F2562D510001953AD /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC762C2497A79000C9C443 /* TwoFishReadStream.m */; };
 		C86E60342562D52D001953AD /* PasswordHistory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DE2074FA3500148741 /* PasswordHistory.m */; };
 		C86E60352562D52D001953AD /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DA2074FA3500148741 /* PasswordHistoryEntry.m */; };
-		C86E60362562D52D001953AD /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF408F21807A0200B69383 /* PwSafeMetadata.m */; };
 		C86E60372562D52D001953AD /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */; };
 		C86E60382562D52D001953AD /* Group.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DD2074FA3500148741 /* Group.m */; };
 		C86E60392562D52D001953AD /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347E02074FA3500148741 /* Field.m */; };
@@ -620,7 +622,6 @@
 		C89B8F902562D2CA00B590C0 /* Kdbx4SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCB219B47DA00C22CB4 /* Kdbx4SerializationData.m */; };
 		C89B8F912562D2CA00B590C0 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */; };
 		C89B8F922562D2CA00B590C0 /* Argon2KdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CC3219B47DA00C22CB4 /* Argon2KdfCipher.m */; };
-		C89B8F932562D2CA00B590C0 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */; };
 		C89B8F942562D2CA00B590C0 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5896224BFA7200013808 /* AesKdfCipher.m */; };
 		C89B8F952562D2CA00B590C0 /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D00219B48D300C22CB4 /* V3BinariesList.m */; };
 		C89B8F962562D2CA00B590C0 /* VariantObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD0219B47DB00C22CB4 /* VariantObject.m */; };
@@ -639,7 +640,6 @@
 		C89B8FA32562D2CA00B590C0 /* VariantDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD2219B47DB00C22CB4 /* VariantDictionary.m */; };
 		C89B8FA42562D2CA00B590C0 /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097121825106007BA1E7 /* Meta.m */; };
 		C89B8FA52562D2CA00B590C0 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096E21825105007BA1E7 /* Root.m */; };
-		C89B8FA62562D2CA00B590C0 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCC219B47DA00C22CB4 /* KeePass4DatabaseMetadata.m */; };
 		C89B8FA72562D2CA00B590C0 /* Entry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095221825103007BA1E7 /* Entry.m */; };
 		C89B8FA82562D2CA00B590C0 /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CFE219B48D300C22CB4 /* XmlProcessingContext.m */; };
 		C89B8FA92562D2CA00B590C0 /* XmlSerializer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4A32332D92900C2E084 /* XmlSerializer.m */; };
@@ -666,7 +666,6 @@
 		C89B8FC22562D2FE00B590C0 /* AttachmentsRationalizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CFC219B48D300C22CB4 /* AttachmentsRationalizer.m */; };
 		C89B8FC72562D30C00B590C0 /* KdbSerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CBB219B479900C22CB4 /* KdbSerializationData.m */; };
 		C89B8FC82562D30C00B590C0 /* KdbGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB4219B479800C22CB4 /* KdbGroup.m */; };
-		C89B8FC92562D30C00B590C0 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB8219B479900C22CB4 /* Kdb1DatabaseMetadata.m */; };
 		C89B8FCA2562D30C00B590C0 /* KdbEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB6219B479800C22CB4 /* KdbEntry.m */; };
 		C89B8FCB2562D30C00B590C0 /* KdbSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB7219B479800C22CB4 /* KdbSerialization.m */; };
 		C89B8FD02562D32200B590C0 /* UiAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A5228472D200CA7405 /* UiAttachment.m */; };
@@ -733,7 +732,6 @@
 		C8B9458B2573D01A00932C46 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CF6219B48D200C22CB4 /* KdbxSerializationCommon.m */; };
 		C8B9458C2573D01A00932C46 /* SprCompilation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD383225CFE2F00290488 /* SprCompilation.m */; };
 		C8B9458D2573D01A00932C46 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097921825107007BA1E7 /* KeePassGroup.m */; };
-		C8B9458E2573D01A00932C46 /* Kdb1DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB8219B479900C22CB4 /* Kdb1DatabaseMetadata.m */; };
 		C8B9458F2573D01A00932C46 /* StrongboxDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0835A92284732500CA7405 /* StrongboxDatabase.m */; };
 		C8B945902573D01A00932C46 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E2CB172477D5270029E1CB /* DeletedObjects.m */; };
 		C8B945912573D01A00932C46 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */; };
@@ -787,7 +785,6 @@
 		C8B945C12573D01A00932C46 /* KeePassXmlAutoType.m in Sources */ = {isa = PBXBuildFile; fileRef = C86791642561A1630038310E /* KeePassXmlAutoType.m */; };
 		C8B945C22573D01A00932C46 /* PwSafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DC2074FA3500148741 /* PwSafeDatabase.m */; };
 		C8B945C32573D01A00932C46 /* QuickTypeRecordIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD30BB4255D9ACD000A923F /* QuickTypeRecordIdentifier.m */; };
-		C8B945C42573D01A00932C46 /* KeePass4DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCC219B47DA00C22CB4 /* KeePass4DatabaseMetadata.m */; };
 		C8B945C62573D01A00932C46 /* VariantObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CD0219B47DB00C22CB4 /* VariantObject.m */; };
 		C8B945C72573D01A00932C46 /* AutoFillCredentialCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75225702E65009991D4 /* AutoFillCredentialCell.m */; };
 		C8B945C82573D01A00932C46 /* V3BinariesList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D00219B48D300C22CB4 /* V3BinariesList.m */; };
@@ -818,7 +815,6 @@
 		C8B945E32573D01A00932C46 /* DatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D559FA320750D1D009856E3 /* DatabaseMetadata.m */; };
 		C8B945E42573D01A00932C46 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5896224BFA7200013808 /* AesKdfCipher.m */; };
 		C8B945E52573D01A00932C46 /* Kdbx4Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CC4219B47DA00C22CB4 /* Kdbx4Serialization.m */; };
-		C8B945E62573D01A00932C46 /* KeePassDatabaseMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */; };
 		C8B945E72573D01A00932C46 /* encoding.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D1A219B4B2900C22CB4 /* encoding.c */; };
 		C8B945E82573D01A00932C46 /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DACA5BF23CCD40F00891366 /* SecretStore.m */; };
 		C8B945E92573D01A00932C46 /* Field.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347E02074FA3500148741 /* Field.m */; };
@@ -848,7 +844,6 @@
 		C8B946012573D01A00932C46 /* YubiKeyData.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D942465478C00EEBFC9 /* YubiKeyData.m */; };
 		C8B946022573D01A00932C46 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */; };
 		C8B946032573D01A00932C46 /* PasswordGenerationConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5622CBCD16000954D0 /* PasswordGenerationConfig.m */; };
-		C8B946042573D01A00932C46 /* PwSafeMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF408F21807A0200B69383 /* PwSafeMetadata.m */; };
 		C8B946052573D01A00932C46 /* MMWormholeFileTransiting.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E78B3C25715C8700251153 /* MMWormholeFileTransiting.m */; };
 		C8B946062573D01A00932C46 /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
 		C8B946072573D01A00932C46 /* CustomData.m in Sources */ = {isa = PBXBuildFile; fileRef = C80B10832551F9D200FBDF72 /* CustomData.m */; };
@@ -863,7 +858,6 @@
 		C8B946112573D01A00932C46 /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA22465480B00EEBFC9 /* libjson.a */; };
 		C8B946122573D01A00932C46 /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9D9F2465480A00EEBFC9 /* libjson-c.a */; };
 		C8B946132573D01A00932C46 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA02465480A00EEBFC9 /* libyubikey.a */; };
-		C8B946142573D01A00932C46 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */; };
 		C8B946162573D01A00932C46 /* SelectCredential.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AD025714A3900251153 /* SelectCredential.xib */; };
 		C8B946172573D01A00932C46 /* CredentialProviderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE79B8A255D987C00F59B10 /* CredentialProviderViewController.xib */; };
 		C8B946182573D01A00932C46 /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */; };
@@ -1003,6 +997,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		017EC729AC7266E294E65B3B /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro-AutoFill/Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig"; sourceTree = "<group>"; };
+		02769ADB3F07590BDCA1F7CF /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
 		0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.release.xcconfig"; sourceTree = "<group>"; };
 		16E4979B89A05E87EE4710DA /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 		175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1136,8 +1132,6 @@
 		4D524CB5219B479800C22CB4 /* KdbSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdbSerialization.h; path = ../model/keepass/KdbSerialization.h; sourceTree = "<group>"; };
 		4D524CB6219B479800C22CB4 /* KdbEntry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KdbEntry.m; path = ../model/keepass/KdbEntry.m; sourceTree = "<group>"; };
 		4D524CB7219B479800C22CB4 /* KdbSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KdbSerialization.m; path = ../model/keepass/KdbSerialization.m; sourceTree = "<group>"; };
-		4D524CB8219B479900C22CB4 /* Kdb1DatabaseMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Kdb1DatabaseMetadata.m; path = ../model/keepass/Kdb1DatabaseMetadata.m; sourceTree = "<group>"; };
-		4D524CB9219B479900C22CB4 /* Kdb1DatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kdb1DatabaseMetadata.h; path = ../model/keepass/Kdb1DatabaseMetadata.h; sourceTree = "<group>"; };
 		4D524CBA219B479900C22CB4 /* KdbSerializationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdbSerializationData.h; path = ../model/keepass/KdbSerializationData.h; sourceTree = "<group>"; };
 		4D524CBB219B479900C22CB4 /* KdbSerializationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KdbSerializationData.m; path = ../model/keepass/KdbSerializationData.m; sourceTree = "<group>"; };
 		4D524CC3219B47DA00C22CB4 /* Argon2KdfCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Argon2KdfCipher.m; path = ../model/keepass/Argon2KdfCipher.m; sourceTree = "<group>"; };
@@ -1146,10 +1140,8 @@
 		4D524CC6219B47DA00C22CB4 /* Argon2KdfCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Argon2KdfCipher.h; path = ../model/keepass/Argon2KdfCipher.h; sourceTree = "<group>"; };
 		4D524CC7219B47DA00C22CB4 /* VariantObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VariantObject.h; path = ../model/keepass/VariantObject.h; sourceTree = "<group>"; };
 		4D524CC8219B47DA00C22CB4 /* KdfParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KdfParameters.h; path = ../model/keepass/KdfParameters.h; sourceTree = "<group>"; };
-		4D524CC9219B47DA00C22CB4 /* KeePass4DatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePass4DatabaseMetadata.h; path = ../model/keepass/KeePass4DatabaseMetadata.h; sourceTree = "<group>"; };
 		4D524CCA219B47DA00C22CB4 /* VariantDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VariantDictionary.h; path = ../model/keepass/VariantDictionary.h; sourceTree = "<group>"; };
 		4D524CCB219B47DA00C22CB4 /* Kdbx4SerializationData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Kdbx4SerializationData.m; path = ../model/keepass/Kdbx4SerializationData.m; sourceTree = "<group>"; };
-		4D524CCC219B47DA00C22CB4 /* KeePass4DatabaseMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePass4DatabaseMetadata.m; path = ../model/keepass/KeePass4DatabaseMetadata.m; sourceTree = "<group>"; };
 		4D524CCD219B47DA00C22CB4 /* Binary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Binary.m; path = ../model/keepass/Binary.m; sourceTree = "<group>"; };
 		4D524CCE219B47DA00C22CB4 /* Kdbx4SerializationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Kdbx4SerializationData.h; path = ../model/keepass/Kdbx4SerializationData.h; sourceTree = "<group>"; };
 		4D524CCF219B47DA00C22CB4 /* Binary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Binary.h; path = ../model/keepass/Binary.h; sourceTree = "<group>"; };
@@ -1316,10 +1308,8 @@
 		4D9E097121825106007BA1E7 /* Meta.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Meta.m; path = ../model/keepass/Meta.m; sourceTree = "<group>"; };
 		4D9E097321825106007BA1E7 /* KeePassFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassFile.h; path = ../model/keepass/KeePassFile.h; sourceTree = "<group>"; };
 		4D9E097421825106007BA1E7 /* Entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entry.h; path = ../model/keepass/Entry.h; sourceTree = "<group>"; };
-		4D9E097521825106007BA1E7 /* KeePassDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseMetadata.h; path = ../model/keepass/KeePassDatabaseMetadata.h; sourceTree = "<group>"; };
 		4D9E097921825107007BA1E7 /* KeePassGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassGroup.m; path = ../model/keepass/KeePassGroup.m; sourceTree = "<group>"; };
 		4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongBoxModelAdaptor.m; path = ../model/keepass/XmlStrongBoxModelAdaptor.m; sourceTree = "<group>"; };
-		4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseMetadata.m; path = ../model/keepass/KeePassDatabaseMetadata.m; sourceTree = "<group>"; };
 		4D9E097C21825107007BA1E7 /* Kdbx4Database.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Kdbx4Database.m; path = ../model/keepass/Kdbx4Database.m; sourceTree = "<group>"; };
 		4D9E097E21825107007BA1E7 /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLWriter.m; path = ../model/keepass/XMLWriter.m; sourceTree = "<group>"; };
 		4D9E097F21825107007BA1E7 /* InnerRandomStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InnerRandomStream.h; path = ../model/keepass/InnerRandomStream.h; sourceTree = "<group>"; };
@@ -1343,6 +1333,7 @@
 		4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Extensions.m"; path = "../model/NSDate+Extensions.m"; sourceTree = "<group>"; };
 		4DACA5BF23CCD40F00891366 /* SecretStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SecretStore.m; path = ../model/SecretStore.m; sourceTree = "<group>"; };
 		4DAF56EA240181480026282C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = ../StrongBox/es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		4DB3DD2D257E7A4000DC6560 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		4DBCE21C222410A200A2AFA2 /* ClickableImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableImageView.h; path = MacBox/ClickableImageView.h; sourceTree = "<group>"; };
 		4DBCE21D222410A200A2AFA2 /* ClickableImageView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClickableImageView.m; path = MacBox/ClickableImageView.m; sourceTree = "<group>"; };
 		4DBCE21F222414A100A2AFA2 /* SelectPredefinedIconController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SelectPredefinedIconController.h; path = MacBox/SelectPredefinedIconController.h; sourceTree = "<group>"; };
@@ -1408,6 +1399,10 @@
 		4DCA65AD1F4B45800078B962 /* DocumentController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DocumentController.h; path = MacBox/DocumentController.h; sourceTree = "<group>"; };
 		4DCA65AE1F4B45800078B962 /* DocumentController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DocumentController.m; path = MacBox/DocumentController.m; sourceTree = "<group>"; };
 		4DCA65B01F4B4A000078B962 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = Credits.rtf; path = MacBox/Credits.rtf; sourceTree = "<group>"; };
+		4DCAE882257E6E8500072D4B /* SyncComparisonParams.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SyncComparisonParams.h; path = ../Sync/SyncComparisonParams.h; sourceTree = "<group>"; };
+		4DCAE883257E6E8500072D4B /* SyncComparisonParams.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SyncComparisonParams.m; path = ../Sync/SyncComparisonParams.m; sourceTree = "<group>"; };
+		4DCAE8B7257E711A00072D4B /* UnifiedDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = UnifiedDatabaseMetadata.h; path = ../model/UnifiedDatabaseMetadata.h; sourceTree = "<group>"; };
+		4DCAE8B8257E711A00072D4B /* UnifiedDatabaseMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = UnifiedDatabaseMetadata.m; path = ../model/UnifiedDatabaseMetadata.m; sourceTree = "<group>"; };
 		4DCE899B255D99FE002C02D9 /* AutoFillManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AutoFillManager.m; path = ../../StrongBox/AutoFillManager.m; sourceTree = "<group>"; };
 		4DCE899C255D99FE002C02D9 /* AutoFillManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AutoFillManager.h; path = ../../StrongBox/AutoFillManager.h; sourceTree = "<group>"; };
 		4DD0328D22CD1B4400F33328 /* NSCheckboxTableCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NSCheckboxTableCellView.h; path = MacBox/NSCheckboxTableCellView.h; sourceTree = "<group>"; };
@@ -1527,15 +1522,13 @@
 		4DF59F601F30DB7A00D68BFE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = MacBox/Assets.xcassets; sourceTree = "<group>"; };
 		4DF59F631F30DB7A00D68BFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4DF59F651F30DB7A00D68BFE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = MacBox/Info.plist; sourceTree = "<group>"; };
-		4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AbstractDatabaseMetadata.h; path = ../model/AbstractDatabaseMetadata.h; sourceTree = "<group>"; };
-		4DFF408E21807A0200B69383 /* PwSafeMetadata.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PwSafeMetadata.h; path = ../model/pwsafe/PwSafeMetadata.h; sourceTree = "<group>"; };
-		4DFF408F21807A0200B69383 /* PwSafeMetadata.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PwSafeMetadata.m; path = ../model/pwsafe/PwSafeMetadata.m; sourceTree = "<group>"; };
 		50F27062B3FD89F6D407C032 /* Pods-common-mac-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 		963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B41EA75056B46ED8AB43CE4B /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
+		A3B3AD6EAF58D421F9BB2641 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.release.xcconfig"; sourceTree = "<group>"; };
 		B5775E930C35CCA891076DB8 /* Pods_Macbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Macbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Outright_Pro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF1B19F3B8933C37A37BB3CF /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C803E1CD2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		C803E1CE2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		C803E1CF2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Main.strings; sourceTree = "<group>"; };
@@ -1664,7 +1657,6 @@
 		C87A993C255968EA0002BEF8 /* CheckURLExistsOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CheckURLExistsOperation.swift; path = "../FavIcon-Swift/CheckURLExistsOperation.swift"; sourceTree = "<group>"; };
 		C87A993D255968EA0002BEF8 /* DownloadImageOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DownloadImageOperation.swift; path = "../FavIcon-Swift/DownloadImageOperation.swift"; sourceTree = "<group>"; };
 		C87A993E255968EA0002BEF8 /* FavIcon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = FavIcon.swift; path = "../FavIcon-Swift/FavIcon.swift"; sourceTree = "<group>"; };
-		C89B8E942562A5E900B590C0 /* Strongbox AutoFill copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox AutoFill copy-Info.plist"; path = "/Users/strongbox/dev/strongbox/macbox/Strongbox AutoFill copy-Info.plist"; sourceTree = "<absolute>"; };
 		C89F6B8A247FC5AE0070E754 /* changelog-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-mac.txt"; path = "../build/changelog-mac.txt"; sourceTree = "<group>"; };
 		C89F6B8B247FC5AE0070E754 /* changelog-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-ios.txt"; path = "../build/changelog-ios.txt"; sourceTree = "<group>"; };
 		C89F6B8C247FC5AE0070E754 /* version-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-ios.txt"; path = "../build/version-ios.txt"; sourceTree = "<group>"; };
@@ -1713,7 +1705,6 @@
 		C8B45C8A24ACC97700318562 /* StreamUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StreamUtils.m; path = ../model/StreamUtils.m; sourceTree = "<group>"; };
 		C8B45C8B24ACC97700318562 /* StreamUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StreamUtils.h; path = ../model/StreamUtils.h; sourceTree = "<group>"; };
 		C8B946232573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox-Outright-Pro-AutoFill.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C8B946242573D01A00932C46 /* Strongbox AutoFill copy2-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Strongbox AutoFill copy2-Info.plist"; path = "/Users/strongbox/dev/strongbox/macbox/Strongbox AutoFill copy2-Info.plist"; sourceTree = "<absolute>"; };
 		C8B946862573D59400932C46 /* AttachmentItem.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AttachmentItem.xib; path = MacBox/AttachmentItem.xib; sourceTree = "<group>"; };
 		C8B946A32573D63400932C46 /* CustomFieldTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CustomFieldTableCellView.xib; path = MacBox/CustomFieldTableCellView.xib; sourceTree = "<group>"; };
 		C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CollectionViewHeader.xib; path = MacBox/CollectionViewHeader.xib; sourceTree = "<group>"; };
@@ -1804,8 +1795,8 @@
 		C8EDCD41250B773100E427CB /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
 		C8EDCD42250B773400E427CB /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/PressYubiKeyWindow.strings; sourceTree = "<group>"; };
 		EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; sourceTree = "<group>"; };
+		EBD47B91E82A65C6AA0A0FDA /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro-AutoFill/Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
 		F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.debug.xcconfig"; sourceTree = "<group>"; };
-		FE2769CB44968F52B783C436 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1818,6 +1809,7 @@
 				4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */,
 				C85B9DA82465480B00EEBFC9 /* libykpers-1.a in Frameworks */,
 				519C2CAA704EB1D2C41D0116 /* Pods_common_mac_Strongbox_Outright_Pro.framework in Frameworks */,
+				4DB3DD2E257E7A4000DC6560 /* CloudKit.framework in Frameworks */,
 				C85B9DA62465480B00EEBFC9 /* libyubikey.a in Frameworks */,
 				C85B9DA42465480B00EEBFC9 /* libjson-c.a in Frameworks */,
 			);
@@ -1840,6 +1832,7 @@
 				C89561D5256552DE001C747C /* libjson-c.a in Frameworks */,
 				C89561D8256552DE001C747C /* libyubikey.a in Frameworks */,
 				D26FCE46F1386598F6E19202 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */,
+				631EEDB2B882A43EE4887BCF /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1867,7 +1860,7 @@
 				C8B946112573D01A00932C46 /* libjson.a in Frameworks */,
 				C8B946122573D01A00932C46 /* libjson-c.a in Frameworks */,
 				C8B946132573D01A00932C46 /* libyubikey.a in Frameworks */,
-				C8B946142573D01A00932C46 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */,
+				9B9F816C1BF4C9C272AEADB5 /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1898,6 +1891,7 @@
 		4D1D6F3A1F386CB700D2B8EC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4DB3DD2D257E7A4000DC6560 /* CloudKit.framework */,
 				4D8354C4238908AB00E264E0 /* FavIcon.framework */,
 				4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */,
 				4D29662D21AD72AA009B7936 /* SAMKeychain.framework */,
@@ -1909,6 +1903,7 @@
 				BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */,
 				4DE79B84255D987C00F59B10 /* AuthenticationServices.framework */,
 				2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */,
+				BF1B19F3B8933C37A37BB3CF /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2019,8 +2014,6 @@
 			children = (
 				4D524CB0219B479800C22CB4 /* Kdb1Database.h */,
 				4D524CB1219B479800C22CB4 /* Kdb1Database.m */,
-				4D524CB9219B479900C22CB4 /* Kdb1DatabaseMetadata.h */,
-				4D524CB8219B479900C22CB4 /* Kdb1DatabaseMetadata.m */,
 				4D524CB2219B479800C22CB4 /* KdbEntry.h */,
 				4D524CB6219B479800C22CB4 /* KdbEntry.m */,
 				4D524CB3219B479800C22CB4 /* KdbGroup.h */,
@@ -2048,8 +2041,6 @@
 				4D524CCB219B47DA00C22CB4 /* Kdbx4SerializationData.m */,
 				4D524CC8219B47DA00C22CB4 /* KdfParameters.h */,
 				4D524CD1219B47DB00C22CB4 /* KdfParameters.m */,
-				4D524CC9219B47DA00C22CB4 /* KeePass4DatabaseMetadata.h */,
-				4D524CCC219B47DA00C22CB4 /* KeePass4DatabaseMetadata.m */,
 				4D524CCA219B47DA00C22CB4 /* VariantDictionary.h */,
 				4D524CD2219B47DB00C22CB4 /* VariantDictionary.m */,
 				4D524CC7219B47DA00C22CB4 /* VariantObject.h */,
@@ -2146,8 +2137,6 @@
 				4D9E099D21825134007BA1E7 /* KeePassDatabase.m */,
 				4D9E095021825103007BA1E7 /* DecryptionParameters.h */,
 				4D9E096B21825105007BA1E7 /* DecryptionParameters.m */,
-				4D9E097521825106007BA1E7 /* KeePassDatabaseMetadata.h */,
-				4D9E097B21825107007BA1E7 /* KeePassDatabaseMetadata.m */,
 				4D9E094C21825103007BA1E7 /* SerializationData.h */,
 				4D9E095F21825104007BA1E7 /* SerializationData.m */,
 			);
@@ -2456,6 +2445,15 @@
 			name = MyAutoComplete;
 			sourceTree = "<group>";
 		};
+		4DCAE87C257E6E3600072D4B /* Sync */ = {
+			isa = PBXGroup;
+			children = (
+				4DCAE882257E6E8500072D4B /* SyncComparisonParams.h */,
+				4DCAE883257E6E8500072D4B /* SyncComparisonParams.m */,
+			);
+			name = Sync;
+			sourceTree = "<group>";
+		};
 		4DD2BAB6238BE42600513271 /* Base32 */ = {
 			isa = PBXGroup;
 			children = (
@@ -2540,8 +2538,6 @@
 				4D524C9E219B44F200C22CB4 /* twofish.c */,
 				4D524C9B219B44BE00C22CB4 /* PwSafeSerialization.h */,
 				4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */,
-				4DFF408E21807A0200B69383 /* PwSafeMetadata.h */,
-				4DFF408F21807A0200B69383 /* PwSafeMetadata.m */,
 				4D23BBF2216136D10054C8D0 /* formatV3.txt */,
 				4D23BBF3216136D10054C8D0 /* formatV4.txt */,
 				4DF347EB2074FA3F00148741 /* crypt_argchk.c */,
@@ -2564,6 +2560,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				4DCAE8B7257E711A00072D4B /* UnifiedDatabaseMetadata.h */,
+				4DCAE8B8257E711A00072D4B /* UnifiedDatabaseMetadata.m */,
 				4D216F5922CBCD73000954D0 /* Password Generation */,
 				4DA50CFA244DFCFE00364781 /* Audit */,
 				C85B9D7B2465453A00EEBFC9 /* YubiKey */,
@@ -2597,6 +2595,7 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
+				4DCAE87C257E6E3600072D4B /* Sync */,
 				4D4A003B231317A900B69E09 /* Localizable.strings */,
 				4DF59F541F30DB7A00D68BFE /* AppDelegate.h */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
@@ -2631,8 +2630,6 @@
 				4DF59F521F30DB7A00D68BFE /* Products */,
 				4D1D6F3A1F386CB700D2B8EC /* Frameworks */,
 				83A5026A689FD4BF4431C710 /* Pods */,
-				C89B8E942562A5E900B590C0 /* Strongbox AutoFill copy-Info.plist */,
-				C8B946242573D01A00932C46 /* Strongbox AutoFill copy2-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2695,8 +2692,10 @@
 				645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */,
 				EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */,
 				34629E3CBC779E0F1547E434 /* Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig */,
-				B41EA75056B46ED8AB43CE4B /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */,
-				FE2769CB44968F52B783C436 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */,
+				02769ADB3F07590BDCA1F7CF /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */,
+				A3B3AD6EAF58D421F9BB2641 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */,
+				EBD47B91E82A65C6AA0A0FDA /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig */,
+				017EC729AC7266E294E65B3B /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -2809,7 +2808,6 @@
 				4D01BA2B22BD31F00044226F /* SearchScope.h */,
 				4D524D09219B490100C22CB4 /* NodeFileAttachment.h */,
 				4D524D08219B490100C22CB4 /* NodeFileAttachment.m */,
-				4DFF400A2180726700B69383 /* AbstractDatabaseMetadata.h */,
 				4DF347FE2074FA6C00148741 /* Node.h */,
 				4DF348002074FA6C00148741 /* Node.m */,
 				4DF347FA2074FA6C00148741 /* NodeFields.h */,
@@ -3076,7 +3074,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C8B946202573D01A00932C46 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro-AutoFill" */;
 			buildPhases = (
-				C8B945642573D01A00932C46 /* [CP] Check Pods Manifest.lock */,
+				D0B7F388F948E4D238927520 /* [CP] Check Pods Manifest.lock */,
 				C8B945652573D01A00932C46 /* Sources */,
 				C8B9460E2573D01A00932C46 /* Frameworks */,
 				C8B946152573D01A00932C46 /* Resources */,
@@ -3376,7 +3374,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C8B945642573D01A00932C46 /* [CP] Check Pods Manifest.lock */ = {
+		D0B7F388F948E4D238927520 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -3391,7 +3389,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox AutoFill-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox-Outright-Pro-AutoFill-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3474,7 +3472,6 @@
 				4D1FFA742403030100B75EA2 /* DatabaseAttachment.m in Sources */,
 				4D1FFA752403030100B75EA2 /* AesKdfCipher.m in Sources */,
 				4D1FFA762403030100B75EA2 /* crypt_argchk.c in Sources */,
-				4D1FFA772403030100B75EA2 /* PwSafeMetadata.m in Sources */,
 				4D1FFA782403030100B75EA2 /* MMcGACTextField.m in Sources */,
 				4D1FFA792403030100B75EA2 /* Record.m in Sources */,
 				4D1FFA7A2403030100B75EA2 /* Kdb1Database.m in Sources */,
@@ -3534,13 +3531,11 @@
 				4D1FFA9D2403030100B75EA2 /* DatabaseMetadata.m in Sources */,
 				4D1FFA9E2403030100B75EA2 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D1FFA9F2403030100B75EA2 /* argon2.c in Sources */,
-				4D1FFAA02403030100B75EA2 /* KeePass4DatabaseMetadata.m in Sources */,
 				C87A9948255968EB0002BEF8 /* Utils.swift in Sources */,
 				4D1FFAA12403030100B75EA2 /* FavIconResultTableCellView.m in Sources */,
 				4D1FFAA22403030100B75EA2 /* ClickableImageView.m in Sources */,
 				4D1FFAA32403030100B75EA2 /* NodeFileAttachment.m in Sources */,
 				4D1FFAA42403030100B75EA2 /* XmlSerializer.m in Sources */,
-				4D1FFAA52403030100B75EA2 /* KeePassDatabaseMetadata.m in Sources */,
 				4D1FFAA62403030100B75EA2 /* CustomField.m in Sources */,
 				C8DC76362497A79000C9C443 /* TwoFishReadStream.m in Sources */,
 				4D1FFAA72403030100B75EA2 /* NSCheckboxTableCellView.m in Sources */,
@@ -3551,6 +3546,7 @@
 				C8E78B4325715C8700251153 /* MMWormholeCoordinatedFileTransiting.m in Sources */,
 				4D1FFAAC2403030100B75EA2 /* core.c in Sources */,
 				4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */,
+				4DCAE886257E6E8500072D4B /* SyncComparisonParams.m in Sources */,
 				4D1FFAAE2403030100B75EA2 /* Document.m in Sources */,
 				4DCE899E255D99FE002C02D9 /* AutoFillManager.m in Sources */,
 				C8E2CB1A2477D5270029E1CB /* DeletedObjects.m in Sources */,
@@ -3580,7 +3576,6 @@
 				4D1FFABD2403030100B75EA2 /* Utils.m in Sources */,
 				4D1FFABE2403030100B75EA2 /* String.m in Sources */,
 				4D1FFABF2403030100B75EA2 /* ClipboardManager.m in Sources */,
-				4D1FFAC02403030100B75EA2 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D1FFAC12403030100B75EA2 /* FavIconManager.m in Sources */,
 				4D1FFAC22403030100B75EA2 /* PredefinedKeePassIcon.m in Sources */,
 				4D1FFAC32403030100B75EA2 /* KdbxSerialization.m in Sources */,
@@ -3672,6 +3667,7 @@
 				4D1FFB002403030100B75EA2 /* DatabasesManager.m in Sources */,
 				4D1FFB012403030100B75EA2 /* Group.m in Sources */,
 				4D1FFB022403030100B75EA2 /* Kdbx4Serialization.m in Sources */,
+				4DCAE8BB257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
 				C87A9950255968EB0002BEF8 /* DownloadImageOperation.swift in Sources */,
 				4D1FFB032403030100B75EA2 /* SerializationData.m in Sources */,
 				4D1FFB042403030100B75EA2 /* PwSafeDatabase.m in Sources */,
@@ -3744,8 +3740,8 @@
 				C89B8F982562D2CA00B590C0 /* SprCompilation.m in Sources */,
 				C8B946BB2573D68000932C46 /* FavIconDownloadOptions.m in Sources */,
 				C89B8F8C2562D2CA00B590C0 /* KeePassGroup.m in Sources */,
-				C89B8FC92562D30C00B590C0 /* Kdb1DatabaseMetadata.m in Sources */,
 				C89B8FD32562D32200B590C0 /* StrongboxDatabase.m in Sources */,
+				4DCAE885257E6E8500072D4B /* SyncComparisonParams.m in Sources */,
 				C89B8FA02562D2CA00B590C0 /* DeletedObjects.m in Sources */,
 				C80798332562DEEC00FE0CA7 /* NSDictionary+Extensions.m in Sources */,
 				C86E60662562D5A7001953AD /* OTPToken+Persistence.m in Sources */,
@@ -3789,6 +3785,7 @@
 				C86E60382562D52D001953AD /* Group.m in Sources */,
 				C86E60652562D5A7001953AD /* OTPToken.m in Sources */,
 				C89B8F6D2562C54F00B590C0 /* NSArray+Extensions.m in Sources */,
+				4DCAE8BA257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
 				C80798582562E27800FE0CA7 /* AutoFillNewRecordSettings.m in Sources */,
 				C8C1F73D257010AE009991D4 /* NSMutableArray+Extensions.m in Sources */,
 				C86E60752562D5EB001953AD /* twofish.c in Sources */,
@@ -3798,7 +3795,6 @@
 				C86791692561A1630038310E /* KeePassXmlAutoType.m in Sources */,
 				C89B8F782562D24A00B590C0 /* PwSafeDatabase.m in Sources */,
 				4DD30BB7255D9ACD000A923F /* QuickTypeRecordIdentifier.m in Sources */,
-				C89B8FA62562D2CA00B590C0 /* KeePass4DatabaseMetadata.m in Sources */,
 				C89B8F962562D2CA00B590C0 /* VariantObject.m in Sources */,
 				C8C1F75325702E65009991D4 /* AutoFillCredentialCell.m in Sources */,
 				C89B8F952562D2CA00B590C0 /* V3BinariesList.m in Sources */,
@@ -3829,7 +3825,6 @@
 				C89B8F332562BCBD00B590C0 /* DatabaseMetadata.m in Sources */,
 				C89B8F942562D2CA00B590C0 /* AesKdfCipher.m in Sources */,
 				C89B8F972562D2CA00B590C0 /* Kdbx4Serialization.m in Sources */,
-				C89B8F932562D2CA00B590C0 /* KeePassDatabaseMetadata.m in Sources */,
 				C86E60962562D649001953AD /* encoding.c in Sources */,
 				C89B8F3D2562BCD400B590C0 /* SecretStore.m in Sources */,
 				C86E60392562D52D001953AD /* Field.m in Sources */,
@@ -3859,7 +3854,6 @@
 				C89561CB2565521A001C747C /* YubiKeyData.m in Sources */,
 				C86E60372562D52D001953AD /* PwSafeSerialization.m in Sources */,
 				C86E60582562D58B001953AD /* PasswordGenerationConfig.m in Sources */,
-				C86E60362562D52D001953AD /* PwSafeMetadata.m in Sources */,
 				C8E78B5025715C8700251153 /* MMWormholeFileTransiting.m in Sources */,
 				C8E78AC2257147FA00251153 /* ProgressWindow.m in Sources */,
 				C86E603F2562D540001953AD /* CustomData.m in Sources */,
@@ -3889,7 +3883,6 @@
 				4D524CAB219B45F700C22CB4 /* DatabaseAttachment.m in Sources */,
 				4DEA5898224BFA7300013808 /* AesKdfCipher.m in Sources */,
 				4DF347ED2074FA3F00148741 /* crypt_argchk.c in Sources */,
-				4DFF409021807A0200B69383 /* PwSafeMetadata.m in Sources */,
 				4DBFD38B225D12A300290488 /* MMcGACTextField.m in Sources */,
 				4DF347EA2074FA3500148741 /* Record.m in Sources */,
 				4D524CBC219B479900C22CB4 /* Kdb1Database.m in Sources */,
@@ -3949,12 +3942,10 @@
 				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */,
 				C87A9947255968EA0002BEF8 /* Utils.swift in Sources */,
-				4D524CD6219B47DB00C22CB4 /* KeePass4DatabaseMetadata.m in Sources */,
 				4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */,
 				4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */,
 				4D524D0A219B490100C22CB4 /* NodeFileAttachment.m in Sources */,
 				4D2CB4A42332D92900C2E084 /* XmlSerializer.m in Sources */,
-				4D9E099621825108007BA1E7 /* KeePassDatabaseMetadata.m in Sources */,
 				C8DC76352497A79000C9C443 /* TwoFishReadStream.m in Sources */,
 				4D29664121ADAC0B009B7936 /* CustomField.m in Sources */,
 				4DD0328F22CD1B4400F33328 /* NSCheckboxTableCellView.m in Sources */,
@@ -3964,6 +3955,7 @@
 				C8E78B4825715C8700251153 /* MMWormhole.m in Sources */,
 				4D524CBE219B479900C22CB4 /* KdbEntry.m in Sources */,
 				4D524D25219B4B2A00C22CB4 /* core.c in Sources */,
+				4DCAE884257E6E8500072D4B /* SyncComparisonParams.m in Sources */,
 				4DBF494322232A3200F48182 /* DAVRequests.m in Sources */,
 				4DCE899D255D99FE002C02D9 /* AutoFillManager.m in Sources */,
 				C8E2CB192477D5270029E1CB /* DeletedObjects.m in Sources */,
@@ -3993,7 +3985,6 @@
 				4DF348052074FA6C00148741 /* Utils.m in Sources */,
 				4D9E098921825108007BA1E7 /* String.m in Sources */,
 				4DF522B623C8ABEF00CD948E /* ClipboardManager.m in Sources */,
-				4D524CC0219B479900C22CB4 /* Kdb1DatabaseMetadata.m in Sources */,
 				4D8354C32389086E00E264E0 /* FavIconManager.m in Sources */,
 				4DBCE22722241D6700A2AFA2 /* PredefinedKeePassIcon.m in Sources */,
 				4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */,
@@ -4085,6 +4076,7 @@
 				C8E0BA8F2571665A00641F33 /* AutoFillWormhole.m in Sources */,
 				4DF347E72074FA3500148741 /* Group.m in Sources */,
 				4D524CD4219B47DB00C22CB4 /* Kdbx4Serialization.m in Sources */,
+				4DCAE8B9257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
 				C87A994F255968EB0002BEF8 /* DownloadImageOperation.swift in Sources */,
 				4D9E098821825108007BA1E7 /* SerializationData.m in Sources */,
 				4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */,
@@ -4148,8 +4140,8 @@
 				C8B9458C2573D01A00932C46 /* SprCompilation.m in Sources */,
 				C8B946B52573D67F00932C46 /* FavIconDownloadOptions.m in Sources */,
 				C8B9458D2573D01A00932C46 /* KeePassGroup.m in Sources */,
-				C8B9458E2573D01A00932C46 /* Kdb1DatabaseMetadata.m in Sources */,
 				C8B9458F2573D01A00932C46 /* StrongboxDatabase.m in Sources */,
+				4DCAE887257E6E8500072D4B /* SyncComparisonParams.m in Sources */,
 				C8B945902573D01A00932C46 /* DeletedObjects.m in Sources */,
 				C8B945912573D01A00932C46 /* NSDictionary+Extensions.m in Sources */,
 				C8B945922573D01A00932C46 /* OTPToken+Persistence.m in Sources */,
@@ -4193,6 +4185,7 @@
 				C8B945B82573D01A00932C46 /* Group.m in Sources */,
 				C8B945B92573D01A00932C46 /* OTPToken.m in Sources */,
 				C8B945BA2573D01A00932C46 /* NSArray+Extensions.m in Sources */,
+				4DCAE8BC257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
 				C8B945BB2573D01A00932C46 /* AutoFillNewRecordSettings.m in Sources */,
 				C8B945BC2573D01A00932C46 /* NSMutableArray+Extensions.m in Sources */,
 				C8B945BD2573D01A00932C46 /* twofish.c in Sources */,
@@ -4202,7 +4195,6 @@
 				C8B945C12573D01A00932C46 /* KeePassXmlAutoType.m in Sources */,
 				C8B945C22573D01A00932C46 /* PwSafeDatabase.m in Sources */,
 				C8B945C32573D01A00932C46 /* QuickTypeRecordIdentifier.m in Sources */,
-				C8B945C42573D01A00932C46 /* KeePass4DatabaseMetadata.m in Sources */,
 				C8B945C62573D01A00932C46 /* VariantObject.m in Sources */,
 				C8B945C72573D01A00932C46 /* AutoFillCredentialCell.m in Sources */,
 				C8B945C82573D01A00932C46 /* V3BinariesList.m in Sources */,
@@ -4233,7 +4225,6 @@
 				C8B945E32573D01A00932C46 /* DatabaseMetadata.m in Sources */,
 				C8B945E42573D01A00932C46 /* AesKdfCipher.m in Sources */,
 				C8B945E52573D01A00932C46 /* Kdbx4Serialization.m in Sources */,
-				C8B945E62573D01A00932C46 /* KeePassDatabaseMetadata.m in Sources */,
 				C8B945E72573D01A00932C46 /* encoding.c in Sources */,
 				C8B945E82573D01A00932C46 /* SecretStore.m in Sources */,
 				C8B945E92573D01A00932C46 /* Field.m in Sources */,
@@ -4263,7 +4254,6 @@
 				C8B946012573D01A00932C46 /* YubiKeyData.m in Sources */,
 				C8B946022573D01A00932C46 /* PwSafeSerialization.m in Sources */,
 				C8B946032573D01A00932C46 /* PasswordGenerationConfig.m in Sources */,
-				C8B946042573D01A00932C46 /* PwSafeMetadata.m in Sources */,
 				C8B946052573D01A00932C46 /* MMWormholeFileTransiting.m in Sources */,
 				C8B946062573D01A00932C46 /* ProgressWindow.m in Sources */,
 				C8B946072573D01A00932C46 /* CustomData.m in Sources */,
@@ -4705,7 +4695,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -4715,7 +4705,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4736,7 +4726,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -4746,7 +4736,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4807,7 +4797,7 @@
 		};
 		4DE79B93255D987C00F59B10 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B41EA75056B46ED8AB43CE4B /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */;
+			baseConfigurationReference = 02769ADB3F07590BDCA1F7CF /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -4817,7 +4807,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2964;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4833,7 +4823,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -4845,7 +4835,7 @@
 		};
 		4DE79B94255D987C00F59B10 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FE2769CB44968F52B783C436 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */;
+			baseConfigurationReference = A3B3AD6EAF58D421F9BB2641 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -4855,7 +4845,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2964;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4871,7 +4861,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4999,7 +4989,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2964;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -5009,7 +4999,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5030,7 +5020,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2964;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -5040,7 +5030,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5051,7 +5041,7 @@
 		};
 		C8B946212573D01A00932C46 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = B41EA75056B46ED8AB43CE4B /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */;
+			baseConfigurationReference = EBD47B91E82A65C6AA0A0FDA /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -5061,7 +5051,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -5077,19 +5067,20 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.pro.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
 		C8B946222573D01A00932C46 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = FE2769CB44968F52B783C436 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */;
+			baseConfigurationReference = 017EC729AC7266E294E65B3B /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -5099,7 +5090,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2965;
+				CURRENT_PROJECT_VERSION = 2971;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -5115,10 +5106,11 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.0;
+				MARKETING_VERSION = 1.14.2;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.pro.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 			};
 			name = Release;

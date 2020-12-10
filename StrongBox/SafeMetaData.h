@@ -134,6 +134,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSUUID* outstandingUpdateId;
 @property (nullable) NSDate* lastSyncRemoteModDate; 
 
+@property (readonly) BOOL quickTypeEnabled; 
+
 @end
 
 NS_ASSUME_NONNULL_END

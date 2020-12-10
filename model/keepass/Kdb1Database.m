@@ -9,7 +9,6 @@
 #import "Kdb1Database.h"
 #import "KdbSerialization.h"
 #import "NSArray+Extensions.h"
-#import "Kdb1DatabaseMetadata.h"
 #import "KeePassConstants.h"
 #import "Utils.h"
 #import "Constants.h"
@@ -53,7 +52,7 @@ static const BOOL kLogVerbose = NO;
     
     [self addKeePassDefaultRootGroup:rootGroup];
     
-    Kdb1DatabaseMetadata *metadata = [[Kdb1DatabaseMetadata alloc] init];
+    UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass1];
     
     StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
                                                                  metadata:metadata
@@ -90,7 +89,7 @@ static const BOOL kLogVerbose = NO;
 
     
 
-    Kdb1DatabaseMetadata *metadata = [[Kdb1DatabaseMetadata alloc] init];
+    UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass1];
 
     metadata.versionInt = serializationData.version;
     metadata.transformRounds = serializationData.transformRounds;
@@ -154,12 +153,10 @@ static const BOOL kLogVerbose = NO;
                     serializationData:serializationData
                      existingGroupIds:[NSMutableSet<NSNumber*> set]
                           attachments:database.attachments];
-    
-    Kdb1DatabaseMetadata* metadata = (Kdb1DatabaseMetadata*)database.metadata;
-    
-    serializationData.flags = metadata.flags;
-    serializationData.version = metadata.versionInt;
-    serializationData.transformRounds = metadata.transformRounds;
+        
+    serializationData.flags = database.metadata.flags;
+    serializationData.version = database.metadata.versionInt;
+    serializationData.transformRounds = (uint32_t)database.metadata.transformRounds;
     
     NSMutableArray<KdbEntry*>* metaEntries = (NSMutableArray<KdbEntry*>*)database.adaptorTag;
     if(metaEntries) {

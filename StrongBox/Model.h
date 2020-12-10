@@ -9,7 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "SafesList.h"
 #import "DatabaseModel.h"
-#import "AbstractDatabaseMetadata.h"
 #import "DatabaseAuditor.h"
 
 NS_ASSUME_NONNULL_BEGIN

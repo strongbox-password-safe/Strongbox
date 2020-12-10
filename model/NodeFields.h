@@ -14,6 +14,7 @@
 #import "SerializationPackage.h"
 #import "MutableOrderedDictionary.h"
 #import "AutoType.h"
+#import "SyncComparisonParams.h"
 
 @class Node;
 
@@ -63,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneTouchProperties:(BOOL)cloneTouchProperties;
 
-- (BOOL)isSyncEqualTo:(NodeFields*)other;
+- (BOOL)isSyncEqualTo:(NodeFields*)other params:(SyncComparisonParams *)params;
 
 - (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;
 - (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;

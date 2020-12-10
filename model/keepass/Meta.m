@@ -26,6 +26,7 @@
         self.historyMaxItems = @(kDefaultHistoryMaxItems);
         self.historyMaxSize = @(kDefaultHistoryMaxSize);
         self.recycleBinEnabled = YES;
+        
         _recycleBinChanged = [NSDate date];
         _recycleBinGroup = NSUUID.zero;
         
@@ -90,6 +91,46 @@
         self.customData = (CustomData*)completedObject;
         return YES;
     }
+    else if ([withXmlElementName isEqualToString:kSettingsChangedElementName]) {
+        self.settingsChanged = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kDatabaseNameElementName]) {
+        self.databaseName = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kDatabaseNameChangedElementName]) {
+        self.databaseNameChanged = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kDatabaseDescriptionElementName]) {
+        self.databaseDescription = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kDatabaseDescriptionChangedElementName]) {
+        self.databaseDescriptionChanged = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kDefaultUserNameElementName]) {
+        self.defaultUserName = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kDefaultUserNameChangedElementName]) {
+        self.defaultUserNameChanged = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kColorElementName]) {
+        self.color = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kEntryTemplatesGroupElementName]) {
+        self.entryTemplatesGroup = [SimpleXmlValueExtractor getUuid:completedObject];
+        return YES;
+    }
+    else if ([withXmlElementName isEqualToString:kEntryTemplatesGroupChangedElementName]) {
+        self.entryTemplatesGroupChanged = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
     else {
         return NO;
     }
@@ -116,6 +157,17 @@
     if (self.customData && self.customData.orderedDictionary.count) {
         if ( ![self.customData writeXml:serializer] ) return NO;
     }
+
+    if (self.settingsChanged && ![serializer writeElement:kSettingsChangedElementName date:self.settingsChanged]) return NO;
+    if (self.databaseName && ![serializer writeElement:kDatabaseNameElementName text:self.databaseName]) return NO;
+    if (self.databaseNameChanged && ![serializer writeElement:kDatabaseNameChangedElementName date:self.databaseNameChanged]) return NO;
+    if (self.databaseDescription && ![serializer writeElement:kDatabaseDescriptionElementName text:self.databaseDescription]) return NO;
+    if (self.databaseDescriptionChanged && ![serializer writeElement:kDatabaseDescriptionChangedElementName date:self.databaseDescriptionChanged]) return NO;
+    if (self.defaultUserName && ![serializer writeElement:kDefaultUserNameElementName text:self.defaultUserName]) return NO;
+    if (self.defaultUserNameChanged && ![serializer writeElement:kDefaultUserNameChangedElementName date:self.defaultUserNameChanged]) return NO;
+    if (self.color && ![serializer writeElement:kColorElementName text:self.color]) return NO;
+    if (self.entryTemplatesGroup && ![serializer writeElement:kEntryTemplatesGroupElementName uuid:self.entryTemplatesGroup]) return NO;
+    if (self.entryTemplatesGroupChanged && ![serializer writeElement:kEntryTemplatesGroupChangedElementName date:self.entryTemplatesGroupChanged]) return NO;
 
     
     

@@ -86,9 +86,14 @@ static NSString* const kMailToScheme = @"mailto";
                     [identities addObjectsFromArray:[self getPasswordCredentialIdentity:node database:database databaseUuid:databaseUuid]];
                 }
 #if TARGET_OS_IPHONE
-                NSInteger databasesUsingQuickType = SafesList.sharedInstance.snapshot.count;
+                NSInteger databasesUsingQuickType = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+                    return obj.autoFillEnabled && obj.quickTypeEnabled;
+                }].count;
+
 #else
-                NSInteger databasesUsingQuickType = DatabasesManager.sharedInstance.snapshot.count;
+                NSInteger databasesUsingQuickType = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
+                    return obj.autoFillEnabled && obj.quickTypeEnabled;
+                }].count;
 #endif
                 if(databasesUsingQuickType < 2) { 
                     [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
@@ -141,7 +146,7 @@ static NSString* const kMailToScheme = @"mailto";
 
         [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
             ret = state.enabled;
-            NSLog(@"XXXX - Got AutoFill State = [%hhd]", ret);
+
             dispatch_group_leave(g);
         }];
 

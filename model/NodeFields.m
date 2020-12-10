@@ -116,7 +116,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return ret;
 }
 
-- (BOOL)isSyncEqualTo:(NodeFields *)other {
+- (BOOL)isSyncEqualTo:(NodeFields *)other params:(SyncComparisonParams *)params {
     BOOL simpleEqual =  [self.username compare:other.username] == NSOrderedSame &&
                         [self.password compare:other.password] == NSOrderedSame &&
                         [self.url compare:other.url] == NSOrderedSame &&
@@ -140,12 +140,19 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         }
     }
 
+    
+    
     if(self.attachments.count != other.attachments.count) {
         return NO;
     }
     
-    for (NodeFileAttachment* att in self.attachments) {
-        [self attachmentIsSyncEqualTo:att.filename];
+    
+    
+    for (int i=0; i < self.attachments.count; i++) {
+        NodeFileAttachment* myAttachment = self.attachments[i];
+        NodeFileAttachment* theirAttachment = other.attachments[i];
+        
+        [self attachmentIsSyncEqualTo:myAttachment b:theirAttachment params:params];
     }
 
     
@@ -153,13 +160,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     if ( ![self.created isEqualToDate:other.created] ) return NO;
     if ( ![self.modified isEqualToDate:other.modified] ) return NO;
     if ( ![self.expires isEqualToDate:other.expires] ) return NO;
-    
-    
-
-    if ( ![self.tags isEqualToSet:other.tags]) return NO; 
-
-    if ( ![self.customData isEqual:other.customData] ) return NO; 
-    
+        
     if ((self.foregroundColor == nil && other.foregroundColor != nil) || (self.foregroundColor != nil && ![self.foregroundColor isEqual:other.foregroundColor] )) {
         return NO;
     }
@@ -173,19 +174,17 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         return NO;
     }
     
+    
+
+    if ( ![self.tags isEqualToSet:other.tags]) return NO; 
+
+    if ( ![self.customData isEqual:other.customData] ) return NO; 
+
     return NO;
 }
 
-- (BOOL)attachmentIsSyncEqualTo:(NSString*)attachmentName {
-    
-    
-    
-
-    
-    
-    
-    
-    return NO;
+- (BOOL)attachmentIsSyncEqualTo:(NodeFileAttachment*)a b:(NodeFileAttachment*)b params:(SyncComparisonParams *)params {
+    return params.compareNodeAttachmentBlock(a, b); 
 }
 
 + (NodeFields *)deserialize:(NSDictionary *)dict {

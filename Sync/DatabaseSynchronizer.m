@@ -86,63 +86,199 @@
     SyncDiffReport* ret = [[SyncDiffReport alloc] init];
     NSMutableArray<NSUUID*> *changedNodes = NSMutableArray.array;
     
+    __weak id weakSelf = self;
+    SyncComparisonParams* params = [[SyncComparisonParams alloc] init];
+    params.compareNodeAttachmentBlock = ^BOOL(NodeFileAttachment * _Nonnull a, NodeFileAttachment * _Nonnull b) {
+        return [weakSelf compareNodeAttachment:a b:b];
+    };
+    
     [self.theirs preOrderTraverse:^BOOL(Node * _Nonnull node) {
         Node* myVersion = self.myIdToNodeMap[node.uuid];
 
         if ( !myVersion ) {
             [changedNodes addObject:node.uuid];
         }
-        else if ( ![myVersion isSyncEqualTo:node] ) {
+        else if ( ![myVersion isSyncEqualTo:node params:params] ) {
             [changedNodes addObject:node.uuid];
         }
         
         return YES;
     }];
+    
     ret.changes = changedNodes;
     
     
+
     
+    
+    
+
+
+
+
+
+
+
+
+
     
     
     
     
 
-    
+
+
+
+
 
     
     
     
     
+
+
+
+
+
+
     
     
     
 
+
+
+
+
+
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+
+
+
+
+
+
+
+
+
+    
     return ret;
+}
+
+- (BOOL)compareNodeAttachment:(NodeFileAttachment*)a b:(NodeFileAttachment*)b {
+    UiAttachment* alpha = [self.mine getUiAttachment:a];
+    UiAttachment* beta = [self.theirs getUiAttachment:b];
+    
+    if ( [alpha.filename compare:beta.filename] != NSOrderedSame ) {
+        return NO;
+    }
+    
+    return [alpha.dbAttachment.digestHash isEqualToString:beta.dbAttachment.digestHash];
 }
 
 - (void)applyDiff:(SyncDiffReport*)diff {
     
     
+    
+    
+    
+    
 
+    
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
+    
+
+    
+    
+    
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
 }
 
-- (void)addTheirNewGroupToMine:(NSUUID*)uuid {
-    Node* theirNewGroup = self.theirIdToNodeMap[uuid];
-    
-    
-    
-    
-    Node* ourParentGroup = self.mine.rootGroup;
-    Node* found = self.myIdToNodeMap[theirNewGroup.parent.uuid];
-    if (theirNewGroup.parent != nil && theirNewGroup.parent != self.theirs.rootGroup && found) {
-        ourParentGroup = found;
-    }
-    
-    Node* ourNewGroup = [theirNewGroup cloneAsChildOf:ourParentGroup];
-    
-    [ourParentGroup addChild:ourNewGroup keePassGroupTitleRules:YES]; 
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

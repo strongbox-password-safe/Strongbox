@@ -71,6 +71,7 @@ static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPa
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
 static NSString* const kMigratedToNewSettings = @"migratedToNewSettings";
 static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
+static NSString* const kStartWithSearch = @"startWithSearch";
 
 
 
@@ -163,6 +164,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)startWithSearch {
+    return [self getBool:kStartWithSearch fallback:YES];
+}
+
+- (void)setStartWithSearch:(BOOL)startWithSearch {
+    [self setBool:kStartWithSearch value:startWithSearch];
+}
 
 - (BOOL)showAdvancedUnlockOptions {
     return [self getBool:kShowAdvancedUnlockOptions];

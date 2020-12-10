@@ -7,11 +7,11 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "AbstractDatabaseMetadata.h"
 #import "DatabaseAttachment.h"
 #import "UiAttachment.h"
 #import "CompositeKeyFactors.h"
 #import "NodeHierarchyReconstructionData.h"
+#import "UnifiedDatabaseMetadata.h"
 
 #if TARGET_OS_IPHONE
 #import <UIKit/UIKit.h>
@@ -25,26 +25,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithMetadata:(id<AbstractDatabaseMetadata>)metadata
+- (instancetype)initWithMetadata:(UnifiedDatabaseMetadata*)metadata
              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments
                       customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments
                       customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons
@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSObject* adaptorTag; 
 
 @property (nonatomic, readonly) Node* rootGroup;
-@property (nonatomic, readonly) id<AbstractDatabaseMetadata> metadata;
+@property (nonatomic, readonly) UnifiedDatabaseMetadata* metadata;
 @property (nonatomic, readonly) NSArray<DatabaseAttachment*> *attachments;
 @property (nonatomic, readonly) NSDictionary<NSUUID*, NSData*>* customIcons;
 @property (nonatomic, readonly) NSDictionary<NSUUID*, NSDate*> *deletedObjects;

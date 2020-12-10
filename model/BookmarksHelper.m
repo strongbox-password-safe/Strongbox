@@ -115,7 +115,7 @@
     
     if(bookmarkDataIsStale) {
         if ([bookmarkFileURL startAccessingSecurityScopedResource]) {
-            NSLog(@"Regenerating Bookmark -> bookmarkDataIsStale = %d => [%@]", bookmarkDataIsStale, bookmarkFileURL);
+
             
             NSData* fileIdentifier = [BookmarksHelper getBookmarkDataFromUrl:bookmarkFileURL readOnly:readOnly error:error];
             

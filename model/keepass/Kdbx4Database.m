@@ -52,7 +52,7 @@ static const BOOL kLogVerbose = NO;
     Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
     [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
     
-    KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
+    UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass4];
     
     return [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
 }
@@ -102,8 +102,8 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
    
     
     
-    KeePass4DatabaseMetadata *metadata = [[KeePass4DatabaseMetadata alloc] init];
-    
+    UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass4];
+                                         
     if(xmlMeta) {
         metadata.generator = xmlMeta.generator ? xmlMeta.generator : @"<Unknown>";
         
@@ -181,20 +181,19 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     
     
     rootXmlDocument.keePassFile.meta.headerHash = nil; 
-    KeePass4DatabaseMetadata* metadata = (KeePass4DatabaseMetadata*)database.metadata;
     
     
     
-    rootXmlDocument.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
-    rootXmlDocument.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
-    rootXmlDocument.keePassFile.meta.recycleBinChanged = metadata.recycleBinChanged;
-    rootXmlDocument.keePassFile.meta.historyMaxItems = metadata.historyMaxItems;
-    rootXmlDocument.keePassFile.meta.historyMaxSize = metadata.historyMaxSize;
-    rootXmlDocument.keePassFile.meta.customData.orderedDictionary = metadata.customData; 
+    rootXmlDocument.keePassFile.meta.recycleBinEnabled = database.metadata.recycleBinEnabled;
+    rootXmlDocument.keePassFile.meta.recycleBinGroup = database.metadata.recycleBinGroup;
+    rootXmlDocument.keePassFile.meta.recycleBinChanged = database.metadata.recycleBinChanged;
+    rootXmlDocument.keePassFile.meta.historyMaxItems = database.metadata.historyMaxItems;
+    rootXmlDocument.keePassFile.meta.historyMaxSize = database.metadata.historyMaxSize;
+    rootXmlDocument.keePassFile.meta.customData.orderedDictionary = database.metadata.customData;
     
     
     
-    id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
+    id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:database.metadata.innerRandomStreamId
                                                                                     key:nil 
                                                                                v4Format:YES
                                                                             prettyPrint:NO];
@@ -220,13 +219,13 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     
     Kdbx4SerializationData *serializationData = [[Kdbx4SerializationData alloc] init];
     
-    serializationData.fileVersion = metadata.version;
-    serializationData.compressionFlags = metadata.compressionFlags;
-    serializationData.innerRandomStreamId = metadata.innerRandomStreamId;
+    serializationData.fileVersion = database.metadata.version;
+    serializationData.compressionFlags = database.metadata.compressionFlags;
+    serializationData.innerRandomStreamId = database.metadata.innerRandomStreamId;
     serializationData.innerRandomStreamKey = xmlSerializer.protectedStreamKey;
     serializationData.extraUnknownHeaders = unknownHeaders;
-    serializationData.kdfParameters = metadata.kdfParameters;
-    serializationData.cipherUuid = metadata.cipherUuid;
+    serializationData.kdfParameters = database.metadata.kdfParameters;
+    serializationData.cipherUuid = database.metadata.cipherUuid;
     serializationData.attachments = database.attachments;
     
     [Kdbx4Serialization serialize:serializationData

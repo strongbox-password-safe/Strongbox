@@ -114,7 +114,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return self.passwordDatabase.format;
 }
 
--(id<AbstractDatabaseMetadata>)metadata {
+- (UnifiedDatabaseMetadata*)metadata {
     return self.passwordDatabase.metadata;
 }
 

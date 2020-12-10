@@ -3,7 +3,6 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "AbstractDatabaseMetadata.h"
 #import "AbstractDatabaseFormatAdaptor.h"
 #import "DatabaseAttachment.h"
 #import "UiAttachment.h"
@@ -14,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseModel : NSObject
 
 + (BOOL)isValidDatabase:(NSURL*)url error:(NSError**)error;
-+ (BOOL)isValidDatabaseWithPrefix:(nullable NSData *)prefix error:(NSError**)error; 
++ (BOOL)isValidDatabaseWithPrefix:(nullable NSData *)prefix error:(NSError**)error; // TODO: Eventually remove - URL only
 
 + (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)prefix;
 
@@ -85,6 +84,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
 - (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
 - (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
+- (UiAttachment*)getUiAttachment:(NodeFileAttachment*)nodeFileAttachment;
 
 
 
@@ -145,7 +145,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)getHtmlPrintString:(NSString*)databaseName;
 
 @property (nonatomic, readonly, nonnull) Node* rootGroup;
-@property (nonatomic, readonly, nonnull) id<AbstractDatabaseMetadata> metadata;
+@property (nonatomic, readonly, nonnull) UnifiedDatabaseMetadata* metadata;
 @property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
 @property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
 

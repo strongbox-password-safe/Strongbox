@@ -8,8 +8,6 @@
 #import "StrongboxDatabase.h"
 #import "AttachmentsRationalizer.h"
 #import "NSArray+Extensions.h"
-#import "KeePassDatabaseMetadata.h"
-#import "KeePass4DatabaseMetadata.h"
 #import "KeePassConstants.h"
 #import "CustomIconsRationalizer.h"
 
@@ -25,7 +23,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 
 @implementation StrongboxDatabase
 
-- (instancetype)initWithMetadata:(id<AbstractDatabaseMetadata>)metadata
+- (instancetype)initWithMetadata:(UnifiedDatabaseMetadata*)metadata
              compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
     return [self initWithRootGroup:[Node rootGroup]
                           metadata:metadata
@@ -33,7 +31,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
     return [self initWithRootGroup:rootGroup
                           metadata:metadata
@@ -42,7 +40,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments {
     return [self initWithRootGroup:rootGroup
@@ -53,7 +51,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (instancetype)initWithRootGroup:(Node*)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment*>*)attachments
                       customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons {
@@ -66,7 +64,7 @@ static NSString* const kKeePass1BackupGroupName = @"Backup";
 }
 
 - (instancetype)initWithRootGroup:(Node *)rootGroup
-                         metadata:(id<AbstractDatabaseMetadata>)metadata
+                         metadata:(UnifiedDatabaseMetadata*)metadata
               compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                       attachments:(NSArray<DatabaseAttachment *> *)attachments
                       customIcons:(NSDictionary<NSUUID *,NSData *> *)customIcons

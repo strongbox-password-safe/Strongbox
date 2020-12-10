@@ -52,6 +52,7 @@
 #import "DebugHelper.h"
 #import "GettingStartedInitialViewController.h"
 #import "UITableView+EmptyDataSet.h"
+#import "MergeInitialViewController.h"
 
 @interface SafesViewController ()
 
@@ -1084,6 +1085,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     [ma addObject:[self getContextualMenuRenameAction:indexPath]];
 
+
+
     [ma addObject:[self getContextualMenuRemoveAction:indexPath]];
 
     return [UIMenu menuWithTitle:@""
@@ -1181,6 +1184,24 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                            destructive:NO
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self renameSafe:indexPath];
+    }];
+}
+
+- (UIAction*)getContextualMenuMergeAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    BOOL iOS14 = NO;
+    if ( @available(iOS 14.0, *) ) { 
+        iOS14 = YES;
+    }
+    
+    UIImage* img = iOS14 ? [UIImage systemImageNamed:@"arrow.triangle.merge"] : [UIImage imageNamed:@"paper_plane"];
+
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    return [self getContextualMenuItem:NSLocalizedString(@"generic_action_merge_ellipsis", @"Merge...")
+                                 image:img
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self beginMergeWizard:safe];
     }];
 }
 
@@ -1300,6 +1321,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)showDatabaseMoreActions:(NSIndexPath*)indexPath {
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"safes_vc_database_actions_sheet_title", @"Title of the 'More Actions' alert/action sheet")
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleAlert];
@@ -1315,7 +1338,6 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
     UIAlertAction *quickLaunchAction = [UIAlertAction actionWithTitle:isAlreadyQuickLaunch ?
                                         NSLocalizedString(@"safes_vc_action_unset_as_quick_launch", @"Button Title to Unset Quick Launch") :
@@ -1327,13 +1349,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     [alertController addAction:quickLaunchAction];
 
     
-   
 
-
-
-
-
-
+    UIAlertAction *mergeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_action_merge_ellipsis", @"Merge...")
+                                                            style:UIAlertActionStyleDefault
+                                                          handler:^(UIAlertAction *a) {
+        [self beginMergeWizard:safe];
+    }];
 
 
 
@@ -1698,6 +1719,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                 vc.modalInPresentation = YES;
             }
         }
+    }
+    else if ( [segue.identifier isEqualToString:@"segueToMergeWizard"]) {
+        SafeMetaData* dest = (SafeMetaData*)sender;
+        MergeInitialViewController* vc = (MergeInitialViewController*)segue.destinationViewController;
+        vc.destinationDatabase = dest;
     }
 }
 
@@ -2442,6 +2468,19 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     metadata.likelyFormat = format;
     
     [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:dateModified];
+}
+
+
+
+- (void)beginMergeWizard:(SafeMetaData*)destinationDatabase {
+    if (self.collection.count < 2) {
+        [Alerts info:self
+               title:NSLocalizedString(@"merge_no_other_databases_available_title", @"No Other Databases Available")
+             message:NSLocalizedString(@"merge_no_other_databases_available_msg", @"There are no other databases in your databases collection to merge into this database. You must add another database so that you can select it for the merge operation. Tap the '+' button to add.")];
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToMergeWizard" sender:destinationDatabase];
+    }
 }
 
 @end

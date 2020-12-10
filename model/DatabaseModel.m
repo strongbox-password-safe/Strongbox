@@ -559,16 +559,14 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     return self.adaptor.fileExtension;
 }
 
--(id<AbstractDatabaseMetadata>)metadata {
+-(UnifiedDatabaseMetadata*)metadata {
     return self.theSafe.metadata;
 }
 
+
+
 -(NSArray<DatabaseAttachment *> *)attachments {
     return self.theSafe.attachments;
-}
-
-- (NSDictionary<NSUUID *,NSData *> *)customIcons {
-    return self.theSafe.customIcons;
 }
 
 - (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment {
@@ -585,6 +583,23 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 
 - (void)setNodeAttachments:(Node *)node attachments:(NSArray<UiAttachment *> *)attachments {
     [self.theSafe setNodeAttachments:node attachments:attachments];
+}
+
+- (UiAttachment*)getUiAttachment:(NodeFileAttachment*)nodeFileAttachment {
+    NSInteger index = nodeFileAttachment.index;
+    if ( index < 0 || index >= self.attachments.count ) {
+        return nil;
+    }
+        
+    DatabaseAttachment *dbAttachment = self.attachments[index];
+    
+    return [UiAttachment attachmentWithFilename:nodeFileAttachment.filename dbAttachment:dbAttachment];
+}
+
+
+
+- (NSDictionary<NSUUID *,NSData *> *)customIcons {
+    return self.theSafe.customIcons;
 }
 
 - (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize {
@@ -615,7 +630,6 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 
     [self.theSafe setNodeCustomIconUuid:node uuid:uuid rationalize:rationalize];
 }
-
 
 - (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize {
     [self setNodeIconId:node iconId:iconId rationalize:rationalize addHistory:YES];

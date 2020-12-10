@@ -108,6 +108,13 @@
 
 
 
+- (BOOL)quickTypeEnabled {
+    return YES;
+}
+
+
+
+
 + (instancetype)fromJsonSerializationDictionary:(NSDictionary *)jsonDictionary {
     SafeMetaData *ret = [[SafeMetaData alloc] init];
 

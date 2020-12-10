@@ -111,6 +111,7 @@
 @property (weak) IBOutlet NSButton *colorizePasswords;
 @property (weak) IBOutlet NSButton *useColorBlindPalette;
 @property (weak) IBOutlet NSButton *checkboxClipboardHandoff;
+@property (weak) IBOutlet NSButton *checkboxStartInSearchMode;
 
 @end
 
@@ -229,6 +230,8 @@
     self.colorizePasswords.state = Settings.sharedInstance.colorizePasswords ? NSOnState : NSOffState;
     self.useColorBlindPalette.state = Settings.sharedInstance.colorizeUseColorBlindPalette ? NSOnState : NSOffState;
     self.checkboxClipboardHandoff.state = Settings.sharedInstance.clipboardHandoff ? NSOnState : NSOffState;
+
+    self.checkboxStartInSearchMode.state = Settings.sharedInstance.startWithSearch ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -273,6 +276,8 @@
     
     Settings.sharedInstance.clipboardHandoff = self.checkboxClipboardHandoff.state == NSOnState;
 
+    Settings.sharedInstance.startWithSearch = self.checkboxStartInSearchMode.state == NSOnState;
+    
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }

@@ -15,6 +15,9 @@ abstract_target 'common-mac' do
 
     target 'Strongbox AutoFill' do
     end
+
+    target 'Strongbox-Outright-Pro-AutoFill' do
+    end
 end
 
 abstract_target 'common-ios' do

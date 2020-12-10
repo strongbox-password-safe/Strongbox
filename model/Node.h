@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "NodeFields.h"
 #import "OTPToken.h"
+#import "SyncComparisonParams.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -126,7 +127,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSComparator finderStyleNodeComparator;
 
-- (BOOL)isSyncEqualTo:(Node*)other;
+- (BOOL)isSyncEqualTo:(Node*)other params:(SyncComparisonParams*)params;
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 
 @end

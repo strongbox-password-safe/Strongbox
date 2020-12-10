@@ -38,7 +38,7 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 
     [self loadStatistics];
     
-    self.metadataKvps = [self.viewModel.database.metadata kvpForUi];
+    self.metadataKvps = [self.viewModel.database.metadata filteredKvpForUIWithFormat:self.viewModel.database.format];
     
     self.customData = self.viewModel.database.metadata.customData;
 }

@@ -45,7 +45,7 @@
     
     [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
     
-    KeePassDatabaseMetadata* metadata = [[KeePassDatabaseMetadata alloc] init];
+    UnifiedDatabaseMetadata* metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass];
     
     StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
     
@@ -121,8 +121,8 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
     
 
-    KeePassDatabaseMetadata *metadata = [[KeePassDatabaseMetadata alloc] init];
-    
+    UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass];
+
     
 
     if(xmlMeta) {
@@ -142,6 +142,20 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
         
 
         metadata.customData = xmlMeta.customData.orderedDictionary;
+        
+        
+        
+
+
+
+
+
+
+
+
+
+
+
     }
     
     
@@ -200,16 +214,14 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
         return;
     }
     
-    KeePassDatabaseMetadata* metadata = (KeePassDatabaseMetadata*)database.metadata;
     
     
-    
-    rootXmlDocument.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
-    rootXmlDocument.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
-    rootXmlDocument.keePassFile.meta.recycleBinChanged = metadata.recycleBinChanged;
-    rootXmlDocument.keePassFile.meta.historyMaxItems = metadata.historyMaxItems;
-    rootXmlDocument.keePassFile.meta.historyMaxSize = metadata.historyMaxSize;
-    rootXmlDocument.keePassFile.meta.customData.orderedDictionary = metadata.customData;
+    rootXmlDocument.keePassFile.meta.recycleBinEnabled = database.metadata.recycleBinEnabled;
+    rootXmlDocument.keePassFile.meta.recycleBinGroup = database.metadata.recycleBinGroup;
+    rootXmlDocument.keePassFile.meta.recycleBinChanged = database.metadata.recycleBinChanged;
+    rootXmlDocument.keePassFile.meta.historyMaxItems = database.metadata.historyMaxItems;
+    rootXmlDocument.keePassFile.meta.historyMaxSize = database.metadata.historyMaxSize;
+    rootXmlDocument.keePassFile.meta.customData.orderedDictionary = database.metadata.customData;
     
     
     
@@ -229,7 +241,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
     
     
-    XmlSerializer *xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:metadata.innerRandomStreamId
+    XmlSerializer *xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:database.metadata.innerRandomStreamId
                                                                                 key:nil 
                                                                            v4Format:NO
                                                                         prettyPrint:NO];
@@ -238,11 +250,11 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
     serializationData.protectedStreamKey = xmlSerializer.protectedStreamKey;
     serializationData.extraUnknownHeaders = adaptorTag ? adaptorTag.unknownHeaders : @{};
-    serializationData.compressionFlags = metadata.compressionFlags;
-    serializationData.innerRandomStreamId = metadata.innerRandomStreamId;
-    serializationData.transformRounds = metadata.transformRounds;
-    serializationData.fileVersion = metadata.version;
-    serializationData.cipherId = metadata.cipherUuid;
+    serializationData.compressionFlags = database.metadata.compressionFlags;
+    serializationData.innerRandomStreamId = database.metadata.innerRandomStreamId;
+    serializationData.transformRounds = database.metadata.transformRounds;
+    serializationData.fileVersion = database.metadata.version;
+    serializationData.cipherId = database.metadata.cipherUuid;
     
     KdbxSerialization *kdbxSerializer = [[KdbxSerialization alloc] init:serializationData];
     
@@ -260,7 +272,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
         else {
             rootXmlDocument.keePassFile.meta.headerHash = hash;
             [self continueSaveWithHeaderHash:rootXmlDocument
-                                    metadata:metadata
+                                    metadata:database.metadata
                                xmlSerializer:xmlSerializer
                               kdbxSerializer:kdbxSerializer
                                   completion:completion];
@@ -269,7 +281,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
 }
 
 - (void)continueSaveWithHeaderHash:(RootXmlDomainObject*)xmlDoc
-                          metadata:(KeePassDatabaseMetadata*)metadata
+                          metadata:(UnifiedDatabaseMetadata*)metadata
                      xmlSerializer:(XmlSerializer*)xmlSerializer
                     kdbxSerializer:(KdbxSerialization*)kdbxSerializer
                         completion:(SaveCompletionBlock)completion {

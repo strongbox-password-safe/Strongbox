@@ -4,7 +4,6 @@
 #import <Foundation/Foundation.h>
 #import "Node.h"
 #import "AbstractDatabaseFormatAdaptor.h"
-#import "KeePassDatabaseMetadata.h"
 #import "KeePassConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN

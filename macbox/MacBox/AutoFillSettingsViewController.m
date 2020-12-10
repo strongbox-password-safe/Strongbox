@@ -10,6 +10,7 @@
 #import "DatabasesManager.h"
 #import "AutoFillManager.h"
 #import "Settings.h"
+#import "Alerts.h"
 
 @interface AutoFillSettingsViewController ()
 
@@ -17,6 +18,8 @@
 @property (weak) IBOutlet NSButton *enableQuickType;
 @property (weak) IBOutlet NSButton *useWormholeIfUnlocked;
 @property (weak) IBOutlet NSTextField *labelProWarning;
+@property (weak) IBOutlet NSButton *enableSystemExtension;
+@property (weak) IBOutlet NSTextField *labelNavHelp;
 
 @end
 
@@ -33,12 +36,23 @@
 
     self.labelProWarning.hidden = pro;
     
+    self.enableSystemExtension.state = AutoFillManager.sharedInstance.isOnForStrongbox ? NSControlStateValueOn : NSControlStateValueOff;
+    self.labelNavHelp.textColor = AutoFillManager.sharedInstance.isOnForStrongbox ? NSColor.secondaryLabelColor : nil;
+    
     self.enableAutoFill.state = self.model.databaseMetadata.autoFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     self.enableQuickType.state = self.model.databaseMetadata.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     self.useWormholeIfUnlocked.state = self.model.databaseMetadata.quickWormholeFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
 
-    self.enableQuickType.enabled = self.model.databaseMetadata.autoFillEnabled;
-    self.useWormholeIfUnlocked.enabled = self.model.databaseMetadata.autoFillEnabled && self.model.databaseMetadata.quickTypeEnabled;
+    self.enableSystemExtension.enabled = AutoFillManager.sharedInstance.isPossible && !AutoFillManager.sharedInstance.isOnForStrongbox;
+    self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox;
+
+    self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.model.databaseMetadata.autoFillEnabled;
+    self.useWormholeIfUnlocked.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.model.databaseMetadata.autoFillEnabled && self.model.databaseMetadata.quickTypeEnabled;
+
+    __weak id weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakSelf bindUI];
+    });
 }
 
 - (IBAction)onChanged:(id)sender {
@@ -72,6 +86,21 @@
     }
     
     [self bindUI];
+}
+
+- (IBAction)onEnableSystemExtension:(id)sender {
+    [Alerts customOptionWithCancel:NSLocalizedString(@"mac_autofill_enable_extension_title", @"Enable Strongbox Extension")
+                 informativeText:NSLocalizedString(@"mac_autofill_enable_extension_message", @"To use AutoFill you must enable the Strongbox Extension in System Preferences. To do this click the 'Open System Preferences...' button below and navigate to:\n\n∙ Extensions > Password AutoFill > Check 'Strongbox'\n\n")
+               option1AndDefault:NSLocalizedString(@"mac_autofill_action_open_system_preferences", @"Open System Preferences...")
+                          window:self.view.window
+                        completion:^(BOOL go) {
+        if (go) {
+            NSTask *task = [[NSTask alloc] init];
+            task.launchPath = @"/bin/sh";
+            task.arguments = @[@"-c" , @"open x-apple.systempreferences:com.apple.preference"];
+            [task launch];
+        }
+    }];
 }
 
 @end

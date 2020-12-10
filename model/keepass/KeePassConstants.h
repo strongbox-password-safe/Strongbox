@@ -63,6 +63,18 @@ static NSString* const kCustomDataElementName = @"CustomData";
 static NSString* const kCustomDataItemElementName = @"Item";
 static NSString* const kNotesElementName = @"Notes";
 
+static NSString* const kSettingsChangedElementName = @"SettingsChanged";
+static NSString* const kDatabaseNameElementName = @"DatabaseName";
+static NSString* const kDatabaseNameChangedElementName = @"DatabaseNameChanged";
+static NSString* const kDatabaseDescriptionElementName = @"DatabaseDescription";
+static NSString* const kDatabaseDescriptionChangedElementName = @"DatabaseDescriptionChanged";
+static NSString* const kDefaultUserNameElementName = @"DefaultUserName";
+static NSString* const kDefaultUserNameChangedElementName = @"DefaultUserNameChanged";
+static NSString* const kColorElementName = @"Color";
+static NSString* const kEntryTemplatesGroupElementName = @"EntryTemplatesGroup";
+static NSString* const kEntryTemplatesGroupChangedElementName = @"EntryTemplatesGroupChanged";
+
+
 static NSString* const kDefaultAutoTypeSequenceElementName = @"DefaultAutoTypeSequence";
 static NSString* const kEnableAutoTypeElementName = @"EnableAutoType";
 static NSString* const kEnableSearchingElementName = @"EnableSearching";
