@@ -10,10 +10,12 @@
 #import "DatabaseModel.h"
 #import "NSArray+Extensions.h"
 #import "NSDate+Extensions.h"
+#import "Pair.h"
+#import "DatabaseSearchAndSorter.h"
 
 @interface DatabaseSynchronizer ()
 
-@property DatabaseModel* mine; // Mine, local here, containing changes that I have made and the copy Strongbox works with
+@property DatabaseModel* mine; 
 @property DatabaseModel* theirs; 
 
 @property NSArray<Node*> *myEntries;
@@ -23,11 +25,6 @@
 
 @property NSDictionary<NSUUID*, Node*>* myIdToNodeMap;
 @property NSDictionary<NSUUID*, Node*>* theirIdToNodeMap;
-
-
-
-
-
 
 @end
 
@@ -86,26 +83,35 @@
     SyncDiffReport* ret = [[SyncDiffReport alloc] init];
     NSMutableArray<NSUUID*> *changedNodes = NSMutableArray.array;
     
+    NSMutableArray<Node*> *onlyInTheirs = NSMutableArray.array;
+    NSMutableArray<Pair<Node*, Node*>*> *nodesWithDiffs = NSMutableArray.array;
+
     __weak id weakSelf = self;
     SyncComparisonParams* params = [[SyncComparisonParams alloc] init];
     params.compareNodeAttachmentBlock = ^BOOL(NodeFileAttachment * _Nonnull a, NodeFileAttachment * _Nonnull b) {
         return [weakSelf compareNodeAttachment:a b:b];
     };
     
-    [self.theirs preOrderTraverse:^BOOL(Node * _Nonnull node) {
-        Node* myVersion = self.myIdToNodeMap[node.uuid];
+    [self.theirs preOrderTraverse:^BOOL(Node * _Nonnull theirVersion) {
+        Node* myVersion = self.myIdToNodeMap[theirVersion.uuid];
 
         if ( !myVersion ) {
-            [changedNodes addObject:node.uuid];
+            [onlyInTheirs addObject:theirVersion];
+            [changedNodes addObject:theirVersion.uuid];
         }
-        else if ( ![myVersion isSyncEqualTo:node params:params] ) {
-            [changedNodes addObject:node.uuid];
+        else if ( ![myVersion isSyncEqualTo:theirVersion params:params] ) {
+            [nodesWithDiffs addObject:[Pair pairOfA:myVersion andB:theirVersion]];
+            [changedNodes addObject:theirVersion.uuid];
         }
         
         return YES;
     }];
     
-    ret.changes = changedNodes;
+    ret.changes = changedNodes;    
+    ret.onlyInTheirs = onlyInTheirs;
+    ret.differentFromOurs = nodesWithDiffs;
+    
+    
     
     
 

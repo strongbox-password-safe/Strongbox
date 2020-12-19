@@ -16,6 +16,7 @@
 #import "KeePassCiphers.h"
 #import "Utils.h"
 #import "NSDate+Extensions.h"
+#import "Platform.h"
 
 static const uint32_t kKdb1DefaultVersion = 0x00030004;
 
@@ -35,6 +36,8 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     self = [super init];
     
     if (self) {
+        NSDate* now = NSDate.date;
+        
         self.transformRounds = kDefaultTransformRounds; 
         self.generator = kStrongboxGenerator;
         self.compressionFlags = kGzipCompressionFlag;
@@ -43,13 +46,26 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
         self.historyMaxSize = @(kDefaultHistoryMaxSize);
         self.recycleBinEnabled = YES;
         self.recycleBinGroup = NSUUID.zero;
-        self.recycleBinChanged = [NSDate date];
+        self.recycleBinChanged = now;
+        self.settingsChanged = now;
+        self.databaseName = @"";
+        self.databaseNameChanged = now;
+        self.databaseDescription = @"";
+        self.databaseDescriptionChanged = now;
+        self.defaultUserName = @"";
+        self.defaultUserNameChanged = now;
+        self.color = @"";
+        self.entryTemplatesGroup = NSUUID.zero;
+        self.entryTemplatesGroupChanged = now;
+
+        
+        
         self.kdfParameters = [[Argon2KdfCipher alloc] initWithDefaults].kdfParameters; 
         self.flags = kFlagsAes | kFlagsSha2; 
         self.versionInt = kKdb1DefaultVersion; 
         self.keyStretchIterations = DEFAULT_KEYSTRETCH_ITERATIONS; 
         self.innerRandomStreamId = kKdb4DefaultInnerRandomStreamId; 
-
+        
         
         
         if ( format == kPasswordSafe ) {
@@ -166,6 +182,8 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_recycle_bin_enabled", @"Recycle Bin Enabled") andValue:localizedYesOrNoFromBool(self.recycleBinEnabled)];
     
+    [self appendKeePassCommonMetadataKvps:kvps];
+    
     return kvps;
 }
 
@@ -192,8 +210,24 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_recycle_bin_enabled", @"Recycle Bin Enabled") andValue:localizedYesOrNoFromBool(self.recycleBinEnabled)];
     
+    [self appendKeePassCommonMetadataKvps:kvps];
+    
     return kvps;
 }
 
+- (void)appendKeePassCommonMetadataKvps:(MutableOrderedDictionary<NSString*, NSString*>*)kvps {
+    if (Platform.sharedInstance.isSimulator) {
+        [kvps addKey:@"settingsChanged" andValue:self.settingsChanged.friendlyDateString];
+        [kvps addKey:@"databaseName" andValue:self.databaseName];
+        [kvps addKey:@"databaseNameChanged" andValue:self.databaseNameChanged.friendlyDateString];
+        [kvps addKey:@"databaseDescription" andValue:self.databaseDescription];
+        [kvps addKey:@"databaseDescriptionChanged" andValue:self.databaseDescriptionChanged.friendlyDateString];
+        [kvps addKey:@"defaultUserName" andValue:self.defaultUserName];
+        [kvps addKey:@"defaultUserNameChanged" andValue:self.defaultUserNameChanged.friendlyDateString];
+        [kvps addKey:@"color" andValue:self.color];
+        [kvps addKey:@"entryTemplatesGroup" andValue:keePassStringIdFromUuid(self.entryTemplatesGroup)];
+        [kvps addKey:@"entryTemplatesGroupChanged" andValue:self.entryTemplatesGroupChanged.friendlyDateString];
+    }
+}
 
 @end

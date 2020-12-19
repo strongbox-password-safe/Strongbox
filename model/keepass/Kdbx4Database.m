@@ -15,7 +15,7 @@
 #import "XmlStrongboxNodeModelAdaptor.h"
 #import "AttachmentsRationalizer.h"
 #import "XmlSerializer.h"
-#import "XmlStrongBoxModelAdaptor.h"
+#import "KeePassXmlModelAdaptor.h"
 #import "KeePass2TagPackage.h"
 #import "NSArray+Extensions.h"
 
@@ -84,44 +84,32 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
 }
 
 static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData, CompositeKeyFactors* ckf, OpenCompletionBlock completion) {
+    RootXmlDomainObject* xmlRoot = serializationData.rootXmlObject;
+    Meta* meta = xmlRoot.keePassFile ? xmlRoot.keePassFile.meta : nil;
     
     
-    XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup * rootXmlGroup = getExistingRootKeePassGroup(serializationData.rootXmlObject);
-    NSError* err;
-    Node* rootGroup = [adaptor toModel:rootXmlGroup error:&err];
+    
+    NSError* error;
+    Node* rootGroup = [KeePassXmlModelAdaptor getNodeModel:xmlRoot error:&error];
     if(rootGroup == nil) {
-        NSLog(@"Error converting Xml model to Strongbox model: [%@]", err);
-        completion(NO, nil, err);
+        NSLog(@"Error converting Xml model to Strongbox model: [%@]", error);
+        completion(NO, nil, error);
         return;
     }
     
-    Meta* xmlMeta = serializationData.rootXmlObject.keePassFile ? serializationData.rootXmlObject.keePassFile.meta : nil;
-    NSMutableDictionary<NSUUID*, NSData*>* customIcons = safeGetCustomIcons(xmlMeta);
-    NSDictionary<NSUUID*, NSDate*>* deletedObjects = safeGetDeletedObjects(serializationData.rootXmlObject);
-   
     
     
-    UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass4];
-                                         
-    if(xmlMeta) {
-        metadata.generator = xmlMeta.generator ? xmlMeta.generator : @"<Unknown>";
-        
-        
-        
-        metadata.historyMaxItems = xmlMeta.historyMaxItems;
-        metadata.historyMaxSize = xmlMeta.historyMaxSize;
-    
-        
-        
-        metadata.recycleBinEnabled = xmlMeta.recycleBinEnabled;
-        metadata.recycleBinGroup = xmlMeta.recycleBinGroup;
-        metadata.recycleBinChanged = xmlMeta.recycleBinChanged;
-        
-        
+    NSMutableDictionary<NSUUID*, NSData*>* customIcons = [KeePassXmlModelAdaptor getCustomIcons:meta];
 
-        metadata.customData = xmlMeta.customData.orderedDictionary;
-    }
+    
+    
+    NSDictionary<NSUUID*, NSDate*>* deletedObjects = [KeePassXmlModelAdaptor getDeletedObjects:xmlRoot];
+    
+    
+    
+    UnifiedDatabaseMetadata *metadata = [KeePassXmlModelAdaptor getMetadata:meta format:kKeePass];
+    
+    
     
     metadata.cipherUuid = serializationData.cipherUuid;
     metadata.kdfParameters = serializationData.kdfParameters;
@@ -138,7 +126,7 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
 
     KeePass2TagPackage* tag = [[KeePass2TagPackage alloc] init];
     tag.unknownHeaders = serializationData.extraUnknownHeaders;
-    tag.originalMeta = xmlMeta;
+    tag.originalMeta = meta;
     
     ret.adaptorTag = tag;
     
@@ -158,12 +146,13 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     
     
     
-    XmlStrongBoxModelAdaptor *xmlAdaptor = [[XmlStrongBoxModelAdaptor alloc] init];
+    KeePassXmlModelAdaptor *xmlAdaptor = [[KeePassXmlModelAdaptor alloc] init];
     
     KeePassDatabaseWideProperties* databaseProperties = [[KeePassDatabaseWideProperties alloc] init];
     databaseProperties.customIcons = database.customIcons;
     databaseProperties.originalMeta = tag ? tag.originalMeta : nil;
     databaseProperties.deletedObjects = database.deletedObjects;
+    databaseProperties.metadata = database.metadata;
     
     NSError* error;
     RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
@@ -181,15 +170,6 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     
     
     rootXmlDocument.keePassFile.meta.headerHash = nil; 
-    
-    
-    
-    rootXmlDocument.keePassFile.meta.recycleBinEnabled = database.metadata.recycleBinEnabled;
-    rootXmlDocument.keePassFile.meta.recycleBinGroup = database.metadata.recycleBinGroup;
-    rootXmlDocument.keePassFile.meta.recycleBinChanged = database.metadata.recycleBinChanged;
-    rootXmlDocument.keePassFile.meta.historyMaxItems = database.metadata.historyMaxItems;
-    rootXmlDocument.keePassFile.meta.historyMaxSize = database.metadata.historyMaxSize;
-    rootXmlDocument.keePassFile.meta.customData.orderedDictionary = database.metadata.customData;
     
     
     
@@ -243,33 +223,6 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
             completion(NO, data, xml, nil);
         }
     }];
-}
-
-static KeePassGroup *getExistingRootKeePassGroup(RootXmlDomainObject * _Nonnull existingRootXmlDocument) {
-    
-    
-    KeePassFile *keepassFileElement = existingRootXmlDocument == nil ? nil : existingRootXmlDocument.keePassFile;
-    Root* rootXml = keepassFileElement == nil ? nil : keepassFileElement.root;
-    KeePassGroup *rootXmlGroup = rootXml == nil ? nil : rootXml.rootGroup;
-    
-    return rootXmlGroup;
-}
-
-static NSMutableDictionary<NSUUID*, NSData*>* safeGetCustomIcons(Meta* meta) {
-    if(meta.customIconList) {
-        if(meta.customIconList.icons) {
-            NSArray<CustomIcon*> *icons = meta.customIconList.icons;
-            NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
-            for (CustomIcon* icon in icons) {
-                if(icon.data != nil) { 
-                    [ret setObject:icon.data forKey:icon.uuid];
-                }
-            }
-            return ret;
-        }
-    }
-    
-    return [NSMutableDictionary dictionary];
 }
 
 @end

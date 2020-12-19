@@ -15,8 +15,8 @@
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
 #import "SharedAppAndAutoFillSettings.h"
-#import "OpenSafeSequenceHelper.h"
 #import "SVProgressHUD.h"
+#import "KeyFileHelper.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 

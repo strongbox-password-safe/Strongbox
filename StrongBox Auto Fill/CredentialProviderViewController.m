@@ -76,6 +76,7 @@
                                                           openLocalOnly:NO
                                             biometricAuthenticationDone:NO
                                                     noConvenienceUnlock:NO
+                                                        allowOnboarding:NO
                                                              completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
                     
                     
@@ -84,15 +85,15 @@
 
                     NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
                     
-                    if(model) {
+                    if(result == kUnlockDatabaseResultSuccess) {
                         [self onUnlockedDatabase:model quickTypeIdentifier:identifier];
                     }
-                    else if(error == nil) {
+                    else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
                         [self cancel:nil]; 
                     }
-                    else {
+                    else if (result == kUnlockDatabaseResultError) {
                         [Alerts error:self
-                                title:NSLocalizedString(@"cred_vc_error_opening_title", @"Strongbox: Error Opening Database")
+                                title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
                                 error:error
                            completion:^{
                             [self exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];

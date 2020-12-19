@@ -139,7 +139,11 @@ rotateLastImage:(BOOL)rotateLastImage
 
 
 - (void)populateCell:(SafeMetaData*)database {
-    [self populateCell:database disabled:NO autoFill:NO];
+    [self populateCell:database disabled:NO];
+}
+
+- (void)populateCell:(SafeMetaData *)database disabled:(BOOL)disabled {
+    [self populateCell:database disabled:disabled autoFill:NO];
 }
 
 - (void)populateCell:(SafeMetaData *)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill {

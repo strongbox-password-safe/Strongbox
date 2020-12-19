@@ -13,7 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MergeInitialViewController : UIViewController
 
-@property SafeMetaData* destinationDatabase;
+@property SafeMetaData* firstMetadata;
+@property (nonatomic, copy) void (^onDone)(BOOL userCancelled);
 
 @end
 

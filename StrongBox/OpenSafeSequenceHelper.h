@@ -19,11 +19,15 @@ typedef enum : NSUInteger {
     kUnlockDatabaseResultViewDebugSyncLogRequested,
 } UnlockDatabaseResult;
 
-typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, const NSError*_Nullable error);
+typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, NSError*_Nullable error);
 
 @interface OpenSafeSequenceHelper : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
+
+
+
+
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
@@ -47,7 +51,9 @@ typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                     noConvenienceUnlock:(BOOL)noConvenienceUnlock
+                        allowOnboarding:(BOOL)allowOnboarding
                              completion:(UnlockDatabaseCompletionBlock)completion;
+
 
 + (void)beginSequenceWithViewController:(UIViewController*)viewController
                                    safe:(SafeMetaData*)safe
@@ -57,10 +63,8 @@ typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                     noConvenienceUnlock:(BOOL)noConvenienceUnlock
+                        allowOnboarding:(BOOL)allowOnboarding
                              completion:(UnlockDatabaseCompletionBlock)completion;
-
-NSData*_Nullable getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
-NSData*_Nullable getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NSError** error);
 
 @end
 

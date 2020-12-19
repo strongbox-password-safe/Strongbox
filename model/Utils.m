@@ -130,6 +130,9 @@ NSString* friendlyMemorySizeString(long long byteCount) {
 }
 
 NSString* keePassStringIdFromUuid(NSUUID* uuid) {
+    if (!uuid) {
+        return nil;
+    }
     
     
     uuid_t uid;

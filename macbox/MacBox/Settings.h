@@ -102,8 +102,6 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL doNotRememberKeyFile;
 @property BOOL allowEmptyOrNoPasswordEntry;
 
-@property BOOL hasDoneProFamilyCheck;
-
 @property BOOL colorizePasswords;
 @property BOOL colorizeUseColorBlindPalette;
 

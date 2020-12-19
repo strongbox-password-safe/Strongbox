@@ -14,6 +14,8 @@
 #import "Utils.h"
 #import "NSCheckboxTableCellView.h"
 #import "ColoredStringHelper.h"
+#import "ClipboardManager.h"
+#import "MBProgressHUD.h"
 
 @interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate, NSWindowDelegate>
 
@@ -112,6 +114,7 @@
 @property (weak) IBOutlet NSButton *useColorBlindPalette;
 @property (weak) IBOutlet NSButton *checkboxClipboardHandoff;
 @property (weak) IBOutlet NSButton *checkboxStartInSearchMode;
+@property (weak) IBOutlet NSButton *buttonCopySamplePassword;
 
 @end
 
@@ -769,6 +772,25 @@
     [self bindAutoClearClipboard];
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
+}
+
+- (IBAction)onCopyGenerated:(id)sender {
+    NSAttributedString* samplePassword = self.labelSamplePassword.attributedStringValue;
+    
+    [ClipboardManager.sharedInstance copyConcealedString:samplePassword.string];
+
+    NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_no_item_title_fmt", @"%@ Copied");
+    NSString* msg= [NSString stringWithFormat:loc, NSLocalizedString(@"generic_fieldname_password", @"Password")];
+    
+    self.labelSamplePassword.stringValue = msg;
+    self.labelSamplePassword.textColor = NSColor.systemBlueColor;
+    self.buttonCopySamplePassword.enabled = NO;
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.labelSamplePassword.attributedStringValue = samplePassword;
+        self.buttonCopySamplePassword.enabled = YES;
+        self.labelSamplePassword.textColor = nil;
+    });
 }
 
 @end

@@ -15,19 +15,16 @@
 #import "Model.h"
 #import "SharedAppAndAutoFillSettings.h"
 
-@interface UpgradeViewController () <SKStoreProductViewControllerDelegate>
+@interface UpgradeViewController ()
 
 @property (weak, nonatomic) IBOutlet UIView *buttonViewMonthly;
 @property (weak, nonatomic) IBOutlet UIView *buttonViewYearly;
 @property (weak, nonatomic) IBOutlet UIView *buttonViewLifeTime;
-@property (weak, nonatomic) IBOutlet UIView *buttonViewFamilySharing;
 @property (weak, nonatomic) IBOutlet UIButton *buttonRestorePrevious;
 
 @property (weak, nonatomic) IBOutlet UILabel *buttonMonthlyTitle;
 @property (weak, nonatomic) IBOutlet UILabel *buttonYearlyTitle;
 @property (weak, nonatomic) IBOutlet UILabel *buttonLifeTimeTitle;
-@property (weak, nonatomic) IBOutlet UILabel *buttonFamilySharingTitle;
-@property (weak, nonatomic) IBOutlet UILabel *buttonFamilySharingSubtitle;
 
 @property (weak, nonatomic) IBOutlet UILabel *monthlyPrice;
 @property (weak, nonatomic) IBOutlet UILabel *yearlyBonusLabel;
@@ -47,8 +44,6 @@
 @property (weak, nonatomic) IBOutlet UITextView *termsAndConditionsTextView;
 
 @end
-
-const static NSUInteger kFamilySharingProductId = 1481853033;
 
 @implementation UpgradeViewController
 
@@ -79,7 +74,6 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     self.buttonViewMonthly.layer.cornerRadius = kRadius;
     self.buttonViewYearly.layer.cornerRadius = kRadius;
     self.buttonViewLifeTime.layer.cornerRadius = kRadius;
-    self.buttonViewFamilySharing.layer.cornerRadius = kRadius;
     self.buttonStartFreeTrial.layer.cornerRadius = kRadius;
     
     UITapGestureRecognizer *m = [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -93,10 +87,6 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     UITapGestureRecognizer *l = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                         action:@selector(onLifeTime)];
     [self.buttonViewLifeTime addGestureRecognizer:l];
-
-    UITapGestureRecognizer *f = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                        action:@selector(onFamilySharing)];
-    [self.buttonViewFamilySharing addGestureRecognizer:f];
 
     UITapGestureRecognizer *trial = [[UITapGestureRecognizer alloc] initWithTarget:self
                                                                             action:@selector(onStartFreeTrial)];
@@ -185,7 +175,6 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     [self bindMonthlyPricing];
     [self bindYearlyPricing];
     [self bindLifeTimePricing];
-    [self bindFamilySharing];
 }
 
 - (void)bindMonthlyPricing {
@@ -259,11 +248,6 @@ const static NSUInteger kFamilySharingProductId = 1481853033;
     }
 }
 
-- (void)bindFamilySharing {
-    self.buttonFamilySharingTitle.text = NSLocalizedString(@"upgrade_family_sharing_button_title", @"Need Family Sharing?");
-    self.buttonFamilySharingSubtitle.text = NSLocalizedString(@"upgrade_family_sharing_button_subtitle", @"Tap for more info...");
-}
-
 - (IBAction)onFreeProComparisonChart:(id)sender {
     [self performSegueWithIdentifier:@"segueToFreeProComparison" sender:nil];
 }
@@ -324,21 +308,6 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
 
 - (void)onLifeTime {
     [self purchase:ProUpgradeIAPManager.sharedInstance.lifeTimeProduct];
-}
-
-- (void)onFamilySharing {
-    NSLog(@"onFamilySharing");
-    
-    self.buttonViewFamilySharing.userInteractionEnabled = NO;
-
-    [Alerts okCancel:self
-               title:NSLocalizedString(@"upgrade_family_sharing_info_title", @"Title of info dialog about Family Sharing upgrade")
-             message:NSLocalizedString(@"upgrade_family_sharing_info_message", @"A message about how you will need to download/purchase a separate App for Family Sharing to work")
-              action:^(BOOL response) {
-        if(response) {
-            [self showFamilySharingAppInAppStore];
-        }
-    }];
 }
 
 - (IBAction)onIHaveQuestions:(id)sender {
@@ -414,34 +383,8 @@ static int calculatePercentageSavings(NSDecimalNumber* price, NSDecimalNumber* m
     self.buttonViewMonthly.userInteractionEnabled = enable;
     self.buttonViewYearly.userInteractionEnabled = enable;
     self.buttonViewLifeTime.userInteractionEnabled = enable;
-    self.buttonViewFamilySharing.userInteractionEnabled = enable;
     self.buttonStartFreeTrial.userInteractionEnabled = enable;
     self.buttonRestorePrevious.enabled = enable;
-}
-
-- (void)showFamilySharingAppInAppStore {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"")];
-    
-    SKStoreProductViewController* vc = [[SKStoreProductViewController alloc] init];
-    vc.delegate = self;
-    
-    [vc loadProductWithParameters:@{ SKStoreProductParameterITunesItemIdentifier : @(kFamilySharingProductId) }
-                  completionBlock:^(BOOL result, NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.buttonViewFamilySharing.userInteractionEnabled = YES;
-            [SVProgressHUD dismiss];
-            
-            if(result) {
-                [self presentViewController:vc animated:YES completion:nil];
-            }
-            else {
-                [Alerts error:self title:NSLocalizedString(@"generic_error", @"") error:error];
-            }});
-    }];
-}
-
-- (void)productViewControllerDidFinish:(SKStoreProductViewController *)viewController {
-    [viewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)onStartFreeTrial {

@@ -16,6 +16,7 @@ extern NSString* const kDatabaseCell;
 @interface DatabaseCell : UITableViewCell
 
 - (void)populateCell:(SafeMetaData*)database;
+- (void)populateCell:(SafeMetaData *)database disabled:(BOOL)disabled;
 - (void)populateCell:(SafeMetaData*)database disabled:(BOOL)disabled autoFill:(BOOL)autoFill;
 
 @end

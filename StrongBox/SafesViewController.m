@@ -957,6 +957,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                                   openLocalOnly:openLocalOnly
                                     biometricAuthenticationDone:userJustCompletedBiometricAuthentication
                                             noConvenienceUnlock:noConvenienceUnlock
+                                                allowOnboarding:YES
                                                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
             if (result == kUnlockDatabaseResultSuccess) {
                 if (@available(iOS 11.0, *)) { 
@@ -968,6 +969,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             }
             else if (result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
                 [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
+            }
+            else if (result == kUnlockDatabaseResultError) {
+                [Alerts error:self
+                        title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                        error:error];
             }
         }];
     }
@@ -1085,7 +1091,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     [ma addObject:[self getContextualMenuRenameAction:indexPath]];
 
-
+    
 
     [ma addObject:[self getContextualMenuRemoveAction:indexPath]];
 
@@ -1350,11 +1356,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     
 
-    UIAlertAction *mergeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_action_merge_ellipsis", @"Merge...")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-        [self beginMergeWizard:safe];
-    }];
+
+
+
+
+
 
 
 
@@ -1722,9 +1728,21 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }
     else if ( [segue.identifier isEqualToString:@"segueToMergeWizard"]) {
         SafeMetaData* dest = (SafeMetaData*)sender;
-        MergeInitialViewController* vc = (MergeInitialViewController*)segue.destinationViewController;
-        vc.destinationDatabase = dest;
+        UINavigationController* nav = segue.destinationViewController;
+        MergeInitialViewController* vc = (MergeInitialViewController*)nav.topViewController;
+        vc.firstMetadata = dest;
+        vc.onDone = ^(BOOL userCancelled) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if (!userCancelled) {
+                    [self onMergeWizardDone];
+                }
+            }];
+        };
     }
+}
+
+- (void)onMergeWizardDone {
+    
 }
 
 - (void)onOnboardingDoneWithAddDatabase:(BOOL)addExisting

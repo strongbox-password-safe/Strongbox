@@ -9,10 +9,7 @@
 #import "MergeInitialViewController.h"
 #import "OpenSafeSequenceHelper.h"
 #import "Alerts.h"
-
-@interface MergeInitialViewController ()
-
-@end
+#import "MergeSelectSecondDatabaseViewController.h"
 
 @implementation MergeInitialViewController
 
@@ -36,31 +33,36 @@
 
 - (IBAction)onUnlock:(id)sender {
     [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                       safe:self.destinationDatabase
+                                                       safe:self.firstMetadata
                                         canConvenienceEnrol:NO
                                              isAutoFillOpen:NO
                                               openLocalOnly:NO
                                                  completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
-        if ( result == kUnlockDatabaseResultError ) {
-            [Alerts error:self error:error];
-            [self dismiss];
+        if(result == kUnlockDatabaseResultSuccess) {
+            [self performSegueWithIdentifier:@"segueToSelectSecondDatabase" sender:model];
         }
-        else if ( result == kUnlockDatabaseResultSuccess ) {
-            [Alerts info:self title:@"Yo!" message:@"Bar"];
-            
+        else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
+            self.onDone(YES);
         }
-        else {
-            [self dismiss];
+        else if (result == kUnlockDatabaseResultError) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                    error:error];
         }
     }];
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self dismiss];
+    self.onDone(YES);
 }
 
-- (void)dismiss {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.identifier isEqualToString:@"segueToSelectSecondDatabase"]) {
+        MergeSelectSecondDatabaseViewController* vc = segue.destinationViewController;
+        
+        vc.firstDatabase = sender;
+        vc.onDone = self.onDone;
+    }
 }
 
 @end

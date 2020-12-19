@@ -602,16 +602,20 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if ( ![self.uuid isEqual:other.uuid] ) {
         return NO;
     }
-    
+        
     if (self.isGroup) {
         
         BOOL ret = [other.fields.modified isLaterThan:self.fields.modified]; 
 
         NSLog(@"%@ = %@ ? %d", self.fields.modified, other.fields.modified, ret);
 
-        return !ret;
+        return !ret; 
     }
     else {
+        if ( [self.title compare:other.title] != NSOrderedSame ) {
+            return NO;
+        }
+
         if (!( ( self.iconId == nil && other.iconId == nil ) ||
               (self.iconId && other.iconId && ([self.iconId isEqual:other.iconId])))) {
             return NO;

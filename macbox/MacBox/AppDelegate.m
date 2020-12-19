@@ -109,12 +109,10 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)initializeProFamilyEdition {
-    if(!Settings.sharedInstance.hasDoneProFamilyCheck && [self isProFamilyEdition]) {
+    if([self isProFamilyEdition]) {
         NSLog(@"Initial launch of Pro/Family Edition... setting Pro");
         [Settings.sharedInstance setFullVersion:YES];
     }
-    
-    Settings.sharedInstance.hasDoneProFamilyCheck = YES;
 }
 
 - (BOOL)isProFamilyEdition {

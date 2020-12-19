@@ -8,12 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
+#import "Pair.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface SyncDiffReport : NSObject
 
-@property NSArray<NSUUID*> * changes;
+@property NSArray<Node*>* onlyInTheirs;
+@property NSArray<Pair<Node*, Node*>*>* differentFromOurs;
+
+@property NSArray<NSUUID*>* changes;
 
 @end
 

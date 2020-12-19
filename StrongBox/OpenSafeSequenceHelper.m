@@ -41,6 +41,7 @@
 #endif
 
 #import <Foundation/FoundationErrors.h>
+#import "KeyFileHelper.h"
 
 @interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate>
 
@@ -50,6 +51,7 @@
 @property BOOL canConvenienceEnrol;
 @property (nonnull) UnlockDatabaseCompletionBlock completion;
 
+@property BOOL allowOnboarding;
 @property BOOL isConvenienceUnlock;
 @property BOOL isAutoFillOpen;
 @property BOOL isAutoFillQuickTypeOpen;
@@ -69,6 +71,13 @@
 @property BOOL noConvenienceUnlock;
 
 @end
+
+
+
+
+
+
+
 
 @implementation OpenSafeSequenceHelper
 
@@ -101,6 +110,7 @@
                                               openLocalOnly:openLocalOnly
                                 biometricAuthenticationDone:biometricAuthenticationDone
                                         noConvenienceUnlock:NO
+                                            allowOnboarding:NO
                                                  completion:completion];
 }
 
@@ -111,6 +121,7 @@
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                     noConvenienceUnlock:(BOOL)noConvenienceUnlock
+                        allowOnboarding:(BOOL)allowOnboarding
                              completion:(UnlockDatabaseCompletionBlock)completion {
     [OpenSafeSequenceHelper beginSequenceWithViewController:viewController
                                                        safe:safe
@@ -120,6 +131,7 @@
                                      openLocalOnly:openLocalOnly
                                 biometricAuthenticationDone:biometricAuthenticationDone
                                         noConvenienceUnlock:noConvenienceUnlock
+                                            allowOnboarding:allowOnboarding
                                                  completion:completion];
 }
 
@@ -131,6 +143,7 @@
                           openLocalOnly:(BOOL)openLocalOnly
             biometricAuthenticationDone:(BOOL)biometricAuthenticationDone
                     noConvenienceUnlock:(BOOL)noConvenienceUnlock
+                        allowOnboarding:(BOOL)allowOnboarding
                              completion:(UnlockDatabaseCompletionBlock)completion {
     OpenSafeSequenceHelper *helper = [[OpenSafeSequenceHelper alloc] initWithViewController:viewController
                                                                                        safe:safe
@@ -140,6 +153,7 @@
                                                                               openLocalOnly:openLocalOnly
                                                                         biometricPreCleared:biometricAuthenticationDone
                                                                         noConvenienceUnlock:noConvenienceUnlock
+                                                                            allowOnboarding:allowOnboarding
                                                                                  completion:completion];
     
     [helper beginSeq];
@@ -153,6 +167,7 @@
                          openLocalOnly:(BOOL)openLocalOnly
                    biometricPreCleared:(BOOL)biometricPreCleared
                    noConvenienceUnlock:(BOOL)noConvenienceUnlock
+                       allowOnboarding:(BOOL)allowOnboarding
                             completion:(UnlockDatabaseCompletionBlock)completion {
     self = [super init];
     if (self) {
@@ -166,7 +181,9 @@
         self.openLocalOnly = openLocalOnly;
         self.biometricPreCleared = biometricPreCleared;
         self.noConvenienceUnlock = noConvenienceUnlock;
+        self.allowOnboarding = allowOnboarding;
     }
+    
     
     return self;
 }
@@ -779,7 +796,7 @@
     NSError* error;
     BOOL valid = [DatabaseModel isValidDatabase:url error:&error];
     if (!valid) {
-        [self openSafeWithDataDone:error openedSafe:nil modDate:modDate];
+        [self openSafeWithDataDone:nil modDate:modDate error:error];
         return;
     }
 
@@ -845,17 +862,10 @@
     });
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword
-                                                   keyFileDigest:self.keyFileDigest
-                                                       yubiKeyCR:yubiKeyCR];
-        
-        DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
-                                                            sanityCheckInnerStream:YES];
+        CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword keyFileDigest:self.keyFileDigest yubiKeyCR:yubiKeyCR];
+        DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig sanityCheckInnerStream:YES];
     
-        if(!self.isConvenienceUnlock &&
-           (format == kKeePass || format == kKeePass4) &&
-           self.masterPassword.length == 0 &&
-           (self.keyFileDigest || yubiKeyCR)) {
+        if(!self.isConvenienceUnlock && (format == kKeePass || format == kKeePass4) && self.masterPassword.length == 0 && (self.keyFileDigest || yubiKeyCR)) {
             
             
             
@@ -864,21 +874,13 @@
             
 
             if (!yubiKeyCR) { 
-                [DatabaseModel fromUrl:url
-                                   ckf:cpf
-                                config:modelConfig
-                            completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                [DatabaseModel fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                     if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
-                        CompositeKeyFactors* ckf = [CompositeKeyFactors password:nil
-                                                                   keyFileDigest:self.keyFileDigest
-                                                                       yubiKeyCR:yubiKeyCR];
+                        CompositeKeyFactors* ckf = [CompositeKeyFactors password:nil keyFileDigest:self.keyFileDigest yubiKeyCR:yubiKeyCR];
                         
                         
                         
-                        [DatabaseModel fromUrl:url
-                               ckf:ckf
-                            config:modelConfig
-                        completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                        [DatabaseModel fromUrl:url ckf:ckf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                             if(model) {
                                 self.masterPassword = nil;
                             }
@@ -906,20 +908,14 @@
                     }
                     
                     cpf.password = self.masterPassword;
-                    [DatabaseModel fromUrl:url
-                                       ckf:cpf
-                                    config:modelConfig
-                                completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                    [DatabaseModel fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                         [self onGotDatabaseModelFromData:userCancelled model:model modDate:modDate error:error];
                     }];
                 }];
             }
         }
         else {
-            [DatabaseModel fromUrl:url
-                               ckf:cpf
-                            config:modelConfig
-                        completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+            [DatabaseModel fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                 [self onGotDatabaseModelFromData:userCancelled model:model modDate:modDate error:error];
             }];
         }
@@ -929,7 +925,7 @@
 - (void)onGotDatabaseModelFromData:(BOOL)userCancelled
                              model:(DatabaseModel*)model
                            modDate:(NSDate*)modDate
-                             error:(const NSError*)error {
+                             error:(NSError*)error {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [SVProgressHUD dismiss];
         
@@ -937,25 +933,18 @@
             self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
         }
         else {
-            [self openSafeWithDataDone:error openedSafe:model modDate:modDate];
+            [self openSafeWithDataDone:model modDate:modDate error:error];
         }
     });
 }
 
-- (void)openSafeWithDataDone:(const NSError*)error
-                  openedSafe:(DatabaseModel*)openedSafe
-                     modDate:(NSDate*)modDate {
+- (void)openSafeWithDataDone:(DatabaseModel*)openedSafe
+                     modDate:(NSDate*)modDate
+                       error:(NSError*)error {
     [SVProgressHUD dismiss];
     
     if (openedSafe == nil) {
-        if(!error) {
-            [Alerts error:self.viewController
-                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                    error:error];
-            self.completion(kUnlockDatabaseResultError, nil, error);
-            return;
-        }
-        else if (error.code == kStrongboxErrorCodeIncorrectCredentials) {
+        if(error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
             if(self.isConvenienceUnlock) { 
                 self.safe.isEnrolledForConvenience = NO;
                 self.safe.convenienceMasterPassword = nil;
@@ -983,10 +972,10 @@
                 }
             }
         }
-        else {
-            [Alerts error:self.viewController
-                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                    error:error];
+        
+        if (!error) {
+            NSLog(@"WARNWARN - No database but error not set?!");
+            error = [Utils createNSError:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") errorCode:-1];
         }
         
         self.completion(kUnlockDatabaseResultError, nil, error);
@@ -1001,10 +990,10 @@
         BOOL quickLaunchPossible = !self.isAutoFillOpen && SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil;
         BOOL quickLaunchNotYetPrompted = !self.safe.hasBeenPromptedForQuickLaunch;
         
-        if (conveniencePossible && convenienceNotYetPrompted) {
+        if (conveniencePossible && convenienceNotYetPrompted && self.allowOnboarding) {
             [self promptForConvenienceEnrolAndOpen:biometricPossible pinPossible:pinPossible openedSafe:openedSafe];
         }
-        else if (quickLaunchPossible && quickLaunchNotYetPrompted) {
+        else if (quickLaunchPossible && quickLaunchNotYetPrompted && self.allowOnboarding) {
             [self promptForQuickLaunch:openedSafe];
         }
         else {
@@ -1175,31 +1164,6 @@
 }
 
 
-
-NSData* getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error) {
-    NSData* keyFileData = getKeyFileData(keyFileBookmark, onceOffKeyFileData, error);
-    
-    NSData *keyFileDigest = keyFileData ? [KeyFileParser getKeyFileDigestFromFileData:keyFileData checkForXml:format != kKeePass1] : nil;
-
-    return keyFileDigest;
-}
-
-NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NSError** error) {
-    NSData* keyFileData = nil;
-    
-    if (keyFileBookmark) {
-        NSString* updated;
-        NSURL* keyFileUrl = [BookmarksHelper getUrlFromBookmark:keyFileBookmark readOnly:YES updatedBookmark:&updated error:error];
-        if (keyFileUrl) {
-            keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
-        }
-    }
-    else if (onceOffKeyFileData) {
-        keyFileData = onceOffKeyFileData;
-    }
-    
-    return keyFileData;
-}
 
 + (BOOL)isAutoFillLikelyToCrash:(NSURL*)url {
     DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];

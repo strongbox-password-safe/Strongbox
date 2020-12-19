@@ -23,7 +23,7 @@
 #import "FavIconBulkViewController.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
-#import "OpenSafeSequenceHelper.h"
+#import "KeyFileHelper.h"
 
 @interface DatabaseOperations ()
 

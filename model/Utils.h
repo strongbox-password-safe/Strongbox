@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSString *)hostname;
 + (NSString *)getUsername;
 
-NSString* keePassStringIdFromUuid(NSUUID* uuid);
+NSString*_Nullable keePassStringIdFromUuid(NSUUID* uuid);
 NSUUID*_Nullable uuidFromKeePassStringId(NSString* stringId);
 
 BOOL isValidUrl(NSString* urlString);

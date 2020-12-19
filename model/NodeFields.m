@@ -157,10 +157,10 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
     
     
-    if ( ![self.created isEqualToDate:other.created] ) return NO;
-    if ( ![self.modified isEqualToDate:other.modified] ) return NO;
-    if ( ![self.expires isEqualToDate:other.expires] ) return NO;
-        
+    if ((self.created == nil && other.created != nil) || (self.created != nil && ![self.created isEqualToDate:other.created] )) return NO;
+    if ((self.modified == nil && other.modified != nil) || (self.modified != nil && ![self.modified isEqualToDate:other.modified] )) return NO;
+    if ((self.expires == nil && other.expires != nil) || (self.expires != nil && ![self.expires isEqualToDate:other.expires] )) return NO;
+            
     if ((self.foregroundColor == nil && other.foregroundColor != nil) || (self.foregroundColor != nil && ![self.foregroundColor isEqual:other.foregroundColor] )) {
         return NO;
     }
@@ -180,7 +180,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
     if ( ![self.customData isEqual:other.customData] ) return NO; 
 
-    return NO;
+    return YES;
 }
 
 - (BOOL)attachmentIsSyncEqualTo:(NodeFileAttachment*)a b:(NodeFileAttachment*)b params:(SyncComparisonParams *)params {

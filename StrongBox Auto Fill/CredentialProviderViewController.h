@@ -19,5 +19,6 @@ API_AVAILABLE(ios(12.0))
 
 - (void)exitWithUserCancelled;
 - (void)exitWithCredential:(NSString*)username password:(NSString*)password;
+- (void)exitWithErrorOccurred:(NSError*)error;
 
 @end

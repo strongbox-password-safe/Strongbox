@@ -41,6 +41,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self installTopLevelExceptionHandlers];
     
+    
+    
     [self initializeDropbox];
     
     [self performEarlyBasicICloudInitialization];
@@ -48,7 +50,7 @@
     [self initializeInstallSettingsAndLaunchCount];   
     
     [self initializeProFamilyEdition];
-        
+    
     [self markDirectoriesForBackupInclusion];
     
     [self cleanupWorkingDirectories:launchOptions];

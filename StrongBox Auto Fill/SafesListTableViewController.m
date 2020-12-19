@@ -172,17 +172,29 @@
                                              isAutoFillOpen:YES
                                               openLocalOnly:NO
                                 biometricAuthenticationDone:NO
-                                                 completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
+                                                 completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
         
         
 
         AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+    
+        if(result == kUnlockDatabaseResultSuccess) {
+            [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
+        }
+        else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
+            [self onCancel:nil];
+        }
+        else if (result == kUnlockDatabaseResultError) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                    error:error
+               completion:^{
+                [[self getInitialViewController] exitWithErrorOccurred:error];
+            }];
+        }
         
-          if(model) {
-              [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
-          }
-          [self refreshSafes]; 
-      }];
+        [self refreshSafes]; 
+    }];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

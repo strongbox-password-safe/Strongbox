@@ -130,7 +130,6 @@
 		4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA6219B459A00C22CB4 /* AutoFillNewRecordSettings.m */; };
 		4D1FFAE52403030100B75EA2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F581F30DB7A00D68BFE /* main.m */; };
 		4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4972332D80A00C2E084 /* GZipInputStream.m */; };
-		4D1FFAE72403030100B75EA2 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
 		4D1FFAE82403030100B75EA2 /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493022232A3200F48182 /* DAVRequest.m */; };
 		4D1FFAE92403030100B75EA2 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
 		4D1FFAEA2403030100B75EA2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F551F30DB7A00D68BFE /* AppDelegate.m */; };
@@ -332,7 +331,6 @@
 		4D9E098F21825108007BA1E7 /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096E21825105007BA1E7 /* Root.m */; };
 		4D9E099121825108007BA1E7 /* Meta.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097121825106007BA1E7 /* Meta.m */; };
 		4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097921825107007BA1E7 /* KeePassGroup.m */; };
-		4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
 		4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097C21825107007BA1E7 /* Kdbx4Database.m */; };
 		4D9E099921825108007BA1E7 /* XMLWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097E21825107007BA1E7 /* XMLWriter.m */; };
 		4D9E099E21825134007BA1E7 /* KdbxSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099B21825134007BA1E7 /* KdbxSerialization.m */; };
@@ -476,6 +474,7 @@
 		C831367724A9203A00D475D9 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C831367324A9203A00D475D9 /* cencode.c */; };
 		C8453ED6254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED4254DC0A7006BE885 /* PlaintextInnerStream.m */; };
 		C8453ED7254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED4254DC0A7006BE885 /* PlaintextInnerStream.m */; };
+		C847979425895647002CEEE7 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DB3DD2D257E7A4000DC6560 /* CloudKit.framework */; };
 		C85B9D77246544C600EEBFC9 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
 		C85B9D78246544C600EEBFC9 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
 		C85B9D79246544C600EEBFC9 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D76246544C600EEBFC9 /* NSString+Extensions.m */; };
@@ -564,6 +563,14 @@
 		C86E60972562D649001953AD /* blake2b.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D1F219B4B2900C22CB4 /* blake2b.c */; };
 		C86E9076246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */; };
 		C86E9077246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */; };
+		C870739C258935500002070A /* KeePassXmlModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = C870739B258935500002070A /* KeePassXmlModelAdaptor.m */; };
+		C870739D258935500002070A /* KeePassXmlModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = C870739B258935500002070A /* KeePassXmlModelAdaptor.m */; };
+		C870739E258935500002070A /* KeePassXmlModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = C870739B258935500002070A /* KeePassXmlModelAdaptor.m */; };
+		C870739F258935500002070A /* KeePassXmlModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = C870739B258935500002070A /* KeePassXmlModelAdaptor.m */; };
+		C87073A72589356A0002070A /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = C87073A62589356A0002070A /* Platform.m */; };
+		C87073A82589356A0002070A /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = C87073A62589356A0002070A /* Platform.m */; };
+		C87073A92589356A0002070A /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = C87073A62589356A0002070A /* Platform.m */; };
+		C87073AA2589356A0002070A /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = C87073A62589356A0002070A /* Platform.m */; };
 		C87A993F255968EA0002BEF8 /* URLRequestOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87A9932255968EA0002BEF8 /* URLRequestOperation.swift */; };
 		C87A9940255968EA0002BEF8 /* URLRequestOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87A9932255968EA0002BEF8 /* URLRequestOperation.swift */; };
 		C87A9941255968EA0002BEF8 /* XMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9934255968EA0002BEF8 /* XMLDocument.m */; };
@@ -653,7 +660,6 @@
 		C89B8FB52562D2FE00B590C0 /* TwoFishCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE6219B481200C22CB4 /* TwoFishCipher.m */; };
 		C89B8FB62562D2FE00B590C0 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED4254DC0A7006BE885 /* PlaintextInnerStream.m */; };
 		C89B8FB72562D2FE00B590C0 /* AesCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096521825104007BA1E7 /* AesCipher.m */; };
-		C89B8FB82562D2FE00B590C0 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
 		C89B8FB92562D2FE00B590C0 /* ChaCha20Cipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE1219B481200C22CB4 /* ChaCha20Cipher.m */; };
 		C89B8FBA2562D2FE00B590C0 /* InnerRandomStreamFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE3219B481200C22CB4 /* InnerRandomStreamFactory.m */; };
 		C89B8FBB2562D2FE00B590C0 /* KeePassCiphers.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CDE219B481200C22CB4 /* KeePassCiphers.m */; };
@@ -750,7 +756,6 @@
 		C8B9459E2573D01A00932C46 /* OTPToken+Serialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AF21F898460043DDC0 /* OTPToken+Serialization.m */; };
 		C8B9459F2573D01A00932C46 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
 		C8B945A02573D01A00932C46 /* ref.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D22219B4B2900C22CB4 /* ref.c */; };
-		C8B945A12573D01A00932C46 /* XmlStrongBoxModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */; };
 		C8B945A22573D01A00932C46 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5895224BFA7200013808 /* StringValue.m */; };
 		C8B945A32573D01A00932C46 /* HmacBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC763A2497A7F800C9C443 /* HmacBlockStream.m */; };
 		C8B945A42573D01A00932C46 /* OTPToken+Generation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9AC21F898460043DDC0 /* OTPToken+Generation.m */; };
@@ -1282,7 +1287,6 @@
 		4D9E094A21825103007BA1E7 /* KeePassGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassGroup.h; path = ../model/keepass/KeePassGroup.h; sourceTree = "<group>"; };
 		4D9E094B21825103007BA1E7 /* RootXmlDomainObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RootXmlDomainObject.h; path = ../model/keepass/RootXmlDomainObject.h; sourceTree = "<group>"; };
 		4D9E094C21825103007BA1E7 /* SerializationData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SerializationData.h; path = ../model/keepass/SerializationData.h; sourceTree = "<group>"; };
-		4D9E094D21825103007BA1E7 /* XmlStrongBoxModelAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XmlStrongBoxModelAdaptor.h; path = ../model/keepass/XmlStrongBoxModelAdaptor.h; sourceTree = "<group>"; };
 		4D9E094F21825103007BA1E7 /* Root.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Root.h; path = ../model/keepass/Root.h; sourceTree = "<group>"; };
 		4D9E095021825103007BA1E7 /* DecryptionParameters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DecryptionParameters.h; path = ../model/keepass/DecryptionParameters.h; sourceTree = "<group>"; };
 		4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongboxNodeModelAdaptor.m; path = ../model/keepass/XmlStrongboxNodeModelAdaptor.m; sourceTree = "<group>"; };
@@ -1309,7 +1313,6 @@
 		4D9E097321825106007BA1E7 /* KeePassFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassFile.h; path = ../model/keepass/KeePassFile.h; sourceTree = "<group>"; };
 		4D9E097421825106007BA1E7 /* Entry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entry.h; path = ../model/keepass/Entry.h; sourceTree = "<group>"; };
 		4D9E097921825107007BA1E7 /* KeePassGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassGroup.m; path = ../model/keepass/KeePassGroup.m; sourceTree = "<group>"; };
-		4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XmlStrongBoxModelAdaptor.m; path = ../model/keepass/XmlStrongBoxModelAdaptor.m; sourceTree = "<group>"; };
 		4D9E097C21825107007BA1E7 /* Kdbx4Database.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Kdbx4Database.m; path = ../model/keepass/Kdbx4Database.m; sourceTree = "<group>"; };
 		4D9E097E21825107007BA1E7 /* XMLWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = XMLWriter.m; path = ../model/keepass/XMLWriter.m; sourceTree = "<group>"; };
 		4D9E097F21825107007BA1E7 /* InnerRandomStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = InnerRandomStream.h; path = ../model/keepass/InnerRandomStream.h; sourceTree = "<group>"; };
@@ -1643,6 +1646,10 @@
 		C86791742561A1910038310E /* AutoTypeAssociation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AutoTypeAssociation.m; path = ../model/AutoTypeAssociation.m; sourceTree = "<group>"; };
 		C86E9074246D88D70029623A /* KeePassDatabaseWideProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassDatabaseWideProperties.h; path = ../model/keepass/KeePassDatabaseWideProperties.h; sourceTree = "<group>"; };
 		C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeePassDatabaseWideProperties.m; path = ../model/keepass/KeePassDatabaseWideProperties.m; sourceTree = "<group>"; };
+		C870739A258935500002070A /* KeePassXmlModelAdaptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassXmlModelAdaptor.h; path = ../model/keepass/KeePassXmlModelAdaptor.h; sourceTree = "<group>"; };
+		C870739B258935500002070A /* KeePassXmlModelAdaptor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = KeePassXmlModelAdaptor.m; path = ../model/keepass/KeePassXmlModelAdaptor.m; sourceTree = "<group>"; };
+		C87073A52589356A0002070A /* Platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = ../model/Platform.h; sourceTree = "<group>"; };
+		C87073A62589356A0002070A /* Platform.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Platform.m; path = ../model/Platform.m; sourceTree = "<group>"; };
 		C87A9930255968EA0002BEF8 /* Strongbox-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Bridging-Header.h"; sourceTree = "<group>"; };
 		C87A9931255968EA0002BEF8 /* Strongbox-Outright-Pro-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strongbox-Outright-Pro-Bridging-Header.h"; sourceTree = "<group>"; };
 		C87A9932255968EA0002BEF8 /* URLRequestOperation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = URLRequestOperation.swift; path = "../FavIcon-Swift/URLRequestOperation.swift"; sourceTree = "<group>"; };
@@ -1843,6 +1850,7 @@
 				C89B8E5C2562952300B590C0 /* AuthenticationServices.framework in Frameworks */,
 				4DA203921F7662D000113A6B /* StoreKit.framework in Frameworks */,
 				C85B9DA92465480B00EEBFC9 /* libjson.a in Frameworks */,
+				C847979425895647002CEEE7 /* CloudKit.framework in Frameworks */,
 				4D2CB4A52332D97800C2E084 /* libxml2.2.dylib in Frameworks */,
 				C85B9DA72465480B00EEBFC9 /* libykpers-1.a in Frameworks */,
 				6B9B902F795918EE0444B2D8 /* Pods_common_mac_Strongbox.framework in Frameworks */,
@@ -2307,6 +2315,8 @@
 		4D9E0948218250F6007BA1E7 /* KeePass */ = {
 			isa = PBXGroup;
 			children = (
+				C870739A258935500002070A /* KeePassXmlModelAdaptor.h */,
+				C870739B258935500002070A /* KeePassXmlModelAdaptor.m */,
 				4D524CF2219B481A00C22CB4 /* Xml */,
 				4D524CC2219B47A300C22CB4 /* KDBX4 */,
 				4D524CF3219B482800C22CB4 /* KDBX3 */,
@@ -2341,8 +2351,6 @@
 				4D524CFC219B48D300C22CB4 /* AttachmentsRationalizer.m */,
 				4D524D0B219B497B00C22CB4 /* KdbxSerializationCommon.h */,
 				4D524CF6219B48D200C22CB4 /* KdbxSerializationCommon.m */,
-				4D9E094D21825103007BA1E7 /* XmlStrongBoxModelAdaptor.h */,
-				4D9E097A21825107007BA1E7 /* XmlStrongBoxModelAdaptor.m */,
 				4D9E096821825105007BA1E7 /* XmlStrongboxNodeModelAdaptor.h */,
 				4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */,
 				C86E9074246D88D70029623A /* KeePassDatabaseWideProperties.h */,
@@ -2560,6 +2568,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C87073A52589356A0002070A /* Platform.h */,
+				C87073A62589356A0002070A /* Platform.m */,
 				4DCAE8B7257E711A00072D4B /* UnifiedDatabaseMetadata.h */,
 				4DCAE8B8257E711A00072D4B /* UnifiedDatabaseMetadata.m */,
 				4D216F5922CBCD73000954D0 /* Password Generation */,
@@ -3569,6 +3579,8 @@
 				4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */,
 				4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */,
 				4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */,
+				C870739E258935500002070A /* KeePassXmlModelAdaptor.m in Sources */,
+				C87073A92589356A0002070A /* Platform.m in Sources */,
 				C8B946492573D44B00932C46 /* AutoFillSettingsViewController.m in Sources */,
 				4DD7840A2412CE6C00E45D1C /* ColoredStringHelper.m in Sources */,
 				C8E78B4925715C8700251153 /* MMWormhole.m in Sources */,
@@ -3625,7 +3637,6 @@
 				4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */,
 				4D1FFAE52403030100B75EA2 /* main.m in Sources */,
 				4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */,
-				4D1FFAE72403030100B75EA2 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				C8DC76402497A90700C9C443 /* FileManager.m in Sources */,
 				C86E9077246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				C85B9D912465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
@@ -3759,7 +3770,6 @@
 				C86E60632562D5A7001953AD /* OTPToken+Serialization.m in Sources */,
 				C89B8FD12562D32200B590C0 /* CustomField.m in Sources */,
 				C86E60942562D649001953AD /* ref.c in Sources */,
-				C89B8FB82562D2FE00B590C0 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				C89B8E6B2562956700B590C0 /* StringValue.m in Sources */,
 				C86E602C2562D510001953AD /* HmacBlockStream.m in Sources */,
 				C86E60622562D5A7001953AD /* OTPToken+Generation.m in Sources */,
@@ -3786,6 +3796,7 @@
 				C86E60652562D5A7001953AD /* OTPToken.m in Sources */,
 				C89B8F6D2562C54F00B590C0 /* NSArray+Extensions.m in Sources */,
 				4DCAE8BA257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
+				C87073A82589356A0002070A /* Platform.m in Sources */,
 				C80798582562E27800FE0CA7 /* AutoFillNewRecordSettings.m in Sources */,
 				C8C1F73D257010AE009991D4 /* NSMutableArray+Extensions.m in Sources */,
 				C86E60752562D5EB001953AD /* twofish.c in Sources */,
@@ -3814,6 +3825,7 @@
 				C89B8FA22562D2CA00B590C0 /* DeletedObject.m in Sources */,
 				C8C083502569581F00FF280D /* CustomBackgroundTableView.m in Sources */,
 				C86E606B2562D5AF001953AD /* PasswordMaker.m in Sources */,
+				C870739D258935500002070A /* KeePassXmlModelAdaptor.m in Sources */,
 				C8E78B4A25715C8700251153 /* MMWormhole.m in Sources */,
 				C89B8FCA2562D30C00B590C0 /* KdbEntry.m in Sources */,
 				C8E78B4425715C8700251153 /* MMWormholeCoordinatedFileTransiting.m in Sources */,
@@ -3978,6 +3990,8 @@
 				4D1E77D523AFD7FB007240FA /* CustomIconsRationalizer.m in Sources */,
 				C8E78B4E25715C8700251153 /* MMWormholeFileTransiting.m in Sources */,
 				C80FF039256D666E00A181B1 /* AutoFillSettingsViewController.m in Sources */,
+				C870739C258935500002070A /* KeePassXmlModelAdaptor.m in Sources */,
+				C87073A72589356A0002070A /* Platform.m in Sources */,
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
 				4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */,
 				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
@@ -4033,7 +4047,6 @@
 				4D524CA8219B459B00C22CB4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
 				4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */,
-				4D9E099521825108007BA1E7 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				C8DC763F2497A90700C9C443 /* FileManager.m in Sources */,
 				C86E9076246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				C85B9D902465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
@@ -4159,7 +4172,6 @@
 				C8B9459E2573D01A00932C46 /* OTPToken+Serialization.m in Sources */,
 				C8B9459F2573D01A00932C46 /* CustomField.m in Sources */,
 				C8B945A02573D01A00932C46 /* ref.c in Sources */,
-				C8B945A12573D01A00932C46 /* XmlStrongBoxModelAdaptor.m in Sources */,
 				C8B945A22573D01A00932C46 /* StringValue.m in Sources */,
 				C8B945A32573D01A00932C46 /* HmacBlockStream.m in Sources */,
 				C8B945A42573D01A00932C46 /* OTPToken+Generation.m in Sources */,
@@ -4186,6 +4198,7 @@
 				C8B945B92573D01A00932C46 /* OTPToken.m in Sources */,
 				C8B945BA2573D01A00932C46 /* NSArray+Extensions.m in Sources */,
 				4DCAE8BC257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
+				C87073AA2589356A0002070A /* Platform.m in Sources */,
 				C8B945BB2573D01A00932C46 /* AutoFillNewRecordSettings.m in Sources */,
 				C8B945BC2573D01A00932C46 /* NSMutableArray+Extensions.m in Sources */,
 				C8B945BD2573D01A00932C46 /* twofish.c in Sources */,
@@ -4214,6 +4227,7 @@
 				C8B945D82573D01A00932C46 /* DeletedObject.m in Sources */,
 				C8B945D92573D01A00932C46 /* CustomBackgroundTableView.m in Sources */,
 				C8B945DA2573D01A00932C46 /* PasswordMaker.m in Sources */,
+				C870739F258935500002070A /* KeePassXmlModelAdaptor.m in Sources */,
 				C8B945DB2573D01A00932C46 /* MMWormhole.m in Sources */,
 				C8B945DC2573D01A00932C46 /* KdbEntry.m in Sources */,
 				C8B945DD2573D01A00932C46 /* MMWormholeCoordinatedFileTransiting.m in Sources */,
@@ -4689,13 +4703,13 @@
 			baseConfigurationReference = EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur-Pro";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -4705,7 +4719,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4720,13 +4734,13 @@
 			baseConfigurationReference = 34629E3CBC779E0F1547E434 /* Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-Family";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur-Pro";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -4736,7 +4750,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -4807,7 +4821,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4823,7 +4837,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -4845,7 +4859,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -4861,7 +4875,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4983,13 +4997,13 @@
 			baseConfigurationReference = 50F27062B3FD89F6D407C032 /* Pods-common-mac-Strongbox.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -4999,7 +5013,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5014,13 +5028,13 @@
 			baseConfigurationReference = 645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = StrongBox.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -5030,7 +5044,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -5051,7 +5065,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -5067,7 +5081,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -5090,7 +5104,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2971;
+				CURRENT_PROJECT_VERSION = 2979;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -5106,7 +5120,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.2;
+				MARKETING_VERSION = 1.14.4;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.pro.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";

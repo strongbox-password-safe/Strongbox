@@ -33,6 +33,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) MutableOrderedDictionary* customData;
 
+@property NSDate* settingsChanged;
+@property (nonatomic) NSString *databaseName;
+@property NSDate* databaseNameChanged;
+@property (nonatomic) NSString *databaseDescription;
+@property NSDate* databaseDescriptionChanged;
+@property (nonatomic) NSString *defaultUserName;
+@property NSDate* defaultUserNameChanged;
+@property (nonatomic) NSString *color;
+@property NSUUID* entryTemplatesGroup;
+@property NSDate* entryTemplatesGroupChanged;
+
 
 
 @property (nonatomic) uint32_t compressionFlags;

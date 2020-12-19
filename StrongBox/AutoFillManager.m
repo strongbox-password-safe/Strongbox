@@ -102,7 +102,7 @@ static NSString* const kMailToScheme = @"mailto";
                 }
                 else {
                     [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
-                        NSLog(@"Saved Credential Identities (%lu items)... [%d] - [%@]", identities.count, success, error);
+                        NSLog(@"Saved Credential Identities (%lu items)... [%d] - [%@]", (unsigned long) identities.count, success, error);
                     }];
                 }
 #if TARGET_OS_IPHONE

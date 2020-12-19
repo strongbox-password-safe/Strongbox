@@ -41,6 +41,7 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     self.searchField.delegate = self;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
+    self.tableView.doubleAction = @selector(onSelect:);
     
     NSString *text = self.items.count ?
         NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Entries") :
