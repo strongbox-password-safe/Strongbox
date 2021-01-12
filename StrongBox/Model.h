@@ -6,10 +6,10 @@
 //  Copyright (c) 2014 Mark McGuill. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
 #import "SafesList.h"
 #import "DatabaseModel.h"
 #import "DatabaseAuditor.h"
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,6 +19,7 @@ extern NSString* const kAuditCompletedNotificationKey;
 extern NSString* const kProStatusChangedNotificationKey;
 extern NSString* const kAppStoreSaleNotificationKey; 
 extern NSString* const kCentralUpdateOtpUiNotification;
+extern NSString* const kMasterDetailViewCloseNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 extern NSString *const kWormholeAutoFillUpdateMessageId;
 
@@ -27,6 +28,10 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 @property (nonatomic, readonly, nonnull) SafeMetaData *metadata;
 @property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
 @property (nonatomic, readonly) BOOL isReadOnly;
+
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
 
 
 
@@ -46,7 +51,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 @property (readonly) AuditState auditState;
 
-@property (readonly) NSNumber* auditIssueCount;
+@property (readonly, nullable) NSNumber* auditIssueCount;
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditHibpErrorCount;
 
@@ -65,7 +70,8 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 
 
-- (Node* _Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*_Nonnull)title;
+- (Node*_Nullable)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title;
+- (Node*_Nullable)addItem:(Node *_Nonnull)parent item:(Node*)item;
 
 - (void)deleteItems:(const NSArray<Node *> *)items;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items;
@@ -74,6 +80,7 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 - (BOOL)isPinned:(Node*)item;
 - (void)togglePin:(Node*)item;
 @property (readonly) NSSet<NSString*>* pinnedSet;
+@property (readonly) NSArray<Node*>* pinnedNodes;
 
 -(void)encrypt:(void (^)(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
 

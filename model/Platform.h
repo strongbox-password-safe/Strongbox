@@ -12,9 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Platform : NSObject
 
-+ (instancetype)sharedInstance;
-
-@property (readonly) BOOL isSimulator;
+@property (class, readonly) BOOL isSimulator;
+@property (class, readonly) BOOL iOS13Available;
+@property (class, readonly) BOOL iOS14Available;
 
 @end
 

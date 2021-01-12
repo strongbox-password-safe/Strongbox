@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Node.h"
+#import "DatabaseModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -20,7 +20,7 @@ static NSString* const kCSVHeaderNotes = @"Notes";
 
 @interface Csv : NSObject
 
-+ (NSData*)getSafeAsCsv:(Node*)rootGroup;
++ (NSData*)getSafeAsCsv:(DatabaseModel*_Nullable)database;
 
 @end
 

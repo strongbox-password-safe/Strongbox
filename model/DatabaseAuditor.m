@@ -574,7 +574,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     NSSet<NSString*>* pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
     
     for (NSString* password in nodesByPasswords.allKeys) {
-        NSString* sha1HexPassword = password.sha1.hex;
+        NSString* sha1HexPassword = password.sha1Data.hexString;
         NSArray<Node*>* affectedNodes = nodesByPasswords[password];
         
         if ([pwnedCache containsObject:sha1HexPassword]) {
@@ -609,7 +609,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 }
 
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion {
-    NSString* sha1HexPassword = password.sha1.hex;
+    NSString* sha1HexPassword = password.sha1Data.hexString;
     NSSet<NSString*>* pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
     
     if ([pwnedCache containsObject:sha1HexPassword]) {

@@ -9,21 +9,13 @@
 const NSInteger kPwSafeDefaultVersionMajor = 0x03;
 const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
 
-@interface PwSafeDatabase ()
-
-@end
-
 @implementation PwSafeDatabase
 
 + (NSString *)fileExtension {
     return @"psafe3";
 }
 
-- (NSString *)fileExtension {
-    return [PwSafeDatabase fileExtension];
-}
-
-- (DatabaseFormat)format {
++ (DatabaseFormat)format {
     return kPasswordSafe;
 }
 
@@ -31,15 +23,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return [PwSafeSerialization isValidDatabase:prefix error:error];
 }
 
-- (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithMetadata:[UnifiedDatabaseMetadata withDefaultsForFormat:kPasswordSafe] compositeKeyFactors:ckf];
-    
-    [self defaultLastUpdateFieldsToNow:ret.metadata];
-    
-    return ret;
-}
-
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
++ (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
     NSError* error;
     if (![PwSafeDatabase isValidDatabase:data error:&error]) {
         NSLog(@"Not a valid safe!");
@@ -49,7 +33,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     }
 
     NSMutableArray<Field*> *headerFields;
-    NSArray<Record*> *records = [self decryptSafe:data
+    NSArray<Record*> *records = [PwSafeDatabase decryptSafe:data
                                          password:ckf.password
                                           headers:&headerFields
                                             error:&error];
@@ -61,7 +45,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     
     
     
-    Node* rootGroup = [self buildModel:records headers:headerFields];
+    Node* rootGroup = [PwSafeDatabase buildModel:records headers:headerFields];
     if(!rootGroup) {
         NSLog(@"Could not build model from records and headers?!");
         error = [Utils createNSError:@"Could not parse this Password Safe File." errorCode:-1];
@@ -70,22 +54,22 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     }
     
     UnifiedDatabaseMetadata* metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kPasswordSafe];
-    metadata.version = [self getVersion:headerFields];
+    metadata.version = [PwSafeDatabase getVersion:headerFields];
     metadata.keyStretchIterations = [PwSafeSerialization getKeyStretchIterations:data];
 
-    [self syncLastUpdateFieldsFromHeaders:metadata headers:headerFields];
+    [PwSafeDatabase syncLastUpdateFieldsFromHeaders:metadata headers:headerFields];
     
-    StrongboxDatabase *ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
-    ret.adaptorTag = headerFields;
+    DatabaseModel *ret = [[DatabaseModel alloc] initWithFormat:kPasswordSafe compositeKeyFactors:ckf metadata:metadata root:rootGroup];
+    metadata.adaptorTag = headerFields;
 
     completion(NO, ret, nil);
 }
 
-- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream *)xmlDumpStream sanityCheckInnerStream:(BOOL)sanityCheckInnerStream completion:(OpenCompletionBlock)completion {
++ (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream *)xmlDumpStream sanityCheckInnerStream:(BOOL)sanityCheckInnerStream completion:(OpenCompletionBlock)completion {
     [self read:stream ckf:ckf completion:completion];
 }
 
-- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
++ (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
     NSMutableData* mutableData = [NSMutableData dataWithCapacity:kStreamingSerializationChunkSize];
     
     [stream open];
@@ -110,22 +94,22 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     [self open:mutableData ckf:ckf completion:completion];
 }
 
-- (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
-    if(!database.compositeKeyFactors.password) {
++ (void)save:(DatabaseModel *)database completion:(SaveCompletionBlock)completion {
+    if(!database.ckfs.password) {
         NSError* error = [Utils createNSError:@"Master Password not set." errorCode:-3];
         completion(NO, nil, nil, error);
         return;
     }
     
-    [self defaultLastUpdateFieldsToNow:database.metadata];
+    [PwSafeDatabase defaultLastUpdateFieldsToNow:database.meta];
     
     
     
     NSMutableData *ret = [[NSMutableData alloc] init];
     
     NSData *K, *L;
-    PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)database.metadata.keyStretchIterations
-                                                      masterPassword:database.compositeKeyFactors.password
+    PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)database.meta.keyStretchIterations
+                                                      masterPassword:database.ckfs.password
                                                                    K:&K
                                                                    L:&L];
     
@@ -136,21 +120,21 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     
     
     
-    NSMutableArray<Field*>* headerFields = database.adaptorTag ? (NSMutableArray<Field*>*)database.adaptorTag : [NSMutableArray array];
+    NSMutableArray<Field*>* headerFields = database.meta.adaptorTag ? (NSMutableArray<Field*>*)database.meta.adaptorTag : [NSMutableArray array];
     
-    [self addDefaultHeaderFieldsIfNotSet:headerFields];
-    [self syncEmptyGroupsToHeaders:headerFields rootGroup:database.rootGroup];
-    [self syncLastUpdateFieldsToHeaders:database.metadata headers:headerFields];
+    [PwSafeDatabase addDefaultHeaderFieldsIfNotSet:headerFields];
+    [PwSafeDatabase syncEmptyGroupsToHeaders:headerFields rootGroup:database.rootNode];
+    [PwSafeDatabase syncLastUpdateFieldsToHeaders:database.meta headers:headerFields];
     
-    [toBeEncrypted appendData:[self serializeHeaderFields:headerFields]];
-    [hmacData appendData:[self getHeaderFieldHmacData:headerFields]];
+    [toBeEncrypted appendData:[PwSafeDatabase serializeHeaderFields:headerFields]];
+    [hmacData appendData:[PwSafeDatabase getHeaderFieldHmacData:headerFields]];
     
     
     
-    NSArray<Record*>* records = [self getRecordsForSerialization:database.rootGroup];
+    NSArray<Record*>* records = [PwSafeDatabase getRecordsForSerialization:database.rootNode];
     
-    [toBeEncrypted appendData:[self serializeRecords:records]];
-    [hmacData appendData:[self getRecordsHmacData:records]];
+    [toBeEncrypted appendData:[PwSafeDatabase serializeRecords:records]];
+    [hmacData appendData:[PwSafeDatabase getRecordsHmacData:records]];
     
     
     
@@ -177,8 +161,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
 
 
 
-
-- (Node*)buildModel:(NSArray<Record*>*)records headers:(NSArray<Field*>*)headers  {
++ (Node*)buildModel:(NSArray<Record*>*)records headers:(NSArray<Field*>*)headers  {
     Node* root = [[Node alloc] initAsRoot:nil];
     
     
@@ -219,7 +202,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return root;
 }
 
-- (Node*)createNodeFromExistingRecord:(Record*)record parent:(Node*)group {
++ (Node*)createNodeFromExistingRecord:(Record*)record parent:(Node*)group {
     NodeFields* fields = [[NodeFields alloc] init];
     
     fields.username = record.username;
@@ -242,7 +225,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return ret;
 }
 
-- (NSSet<Group*>*)getEmptyGroupsFromHeaders:(NSArray<Field*>*)headers {
++ (NSSet<Group*>*)getEmptyGroupsFromHeaders:(NSArray<Field*>*)headers {
     NSMutableSet<Group*> *groups = [[NSMutableSet<Group*> alloc] init];
     
     for (Field *field in headers) {
@@ -255,7 +238,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return groups;
 }
 
-- (Node*)addGroupUsingGroupComponents:(Node*)root groupComponents:(NSArray<NSString*>*)groupComponents {
++ (Node*)addGroupUsingGroupComponents:(Node*)root groupComponents:(NSArray<NSString*>*)groupComponents {
     Node* node = root;
     
     for(NSString* component in groupComponents) {
@@ -275,7 +258,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return node;
 }
 
-- (NSArray<Record*> *)decryptSafe:(NSData*)safeData
++ (NSArray<Record*> *)decryptSafe:(NSData*)safeData
                          password:(NSString*)password
                           headers:(NSMutableArray<Field*> **)headerFields
                             error:(NSError **)ppError {
@@ -331,7 +314,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
 
 
 
-- (void)addDefaultHeaderFieldsIfNotSet:(NSMutableArray<Field*>*)headers {
++ (void)addDefaultHeaderFieldsIfNotSet:(NSMutableArray<Field*>*)headers {
     
     
     if(![self getFirstHeaderFieldOfType:HDR_VERSION headers:headers]) {
@@ -354,7 +337,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     }
 }
 
-- (void)deleteEmptyGroupHeaderFields:(NSMutableArray<Field*>*)headers {
++ (void)deleteEmptyGroupHeaderFields:(NSMutableArray<Field*>*)headers {
     NSMutableArray<Field*> *fieldsToRemove = [NSMutableArray array];
     
     for (Field *field in headers) {
@@ -368,7 +351,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     }
 }
 
-- (NSArray<Group*>*)getMinimalEmptyGroupObjectsFromModel:(Node*)rootGroup {
++ (NSArray<Group*>*)getMinimalEmptyGroupObjectsFromModel:(Node*)rootGroup {
     NSArray<Node*> *emptyGroups = [[rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return node.isGroup && node.children.count == 0;
     }] sortedArrayUsingComparator:finderStyleNodeComparator];
@@ -383,7 +366,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return groups;
 }
 
-- (void)syncEmptyGroupsToHeaders:(NSMutableArray<Field*>*)headers rootGroup:(Node*)rootGroup {
++ (void)syncEmptyGroupsToHeaders:(NSMutableArray<Field*>*)headers rootGroup:(Node*)rootGroup {
     [self deleteEmptyGroupHeaderFields:headers];
     
     NSArray<Group*>* emptyGroups = [self getMinimalEmptyGroupObjectsFromModel:rootGroup];
@@ -394,7 +377,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     }
 }
 
-- (NSArray<Record*>* _Nonnull)getRecordsForSerialization:(Node*)rootGroup {
++ (NSArray<Record*>* _Nonnull)getRecordsForSerialization:(Node*)rootGroup {
     NSArray<Node*> *recordNodes = [[rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
     }] sortedArrayUsingComparator:finderStyleNodeComparator];
@@ -409,7 +392,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return records;
 }
 
-- (Record* _Nonnull)createOrUpdateSerializationRecordWithNode:(Node* _Nonnull)recordNode {
++ (Record* _Nonnull)createOrUpdateSerializationRecordWithNode:(Node* _Nonnull)recordNode {
     Record *record = recordNode.linkedData ? ( (Record*)recordNode.linkedData) : [[Record alloc] init];
  
     record.title = recordNode.title;
@@ -436,7 +419,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return record;
 }
     
-- (NSData*)getHeaderFieldHmacData:(NSMutableArray<Field*>*)headers {
++ (NSData*)getHeaderFieldHmacData:(NSMutableArray<Field*>*)headers {
     NSMutableData *hmacData = [[NSMutableData alloc] init];
     
     for (Field *dbHeaderField in headers) {
@@ -446,7 +429,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return hmacData;
 }
 
-- (NSData*)serializeHeaderFields:(NSMutableArray<Field*>*)headers {
++ (NSData*)serializeHeaderFields:(NSMutableArray<Field*>*)headers {
     NSMutableData *toBeEncrypted = [[NSMutableData alloc] init];
     
     for (Field *dbHeaderField in headers) {
@@ -465,7 +448,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return toBeEncrypted;
 }
 
-- (NSData*)serializeRecords:(NSArray<Record*>*)records {
++ (NSData*)serializeRecords:(NSArray<Record*>*)records {
     NSMutableData *toBeEncrypted = [[NSMutableData alloc] init];
     
     for (Record *record in records) {
@@ -482,7 +465,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return toBeEncrypted;
 }
 
-- (NSData*)getRecordsHmacData:(NSArray<Record*>*)records {
++ (NSData*)getRecordsHmacData:(NSArray<Record*>*)records {
     NSMutableData *hmacData = [[NSMutableData alloc] init];
     
     for (Record *record in records) {
@@ -494,14 +477,14 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return hmacData;
 }
 
-- (void)syncLastUpdateFieldsToHeaders:(UnifiedDatabaseMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
++ (void)syncLastUpdateFieldsToHeaders:(UnifiedDatabaseMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
     [self setHeaderFieldString:HDR_LASTUPDATEAPPLICATION value:metadata.lastUpdateApp headers:headers];
     [self setHeaderFieldString:HDR_LASTUPDATEHOST value:metadata.lastUpdateHost headers:headers];
     [self setHeaderFieldString:HDR_LASTUPDATEUSER value:metadata.lastUpdateUser headers:headers];
     [self setHeaderFieldDate:HDR_LASTUPDATETIME value:metadata.lastUpdateTime headers:headers];
 }
 
-- (void)syncLastUpdateFieldsFromHeaders:(UnifiedDatabaseMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
++ (void)syncLastUpdateFieldsFromHeaders:(UnifiedDatabaseMetadata*)metadata headers:(NSMutableArray<Field*>*)headers {
     Field *appField = [self getFirstHeaderFieldOfType:HDR_LASTUPDATETIME headers:headers];
     if(appField) {
         metadata.lastUpdateTime = appField.dataAsDate;
@@ -523,7 +506,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     }
 }
 
-- (NSString*)getDiagnosticDumpString:(BOOL)plaintextPasswords headers:(NSMutableArray<Field*>*)headers rootGroup:(Node*)rootGroup {
++ (NSString*)getDiagnosticDumpString:(BOOL)plaintextPasswords headers:(NSMutableArray<Field*>*)headers rootGroup:(Node*)rootGroup {
     [self addDefaultHeaderFieldsIfNotSet:headers];
     [self syncEmptyGroupsToHeaders:headers rootGroup:rootGroup];
     
@@ -565,14 +548,14 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return dump;
 }
 
-- (void)defaultLastUpdateFieldsToNow:(UnifiedDatabaseMetadata*)metadata {
++ (void)defaultLastUpdateFieldsToNow:(UnifiedDatabaseMetadata*)metadata {
     metadata.lastUpdateTime = [[NSDate alloc] init];
     metadata.lastUpdateUser = [Utils getUsername];
     metadata.lastUpdateHost = [Utils hostname];
     metadata.lastUpdateApp =  [Utils getAppName];
 }
 
--(NSString*)getVersion:(NSMutableArray<Field*>*)headers {
++ (NSString*)getVersion:(NSMutableArray<Field*>*)headers {
     Field *version = [self getFirstHeaderFieldOfType:HDR_VERSION headers:headers];
     if(!version) {
         return [NSString stringWithFormat:@"%ld.%ld", (long)kPwSafeDefaultVersionMajor, (long)kPwSafeDefaultVersionMinor];
@@ -584,7 +567,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
 
 
 
--(Field*_Nullable) getFirstHeaderFieldOfType:(HeaderFieldType)type headers:(NSMutableArray<Field*>*)headers {
++ (Field*_Nullable) getFirstHeaderFieldOfType:(HeaderFieldType)type headers:(NSMutableArray<Field*>*)headers {
     for (Field *field in headers) {
         if (field.dbHeaderFieldType == type) {
             return field;
@@ -594,7 +577,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return nil;
 }
 
-- (void)setHeaderFieldString:(HeaderFieldType)type value:(NSString*)value headers:(NSMutableArray<Field*>*)headers {
++ (void)setHeaderFieldString:(HeaderFieldType)type value:(NSString*)value headers:(NSMutableArray<Field*>*)headers {
     Field *appField = [self getFirstHeaderFieldOfType:type headers:headers];
     
     if (appField) {
@@ -606,7 +589,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     }
 }
 
-- (void)setHeaderFieldDate:(HeaderFieldType)type value:(NSDate*)value headers:(NSMutableArray<Field*>*)headers {
++ (void)setHeaderFieldDate:(HeaderFieldType)type value:(NSDate*)value headers:(NSMutableArray<Field*>*)headers {
     Field *appField = [self getFirstHeaderFieldOfType:type headers:headers];
     
     time_t timeT = (time_t)value.timeIntervalSince1970;

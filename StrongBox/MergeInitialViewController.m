@@ -42,7 +42,7 @@
             [self performSegueWithIdentifier:@"segueToSelectSecondDatabase" sender:model];
         }
         else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
-            self.onDone(YES);
+            self.onDone();
         }
         else if (result == kUnlockDatabaseResultError) {
             [Alerts error:self
@@ -53,7 +53,7 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    self.onDone(YES);
+    self.onDone();
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

@@ -7,6 +7,32 @@ https://apps.apple.com/app/strongbox-password-safe/id897283731
 
 Strongbox supports the open source Password Safe (version 3) and KeePass file formats (KeePass 1 and 2, i.e. KDB, KDBX (3.1 and 4)). Strongbox uses open source encryption algoritms likes TwoFish, Argon2d, ChaCha20, Aes, Salsa20 and various other cryptographic techniques (SHA256s, HMACs, CSPRNGs) to store groups and entries, containing various secrets, mostly designed around password storage. You can also store File Attachments in KeePass format safes. YubiKey is also supported!
 
+# Beta Testers Wanted
+If you'd like to beta test new versions of Strongbox before they are released to the general public please just email support@strongboxsafe.com. You'll need to be fairly technically competent and have a good backup process in place (just in case).
+
+# Localization - Help Wanted
+Localization and translation is managed through the parallel Babel project here:
+
+https://github.com/strongbox-password-safe/babel
+
+This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch and we'll try to set you up. Currently we are using Crowd In to manage things and it seems to be working well. Get in touch to get an invite to that system and being work on your language.
+
+You can submit Pull Requests any way you choose, and it will be much appreciated, but please get in touch first so I can make sure the Repo is setup correctly for your language.
+
+Big thank you to all the localization contributors
+
+- Chinese - GY & Attis & Anonymous
+- Czech - S474N
+- French - Charles-Ivan Chesneau
+- German - @Slummi
+- Italian - Marco Ermini
+- Japanese - Anonymous
+- Norwegian - Ole Aldric
+- Russian - Wishes to remain anonymous
+- Spanish - Wishes to remain anonymous
+- Swedish - Jari Häkkinen
+- Ukrainian - Artem Polivanchuk
+
 # License Notes
 This software provided here on Github is licensed under the GNU AGPL by default, except for translations of Strings files which are managed under the MIT Licence in the Babel sub project. Copyright/Ownership is held by Mark McGuill. Strongbox is licensed to Apple under a different license which is compatible with the App Store.
 
@@ -31,29 +57,6 @@ If you're having trouble, please checkout the following sources:
 - [Reddit r/strongbox](https://www.reddit.com/r/strongbox/ "r/strongbox")
 
 Another important step is to restart your device, it's surprising how often this can fix issues. If you are having iCloud trouble, then signing in and out of iCloud/iCloud Drive can help.
-
-# Localization (Volunteers Welcome)
-Localization and translation is managed through the parallel Babel project here:
-
-https://github.com/strongbox-password-safe/babel
-
-This is managed under the MIT licence to avoid issues with the Apple's App Store and ownership. There are some efforts underway right now but if you would like to see Strongbox translated into your language just get in touch and we'll try to set you up. Currently we are using Crowd In to manage things and it seems to be working well. Get in touch to get an invite to that system and being work on your language.
-
-You can submit Pull Requests any way you choose, and it will be much appreciated, but please get in touch first so I can make sure the Repo is setup correctly for your language.
-
-Big thank you to all the localization contributors
-
-- Chinese - GY & Attis & Anonymous
-- Czech - S474N
-- French - Charles-Ivan Chesneau
-- German - @Slummi
-- Italian - Marco Ermini
-- Japanese - Anonymous
-- Norwegian - Ole Aldric
-- Russian - Wishes to remain anonymous
-- Spanish - Wishes to remain anonymous
-- Swedish - Jari Häkkinen
-- Ukrainian - Artem Polivanchuk
 
 # Build Issues
 The code is provided here for reasons of security, transparency and openness. Anyone can view the code and verify that everything is above board, the algorithms are correct and there are no backdoors or other malicious features present. You will need Google Drive, OneDrive and Dropbox developer accounts (with keys/secrets) before building. Familiarity with Cocoapods and other build tools is a prerequisite. Please do not file issues about build issues, I can't guarantee what is here will build in your environment. What is here is all of the functional code used in building Strongbox. XCode Interface Builder UI files, XCode project/solution/workspace, and other non functional code files may be removed to hinder copy cat apps. Translation strings files are managed in the separate Babel repository. 

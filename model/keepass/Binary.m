@@ -82,7 +82,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"{ [%@] = [%d] }", self.filename, self.index];
+    return [NSString stringWithFormat:@"{ [%@] = [%ld] }", self.filename, (long)self.index];
 }
 
 @end

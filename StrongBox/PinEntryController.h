@@ -20,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* info;
 @property NSString* warning;
 @property BOOL showFallbackOption;
+@property BOOL isDatabasePIN;
 
 @end
 

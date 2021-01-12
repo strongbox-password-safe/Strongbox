@@ -56,8 +56,7 @@ NSDateFormatter* _dateFormatter;
     self.versions = [NSMutableArray array];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 1;
 }
 

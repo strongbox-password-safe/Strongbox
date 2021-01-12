@@ -10,6 +10,7 @@
 #import "NodeFields.h"
 #import "OTPToken.h"
 #import "SyncComparisonParams.h"
+#import "NodeIcon.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -46,8 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL childRecordsAllowed;
 @property (nonatomic, strong, readonly, nonnull) NSString *title;
 @property (nonatomic, strong, readonly, nonnull) NSUUID *uuid;
-@property (nullable) NSNumber* iconId;
-@property (nullable) NSUUID* customIconUuid;
+
+@property (nullable) NodeIcon* icon;
+
 @property (nonatomic, strong, readonly, nonnull) NodeFields *fields;
 @property (nonatomic, weak, readonly, nullable) Node* parent;
 
@@ -70,33 +72,44 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSDictionary *)serialize:(SerializationPackage*)serialization; 
 
-- (NSString*)getSerializationId:(BOOL)groupCanUseUuid; 
-
 - (BOOL)contains:(Node*)test;
 - (BOOL)setTitle:(NSString*_Nonnull)title keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 - (BOOL)validateAddChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+
+
+
 - (BOOL)addChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+- (BOOL)insertChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules atPosition:(NSInteger)atPosition;
+- (void)removeChild:(Node*)node;
+
+- (Node*_Nullable)firstOrDefault:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate;
+- (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate;
+
+
+
+- (BOOL)reorderChild:(Node*)item to:(NSInteger)to keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+- (BOOL)reorderChildAt:(NSUInteger)from to:(NSInteger)to keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+
 
 - (BOOL)validateChangeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
-- (BOOL)changeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 
-- (void)moveChild:(NSUInteger)from to:(NSUInteger)to;
-- (void)removeChild:(Node*)node; 
+- (BOOL)changeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+- (BOOL)changeParent:(Node*)parent position:(NSInteger)position keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 
 - (Node*)clone;
 - (Node*)cloneAsChildOf:(Node*)parentNode;
+
 - (Node*)clone:(BOOL)recursive;
 - (Node*)cloneForHistory;
 - (Node*)duplicate:(NSString*)newTitle; 
+
+- (BOOL)mergePropertiesInFromNode:(Node *)mergeNode mergeLocationChangedDate:(BOOL)mergeLocationChangedDate includeHistory:(BOOL)includeHistory keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 
 - (void)sortChildren:(BOOL)ascending;
 
 - (NSArray<NSString*>*)getTitleHierarchy;
 
 - (Node*_Nullable)getChildGroupWithTitle:(NSString*_Nonnull)title;
-
-- (Node*_Nullable)findFirstChild:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate;
-- (NSArray<Node*>*_Nonnull)filterChildren:(BOOL)recursive predicate:(BOOL (^_Nullable)(Node* _Nonnull node))predicate;
 
 - (void)restoreFromHistoricalNode:(Node*)historicalItem;
 
@@ -127,7 +140,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSComparator finderStyleNodeComparator;
 
-- (BOOL)isSyncEqualTo:(Node*)other params:(SyncComparisonParams*)params;
+- (BOOL)isSyncEqualTo:(Node*)other;
+- (BOOL)isSyncEqualTo:(Node *)other isForUIDiffReport:(BOOL)isForUIDiffReport;
+- (BOOL)isSyncEqualTo:(Node *)other isForUIDiffReport:(BOOL)isForUIDiffReport checkHistory:(BOOL)checkHistory;
+
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 
 @end

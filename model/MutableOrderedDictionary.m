@@ -26,6 +26,10 @@
     return self;
 }
 
+- (void)remove:(id)key {
+    self[key] = nil;
+}
+
 - (void)setObject:(id)obj forKeyedSubscript:(id)key {
     [self addKey:key andValue:obj];
 }
@@ -33,10 +37,22 @@
 - (void)addKey:(id)key andValue:(id)value {
     if(self.kvps[key]) {
         [self.keys removeObject:key];
+        [self.kvps removeObjectForKey:key];
     }
 
     if(value != nil) {
         [self.keys addObject:key];
+        [self.kvps setValue:value forKey:key];
+    }
+}
+
+- (void)insertKey:(id)key withValue:(id)value atIndex:(NSUInteger)atIndex {
+    if(self.kvps[key]) {
+        return;
+    }
+
+    if(value != nil) {
+        [self.keys insertObject:key atIndex:atIndex];
         [self.kvps setValue:value forKey:key];
     }
 }
@@ -57,8 +73,16 @@
     }
 }
 
+- (BOOL)containsKey:(id)key {
+    return [self.kvps objectForKey:key] != nil;
+}
+
 -(NSUInteger)count {
     return [self.kvps count];
+}
+
+- (NSDictionary *)dictionary {
+    return self.kvps.copy;
 }
 
 - (NSString *)description {

@@ -8,14 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "SafeMetaData.h"
+#import "NodeIcon.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface IconsCollectionViewController : UIViewController
 
-@property (nonatomic, copy) void (^onDone)(BOOL response, NSInteger selectedIndex, NSUUID*_Nullable selectedCustomIconId);
-@property NSDictionary<NSUUID*, NSData*>* customIcons;
-@property KeePassIconSet iconSet;
+@property (nonatomic, copy) void (^onDone)(BOOL response, NodeIcon*_Nullable icon);
+@property NSSet<NodeIcon*>* customIconSet;
+@property KeePassIconSet predefinedKeePassIconSet;
 
 @end
 

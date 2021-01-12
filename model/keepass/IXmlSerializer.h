@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol IXmlSerializer <NSObject>
 
-@property (nonatomic, readonly) NSData* protectedStreamKey;
+@property (nonatomic, readonly, nullable) NSData* protectedStreamKey;
 @property (nonatomic, readonly) NSString* xml;
 
 - (void)beginDocument;

@@ -94,7 +94,7 @@
     NSArray<UIImage*>* images = [self getImagesForNode:node];
     NSNumber* selectedIndex = self.nodeSelected[node.uuid];
     
-    image = selectedIndex != nil ? images[selectedIndex.intValue] : nil;
+    image = (selectedIndex != nil && selectedIndex.intValue < images.count && selectedIndex.intValue >= 0) ? images[selectedIndex.intValue] : nil;
 
     if(indexPath.section == 0) {
         cell.accessoryType = images.count > 1 ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;

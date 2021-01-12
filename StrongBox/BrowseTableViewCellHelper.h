@@ -44,6 +44,16 @@ NS_ASSUME_NONNULL_BEGIN
                                   noFlags:(BOOL)noFlags
                       showGroupChildCount:(BOOL)showGroupChildCount;
 
+- (UITableViewCell *)getBrowseCellForNode:(Node*)node
+                                indexPath:(NSIndexPath*)indexPath
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
+                        showGroupLocation:(BOOL)showGroupLocation
+                    groupLocationOverride:(NSString*_Nullable)groupLocationOverride
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType
+                                  noFlags:(BOOL)noFlags
+                      showGroupChildCount:(BOOL)showGroupChildCount
+                         subtitleOverride:(NSNumber*_Nullable)subtitleOverride;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -19,7 +19,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
           
 @interface DatabaseSearchAndSorter ()
 
-@property DatabaseModel* model;
+@property DatabaseModel* database;
 @property (copy, nullable) FlaggedByAuditPredicate isFlaggedByAudit;
 @property BrowseSortField browseSortField;
 @property BOOL descending;
@@ -41,7 +41,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
     self = [super init];
     
     if (self) {
-        self.model = databaseModel;
+        self.database = databaseModel;
         self.isFlaggedByAudit = isFlaggedByAudit;
         self.browseSortField = browseSortField;
         self.descending = descending;
@@ -57,7 +57,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
 }
 
 - (NSString*)dereference:(NSString*)text node:(Node*)node {
-    if(self.model.format == kPasswordSafe || !text.length) {
+    if(self.database.originalFormat == kPasswordSafe || !text.length) {
         return text;
     }
     
@@ -65,7 +65,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
     
     BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
     
-    NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.model.rootGroup error:&error] : text;
+    NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node database:self.database error:&error] : text;
     
     if(error) {
         NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
@@ -81,7 +81,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
         includeRecycleBin:(BOOL)includeRecycleBin
            includeExpired:(BOOL)includeExpired
             includeGroups:(BOOL)includeGroups {
-    return [self searchNodes:self.model.allNodes
+    return [self searchNodes:self.database.effectiveRootGroup.allChildren
                   searchText:searchText
                        scope:scope
                  dereference:dereference
@@ -101,7 +101,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
                  includeGroups:(BOOL)includeGroups {
     NSMutableArray* results = [nodes mutableCopy]; 
     
-    NSArray<NSString*>* terms = [self.model getSearchTerms:searchText];
+    NSArray<NSString*>* terms = [self.database getSearchTerms:searchText];
     
     for (NSString* word in terms) {
         [self filterForWord:results
@@ -172,37 +172,37 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
 
 - (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.model isTitleMatches:searchText node:node dereference:dereference];
+        return [self.database isTitleMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.model isUsernameMatches:searchText node:node dereference:dereference];
+        return [self.database isUsernameMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.model isPasswordMatches:searchText node:node dereference:dereference];
+        return [self.database isPasswordMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.model isUrlMatches:searchText node:node dereference:dereference];
+        return [self.database isUrlMatches:searchText node:node dereference:dereference];
     }];
 }
 
 - (void)searchTags:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.model isTagsMatches:searchText node:node];
+        return [self.database isTagsMatches:searchText node:node];
     }];
 }
 
 - (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.model isAllFieldsMatches:searchText node:node dereference:dereference];
+        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference];
     }];
 }
 
@@ -212,8 +212,8 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
         includeExpired:(BOOL)includeExpired
          includeGroups:(BOOL)includeGroups {
     if(!includeKeePass1Backup) {
-        if (self.model.format == kKeePass1) {
-            Node* backupGroup = self.model.keePass1BackupNode;
+        if (self.database.originalFormat == kKeePass1) {
+            Node* backupGroup = self.database.keePass1BackupNode;
             if(backupGroup) {
                 [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
                     return (obj != backupGroup && ![backupGroup contains:obj]);
@@ -222,7 +222,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
         }
     }
 
-    Node* recycleBin = self.model.recycleBinNode;
+    Node* recycleBin = self.database.recycleBinNode;
     if(!includeRecycleBin && recycleBin) {
         [matches mutableFilter:^BOOL(Node * _Nonnull obj) {
             return obj != recycleBin && ![recycleBin contains:obj];
@@ -244,13 +244,11 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
 
 - (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items {
     BrowseSortField field = self.browseSortField;
-
-
     
-    if(field == kBrowseSortFieldEmail && self.model.format != kPasswordSafe) {
+    if(field == kBrowseSortFieldEmail && self.database.originalFormat != kPasswordSafe) {
         field = kBrowseSortFieldTitle;
     }
-    else if(field == kBrowseSortFieldNone && self.model.format == kPasswordSafe) {
+    else if(field == kBrowseSortFieldNone && self.database.originalFormat == kPasswordSafe) {
         field = kBrowseSortFieldTitle;
     }
     

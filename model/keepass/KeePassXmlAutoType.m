@@ -37,6 +37,7 @@
         return YES;
     }
     if([withXmlElementName isEqualToString:kDataTransferObfuscationElementName]) {
+        
         self.dataTransferObfuscation = [SimpleXmlValueExtractor getBool:completedObject];
         return YES;
     }
@@ -61,6 +62,7 @@
 
     if (![serializer writeElement:kEnabledElementName boolean:self.enabled]) return NO;
 
+    
     if (![serializer writeElement:kDataTransferObfuscationElementName integer:self.dataTransferObfuscation ? 1 : 0]) return NO;
 
     if ( self.defaultSequence.length ) {

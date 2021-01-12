@@ -16,6 +16,7 @@
 #import "SVProgressHUD.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+#import "Alerts.h"
 
 @interface SFTPStorageProvider ()
 
@@ -338,16 +339,24 @@ viewController:(UIViewController *)viewController
             SFTPSessionConfigurationViewController *vc = [[SFTPSessionConfigurationViewController alloc] init];
             __weak SFTPSessionConfigurationViewController* weakRef = vc;
             vc.onDone = ^(BOOL success) {
-                [viewController dismissViewControllerAnimated:YES completion:^{
-                    if(success) {
-                        NSError* error;
-                        NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:weakRef.configuration viewController:viewController error:&error];
-                        completion(NO, sftp, weakRef.configuration, error);
+                if(success) {
+                    NSError* error;
+                    NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:weakRef.configuration viewController:viewController error:&error];
+                    
+                    if (sftp && !error) {
+                        [viewController dismissViewControllerAnimated:YES completion:^{
+                            completion(NO, sftp, weakRef.configuration, error);
+                        }];
                     }
                     else {
-                        completion(YES, nil, nil, nil);
+                        [Alerts error:weakRef error:error];
                     }
-                }];
+                }
+                else {
+                    [viewController dismissViewControllerAnimated:YES completion:^{
+                        completion(YES, nil, nil, nil);
+                    }];
+                }
             };
             
             vc.modalPresentationStyle = UIModalPresentationFormSheet;

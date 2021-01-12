@@ -59,6 +59,8 @@ typedef BOOL (^FlaggedByAuditPredicate)(Node* node);
                            includeExpired:(BOOL)includeExpired
                             includeGroups:(BOOL)includeGroups;
 
+- (NSArray<Node*>*)sortItemsForBrowse:(NSArray<Node*>*)items;
+
 @end
 
 NS_ASSUME_NONNULL_END

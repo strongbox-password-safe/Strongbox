@@ -71,11 +71,15 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     return _regex;
 }
 
-- (NSString *)sprCompile:(NSString *)test node:(Node *)node rootNode:(Node *)rootNode error:(NSError **)error {
-    return [self sprCompile:test node:node rootNode:rootNode error:error depth:0];
+- (NSString *)sprCompile:(NSString *)test node:(Node *)node database:(DatabaseModel*)database error:(NSError **)error {
+    return [self sprCompile:test node:node database:database depth:0 noRecurse:NO error:error];
 }
 
-- (NSString *)sprCompile:(NSString *)test node:(Node *)node rootNode:(Node *)rootNode error:(NSError **)error depth:(NSUInteger)depth {
+- (NSString *)sprCompile:(NSString *)test node:(Node *)node database:(DatabaseModel*)database noRecurse:(BOOL)noRecurse error:(NSError **)error {
+    return [self sprCompile:test node:node database:database depth:0 noRecurse:noRecurse error:error];
+}
+
+- (NSString *)sprCompile:(NSString *)test node:(Node *)node database:(DatabaseModel*)database depth:(NSUInteger)depth noRecurse:(BOOL)noRecurse error:(NSError **)error {
     if(!test.length) {
         return @"";
     }
@@ -85,7 +89,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 
     if(match) {
         NSError* matchError;
-        NSString* compiled = [self sprCompileRegexMatch:match test:test node:node rootNode:rootNode error:&matchError];
+        NSString* compiled = [self sprCompileRegexMatch:match test:test node:node database:database error:&matchError];
 
         if(!compiled) {
             NSLog(@"Failed to compile Error: [%@]", matchError);
@@ -96,8 +100,8 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 
         ret = [test stringByReplacingCharactersInRange:match.range withString:compiled];
         
-        if(depth < 10) { 
-            ret = [self sprCompile:ret node:node rootNode:rootNode error:error depth:depth+1];
+        if(depth < 10 && !noRecurse) { 
+            ret = [self sprCompile:ret node:node database:database depth:depth+1 noRecurse:noRecurse error:error];
         }
         else {
             NSLog(@"Depth/Recurse Limit Exceeded in SPR Compile... Will not attempt Further.");
@@ -107,7 +111,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     return ret;
 }
 
-- (NSString*)sprCompileRegexMatch:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node rootNode:(Node *)rootNode error:(NSError**)error {
+- (NSString*)sprCompileRegexMatch:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node database:(DatabaseModel*)database error:(NSError**)error {
 
 
 
@@ -158,10 +162,10 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
         }
     }
     else if([operation hasPrefix:kUrlOperation]) {
-        return [self sprCompileUrl:match test:test node:node rootNode:rootNode error:error]; 
+        return [self sprCompileUrl:match test:test node:node database:database error:error]; 
     }
     else if([operation hasPrefix:kReferenceOperation]) {
-        return [self sprCompileReference:match test:test node:node rootNode:rootNode error:error];
+        return [self sprCompileReference:match test:test node:node database:database error:error];
     }
     else {
         if(error) {
@@ -173,7 +177,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     return nil;
 }
 
--(NSString*)sprCompileReference:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node rootNode:(Node *)rootNode error:(NSError**)error {
+-(NSString*)sprCompileReference:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node database:(DatabaseModel*)database error:(NSError**)error {
     NSString* desiredField = ([match rangeAtIndex:6].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:6]];
     NSString* searchByField = ([match rangeAtIndex:7].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:7]];
     NSString* searchTarget = ([match rangeAtIndex:8].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:8]];
@@ -187,7 +191,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     
     NSLog(@"desiredField = [%@], searchByField = [%@], searchTarget = [%@]", desiredField, searchByField, searchTarget);
     
-    Node* target = [self findReferencedNode:searchByField searchTarget:searchTarget rootNode:rootNode error:error];
+    Node* target = [self findReferencedNode:searchByField searchTarget:searchTarget database:database error:error];
     
     if(!target) {
         return test; 
@@ -219,7 +223,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     }
 }
 
-- (Node*)findReferencedNode:(NSString*)searchByField searchTarget:(NSString*)searchTarget rootNode:(Node*)rootNode error:(NSError**)error {
+- (Node*)findReferencedNode:(NSString*)searchByField searchTarget:(NSString*)searchTarget database:(DatabaseModel*)database error:(NSError**)error {
     Node* target = nil;
     
     if([searchByField isEqualToString:kReferenceFieldId]) {
@@ -232,37 +236,35 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
             return nil;
         }
         
-        target = [rootNode findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
-            return !node.isGroup && [node.uuid isEqual:uuidTarget];
-        }];
+        target = [database getItemById:uuidTarget];
     }
     else if([searchByField isEqualToString:kReferenceFieldTitle]) {
-        target = [rootNode findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        target = [database.rootNode firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
             return !node.isGroup && [node.title localizedCaseInsensitiveContainsString:searchTarget];
         }];
     }
     else if([searchByField isEqualToString:kReferenceFieldUsername]) {
-        target = [rootNode findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        target = [database.rootNode firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
             return !node.isGroup && [node.fields.username localizedCaseInsensitiveContainsString:searchTarget];
         }];
     }
     else if([searchByField isEqualToString:kReferenceFieldPassword]) {
-        target = [rootNode findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        target = [database.rootNode firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
             return !node.isGroup && [node.fields.password localizedCaseInsensitiveContainsString:searchTarget];
         }];
     }
     else if([searchByField isEqualToString:kReferenceFieldUrl]) {
-        target = [rootNode findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        target = [database.rootNode firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
             return !node.isGroup && [node.fields.url localizedCaseInsensitiveContainsString:searchTarget];
         }];
     }
     else if([searchByField isEqualToString:kReferenceFieldNotes]) {
-        target = [rootNode findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
-            return !node.isGroup && [node.fields.notes localizedCaseInsensitiveContainsString:searchTarget];
+        target = [database.rootNode firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
+            return !database.rootNode.isGroup && [node.fields.notes localizedCaseInsensitiveContainsString:searchTarget];
         }];
     }
     else if([searchByField isEqualToString:kReferenceFieldCustomFields]) {
-        target = [rootNode findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+        target = [database.rootNode firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
             if(node.isGroup) {
                 return NO;
             }
@@ -279,7 +281,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     return target;
 }
 
--(NSString*)sprCompileUrl:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node rootNode:(Node*)rootNode error:(NSError**)error {
+-(NSString*)sprCompileUrl:(NSTextCheckingResult*)match test:(NSString*)test node:(Node*)node database:(DatabaseModel*)database error:(NSError**)error {
     NSString* subOperation = ([match rangeAtIndex:3].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:3]];
     
     
@@ -290,7 +292,9 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     
     
     
-    NSString* dereferencedUrl = [self sprCompile:node.fields.url node:node rootNode:rootNode error:error];
+    
+    
+    NSString* dereferencedUrl = [self sprCompile:node.fields.url node:node database:database noRecurse:YES error:error];
     NSURLComponents* components = [NSURLComponents componentsWithString:dereferencedUrl];
     
     if([subOperation isEqualToString:kUrlSubOperationScheme]) {

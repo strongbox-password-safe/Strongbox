@@ -8,13 +8,9 @@
 
 #import "MergeSelectSecondDatabaseViewController.h"
 #import "SecondDatabaseListTableViewController.h"
-#import "ShowMergeDiffTableViewController.h"
 #import "OpenSafeSequenceHelper.h"
 #import "Alerts.h"
-
-@interface MergeSelectSecondDatabaseViewController ()
-
-@end
+#import "SelectComparisonTypeViewController.h"
 
 @implementation MergeSelectSecondDatabaseViewController
 
@@ -56,10 +52,10 @@
                                               openLocalOnly:NO
                                                  completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
         if(result == kUnlockDatabaseResultSuccess) {
-            [self performSegueWithIdentifier:@"segueToDiffDatabases" sender:model];
+            [self performSegueWithIdentifier:@"segueToSelectComparisonType" sender:model];
         }
         else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
-            self.onDone(YES);
+            self.onDone();
         }
         else if (result == kUnlockDatabaseResultError) {
             [Alerts error:self
@@ -80,8 +76,8 @@
             }];
         };
     }
-    else if ([segue.identifier isEqualToString:@"segueToDiffDatabases"]) {
-        ShowMergeDiffTableViewController* vc = segue.destinationViewController;
+    else if ([segue.identifier isEqualToString:@"segueToSelectComparisonType"]) {
+        SelectComparisonTypeViewController* vc = segue.destinationViewController;
         vc.firstDatabase = self.firstDatabase;
         vc.secondDatabase = sender;
         vc.onDone = self.onDone;

@@ -38,7 +38,7 @@
     return [NSData dataWithBytes:digest length:CC_SHA256_DIGEST_LENGTH];
 }
 
-- (NSString *)hex {
+- (NSString *)hexString {
     const unsigned char *dataBuffer = (const unsigned char *)self.bytes;
     
     if (!dataBuffer) {
@@ -53,6 +53,10 @@
     }
     
     return [NSString stringWithString:hexString];
+}
+
+- (NSString *)base64String {
+    return [self base64EncodedStringWithOptions:kNilOptions];
 }
 
 @end

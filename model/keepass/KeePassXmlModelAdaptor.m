@@ -14,12 +14,16 @@
 
 @implementation KeePassXmlModelAdaptor
 
-+ (Node*)getNodeModel:(RootXmlDomainObject*)xmlRoot error:(NSError**)error {
++ (Node *)toStrongboxModel:(RootXmlDomainObject *)xmlRoot error:(NSError *__autoreleasing  _Nullable *)error {
+    return [KeePassXmlModelAdaptor toStrongboxModel:xmlRoot attachments:@[] customIconPool:@{} error:error];
+}
+
++ (Node *)toStrongboxModel:(RootXmlDomainObject *)xmlRoot attachments:(NSArray<DatabaseAttachment *> *)attachments customIconPool:(NSDictionary<NSUUID *,NSData *> *)customIconPool error:(NSError *__autoreleasing  _Nullable *)error {
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     
     KeePassGroup * rootGroup = getExistingRootKeePassGroup(xmlRoot);
     
-    Node* rootNode = [adaptor toModel:rootGroup error:error];
+    Node* rootNode = [adaptor toStrongboxModel:rootGroup attachmentsPool:attachments customIconPool:customIconPool error:error];
     
     if(!rootNode) {
         NSLog(@"Could not build node model from xml root document.");
@@ -44,7 +48,7 @@
         metadata.recycleBinEnabled = meta.recycleBinEnabled;
         metadata.recycleBinGroup = meta.recycleBinGroup;
         metadata.recycleBinChanged = meta.recycleBinChanged;
-        metadata.customData = meta.customData.orderedDictionary;
+        metadata.customData = meta.customData ? meta.customData.dictionary : @{}.mutableCopy;
         metadata.settingsChanged = meta.settingsChanged;
         metadata.databaseName = meta.databaseName;
         metadata.databaseNameChanged = meta.databaseNameChanged;
@@ -60,14 +64,18 @@
     return metadata;
 }
 
-- (RootXmlDomainObject*)toXmlModelFromStrongboxModel:(Node*)rootNode
+- (RootXmlDomainObject *)toKeePassModel:(Node *)rootNode databaseProperties:(KeePassDatabaseWideProperties *)databaseProperties context:(XmlProcessingContext *)context error:(NSError *__autoreleasing  _Nullable *)error {
+    return [self toKeePassModel:rootNode databaseProperties:databaseProperties context:context minimalAttachmentPool:nil error:error];
+}
+
+- (RootXmlDomainObject*)toKeePassModel:(Node*)rootNode
                                   databaseProperties:(KeePassDatabaseWideProperties*)databaseProperties
                                              context:(XmlProcessingContext*)context
+                               minimalAttachmentPool:(NSArray<DatabaseAttachment*>**)minimalAttachmentPool
                                                error:(NSError **)error {
     RootXmlDomainObject *ret = [[RootXmlDomainObject alloc] initWithDefaultsAndInstantiatedChildren:context];
     
     Meta* originalMeta = databaseProperties.originalMeta;
-    NSDictionary<NSUUID*, NSData*> * customIcons = databaseProperties.customIcons;
     
     if(originalMeta && originalMeta.unmanagedChildren) {
         for (id<XmlParsingDomainObject> child in originalMeta.unmanagedChildren) {
@@ -78,7 +86,8 @@
     
     
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    KeePassGroup* rootXmlGroup = [adaptor fromModel:rootNode context:context error:error];
+    NSDictionary<NSUUID *,NSData *>* customIconPool;
+    KeePassGroup* rootXmlGroup = [adaptor toKeePassModel:rootNode context:context minimalAttachmentPool:minimalAttachmentPool customIconPool:&customIconPool error:error];
     
     if(!rootXmlGroup) {
         NSLog(@"Could not serialize groups/entries.");
@@ -95,7 +104,7 @@
     ret.keePassFile.meta.recycleBinChanged = databaseProperties.metadata.recycleBinChanged;
     ret.keePassFile.meta.historyMaxItems = databaseProperties.metadata.historyMaxItems;
     ret.keePassFile.meta.historyMaxSize = databaseProperties.metadata.historyMaxSize;
-    ret.keePassFile.meta.customData.orderedDictionary = databaseProperties.metadata.customData;
+    ret.keePassFile.meta.customData.dictionary = databaseProperties.metadata.customData;
     ret.keePassFile.meta.settingsChanged = databaseProperties.metadata.settingsChanged;
     ret.keePassFile.meta.databaseName = databaseProperties.metadata.databaseName;
     ret.keePassFile.meta.databaseNameChanged = databaseProperties.metadata.databaseNameChanged;
@@ -127,7 +136,7 @@
         
     
 
-    if(customIcons.count && !ret.keePassFile.meta.customIconList) {
+    if(customIconPool.count && !ret.keePassFile.meta.customIconList) {
         ret.keePassFile.meta.customIconList = [[CustomIconList alloc] initWithContext:[XmlProcessingContext standardV3Context]];
     }
     
@@ -135,15 +144,14 @@
         [ret.keePassFile.meta.customIconList.icons removeAllObjects];
     }
     
-    for (NSUUID* uuid in customIcons.allKeys) {
-        NSData* data = customIcons[uuid];
+    for (NSUUID* uuid in customIconPool.allKeys) {
+        NSData* data = customIconPool[uuid];
         CustomIcon *icon = [[CustomIcon alloc] initWithContext:[XmlProcessingContext standardV3Context]];
         icon.uuid = uuid;
         icon.data = data;
-        
         [ret.keePassFile.meta.customIconList.icons addObject:icon];
     }
-    
+
     return ret;
 }
 

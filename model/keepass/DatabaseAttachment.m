@@ -41,7 +41,7 @@ static const BOOL kEncrypt = YES;
 
 + (void)initialize {
     if(self == [DatabaseAttachment class]) {
-        kEmptyDataDigest = NSData.data.sha256.hex; 
+        kEmptyDataDigest = NSData.data.sha256.hexString; 
     }
 }
 
@@ -60,7 +60,7 @@ static const BOOL kEncrypt = YES;
     self.encryptionKey = nil;
 }
 
-- (instancetype)initWithData:(NSData *)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory {
+- (instancetype)initNonPerformantWithData:(NSData *)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory {
     return [self initWithStream:[NSInputStream inputStreamWithData:data] protectedInMemory:protectedInMemory compressed:compressed];
 }
 
@@ -208,7 +208,7 @@ static const BOOL kEncrypt = YES;
     
     
     self.attachmentLength = self.digested ? self.digested.length : 0;
-    _sha256Hex = self.digested ? self.digested.digest.hex : kEmptyDataDigest;
+    _sha256Hex = self.digested ? self.digested.digest.hexString : kEmptyDataDigest;
 }
 
 - (NSInputStream *)getPlainTextInputStream {
@@ -223,7 +223,7 @@ static const BOOL kEncrypt = YES;
     return aesDecrypt;
 }
 
-- (NSData *)unitTestDataOnly {
+- (NSData *)nonPerformantFullData {
     return [NSData dataWithContentsOfStream:[self getPlainTextInputStream]];
 }
 

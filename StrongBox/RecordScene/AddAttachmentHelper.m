@@ -11,7 +11,6 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "SVProgressHUD.h"
-#import "UiAttachment.h"
 #import "UIImage+FixOrientation.h"
 #import "NSDate+Extensions.h"
 
@@ -20,7 +19,7 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
 @interface AddAttachmentHelper () <UIImagePickerControllerDelegate, UIDocumentPickerDelegate, UINavigationControllerDelegate>
 
 @property UIViewController* parentViewController;
-@property (nonatomic, copy) void (^onAdd)(UiAttachment * _Nonnull attachment);
+@property (nonatomic, copy) void (^onAdd)(NSString* filename, DatabaseAttachment* databaseAttachment);
 @property NSSet<NSString*>* usedFilenames;
 
 @end
@@ -38,7 +37,9 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
     return sharedInstance;
 }
 
-- (void)beginAddAttachmentUi:(UIViewController *)vc usedFilenames:(NSArray<NSString *> *)usedFilenames onAdd:(void (^)(UiAttachment * _Nonnull))onAdd {
+- (void)beginAddAttachmentUi:(UIViewController *)vc
+               usedFilenames:(NSArray<NSString *> *)usedFilenames
+                       onAdd:(void (^)(NSString* filename, DatabaseAttachment* databaseAttachment))onAdd {
     self.parentViewController = vc;
     self.onAdd = onAdd;
     self.usedFilenames = [NSSet setWithArray:usedFilenames]; 
@@ -323,11 +324,10 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
                                       if(self.onAdd) {
                                           NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
                                           DatabaseAttachment *dbAttachment = [[DatabaseAttachment alloc] initWithStream:inputStream protectedInMemory:YES compressed:YES];
-                                          UiAttachment* attachment = [[UiAttachment alloc] initWithFilename:text dbAttachment:dbAttachment];
                                           
-                                          NSLog(@"Adding Attachment: [%@]", attachment);
+                                          NSLog(@"Adding Attachment: [%@]-[%@]", text, dbAttachment.digestHash);
                                           
-                                          self.onAdd(attachment);
+                                          self.onAdd(text, dbAttachment);
                                       }
                                   }
                               }

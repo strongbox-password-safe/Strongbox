@@ -31,10 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSInputStream*)getPlainTextInputStream;
 
-
-
-- (instancetype)initWithData:(NSData*)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory; 
-@property (readonly) NSData* unitTestDataOnly;
+- (instancetype)initNonPerformantWithData:(NSData*)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory;
+@property (readonly) NSData* nonPerformantFullData;
 
 @end
 

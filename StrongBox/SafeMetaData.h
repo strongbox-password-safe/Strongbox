@@ -16,12 +16,7 @@
 #import "BrowseItemSubtitleField.h"
 #import "YubiKeyHardwareConfiguration.h"
 #import "DatabaseAuditorConfiguration.h"
-
-typedef NS_ENUM (NSInteger, KeePassIconSet) {
-    kKeePassIconSetClassic,
-    kKeePassIconSetSfSymbols,
-    kKeePassIconSetKeePassXC,
-};
+#import "KeePassIconSet.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

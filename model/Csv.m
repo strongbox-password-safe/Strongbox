@@ -11,8 +11,8 @@
 
 @implementation Csv
 
-+ (NSData*)getSafeAsCsv:(Node*)rootGroup {
-    NSArray<Node*>* nodes = [rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
++ (NSData*)getSafeAsCsv:(DatabaseModel*)database {
+    NSArray<Node*>* nodes = [database.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
         return !node.isGroup;
     }];
     

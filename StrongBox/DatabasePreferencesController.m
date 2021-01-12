@@ -116,7 +116,7 @@
                }];
     }
     else {
-        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) { 
+        if (self.viewModel.database.ckfs.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) {
             [Alerts warn:self
                    title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
                  message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
@@ -126,7 +126,7 @@
 
         self.viewModel.metadata.isTouchIdEnabled = YES;
         self.viewModel.metadata.isEnrolledForConvenience = YES;
-        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;
+        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
         
         [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindUi];
@@ -227,7 +227,7 @@
     }
     else if([segue.identifier isEqualToString:@"segueToViewPreferences"]) {
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)segue.destinationViewController;
-        vc.format = self.viewModel.database.format;
+        vc.format = self.viewModel.database.originalFormat;
         vc.databaseMetaData = self.viewModel.metadata;
     }
     else if ([segue.identifier isEqualToString:@"segueToStatistics"]) {

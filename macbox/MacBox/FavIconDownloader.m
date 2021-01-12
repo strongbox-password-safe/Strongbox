@@ -13,7 +13,7 @@
 #import "Settings.h"
 #import "FavIconResultTableCellView.h"
 #import "Utils.h"
-#import "MacNodeIconHelper.h"
+#import "NodeIconHelper.h"
 #import "Alerts.h"
 #import "NSString+Extensions.h"
 

@@ -13,7 +13,6 @@
 #import "KdbxSerializationCommon.h"
 #import "Kdbx4Serialization.h"
 #import "XmlStrongboxNodeModelAdaptor.h"
-#import "AttachmentsRationalizer.h"
 #import "XmlSerializer.h"
 #import "KeePassXmlModelAdaptor.h"
 #import "KeePass2TagPackage.h"
@@ -30,11 +29,7 @@ static const BOOL kLogVerbose = NO;
     return @"kdbx";
 }
 
-- (NSString *)fileExtension {
-    return [Kdbx4Database fileExtension];
-}
-
-- (DatabaseFormat)format {
++ (DatabaseFormat)format {
     return kKeePass4;
 }
 
@@ -42,26 +37,11 @@ static const BOOL kLogVerbose = NO;
     return keePass2SignatureAndVersionMatch(prefix, kKdbx4MajorVersionNumber, kKdbx4MaximumAcceptableMinorVersionNumber, error);
 }
 
-- (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
-    Node* rootGroup = [[Node alloc] initAsRoot:nil];
-    
-    NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
-    if ([rootGroupName isEqualToString:@"generic_database"]) { 
-      rootGroupName = kDefaultRootGroupName;
-    }
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
-    [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
-    
-    UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass4];
-    
-    return [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
-}
-
-- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
++ (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
     [self read:stream ckf:ckf xmlDumpStream:nil sanityCheckInnerStream:YES completion:completion];
 }
 
-- (void)read:(NSInputStream *)stream
++ (void)read:(NSInputStream *)stream
          ckf:(CompositeKeyFactors *)ckf
 xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
 sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
@@ -86,20 +66,21 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
 static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData, CompositeKeyFactors* ckf, OpenCompletionBlock completion) {
     RootXmlDomainObject* xmlRoot = serializationData.rootXmlObject;
     Meta* meta = xmlRoot.keePassFile ? xmlRoot.keePassFile.meta : nil;
+        
     
     
+    NSMutableDictionary<NSUUID*, NSData*>* customIcons = [KeePassXmlModelAdaptor getCustomIcons:meta];
+
     
+
     NSError* error;
-    Node* rootGroup = [KeePassXmlModelAdaptor getNodeModel:xmlRoot error:&error];
+    Node* rootGroup = [KeePassXmlModelAdaptor toStrongboxModel:xmlRoot attachments:serializationData.attachments customIconPool:customIcons error:&error];
     if(rootGroup == nil) {
         NSLog(@"Error converting Xml model to Strongbox model: [%@]", error);
         completion(NO, nil, error);
         return;
     }
     
-    
-    
-    NSMutableDictionary<NSUUID*, NSData*>* customIcons = [KeePassXmlModelAdaptor getCustomIcons:meta];
 
     
     
@@ -117,47 +98,48 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     metadata.compressionFlags = serializationData.compressionFlags;
     metadata.version = serializationData.fileVersion;
     
-    StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
-                                                                 metadata:metadata
-                                                      compositeKeyFactors:ckf
-                                                              attachments:serializationData.attachments
-                                                              customIcons:customIcons
-                                                           deletedObjects:deletedObjects];
+    DatabaseModel* ret = [[DatabaseModel alloc] initWithFormat:kKeePass4
+                                           compositeKeyFactors:ckf
+                                                      metadata:metadata
+                                                          root:rootGroup
+                                                deletedObjects:deletedObjects];
 
     KeePass2TagPackage* tag = [[KeePass2TagPackage alloc] init];
     tag.unknownHeaders = serializationData.extraUnknownHeaders;
     tag.originalMeta = meta;
     
-    ret.adaptorTag = tag;
+    ret.meta.adaptorTag = tag;
     
     completion(NO, ret, nil);
 }
 
-- (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
-    if(!database.compositeKeyFactors.password &&
-       !database.compositeKeyFactors.keyFileDigest &&
-       !database.compositeKeyFactors.yubiKeyCR) {
++ (void)save:(DatabaseModel *)database completion:(SaveCompletionBlock)completion {
+    if(!database.ckfs.password &&
+       !database.ckfs.keyFileDigest &&
+       !database.ckfs.yubiKeyCR) {
         NSError *error = [Utils createNSError:@"A least one composite key factor is required to encrypt database." errorCode:-3];
         completion(NO, nil, nil, error);
         return;
     }
 
-    KeePass2TagPackage* tag = (KeePass2TagPackage*)database.adaptorTag;
+    KeePass2TagPackage* tag = (KeePass2TagPackage*)database.meta.adaptorTag;
     
     
     
     KeePassXmlModelAdaptor *xmlAdaptor = [[KeePassXmlModelAdaptor alloc] init];
     
     KeePassDatabaseWideProperties* databaseProperties = [[KeePassDatabaseWideProperties alloc] init];
-    databaseProperties.customIcons = database.customIcons;
     databaseProperties.originalMeta = tag ? tag.originalMeta : nil;
     databaseProperties.deletedObjects = database.deletedObjects;
-    databaseProperties.metadata = database.metadata;
+    databaseProperties.metadata = database.meta;
     
     NSError* error;
-    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
+    
+    NSArray<DatabaseAttachment*>* minimalAttachmentPool = @[];
+    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toKeePassModel:database.rootNode
                                                                  databaseProperties:databaseProperties
                                                                             context:[XmlProcessingContext standardV4Context]
+                                                              minimalAttachmentPool:&minimalAttachmentPool
                                                                               error:&error];
     
     if(!rootXmlDocument) {
@@ -173,7 +155,7 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     
     
     
-    id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:database.metadata.innerRandomStreamId
+    id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:database.meta.innerRandomStreamId
                                                                                     key:nil 
                                                                                v4Format:YES
                                                                             prettyPrint:NO];
@@ -199,18 +181,18 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     
     Kdbx4SerializationData *serializationData = [[Kdbx4SerializationData alloc] init];
     
-    serializationData.fileVersion = database.metadata.version;
-    serializationData.compressionFlags = database.metadata.compressionFlags;
-    serializationData.innerRandomStreamId = database.metadata.innerRandomStreamId;
+    serializationData.fileVersion = database.meta.version;
+    serializationData.compressionFlags = database.meta.compressionFlags;
+    serializationData.innerRandomStreamId = database.meta.innerRandomStreamId;
     serializationData.innerRandomStreamKey = xmlSerializer.protectedStreamKey;
     serializationData.extraUnknownHeaders = unknownHeaders;
-    serializationData.kdfParameters = database.metadata.kdfParameters;
-    serializationData.cipherUuid = database.metadata.cipherUuid;
-    serializationData.attachments = database.attachments;
+    serializationData.kdfParameters = database.meta.kdfParameters;
+    serializationData.cipherUuid = database.meta.cipherUuid;
+    serializationData.attachments = minimalAttachmentPool;
     
     [Kdbx4Serialization serialize:serializationData
                               xml:xml
-                              ckf:database.compositeKeyFactors
+                              ckf:database.ckfs
                        completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
         if (userCancelled) {
             completion(userCancelled, nil, nil, nil);

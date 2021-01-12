@@ -58,7 +58,14 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
 //            return
 //        }
         
-        completionHandler(.useCredential, URLCredential(trust: challenge.protectionSpace.serverTrust!))
+        
+        guard let serverTrust = challenge.protectionSpace.serverTrust else {
+            print(challenge)
+            completionHandler(.rejectProtectionSpace, nil)
+            return
+        }
+        
+        completionHandler(.useCredential, URLCredential(trust: serverTrust))
     }
 }
     

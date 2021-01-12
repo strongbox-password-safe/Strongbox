@@ -1,0 +1,23 @@
+//
+//  SyncDiffReport.h
+//  Strongbox
+//
+//  Created by Strongbox on 20/10/2020.
+//  Copyright © 2020 Mark McGuill. All rights reserved.
+//
+
+#import <Foundation/Foundation.h>
+#import "Node.h"
+#import "Pair.h"
+#import "DiffSummary.h"
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface MergeDryRunReport : NSObject
+
+@property BOOL success;
+@property DiffSummary* diff;
+
+@end
+
+NS_ASSUME_NONNULL_END

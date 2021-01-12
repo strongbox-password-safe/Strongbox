@@ -20,6 +20,9 @@
 #import "BiometricIdHelper.h"
 #import "DatabasesManagerView.h"
 #import "AutoFillManager.h"
+#import "SampleItemsGenerator.h"
+#import "DatabaseModelConfig.h"
+#import "Serializator.h"
 
 @interface Document ()
 
@@ -47,8 +50,8 @@
 
 - (instancetype)initWithCredentials:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
     if (self = [super init]) {
-        DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:Settings.sharedInstance.passwordGenerationConfig];
-        DatabaseModel *db = [[DatabaseModel alloc] initNew:compositeKeyFactors format:format config:config];
+        DatabaseModel* db = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:compositeKeyFactors];
+        [SampleItemsGenerator addSampleGroupAndRecordToRoot:db passwordConfig:Settings.sharedInstance.passwordGenerationConfig];
         self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:nil];
     }
     
@@ -104,7 +107,7 @@
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
     if(self.credentialsForUnlock) {
         NSError* error;
-        if(![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) {
+        if(![Serializator isValidDatabaseWithPrefix:data error:&error]) {
             if(outError != nil) {
                 *outError = error;
             }
@@ -280,11 +283,9 @@
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
     
-    DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:Settings.sharedInstance.passwordGenerationConfig];
-    
-    [DatabaseModel fromLegacyData:data
+    [Serializator fromLegacyData:data
                               ckf:self.credentialsForUnlock
-                           config:modelConfig
+                           config:DatabaseModelConfig.defaults
                        completion:^(BOOL userCancelled, DatabaseModel * _Nonnull model, NSError * _Nonnull error) {
         
         db = model;

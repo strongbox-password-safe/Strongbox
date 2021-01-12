@@ -154,6 +154,7 @@
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
     pinEntryVc.pinLength = Settings.sharedInstance.appLockPin.length;
+    pinEntryVc.isDatabasePIN = NO;
     
     if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0 && Settings.sharedInstance.failedUnlockAttempts > 0) {
         NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - Settings.sharedInstance.failedUnlockAttempts;

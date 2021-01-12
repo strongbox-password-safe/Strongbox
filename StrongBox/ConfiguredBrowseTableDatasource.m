@@ -95,14 +95,6 @@ const NSUInteger kSectionIdxLast = 3;
         return @[];
     }
     
-    NSSet<NSString*> *set = self.viewModel.pinnedSet;
-    
-    NSArray<Node*>* pinned = [self.viewModel.database.rootGroup filterChildren:YES
-                                                                     predicate:^BOOL(Node * _Nonnull node) {
-        NSString* sid = [node getSerializationId:self.viewModel.database.format != kPasswordSafe];
-        return [set containsObject:sid];
-    }];
-    
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
@@ -110,7 +102,7 @@ const NSUInteger kSectionIdxLast = 3;
         return [self.viewModel isFlaggedByAudit:node];
     }];
 
-    return [searcher filterAndSortForBrowse:pinned.mutableCopy
+    return [searcher filterAndSortForBrowse:self.viewModel.pinnedNodes.mutableCopy
                       includeKeePass1Backup:YES
                           includeRecycleBin:YES
                              includeExpired:YES
@@ -122,7 +114,7 @@ const NSUInteger kSectionIdxLast = 3;
         return @[];
     }
     
-    NSArray<Node*>* ne = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
+    NSArray<Node*>* ne = [self.viewModel.database.effectiveRootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.nearlyExpired;
     }];
 
@@ -145,7 +137,7 @@ const NSUInteger kSectionIdxLast = 3;
         return @[];
     }
     
-    NSArray<Node*>* exp = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
+    NSArray<Node*>* exp = [self.viewModel.database.effectiveRootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.expired;
     }];
 
@@ -174,7 +166,7 @@ const NSUInteger kSectionIdxLast = 3;
             ret = currentGroup.allChildRecords;
             break;
         case kBrowseViewTypeTotpList:
-            ret = [self.viewModel.database.rootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
+            ret = [self.viewModel.database.effectiveRootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
                 return obj.fields.otpToken != nil;
             }];
             break;

@@ -18,6 +18,7 @@
 #import "Utils.h"
 #import "NSArray+Extensions.h"
 #import "BookmarksHelper.h"
+#import "Serializator.h"
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 
@@ -54,7 +55,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     NSString* loc4 = NSLocalizedString(@"mac_save_new_db_message",  @"You must save this new database before you can use it");
     panel.message = loc4;
     
-    NSString* ext = [DatabaseModel getDefaultFileExtensionForFormat:wizard.selectedDatabaseFormat];
+    NSString* ext = [Serializator getDefaultFileExtensionForFormat:wizard.selectedDatabaseFormat];
     
     NSString* loc5 = NSLocalizedString(@"mac_untitled_database_filename_fmt", @"Untitled.%@");
     panel.nameFieldStringValue = [NSString stringWithFormat:loc5, ext ];

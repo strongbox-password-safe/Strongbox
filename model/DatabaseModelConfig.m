@@ -11,23 +11,18 @@
 @implementation DatabaseModelConfig
 
 + (instancetype)defaults {
-    return [DatabaseModelConfig withPasswordConfig:PasswordGenerationConfig.defaults];
+    return [DatabaseModelConfig withSanityCheckInnerStream:YES];
 }
 
-+ (instancetype)withPasswordConfig:(PasswordGenerationConfig *)passwordConfig {
-    return [DatabaseModelConfig withPasswordConfig:passwordConfig sanityCheckInnerStream:YES];
-}
-
-+ (instancetype)withPasswordConfig:(PasswordGenerationConfig *)passwordConfig sanityCheckInnerStream:(BOOL)sanityCheckInnerStream {
-    DatabaseModelConfig* config = [[DatabaseModelConfig alloc] initWithPasswordConfig:passwordConfig sanityCheckInnerStream:sanityCheckInnerStream];
++ (instancetype)withSanityCheckInnerStream:(BOOL)sanityCheckInnerStream {
+    DatabaseModelConfig* config = [[DatabaseModelConfig alloc] initWithSanityCheckInnerStream:sanityCheckInnerStream];
         
     return config;
 }
 
-- (instancetype)initWithPasswordConfig:(PasswordGenerationConfig *)passwordConfig sanityCheckInnerStream:(BOOL)sanityCheckInnerStream {
+- (instancetype)initWithSanityCheckInnerStream:(BOOL)sanityCheckInnerStream {
     self = [super init];
     if (self) {
-        _passwordGeneration = passwordConfig;
         _sanityCheckInnerStream = sanityCheckInnerStream;
     }
     return self;

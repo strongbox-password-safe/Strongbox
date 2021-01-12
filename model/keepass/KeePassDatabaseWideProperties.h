@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeePassDatabaseWideProperties : NSObject
 
-@property NSDictionary<NSUUID*, NSData*> * customIcons;
 @property (nullable) Meta* originalMeta;
 @property NSDictionary<NSUUID*, NSDate*>* deletedObjects;
 @property UnifiedDatabaseMetadata* metadata;

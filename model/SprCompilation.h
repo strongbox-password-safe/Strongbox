@@ -7,7 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Node.h"
+#import "DatabaseModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 - (BOOL)isSprCompilable:(NSString*)test;
-- (NSString*)sprCompile:(NSString*)test node:(Node*)node rootNode:(Node*)rootNode error:(NSError*_Nullable*)error;
+- (NSString*)sprCompile:(NSString*)test node:(Node*)node database:(DatabaseModel*)database error:(NSError*_Nullable*)error;
 
 - (NSArray*)matches:(NSString*)test;
 

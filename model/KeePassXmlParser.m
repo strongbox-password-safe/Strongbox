@@ -120,7 +120,7 @@
 
             if (self.sanityCheckStreamDecryption && !decrypted) {
                 NSLog(@"WARN: Could not decrypt CipherText...");
-                NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt stream. Sanity Check failed: [%@].\n\nPlease Upgrade DB to KDBX4", self.innerRandomStream.key.hex];
+                NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt stream. Sanity Check failed: [%@].\n\nPlease Upgrade DB to KDBX4", self.innerRandomStream.key.hexString];
                 self.errorParse = [Utils createNSError:msg errorCode:-1];
                 return;
             }

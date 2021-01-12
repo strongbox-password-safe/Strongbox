@@ -53,6 +53,8 @@
 #import "GettingStartedInitialViewController.h"
 #import "UITableView+EmptyDataSet.h"
 #import "MergeInitialViewController.h"
+#import "Platform.h"
+#import "Serializator.h"
 
 @interface SafesViewController ()
 
@@ -1029,7 +1031,6 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
     
     BOOL conveniencePossible = safe.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
     if (conveniencePossible) [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
@@ -1039,11 +1040,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     BOOL localCopyAvailable = safe.storageProvider != kLocalDevice && localCopyUrl != nil;
     if (localCopyAvailable) [ma addObject:[self getContextualMenuOpenLocalAction:indexPath]];
 
-    [ma addObject:[self getContextualViewBackupsAction:indexPath]];
+    if ( [BackupsManager.sharedInstance getAvailableBackups:safe].count ) [ma addObject:[self getContextualViewBackupsAction:indexPath]];
     
     BOOL shareAllowed = !Settings.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil;
     if (shareAllowed) [ma addObject:[self getContextualShareAction:indexPath]];
 
+    SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
     BOOL syncLogAvailable = syncStatus.changeLog.firstObject != nil;
     if (syncLogAvailable) [ma addObject:[self getContextualViewSyncLogAction:indexPath]];
 
@@ -1088,11 +1090,19 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
 - (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
+    SafeMetaData *safe = self.collection[indexPath.row];
 
     [ma addObject:[self getContextualMenuRenameAction:indexPath]];
 
+    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe];
+    if (url) {
+        [ma addObject:[self getContextualMenuCreateLocalCopyAction:indexPath]];
+    }
     
-
+    if (self.collection.count > 1) {
+        [ma addObject:[self getContextualMenuMergeAction:indexPath]];
+    }
+    
     [ma addObject:[self getContextualMenuRemoveAction:indexPath]];
 
     return [UIMenu menuWithTitle:@""
@@ -1192,18 +1202,34 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [self renameSafe:indexPath];
     }];
 }
-
-- (UIAction*)getContextualMenuMergeAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
-    BOOL iOS14 = NO;
-    if ( @available(iOS 14.0, *) ) { 
-        iOS14 = YES;
-    }
     
-    UIImage* img = iOS14 ? [UIImage systemImageNamed:@"arrow.triangle.merge"] : [UIImage imageNamed:@"paper_plane"];
+- (UIAction*)getContextualMenuCreateLocalCopyAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    UIImage* img = Platform.iOS13Available ? [UIImage systemImageNamed:@"doc.on.doc"] : [UIImage imageNamed:@"copy"];
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    return [self getContextualMenuItem:NSLocalizedString(@"generic_action_merge_ellipsis", @"Merge...")
+    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy") 
+                                 image:img
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self createLocalCopyDatabase:safe];
+    }];
+
+    
+
+
+
+
+    
+    return ret;
+}
+
+- (UIAction*)getContextualMenuMergeAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    UIImage* img = Platform.iOS14Available ? [UIImage systemImageNamed:@"arrow.triangle.merge"] : [UIImage imageNamed:@"paper_plane"];
+
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    return [self getContextualMenuItem:NSLocalizedString(@"generic_action_compare_and_merge_ellipsis", @"Compare & Merge...")
                                  image:img
                            destructive:NO
                                handler:^(__kindof UIAction * _Nonnull action) {
@@ -1234,7 +1260,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                                         image:image
                                    identifier:nil
                                       handler:handler];
-    
+
     if (destructive) {
         ret.attributes = UIMenuElementAttributesDestructive;
     }
@@ -1356,15 +1382,16 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
     
 
+    if (self.collection.count > 1) {
+        UIAlertAction *mergeAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_action_compare_and_merge_ellipsis", @"Compare & Merge...")
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) {
+            [self beginMergeWizard:safe];
+        }];
 
-
-
-
-
-
-
-
-
+        [alertController addAction:mergeAction];
+    }
+    
     
     
     BOOL localDeviceOption = safe.storageProvider == kLocalDevice;
@@ -1382,22 +1409,39 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     
     
-    UIAlertAction *viewBackupsOption = [UIAlertAction actionWithTitle:
-            NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
-                                                            style:UIAlertActionStyleDefault
-                                                          handler:^(UIAlertAction *a) {
-            [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
+    if ( [BackupsManager.sharedInstance getAvailableBackups:safe].count ) {
+        UIAlertAction *viewBackupsOption = [UIAlertAction actionWithTitle:
+                NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) {
+                [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
+            }];
+        
+        [alertController addAction:viewBackupsOption];
+    }
+    
+    
+    
+    if ( [SyncManager.sharedInstance getSyncStatus:safe].changeLog.count ) {
+        UIAlertAction *viewSyncStatus = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
+                                                                 style:UIAlertActionStyleDefault
+                                                               handler:^(UIAlertAction *a) {
+            [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
         }];
+        [alertController addAction:viewSyncStatus];
+    }
     
-    [alertController addAction:viewBackupsOption];
-
     
-    UIAlertAction *viewSyncStatus = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
-                                                             style:UIAlertActionStyleDefault
-                                                           handler:^(UIAlertAction *a) {
-        [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
-    }];
-    [alertController addAction:viewSyncStatus];
+    
+    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe];
+    if (url) {
+        UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy")
+                                                                 style:UIAlertActionStyleDefault
+                                                               handler:^(UIAlertAction *a) {
+            [self createLocalCopyDatabase:safe];
+        }];
+        [alertController addAction:action];
+    }
     
     
     
@@ -1554,7 +1598,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         }
         
         vc.viewModel = (Model *)sender;
-        vc.currentGroup = vc.viewModel.database.rootGroup;
+        vc.currentGroup = vc.viewModel.database.effectiveRootGroup;
         self.lastOpenedDatabase = vc.viewModel.metadata;
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])
@@ -1731,18 +1775,10 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         UINavigationController* nav = segue.destinationViewController;
         MergeInitialViewController* vc = (MergeInitialViewController*)nav.topViewController;
         vc.firstMetadata = dest;
-        vc.onDone = ^(BOOL userCancelled) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if (!userCancelled) {
-                    [self onMergeWizardDone];
-                }
-            }];
+        vc.onDone = ^{
+            [self dismissViewControllerAnimated:YES completion:nil];
         };
     }
-}
-
-- (void)onMergeWizardDone {
-    
 }
 
 - (void)onOnboardingDoneWithAddDatabase:(BOOL)addExisting
@@ -1950,8 +1986,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         provider = LocalDeviceStorageProvider.sharedInstance;
     }
 
-    NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];  
+    NSString* extension = [Serializator getLikelyFileExtension:data];
+    DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];  
     
     [provider create:nickName
            extension:extension
@@ -2127,6 +2163,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     __weak PinEntryController* weakVc = pinEntryVc;
     
     pinEntryVc.pinLength = Settings.sharedInstance.appLockPin.length;
+    pinEntryVc.isDatabasePIN = NO;
     
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {
@@ -2306,7 +2343,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 - (void)importSafe:(NSData*)data url:(NSURL*)url canOpenInPlace:(BOOL)canOpenInPlace forceOpenInPlace:(BOOL)forceOpenInPlace modDate:(NSDate*)modDate {
     NSError* error;
     
-    if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) { 
+    if (![Serializator isValidDatabaseWithPrefix:data error:&error]) { 
         [Alerts error:self
                 title:[NSString stringWithFormat:NSLocalizedString(@"safesvc_error_title_import_database_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                 error:error];
@@ -2391,8 +2428,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)copyAndAddImportedSafe:(NSString *)nickName data:(NSData *)data url:(NSURL*)url modDate:(NSDate*)modDate {
-    NSString* extension = [DatabaseModel getLikelyFileExtension:data];
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
+    NSString* extension = [Serializator getLikelyFileExtension:data];
+    DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];
     
 
     
@@ -2482,13 +2519,55 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     SafeMetaData* metadata = [FilesAppUrlBookmarkProvider.sharedInstance getSafeMetaData:nickName fileName:filename providerData:bookMark];
     
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
+    DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];
     metadata.likelyFormat = format;
     
     [[SafesList sharedInstance] addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:dateModified];
 }
 
 
+
+- (void)createLocalCopyDatabase:(SafeMetaData*)database {
+    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:database];
+    
+    NSError* error;
+    NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
+    if (!data) {
+        [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
+        return;
+    }
+    
+    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+    if (!attr || error) {
+        [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
+        return;
+    }
+    
+    NSDate* modDate = attr.fileModificationDate;
+    
+    NSString* nickName = [NSString stringWithFormat:@"Local Copy of %@", database.nickName];
+    NSString* extension = [Serializator getLikelyFileExtension:data];
+    [LocalDeviceStorageProvider.sharedInstance create:nickName
+                                            extension:extension
+                                                 data:data
+                                              modDate:modDate
+                                    suggestedFilename:nickName
+                                           completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
+        if(error || !metadata) {
+            [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
+            return;
+        }
+        
+        [SafesList.sharedInstance addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];
+
+        [Alerts info:self
+               title:NSLocalizedString(@"generic_done", @"Done")
+             message:NSLocalizedString(@"safes_vc_created_local_copy_done", @"Local Copy Created.")
+          completion:^{
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }];
+    }];
+}
 
 - (void)beginMergeWizard:(SafeMetaData*)destinationDatabase {
     if (self.collection.count < 2) {

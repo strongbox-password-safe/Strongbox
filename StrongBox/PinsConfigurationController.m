@@ -9,8 +9,8 @@
 #import "PinsConfigurationController.h"
 #import "PinEntryController.h"
 #import "Alerts.h"
-//#import "Settings.h"
 #import "SharedAppAndAutoFillSettings.h"
+
 @interface PinsConfigurationController ()
 
 @end
@@ -175,6 +175,8 @@
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
+    pinEntryVc.isDatabasePIN = YES;
+    
     pinEntryVc.info = duressPin ? NSLocalizedString(@"pins_config_vc_enter_duress_pin", @"Enter Duress PIN") : @"";
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
@@ -186,7 +188,7 @@
                         self.viewModel.metadata.duressPin = pin;
                     }
                     else {
-                        if (self.viewModel.database.compositeKeyFactors.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) {
+                        if (self.viewModel.database.ckfs.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) {
                             [Alerts warn:self
                                    title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
                                  message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
@@ -195,7 +197,7 @@
                         }
 
                         self.viewModel.metadata.conveniencePin = pin;
-                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.compositeKeyFactors.password;                        
+                        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;                        
                         self.viewModel.metadata.isEnrolledForConvenience = YES;
                     }
                     

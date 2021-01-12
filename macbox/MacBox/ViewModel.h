@@ -58,29 +58,20 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
 - (void)setItemExpires:(Node*)item expiry:(NSDate*_Nullable)expiry;
 
-- (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage;
 
-- (void)setItemIcon:(Node *)item
-              index:(NSNumber*_Nullable)index
-     existingCustom:(NSUUID*_Nullable)existingCustom
-             custom:(NSData*_Nullable)custom;
 
-- (void)setItemIcon:(Node *)item
-              index:(NSNumber*_Nullable)index
-     existingCustom:(NSUUID*_Nullable)existingCustom
-             custom:(NSData*_Nullable)custom
-        rationalize:(BOOL)rationalize
-        batchUpdate:(BOOL)batchUpdate;
-
+- (void)setItemIcon:(Node *)item image:(NSImage*)image;
+- (void)setItemIcon:(Node *)item icon:(NodeIcon*)icon;
+- (void)setItemIcon:(Node *)item icon:(NodeIcon*)icon batchUpdate:(BOOL)batchUpdate;
 - (void)batchSetIcons:(NSDictionary<NSUUID*, NSImage*>*)iconMap;
+
+
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
     
-- (void)removeItemAttachment:(Node*)item atIndex:(NSUInteger)atIndex;
-
-- (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment;
-- (void)addItemAttachment:(Node*)item attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
+- (void)removeItemAttachment:(Node*)item filename:(NSString*)filename;
+- (void)addItemAttachment:(Node*)item filename:(NSString*)filename attachment:(DatabaseAttachment*)attachment;
 
 - (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
@@ -123,13 +114,13 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 @property (nonatomic, readonly, weak) Document*  document;
 @property (nonatomic, readonly) BOOL locked;
-@property (nonatomic, readonly) NSURL*  fileUrl;
-@property (nonatomic, readonly) Node*  rootGroup;
+@property (nonatomic, readonly) NSURL* fileUrl;
+@property (nonatomic, readonly) Node* rootGroup;
 @property (nonatomic, readonly) BOOL masterCredentialsSet;
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
-@property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
-@property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
+
+@property (nonatomic, readonly, nonnull) NSSet<NodeIcon*>* customIcons;
 
 @property (nonatomic) CompositeKeyFactors* compositeKeyFactors;
 

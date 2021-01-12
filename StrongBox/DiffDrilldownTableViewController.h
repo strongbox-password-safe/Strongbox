@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property Model* firstDatabase;
 @property Model* secondDatabase;
 
+@property BOOL isMergeDiff;
+
 @property Pair<Node*, Node*>* diffPair;
 
 @end

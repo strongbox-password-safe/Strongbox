@@ -14,11 +14,11 @@
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "Constants.h"
+#import "MinimalPoolHelper.h"
 
 @interface AttachmentsPoolViewController () <QLPreviewControllerDelegate, QLPreviewControllerDataSource>
 
-@property NSArray<NodeFileAttachment*>* fileAttachments;
-@property NSArray<NodeFileAttachment*>* historicalFileAttachments;
+@property NSArray<DatabaseAttachment*>* attachments;
 
 @end
 
@@ -28,75 +28,38 @@
     [super viewDidLoad];
 
     self.tableView.tableFooterView = [UIView new];
-    
-    self.fileAttachments = [self getAllFileAttachments];
-    self.historicalFileAttachments = [self getAllHistoricalFileAttachments];
-}
 
-- (NSArray<NodeFileAttachment*>*)getAllFileAttachments {
-    Node* root = self.viewModel.database.rootGroup;
-    
-    NSArray<Node*>* currentNodesWithAttachments = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup && node.fields.attachments.count > 0;
-    }];
-    
-    NSArray<NodeFileAttachment*> *fileAttachments = [currentNodesWithAttachments flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return obj.fields.attachments;
-    }];
-    
-    return fileAttachments;
-}
-
-- (NSArray<NodeFileAttachment*>*)getAllHistoricalFileAttachments {
-    Node* root = self.viewModel.database.rootGroup;
-
-    NSArray<Node*>* allNodesWithHistoryNodeAttachments = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup && [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
-            return obj.fields.attachments.count > 0;
-        }];
-    }];
-
-    NSArray<Node*>* allHistoricalNodesWithAttachments = [allNodesWithHistoryNodeAttachments flatMap:^id _Nonnull(Node * _Nonnull node, NSUInteger idx) {
-        return [node.fields.keePassHistory filter:^BOOL(Node * _Nonnull obj) {
-            return obj.fields.attachments.count > 0;
-        }];
-    }];
-    
-    NSArray<NodeFileAttachment*> *fileAttachments = [allHistoricalNodesWithAttachments flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return obj.fields.attachments;
-    }];
-    
-    return fileAttachments;
+    self.attachments = self.viewModel.database.attachmentPool;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.viewModel.database.attachments.count;
+    return self.attachments.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"attachmentPoolCell" forIndexPath:indexPath];
- 
-    DatabaseAttachment* attachment = self.viewModel.database.attachments[indexPath.row];
-    
-    cell.textLabel.text = [self getAttachmentLikelyName:indexPath.row forDisplay:YES];
-    
+
+    DatabaseAttachment* attachment = self.attachments[indexPath.row];
+
+    cell.textLabel.text = [self getAttachmentLikelyName:attachment forDisplay:YES];
+
     NSUInteger filesize = attachment.length;
     cell.detailTextLabel.text = friendlyFileSizeString(filesize);
     cell.imageView.image = [UIImage imageNamed:@"document"];
-    
+
     if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
         NSInputStream* attStream = [attachment getPlainTextInputStream];
         NSData* data = [NSData dataWithContentsOfStream:attStream];
         UIImage* img = [UIImage imageWithData:data];
-        
+
         if(img) { 
             @autoreleasepool { 
                 UIGraphicsBeginImageContextWithOptions(CGSizeMake(48, 48), NO, 0.0);
-                
+
                 CGRect imageRect = CGRectMake(0, 0, 48, 48);
                 [img drawInRect:imageRect];
                 cell.imageView.image = UIGraphicsGetImageFromCurrentImageContext();
-                
+
                 UIGraphicsEndImageContext();
             }
         }
@@ -105,34 +68,57 @@
     return cell;
 }
 
-- (NSString*)getAttachmentLikelyName:(NSUInteger)poolIndex forDisplay:(BOOL)forDisplay {
-    NodeFileAttachment* fa = [self.fileAttachments firstOrDefault:^BOOL(NodeFileAttachment * _Nonnull obj) {
-        return obj.index == poolIndex;
+- (NSString*)getAttachmentLikelyName:(DatabaseAttachment*)attachment forDisplay:(BOOL)forDisplay {
+    Node* match = [self.viewModel.database.effectiveRootGroup firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
+        return [node.fields.attachments.allValues anyMatch:^BOOL(DatabaseAttachment * _Nonnull obj) {
+            return [obj.digestHash isEqualToString:attachment.digestHash];
+        }];
     }];
-    
-    if(fa) {
-        return forDisplay ? fa.filename :
-        [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  
+
+    Node* historicalMatch = nil;
+    if (!match) {
+        match = [self.viewModel.database.effectiveRootGroup firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
+            return [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
+                return [obj.fields.attachments.allValues anyMatch:^BOOL(DatabaseAttachment * _Nonnull da) {
+                    return [da.digestHash isEqualToString:attachment.digestHash];
+                }];
+            }];
+        }];
+        
+        historicalMatch = [match.fields.keePassHistory firstOrDefault:^BOOL(Node * _Nonnull obj) {
+            return [obj.fields.attachments.allValues anyMatch:^BOOL(DatabaseAttachment * _Nonnull da) {
+                return [da.digestHash isEqualToString:attachment.digestHash];
+            }];
+        }];
     }
-    
-    fa = [self.historicalFileAttachments firstOrDefault:^BOOL(NodeFileAttachment * _Nonnull obj) {
-        return obj.index == poolIndex;
-    }];
-    
-    if(fa) {
-        return forDisplay ?
-            [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_historical_fmt", @"%@ (Historical)"), fa.filename] :
-            [NSString stringWithFormat:@"%@-(%u).%@", fa.filename.stringByDeletingPathExtension, fa.index, fa.filename.pathExtension];  
+
+    if (match) {
+        Node* containerNode = historicalMatch ? historicalMatch : match;
+        for (NSString* filename in containerNode.fields.attachments.allKeys) {
+            DatabaseAttachment* att = containerNode.fields.attachments[filename];
+            if ([att.digestHash isEqualToString:attachment.digestHash]) {
+                if (!historicalMatch) {
+                    NSString* foo = filename;
+                    NSString* bar = [NSString stringWithFormat:@"%@ [%@]", foo, match.title];
+                    return forDisplay ? bar :
+                    [NSString stringWithFormat:@"%@-(%@).%@", filename.stringByDeletingPathExtension, NSUUID.UUID.UUIDString, filename.pathExtension];  
+                }
+                else {
+                    NSString* foo = [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_historical_fmt", @"%@ (Historical)"), filename];
+                    NSString* bar = [NSString stringWithFormat:@"%@ [%@]", foo, match.title];
+                    return forDisplay ? bar :
+                        [NSString stringWithFormat:@"%@-(%@).%@", filename.stringByDeletingPathExtension, NSUUID.UUID.UUIDString, filename.pathExtension];  
+                }
+            }
+        }
     }
-    
-    NSString* unknown = [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_orphan_fmt", @"<Orphan Attachment> [%lu]"), (unsigned long)poolIndex];
-    
-    return unknown;
+
+    return [NSString stringWithFormat:NSLocalizedString(@"attachment_pool_vc_filename_orphan_fmt", @"<Orphan Attachment> [%lu]"), 0];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self launchAttachmentPreview:indexPath.row];
-    
+
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
@@ -142,7 +128,7 @@
     v.currentPreviewItemIndex = index;
     v.delegate = self;
     v.modalPresentationStyle = UIModalPresentationFormSheet;
-    
+
     [self presentViewController:v animated:YES completion:nil];
 }
 
@@ -151,21 +137,21 @@
 }
 
 - (NSInteger)numberOfPreviewItemsInPreviewController:(QLPreviewController *)controller {
-    return self.viewModel.database.attachments.count;
+    return self.attachments.count;
 }
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    DatabaseAttachment* attachment = [self.viewModel.database.attachments objectAtIndex:index];
-    
-    NSString* filename = [self getAttachmentLikelyName:index forDisplay:NO];
-    
+    DatabaseAttachment* attachment = [self.attachments objectAtIndex:index];
+
+    NSString* filename = [self getAttachmentLikelyName:attachment forDisplay:NO];
+
     NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
-    
+
     NSInputStream* attStream = [attachment getPlainTextInputStream];
     [StreamUtils pipeFromStream:attStream to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
 
     NSURL* url = [NSURL fileURLWithPath:f];
-    
+
     return url;
 }
 

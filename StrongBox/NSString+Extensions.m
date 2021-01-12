@@ -76,12 +76,13 @@ static NSString* const kLowerCaseNull = @"null";
     return _hostRegex;
 }
 
-- (NSData*)sha1 {
+- (NSData*)sha1Data {
     NSData* data = [self dataUsingEncoding:NSUTF8StringEncoding];
+    
     return data.sha1;
 }
 
-- (NSData*)sha256 {
+- (NSData*)sha256Data {
     NSData* data = [self dataUsingEncoding:NSUTF8StringEncoding];
     return data.sha256;
 }

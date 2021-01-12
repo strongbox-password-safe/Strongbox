@@ -42,6 +42,7 @@
 
 #import <Foundation/FoundationErrors.h>
 #import "KeyFileHelper.h"
+#import "Serializator.h"
 
 @interface OpenSafeSequenceHelper () <UIDocumentPickerDelegate>
 
@@ -267,6 +268,7 @@
     
     vc.pinLength = self.safe.conveniencePin.length;
     vc.showFallbackOption = YES;
+    vc.isDatabasePIN = YES;
     
     if(self.safe.failedPinAttempts > 0) {
         vc.warning = [NSString stringWithFormat:
@@ -794,13 +796,13 @@
 
 - (void)unlockDatabaseAtUrl:(NSURL*)url modDate:(NSDate*)modDate {
     NSError* error;
-    BOOL valid = [DatabaseModel isValidDatabase:url error:&error];
+    BOOL valid = [Serializator isValidDatabase:url error:&error];
     if (!valid) {
         [self openSafeWithDataDone:nil modDate:modDate error:error];
         return;
     }
 
-    DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
+    DatabaseFormat format = [Serializator getDatabaseFormat:url];
     
     if (self.undigestedKeyFileData) {
         self.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:self.undigestedKeyFileData checkForXml:format != kKeePass1];
@@ -863,7 +865,7 @@
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         CompositeKeyFactors* cpf = [CompositeKeyFactors password:self.masterPassword keyFileDigest:self.keyFileDigest yubiKeyCR:yubiKeyCR];
-        DatabaseModelConfig* modelConfig = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig sanityCheckInnerStream:YES];
+        DatabaseModelConfig* modelConfig = DatabaseModelConfig.defaults;
     
         if(!self.isConvenienceUnlock && (format == kKeePass || format == kKeePass4) && self.masterPassword.length == 0 && (self.keyFileDigest || yubiKeyCR)) {
             
@@ -874,13 +876,13 @@
             
 
             if (!yubiKeyCR) { 
-                [DatabaseModel fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                [Serializator fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                     if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
                         CompositeKeyFactors* ckf = [CompositeKeyFactors password:nil keyFileDigest:self.keyFileDigest yubiKeyCR:yubiKeyCR];
                         
                         
                         
-                        [DatabaseModel fromUrl:url ckf:ckf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                        [Serializator fromUrl:url ckf:ckf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                             if(model) {
                                 self.masterPassword = nil;
                             }
@@ -908,14 +910,14 @@
                     }
                     
                     cpf.password = self.masterPassword;
-                    [DatabaseModel fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                    [Serializator fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                         [self onGotDatabaseModelFromData:userCancelled model:model modDate:modDate error:error];
                     }];
                 }];
             }
         }
         else {
-            [DatabaseModel fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+            [Serializator fromUrl:url ckf:cpf config:modelConfig completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
                 [self onGotDatabaseModelFromData:userCancelled model:model modDate:modDate error:error];
             }];
         }
@@ -1082,7 +1084,7 @@
         UIAlertAction *biometricAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_use_bio_fmt", @"Use %@"), self.biometricIdName]
                                                                   style:UIAlertActionStyleDefault
                                                                 handler:^(UIAlertAction *a) {
-            [self enrolForBiometrics:openedSafe.compositeKeyFactors];
+            [self enrolForBiometrics:openedSafe.ckfs];
             [self onSuccessfulSafeOpen:openedSafe];
         }];
         
@@ -1114,12 +1116,12 @@
 - (void)setupConveniencePinAndOpen:(DatabaseModel*)openedSafe {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
-    
+    pinEntryVc.isDatabasePIN = YES;
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
                 if(!(self.safe.duressPin != nil && [pin isEqualToString:self.safe.duressPin])) {
-                    [self enrolForPinCodeUnlock:pin compositeKeyFactors:openedSafe.compositeKeyFactors];
+                    [self enrolForPinCodeUnlock:pin compositeKeyFactors:openedSafe.ckfs];
                     [self onSuccessfulSafeOpen:openedSafe];
                 }
                 else {
@@ -1153,10 +1155,10 @@
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.safe.uuid];
     }
 
-    NSLog(@"Setting likelyFormat to [%ld]", (long)openedSafe.format);
+    NSLog(@"Setting likelyFormat to [%ld]", (long)openedSafe.originalFormat);
     
     if (!self.isAutoFillOpen) { 
-        self.safe.likelyFormat = openedSafe.format;
+        self.safe.likelyFormat = openedSafe.originalFormat;
         [SafesList.sharedInstance update:self.safe];
     }
     
@@ -1166,7 +1168,7 @@
 
 
 + (BOOL)isAutoFillLikelyToCrash:(NSURL*)url {
-    DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
+    DatabaseFormat format = [Serializator getDatabaseFormat:url];
     
     if(format == kKeePass4) {     
         NSInputStream* inputStream = [NSInputStream inputStreamWithURL:url];
@@ -1267,7 +1269,7 @@ static OpenSafeSequenceHelper *sharedInstance = nil;
     else {
         NSError* error;
         
-        if (![DatabaseModel isValidDatabaseWithPrefix:data error:&error]) {
+        if (![Serializator isValidDatabaseWithPrefix:data error:&error]) {
             [Alerts error:self.viewController
                     title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                     error:error];

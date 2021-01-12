@@ -9,24 +9,35 @@
 #import "NodeIconHelper.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
+#import "ConcurrentMutableDictionary.h"
 
-static UIImage* kPwSafeFolderImage;
-static UIImage* kPwSafeRecordImage;
+static IMAGE_TYPE_PTR kPwSafeFolderImage;
+static IMAGE_TYPE_PTR kPwSafeRecordImage;
 
-static NSArray<UIImage*> *kKeePassIconSet;
-static NSArray<UIImage*> *kKeePassiOS13SFIconSet;
-static NSArray<UIImage*> *kKeePassXCIconSet;
+static IMAGE_TYPE_PTR kFolderImage;
+static IMAGE_TYPE_PTR kSmallYellowFolderImage;
+static IMAGE_TYPE_PTR kSmallLockImage;
+
+static NSArray<IMAGE_TYPE_PTR> *kKeePassIconSet;
+static NSArray<IMAGE_TYPE_PTR> *kKeePassiOS13SFIconSet;
+static NSArray<IMAGE_TYPE_PTR> *kKeePassXCIconSet;
 
 @implementation NodeIconHelper
 
 + (void)initialize {
     if(self == [NodeIconHelper class]) {
+#if TARGET_OS_IPHONE
         kPwSafeFolderImage = [UIImage imageNamed:@"folder"];
         kPwSafeRecordImage = [UIImage imageNamed:@"document"];
+#else
+        kFolderImage = [NSImage imageNamed:@"blue-folder-cropped-256"];
+        kSmallYellowFolderImage = [NSImage imageNamed:@"Places-folder-yellow-icon-32"];
+        kSmallLockImage = [NSImage imageNamed:@"lock-48"];
+#endif
     }
 }
 
-static NSArray<UIImage*>* loadKeePassiOS13SFIconSet() {
+static NSArray<IMAGE_TYPE_PTR>* loadKeePassiOS13SFIconSet() {
     if (@available(iOS 13.0, *)) {
         NSArray<NSString*>* names = @[@"lock",
                                       @"globe",
@@ -99,8 +110,17 @@ static NSArray<UIImage*>* loadKeePassiOS13SFIconSet() {
                                       @"equal.square.fill"];
         
         return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-            UIImage* img = [UIImage systemImageNamed:obj];
+#if TARGET_OS_IPHONE
+            IMAGE_TYPE_PTR img = [UIImage systemImageNamed:obj];
             return img ? img : [UIImage systemImageNamed:@"lock"];
+#else
+            if (@available(macOS 11.0, *)) {
+                IMAGE_TYPE_PTR img = [NSImage imageWithSystemSymbolName:obj accessibilityDescription:nil];
+                return img ? img : kSmallLockImage;
+            } else {
+                return kSmallLockImage;
+            };
+#endif
         }];
     }
     else {
@@ -108,7 +128,7 @@ static NSArray<UIImage*>* loadKeePassiOS13SFIconSet() {
     }
 }
 
-static NSArray<UIImage*>* loadKeePassXCIconSet() {
+static NSArray<IMAGE_TYPE_PTR>* loadKeePassXCIconSet() {
     NSArray<NSString*>* names = @[@"KPXC_C00_Password",
                                   @"KPXC_C01_Package_Network",
                                   @"KPXC_C02_MessageBox_Warning",
@@ -180,11 +200,15 @@ static NSArray<UIImage*>* loadKeePassXCIconSet() {
                                   @"KPXC_C68_Smartphone"];
     
     return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+#if TARGET_OS_IPHONE
         return [UIImage imageNamed:obj];
+#else
+        return [NSImage imageNamed:obj];
+#endif
     }];
 }
 
-static NSArray<UIImage*>* loadKeePassIconSet() {
+static NSArray<IMAGE_TYPE_PTR>* loadKeePassIconSet() {
     NSArray<NSString*>* names = @[@"C00_Password",
                                   @"C01_Package_Network",
                                   @"C02_MessageBox_Warning",
@@ -256,60 +280,112 @@ static NSArray<UIImage*>* loadKeePassIconSet() {
                                   @"C68_Smartphone"];
     
     return [names map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+#if TARGET_OS_IPHONE
         return [UIImage imageNamed:obj];
+#else
+        return [NSImage imageNamed:obj];
+#endif
     }];
 }
 
-+ (UIImage *)getIconForNode:(Node *)vm model:(id)model {
-    return [NodeIconHelper getIconForNode:vm.isGroup
-                           customIconUuid:vm.customIconUuid
-                                   iconId:vm.iconId
-                                    model:model];
++ (IMAGE_TYPE_PTR)getIconForNode:(Node*)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format {
+    return [self getIconForNode:vm predefinedIconSet:predefinedIconSet format:format large:NO];
+    
 }
 
-+ (UIImage *)getIconForNode:(BOOL)isGroup
-             customIconUuid:(NSUUID *)customIconUuid
-                     iconId:(NSNumber *)iconId
-                      model:(Model*)model {
-    if(model.database.format == kPasswordSafe) {
++ (IMAGE_TYPE_PTR)getIconForNode:(Node*)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format large:(BOOL)large {
+    return [self getNodeIcon:vm.icon predefinedIconSet:predefinedIconSet format:format isGroup:vm.isGroup large:large];
+}
+
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon {
+    return [self getNodeIcon:icon predefinedIconSet:kKeePassIconSetKeePassXC format:kKeePass4 isGroup:NO];
+}
+
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet {
+    return [self getNodeIcon:icon predefinedIconSet:predefinedIconSet format:kKeePass4 isGroup:NO];
+}
+
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format {
+    return [self getNodeIcon:icon predefinedIconSet:predefinedIconSet format:format isGroup:NO];
+}
+
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format isGroup:(BOOL)isGroup {
+    return [self getNodeIcon:icon predefinedIconSet:predefinedIconSet format:format isGroup:isGroup large:NO];
+}
+
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format isGroup:(BOOL)isGroup large:(BOOL)large {
+    if(format == kPasswordSafe) {
+#if TARGET_OS_IPHONE
         return isGroup ? kPwSafeFolderImage : kPwSafeRecordImage;
-    }
-    
-    NSArray<UIImage*>* iconSet = [NodeIconHelper getIconSet:model.metadata.keePassIconSet];
-        
-    if(customIconUuid) {
-        return [NodeIconHelper getCustomIcon:customIconUuid customIcons:model.database.customIcons];
-    }
-    else if(iconId && iconId.intValue >= 0 && iconId.intValue < iconSet.count) {
-        return iconSet[iconId.intValue];
+#else
+        if(!large) {
+            return isGroup ? kSmallYellowFolderImage : kSmallLockImage;
+        }
+        else {
+            return isGroup ? kFolderImage : kSmallLockImage;
+        }
+#endif
     }
     else {
-        return isGroup ? iconSet[48] : iconSet[0];
+        NSArray<IMAGE_TYPE_PTR>* iconSet = [NodeIconHelper getIconSet:predefinedIconSet];
+        
+        if (icon == nil) {
+            return isGroup ? iconSet[48] : iconSet[0];
+        }
+
+        if(icon.isCustom) {
+            return [NodeIconHelper getCustomIcon:icon];
+        }
+        else if(icon.preset >= 0 && icon.preset < iconSet.count) {
+            return iconSet[icon.preset];
+        }
+        else {
+            return isGroup ? iconSet[48] : iconSet[0];
+        }
     }
 }
 
++ (IMAGE_TYPE_PTR)getCustomIcon:(NodeIcon *)icon {
+    if (icon.cachedImage) {
 
-+ (UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons {
-    NSData* data = customIcons[uuid];
+        return icon.cachedImage;
+    }
+
+    if (!icon.isCustom || icon.custom == nil) {
+        return nil;
+    }
+        
     
-    if(data) {
-        
-        UIImage* img = [UIImage imageWithData:data];
-        if(!img) {
-            return nil;
-        }
-        
-        if(img.size.height != 48 || img.size.width != 48) {
-            return scaleImage(img, CGSizeMake(48, 48));
-        }
-        
-        return img;
+    
+#if TARGET_OS_IPHONE
+    IMAGE_TYPE_PTR img = [UIImage imageWithData:icon.custom];
+#else
+    IMAGE_TYPE_PTR img = [[NSImage alloc] initWithData:icon.custom];
+#endif
+
+    if(!img) {
+        return nil;
     }
     
-    return nil;
+    IMAGE_TYPE_PTR image;
+    if(img.size.height != 48 || img.size.width != 48) {
+        image = scaleImage(img, CGSizeMake(48, 48));
+    }
+    
+    image = image ? image : img;
+    
+    if (image) {
+        icon.cachedImage = image;
+
+    }
+    else {
+        NSLog(@"WARNWARN: Couldn't Load Image!");
+    }
+    
+    return image;
 }
 
-+ (NSArray<UIImage*>*)getKeePassIconSet {
++ (NSArray<IMAGE_TYPE_PTR>*)getKeePassIconSet {
     if (kKeePassIconSet == nil) {
         kKeePassIconSet = loadKeePassIconSet();
     }
@@ -317,7 +393,7 @@ static NSArray<UIImage*>* loadKeePassIconSet() {
     return kKeePassIconSet;
 }
 
-+ (NSArray<UIImage*>*)getKeePassiOS13SFIconSet {
++ (NSArray<IMAGE_TYPE_PTR>*)getKeePassiOS13SFIconSet {
     if (kKeePassiOS13SFIconSet == nil) {
         kKeePassiOS13SFIconSet = loadKeePassiOS13SFIconSet();
     }
@@ -325,7 +401,7 @@ static NSArray<UIImage*>* loadKeePassIconSet() {
     return kKeePassiOS13SFIconSet;
 }
 
-+ (NSArray<UIImage*>*)getKeePassXCIconSet {
++ (NSArray<IMAGE_TYPE_PTR>*)getKeePassXCIconSet {
     if (kKeePassXCIconSet == nil) {
         kKeePassXCIconSet = loadKeePassXCIconSet();
     }
@@ -333,7 +409,7 @@ static NSArray<UIImage*>* loadKeePassIconSet() {
     return kKeePassXCIconSet;
 }
 
-+ (NSArray<UIImage*>*)getIconSet:(KeePassIconSet)iconSet {
++ (NSArray<IMAGE_TYPE_PTR>*)getIconSet:(KeePassIconSet)iconSet {
     if (iconSet == kKeePassIconSetKeePassXC) {
         return [NodeIconHelper getKeePassXCIconSet];
     }

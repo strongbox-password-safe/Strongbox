@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, NSNumber* _Nullable userSelectedNewIconIndex, NSUUID*_Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID*, UIImage*>* _Nullable selected);
+typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID*, NodeIcon*>* _Nullable selected);
 
 @interface SetNodeIconUiHelper : NSObject
 
@@ -26,7 +26,7 @@ typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, NSNumber* _Nullable userS
 - (void)expressDownloadBestFavIcon:(NSString*)urlOverride
                         completion:(void (^)(UIImage * _Nullable))completion;
 
-@property NSDictionary<NSUUID*, NSData*>* customIcons;
+@property NSSet<NodeIcon*>* customIconPool;
 
 @end
 

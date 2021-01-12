@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
+- (instancetype)clone;
+
 - (MutableOrderedDictionary<NSString *,NSString *> *)filteredKvpForUIWithFormat:(DatabaseFormat)format;
 
 @property (nonatomic, nullable) NSString* version;
@@ -31,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSNumber *historyMaxItems;
 @property (nonatomic, nullable) NSNumber *historyMaxSize;
 
-@property (nonatomic) MutableOrderedDictionary* customData;
+@property (nonatomic) NSMutableDictionary* customData;
 
 @property NSDate* settingsChanged;
 @property (nonatomic) NSString *databaseName;
@@ -47,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property (nonatomic) uint32_t compressionFlags;
-@property (nonatomic) uint64_t transformRounds; 
+@property (nonatomic) uint64_t transformRounds;
 @property (nonatomic) uint32_t innerRandomStreamId;
 @property NSUUID* cipherUuid;
 
@@ -68,6 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property uint32_t flags;
 @property uint32_t versionInt;
 
+
+
+@property (nullable) NSObject* adaptorTag; 
 
 @end
 

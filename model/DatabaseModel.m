@@ -1,445 +1,184 @@
-#import <Foundation/Foundation.h>
 #import "DatabaseModel.h"
-#import "PwSafeDatabase.h"
-#import "KeePassDatabase.h"
-#import "AbstractDatabaseFormatAdaptor.h"
 #import "Utils.h"
-#import "Kdbx4Database.h"
-#import "Kdb1Database.h"
 #import "PasswordMaker.h"
 #import "SprCompilation.h"
 #import "NSArray+Extensions.h"
 #import "NSMutableArray+Extensions.h"
-#import "Kdbx4Serialization.h"
-#import "KeePassCiphers.h"
-#import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
 #import "NSData+Extensions.h"
-#import "Constants.h"
 #import "NSDate+Extensions.h"
-#import "StreamUtils.h"
-#import "LoggingInputStream.h"
+#import "KeePassConstants.h"
+#import "ConcurrentMutableDictionary.h"
+#import "MinimalPoolHelper.h"
 
 #if TARGET_OS_IPHONE
-#import "KissXML.h" 
+#import "KissXML.h" // Drop in replacements for the NSXML stuff available on Mac
 #endif
+
+static NSString* const kKeePass1BackupGroupName = @"Backup";
+static NSString* const kDefaultRecycleBinTitle = @"Recycle Bin";
+static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 @interface DatabaseModel ()
 
-@property (nonatomic, strong) StrongboxDatabase* theSafe;
-@property (nonatomic, strong) id<AbstractDatabaseFormatAdaptor> adaptor;
-@property DatabaseModelConfig* config;
+@property (nonatomic, readonly) NSMutableDictionary<NSUUID*, NSDate*> *mutableDeletedObjects;
+@property (nonatomic, readonly) DatabaseFormat format;
+@property (nonatomic, nonnull, readonly) UnifiedDatabaseMetadata* metadata;
+@property (nonatomic, nonnull, readonly) CompositeKeyFactors *compositeKeyFactors;
+
+@property (nonatomic, readonly, nonnull) ConcurrentMutableDictionary<NSUUID*, Node*>* fastNodeIdMap;
 
 @end
 
 @implementation DatabaseModel
 
-+ (NSData*_Nullable)getValidationPrefixFromUrl:(NSURL*)url {
-    NSInputStream* inputStream = [NSInputStream inputStreamWithURL:url];
-    
-    [inputStream open];
-    
-    uint8_t buf[kMinimumDatabasePrefixLengthForValidation];
-    NSInteger bytesRead = [inputStream read:buf maxLength:kMinimumDatabasePrefixLengthForValidation];
-    
-    [inputStream close];
-    
-    if (bytesRead > 0) {
-        return [NSData dataWithBytes:buf length:bytesRead];
-    }
-    
-    return nil;
+- (instancetype)init {
+    return [self initWithFormat:kDefaultDatabaseFormat];
 }
 
-+ (BOOL)isValidDatabase:(NSURL *)url error:(NSError *__autoreleasing  _Nullable *)error {
-    NSData* prefix = [DatabaseModel getValidationPrefixFromUrl:url];
+- (instancetype)clone {
+    CompositeKeyFactors* ckfClone = [self.ckfs clone];
+    UnifiedDatabaseMetadata* metadataClone = [self.metadata clone];
+    Node* treeClone = [self.rootNode clone:YES];
     
-    return [DatabaseModel isValidDatabaseWithPrefix:prefix error:error];
-}
- 
-+ (BOOL)isValidDatabaseWithPrefix:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error {
-    if(prefix == nil) {
-        if(error) {
-            *error = [Utils createNSError:@"Database Data is Nil" errorCode:-1];
-        }
-        return NO;
-    }
-    if(prefix.length == 0) {
-        if(error) {
-            *error = [Utils createNSError:@"Database Data is zero length" errorCode:-1];
-        }
-        return NO;
-    }
-
-    NSError *pw, *k1, *k2, *k3;
-        
-    BOOL ret = [PwSafeDatabase isValidDatabase:prefix error:&pw] ||
-        [KeePassDatabase isValidDatabase:prefix error:&k1] ||
-        [Kdbx4Database isValidDatabase:prefix error:&k2] ||
-        [Kdb1Database isValidDatabase:prefix error:&k3];
-
-    if(!ret && error) {
-        NSData* prefixBytes = [prefix subdataWithRange:NSMakeRange(0, MIN(12, prefix.length))];
-        
-        NSString* errorSummary = @"Invalid Database. Debug Info:\n";
-        
-        NSString* prefix = prefixBytes.hex;
-        
-        if([prefix hasPrefix:@"004D534D414D415250435259"]) { 
-            NSString* loc = NSLocalizedString(@"error_database_is_encrypted_ms_intune", @"It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.");
-            
-            errorSummary = loc;
-        }
-        else {
-            errorSummary = [errorSummary stringByAppendingFormat:@"PFX: [%@]\n", prefix];
-            errorSummary = [errorSummary stringByAppendingFormat:@"PWS: [%@]\n", pw.localizedDescription];
-            errorSummary = [errorSummary stringByAppendingFormat:@"KP:[%@]-[%@]\n", k1.localizedDescription, k2.localizedDescription];
-            errorSummary = [errorSummary stringByAppendingFormat:@"KP1: [%@]\n", k3.localizedDescription];
-        }
-        
-        *error = [Utils createNSError:errorSummary errorCode:-1];
-    }
-    
-    return ret;
+    return [[DatabaseModel alloc] initWithFormat:self.originalFormat
+                             compositeKeyFactors:ckfClone
+                                        metadata:metadataClone
+                                            root:treeClone
+                                  deletedObjects:self.deletedObjects.copy];
 }
 
-+ (DatabaseFormat)getDatabaseFormat:(NSURL *)url {
-    NSData* prefix = [DatabaseModel getValidationPrefixFromUrl:url];
-    return [DatabaseModel getDatabaseFormatWithPrefix:prefix];
+- (instancetype)initWithFormat:(DatabaseFormat)format {
+    return [self initWithFormat:format
+            compositeKeyFactors:CompositeKeyFactors.unitTestDefaults];
 }
 
-+ (DatabaseFormat)getDatabaseFormatWithPrefix:(NSData *)prefix {
-    if(prefix == nil || prefix.length == 0) {
-        return kFormatUnknown;
-    }
-    
-    NSError* error;
-    if([PwSafeDatabase isValidDatabase:prefix error:&error]) {
-        return kPasswordSafe;
-    }
-    else if ([KeePassDatabase isValidDatabase:prefix error:&error]) {
-        return kKeePass;
-    }
-    else if([Kdbx4Database isValidDatabase:prefix error:&error]) {
-        return kKeePass4;
-    }
-    else if([Kdb1Database isValidDatabase:prefix error:&error]) {
-        return kKeePass1;
-    }
-    
-    return kFormatUnknown;
-}
-
-+ (NSString*)getLikelyFileExtension:(NSData *)prefix {
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:prefix];
-    
-    if (format == kPasswordSafe) {
-        return [PwSafeDatabase fileExtension];
-    }
-    else if (format == kKeePass4) {
-        return [Kdbx4Database fileExtension];
-    }
-    else if (format == kKeePass) {
-        return [KeePassDatabase fileExtension];
-    }
-    else if (format == kKeePass1) {
-        return [Kdb1Database fileExtension];
-    }
-    else {
-        return @"dat";
-    }
-}
-
-+ (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format {
-    if(format == kPasswordSafe) {
-        return [PwSafeDatabase fileExtension];
-    }
-    else if (format == kKeePass) {
-        return [KeePassDatabase fileExtension];
-    }
-    else if(format == kKeePass4) {
-        return [Kdbx4Database fileExtension];
-    }
-    else if(format == kKeePass1) {
-        return [Kdb1Database fileExtension];
-    }
-    
-    return @"dat";
-}
-
-+ (id<AbstractDatabaseFormatAdaptor>)getAdaptor:(DatabaseFormat)format {
-    if(format == kPasswordSafe) {
-        return [[PwSafeDatabase alloc] init];
-    }
-    else if(format == kKeePass) {
-        return [[KeePassDatabase alloc] init];
-    }
-    else if(format == kKeePass4) {
-        return [[Kdbx4Database alloc] init];
-    }
-    else if(format == kKeePass1) {
-        return [[Kdb1Database alloc] init];
-    }
-    
-    NSLog(@"WARN: No such adaptor for format!");
-    return nil;
-}
-
-
-
-
-- (NSData*)expressToData {
-    __block NSData* ret;
-
-    dispatch_group_t group = dispatch_group_create();
-    dispatch_group_enter(group);
-
-    [self getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled || error) {
-            NSLog(@"Error: expressToData [%@]", error);
-        }
-        else {
-            ret = data;
-        }
-        dispatch_group_leave(group);
-    }];
-
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-
-    return ret;
-}
-
-+ (instancetype)expressFromData:(NSData*)data password:(NSString*)password config:(DatabaseModelConfig*)config {
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:data];
-    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:format];
-    if (adaptor == nil) {
-       return nil;
-    }
-
-    __block DatabaseModel* model = nil;
-    dispatch_group_t group = dispatch_group_create();
-    dispatch_group_enter(group);
-
-    NSInputStream* stream = [NSInputStream inputStreamWithData:data];
-    [stream open];
-    [adaptor read:stream
-              ckf:[CompositeKeyFactors password:password]
-    xmlDumpStream:nil
-sanityCheckInnerStream:config.sanityCheckInnerStream
-     completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
-        [stream close];
-      
-        if(userCancelled || database == nil || error) {
-            NSLog(@"Error: expressFromData = [%@]", error);
-            model = nil;
-        }
-        else {
-            model = [[DatabaseModel alloc] initWithDatabase:database adaptor:adaptor config:config];
-        }
-        
-        dispatch_group_leave(group);
-    }];
-
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-
-    return model;
-}
-
-
-
-+ (void)fromUrlOrLegacyData:(NSURL *)url
-                 legacyData:(NSData *)legacyData
-                        ckf:(CompositeKeyFactors *)ckf
-                     config:(DatabaseModelConfig *)config
-                 completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
-    if (url) {
-        [DatabaseModel fromUrl:url ckf:ckf config:config completion:completion];
-    }
-    else {
-        [DatabaseModel fromLegacyData:legacyData ckf:ckf config:config completion:completion];
-    }
-}
-
-+ (void)fromLegacyData:legacyData
-                   ckf:(CompositeKeyFactors *)ckf
-                config:(DatabaseModelConfig*)config
-            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion {
-    NSInputStream* stream = [NSInputStream inputStreamWithData:legacyData];
-    
-    DatabaseFormat format = [DatabaseModel getDatabaseFormatWithPrefix:legacyData];
-
-    [DatabaseModel fromStreamWithFormat:stream
-                                    ckf:ckf
-                                 config:config
-                                 format:format
-                          xmlDumpStream:nil
-                             completion:completion];
-}
-
-+ (void)fromUrl:(NSURL *)url
-            ckf:(CompositeKeyFactors *)ckf
-         config:(DatabaseModelConfig *)config
-     completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
-    [DatabaseModel fromUrl:url ckf:ckf config:config xmlDumpStream:nil  completion:completion];
-}
-
-+ (void)fromUrl:(NSURL *)url
-            ckf:(CompositeKeyFactors *)ckf
-         config:(DatabaseModelConfig *)config
-  xmlDumpStream:(NSOutputStream *)xmlDumpStream
-     completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
-    DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
-     
-    NSInputStream* stream = [NSInputStream inputStreamWithURL:url];
-    
-    
-    
-    
-    [DatabaseModel fromStreamWithFormat:stream
-                                    ckf:ckf
-                                 config:config
-                                 format:format
-                          xmlDumpStream:xmlDumpStream
-                             completion:completion];
-}
-
-+ (void)fromStreamWithFormat:(NSInputStream *)stream
-                         ckf:(CompositeKeyFactors *)ckf
-                      config:(DatabaseModelConfig*)config
-                      format:(DatabaseFormat)format
-               xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
-                  completion:(void(^)(BOOL userCancelled, DatabaseModel*_Nullable model, NSError*_Nullable error))completion {
-    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:format];
-
-    if (adaptor == nil) {
-        completion(NO, nil, nil);
-        return;
-    }
-    
-    NSTimeInterval startDecryptTime = NSDate.timeIntervalSinceReferenceDate;
-    
-    [stream open];
-    
-    [adaptor read:stream
-              ckf:ckf
-    xmlDumpStream:xmlDumpStream
-     sanityCheckInnerStream:config.sanityCheckInnerStream
-       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
-        
-        [stream close];
-        
-        NSLog(@"====================================== PERF ======================================");
-        NSLog(@"DESERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startDecryptTime);
-        NSLog(@"====================================== PERF ======================================");
-
-        if(userCancelled || database == nil || error) {
-            completion(userCancelled, nil ,error);
-        }
-        else {
-            DatabaseModel* model = [[DatabaseModel alloc] initWithDatabase:database adaptor:adaptor config:config];
-            completion(NO, model, nil);
-        }
-    }];
-}
-
-
-
-- (instancetype)initWithDatabase:(StrongboxDatabase*)database
-                         adaptor:(id<AbstractDatabaseFormatAdaptor>)adaptor
-                          config:(DatabaseModelConfig*)config {
-    if (self = [super init]) {
-        if (adaptor == nil) {
-            return nil;
-        }
-        if (database == nil) {
-            return nil;
-        }
-        
-        self.adaptor = adaptor;
-        self.theSafe = database;
-        self.config = config;
-    }
-    return self;
-}
-
-- (instancetype)initWithFormat:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
-    return [self initWithFormat:format compositeKeyFactors:compositeKeyFactors config:DatabaseModelConfig.defaults];
+- (instancetype)initWithCompositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
+    return [self initWithFormat:kDefaultDatabaseFormat
+            compositeKeyFactors:compositeKeyFactors];
 }
 
 - (instancetype)initWithFormat:(DatabaseFormat)format
-           compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
-                        config:(DatabaseModelConfig*)config {
-    id<AbstractDatabaseFormatAdaptor> adaptor = [DatabaseModel getAdaptor:format];
-    if (adaptor == nil) {
-        return nil;
+           compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors {
+    return [self initWithFormat:format
+            compositeKeyFactors:compositeKeyFactors
+                       metadata:[UnifiedDatabaseMetadata withDefaultsForFormat:format]];
+}
+
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      metadata:(UnifiedDatabaseMetadata*)metadata
+            {
+    return [self initWithFormat:format
+            compositeKeyFactors:compositeKeyFactors
+                       metadata:metadata
+                           root:nil];
+}
+
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      metadata:(UnifiedDatabaseMetadata *)metadata
+                          root:(Node *)root {
+    return [self initWithFormat:format
+            compositeKeyFactors:compositeKeyFactors
+                       metadata:metadata
+                           root:root
+                 deletedObjects:@{}];
+}
+    
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      metadata:(UnifiedDatabaseMetadata*)metadata
+                          root:(Node *_Nullable)root
+                deletedObjects:(NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
+    if (self = [super init]) {
+        _fastNodeIdMap = [[ConcurrentMutableDictionary alloc] init];
+        _format = format;
+        _compositeKeyFactors = compositeKeyFactors;
+        _metadata = metadata;
+        
+        _rootNode = root ? root : [self initializeRoot];
+        [self rebuildFastNodeIdMap];
+ 
+        _mutableDeletedObjects = deletedObjects.mutableCopy;
     }
-    
-    StrongboxDatabase* database = [adaptor create:compositeKeyFactors];
-    
-    return [self initWithDatabase:database adaptor:adaptor config:config];
-}
-
-- (instancetype)initEmptyForTesting:(CompositeKeyFactors *)compositeKeyFactors {
-    DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:PasswordGenerationConfig.defaults];
-    
-    return [self initWithFormat:kKeePass compositeKeyFactors:compositeKeyFactors config:config];
-}
-
-- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
-                 format:(DatabaseFormat)format {
-    return [self initNew:compositeKeyFactors format:format config:DatabaseModelConfig.defaults];
-}
-
-- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
-                 format:(DatabaseFormat)format
-                 config:(DatabaseModelConfig*)config {
-    if (self = [self initWithFormat:format compositeKeyFactors:compositeKeyFactors config:config]) {
-        if(format != kKeePass1) {
-            [self addSampleGroupAndRecordToRoot];
-        }
-        else {
-            Node *parent = self.theSafe.rootGroup.childGroups[0];
-            [self addSampleGroupAndRecordToGroup:parent];
-        }
-    }
-    
     return self;
 }
 
-- (void)getAsData:(SaveCompletionBlock)completion {
-    [self.theSafe performPreSerializationTidy]; 
+
+
+- (Node*)initializeRoot {
+    Node* rootGroup = [[Node alloc] initAsRoot:nil childRecordsAllowed:self.format != kKeePass1];
+
+    if (self.format != kPasswordSafe) {
+        
+        
+
+        NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
+        if ([rootGroupName isEqualToString:@"generic_database"]) { 
+            rootGroupName = kDefaultRootGroupName;
+        }
+        Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
+        
+        [self addChild:keePassRootGroup destination:rootGroup];
+    }
     
-    [self.adaptor save:self.theSafe completion:completion];
-}
-
-- (void)addSampleGroupAndRecordToRoot {
-    [self addSampleGroupAndRecordToGroup:self.rootGroup];
-}
-
-- (void)addSampleGroupAndRecordToGroup:(Node*)parent {
-    NSString* password = [PasswordMaker.sharedInstance generateForConfigOrDefault:self.config.passwordGeneration];
-
-    Node* sampleFolder = [[Node alloc] initAsGroup:NSLocalizedString(@"model_sample_group_title", @"Sample Group")
-                                            parent:parent
-                            keePassGroupTitleRules:YES
-                                              uuid:nil];
-    
-    [parent addChild:sampleFolder keePassGroupTitleRules:NO];
-    
-    NodeFields *fields = [[NodeFields alloc] initWithUsername:NSLocalizedString(@"model_sample_entry_username", @"username")
-                                                          url:@"https:
-                                                     password:password
-                                                        notes:@""
-                                                        email:@"user@gmail.com"];
-
-    [parent addChild:[[Node alloc] initAsRecord:NSLocalizedString(@"model_sample_entry_title", @"Sample")
-                                         parent:parent
-                                         fields:fields
-                                           uuid:nil]
-                         keePassGroupTitleRules:NO];
+    return rootGroup;
 }
 
 
+
+- (NSArray<DatabaseAttachment *> *)attachmentPool {
+    return [MinimalPoolHelper getMinimalAttachmentPool:self.rootNode];
+}
+
+- (NSSet<NodeIcon *> *)customIconPool {
+    NSDictionary<NSUUID *,NSData *> *min = [MinimalPoolHelper getMinimalIconPool:self.rootNode];
+    
+    NSSet<NodeIcon*> *ret = [min.allValues map:^id _Nonnull(NSData * _Nonnull obj, NSUInteger idx) {
+        return [NodeIcon withCustom:obj];
+    }].set;
+    
+    NSLog(@"Got %@ custom icons", @(ret.count));
+    
+    return ret;
+}
+
+- (DatabaseFormat)originalFormat {
+    return self.format;
+}
+
+- (CompositeKeyFactors *)ckfs {
+    return self.compositeKeyFactors;
+}
+
+- (UnifiedDatabaseMetadata *)meta {
+    return self.metadata;
+}
+
+- (Node *)effectiveRootGroup {
+    if(self.format == kKeePass || self.format == kKeePass4) {
+        
+        
+        
+        
+        
+        
+        if(self.rootNode.children.count > 0) {
+            return [self.rootNode.children objectAtIndex:0];
+        }
+        else {
+            return self.rootNode; 
+        }
+    }
+    else {
+        return self.rootNode;
+    }
+}
+
+- (BOOL)isUsingKeePassGroupTitleRules {
+    return self.format != kPasswordSafe;
+}
 
 - (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
     BOOL shouldAddHistory = YES; 
@@ -449,13 +188,10 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     }
 }
 
-
-
-
 - (BOOL)setItemTitle:(Node *)item title:(NSString *)title {
     Node* originalNodeForHistory = [item cloneForHistory];
 
-    BOOL ret = [item setTitle:title keePassGroupTitleRules:self.format != kPasswordSafe];
+    BOOL ret = [item setTitle:title keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
 
     if (ret) {
         [self addHistoricalNode:item originalNodeForHistory:originalNodeForHistory];
@@ -463,6 +199,96 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     }
     
     return ret;
+}
+
+
+
+- (void)rebuildFastNodeIdMap {
+    [self.fastNodeIdMap removeAllObjects];
+
+    if (self.rootNode && self.rootNode.children) {
+        self.fastNodeIdMap[self.rootNode.uuid] = self.rootNode;
+        
+        for (Node* node in self.rootNode.allChildren) {
+            self.fastNodeIdMap[node.uuid] = node;
+        }
+    }
+}
+
+- (BOOL)insertNodeAndTrackNode:(Node*)node parent:(Node*)parent position:(NSInteger)position {
+    if (node && parent) {
+        BOOL ret = [parent insertChild:node keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules atPosition:position];
+        
+        self.fastNodeIdMap[node.uuid] = node;
+        
+        return ret;
+    }
+    else {
+        return NO;
+    }
+}
+
+- (void)removeNodeFromParentAndTrack:(Node*)node {
+    if (node && node.parent) {
+        [node.parent removeChild:node];
+        [self.fastNodeIdMap removeObjectForKey:node.uuid];
+    }
+}
+
+- (Node *)getItemById:(NSUUID *)uuid {
+    if (uuid == nil) {
+        return nil;
+    }
+    
+    return self.fastNodeIdMap[uuid];
+}
+
+- (Node *)getItemByCrossSerializationFriendlyId:(NSString*)serializationId {
+    if (serializationId.length < 1) {
+        return nil;
+    }
+        
+    NSString* prefix = [serializationId substringToIndex:1];
+    NSString* suffix = [serializationId substringFromIndex:1];
+    
+    if (self.format != kPasswordSafe || [prefix isEqualToString:@"R"]) {
+        NSUUID* uuid = [[NSUUID alloc] initWithUUIDString:suffix];
+        if (uuid) {
+            return [self getItemById:uuid];
+        }
+    }
+    else if ([prefix isEqualToString:@"G"]) { 
+        return [self.rootNode firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
+            NSString *testId = [self getCrossSerializationFriendlyId:node];
+            return [testId isEqualToString:serializationId];
+        }];
+    }
+    
+    return nil;
+}
+
+- (NSString *)getCrossSerializationFriendlyId:(Node *)node {
+    if (!node) {
+        return nil;
+    }
+    
+    
+    
+    
+    
+
+    BOOL groupCanUseUuid = self.format != kPasswordSafe;
+    
+    NSString *identifier;
+    if(node.isGroup && !groupCanUseUuid) {
+        NSArray<NSString*> *titleHierarchy = [node getTitleHierarchy];
+        identifier = [titleHierarchy componentsJoinedByString:@":"];
+    }
+    else {
+        identifier = [node.uuid UUIDString];
+    }
+    
+    return [NSString stringWithFormat:@"%@%@", node.isGroup ? @"G" : @"R",  identifier];
 }
 
 
@@ -484,7 +310,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     
     BOOL isCompilable = [SprCompilation.sharedInstance isSprCompilable:text];
     
-    NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node rootNode:self.rootGroup error:&error] : text;
+    NSString* compiled = isCompilable ? [SprCompilation.sharedInstance sprCompile:text node:node database:self error:&error] : text;
     
     if(error) {
         NSLog(@"WARN: SPR Compilation ERROR: [%@]", error);
@@ -495,17 +321,182 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 
 
 
-- (void)preOrderTraverse:(BOOL (^)(Node * _Nonnull))function {
-    [self.rootGroup preOrderTraverse:function]; 
+- (BOOL)preOrderTraverse:(BOOL (^)(Node * _Nonnull))function {
+    return [self.rootNode preOrderTraverse:function];
 }
 
 
 
-- (NSString *)getGroupPathDisplayString:(Node *)vm {
+
+- (BOOL)validateMoveItems:(const NSArray<Node*>*)items destination:(Node*)destination {
+    NSArray<Node*>* minimalItems = [self getMinimalNodeSet:items].allObjects;
+    
+    BOOL invalid = [minimalItems anyMatch:^BOOL(Node * _Nonnull obj) {
+        return obj.parent == nil || ![obj validateChangeParent:destination keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
+    }];
+    
+    return !invalid;
+}
+
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination {
+    return [self moveItems:items destination:destination date:NSDate.date undoData:nil];
+}
+
+- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
+    return [self moveItems:items destination:destination date:NSDate.date undoData:undoData];
+}
+
+- (BOOL)moveItems:(const NSArray<Node *> *_Nonnull)items
+      destination:(Node*_Nonnull)destination
+             date:(NSDate*_Nonnull)date
+         undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
+    NSArray<Node*>* minimalItems = [self getMinimalNodeSet:items].allObjects;
+    
+    BOOL invalid = [minimalItems anyMatch:^BOOL(Node * _Nonnull obj) {
+        return obj.parent == nil || ![obj validateChangeParent:destination keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
+    }];
+    
+    if (invalid) {
+        return NO;
+    }
+    
+    if (undoData) {
+        *undoData = [self getHierarchyCloneForReconstruction:items];
+    }
+
+    
+    
+    
+    BOOL rollback = NO;
+    
+    NSMutableArray<Node*> *rollbackTo = NSMutableArray.array;
+    for(Node* itemToMove in minimalItems) {
+        [rollbackTo addObject:itemToMove.parent];
+        
+        if(![itemToMove changeParent:destination keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules]) {
+            rollback = YES;
+            NSLog(@"Error Changing Parents. [%@]", itemToMove);
+            break;
+        }
+    }
+    
+    if (rollback) {
+        int i = 0;
+        for (Node* previousParent in rollbackTo) {
+            [minimalItems[i++] changeParent:previousParent keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
+        }
+    }
+    else {
+        for(Node* itemToMove in minimalItems) { 
+            [itemToMove touchLocationChanged:date]; 
+        }
+    }
+    
+    return !rollback;
+}
+
+- (void)undoMove:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    
+    
+    
+    
+    for (NodeHierarchyReconstructionData* reconItem in undoData) {
+        Node* originalMovedItem = [self getItemById:reconItem.clonedNode.uuid];
+    
+        if (originalMovedItem) {
+            [self removeNodeFromParentAndTrack:originalMovedItem];
+        }
+        else {
+            
+            NSLog(@"WARNWARN: Could not find original moved item! [%@]", reconItem);
+        }
+    }
+    
+    
+    
+    [self reconstruct:undoData];
+}
+
+
+
+
+- (BOOL)validateAddChild:(Node *)item destination:(Node *)destination {
+    return [destination validateAddChild:item keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
+}
+
+- (BOOL)addChild:(Node *)item destination:(Node *)destination {
+    return [self insertChild:item destination:destination atPosition:-1];
+}
+
+- (BOOL)insertChild:(Node *)item destination:(Node *)destination atPosition:(NSInteger)position {
+    if( ![destination validateAddChild:item keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules]) {
+        return NO;
+    }
+
+    return [self insertNodeAndTrackNode:item parent:destination position:position];
+}
+
+- (void)removeChildFromParent:(Node *)item {
+    [self removeNodeFromParentAndTrack:item];
+}
+
+
+
+- (BOOL)reorderItem:(Node *)item to:(NSInteger)to {
+    NSLog(@"reorderItem: %@ > %lu", item, (unsigned long)index);
+
+    if (item.parent == nil) {
+        NSLog(@"WARNWARN: Cannot change order of item, parent is nil");
+        return NO;
+    }
+
+    NSUInteger currentIndex = [item.parent.children indexOfObject:item];
+    if (currentIndex == NSNotFound) {
+        NSLog(@"WARNWARN: Cannot change order of item, item not found in parent!");
+        return NO;
+    }
+
+    if (to >= item.parent.children.count || to < -1) {
+        to = -1;
+    }
+    
+    
+    BOOL ret = [item.parent reorderChild:item to:to keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules];
+
+    if (ret) {
+        [item touchLocationChanged];
+    }
+    
+    return ret;
+}
+
+- (BOOL)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:(Node*)parentGroup {
+    NSLog(@"reorderItem: %lu > %lu", (unsigned long)from, (unsigned long)to);
+    
+    if (from < 0 || from >= parentGroup.children.count) {
+        return NO;
+    }
+    if(from == to) {
+        return YES;
+    }
+    
+    NSLog(@"reorderItem Ok: %lu > %lu", (unsigned long)from, (unsigned long)to);
+
+    Node* item = parentGroup.children[from];
+    
+    return [self reorderItem:item to:to];
+}
+
+
+
+
+
+
+- (NSString *)getPathDisplayString:(Node *)vm {
     NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
     
     Node* current = vm;
-    while (current != nil && current != self.rootGroup) {
+    while (current != nil && current != self.effectiveRootGroup) {
         [hierarchy insertObject:current.title atIndex:0];
         current = current.parent;
     }
@@ -514,15 +505,15 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 }
 
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm {
-    if(!vm || vm.parent == nil || vm.parent == self.rootGroup) {
+    if(!vm || vm.parent == nil || vm.parent == self.effectiveRootGroup) {
         return @"/";
     }
     
     NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
     
     Node* current = vm;
-    while (current.parent != nil && current.parent != self.rootGroup) {
-        [hierarchy insertObject:current.parent.title atIndex:0]; 
+    while (current.parent != nil && current.parent != self.effectiveRootGroup) {
+        [hierarchy insertObject:current.parent.title atIndex:0];
         current = current.parent;
     }
     
@@ -531,255 +522,23 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     return path;
 }
 
-- (Node*)rootGroup {
-    if(self.format == kKeePass || self.format == kKeePass4) {
-        
-        
-        
-        
-        
-        
-        if(self.theSafe.rootGroup.children.count > 0) {
-            return [self.theSafe.rootGroup.children objectAtIndex:0];
-        }
-        else {
-            return self.theSafe.rootGroup; 
-        }
-    }
-    else {
-        return self.theSafe.rootGroup;
-    }
-}
-
-- (DatabaseFormat)format {
-    return self.adaptor.format;
-}
-
-- (NSString *)fileExtension {
-    return self.adaptor.fileExtension;
-}
-
--(UnifiedDatabaseMetadata*)metadata {
-    return self.theSafe.metadata;
-}
-
-
-
--(NSArray<DatabaseAttachment *> *)attachments {
-    return self.theSafe.attachments;
-}
-
-- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment {
-    [self addNodeAttachment:node attachment:attachment rationalize:YES];
-}
-
-- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize {
-    [self.theSafe addNodeAttachment:node attachment:attachment rationalize:rationalize];
-}
-
-- (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex {
-    [self.theSafe removeNodeAttachment:node atIndex:atIndex];
-}
-
-- (void)setNodeAttachments:(Node *)node attachments:(NSArray<UiAttachment *> *)attachments {
-    [self.theSafe setNodeAttachments:node attachments:attachments];
-}
-
-- (UiAttachment*)getUiAttachment:(NodeFileAttachment*)nodeFileAttachment {
-    NSInteger index = nodeFileAttachment.index;
-    if ( index < 0 || index >= self.attachments.count ) {
-        return nil;
-    }
-        
-    DatabaseAttachment *dbAttachment = self.attachments[index];
-    
-    return [UiAttachment attachmentWithFilename:nodeFileAttachment.filename dbAttachment:dbAttachment];
-}
-
-
-
-- (NSDictionary<NSUUID *,NSData *> *)customIcons {
-    return self.theSafe.customIcons;
-}
-
-- (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize {
-    [self setNodeCustomIcon:node data:data rationalize:rationalize addHistory:YES];
-}
-
-- (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory {
-    if (addHistory) {
-        Node* originalNodeForHistory = [node cloneForHistory];
-        [self addHistoricalNode:node originalNodeForHistory:originalNodeForHistory];
-    }
-    
-    [node touch:YES touchParents:NO];
-    [self.theSafe setNodeCustomIcon:node data:data rationalize:rationalize];
-}
-
-- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID *)uuid rationalize:(BOOL)rationalize {
-    [self setNodeCustomIconUuid:node uuid:uuid rationalize:rationalize addHistory:YES];
-}
-
-- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID *)uuid rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory {
-    if (addHistory) {
-        Node* originalNodeForHistory = [node cloneForHistory];
-        [self addHistoricalNode:node originalNodeForHistory:originalNodeForHistory];
-    }
-    
-    [node touch:YES touchParents:NO];
-
-    [self.theSafe setNodeCustomIconUuid:node uuid:uuid rationalize:rationalize];
-}
-
-- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize {
-    [self setNodeIconId:node iconId:iconId rationalize:rationalize addHistory:YES];
-}
-
-- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory {
-    if (addHistory) {
-        Node* originalNodeForHistory = [node cloneForHistory];
-        [self addHistoricalNode:node originalNodeForHistory:originalNodeForHistory];
-    }
-    
-    [node touch:YES touchParents:NO];
-
-    if(iconId.intValue == -1) {
-        node.iconId = !node.isGroup ? @(0) : @(48); 
-    }
-    else {
-        node.iconId = iconId;
-    }
-    node.customIconUuid = nil;
-}
-
-
-
-- (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
-    self.theSafe.recycleBinEnabled = recycleBinEnabled;
-}
-
-- (BOOL)recycleBinEnabled {
-    return self.theSafe.recycleBinEnabled;
-}
-
-- (Node*)recycleBinNode {
-    return self.theSafe.recycleBinNode;
-}
-
-- (Node *)keePass1BackupNode {
-    return self.theSafe.keePass1BackupNode;
-}
-
-- (NSSet<Node *> *)getMinimalNodeSet:(const NSArray<Node *> *)nodes {
-    return [self.theSafe getMinimalNodeSet:nodes];
-}
-
-
-
-
-- (NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
-    return self.theSafe.deletedObjects;
-}
-
-- (void)deleteItems:(const NSArray<Node *> *)items {
-    [self deleteItems:items undoData:nil];
-}
-
-- (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *>**)undoData {
-    [self.theSafe deleteItems:items undoData:undoData];
-}
-
-- (void)unDelete:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
-    [self.theSafe unDelete:undoData];
-}
-
-
-
-
-- (BOOL)canRecycle:(Node *)item {
-    return [self.theSafe canRecycle:item];
-}
-
-- (BOOL)recycleItems:(const NSArray<Node *> *)items {
-    return [self.theSafe recycleItems:items];
-}
-
-- (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
-    return [self.theSafe recycleItems:items undoData:undoData];
-}
-
-- (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
-    [self.theSafe undoRecycle:undoData];
-}
-
-
-
-
-- (BOOL)validateMoveItems:(const NSArray<Node *> *)items destination:(Node *)destination {
-    return [self.theSafe validateMoveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
-}
-
-- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node*)destination {
-    return [self.theSafe moveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
-}
-
-- (BOOL)moveItems:(const NSArray<Node *> *)items destination:(Node *)destination undoData:(NSArray<NodeHierarchyReconstructionData *> * _Nullable __autoreleasing *)undoData {
-    return [self.theSafe moveItems:items destination:destination keePassGroupTitleRules:self.format != kPasswordSafe undoData:undoData];
-}
-
-- (void)undoMove:(NSArray<NodeHierarchyReconstructionData *> *)undoData {
-    [self.theSafe undoMove:undoData];
-}
-
-
-
-
-- (BOOL)validateAddChild:(Node *)item destination:(Node *)destination {
-    return [self.theSafe validateAddChild:item destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
-}
-
-- (BOOL)addChild:(Node *)item destination:(Node *)destination {
-    return [self.theSafe addChild:item destination:destination keePassGroupTitleRules:self.format != kPasswordSafe];
-}
-
-- (void)unAddChild:(Node *)item {
-    return [self.theSafe unAddChild:item];
-}
-
-
-
-
-- (NSArray<Node *>*)allNodes {
-    return [self.rootGroup filterChildren:YES predicate:nil];
-}
-
--(NSArray<Node *> *)allRecords {
-    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return !node.isGroup;
-    }];
-}
-
--(NSArray<Node *> *)allGroups {
-    return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        return node.isGroup;
-    }];
-}
-
 - (NSArray<Node *> *)activeGroups {
     if(self.format == kPasswordSafe) {
-        return self.allGroups;
+        return self.effectiveRootGroup.allChildGroups;
     }
     else if(self.format == kKeePass1) {
         
-        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return node.isGroup && (self.keePass1BackupNode == nil || (node != self.keePass1BackupNode && ![self.keePass1BackupNode contains:node]));
+        Node* keePass1BackupNode = self.keePass1BackupNode;
+
+        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            return node.isGroup && (keePass1BackupNode == nil || (node != keePass1BackupNode && ![keePass1BackupNode contains:node]));
         }];
     }
     else {
         
         Node* recycleBin = self.recycleBinNode;
-        
-        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+
+        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
             return node.isGroup && (recycleBin == nil || (node != recycleBin && ![recycleBin contains:node]));
         }];
     }
@@ -787,20 +546,22 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 
 - (NSArray<Node *> *)activeRecords {
     if(self.format == kPasswordSafe) {
-        return self.allRecords;
+        return self.effectiveRootGroup.allChildRecords;
     }
     else if(self.format == kKeePass1) {
         
-        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return !node.isGroup && (self.keePass1BackupNode == nil || ![self.keePass1BackupNode contains:node]);
+        Node* keePass1BackupNode = self.keePass1BackupNode;
+
+        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            return !node.isGroup && (keePass1BackupNode == nil || (node != keePass1BackupNode && ![keePass1BackupNode contains:node]));
         }];
     }
     else {
         
         Node* recycleBin = self.recycleBinNode;
-        
-        return [self.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return !node.isGroup && (recycleBin == nil || ![recycleBin contains:node]);
+
+        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            return !node.isGroup && (recycleBin == nil || (node != recycleBin && ![recycleBin contains:node]));
         }];
     }
 }
@@ -904,14 +665,12 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 }
 
 -(NSInteger)numberOfRecords {
-    return self.allRecords.count;
+    return self.effectiveRootGroup.allChildRecords.count;
 }
 
 -(NSInteger)numberOfGroups {
-    return self.allGroups.count;
+    return self.effectiveRootGroup.allChildGroups.count;
 }
-
-
 
 - (NSString*)mostFrequentInCountedSet:(NSCountedSet<NSString*>*)bag {
     NSString *mostOccurring = nil;
@@ -926,6 +685,10 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     
     return mostOccurring;
 }
+
+
+
+
 
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
@@ -1004,9 +767,12 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
             }
         }
         
+        
+        
+        
         if (self.format != kPasswordSafe) {
-            BOOL attachmentMatch = [node.fields.attachments anyMatch:^BOOL(NodeFileAttachment* _Nonnull obj) {
-                return [obj.filename localizedStandardContainsString:searchText];
+            BOOL attachmentMatch = [node.fields.attachments.allKeys anyMatch:^BOOL(NSString * _Nonnull obj) {
+                return [obj localizedStandardContainsString:searchText];
             }];
             
             if (attachmentMatch) {
@@ -1030,9 +796,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     }];
 }
 
-- (CompositeKeyFactors *)compositeKeyFactors {
-    return self.theSafe.compositeKeyFactors;
-}
+
 
 - (NSString*)getHtmlPrintString:(NSString*)databaseName {
     
@@ -1049,17 +813,17 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     
     NSMutableString* ret = [NSMutableString stringWithFormat:@"<html>%@\n<body>\n    <h1 class=\"database-title\">%@</h1>\n<h6>Printed: %@</h6>    ", stylesheet, [self htmlStringFromString:databaseName], NSDate.date.iso8601DateString];
     
-    NSArray<Node*>* sortedGroups = [self.rootGroup.allChildGroups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-        NSString* path1 = [self getGroupPathDisplayString:obj1];
-        NSString* path2 = [self getGroupPathDisplayString:obj2];
+    NSArray<Node*>* sortedGroups = [self.effectiveRootGroup.allChildGroups sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        NSString* path1 = [self getPathDisplayString:obj1];
+        NSString* path2 = [self getPathDisplayString:obj2];
         return finderStringCompare(path1, path2);
     }];
     
     NSMutableArray* allGroups = sortedGroups.mutableCopy;
-    [allGroups addObject:self.rootGroup];
+    [allGroups addObject:self.effectiveRootGroup];
     
     for(Node* group in allGroups) {
-        [ret appendFormat:@"    <div class=\"group-title\">%@</div>\n", [self htmlStringFromString:[self getGroupPathDisplayString:group]]];
+        [ret appendFormat:@"    <div class=\"group-title\">%@</div>\n", [self htmlStringFromString:[self getPathDisplayString:group]]];
         
         NSMutableArray* nodeStrings = @[].mutableCopy;
         
@@ -1139,6 +903,319 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     NSString *escapedString = textNode.XMLString;
     
     return [[escapedString stringByReplacingOccurrencesOfString:@"\r\n" withString:@"<br>"] stringByReplacingOccurrencesOfString:@"\n" withString:@"<br>"];
+}
+
+
+
+- (void)performPreSerializationTidy {
+    [self trimKeePassHistory];
+}
+
+- (void)trimKeePassHistory {
+    [self trimKeePassHistory:self.metadata.historyMaxItems maxSize:self.metadata.historyMaxSize];
+}
+
+- (void)trimKeePassHistory:(NSNumber*)maxItems maxSize:(NSNumber*)maxSize {
+    for(Node* record in self.rootNode.allChildRecords) {
+        [self trimNodeKeePassHistory:record maxItems:maxItems maxSize:maxSize];
+    }
+}
+
+- (BOOL)trimNodeKeePassHistory:(Node*)node maxItems:(NSNumber*)maxItemsNum maxSize:(NSNumber*)maxSizeNum {
+    bool trimmed = false;
+    
+    NSInteger maxItems = maxItemsNum != nil ? maxItemsNum.integerValue : kDefaultHistoryMaxItems;
+    NSInteger maxSize = maxSizeNum != nil ? maxSizeNum.integerValue : kDefaultHistoryMaxSize;
+    
+    if(maxItems >= 0)
+    {
+        while(node.fields.keePassHistory.count > maxItems)
+        {
+            [self removeOldestHistoryItem:node];
+            trimmed = YES;
+        }
+    }
+    
+    if(maxSize >= 0)
+    {
+        while(true)
+        {
+            NSUInteger histSize = 0;
+            
+            for (Node* historicalNode in node.fields.keePassHistory) {
+                histSize += [self getEstimatedSize:historicalNode];
+            }
+            
+            if(histSize > maxSize)
+            {
+                [self removeOldestHistoryItem:node];
+                trimmed = YES;
+            }
+            else {
+                break;
+            }
+        }
+    }
+    
+    return trimmed;
+}
+
+- (NSUInteger)getEstimatedSize:(Node*)node {
+    
+    NSUInteger fixedStructuralSizeGuess = 256;
+    
+    NSUInteger basicFields = node.title.length +
+    node.fields.username.length +
+    node.fields.password.length +
+    node.fields.url.length +
+    node.fields.notes.length;
+    
+    NSUInteger customFields = 0;
+    for (NSString* key in node.fields.customFields.allKeys) {
+        customFields += key.length + node.fields.customFields[key].value.length;
+    }
+    
+    
+    
+    NSUInteger historySize = 0;
+    for (Node* historyNode in node.fields.keePassHistory) {
+        historySize += [self getEstimatedSize:historyNode];
+    }
+    
+    
+    
+    NSUInteger iconSize = node.icon ? node.icon.estimatedStorageBytes : 0UL;
+        
+    
+    
+    NSUInteger binariesSize = 0;
+    for (NSString* filename in node.fields.attachments.allKeys) {
+        DatabaseAttachment* dbA = node.fields.attachments[filename];
+        binariesSize += dbA == nil ? 0 : dbA.estimatedStorageBytes;
+    }
+    
+    NSUInteger textSize = (basicFields + customFields) * 2; 
+    
+    NSUInteger ret = fixedStructuralSizeGuess + textSize + historySize + iconSize + binariesSize;
+
+    
+    
+    return ret;
+}
+
+- (void)removeOldestHistoryItem:(Node*)node {
+    NSArray* sorted = [node.fields.keePassHistory sortedArrayUsingComparator:^NSComparisonResult(Node*  _Nonnull obj1, Node*  _Nonnull obj2) {
+        return [obj1.fields.modified compare:obj2.fields.modified];
+    }];
+    
+    if(sorted.count < 2) {
+        [node.fields.keePassHistory removeAllObjects];
+    }
+    else {
+        node.fields.keePassHistory = [[sorted subarrayWithRange:NSMakeRange(1, sorted.count - 1)] mutableCopy];
+    }
+}
+
+
+
+
+- (void)setDeletedObjects:(NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
+    [self.mutableDeletedObjects removeAllObjects];
+    [self.mutableDeletedObjects addEntriesFromDictionary:deletedObjects];
+}
+
+- (NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
+    return self.mutableDeletedObjects.copy;
+}
+
+- (BOOL)canRecycle:(Node *)item {
+    BOOL willRecycle = self.recycleBinEnabled;
+    
+    if(self.recycleBinEnabled && self.recycleBinNode) {
+        if([self.recycleBinNode contains:item] || self.recycleBinNode == item) {
+            willRecycle = NO;
+        }
+    }
+
+    return willRecycle;
+}
+
+- (void)deleteAllGroupItems:(Node*)group deletionDate:(NSDate*)deletionDate {
+    for (Node* entry in group.childRecords) {
+        [self removeNodeFromParentAndTrack:entry];
+        self.mutableDeletedObjects[entry.uuid] = deletionDate;
+    }
+
+    for (Node* subgroup in group.childGroups) {
+        [self deleteAllGroupItems:subgroup deletionDate:deletionDate];
+        self.mutableDeletedObjects[subgroup.uuid] = deletionDate;
+    }
+}
+
+- (NSArray<NodeHierarchyReconstructionData*>*)getHierarchyCloneForReconstruction:(const NSArray<Node*>*)items {
+    return [items map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        NodeHierarchyReconstructionData* recon = [[NodeHierarchyReconstructionData alloc] init];
+        
+        recon.index = [obj.parent.children indexOfObject:obj];
+        recon.clonedNode = [obj clone:YES];
+        
+        return recon;
+    }];
+}
+
+- (void)reconstruct:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    for (NodeHierarchyReconstructionData* recon in undoData) {
+        Node* parent = recon.clonedNode.parent;
+        
+        if (!parent) {
+            continue; 
+        }
+        
+        [self addChild:recon.clonedNode destination:parent];
+        
+        NSUInteger currentIndex = parent.children.count - 1;
+        if (currentIndex != recon.index) {
+            if (! [parent reorderChildAt:currentIndex to:recon.index keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules] ) {
+                NSLog(@"WARNWARN: Could not reorder child from %lu to %lu during reconstruction.", (unsigned long)currentIndex, (unsigned long)recon.index);
+            }
+        }
+    }
+}
+
+- (void)unDelete:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    [self reconstruct:undoData];
+    
+    for (NodeHierarchyReconstructionData* recon in undoData) {
+        
+        NSArray<NSUUID*>* childIds = [recon.clonedNode.allChildren map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+            return obj.uuid;
+        }];
+        
+        [self.mutableDeletedObjects removeObjectForKey:recon.clonedNode.uuid];
+        [self.mutableDeletedObjects removeObjectsForKeys:childIds];
+    }
+}
+
+- (void)deleteItems:(const NSArray<Node *> *)items {
+    [self deleteItems:items undoData:nil];
+}
+
+- (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
+    NSDate* now = NSDate.date;
+    NSSet<Node*> *minimalNodeSet = [self getMinimalNodeSet:items];
+    
+    if (undoData) {
+        *undoData = [self getHierarchyCloneForReconstruction:items];
+    }
+    
+    for (Node* item in minimalNodeSet) {
+        if (item.parent == nil || ![item.parent contains:item]) { 
+            NSLog(@"WARNWARN: Attempt to delete item with no parent");
+            return;
+        }
+
+        if (item.isGroup) {
+            [self deleteAllGroupItems:item deletionDate:now];
+        }
+
+        [self removeNodeFromParentAndTrack:item];
+        self.mutableDeletedObjects[item.uuid] = now;
+    }
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items {
+    return [self recycleItems:items undoData:nil];
+}
+
+- (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>**)undoData {
+    if (!self.recycleBinEnabled) {
+        NSLog(@"WARNWARN: Attempt to recycle item when recycle bin disabled!");
+        return NO;
+    }
+    
+    if(self.recycleBinNode == nil) {     
+        [self createNewRecycleBinNode];
+    }
+    
+    NSDate* now = NSDate.date;
+    NSSet<Node*> *minimalNodeSet = [self getMinimalNodeSet:items];
+
+    BOOL ret = [self moveItems:minimalNodeSet.allObjects destination:self.recycleBinNode date:now undoData:undoData];
+    
+    if (ret) {
+        for (Node* item in minimalNodeSet) { 
+            [item touchAt:now]; 
+        }
+    }
+
+    return ret;
+}
+
+- (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData*>*)undoData {
+    [self undoMove:undoData];
+}
+
+- (void)setRecycleBinEnabled:(BOOL)recycleBinEnabled {
+    self.metadata.recycleBinEnabled = recycleBinEnabled;
+}
+
+- (BOOL)recycleBinEnabled {
+    return self.metadata.recycleBinEnabled;
+}
+
+- (NSUUID *)recycleBinNodeUuid {
+    return self.metadata.recycleBinGroup;
+}
+
+- (void)setRecycleBinNodeUuid:(NSUUID *)recycleBinNode {
+    self.metadata.recycleBinGroup = recycleBinNode;
+}
+- (NSDate *)recycleBinChanged {
+    return self.metadata.recycleBinChanged;
+}
+
+- (void)setRecycleBinChanged:(NSDate *)recycleBinChanged {
+    self.metadata.recycleBinChanged = recycleBinChanged;
+}
+
+- (Node *)recycleBinNode {
+    return [self getItemById:self.recycleBinNodeUuid];
+}
+
+- (Node*)keePass1BackupNode {
+    return [self.effectiveRootGroup firstOrDefault:NO predicate:^BOOL(Node * _Nonnull node) {
+        return [node.title isEqualToString:kKeePass1BackupGroupName];
+    }];
+}
+
+- (void)createNewRecycleBinNode {
+    Node* recycleBin = [[Node alloc] initAsGroup:kDefaultRecycleBinTitle parent:self.effectiveRootGroup keePassGroupTitleRules:self.isUsingKeePassGroupTitleRules uuid:nil];
+    recycleBin.icon = [NodeIcon withPreset:43];
+    
+    [self addChild:recycleBin destination:self.effectiveRootGroup];
+
+    self.recycleBinNodeUuid = recycleBin.uuid;
+    self.recycleBinChanged = [NSDate date];
+}
+
+
+
+- (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes {
+    
+    
+    
+    NSArray<Node*>* groups = [nodes filter:^BOOL(Node * _Nonnull obj) {
+        return obj.isGroup;
+    }];
+    
+    NSArray<Node*>* minimalNodeSet = [nodes filter:^BOOL(Node * _Nonnull node) {
+        BOOL alreadyContained = [groups anyMatch:^BOOL(Node * _Nonnull group) {
+            return [group contains:node];
+        }];
+        return !alreadyContained;
+    }];
+    
+    return [NSSet setWithArray:minimalNodeSet];
 }
 
 @end

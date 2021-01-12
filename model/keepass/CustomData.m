@@ -18,7 +18,7 @@
 
 - (instancetype)initWithXmlElementName:(NSString *)xmlElementName context:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:xmlElementName context:context]) {
-        self.orderedDictionary = [[MutableOrderedDictionary alloc] init];
+        self.dictionary = @{}.mutableCopy;
     }
     
     return self;
@@ -35,7 +35,7 @@
 - (BOOL)addKnownChildObject:(id<XmlParsingDomainObject>)completedObject withXmlElementName:(nonnull NSString *)withXmlElementName {
     if([withXmlElementName isEqualToString:kCustomDataItemElementName]) {
         CustomDataItem* item = (CustomDataItem*)completedObject;
-        self.orderedDictionary[item.key] = item.value;
+        self.dictionary[item.key] = item.value;
         return YES;
     }
     
@@ -49,8 +49,8 @@
         return NO;
     }
     
-    for (NSString* key in self.orderedDictionary.allKeys) {
-        NSString* value = self.orderedDictionary[key];
+    for (NSString* key in self.dictionary.allKeys) {
+        NSString* value = self.dictionary[key];
         
         if(![serializer beginElement:kCustomDataItemElementName]) return NO;
 
@@ -86,7 +86,7 @@
     
     CustomData* other = (CustomData*)object;
     
-    if(![self.orderedDictionary isEqual:other.orderedDictionary]) {
+    if(![self.dictionary isEqualToDictionary:other.dictionary]) {
         return NO;
     }
 

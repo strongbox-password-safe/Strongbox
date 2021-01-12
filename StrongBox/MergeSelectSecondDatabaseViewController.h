@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MergeSelectSecondDatabaseViewController : UIViewController
 
 @property Model* firstDatabase;
-@property (nonatomic, copy) void (^onDone)(BOOL userCancelled);
+@property (nonatomic, copy) void (^onDone)(void);
 
 @end
 

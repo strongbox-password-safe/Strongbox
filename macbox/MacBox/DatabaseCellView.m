@@ -34,6 +34,7 @@
     
     NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:storageInfo];
     url = url ? url : metadata.fileUrl; 
+    
     self.textFieldSubtitleLeft.stringValue = url ? url.path : @"";
     
     NSString* fileSize = @"";

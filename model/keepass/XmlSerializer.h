@@ -27,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
                                  v4Format:(BOOL)v4Format
                               prettyPrint:(BOOL)prettyPrint NS_DESIGNATED_INITIALIZER;
 
-@property (nonatomic, readonly) NSData* protectedStreamKey;
+@property (nonatomic, readonly, nullable) NSData* protectedStreamKey;
                                 
 @end
 

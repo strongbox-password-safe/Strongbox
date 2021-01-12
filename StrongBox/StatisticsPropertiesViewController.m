@@ -9,6 +9,7 @@
 #import "StatisticsPropertiesViewController.h"
 #import "MutableOrderedDictionary.h"
 #import "GenericKeyValueTableViewCell.h"
+#import "Utils.h"
 
 @interface StatisticsPropertiesViewController ()
 
@@ -38,9 +39,13 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 
     [self loadStatistics];
     
-    self.metadataKvps = [self.viewModel.database.metadata filteredKvpForUIWithFormat:self.viewModel.database.format];
+    self.metadataKvps = [self.viewModel.database.meta filteredKvpForUIWithFormat:self.viewModel.database.originalFormat];
     
-    self.customData = self.viewModel.database.metadata.customData;
+    self.customData = [[MutableOrderedDictionary alloc] init];
+    NSArray* sortedKeys = [self.viewModel.database.meta.customData.allKeys sortedArrayUsingComparator:finderStringComparator];
+    for (NSString* key in sortedKeys) {
+        [self.customData addKey:key andValue:self.viewModel.database.meta.customData[key]];
+    }
 }
 
 - (void)loadStatistics {

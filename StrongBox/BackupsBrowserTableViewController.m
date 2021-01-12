@@ -13,6 +13,7 @@
 #import "ExportOptionsTableViewController.h"
 #import "LocalDeviceStorageProvider.h"
 #import "NSDate+Extensions.h"
+#import "Serializator.h"
 
 @interface BackupsBrowserTableViewController ()
 
@@ -139,7 +140,7 @@
     NSDate* modDate = attr.fileModificationDate;
     
     NSString* nickName = [NSString stringWithFormat:@"Restored Backup of %@", self.metadata.nickName];
-    NSString* extension = [DatabaseModel getLikelyFileExtension:data];
+    NSString* extension = [Serializator getLikelyFileExtension:data];
     [LocalDeviceStorageProvider.sharedInstance create:nickName
                                             extension:extension
                                                  data:data
@@ -147,13 +148,8 @@
                                     suggestedFilename:nickName
                                            completion:^(SafeMetaData * _Nonnull metadata, NSError * _Nonnull error) {
         if(error || !metadata) {
-            NSError* error;
-            NSData* data = [NSData dataWithContentsOfURL:item.url options:kNilOptions error:&error];
-            if (!data) {
-                [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
-                return;
-            }
-
+            [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
+            return;
         }
         
         [SafesList.sharedInstance addWithDuplicateCheck:metadata initialCache:data initialCacheModDate:modDate];

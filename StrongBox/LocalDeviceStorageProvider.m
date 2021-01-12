@@ -230,7 +230,7 @@ suggestedFilename:(NSString *)suggestedFilename
 
 - (NSURL*)getFileUrl:(SafeMetaData*)safeMetaData {
     LocalDatabaseIdentifier* identifier = [self getIdentifierFromMetadata:safeMetaData];
-    return identifier ? [self getFileUrl:identifier.sharedStorage filename:identifier.filename] : nil;
+    return [self getFileUrl:identifier.sharedStorage filename:identifier.filename];
 }
 
 - (NSURL*)getFileUrl:(BOOL)sharedStorage filename:(NSString*)filename {

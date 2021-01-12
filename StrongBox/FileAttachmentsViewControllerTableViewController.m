@@ -25,7 +25,7 @@
 @interface FileAttachmentsViewControllerTableViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAdd;
-@property NSMutableArray<UiAttachment*> *workingAttachments;
+@property NSMutableDictionary<NSString*, DatabaseAttachment*> *workingAttachments;
 @property BOOL dirty;
 
 @end
@@ -115,10 +115,29 @@
 }
 
 - (void)removeAttachment:(NSIndexPath*)indexPath {
+    NSString* filename = self.workingAttachments.allKeys[indexPath.row];
+    
     [Alerts yesNo:self title:@"Are you sure?" message:@"Are you sure you want to remove this attachment?" action:^(BOOL response) {
         if(response) {
-            UiAttachment* attachment = [self.workingAttachments objectAtIndex:indexPath.row];
-            [self.workingAttachments removeObject:attachment];
+            [self.workingAttachments removeObjectForKey:filename];
+            self.dirty = YES;
+            [self refresh];
+        }
+    }];
+}
+
+- (void)renameAttachment:(NSIndexPath*)indexPath { 
+    NSString* filename = self.workingAttachments.allKeys[indexPath.row];
+    DatabaseAttachment* attachment = self.workingAttachments[filename];
+    
+    Alerts *x = [[Alerts alloc] initWithTitle:@"Filename" message:@"Enter a filename for this item"];
+    
+    [x OkCancelWithTextFieldNotEmpty:self
+                        textFieldText:filename
+                       completion:^(NSString *text, BOOL response) {
+        if(response) {
+            self.workingAttachments[text] = attachment;
+            [self.workingAttachments removeObjectForKey:filename];
             
             self.dirty = YES;
             [self refresh];
@@ -126,29 +145,11 @@
     }];
 }
 
-- (void)renameAttachment:(NSIndexPath*)indexPath {
-    UiAttachment* attachment = [self.workingAttachments objectAtIndex:indexPath.row];
-
-    Alerts *x = [[Alerts alloc] initWithTitle:@"Filename" message:@"Enter a filename for this item"];
-    
-    [x OkCancelWithTextFieldNotEmpty:self
-                        textFieldText:attachment.filename
-                       completion:^(NSString *text, BOOL response) {
-        if(response) {
-            attachment.filename = text;
-            self.dirty = YES;
-            [self refresh];
-        }
-    }];
-}
-
 - (IBAction)onAddAttachment:(id)sender {
-    NSArray* usedFilenames = [self.workingAttachments map:^id _Nonnull(UiAttachment * _Nonnull obj, NSUInteger idx) {
-        return obj.filename;
-    }];
+    NSArray* usedFilenames = self.workingAttachments.allKeys;
     
-    [AddAttachmentHelper.sharedInstance beginAddAttachmentUi:self usedFilenames:usedFilenames onAdd:^(UiAttachment * _Nonnull attachment) {
-        [self.workingAttachments addObject:attachment];
+    [AddAttachmentHelper.sharedInstance beginAddAttachmentUi:self usedFilenames:usedFilenames onAdd:^(NSString * _Nonnull filename, DatabaseAttachment * _Nonnull databaseAttachment) {
+        self.workingAttachments[filename] = databaseAttachment;
         self.dirty = YES;
         [self refresh];
     }];
@@ -163,11 +164,12 @@
 }
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    UiAttachment* attachment = [self.workingAttachments objectAtIndex:index];
+    NSString* filename = self.workingAttachments.allKeys[index];
+    DatabaseAttachment* attachment = self.workingAttachments[filename];
+   
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     
-    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:attachment.filename];
-    
-    NSInputStream* inputStream = [attachment.dbAttachment getPlainTextInputStream];
+    NSInputStream* inputStream = [attachment getPlainTextInputStream];
 
     NSOutputStream* os = [NSOutputStream outputStreamToFileAtPath:f append:NO];
     
@@ -197,14 +199,15 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"FileAttachmentReuseIdentifier" forIndexPath:indexPath];
     
-    UiAttachment* attachment = [self.workingAttachments objectAtIndex:indexPath.row];
+    NSString* filename = self.workingAttachments.allKeys[indexPath.row];
+    DatabaseAttachment* attachment = self.workingAttachments[filename];
     
-    cell.textLabel.text = attachment.filename;
-    cell.detailTextLabel.text = friendlyFileSizeString(attachment.dbAttachment.length);
+    cell.textLabel.text = filename;
+    cell.detailTextLabel.text = friendlyFileSizeString(attachment.length);
     cell.imageView.image = [UIImage imageNamed:@"document"];
 
-    if (attachment.dbAttachment.length < kMaxAttachmentTableviewIconImageSize) {
-        NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+    if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
+        NSInputStream* attStream = [attachment getPlainTextInputStream];
         NSData* data = [NSData dataWithContentsOfStream:attStream];
         UIImage* img = [UIImage imageWithData:data];
 

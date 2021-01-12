@@ -595,7 +595,7 @@ static NSData *getMaster(NSData* masterSeed, NSData *transformKey, NSData* yubiR
 }
 
 static NSData *getCompositeKey(CompositeKeyFactors* compositeKeyFactors) {
-    NSData *hashedPassword = compositeKeyFactors.password != nil ? compositeKeyFactors.password.sha256 : nil;
+    NSData *hashedPassword = compositeKeyFactors.password != nil ? compositeKeyFactors.password.sha256Data : nil;
         
     
     

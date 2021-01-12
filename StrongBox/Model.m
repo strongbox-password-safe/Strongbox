@@ -16,11 +16,14 @@
 #import "DatabaseAuditor.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "SyncManager.h"
+#import "Serializator.h"
+#import "SampleItemsGenerator.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
 NSString* const kAuditCompletedNotificationKey = @"kAuditCompletedNotificationKey";
 NSString* const kCentralUpdateOtpUiNotification = @"kCentralUpdateOtpUiNotification";
+NSString* const kMasterDetailViewCloseNotification = @"kMasterDetailViewClose";
 NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseViewPreferencesChangedNotificationKey";
 NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
 NSString* const kAppStoreSaleNotificationKey = @"appStoreSaleNotification";
@@ -46,17 +49,19 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     meta.autoFillEnabled = NO;
     
     NSData* data = [self getDuressDummyData];
-    DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
     if (!data) {
         CompositeKeyFactors *cpf = [CompositeKeyFactors password:@"1234"];
-        DatabaseModelConfig* config = [DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
-        DatabaseModel* model = [[DatabaseModel alloc] initNew:cpf format:kKeePass config:config];
-    
-        data = [model expressToData];
+
+        DatabaseModel* model = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:cpf];
+        
+        [SampleItemsGenerator addSampleGroupAndRecordToRoot:model passwordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+        
+        data = [Serializator expressToData:model format:model.originalFormat];
+        
         [self setDuressDummyData:data];
     }
 
-    DatabaseModel* model = [DatabaseModel expressFromData:data password:@"1234" config:config];
+    DatabaseModel* model = [Serializator expressFromData:data password:@"1234"];
     
     return [self initWithSafeDatabase:model metaData:meta forcedReadOnly:NO isAutoFill:isAutoFillOpen isDuressDummyMode:YES];
 }
@@ -149,7 +154,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     __weak Model* weakSelf = self;
     self.auditor = [[DatabaseAuditor alloc] initWithPro:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial
                                              isExcluded:^BOOL(Node * _Nonnull item) {
-        NSString* sid = [item getSerializationId:weakSelf.database.format != kPasswordSafe];
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyId:item];
         return [weakSelf isExcludedFromAuditHelper:set sid:sid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
@@ -159,7 +164,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 }
 
 - (BOOL)isExcludedFromAudit:(Node *)item {
-    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
 
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
@@ -187,8 +192,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditNodesChangedNotificationKey object:nil];
         });
     }
-               progress:^(CGFloat progress) {
-
+    progress:^(double progress) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
         });
@@ -262,7 +266,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 }
 
 - (void)setItemAuditExclusion:(Node *)item exclude:(BOOL)exclude {
-    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
         
     NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
@@ -381,13 +385,21 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 
 - (Node*)addNewGroup:(Node *_Nonnull)parentGroup title:(NSString*)title {
-    BOOL keePassGroupTitleRules = self.database.format != kPasswordSafe;
+    BOOL keePassGroupTitleRules = self.database.originalFormat != kPasswordSafe;
     
     Node* newGroup = [[Node alloc] initAsGroup:title parent:parentGroup keePassGroupTitleRules:keePassGroupTitleRules uuid:nil];
-    if([parentGroup addChild:newGroup keePassGroupTitleRules:keePassGroupTitleRules]) {
+    
+    if ( [self.database addChild:newGroup destination:parentGroup] ) {
         return newGroup;
     }
 
+    return nil;
+}
+
+- (Node *)addItem:(Node *)parent item:(Node *)item {
+    if ( [self.database addChild:item destination:parent] ) {
+        return item;
+    }
     return nil;
 }
 
@@ -423,6 +435,10 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 
 
+- (NSArray<Node*>*)pinnedNodes {
+    return [self getNodesFromSerializationIds:self.pinnedSet];
+}
+
 - (NSSet<NSString*>*)pinnedSet {
     return self.cachedPinned;
 }
@@ -432,13 +448,13 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
         return NO;
     }
     
-    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
     
     return [self.cachedPinned containsObject:sid];
 }
 
 - (void)togglePin:(Node*)item {
-    NSString* sid = [item getSerializationId:self.database.format != kPasswordSafe];
+    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
 
     NSMutableSet<NSString*>* favs = self.cachedPinned.mutableCopy;
     
@@ -451,13 +467,16 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     
     
     
-    NSArray<Node*>* pinned = [self.database.rootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        NSString* sid = [node getSerializationId:self.database.format != kPasswordSafe];
+    __weak Model* weakSelf = self;
+    NSArray<Node*>* pinned = [self.database.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyId:node];
         return [favs containsObject:sid];
     }];
     
     NSArray<NSString*>* trimmed = [pinned map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [obj getSerializationId:self.database.format != kPasswordSafe];
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyId:obj];
+        
+        return sid;
     }];
     self.cachedPinned = [NSSet setWithArray:trimmed];
 
@@ -472,7 +491,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        [self.database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        [Serializator getAsData:self.database format:self.database.originalFormat completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^(void){
                 [SVProgressHUD dismiss];
                 completion(userCancelled, data, debugXml, error);
@@ -489,15 +508,29 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 
 - (NSArray<Node*>*)getNodesFromSerializationIds:(NSSet<NSString*>*)set {
+    NSMutableArray<Node*>* ret = @[].mutableCopy;
     
+    for (NSString *sid in set) {
+        Node* node = [self.database getItemByCrossSerializationFriendlyId:sid];
+        
+        if (node) {
+            [ret addObject:node];
+        }
+    }
     
-    NSArray<Node*>* ret = [self.database.rootGroup filterChildren:YES
-                                                        predicate:^BOOL(Node * _Nonnull node) {
-        NSString* sid = [node getSerializationId:self.database.format != kPasswordSafe];
-        return [set containsObject:sid];
-    }];
-
     return [ret sortedArrayUsingComparator:finderStyleNodeComparator];
+}
+
+- (NSArray<Node *>*)allNodes {
+    return self.database.effectiveRootGroup.allChildren;
+}
+
+-(NSArray<Node *> *)allRecords {
+    return self.database.effectiveRootGroup.allChildRecords;
+}
+
+-(NSArray<Node *> *)allGroups {
+    return self.database.effectiveRootGroup.allChildGroups;
 }
 
 @end

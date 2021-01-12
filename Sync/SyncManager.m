@@ -23,6 +23,7 @@
 #import "ConcurrentMutableDictionary.h"
 #import "SyncStatus.h"
 #import "SharedAppAndAutoFillSettings.h"
+#import "Serializator.h"
 
 NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
 
@@ -235,7 +236,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             if(!item.folder && ![existing containsObject:item.name]) {
                 NSURL *url = [FileManager.sharedInstance.documentsDirectory URLByAppendingPathComponent:item.name];
 
-                if([DatabaseModel isValidDatabase:url error:&error]) {
+                if([Serializator isValidDatabase:url error:&error]) {
                     NSLog(@"New File: [%@] is a valid database", item.name);
                     [newSafes addObject:item];
                 }

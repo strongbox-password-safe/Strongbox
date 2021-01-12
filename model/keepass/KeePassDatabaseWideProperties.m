@@ -14,7 +14,6 @@
 {
     self = [super init];
     if (self) {
-        self.customIcons = @{};
         self.deletedObjects = @{};
     }
     return self;

@@ -106,7 +106,7 @@
         return [self.model isFlaggedByAudit:node];
     }];
 
-    self.items = [searcher filterAndSortForBrowse:self.model.database.allRecords.mutableCopy
+    self.items = [searcher filterAndSortForBrowse:self.model.allRecords.mutableCopy
                             includeKeePass1Backup:self.model.metadata.showKeePass1BackupGroup
                                 includeRecycleBin:self.model.metadata.showRecycleBinInSearchResults
                                    includeExpired:self.model.metadata.showExpiredInSearch
@@ -400,7 +400,7 @@
 
     vc.createNewItem = YES;
     vc.item = nil;
-    vc.parentGroup = self.model.database.rootGroup;
+    vc.parentGroup = self.model.database.effectiveRootGroup;
     vc.readOnly = NO;
     vc.databaseModel = self.model;
     vc.autoFillSuggestedUrl = suggestedUrl;

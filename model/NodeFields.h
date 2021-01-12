@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "PasswordHistory.h"
-#import "NodeFileAttachment.h"
 #import "StringValue.h"
 #import "OTPToken.h"
 #import "SerializationPackage.h"
@@ -42,11 +41,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic, strong, nullable, readonly) NSNumber *usageCount;
 @property (nonatomic, strong, nullable) NSDate *passwordModified;
 @property (nonatomic, strong, nullable) NSDate *expires;
-@property (nonatomic, strong, nonnull) NSMutableArray<NodeFileAttachment*> *attachments;
+@property (nonatomic, strong, nonnull) NSMutableDictionary<NSString*, DatabaseAttachment*> *attachments;
 @property (nonatomic, strong, nonnull) NSMutableSet<NSString*> *tags;
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; 
 @property NSMutableArray<Node*> *keePassHistory;
-@property MutableOrderedDictionary<NSString*, NSString*> *customData;
+@property NSMutableDictionary<NSString*, NSString*> *customData;
 
 @property (nonatomic, nullable) NSString* defaultAutoTypeSequence;
 @property (nonatomic, nullable) NSNumber* enableAutoType;
@@ -62,12 +61,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (NodeFields *)deserialize:(NSDictionary *)dict;
 - (NSDictionary*)serialize:(SerializationPackage*)serialization;
 
-- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneTouchProperties:(BOOL)cloneTouchProperties;
+- (NodeFields*)cloneOrDuplicate:(BOOL)cloneTouchProperties;
 
-- (BOOL)isSyncEqualTo:(NodeFields*)other params:(SyncComparisonParams *)params;
+- (void)mergePropertiesInFromNode:(NodeFields *)mergeNodeFields mergeLocationChangedDate:(BOOL)mergeLocationChangedDate includeHistory:(BOOL)includeHistory;
 
-- (NSMutableArray<NodeFileAttachment*>*)cloneAttachments;
-- (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields;
+- (void)restoreFromHistoricalNode:(NodeFields*)historicalFields;
+
+- (BOOL)isSyncEqualTo:(NodeFields*)other isForUIDiffReport:(BOOL)isForUIDiffReport checkHistory:(BOOL)checkHistory;
 
 
 

@@ -18,7 +18,7 @@
 #import "Settings.h"
 #import "OTPToken+Generation.h"
 #import "AppDelegate.h"
-#import "MacNodeIconHelper.h"
+#import "NodeIconHelper.h"
 #import "MBProgressHUD.h"
 #import "Entry.h"
 #import "ViewController.h"
@@ -78,9 +78,9 @@
 @property (nonnull, strong, nonatomic) NSArray<CustomField*> *customFields;
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property NSTimer* timerRefreshOtp;
-@property (nonnull, strong, nonatomic) NSArray *attachments;
+@property (nonnull, strong, nonatomic) NSArray *sortedAttachmentFileNames;
 @property NSArray<Node*>* groups;
-@property NSMutableDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
+@property NSMutableDictionary<NSString*, NSImage*> *attachmentsIconCache;
 
 
 
@@ -405,7 +405,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)setupAttachmentsUI {
-    self.attachments = [NSArray array];
+    self.sortedAttachmentFileNames = @[];
     self.attachmentsView.dataSource = self;
     self.attachmentsView.delegate = self;
     self.attachmentsView.onSpaceBar = self.attachmentsView.onDoubleClick = ^{ 
@@ -509,10 +509,10 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)bindUiToAttachments {
     self.attachmentsIconCache = nil;
-    self.attachments = [self.node.fields.attachments copy];
+    self.sortedAttachmentFileNames = [self.node.fields.attachments.allKeys sortedArrayUsingComparator:finderStringComparator];
     [self.attachmentsView reloadData];
     
-    self.buttonAddAttachment.enabled = !self.historical && !(self.model.format == kKeePass1 && self.attachments.count > 0);
+    self.buttonAddAttachment.enabled = !self.historical && !(self.model.format == kKeePass1 && self.sortedAttachmentFileNames.count > 0);
     self.buttonRemoveAttachment.enabled = !self.historical;
 }
 
@@ -974,7 +974,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (NSImage * )getIconForNode {
-    return [MacNodeIconHelper getIconForNode:self.model vm:self.node large:NO];
+    return [NodeIconHelper getIconForNode:self.node predefinedIconSet:kKeePassIconSetClassic format:self.model.format];
 }
 
 - (void)onEditNodeIcon {
@@ -986,11 +986,11 @@ static NSString* trimField(NSTextField* textField) {
     
     __weak NodeDetailsViewController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
-    self.selectPredefinedIconController.customIcons = self.model.customIcons;
+    self.selectPredefinedIconController.customIcons = self.model.customIcons.allObjects;
     self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
     self.selectPredefinedIconController.hideFavIconButton = NO;
     
-    self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data, NSUUID * _Nullable existingCustom, BOOL showFindFavIcons) {
+    self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
         if(showFindFavIcons) {
             [FavIconDownloader showUi:weakSelf
                                 nodes:@[weakSelf.node]
@@ -1002,7 +1002,7 @@ static NSString* trimField(NSTextField* textField) {
             }];
         }
         else {
-            onSelectedNewIcon(weakSelf.model, weakSelf.node, index, data, existingCustom, weakSelf.view.window);
+            onSelectedNewIcon(weakSelf.model, weakSelf.node, icon, weakSelf.view.window);
         }
     };
     
@@ -1020,16 +1020,16 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return self.attachments.count;
+    return self.sortedAttachmentFileNames.count;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath {
     AttachmentItem *item = [self.attachmentsView makeItemWithIdentifier:@"AttachmentItem" forIndexPath:indexPath];
     
-    NodeFileAttachment* attachment = self.attachments[indexPath.item];
-    DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
+    NSString* filename = self.sortedAttachmentFileNames[indexPath.item];
+    DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
     
-    item.textField.stringValue = attachment.filename;
+    item.textField.stringValue = filename;
     item.labelFileSize.stringValue = [NSByteCountFormatter stringFromByteCount:dbAttachment.length countStyle:NSByteCountFormatterCountStyleFile];
     
     if(self.attachmentsIconCache == nil) {
@@ -1037,12 +1037,12 @@ static NSString* trimField(NSTextField* textField) {
         [self buildAttachmentsIconCache];
     }
     
-    NSImage* cachedIcon = self.attachmentsIconCache[@(attachment.index)];
+    NSImage* cachedIcon = self.attachmentsIconCache[dbAttachment.digestHash];
     if(cachedIcon) {
         item.imageView.image = cachedIcon;
     }
     else {
-        NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:attachment.filename.pathExtension];        
+        NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:filename.pathExtension];
         item.imageView.image = img;
     }
     
@@ -1050,7 +1050,8 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)buildAttachmentsIconCache {
-    NSArray *workingCopy = [self.model.attachments copy];
+    NSArray *workingCopy = self.model.database.attachmentPool;
+
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         for (int i=0;i<workingCopy.count;i++) {
             DatabaseAttachment* dbAttachment = workingCopy[i];
@@ -1181,16 +1182,10 @@ static NSString* trimField(NSTextField* textField) {
     if(idx == NSNotFound) {
         return nil;
     }
-    NodeFileAttachment* nodeAttachment = self.attachments[idx];
+    NSString* filename = self.sortedAttachmentFileNames[idx];
+    DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
     
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        return nil;
-    }
-    
-    DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-    
-    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:nodeAttachment.filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
     
     NSURL* url = [NSURL fileURLWithPath:f];
@@ -1369,21 +1364,16 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    NodeFileAttachment* nodeAttachment = self.attachments[idx];
-    
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        return;
-    }
+    NSString* filename = self.sortedAttachmentFileNames[idx];
     
     
     
     NSSavePanel * savePanel = [NSSavePanel savePanel];
-    savePanel.nameFieldStringValue = nodeAttachment.filename;
+    savePanel.nameFieldStringValue = filename;
     
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
+            DatabaseAttachment* dbAttachment = self.node.fields.attachments[filename];
             
             NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
             [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:outStream];
@@ -1403,19 +1393,19 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    NodeFileAttachment* nodeAttachment = self.attachments[idx];
+    NSString* filename = self.sortedAttachmentFileNames[idx];
     
     NSString* loc = NSLocalizedString(@"mac_node_details_are_you_sure_remove_attachment_fmt", @"Are you sure you want to remove the attachment: %@?");
-    NSString* prompt = [NSString stringWithFormat:loc, nodeAttachment.filename];
+    NSString* prompt = [NSString stringWithFormat:loc, filename];
     [Alerts yesNo:prompt window:self.view.window completion:^(BOOL yesNo) {
         if(yesNo) {
-            [self.model removeItemAttachment:self.node atIndex:idx];
+            [self.model removeItemAttachment:self.node filename:filename];
         }
     }];
 }
 
 - (IBAction)onAddAttachment:(id)sender {
-    if(self.historical || (self.model.format == kKeePass1 && self.attachments.count > 0)) {
+    if(self.historical || (self.model.format == kKeePass1 && self.sortedAttachmentFileNames.count > 0)) {
         return;
     }
     
@@ -1426,11 +1416,8 @@ static NSString* trimField(NSTextField* textField) {
             for (NSURL* url in openPanel.URLs) {
                 NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:url.path];
                 DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithStream:stream protectedInMemory:YES compressed:YES];
-                
                 NSString* filename = url.lastPathComponent;
-                UiAttachment* att = [[UiAttachment alloc] initWithFilename:filename dbAttachment:dbA];
-
-                [self.model addItemAttachment:self.node attachment:att];
+                [self.model addItemAttachment:self.node filename:filename attachment:dbA];
             }
         }
     }];

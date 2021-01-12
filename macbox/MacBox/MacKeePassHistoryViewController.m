@@ -7,7 +7,7 @@
 //
 
 #import "MacKeePassHistoryViewController.h"
-#import "MacNodeIconHelper.h"
+#import "NodeIconHelper.h"
 #import "Alerts.h"
 #import "NodeDetailsViewController.h"
 
@@ -86,7 +86,7 @@
     if([tableColumn.identifier isEqualToString:@"TitleColumnIdentifier"]) {
         cell = [self.tableViewHistory makeViewWithIdentifier:@"HistoryTitleCellIdentifier" owner:nil];
 
-        cell.imageView.image = [MacNodeIconHelper getIconForNode:self.model vm:item large:NO];
+        cell.imageView.image = [NodeIconHelper getIconForNode:item predefinedIconSet:kKeePassIconSetClassic format:self.model.format];
         cell.textField.stringValue = item.title;
     }
     else if([tableColumn.identifier isEqualToString:@"Username"]) {

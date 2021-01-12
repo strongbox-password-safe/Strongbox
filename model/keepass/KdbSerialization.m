@@ -86,13 +86,13 @@ static const BOOL kLogVerbose = NO;
 
 static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable keyFileDigest) {
     if(password.length && !keyFileDigest) {
-        return password.sha256;
+        return password.sha256Data;
     }
     else if(keyFileDigest && !password.length) {
         return keyFileDigest;
     }
     else {
-        NSData* hashedPassword = password.sha256;
+        NSData* hashedPassword = password.sha256Data;
         
         NSMutableData *compositeKey = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH ];
         CC_SHA256_CTX context;

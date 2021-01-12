@@ -138,7 +138,7 @@ NSString* keePassStringIdFromUuid(NSUUID* uuid) {
     uuid_t uid;
     [uuid getUUIDBytes:(uint8_t*)&uid];
     
-    return [NSData dataWithBytes:uid length:sizeof(uuid_t)].hex;
+    return [NSData dataWithBytes:uid length:sizeof(uuid_t)].hexString;
 }
 
 NSUUID* uuidFromKeePassStringId(NSString* stringId) {

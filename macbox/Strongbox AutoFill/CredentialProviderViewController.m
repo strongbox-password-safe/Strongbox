@@ -29,6 +29,7 @@
 #import "MMWormhole.h"
 #import "AutoFillWormhole.h"
 #import "SecretStore.h"
+#import "Serializator.h"
 
 @interface CredentialProviderViewController ()
 
@@ -393,7 +394,7 @@
                                                                 url:(NSURL*)url
                                                               error:(NSError**)error {
     [url startAccessingSecurityScopedResource];
-    DatabaseFormat format = [DatabaseModel getDatabaseFormat:url];
+    DatabaseFormat format = [Serializator getDatabaseFormat:url];
     [url stopAccessingSecurityScopedResource];
     
     NSData* keyFileDigest = [self getSelectedKeyFileDigest:format bookmark:keyFileBookmark error:error];
@@ -483,7 +484,7 @@
     NSString* loc = NSLocalizedString(@"generic_unlocking_ellipsis", @"Unlocking...");
     [self showProgressModal:loc];
     
-    [DatabaseModel fromUrl:url
+    [Serializator fromUrl:url
                        ckf:ckf
                     config:DatabaseModelConfig.defaults
                 completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
@@ -521,7 +522,7 @@
 }
 
 - (void)autoFillWithQuickType:(DatabaseModel*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier {
-    Node* node = [model.rootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
+    Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
         return [obj.uuid.UUIDString isEqualToString:quickTypeIdentifier.nodeId]; 
     }];
     
@@ -614,7 +615,7 @@
               quickTypeIdentifier:(QuickTypeRecordIdentifier*_Nullable)quickTypeIdentifier
                serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {;
     NSError* error;
-    BOOL valid = [DatabaseModel isValidDatabase:url error:&error];
+    BOOL valid = [Serializator isValidDatabase:url error:&error];
     if (!valid) {
         [Alerts error:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]")]
                 error:error

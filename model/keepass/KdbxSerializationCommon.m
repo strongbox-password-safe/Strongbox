@@ -335,7 +335,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     if (!parser) {
         if (error) {
-            NSString* msg = [NSString stringWithFormat:@"Parser Error - Please send this error to support@strongboxsafe.com: [%d]-[%lu]-[%@]", innerRandomStreamId, (unsigned long)innerRandomStreamKey.length, innerRandomStreamKey.hex];
+            NSString* msg = [NSString stringWithFormat:@"Parser Error - Please send this error to support@strongboxsafe.com: [%d]-[%lu]-[%@]", innerRandomStreamId, (unsigned long)innerRandomStreamKey.length, innerRandomStreamKey.hexString];
             *error = [Utils createNSError:msg errorCode:-1];
         }
         
@@ -433,7 +433,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         NSLog(@"XML Error: %d", err);
         if (error) {
             NSData* foo = [NSData dataWithBytes:chnk length:20];
-            NSString* hex = foo.hex;
+            NSString* hex = foo.hexString;
             
             *error = parser.error ? parser.error : [Utils createNSError:[NSString stringWithFormat:@"Error reading Final XML Hex = [%@]", hex]
                                 errorCode:err];
@@ -454,7 +454,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
         
         if (error) {
             NSData* foo = [NSData dataWithBytes:chnk length:20];
-            NSString* hex = foo.hex;
+            NSString* hex = foo.hexString;
             *error = [Utils createNSError:[NSString stringWithFormat:@"Could not find any valid XML. Hex = [%@]", hex]
                                errorCode:-1];
         }

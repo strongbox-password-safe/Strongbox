@@ -13,12 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface Kdbx4Database : NSObject<AbstractDatabaseFormatAdaptor>
 
-- (void)read:(NSInputStream *)stream
-         ckf:(CompositeKeyFactors *)ckf
-xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
-sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
-  completion:(OpenCompletionBlock)completion;
-
 @end
 
 NS_ASSUME_NONNULL_END

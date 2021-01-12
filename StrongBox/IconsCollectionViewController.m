@@ -17,25 +17,25 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UIView *customIconsView;
 
+@property NSArray<NodeIcon*>* customIcons;
+
 @end
 
 @implementation IconsCollectionViewController
 
 - (IBAction)onCancel:(id)sender {
-    self.onDone(NO, -1, nil);
+    self.onDone(NO, nil);
 }
 
 - (IBAction)onUseDefault:(id)sender {
-    self.onDone(YES, -1, nil);
+    self.onDone(YES, nil);
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    
-    
-    
-    
+    self.customIcons = self.customIconSet ? self.customIconSet.allObjects : @[];
+        
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
 
@@ -55,7 +55,7 @@
 }
 
 - (BOOL)hasCustomIcons {
-    return (self.customIcons && self.customIcons.count);
+    return self.customIcons.firstObject != nil;
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
@@ -63,14 +63,14 @@
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return ([self hasCustomIcons] && section == 0) ? self.customIcons.count : [NodeIconHelper getIconSet:self.iconSet].count;
+    return ([self hasCustomIcons] && section == 0) ? self.customIcons.count : [NodeIconHelper getIconSet:self.predefinedKeePassIconSet].count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     if([self hasCustomIcons] && indexPath.section == 0) {
         IconViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CELL" forIndexPath:indexPath];
-        NSUUID* uuid = self.customIcons.allKeys[indexPath.row];
-        UIImage* image = [NodeIconHelper getCustomIcon:uuid customIcons:self.customIcons];
+        NodeIcon* icon = self.customIcons[indexPath.row];
+        UIImage* image = [NodeIconHelper getNodeIcon:icon];
         
         if(image) {
             cell.imageView.image = image;
@@ -80,7 +80,7 @@
     }
     else {
         IconViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CELL" forIndexPath:indexPath];
-        cell.imageView.image = [NodeIconHelper getIconSet:self.iconSet][indexPath.item];
+        cell.imageView.image = [NodeIconHelper getNodeIcon:[NodeIcon withPreset:indexPath.item] predefinedIconSet:self.predefinedKeePassIconSet];
         return cell;
     }
 }
@@ -107,11 +107,11 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     if([self hasCustomIcons] && indexPath.section == 0) {
-        NSUUID* uuid = self.customIcons.allKeys[indexPath.row];
-        self.onDone(YES, -1L, uuid);
+        NodeIcon* icon = self.customIcons[indexPath.row];
+        self.onDone(YES, icon);
     }
     else {
-        self.onDone(YES, indexPath.item, nil);
+        self.onDone(YES, [NodeIcon withPreset:indexPath.item]);
     }
 }
 

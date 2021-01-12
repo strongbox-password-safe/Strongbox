@@ -8,8 +8,10 @@
 
 #import "DatabaseMetadata.h"
 #import "SecretStore.h"
+#import "BookmarksHelper.h"
 
 const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
+static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
 
 @implementation DatabaseMetadata
 
@@ -34,6 +36,25 @@ const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
     self.keyFileBookmark = nil;
     self.autoFillKeyFileBookmark = nil;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 - (NSString*)getConveniencePasswordIdentifier {
     return [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];

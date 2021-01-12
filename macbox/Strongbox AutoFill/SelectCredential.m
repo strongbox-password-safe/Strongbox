@@ -8,7 +8,7 @@
 
 #import "SelectCredential.h"
 #import "DatabaseSearchAndSorter.h"
-#import "MacNodeIconHelper.h"
+#import "NodeIconHelper.h"
 #import "AutoFillCredentialCell.h"
 #import "NSString+Extensions.h"
 #import "regdom.h"
@@ -42,19 +42,19 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.doubleAction = @selector(onSelect:);
-    
-    NSString *text = self.items.count ?
-        NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Entries") :
-        NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
-    
-    self.tableView.emptyString = text;
-    
+
     [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kAutoFillCredentialCell bundle:nil]
                   forIdentifier:kAutoFillCredentialCell];
 
     [self bindSelectButton];
     
     [self loadItems];
+    
+    NSString *text = self.items.count ?
+        NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Entries") :
+        NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
+    
+    self.tableView.emptyString = text;
 }
 
 - (void)viewDidAppear {
@@ -116,7 +116,7 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
                                                                             descending:NO
                                                                      foldersSeparately:YES];
     
-    self.items = [searcher filterAndSortForBrowse:self.model.allRecords.mutableCopy
+    self.items = [searcher filterAndSortForBrowse:self.model.effectiveRootGroup.allChildRecords.mutableCopy
                                   includeKeePass1Backup:NO
                                       includeRecycleBin:NO
                                          includeExpired:NO
@@ -298,7 +298,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     NSString* title = [self dereference:node.title node:node];
     NSString* username = [self dereference:node.fields.username node:node];
     
-    NSImage* icon = [MacNodeIconHelper getIconForNode:self.model vm:node large:NO];
+    NSImage* icon = [NodeIconHelper getIconForNode:node predefinedIconSet:kKeePassIconSetClassic format:self.model.originalFormat large:NO];
 
     AutoFillCredentialCell *result = [tableView makeViewWithIdentifier:kAutoFillCredentialCell owner:self];
 

@@ -7,24 +7,24 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 #import "Node.h"
-#import "Model.h"
+#import "NodeIcon.h"
+#import "KeePassIconSet.h"
+#import "DatabaseFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeIconHelper : NSObject
 
-+ (UIImage*)getIconForNode:(Node*)vm model:(Model*)model;
++ (NSArray<IMAGE_TYPE_PTR>*)getIconSet:(KeePassIconSet)iconSet;
 
-+ (UIImage *)getIconForNode:(BOOL)isGroup
-             customIconUuid:(NSUUID*)customIconUuid
-                     iconId:(NSNumber*)iconId
-                   model:(Model *)model;
++ (IMAGE_TYPE_PTR)getIconForNode:(Node *)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format;
++ (IMAGE_TYPE_PTR)getIconForNode:(Node *)vm predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format large:(BOOL)large;
 
-+ (nullable UIImage*)getCustomIcon:(NSUUID*)uuid customIcons:(NSDictionary<NSUUID*, NSData*>*)customIcons;
-
-+ (NSArray<UIImage*>*)getIconSet:(KeePassIconSet)iconSet;
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*)icon;
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet;
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon*)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format;
++ (IMAGE_TYPE_PTR)getNodeIcon:(NodeIcon *)icon predefinedIconSet:(KeePassIconSet)predefinedIconSet format:(DatabaseFormat)format isGroup:(BOOL)isGroup;
 
 @end
 

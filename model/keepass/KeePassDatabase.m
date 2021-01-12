@@ -19,11 +19,7 @@
     return @"kdbx";
 }
 
-- (NSString *)fileExtension {
-    return [KeePassDatabase fileExtension];
-}
-
-- (DatabaseFormat)format {
++ (DatabaseFormat)format {
     return kKeePass;
 }
 
@@ -31,37 +27,16 @@
     return [KdbxSerialization isValidDatabase:prefix error:error];
 }
 
-- (StrongboxDatabase *)create:(CompositeKeyFactors *)ckf {
-    Node* rootGroup = [[Node alloc] initAsRoot:nil];
-    
-    
-    
-    
-    NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
-    if ([rootGroupName isEqualToString:@"generic_database"]) { 
-        rootGroupName = kDefaultRootGroupName;
-    }
-    Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
-    
-    [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
-    
-    UnifiedDatabaseMetadata* metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass];
-    
-    StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup metadata:metadata compositeKeyFactors:ckf];
-    
-    return ret;
-}
-
-- (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
++ (void)open:(NSData *)data ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
     NSInputStream* stream = [NSInputStream inputStreamWithData:data];
     [self read:stream ckf:ckf completion:completion];
 }
 
-- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
++ (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf completion:(OpenCompletionBlock)completion {
     [self read:stream ckf:ckf xmlDumpStream:nil sanityCheckInnerStream:YES completion:completion];
 }
 
-- (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream*)xmlDumpStream sanityCheckInnerStream:(BOOL)sanityCheckInnerStream completion:(OpenCompletionBlock)completion {
++ (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream*)xmlDumpStream sanityCheckInnerStream:(BOOL)sanityCheckInnerStream completion:(OpenCompletionBlock)completion {
     [KdbxSerialization deserialize:stream
                compositeKeyFactors:ckf
                      xmlDumpStream:xmlDumpStream
@@ -98,22 +73,22 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
             return;
         }
     }
+ 
     
+
+    NSArray<DatabaseAttachment*>* attachments = [KeePassXmlModelAdaptor getV3Attachments:xmlRoot];
+    NSMutableDictionary<NSUUID*, NSData*>* customIconPool = [KeePassXmlModelAdaptor getCustomIcons:meta];
+
     
         
     NSError* error;
-    Node* rootGroup = [KeePassXmlModelAdaptor getNodeModel:xmlRoot error:&error];
+    Node* rootGroup = [KeePassXmlModelAdaptor toStrongboxModel:xmlRoot attachments:attachments customIconPool:customIconPool error:&error];
     if(rootGroup == nil) {
         NSLog(@"Error converting Xml model to Strongbox model: [%@]", error);
         completion(NO, nil, error);
         return;
     }
  
-    
-
-    NSArray<DatabaseAttachment*>* attachments = [KeePassXmlModelAdaptor getV3Attachments:xmlRoot];
-    NSMutableDictionary<NSUUID*, NSData*>* customIcons = [KeePassXmlModelAdaptor getCustomIcons:meta];
-
     
     
     NSDictionary<NSUUID*, NSDate*>* deletedObjects = [KeePassXmlModelAdaptor getDeletedObjects:xmlRoot];
@@ -134,27 +109,23 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     adaptorTag.unknownHeaders = serializationData.extraUnknownHeaders;
     adaptorTag.originalMeta = meta;
     
-    StrongboxDatabase* ret = [[StrongboxDatabase alloc] initWithRootGroup:rootGroup
-                                                                 metadata:metadata
-                                                      compositeKeyFactors:ckf
-                                                              attachments:attachments
-                                                              customIcons:customIcons
-                                                           deletedObjects:deletedObjects];
-    ret.adaptorTag = adaptorTag;
+    DatabaseModel *ret = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:ckf metadata:metadata root:rootGroup deletedObjects:deletedObjects];
+    
+    ret.meta.adaptorTag = adaptorTag;
     
     completion(NO, ret, nil);
 }
 
-- (void)save:(StrongboxDatabase *)database completion:(SaveCompletionBlock)completion {
-    if(!database.compositeKeyFactors.password &&
-       !database.compositeKeyFactors.keyFileDigest &&
-       !database.compositeKeyFactors.yubiKeyCR) {
++ (void)save:(DatabaseModel *)database completion:(SaveCompletionBlock)completion {
+    if(!database.ckfs.password &&
+       !database.ckfs.keyFileDigest &&
+       !database.ckfs.yubiKeyCR) {
         NSError *error = [Utils createNSError:@"A least one composite key factor is required to encrypt database." errorCode:-3];
         completion(NO, nil, nil, error);
         return;
     }
     
-    KeePass2TagPackage* adaptorTag = (KeePass2TagPackage*)database.adaptorTag;
+    KeePass2TagPackage* adaptorTag = (KeePass2TagPackage*)database.meta.adaptorTag;
     
     
     
@@ -162,22 +133,24 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     NSError* err;
     
     KeePassDatabaseWideProperties* databaseProperties = [[KeePassDatabaseWideProperties alloc] init];
-    databaseProperties.customIcons = database.customIcons;
     databaseProperties.originalMeta = adaptorTag ? adaptorTag.originalMeta : nil;
     databaseProperties.deletedObjects = database.deletedObjects;
-    databaseProperties.metadata = database.metadata;
+    databaseProperties.metadata = database.meta;
     
-    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toXmlModelFromStrongboxModel:database.rootGroup
+    NSArray<DatabaseAttachment*>* minimalAttachmentPool = @[];
+    RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toKeePassModel:database.rootNode
                                                                  databaseProperties:databaseProperties
                                                                             context:[XmlProcessingContext standardV3Context]
+                                                              minimalAttachmentPool:&minimalAttachmentPool
                                                                               error:&err];
-    
+        
     if(!rootXmlDocument) {
         NSLog(@"Could not convert Database to Xml Model.");
         NSError *error = [Utils createNSError:@"Could not convert Database to Xml Model." errorCode:-4];
         completion(NO, nil, nil, error);
         return;
     }
+
     
     
     
@@ -189,7 +162,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     [v3Binaries removeAllObjects];
     
     int i = 0;
-    for (DatabaseAttachment* binary in database.attachments) {
+    for (DatabaseAttachment* binary in minimalAttachmentPool) {
         V3Binary* bin = [[V3Binary alloc] initWithContext:[XmlProcessingContext standardV3Context] dbAttachment:binary];
         bin.id = i++;
         [v3Binaries addObject:bin];
@@ -197,7 +170,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
     
     
-    XmlSerializer *xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:database.metadata.innerRandomStreamId
+    XmlSerializer *xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:database.meta.innerRandomStreamId
                                                                                 key:nil 
                                                                            v4Format:NO
                                                                         prettyPrint:NO];
@@ -206,17 +179,17 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
     serializationData.protectedStreamKey = xmlSerializer.protectedStreamKey;
     serializationData.extraUnknownHeaders = adaptorTag ? adaptorTag.unknownHeaders : @{};
-    serializationData.compressionFlags = database.metadata.compressionFlags;
-    serializationData.innerRandomStreamId = database.metadata.innerRandomStreamId;
-    serializationData.transformRounds = database.metadata.transformRounds;
-    serializationData.fileVersion = database.metadata.version;
-    serializationData.cipherId = database.metadata.cipherUuid;
+    serializationData.compressionFlags = database.meta.compressionFlags;
+    serializationData.innerRandomStreamId = database.meta.innerRandomStreamId;
+    serializationData.transformRounds = database.meta.transformRounds;
+    serializationData.fileVersion = database.meta.version;
+    serializationData.cipherId = database.meta.cipherUuid;
     
     KdbxSerialization *kdbxSerializer = [[KdbxSerialization alloc] init:serializationData];
     
     
     
-    [kdbxSerializer stage1Serialize:database.compositeKeyFactors
+    [kdbxSerializer stage1Serialize:database.ckfs
                          completion:^(BOOL userCancelled, NSString * _Nullable hash, NSError * _Nullable error) {
         if (userCancelled || !hash || error) {
             if (!userCancelled) {
@@ -228,7 +201,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
         else {
             rootXmlDocument.keePassFile.meta.headerHash = hash;
             [self continueSaveWithHeaderHash:rootXmlDocument
-                                    metadata:database.metadata
+                                    metadata:database.meta
                                xmlSerializer:xmlSerializer
                               kdbxSerializer:kdbxSerializer
                                   completion:completion];
@@ -236,7 +209,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     }];
 }
 
-- (void)continueSaveWithHeaderHash:(RootXmlDomainObject*)xmlDoc
++ (void)continueSaveWithHeaderHash:(RootXmlDomainObject*)xmlDoc
                           metadata:(UnifiedDatabaseMetadata*)metadata
                      xmlSerializer:(XmlSerializer*)xmlSerializer
                     kdbxSerializer:(KdbxSerialization*)kdbxSerializer

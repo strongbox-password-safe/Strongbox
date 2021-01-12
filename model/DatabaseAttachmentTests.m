@@ -65,7 +65,7 @@
         return;
     }
     
-    DatabaseAttachment* dataAttachment = [[DatabaseAttachment alloc] initWithData:fileData compressed:YES protectedInMemory:YES];
+    DatabaseAttachment* dataAttachment = [[DatabaseAttachment alloc] initNonPerformantWithData:fileData compressed:YES protectedInMemory:YES];
 
     NSUInteger length = attributes.fileSize;
     NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:filename];
@@ -73,17 +73,17 @@
     DatabaseAttachment* streamAttachment = [[DatabaseAttachment alloc] initWithStream:stream length:length protectedInMemory:YES];
     [stream close];
 
-    NSData* sd = streamAttachment.unitTestDataOnly;
-    NSData* dd = dataAttachment.unitTestDataOnly;
+    NSData* sd = streamAttachment.nonPerformantFullData;
+    NSData* dd = dataAttachment.nonPerformantFullData;
 
     XCTAssertTrue(dataAttachment.estimatedStorageBytes == streamAttachment.estimatedStorageBytes);
     XCTAssertTrue([dataAttachment.digestHash isEqualToString:streamAttachment.digestHash]);
-    XCTAssertTrue([dataAttachment.digestHash isEqualToString:dataAttachment.unitTestDataOnly.sha256.hex]);
-    XCTAssertTrue([streamAttachment.digestHash isEqualToString:streamAttachment.unitTestDataOnly.sha256.hex]);
+    XCTAssertTrue([dataAttachment.digestHash isEqualToString:dataAttachment.nonPerformantFullData.sha256.hexString]);
+    XCTAssertTrue([streamAttachment.digestHash isEqualToString:streamAttachment.nonPerformantFullData.sha256.hexString]);
 
-    NSLog(@"SHA256: [%@] = [%@] = [%@] = [%@]", dataAttachment.digestHash, streamAttachment.digestHash, dd.sha256.hex, sd.sha256.hex);
+    NSLog(@"SHA256: [%@] = [%@] = [%@] = [%@]", dataAttachment.digestHash, streamAttachment.digestHash, dd.sha256.hexString, sd.sha256.hexString);
 
-    if (![dataAttachment.digestHash isEqualToString:dd.sha256.hex]) {
+    if (![dataAttachment.digestHash isEqualToString:dd.sha256.hexString]) {
         NSLog(@"Ruh Roh...");
     }
 

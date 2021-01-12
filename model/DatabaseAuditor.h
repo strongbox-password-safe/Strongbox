@@ -31,7 +31,7 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
 };
 
 typedef void (^AuditCompletionBlock)(BOOL userStopped);
-typedef void (^AuditProgressBlock)(CGFloat progress);
+typedef void (^AuditProgressBlock)(double progress);
 typedef void (^AuditNodesChangedBlock)(void);
 typedef BOOL (^AuditIsDereferenceableTextBlock)(NSString* string);
 typedef void (^SaveConfigurationBlock)(DatabaseAuditorConfiguration* config);

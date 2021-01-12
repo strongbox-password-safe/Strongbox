@@ -18,6 +18,7 @@
 #import "NSArray+Extensions.h"
 #import "NSString+Extensions.h"
 #import "AutoFillManager.h"
+#import "Serializator.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -106,20 +107,16 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return self.passwordDatabase;
 }
 
-- (NSArray<DatabaseAttachment *> *)attachments {
-    return self.passwordDatabase.attachments;
-}
-
 - (DatabaseFormat)format {
-    return self.passwordDatabase.format;
+    return self.passwordDatabase.originalFormat;
 }
 
 - (UnifiedDatabaseMetadata*)metadata {
-    return self.passwordDatabase.metadata;
+    return self.passwordDatabase.meta;
 }
 
-- (NSDictionary<NSUUID *,NSData *> *)customIcons {
-    return self.passwordDatabase.customIcons;
+- (NSSet<NodeIcon*>*)customIcons {
+    return self.passwordDatabase.customIconPool;
 }
 
 - (NSArray<Node*>*)activeRecords {
@@ -127,7 +124,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)node {
-    return [self.passwordDatabase getGroupPathDisplayString:node];
+    return [self.passwordDatabase getPathDisplayString:node];
 }
 
 - (NSArray<Node*>*)activeGroups {
@@ -135,14 +132,14 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 -(Node*)rootGroup {
-    return self.passwordDatabase.rootGroup;
+    return self.passwordDatabase.effectiveRootGroup;
 }
 
 - (BOOL)masterCredentialsSet {
     if(!self.locked) {
-        return !(self.passwordDatabase.compositeKeyFactors.password == nil &&
-                 self.passwordDatabase.compositeKeyFactors.keyFileDigest == nil &&
-                 self.passwordDatabase.compositeKeyFactors.yubiKeyCR == nil);
+        return !(self.passwordDatabase.ckfs.password == nil &&
+                 self.passwordDatabase.ckfs.keyFileDigest == nil &&
+                 self.passwordDatabase.ckfs.yubiKeyCR == nil);
     }
     
     return NO;
@@ -154,7 +151,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         completion(NO, nil, nil, nil);
     }
     
-    [self.passwordDatabase getAsData:completion];
+    [Serializator getAsData:self.passwordDatabase format:self.passwordDatabase.originalFormat completion:completion];
 }
 
 - (NSURL*)fileUrl {
@@ -174,7 +171,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 
 -(CompositeKeyFactors *)compositeKeyFactors {
-    return self.locked ? nil : self.passwordDatabase.compositeKeyFactors;
+    return self.locked ? nil : self.passwordDatabase.ckfs;
 }
 
 - (void)setCompositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
@@ -182,16 +179,16 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    CompositeKeyFactors* original = [self.passwordDatabase.compositeKeyFactors clone];
+    CompositeKeyFactors* original = [self.passwordDatabase.ckfs clone];
     
     [[self.document.undoManager prepareWithInvocationTarget:self] setCompositeKeyFactors:original];
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_change_master_credentials", @"Change Master Credentials");
     [self.document.undoManager setActionName:loc];
     
-    self.passwordDatabase.compositeKeyFactors.password = compositeKeyFactors.password;
-    self.passwordDatabase.compositeKeyFactors.keyFileDigest = compositeKeyFactors.keyFileDigest;
-    self.passwordDatabase.compositeKeyFactors.yubiKeyCR = compositeKeyFactors.yubiKeyCR;
+    self.passwordDatabase.ckfs.password = compositeKeyFactors.password;
+    self.passwordDatabase.ckfs.keyFileDigest = compositeKeyFactors.keyFileDigest;
+    self.passwordDatabase.ckfs.yubiKeyCR = compositeKeyFactors.yubiKeyCR;
 }
 
 
@@ -240,47 +237,6 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 - (void)setItemExpires:(Node *)item expiry:(NSDate *)expiry {
     [self setItemExpires:item expiry:expiry modified:nil];
-}
-
-
-
-- (void)setItemIcon:(Node *)item index:(NSNumber*)index existingCustom:(NSUUID*)existingCustom custom:(NSData*)custom {
-    [self setItemIcon:item index:index existingCustom:existingCustom custom:custom rationalize:NO batchUpdate:NO];
-}
-
-- (void)setItemIcon:(Node *)item
-              index:(NSNumber*)index
-     existingCustom:(NSUUID*)existingCustom
-             custom:(NSData*)custom
-        rationalize:(BOOL)rationalize
-        batchUpdate:(BOOL)batchUpdate {
-    [self setItemIcon:item
-                index:index
-       existingCustom:existingCustom
-               custom:custom
-             modified:nil
-          rationalize:rationalize
-          batchUpdate:batchUpdate];
-}
-
-- (void)batchSetIcons:(NSDictionary<NSUUID *,NSImage *>*)iconMap {
-    if(self.locked) {
-        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
-    }
-    
-    [self.document.undoManager beginUndoGrouping];
-            
-    for (Node* item in self.rootGroup.allChildRecords) {
-        NSImage* selectedImage = iconMap[item.uuid];
-        if(selectedImage) {
-            [self setItemIcon:item customImage:selectedImage rationalize:NO batchUpdate:YES];
-        }
-    }
-
-    NSString* loc = NSLocalizedString(@"mac_undo_action_set_icons", @"Set Icon(s)");
-
-    [self.document.undoManager setActionName:loc];
-    [self.document.undoManager endUndoGrouping];
 }
 
 
@@ -504,41 +460,66 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     });
 }
 
-- (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage {
-    [self setItemIcon:item customImage:customImage rationalize:NO batchUpdate:NO];
+
+
+
+
+- (void)batchSetIcons:(NSDictionary<NSUUID *,NSImage *>*)iconMap {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+    
+    [self.document.undoManager beginUndoGrouping];
+            
+    for (Node* item in self.rootGroup.allChildRecords) {
+        NSImage* selectedImage = iconMap[item.uuid];
+        if(selectedImage) {
+            CGImageRef cgRef = [selectedImage CGImageForProposedRect:NULL context:nil hints:nil];
+        
+            if (cgRef) { 
+                NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
+                NSData *selectedImageData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
+                [self setItemIcon:item icon:[NodeIcon withCustom:selectedImageData] batchUpdate:YES];
+            }
+        }
+    }
+
+    NSString* loc = NSLocalizedString(@"mac_undo_action_set_icons", @"Set Icon(s)");
+
+    [self.document.undoManager setActionName:loc];
+    [self.document.undoManager endUndoGrouping];
 }
 
-- (void)setItemIcon:(Node *)item customImage:(NSImage *)customImage rationalize:(BOOL)rationalize batchUpdate:(BOOL)batchUpdate {
-    CGImageRef cgRef = [customImage CGImageForProposedRect:NULL context:nil hints:nil];
+- (void)setItemIcon:(Node *)item image:(NSImage *)image {
+    if(image) {
+        CGImageRef cgRef = [image CGImageForProposedRect:NULL context:nil hints:nil];
     
-    if (cgRef) { 
-        NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
-        NSData *selectedImageData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
-        [self setItemIcon:item index:nil existingCustom:nil custom:selectedImageData modified:nil rationalize:rationalize batchUpdate:batchUpdate];
+        if (cgRef) { 
+            NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
+            NSData *selectedImageData = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
+            [self setItemIcon:item icon:[NodeIcon withCustom:selectedImageData]];
+        }
     }
 }
 
+- (void)setItemIcon:(Node *)item icon:(NodeIcon*)icon {
+    [self setItemIcon:item icon:icon batchUpdate:NO];
+}
+
+- (void)setItemIcon:(Node *)item icon:(NodeIcon*)icon batchUpdate:(BOOL)batchUpdate {
+    [self setItemIcon:item icon:icon modified:nil batchUpdate:batchUpdate];
+}
+
 - (void)setItemIcon:(Node *)item
-              index:(NSNumber*)index
-     existingCustom:(NSUUID*)existingCustom
-             custom:(NSData*)custom
+               icon:(NodeIcon*_Nullable)icon
            modified:(NSDate*)modified
-        rationalize:(BOOL)rationalize
         batchUpdate:(BOOL)batchUpdate  {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
     
-    NSNumber *oldIndex = item.iconId;
-    NSData* oldCustom = nil;
-    if(item.customIconUuid) {
-        oldCustom = self.passwordDatabase.customIcons[item.customIconUuid];
-    }
+    NodeIcon* oldIcon = item.icon;
     NSDate* oldModified = item.fields.modified;
-    
-    if(index != nil && index.intValue == -1) {
-        index = item.isGroup ? @(48) : @(0);
-    }
     
     
     
@@ -552,25 +533,11 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
     
     
-    item.iconId = index;
-    if(existingCustom) {
-        item.customIconUuid = existingCustom;
-    }
-    else {
-        [self.passwordDatabase setNodeCustomIcon:item data:custom rationalize:rationalize];
-    }
+    item.icon = icon;
     
     [self touchAndModify:item modDate:modified];
     
-    
-    
-    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item
-                                                                        index:oldIndex
-                                                               existingCustom:nil
-                                                                       custom:oldCustom
-                                                                     modified:oldModified
-                                                                  rationalize:NO
-                                                                  batchUpdate:batchUpdate];
+    [[self.document.undoManager prepareWithInvocationTarget:self] setItemIcon:item icon:oldIcon modified:oldModified batchUpdate:batchUpdate];
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_icon_change", @"Icon Change");
     [self.document.undoManager setActionName:loc];
@@ -582,6 +549,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
                                                                     kNotificationUserInfoKeyIsBatchIconUpdate : @(batchUpdate)}];
     });
 }
+
+
 
 - (void)deleteHistoryItem:(Node *)item historicalItem:(Node *)historicalItem {
     [self deleteHistoryItem:item historicalItem:historicalItem index:-1 modified:nil];
@@ -653,18 +622,18 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     });
 }
 
-- (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex {
-    [self removeItemAttachment:item atIndex:atIndex modified:nil];
+- (void)removeItemAttachment:(Node *)item filename:(NSString *)filename {
+    [self removeItemAttachment:item filename:filename modified:nil];
 }
 
-- (void)removeItemAttachment:(Node *)item atIndex:(NSUInteger)atIndex modified:(NSDate*)modified {
+- (void)removeItemAttachment:(Node *)item filename:(NSString *)filename modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
- 
-    NodeFileAttachment* nodeAttachment = item.fields.attachments[atIndex];
-    DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
-    UiAttachment* old = [[UiAttachment alloc] initWithFilename:nodeAttachment.filename dbAttachment:dbAttachment];
+
+    DatabaseAttachment* oldDbAttachment = item.fields.attachments[filename];
+    [item.fields.attachments removeObjectForKey:filename];
+
     NSDate* oldModified = item.fields.modified;
 
     if(self.document.undoManager.isUndoing) {
@@ -675,14 +644,12 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [item.fields.keePassHistory addObject:cloneForHistory];
     }
     
-    [[self.document.undoManager prepareWithInvocationTarget:self] addItemAttachment:item attachment:old modified:oldModified];
+    [[self.document.undoManager prepareWithInvocationTarget:self] addItemAttachment:item filename:filename attachment:oldDbAttachment modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
         NSString* loc = NSLocalizedString(@"mac_undo_action_remove_attachment", @"Remove Attachment");
         [self.document.undoManager setActionName:loc];
     }
-
-    [self.passwordDatabase removeNodeAttachment:item atIndex:atIndex];
     
     [self touchAndModify:item modDate:modified];
     
@@ -691,19 +658,11 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     });
 }
 
-- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment {
-    [self addItemAttachment:item attachment:attachment modified:nil];
+- (void)addItemAttachment:(Node *)item filename:(NSString *)filename attachment:(DatabaseAttachment *)attachment {
+    [self addItemAttachment:item filename:filename attachment:attachment modified:nil];
 }
 
-- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment modified:(NSDate*)modified {
-    [self addItemAttachment:item attachment:attachment rationalize:YES modified:modified];
-}
-
-- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment rationalize:(BOOL)rationalize {
-    [self addItemAttachment:item attachment:attachment rationalize:rationalize modified:nil];
-}
-
-- (void)addItemAttachment:(Node *)item attachment:(UiAttachment *)attachment rationalize:(BOOL)rationalize modified:(NSDate*)modified {
+- (void)addItemAttachment:(Node *)item filename:(NSString *)filename attachment:(DatabaseAttachment *)attachment modified:(NSDate*)modified {
     if(self.locked) {
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
@@ -717,35 +676,11 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     }
     
     NSDate* oldModified = item.fields.modified;
-
-    [self.passwordDatabase addNodeAttachment:item attachment:attachment rationalize:rationalize];
     
+    item.fields.attachments[filename] = attachment;
     [self touchAndModify:item modDate:modified];
     
-    
-    
-    int i=0;
-    NSUInteger foundIndex = -1;
-    for (NodeFileAttachment* nodeAttachment in item.fields.attachments) {
-        if([nodeAttachment.filename isEqualToString:attachment.filename]) {
-            DatabaseAttachment* dbAttachment = self.passwordDatabase.attachments[nodeAttachment.index];
-            if([dbAttachment.digestHash isEqualToString:attachment.dbAttachment.digestHash]) {
-                foundIndex = i;
-                break;
-            }
-        }
-        i++;
-    }
-    
-    if(foundIndex == -1) {
-        NSLog(@"WARN: Could not find added Attachment index!");
-        
-        return;
-    }
-    
-    NSLog(@"found attachment added at: %lu", (unsigned long)foundIndex);
-    
-    [[self.document.undoManager prepareWithInvocationTarget:self] removeItemAttachment:item atIndex:foundIndex modified:oldModified];
+    [[self.document.undoManager prepareWithInvocationTarget:self] removeItemAttachment:item filename:filename modified:oldModified];
     
     if(!self.document.undoManager.isUndoing) {
         NSString* loc = NSLocalizedString(@"mac_undo_action_add_attachment", @"Add Attachment");
@@ -962,7 +897,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
     }
 
-    [self.passwordDatabase unAddChild:item];
+    [self.passwordDatabase removeChildFromParent:item];
 
     [[self.document.undoManager prepareWithInvocationTarget:self] addItem:item parent:item.parent openEntryDetailsWindowWhenDone:NO];
     
@@ -1148,8 +1083,8 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
                                                             email:actualEmail];
         
         
-        Node* record = [[Node alloc] initAsRecord:actualTitle parent:self.passwordDatabase.rootGroup fields:fields uuid:nil];
-        [self addItem:record parent:self.passwordDatabase.rootGroup openEntryDetailsWindowWhenDone:NO];
+        Node* record = [[Node alloc] initAsRecord:actualTitle parent:self.passwordDatabase.effectiveRootGroup fields:fields uuid:nil];
+        [self addItem:record parent:self.passwordDatabase.effectiveRootGroup openEntryDetailsWindowWhenDone:NO];
     }
     
     NSString* loc = NSLocalizedString(@"mac_undo_action_import_entries_from_csv", @"Import Entries from CSV");
@@ -1273,14 +1208,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (Node*)getItemFromSerializationId:(NSString*)serializationId {
-    if(!serializationId) {
-        return nil;
-    }
-    
-    return [self.rootGroup findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
-        NSString* sid = [node getSerializationId:self.format != kPasswordSafe];
-        return [sid isEqualToString:serializationId];
-    }];
+    return [self.passwordDatabase getItemByCrossSerializationFriendlyId:serializationId];
 }
 
 - (NSString*)generatePassword {

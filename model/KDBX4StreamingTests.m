@@ -137,17 +137,16 @@
     NSData *largeDb = [[NSFileManager defaultManager] contentsAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-AES-4.kdbx"];
     XCTAssertNotNil(largeDb);
     
-    Kdbx4Database* adaptor = [[Kdbx4Database alloc] init];
     NSURL* url = [NSURL fileURLWithPath:@"/Users/strongbox/strongbox-test-files/large-test-242-AES-4.kdbx"];
     NSInputStream *inputStream = [NSInputStream inputStreamWithURL:url];
     [inputStream open];
     
-    [adaptor read:inputStream
-              ckf:[CompositeKeyFactors password:@"a"]
-       completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable database, NSError * _Nullable error) {
+    [Kdbx4Database read:inputStream
+                    ckf:[CompositeKeyFactors password:@"a"]
+             completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable error) {
         NSLog(@"%@", database);
         XCTAssertNotNil(database);
-        XCTAssertTrue([database.rootGroup.children[0].title isEqualToString:@"Database"]);
+        XCTAssertTrue([database.rootNode.children[0].title isEqualToString:@"Database"]);
     }];
 }
 
@@ -155,11 +154,11 @@
     NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-ChaCha20-4.kdbx"];
     [stream open];
     
-    [[[Kdbx4Database alloc] init] read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [Kdbx4Database read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, DatabaseModel * _Nullable db, NSError * _Nullable error) {
         [stream close];
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
-        XCTAssertTrue([db.rootGroup.children[0].title isEqualToString:@"Database"]);
+        XCTAssertTrue([db.rootNode.children[0].title isEqualToString:@"Database"]);
     }];
 }
 
@@ -167,11 +166,11 @@
     NSInputStream* stream = [NSInputStream inputStreamWithFileAtPath:@"/Users/strongbox/strongbox-test-files/large-test-242-TwoFish-4.kdbx"];
     [stream open];
     
-    [[[Kdbx4Database alloc] init] read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, StrongboxDatabase * _Nullable db, NSError * _Nullable error) {
+    [Kdbx4Database read:stream ckf:[CompositeKeyFactors password:@"a"] completion:^(BOOL userCancelled, DatabaseModel * _Nullable db, NSError * _Nullable error) {
         [stream close];
         NSLog(@"%@", db);
         XCTAssertNotNil(db);
-        XCTAssertTrue([db.rootGroup.children[0].title isEqualToString:@"Database"]);
+        XCTAssertTrue([db.rootNode.children[0].title isEqualToString:@"Database"]);
     }];
 }
 

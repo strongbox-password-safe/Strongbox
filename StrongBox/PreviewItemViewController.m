@@ -30,7 +30,7 @@
 - (instancetype)initForItem:(Node *)item andModel:(Model *)model API_AVAILABLE(ios(13.0)) {
     self = [super initWithNibName:nil bundle:nil];
     if (self) {
-        UIImage* icon = [NodeIconHelper getIconForNode:item model:model];
+        UIImage* icon = [NodeIconHelper getIconForNode:item predefinedIconSet:model.metadata.keePassIconSet format:model.database.originalFormat];
 
         UIImageView *imageView = [[UIImageView alloc] init];
         imageView.image = icon;

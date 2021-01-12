@@ -14,6 +14,7 @@
 #import "MMcG_MF_Base32Additions.h"
 #import "NSArray+Extensions.h"
 #import "NSDate+Extensions.h"
+#import "NSData+Extensions.h"
 
 @interface Node ()
 
@@ -117,9 +118,8 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
         _uuid = uuid == nil ?  [[NSUUID alloc] init] : uuid;
         _fields = fields == nil ? [[NodeFields alloc] init] : fields;
         _childRecordsAllowed = childRecordsAllowed;
-        _iconId = nil;
-        _customIconUuid = nil;
-
+        _icon = nil;
+        
         return self;
     }
     
@@ -133,9 +133,10 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     NSDictionary *nodeFieldsDict = dict[@"fields"];
     NSString *title = dict[@"title"];
     NSNumber *isGroup = dict[@"isGroup"];
-    NSNumber *iconId = dict[@"iconId"];
     NSArray<NSDictionary*> *children = dict[@"children"];
-    NSString* customIconUuid = dict[@"customIconUuid"]; 
+
+    NSNumber *iconId = dict[@"iconId"];
+    NSString* customIconData = dict[@"customIconData"]; 
     
     NodeFields* nodeFields = [NodeFields deserialize:nodeFieldsDict];
     
@@ -155,9 +156,13 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
         ret = [[Node alloc] initAsRecord:title parent:parent fields:nodeFields uuid:nil];
     }
     
-    
-    ret.iconId = iconId;
-    ret.customIconUuid = [[NSUUID alloc] initWithUUIDString:customIconUuid];
+    if (customIconData) {
+        NSData* d = [[NSData alloc] initWithBase64EncodedString:customIconData options:kNilOptions];
+        ret.icon = [NodeIcon withCustom:d];
+    }
+    else if (iconId != nil) {
+        ret.icon = [NodeIcon withPreset:iconId.integerValue];
+    }
     
     for (NSDictionary* child in children) {
         Node* childNode = [Node deserialize:child parent:ret keePassGroupTitleRules:allowDuplicateGroupTitle error:error];
@@ -179,23 +184,32 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     ret[@"fields"] = fieldsDictionary;
     ret[@"title"] = self.title;
     ret[@"isGroup"] = @(self.isGroup);
-    ret[@"iconId"] = self.iconId;
-    
+        
     NSArray<NSDictionary*>* childDictionaries = [self.children map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return [obj serialize:serialization];
     }];
     ret[@"children"] = childDictionaries;
+
     
-    if(self.customIconUuid) {
-        ret[@"customIconUuid"] = self.customIconUuid.UUIDString;
-        [serialization.usedCustomIcons addObject:self.customIconUuid];
+    
+    if (self.icon) {
+        if (self.icon.isCustom) {
+            ret[@"customIconData"] =  self.icon.custom.base64String;
+        }
+        else {
+            ret[@"iconId"] = @(self.icon.preset);
+        }
     }
     
     return ret;
 }
 
 - (Node*)duplicate:(NSString*)newTitle {
-    return [self cloneOrDuplicate:YES cloneMetadataDates:NO cloneUuid:NO cloneRecursive:NO newTitle:newTitle parentNode:nil];
+    Node* ret = [self cloneOrDuplicate:NO cloneUuid:NO cloneRecursive:NO newTitle:newTitle parentNode:nil];
+
+    [ret.fields.keePassHistory removeAllObjects];
+
+    return ret;
 }
 
 - (Node *)clone {
@@ -203,71 +217,102 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (Node *)cloneAsChildOf:(Node*)parentNode {
-    return [self cloneOrDuplicate:NO cloneMetadataDates:YES cloneUuid:YES cloneRecursive:NO newTitle:nil parentNode:parentNode];
+    return [self cloneOrDuplicate:YES cloneUuid:YES cloneRecursive:NO newTitle:nil parentNode:parentNode];
 }
 
 - (Node *)clone:(BOOL)recursive {
-    return [self cloneOrDuplicate:NO cloneMetadataDates:YES cloneUuid:YES cloneRecursive:recursive newTitle:nil parentNode:nil];
+    return [self cloneOrDuplicate:YES cloneUuid:YES cloneRecursive:recursive newTitle:nil parentNode:nil];
 }
 
 - (Node *)cloneForHistory {
-    return [self cloneOrDuplicate:YES cloneMetadataDates:YES cloneUuid:YES cloneRecursive:NO newTitle:nil parentNode:nil];
+    Node* ret = [self cloneOrDuplicate:YES cloneUuid:YES cloneRecursive:NO newTitle:nil parentNode:nil];
+    [ret.fields.keePassHistory removeAllObjects];
+    return ret;
 }
 
-- (Node*)cloneOrDuplicate:(BOOL)clearHistory
-       cloneMetadataDates:(BOOL)cloneMetadataDates
+- (Node*)cloneOrDuplicate:(BOOL)cloneMetadataDates
                 cloneUuid:(BOOL)cloneUuid
            cloneRecursive:(BOOL)cloneRecursive
                  newTitle:(NSString*)newTitle
                parentNode:(Node*)parentNode {
-    NodeFields* clonedFields = [self.fields cloneOrDuplicate:clearHistory cloneTouchProperties:cloneMetadataDates];
+    NodeFields* clonedFields = [self.fields cloneOrDuplicate:cloneMetadataDates];
     
-    Node* ret = [[Node alloc] initWithParent:parentNode ? parentNode : self.parent
+    Node* newParent = parentNode ? parentNode : self.parent;
+    NSUUID* newUuid = cloneUuid ? self.uuid : nil;
+    
+    if (newParent == nil) {
+        
+        newUuid = nil;
+    }
+    
+    Node* ret = [[Node alloc] initWithParent:newParent
                                        title:newTitle.length ? newTitle : self.title
                                      isGroup:self.isGroup
-                                        uuid:cloneUuid ? self.uuid : nil
+                                        uuid:newUuid
                                       fields:clonedFields
                          childRecordsAllowed:self.childRecordsAllowed];
     
-    ret.iconId = self.iconId;
-    ret.customIconUuid = self.customIconUuid;
+    ret.icon = self.icon;
+
     ret.linkedData = self.linkedData;
     
     if (ret.isGroup && cloneRecursive) {
         for (Node* child in self.children) {
-            Node* clonedChild = [child cloneOrDuplicate:clearHistory
-                                     cloneMetadataDates:cloneMetadataDates
+            Node* clonedChild = [child cloneOrDuplicate:cloneMetadataDates
                                               cloneUuid:cloneUuid
                                          cloneRecursive:cloneRecursive
                                                newTitle:newTitle
-                                             parentNode:nil];
+                                             parentNode:ret];
         
-            [ret addChild:clonedChild keePassGroupTitleRules:YES];
+            [ret insertChild:clonedChild keePassGroupTitleRules:YES atPosition:-1];
         }
     }
     
     return ret;
 }
 
-- (BOOL)isUsingKeePassDefaultIcon {
-    if(self.customIconUuid) {
+
+
+
+- (BOOL)mergePropertiesInFromNode:(Node *)mergeNode mergeLocationChangedDate:(BOOL)mergeLocationChangedDate includeHistory:(BOOL)includeHistory keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    if (self.isGroup != mergeNode.isGroup) {
+        NSLog(@"WARNWARN: mergePropertiesInFromNode - group not group");
+        return NO;
+    }
+
+    if (![self setTitle:mergeNode.title keePassGroupTitleRules:keePassGroupTitleRules]) {
         return NO;
     }
     
-    NSNumber* index = self.iconId;
-    if(index == nil) {
+    self.icon = mergeNode.icon;
+    
+    self.linkedData = self.linkedData; 
+    
+    [self.fields mergePropertiesInFromNode:mergeNode.fields mergeLocationChangedDate:mergeLocationChangedDate includeHistory:includeHistory];
+    
+    return YES;
+}
+
+
+
+- (BOOL)isUsingKeePassDefaultIcon {
+    if (self.icon == nil) {
         return YES;
     }
     
-    if(index.intValue == -1) {
+    if(self.icon.isCustom) {
+        return NO;
+    }
+        
+    if(self.icon.preset == -1) {
         return YES;
     }
     
-    if(self.isGroup && index.intValue == 48) {
+    if(self.isGroup && self.icon.preset == 48) {
         return YES;
     }
     
-    if(!self.isGroup && index.intValue == 0) {
+    if(!self.isGroup && self.icon.preset == 0) {
         return YES;
     }
     
@@ -395,7 +440,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return YES;
 }
 
-- (BOOL)validateAddChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+- (BOOL)validateAddChild:(Node *)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     if(!node) {
         return NO;
     }
@@ -416,30 +461,53 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (BOOL)addChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    return [self insertChild:node keePassGroupTitleRules:keePassGroupTitleRules atPosition:-1];
+}
+
+- (BOOL)insertChild:(Node* _Nonnull)node keePassGroupTitleRules:(BOOL)keePassGroupTitleRules atPosition:(NSInteger)atPosition {
     if(![self validateAddChild:node keePassGroupTitleRules:keePassGroupTitleRules]) {
         return NO;
     }
 
-    [_mutableChildren addObject:node];
+    if (atPosition == -1) { 
+        atPosition = _mutableChildren.count;
+    }
+    else {
+        atPosition = MAX(0, atPosition);
+        atPosition = MIN(_mutableChildren.count, atPosition);
+    }
+    
+    [_mutableChildren insertObject:node atIndex:atPosition];
     
     return YES;
 }
 
-- (void)moveChild:(NSUInteger)from to:(NSUInteger)to {
-    NSLog(@"moveChild: %lu > %lu", (unsigned long)from, (unsigned long)to);
-    if(from == to || from >= _mutableChildren.count || to >= _mutableChildren.count || from < 0 || to < 0) {
-        return;
+- (BOOL)reorderChild:(Node*)item to:(NSInteger)to keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    if (![_mutableChildren containsObject:item]) {
+        return NO;
     }
     
-    NSLog(@"moveChild Ok: %lu > %lu", (unsigned long)from, (unsigned long)to);
+    [_mutableChildren removeObject:item];
+    return [self insertChild:item keePassGroupTitleRules:YES atPosition:to];
+}
+
+- (BOOL)reorderChildAt:(NSUInteger)from to:(NSInteger)to keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    if (from >= _mutableChildren.count) {
+        return NO;
+    }
+        
+    Node* item = _mutableChildren[from];
     
-    Node* node = _mutableChildren[from];
-    [_mutableChildren removeObjectAtIndex:from];
-    [_mutableChildren insertObject:node atIndex:to];
+    return [self reorderChild:item to:to keePassGroupTitleRules:keePassGroupTitleRules];
 }
 
 - (void)removeChild:(Node* _Nonnull)node {
     [_mutableChildren removeObject:node];
+    [node clearParent];
+}
+
+- (void)clearParent {
+    _parent = nil;
 }
 
 - (void)sortChildren:(BOOL)ascending {
@@ -452,7 +520,12 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
             ![parent isChildOf:self] && [parent validateAddChild:self keePassGroupTitleRules:keePassGroupTitleRules];
 }
 
+
 - (BOOL)changeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+    return [self changeParent:parent position:-1 keePassGroupTitleRules:keePassGroupTitleRules];
+}
+
+- (BOOL)changeParent:(Node *)parent position:(NSInteger)position keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
     if(![self validateChangeParent:parent keePassGroupTitleRules:keePassGroupTitleRules]) {
         return NO;
     }
@@ -463,7 +536,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     _parent = parent;
     
-    if([parent addChild:self keePassGroupTitleRules:keePassGroupTitleRules]) {
+    if([parent insertChild:self keePassGroupTitleRules:keePassGroupTitleRules atPosition:position]) {
         return YES;
     }
     else { 
@@ -486,24 +559,6 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return NO;
 }
 
-- (NSString*)getSerializationId:(BOOL)groupCanUseUuid {
-    
-    
-    
-
-    NSString *identifier;
-    if(self.isGroup && !groupCanUseUuid) {
-        NSArray<NSString*> *titleHierarchy = [self getTitleHierarchy];
-
-        identifier = [titleHierarchy componentsJoinedByString:@":"];
-    }
-    else {
-        identifier = [self.uuid UUIDString];
-    }
-    
-    return [NSString stringWithFormat:@"%@%@", self.isGroup ? @"G" : @"R",  identifier];
-}
-
 - (Node*)getChildGroupWithTitle:(NSString*)title {
     for(Node* child in self.children) {
         if(child.isGroup && [child.title compare:title] == NSOrderedSame) {
@@ -514,7 +569,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return nil;
 }
 
-- (Node*_Nullable)findFirstChild:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate {
+- (Node*_Nullable)firstOrDefault:(BOOL)recursive predicate:(BOOL (^_Nonnull)(Node* _Nonnull node))predicate {
     if(!self.isGroup) {
         return nil;
     }
@@ -532,7 +587,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if(recursive) {
         for(Node* child in _mutableChildren) {
             if(child.isGroup) {
-                Node* match = [child findFirstChild:YES predicate:predicate];
+                Node* match = [child firstOrDefault:YES predicate:predicate];
                 if(match) {
                     return match;
                 }
@@ -594,7 +649,16 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return YES;
 }
 
-- (BOOL)isSyncEqualTo:(Node *)other params:(SyncComparisonParams *)params { 
+- (BOOL)isSyncEqualTo:(Node *)other { 
+    return [self isSyncEqualTo:other isForUIDiffReport:NO];
+}
+
+- (BOOL)isSyncEqualTo:(Node *)other isForUIDiffReport:(BOOL)isForUIDiffReport {
+    return [self isSyncEqualTo:other isForUIDiffReport:isForUIDiffReport checkHistory:NO];
+}
+
+- (BOOL)isSyncEqualTo:(Node *)other isForUIDiffReport:(BOOL)isForUIDiffReport checkHistory:(BOOL)checkHistory {
+    
     if (other == nil) {
         return NO;
     }
@@ -603,11 +667,11 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
         return NO;
     }
         
-    if (self.isGroup) {
+    if (self.isGroup && !isForUIDiffReport) {
         
         BOOL ret = [other.fields.modified isLaterThan:self.fields.modified]; 
 
-        NSLog(@"%@ = %@ ? %d", self.fields.modified, other.fields.modified, ret);
+
 
         return !ret; 
     }
@@ -616,17 +680,14 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
             return NO;
         }
 
-        if (!( ( self.iconId == nil && other.iconId == nil ) ||
-              (self.iconId && other.iconId && ([self.iconId isEqual:other.iconId])))) {
+        if (!( ( self.icon == nil && other.icon == nil ) ||
+              (self.icon && ([self.icon isEqual:other.icon])))) {
             return NO;
         }
 
-        if( ! ( (self.customIconUuid == nil && other.customIconUuid == nil)  ||
-               (self.customIconUuid && other.customIconUuid && [self.customIconUuid isEqual:other.customIconUuid]))) {
-            return NO;
-        }
-
-        return [self.fields isSyncEqualTo:other.fields params:params];
+        return [self.fields isSyncEqualTo:other.fields
+                        isForUIDiffReport:(self.isGroup && isForUIDiffReport)
+                             checkHistory:!self.isGroup && checkHistory];
     }
 }
 
@@ -644,7 +705,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (BOOL)contains:(Node*)test {
-    Node* match = [self findFirstChild:YES predicate:^BOOL(Node * _Nonnull node) {
+    Node* match = [self firstOrDefault:YES predicate:^BOOL(Node * _Nonnull node) {
         return node == test;
     }];
     
@@ -653,17 +714,10 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
 - (void)restoreFromHistoricalNode:(Node *)historicalItem {
     [self setTitle:historicalItem.title keePassGroupTitleRules:YES];
-    self.iconId = historicalItem.iconId;
-    self.customIconUuid = historicalItem.customIconUuid;
-    self.fields.username = historicalItem.fields.username;
-    self.fields.url = historicalItem.fields.url;
-    self.fields.password = historicalItem.fields.password;
-    self.fields.email = historicalItem.fields.email;
-    self.fields.notes = historicalItem.fields.notes;
-    self.fields.passwordModified = historicalItem.fields.passwordModified;
-    self.fields.attachments = [historicalItem.fields cloneAttachments];
-    self.fields.customFields = [historicalItem.fields cloneCustomFields];
-    self.fields.expires = historicalItem.fields.expires;
+
+    self.icon = historicalItem.icon;
+    
+    [self.fields restoreFromHistoricalNode:historicalItem.fields];
 }
 
 - (NSString*)recursiveTreeDescription:(uint32_t)indentLevel {
@@ -679,8 +733,10 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
         for (Node* child in self.childRecords) {
             NSString* attachmentString;
             if(child.fields.attachments.count == 1) {
-                NodeFileAttachment* a = [child.fields.attachments objectAtIndex:0];
-                attachmentString = [NSString stringWithFormat:@"(attachment: [%@] index: %d)", a.filename, a.index];
+                NSString* filename = child.fields.attachments.allKeys.firstObject;
+                
+                DatabaseAttachment* a = child.fields.attachments[filename];
+                attachmentString = [NSString stringWithFormat:@"(attachment: [%@] index: %@)", filename, a.digestHash];
             }
             else {
                 attachmentString = [NSString stringWithFormat:@"(%lu attachments)", (unsigned long)child.fields.attachments.count];

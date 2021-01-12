@@ -3,108 +3,74 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "AbstractDatabaseFormatAdaptor.h"
 #import "DatabaseAttachment.h"
-#import "UiAttachment.h"
-#import "DatabaseModelConfig.h"
+#import "DatabaseFormat.h"
+#import "UnifiedDatabaseMetadata.h"
+#import "NodeHierarchyReconstructionData.h"
+#import "CompositeKeyFactors.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseModel : NSObject
 
-+ (BOOL)isValidDatabase:(NSURL*)url error:(NSError**)error;
-+ (BOOL)isValidDatabaseWithPrefix:(nullable NSData *)prefix error:(NSError**)error; // TODO: Eventually remove - URL only
+@property (nonatomic, readonly) Node* rootNode;
 
-+ (NSString*_Nonnull)getLikelyFileExtension:(NSData *_Nonnull)prefix;
+@property (nonatomic, readonly) DatabaseFormat originalFormat;
+@property (nonatomic, readonly) Node* effectiveRootGroup;
+@property (nonatomic, readonly, nonnull) UnifiedDatabaseMetadata* meta;
+@property (nonatomic, readonly, nonnull) CompositeKeyFactors *ckfs;
 
-+ (DatabaseFormat)getDatabaseFormat:(NSURL*)url;
-+ (DatabaseFormat)getDatabaseFormatWithPrefix:(NSData *)prefix;
+@property (nonatomic) NSDictionary<NSUUID*, NSDate*> *deletedObjects;
 
-+ (NSString*)getDefaultFileExtensionForFormat:(DatabaseFormat)format;
+@property (readonly) NSArray<DatabaseAttachment*> *attachmentPool;
+@property (readonly) NSSet<NodeIcon*>* customIconPool;
 
+- (instancetype)init;
 
+- (instancetype)clone;
 
-- (NSData*)expressToData;
-+ (instancetype _Nullable)expressFromData:(NSData*)data password:(NSString*)password config:(DatabaseModelConfig*)config;
+- (instancetype)initWithFormat:(DatabaseFormat)format;
 
-
-
-
-+ (void)fromLegacyData:legacyData
-                   ckf:(CompositeKeyFactors *)ckf
-                config:(DatabaseModelConfig*)config
-            completion:(void (^)(BOOL, DatabaseModel * _Nullable, NSError * _Nullable))completion;
-
-+ (void)fromUrl:(NSURL *)url
-            ckf:(CompositeKeyFactors *)ckf
-         config:(DatabaseModelConfig*)config
-     completion:(void (^)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error))completion;
-
-+ (void)fromUrl:(NSURL *)url
-            ckf:(CompositeKeyFactors *)ckf
-         config:(DatabaseModelConfig*)config
-  xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
-     completion:(void (^)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error))completion;
-
-+ (void)fromUrlOrLegacyData:(NSURL *)url
-                 legacyData:(NSData *)legacyData
-                        ckf:(CompositeKeyFactors *)ckf
-                     config:(DatabaseModelConfig*)config
-                 completion:(void (^)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error))completion;
-
-
-
-- (void)getAsData:(SaveCompletionBlock)completion;
-
-- (instancetype _Nullable )init NS_UNAVAILABLE;
-
-- (instancetype)initEmptyForTesting:(CompositeKeyFactors*)compositeKeyFactors;
+- (instancetype)initWithCompositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors;
 
 - (instancetype)initWithFormat:(DatabaseFormat)format
            compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
 
 - (instancetype)initWithFormat:(DatabaseFormat)format
-           compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
-                        config:(DatabaseModelConfig*)config;
+           compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      metadata:(UnifiedDatabaseMetadata*)metadata;
 
-- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
-                 format:(DatabaseFormat)format;
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      metadata:(UnifiedDatabaseMetadata*)metadata
+                          root:(Node *_Nullable)root;
 
-- (instancetype)initNew:(CompositeKeyFactors *)compositeKeyFactors
-                 format:(DatabaseFormat)format
-                 config:(DatabaseModelConfig*)config;
+- (instancetype)initWithFormat:(DatabaseFormat)format
+           compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
+                      metadata:(UnifiedDatabaseMetadata*)metadata
+                          root:(Node *_Nullable)root
+                deletedObjects:(NSDictionary<NSUUID *,NSDate *> *)deletedObjects;
 
 
+
+- (void)performPreSerializationTidy;
+- (NSSet<Node*>*)getMinimalNodeSet:items;
 
 - (BOOL)setItemTitle:(Node*)item title:(NSString*)title;
 
 
 
-- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment;
-- (void)addNodeAttachment:(Node *)node attachment:(UiAttachment*)attachment rationalize:(BOOL)rationalize;
-- (void)removeNodeAttachment:(Node *)node atIndex:(NSUInteger)atIndex;
-- (void)setNodeAttachments:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments;
-- (UiAttachment*)getUiAttachment:(NodeFileAttachment*)nodeFileAttachment;
-
-
-
-- (void)setNodeCustomIcon:(Node*)node data:(NSData*)data rationalize:(BOOL)rationalize;
-- (void)setNodeCustomIcon:(Node *)node data:(NSData *)data rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
-
-- (void)setNodeCustomIconUuid:(Node*)node uuid:(NSUUID*)uuid rationalize:(BOOL)rationalize;
-- (void)setNodeCustomIconUuid:(Node *)node uuid:(NSUUID*)uuid rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
-
-- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize;
-- (void)setNodeIconId:(Node *)node iconId:(NSNumber *)iconId rationalize:(BOOL)rationalize addHistory:(BOOL)addHistory;
-
-
-
-@property (readonly) NSDictionary<NSUUID*, NSDate*>* deletedObjects;
 - (void)deleteItems:(const NSArray<Node *> *)items;
 - (void)deleteItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
 - (void)unDelete:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
 
 
+
+@property BOOL recycleBinEnabled;
+@property (nullable, readonly) NSUUID* recycleBinNodeUuid;   
+@property (nullable, readonly) NSDate* recycleBinChanged;
+@property (nullable, readonly) Node* recycleBinNode;
+@property (nullable, readonly) Node* keePass1BackupNode;
 
 - (BOOL)canRecycle:(Node*)item;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items;
@@ -120,17 +86,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
+- (BOOL)reorderItem:(Node*)item to:(NSInteger)to; 
+- (BOOL)reorderChildFrom:(NSUInteger)from to:(NSInteger)to parentGroup:parentGroup;
+
+
+
 - (BOOL)validateAddChild:(Node*)item destination:(Node*)destination;
 - (BOOL)addChild:(Node*)item destination:(Node*)destination;
-- (void)unAddChild:(Node*)item;
+- (BOOL)insertChild:(Node*)item destination:(Node*)destination atPosition:(NSInteger)position;
+- (void)removeChildFromParent:(Node*)item;
+
+
+
+- (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory;
 
 
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
-
-- (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
-- (NSString *)getGroupPathDisplayString:(Node *)vm;
+- (NSString *)getPathDisplayString:(Node *)vm;
 
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
 
@@ -144,16 +118,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString*)getHtmlPrintString:(NSString*)databaseName;
 
-@property (nonatomic, readonly, nonnull) Node* rootGroup;
-@property (nonatomic, readonly, nonnull) UnifiedDatabaseMetadata* metadata;
-@property (nonatomic, readonly, nonnull) NSArray<DatabaseAttachment*> *attachments;
-@property (nonatomic, readonly, nonnull) NSDictionary<NSUUID*, NSData*>* customIcons;
 
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *allGroups;
+
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *activeRecords;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *activeGroups;
+
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull usernameSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull urlSet;
@@ -165,16 +134,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSInteger numberOfRecords;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
+@property (readonly) BOOL isUsingKeePassGroupTitleRules;
 
-@property BOOL recycleBinEnabled;
-@property (readonly, nullable) Node* recycleBinNode;
-@property (nullable, readonly) Node* keePass1BackupNode;
 
-@property (nonatomic, nonnull, readonly) CompositeKeyFactors* compositeKeyFactors;
-@property (nonatomic, readonly) DatabaseFormat format;
-@property (nonatomic, readonly, nonnull) NSString* fileExtension;
 
-- (void)preOrderTraverse:(BOOL (^)(Node* node))function; 
+- (Node *_Nullable)getItemByCrossSerializationFriendlyId:(NSString*)serializationId;
+- (NSString*)getCrossSerializationFriendlyId:(Node*)node; 
+- (Node*_Nullable)getItemById:(NSUUID*)uuid;
+- (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 
 @end
 

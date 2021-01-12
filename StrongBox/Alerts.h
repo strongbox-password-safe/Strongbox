@@ -18,6 +18,7 @@
                             allowEmpty:(BOOL)allowEmpty
                             completion:(void (^)(NSString *password, BOOL response))completion;
 
++ (void)areYouSure:(UIViewController *)viewController message:(NSString*)message action:(void (^) (BOOL response))action;
 
 + (void)yesNo:(UIViewController *)viewController
         title:(NSString *)title
@@ -30,6 +31,8 @@
           action:(void (^)(BOOL response))action;
 
 + (void)error:(UIViewController *)viewController error:(const NSError *)error;
+
++ (void)error:(UIViewController *)viewController error:(const NSError *)error completion:(void (^)(void))completion;
 
 + (void)error:(UIViewController *)viewController
         title:(NSString *)title

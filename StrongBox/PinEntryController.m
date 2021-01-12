@@ -33,6 +33,8 @@
 @property (weak, nonatomic) IBOutlet UIImageView *logo;
 @property (weak, nonatomic) IBOutlet UIStackView *stackView;
 
+@property (weak, nonatomic) IBOutlet UILabel *labelWhichPIN;
+
 @end
 
 @implementation PinEntryController
@@ -186,7 +188,9 @@
         }
     }
     else {
-        self.labelEnteredText.text = self.info.length ? self.info : NSLocalizedString(@"pin_entry_default_text", @"PIN");
+        NSString* placeholderText = self.isDatabasePIN ? NSLocalizedString(@"pin_entry_database_default_text", @"Database PIN") : NSLocalizedString(@"pin_entry_app_default_text", @"App PIN");
+        
+        self.labelEnteredText.text = self.info.length ? self.info : placeholderText;
         if (@available(iOS 13.0, *)) {
             self.labelEnteredText.textColor = UIColor.systemGrayColor;
         }

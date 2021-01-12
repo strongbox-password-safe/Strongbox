@@ -64,24 +64,35 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:groupLocationOverride accessoryType:accessoryType noFlags:NO showGroupChildCount:YES];
 }
 
-
-- (UITableViewCell *)getBrowseCellForNode:(Node*)node
-                                indexPath:(NSIndexPath*)indexPath
-                        showLargeTotpCell:(BOOL)totp
+- (UITableViewCell *)getBrowseCellForNode:(Node *)node
+                                indexPath:(NSIndexPath *)indexPath
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
                         showGroupLocation:(BOOL)showGroupLocation
-                    groupLocationOverride:(NSString*)groupLocationOverride
+                    groupLocationOverride:(NSString *)groupLocationOverride
                             accessoryType:(UITableViewCellAccessoryType)accessoryType
                                   noFlags:(BOOL)noFlags
                       showGroupChildCount:(BOOL)showGroupChildCount {
+    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:groupLocationOverride accessoryType:accessoryType noFlags:NO showGroupChildCount:showGroupLocation subtitleOverride:nil];
+}
+
+- (UITableViewCell *)getBrowseCellForNode:(Node *)node
+                                indexPath:(NSIndexPath *)indexPath
+                        showLargeTotpCell:(BOOL)showLargeTotpCell
+                        showGroupLocation:(BOOL)showGroupLocation
+                    groupLocationOverride:(NSString *)groupLocationOverride
+                            accessoryType:(UITableViewCellAccessoryType)accessoryType
+                                  noFlags:(BOOL)noFlags
+                      showGroupChildCount:(BOOL)showGroupChildCount
+                         subtitleOverride:(NSNumber *)subtitleOverride {
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
-    UIImage* icon = [NodeIconHelper getIconForNode:node model:self.viewModel];
+    UIImage* icon = [NodeIconHelper getIconForNode:node predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat];
 
 
 
-    if(totp) {
+    if(showLargeTotpCell) {
         BrowseItemTotpCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemTotpCell forIndexPath:indexPath];
-        NSString* subtitle = [self getBrowseItemSubtitle:node];
-        
+        NSString* subtitle = [self getBrowseItemSubtitle:node subtitleOverride:subtitleOverride];
+
         [cell setItem:title subtitle:subtitle icon:icon expired:node.expired otpToken:node.fields.otpToken];
         
         return cell;
@@ -111,7 +122,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }
         else {
-            NSString* subtitle = [self getBrowseItemSubtitle:node];
+            NSString* subtitle = [self getBrowseItemSubtitle:node subtitleOverride:subtitleOverride];
             
             [cell setRecord:title
                    subtitle:subtitle
@@ -190,7 +201,13 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 }
 
 - (NSString*)getBrowseItemSubtitle:(Node*)node {
-    switch (self.viewModel.metadata.browseItemSubtitleField) {
+    return [self getBrowseItemSubtitle:node subtitleOverride:nil];
+}
+
+- (NSString*)getBrowseItemSubtitle:(Node*)node subtitleOverride:(NSNumber*_Nullable)subtitleOverride {
+    BrowseItemSubtitleField field = subtitleOverride != nil ? subtitleOverride.intValue : self.viewModel.metadata.browseItemSubtitleField;
+    
+    switch (field) {
         case kBrowseItemSubtitleNoField:
             return @"";
             break;

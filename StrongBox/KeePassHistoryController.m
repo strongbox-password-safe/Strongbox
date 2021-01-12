@@ -86,7 +86,15 @@
     
     NSString *groupLocation = [self.df stringFromDate:node.fields.modified];
     
-    return [self.cellHelper getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:NO showGroupLocation:NO groupLocationOverride:groupLocation accessoryType:UITableViewCellAccessoryDisclosureIndicator];
+    return [self.cellHelper getBrowseCellForNode:node
+                                       indexPath:indexPath
+                               showLargeTotpCell:NO
+                               showGroupLocation:NO
+                           groupLocationOverride:groupLocation
+                                   accessoryType:UITableViewCellAccessoryDisclosureIndicator
+                                         noFlags:NO
+                             showGroupChildCount:NO
+                                subtitleOverride:@(kBrowseItemSubtitleModified)];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

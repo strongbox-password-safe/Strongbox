@@ -220,7 +220,7 @@ const static NSSet<NSString*> *wellKnownKeys;
         if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
     }
     
-    if ( self.customData && self.customData.orderedDictionary.count ) {
+    if ( self.customData && self.customData.dictionary.count ) {
         if ( ![self.customData writeXml:serializer] ) return NO;
     }
 

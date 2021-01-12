@@ -233,12 +233,14 @@
 - (void)requestAppLockPinCodeAndConfirm {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* vc1 = (PinEntryController*)[storyboard instantiateInitialViewController];
+    vc1.isDatabasePIN = NO;
     
     vc1.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self dismissViewControllerAnimated:YES completion:^{
             if(response == kOk) {
                 PinEntryController* vc2 = (PinEntryController*)[storyboard instantiateInitialViewController];
                 vc2.info = NSLocalizedString(@"prefs_vc_confirm_pin", @"Confirm PIN");
+                vc2.isDatabasePIN = NO;
                 vc2.onDone = ^(PinEntryResponse response2, NSString * _Nullable confirmPin) {
                     [self dismissViewControllerAnimated:YES completion:^{
                         if(response2 == kOk) {

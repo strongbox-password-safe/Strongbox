@@ -16,6 +16,7 @@
 #import "NSURL+QueryItems.h"
 #import "MMcG_MF_Base32Additions.h"
 #import "NSDate+Extensions.h"
+#import "Node.h"
 
 static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
@@ -78,20 +79,42 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         _created = date;
         
         self.passwordModified = date;
-        self.attachments = [NSMutableArray array];
+        self.attachments = [NSMutableDictionary dictionary];
         self.mutableCustomFields = [NSMutableDictionary dictionary];
         self.keePassHistory = [NSMutableArray array];
         self.tags = [NSMutableSet set];
-        self.customData = [[MutableOrderedDictionary alloc] init];
+        self.customData = @{}.mutableCopy;
     }
     
     return self;
 }
 
-- (NSMutableArray<NodeFileAttachment*>*)cloneAttachments {
-    return [[self.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
-        return [NodeFileAttachment attachmentWithName:obj.filename index:obj.index linkedObject:obj.linkedObject];
-    }] mutableCopy];
+- (AutoType*)cloneAutoType {
+    if (self.autoType) {
+        AutoType *autoType = [[AutoType alloc] init];
+        autoType.enabled = self.autoType.enabled;
+        autoType.dataTransferObfuscation = self.autoType.dataTransferObfuscation;
+        autoType.defaultSequence = self.autoType.defaultSequence;
+        
+        autoType.asssociations = self.autoType.asssociations;
+        
+        if (self.autoType.asssociations) {
+            NSMutableArray *ma = NSMutableArray.array;
+            
+            for (AutoTypeAssociation* assoc in self.autoType.asssociations) {
+                AutoTypeAssociation* ata = [[AutoTypeAssociation alloc] init];
+                ata.window = assoc.window;
+                ata.keystrokeSequence = assoc.keystrokeSequence;
+                [ma addObject:ata];
+            }
+            
+            autoType.asssociations = ma.copy;
+        }
+        
+        return autoType;
+    }
+    
+    return nil;
 }
 
 - (NSMutableDictionary<NSString*, StringValue*>*)cloneCustomFields {
@@ -105,88 +128,6 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return ret;
 }
 
-- (MutableOrderedDictionary<NSString*, NSString*>*)cloneCustomData {
-    MutableOrderedDictionary<NSString*, NSString*>* ret = [[MutableOrderedDictionary alloc] init];
-    
-    for (NSString* key in self.customData.allKeys) {
-        NSString* value = self.customData[key];
-        ret[key] = value;
-    }
-    
-    return ret;
-}
-
-- (BOOL)isSyncEqualTo:(NodeFields *)other params:(SyncComparisonParams *)params {
-    BOOL simpleEqual =  [self.username compare:other.username] == NSOrderedSame &&
-                        [self.password compare:other.password] == NSOrderedSame &&
-                        [self.url compare:other.url] == NSOrderedSame &&
-                        [self.notes compare:other.notes] == NSOrderedSame &&
-                        [self.email compare:other.email] == NSOrderedSame;
-
-    if ( !simpleEqual ) return NO;
-    
-    
-    
-    if(self.customFields.count != other.customFields.count) {
-        return YES;
-    }
-
-    for (NSString* key in self.customFields.allKeys) {
-        StringValue* a = self.customFields[key];
-        StringValue* b = other.customFields[key];
-        
-        if(![a isEqual:b]) {
-            return NO;
-        }
-    }
-
-    
-    
-    if(self.attachments.count != other.attachments.count) {
-        return NO;
-    }
-    
-    
-    
-    for (int i=0; i < self.attachments.count; i++) {
-        NodeFileAttachment* myAttachment = self.attachments[i];
-        NodeFileAttachment* theirAttachment = other.attachments[i];
-        
-        [self attachmentIsSyncEqualTo:myAttachment b:theirAttachment params:params];
-    }
-
-    
-    
-    if ((self.created == nil && other.created != nil) || (self.created != nil && ![self.created isEqualToDate:other.created] )) return NO;
-    if ((self.modified == nil && other.modified != nil) || (self.modified != nil && ![self.modified isEqualToDate:other.modified] )) return NO;
-    if ((self.expires == nil && other.expires != nil) || (self.expires != nil && ![self.expires isEqualToDate:other.expires] )) return NO;
-            
-    if ((self.foregroundColor == nil && other.foregroundColor != nil) || (self.foregroundColor != nil && ![self.foregroundColor isEqual:other.foregroundColor] )) {
-        return NO;
-    }
-    if ((self.backgroundColor == nil && other.backgroundColor != nil) || (self.backgroundColor != nil && ![self.backgroundColor isEqual:other.backgroundColor] )) {
-        return NO;
-    }
-    if ((self.overrideURL == nil && other.overrideURL != nil) || (self.overrideURL != nil && ![self.overrideURL isEqual:other.overrideURL] )) {
-        return NO;
-    }
-    if ((self.autoType == nil && other.autoType != nil) || (self.autoType != nil && ![self.autoType isEqual:other.autoType])) {
-        return NO;
-    }
-    
-    
-
-    if ( ![self.tags isEqualToSet:other.tags]) return NO; 
-
-    if ( ![self.customData isEqual:other.customData] ) return NO; 
-
-    return YES;
-}
-
-- (BOOL)attachmentIsSyncEqualTo:(NodeFileAttachment*)a b:(NodeFileAttachment*)b params:(SyncComparisonParams *)params {
-    return params.compareNodeAttachmentBlock(a, b); 
-}
-
 + (NodeFields *)deserialize:(NSDictionary *)dict {
     NSString* username = dict[@"username"];
     NSString* url = dict[@"url"];
@@ -195,7 +136,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     NSString* email = dict[@"email"];
     NSNumber* passwordModified = dict[@"passwordModified"];
     NSNumber* expires = dict[@"expires"];
-    NSArray<NSDictionary*>* attachments = dict[@"attachments"];
+    NSDictionary<NSString*, NSString*>* attachments = dict[@"attachments"];
     NSArray<NSDictionary*>* customFields = dict[@"customFields"];
     NSArray<NSDictionary*>* customData = dict[@"customData"];
     NSString* defaultAutoTypeSequence = dict[@"defaultAutoTypeSequence"];
@@ -224,13 +165,12 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     
     
-    NSArray<NodeFileAttachment*>* nfas = [attachments map:^id _Nonnull(NSDictionary * _Nonnull obj, NSUInteger idx) {
-        NSString* filename = obj.allKeys.firstObject;
-        NSNumber* index = obj[filename];
-        
-        return [NodeFileAttachment attachmentWithName:filename index:index.unsignedIntValue linkedObject:nil];
-    }];
-    [ret.attachments addObjectsFromArray:nfas];
+    for (NSString* filename in attachments.allKeys) {
+        NSString* base64 = attachments[filename];
+        NSData* data = [[NSData alloc] initWithBase64EncodedString:base64 options:kNilOptions];
+        DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] initNonPerformantWithData:data compressed:YES protectedInMemory:YES];
+        ret.attachments[filename] = dbAttachment;
+    }
     
     
     
@@ -300,10 +240,14 @@ static NSString* const kKeeOtpPluginKey = @"otp";
 
     
     
-    NSArray<NSDictionary*>* attachments = [self.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
-        [serialization.usedAttachmentIndices addObject:@(obj.index)];
-        return @{ obj.filename : @(obj.index) };
-    }];
+    NSMutableDictionary<NSString*, NSString*> *attachments = NSMutableDictionary.dictionary;
+    
+    for (NSString* filename in self.attachments.allKeys) {
+        DatabaseAttachment* dbAttachment = self.attachments[filename];
+        NSData* data = dbAttachment.nonPerformantFullData;
+        NSString* base64 = [data base64EncodedStringWithOptions:kNilOptions];
+        attachments[filename] = base64;
+    }
     ret[@"attachments"] = attachments;
     
     
@@ -365,67 +309,158 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return ret;
 }
 
-- (NodeFields*)cloneOrDuplicate:(BOOL)clearHistory cloneTouchProperties:(BOOL)cloneMetadataDates {
-    NodeFields* ret = [[NodeFields alloc] initWithUsername:self.username
-                                                       url:self.url
-                                                  password:self.password
-                                                     notes:self.notes
-                                                     email:self.email];
+
+
+- (BOOL)isSyncEqualTo:(NodeFields *)other isForUIDiffReport:(BOOL)isForUIDiffReport checkHistory:(BOOL)checkHistory {
+    BOOL simpleEqual =  [self.username compare:other.username] == NSOrderedSame &&
+                        [self.password compare:other.password] == NSOrderedSame &&
+                        [self.url compare:other.url] == NSOrderedSame &&
+                        [self.notes compare:other.notes] == NSOrderedSame &&
+                        [self.email compare:other.email] == NSOrderedSame;
+
+    if ( !simpleEqual ) return NO;
     
-    ret.expires = self.expires;
-    ret.passwordModified = self.passwordModified;
-    ret.defaultAutoTypeSequence = self.defaultAutoTypeSequence;
-    ret.enableSearching = self.enableSearching;
-    ret.enableAutoType = self.enableAutoType;
-    ret.lastTopVisibleEntry = self.lastTopVisibleEntry;
-    ret.tags = self.tags.mutableCopy;
-    ret.foregroundColor = self.foregroundColor;
-    ret.backgroundColor = self.backgroundColor;
-    ret.overrideURL = self.overrideURL;
-    ret.attachments = [self cloneAttachments];
-    ret.mutableCustomFields = [self cloneCustomFields];
-    ret.customData = [self cloneCustomData];
     
-    if (self.autoType) {
-        ret.autoType = [[AutoType alloc] init];
-        ret.autoType.enabled = self.autoType.enabled;
-        ret.autoType.dataTransferObfuscation = self.autoType.dataTransferObfuscation;
-        ret.autoType.defaultSequence = self.autoType.defaultSequence;
+    
+    if(self.customFields.count != other.customFields.count) {
+        return YES;
+    }
+
+    for (NSString* key in self.customFields.allKeys) {
+        StringValue* a = self.customFields[key];
+        StringValue* b = other.customFields[key];
         
-        ret.autoType.asssociations = self.autoType.asssociations;
-        
-        if (self.autoType.asssociations) {
-            NSMutableArray *ma = NSMutableArray.array;
-            
-            for (AutoTypeAssociation* assoc in self.autoType.asssociations) {
-                AutoTypeAssociation* ata = [[AutoTypeAssociation alloc] init];
-                ata.window = assoc.window;
-                ata.keystrokeSequence = assoc.keystrokeSequence;
-                [ma addObject:ata];
-            }
-            
-            ret.autoType.asssociations = ma.copy;
+        if(![a isEqual:b]) {
+            return NO;
         }
-
     }
 
-    if (clearHistory) {
-        ret.keePassHistory = [NSMutableArray array];
+    
+    
+    if(self.attachments.count != other.attachments.count) {
+        return NO;
     }
-    else {
-        ret.keePassHistory = self.keePassHistory.mutableCopy;
+    
+    for (NSString* filename in self.attachments.allKeys) {
+        DatabaseAttachment* myAttachment = self.attachments[filename];
+        DatabaseAttachment* theirAttachment = other.attachments[filename];
+        
+        if (theirAttachment == nil) {
+            return NO;
+        }
+        
+        if (![myAttachment.digestHash isEqualToString:theirAttachment.digestHash]) {
+            return NO;
+        }
     }
 
-    if (cloneMetadataDates) {
-        [ret setTouchPropertiesWithCreated:self.created
-                                  accessed:self.accessed
-                                  modified:self.modified
-                           locationChanged:self.locationChanged
-                                usageCount:self.usageCount];
+    
+    
+    if ((self.created == nil && other.created != nil) || (self.created != nil && ![self.created isEqualToDate:other.created] )) return NO;
+
+    if (!isForUIDiffReport) {
+        
+        
+        if ((self.modified == nil && other.modified != nil) || (self.modified != nil && ![self.modified isEqualToDate:other.modified] )) return NO;
     }
+    
+    if ((self.expires == nil && other.expires != nil) || (self.expires != nil && ![self.expires isEqualToDate:other.expires] )) return NO;
+            
+    if ((self.foregroundColor.length == 0 && other.foregroundColor.length) || (self.foregroundColor.length && ![self.foregroundColor isEqualToString:other.foregroundColor] )) {
+        return NO;
+    }
+    if ((self.backgroundColor.length == 0 && other.backgroundColor.length) || (self.backgroundColor.length && ![self.backgroundColor isEqualToString:other.backgroundColor] )) {
+        return NO;
+    }
+    if ((self.overrideURL.length == 0 && other.overrideURL.length) || (self.overrideURL.length && ![self.overrideURL isEqualToString:other.overrideURL] )) {
+        return NO;
+    }
+    if ((self.autoType == nil && other.autoType != nil) || (self.autoType != nil && ![self.autoType isEqual:other.autoType])) {
+        return NO;
+    }
+    
+    
+
+    if ( ![self.tags isEqualToSet:other.tags]) return NO;
+
+    if ( ![self.customData isEqualToDictionary:other.customData] ) return NO; 
+
+    
+    
+    if (checkHistory) {
+        if (self.keePassHistory.count == other.keePassHistory.count) {
+            for (int i=0; i<self.keePassHistory.count; i++) {
+                Node* myHist = self.keePassHistory[i];
+                Node* otherHist = other.keePassHistory[i];
+                if (![myHist isSyncEqualTo:otherHist isForUIDiffReport:YES checkHistory:NO]) {
+                    return NO;
+                }
+            }
+        }
+        else {
+            return NO;
+        }
+    }
+    
+    return YES;
+}
+
+- (void)mergePropertiesInFromNode:(NodeFields *)mergeNodeFields mergeLocationChangedDate:(BOOL)mergeLocationChangedDate includeHistory:(BOOL)includeHistory {
+    [self copyFieldsFrom:mergeNodeFields copyTouchDates:YES copyLocationChangedDate:mergeLocationChangedDate includeHistory:includeHistory];
+}
+
+- (void)restoreFromHistoricalNode:(NodeFields *)historicalFields {
+    [self copyFieldsFrom:historicalFields copyTouchDates:NO copyLocationChangedDate:NO includeHistory:NO];
+}
+
+- (void)copyFieldsFrom:(NodeFields *)from copyTouchDates:(BOOL)copyTouchDates copyLocationChangedDate:(BOOL)copyLocationChangedDate includeHistory:(BOOL)includeHistory {
+    [NodeFields copyField:from to:self copyTouchDates:copyTouchDates copyLocationChangedDate:copyLocationChangedDate includeHistory:includeHistory];
+}
+
+- (NodeFields*)cloneOrDuplicate:(BOOL)cloneMetadataDates {
+    NodeFields* ret = [[NodeFields alloc] init];
+
+    [NodeFields copyField:self to:ret copyTouchDates:cloneMetadataDates copyLocationChangedDate:YES includeHistory:YES];
 
     return ret;
 }
+
++ (void)copyField:(NodeFields*)from to:(NodeFields*)to copyTouchDates:(BOOL)copyTouchDates copyLocationChangedDate:(BOOL)copyLocationChangedDate includeHistory:(BOOL)includeHistory {
+    to.username = from.username;
+    to.url = from.url;
+    to.password = from.password;
+    to.email = from.email;
+    to.notes = from.notes;
+    
+    to.customFields = [from cloneCustomFields];
+    
+    to.expires = from.expires;
+    to.defaultAutoTypeSequence = from.defaultAutoTypeSequence;
+    to.enableAutoType = from.enableAutoType;
+    to.enableSearching = from.enableSearching;
+    to.lastTopVisibleEntry = from.lastTopVisibleEntry;
+    to.foregroundColor = from.foregroundColor;
+    to.backgroundColor = from.backgroundColor;
+    to.overrideURL = from.overrideURL;
+    to.passwordModified = from.passwordModified;
+    to.autoType = [from cloneAutoType];
+    to.tags = from.tags.mutableCopy;
+    to.customData = from.customData.mutableCopy;
+    to.attachments = from.attachments.mutableCopy;
+    
+    if (copyTouchDates) {
+        [to setTouchPropertiesWithCreated:from.created
+                                 accessed:from.accessed
+                                 modified:from.modified
+                          locationChanged:copyLocationChangedDate ? from.locationChanged : nil
+                               usageCount:from.usageCount];
+    }
+
+    if(includeHistory) {
+        to.keePassHistory = from.keePassHistory.mutableCopy;
+    }
+}
+
 
 - (void)setPassword:(NSString *)password {
     NSString* newPassword = password;

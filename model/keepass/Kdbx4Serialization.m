@@ -772,7 +772,7 @@ typedef void (^GetCompositeKeyCompletionBlock)(BOOL userCancelled, NSData*_Nulla
 + (void)getCompositeKey:(NSData*)yubiKeyChallenge
     compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
              completion:(GetCompositeKeyCompletionBlock)completion {
-    NSData *hashedPassword = compositeKeyFactors.password != nil ? compositeKeyFactors.password.sha256 : nil;
+    NSData *hashedPassword = compositeKeyFactors.password != nil ? compositeKeyFactors.password.sha256Data : nil;
     
     if(compositeKeyFactors.yubiKeyCR) {
         compositeKeyFactors.yubiKeyCR(yubiKeyChallenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {

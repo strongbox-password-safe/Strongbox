@@ -57,7 +57,12 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
         self.color = @"";
         self.entryTemplatesGroup = NSUUID.zero;
         self.entryTemplatesGroupChanged = now;
-
+        self.lastUpdateTime = NSDate.date;
+        self.lastUpdateUser = [Utils getUsername];
+        self.lastUpdateHost = [Utils hostname];
+        self.lastUpdateApp =  [Utils getAppName];
+        self.customData = @{}.mutableCopy;
+        
         
         
         self.kdfParameters = [[Argon2KdfCipher alloc] initWithDefaults].kdfParameters; 
@@ -80,7 +85,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
             self.innerRandomStreamId = kKP3DefaultInnerRandomStreamId;
         }
         else if (format == kKeePass1) {
-            self.recycleBinEnabled = NO; 
+            self.recycleBinEnabled = NO;
         }
         else {
             NSLog(@"WARNWARN: No DEFAULTS set for this format! WARNWARN");
@@ -88,6 +93,43 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     }
     
     return self;
+}
+
+- (instancetype)clone {
+    UnifiedDatabaseMetadata* ret = [[UnifiedDatabaseMetadata alloc] initWithDefaultsForFormat:kKeePass4];
+    
+    ret.transformRounds = self.transformRounds;
+    ret.generator = self.generator;
+    ret.compressionFlags = self.compressionFlags;
+    ret.cipherUuid = self.cipherUuid;
+    ret.historyMaxItems = self.historyMaxItems;
+    ret.historyMaxSize = self.historyMaxSize;
+    ret.recycleBinEnabled = self.recycleBinEnabled;
+    ret.recycleBinGroup = self.recycleBinGroup;
+    ret.recycleBinChanged = self.recycleBinChanged;
+    ret.settingsChanged = self.settingsChanged;
+    ret.databaseName = self.databaseName;
+    ret.databaseNameChanged = self.databaseNameChanged;
+    ret.databaseDescription = self.databaseDescription;
+    ret.databaseDescriptionChanged = self.databaseDescriptionChanged;
+    ret.defaultUserName = self.defaultUserName;
+    ret.defaultUserNameChanged = self.defaultUserNameChanged;
+    ret.color = self.color;
+    ret.entryTemplatesGroup = self.entryTemplatesGroup;
+    ret.entryTemplatesGroupChanged = self.entryTemplatesGroupChanged;
+    ret.lastUpdateTime = self.lastUpdateTime;
+    ret.lastUpdateUser = self.lastUpdateUser;
+    ret.lastUpdateHost = self.lastUpdateHost;
+    ret.lastUpdateApp = self.lastUpdateApp;
+    ret.flags = self.flags;
+    ret.versionInt = self.versionInt;
+    ret.keyStretchIterations = self.keyStretchIterations;
+    ret.innerRandomStreamId = self.innerRandomStreamId;
+    ret.version = self.version;
+    ret.kdfParameters = self.kdfParameters; 
+    ret.customData = self.customData.mutableCopy;
+    
+    return ret;
 }
 
 - (MutableOrderedDictionary<NSString *,NSString *> *)filteredKvpForUIWithFormat:(DatabaseFormat)format {
@@ -105,7 +147,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     }
     else {
         NSLog(@"WARNWARN: No kvpForUi set for this format! WARNWARN");
-        return nil;
+        return [[MutableOrderedDictionary alloc] init];
     }
 }
 
@@ -132,7 +174,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     if (self.lastUpdateTime) {
         [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_time", @"Last Update Time")
-            andValue:self.lastUpdateTime.friendlyDateString]; 
+            andValue:self.lastUpdateTime.friendlyDateString];
     }
     
     if (self.lastUpdateUser.length) {
@@ -216,7 +258,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
 }
 
 - (void)appendKeePassCommonMetadataKvps:(MutableOrderedDictionary<NSString*, NSString*>*)kvps {
-    if (Platform.sharedInstance.isSimulator) {
+    if (Platform.isSimulator) {
         [kvps addKey:@"settingsChanged" andValue:self.settingsChanged.friendlyDateString];
         [kvps addKey:@"databaseName" andValue:self.databaseName];
         [kvps addKey:@"databaseNameChanged" andValue:self.databaseNameChanged.friendlyDateString];

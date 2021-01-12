@@ -17,9 +17,13 @@
 @implementation WindowController
 
 - (void)windowDidLoad {
+    [super windowDidLoad];
+    
     self.shouldCascadeWindows = YES;
     
-    [super windowDidLoad];
+    
+    
+    self.windowFrameAutosaveName = @"strongbox-window-controller-autosave";
 }
 
 - (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {

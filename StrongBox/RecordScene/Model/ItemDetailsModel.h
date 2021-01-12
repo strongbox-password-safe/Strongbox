@@ -8,10 +8,11 @@
 
 #import <Foundation/Foundation.h>
 #import "CustomFieldViewModel.h"
-#import "UiAttachment.h"
-#import "SetIconModel.h"
 #import "OTPToken.h"
 #import "ItemMetadataEntry.h"
+#import "DatabaseAttachment.h"
+#import "MutableOrderedDictionary.h"
+#import "NodeIcon.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -29,9 +30,9 @@ NS_ASSUME_NONNULL_BEGIN
                       expires:(NSDate*_Nullable)expires
                          tags:(NSSet<NSString*>*_Nullable)tags
                          totp:(OTPToken*_Nullable)totp
-                         icon:(SetIconModel*)icon
+                         icon:(NodeIcon*_Nullable)icon
                  customFields:(NSArray<CustomFieldViewModel*>*)customFields
-                  attachments:(NSArray<UiAttachment*>*)attachments
+                  attachments:(NSDictionary<NSString*, DatabaseAttachment*>*)attachments
                      metadata:(NSArray<ItemMetadataEntry*>*)metadata
                    hasHistory:(BOOL)hasHistory NS_DESIGNATED_INITIALIZER;
 
@@ -39,13 +40,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isValid;
 - (BOOL)isDifferentFrom:(ItemDetailsModel*)other;
 
+- (void)removeAttachment:(NSString*)filename; 
+- (NSUInteger)insertAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment;
+
 - (void)removeCustomFieldAtIndex:(NSUInteger)index;
 - (NSUInteger)insertCustomField:(CustomFieldViewModel*)field;
 
-- (NSUInteger)insertAttachment:(UiAttachment*)attachment;
-- (void)removeAttachmentAtIndex:(NSUInteger)index;
-
-@property SetIconModel* icon;
+@property (nullable) NodeIcon* icon;
 @property NSString* title;
 @property NSString* username;
 @property NSString* password;
@@ -56,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable) OTPToken* totp;
 @property (readonly) NSArray<CustomFieldViewModel*> *customFields;
-@property (readonly) NSArray<UiAttachment*> *attachments;
+@property (readonly) MutableOrderedDictionary<NSString*, DatabaseAttachment*>* attachments;
 @property (readonly) NSArray<ItemMetadataEntry*> *metadata;
 
 - (void)addTag:(NSString*)tag;

@@ -12,6 +12,7 @@
 #import "Utils.h"
 #import "NodeIconHelper.h"
 #import "UITableView+EmptyDataSet.h"
+#import "Serializator.h"
 
 @interface StorageBrowserTableViewController ()
 
@@ -225,8 +226,8 @@
           initialDateModified:(NSDate*)initialDateModified error:(const NSError *)error {
     if (result == kReadResultSuccess) {
         NSError* err;
-        if ([DatabaseModel isValidDatabaseWithPrefix:data error:&err]) {  
-            DatabaseFormat likelyFormat = [DatabaseModel getDatabaseFormatWithPrefix:data];
+        if ([Serializator isValidDatabaseWithPrefix:data error:&err]) {  
+            DatabaseFormat likelyFormat = [Serializator getDatabaseFormatWithPrefix:data];
             self.onDone([SelectedStorageParameters parametersForNativeProviderExisting:self.safeStorageProvider
                                                                                   file:file
                                                                           likelyFormat:likelyFormat

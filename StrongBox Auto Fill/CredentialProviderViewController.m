@@ -117,8 +117,8 @@
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
         [Alerts info:self
-               title:NSLocalizedString(@"autofill_error_unknown_item_title",@"Strongbox: Error Locating Entry")
-             message:NSLocalizedString(@"autofill_error_unknown_item_message",@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
+               title:NSLocalizedString(@"autofill_error_unknown_item_title", @"Strongbox: Error Locating Entry")
+             message:NSLocalizedString(@"autofill_error_unknown_item_message", @"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
           completion:^{
             
             [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this record in Strongbox any longer." errorCode:-1]];
@@ -127,7 +127,7 @@
 }
 
 - (void)onUnlockedDatabase:(Model*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)identifier {
-    Node* node = [model.database.rootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
+    Node* node = [model.database.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
         return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
     }];
     

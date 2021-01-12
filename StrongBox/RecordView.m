@@ -16,7 +16,6 @@
 #import "TextFieldAutoSuggest.h"
 #import "FileAttachmentsViewControllerTableViewController.h"
 #import "NSArray+Extensions.h"
-#import "UiAttachment.h"
 #import "CustomFieldsViewController.h"
 #import "OTPToken+Generation.h"
 #import "QRCodeScannerViewController.h"
@@ -40,9 +39,7 @@ static const int kMinNotesCellHeight = 160;
 
 @property BOOL editingNewRecord;
 
-@property NSNumber* userSelectedNewIconIndex;
-@property NSUUID* userSelectedNewExistingCustomIconId;
-@property UIImage* userSelectedNewCustomIcon;
+@property NodeIcon* userSelectedNodeIcon;
 
 @property BOOL hidePassword;
 @property BOOL showOtp;
@@ -61,7 +58,7 @@ static const int kMinNotesCellHeight = 160;
 
 - (void)onChangeIcon {
     self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIcons = self.viewModel.database.customIcons;
+    self.sni.customIconPool = self.viewModel.database.customIconPool;
     
     NSString* urlHint = trim(self.textFieldUrl.text);
     if(!urlHint.length) {
@@ -71,30 +68,13 @@ static const int kMinNotesCellHeight = 160;
     [self.sni changeIcon:self
                     node:self.record
                  urlOverride:urlHint
-                  format:self.viewModel.database.format
+                  format:self.viewModel.database.originalFormat
           keePassIconSet:self.viewModel.metadata.keePassIconSet
-              completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nullable selected) {
+              completion:^(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selected) { 
         
         if(goNoGo) {
-            self.userSelectedNewIconIndex = userSelectedNewIconIndex;
-            self.userSelectedNewExistingCustomIconId = userSelectedExistingCustomIconId;
-            self.userSelectedNewCustomIcon = selected ? selected.allValues.firstObject : nil;
-
-            if(self.userSelectedNewCustomIcon) {
-                self.imageViewIcon.image = self.userSelectedNewCustomIcon;
-            }
-            else if(self.userSelectedNewExistingCustomIconId) {
-                self.imageViewIcon.image = [NodeIconHelper getCustomIcon:self.userSelectedNewExistingCustomIconId customIcons:self.viewModel.database.customIcons];
-            }
-            else if(self.userSelectedNewIconIndex) {
-                if(self.userSelectedNewIconIndex.intValue == -1) {
-                    self.imageViewIcon.image = [NodeIconHelper getIconSet:self.viewModel.metadata.keePassIconSet][0]; 
-                }
-                else {
-                    self.imageViewIcon.image = [NodeIconHelper getIconSet:self.viewModel.metadata.keePassIconSet][self.userSelectedNewIconIndex.intValue];
-                }
-            }
-            
+            self.userSelectedNodeIcon = selected.allValues.firstObject;
+            self.imageViewIcon.image = [NodeIconHelper getNodeIcon:self.userSelectedNodeIcon predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat isGroup:NO];
             self.editButtonItem.enabled = [self recordCanBeSaved];
         }
     }];
@@ -107,12 +87,8 @@ static const int kMinNotesCellHeight = 160;
 - (IBAction)onCancel:(id)sender {
     if(self.isEditing) {
         if(!self.editingNewRecord) {
-            self.userSelectedNewIconIndex = nil;
-            self.userSelectedNewExistingCustomIconId = nil;
-            self.userSelectedNewCustomIcon = nil;
-            
+            self.userSelectedNodeIcon = nil;
             [self bindUiToKeePassDereferenceableFields:NO];
-            
             [self setEditing:NO animated:YES];
         }
         else {
@@ -343,10 +319,7 @@ static const int kMinNotesCellHeight = 160;
     
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
     
-    self.userSelectedNewIconIndex = nil;
-    self.userSelectedNewExistingCustomIconId = nil;
-    self.userSelectedNewCustomIcon = nil;
-    
+    self.userSelectedNodeIcon = nil;
     self.hidePassword = !self.viewModel.metadata.showPasswordByDefaultOnEditScreen;
 
     if(!self.record) {
@@ -408,7 +381,8 @@ static const int kMinNotesCellHeight = 160;
     
     NSString* singleAttachment;
     if(count == 1) {
-        singleAttachment = [NSString stringWithFormat:@"📎 %@", [self.record.fields.attachments objectAtIndex:0].filename];
+        NSString* filename = self.record.fields.attachments.allKeys.firstObject;
+        singleAttachment = [NSString stringWithFormat:@"📎 %@", filename];
     }
     self.labelAttachmentCount.text = count == 0 ? @"📎 None" : count == 1 ? singleAttachment : [NSString stringWithFormat:@"📎 %d Attachments", count];
     
@@ -425,7 +399,7 @@ static const int kMinNotesCellHeight = 160;
     
     
     
-    UIImage* icon = [NodeIconHelper getIconForNode:self.record model:self.viewModel];
+    UIImage* icon = [NodeIconHelper getIconForNode:self.record predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat];
     [self.imageViewIcon setImage:icon];
 }
 
@@ -478,8 +452,8 @@ static const int kMinNotesCellHeight = 160;
     self.textFieldTitle.borderStyle = self.editing ? UITextBorderStyleRoundedRect : UITextBorderStyleNone;
     [self setTitleTextFieldUIValidationIndicator];
 
-    self.imageViewIcon.userInteractionEnabled = self.editing && self.viewModel.database.format != kPasswordSafe;
-    self.imageViewIcon.layer.borderWidth = (self.editing && self.viewModel.database.format != kPasswordSafe) ? 1.5f : 0.0f;
+    self.imageViewIcon.userInteractionEnabled = self.editing && self.viewModel.database.originalFormat != kPasswordSafe;
+    self.imageViewIcon.layer.borderWidth = (self.editing && self.viewModel.database.originalFormat != kPasswordSafe) ? 1.5f : 0.0f;
         
     self.textFieldPassword.layer.borderColor = self.editing ? [UIColor darkGrayColor].CGColor : [UIColor lightGrayColor].CGColor;
     self.textFieldPassword.backgroundColor = [UIColor whiteColor];
@@ -526,9 +500,9 @@ static const int kMinNotesCellHeight = 160;
 
     
 
-    DatabaseFormat format = self.viewModel.database.format;
+    DatabaseFormat format = self.viewModel.database.originalFormat;
     BOOL keePassHistoryAvailable = self.record.fields.keePassHistory.count > 0 && (format == kKeePass || format == kKeePass4);
-    self.buttonHistory.hidden = (self.editing || !(self.viewModel.database.format == kPasswordSafe || keePassHistoryAvailable));
+    self.buttonHistory.hidden = (self.editing || !(self.viewModel.database.originalFormat == kPasswordSafe || keePassHistoryAvailable));
 
     
     
@@ -586,17 +560,11 @@ static const int kMinNotesCellHeight = 160;
         return YES;
     }
     
-    BOOL userHasSetIcon = (self.userSelectedNewIconIndex != nil || self.userSelectedNewExistingCustomIconId != nil || self.userSelectedNewCustomIcon != nil);
+    BOOL userHasSetIcon = self.userSelectedNodeIcon != nil;
     BOOL userSetIconIsSameAsRecordIcon = YES;
-    
     if(userHasSetIcon) {
-        if(self.userSelectedNewCustomIcon != nil) {
+        if (self.record.icon == nil || ![self.record.icon isEqual:self.userSelectedNodeIcon]) {
             userSetIconIsSameAsRecordIcon = NO;
-        }
-        else {
-            userSetIconIsSameAsRecordIcon =
-                (self.userSelectedNewIconIndex && (self.record.iconId.intValue == self.userSelectedNewIconIndex.intValue)) ||
-                (self.userSelectedNewExistingCustomIconId && (self.record.customIconUuid == self.userSelectedNewExistingCustomIconId));
         }
     }
     
@@ -717,7 +685,7 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (IBAction)onViewHistory:(id)sender {
-    if(self.viewModel.database.format == kPasswordSafe) {
+    if(self.viewModel.database.originalFormat == kPasswordSafe) {
         [self performSegueWithIdentifier:@"segueToPasswordHistory" sender:nil];
     }
     else {
@@ -754,9 +722,8 @@ static const int kMinNotesCellHeight = 160;
         
         FileAttachmentsViewControllerTableViewController* vc = (FileAttachmentsViewControllerTableViewController*)[nav topViewController];
         
-        NSArray<UiAttachment*>* attachments = getUiAttachments(self.record, self.viewModel.database.attachments);
-        vc.attachments = attachments;
-        vc.format = self.viewModel.database.format;
+        vc.attachments = self.record.fields.attachments.copy;
+        vc.format = self.viewModel.database.originalFormat;
         vc.readOnly = self.readOnlyMode;
         
         __weak FileAttachmentsViewControllerTableViewController* weakRef = vc;
@@ -804,13 +771,6 @@ static const int kMinNotesCellHeight = 160;
     }
 }
 
-static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAttachment*>* dbAttachments) {
-    return [record.fields.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
-        DatabaseAttachment *dbAttachment = dbAttachments[obj.index];
-        return [[UiAttachment alloc] initWithFilename:obj.filename dbAttachment:dbAttachment];
-    }];
-}
-
 
 
 
@@ -824,13 +784,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
     if (section == 5) { 
-        return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForHeaderInSection:section];
+        return self.viewModel.database.originalFormat == kPasswordSafe ? 0 : [super tableView:tableView heightForHeaderInSection:section];
     }
     else if (section == 6) { 
-        return self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 : [super tableView:tableView heightForHeaderInSection:section];
+        return self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1 ? 0 : [super tableView:tableView heightForHeaderInSection:section];
     }
     else if (section == 3) {  
-        return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForHeaderInSection:section] : 0;
+        return self.viewModel.database.originalFormat == kPasswordSafe ? [super tableView:tableView heightForHeaderInSection:section] : 0;
     }
     
     return [super tableView:tableView heightForHeaderInSection:section];
@@ -852,13 +812,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         int username = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:2]];
         int url = [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:4]];
        
-        int attachments = self.viewModel.database.format == kPasswordSafe ? 0 :
+        int attachments = self.viewModel.database.originalFormat == kPasswordSafe ? 0 :
             [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:5]] + self.tableView.sectionHeaderHeight;
         
-        int customFields = self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 :
+        int customFields = self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1 ? 0 :
         [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:6]] + self.tableView.sectionHeaderHeight;
         
-        int email = self.viewModel.database.format == kPasswordSafe ?
+        int email = self.viewModel.database.originalFormat == kPasswordSafe ?
             [super tableView:tableView heightForRowAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:3]] + self.tableView.sectionHeaderHeight : 0;
 
         
@@ -888,13 +848,13 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         return availableHeight;
     }
     else if (indexPath.section == 5 && indexPath.row == 0) { 
-        return self.viewModel.database.format == kPasswordSafe ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
+        return self.viewModel.database.originalFormat == kPasswordSafe ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
     }
     else if (indexPath.section == 6 && indexPath.row == 0) { 
-        return self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1 ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
+        return self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1 ? 0 : [super tableView:tableView heightForRowAtIndexPath:indexPath];
     }
     else if (indexPath.section == 3 && indexPath.row == 0) { 
-        return self.viewModel.database.format == kPasswordSafe ? [super tableView:tableView heightForRowAtIndexPath:indexPath] : 0;
+        return self.viewModel.database.originalFormat == kPasswordSafe ? [super tableView:tableView heightForRowAtIndexPath:indexPath] : 0;
     }
     else {
         return [super tableView:tableView heightForRowAtIndexPath:indexPath];
@@ -914,16 +874,17 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     }];
 }
 
-- (void)onAttachmentsChanged:(Node*)node attachments:(NSArray<UiAttachment*>*)attachments {
+- (void)onAttachmentsChanged:(Node*)node attachments:(NSDictionary<NSString*, DatabaseAttachment*>*)attachments {
     Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
     [self addHistoricalNode:clonedOriginalNodeForHistory]; 
     
     
 
+    [self.record.fields.attachments removeAllObjects];
+    [self.record.fields.attachments addEntriesFromDictionary:attachments];
+
     [self.record touch:YES touchParents:NO];
 
-    [self.viewModel.database setNodeAttachments:node attachments:attachments];
-    
     [self sync:^(BOOL userCancelled, NSError *error) {
         if (userCancelled) {
             [self.navigationController popToRootViewControllerAnimated:YES];
@@ -1076,7 +1037,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
             vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
                 [self dismissViewControllerAnimated:YES completion:nil];
                 if(response) {
-                    BOOL appendToNotes = self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1;
+                    BOOL appendToNotes = self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1;
                     Node* clonedOriginalNodeForHistory = [self.record cloneForHistory];
                     
                     BOOL success = [self.record setTotpWithString:string
@@ -1103,7 +1064,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
                    
                    BOOL steam = response == 2;
             
-                   BOOL appendToNotes = self.viewModel.database.format == kPasswordSafe || self.viewModel.database.format == kKeePass1;
+                   BOOL appendToNotes = self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1;
                    
                    BOOL success = [self.record setTotpWithString:text
                                                 appendUrlToNotes:appendToNotes
@@ -1188,7 +1149,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     self.record.fields.email = trim(self.textFieldEmail.text);
     
     if (self.editingNewRecord) {
-        [self.parentGroup addChild:self.record keePassGroupTitleRules:NO];
+        [self.viewModel addItem:self.parentGroup item:self.record];
     }
     else { 
         [self addHistoricalNode:originalNodeForHistory];
@@ -1197,40 +1158,29 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
     
     
     
-    if(self.userSelectedNewCustomIcon) {
-        NSData *data = UIImagePNGRepresentation(self.userSelectedNewCustomIcon);
-        [self.viewModel.database setNodeCustomIcon:self.record data:data rationalize:YES];
-    }
-    else if(self.userSelectedNewExistingCustomIconId) {
-        self.record.customIconUuid = self.userSelectedNewExistingCustomIconId;
-    }
-    else if(self.userSelectedNewIconIndex) {
-        if(self.userSelectedNewIconIndex.intValue == -1) {
-            self.record.iconId = @(0); 
-        }
-        else {
-            self.record.iconId = self.userSelectedNewIconIndex;
-        }
-        self.record.customIconUuid = nil;
+    BOOL userSetIconIsSameAsRecordIcon = (self.record.icon == nil && self.userSelectedNodeIcon == nil) || (self.record.icon != nil && [self.record.icon isEqual:self.userSelectedNodeIcon]);
+
+    if(!userSetIconIsSameAsRecordIcon) {
+        self.record.icon = self.userSelectedNodeIcon;
     }
     else if(self.editingNewRecord) {
         
         
         
         if(SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.viewModel.metadata.tryDownloadFavIconForNewRecord &&
-           (self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4)) {
+           (self.viewModel.database.originalFormat == kKeePass || self.viewModel.database.originalFormat == kKeePass4)) {
             NSString* urlHint = trim(self.textFieldUrl.text);
             if(!urlHint.length) {
                 urlHint = trim(self.textFieldTitle.text);
             }
             
             self.sni = [[SetNodeIconUiHelper alloc] init];
-            self.sni.customIcons = self.viewModel.database.customIcons;
+            self.sni.customIconPool = self.viewModel.database.customIconPool;
             
             [self.sni expressDownloadBestFavIcon:urlHint completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
                 if(userSelectedNewCustomIcon) {
                     NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
-                    [self.viewModel.database setNodeCustomIcon:self.record data:data rationalize:YES];
+                    self.record.icon = [NodeIcon withCustom:data];
                 }
                 
                 [self sync:completion];
@@ -1250,9 +1200,7 @@ static NSArray<UiAttachment*>* getUiAttachments(Node* record, NSArray<DatabaseAt
         
         if(!error) {
             self.editingNewRecord = NO;
-            self.userSelectedNewCustomIcon = nil;
-            self.userSelectedNewIconIndex = nil;
-            self.userSelectedNewExistingCustomIconId = nil;
+            self.userSelectedNodeIcon = nil;
         }
                 
         dispatch_async(dispatch_get_main_queue(), ^(void) {

@@ -10,6 +10,7 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "BrowseTableViewCellHelper.h"
+#import "DatabaseSearchAndSorter.h"
 
 @interface SelectDestinationGroupController ()
 
@@ -39,12 +40,14 @@
     self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.viewModel tableView:self.tableView];
 }
 
-
 - (void)refresh {
-    self.items = [self.currentGroup filterChildren:NO predicate:^BOOL(Node * _Nonnull node) {
-        return node.isGroup;
-    }];
-
+    DatabaseSearchAndSorter *sorter = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
+                                                                     browseSortField:self.viewModel.metadata.browseSortField
+                                                                          descending:self.viewModel.metadata.browseSortOrderDescending
+                                                                   foldersSeparately:YES];
+    
+    self.items = [sorter sortItemsForBrowse:self.currentGroup.childGroups];
+    
     self.buttonMove.enabled = [self moveOfItemsIsValid:self.currentGroup subgroupsValid:NO];
     
     [self.tableView reloadData];
@@ -114,10 +117,6 @@
 
 
 #pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.items.count;

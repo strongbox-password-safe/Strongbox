@@ -58,7 +58,10 @@ const static NSUInteger kSectionUuidIdx = 4;
     [self.tableView registerNib:[UINib nibWithNibName:kGenericBasicCellId bundle:nil] forCellReuseIdentifier:kGenericBasicCellId];
 
     self.customData = [[MutableOrderedDictionary alloc] init];
-    [self.customData addAll:self.item.fields.customData];
+    NSArray* sortedKeys = [self.item.fields.customData.allKeys sortedArrayUsingComparator:finderStringComparator];
+    for (NSString* key in sortedKeys) {
+        [self.customData addKey:key andValue:self.item.fields.customData[key]];
+    }
     
     self.notes = self.item.isGroup ? self.item.fields.notes : @"";
     
@@ -128,7 +131,7 @@ const static NSUInteger kSectionUuidIdx = 4;
         self.dates[NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")] = self.item.fields.modified.friendlyDateString;
     }
 
-    if ( self.model.database.format == kKeePass4 || self.model.database.format == kKeePass ) {
+    if ( self.model.database.originalFormat == kKeePass4 || self.model.database.originalFormat == kKeePass ) {
         if (self.item.fields.modified) {
             self.dates[NSLocalizedString(@"item_details_metadata_location_changed_field_title", @"Location Changed")] = self.item.fields.locationChanged.friendlyDateString;
         }

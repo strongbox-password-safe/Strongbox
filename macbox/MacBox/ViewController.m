@@ -24,9 +24,8 @@
 #import "KeyFileParser.h"
 #import "ProgressWindow.h"
 #import "SelectPredefinedIconController.h"
-#import "KeePassPredefinedIcons.h"
 #import "MacKeePassHistoryViewController.h"
-#import "MacNodeIconHelper.h"
+#import "NodeIconHelper.h"
 #import "OTPToken+Generation.h"
 #import "MBProgressHUD.h"
 #import "CustomFieldTableCellView.h"
@@ -53,9 +52,11 @@
 #import "AutoFillWormhole.h"
 #import "QuickTypeRecordIdentifier.h"
 #import "SecretStore.h"
+#import "OutlineView.h"
 
-static const int kMaxRecommendCustomIconSize = 128*1024;
-static const int kMaxCustomIconDimension = 256;
+
+
+
 static const CGFloat kExpiredOutlineViewCellAlpha = 0.35f;
 
 static NSString* const kPasswordCellIdentifier = @"CustomFieldValueCellIdentifier";
@@ -94,7 +95,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property (weak) IBOutlet NSButton *buttonToggleQuickViewPanel;
 @property (weak) IBOutlet ClickableImageView *imageViewGroupDetails;
 @property (weak) IBOutlet NSTableView *tableViewSummary;
-@property (weak) IBOutlet NSOutlineView *outlineView;
+@property (weak) IBOutlet OutlineView *outlineView;
 @property (weak) IBOutlet NSTabView *tabViewLockUnlock;
 @property (weak) IBOutlet NSTabView *tabViewRightPane;
 @property (weak) IBOutlet NSButton *buttonCreateGroup;
@@ -119,7 +120,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property (weak) IBOutlet NSView *containerViewForEnterMasterCredentials;
 @property (weak) IBOutlet NSView *attachmentsRow;
 @property (weak) IBOutlet NSTableView *attachmentsTable;
-@property NSDictionary<NSNumber*, NSImage*> *attachmentsIconCache;
+@property NSDictionary<NSString*, NSImage*> *attachmentsIconCache;
 @property (weak) IBOutlet NSView *expiresRow;
 @property (weak) IBOutlet NSTextField *labelExpires;
 
@@ -132,7 +133,8 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 
 
-@property NSArray* attachments;
+@property NSArray<NSString*>* sortedAttachmentsFilenames;
+@property NSDictionary<NSString*, DatabaseAttachment*>* attachments;
 
 @property (weak, nonatomic) ViewModel* model;
 @property BOOL isPromptingAboutUnderlyingFileChange;
@@ -197,9 +199,13 @@ static NSImage* kStrongBox256Image;
 
     [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeRequestId
                                          listener:^(id messageObject) {
-        if ( self.model && !self.model.locked ) {
+        if ( self.model && !self.model.locked && messageObject) {
             NSDictionary *dict = (NSDictionary*)messageObject;
             NSString* json = dict[@"id"];
+            if (!json) {
+                return;
+            }
+            
             QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
             
             if( identifier && self.model.databaseMetadata && [self.model.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
@@ -212,7 +218,7 @@ static NSImage* kStrongBox256Image;
                 
                 
                 DatabaseModel* model = self.model.database;
-                Node* node = [model.rootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
+                Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
                     return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
                 }];
 
@@ -534,6 +540,15 @@ static NSImage* kStrongBox256Image;
     self.outlineView.delegate = self;
     self.outlineView.dataSource = self;
     
+    __weak ViewController* weakSelf = self;
+    self.outlineView.onEnterKey = ^{
+        [weakSelf outlineViewOnEnterKey];
+    };
+    
+    self.outlineView.onDeleteKey = ^{
+        [weakSelf outlineViewOnDeleteKey];
+    };
+    
     [self bindColumnsToSettings];
 }
 
@@ -631,7 +646,7 @@ static NSImage* kStrongBox256Image;
 
 
 - (NSImage * )getIconForNode:(Node *)vm large:(BOOL)large {
-    return [MacNodeIconHelper getIconForNode:self.model.database vm:vm large:large];
+    return [NodeIconHelper getIconForNode:vm predefinedIconSet:kKeePassIconSetClassic format:self.model.format large:large];
 }
 
 - (void)onDeleteHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
@@ -745,7 +760,7 @@ static NSImage* kStrongBox256Image;
                     NSLog(@"Got FavIcon on Change URL or New Entry: [%@]", image);
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if(image) {
-                            [self.model setItemIcon:node customImage:image];
+                            [self.model setItemIcon:node image:image];
                         }
                     });
             }];
@@ -989,13 +1004,10 @@ static NSImage* kStrongBox256Image;
         
         
         
-        self.attachments = [it.fields.attachments sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
-            NodeFileAttachment* f1 = obj1;
-            NodeFileAttachment* f2 = obj2;
-            return finderStringCompare(f1.filename, f2.filename);
-        }];
+        self.sortedAttachmentsFilenames = [it.fields.attachments.allKeys sortedArrayUsingComparator:finderStringComparator];
+        self.attachments = it.fields.attachments.copy;
         
-        self.attachmentsRow.hidden = self.model.format == kPasswordSafe || self.attachments.count == 0 || !Settings.sharedInstance.showAttachmentsOnQuickViewPanel;
+        self.attachmentsRow.hidden = self.model.format == kPasswordSafe || self.sortedAttachmentsFilenames.count == 0 || !Settings.sharedInstance.showAttachmentsOnQuickViewPanel;
         [self.attachmentsTable reloadData];
     }
 }
@@ -1372,6 +1384,18 @@ static NSImage* kStrongBox256Image;
     }
 }
 
+- (void)outlineViewOnEnterKey {
+    Node* item = [self getCurrentSelectedItem];
+    
+    if (item) {
+        [self openItemDetails:item newEntry:NO];
+    }
+}
+
+- (void)outlineViewOnDeleteKey {
+    [self onDelete:nil];
+}
+
 
 
 - (NSArray<Node*> *)getItems:(Node*)parentGroup {
@@ -1488,7 +1512,7 @@ static NSImage* kStrongBox256Image;
 
 - (NSString*)selectedItemSerializationId {
     Node* item = [self getCurrentSelectedItem];
-    return item ? [item getSerializationId:self.model.format != kPasswordSafe] : nil;
+    return [self.model.database getCrossSerializationFriendlyId:item];
 }
 
 - (void)showProgressModal:(NSString*)operationDescription {
@@ -2254,6 +2278,8 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (id)copy:(id)sender {
+    NSLog(@"Copied Items to Pasteboard...");
+    
     NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
     NSArray* selected = [self getSelectedItems];
     
@@ -2307,7 +2333,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (NSArray<NSString*>*)getInternalSerializationIds:(NSArray<Node*>*)nodes {
     return [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [obj getSerializationId:self.model.format != kPasswordSafe];
+        return [self.model.database getCrossSerializationFriendlyId:obj];
     }];
 }
 
@@ -2319,34 +2345,11 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSArray<NSDictionary*>* nodeDictionaries = [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return [obj serialize:serializationPackage];
     }];
-    
-    
-    
-    NSMutableDictionary<NSString*, NSString*> *attachmentsMap = [NSMutableDictionary dictionaryWithCapacity:serializationPackage.usedAttachmentIndices.count];
-    
-    for (NSNumber* index in serializationPackage.usedAttachmentIndices) {
-        DatabaseAttachment* a = self.model.attachments[index.integerValue];
-        NSData* data = [NSData dataWithContentsOfStream:[a getPlainTextInputStream]];
-        NSString* base64 = [data base64EncodedStringWithOptions:kNilOptions];
-        [attachmentsMap setValue:base64 forKey:index.stringValue];
-    }
-    
-    
-    
-    NSMutableDictionary<NSString*, NSString*> *customIconsMap = [NSMutableDictionary dictionaryWithCapacity:serializationPackage.usedCustomIcons.count];
-    
-    for(NSUUID* icon in serializationPackage.usedCustomIcons) {
-        NSData* iconData = self.model.customIcons[icon];
-        NSString* iconB64 = [iconData base64EncodedStringWithOptions:kNilOptions];
-        [customIconsMap setValue:iconB64 forKey:icon.UUIDString];
-    }
-    
+            
     
     
     NSDictionary *serialized = @{ @"sourceFormat" : @(self.model.format),
-                                  @"nodes" : nodeDictionaries,
-                                  @"attachmentsMap" : attachmentsMap,
-                                  @"customIconsMap" : customIconsMap };
+                                  @"nodes" : nodeDictionaries };
     
     
     
@@ -2579,8 +2582,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
            completion:^(BOOL yesNo) {
                if(yesNo) {
                    for (Node* incompatible in incompatibles) {
-                       incompatible.iconId = nil;
-                       incompatible.customIconUuid = nil;
+                       incompatible.icon = nil;
                        [incompatible.fields.attachments removeAllObjects];
                        [incompatible.fields removeAllCustomFields];
                    }
@@ -2607,7 +2609,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [all addObjectsFromArray:nodes];
     
     NSArray<Node*>* incompatibles = [all filter:^BOOL(Node * _Nonnull obj) {
-        BOOL customIcon = obj.customIconUuid != nil;
+        BOOL customIcon = obj.icon.isCustom;
         BOOL tooManyAttachments = obj.fields.attachments.count > 1;
         BOOL customFields = obj.fields.customFields.count;
         
@@ -2627,11 +2629,17 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
            completion:^(BOOL yesNo) {
                if(yesNo) {
                    for (Node* incompatible in incompatibles) {
-                       incompatible.customIconUuid = nil;
-                       NodeFileAttachment* firstAttachment = incompatible.fields.attachments.firstObject;
-                       [incompatible.fields.attachments removeAllObjects];
-                       if(firstAttachment) {
-                           [incompatible.fields.attachments addObject:firstAttachment];
+                       incompatible.icon = nil;
+                       NSString* firstAttachmentFilename = incompatible.fields.attachments.allKeys.firstObject;
+                       if(firstAttachmentFilename) { 
+                           DatabaseAttachment* dbA = incompatible.fields.attachments[firstAttachmentFilename];
+                           
+                           [incompatible.fields.attachments removeAllObjects];
+                           
+                           incompatible.fields.attachments[firstAttachmentFilename] = dbA;
+                       }
+                       else {
+                           [incompatible.fields.attachments removeAllObjects];
                        }
                        [incompatible.fields removeAllCustomFields];
                    }
@@ -2679,8 +2687,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
            completion:^(BOOL yesNo) {
                if(yesNo) {
                    for (Node* incompatible in incompatibles) {
-                       incompatible.iconId = nil;
-                       incompatible.customIconUuid = nil;
+                       incompatible.icon = nil;
                        [incompatible.fields.attachments removeAllObjects];
                        [incompatible.fields removeAllCustomFields];
                    }
@@ -2722,17 +2729,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                 nodes:(NSArray<Node*>*)nodes
       destinationItem:(Node*)destinationItem
          sourceFormat:(DatabaseFormat)sourceFormat {
-    NSDictionary<NSString*, NSString*>* attachmentsMap = serialized[@"attachmentsMap"];
-    NSMutableDictionary<NSString*, NSString*> *customIconsMap = serialized[@"customIconsMap"];
-    
-    [self rebuildAttachments:nodes attachmentsMap:attachmentsMap];
-    
-    
-
-    [self rebuildCustomIcons:nodes customIconsMap:customIconsMap];
-    
-    
-    
     BOOL keePassGroupTitleRules = self.model.format != kPasswordSafe;
     
     BOOL success = [self.model addChildren:nodes parent:destinationItem keePassGroupTitleRules:keePassGroupTitleRules];
@@ -2743,56 +2739,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
               window:self.view.window
           completion:nil];
     }
-}
-
-- (void)rebuildCustomIcons:(NSArray<Node*>*)nodes customIconsMap:(NSDictionary<NSString*, NSString*>*)customIconsMap {
-    for (Node* node in nodes) {
-        [self rebuildCustomIconsForSerializedNode:node customIconsMap:customIconsMap];
-    }
-}
-
-- (void)rebuildCustomIconsForSerializedNode:(Node*)node customIconsMap:(NSDictionary<NSString*, NSString*>*)customIconsMap {
-    NSUUID* original = node.customIconUuid;
-    node.customIconUuid = nil;
-
-    if(original) {
-        NSString* b64Data = customIconsMap[original.UUIDString];
-        NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
-        
-        [self.model setItemIcon:node index:nil existingCustom:nil custom:data rationalize:NO batchUpdate:NO]; 
-    }
-    
-    
-    
-    [self rebuildCustomIcons:node.children customIconsMap:customIconsMap];
-}
-
-- (void)rebuildAttachments:(NSArray<Node*>*)nodes attachmentsMap:(NSDictionary<NSString*, NSString*>*)attachmentsMap {
-    for (Node* node in nodes) {
-        [self rebuildAttachmentsForSerializedNode:node attachmentsMap:attachmentsMap];
-    }
-}
-
-- (void)rebuildAttachmentsForSerializedNode:(Node*)node attachmentsMap:(NSDictionary<NSString*, NSString*>*)attachmentsMap {
-    
-    
-    NSArray* originalAttachments = node.fields.attachments.copy;
-    [node.fields.attachments removeAllObjects];
-    
-    for (NodeFileAttachment* attachment in originalAttachments) {
-        NSString* b64Data = attachmentsMap[@(attachment.index).stringValue];
-        NSData* data = [[NSData alloc] initWithBase64EncodedString:b64Data options:kNilOptions];
-        
-        NSInputStream* stream  = [NSInputStream inputStreamWithData:data];
-        DatabaseAttachment* dbA = [[DatabaseAttachment alloc] initWithStream:stream protectedInMemory:YES compressed:YES];
-        UiAttachment* uiAttachment = [UiAttachment attachmentWithFilename:attachment.filename dbAttachment:dbA];
-    
-        [self.model addItemAttachment:node attachment:uiAttachment rationalize:NO]; 
-    }
-    
-    
-    
-    [self rebuildAttachments:node.children attachmentsMap:attachmentsMap];
 }
 
 
@@ -3068,10 +3014,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return !self.model.locked && (item == nil || ((self.model.format == kKeePass || self.model.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
     }
     else if (theAction == @selector(onPreviewQuickViewAttachment:)) {
-        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.attachments.count > 0 && self.attachmentsTable.selectedRow != -1;
+        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
     }
     else if (theAction == @selector(onSaveQuickViewAttachmentAs:)) {
-        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.attachments.count > 0 && self.attachmentsTable.selectedRow != -1;
+        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
     }
     
     return YES;
@@ -3099,7 +3045,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (IBAction)onCopyAsCsv:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
     
-    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.model.rootGroup] encoding:NSUTF8StringEncoding];
+    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.model.database] encoding:NSUTF8StringEncoding];
     
     [[NSPasteboard generalPasteboard] setString:newStr forType:NSStringPboardType];
 }
@@ -3263,7 +3209,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return dictionary.count;
     }
     else if (tableView == self.attachmentsTable) {
-        return self.attachments.count;
+        return self.sortedAttachmentsFilenames.count;
     }
     else {
         return self.customFields.count;
@@ -3286,26 +3232,26 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return cell;
     }
     else if (tableView == self.attachmentsTable) {
-        NodeFileAttachment* attachment = self.attachments[row];
-        DatabaseAttachment* dbAttachment = self.model.attachments[attachment.index];
+        NSString* filename = self.sortedAttachmentsFilenames[row];
+        DatabaseAttachment* dbAttachment = self.attachments[filename];
 
         BOOL isFileNameColumn = [tableColumn.identifier isEqualToString:@"filename"];
         NSString* cellId = isFileNameColumn ? @"AttachmentFileNameCellIdentifier" : @"AttachmentFileSizeCellIdentifier";
         NSTableCellView* cell = [self.attachmentsTable makeViewWithIdentifier:cellId owner:nil];
 
-        cell.textField.stringValue = isFileNameColumn ? attachment.filename : [NSByteCountFormatter stringFromByteCount:dbAttachment.length countStyle:NSByteCountFormatterCountStyleFile];
+        cell.textField.stringValue = isFileNameColumn ? filename : [NSByteCountFormatter stringFromByteCount:dbAttachment.length countStyle:NSByteCountFormatterCountStyleFile];
         
         if(self.attachmentsIconCache == nil) {
             self.attachmentsIconCache = @{};
             [self buildAttachmentsIconCache];
         }
         
-        NSImage* cachedIcon = self.attachmentsIconCache[@(attachment.index)];
+        NSImage* cachedIcon = self.attachmentsIconCache[dbAttachment.digestHash];
         if(cachedIcon && Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel) {
             cell.imageView.image = cachedIcon;
         }
         else {
-            NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:attachment.filename.pathExtension];
+            NSImage* img = [[NSWorkspace sharedWorkspace] iconForFileType:filename.pathExtension];
             cell.imageView.image = img;
         }
 
@@ -3338,7 +3284,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)buildAttachmentsIconCache {
-    NSArray *workingCopy = [self.model.attachments copy];
+    NSArray *workingCopy = self.model.database.attachmentPool;
     NSMutableDictionary *tmp = @{}.mutableCopy;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
@@ -3384,16 +3330,11 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     if(idx == -1) {
         return nil;
     }
-    NodeFileAttachment* nodeAttachment = self.attachments[idx];
+    NSString* filename = self.sortedAttachmentsFilenames[idx];
     
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        return nil;
-    }
+    DatabaseAttachment* dbAttachment = self.attachments[filename];
     
-    DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
-    
-    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:nodeAttachment.filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     [StreamUtils pipeFromStream:[dbAttachment getPlainTextInputStream] to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
     
     NSURL* url = [NSURL fileURLWithPath:f];
@@ -3416,32 +3357,27 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (IBAction)onPreviewQuickViewAttachment:(id)sender {
     NSInteger selected = self.attachmentsTable.selectedRow;
-    if(selected >= 0 && selected < self.attachments.count) {
+    if(selected >= 0 && selected < self.sortedAttachmentsFilenames.count) {
         [QLPreviewPanel.sharedPreviewPanel makeKeyAndOrderFront:self];
     }
 }
 
 - (IBAction)onSaveQuickViewAttachmentAs:(id)sender {
     NSInteger selected = self.attachmentsTable.selectedRow;
-    if(selected < 0 || selected >= self.attachments.count) {
+    if(selected < 0 || selected >= self.sortedAttachmentsFilenames.count) {
         return;
     }
     
-    NodeFileAttachment* nodeAttachment = self.attachments[selected];
-    
-    if(nodeAttachment.index < 0 || nodeAttachment.index >= self.model.attachments.count) {
-        NSLog(@"Node Attachment out of bounds of Database Attachments. [%d]", nodeAttachment.index);
-        return;
-    }
+    NSString* filename = self.sortedAttachmentsFilenames[selected];
     
     
     
     NSSavePanel * savePanel = [NSSavePanel savePanel];
-    savePanel.nameFieldStringValue = nodeAttachment.filename;
+    savePanel.nameFieldStringValue = filename;
     
     [savePanel beginSheetModalForWindow:self.view.window completionHandler:^(NSInteger result){
         if (result == NSFileHandlingPanelOKButton) {
-            DatabaseAttachment* dbAttachment = [self.model.attachments objectAtIndex:nodeAttachment.index];
+            DatabaseAttachment* dbAttachment = self.attachments[filename];
             NSInputStream* inStream = [dbAttachment getPlainTextInputStream];
             NSOutputStream* outStream = [NSOutputStream outputStreamToFileAtPath:savePanel.URL.path append:NO];
 
@@ -3469,14 +3405,14 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     __weak ViewController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
-    self.selectPredefinedIconController.customIcons = self.model.customIcons;
+    self.selectPredefinedIconController.customIcons = self.model.customIcons.allObjects;
     self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
-    self.selectPredefinedIconController.onSelectedItem = ^(NSNumber * _Nullable index, NSData * _Nullable data, NSUUID * _Nullable existingCustom, BOOL showFindFavIcons) {
+    self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) { 
         if(showFindFavIcons) {
             [weakSelf showFindFavIconsForItem:item];
         }
         else {
-            onSelectedNewIcon(weakSelf.model, item, index, data, existingCustom, weakSelf.view.window);
+            onSelectedNewIcon(weakSelf.model, item, icon, weakSelf.view.window);
         }
     };
 
@@ -3484,59 +3420,59 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
 }
 
-void onSelectedNewIcon(ViewModel* model, Node* item, NSNumber* index, NSData* data, NSUUID* existingCustom, NSWindow* window) {
-    if(data) {
-        NSImage* icon = [[NSImage alloc] initWithData:data];
-        if(icon) {
-            if(data.length > kMaxRecommendCustomIconSize) {
-                NSImage* rescaled = scaleImage(icon, CGSizeMake(kMaxCustomIconDimension, kMaxCustomIconDimension));
-                NSInteger saving = 0;
-                NSData *compressed;
-                
-                if (rescaled.isValid) {
-                    CGImageRef cgRef = [rescaled CGImageForProposedRect:NULL context:nil hints:nil];
-                    NSBitmapImageRep *newRep = [[NSBitmapImageRep alloc] initWithCGImage:cgRef];
-                    compressed = [newRep representationUsingType:NSBitmapImageFileTypePNG properties:@{ }];
-                    
-                    saving = data.length - compressed.length;
-                    if(saving < 0) {
-                        NSLog(@"Not much saving from PNG trying JPG...");
-                        compressed = [newRep representationUsingType:NSBitmapImageFileTypeJPEG properties:@{ }];
-                        saving = data.length - compressed.length;
-                    }
-                }
-                
-                if(saving > (32 * 1024)) {
-                    NSString* savingStr = [[[NSByteCountFormatter alloc] init] stringFromByteCount:saving];
-                    
-                    NSString* loc = NSLocalizedString(@"mac_large_image_as_icon_use_scaled_down_version_fmt", @"This is a large image to use as an icon. Would you like to use a scaled down version to save %@?");
-                    
-                    NSString* message = [NSString stringWithFormat:loc, savingStr];
-                    [Alerts yesNo:message window:window completion:^(BOOL yesNo) {
-                        if(yesNo) {
-                            [model setItemIcon:item index:index existingCustom:existingCustom custom:compressed];
-                        }
-                        else {
-                            [model setItemIcon:item index:index existingCustom:existingCustom custom:data];
-                        }
-                    }];
-                }
-                else {
-                    [model setItemIcon:item index:index existingCustom:existingCustom custom:data];
-                }
-            }
-            else {
-                [model setItemIcon:item index:index existingCustom:existingCustom custom:data];
-            }
-        }
-        else {
-            NSString* loc = NSLocalizedString(@"mac_not_a_valid_image_file", @"This is not a valid image file.");
-            [Alerts info:loc window:window];
-        }
-    }
-    else {
-        [model setItemIcon:item index:index existingCustom:existingCustom custom:nil];
-    }
+void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSWindow* window) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        [model setItemIcon:item icon:selectedIcon];
+
 }
 
 - (IBAction)onViewItemHistory:(id)sender {

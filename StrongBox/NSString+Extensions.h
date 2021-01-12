@@ -12,8 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSString (Extensions)
 
-@property (readonly) NSData* sha1;
-@property (readonly) NSData* sha256;
+@property (readonly) NSData* sha1Data;
+@property (readonly) NSData* sha256Data;
 
 @property (readonly) NSString* trimmed;
 @property (readonly) NSArray<NSString*>* lines;

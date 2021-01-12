@@ -22,7 +22,8 @@
 #import "NSDate+Extensions.h"
 #import "FileManager.h"
 #import "DatabaseModel.h"
-#import "DatabaseSynchronizer.h"
+#import "DatabaseMerger.h"
+#import "Serializator.h"
 
 
 
@@ -439,13 +440,13 @@
     
     
     
-    [DatabaseModel fromUrl:localUrl
+    [Serializator fromUrl:localUrl
                        ckf:nil 
                     config:DatabaseModelConfig.defaults
                 completion:^(BOOL userCancelled, DatabaseModel * _Nullable mine, const NSError * _Nullable error) {
         
         
-        [DatabaseModel fromUrl:remoteUrl
+        [Serializator fromUrl:remoteUrl
                            ckf:nil 
                         config:DatabaseModelConfig.defaults
                     completion:^(BOOL userCancelled, DatabaseModel * _Nullable theirs, const NSError * _Nullable error) {
@@ -459,7 +460,7 @@
 }
 
 - (void)synchronizeModels:(DatabaseModel*)mine theirs:(DatabaseModel*)theirs {
-    DatabaseSynchronizer *synchronzier = [DatabaseSynchronizer newSynchronizerFor:mine theirs:theirs];
+    DatabaseMerger *synchronzier = [DatabaseMerger mergerFor:mine theirs:theirs];
     
     
 }

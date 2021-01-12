@@ -147,6 +147,13 @@
     });
 }
 
++ (void)areYouSure:(UIViewController *)viewController message:(NSString *)message action:(void (^)(BOOL response))action {
+    [Alerts yesNo:viewController
+            title:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
+          message:message
+           action:action];
+}
+
 + (void)yesNo:(UIViewController *)viewController
         title:(NSString *)title
       message:(NSString *)message
@@ -200,7 +207,11 @@
 }
 
 + (void)error:(UIViewController *)viewController error:(NSError *)error {
-    [Alerts error:viewController title:NSLocalizedString(@"generic_error", @"Error") error:error];
+    [Alerts error:viewController error:error completion:nil];
+}
+
++ (void)error:(UIViewController *)viewController error:(const NSError *)error completion:(void (^)(void))completion {
+    [Alerts error:viewController title:NSLocalizedString(@"generic_error", @"Error") error:error completion:completion];
 }
 
 + (void)error:(UIViewController *)viewController

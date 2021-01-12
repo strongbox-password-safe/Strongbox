@@ -16,6 +16,7 @@
 #import "ClipboardManager.h"
 #import "Utils.h"
 #import "NSDate+Extensions.h"
+#import "Serializator.h"
 
 @interface Delegate : NSObject <CHCSVParserDelegate, UIActivityItemSource>
 
@@ -55,7 +56,7 @@
         [self reloadDataAnimated:YES];
     }
     else {
-        if (!( self.viewModel.database.format == kKeePass || self.viewModel.database.format == kKeePass4 )) {
+        if (!( self.viewModel.database.originalFormat == kKeePass || self.viewModel.database.originalFormat == kKeePass4 )) {
             [self cell:self.cellXml setHidden:YES];
         }
         
@@ -170,7 +171,7 @@
 }
 
 - (void)copyCsv {
-    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database.rootGroup] encoding:NSUTF8StringEncoding];
+    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database] encoding:NSUTF8StringEncoding];
 
     [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:newStr];
     
@@ -210,7 +211,7 @@
 }
 
 - (void)exportCsvByEmail {
-    NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database.rootGroup];
+    NSData *newStr = [Csv getSafeAsCsv:self.viewModel.database];
     NSString* attachmentName = [NSString stringWithFormat:@"%@.csv", self.viewModel.metadata.nickName];
     [self composeEmail:attachmentName mimeType:@"text/csv" data:newStr nickname:self.viewModel.metadata.nickName];
 }
@@ -236,7 +237,7 @@
                 return;
             }
             
-            NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.viewModel.database.format];
+            NSString* likelyExtension = [Serializator getDefaultFileExtensionForFormat:self.viewModel.database.originalFormat];
             NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
             NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName, appendExtension];
             
@@ -247,7 +248,7 @@
         }];
     }
     else {
-        NSString* likelyExtension = [DatabaseModel getDefaultFileExtensionForFormat:self.metadata.likelyFormat];
+        NSString* likelyExtension = [Serializator getDefaultFileExtensionForFormat:self.metadata.likelyFormat];
         NSString* appendExtension = self.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
         NSString *attachmentName = [NSString stringWithFormat:@"%@-%@-%@", self.metadata.fileName, self.backupItem.backupCreatedDate.iso8601DateString, appendExtension];
 

@@ -7,15 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NodeFileAttachment.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef BOOL (^NodeAttachmentCompareBlock)(NodeFileAttachment* a, NodeFileAttachment* b);
-
 @interface SyncComparisonParams : NSObject
-
-@property NodeAttachmentCompareBlock compareNodeAttachmentBlock;
 
 @end
 

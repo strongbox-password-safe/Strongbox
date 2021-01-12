@@ -42,6 +42,8 @@
 @property BOOL currentYubiKeySlot2IsBlocking;
 @property NSString* currentYubiKeySerial;
 
+@property BOOL hasSetInitialFocus;
+
 @end
 
 @implementation ManualCredentialsEntry
@@ -74,6 +76,11 @@
     NSButton *closeButton = [window standardWindowButton:NSWindowCloseButton];
 
     [closeButton setEnabled:NO];
+    
+    if (!self.hasSetInitialFocus) {
+        self.hasSetInitialFocus = YES;
+        [self.textFieldPassword becomeFirstResponder];
+    }
 }
 
 - (void)bindUi {

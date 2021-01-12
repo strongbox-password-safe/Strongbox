@@ -24,6 +24,7 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "NSString+Extensions.h"
 #import "SafeStorageProviderFactory.h"
+#import "Serializator.h"
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
@@ -220,7 +221,7 @@
         return;
     }
     
-    if (![DatabaseModel isValidDatabaseWithPrefix:importedData error:&error] ) {
+    if (![Serializator isValidDatabaseWithPrefix:importedData error:&error] ) {
         [Alerts error:self
                 title:NSLocalizedString(@"sspc_error_invalid_database", @"Invalid Database")
                 error:error];

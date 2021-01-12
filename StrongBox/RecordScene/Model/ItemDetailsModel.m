@@ -9,11 +9,13 @@
 #import "ItemDetailsModel.h"
 #import "Utils.h"
 #import "OTPToken+Serialization.h"
+#import "MutableOrderedDictionary.h"
+#import "NodeIcon.h"
 
 @interface ItemDetailsModel()
 
 @property NSMutableArray<CustomFieldViewModel*>* mutableCustomFields;
-@property NSMutableArray<UiAttachment*>* mutableAttachments;
+@property MutableOrderedDictionary<NSString*, DatabaseAttachment*>* mutableAttachments;
 @property NSMutableSet<NSString*>* mutableTags;
 
 @end
@@ -29,10 +31,10 @@
                       expires:(NSDate*)expires
                          tags:(NSSet<NSString*>*)tags
                          totp:(OTPToken *)totp
-                         icon:(SetIconModel*)icon
+                         icon:(NodeIcon*)icon
                  customFields:(NSArray<CustomFieldViewModel *> *)customFields
-                  attachments:(NSArray<UiAttachment *> *)attachments
-                     metadata:(NSArray<ItemMetadataEntry*> *)metadata
+                  attachments:(nonnull NSDictionary<NSString *,DatabaseAttachment *> *)attachments
+                     metadata:(nonnull NSArray<ItemMetadataEntry *> *)metadata
                    hasHistory:(BOOL)hasHistory {
     if (self = [super init]) {
         self.title = title;
@@ -46,7 +48,12 @@
         self.notes = notes;
         self.icon = icon;
         self.mutableCustomFields = customFields ? [[customFields sortedArrayUsingComparator:customFieldKeyComparator] mutableCopy] : [NSMutableArray array];
-        self.mutableAttachments = attachments ? [[attachments sortedArrayUsingComparator:attachmentNameComparator] mutableCopy] : [NSMutableArray array];
+        
+        self.mutableAttachments = [[MutableOrderedDictionary alloc] init];
+        NSArray<NSString*>* sortedFilenames = [attachments.allKeys sortedArrayUsingComparator:finderStringComparator];
+        for (NSString* filename in sortedFilenames) {
+            self.mutableAttachments[filename] = attachments[filename];
+        }
         
         _metadata = metadata;
         
@@ -68,7 +75,7 @@
                                                                  totp:self.totp
                                                                  icon:self.icon
                                                          customFields:self.customFields
-                                                          attachments:self.attachments
+                                                          attachments:self.attachments.dictionary
                                                              metadata:self.metadata
                                                            hasHistory:self.hasHistory];
 
@@ -112,18 +119,10 @@
 
     
     
-    if(self.icon.customImage) {
+    if (!( ( self.icon == nil && other.icon == nil ) || (self.icon && [self.icon isEqual:other.icon]) )) { 
         return YES; 
     }
-    
-    if(!((self.icon.customUuid == nil && other.icon.customUuid == nil)  || (self.icon.customUuid && other.icon.customUuid && [self.icon.customUuid isEqual:other.icon.customUuid]))) {
-        return YES;
-    }
-    
-    if(!((self.icon.index == nil && other.icon.index == nil) || (self.icon.index && other.icon.index && [self.icon.index isEqual:other.icon.index]))) {
-        return YES;
-    }
-    
+        
     
     
     if(self.customFields.count != other.customFields.count) {
@@ -145,34 +144,29 @@
         return YES;
     }
     
-    for(int i=0;i<self.attachments.count;i++) {
-        UiAttachment* a = self.attachments[i];
-        UiAttachment* b = other.attachments[i];
+    for (NSString* filename in self.attachments.allKeys) {
+        DatabaseAttachment* b = other.attachments[filename];
+        DatabaseAttachment* a = self.attachments[filename];
         
-        if([a.filename compare:b.filename] == NSOrderedSame) {
-            if(![a.dbAttachment.digestHash isEqualToString:b.dbAttachment.digestHash]) {
-                return YES;
-            }
-        }
-        else {
+        if (!b || ![b.digestHash isEqualToString:a.digestHash]) {
             return YES;
         }
     }
-    
+        
     return NO;
 }
 
-- (void)removeAttachmentAtIndex:(NSUInteger)index {
-    [self.mutableAttachments removeObjectAtIndex:index];
+- (void)removeAttachment:(NSString*)filename {
+    [self.mutableAttachments remove:filename];
 }
 
-- (NSUInteger)insertAttachment:(UiAttachment*)attachment {
-    NSUInteger idx = [self.mutableAttachments indexOfObject:attachment
-                                               inSortedRange:NSMakeRange(0, self.mutableAttachments.count)
-                                                     options:NSBinarySearchingInsertionIndex
-                                             usingComparator:attachmentNameComparator];
+- (NSUInteger)insertAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment {
+    NSUInteger idx = [self.mutableAttachments.allKeys indexOfObject:filename
+                                                      inSortedRange:NSMakeRange(0, self.mutableAttachments.count)
+                                                            options:NSBinarySearchingInsertionIndex
+                                                    usingComparator:finderStringComparator];
     
-    [self.mutableAttachments insertObject:attachment atIndex:idx];
+    [self.mutableAttachments insertKey:filename withValue:attachment atIndex:idx];
     
     return idx;
 }
@@ -204,20 +198,13 @@
     return [self.mutableTags.allObjects sortedArrayUsingComparator:finderStringComparator];
 }
 
-- (NSArray<UiAttachment *> *)attachments {
+- (MutableOrderedDictionary<NSString *,DatabaseAttachment *> *)attachments {
     return self.mutableAttachments;
 }
 
 - (NSArray<CustomFieldViewModel *> *)customFields {
     return self.mutableCustomFields;
 }
-
-NSComparator attachmentNameComparator = ^(id  obj1, id  obj2) {
-    UiAttachment* a = obj1;
-    UiAttachment* b = obj2;
-    
-    return finderStringCompare(a.filename, b.filename);
-};
 
 NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     CustomFieldViewModel* a = obj1;
@@ -236,11 +223,13 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     NSInputStream* dataStream = [NSInputStream inputStreamWithData:NSData.data];
     DatabaseAttachment* dbAttachment = [[DatabaseAttachment alloc] initWithStream:dataStream protectedInMemory:YES compressed:YES];
      
-    UiAttachment* a1 = [[UiAttachment alloc] initWithFilename:@"filename.jpg" dbAttachment:dbAttachment];
-    UiAttachment* a2 = [[UiAttachment alloc] initWithFilename:@"document.txt" dbAttachment:dbAttachment];
-    UiAttachment* a3 = [[UiAttachment alloc] initWithFilename:@"abc.pdf" dbAttachment:dbAttachment];
-    UiAttachment* a4 = [[UiAttachment alloc] initWithFilename:@"cool.mpg" dbAttachment:dbAttachment];
-    
+    NSDictionary<NSString*, DatabaseAttachment*>* attachments = @{
+        @"filename.jpg" : dbAttachment,
+        @"document.txt" : dbAttachment,
+        @"abc.pdf" : dbAttachment,
+        @"cool.mpg" : dbAttachment
+    };
+        
     NSArray<ItemMetadataEntry*>* metadata = @[ [ItemMetadataEntry entryWithKey:@"ID" value:NSUUID.UUID.UUIDString copyable:YES],
                                 [ItemMetadataEntry entryWithKey:@"Created" value:@"November 21 at 13:21" copyable:NO],
                                 [ItemMetadataEntry entryWithKey:@"Accessed" value:@"Yesterday at 08:21" copyable:NO],
@@ -262,9 +251,9 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
                                                             expires:nil
                                                                tags:nil
                                                                totp:token
-                                                               icon:[SetIconModel setIconModelWith:@(12) customUuid:nil customImage:nil]
+                                                               icon:[NodeIcon withPreset:12]
                                                        customFields:@[ c1, c2, c3]
-                                                        attachments:@[ a1, a2, a3, a4]
+                                                        attachments:attachments
                                                            metadata:metadata
                                                          hasHistory:YES];
     

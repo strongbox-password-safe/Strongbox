@@ -18,6 +18,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable ValueType)objectForKey:(nonnull KeyType)key;
 - (void)removeObjectForKey:(nonnull id<NSCopying>)forKey;
 
+- (id)objectForKeyedSubscript:(KeyType)key;
+- (void)setObject:(ValueType)obj forKeyedSubscript:(KeyType)key;
+
+- (void)removeAllObjects;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
 @property NSString* filename;
-@property uint32_t index;
+@property NSInteger index;
 
 @end
 

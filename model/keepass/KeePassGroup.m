@@ -144,7 +144,7 @@
         }
     }
 
-    if (self.customData && self.customData.orderedDictionary.count) {
+    if (self.customData && self.customData.dictionary.count) {
         if ( ![self.customData writeXml:serializer] ) return NO;
     }
 
@@ -156,11 +156,11 @@
         if ( ![serializer writeElement:kDefaultAutoTypeSequenceElementName text:self.defaultAutoTypeSequence] ) return NO;
     }
     
-    if ( self.enableAutoType ) {
+    if ( self.enableAutoType != nil ) {
         if ( ![serializer writeElement:kEnableAutoTypeElementName boolean:self.enableAutoType.boolValue]) return NO;
     }
     
-    if ( self.enableSearching ) {
+    if ( self.enableSearching != nil ) {
         if ( ![serializer writeElement:kEnableSearchingElementName boolean:self.enableSearching.boolValue]) return NO;
     }
     

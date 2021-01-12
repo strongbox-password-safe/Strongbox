@@ -404,7 +404,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (void)prepareTableViewForEditing {
-    BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4);
+    BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4);
     NSUInteger addCustomFieldIdx = self.model.customFields.count + kSimpleRowCount;
 
     if(self.editing) {
@@ -545,7 +545,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if(section == kSimpleFieldsSectionIdx) {
-        BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4);
+        BOOL showAddCustomFieldRow = self.editing && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4);
         return kSimpleRowCount + (self.model.customFields.count + (showAddCustomFieldRow ? 1 : 0));
     }
     else if (section == kNotesSectionIdx) {
@@ -585,7 +585,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             return CGFLOAT_MIN;
         }
         else if(indexPath.row == kRowEmail) {
-            if(self.databaseModel.database.format != kPasswordSafe || (shouldHideEmpty && !self.model.email.length)) {
+            if(self.databaseModel.database.originalFormat != kPasswordSafe || (shouldHideEmpty && !self.model.email.length)) {
                 return CGFLOAT_MIN;
             }
         }
@@ -634,7 +634,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         }
     }
 #ifndef IS_APP_EXTENSION
-    else if(indexPath.section == kAttachmentsSectionIdx && self.databaseModel.database.format == kPasswordSafe) {
+    else if(indexPath.section == kAttachmentsSectionIdx && self.databaseModel.database.originalFormat == kPasswordSafe) {
         return CGFLOAT_MIN;
     }
     else if(indexPath.section == kMetadataSectionIdx && (self.editing || self.hideMetadataSection)) {
@@ -665,7 +665,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }
 #ifndef IS_APP_EXTENSION
     else if(section == kAttachmentsSectionIdx) {
-        if(self.databaseModel.database.format == kPasswordSafe || (!self.editing && self.model.attachments.count == 0)) {
+        if(self.databaseModel.database.originalFormat == kPasswordSafe || (!self.editing && self.model.attachments.count == 0)) {
             return CGFLOAT_MIN;
         }
     }
@@ -728,7 +728,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         if(indexPath.section == kAttachmentsSectionIdx && indexPath.row > 0) {
-            [self.model removeAttachmentAtIndex:indexPath.row - 1];
+            NSString* filename = self.model.attachments.allKeys[indexPath.row - 1];
+            [self.model removeAttachment:filename];
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
             [self onModelEdited];
         }
@@ -758,15 +759,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (void)promptToAddAttachment {
-    NSArray* usedFilenames = [self.model.attachments map:^id _Nonnull(UiAttachment *obj, NSUInteger idx) {
-        return obj.filename;
-    }];
+    NSArray* usedFilenames = self.model.attachments.allKeys;
     
     [AddAttachmentHelper.sharedInstance beginAddAttachmentUi:self
                                                usedFilenames:usedFilenames
-                                                       onAdd:^(UiAttachment * _Nonnull attachment) {
-                                                           [self onAddAttachment:attachment];
-                                                       }];
+                                                       onAdd:^(NSString * _Nonnull filename, DatabaseAttachment * _Nonnull databaseAttachment) {
+        [self onAddAttachment:filename attachment:databaseAttachment];
+    }];
 }
 
 - (void)launchAttachmentPreview:(NSUInteger)index {
@@ -780,10 +779,11 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [self presentViewController:v animated:YES completion:nil];
 }
 
-- (void)onAddAttachment:(UiAttachment*)attachment {
+- (void)onAddAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment {
     NSLog(@"Adding new Attachment: [%@]", attachment);
     
-    NSUInteger idx = [self.model insertAttachment:attachment];
+    NSUInteger idx = [self.model insertAttachment:filename attachment:attachment];
+    
     if (@available(iOS 11.0, *)) { 
         [self.tableView performBatchUpdates:^{
             [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:idx + 1 inSection:kAttachmentsSectionIdx]] 
@@ -805,11 +805,12 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (id <QLPreviewItem>)previewController:(QLPreviewController *)controller previewItemAtIndex:(NSInteger)index {
-    UiAttachment* attachment = [self.model.attachments objectAtIndex:index];
+    NSString* filename = self.model.attachments.allKeys[index];
+    DatabaseAttachment* attachment = self.model.attachments[filename];
     
-    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:attachment.filename];
+    NSString* f = [FileManager.sharedInstance.tmpAttachmentPreviewPath stringByAppendingPathComponent:filename];
     
-    NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+    NSInputStream* attStream = [attachment getPlainTextInputStream];
     [StreamUtils pipeFromStream:attStream to:[NSOutputStream outputStreamToFileAtPath:f append:NO]];
 
     NSURL* url = [NSURL fileURLWithPath:f];
@@ -1014,44 +1015,33 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (UIImage*)getIconImageFromModel {
-    if(self.databaseModel.database.format == kPasswordSafe) {
+    if(self.databaseModel.database.originalFormat == kPasswordSafe) {
         return nil;
     }
-    
-    if(self.model.icon.customImage) {
-        return self.model.icon.customImage;
-    }
-    
-    return [NodeIconHelper getIconForNode:NO
-                           customIconUuid:self.model.icon.customUuid
-                                   iconId:self.model.icon.index
-                                    model:self.databaseModel];
+        
+    return [NodeIconHelper getNodeIcon:self.model.icon predefinedIconSet:self.databaseModel.metadata.keePassIconSet format:self.databaseModel.database.originalFormat];
 }
 
 #ifndef IS_APP_EXTENSION
 - (void)onChangeIcon {
     self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIcons = self.databaseModel.database.customIcons;
+    self.sni.customIconPool = self.databaseModel.database.customIconPool;
     
     NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
     
     [self.sni changeIcon:self
                     node:self.item
                  urlOverride:urlHint
-                  format:self.databaseModel.database.format
+                  format:self.databaseModel.database.originalFormat
           keePassIconSet:self.databaseModel.metadata.keePassIconSet
-                   completion:^(BOOL goNoGo, NSNumber * _Nullable userSelectedNewIconIndex, NSUUID * _Nullable userSelectedExistingCustomIconId, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,UIImage *> * _Nullable selected) {
-    
-                  if(goNoGo) {
-                      UIImage* userSelectedNewCustomIcon = selected ? selected.allValues.firstObject : nil;
-                      self.model.icon = [SetIconModel setIconModelWith:userSelectedNewIconIndex customUuid:userSelectedExistingCustomIconId customImage:userSelectedNewCustomIcon];
-                      self.iconExplicitlyChanged = YES;
-                      
-                      [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]] withRowAnimation:UITableViewRowAnimationAutomatic];
-                      
-                      [self onModelEdited];
-                  }
-              }];
+              completion:^(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selected) {
+        if(goNoGo) {
+            self.model.icon = selected ? selected.allValues.firstObject : nil;
+            self.iconExplicitlyChanged = YES;
+            [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self onModelEdited];
+        }
+    }];
 }
 #endif
 
@@ -1227,7 +1217,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (ItemDetailsModel*)modelFromItem:(Node*)item {
-    DatabaseFormat format = self.databaseModel.database.format;
+    DatabaseFormat format = self.databaseModel.database.originalFormat;
     
     
     
@@ -1237,11 +1227,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     BOOL keePassHistoryAvailable = item.fields.keePassHistory.count > 0 && (format == kKeePass || format == kKeePass4);
     BOOL historyAvailable = format == kPasswordSafe || keePassHistoryAvailable;
-    
-    
-    
-    SetIconModel* iconModel = [SetIconModel setIconModelWith:item.iconId customUuid:item.customIconUuid customImage:nil];
-    
+   
     
     
     NSArray<CustomFieldViewModel*>* customFieldModels = [item.fields.customFields map:^id(NSString *key, StringValue* value) {
@@ -1249,13 +1235,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }];
     
     
-    
-    NSArray<DatabaseAttachment*>* dbAttachments = self.databaseModel.database.attachments;
-    NSArray<UiAttachment*>* attachments = [item.fields.attachments map:^id _Nonnull(NodeFileAttachment * _Nonnull obj, NSUInteger idx) {
-        DatabaseAttachment *dbAttachment = dbAttachments[obj.index];
-        return [UiAttachment attachmentWithFilename:obj.filename dbAttachment:dbAttachment];
-    }];
-    
+        
     ItemDetailsModel *ret = [[ItemDetailsModel alloc] initWithTitle:item.title
                                                            username:item.fields.username
                                                            password:item.fields.password
@@ -1265,9 +1245,9 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                                                             expires:item.fields.expires
                                                                tags:item.fields.tags
                                                                totp:item.fields.otpToken
-                                                               icon:iconModel
+                                                               icon:item.icon
                                                        customFields:customFieldModels
-                                                        attachments:attachments
+                                                        attachments:item.fields.attachments
                                                            metadata:metadata
                                                          hasHistory:historyAvailable];
     
@@ -1276,7 +1256,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)applyModelChangesToNodeItem {
     if (self.createNewItem) {
-        [self.parentGroup addChild:self.item keePassGroupTitleRules:NO];
+        [self.databaseModel addItem:self.parentGroup item:self.item];
     }
     else { 
         Node* originalNodeForHistory = [self.item cloneForHistory];
@@ -1309,13 +1289,14 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
         if(self.model.totp != nil) {
             [self.item.fields setTotp:self.model.totp
-                     appendUrlToNotes:self.databaseModel.database.format == kPasswordSafe || self.databaseModel.database.format == kKeePass1];
+                     appendUrlToNotes:self.databaseModel.database.originalFormat == kPasswordSafe || self.databaseModel.database.originalFormat == kKeePass1];
         }
     }
 
     
 
-    [self.databaseModel.database setNodeAttachments:self.item attachments:self.model.attachments];
+    [self.item.fields.attachments removeAllObjects];
+    [self.item.fields.attachments addEntriesFromDictionary:self.model.attachments.dictionary];
 
     
     
@@ -1443,28 +1424,19 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     
     
+    
+    
 
     if (self.iconExplicitlyChanged) {
         self.iconExplicitlyChanged = NO;
-        if(self.model.icon.customImage) {
-            NSData *data = UIImagePNGRepresentation(self.model.icon.customImage);
-            [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES addHistory:NO]; 
-        }
-        else if(self.model.icon.customUuid != nil) {
-            if(![self.model.icon.customUuid isEqual:self.item.customIconUuid]) {
-                [self.databaseModel.database setNodeCustomIconUuid:self.item uuid:self.model.icon.customUuid rationalize:YES addHistory:NO];
-            }
-        }
-        else if(self.model.icon.index != nil) {
-            [self.databaseModel.database setNodeIconId:self.item iconId:self.model.icon.index rationalize:YES addHistory:NO];
-        }
+        self.item.icon = self.model.icon;
     }
     else {
         if (self.createNewItem || self.urlJustChanged) {
             self.urlJustChanged = NO;
 #ifndef IS_APP_EXTENSION
             
-            BOOL favIconFetchPossible = (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.format == kKeePass || self.databaseModel.database.format == kKeePass4) && isValidUrl(self.model.url));
+            BOOL favIconFetchPossible = (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4) && isValidUrl(self.model.url));
 
             if (favIconFetchPossible) {
                 if (!self.databaseModel.metadata.promptedForAutoFetchFavIcon) {
@@ -1504,13 +1476,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)fetchFavIcon:(void (^)(void))completion {
     self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIcons = self.databaseModel.database.customIcons;
+    self.sni.customIconPool = self.databaseModel.database.customIconPool;
 
     [self.sni expressDownloadBestFavIcon:self.model.url
-                              completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
-                          if(userSelectedNewCustomIcon) {
-                              NSData *data = UIImagePNGRepresentation(userSelectedNewCustomIcon);
-                              [self.databaseModel.database setNodeCustomIcon:self.item data:data rationalize:YES];
+                              completion:^(UIImage * _Nullable favIcon) {
+                          if(favIcon) {
+                              NSData *data = UIImagePNGRepresentation(favIcon);
+                              self.item.icon = [NodeIcon withCustom:data];
                           }
 
                           completion();
@@ -1630,7 +1602,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             }
         }
         else if(indexPath.section == kOtherSectionIdx && indexPath.row == 0) {
-            [self performSegueWithIdentifier:self.databaseModel.database.format == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
+            [self performSegueWithIdentifier:self.databaseModel.database.originalFormat == kPasswordSafe ? @"toPasswordHistory" : @"toKeePassHistory" sender:nil];
         }
     }
         
@@ -1977,15 +1949,16 @@ suggestionProvider:^NSString*(NSString *text) {
     }
     else {
         NSInteger idx = indexPath.row - (self.editing ? 1 : 0);
-        UiAttachment* attachment = self.model.attachments[idx];
+        NSString* filename = self.model.attachments.allKeys[idx];
+        DatabaseAttachment* attachment = self.model.attachments[filename];
         
         if(self.editing) {
             EditAttachmentCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kEditAttachmentCellId forIndexPath:indexPath];
-            cell.textField.text = attachment.filename;
+            cell.textField.text = filename;
             cell.image.image = [UIImage imageNamed:@"document"];
 
-            if (attachment.dbAttachment.length < kMaxAttachmentTableviewIconImageSize) {
-                NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+            if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
+                NSInputStream* attStream = [attachment getPlainTextInputStream];
                 NSData* data = [NSData dataWithContentsOfStream:attStream];
                 UIImage* img = [UIImage imageWithData:data];
                 if(img) {
@@ -2005,14 +1978,14 @@ suggestionProvider:^NSString*(NSString *text) {
         }
         else {
             UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kViewAttachmentCellId forIndexPath:indexPath];
-            cell.textLabel.text = attachment.filename;
+            cell.textLabel.text = filename;
             cell.imageView.image = [UIImage imageNamed:@"document"];
 
-            NSUInteger filesize = attachment.dbAttachment.length;
+            NSUInteger filesize = attachment.length;
             cell.detailTextLabel.text = friendlyFileSizeString(filesize);
            
-            if (attachment.dbAttachment.length < kMaxAttachmentTableviewIconImageSize) {
-                NSInputStream* attStream = [attachment.dbAttachment getPlainTextInputStream];
+            if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
+                NSInputStream* attStream = [attachment getPlainTextInputStream];
                 NSData* data = [NSData dataWithContentsOfStream:attStream];
                 UIImage* img = [UIImage imageWithData:data];
 
@@ -2051,7 +2024,7 @@ suggestionProvider:^NSString*(NSString *text) {
 - (UITableViewCell*)getOtherCell:(NSIndexPath*)indexPath {
     GenericBasicCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericBasicCellId forIndexPath:indexPath];
     
-    cell.labelText.text = self.databaseModel.database.format == kPasswordSafe ?
+    cell.labelText.text = self.databaseModel.database.originalFormat == kPasswordSafe ?
     
     NSLocalizedString(@"item_details_password_history", @"Password History") :
     NSLocalizedString(@"item_details_item_history", @"Item History");

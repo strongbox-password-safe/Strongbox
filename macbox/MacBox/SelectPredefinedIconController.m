@@ -9,16 +9,16 @@
 #import "SelectPredefinedIconController.h"
 #import "PredefinedKeePassIcon.h"
 #import "Utils.h"
-#import "KeePassPredefinedIcons.h"
 #import "Alerts.h"
 #import "CollectionViewHeader.h"
-#import "MacNodeIconHelper.h"
+#import "NodeIconHelper.h"
 
 @interface SelectPredefinedIconController () <NSCollectionViewDataSource, NSCollectionViewDelegate>
 
 @property (weak) IBOutlet NSCollectionView *collectionView;
 @property (weak) IBOutlet NSButton *buttonSelectFile;
 @property (weak) IBOutlet NSButton *buttonFindFavIcons;
+@property NSArray<NSImage*>* predefinedIcons;
 
 @end
 
@@ -32,6 +32,8 @@
 
     self.buttonSelectFile.hidden = self.hideSelectFile;
     self.buttonFindFavIcons.hidden = self.hideFavIconButton;
+    
+    self.predefinedIcons = [NodeIconHelper getIconSet:kKeePassIconSetClassic];
 }
 
 - (BOOL)hasCustomIcons {
@@ -43,19 +45,18 @@
 }
 
 - (NSInteger)collectionView:(NSCollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
-    return [self hasCustomIcons] && section == 0 ? self.customIcons.count : KeePassPredefinedIcons.icons.count;
+    return [self hasCustomIcons] && section == 0 ? self.customIcons.count : self.predefinedIcons.count;
 }
 
 - (NSCollectionViewItem *)collectionView:(NSCollectionView *)collectionView itemForRepresentedObjectAtIndexPath:(NSIndexPath *)indexPath {
     PredefinedKeePassIcon *item = [self.collectionView makeItemWithIdentifier:@"PredefinedKeePassIcon" forIndexPath:indexPath];
     
     if([self hasCustomIcons] && indexPath.section == 0) {
-        NSUUID* uuid = self.customIcons.allKeys[indexPath.item];
-        
-        item.icon.image = [MacNodeIconHelper getCustomIcon:uuid customIcons:self.customIcons];
+        NodeIcon* icon = self.customIcons[indexPath.item];
+        item.icon.image = [NodeIconHelper getNodeIcon:icon];
     }
     else {
-        item.icon.image = KeePassPredefinedIcons.icons[indexPath.item];
+        item.icon.image = self.predefinedIcons[indexPath.item];
     }
     
     return item;
@@ -69,11 +70,11 @@
         [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
         
         if([self hasCustomIcons] && indexPath.section == 0) {
-            NSUUID* uuid = self.customIcons.allKeys[indexPath.item];
-            self.onSelectedItem(nil, nil, uuid, NO);
+            NodeIcon* icon = self.customIcons[indexPath.item];
+            self.onSelectedItem(icon, NO);
         }
         else {
-            self.onSelectedItem(@(indexPath.item), nil, nil, NO);
+            self.onSelectedItem([NodeIcon withPreset:indexPath.item], NO);
         }
         
     }
@@ -81,7 +82,7 @@
 
 - (IBAction)onUseDefault:(id)sender {
     [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-    self.onSelectedItem(@(-1), nil, nil, NO);
+    self.onSelectedItem(nil, NO);
 }
 
 - (IBAction)onCancel:(id)sender {
@@ -106,7 +107,7 @@
             }
 
             [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-            self.onSelectedItem(nil, data, nil, NO);
+            self.onSelectedItem([NodeIcon withCustom:data], NO);
         }
     }];
 }
@@ -130,7 +131,7 @@
 
 - (IBAction)onFindFavIcons:(id)sender {
     [self.window.sheetParent endSheet:self.window returnCode:NSModalResponseOK];
-    self.onSelectedItem(nil, nil, nil, YES);
+    self.onSelectedItem(nil, YES);
 }
 
 @end

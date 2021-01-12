@@ -17,6 +17,8 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "SVProgressHUD.h"
 #import "KeyFileHelper.h"
+#import "Serializator.h"
+#import "SampleItemsGenerator.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 
@@ -84,9 +86,11 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
     dispatch_async(dispatch_get_main_queue(), ^(void) { 
         [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     });
-                   
+                  
+    DatabaseFormat format = database.originalFormat;
+    
     dispatch_async(dispatch_get_global_queue(0L, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
-        [database getAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        [Serializator getAsData:database format:format completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
             if (userCancelled || data == nil || error) {
                 completion(userCancelled, nil, nil, error);
                 return;
@@ -96,13 +100,13 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
                 [SVProgressHUD dismiss];
                 
                 [provider create:name
-                       extension:database.fileExtension
+                       extension:[Serializator getDefaultFileExtensionForFormat:format]
                             data:data
                     parentFolder:parentFolder
                   viewController:vc
                       completion:^(SafeMetaData *metadata, NSError *error) {
                     metadata.keyFileBookmark = keyFileBookmark;
-                    metadata.likelyFormat = database.format;
+                    metadata.likelyFormat = format;
                     metadata.contextAwareYubiKeyConfig = yubiKeyConfig;
 
                     dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -141,9 +145,11 @@ static DatabaseModel* getNewDatabase(NSString* password,
         ckf = [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
     }
     
-    return [[DatabaseModel alloc] initNew:ckf
-                                   format:format
-                                   config:[DatabaseModelConfig withPasswordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig]];
+    DatabaseModel* database = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:ckf];
+
+    [SampleItemsGenerator addSampleGroupAndRecordToRoot:database passwordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+    
+    return database;
 }
 
 @end

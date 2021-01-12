@@ -12,13 +12,13 @@
 @implementation DatabaseGenerator
 
 + (DatabaseModel*)generateEmpty:(NSString*)password {
-    DatabaseModel* db = [[DatabaseModel alloc] initEmptyForTesting:[CompositeKeyFactors password:password]];
+    DatabaseModel* db = [[DatabaseModel alloc] init];
 
     return db;
 }
 
 + (DatabaseModel*)generate:(NSString*)password {
-    DatabaseModel* db = [[DatabaseModel alloc] initEmptyForTesting:[CompositeKeyFactors password:password]];
+    DatabaseModel* db = [[DatabaseModel alloc] init];
     
     int groupCount = 10;
     int subGroupCount = 2;
@@ -30,18 +30,18 @@
             Node* existing;
             do {
                 title = [PasswordMaker.sharedInstance generateRandomWord];
-                existing = [db.rootGroup findFirstChild:NO predicate:^BOOL(Node * _Nonnull node) {
+                existing = [db.effectiveRootGroup firstOrDefault:NO predicate:^BOOL(Node * _Nonnull node) {
                     return [node.title isEqualToString:title];
                 }];
             } while (existing);
             
-            Node* childGroup = [[Node alloc] initAsGroup:title parent:db.rootGroup keePassGroupTitleRules:NO uuid:nil];
+            Node* childGroup = [[Node alloc] initAsGroup:title parent:db.effectiveRootGroup keePassGroupTitleRules:NO uuid:nil];
             
-            [db.rootGroup addChild:childGroup keePassGroupTitleRules:NO];
+            [db addChild:childGroup destination:db.effectiveRootGroup];
             
             for (int j = 0; j < entryCount; j++) {
                 Node* childEntry = [self createSampleEntry:j parentGroup:childGroup];
-                [childGroup addChild:childEntry keePassGroupTitleRules:YES];
+                [db addChild:childEntry destination:childGroup];
             }
         }
     }
