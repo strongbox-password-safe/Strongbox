@@ -10,15 +10,15 @@
 #import "DocumentController.h"
 #import "Settings.h"
 #import "UpgradeWindowController.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "Utils.h"
 #import "Strongbox.h"
 #import "PreferencesWindowController.h"
-#import "DatabasesManagerView.h"
+#import "DatabasesManagerVC.h"
 #import "BiometricIdHelper.h"
 #import "ViewController.h"
 #import "DatabasesManager.h"
-
+#import "SafeStorageProviderFactory.h"
 
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
 
@@ -91,10 +91,6 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     
     [self showHideSystemStatusBarIcon];
     
-    
-    
-    
-
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onPreferencesChanged:)
                                                  name:kPreferencesChangedNotification
@@ -231,7 +227,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
                                 @"You can always find out more at any time by tapping 'Upgrade to Pro' in the Strongbox menu item.\n\n"
                                 @"Thanks!\n-Mark");
 
-        [Alerts info:loc
+        [MacAlerts info:loc
      informativeText:loc2
               window:[NSApplication sharedApplication].mainWindow 
           completion:nil];
@@ -375,11 +371,11 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (IBAction)onViewDatabases:(id)sender {
-    [DatabasesManagerView show:NO]; 
+    [DatabasesManagerVC show];
 }
 
 - (IBAction)onViewDebugDatabasesList:(id)sender {
-    [DatabasesManagerView show:YES]; 
+    [DatabasesManagerVC show];
 }
 
 - (IBAction)onPreferences:(id)sender {
@@ -419,7 +415,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
         NSURL *mailtoURL = [NSURL URLWithString:encodedURLString];
         
         if(![[NSWorkspace sharedWorkspace] openURL:mailtoURL]) {
-            [Alerts info:@"Email Unavailable"
+            [MacAlerts info:@"Email Unavailable"
          informativeText:@"Strongbox could not initialize an email for you, perhaps because it is not configured.\n\n"
                         @"Please send an email to support@strongboxsafe.com with details of your issue."
                   window:[NSApplication sharedApplication].mainWindow

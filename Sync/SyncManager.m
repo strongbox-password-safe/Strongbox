@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 20/06/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SyncManager.h"
@@ -24,6 +24,7 @@
 #import "SyncStatus.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "Serializator.h"
+#import "WorkingCopyManager.h"
 
 NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
 
@@ -72,29 +73,35 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.inProgressBehaviour = kInProgressBehaviourJoin;
-    
+    params.syncForcePushDoNotCheckForConflicts = SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts;
+    params.syncPullEvenIfModifiedDateSame = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
+
     NSLog(@"BACKGROUND SYNC Start: [%@]", database.nickName);
 
-    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
+    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
         NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
     }];
 }
 
-- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
+- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.interactiveVC = interactiveVC;
+    params.key = key;
     params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
-    
-    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
+    params.syncForcePushDoNotCheckForConflicts = SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts;
+    params.syncPullEvenIfModifiedDateSame = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
+
+    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         NSLog(@"INTERACTIVE SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
-        completion(result, conflictAndLocalWasChanged, error);
+        completion(result, localWasChanged, error);
     }];
 }
 
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error {
-    NSURL* localWorkingCache = [self getLocalWorkingCache:database];
     
+    
+    NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
     if (localWorkingCache) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
@@ -112,7 +119,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     database.outstandingUpdateId = updateId;
     [SafesList.sharedInstance update:database];
         
-    NSURL* url = [self setWorkingCacheWithData:data dateModified:NSDate.date database:database error:error];
+    NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:data dateModified:NSDate.date database:database error:error];
     
     return url != nil;
 }
@@ -123,52 +130,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
 
 
-- (NSURL*)setWorkingCacheWithData:(NSData*)data dateModified:(NSDate*)dateModified database:(SafeMetaData*)database error:(NSError**)error {
-    if (!data || !dateModified) {
-        if (error) {
-            *error = [Utils createNSError:@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache" errorCode:-1];
-        }
-        
-        NSLog(@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache [%@][%@]", data, dateModified);
-        return nil;
-    }
-    
-    NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase:database];
-
-    [data writeToURL:localWorkingCacheUrl options:NSDataWritingAtomic error:error];
-    
-    NSLog(@"SyncManager::setWorkingCacheWithData - Wrote to working file [%@]-[%@]", localWorkingCacheUrl, *error);
-
-    if (*error) {
-        return nil;
-    }
-    else {
-        NSError *err2;
-        [NSFileManager.defaultManager setAttributes:@{ NSFileModificationDate : dateModified }
-                                       ofItemAtPath:localWorkingCacheUrl.path
-                                              error:&err2];
-        
-        NSLog(@"Set Working Cache Attributes for [%@] to [%@] with error = [%@]", database.nickName, dateModified, err2);
-        
-        if (err2 && error) {
-            *error = err2;
-        }
-        
-        return err2 ? nil : localWorkingCacheUrl;
-    }
-}
-
 - (NSString *)getPrimaryStorageDisplayName:(SafeMetaData *)database {
     return [SafeStorageProviderFactory getStorageDisplayName:database];
-}
-
-- (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData *)database { 
-#ifndef IS_APP_EXTENSION
-    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:database.storageProvider];
-    return provider.immediatelyOfferCacheIfOffline;
-#else
-    return NO; 
-#endif
 }
 
 - (void)removeDatabaseAndLocalCopies:(SafeMetaData*)database {
@@ -179,7 +142,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         [[AppleICloudProvider sharedInstance] delete:database completion:nil];
     }
 
-    [self deleteLocalWorkingCache:database];
+    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database];
 }
 
 
@@ -265,23 +228,17 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     
     NSMutableArray<StorageBrowserItem*>* items = [NSMutableArray array];
     for (NSString* file in directoryContent) {
-        StorageBrowserItem* browserItem = [[StorageBrowserItem alloc] init];
-        
         BOOL isDirectory;
         NSString *fullPath = [FileManager.sharedInstance.documentsDirectory.path stringByAppendingPathComponent:file];
         
         BOOL exists = [[NSFileManager defaultManager] fileExistsAtPath:fullPath isDirectory:&isDirectory];
         
         if(exists) {
-            browserItem.folder = isDirectory != 0;
-            browserItem.name = file;
-            
             LocalDatabaseIdentifier *identifier = [[LocalDatabaseIdentifier alloc] init];
             identifier.sharedStorage = NO;
             identifier.filename = file;
             
-            browserItem.providerData = identifier;
-            
+            StorageBrowserItem *browserItem = [StorageBrowserItem itemWithName:file identifier:nil folder:isDirectory != 0 providerData:identifier];
             [items addObject:browserItem];
         }
     }
@@ -384,83 +341,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 - (NSURL*)getLegacyLocalDatabaseFileUrl:(BOOL)sharedStorage filename:(NSString*)filename {
     NSURL* folder = [self getLegacyLocalDatabaseDirectory:sharedStorage];
     return [folder URLByAppendingPathComponent:filename];
-}
-
-
-
-- (void)deleteLocalWorkingCache:(SafeMetaData*)database {
-    NSURL* localCache = [self getLocalWorkingCache:database];
-    
-    if (localCache) {
-        NSError* error;
-        [NSFileManager.defaultManager removeItemAtURL:localCache error:&error];
-        
-        if (error) {
-            NSLog(@"Error delete local working cache: [%@]", error);
-        }
-    }
-}
-
-- (BOOL)isLocalWorkingCacheAvailable:(SafeMetaData *)database modified:(NSDate**)modified {
-    return [self getLocalWorkingCache:database modified:modified] != nil;
-}
-
-- (NSURL*)getLocalWorkingCacheUrlForDatabase:(SafeMetaData*)database {
-    return [FileManager.sharedInstance.syncManagerLocalWorkingCachesDirectory URLByAppendingPathComponent:database.uuid];
-}
-
-- (NSURL*)getLocalWorkingCache:(SafeMetaData*)database {
-    return [self getLocalWorkingCache:database modified:nil];
-}
-
-- (NSURL*)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate**)modified {
-    return [self getLocalWorkingCache:database modified:modified fileSize:nil];
-}
-
-- (NSURL*)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate**)modified fileSize:(unsigned long long*_Nullable)fileSize {
-    NSURL* url = [self getLocalWorkingCacheUrlForDatabase:database];
-
-    NSError* error;
-    NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-    
-    if (error) {
-        
-        if (modified) {
-            *modified = nil;
-        }
-        return nil;
-    }
-
-    if (modified) {
-        *modified = attributes.fileModificationDate;
-    }
-
-    if (fileSize) {
-        *fileSize = attributes.fileSize;
-    }
-    
-    return url;
-}
-
-
-
-static NSString* syncResultToString(SyncAndMergeResult result) {
-    switch(result) {
-        case kSyncAndMergeError:
-            return @"Error";
-            break;
-        case kSyncAndMergeSuccess:
-            return @"Success";
-            break;
-        case kSyncAndMergeResultUserInteractionRequired:
-            return @"User Interaction Required";
-            break;
-        case kSyncAndMergeResultUserCancelled:
-            return @"User Cancelled";
-            break;
-        default:
-            return @"Unknown!";
-    }
 }
 
 @end

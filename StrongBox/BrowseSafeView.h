@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface BrowseSafeView : UITableViewController
 
 @property (nonatomic, strong, nonnull) Model *viewModel;
-@property (nonatomic, strong, nonnull) Node *currentGroup;
+@property (nonatomic, strong, nonnull) NSUUID *currentGroupId;
 
 @end
 

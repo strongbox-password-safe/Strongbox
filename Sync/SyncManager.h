@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 20/06/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -25,7 +25,9 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 - (void)backgroundSyncAll;
 - (void)backgroundSyncOutstandingUpdates;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;
-- (void)sync:(SafeMetaData*)database interactiveVC:(UIViewController*)interactiveVC join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
+
+- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
+
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error;
 
 
@@ -38,18 +40,6 @@ extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
 #ifndef IS_APP_EXTENSION
 - (BOOL)toggleLocalDatabaseFilesVisibility:(SafeMetaData*)metadata error:(NSError**)error;
 #endif
-
-- (BOOL)isLegacyImmediatelyOfferLocalCopyIfOffline:(SafeMetaData*)database;
-
-- (BOOL)isLocalWorkingCacheAvailable:(SafeMetaData*)database modified:(NSDate*_Nullable*_Nullable)modified;
-- (NSURL*_Nullable)getLocalWorkingCache:(SafeMetaData*)database;
-- (NSURL*_Nullable)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate *_Nullable*_Nullable)modified;
-- (NSURL*_Nullable)getLocalWorkingCache:(SafeMetaData*)database modified:(NSDate *_Nullable*_Nullable)modified fileSize:(unsigned long long*_Nullable)fileSize;
-
-
-- (NSURL*_Nullable)setWorkingCacheWithData:(NSData*)data dateModified:(NSDate*)dateModified database:(SafeMetaData*)database error:(NSError**)error;
-
-- (NSURL*)getLocalWorkingCacheUrlForDatabase:(SafeMetaData*)database;
 
 @end
 

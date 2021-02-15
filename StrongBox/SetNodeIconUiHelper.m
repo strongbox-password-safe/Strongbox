@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 23/02/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -151,6 +151,29 @@
     }
 }
 
+- (void)downloadFavIcon:(UIViewController*)presentingVc
+                  nodes:(NSArray<Node*>*)nodes
+            urlOverride:(NSString*)urlOverride
+             completion:(FavIconBulkDoneBlock)completion {
+    if (urlOverride) {
+        [FavIconBulkViewController presentModal:presentingVc
+                                           node:nodes.firstObject
+                                    urlOverride:urlOverride
+                                         onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
+            [presentingVc dismissViewControllerAnimated:YES completion:nil];
+            completion(go, selectedFavIcons);
+        }];
+    }
+    else {
+        [FavIconBulkViewController presentModal:presentingVc
+                                          nodes:nodes
+                                         onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
+            [presentingVc dismissViewControllerAnimated:YES completion:nil];
+            completion(go, selectedFavIcons);
+        }];
+    }
+}
+
 - (void)completeDownloadFavIcons:(BOOL)go isGroup:(BOOL)isGroup selectedFavIcons:(NSDictionary<NSUUID *,UIImage *> * _Nullable)selectedFavIcons completion:(ChangeIconCompletionBlock)completion {
     NSMutableDictionary<NSUUID*, NodeIcon*>* ret = NSMutableDictionary.dictionary;
     
@@ -167,25 +190,6 @@
     }
     
     completion(go, isGroup, ret);
-}
-
-- (void)downloadFavIcon:(UIViewController*)presentingVc
-                  nodes:(NSArray<Node*>*)nodes
-            urlOverride:(NSString*)urlOverride
-             completion:(FavIconBulkDoneBlock)completion {
-    if (urlOverride) {
-        [FavIconBulkViewController presentModal:presentingVc node:nodes.firstObject urlOverride:urlOverride
-                                         onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
-            [presentingVc dismissViewControllerAnimated:YES completion:nil];
-            completion(go, selectedFavIcons);
-        }];
-    }
-    else {
-        [FavIconBulkViewController presentModal:presentingVc nodes:nodes onDone:^(BOOL go, NSDictionary<NSUUID*,UIImage *> * _Nullable selectedFavIcons) {
-            [presentingVc dismissViewControllerAnimated:YES completion:nil];
-            completion(go, selectedFavIcons);
-        }];
-    }
 }
 
 - (void)expressDownloadBestFavIcon:(NSString*)urlOverride completion:(void (^)(UIImage * _Nullable))completion {

@@ -3,7 +3,7 @@
 //  test-new-ui
 //
 //  Created by Mark on 18/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -26,8 +26,10 @@ extern NSString *const kNotificationNameItemDetailsEditDone;
 @property BOOL createNewItem;
 @property BOOL editImmediately;
 
-@property Node* parentGroup;
-@property Node*_Nullable item;
+@property NSUUID* parentGroupId;
+@property NSUUID*_Nullable itemId;
+@property NSNumber*_Nullable historicalIndex;
+
 @property BOOL readOnly;
 @property Model* databaseModel;
 

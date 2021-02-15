@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 01/10/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DebugHelper.h"
@@ -18,6 +18,7 @@
 #import "NSDate+Extensions.h"
 #import "NSArray+Extensions.h"
 #import "SafeStorageProviderFactory.h"
+#import "WorkingCopyManager.h"
 
 @implementation DebugHelper
 
@@ -104,7 +105,7 @@
         
         NSDate* mod;
         unsigned long long fileSize;
-        NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
         
         NSString* syncState;
         if (url) {

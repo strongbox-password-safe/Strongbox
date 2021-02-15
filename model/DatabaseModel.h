@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) DatabaseFormat originalFormat;
 @property (nonatomic, readonly) Node* effectiveRootGroup;
 @property (nonatomic, readonly, nonnull) UnifiedDatabaseMetadata* meta;
-@property (nonatomic, readonly, nonnull) CompositeKeyFactors *ckfs;
+@property (nonatomic, nonnull) CompositeKeyFactors *ckfs;
 
 @property (nonatomic) NSDictionary<NSUUID*, NSDate*> *deletedObjects;
 
@@ -72,7 +72,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, readonly) Node* recycleBinNode;
 @property (nullable, readonly) Node* keePass1BackupNode;
 
-- (BOOL)canRecycle:(Node*)item;
+- (BOOL)canRecycle:(NSUUID*)itemId;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items undoData:(NSArray<NodeHierarchyReconstructionData*>*_Nullable*_Nullable)undoData;
 - (void)undoRecycle:(NSArray<NodeHierarchyReconstructionData*>*)undoData;
@@ -138,8 +138,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
+- (NSString*_Nullable)getCrossSerializationFriendlyIdId:(NSUUID *)nodeId;
 - (Node *_Nullable)getItemByCrossSerializationFriendlyId:(NSString*)serializationId;
-- (NSString*)getCrossSerializationFriendlyId:(Node*)node; 
+
 - (Node*_Nullable)getItemById:(NSUUID*)uuid;
 - (BOOL)preOrderTraverse:(BOOL (^)(Node* node))function; 
 

@@ -22,12 +22,14 @@ extern NSString* const kCentralUpdateOtpUiNotification;
 extern NSString* const kMasterDetailViewCloseNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 extern NSString *const kWormholeAutoFillUpdateMessageId;
+extern NSString* const kDatabaseReloadedNotificationKey;
 
 @interface Model : NSObject
 
 @property (nonatomic, readonly, nonnull) SafeMetaData *metadata;
 @property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
 @property (nonatomic, readonly) BOOL isReadOnly;
+@property (readonly) BOOL isInOfflineMode;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allNodes;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allRecords;
@@ -35,34 +37,44 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 
 
+
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
-- (instancetype _Nullable )initWithSafeDatabase:(DatabaseModel *_Nonnull)passwordDatabase
-                                       metaData:(SafeMetaData *_Nonnull)metaData
-                                 forcedReadOnly:(BOOL)forcedReadOnly
-                                     isAutoFill:(BOOL)isAutoFillOpen;
+- (instancetype _Nullable )initWithDatabase:(DatabaseModel *_Nonnull)passwordDatabase
+                                   metaData:(SafeMetaData *_Nonnull)metaData
+                             forcedReadOnly:(BOOL)forcedReadOnly
+                                 isAutoFill:(BOOL)isAutoFill;
 
-- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen templateMetaData:(SafeMetaData*)templateMetaData;
+- (instancetype _Nullable )initWithDatabase:(DatabaseModel *_Nonnull)passwordDatabase
+                                   metaData:(SafeMetaData *_Nonnull)metaData
+                             forcedReadOnly:(BOOL)forcedReadOnly
+                                 isAutoFill:(BOOL)isAutoFill
+                                offlineMode:(BOOL)offlineMode; 
 
-- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error))handler;
+- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
+                 templateMetaData:(SafeMetaData*)templateMetaData;
+
+- (void)reloadDatabaseFromLocalWorkingCopy:(UIViewController*)viewController 
+                                completion:(void(^_Nullable)(BOOL success))completion;
+
+- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
 - (void)stopAndClearAuditor;
 
 @property (readonly) AuditState auditState;
-
 @property (readonly, nullable) NSNumber* auditIssueCount;
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditHibpErrorCount;
 
-- (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)item;
-- (BOOL)isFlaggedByAudit:(Node*)item;
-- (NSString*)getQuickAuditSummaryForNode:(Node*)item;
-- (NSString*)getQuickAuditVeryBriefSummaryForNode:(Node*)item;
-- (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node;
-- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(Node*)node;
-- (void)setItemAuditExclusion:(Node*)item exclude:(BOOL)exclude;
-- (BOOL)isExcludedFromAudit:(Node*)item;
+- (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(NSUUID*)item;
+- (BOOL)isFlaggedByAudit:(NSUUID*)item;
+- (NSString*)getQuickAuditSummaryForNode:(NSUUID*)item;
+- (NSString*)getQuickAuditVeryBriefSummaryForNode:(NSUUID*)item;
+- (NSSet<Node*>*)getSimilarPasswordNodeSet:(NSUUID*)node;
+- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(NSUUID*)node;
+- (void)setItemAuditExclusion:(NSUUID*)item exclude:(BOOL)exclude;
+- (BOOL)isExcludedFromAudit:(NSUUID*)item;
 - (NSArray<Node*>*)getExcludedAuditItems;
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion;
 
@@ -75,10 +87,12 @@ extern NSString *const kWormholeAutoFillUpdateMessageId;
 
 - (void)deleteItems:(const NSArray<Node *> *)items;
 - (BOOL)recycleItems:(const NSArray<Node *> *)items;
-- (BOOL)canRecycle:(Node*_Nonnull)child;
 
-- (BOOL)isPinned:(Node*)item;
-- (void)togglePin:(Node*)item;
+- (BOOL)canRecycle:(NSUUID*_Nonnull)itemId;
+
+- (BOOL)isPinned:(NSUUID*)itemId;
+- (void)togglePin:(NSUUID*)itemId;
+
 @property (readonly) NSSet<NSString*>* pinnedSet;
 @property (readonly) NSArray<Node*>* pinnedNodes;
 

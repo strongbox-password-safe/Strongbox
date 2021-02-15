@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 11/06/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "StaticDataTableViewController.h"

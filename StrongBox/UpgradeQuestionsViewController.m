@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 14/03/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "UpgradeQuestionsViewController.h"

@@ -3,13 +3,23 @@
 //  Strongbox
 //
 //  Created by Strongbox on 10/08/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import "NSDate+Extensions.h"
 
 @implementation NSDate (Extensions)
+
++ (BOOL)isMoreThanXMinutesAgo:(NSDate *)date minutes:(NSUInteger)minutes {
+    if (date == nil) {
+        return NO;
+    }
+    
+    NSDate* ref = [NSDate.date dateByAddingTimeInterval:(minutes * -60.0f)];
+    
+    return [date isEarlierThan:ref];
+}
 
 - (BOOL)isEqualToDateWithinEpsilon:(NSDate *)other {
     if (other == nil) {

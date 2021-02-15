@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 08/08/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 
-- (instancetype)initWithDatabase:(SafeMetaData*)database NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDatabase:(METADATA_PTR)database NS_DESIGNATED_INITIALIZER;
 
 @property (readonly) SyncStatus* status;
 @property (readonly) dispatch_queue_t dispatchSerialQueue;

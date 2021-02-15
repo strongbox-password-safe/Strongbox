@@ -13,7 +13,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^GetAvailableYubiKeyCompletion)(YubiKeyData* yubiKeyData);
+typedef void (^GetAvailableYubiKeyCompletion)(YubiKeyData*_Nullable yubiKeyData);
 typedef void (^ChallengeResponseCompletion)(NSData* response, NSError* error);
 
 @interface MacYubiKeyManager : NSObject

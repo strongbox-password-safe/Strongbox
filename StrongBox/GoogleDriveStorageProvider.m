@@ -32,10 +32,11 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = YES; 
+        _defaultForImmediatelyOfferOfflineCache = YES; 
         _supportsConcurrentRequests = NO; 
-        
         _iconsByUrl = [[NSMutableDictionary alloc] init];
+        _privacyOptInRequired = YES;
+        
         return self;
     }
     else {

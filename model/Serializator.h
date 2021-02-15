@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 20/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_Nullable model, const NSError*_Nullable error);
+typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_Nullable model, NSError*_Nullable error);
 
 @interface Serializator : NSObject
 
@@ -36,6 +36,10 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_N
                    ckf:(CompositeKeyFactors *)ckf
                 config:(DatabaseModelConfig*)config
             completion:(DeserializeCompletionBlock)completion;
+
++ (void)fromUrl:(NSURL *)url
+            ckf:(CompositeKeyFactors *)ckf
+     completion:(DeserializeCompletionBlock)completion;
 
 + (void)fromUrl:(NSURL *)url
             ckf:(CompositeKeyFactors *)ckf

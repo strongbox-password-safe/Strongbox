@@ -31,6 +31,13 @@
     }
 }
 
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    
+    self.navigationController.navigationBarHidden = YES;
+    self.navigationController.toolbarHidden = YES;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -57,7 +64,7 @@
 
     BOOL success = [syncer merge]; 
     if (success) {
-        Model* clonedViewModel = [[Model alloc] initWithSafeDatabase:cloneOfFirst metaData:self.firstDatabase.metadata forcedReadOnly:NO isAutoFill:NO];
+        Model* clonedViewModel = [[Model alloc] initWithDatabase:cloneOfFirst metaData:self.firstDatabase.metadata forcedReadOnly:NO isAutoFill:NO];
         
         [self performSegueWithIdentifier:@"segueToDiffDatabases" sender:@{
             @"mergeCompare" : @(YES),
@@ -69,13 +76,13 @@
                 title:NSLocalizedString(@"merge_view_merge_title_error", @"There was an problem merging this database.")
                 error:nil
            completion:^{
-            self.onDone();
+            self.onDone(NO, nil, nil);
         }];
     }
 }
 
 - (IBAction)onCancel:(id)sender {
-    self.onDone();
+    self.onDone(NO, nil, nil);
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

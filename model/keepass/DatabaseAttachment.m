@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 01/11/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseAttachment.h"
@@ -253,4 +253,30 @@ static const BOOL kEncrypt = YES;
     return [NSString stringWithFormat:@"Compressed: %d, Protected: %d, Size: %lu", self.compressed, self.protectedInMemory, (unsigned long)self.estimatedStorageBytes];
 }
 
+- (BOOL)isEqual:(id)object {
+    if (object == nil) {
+        return NO;
+    }
+    if (self == object) {
+        return YES;
+    }
+    if (![object isKindOfClass:[DatabaseAttachment class]]) {
+        return NO;
+    }
+    
+    DatabaseAttachment* other = (DatabaseAttachment*)object;
+    if ( self.compressed != other.compressed ) {
+        return NO;
+    }
+    
+    if ( self.protectedInMemory != other.protectedInMemory ) {
+        return NO;
+    }
+    
+    if ( ![self.digestHash isEqualToString:other.digestHash] ) {
+        return NO;
+    }
+    
+    return YES;
+}
 @end

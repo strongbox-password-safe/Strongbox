@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 09/09/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseOperations.h"
@@ -141,30 +141,28 @@
             return;
         }
         
-        newCkf.keyFileDigest = keyFileDigest;
+        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:keyFileDigest];
     }
 
     
     
     if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
-        newCkf.yubiKeyCR = ^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:newCkf.keyFileDigest yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
             [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
-        };
+        }];
     }
 
     CompositeKeyFactors *rollbackCkf = [self.viewModel.database.ckfs clone];
-    self.viewModel.database.ckfs.password = newCkf.password;
-    self.viewModel.database.ckfs.keyFileDigest = newCkf.keyFileDigest;
-    self.viewModel.database.ckfs.yubiKeyCR = newCkf.yubiKeyCR;
+    self.viewModel.database.ckfs = newCkf;
     
     [self.viewModel update:self
-                   handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
-        if (userCancelled || error || conflictAndLocalWasChanged) {
+                   handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+        if (userCancelled || error || localWasChanged) {
             
-            self.viewModel.database.ckfs.password = rollbackCkf.password;
-            self.viewModel.database.ckfs.keyFileDigest = rollbackCkf.keyFileDigest;
-            self.viewModel.database.ckfs.yubiKeyCR = rollbackCkf.yubiKeyCR;
+            self.viewModel.database.ckfs = rollbackCkf;
         
+            
+            
             if (error) {
                 [Alerts error:self
                         title:NSLocalizedString(@"db_management_couldnt_change_credentials", @"Could not change credentials")

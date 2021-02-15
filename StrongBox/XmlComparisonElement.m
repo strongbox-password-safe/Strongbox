@@ -3,7 +3,7 @@
 //  StrongboxTests
 //
 //  Created by Mark on 03/09/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "XmlComparisonElement.h"

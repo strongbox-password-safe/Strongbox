@@ -3,7 +3,7 @@
 //  AcmeBankDemo
 //
 //  Created by Conrad Ciobanica on 2018-02-26.
-//  Copyright © 2018 Yubico. All rights reserved.
+//  Copyright © 2014-2021 Yubico. All rights reserved.
 //
 
 import UIKit

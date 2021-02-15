@@ -3,11 +3,12 @@
 //  Strongbox
 //
 //  Created by Strongbox on 02/05/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "NSString+Extensions.h"
 #import "NSData+Extensions.h"
+#import "MMcG_MF_Base32Additions.h"
 
 static NSString* const kDefaultScheme = @"https";
 
@@ -183,7 +184,8 @@ static NSString* const kLowerCaseNull = @"null";
 }
 
 - (BOOL)isHexString {
-    NSTextCheckingResult* result = [[NSString isHexStringRegex] firstMatchInString:self options:kNilOptions range:NSMakeRange(0, self.length)];
+    NSString* string = [[self componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet] componentsJoinedByString:@""];
+    NSTextCheckingResult* result = [[NSString isHexStringRegex] firstMatchInString:string options:kNilOptions range:NSMakeRange(0, string.length)];
     
     if (!result) {
         return NO;
@@ -202,6 +204,38 @@ static NSString* const kLowerCaseNull = @"null";
 
 - (BOOL)isKeePassXmlBooleanStringNull {
     return [self.lowercaseString isEqualToString:kLowerCaseNull];
+}
+
+- (NSData *)dataFromHex {
+    NSString* string = [[self componentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet] componentsJoinedByString:@""];
+        
+    const char *chars = [string UTF8String];
+    NSUInteger i = 0, len = string.length;
+    
+    NSMutableData *data = [NSMutableData dataWithCapacity:len / 2];
+    char byteChars[3] = {'\0','\0','\0'};
+    unsigned long wholeByte;
+    
+    while (i < len) {
+        byteChars[0] = chars[i++];
+        byteChars[1] = chars[i++];
+        wholeByte = strtoul(byteChars, NULL, 16);
+        [data appendBytes:&wholeByte length:1];
+    }
+    
+    return data.copy;
+}
+
+- (NSData *)dataFromBase32 {
+    return [NSData mmcg_dataWithBase32String:self];
+}
+
+- (NSData *)dataFromBase64 {
+    return [[NSData alloc] initWithBase64EncodedString:self options:NSDataBase64DecodingIgnoreUnknownCharacters];
+}
+
+- (NSData *)utf8Data {
+    return [self dataUsingEncoding:NSUTF8StringEncoding];
 }
 
 @end

@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 24/04/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithModel:(Model*)model isDisplayingRootGroup:(BOOL)isDisplayingRootGroup tableView:(UITableView*)tableView NS_DESIGNATED_INITIALIZER;
 
-- (void)refreshItems:(Node*)currentGroup;
+- (void)refreshItems:(NSUUID*)currentGroup;
 
 @end
 

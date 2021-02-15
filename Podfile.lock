@@ -26,7 +26,7 @@ PODS:
   - ISMessages (1.3.1)
   - libsodium (1.0.12)
   - MTBBarcodeScanner (5.0.11)
-  - ObjectiveDropboxOfficial (5.0.3)
+  - ObjectiveDropboxOfficial (5.0.5)
   - OneDriveSDK (1.3.0):
     - OneDriveSDK/Auth (= 1.3.0)
     - OneDriveSDK/Common (= 1.3.0)
@@ -85,7 +85,7 @@ SPEC CHECKSUMS:
   ISMessages: 562cddc3e960359de95f934a4e5c4e1f4ea6fd7d
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
-  ObjectiveDropboxOfficial: 4c9e5cfc3c5cb3ba73eed5fa659d1b3885f318d3
+  ObjectiveDropboxOfficial: 9ba0f4a3a9fdc914c2e660d759957328dd6cd744
   OneDriveSDK: 90ab8781f0992c37d96b68cc340585f5cf36701f
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
 

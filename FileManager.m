@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 17/06/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "FileManager.h"
@@ -65,6 +65,15 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     return ret;
 }
 
+- (NSURL *)syncManagerMergeWorkingDirectory {
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
+    NSURL* ret = [url URLByAppendingPathComponent:@"sync-manager/merge-working"];
+    
+    [self createIfNecessary:ret];
+    
+    return ret;
+}
+
 - (NSURL *)keyFilesDirectory {
     NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"key-files"];
@@ -119,6 +128,68 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
         NSLog(@"Error Creating Directory: %@ => [%@]", url, error.localizedDescription);
     }
 }
+
+- (void)setFileProtection:(BOOL)complete {
+    [self setFileProtectionRecursive:self.documentsDirectory complete:complete];
+    [self setFileProtectionRecursive:self.sharedAppGroupDirectory complete:complete];
+    [self setFileProtectionRecursive:self.appSupportDirectory complete:complete];
+}
+
+- (void)setFileProtectionRecursive:(NSURL*)url complete:(BOOL)complete {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *directoryURL = url;
+    NSArray *keys = @[NSURLIsDirectoryKey, NSURLFileProtectionKey];
+
+    NSDirectoryEnumerator *enumerator = [fileManager enumeratorAtURL:directoryURL
+                                          includingPropertiesForKeys:keys
+                                                             options:0
+                                                        errorHandler:^BOOL(NSURL *url, NSError *error) {
+        NSLog(@"Error Traversing Directory: [%@]", error);
+        return YES; 
+    }];
+
+    for (NSURL *url in enumerator) {
+
+
+     
+
+
+
+
+            
+
+
+
+
+            [self setFileProtectionForFile:url complete:complete];
+
+            
+
+
+
+
+
+
+    }
+}
+
+- (void)setFileProtectionForFile:(NSURL*)URL complete:(BOOL)complete {
+    NSError *error = nil;
+    
+    NSFileProtectionType prot = complete ? NSURLFileProtectionComplete : NSURLFileProtectionCompleteUntilFirstUserAuthentication;
+    
+    BOOL success = [URL setResourceValue:prot forKey:NSURLFileProtectionKey error:&error];
+
+    if(!success){
+        NSLog(@"Error setting File Protection for %@ - %@", [URL lastPathComponent], error);
+    }
+    else {
+        NSLog(@"%@ [%@] file protection set", complete ? @"Complete" : @"Default", URL.lastPathComponent);
+    }
+}
+
+
+
 
 - (void)setDirectoryInclusionFromBackup:(BOOL)localDocuments importedKeyFiles:(BOOL)importedKeyFiles {
     
@@ -268,9 +339,18 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     [self deleteAllFoo:tmpPath];
 }
 
-- (void)deleteAllTmpEncryptedAttachmentFiles { 
-    NSString* tmpPath = [self tmpEncryptedAttachmentPath];
+- (void)deleteAllTmpWorkingFiles { 
+    [self deleteAllTmpEncryptedAttachmentWorkingFiles];
+    [self deleteAllTmpSyncMergeWorkingFiles];
+}
 
+- (void)deleteAllTmpEncryptedAttachmentWorkingFiles { 
+    NSString* tmpPath = [self tmpEncryptedAttachmentPath];
+    [self deleteAllFoo:tmpPath];
+}
+
+- (void)deleteAllTmpSyncMergeWorkingFiles {
+    NSString* tmpPath = self.syncManagerMergeWorkingDirectory.path;
     [self deleteAllFoo:tmpPath];
 }
 

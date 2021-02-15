@@ -39,6 +39,9 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    
+    
     [self installTopLevelExceptionHandlers];
     
     [self initializeDropbox];
@@ -105,7 +108,7 @@
         [FileManager.sharedInstance deleteAllInboxItems];
          
         [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
-        [FileManager.sharedInstance deleteAllTmpEncryptedAttachmentFiles];
+        [FileManager.sharedInstance deleteAllTmpWorkingFiles];
     }
 }
 

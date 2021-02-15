@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 24/10/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "BiometricsManager.h"
@@ -35,8 +35,7 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
     return sharedInstance;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.lastKnownGoodDatabaseState = [SecretStore.sharedInstance getSecureObject:kBiometricDatabaseStateKey];
@@ -95,14 +94,18 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
         return;
     }
     
-    if(autoFill) {
-        self.autoFillLastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
-        [SecretStore.sharedInstance setSecureObject:self.autoFillLastKnownGoodDatabaseState forIdentifier:kAutoFillBiometricDatabaseStateKey];
-    }
-    else {
-        self.lastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
-        [SecretStore.sharedInstance setSecureObject:self.lastKnownGoodDatabaseState forIdentifier:kBiometricDatabaseStateKey];
-    }
+    
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
+        if(autoFill) {
+            self.autoFillLastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
+            [SecretStore.sharedInstance setSecureObject:self.autoFillLastKnownGoodDatabaseState forIdentifier:kAutoFillBiometricDatabaseStateKey];
+        }
+        else {
+            self.lastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
+            [SecretStore.sharedInstance setSecureObject:self.lastKnownGoodDatabaseState forIdentifier:kBiometricDatabaseStateKey];
+        }
+    });
 }
 
 - (BOOL)isBiometricDatabaseStateHasChanged:(BOOL)autoFill {

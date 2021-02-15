@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 20/09/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "AppleICloudProvider.h"
@@ -36,7 +36,7 @@
         _browsableNew = NO;
         _browsableExisting = NO;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = NO; 
+        _defaultForImmediatelyOfferOfflineCache = NO; 
         _supportsConcurrentRequests = NO; 
         
         return self;
@@ -155,7 +155,7 @@ suggestedFilename:nil
                     [SVProgressHUD dismiss];
                 });
             }
-            
+             
             if (!success) {
                 NSLog(@"Failed to open %@", fileUrl);
                 completion(kReadResultError, nil, nil, [Utils createNSError:@"Could not read iCloud file. Try restarting your device." errorCode:-6]);
@@ -163,9 +163,7 @@ suggestedFilename:nil
             }
 
             
-            
             NSData* data = doc.data;
-            
             [doc closeWithCompletionHandler:^(BOOL success) {
                 if (!success) {
                     NSLog(@"Failed to close %@", fileUrl);
@@ -173,7 +171,12 @@ suggestedFilename:nil
                     return;
                 }
                 
-                completion(kReadResultSuccess, data, doc.fileModificationDate, nil);
+                if ( options && options.onlyIfModifiedDifferentFrom && doc.fileModificationDate && [doc.fileModificationDate isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom] ) {
+                    completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
+                }
+                else {
+                    completion(kReadResultSuccess, data, doc.fileModificationDate, nil);
+                }
             }];
         }];
     });

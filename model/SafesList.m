@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 30/03/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SafesList.h"
@@ -11,7 +11,7 @@
 #import "SharedAppAndAutoFillSettings.h"
 #import "FileManager.h"
 #import "NSArray+Extensions.h"
-#import "SyncManager.h"
+#import "WorkingCopyManager.h"
 
 @interface SafesList()
 
@@ -309,7 +309,7 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 - (void)_internalAdd:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
     if (initialCache) {
         NSError* error;
-        NSURL* url = [SyncManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe error:&error];
+        NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe error:&error];
 
         safe.lastSyncRemoteModDate = initialCacheModDate; 
         

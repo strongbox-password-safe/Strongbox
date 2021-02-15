@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 24/04/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "ConfiguredBrowseTableDatasource.h"
@@ -99,7 +99,7 @@ const NSUInteger kSectionIdxLast = 3;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node];
+        return [self.viewModel isFlaggedByAudit:node.uuid];
     }];
 
     return [searcher filterAndSortForBrowse:self.viewModel.pinnedNodes.mutableCopy
@@ -122,7 +122,7 @@ const NSUInteger kSectionIdxLast = 3;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node];
+        return [self.viewModel isFlaggedByAudit:node.uuid];
     }];
 
     return [searcher filterAndSortForBrowse:ne.mutableCopy
@@ -145,7 +145,7 @@ const NSUInteger kSectionIdxLast = 3;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node];
+        return [self.viewModel isFlaggedByAudit:node.uuid];
     }];
 
     return [searcher filterAndSortForBrowse:exp.mutableCopy
@@ -155,15 +155,20 @@ const NSUInteger kSectionIdxLast = 3;
                               includeGroups:YES];
 }
 
-- (NSArray<Node*>*)loadStandardItems:(Node*)currentGroup  {
-    NSArray<Node*>* ret;
+- (NSArray<Node*>*)loadStandardItems:(NSUUID*)currentGroup  {
+    NSArray<Node*>* ret = @[];
+    
+    Node* current = [self.viewModel.database getItemById:currentGroup];
+    if (!current) {
+        return ret; 
+    }
     
     switch (self.viewModel.metadata.browseViewType) {
         case kBrowseViewTypeHierarchy:
-            ret = currentGroup.children;
+            ret = current.children;
             break;
         case kBrowseViewTypeList:
-            ret = currentGroup.allChildRecords;
+            ret = current.allChildRecords;
             break;
         case kBrowseViewTypeTotpList:
             ret = [self.viewModel.database.effectiveRootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
@@ -178,7 +183,7 @@ const NSUInteger kSectionIdxLast = 3;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node];
+        return [self.viewModel isFlaggedByAudit:node.uuid];
     }];
 
     return [searcher filterAndSortForBrowse:ret.mutableCopy
@@ -188,7 +193,7 @@ const NSUInteger kSectionIdxLast = 3;
                               includeGroups:YES];
 }
 
-- (void)refreshItems:(Node*)currentGroup {
+- (void)refreshItems:(NSUUID *)currentGroup {
     self.standardItemsCache = [self loadStandardItems:currentGroup];
     
     

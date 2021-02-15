@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 14/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Platform.h"
@@ -12,6 +12,14 @@
 
 + (BOOL)isSimulator {
     return TARGET_OS_SIMULATOR != 0;
+}
+
++ (BOOL)iOS11Available {
+    if ( @available(iOS 11.0, *) ) { 
+        return YES;
+    }
+    
+    return NO;
 }
 
 + (BOOL)iOS13Available {

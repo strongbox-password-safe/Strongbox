@@ -3,12 +3,13 @@
 //  MacBox
 //
 //  Created by Mark on 16/08/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Utils.h"
 #import <CommonCrypto/CommonCrypto.h>
 #import "NSData+Extensions.h"
+#import "NSString+Extensions.h"
 
 #if TARGET_OS_IPHONE
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -148,7 +149,7 @@ NSUUID* uuidFromKeePassStringId(NSString* stringId) {
     
     
     
-    NSData* uuidData = [Utils dataFromHexString:stringId];
+    NSData* uuidData = stringId.dataFromHex;
     return [[NSUUID alloc] initWithUUIDBytes:uuidData.bytes];
 }
 
@@ -307,27 +308,6 @@ void hexdump(unsigned char *buffer, unsigned long index, unsigned long width) {
     }
     
     printf("\n");
-}
-
-+ (NSData *)dataFromHexString:(NSString*)string {
-    
-    string = [string stringByReplacingOccurrencesOfString:@" " withString:@""];
-    
-    const char *chars = [string UTF8String];
-    NSUInteger i = 0, len = string.length;
-    
-    NSMutableData *data = [NSMutableData dataWithCapacity:len / 2];
-    char byteChars[3] = {'\0','\0','\0'};
-    unsigned long wholeByte;
-    
-    while (i < len) {
-        byteChars[0] = chars[i++];
-        byteChars[1] = chars[i++];
-        wholeByte = strtoul(byteChars, NULL, 16);
-        [data appendBytes:&wholeByte length:1];
-    }
-    
-    return data;
 }
 
 NSData* hmacSha1(NSData* data, NSData* key) {

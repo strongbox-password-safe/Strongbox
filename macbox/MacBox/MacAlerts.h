@@ -9,9 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
 
-@interface Alerts : NSObject<NSTextFieldDelegate>
+@interface MacAlerts : NSObject<NSTextFieldDelegate>
 
 + (void)error:(const NSError*)error window:(NSWindow*)window;
++ (void)error:(const NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion;
+
 + (void)error:(NSString*)message error:(const NSError*)error window:(NSWindow*)window;
 + (void)error:(NSString*)message error:(const NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion;
 

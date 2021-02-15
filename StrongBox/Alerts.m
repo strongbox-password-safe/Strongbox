@@ -3,12 +3,16 @@
 //  StrongBox
 //
 //  Created by Mark on 29/05/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Alerts.h"
-#import <MobileCoreServices/MobileCoreServices.h>
 #import "utils.h"
+#import "SharedAppAndAutoFillSettings.h"
+
+#if TARGET_OS_IPHONE
+#import <MobileCoreServices/MobileCoreServices.h>
+#endif
 
 @interface Alerts ()
 
@@ -196,7 +200,7 @@
                                                               handler:^(UIAlertAction *a) { action(YES); }];
 
         UIAlertAction *noAction = [UIAlertAction actionWithTitle:secondButtonText
-                                                           style:UIAlertActionStyleDefault
+                                                           style:UIAlertActionStyleCancel
                                                          handler:^(UIAlertAction *a) { action(NO); }];
 
         [alertController addAction:defaultAction];
@@ -321,6 +325,30 @@
         [alertController addAction:defaultAction];
         [alertController addAction:secondAction];
         [alertController addAction:thirdAction];
+    
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
+}
+
++ (void)oneOptionsWithCancel:(VIEW_CONTROLLER_PTR)viewController title:(NSString *)title message:(NSString *)message buttonText:(NSString *)buttonText action:(void (^)(BOOL response))action {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        
+        
+        
+        
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:buttonText
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(YES); }];
+                
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) { action(NO); }];
+        
+        [alertController addAction:defaultAction];
+        [alertController addAction:cancelAction];
     
         [viewController presentViewController:alertController animated:YES completion:nil];
     });
@@ -599,6 +627,27 @@
     
         [viewController presentViewController:alertController animated:YES completion:nil];
     });
+}
+
++ (void)checkThirdPartyLibOptInOK:(UIViewController *)viewController completion:(void (^)(BOOL optInOk))completion {
+    if ( SharedAppAndAutoFillSettings.sharedInstance.userHasOptedInToThirdPartyStorageLibraries ) {
+        completion(YES);
+        return;
+    }
+     
+    
+    
+    [Alerts oneOptionsWithCancel:viewController
+                           title:NSLocalizedString(@"third_party_storage_privacy_opt_in_title", @"Third Party Storage Privacy Opt-In")
+                         message:NSLocalizedString(@"third_party_storage_privacy_opt_in_message", @"You are about to use a software library from Google, Microsoft or Dropbox for the first time to access your cloud files.\n\nStrongbox does not control these organizations privacy policies (which may not be awesome).\n\nStrongbox offers these services for your convenience and it is entirely at your discretion whether you use them or not. See our support articles for more info.")
+                      buttonText:NSLocalizedString(@"third_party_storage_privacy_option_opt_in", @"That's cool, opt in...")
+                          action:^(BOOL response) {
+        if ( response ) {
+            SharedAppAndAutoFillSettings.sharedInstance.userHasOptedInToThirdPartyStorageLibraries = YES;
+        }
+        
+        completion(response);
+    }];
 }
 
 @end

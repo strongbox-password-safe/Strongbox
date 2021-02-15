@@ -3,12 +3,13 @@
 //  Strongbox
 //
 //  Created by Strongbox on 16/10/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "VirtualYubiKey.h"
 #import "SecretStore.h"
 #import "Utils.h"
+#import "NSString+Extensions.h"
 
 @interface VirtualYubiKey ()
 
@@ -111,7 +112,7 @@
     if (paddingRequired) {
         sec = [sec substringFromIndex:1];
     }
-    NSData* yubikeySecretData = [Utils dataFromHexString:sec];
+    NSData* yubikeySecretData = sec.dataFromHex;
     
     NSData *actualChallenge = paddingRequired ? paddedChallenge : challenge;
     

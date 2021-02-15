@@ -10,7 +10,7 @@
 #import "BookmarksHelper.h"
 #import "Utils.h"
 #import "SecretStore.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "BiometricIdHelper.h"

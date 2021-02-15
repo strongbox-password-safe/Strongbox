@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 28/05/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 //    [12] Password History is an optional record. If it exists, it stores the
 //    creation times and values of the last few passwords used in the current

@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 04/04/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #ifndef StorageProvider_h
@@ -12,7 +12,7 @@
 typedef NS_ENUM (NSUInteger, StorageProvider) {
     kGoogleDrive,
     kDropbox,
-    kLocalDevice,
+    kLocalDevice, 
     kiCloud,
     kOneDrive,
     kFilesAppUrlBookmark,

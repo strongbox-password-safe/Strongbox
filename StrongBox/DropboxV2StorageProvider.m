@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 26/05/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DropboxV2StorageProvider.h"
@@ -32,8 +32,9 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = YES; 
+        _defaultForImmediatelyOfferOfflineCache = YES; 
         _supportsConcurrentRequests = NO; 
+        _privacyOptInRequired = YES;
         
         return self;
     }

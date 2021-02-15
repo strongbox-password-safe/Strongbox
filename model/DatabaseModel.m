@@ -24,7 +24,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 @property (nonatomic, readonly) NSMutableDictionary<NSUUID*, NSDate*> *mutableDeletedObjects;
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, nonnull, readonly) UnifiedDatabaseMetadata* metadata;
-@property (nonatomic, nonnull, readonly) CompositeKeyFactors *compositeKeyFactors;
+
 
 @property (nonatomic, readonly, nonnull) ConcurrentMutableDictionary<NSUUID*, Node*>* fastNodeIdMap;
 
@@ -94,7 +94,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     if (self = [super init]) {
         _fastNodeIdMap = [[ConcurrentMutableDictionary alloc] init];
         _format = format;
-        _compositeKeyFactors = compositeKeyFactors;
+        _ckfs = compositeKeyFactors;
         _metadata = metadata;
         
         _rootNode = root ? root : [self initializeRoot];
@@ -146,10 +146,6 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (DatabaseFormat)originalFormat {
     return self.format;
-}
-
-- (CompositeKeyFactors *)ckfs {
-    return self.compositeKeyFactors;
 }
 
 - (UnifiedDatabaseMetadata *)meta {
@@ -206,11 +202,19 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (void)rebuildFastNodeIdMap {
     [self.fastNodeIdMap removeAllObjects];
 
+    
     if (self.rootNode && self.rootNode.children) {
         self.fastNodeIdMap[self.rootNode.uuid] = self.rootNode;
         
         for (Node* node in self.rootNode.allChildren) {
-            self.fastNodeIdMap[node.uuid] = node;
+            Node* existing = self.fastNodeIdMap[node.uuid];
+            
+            if ( existing ) {
+                NSLog(@"WARNWARN: XXXXX - Duplicate ID in database => [%@] - [%@] - [%@]", existing, node, node.uuid);
+            }
+            else {
+                self.fastNodeIdMap[node.uuid] = node;
+            }
         }
     }
 }
@@ -267,11 +271,17 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return nil;
 }
 
+- (NSString *)getCrossSerializationFriendlyIdId:(NSUUID *)nodeId {
+    Node* node = [self getItemById:nodeId];
+    return [self getCrossSerializationFriendlyId:node];
+}
+
+
 - (NSString *)getCrossSerializationFriendlyId:(Node *)node {
     if (!node) {
         return nil;
     }
-    
+
     
     
     
@@ -1028,11 +1038,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return self.mutableDeletedObjects.copy;
 }
 
-- (BOOL)canRecycle:(Node *)item {
+- (BOOL)canRecycle:(NSUUID *)itemId {
     BOOL willRecycle = self.recycleBinEnabled;
     
-    if(self.recycleBinEnabled && self.recycleBinNode) {
-        if([self.recycleBinNode contains:item] || self.recycleBinNode == item) {
+    Node* item = [self getItemById:itemId];
+    if(item && self.recycleBinEnabled && self.recycleBinNode) {
+        if([self.recycleBinNode contains:item] || [self.recycleBinNode.uuid isEqual:itemId]) {
             willRecycle = NO;
         }
     }

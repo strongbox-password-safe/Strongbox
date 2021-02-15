@@ -10,6 +10,8 @@
 #import "StorageProvider.h"
 #import "SecretStore.h"
 #import "YubiKeyConfiguration.h"
+#import "QuickTypeAutoFillDisplayFormat.h"
+#import "ConflictResolutionStrategy.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,6 +45,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property (nonatomic) BOOL autoFillEnabled;
 @property (nonatomic) BOOL quickTypeEnabled;
+@property (nonatomic) QuickTypeAutoFillDisplayFormat quickTypeDisplayFormat;
+
 @property (nonatomic) BOOL quickWormholeFillEnabled;
 @property (nonatomic) BOOL hasPromptedForAutoFillEnrol;
 
@@ -53,6 +57,12 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 - (void)clearSecureItems;
 - (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*_Nullable)password; 
+
+@property (nullable) NSUUID* outstandingUpdateId;
+@property (nullable) NSDate* lastSyncRemoteModDate; 
+@property (nullable) NSDate* lastSyncAttempt;
+@property ConflictResolutionStrategy conflictResolutionStrategy;
+@property (readonly) BOOL readOnly; 
 
 @end
 

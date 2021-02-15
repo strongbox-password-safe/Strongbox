@@ -8,7 +8,7 @@
 
 #import "MacKeePassHistoryViewController.h"
 #import "NodeIconHelper.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "NodeDetailsViewController.h"
 
 @interface MacKeePassHistoryViewController () <NSTableViewDelegate, NSTableViewDataSource>
@@ -172,7 +172,7 @@
     
     NSString* loc = NSLocalizedString(@"mac_keepass_history_are_sure_delete", @"Are you sure you want to delete this history item?");
     
-    [Alerts yesNo:loc
+    [MacAlerts yesNo:loc
            window:self.view.window
        completion:^(BOOL yesNo) {
         if(yesNo) {
@@ -194,7 +194,7 @@
     
     NSString* loc = NSLocalizedString(@"mac_keepass_history_are_sure_restore", @"Are you sure you want to restore this history item?");
     
-    [Alerts yesNo:loc
+    [MacAlerts yesNo:loc
            window:self.view.window
        completion:^(BOOL yesNo) {
         if(yesNo) {

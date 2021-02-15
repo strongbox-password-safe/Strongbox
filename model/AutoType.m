@@ -3,15 +3,14 @@
 //  Strongbox
 //
 //  Created by Strongbox on 15/11/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "AutoType.h"
 
 @implementation AutoType
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.asssociations = @[];
@@ -51,6 +50,14 @@
     }
     
     return YES;
+}
+
++ (BOOL)isDefault:(AutoType*)autoType {
+    return autoType == nil || (autoType.enabled && autoType.dataTransferObfuscation == 0 && autoType.defaultSequence.length == 0 && autoType.asssociations.count == 0);
+}
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"AutoType: [%d-%d-%@-[%@]]", self.enabled, self.dataTransferObfuscation, self.defaultSequence, self.asssociations];
 }
 
 @end

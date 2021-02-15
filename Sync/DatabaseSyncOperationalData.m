@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 08/08/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseSyncOperationalData.h"
@@ -13,13 +13,13 @@
 
 @property ConcurrentMutableArray<SyncDatabaseRequest*>* requestQueue;
 
-@property SafeMetaData* database;
+@property METADATA_PTR database;
 
 @end
 
 @implementation DatabaseSyncOperationalData
 
-- (instancetype)initWithDatabase:(SafeMetaData*)database  {
+- (instancetype)initWithDatabase:(METADATA_PTR)database  {
     self = [super init];
     
     if (self) {

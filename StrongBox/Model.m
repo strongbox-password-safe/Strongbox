@@ -18,6 +18,7 @@
 #import "SyncManager.h"
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
+#import "DatabaseUnlocker.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
@@ -28,6 +29,7 @@ NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseView
 NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
 NSString* const kAppStoreSaleNotificationKey = @"appStoreSaleNotification";
 NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-id";
+NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificationKey";
 
 @interface Model ()
 
@@ -36,17 +38,22 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 @property BOOL isAutoFillOpen;
 @property BOOL forcedReadOnly;
 @property BOOL isDuressDummyMode;
+@property DatabaseModel* theDatabase;
+@property BOOL offlineMode; 
 
 @end
 
 @implementation Model
 
-- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen templateMetaData:(SafeMetaData*)templateMetaData {
+- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
+                 templateMetaData:(SafeMetaData*)templateMetaData {
     SafeMetaData* meta = [[SafeMetaData alloc] initWithNickName:templateMetaData.nickName
                                                 storageProvider:templateMetaData.storageProvider
                                                        fileName:templateMetaData.fileName
                                                  fileIdentifier:templateMetaData.fileIdentifier];
     meta.autoFillEnabled = NO;
+    meta.hasBeenPromptedForConvenience = YES; 
+    meta.hasBeenPromptedForQuickLaunch = YES;
     
     NSData* data = [self getDuressDummyData];
     if (!data) {
@@ -63,39 +70,103 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
     DatabaseModel* model = [Serializator expressFromData:data password:@"1234"];
     
-    return [self initWithSafeDatabase:model metaData:meta forcedReadOnly:NO isAutoFill:isAutoFillOpen isDuressDummyMode:YES];
+    return [self initWithDatabase:model metaData:meta forcedReadOnly:NO isAutoFill:isAutoFillOpen offlineMode:NO isDuressDummyMode:YES];
 }
 
-- (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
-                            metaData:(SafeMetaData *)metaData
-                      forcedReadOnly:(BOOL)forcedReadOnly
-                          isAutoFill:(BOOL)isAutoFill {
-    return [self initWithSafeDatabase:passwordDatabase metaData:metaData forcedReadOnly:forcedReadOnly isAutoFill:isAutoFill isDuressDummyMode:NO];
+- (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
+                        metaData:(SafeMetaData *)metaData
+                  forcedReadOnly:(BOOL)forcedReadOnly
+                      isAutoFill:(BOOL)isAutoFill {
+    return [self initWithDatabase:passwordDatabase metaData:metaData forcedReadOnly:forcedReadOnly isAutoFill:isAutoFill offlineMode:NO];
 }
 
-- (instancetype)initWithSafeDatabase:(DatabaseModel *)passwordDatabase
-                            metaData:(SafeMetaData *)metaData
-                      forcedReadOnly:(BOOL)forcedReadOnly
-                          isAutoFill:(BOOL)isAutoFill
-                   isDuressDummyMode:(BOOL)isDuressDummyMode {
+- (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase metaData:(SafeMetaData *)metaData forcedReadOnly:(BOOL)forcedReadOnly isAutoFill:(BOOL)isAutoFill offlineMode:(BOOL)offlineMode {
+    return [self initWithDatabase:passwordDatabase metaData:metaData forcedReadOnly:forcedReadOnly isAutoFill:isAutoFill offlineMode:offlineMode isDuressDummyMode:NO];
+}
+
+- (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
+                        metaData:(SafeMetaData *)metaData
+                  forcedReadOnly:(BOOL)forcedReadOnly
+                      isAutoFill:(BOOL)isAutoFill
+                     offlineMode:(BOOL)offlineMode
+               isDuressDummyMode:(BOOL)isDuressDummyMode {
     if (self = [super init]) {
-        _database = passwordDatabase;
+        if ( !passwordDatabase ) {
+            return nil;
+        }
+        
+        self.theDatabase = passwordDatabase;
         _metadata = metaData;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
         
         self.forcedReadOnly = forcedReadOnly;
         self.isAutoFillOpen = isAutoFill;
         self.isDuressDummyMode = isDuressDummyMode;
+        self.offlineMode = offlineMode;
         
         [self createNewAuditor];
-
-        [self restartBackgroundAudit];
         
         return self;
     }
     else {
         return nil;
     }
+}
+
+
+
+- (DatabaseModel *)database {
+    return self.theDatabase;
+}
+
+- (void)reloadDatabaseFromLocalWorkingCopy:(UIViewController*)viewController 
+                                completion:(void(^)(BOOL success))completion {
+    if (self.isDuressDummyMode) {
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if (completion) {
+                completion(YES);
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:nil];
+            });
+        });
+        return;
+    }
+
+    NSLog(@"XXXXX - reloadDatabaseFromLocalWorkingCopy....");
+
+    
+    DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata viewController:viewController forceReadOnly:self.forcedReadOnly isAutoFillOpen:self.isAutoFillOpen offlineMode:self.offlineMode];
+    [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+        if ( result == kUnlockDatabaseResultSuccess) {
+            NSLog(@"XXXXX - reloadDatabaseFromLocalWorkingCopy... Success ");
+
+            self.theDatabase = model.database;
+            if (completion) {
+                completion(YES);
+            }
+            
+            [self restartBackgroundAudit];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSNotificationCenter.defaultCenter postNotificationName:kDatabaseReloadedNotificationKey object:nil];
+            });
+        }
+        else {
+            NSLog(@"Unlocking local copy for database reload request failed: %@", error);
+            
+            
+            
+            
+
+            
+            if (completion) {
+                completion(NO); 
+            }
+        }
+    }];
 }
 
 
@@ -154,7 +225,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     __weak Model* weakSelf = self;
     self.auditor = [[DatabaseAuditor alloc] initWithPro:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial
                                              isExcluded:^BOOL(Node * _Nonnull item) {
-        NSString* sid = [weakSelf.database getCrossSerializationFriendlyId:item];
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:item.uuid];
         return [weakSelf isExcludedFromAuditHelper:set sid:sid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
@@ -163,8 +234,8 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     }];
 }
 
-- (BOOL)isExcludedFromAudit:(Node *)item {
-    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
+- (BOOL)isExcludedFromAudit:(NSUUID *)item {
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:item];
 
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
@@ -181,11 +252,8 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 - (void)restartAudit {
     [self stopAndClearAuditor];
 
-    [self.auditor start:self.database.activeRecords
+    [self.auditor start:self.database
                  config:self.metadata.auditConfig
-      isDereferenceable:^BOOL(NSString * _Nonnull string) {
-        return [self.database isDereferenceableText:string];
-    }
             nodesChanged:^{
         NSLog(@"Audit Nodes Changed Callback...");
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -216,7 +284,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return self.auditor ? self.auditor.auditIssueNodeCount : 0;
 }
 
-- (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item {
+- (NSString *)getQuickAuditVeryBriefSummaryForNode:(NSUUID *)item {
     if (self.auditor) {
         return [self.auditor getQuickAuditVeryBriefSummaryForNode:item];
     }
@@ -224,7 +292,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return @"";
 }
 
-- (NSString*)getQuickAuditSummaryForNode:(Node*)item {
+- (NSString *)getQuickAuditSummaryForNode:(NSUUID *)item {
     if (self.auditor) {
         return [self.auditor getQuickAuditSummaryForNode:item];
     }
@@ -232,7 +300,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return @"";
 }
 
-- (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)item {
+- (NSSet<NSNumber *> *)getQuickAuditFlagsForNode:(NSUUID *)item {
     if (self.auditor) {
         return [self.auditor getQuickAuditFlagsForNode:item];
     }
@@ -240,7 +308,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return NSSet.set;
 }
 
-- (BOOL)isFlaggedByAudit:(Node*)item {
+- (BOOL)isFlaggedByAudit:(NSUUID *)item {
     if (self.auditor) {
         NSSet<NSNumber*>* auditFlags = [self.auditor getQuickAuditFlagsForNode:item];
         return auditFlags.count > 0;
@@ -249,24 +317,36 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return NO;
 }
 
-- (NSSet<Node *> *)getSimilarPasswordNodeSet:(Node *)node {
+- (NSSet<Node *> *)getSimilarPasswordNodeSet:(NSUUID *)node {
     if (self.auditor) {
-        return [self.auditor getSimilarPasswordNodeSet:node];
+        NSSet<NSUUID*>* sims = [self.auditor getSimilarPasswordNodeSet:node];
+        
+        return [[sims.allObjects filter:^BOOL(NSUUID * _Nonnull obj) {
+            return [self.database getItemById:obj] != nil;
+        }] map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+            return [self.database getItemById:obj];
+        }].set;
     }
     
     return NSSet.set;
 }
 
-- (NSSet<Node *> *)getDuplicatedPasswordNodeSet:(Node *)node {
+- (NSSet<Node *> *)getDuplicatedPasswordNodeSet:(NSUUID *)node {
     if (self.auditor) {
-        return [self.auditor getDuplicatedPasswordNodeSet:node];
+        NSSet<NSUUID*>* dupes = [self.auditor getDuplicatedPasswordNodeSet:node];
+        
+        return [[dupes.allObjects filter:^BOOL(NSUUID * _Nonnull obj) {
+            return [self.database getItemById:obj] != nil;
+        }] map:^id _Nonnull(NSUUID * _Nonnull obj, NSUInteger idx) {
+            return [self.database getItemById:obj];
+        }].set;
     }
     
     return NSSet.set;
 }
 
-- (void)setItemAuditExclusion:(Node *)item exclude:(BOOL)exclude {
-    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
+- (void)setItemAuditExclusion:(NSUUID *)item exclude:(BOOL)exclude {
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:item];
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
         
     NSMutableSet<NSString*> *mutable = [NSMutableSet setWithArray:excluded];
@@ -299,11 +379,15 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
 
 
 
+- (BOOL)isInOfflineMode {
+    return self.offlineMode;
+}
+
 - (BOOL)isReadOnly {
     return self.metadata.readOnly || self.forcedReadOnly;
 }
 
-- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error))handler {
+- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
     if(self.isReadOnly) {
         handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
         return;
@@ -319,7 +403,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     }];
 }
 
-- (void)onEncryptionDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error))completion {
+- (void)onEncryptionDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
     if (self.isDuressDummyMode) {
         [self setDuressDummyData:data];
         completion(NO, NO, nil);
@@ -336,21 +420,28 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
             return;
         }
 
-        if (self.isAutoFillOpen) { 
+        if ( self.offlineMode ) { 
             completion(NO, NO, nil);
         }
         else {
-            [SyncManager.sharedInstance sync:self.metadata interactiveVC:viewController join:NO completion:^(SyncAndMergeResult result, BOOL conflictAndLocalWasChanged, const NSError * _Nullable error) {
-                if (result == kSyncAndMergeSuccess) {
+            CompositeKeyFactors* key = self.database.ckfs;
+            
+            [SyncManager.sharedInstance sync:self.metadata interactiveVC:viewController key:key join:NO completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
+                if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
                     if(self.metadata.autoFillEnabled) {
-                        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid];
+                        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid displayFormat:self.metadata.quickTypeDisplayFormat];
                     }
 
                     
                     if (self.metadata.auditConfig.auditInBackground) {
                         [self restartAudit];
                     }
-                    completion(NO, conflictAndLocalWasChanged, nil);
+
+                    completion(NO, localWasChanged, nil);
+                    
+                    if (localWasChanged) {
+                        [self reloadDatabaseFromLocalWorkingCopy:viewController completion:nil];
+                    }
                 }
                 else if (result == kSyncAndMergeError) {
                     completion(NO, NO, error);
@@ -359,7 +450,7 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
                     
                     NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
                     error = [Utils createNSError:message errorCode:-1];
-                    completion(NO, NO, error); 
+                    completion(YES, NO, error);
                 }
                 else { 
                     error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
@@ -403,8 +494,8 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return nil;
 }
 
-- (BOOL)canRecycle:(Node*_Nonnull)item {
-    return [self.database canRecycle:item];
+- (BOOL)canRecycle:(NSUUID *)itemId {
+    return [self.database canRecycle:itemId];
 }
 
 - (void)deleteItems:(const NSArray<Node *> *)items {
@@ -413,8 +504,8 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     
     
     for (Node* item in items) {
-        if([self isPinned:item]) {
-            [self togglePin:item];
+        if([self isPinned:item.uuid]) {
+            [self togglePin:item.uuid];
         }
     }
 }
@@ -424,8 +515,8 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     
     if (ret) { 
         for (Node* item in items) {
-            if([self isPinned:item]) {
-                [self togglePin:item];
+            if([self isPinned:item.uuid]) {
+                [self togglePin:item.uuid];
             }
         }
     }
@@ -443,22 +534,22 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     return self.cachedPinned;
 }
 
-- (BOOL)isPinned:(Node*)item {
+- (BOOL)isPinned:(NSUUID *)itemId {
     if(self.cachedPinned.count == 0) {
         return NO;
     }
     
-    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
     
     return [self.cachedPinned containsObject:sid];
 }
 
-- (void)togglePin:(Node*)item {
-    NSString* sid = [self.database getCrossSerializationFriendlyId:item];
+- (void)togglePin:(NSUUID *)itemId {
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:itemId];
 
     NSMutableSet<NSString*>* favs = self.cachedPinned.mutableCopy;
     
-    if([self isPinned:item]) {
+    if([self isPinned:itemId]) {
         [favs removeObject:sid];
     }
     else {
@@ -469,13 +560,12 @@ NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-
     
     __weak Model* weakSelf = self;
     NSArray<Node*>* pinned = [self.database.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-        NSString* sid = [weakSelf.database getCrossSerializationFriendlyId:node];
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:node.uuid];
         return [favs containsObject:sid];
     }];
     
     NSArray<NSString*>* trimmed = [pinned map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        NSString* sid = [weakSelf.database getCrossSerializationFriendlyId:obj];
-        
+        NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:obj.uuid];
         return sid;
     }];
     self.cachedPinned = [NSSet setWithArray:trimmed];

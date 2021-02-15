@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 28/05/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

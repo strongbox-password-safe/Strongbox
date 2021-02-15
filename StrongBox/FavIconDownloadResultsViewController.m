@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 27/11/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "FavIconDownloadResultsViewController.h"
@@ -94,7 +94,7 @@
     NSArray<UIImage*>* images = [self getImagesForNode:node];
     NSNumber* selectedIndex = self.nodeSelected[node.uuid];
     
-    image = (selectedIndex != nil && selectedIndex.intValue < images.count && selectedIndex.intValue >= 0) ? images[selectedIndex.intValue] : nil;
+    image = (images && selectedIndex != nil && selectedIndex.intValue < images.count && selectedIndex.intValue >= 0) ? images[selectedIndex.intValue] : nil;
 
     if(indexPath.section == 0) {
         cell.accessoryType = images.count > 1 ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
@@ -171,8 +171,12 @@
 
     for (Node* obj in self.successful) {
         NSNumber* index = self.nodeSelected[obj.uuid];
+        
         NSArray<UIImage*>* images = [self getImagesForNode:obj];
-        selected[obj.uuid] = images[index.intValue];
+        
+        if (images != nil && index != nil && index.intValue < images.count && index.intValue >= 0) {
+            selected[obj.uuid] = images[index.intValue];
+        }
     }
     
     self.onDone(YES, selected);

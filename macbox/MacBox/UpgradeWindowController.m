@@ -7,7 +7,7 @@
 //
 
 #import "UpgradeWindowController.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "Settings.h"
 
 #define kFontName @"Futura-Bold"
@@ -255,7 +255,7 @@ static UpgradeWindowController *sharedInstance = nil;
     }
     else{
         NSString* loc = NSLocalizedString(@"mac_upgrade_purchases_disabled_on_device", @"Purchases Are Disabled on Your Device.");
-        [Alerts info:loc window:self.window];
+        [MacAlerts info:loc window:self.window];
     }
 }
 
@@ -276,7 +276,7 @@ static UpgradeWindowController *sharedInstance = nil;
     NSLog(@"restoreCompletedTransactionsFailedWithError: %@", error);
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        [Alerts error:@"Error in restoreCompletedTransactionsFailedWithError" error:error window:self.window completion:^{
+        [MacAlerts error:@"Error in restoreCompletedTransactionsFailedWithError" error:error window:self.window completion:^{
             [self close:NO];
         }];
     });
@@ -290,7 +290,7 @@ static UpgradeWindowController *sharedInstance = nil;
             NSString* loc = NSLocalizedString(@"mac_upgrade_restoration_unsuccessful", @"Restoration Unsuccessful");
             NSString* loc2 = NSLocalizedString(@"mac_upgrade_could_not_find_any_previous_purchases", @"Could not find any previously purchased products.");
 
-            [Alerts info:loc
+            [MacAlerts info:loc
          informativeText:loc2
                   window:self.window
               completion:^{
@@ -309,7 +309,7 @@ static UpgradeWindowController *sharedInstance = nil;
         NSString* loc2 = NSLocalizedString(@"mac_upgrade_upgrade_restored_success", @"Upgrade Restored Successfully. Thank you for your support!\n\n"
         @"Please restart the Application to enjoy your Pro features.");
 
-        [Alerts info:loc
+        [MacAlerts info:loc
      informativeText:loc2
               window:self.window
           completion:^{
@@ -333,7 +333,7 @@ updatedTransactions:(NSArray *)transactions {
                 NSString* loc2 = NSLocalizedString(@"mac_upgrade_upgrade_successful_thank_you", @"Upgrade to Pro version successful! Thank you for your support!\n\nPlease restart the Application to enjoy your Pro features.");
 
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [Alerts info:loc
+                    [MacAlerts info:loc
                  informativeText:loc2
                           window:self.window  completion:^{
                         [self close:YES];
@@ -360,7 +360,7 @@ updatedTransactions:(NSArray *)transactions {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     NSString* loc = NSLocalizedString(@"mac_upgrade_failed_to_upgrade", @"Failed to Upgrade");
 
-                    [Alerts error:loc
+                    [MacAlerts error:loc
                             error:transaction.error
                            window:self.window
                        completion:^{

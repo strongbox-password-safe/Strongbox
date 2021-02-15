@@ -26,9 +26,15 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
         self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
+        self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
+        self.conflictResolutionStrategy = kConflictResolutionStrategyForcePushLocal; 
     }
     
     return self;
+}
+
+- (BOOL)readOnly {
+    return NO;
 }
 
 - (void)clearSecureItems {
@@ -36,25 +42,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     self.keyFileBookmark = nil;
     self.autoFillKeyFileBookmark = nil;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (NSString*)getConveniencePasswordIdentifier {
     return [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
@@ -148,6 +135,12 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.quickTypeEnabled forKey:@"quickTypeEnabled"];
     [encoder encodeBool:self.hasPromptedForAutoFillEnrol forKey:@"hasPromptedForAutoFillEnrol"];
     [encoder encodeBool:self.quickWormholeFillEnabled forKey:@"quickWormholeFillEnabled"];
+    [encoder encodeInteger:self.quickTypeDisplayFormat forKey:@"quickTypeDisplayFormat"];
+
+    [encoder encodeInteger:self.conflictResolutionStrategy forKey:@"conflictResolutionStrategy"];
+    [encoder encodeObject:self.outstandingUpdateId forKey:@"outstandingUpdateId"];
+    [encoder encodeObject:self.lastSyncRemoteModDate forKey:@"lastSyncRemoteModDate"];
+    [encoder encodeObject:self.lastSyncAttempt forKey:@"lastSyncAttempt"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -198,6 +191,26 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         if([decoder containsValueForKey:@"quickWormholeFillEnabled"]) {
             self.quickWormholeFillEnabled = [decoder decodeBoolForKey:@"quickWormholeFillEnabled"];
+        }
+        
+        if([decoder containsValueForKey:@"quickTypeDisplayFormat"]) {
+            self.quickTypeDisplayFormat = [decoder decodeIntegerForKey:@"quickTypeDisplayFormat"];
+        }
+        
+        if([decoder containsValueForKey:@"conflictResolutionStrategy"]) {
+            self.conflictResolutionStrategy = [decoder decodeIntegerForKey:@"conflictResolutionStrategy"];
+        }
+        
+        if ( [decoder containsValueForKey:@"outstandingUpdateId"] ) {
+            self.outstandingUpdateId = [decoder decodeObjectForKey:@"outstandingUpdateId"];
+        }
+
+        if ( [decoder containsValueForKey:@"lastSyncRemoteModDate"] ) {
+            self.lastSyncRemoteModDate = [decoder decodeObjectForKey:@"lastSyncRemoteModDate"];
+        }
+
+        if ( [decoder containsValueForKey:@"lastSyncAttempt"] ) {
+            self.lastSyncAttempt = [decoder decodeObjectForKey:@"lastSyncAttempt"];
         }
     }
     

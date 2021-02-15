@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 24/04/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "BrowseTableViewCellHelper.h"
@@ -72,7 +72,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                             accessoryType:(UITableViewCellAccessoryType)accessoryType
                                   noFlags:(BOOL)noFlags
                       showGroupChildCount:(BOOL)showGroupChildCount {
-    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:groupLocationOverride accessoryType:accessoryType noFlags:NO showGroupChildCount:showGroupLocation subtitleOverride:nil];
+    return [self getBrowseCellForNode:node indexPath:indexPath showLargeTotpCell:showLargeTotpCell showGroupLocation:showGroupLocation groupLocationOverride:groupLocationOverride accessoryType:accessoryType noFlags:NO showGroupChildCount:showGroupChildCount subtitleOverride:nil];
 }
 
 - (UITableViewCell *)getBrowseCellForNode:(Node *)node
@@ -104,14 +104,14 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
         
         NSDictionary<NSNumber*, UIColor*> *flagTintColors = @{};
         
-        NSString* briefAudit = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node] : @"";
+        NSString* briefAudit = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self.viewModel getQuickAuditVeryBriefSummaryForNode:node.uuid] : @"";
         NSArray* flags = self.viewModel.metadata.showFlagsInBrowse && !noFlags ? [self getFlags:node isFlaggedByAudit:briefAudit.length tintColors:&flagTintColors] : @[];
         
         if(node.isGroup) {
             BOOL italic = (self.viewModel.database.recycleBinEnabled && node == self.viewModel.database.recycleBinNode);
 
             NSString* childCount = self.viewModel.metadata.showChildCountOnFolderInBrowse && showGroupChildCount ? [NSString stringWithFormat:@"(%lu)", (unsigned long)node.children.count] : @"";
-            
+                        
             [cell setGroup:title
                       icon:icon
                 childCount:childCount
@@ -152,7 +152,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
 
     NSMutableArray<UIImage*> *flags = NSMutableArray.array;
     
-    if([self.viewModel isPinned:node]) {
+    if([self.viewModel isPinned:node.uuid]) {
         UIImage* image;
         if (@available(iOS 13.0, *)) {
            image = [UIImage systemImageNamed:@"pin"];

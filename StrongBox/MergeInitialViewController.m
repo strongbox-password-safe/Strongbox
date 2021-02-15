@@ -3,13 +3,15 @@
 //  Strongbox
 //
 //  Created by Mark on 07/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "MergeInitialViewController.h"
-#import "OpenSafeSequenceHelper.h"
 #import "Alerts.h"
 #import "MergeSelectSecondDatabaseViewController.h"
+#import "CompositeKeyDeterminer.h"
+#import "DatabaseUnlocker.h"
+#import "DuressActionHelper.h"
 
 @implementation MergeInitialViewController
 
@@ -32,28 +34,52 @@
 }
 
 - (IBAction)onUnlock:(id)sender {
-    [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                       safe:self.firstMetadata
-                                        canConvenienceEnrol:NO
-                                             isAutoFillOpen:NO
-                                              openLocalOnly:NO
-                                                 completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
-        if(result == kUnlockDatabaseResultSuccess) {
-            [self performSegueWithIdentifier:@"segueToSelectSecondDatabase" sender:model];
+    CompositeKeyDeterminer* determiner = [CompositeKeyDeterminer determinerWithViewController:self database:self.firstMetadata isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+    [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        if (result == kGetCompositeKeyResultSuccess) {
+            DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.firstMetadata viewController:self forceReadOnly:NO isAutoFillOpen:NO offlineMode:YES];
+            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                [self onUnlockDone:result model:model error:error];
+            }];
         }
-        else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
-            self.onDone();
+        else if (result == kGetCompositeKeyResultError) {
+            [self displayError:error];
         }
-        else if (result == kUnlockDatabaseResultError) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                    error:error];
+        else if (result == kGetCompositeKeyResultDuressIndicated) {
+            [DuressActionHelper performDuressAction:self database:self.firstMetadata isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                [self onUnlockDone:result model:model error:error];
+            }];
+        }
+        else {
+            [self onCancel:nil];
         }
     }];
 }
 
+- (void)onUnlockDone:(UnlockDatabaseResult)result model:(Model * _Nullable)model error:(NSError * _Nullable)error {
+    if(result == kUnlockDatabaseResultSuccess) {
+        [self performSegueWithIdentifier:@"segueToSelectSecondDatabase" sender:model];
+    }
+    else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
+        [self onCancel:nil];
+    }
+    else if (result == kUnlockDatabaseResultIncorrectCredentials) {
+        
+        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+    }
+    else if (result == kUnlockDatabaseResultError) {
+        [self displayError:error];
+    }
+}
+
+- (void)displayError:(NSError*)error {
+    [Alerts error:self
+            title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+            error:error];
+}
+
 - (IBAction)onCancel:(id)sender {
-    self.onDone();
+    self.onDone(NO, nil, nil);
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

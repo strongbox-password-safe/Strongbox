@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 24/04/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SearchResultsBrowseTableDatasource.h"
@@ -69,7 +69,7 @@
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.viewModel isFlaggedByAudit:node];
+        return [self.viewModel isFlaggedByAudit:node.uuid];
     }];
 
     self.searchResults = [searcher search:searchController.searchBar.text

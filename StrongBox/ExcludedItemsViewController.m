@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 05/06/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "ExcludedItemsViewController.h"
@@ -93,7 +93,7 @@
     UITableViewRowAction *removeAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleDefault
                                                                             title:NSLocalizedString(@"audit_excluded_items_vc_action_unclude", @"Unexclude")
                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self.model setItemAuditExclusion:item exclude:NO];
+        [self.model setItemAuditExclusion:item.uuid exclude:NO];
         
         [self refreshItems];
         

@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 01/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "AutoFillManager.h"
@@ -57,67 +57,50 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
 
-- (void)    updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid {
-#if TARGET_OS_IPHONE
-    if (@available(iOS 12.0, *)) {
-#else
-    if (@available(macOS 11.0, *)) {
-#endif
-        if (database == nil) {
-            return;
-        }
-        
-        [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
-#if TARGET_OS_IPHONE
-            if(state.enabled) {
-                
+- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat {
+    if (! self.isPossible || database == nil ) {
+        return;
+    }
 
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD showWithStatus:@"Populating AutoFill..."];
-                });
+#if TARGET_OS_IPHONE
+    NSInteger databasesUsingQuickType = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
+        return obj.autoFillEnabled && obj.quickTypeEnabled;
+    }].count;
 #else
-            if(state.enabled) {
-                
+    NSInteger databasesUsingQuickType = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
+        return obj.autoFillEnabled && obj.quickTypeEnabled;
+    }].count;
 #endif
-                NSLog(@"Updating Quick Type AutoFill Database...");
-                
-                NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
+
+    [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
+        if(state.enabled) {
+            NSLog(@"Updating Quick Type AutoFill Database...");
+
+            NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
+            @try {
                 for (Node* node in database.activeRecords) {
-                    [identities addObjectsFromArray:[self getPasswordCredentialIdentity:node database:database databaseUuid:databaseUuid]];
+                    [identities addObjectsFromArray:[self getPasswordCredentialIdentity:node database:database databaseUuid:databaseUuid displayFormat:displayFormat]];
                 }
-#if TARGET_OS_IPHONE
-                NSInteger databasesUsingQuickType = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-                    return obj.autoFillEnabled && obj.quickTypeEnabled;
-                }].count;
+            }
+            @finally { }
+            
+            
 
-#else
-                NSInteger databasesUsingQuickType = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
-                    return obj.autoFillEnabled && obj.quickTypeEnabled;
-                }].count;
-#endif
-                if(databasesUsingQuickType < 2) { 
-                    [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
-                        NSLog(@"Replaced All Credential Identities... [%d] - [%@]", success, error);
-                    }];
-                }
-                else {
-                    [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
-                        NSLog(@"Saved Credential Identities (%lu items)... [%d] - [%@]", (unsigned long) identities.count, success, error);
-                    }];
-                }
-#if TARGET_OS_IPHONE
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
-#endif
+            if(databasesUsingQuickType < 2) { 
+                [ASCredentialIdentityStore.sharedStore replaceCredentialIdentitiesWithIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
+                    NSLog(@"Replaced All Credential Identities... [%d] - [%@]", success, error);
+                }];
             }
             else {
-                NSLog(@"AutoFill Credential Store Disabled...");
+                [ASCredentialIdentityStore.sharedStore saveCredentialIdentities:identities completion:^(BOOL success, NSError * _Nullable error) {
+                    NSLog(@"Saved Credential Identities (%lu items)... [%d] - [%@]", (unsigned long) identities.count, success, error);
+                }];
             }
-        }];
-    } else {
-        
-    }
+        }
+        else {
+            NSLog(@"AutoFill Credential Store Disabled...");
+        }
+    }];
 }
 
 - (BOOL)isPossible {
@@ -159,6 +142,7 @@ static NSString* const kMailToScheme = @"mailto";
 - (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentity:(Node*)node
                                                                 database:(DatabaseModel*)database
                                                             databaseUuid:(NSString*)databaseUuid
+                                                           displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
     API_AVAILABLE(ios(12.0), macos(11.0)) {
 #if TARGET_OS_IPHONE
     if (@available(iOS 12.0, *)) {
@@ -201,11 +185,24 @@ static NSString* const kMailToScheme = @"mailto";
             
             ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
             
-            NSString* usernameField = [database dereference:node.fields.username node:node];
+            NSString* username = [database dereference:node.fields.username node:node];
+            NSString* title = [database dereference:node.title node:node];
+            
+            NSString* quickTypeText;
+            
+            if ( displayFormat == kQuickTypeFormatTitleThenUsername ) {
+                quickTypeText = [NSString stringWithFormat:@"%@ (%@)", title, username];
+            }
+            else if ( displayFormat == kQuickTypeFormatUsernameOnly ) {
+                quickTypeText = username;
+            }
+            else {
+                quickTypeText = title;
+            }
+
 
             
-            
-            ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:usernameField recordIdentifier:[recordIdentifier toJson]];
+            ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:quickTypeText recordIdentifier:[recordIdentifier toJson]];
             [identities addObject:iden];
         }
         

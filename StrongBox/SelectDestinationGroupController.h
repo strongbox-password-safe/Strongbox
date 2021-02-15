@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property Node * _Nonnull currentGroup;
 @property NSArray<Node*> * _Nonnull itemsToMove;
 
-@property (nonatomic, copy, nonnull) void (^onDone)(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError* error);
+@property (nonatomic, copy, nonnull) void (^onDone)(BOOL userCancelled, BOOL localWasChanged, NSError* error);
 
 @end
 

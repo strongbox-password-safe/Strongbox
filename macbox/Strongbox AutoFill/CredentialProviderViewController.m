@@ -12,7 +12,7 @@
 #import "DatabasesManager.h"
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "Settings.h"
 #import "DatabaseModel.h"
 #import "ViewModel.h"
@@ -30,6 +30,7 @@
 #import "AutoFillWormhole.h"
 #import "SecretStore.h"
 #import "Serializator.h"
+#import "MacYubiKeyManager.h"
 
 @interface CredentialProviderViewController ()
 
@@ -78,7 +79,7 @@
 
         if (self.view && self.view.window) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts info:NSLocalizedString(@"mac_autofill_pro_feature_title", @"Pro Feature")
+                [MacAlerts info:NSLocalizedString(@"mac_autofill_pro_feature_title", @"Pro Feature")
              informativeText:NSLocalizedString(@"mac_autofill_pro_feature_upgrade-message", @"AutoFill is only available on the Pro edition of Strongbox. You can upgrade like this:\n\n1. Launch Strongbox\n2. Click the 'Strongbox' menu\n3. Click 'Upgrade to Pro...'.\n\nThank you!")
                       window:self.view.window
                   completion:^{
@@ -93,7 +94,7 @@
 }
 
 - (void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
-    NSLog(@"AutoFill: provideCredentialWithoutUserInteractionForIdentity [%@]", credentialIdentity);
+
 
     self.quickTypeMode = YES;
 
@@ -124,7 +125,6 @@
 - (void)doQuickWormholeFill:(QuickTypeRecordIdentifier*)identifier {
     self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
                                                          optionalDirectory:kAutoFillWormholeName];
-
 
     [self.wormhole clearAllMessageContents];
     
@@ -201,7 +201,7 @@
             else {
                 [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 
-                [Alerts info:NSLocalizedString(@"autofill_error_unknown_db_title", @"Strongbox: Unknown Database")
+                [MacAlerts info:NSLocalizedString(@"autofill_error_unknown_db_title", @"Strongbox: Unknown Database")
              informativeText:NSLocalizedString(@"autofill_error_unknown_db_message", @"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
                       window:self.view.window
                   completion:^{
@@ -213,7 +213,7 @@
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
-        [Alerts info:NSLocalizedString(@"autofill_error_unknown_item_title",@"Strongbox: Error Locating Entry")
+        [MacAlerts info:NSLocalizedString(@"autofill_error_unknown_item_title",@"Strongbox: Error Locating Entry")
      informativeText:NSLocalizedString(@"autofill_error_unknown_item_message",@"Strongbox could not find this entry, it is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
               window:self.view.window
           completion:^{
@@ -276,12 +276,12 @@
         NSString* welcomeRelocText = [NSString stringWithFormat:fmt, database.fileUrl && database.fileUrl.path ? database.fileUrl.path : NSLocalizedString(@"generic_unknown", @"Unknown")];
         NSString* button = [NSString stringWithFormat:buttonFmt, database.fileUrl && database.fileUrl.lastPathComponent ? database.fileUrl.lastPathComponent : NSLocalizedString(@"generic_unknown", @"Unknown")];
         
-        [Alerts customOptionWithCancel:NSLocalizedString(@"mac_welcome_to_autofill", @"Welcome to Strongbox AutoFill")
+        [MacAlerts customOptionWithCancel:NSLocalizedString(@"mac_welcome_to_autofill", @"Welcome to Strongbox AutoFill")
                        informativeText:welcomeRelocText
                      option1AndDefault:button
                               window:self.view.window
                             completion:^(BOOL go) {
-            if (go) {
+            if ( go ) {
                 [self beginRelocateDatabaseFileProcedure:database quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
             }
             else {
@@ -300,9 +300,7 @@
     BOOL passwordAvailable = database.conveniencePassword.length;
     
     BOOL keyFileNotSetButRequired = database.keyFileBookmark.length && !database.autoFillKeyFileBookmark.length;
-    
-    
-    
+        
     if (database.isTouchIdEnabled && pro && database.isTouchIdEnrolled && bioAvailable && passwordAvailable && !keyFileNotSetButRequired) {
         NSLog(@"Unlock Database: Biometric Possible & Available...");
 
@@ -329,17 +327,17 @@
         
                 CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:database.conveniencePassword
                                                                              keyFileBookmark:database.autoFillKeyFileBookmark
+                                                                        yubiKeyConfiguration:database.yubiKeyConfiguration
                                                                                          url:url
                                                                                        error:&err];
-                if(err) {
-                    [Alerts error:NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not read the key file.")
-                            error:err
-                           window:self.view.window];
-                    
-                    [self exitWithErrorOccurred:err];
+                if( !ckf || err) {
+                    [MacAlerts error:err window:self.view.window completion:^{
+                        [self exitWithErrorOccurred:err];
+                    }];
                 }
-                
-                [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf serviceIdentifiers:serviceIdentifiers];
+                else {
+                    [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf serviceIdentifiers:serviceIdentifiers];
+                }
             }
             else {
                 NSLog(@"Error unlocking safe with Touch ID. [%@]", error);
@@ -352,7 +350,7 @@
                     [self exitWithUserCancelled];
                 }
                 else {
-                    [Alerts error:error window:self.view.window];
+                    [MacAlerts error:error window:self.view.window];
                     [self exitWithErrorOccurred:error];
                 }
             }
@@ -360,7 +358,10 @@
     }];
 }
 
-- (void)manualUnlockDatabase:(DatabaseMetadata*)database url:(NSURL*)url quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+- (void)manualUnlockDatabase:(DatabaseMetadata*)database
+                         url:(NSURL*)url
+         quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
+          serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     ManualCredentialsEntry* mce = [[ManualCredentialsEntry alloc] initWithNibName:@"ManualCredentialsEntry" bundle:nil];
     mce.database = database;
     mce.isAutoFillOpen = YES;
@@ -371,11 +372,12 @@
         }
         else {
             NSError* error;
-            CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:password keyFileBookmark:keyFileBookmark url:url error:&error];
+            CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:password keyFileBookmark:keyFileBookmark yubiKeyConfiguration:yubiKeyConfiguration url:url error:&error];
             
-            if (!ckf || error) {
-                [Alerts error:error window:self.view.window];
-                [self exitWithErrorOccurred:error];
+            if( !ckf || error) {
+                [MacAlerts error:error window:self.view.window completion:^{
+                    [self exitWithErrorOccurred:error];
+                }];
             }
             else {
                 database.autoFillKeyFileBookmark = keyFileBookmark;
@@ -391,6 +393,7 @@
 
 - (CompositeKeyFactors*)getCompositeKeyFactorsWithSelectedUiFactors:(NSString*)password
                                                     keyFileBookmark:(NSString*)keyFileBookmark
+                                               yubiKeyConfiguration:(YubiKeyConfiguration * _Nullable)yubiKeyConfiguration
                                                                 url:(NSURL*)url
                                                               error:(NSError**)error {
     [url startAccessingSecurityScopedResource];
@@ -398,31 +401,49 @@
     [url stopAccessingSecurityScopedResource];
     
     NSData* keyFileDigest = [self getSelectedKeyFileDigest:format bookmark:keyFileBookmark error:error];
-
     if(*error) {
         return nil;
     }
         
-    if ((YES)) { 
+    if ( yubiKeyConfiguration == nil ) {
         return [CompositeKeyFactors password:password keyFileDigest:keyFileDigest];
     }
     else {
+        __block YubiKeyData * _Nonnull foundYubiKey;
         
-        
+        dispatch_group_t group = dispatch_group_create();
+        dispatch_group_enter(group);
+        [MacYubiKeyManager.sharedInstance getAvailableYubiKey:^(YubiKeyData * _Nonnull yubiKeyData) {
+            foundYubiKey = yubiKeyData;
+            dispatch_group_leave(group);
+        }];
+        dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
+        if ( foundYubiKey == nil || ![foundYubiKey.serial isEqualToString:yubiKeyConfiguration.deviceSerial]) {
+            if (error) {
+                NSString* errorMessage = NSLocalizedString(@"mac_autofill_no_or_incorrect_yubikey_found", @"Your Database is configured to use a YubiKey, however no YubiKey or an incorrect YubiKey was found connected.");
+                *error = [Utils createNSError:errorMessage errorCode:-24123];
+            }
+            return nil;
+        }
+        else {
+            NSInteger slot = yubiKeyConfiguration.slot;
+            BOOL currentYubiKeySlot1IsBlocking = foundYubiKey.slot1CrStatus == YubiKeySlotCrStatusSupportedBlocking;
+            BOOL currentYubiKeySlot2IsBlocking = foundYubiKey.slot2CrStatus == YubiKeySlotCrStatusSupportedBlocking;
+            BOOL blocking = slot == 1 ? currentYubiKeySlot1IsBlocking : currentYubiKeySlot2IsBlocking;
 
+            NSWindow* windowHint = self.view.window; 
 
-
-
-
-
-
-
-
-
-
-
-
+            return [CompositeKeyFactors password:password
+                                   keyFileDigest:keyFileDigest
+                                       yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+                [MacYubiKeyManager.sharedInstance compositeKeyFactorCr:challenge
+                                                            windowHint:windowHint
+                                                                  slot:slot
+                                                        slotIsBlocking:blocking
+                                                            completion:completion];
+            }];
+        }
     }
 }
 
@@ -499,7 +520,7 @@
                 [self exitWithUserCancelled]; 
             }
             else {
-                [Alerts error:NSLocalizedString(@"cred_vc_error_opening_title", @"Strongbox: Error Opening Database")
+                [MacAlerts error:NSLocalizedString(@"cred_vc_error_opening_title", @"Strongbox: Error Opening Database")
                         error:error
                        window:self.view.window
                    completion:^{
@@ -536,7 +557,7 @@
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
         
-        [Alerts info:@"Strongbox: Error Locating This Record"
+        [MacAlerts info:@"Strongbox: Error Locating This Record"
      informativeText:@"Strongbox could not find this record in the database any longer. It is possibly stale. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill."
               window:self.view.window
           completion:^{
@@ -617,7 +638,7 @@
     NSError* error;
     BOOL valid = [Serializator isValidDatabase:url error:&error];
     if (!valid) {
-        [Alerts error:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]")]
+        [MacAlerts error:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]")]
                 error:error
                window:self.view.window completion:^{
             [self exitWithUserCancelled];
@@ -626,7 +647,7 @@
     }
 
     if([url.lastPathComponent compare:database.fileUrl.lastPathComponent] != NSOrderedSame) {
-        [Alerts yesNo:NSLocalizedString(@"open_sequence_database_different_filename_title",@"Different Filename")
+        [MacAlerts yesNo:NSLocalizedString(@"open_sequence_database_different_filename_title",@"Different Filename")
       informativeText:NSLocalizedString(@"open_sequence_database_different_filename_message",@"This doesn't look like it's the right file because the filename looks different than the one you originally added. Do you want to continue?")
                window:self.view.window
            completion:^(BOOL yesNo) {
@@ -657,7 +678,7 @@
     }
     else {
         NSLog(@"WARNWARN: Could not bookmark user selected file in AutoFill: [%@]", error);
-        [Alerts error:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
+        [MacAlerts error:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
                 error:error
                window:self.view.window];
     }

@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 16/07/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "CompositeKeyFactors.h"
@@ -42,6 +42,10 @@
         _yubiKeyCR = yubiKeyCR;
     }
     return self;
+}
+
+- (BOOL)isAmbiguousEmptyOrNullPassword {
+    return self.password.length == 0 && (self.keyFileDigest || self.yubiKeyCR);
 }
 
 - (instancetype)clone {

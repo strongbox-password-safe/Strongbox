@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 05/12/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "FilesAppUrlBookmarkProvider.h"
@@ -13,6 +13,7 @@
 #import "SafesList.h"
 #import "FileManager.h"
 #import "iCloudSafesCoordinator.h"
+#import "NSDate+Extensions.h"
 
 typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *error);
 
@@ -43,7 +44,7 @@ typedef void (^CreateCompletionBlock)(SafeMetaData *metadata, const NSError *err
         _browsableNew = NO;
         _browsableExisting = NO;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = NO; 
+        _defaultForImmediatelyOfferOfflineCache = NO; 
         _supportsConcurrentRequests = NO; 
     }
     
@@ -184,11 +185,11 @@ viewController:(UIViewController *)viewController
         NSLog(@"Could not access secure scoped resource! Will try get attributes anyway...");
     }
 
-    NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-    if (error) {
-        
-        NSLog(@"Error getting attributes for files based Database, will try open anyway: [%@] - Attributes: [%@]", error, attr);
-    }
+
+
+
+
+
 
     dispatch_async(dispatch_get_main_queue(), ^{ 
         StrongboxUIDocument *document = [[StrongboxUIDocument alloc] initWithFileURL:url];
@@ -199,7 +200,18 @@ viewController:(UIViewController *)viewController
         }
 
         [document openWithCompletionHandler:^(BOOL success) {
-            completion(success ? kReadResultSuccess : kReadResultError, success ? document.data : nil, document.fileModificationDate, success ? nil : error);
+            if (!success) {
+                completion(kReadResultError, nil, nil, error);
+            }
+            else {
+                if ( options && options.onlyIfModifiedDifferentFrom && document.fileModificationDate && [document.fileModificationDate isEqualToDateWithinEpsilon:options.onlyIfModifiedDifferentFrom] ) {
+                    completion(kReadResultModifiedIsSameAsLocal, nil, nil, nil);
+                }
+                else {
+                    completion(kReadResultSuccess, document.data, document.fileModificationDate, nil );
+                }
+            }
+            
             [url stopAccessingSecurityScopedResource];
             
             [document closeWithCompletionHandler:nil];

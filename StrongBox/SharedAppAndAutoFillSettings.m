@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 13/06/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SharedAppAndAutoFillSettings.h"
@@ -45,7 +45,9 @@ static NSString* const kSyncForcePushDoNotCheckForConflicts = @"syncForcePushDoN
 
 static NSString* const kMainAppDidChangeDatabases = @"mainAppDidChangeDatabases";
 static NSString* const kAutoFillDidChangeDatabases = @"autoFillDidChangeDatabases";
-static NSString* const kLegacyShowMetadataOnDetailsScreen  = @"legacyShowMetadataOnDetailsScreen";
+static NSString* const kShowMetadataOnDetailsScreen  = @"legacyShowMetadataOnDetailsScreen";
+static NSString* const kQuickTypeTitleThenUsername = @"quickTypeTitleThenUsername";
+static NSString* const kUserHasOptedInToThirdPartyStorageLibraries = @"userHasOptedInToThirdPartyStorageLibraries";
 
 @implementation SharedAppAndAutoFillSettings
 
@@ -88,12 +90,28 @@ static NSString* const kLegacyShowMetadataOnDetailsScreen  = @"legacyShowMetadat
 
 
 
-- (BOOL)legacyShowMetadataOnDetailsScreen {
-    return [self getBool:kLegacyShowMetadataOnDetailsScreen];
+- (BOOL)userHasOptedInToThirdPartyStorageLibraries {
+    return [self getBool:kUserHasOptedInToThirdPartyStorageLibraries];
 }
 
-- (void)setLegacyShowMetadataOnDetailsScreen:(BOOL)legacyShowMetadataOnDetailsScreen {
-    [self setBool:kLegacyShowMetadataOnDetailsScreen value:legacyShowMetadataOnDetailsScreen];
+- (void)setUserHasOptedInToThirdPartyStorageLibraries:(BOOL)userHasOptedInToThirdPartyStorageLibraries {
+    [self setBool:kUserHasOptedInToThirdPartyStorageLibraries value:userHasOptedInToThirdPartyStorageLibraries];
+}
+
+- (BOOL)quickTypeTitleThenUsername {
+    return [self getBool:kQuickTypeTitleThenUsername fallback:YES];
+}
+
+- (void)setQuickTypeTitleThenUsername:(BOOL)quickTypeTitleThenUsername {
+    [self setBool:kQuickTypeTitleThenUsername value:quickTypeTitleThenUsername];
+}
+
+- (BOOL)showMetadataOnDetailsScreen {
+    return [self getBool:kShowMetadataOnDetailsScreen fallback:YES];
+}
+
+- (void)setShowMetadataOnDetailsScreen:(BOOL)legacyShowMetadataOnDetailsScreen {
+    [self setBool:kShowMetadataOnDetailsScreen value:legacyShowMetadataOnDetailsScreen];
 }
 
 - (BOOL)mainAppDidChangeDatabases {

@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 31/05/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "CASGTableViewController.h"
@@ -32,9 +32,7 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonDone;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPassword;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellReadOnly;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellOpenOffline;
 @property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
-@property (weak, nonatomic) IBOutlet UISwitch *switchOpenOffline;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellYubiKey;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowEmpty;
@@ -68,7 +66,6 @@
     self.selectedYubiKeyConfig = self.initialYubiKeyConfig;
     
     self.switchReadOnly.on = self.initialReadOnly;
-    self.switchOpenOffline.on = self.initialOpenLocalOnly;
     
     self.textFieldName.text = self.selectedName.length ? self.selectedName : [SafesList.sharedInstance getSuggestedDatabaseNameUsingDeviceName];
   
@@ -276,7 +273,6 @@
     creds.oneTimeKeyFileData = self.selectedOneTimeKeyFileData;
     creds.format = self.selectedFormat;
     creds.readOnly = self.switchReadOnly.on;
-    creds.openLocalOnly = self.switchOpenOffline.on;
     creds.yubiKeyConfig = self.selectedYubiKeyConfig;
     
     self.onDone(YES, creds);
@@ -295,7 +291,6 @@
         [self cell:self.cellPassword setHidden:YES];
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellReadOnly setHidden:YES];
-        [self cell:self.cellOpenOffline setHidden:YES];
         [self cell:self.cellAllowEmpty setHidden:YES];
     }
     else if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
@@ -307,7 +302,6 @@
         
         [self cell:self.cellFormat setHidden:self.mode == kCASGModeCreateExpress];
         [self cell:self.cellReadOnly setHidden:YES];
-        [self cell:self.cellOpenOffline setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:self.mode == kCASGModeCreateExpress || !showAllowEmpty];
     }
@@ -317,7 +311,6 @@
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
         [self cell:self.cellReadOnly setHidden:YES];
-        [self cell:self.cellOpenOffline setHidden:YES];
         
         [self cell:self.cellAllowEmpty setHidden:!showAllowEmpty];
     }
@@ -328,10 +321,6 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
-
-        if(!self.showOpenLocalOnlyOption) {
-            [self cell:self.cellOpenOffline setHidden:YES];
-        }
     }
     
     [self reloadDataAnimated:YES];
@@ -516,7 +505,7 @@
         }
     }
     else if(self.mode == kCASGModeSetCredentials && (textField == self.textFieldPassword || textField == self.textFieldConfirmPassword)) {
-        if([self credentialsValidForDatabaseFormat]) {
+        if([self canSet]) {
             [textField resignFirstResponder];
             [self onDone:nil];
         }

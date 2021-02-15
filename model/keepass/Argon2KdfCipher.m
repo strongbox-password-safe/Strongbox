@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 26/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Argon2KdfCipher.h"
@@ -41,12 +41,13 @@ static const BOOL kLogVerbose = NO;
 @property (nonatomic, readonly) NSData *secretKey;
 @property (nonatomic, readonly) NSData *assocData;
 
+@property BOOL argon2id;
+
 @end
 
 @implementation Argon2KdfCipher
 
-- (instancetype)initWithDefaults
-{
+- (instancetype)initWithDefaults:(BOOL)argon2id {
     self = [super init];
     if (self) {
         _parallelism = kDefaultParallelism;
@@ -56,6 +57,7 @@ static const BOOL kLogVerbose = NO;
         _salt = getRandomData(kDefaultSaltLength);
         _secretKey = nil;
         _assocData = nil;
+        self.argon2id = argon2id;
     }
     return self;
 }
@@ -104,6 +106,8 @@ static const BOOL kLogVerbose = NO;
             _version = ((NSNumber*)version.theObject).unsignedIntValue;
         }
         
+        self.argon2id = parameters.uuid && [parameters.uuid isEqual:argon2idCipherUuid()];
+        
         
         
         VariantObject *secretKey = [parameters.parameters objectForKey:kParameterSecretKey];
@@ -138,7 +142,12 @@ static const BOOL kLogVerbose = NO;
     ctx.allocate_cbk = nil; 
     ctx.free_cbk = nil; 
         
-    argon2d_ctx(&ctx);
+    if ( self.argon2id ) {
+        argon2id_ctx(&ctx);
+    }
+    else {
+        argon2d_ctx(&ctx);
+    }
     
     NSData *transformKey = [NSData dataWithBytes:ctx.out length:ctx.outlen];
 
@@ -150,7 +159,9 @@ static const BOOL kLogVerbose = NO;
 }
 
 - (KdfParameters *)kdfParameters {
-    VariantObject *uuid = [[VariantObject alloc] initWithType:kVariantTypeByteArray theObject:argon2CipherUuidData()];
+    NSData* uuidData = self.argon2id ? argon2idCipherUuidData() : argon2dCipherUuidData();
+    VariantObject *uuid = [[VariantObject alloc] initWithType:kVariantTypeByteArray theObject:uuidData];
+    
     VariantObject *voIterations = [[VariantObject alloc] initWithType:kVariantTypeUint64 theObject:@(self.iterations)];
     VariantObject *voParallelism = [[VariantObject alloc] initWithType:kVariantTypeUint32 theObject:@(self.parallelism)];
     VariantObject *voMemory = [[VariantObject alloc] initWithType:kVariantTypeUint64 theObject:@(self.memory)];

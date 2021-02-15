@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "SafeStorageProvider.h"
-#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -21,8 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
-@property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline;
+@property (nonatomic, readonly) BOOL defaultForImmediatelyOfferOfflineCache;
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
+@property (nonatomic, readonly) BOOL privacyOptInRequired;
 
 
 
@@ -30,8 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
          extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject * _Nullable)parentFolder
-    viewController:(UIViewController * _Nullable)viewController
-        completion:(void (^)(SafeMetaData *metadata, NSError *_Nullable error))completion;
+    viewController:(VIEW_CONTROLLER_PTR  _Nullable)viewController
+        completion:(void (^)(METADATA_PTR metadata, NSError *_Nullable error))completion;
 
 
 
@@ -40,15 +40,15 @@ NS_ASSUME_NONNULL_BEGIN
           data:(NSData *)data
        modDate:(NSDate*)modDate
 suggestedFilename:(NSString*)suggestedFilename
-    completion:(void (^)(SafeMetaData *metadata, NSError *_Nullable error))completion;
+    completion:(void (^)(METADATA_PTR metadata, NSError *_Nullable error))completion;
 
 
 - (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data;
 
-- (NSURL *)getFileUrl:(SafeMetaData *)safeMetaData; 
+- (NSURL *)getFileUrl:(METADATA_PTR )safeMetaData; 
 - (BOOL)fileNameExistsInDefaultStorage:(NSString*)filename; 
-- (BOOL)isUsingSharedStorage:(SafeMetaData*)metadata;
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^ _Nullable)(NSError *_Nullable error))completion;
+- (BOOL)isUsingSharedStorage:(METADATA_PTR )metadata;
+- (void)delete:(METADATA_PTR )safeMetaData completion:(void (^ _Nullable)(NSError *_Nullable error))completion;
 
 @end
 

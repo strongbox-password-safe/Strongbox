@@ -21,4 +21,7 @@
 @property BOOL dummyMode;
 @property BOOL biometricsInProgress;
 
+@property (readonly) BOOL isTouchIdUnlockAvailable;
+@property (readonly) BOOL isWatchUnlockAvailable;
+
 @end

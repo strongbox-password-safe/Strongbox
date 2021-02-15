@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 02/05/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -24,6 +24,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL isKeePassXmlBooleanStringTrue;
 @property (readonly) BOOL isKeePassXmlBooleanStringFalse;
 @property (readonly) BOOL isKeePassXmlBooleanStringNull;
+
+@property (readonly, nullable) NSData* dataFromHex;
+@property (readonly, nullable) NSData* dataFromBase32;
+@property (readonly, nullable) NSData* dataFromBase64;
+@property (readonly, nullable) NSData* utf8Data;
+
 
 @end
 

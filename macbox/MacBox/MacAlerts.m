@@ -6,9 +6,9 @@
 //  Copyright © 2017 Mark McGuill. All rights reserved.
 //
 
-#import "Alerts.h"
+#import "MacAlerts.h"
 
-@interface Alerts ()
+@interface MacAlerts ()
 
 @property (nonatomic, strong) NSButton* okButton;
 @property (nonatomic) BOOL allowEmptyInput;
@@ -19,7 +19,7 @@
 
 @end
 
-@implementation Alerts
+@implementation MacAlerts
 
 + (void)info:(NSString *)info
       window:(NSWindow*)window {
@@ -57,7 +57,7 @@ informativeText:(NSString*)informativeText
 + (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText
        window:(NSWindow*)window
    completion:(void (^)(BOOL yesNo))completion {
-    [Alerts yesNo:messageText informativeText:informativeText window:window disableEscapeKey:NO completion:completion];
+    [self yesNo:messageText informativeText:informativeText window:window disableEscapeKey:NO completion:completion];
 }
 
 + (void)yesNo:(NSString *)messageText
@@ -89,24 +89,20 @@ disableEscapeKey:(BOOL)disableEscapeKey
 }
 
 + (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion {
-    [Alerts yesNo:info informativeText:nil window:window completion:completion];
+    [self yesNo:info informativeText:nil window:window completion:completion];
 }
 
 + (void)error:(NSError*)error window:(NSWindow*)window {
-    NSAlert *alert = [[NSAlert alloc] init];
+    [self error:error window:window completion:nil];
+}
 
++ (void)error:(const NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion {
     NSString* loc = NSLocalizedString(@"alerts_unknown_error", @"Unknown Error");
-    [alert setMessageText:error ? error.localizedDescription : loc];
-    [alert setAlertStyle:NSAlertStyleWarning];
-    
-    NSString* loc2 = NSLocalizedString(@"alerts_ok", @"OK");
-    [alert addButtonWithTitle:loc2];
-    
-    [alert beginSheetModalForWindow:window completionHandler:nil];
+    [self error:loc error:error window:window completion:completion];
 }
 
 + (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window {
-    [Alerts error:message error:error window:window completion:nil];
+    [self error:message error:error window:window completion:nil];
 }
 
 + (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion {

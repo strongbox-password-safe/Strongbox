@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 14/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property Model* secondDatabase;
 @property BOOL isMergeDiff;
 
-@property (nonatomic, copy) void (^onDone)(void);
+@property (nonatomic, copy) void (^onDone)(BOOL mergeRequested, Model*_Nullable first, Model*_Nullable second);
 
 @end
 

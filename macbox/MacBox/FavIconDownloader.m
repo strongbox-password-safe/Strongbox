@@ -14,7 +14,7 @@
 #import "FavIconResultTableCellView.h"
 #import "Utils.h"
 #import "NodeIconHelper.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "NSString+Extensions.h"
 
 @interface FavIconDownloader () <NSTableViewDataSource>
@@ -540,7 +540,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
     }];
 
     if(errored.count == 0) {
-        [Alerts yesNo:NSLocalizedString(@"favicon_clear_all_and_retry_message", @"Are you sure you want to clear current results and retry all items?")
+        [MacAlerts yesNo:NSLocalizedString(@"favicon_clear_all_and_retry_message", @"Are you sure you want to clear current results and retry all items?")
                window:self.view.window
            completion:^(BOOL yesNo) {
             if(yesNo) {
@@ -549,7 +549,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         }];
     }
     else {
-        [Alerts twoOptionsWithCancel:NSLocalizedString(@"favicon_retry_all_or_failed_title", @"Retry All or Failed?")
+        [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"favicon_retry_all_or_failed_title", @"Retry All or Failed?")
                      informativeText:NSLocalizedString(@"favicon_retry_all_or_failed_message", @"Would you like to retry all items, or just the failed ones?")
                    option1AndDefault:NSLocalizedString(@"favicon_retry_failed_action", @"Retry Failed")
                              option2:NSLocalizedString(@"favicon_retry_all_action", @"Retry All")
@@ -618,7 +618,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         NSString* loc = NSLocalizedString(@"set_favicons_are_you_sure_yes_no_fmt", @"This will set the icons for %d items to your selected FavIcons. Are you sure you want to continue?");
         
         NSString *info = [NSString stringWithFormat:loc, selected.count];
-        [Alerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are you sure?")
+        [MacAlerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are you sure?")
       informativeText:info
                window:self.view.window
            completion:^(BOOL yesNo) {

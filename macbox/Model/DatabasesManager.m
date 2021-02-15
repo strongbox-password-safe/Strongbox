@@ -190,7 +190,7 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     }
 
     safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
-                                      storageProvider:kLocalDevice
+                                      storageProvider:kLocalDevice 
                                               fileUrl:url
                                           storageInfo:fileIdentifier];
 

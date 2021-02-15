@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 11/12/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SFTPStorageProvider.h"
@@ -12,11 +12,23 @@
 #import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "SFTPProviderData.h"
-#import "SFTPSessionConfigurationViewController.h"
-#import "SVProgressHUD.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+
+#if TARGET_OS_IPHONE
+
+#import "SFTPSessionConfigurationViewController.h"
+#import "SVProgressHUD.h"
 #import "Alerts.h"
+
+#else
+
+#import "SFTPConfigurationVC.h"
+#import "MacAlerts.h"
+#import "MacUrlSchemes.h"
+
+#endif
+
 
 @interface SFTPStorageProvider ()
 
@@ -44,19 +56,39 @@
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = NO; 
+        _defaultForImmediatelyOfferOfflineCache = NO; 
         _supportsConcurrentRequests = NO; 
     }
     
     return self;
 }
 
+- (void)dismissProgressSpinner {
+#if TARGET_OS_IPHONE
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD dismiss];
+    });
+#else
+    
+#endif
+}
+
+- (void)showProgressSpinner:(NSString*)message {
+#if TARGET_OS_IPHONE
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showWithStatus:message]; 
+    });
+#else
+    
+#endif
+}
+
 - (void)create:(NSString *)nickName
      extension:(NSString *)extension
           data:(NSData *)data
   parentFolder:(NSObject *)parentFolder
-viewController:(UIViewController *)viewController
-    completion:(void (^)(SafeMetaData *, const NSError *))completion {
+viewController:(VIEW_CONTROLLER_PTR )viewController
+    completion:(void (^)(METADATA_PTR , const NSError *))completion {
     if(self.maintainSessionForListing && self.maintainedSessionForListing) { 
         [self createWithSession:nickName extension:extension data:data
                    parentFolder:parentFolder sftp:self.maintainedSessionForListing
@@ -82,7 +114,7 @@ viewController:(UIViewController *)viewController
             parentFolder:(NSObject *)parentFolder
                     sftp:(NMSFTP*)sftp
            configuration:(SFTPSessionConfiguration*)configuration
-              completion:(void (^)(SafeMetaData *, NSError *))completion {
+              completion:(void (^)(METADATA_PTR , NSError *))completion {
     NSString *desiredFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
     NSString *dir = [self getDirectoryFromParentFolderObject:parentFolder sessionConfig:configuration];
     NSString *path = [NSString pathWithComponents:@[dir, desiredFilename]];
@@ -94,7 +126,7 @@ viewController:(UIViewController *)viewController
     }
     
     SFTPProviderData* providerData = makeProviderData(path, configuration);
-    SafeMetaData *metadata = [self getSafeMetaData:nickName providerData:providerData];
+    METADATA_PTR metadata = [self getSafeMetaData:nickName providerData:providerData];
 
     [sftp disconnect];
 
@@ -102,7 +134,7 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)list:(NSObject *)parentFolder
-viewController:(UIViewController *)viewController
+viewController:(VIEW_CONTROLLER_PTR )viewController
   completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
     if(self.maintainSessionForListing && self.maintainedSessionForListing) {
         [self listWithSftpSession:self.maintainedSessionForListing
@@ -134,32 +166,36 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)listWithSftpSession:(NMSFTP*)sftp
-                        parentFolder:(NSObject *)parentFolder
-                        configuration:(SFTPSessionConfiguration *)configuration
-                          completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
-    [SVProgressHUD showWithStatus:@"Listing..."];
+               parentFolder:(NSObject *)parentFolder
+              configuration:(SFTPSessionConfiguration *)configuration
+                 completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
+    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_listing", @"Listing...")];
     
     NSString * dir = [self getDirectoryFromParentFolderObject:parentFolder sessionConfig:configuration];
     
     NSArray<NMSFTPFile*>* files = [sftp contentsOfDirectoryAtPath:dir];
     
-    [SVProgressHUD dismiss];
+    [self dismissProgressSpinner];
     
-    NSArray<StorageBrowserItem*>* browserItems = [files map:^id _Nonnull(NMSFTPFile * _Nonnull obj, NSUInteger idx) {
-        StorageBrowserItem* sbi = [[StorageBrowserItem alloc] init];
-        sbi.name = obj.isDirectory && obj.filename.length > 1 ? [obj.filename substringToIndex:obj.filename.length-1] : obj.filename;
-        sbi.folder = obj.isDirectory;
-        NSString* path = [NSString pathWithComponents:@[dir, sbi.name]];
-        sbi.providerData = makeProviderData(path, configuration);
+    if (files == nil) {
+        completion(NO, nil, sftp.session.lastError); 
+    }
+    else {
+        NSArray<StorageBrowserItem*>* browserItems = [files map:^id _Nonnull(NMSFTPFile * _Nonnull obj, NSUInteger idx) {
+            NSString* name = obj.isDirectory && obj.filename.length > 1 ? [obj.filename substringToIndex:obj.filename.length-1] : obj.filename;
+            BOOL folder = obj.isDirectory;
+            NSString* path = [NSString pathWithComponents:@[dir, name]];
+            id providerData = makeProviderData(path, configuration);
+            
+            return [StorageBrowserItem itemWithName:name identifier:path folder:folder providerData:providerData];
+        }];
         
-        return sbi;
-    }];
-    
-    completion(NO, browserItems, nil);
+        completion(NO, browserItems, nil);
+    }
 }
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData
-       interactiveVC:(UIViewController *)viewController
+- (void)pushDatabase:(METADATA_PTR )safeMetaData
+       interactiveVC:(VIEW_CONTROLLER_PTR )viewController
                 data:(NSData *)data
           completion:(StorageProviderUpdateCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
@@ -173,16 +209,12 @@ viewController:(UIViewController *)viewController
         }
     
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
-            });
+            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
         }
 
         if(![sftp writeContents:data toFileAtPath:providerData.filePath progress:nil]) {
             if (viewController) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
+                [self dismissProgressSpinner];
             }
 
             error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_update", @"Could not update file") errorCode:-3];
@@ -196,9 +228,7 @@ viewController:(UIViewController *)viewController
             }
 
             if (viewController) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
+                [self dismissProgressSpinner];
             }
             
             completion(kUpdateResultSuccess, attr.modificationDate, nil);
@@ -210,19 +240,24 @@ viewController:(UIViewController *)viewController
 
 
 
-- (void)delete:(SafeMetaData *)safeMetaData completion:(void (^)(const NSError *))completion {
+- (void)delete:(METADATA_PTR )safeMetaData completion:(void (^)(const NSError *))completion {
     
 }
 
-- (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController completion:(void (^)(UIImage *))completionHandler {
+- (void)loadIcon:(NSObject *)providerData viewController:(VIEW_CONTROLLER_PTR )viewController completion:(void (^)(IMAGE_TYPE_PTR))completionHandler {
     
 }
 
 
 
-- (SFTPProviderData*)getProviderDataFromMetaData:(SafeMetaData*)metaData {
+
+- (SFTPProviderData*)getProviderDataFromMetaData:(METADATA_PTR )metaData {
+#if TARGET_OS_IPHONE
     NSString* json = metaData.fileIdentifier;
-    
+#else
+    NSString* json = metaData.storageInfo;
+#endif
+
     NSError* error;
     NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding]  options:kNilOptions error:&error];
     
@@ -231,7 +266,7 @@ viewController:(UIViewController *)viewController
     return foo;
 }
 
-- (SafeMetaData *)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
+- (METADATA_PTR )getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData {
     SFTPProviderData* foo = (SFTPProviderData*)providerData;
     
     NSError* error;
@@ -241,17 +276,26 @@ viewController:(UIViewController *)viewController
         NSLog(@"%@", error);
         return nil;
     }
-    
+
     NSString *json = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-    
+
+#if TARGET_OS_IPHONE
     return [[SafeMetaData alloc] initWithNickName:nickName
                                   storageProvider:self.storageId
                                          fileName:[foo.filePath lastPathComponent]
                                    fileIdentifier:json];
+#else
+    NSURLComponents* components = [[NSURLComponents alloc] init];
+    components.scheme = kStrongboxSFTPUrlScheme;
+    components.host = foo.sFtpConfiguration.host;
+    components.path = foo.filePath;
+    
+    return [[DatabaseMetadata alloc] initWithNickName:nickName storageProvider:self.storageId fileUrl:components.URL storageInfo:json];
+#endif
 }
 
-- (void)pullDatabase:(SafeMetaData *)safeMetaData
-         interactiveVC:(UIViewController *)viewController
+- (void)pullDatabase:(METADATA_PTR)safeMetaData
+         interactiveVC:(VIEW_CONTROLLER_PTR )viewController
                 options:(StorageProviderReadOptions *)options
              completion:(StorageProviderReadCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
@@ -259,7 +303,7 @@ viewController:(UIViewController *)viewController
 }
 
 - (void)readWithProviderData:(NSObject *)providerData
-              viewController:(UIViewController *)viewController
+              viewController:(VIEW_CONTROLLER_PTR )viewController
                      options:(StorageProviderReadOptions *)options
                   completion:(StorageProviderReadCompletionBlock)completionHandler {
     SFTPProviderData* foo = (SFTPProviderData*)providerData;
@@ -273,9 +317,7 @@ viewController:(UIViewController *)viewController
         }
         
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
-            });
+            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
         }
         
         NMSFTPFile* attr = [sftp infoForFileAtPath:foo.filePath];
@@ -287,9 +329,7 @@ viewController:(UIViewController *)viewController
         
         if (options.onlyIfModifiedDifferentFrom && [options.onlyIfModifiedDifferentFrom isEqualToDateWithinEpsilon:attr.modificationDate]) {
             if (viewController) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [SVProgressHUD dismiss];
-                });
+                [self dismissProgressSpinner];
             }
 
             completionHandler(kReadResultModifiedIsSameAsLocal, nil, nil, error);
@@ -299,9 +339,7 @@ viewController:(UIViewController *)viewController
         NSData* data = [sftp contentsAtPath:foo.filePath];
         
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            [self dismissProgressSpinner];
         }
      
         if(!data) {
@@ -324,8 +362,67 @@ viewController:(UIViewController *)viewController
     return dir;
 }
 
+#if TARGET_OS_IPHONE
+- (void)iOSGetConfiguration:(VIEW_CONTROLLER_PTR)viewController
+                 completion:(void (^)(BOOL userCancelled, NMSFTP* sftp, SFTPSessionConfiguration* configuration, NSError* error))completion {
+    SFTPSessionConfigurationViewController *vc = [[SFTPSessionConfigurationViewController alloc] init];
+    __weak SFTPSessionConfigurationViewController* weakRef = vc;
+    vc.onDone = ^(BOOL success) {
+        if(success) {
+            NSError* error;
+            NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:weakRef.configuration viewController:viewController error:&error];
+            
+            if (sftp && !error) {
+                [viewController dismissViewControllerAnimated:YES completion:^{
+                    completion(NO, sftp, weakRef.configuration, error);
+                }];
+            }
+            else {
+                [Alerts error:weakRef error:error];
+            }
+        }
+        else {
+            [viewController dismissViewControllerAnimated:YES completion:^{
+                completion(YES, nil, nil, nil);
+            }];
+        }
+    };
+    
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    [viewController presentViewController:vc animated:YES completion:nil];
+}
+#else
+- (void)macOSGetConfiguration:(VIEW_CONTROLLER_PTR)viewController
+                   completion:(void (^)(BOOL userCancelled, NMSFTP* sftp, SFTPSessionConfiguration* configuration, NSError* error))completion {
+    SFTPConfigurationVC* configVC = [SFTPConfigurationVC newConfigurationVC];
+    
+    configVC.onDone = ^(BOOL success, SFTPSessionConfiguration * _Nonnull configuration) {
+        if (success) {
+
+
+            NSError* error;
+            NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:configuration viewController:viewController error:&error];
+
+            if (sftp && !error) {
+                completion(NO, sftp, configuration, error);
+            }
+            else {
+                NSLog(@"SFTP error: %@", error);
+                completion(NO, nil, nil, error);
+            }
+        }
+        else {
+            completion(YES, nil, nil, nil);
+        }
+    };
+
+    [viewController presentViewControllerAsSheet:configVC];
+}
+
+#endif
+
 - (void)connectAndAuthenticate:(SFTPSessionConfiguration*)sessionConfiguration
-                viewController:(UIViewController*)viewController
+                viewController:(VIEW_CONTROLLER_PTR)viewController
                     completion:(void (^)(BOOL userCancelled, NMSFTP* sftp, SFTPSessionConfiguration* configuration, NSError* error))completion {
     
     
@@ -336,31 +433,13 @@ viewController:(UIViewController *)viewController
             sessionConfiguration = self.unitTestingSessionConfiguration;
         }
         else {
-            SFTPSessionConfigurationViewController *vc = [[SFTPSessionConfigurationViewController alloc] init];
-            __weak SFTPSessionConfigurationViewController* weakRef = vc;
-            vc.onDone = ^(BOOL success) {
-                if(success) {
-                    NSError* error;
-                    NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:weakRef.configuration viewController:viewController error:&error];
-                    
-                    if (sftp && !error) {
-                        [viewController dismissViewControllerAnimated:YES completion:^{
-                            completion(NO, sftp, weakRef.configuration, error);
-                        }];
-                    }
-                    else {
-                        [Alerts error:weakRef error:error];
-                    }
-                }
-                else {
-                    [viewController dismissViewControllerAnimated:YES completion:^{
-                        completion(YES, nil, nil, nil);
-                    }];
-                }
-            };
-            
-            vc.modalPresentationStyle = UIModalPresentationFormSheet;
-            [viewController presentViewController:vc animated:YES completion:nil];
+#if TARGET_OS_IPHONE
+            [self iOSGetConfiguration:viewController completion:completion];
+#else
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self macOSGetConfiguration:viewController completion:completion];
+            });
+#endif
             return;
         }
     }
@@ -377,25 +456,19 @@ viewController:(UIViewController *)viewController
     NSLog(@"Connecting to %@", sessionConfiguration.host);
     
     if (viewController) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD showWithStatus:@"Connecting..."];
-        });
+        [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_connecting", @"Connecting...")];
     }
     
     NMSSHSession *session = [NMSSHSession connectToHost:sessionConfiguration.host
                                            withUsername:sessionConfiguration.username];
 
     if (viewController) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-        });
+        [self dismissProgressSpinner];
     }
     
     if (session.isConnected) {
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD showWithStatus:@"Authenticating..."];
-            });
+            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating", @"Authenticating...")];
         }
         
         NSLog(@"Supported Authentication Methods by Server: [%@]", session.supportedAuthenticationMethods);
@@ -410,9 +483,7 @@ viewController:(UIViewController *)viewController
         }
 
         if (viewController) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
-            });
+            [self dismissProgressSpinner];
         }
 
         if (!session.isAuthorized) {

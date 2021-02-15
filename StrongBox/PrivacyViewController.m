@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 14/05/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "PrivacyViewController.h"
@@ -47,7 +47,7 @@
         });
     }
     
-    [self updateUnlockAttemptsRemainingLabel];
+    [self updateFailedUnlockAttemptsUI];
 }
 
 - (void)setupImageView {
@@ -55,25 +55,6 @@
     UITapGestureRecognizer *tapGesture1 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onUnlock:)];
     tapGesture1.numberOfTapsRequired = 1;
     [self.imageViewLogo addGestureRecognizer:tapGesture1];
-}
-
-- (void)updateUnlockAttemptsRemainingLabel {
-    if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0 && Settings.sharedInstance.failedUnlockAttempts > 0) {
-        NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - Settings.sharedInstance.failedUnlockAttempts;
-        
-        if(remaining > 0) {
-            self.labelUnlockAttemptsRemaining.text = [NSString stringWithFormat:NSLocalizedString(@"privacy_vc_label_unlock_attempts_fmt", @"Unlock Attempts Remaining: %ld"), (long)remaining];
-        }
-        else {
-            self.labelUnlockAttemptsRemaining.text = NSLocalizedString(@"privacy_vc_label_unlock_attempts_exceeded", @"Unlock Attempts Exceeded");
-        }
-        
-        self.labelUnlockAttemptsRemaining.hidden = NO;
-        self.labelUnlockAttemptsRemaining.textColor = UIColor.systemRedColor;
-    }
-    else {
-        self.labelUnlockAttemptsRemaining.hidden = YES;
-    }
 }
 
 - (void)onAppBecameActive {
@@ -149,6 +130,34 @@
         }}];
 }
 
+- (void)updateFailedUnlockAttemptsUI {
+    NSUInteger failed = Settings.sharedInstance.failedUnlockAttempts;
+    
+    if (failed > 0 ) {
+        if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
+            NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - failed;
+            
+            if(remaining > 0) {
+                self.labelUnlockAttemptsRemaining.text = [NSString stringWithFormat:NSLocalizedString(@"privacy_vc_label_unlock_attempts_fmt", @"Unlock Attempts Remaining: %ld"), (long)remaining];
+            }
+            else {
+                self.labelUnlockAttemptsRemaining.text = NSLocalizedString(@"privacy_vc_label_unlock_attempts_exceeded", @"Unlock Attempts Exceeded");
+            }
+            
+            self.labelUnlockAttemptsRemaining.hidden = NO;
+            self.labelUnlockAttemptsRemaining.textColor = UIColor.systemRedColor;
+        }
+        else {
+            self.labelUnlockAttemptsRemaining.text = [NSString stringWithFormat:NSLocalizedString(@"privacy_vc_label_number_of_failed_unlock_attempts_fmt", @"%@ Failed Unlock Attempts"), @(failed)];
+            self.labelUnlockAttemptsRemaining.hidden = NO;
+            self.labelUnlockAttemptsRemaining.textColor = UIColor.systemOrangeColor;
+        }
+    }
+    else {
+        self.labelUnlockAttemptsRemaining.hidden = YES;
+    }
+}
+
 - (void)requestPin:(BOOL)afterSuccessfulBiometricAuthentication {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
@@ -208,7 +217,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         Settings.sharedInstance.failedUnlockAttempts = Settings.sharedInstance.failedUnlockAttempts + 1;
         NSLog(@"Failed Unlocks: %lu", (unsigned long)Settings.sharedInstance.failedUnlockAttempts);
-        [self updateUnlockAttemptsRemainingLabel];
+        [self updateFailedUnlockAttemptsUI];
 
         if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
             if(Settings.sharedInstance.failedUnlockAttempts >= Settings.sharedInstance.deleteDataAfterFailedUnlockCount) {

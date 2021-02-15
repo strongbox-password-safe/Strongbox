@@ -38,12 +38,35 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 - (instancetype)initUnlockedWithDatabase:(Document *)document database:(DatabaseModel*_Nullable)database selectedItem:(NSString*_Nullable)selectedItem;
 - (instancetype)initLocked:(Document*)document;
+
+@property (readonly, nonatomic) DatabaseModel* database;
+
+
+
+@property (readonly, nonatomic) DatabaseMetadata* databaseMetadata;
+- (void)setDatabaseMetadata:(DatabaseMetadata * _Nonnull)databaseMetadata;
+
+@property (nonatomic, readonly, weak) Document*  document;
+@property (nonatomic, readonly) BOOL locked;
+@property (nonatomic, readonly) NSURL* fileUrl;
+@property (nonatomic, readonly) Node* rootGroup;
+@property (nonatomic, readonly) BOOL masterCredentialsSet;
+@property (nonatomic, readonly) DatabaseFormat format;
+@property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
+
+@property (nonatomic, readonly, nonnull) NSSet<NodeIcon*>* customIcons;
+
+@property (nonatomic) CompositeKeyFactors* compositeKeyFactors;
+
+
     
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
 - (void)lock:(NSString*_Nullable)selectedItem;
-- (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors
-             completion:(void(^)(BOOL success, NSError*_Nullable error))completion;
+
+- (void)reloadAndUnlock:(CompositeKeyFactors *)compositeKeyFactors
+         viewController:(NSViewController*)viewController
+             completion:(void (^)(BOOL, NSError * _Nullable))completion;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
@@ -58,14 +81,10 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 - (void)setItemNotes:(Node*)item notes:(NSString*)notes;
 - (void)setItemExpires:(Node*)item expiry:(NSDate*_Nullable)expiry;
 
-
-
 - (void)setItemIcon:(Node *)item image:(NSImage*)image;
 - (void)setItemIcon:(Node *)item icon:(NodeIcon*)icon;
 - (void)setItemIcon:(Node *)item icon:(NodeIcon*)icon batchUpdate:(BOOL)batchUpdate;
 - (void)batchSetIcons:(NSDictionary<NSUUID*, NSImage*>*)iconMap;
-
-
 
 - (void)deleteHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
 - (void)restoreHistoryItem:(Node*)item historicalItem:(Node*)historicalItem;
@@ -81,7 +100,7 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 
 
-- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
+- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent;
 - (BOOL)addNewRecord:(Node *)parentGroup;
 - (BOOL)addNewGroup:(Node *)parentGroup title:(NSString*)title;
 
@@ -95,8 +114,6 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 - (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination;
 - (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination;
-
-
 
 - (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
 - (Node*_Nullable)getItemFromSerializationId:(NSString*)serializationId;
@@ -112,22 +129,9 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 - (NSString *)getGroupPathDisplayString:(Node *)node;
 
-@property (nonatomic, readonly, weak) Document*  document;
-@property (nonatomic, readonly) BOOL locked;
-@property (nonatomic, readonly) NSURL* fileUrl;
-@property (nonatomic, readonly) Node* rootGroup;
-@property (nonatomic, readonly) BOOL masterCredentialsSet;
-@property (nonatomic, readonly) DatabaseFormat format;
-@property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
-
-@property (nonatomic, readonly, nonnull) NSSet<NodeIcon*>* customIcons;
-
-@property (nonatomic) CompositeKeyFactors* compositeKeyFactors;
-
 @property (readonly) BOOL recycleBinEnabled; 
 @property (readonly) Node* recycleBinNode;
 - (void)createNewRecycleBinNode;
-
 @property (readonly) Node* keePass1BackupNode;
 
 
@@ -145,6 +149,7 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 @property (nonatomic, readonly) NSInteger numberOfGroups;
 
 
+
 @property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL openEntryDetailsWindowWhenDone);
 @property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
 @property (nonatomic, copy, nullable) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
@@ -152,12 +157,6 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 @property (nullable) NSString* selectedItem;
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
-
-@property (readonly, nonatomic) DatabaseMetadata* databaseMetadata;
-@property (readonly, nonatomic) DatabaseModel* database;
-
-- (void)setDatabaseMetadata:(DatabaseMetadata * _Nonnull)databaseMetadata;
-
 
 @end
 

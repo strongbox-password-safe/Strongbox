@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 12/06/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #ifndef BrowseSortField_h

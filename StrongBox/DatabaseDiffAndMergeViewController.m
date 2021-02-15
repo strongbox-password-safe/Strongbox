@@ -3,11 +3,10 @@
 //  Strongbox
 //
 //  Created by Mark on 14/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseDiffAndMergeViewController.h"
-#import "DatabaseMerger.h"
 #import "BrowseTableViewCellHelper.h"
 #import "DiffDrilldownTableViewController.h"
 #import "NSArray+Extensions.h"
@@ -16,7 +15,6 @@
 #import "Alerts.h"
 #import "DatabaseSearchAndSorter.h"
 #import "DatabaseDiffer.h"
-#import "DatabaseMerger.h"
 #import "SVProgressHUD.h"
 #import "SharedAppAndAutoFillSettings.h"
 
@@ -45,7 +43,9 @@
     [super viewDidLoad];
     
     self.navigationController.navigationBarHidden = NO;
-
+    self.navigationController.toolbarHidden = !self.isMergeDiff; 
+    self.navigationItem.hidesBackButton = NO;
+    
     self.browseCellHelperFirstDatabase = [[BrowseTableViewCellHelper alloc] initWithModel:self.firstDatabase tableView:self.tableView];
     self.browseCellHelperSecondDatabase = [[BrowseTableViewCellHelper alloc] initWithModel:self.secondDatabase tableView:self.tableView];
         
@@ -406,52 +406,11 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    self.onDone();
+    self.onDone(NO, nil, nil);
 }
 
 - (IBAction)onMergeOrDone:(id)sender {
-    if ( !self.mergeIsPossible || !self.isMergeDiff) {
-        self.onDone(); 
-    }
-    else {
-        NSString* msg = NSLocalizedString(@"merge_view_are_you_sure", @"Are you sure you want to merge the second database into the first?");
-        
-        [Alerts areYouSure:self message:msg action:^(BOOL response) {
-            if (response) {
-                DatabaseMerger* syncer= [DatabaseMerger mergerFor:self.firstDatabase.database theirs:self.secondDatabase.database];
-                BOOL success = [syncer merge];
-                
-                if (success) {
-                    [self.firstDatabase update:self handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
-                        if (userCancelled) {
-                            self.onDone();
-                        }
-                        else if (error) {
-                            [Alerts error:self error:error completion:^{
-                                self.onDone();
-                            }];
-                        }
-                        else {
-                            [Alerts info:self
-                                   title:NSLocalizedString(@"merge_view_merge_title_success", @"Merge Successful")
-                                 message:NSLocalizedString(@"merge_view_merge_message_success", @"The Merge was successful and your database is now up to date.")
-                              completion:^{
-                                self.onDone();
-                            }];
-                        }
-                    }];
-                }
-                else {
-                    [Alerts error:self
-                            title:NSLocalizedString(@"merge_view_merge_title_error", @"There was an problem merging this database.")
-                            error:nil
-                       completion:^{
-                        self.onDone();
-                    }];
-                }
-            }
-        }];
-    }
+    self.onDone( self.mergeIsPossible && self.isMergeDiff, self.firstDatabase, self.secondDatabase );
 }
 
 @end

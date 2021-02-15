@@ -9,13 +9,14 @@
 #import "PreferencesWindowController.h"
 #import "Settings.h"
 #import "PasswordMaker.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "AppDelegate.h"
 #import "Utils.h"
 #import "NSCheckboxTableCellView.h"
 #import "ColoredStringHelper.h"
 #import "ClipboardManager.h"
 #import "MBProgressHUD.h"
+#import "BiometricIdHelper.h"
 
 @interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate, NSWindowDelegate>
 
@@ -32,7 +33,7 @@
 @property (weak) IBOutlet NSButton *checkboxOtherFieldsAreEditable;
 @property (weak) IBOutlet NSButton *checkboxDereferenceQuickView;
 @property (weak) IBOutlet NSButton *checkboxDereferenceOutlineView;
-@property (weak) IBOutlet NSButton *checkboxDereferenceSearch;
+@property (weak) IBOutlet NSButton *checkboxShowDatabasesManagerOnCloseAllWindows;
 @property (weak) IBOutlet NSButton *checkboxConcealEmptyProtected;
 @property (weak) IBOutlet NSButton *showCustomFieldsInQuickView;
 @property (weak) IBOutlet NSTableView *tableViewWordLists;
@@ -153,19 +154,32 @@
     [super windowDidLoad];
 
     [self setupPasswordGenerationUi];
+        
+    NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangePasswordParameters:)];
+    [self.labelSamplePassword addGestureRecognizer:click];
     
+    [self refreshSamplePassword];
+
+    [self bindUi];
+}
+
+- (void)bindUi {
     [self bindPasswordUiToSettings];
     [self bindGeneralUiToSettings];
     [self bindAutoFillToSettings];
     [self bindAutoLockToSettings];
     [self bindAutoClearClipboard];
-    
     [self bindFavIconDownloading];
-    
-    NSClickGestureRecognizer *click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onChangePasswordParameters:)];
-    [self.labelSamplePassword addGestureRecognizer:click];
-    
-    [self refreshSamplePassword];
+}
+
+- (void)windowDidChangeOcclusionState:(NSNotification *)notification {
+    if (self.window.occlusionState & NSWindowOcclusionStateVisible) {
+        [self bindUi];
+    }
+    else
+    {
+        
+    }
 }
 
 - (void)setupPasswordGenerationUi {
@@ -191,6 +205,8 @@
 }
 
 - (void)bindGeneralUiToSettings {
+    NSLog(@"bindGeneralUiToSettings");
+    
     self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
     self.checkboxShowPasswordImmediatelyInOutline.state = Settings.sharedInstance.showPasswordImmediatelyInOutline ? NSOnState : NSOffState;
@@ -208,7 +224,6 @@
     self.checkboxOtherFieldsAreEditable.state = Settings.sharedInstance.outlineViewEditableFieldsAreReadonly ? NSOffState : NSOnState;
     self.checkboxDereferenceQuickView.state = Settings.sharedInstance.dereferenceInQuickView ? NSOnState : NSOffState;
     self.checkboxDereferenceOutlineView.state = Settings.sharedInstance.dereferenceInOutlineView ? NSOnState : NSOffState;
-    self.checkboxDereferenceSearch.state = Settings.sharedInstance.dereferenceDuringSearch ? NSOnState : NSOffState;
     self.checkboxDetectForeignChanges.state = Settings.sharedInstance.detectForeignChanges ? NSOnState : NSOffState;
     self.checkboxReloadForeignChanges.state = Settings.sharedInstance.autoReloadAfterForeignChanges ? NSOnState : NSOffState;
     self.checkboxAutoDownloadFavIcon.state = Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged ? NSOnState : NSOffState;
@@ -223,6 +238,14 @@
 
     self.allowAppleWatchUnlock.state = Settings.sharedInstance.allowWatchUnlock ? NSOnState : NSOffState;
     
+    self.allowAppleWatchUnlock.enabled = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable; 
+    if ( BiometricIdHelper.sharedInstance.isWatchUnlockAvailable ) {
+        self.allowAppleWatchUnlock.title = NSLocalizedString(@"preference_allow_watch_unlock", @"Allow Watch Unlock");
+    }
+    else {
+        self.allowAppleWatchUnlock.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Allow Watch Unlock - (Enable in System Preferences > Security & Privacy)");
+    }
+    
     if(!Settings.sharedInstance.fullVersion) {
         self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
     }
@@ -235,6 +258,8 @@
     self.checkboxClipboardHandoff.state = Settings.sharedInstance.clipboardHandoff ? NSOnState : NSOffState;
 
     self.checkboxStartInSearchMode.state = Settings.sharedInstance.startWithSearch ? NSOnState : NSOffState;
+
+    self.checkboxShowDatabasesManagerOnCloseAllWindows.state = Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -254,7 +279,6 @@
     Settings.sharedInstance.outlineViewEditableFieldsAreReadonly = self.checkboxOtherFieldsAreEditable.state == NSOffState;
     Settings.sharedInstance.dereferenceInQuickView = self.checkboxDereferenceQuickView.state == NSOnState;
     Settings.sharedInstance.dereferenceInOutlineView = self.checkboxDereferenceOutlineView.state == NSOnState;
-    Settings.sharedInstance.dereferenceDuringSearch = self.checkboxDereferenceSearch.state == NSOnState;
     Settings.sharedInstance.detectForeignChanges = self.checkboxDetectForeignChanges.state == NSOnState;
     Settings.sharedInstance.autoReloadAfterForeignChanges = Settings.sharedInstance.detectForeignChanges && (self.checkboxReloadForeignChanges.state == NSOnState);
     Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged = self.checkboxAutoDownloadFavIcon.state == NSOnState;
@@ -281,6 +305,8 @@
 
     Settings.sharedInstance.startWithSearch = self.checkboxStartInSearchMode.state == NSOnState;
     
+    Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows = self.checkboxShowDatabasesManagerOnCloseAllWindows.state == NSOnState;
+
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
@@ -536,7 +562,7 @@
     
     if(settings.titleAutoFillMode == kCustom) {
         NSString* loc = NSLocalizedString(@"mac_enter_custom_title_default", @"Please enter your custom Title auto fill");
-        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.titleCustomAutoFill allowEmpty:NO];
+        NSString* response = [[MacAlerts alloc] input:loc defaultValue:settings.titleCustomAutoFill allowEmpty:NO];
 
         if(response) {
             settings.titleCustomAutoFill = response;
@@ -555,7 +581,7 @@
     
     if(settings.usernameAutoFillMode == kCustom) {
         NSString* loc = NSLocalizedString(@"mac_enter_custom_username_default", @"Please enter your custom Username auto fill");
-        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.usernameCustomAutoFill allowEmpty:NO];
+        NSString* response = [[MacAlerts alloc] input:loc defaultValue:settings.usernameCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.usernameCustomAutoFill = response;
@@ -574,7 +600,7 @@
     
     if(settings.emailAutoFillMode == kCustom) {
         NSString* loc = NSLocalizedString(@"mac_enter_custom_email_default", @"Please enter your custom Email auto fill");
-        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.emailCustomAutoFill allowEmpty:NO];
+        NSString* response = [[MacAlerts alloc] input:loc defaultValue:settings.emailCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.emailCustomAutoFill = response;
@@ -593,7 +619,7 @@
     
     if(settings.passwordAutoFillMode == kCustom) {
         NSString* loc = NSLocalizedString(@"mac_enter_custom_password_default", @"Please enter your custom Password auto fill");
-        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.passwordCustomAutoFill allowEmpty:NO];
+        NSString* response = [[MacAlerts alloc] input:loc defaultValue:settings.passwordCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.passwordCustomAutoFill = response;
@@ -612,7 +638,7 @@
     
     if(settings.urlAutoFillMode == kCustom) {
         NSString* loc = NSLocalizedString(@"mac_enter_custom_url_default", @"Please enter your custom URL auto fill");
-        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.urlCustomAutoFill allowEmpty:NO];
+        NSString* response = [[MacAlerts alloc] input:loc defaultValue:settings.urlCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.urlCustomAutoFill = response;
@@ -631,7 +657,7 @@
     
     if(settings.notesAutoFillMode == kCustom) {
         NSString* loc = NSLocalizedString(@"mac_enter_custom_notes_default", @"Please enter your custom Notes auto fill");
-        NSString* response = [[Alerts alloc] input:loc defaultValue:settings.notesCustomAutoFill allowEmpty:NO];
+        NSString* response = [[MacAlerts alloc] input:loc defaultValue:settings.notesCustomAutoFill allowEmpty:NO];
         
         if(response) {
             settings.notesCustomAutoFill = response;

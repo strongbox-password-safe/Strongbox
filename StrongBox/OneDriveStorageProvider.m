@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 25/07/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "OneDriveStorageProvider.h"
@@ -39,8 +39,9 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
         _browsableNew = YES;
         _browsableExisting = YES;
         _rootFolderOnly = NO;
-        _immediatelyOfferCacheIfOffline = YES; 
+        _defaultForImmediatelyOfferOfflineCache = YES; 
         _supportsConcurrentRequests = NO; 
+        _privacyOptInRequired = YES;
         
         [ODClient setMicrosoftAccountAppId:kApplicationId scopes:@[@"onedrive.readwrite", @"offline_access"]];
         

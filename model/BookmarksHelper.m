@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 21/01/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "BookmarksHelper.h"

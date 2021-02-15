@@ -23,6 +23,7 @@ Big thank you to all the localization contributors
 
 - Chinese - GY & Attis & Anonymous
 - Czech - S474N
+- Dutch - Wishes to remain anonymous
 - French - Charles-Ivan Chesneau
 - German - @Slummi
 - Italian - Marco Ermini

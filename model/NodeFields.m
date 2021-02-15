@@ -3,7 +3,7 @@
 //  MacBox
 //
 //  Created by Mark on 31/08/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "NodeFields.h"
@@ -17,11 +17,23 @@
 #import "MMcG_MF_Base32Additions.h"
 #import "NSDate+Extensions.h"
 #import "Node.h"
+#import "NSString+Extensions.h"
 
 static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
 static NSString* const kKeePassXcTotpSettingsKey = @"TOTP Settings";
 static NSString* const kKeeOtpPluginKey = @"otp";
+
+static NSString* const kOriginalWindowsSecretKey = @"TimeOtp-Secret";
+static NSString* const kOriginalWindowsSecretHexKey = @"TimeOtp-Secret-Hex";
+static NSString* const kOriginalWindowsSecretBase32Key = @"TimeOtp-Secret-Base32";
+static NSString* const kOriginalWindowsSecretBase64Key = @"TimeOtp-Secret-Base64";
+static NSString* const kOriginalWindowsOtpLengthKey = @"TimeOtp-Length";
+static NSString* const kOriginalWindowsOtpPeriodKey = @"TimeOtp-Period";
+static NSString* const kOriginalWindowsOtpAlgoKey = @"TimeOtp-Algorithm";
+
+static NSString* const kOriginalWindowsOtpAlgoValueSha256 = @"HMAC-SHA-256";
+static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
 @interface NodeFields ()
 
@@ -45,8 +57,28 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     return _regex;
 }
 
++ ( NSSet<NSString*>* )totpCustomFieldKeys {
+    static NSSet<NSString*>* totpKeys;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        totpKeys = @[kKeeOtpPluginKey,
+                   kKeePassXcTotpSeedKey,
+                   kKeePassXcTotpSettingsKey,
+                   kOriginalWindowsSecretKey,
+                   kOriginalWindowsSecretHexKey,
+                   kOriginalWindowsSecretBase32Key,
+                   kOriginalWindowsSecretBase64Key,
+                   kOriginalWindowsOtpLengthKey,
+                   kOriginalWindowsOtpPeriodKey,
+                   kOriginalWindowsOtpAlgoKey].set;
+    });
+    
+    return totpKeys;
+}
+
 + (BOOL)isTotpCustomFieldKey:(NSString*)key {
-    return [key isEqualToString:kKeeOtpPluginKey] || [key isEqualToString:kKeePassXcTotpSeedKey] || [key isEqualToString:kKeePassXcTotpSettingsKey];
+    return [[NodeFields totpCustomFieldKeys] containsObject:key];
 }
 
 - (instancetype _Nullable)init {
@@ -322,38 +354,16 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     
     
     
-    if(self.customFields.count != other.customFields.count) {
-        return YES;
-    }
-
-    for (NSString* key in self.customFields.allKeys) {
-        StringValue* a = self.customFields[key];
-        StringValue* b = other.customFields[key];
-        
-        if(![a isEqual:b]) {
-            return NO;
-        }
-    }
-
-    
-    
-    if(self.attachments.count != other.attachments.count) {
+    if ( ![self.customFields isEqualToDictionary:other.customFields] ) {
         return NO;
     }
-    
-    for (NSString* filename in self.attachments.allKeys) {
-        DatabaseAttachment* myAttachment = self.attachments[filename];
-        DatabaseAttachment* theirAttachment = other.attachments[filename];
-        
-        if (theirAttachment == nil) {
-            return NO;
-        }
-        
-        if (![myAttachment.digestHash isEqualToString:theirAttachment.digestHash]) {
-            return NO;
-        }
-    }
 
+    
+    
+    if ( ![self.attachments isEqualToDictionary:other.attachments] ) {
+        return NO;
+    }
+ 
     
     
     if ((self.created == nil && other.created != nil) || (self.created != nil && ![self.created isEqualToDate:other.created] )) return NO;
@@ -375,8 +385,11 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     if ((self.overrideURL.length == 0 && other.overrideURL.length) || (self.overrideURL.length && ![self.overrideURL isEqualToString:other.overrideURL] )) {
         return NO;
     }
-    if ((self.autoType == nil && other.autoType != nil) || (self.autoType != nil && ![self.autoType isEqual:other.autoType])) {
-        return NO;
+    
+    if ( ![AutoType isDefault:self.autoType] || ![AutoType isDefault:other.autoType]) {
+        if ((self.autoType == nil && other.autoType != nil) || (self.autoType != nil && ![self.autoType isEqual:other.autoType])) {
+            return NO;
+        }
     }
     
     
@@ -618,7 +631,8 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         
         
         
-        self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:[token.secret mmcg_base32String] protected:YES];
+        NSString* base32Secret = token.secret.mmcg_base32String;
+        self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:base32Secret protected:YES];
         
         if(token.algorithm == OTPAlgorithmSteam) {
             NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
@@ -654,6 +668,29 @@ static NSString* const kKeeOtpPluginKey = @"otp";
         else {
             NSURL* otpauthUrl = [token url:YES];
             self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:otpauthUrl.absoluteString protected:YES];
+        }
+        
+        
+        
+        if(token.algorithm != OTPAlgorithmSteam) {
+            self.mutableCustomFields[kOriginalWindowsSecretBase32Key] = [StringValue valueWithString:base32Secret protected:YES];
+
+            if(token.period != OTPToken.defaultPeriod) {
+                self.mutableCustomFields[kOriginalWindowsOtpPeriodKey] = [StringValue valueWithString:@(token.period).stringValue protected:YES];
+            }
+
+            if(token.digits != OTPToken.defaultDigits) {
+                self.mutableCustomFields[kOriginalWindowsOtpLengthKey] = [StringValue valueWithString:@(token.digits).stringValue protected:YES];
+            }
+            
+            if(token.algorithm != OTPToken.defaultAlgorithm) {
+                if ( token.algorithm == OTPAlgorithmSHA256 ) {
+                    self.mutableCustomFields[kOriginalWindowsOtpAlgoKey] = [StringValue valueWithString:kOriginalWindowsOtpAlgoValueSha256 protected:YES];
+                }
+                else if ( token.algorithm == OTPAlgorithmSHA512 ) {
+                    self.mutableCustomFields[kOriginalWindowsOtpAlgoKey] = [StringValue valueWithString:kOriginalWindowsOtpAlgoValueSha512 protected:YES];
+                }
+            }
         }
     }
     
@@ -719,10 +756,7 @@ static NSString* const kKeeOtpPluginKey = @"otp";
             usingLegacyKeeOtpStyle:(BOOL*)usingLegacyKeeOtpStyle {
     
     
-    
-    
-    NSURL *otpUrl = [NSURL URLWithString:password];
-    OTPToken* ret = [NodeFields getOtpTokenFromUrl:otpUrl];
+    OTPToken* ret = [NodeFields getOriginalWindowsKeePassOTPToken:fields];
     if(ret) {
         return ret;
     }
@@ -733,6 +767,14 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     if(ret) {
         return ret;
     }
+    
+    
+    
+    NSURL *otpUrl = [NSURL URLWithString:password];
+    ret = [NodeFields getOtpTokenFromUrl:otpUrl];
+    if(ret) {
+        return ret;
+    }
 
     
     
@@ -740,12 +782,89 @@ static NSString* const kKeeOtpPluginKey = @"otp";
     if(ret) {
         return ret;
     }
-
+    
     
     
     NSURL *url = [NodeFields findOtpUrlInString:notes];
     
     return [NodeFields getOtpTokenFromUrl:url];
+}
+
++ (OTPToken*)getOriginalWindowsKeePassOTPToken:(NSDictionary<NSString*, StringValue*>*)fields {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+    
+    
+    
+    StringValue* secretBase32 = fields[kOriginalWindowsSecretBase32Key];
+    StringValue* secretUtf8 = fields[kOriginalWindowsSecretKey];
+    StringValue* secretHex = fields[kOriginalWindowsSecretHexKey];
+    StringValue* secretBase64 = fields[kOriginalWindowsSecretBase64Key];
+
+    NSData* secret;
+    if ( secretBase32 && secretBase32.value.length ) {
+        secret = secretBase32.value.dataFromBase32;
+    }
+    else if ( secretUtf8 && secretUtf8.value.length ) {
+        secret = secretBase32.value.utf8Data;
+    }
+    else if ( secretHex && secretHex.value.length) {
+        secret = secretBase32.value.dataFromHex;
+    }
+    else if ( secretBase64 && secretBase64.value.length ) {
+        secret = secretBase32.value.dataFromBase64;
+    }
+    else {
+        return nil;
+    }
+    
+    OTPToken* token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secret name:@"<Unknown>" issuer:@"<Unknown>"];
+
+    StringValue* length = fields[kOriginalWindowsOtpLengthKey];
+    if (length && length.value.length) {
+        int digits = length.value.intValue;
+        if (digits > 0) {
+            token.digits = digits;
+        }
+    }
+
+    StringValue* period = fields[kOriginalWindowsOtpPeriodKey];
+    if (period && period.value.length) {
+        int p = period.value.intValue;
+        if (p > 0) {
+            token.period = p;
+        }
+    }
+
+    StringValue* algo = fields[kOriginalWindowsOtpAlgoKey];
+    if (algo && algo.value.length) {
+        NSString* a = algo.value;
+        if ( [a isEqualToString:kOriginalWindowsOtpAlgoValueSha256] ) {
+            token.algorithm = OTPAlgorithmSHA256;
+        }
+        else if ( [a isEqualToString:kOriginalWindowsOtpAlgoValueSha512] ) {
+            token.algorithm = OTPAlgorithmSHA512;
+        }
+    }
+    
+    return token;
 }
 
 + (OTPToken*)getKeePassXCLegacyOTPToken:(NSDictionary<NSString*, StringValue*>*)fields {

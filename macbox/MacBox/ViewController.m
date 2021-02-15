@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "CreateFormatAndSetCredentialsWizard.h"
 #import "Settings.h"
 #import "AppDelegate.h"
@@ -46,7 +46,7 @@
 #import "StreamUtils.h"
 #import "NSDate+Extensions.h"
 #import "DatabaseOnboardingTabViewController.h"
-#import "DatabasesManagerView.h"
+#import "DatabasesManagerVC.h"
 #import "AutoFillManager.h"
 #import "MMWormhole.h"
 #import "AutoFillWormhole.h"
@@ -182,11 +182,11 @@ static NSImage* kStrongBox256Image;
     
     
     self.detailsViewControllers = @{}.mutableCopy;
+
+    [self customizeUi]; 
     
     [self enableDragDrop];
 
-    [self customizeUi];
-    
     [self listenToAutoFillWormhole];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
@@ -1073,13 +1073,11 @@ static NSImage* kStrongBox256Image;
     return items.count == 0 ? nil : items[index];
 }
 
-- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)theColumn byItem:(id)item
-{
+- (id)outlineView:(NSOutlineView *)outlineView objectValueForTableColumn:(NSTableColumn *)theColumn byItem:(id)item {
     return item;
 }
 
-- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item
-{
+- (BOOL)outlineView:(NSOutlineView *)outlineView isGroupItem:(id)item {
     return NO;
 }
 
@@ -1512,7 +1510,7 @@ static NSImage* kStrongBox256Image;
 
 - (NSString*)selectedItemSerializationId {
     Node* item = [self getCurrentSelectedItem];
-    return [self.model.database getCrossSerializationFriendlyId:item];
+    return [self.model.database getCrossSerializationFriendlyIdId:item.uuid];
 }
 
 - (void)showProgressModal:(NSString*)operationDescription {
@@ -1561,7 +1559,7 @@ static NSImage* kStrongBox256Image;
     NSString* password = self.textFieldMasterPassword.stringValue;
     
     if(password.length == 0) {
-        [Alerts twoOptionsWithCancel:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
+        [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
                      informativeText:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
                    option1AndDefault:NSLocalizedString(@"casg_question_option_empty", @"Empty Password")
                              option2:NSLocalizedString(@"casg_question_option_none", @"No Password")
@@ -1585,7 +1583,7 @@ static NSImage* kStrongBox256Image;
     CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:password error:&error];
 
     if(error) {
-        [Alerts error:NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not read the key file.")
+        [MacAlerts error:NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not read the key file.")
                 error:error
                window:self.view.window];
         return;
@@ -1672,7 +1670,7 @@ static NSImage* kStrongBox256Image;
                                                                                            error:&err];
 
                     if(err) {
-                        [Alerts error:NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not read the key file.")
+                        [MacAlerts error:NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not read the key file.")
                                 error:error
                                window:self.view.window];
                         return;
@@ -1687,7 +1685,7 @@ static NSImage* kStrongBox256Image;
                         NSLog(@"User cancelled or selected fallback. Ignore...");
                     }
                     else {
-                        [Alerts error:error window:self.view.window];
+                        [MacAlerts error:error window:self.view.window];
                     }
                 }
             });
@@ -1698,14 +1696,14 @@ static NSImage* kStrongBox256Image;
         
         NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"Touch ID/Apple Watch Unlock is not possible because the stored credentials are unavailable. This is probably because they have expired. Please enter the password manually.");
         
-        [Alerts info:loc window:self.view.window];
+        [MacAlerts info:loc window:self.view.window];
   
         [self bindLockScreenUi];
     }
     else {
         NSString* loc = NSLocalizedString(@"mac_info_biometric_unlock_not_possible_right_now", @"Touch ID/Apple Watch Unlock is not possible at the moment because Biometrics/Apple Watch is not available.");
         
-        [Alerts info:loc window:self.view.window];
+        [MacAlerts info:loc window:self.view.window];
     }
 }
 
@@ -1721,7 +1719,7 @@ static NSImage* kStrongBox256Image;
             if(!Settings.sharedInstance.autoReloadAfterForeignChanges) {
                 NSString* loc = NSLocalizedString(@"mac_db_changed_externally_reload_yes_or_no", @"The database has been changed by another application, would you like to reload this latest version and automatically unlock?");
 
-                [Alerts yesNo:loc
+                [MacAlerts yesNo:loc
                        window:self.view.window
                    completion:^(BOOL yesNo) {
                     if(yesNo) {
@@ -1776,7 +1774,9 @@ static NSImage* kStrongBox256Image;
         [self showProgressModal:loc];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.model reloadAndUnlock:compositeKeyFactors completion:^(BOOL success, NSError * _Nullable error) {
+            [self.model reloadAndUnlock:compositeKeyFactors
+                         viewController:self
+                             completion:^(BOOL success, NSError * _Nullable error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self hideProgressModal];
                     if(success) {
@@ -1788,7 +1788,7 @@ static NSImage* kStrongBox256Image;
         });
     }
     else { 
-        [Alerts info:@"Model is not set. Could not unlock. Please close and reopen your database"
+        [MacAlerts info:@"Model is not set. Could not unlock. Please close and reopen your database"
               window:self.view.window];
     }
 }
@@ -1839,7 +1839,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         }
         
         NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
-        [Alerts error:loc error:error window:self.view.window];
+        [MacAlerts error:loc error:error window:self.view.window];
     
         [self bindBiometricButtonsOnLockScreen];
     }
@@ -1873,7 +1873,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         if([self.model.document isDocumentEdited]) {
             NSString* loc = NSLocalizedString(@"mac_cant_lock_db_while_changes_pending", @"You cannot lock a database while changes are pending. Save changes and lock now?");
             
-            [Alerts yesNo:loc window:self.view.window completion:^(BOOL yesNo) {
+            [MacAlerts yesNo:loc window:self.view.window completion:^(BOOL yesNo) {
                 if(yesNo) {
                     NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
                     [self showProgressModal:loc];
@@ -1966,7 +1966,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                     }
                     else {
                         NSString* loc = NSLocalizedString(@"mac_error_could_not_generate_composite_key", @"Could not generate Composite Key");
-                        [Alerts info:loc window:self.view.window];
+                        [MacAlerts info:loc window:self.view.window];
                     }
                 }
                 
@@ -1984,7 +1984,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
             
             NSString* loc = NSLocalizedString(@"mac_master_credentials_changed_and_saved", @"Master Credentials Changed and Database Saved");
-            [Alerts info:loc window:self.view.window];
+            [MacAlerts info:loc window:self.view.window];
         }
     }];
 }
@@ -2007,6 +2007,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         
         [self.outlineView expandItem:nil expandChildren:YES];
 
+        BOOL found = NO;
         for(int i=0;i < [self.outlineView numberOfRows];i++) {
             
             Node* node = [self.outlineView itemAtRow:i];
@@ -2014,8 +2015,15 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             if([self isSafeItemMatchesSearchCriteria:node recurse:NO]) {
                 
                 [self.outlineView selectRowIndexes: [NSIndexSet indexSetWithIndex: i] byExtendingSelection: NO];
+                found = YES;
                 break;
             }
+        }
+        
+        if ( !found ) { 
+            NSLog(@"No matches...");
+            [self.outlineView deselectAll:nil]; 
+            [self bindDetailsPane];
         }
     }
     else {
@@ -2253,8 +2261,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 
 - (void)enableDragDrop {
-    [self.outlineView registerForDraggedTypes:@[kDragAndDropInternalUti]];
-    [self.outlineView registerForDraggedTypes:@[kDragAndDropExternalUti]];
+    [self.outlineView registerForDraggedTypes:@[kDragAndDropInternalUti, kDragAndDropExternalUti]];
 }
 
 - (Node*)getCurrentSelectedItem {
@@ -2299,7 +2306,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     BOOL ret = [self pasteItemsFromPasteboard:pasteboard destinationItem:destinationItem source:nil clear:NO];
     if(!ret) {
-        [Alerts info:@"Could not paste! Unknown Error." window:self.view.window];
+        [MacAlerts info:@"Could not paste! Unknown Error." window:self.view.window];
     }
     
     return nil;
@@ -2333,7 +2340,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (NSArray<NSString*>*)getInternalSerializationIds:(NSArray<Node*>*)nodes {
     return [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [self.model.database getCrossSerializationFriendlyId:obj];
+        return [self.model.database getCrossSerializationFriendlyIdId:obj.uuid];
     }];
 }
 
@@ -2357,7 +2364,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSData* data = [NSJSONSerialization dataWithJSONObject:serialized options:kNilOptions error:&error];
 
     if(!data) {
-        [Alerts error:@"Could not serialize these items!" error:error window:self.view.window];
+        [MacAlerts error:@"Could not serialize these items!" error:error window:self.view.window];
     }
     
     return data;
@@ -2439,7 +2446,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSDictionary* serialized = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
 
     if(!serialized) {
-        [Alerts error:@"Could not deserialize!" error:error window:self.view.window];
+        [MacAlerts error:@"Could not deserialize!" error:error window:self.view.window];
         return NO;
     }
     
@@ -2457,7 +2464,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         Node* n = [Node deserialize:obj parent:destinationItem keePassGroupTitleRules:keePassGroupTitleRules error:&err];
         
         if(!n) {
-            [Alerts error:err window:self.view.window];
+            [MacAlerts error:err window:self.view.window];
             return NO;
         }
         
@@ -2487,7 +2494,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(nodesWithEmails.count) {
         NSString* loc = NSLocalizedString(@"mac_drag_drop_between_databases_keepass_email_field_not_supported", @"KeePass does not natively support the 'Email' field. Strongbox will add it instead as a custom field.\nDo you want to continue?");
 
-        [Alerts yesNo:loc
+        [MacAlerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2528,7 +2535,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(nodesWithEmails.count || pastingEntriesToRoot) {
         NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries", @"KeePass 1 does not support entries at the root level, these will be discarded. KeePass 1 also does not natively support the 'Email' field. Strongbox will append it instead to the end of the 'Notes' field.\nDo you want to continue?");
         
-        [Alerts yesNo:loc
+        [MacAlerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2577,7 +2584,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(incompatibles.count) {
         NSString* loc = NSLocalizedString(@"mac_password_safe_fmt_does_not_support_icons_attachments_warning", @"The Password Safe format does not support icons, attachments or custom fields. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?");
         
-        [Alerts yesNo:loc
+        [MacAlerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2624,7 +2631,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(incompatibles.count || pastingEntriesToRoot) {
         NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries_or_attachments", @"The KeePass 1 (KDB) does not support entries at the root level, these will be discarded.\n\nThe KeePass 1 (KDB) format also does not support multiple attachments, custom fields or custom icons. If you continue only the first attachment from each item will be copied to this database. Custom Fields and Icons will be discarded.\nDo you want to continue?");
 
-        [Alerts yesNo:loc
+        [MacAlerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2682,7 +2689,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if(incompatibles.count) {
         NSString* loc = NSLocalizedString(@"mac_password_safe_does_not_support_attachments_icons_continue_yes_no", @"The Password Safe format does not support attachments or icons. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?");
         
-        [Alerts yesNo:loc
+        [MacAlerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
                if(yesNo) {
@@ -2729,12 +2736,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                 nodes:(NSArray<Node*>*)nodes
       destinationItem:(Node*)destinationItem
          sourceFormat:(DatabaseFormat)sourceFormat {
-    BOOL keePassGroupTitleRules = self.model.format != kPasswordSafe;
-    
-    BOOL success = [self.model addChildren:nodes parent:destinationItem keePassGroupTitleRules:keePassGroupTitleRules];
+    BOOL success = [self.model addChildren:nodes parent:destinationItem];
     
     if(!success) {
-        [Alerts info:@"Could Not Paste"
+        [MacAlerts info:@"Could Not Paste"
      informativeText:@"Could not place these items here. Unknown error."
               window:self.view.window
           completion:nil];
@@ -2749,7 +2754,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
     if(![self.model addNewRecord:parent]) {
         NSString* loc = NSLocalizedString(@"mac_alert_cannot_create_item_here", @"You cannot create a new item here. It must be within an existing folder.");
-        [Alerts info:loc window:self.view.window];
+        [MacAlerts info:loc window:self.view.window];
         return;
     }
 }
@@ -2759,7 +2764,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
     
     NSString* loc = NSLocalizedString(@"mac_please_enter_a_title_for_new_group", @"Please enter a Title for your new Group");
-    NSString* title = [[[Alerts alloc] init] input:loc defaultValue:kDefaultNewTitle allowEmpty:NO];
+    NSString* title = [[[MacAlerts alloc] init] input:loc defaultValue:kDefaultNewTitle allowEmpty:NO];
     
     if(title.length) {
         [self.model addNewGroup:parent title:title];
@@ -2813,7 +2818,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)postValidationPartialDeleteAndRecycleItemsWithConfirmPrompt:(const NSArray<Node*>*)toBeDeleted toBeRecycled:(const NSArray<Node*>*)toBeRecycled {
-    [Alerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
+    [MacAlerts yesNo:NSLocalizedString(@"browse_vc_partial_recycle_alert_title", @"Partial Recycle")
   informativeText:NSLocalizedString(@"browse_vc_partial_recycle_alert_message", @"Some of the items you have selected cannot be recycled and will be permanently deleted. Is that ok?")
            window:self.view.window
        completion:^(BOOL yesNo) {
@@ -2826,7 +2831,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                    BOOL fail = ![self.model recycleItems:toBeRecycled];
                    
                    if(fail) {
-                       [Alerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+                       [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
                     informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
                              window:self.view.window
                          completion:nil];
@@ -2849,7 +2854,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                    [self.model dereference:item.title node:item]];
     }
     
-    [Alerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
+    [MacAlerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
         if (yesNo) {
             [self.model deleteItems:items];
         }
@@ -2868,12 +2873,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                 [self.model dereference:item.title node:item]];
     }
     
-    [Alerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
+    [MacAlerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
         if (yesNo) {
             BOOL fail = ![self.model recycleItems:items];
 
             if(fail) {
-               [Alerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
+               [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
             informativeText:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")
                      window:self.view.window
                  completion:nil];
@@ -2911,6 +2916,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
     
     if (theAction == @selector(onViewItemDetails:)) {
+        return item != nil && !item.isGroup;
+    }
+    if (theAction == @selector(onDuplicateEntry:)) {
         return item != nil && !item.isGroup;
     }
     else if (theAction == @selector(copy:)) {
@@ -3079,7 +3087,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
    
     loc = NSLocalizedString(@"mac_csv_format_info_title", @"CSV Format");
     
-    [Alerts info:loc
+    [MacAlerts info:loc
  informativeText:message
           window:self.view.window
       completion:^{
@@ -3097,12 +3105,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         if (rows == nil) {
             
             NSLog(@"error parsing file: %@", error);
-            [Alerts error:error window:self.view.window];
+            [MacAlerts error:error window:self.view.window];
             return;
         }
         else if(rows.count == 0){
             NSString* loc = NSLocalizedString(@"mac_csv_file_contains_zero_rows", @"CSV File Contains Zero Rows. Cannot Import.");
-            [Alerts info:loc window:self.view.window];
+            [MacAlerts info:loc window:self.view.window];
         }
         else {
             CHCSVOrderedDictionary *firstRow = [rows firstObject];
@@ -3116,19 +3124,19 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                 NSString* loc = NSLocalizedString(@"mac_found_n_valid_rows_in_csv_file_prompt_to_import_fmt", @"Found %lu valid rows in CSV file. Are you sure you would like to import now?");
                 NSString* message = [NSString stringWithFormat:loc, (unsigned long)rows.count];
                 
-                [Alerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
+                [MacAlerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
                     if(yesNo) {
                         [self.model importRecordsFromCsvRows:rows];
 
                         NSString* loc = NSLocalizedString(@"mac_csv_file_successfully_imported", @"CSV File Successfully Imported.");
-                        [Alerts info:loc window:self.view.window];
+                        [MacAlerts info:loc window:self.view.window];
                     }
                 }];
             }
             else {
                 NSString* loc = NSLocalizedString(@"mac_no_valid_csv_rows_found", @"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields.");
 
-                [Alerts info:loc window:self.view.window];
+                [MacAlerts info:loc window:self.view.window];
             }
         }
     }
@@ -3550,11 +3558,11 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
     }
     
     NSString* loc = NSLocalizedString(@"mac_please_enter_totp_secret_or_otpauth_url", @"Please enter the secret or an OTPAuth URL");
-    NSString* response = [[Alerts alloc] input:loc defaultValue:@"" allowEmpty:NO];
+    NSString* response = [[MacAlerts alloc] input:loc defaultValue:@"" allowEmpty:NO];
     
     if(response) {
         NSString* loc = NSLocalizedString(@"mac_is_this_a_stream_token_yes_no", @"Is this a Steam Token? (Say 'No' if you're unsure)");
-        [Alerts yesNo:loc
+        [MacAlerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
             [self.model setTotp:item otp:response steam:yesNo];
@@ -3752,7 +3760,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];
             
             if(!bookmark) {
-                [Alerts error:error window:self.view.window];
+                [MacAlerts error:error window:self.view.window];
                 [self refreshKeyFileDropdown];
                 return;
             }
@@ -4003,7 +4011,23 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
 }
 
 - (IBAction)onViewAllDatabases:(id)sender {
-    [DatabasesManagerView show:NO];
+    [DatabasesManagerVC show];
+}
+
+- (IBAction)onDuplicateEntry:(id)sender {
+    NSLog(@"onDuplicateEntry");
+    
+    Node* item = nil;
+    
+    if(self.model && !self.model.locked) {
+        item = [self getCurrentSelectedItem];
+    }
+    
+    if (item && !item.isGroup) {
+        Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
+        [item touch:NO touchParents:YES];        
+        [self.model addChildren:@[dupe] parent:item.parent];
+    }
 }
 
 @end

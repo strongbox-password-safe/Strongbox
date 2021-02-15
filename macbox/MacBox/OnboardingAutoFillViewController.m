@@ -9,7 +9,7 @@
 #import "OnboardingAutoFillViewController.h"
 #import "DatabasesManager.h"
 #import "AutoFillManager.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 
 @interface OnboardingAutoFillViewController ()
 
@@ -83,7 +83,9 @@
 
     if ( quickTypeWasTurnedOn ) {
         NSLog(@"AutoFill QuickType was turned on - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model databaseUuid:self.database.uuid];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model
+                                                           databaseUuid:self.database.uuid
+                                                          displayFormat:self.database.quickTypeDisplayFormat];
     }
     
     [self bindUI];
@@ -97,7 +99,7 @@
 }
 
 - (IBAction)onEnableStrongboxSystemExtension:(id)sender {
-    [Alerts customOptionWithCancel:NSLocalizedString(@"mac_autofill_enable_extension_title", @"Enable Strongbox Extension")
+    [MacAlerts customOptionWithCancel:NSLocalizedString(@"mac_autofill_enable_extension_title", @"Enable Strongbox Extension")
                  informativeText:NSLocalizedString(@"mac_autofill_enable_extension_message", @"To use AutoFill you must enable the Strongbox Extension in System Preferences. To do this click the 'Open System Preferences...' button below and navigate to:\n\n∙ Extensions > Password AutoFill > Check 'Strongbox'\n\n")
                option1AndDefault:NSLocalizedString(@"mac_autofill_action_open_system_preferences", @"Open System Preferences...")
                           window:self.view.window

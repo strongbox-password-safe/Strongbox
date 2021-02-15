@@ -14,8 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-@property (readonly, nonnull) NSString* tmpEncryptedAttachmentPath;
-@property (readonly, nonnull) NSString* tmpAttachmentPreviewPath;
+@property (readonly, nullable) NSString* userHomePath;
+@property (readonly, nullable) NSURL* iCloudRootURL;
+@property (readonly, nullable) NSURL* iCloudDriveRootURL;
+
+@property (readonly) NSString* tmpEncryptedAttachmentPath;
+@property (readonly) NSString* tmpAttachmentPreviewPath;
+@property (readonly) NSURL* syncManagerLocalWorkingCachesDirectory;
 
 - (void)deleteAllTmpAttachmentPreviewFiles;
 

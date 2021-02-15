@@ -12,13 +12,14 @@
 #import "CreateFormatAndSetCredentialsWizard.h"
 #import "DatabaseModel.h"
 #import "Settings.h"
-#import "DatabasesManagerView.h"
+#import "DatabasesManagerVC.h"
 #import "DatabasesManager.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "Utils.h"
 #import "NSArray+Extensions.h"
 #import "BookmarksHelper.h"
 #import "Serializator.h"
+#import "MacUrlSchemes.h"
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 
@@ -75,32 +76,53 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
            forSaveOperation:NSSaveOperation
           completionHandler:^(NSError * _Nullable errorOrNil) {
             if(errorOrNil) {
+                NSLog(@"Error Saving New Database: [%@]", errorOrNil);
+            
+                if (NSApplication.sharedApplication.keyWindow) {
+                    [MacAlerts error:errorOrNil window:NSApplication.sharedApplication.keyWindow];
+                }
+                
                 return;
             }
 
             DatabaseMetadata* database = [DatabasesManager.sharedInstance addOrGet:URL];
-            
             database.keyFileBookmark = wizard.selectedKeyFileBookmark;
             database.yubiKeyConfiguration = wizard.selectedYubiKeyConfiguration;
-            
             [DatabasesManager.sharedInstance update:database];
         
             [self addDocument:document];
+            
             [document setDatabaseMetadata:database];
+            
             [document makeWindowControllers];
             [document showWindows];
         }];
     }
 }
 
-- (void)openDocument:(id)sender {
+- (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
+    NSLog(@"openDocumentWithContentsOfURL: [%@]", url);
+    [super openDocumentWithContentsOfURL:url display:displayDocument completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+        if ( document && !error ) {
+            DatabaseMetadata* database = [DatabasesManager.sharedInstance addOrGet:url];
+            [((Document*)document) setDatabaseMetadata:database];
+        }
+        
+        completionHandler(document, documentWasAlreadyOpen, error);
+    }];
+}
 
-    if(self.documents.count == 0) { 
-        [self performEmptyLaunchTasksIfNecessary];
-    }
-    else {
+- (void)openDocument:(id)sender {
+    NSLog(@"openDocument: document count = [%ld]", self.documents.count);
+    
+
+
+
+
         [self originalOpenDocument:sender];
-    }
+
+    
+    
 }
 
 - (void)originalOpenDocument:(id)sender {
@@ -108,9 +130,9 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 }
 
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
-    if(database.storageProvider == kLocalDevice) {
-        NSURL* url = database.fileUrl;
-        
+    NSURL* url = database.fileUrl;
+
+    if(database.storageProvider == kLocalDevice) { 
         if (database.storageInfo != nil) {
             NSError *error = nil;
             NSString* updatedBookmark;
@@ -136,25 +158,33 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
         else {
             NSLog(@"WARN: Storage info/Bookmark unavailable! Falling back solely on fileURL");
         }
-        
-        if (url) {
-            [url startAccessingSecurityScopedResource];
-            [self openDocumentWithContentsOfURL:url
-                                        display:YES
-                              completionHandler:^(NSDocument * _Nullable document,
-                                                 BOOL documentWasAlreadyOpen,
-                                                 NSError * _Nullable error) {
-                if(error) {
-                    NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
-                }
-                
-                completion(error);
-            }];
-        }
-        else {
-            completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
-        }
     }
+        
+    if (url) {
+        [url startAccessingSecurityScopedResource];
+        [self openDocumentWithContentsOfURL:url
+                                    display:YES
+                          completionHandler:^(NSDocument * _Nullable document,
+                                             BOOL documentWasAlreadyOpen,
+                                             NSError * _Nullable error) {
+            if(error) {
+                NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
+            }
+            
+            completion(error);
+        }];
+    }
+    else {
+        completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
+    }
+}
+
+- (NSString *)typeForContentsOfURL:(NSURL *)url error:(NSError *__autoreleasing  _Nullable *)outError {
+    if ([url.scheme isEqualToString:kStrongboxSFTPUrlScheme]) {
+        return kStrongboxPasswordDatabaseDocumentType;
+    }
+    
+    return [super typeForContentsOfURL:url error:outError];
 }
 
 - (void)onAppStartup {
@@ -165,7 +195,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
         [self openPrimaryDatabase];
     }
     else if(self.documents.count == 0) {
-        [DatabasesManagerView show:NO];
+        [DatabasesManagerVC show];
     }
 }
 
@@ -180,7 +210,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
             [self openPrimaryDatabase];
         }
         else {
-            [DatabasesManagerView show:NO];
+            [DatabasesManagerVC show];
         }
     }
 }
@@ -190,6 +220,53 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
        Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
         [self openDatabase:DatabasesManager.sharedInstance.snapshot.firstObject completion:^(NSError *error) { }];
     }
+}
+
+
+
++ (void)restoreWindowWithIdentifier:(NSUserInterfaceItemIdentifier)identifier
+                              state:(NSCoder *)state
+                  completionHandler:(void (^)(NSWindow * _Nullable, NSError * _Nullable))completionHandler {
+    NSLog(@"restoreWindowWithIdentifier...");
+    
+    if ([state containsValueForKey:@"StrongboxNonFileRestorationStateURL"] ) {
+        NSURL *nonFileRestorationStateURL = [state decodeObjectForKey:@"StrongboxNonFileRestorationStateURL"];
+        
+        if ( nonFileRestorationStateURL ) {
+            NSLog(@"restoreWindowWithIdentifier... custom URL");
+
+            [[self sharedDocumentController] reopenDocumentForURL:nonFileRestorationStateURL
+                                                withContentsOfURL:nonFileRestorationStateURL
+                                                          display:NO
+                                                completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+                NSWindow *resultWindow = nil;
+                 
+                if (!documentWasAlreadyOpen) {
+                    if ( !document.windowControllers.count ) {
+                         [document makeWindowControllers];
+                    }
+                    
+                    if ( 1 == document.windowControllers.count ) {
+                        resultWindow = document.windowControllers.firstObject.window;
+                    }
+                    else {
+                        for (NSWindowController *wc in document.windowControllers) {
+                            if ( [wc.window.identifier isEqual:identifier] ) {
+                                resultWindow = wc.window;
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                completionHandler(resultWindow, error);
+            }];
+        }
+        
+        return;
+    }
+
+    [super restoreWindowWithIdentifier:identifier state:state completionHandler:completionHandler];
 }
 
 @end

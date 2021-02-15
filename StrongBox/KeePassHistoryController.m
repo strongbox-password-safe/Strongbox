@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 07/03/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "KeePassHistoryController.h"
@@ -98,12 +98,11 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Node* node = self.items[indexPath.row];
-
     if (@available(iOS 11.0, *)) {
-        [self performSegueWithIdentifier:@"HistoryToItemDetails" sender:node];
+        [self performSegueWithIdentifier:@"HistoryToItemDetails" sender:@(indexPath.row)];
     }
     else {
+        Node* node = self.items[indexPath.row];
         [self performSegueWithIdentifier:@"segueToRecordView" sender:node];
     }
 }
@@ -119,13 +118,17 @@
         vc.isHistoricalEntry = YES;
     }
     else if ([segue.identifier isEqualToString:@"HistoryToItemDetails"]) {
-        Node *record = (Node *)sender;
+        NSNumber *index = (NSNumber *)sender;
         
         ItemDetailsViewController *vc = segue.destinationViewController;
         
         vc.createNewItem = NO;
-        vc.item = record;
-        vc.parentGroup = record.parent;
+        
+        Node* node = self.historicalItems[index.intValue];
+        
+        vc.itemId = node.uuid;
+        vc.historicalIndex = index;
+        vc.parentGroupId = node.parent.uuid;
         vc.readOnly = YES;
         vc.databaseModel = self.viewModel;
     }

@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 27/09/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "BackupsBrowserTableViewController.h"
@@ -52,9 +52,12 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"backupItemCell" forIndexPath:indexPath];
     
     BackupItem* item = self.items[indexPath.row];
-    
-    cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_title_fmt", @"Backup %ld (%@)"), (long)indexPath.row + 1, item.modDate.friendlyDateString];
-    cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_subtitle_fmt", @"%@ (Created %@)"), friendlyFileSizeString(item.fileSize.unsignedIntegerValue), item.backupCreatedDate.friendlyDateString];
+
+    cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_modified_title_fmt", @"Modified %@"), item.modDate.friendlyDateString];
+    cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_taken_at_subtitle_fmt", @"%@ (Backup taken %@)"), friendlyFileSizeString(item.fileSize.unsignedIntegerValue), item.backupCreatedDate.friendlyDateString];
+
+
+
     cell.imageView.image = [UIImage imageNamed:@"file"];
     
     return cell;

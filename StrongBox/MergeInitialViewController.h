@@ -3,18 +3,19 @@
 //  Strongbox
 //
 //  Created by Mark on 07/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 #import "SafeMetaData.h"
+#import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface MergeInitialViewController : UIViewController
 
 @property SafeMetaData* firstMetadata;
-@property (nonatomic, copy) void (^onDone)(void);
+@property (nonatomic, copy) void (^onDone)(BOOL mergeRequested, Model*_Nullable first, Model*_Nullable second);
 
 @end
 

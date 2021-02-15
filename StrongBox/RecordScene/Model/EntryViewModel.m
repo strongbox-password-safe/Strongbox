@@ -3,16 +3,16 @@
 //  test-new-ui
 //
 //  Created by Mark on 19/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "ItemDetailsModel.h"
+#import "EntryViewModel.h"
 #import "Utils.h"
 #import "OTPToken+Serialization.h"
 #import "MutableOrderedDictionary.h"
 #import "NodeIcon.h"
 
-@interface ItemDetailsModel()
+@interface EntryViewModel()
 
 @property NSMutableArray<CustomFieldViewModel*>* mutableCustomFields;
 @property MutableOrderedDictionary<NSString*, DatabaseAttachment*>* mutableAttachments;
@@ -20,7 +20,7 @@
 
 @end
 
-@implementation ItemDetailsModel
+@implementation EntryViewModel
 
 - (instancetype)initWithTitle:(NSString *)title
                      username:(NSString *)username
@@ -64,7 +64,7 @@
 }
 
 - (instancetype)clone {
-    ItemDetailsModel* model = [[ItemDetailsModel alloc] initWithTitle:self.title
+    EntryViewModel* model = [[EntryViewModel alloc] initWithTitle:self.title
                                                              username:self.username
                                                              password:self.password
                                                                   url:self.url
@@ -86,7 +86,7 @@
     return YES;
 }
 
-- (BOOL)isDifferentFrom:(ItemDetailsModel *)other {
+- (BOOL)isDifferentFrom:(EntryViewModel *)other {
     BOOL simpleEqual =  [self.title compare:other.title] == NSOrderedSame &&
                         [self.username compare:other.username] == NSOrderedSame &&
                         [self.password compare:other.password] == NSOrderedSame &&
@@ -242,7 +242,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
         token = [token validate] ? token : nil;
     }
 
-    ItemDetailsModel* ret = [[ItemDetailsModel alloc] initWithTitle:@"Acme Inc."
+    EntryViewModel* ret = [[EntryViewModel alloc] initWithTitle:@"Acme Inc."
                                                            username:@"mark.mc"
                                                            password:@"very very secret that is waaaaaay too long to fit on one line"
                                                                 url:@"https:

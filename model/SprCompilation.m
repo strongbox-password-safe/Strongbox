@@ -3,19 +3,24 @@
 //  Strongbox
 //
 //  Created by Mark on 05/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SprCompilation.h"
 #import "Utils.h"
 #import "NSDictionary+Extensions.h"
 #import "NSArray+Extensions.h"
+#import "OTPToken+Generation.h"
 
 static NSString* const kTitleOperation = @"TITLE";
 static NSString* const kUsernameOperation = @"USERNAME";
 static NSString* const kPasswordOperation = @"PASSWORD";
 static NSString* const kNotesOperation = @"NOTES";
 static NSString* const kUrlOperation = @"URL";
+
+static NSString* const kWinKP_TOTP_Operation = @"TIMEOTP";
+static NSString* const kKPXC_TOTP_Operation = @"TOTP";
+
 static NSString* const kCustomFieldOperation = @"S:";
 static NSString* const kReferenceOperation = @"REF:";
 
@@ -37,7 +42,7 @@ static NSString* const kUrlSubOperationUserInfo = @"USERINFO";
 static NSString* const kUrlSubOperationUserName = @"USERNAME";
 static NSString* const kUrlSubOperationPassword = @"PASSWORD";
 
-static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOST|SCM|PORT|PATH|QUERY|USERNAME|USERINFO|PASSWORD))*|PASSWORD|NOTES|S:(.*?)|REF:((T|U|P|A|N|I)@(T|U|P|A|N|I|O):(.*?))){1}\\}";
+static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOST|SCM|PORT|PATH|QUERY|USERNAME|USERINFO|PASSWORD))*|PASSWORD|NOTES|TIMEOTP|TOTP|S:(.*?)|REF:((T|U|P|A|N|I)@(T|U|P|A|N|I|O):(.*?))){1}\\}";
 
 @implementation SprCompilation
 
@@ -80,7 +85,7 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
 }
 
 - (NSString *)sprCompile:(NSString *)test node:(Node *)node database:(DatabaseModel*)database depth:(NSUInteger)depth noRecurse:(BOOL)noRecurse error:(NSError **)error {
-    if(!test.length) {
+    if(!test.length || !node) {
         return @"";
     }
     
@@ -88,20 +93,26 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     NSTextCheckingResult* match = [[SprCompilation regex] firstMatchInString:test options:kNilOptions range:NSMakeRange(0, test.length)];
 
     if(match) {
-        NSError* matchError;
-        NSString* compiled = [self sprCompileRegexMatch:match test:test node:node database:database error:&matchError];
-
-        if(!compiled) {
-            NSLog(@"Failed to compile Error: [%@]", matchError);
-            if(error) {
-                *error = matchError;
-            }
-        }
-
-        ret = [test stringByReplacingCharactersInRange:match.range withString:compiled];
-        
         if(depth < 10 && !noRecurse) { 
-            ret = [self sprCompile:ret node:node database:database depth:depth+1 noRecurse:noRecurse error:error];
+            NSError* matchError;
+            NSString* compiled = [self sprCompileRegexMatch:match test:test node:node database:database error:&matchError];
+
+            if(!compiled) {
+                NSLog(@"Failed to compile Error: [%@]", matchError);
+                if(error) {
+                    *error = matchError;
+                }
+            }
+            else {
+                ret = [test stringByReplacingCharactersInRange:match.range withString:compiled];
+                
+                if(depth < 10 && !noRecurse) { 
+                    ret = [self sprCompile:ret node:node database:database depth:depth+1 noRecurse:noRecurse error:error];
+                }
+                else {
+                    NSLog(@"Depth/Recurse Limit Exceeded in SPR Compile... Will not attempt Further.");
+                }
+            }
         }
         else {
             NSLog(@"Depth/Recurse Limit Exceeded in SPR Compile... Will not attempt Further.");
@@ -149,6 +160,9 @@ static NSString* const kSprCompilerRegex = @"\\{(TITLE|USERNAME|URL(:(RMVSCM|HOS
     }
     else if([operation isEqualToString:kNotesOperation]) {
         return node.fields.notes;
+    }
+    else if([operation isEqualToString:kKPXC_TOTP_Operation] || [operation isEqualToString:kWinKP_TOTP_Operation]) {
+        return node.fields.otpToken.password;
     }
     else if([operation hasPrefix:kCustomFieldOperation]) {
         NSString* key = ([match rangeAtIndex:4].location == NSNotFound) ? nil : [test substringWithRange:[match rangeAtIndex:4]];

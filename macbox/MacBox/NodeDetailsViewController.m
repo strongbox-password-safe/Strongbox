@@ -13,7 +13,7 @@
 #import "KSPasswordField.h"
 #import "ClickableImageView.h"
 #import "AttachmentCollectionView.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "Utils.h"
 #import "Settings.h"
 #import "OTPToken+Generation.h"
@@ -208,7 +208,7 @@ static NSString* trimField(NSTextField* textField) {
     NSString* message = loc;
     NSString* informative = loc2;
 
-    [Alerts yesNo:message
+    [MacAlerts yesNo:message
   informativeText:informative
            window:self.view.window
  disableEscapeKey:YES
@@ -811,7 +811,7 @@ static NSString* trimField(NSTextField* textField) {
     if(self.historical) {
         return;
     }
-    Alerts* alert = [[Alerts alloc] init];
+    MacAlerts* alert = [[MacAlerts alloc] init];
     
     NSString* loc = NSLocalizedString(@"mac_node_details_edit_custom_field", @"Edit Custom Field");
 
@@ -837,13 +837,13 @@ static NSString* trimField(NSTextField* textField) {
     
     if(!allowUpdate && [existingKeySet containsObject:key]) {
         NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_that_key_already_exists", @"You cannot use that Key here as it already exists in custom fields.");
-        [Alerts info:loc window:self.view.window];
+        [MacAlerts info:loc window:self.view.window];
         return;
     }
     
     if([keePassReserved containsObject:key]) {
         NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_key_reserved", @"You cannot use that Key here as it is reserved for standard KeePass fields.");
-        [Alerts info:loc window:self.view.window];
+        [MacAlerts info:loc window:self.view.window];
         return;
     }
     
@@ -888,7 +888,7 @@ static NSString* trimField(NSTextField* textField) {
     
     NSString* loc = NSLocalizedString(@"mac_node_details_are_you_sure_remove_custom_field_fmt", @"Are you sure you want to remove the custom field '%@'?");
 
-    [Alerts yesNo:[NSString stringWithFormat:loc, field.key]
+    [MacAlerts yesNo:[NSString stringWithFormat:loc, field.key]
            window:self.view.window
        completion:^(BOOL yesNo) {
            if(yesNo) {
@@ -907,7 +907,7 @@ static NSString* trimField(NSTextField* textField) {
             
         NSString* loc = NSLocalizedString(@"mac_node_details_are_you_sure_remove_custom_field_fmt", @"Are you sure you want to remove the custom field '%@'?");
 
-        [Alerts yesNo:[NSString stringWithFormat:loc, field.key]
+        [MacAlerts yesNo:[NSString stringWithFormat:loc, field.key]
                window:self.view.window
            completion:^(BOOL yesNo) {
             if(yesNo) {
@@ -922,7 +922,7 @@ static NSString* trimField(NSTextField* textField) {
         return;
     }
     
-    Alerts* alert = [[Alerts alloc] init];
+    MacAlerts* alert = [[MacAlerts alloc] init];
     
     NSString* loc1 = NSLocalizedString(@"mac_node_details_add_custom_field", @"Add Custom Field");
     NSString* loc2 = NSLocalizedString(@"mac_alerts_input_custom_field_label_key", @"Key");
@@ -1097,7 +1097,7 @@ static NSString* trimField(NSTextField* textField) {
     if(self.node.parent != group) {
         if(![self.model validateMove:@[self.node] destination:group]) { 
             NSString* loc = NSLocalizedString(@"mac_node_details_could_not_change_group", @"Could not change group! Validate failed...");
-            [Alerts info:loc window:self.view.window];
+            [MacAlerts info:loc window:self.view.window];
             [self syncComboGroupWithNode];
         }
         else {
@@ -1397,7 +1397,7 @@ static NSString* trimField(NSTextField* textField) {
     
     NSString* loc = NSLocalizedString(@"mac_node_details_are_you_sure_remove_attachment_fmt", @"Are you sure you want to remove the attachment: %@?");
     NSString* prompt = [NSString stringWithFormat:loc, filename];
-    [Alerts yesNo:prompt window:self.view.window completion:^(BOOL yesNo) {
+    [MacAlerts yesNo:prompt window:self.view.window completion:^(BOOL yesNo) {
         if(yesNo) {
             [self.model removeItemAttachment:self.node filename:filename];
         }

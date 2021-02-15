@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 30/07/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

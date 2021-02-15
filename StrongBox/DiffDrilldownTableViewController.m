@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 15/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DiffDrilldownTableViewController.h"
@@ -194,9 +194,11 @@
         self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.overrideURL, other.fields.overrideURL];
     }
     
-    if ((mine.fields.autoType == nil && other.fields.autoType != nil) || (mine.fields.autoType != nil && ![mine.fields.autoType isEqual:other.fields.autoType])) {
-        NSString* locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_autotype_will_change", @"AutoType will change.") : NSLocalizedString(@"diff_drill_down_autotype_are_different", @"AutoTypes are different.");
-        self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.autoType, other.fields.autoType];
+    if ( ![AutoType isDefault:mine.fields.autoType] || ![AutoType isDefault:other.fields.autoType]) {
+        if ((mine.fields.autoType == nil && other.fields.autoType != nil) || (mine.fields.autoType != nil && ![mine.fields.autoType isEqual:other.fields.autoType])) {
+            NSString* locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_autotype_will_change", @"AutoType will change.") : NSLocalizedString(@"diff_drill_down_autotype_are_different", @"AutoTypes are different.");
+            self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.autoType, other.fields.autoType];
+        }
     }
     
     

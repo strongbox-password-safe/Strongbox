@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 22/07/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "PreferencesTableViewController.h"
@@ -114,7 +114,7 @@
         
     }
     else if(cell == self.cellAboutHelp) {
-        [self onFaq];
+        [self onHelp];
     }
     else if (cell == self.cellClearClipboardDelay) {
         [self promptForInteger:NSLocalizedString(@"prefs_vc_clear_clipboard_delay", @"Clear Clipboard Delay")
@@ -192,16 +192,18 @@
 }
 
 - (void)bindCloudSessions {
-    int cloudSessionCount = 0;
-    cloudSessionCount += [[GoogleDriveManager sharedInstance] isAuthorized] ? 1 : 0;
-    cloudSessionCount += (DBClientsManager.authorizedClient != nil) ? 1 : 0;
-    cloudSessionCount += [[OneDriveStorageProvider sharedInstance] isSignedIn] ? 1 : 0;
+    
 
-    self.cellCloudSessions.userInteractionEnabled = (cloudSessionCount > 0);
-    self.labelCloudSessions.enabled = (cloudSessionCount > 0);
-    self.labelCloudSessions.text = (cloudSessionCount > 0) ? [NSString stringWithFormat:
-                                                              NSLocalizedString(@"prefs_vc_cloud_sessions_count_fmt", @"Sessions (%d)"), cloudSessionCount] :
-    NSLocalizedString(@"prefs_vc_cloud_sessions_count_none", @"No Sessions");
+    
+
+
+
+
+
+
+
+
+
 
     self.switchUseICloud.on = [[SharedAppAndAutoFillSettings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
@@ -337,14 +339,23 @@
     [self bindAppLock];
 }
 
-- (void)onFaq {
-    NSURL* url = [NSURL URLWithString:@"https:
-    if (@available (iOS 10.0, *)) {
-        [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-    }
-    else {
-        [UIApplication.sharedApplication openURL:url];
-    }
+- (void)onHelp {
+    [Alerts yesNo:self
+            title:NSLocalizedString(@"prompt_title_copy_debug_info", @"Copy Debug Info?")
+          message:NSLocalizedString(@"prompt_message_copy_debug_info", @"Would you like to copy some helpful debug information that you can share with support before proceeding?")
+           action:^(BOOL response) {
+        if ( response ) {
+            [UIPasteboard.generalPasteboard setString:[DebugHelper getAboutDebugString]];
+        }
+    
+        NSURL* url = [NSURL URLWithString:@"https:
+        if (@available (iOS 10.0, *)) {
+            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+        }
+        else {
+            [UIApplication.sharedApplication openURL:url];
+        }
+    }];
 }
 
 - (IBAction)onSwitchClearClipboardEnable:(id)sender {

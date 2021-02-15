@@ -10,7 +10,8 @@
 #import "DatabasesManager.h"
 #import "AutoFillManager.h"
 #import "Settings.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
+#import "QuickTypeAutoFillDisplayFormat.h"
 
 @interface AutoFillSettingsViewController ()
 
@@ -20,6 +21,7 @@
 @property (weak) IBOutlet NSTextField *labelProWarning;
 @property (weak) IBOutlet NSButton *enableSystemExtension;
 @property (weak) IBOutlet NSTextField *labelNavHelp;
+@property (weak) IBOutlet NSPopUpButton *popupDisplayFormat;
 
 @end
 
@@ -27,6 +29,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self.popupDisplayFormat.menu removeAllItems];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatTitleThenUsername) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatUsernameOnly) action:nil keyEquivalent:@""];
+    [self.popupDisplayFormat.menu addItemWithTitle:quickTypeFormatString(kQuickTypeFormatTitleOnly) action:nil keyEquivalent:@""];
     
     [self bindUI];
 }
@@ -47,12 +54,34 @@
     self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox;
 
     self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.model.databaseMetadata.autoFillEnabled;
-    self.useWormholeIfUnlocked.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.model.databaseMetadata.autoFillEnabled && self.model.databaseMetadata.quickTypeEnabled;
 
+    [self.popupDisplayFormat selectItemAtIndex:self.model.databaseMetadata.quickTypeDisplayFormat];
+    self.popupDisplayFormat.enabled = self.enableQuickType.enabled && self.model.databaseMetadata.quickTypeEnabled;
+    
+    self.useWormholeIfUnlocked.enabled = self.enableQuickType.enabled && self.model.databaseMetadata.quickTypeEnabled;
+
+    
+    
     __weak id weakSelf = self;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [weakSelf bindUI];
     });
+}
+
+- (IBAction)onDisplayFormatChanged:(id)sender {
+    NSInteger newIndex = self.popupDisplayFormat.indexOfSelectedItem;
+    
+    if ( newIndex != self.model.databaseMetadata.quickTypeDisplayFormat ) {
+        self.model.databaseMetadata.quickTypeDisplayFormat = newIndex;
+        [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
+        
+        NSLog(@"AutoFill QuickType Format was changed - Populating Database....");
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
+                                                           databaseUuid:self.model.databaseMetadata.uuid
+                                                          displayFormat:self.model.databaseMetadata.quickTypeDisplayFormat];
+        
+        [self bindUI];
+    }
 }
 
 - (IBAction)onChanged:(id)sender {
@@ -82,14 +111,16 @@
 
     if ( quickTypeWasTurnedOn ) {
         NSLog(@"AutoFill QuickType was turned off - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database databaseUuid:self.model.databaseMetadata.uuid];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
+                                                           databaseUuid:self.model.databaseMetadata.uuid
+                                                          displayFormat:self.model.databaseMetadata.quickTypeDisplayFormat];
     }
     
     [self bindUI];
 }
 
 - (IBAction)onEnableSystemExtension:(id)sender {
-    [Alerts customOptionWithCancel:NSLocalizedString(@"mac_autofill_enable_extension_title", @"Enable Strongbox Extension")
+    [MacAlerts customOptionWithCancel:NSLocalizedString(@"mac_autofill_enable_extension_title", @"Enable Strongbox Extension")
                  informativeText:NSLocalizedString(@"mac_autofill_enable_extension_message", @"To use AutoFill you must enable the Strongbox Extension in System Preferences. To do this click the 'Open System Preferences...' button below and navigate to:\n\n∙ Extensions > Password AutoFill > Check 'Strongbox'\n\n")
                option1AndDefault:NSLocalizedString(@"mac_autofill_action_open_system_preferences", @"Open System Preferences...")
                           window:self.view.window

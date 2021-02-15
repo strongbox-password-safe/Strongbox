@@ -13,7 +13,7 @@
 #import "MacYubiKeyManager.h"
 #import "BookmarksHelper.h"
 #import "DatabasesManager.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 
 @interface ManualCredentialsEntry () <NSTextFieldDelegate>
 
@@ -47,9 +47,6 @@
 @end
 
 @implementation ManualCredentialsEntry
-
-
-
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -173,7 +170,7 @@
 
 - (IBAction)onUnlock:(id)sender {
     if(self.textFieldPassword.stringValue.length == 0) {
-        [Alerts twoOptionsWithCancel:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
+        [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
                      informativeText:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
                    option1AndDefault:NSLocalizedString(@"casg_question_option_empty", @"Empty Password")
                              option2:NSLocalizedString(@"casg_question_option_none", @"No Password")
@@ -303,7 +300,7 @@
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];
 
             if(!bookmark) {
-                [Alerts error:error window:self.view.window];
+                [MacAlerts error:error window:self.view.window];
                 [self refreshKeyFileDropdown];
                 return;
             }

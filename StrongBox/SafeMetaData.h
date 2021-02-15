@@ -17,6 +17,8 @@
 #import "YubiKeyHardwareConfiguration.h"
 #import "DatabaseAuditorConfiguration.h"
 #import "KeePassIconSet.h"
+#import "ConflictResolutionStrategy.h"
+#import "QuickTypeAutoFillDisplayFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -128,8 +130,29 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable) NSUUID* outstandingUpdateId;
 @property (nullable) NSDate* lastSyncRemoteModDate; 
+@property (nullable) NSDate* lastSyncAttempt;
 
-@property (readonly) BOOL quickTypeEnabled; 
+@property ConflictResolutionStrategy conflictResolutionStrategy;
+
+@property BOOL quickTypeEnabled;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@property BOOL immediateOfflineOfferIfOfflineDetected;
+
+@property QuickTypeAutoFillDisplayFormat quickTypeDisplayFormat;
 
 @end
 

@@ -63,14 +63,15 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
         self.selectedItem = selectedItem;
         
         if(self.document.fileURL) { 
-            _databaseMetadata = [DatabasesManager.sharedInstance addOrGet:self.document.fileURL];
+            _databaseMetadata = [DatabasesManager.sharedInstance getDatabaseByFileUrl:self.document.fileURL];
             
             if(self.databaseMetadata == nil) {
                 NSLog(@"WARN: Could not add or get metadata for [%@]", document.fileURL);
             }
             else if ( database && self.databaseMetadata.autoFillEnabled && self.databaseMetadata.quickTypeEnabled ) {
                 [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:database
-                                                                   databaseUuid:self.databaseMetadata.uuid];
+                                                                   databaseUuid:self.databaseMetadata.uuid
+                                                                  displayFormat:self.databaseMetadata.quickTypeDisplayFormat];
             }
         }
     }
@@ -95,8 +96,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (void)reloadAndUnlock:(CompositeKeyFactors *)compositeKeyFactors
+         viewController:(NSViewController*)viewController
              completion:(void (^)(BOOL, NSError * _Nullable))completion {
     [self.document revertWithUnlock:compositeKeyFactors
+                     viewController:viewController
                        selectedItem:self.selectedItem
                          completion:completion]; 
 }
@@ -186,9 +189,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     NSString* loc = NSLocalizedString(@"mac_undo_action_change_master_credentials", @"Change Master Credentials");
     [self.document.undoManager setActionName:loc];
     
-    self.passwordDatabase.ckfs.password = compositeKeyFactors.password;
-    self.passwordDatabase.ckfs.keyFileDigest = compositeKeyFactors.keyFileDigest;
-    self.passwordDatabase.ckfs.yubiKeyCR = compositeKeyFactors.yubiKeyCR;
+    self.passwordDatabase.ckfs = compositeKeyFactors;
 }
 
 
@@ -855,9 +856,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     return [self addItem:newGroup parent:parentGroup openEntryDetailsWindowWhenDone:NO];
 }
 
-- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
+- (BOOL)addChildren:(NSArray<Node *>*)children parent:(Node *)parent {
     for (Node* child in children) {
-        if(![parent validateAddChild:child keePassGroupTitleRules:YES]) {
+        if ( ![self.passwordDatabase validateAddChild:child destination:parent] ) {
             return NO;
         }
     }
@@ -910,7 +911,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)canRecycle:(Node *)item {
-    return [self.passwordDatabase canRecycle:item];
+    return [self.passwordDatabase canRecycle:item.uuid];
 }
 
 - (void)deleteItems:(const NSArray<Node *> *)items {

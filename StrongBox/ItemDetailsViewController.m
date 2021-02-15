@@ -3,13 +3,13 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 18/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "ItemDetailsViewController.h"
 #import "NotesTableViewCell.h"
 #import "GenericKeyValueTableViewCell.h"
-#import "ItemDetailsModel.h"
+#import "EntryViewModel.h"
 #import "EditPasswordTableViewCell.h"
 #import "EditAttachmentCell.h"
 #import "CustomFieldEditorViewController.h"
@@ -89,8 +89,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 @interface ItemDetailsViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate>
 
-@property ItemDetailsModel* model;
-@property ItemDetailsModel* preEditModelClone;
+@property EntryViewModel* model;
+@property EntryViewModel* preEditModelClone;
 @property BOOL passwordConcealedInUi;
 @property UIBarButtonItem* cancelOrDiscardBarButton;
 @property UIView* coverView;
@@ -188,14 +188,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.hideMetadataSection = NO;
-    if (@available(iOS 13.0, *)) {
-        self.hideMetadataSection = YES;
-    }
-    
-    if (SharedAppAndAutoFillSettings.sharedInstance.legacyShowMetadataOnDetailsScreen) {
-        self.hideMetadataSection = NO;
-    }
+    self.hideMetadataSection = !SharedAppAndAutoFillSettings.sharedInstance.showMetadataOnDetailsScreen;
 
 #ifndef IS_APP_EXTENSION
     self.isAutoFillContext = NO;
@@ -214,10 +207,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
     self.passwordConcealedInUi = !self.databaseModel.metadata.showPasswordByDefaultOnEditScreen;
     
-    if(self.createNewItem) {
-        self.item = [self createNewRecord];
-    }
-    self.model = [self modelFromItem:self.item];
+    self.model = [self refreshViewModel];
     [self bindNavBar];
 
     if(self.createNewItem || self.editImmediately) {
@@ -275,51 +265,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     self.longPressRecognizer.cancelsTouchesInView = YES;
     
     [self.tableView addGestureRecognizer:self.longPressRecognizer];
-}
-
-- (Node*)createNewRecord {
-    AutoFillNewRecordSettings* settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
-    
-    NSString *title = settings.titleAutoFillMode == kDefault ?
-        NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
-        settings.titleCustomAutoFill;
-
-#ifdef IS_APP_EXTENSION
-    if(self.autoFillSuggestedTitle.length) {
-        title = self.autoFillSuggestedTitle;
-    }
-#endif
-    
-    NSString* username = settings.usernameAutoFillMode == kNone ? @"" :
-    settings.usernameAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularUsername : settings.usernameCustomAutoFill;
-    
-    NSString *password =
-    settings.passwordAutoFillMode == kNone ? @"" :
-    settings.passwordAutoFillMode == kGenerated ? [self.databaseModel generatePassword] : settings.passwordCustomAutoFill;
-    
-    NSString* email =
-    settings.emailAutoFillMode == kNone ? @"" :
-    settings.emailAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularEmail : settings.emailCustomAutoFill;
-    
-    NSString* url = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
-    
-#ifdef IS_APP_EXTENSION
-    if(self.autoFillSuggestedUrl.length) {
-        url = self.autoFillSuggestedUrl;
-    }
-#endif
-    
-    NSString* notes = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
-
-#ifdef IS_APP_EXTENSION
-    if(self.autoFillSuggestedNotes.length) {
-        notes = self.autoFillSuggestedNotes;
-    }
-#endif
-
-    NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
-    
-    return [[Node alloc] initAsRecord:title parent:self.parentGroup fields:fields uuid:nil];
 }
 
 - (void)onCancel:(id)sender {
@@ -577,7 +522,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             return CGFLOAT_MIN;
         }
         else if(indexPath.row == kRowPassword && shouldHideEmpty && !self.model.password.length) {
-            if (![self.databaseModel isFlaggedByAudit:self.item]) { 
+            if (!self.itemId || ![self.databaseModel isFlaggedByAudit:self.itemId]) { 
                 return CGFLOAT_MIN;
             }
         }
@@ -837,18 +782,23 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             [self onCustomFieldEditedOrAdded:field fieldToEdit:fieldToEdit];
         };
     }
-    else if ([segue.identifier isEqual:@"toPasswordHistory"] && (self.item != nil)) {
+    else if ([segue.identifier isEqual:@"toPasswordHistory"] && (self.itemId != nil)) {
         PasswordHistoryViewController *vc = segue.destinationViewController;
-        vc.model = self.item.fields.passwordHistory;
+        
+        Node* item = [self.databaseModel.database getItemById:self.itemId];
+        
+        vc.model = item.fields.passwordHistory;
         vc.readOnly = self.readOnly;
         vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(BOOL userCancelled, NSError *error)) {
             [self onPasswordHistoryChanged:changed onDone:onDone];
         };
     }
-    else if ([segue.identifier isEqualToString:@"toKeePassHistory"] && (self.item != nil)) {
+    else if ([segue.identifier isEqualToString:@"toKeePassHistory"] && (self.itemId != nil)) {
         KeePassHistoryController *vc = (KeePassHistoryController *)segue.destinationViewController;
 
-        vc.historicalItems = self.item.fields.keePassHistory;
+        Node* item = [self.databaseModel.database getItemById:self.itemId];
+        
+        vc.historicalItems = item.fields.keePassHistory;
         vc.viewModel = self.databaseModel;
 
         vc.restoreToHistoryItem = ^(Node * historicalNode) {
@@ -879,7 +829,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         AuditDrillDownController* vc = (AuditDrillDownController*)nav.topViewController;
         
         vc.model = self.databaseModel;
-        vc.item = self.item;
+        vc.itemId = self.itemId;
         vc.hideShowAllAuditIssues = YES;
         vc.onDone = ^(BOOL showAllAuditIssues) {
             [self dismissViewControllerAnimated:YES completion:nil];
@@ -925,18 +875,28 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }
 }
 
+- (void)performFullReload {
+    self.model = [self refreshViewModel]; 
+    [self.tableView reloadData];
+    [self bindNavBar];
+}
+
+
+
 - (void)onDeleteHistoryItem:(Node*)historicalNode {
-    [self.item touch:YES touchParents:NO];
-    [self.item.fields.keePassHistory removeObject:historicalNode];
+    Node* item = [self.databaseModel.database getItemById:self.itemId];
+    
+    [item touch:YES touchParents:NO];
+    [item.fields.keePassHistory removeObject:historicalNode];
     
     [self performFullReload];
 
     
     
     [self.databaseModel update:self
-                       handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
         
-        if(userCancelled || conflictAndLocalWasChanged) {
+        if(userCancelled || localWasChanged) {
             [self dismissViewControllerAnimated:YES completion:nil]; 
         }
         else if (error != nil) {
@@ -950,31 +910,27 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }];
 }
 
-- (void)performFullReload {
-    self.model = [self modelFromItem:self.item]; 
-    [self.tableView reloadData];
-    [self bindNavBar];
-}
-
 - (void)onRestoreFromHistoryNode:(Node*)historicalNode {
-    Node* clonedOriginalNodeForHistory = [self.item cloneForHistory];
+    Node* item = [self.databaseModel.database getItemById:self.itemId];
     
-    [self addHistoricalNode:clonedOriginalNodeForHistory];
+    Node* clonedOriginalNodeForHistory = [item cloneForHistory];
+    
+    [self addHistoricalNode:item originalNodeForHistory:clonedOriginalNodeForHistory];
     
     
     
-    [self.item touch:YES touchParents:NO];
+    [item touch:YES touchParents:NO];
     
-    [self.item restoreFromHistoricalNode:historicalNode];
+    [item restoreFromHistoricalNode:historicalNode];
     
     [self performFullReload];
     
     
     
     [self.databaseModel update:self
-                       handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
         
-        if(userCancelled || conflictAndLocalWasChanged) {
+        if(userCancelled || localWasChanged) {
             [self dismissViewControllerAnimated:YES completion:nil];  
         }
         else if (error != nil) {
@@ -988,26 +944,28 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.item];
+                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
             });
         }
     }];
 }
 
 - (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(BOOL userCancelled, NSError *error))onDone {
-    self.item.fields.passwordHistory = changed;
-    [self.item touch:YES touchParents:NO];
+    Node* item = [self.databaseModel.database getItemById:self.itemId];
+    
+    item.fields.passwordHistory = changed;
+    [item touch:YES touchParents:NO];
     
     [self performFullReload];
     
     [self.databaseModel update:self
-                       handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
         
         dispatch_async(dispatch_get_main_queue(), ^(void) {
             onDone(userCancelled, error);
             if (!userCancelled && !error) {
                 dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.item];
+                    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
                 });
             }
         });
@@ -1023,6 +981,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 #ifndef IS_APP_EXTENSION
+
 - (void)onChangeIcon {
     self.sni = [[SetNodeIconUiHelper alloc] init];
     self.sni.customIconPool = self.databaseModel.database.customIconPool;
@@ -1030,8 +989,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
     
     [self.sni changeIcon:self
-                    node:self.item
-                 urlOverride:urlHint
+                    node:self.itemId ? [self.databaseModel.database getItemById:self.itemId] : [self createNewRecord] 
+             urlOverride:urlHint
                   format:self.databaseModel.database.originalFormat
           keePassIconSet:self.databaseModel.metadata.keePassIconSet
               completion:^(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selected) {
@@ -1043,6 +1002,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         }
     }];
 }
+
 #endif
 
 
@@ -1174,11 +1134,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (NSString*)maybeDereference:(NSString*)text {
-    return !self.editing && self.databaseModel.metadata.viewDereferencedFields ? [self.databaseModel.database dereference:text node:self.item] : text;
+    Node* item = self.itemId ? [self.databaseModel.database getItemById:self.itemId] : nil;
+    return item && !self.editing && self.databaseModel.metadata.viewDereferencedFields ? [self.databaseModel.database dereference:text node:item] : text;
 }
 
 - (NSString*)dereference:(NSString*)text {
-    return [self.databaseModel.database dereference:text node:self.item];
+    Node* item = self.itemId ? [self.databaseModel.database getItemById:self.itemId] : nil;
+    return item ? [self.databaseModel.database dereference:text node:item] : text;
 }
 
 
@@ -1216,10 +1178,72 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     return metadata;
 }
 
-- (ItemDetailsModel*)modelFromItem:(Node*)item {
+- (Node*)createNewRecord {
+    AutoFillNewRecordSettings* settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
+
+    NSString *title = settings.titleAutoFillMode == kDefault ?
+        NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
+        settings.titleCustomAutoFill;
+
+#ifdef IS_APP_EXTENSION
+    if(self.autoFillSuggestedTitle.length) {
+        title = self.autoFillSuggestedTitle;
+    }
+#endif
+
+    NSString* username = settings.usernameAutoFillMode == kNone ? @"" :
+    settings.usernameAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularUsername : settings.usernameCustomAutoFill;
+
+    NSString *password =
+    settings.passwordAutoFillMode == kNone ? @"" :
+    settings.passwordAutoFillMode == kGenerated ? [self.databaseModel generatePassword] : settings.passwordCustomAutoFill;
+
+    NSString* email =
+    settings.emailAutoFillMode == kNone ? @"" :
+    settings.emailAutoFillMode == kMostUsed ? self.databaseModel.database.mostPopularEmail : settings.emailCustomAutoFill;
+
+    NSString* url = settings.urlAutoFillMode == kNone ? @"" : settings.urlCustomAutoFill;
+
+#ifdef IS_APP_EXTENSION
+    if(self.autoFillSuggestedUrl.length) {
+        url = self.autoFillSuggestedUrl;
+    }
+#endif
+
+    NSString* notes = settings.notesAutoFillMode == kNone ? @"" : settings.notesCustomAutoFill;
+
+#ifdef IS_APP_EXTENSION
+    if(self.autoFillSuggestedNotes.length) {
+        notes = self.autoFillSuggestedNotes;
+    }
+#endif
+
+    NodeFields *fields = [[NodeFields alloc] initWithUsername:username url:url password:password notes:notes email:email];
+
+    Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
+    return [[Node alloc] initAsRecord:title parent:parentGroup fields:fields uuid:nil];
+}
+
+- (EntryViewModel*)refreshViewModel {
     DatabaseFormat format = self.databaseModel.database.originalFormat;
     
     
+
+    Node* item;
+    
+    if ( self.createNewItem ) { 
+        item = [self createNewRecord];
+    }
+    else {
+        item = [self.databaseModel.database getItemById:self.itemId];
+        if ( self.historicalIndex != nil) {
+            int index = self.historicalIndex.intValue;
+            if ( index >= 0 && index < item.fields.keePassHistory.count ) { 
+                item = item.fields.keePassHistory[index];
+                self.readOnly = YES;
+            }
+        }
+    }
     
     NSArray<ItemMetadataEntry*>* metadata = [self getMetadataFromItem:item format:format];
     
@@ -1236,96 +1260,112 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     
         
-    ItemDetailsModel *ret = [[ItemDetailsModel alloc] initWithTitle:item.title
-                                                           username:item.fields.username
-                                                           password:item.fields.password
-                                                                url:item.fields.url
-                                                              notes:item.fields.notes
-                                                              email:item.fields.email
-                                                            expires:item.fields.expires
-                                                               tags:item.fields.tags
-                                                               totp:item.fields.otpToken
-                                                               icon:item.icon
-                                                       customFields:customFieldModels
-                                                        attachments:item.fields.attachments
-                                                           metadata:metadata
-                                                         hasHistory:historyAvailable];
+    EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
+                                                       username:item.fields.username
+                                                       password:item.fields.password
+                                                            url:item.fields.url
+                                                          notes:item.fields.notes
+                                                          email:item.fields.email
+                                                        expires:item.fields.expires
+                                                           tags:item.fields.tags
+                                                           totp:item.fields.otpToken
+                                                           icon:item.icon
+                                                   customFields:customFieldModels
+                                                    attachments:item.fields.attachments
+                                                       metadata:metadata
+                                                     hasHistory:historyAvailable];
     
     return ret;
 }
 
-- (void)applyModelChangesToNodeItem {
-    if (self.createNewItem) {
-        [self.databaseModel addItem:self.parentGroup item:self.item];
+- (Node*)nodeItemFromModel {
+    Node* ret;
+
+    if ( self.createNewItem ) {
+        ret = [self createNewRecord];
+        Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
+        Node* added = [self.databaseModel addItem:parentGroup item:ret];
+        if ( !added ) {
+            return nil;
+        }
     }
     else { 
-        Node* originalNodeForHistory = [self.item cloneForHistory];
-        [self addHistoricalNode:originalNodeForHistory];
+        ret = [self.databaseModel.database getItemById:self.itemId];
+        Node* originalNodeForHistory = [ret cloneForHistory];
+        [self addHistoricalNode:ret originalNodeForHistory:originalNodeForHistory];
     }
 
-    [self.item touch:YES touchParents:NO];
+    if (! [ret setTitle:self.model.title keePassGroupTitleRules:NO] ) {
+        return nil;
+    }
+    
+    [ret touch:YES touchParents:NO];
 
-    [self.item setTitle:self.model.title keePassGroupTitleRules:NO];
-
-    self.item.fields.username = self.model.username;
-    self.item.fields.password = self.model.password;
-    self.item.fields.url = self.model.url;
-    self.item.fields.email = self.model.email;
-    self.item.fields.notes = self.model.notes;
-    self.item.fields.expires = self.model.expires;
+    ret.fields.username = self.model.username;
+    ret.fields.password = self.model.password;
+    ret.fields.url = self.model.url;
+    ret.fields.email = self.model.email;
+    ret.fields.notes = self.model.notes;
+    ret.fields.expires = self.model.expires;
 
     
 
-    [self.item.fields removeAllCustomFields];
+    [ret.fields removeAllCustomFields];
     for (CustomFieldViewModel *field in self.model.customFields) {
         StringValue *value = [StringValue valueWithString:field.value protected:field.protected];
-        [self.item.fields setCustomField:field.key value:value];
+        [ret.fields setCustomField:field.key value:value];
     }
 
     
 
-    if([OTPToken areDifferent:self.item.fields.otpToken b:self.model.totp]) {
-        [self.item.fields clearTotp]; 
+    if([OTPToken areDifferent:ret.fields.otpToken b:self.model.totp]) {
+        [ret.fields clearTotp]; 
 
         if(self.model.totp != nil) {
-            [self.item.fields setTotp:self.model.totp
-                     appendUrlToNotes:self.databaseModel.database.originalFormat == kPasswordSafe || self.databaseModel.database.originalFormat == kKeePass1];
+            [ret.fields setTotp:self.model.totp
+                appendUrlToNotes:self.databaseModel.database.originalFormat == kPasswordSafe || self.databaseModel.database.originalFormat == kKeePass1];
         }
     }
 
     
 
-    [self.item.fields.attachments removeAllObjects];
-    [self.item.fields.attachments addEntriesFromDictionary:self.model.attachments.dictionary];
+    [ret.fields.attachments removeAllObjects];
+    [ret.fields.attachments addEntriesFromDictionary:self.model.attachments.dictionary];
 
     
     
-    [self.item.fields.tags removeAllObjects];
-    [self.item.fields.tags addObjectsFromArray:self.model.tags];
+    [ret.fields.tags removeAllObjects];
+    [ret.fields.tags addObjectsFromArray:self.model.tags];
+    
+    return ret;
 }
 
 - (void)saveChanges {
-    Node* preSaveCloneOfItem = [self.item clone];
+    Node* item = [self nodeItemFromModel];
     
-    [self applyModelChangesToNodeItem];
+    if ( !item ) {
+        [Alerts info:self
+               title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
+             message:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")];
+        return;
+    }
     
     [self disableUi];
     
-    [self processIconBeforeSave:^{ 
-        
-        
+    [self processIconBeforeSave:item completion:^{ 
 #ifdef IS_APP_EXTENSION
         AutoFillSettings.sharedInstance.autoFillWroteCleanly = NO;
 #endif
 
+        
         [self.databaseModel update:self
-                           handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+                           handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
             #ifdef IS_APP_EXTENSION
                     AutoFillSettings.sharedInstance.autoFillWroteCleanly = YES;
             #endif
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self onSaveChangesDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged preSaveCloneOfItem:preSaveCloneOfItem error:error];
+                [self onSaveChangesDone:item userCancelled:userCancelled localWasChanged:localWasChanged error:error];
             });
         }];
     }];
@@ -1349,34 +1389,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [self.coverView removeFromSuperview];
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-- (void)onSaveChangesDone:(BOOL)userCancelled conflictAndLocalWasChanged:(BOOL)conflictAndLocalWasChanged preSaveCloneOfItem:(Node*)preSaveCloneOfItem error:(NSError*)error {    
-    if(error || userCancelled || conflictAndLocalWasChanged) {  
+- (void)onSaveChangesDone:(Node*)item userCancelled:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*)error {
+    if(error || userCancelled || localWasChanged) {  
         if (error != nil) {
             [Alerts error:self
                     title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
@@ -1393,10 +1407,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         
         
         
+
+        
     }
     else {
         self.createNewItem = NO;
-        self.model = [self modelFromItem:self.item];
+        self.itemId = item.uuid;
+        self.model = [self refreshViewModel];
     }
     
     [self enableUi];
@@ -1408,28 +1425,22 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             [self bindNavBar];
             
             dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.item];
+                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
             });
             
 #ifdef IS_APP_EXTENSION
             if (self.onAutoFillNewItemAdded) {
-                self.onAutoFillNewItemAdded(self.item.fields.username, self.item.fields.password);
+                self.onAutoFillNewItemAdded(item.fields.username, item.fields.password);
             }
 #endif
         }];
     }
 }
 
-- (void)processIconBeforeSave:(void (^)(void))completion {
-    
-    
-    
-    
-    
-
+- (void)processIconBeforeSave:(Node*)item completion:(void (^)(void))completion {
     if (self.iconExplicitlyChanged) {
         self.iconExplicitlyChanged = NO;
-        self.item.icon = self.model.icon;
+        item.icon = self.model.icon;
     }
     else {
         if (self.createNewItem || self.urlJustChanged) {
@@ -1449,7 +1460,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                         [SafesList.sharedInstance update:self.databaseModel.metadata];
 
                         if (self.databaseModel.metadata.tryDownloadFavIconForNewRecord ) {
-                            [self fetchFavIcon:completion];
+                            [self fetchFavIcon:item completion:completion];
                             return;
                         }
                         else {
@@ -1460,7 +1471,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                 }
                 else {
                     if (self.databaseModel.metadata.tryDownloadFavIconForNewRecord ) {
-                        [self fetchFavIcon:completion];
+                        [self fetchFavIcon:item completion:completion];
                         return;
                     }
                 }
@@ -1474,7 +1485,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 #ifndef IS_APP_EXTENSION
 
-- (void)fetchFavIcon:(void (^)(void))completion {
+- (void)fetchFavIcon:(Node*)item completion:(void (^)(void))completion {
     self.sni = [[SetNodeIconUiHelper alloc] init];
     self.sni.customIconPool = self.databaseModel.database.customIconPool;
 
@@ -1482,7 +1493,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                               completion:^(UIImage * _Nullable favIcon) {
                           if(favIcon) {
                               NSData *data = UIImagePNGRepresentation(favIcon);
-                              self.item.icon = [NodeIcon withCustom:data];
+                              item.icon = [NodeIcon withCustom:data];
                           }
 
                           completion();
@@ -1491,14 +1502,15 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 #endif
 
-- (void)addHistoricalNode:(Node*)originalNodeForHistory {
+- (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
     BOOL shouldAddHistory = YES; 
     if(shouldAddHistory && originalNodeForHistory != nil) {
-        [self.item.fields.keePassHistory addObject:originalNodeForHistory];
+        [item.fields.keePassHistory addObject:originalNodeForHistory];
     }
 }
 
 #ifndef IS_APP_EXTENSION
+
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if(self.editing) {
         return nil; 
@@ -1706,7 +1718,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
     else {
         GenericKeyValueTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         
-        NSString* audit = [self.databaseModel getQuickAuditSummaryForNode:self.item];
+        NSString* audit = [self.databaseModel getQuickAuditSummaryForNode:self.itemId];
         
         [cell setConfidentialKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
                            value:[self maybeDereference:self.model.password]
@@ -1890,9 +1902,14 @@ suggestionProvider:^NSString*(NSString *text) {
     else {
         GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         
+        
         NSInteger idx = virtualRow;
-        CustomFieldViewModel* cf = self.model.customFields[idx];
-
+        if (idx < 0 || idx >= self.model.customFields.count) {
+            return cell;
+        }
+        
+        CustomFieldViewModel* cf =  self.model.customFields[idx];
+        
         if(cf.protected && !self.editing) {
             [cell setConfidentialKey:cf.key
                                value:[self maybeDereference:cf.value]
@@ -2109,5 +2126,32 @@ suggestionProvider:^NSString*(NSString *text) {
         [self performSegueWithIdentifier:@"segueToLargeView" sender:@{ @"text" : text, @"colorize" : @(colorize) }];
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

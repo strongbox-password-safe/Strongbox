@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 17/04/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseAuditor.h"
@@ -22,8 +22,6 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
 @interface DatabaseAuditor ()
 
-@property AuditIsDereferenceableTextBlock isDereferenceable;
-
 @property AuditProgressBlock progress;
 @property AuditCompletionBlock completion;
 @property AuditNodesChangedBlock nodesChanged;
@@ -32,19 +30,18 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 @property DatabaseAuditorConfiguration* config;
 
 
-
-@property NSSet<Node*>* commonPasswords;
-@property NSDictionary<NSString*, NSSet<Node*>*>* duplicatedPasswords;
-@property NSSet<Node*>* noPasswords;
-@property NSDictionary<NSUUID*, NSSet<Node*>*>* similar;
-@property NSSet<Node*>* tooShort;
-
-@property NSSet<Node*>* duplicatedPasswordsNodeSet; 
-@property NSSet<Node*>* similarPasswordsNodeSet; 
-
 @property BOOL isPro;
 
-@property ConcurrentMutableSet<Node*>* mutablePwnedNodes;
+
+
+@property NSSet<NSUUID*>* commonPasswords;
+@property NSDictionary<NSString*, NSSet<NSUUID*>*>* duplicatedPasswords;
+@property NSSet<NSUUID*>* noPasswords;
+@property NSDictionary<NSUUID*, NSSet<NSUUID*>*>* similar;
+@property NSSet<NSUUID*>* tooShort;
+@property NSSet<NSUUID*>* duplicatedPasswordsNodeSet; 
+@property NSSet<NSUUID*>* similarPasswordsNodeSet; 
+@property ConcurrentMutableSet<NSUUID*>* mutablePwnedNodes;
 @property NSOperationQueue *hibpQueue;
 
 @property NSUInteger hibpErrorCount;
@@ -54,11 +51,12 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 @property CGFloat hibpProgress;
 @property CGFloat similarProgress;
 
-@property NSSet<Node*>* nodes;
 @property NSArray<Node*>* auditableNonEmptyPasswordNodes;
 
 @property (nullable) SaveConfigurationBlock saveConfig;
 @property (nullable) IsExcludedBlock isExcluded;
+
+@property DatabaseModel* database;
 
 @end
 
@@ -97,9 +95,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     return self;
 }
 
-- (BOOL)start:(NSArray<Node *> *)nodes
+- (BOOL)start:(DatabaseModel*)database
        config:(DatabaseAuditorConfiguration *)config
-isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
  nodesChanged:(AuditNodesChangedBlock)nodesChanged
      progress:(AuditProgressBlock)progress
    completion:(AuditCompletionBlock)completion {
@@ -109,16 +106,15 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     }
 
     self.state = kAuditStateRunning;
-
-    self.isDereferenceable = isDereferenceable;
     self.completion = completion;
     self.nodesChanged = nodesChanged;
     self.progress = progress;
     self.config = config;
 
-    self.nodes = nodes.copy;
-    self.auditableNonEmptyPasswordNodes = [self.nodes.allObjects filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.password.length && !self.isDereferenceable(obj.fields.password) && !self.isExcluded(obj);
+    self.database = database;
+
+    self.auditableNonEmptyPasswordNodes = [self.database.activeRecords filter:^BOOL(Node * _Nonnull obj) {
+        return obj.fields.password.length && ![self.database isDereferenceableText:obj.fields.password] && !self.isExcluded(obj);
     }];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
@@ -164,7 +160,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
 
 
-- (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item {
+- (NSString *)getQuickAuditVeryBriefSummaryForNode:(NSUUID *)item {
     NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
     
     if (flags.anyObject != nil) {
@@ -196,7 +192,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return @"";
 }
 
-- (NSString *)getQuickAuditSummaryForNode:(Node *)item {
+- (NSString *)getQuickAuditSummaryForNode:(NSUUID *)item {
     NSSet<NSNumber*>* flags = [self getQuickAuditFlagsForNode:item];
     
     if (flags.anyObject != nil) {
@@ -228,7 +224,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return @"";
 }
 
-- (NSSet<NSNumber *> *)getQuickAuditFlagsForNode:(Node *)node {
+- (NSSet<NSNumber *> *)getQuickAuditFlagsForNode:(NSUUID *)node {
     NSMutableSet<NSNumber*>* ret = NSMutableSet.set;
     
     if ([self.noPasswords containsObject:node]) {
@@ -283,16 +279,16 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return self.hibpErrorCount;
 }
 
-- (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node {
+- (NSSet<NSUUID *> *)getSimilarPasswordNodeSet:(NSUUID *)node {
     if ([self.similarPasswordsNodeSet containsObject:node]) {
         
         
         
-        NSArray<NSSet<Node*>*>* containedInOthers = [self.similar.allValues filter:^BOOL(NSSet<Node *> * _Nonnull obj) {
+        NSArray<NSSet<NSUUID*>*>* containedInOthers = [self.similar.allValues filter:^BOOL(NSSet<NSUUID *> * _Nonnull obj) {
             return [obj containsObject:node];
         }];
         
-        NSArray<Node*>* allSimilarTo = [containedInOthers flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
+        NSArray<NSUUID*>* allSimilarTo = [containedInOthers flatMap:^NSArray * _Nonnull(NSSet<NSUUID *> * _Nonnull obj, NSUInteger idx) {
             return obj.allObjects;
         }];
         
@@ -300,7 +296,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
         
         
-        NSSet<Node*>* directSimilars = self.similar[node.uuid];
+        NSSet<NSUUID*>* directSimilars = self.similar[node];
         if (directSimilars) {
             [simSet addObjectsFromArray:directSimilars.allObjects];
         }
@@ -316,16 +312,16 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     }
 }
 
-- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(Node*)node {
-    if ([self.duplicatedPasswordsNodeSet containsObject:node]) {
+- (NSSet<NSUUID *> *)getDuplicatedPasswordNodeSet:(NSUUID *)nodeId {
+    if ([self.duplicatedPasswordsNodeSet containsObject:nodeId]) {
         
         
         
-        NSArray<NSSet<Node*>*>* containedInOthers = [self.duplicatedPasswords.allValues filter:^BOOL(NSSet<Node *> * _Nonnull obj) {
-            return [obj containsObject:node];
+        NSArray<NSSet<NSUUID*>*>* containedInOthers = [self.duplicatedPasswords.allValues filter:^BOOL(NSSet<NSUUID *> * _Nonnull obj) {
+            return [obj containsObject:nodeId];
         }];
         
-        NSArray<Node*>* allDuplicatesOf = [containedInOthers flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
+        NSArray<NSUUID*>* allDuplicatesOf = [containedInOthers flatMap:^NSArray * _Nonnull(NSSet<NSUUID *> * _Nonnull obj, NSUInteger idx) {
             return obj.allObjects;
         }];
         
@@ -333,14 +329,18 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
         
         
-        NSSet<Node*>* directDuplicates = self.duplicatedPasswords[node.fields.password];
-        if (directDuplicates) {
-            [dupeSet addObjectsFromArray:directDuplicates.allObjects];
+        Node* node = [self.database getItemById:nodeId];
+        if (node) {
+            NSString* password = node.fields.password;
+            NSSet<NSUUID*>* directDuplicates = self.duplicatedPasswords[password];
+            if (directDuplicates) {
+                [dupeSet addObjectsFromArray:directDuplicates.allObjects];
+            }
         }
         
         
         
-        [dupeSet removeObject:node];
+        [dupeSet removeObject:nodeId];
         
         return dupeSet.copy;
     }
@@ -402,19 +402,21 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     
 }
 
-- (NSSet<Node*>*)checkForNoPasswords {
+- (NSSet<NSUUID*>*)checkForNoPasswords {
     if (!self.config.checkForNoPasswords) {
         return NSSet.set;
     }
 
-    NSArray<Node*>* results = [self.nodes.allObjects filter:^BOOL(Node * _Nonnull obj) {
+    NSArray<Node*>* results = [self.database.activeRecords filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.password.length == 0 && !self.isExcluded(obj);
     }];
 
-    return [NSSet setWithArray:results];
+    return [results map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
+    }].set;
 }
 
-- (NSSet<Node*>*)checkForTooShort {
+- (NSSet<NSUUID*>*)checkForTooShort {
     if (!self.config.checkForMinimumLength) {
         return NSSet.set;
     }
@@ -423,15 +425,17 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         return obj.fields.password.length < self.config.minimumLength; 
     }];
 
-    return [NSSet setWithArray:results];
+    return [results map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
+    }].set;
 }
 
-- (NSDictionary<NSString*, NSSet<Node*>*>*)checkForDuplicatedPasswords {
+- (NSDictionary<NSString*, NSSet<NSUUID*>*>*)checkForDuplicatedPasswords {
     if (!self.config.checkForDuplicatedPasswords) {
         return NSDictionary.dictionary;
     }
     
-    NSMutableDictionary<NSString*, NSMutableSet<Node*>*>* possibleDupes = NSMutableDictionary.dictionary;
+    NSMutableDictionary<NSString*, NSMutableSet<NSUUID*>*>* possibleDupes = NSMutableDictionary.dictionary;
     
     for (Node* entry in self.auditableNonEmptyPasswordNodes) {
         
@@ -441,20 +445,20 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
             password = password.lowercaseString;
         }
         
-        NSMutableSet<Node*>* existing = possibleDupes[password];
+        NSMutableSet<NSUUID*>* existing = possibleDupes[password];
         if(existing) {
-            [existing addObject:entry];
+            [existing addObject:entry.uuid];
         }
         else {
-            possibleDupes[password] = [NSMutableSet setWithObject:entry];
+            possibleDupes[password] = [NSMutableSet setWithObject:entry.uuid];
         }
     }
     
     
     
-    NSMutableDictionary<NSString*, NSSet<Node*>*> *dupes = NSMutableDictionary.dictionary;
+    NSMutableDictionary<NSString*, NSSet<NSUUID*>*> *dupes = NSMutableDictionary.dictionary;
     for (NSString* password in possibleDupes.allKeys) {
-        NSSet<Node*>* nodes = possibleDupes[password];
+        NSSet<NSUUID*>* nodes = possibleDupes[password];
         if (nodes.count > 1) {
             dupes[password] = nodes.copy;
         }
@@ -463,7 +467,7 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
     return dupes.copy;
 }
 
-- (NSSet<Node*>*)checkForCommonPasswords {
+- (NSSet<NSUUID*>*)checkForCommonPasswords {
     if (!self.config.checkForCommonPasswords) {
          return NSSet.set;
     }
@@ -472,17 +476,19 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         return [PasswordMaker.sharedInstance isCommonPassword:obj.fields.password];
     }];
     
-    return [NSSet setWithArray:common];
+    return [common map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
+    }].set;
 }
 
-- (NSDictionary<NSUUID*, NSSet<Node*>*>*)checkForSimilarPasswords {
+- (NSDictionary<NSUUID*, NSSet<NSUUID*>*>*)checkForSimilarPasswords {
     if (!self.config.checkForSimilarPasswords) {
         return NSDictionary.dictionary;
     }
     
     NSMutableArray<Node*>* uncheckedOthers = self.auditableNonEmptyPasswordNodes.mutableCopy; 
 
-    NSMutableDictionary<NSUUID*, NSMutableSet<Node*>*>* similarGroups = NSMutableDictionary.dictionary;
+    NSMutableDictionary<NSUUID*, NSMutableSet<NSUUID*>*>* similarGroups = NSMutableDictionary.dictionary;
     
     int i=0;
     int n = (int)self.auditableNonEmptyPasswordNodes.count - 1;
@@ -521,10 +527,10 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
                 
 
                 if(!similarGroups[entry.uuid]) {
-                    similarGroups[entry.uuid] = [NSMutableSet setWithObject:entry];
+                    similarGroups[entry.uuid] = [NSMutableSet setWithObject:entry.uuid];
                 }
                 
-                [similarGroups[entry.uuid] addObject:other];
+                [similarGroups[entry.uuid] addObject:other.uuid];
             }
         }
     }
@@ -580,7 +586,11 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
         if ([pwnedCache containsObject:sha1HexPassword]) {
             NSLog(@"Pwned: Cache HIT!");
             self.hibpCompletedCount++;
-            [self.mutablePwnedNodes addObjectsFromArray:affectedNodes];
+            NSArray<NSUUID*> *ids = [affectedNodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+                return obj.uuid;
+            }];
+            
+            [self.mutablePwnedNodes addObjectsFromArray:ids];
         }
         else if (checkForNewBreaches) {
             UrlRequestOperation* op = [self haveIBeenPwned:password sha1HexPassword:sha1HexPassword nodes:affectedNodes];
@@ -704,7 +714,11 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
             [mut addObject:sha1HexPassword];
             [SecretStore.sharedInstance setSecureObject:mut.copy forIdentifier:kSecretStoreHibpPwnedSetCacheKey];
             
-            [self.mutablePwnedNodes addObjectsFromArray:nodes];
+            NSArray<NSUUID*> *ids = [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+                return obj.uuid;
+            }];
+            
+            [self.mutablePwnedNodes addObjectsFromArray:ids];
             self.nodesChanged();
         }
     }

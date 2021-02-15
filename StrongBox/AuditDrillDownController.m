@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 01/06/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "AuditDrillDownController.h"
@@ -65,20 +65,25 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 }
 
 - (void)refreshItemsDoIt {
-    NSSet<Node*>* dupes = [self.model getDuplicatedPasswordNodeSet:self.item];
+    NSSet<Node*>* dupes = [self.model getDuplicatedPasswordNodeSet:self.itemId];
     NSMutableSet<Node*>* mute = dupes.mutableCopy;
-    [mute removeObject:self.item];
-     
-    NSSet* sims = [self.model getSimilarPasswordNodeSet:self.item];
+         
+    NSSet* sims = [self.model getSimilarPasswordNodeSet:self.itemId];
     NSMutableSet<Node*>* muteSims = sims.mutableCopy;
-    [muteSims removeObject:self.item];
-
-    self.flags = [self.model getQuickAuditFlagsForNode:self.item];
+    
+    self.flags = [self.model getQuickAuditFlagsForNode:self.itemId];
     self.basicRows = [self getBasicRows:self.flags];
-    self.duplicates = [mute.allObjects sortedArrayUsingComparator:finderStyleNodeComparator];
-    self.similars = [muteSims.allObjects sortedArrayUsingComparator:finderStyleNodeComparator];
     self.actions = [self.flags containsObject:@(kAuditFlagPwned)] || !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
     
+    self.duplicates = [[mute.allObjects filter:^BOOL(Node * _Nonnull obj) {
+        return ![obj.uuid isEqual:self.itemId];
+    }] sortedArrayUsingComparator:finderStyleNodeComparator];
+
+    self.similars = [[muteSims.allObjects filter:^BOOL(Node * _Nonnull obj) {
+        return ![obj.uuid isEqual:self.itemId];
+    }] sortedArrayUsingComparator:finderStyleNodeComparator];
+       
+
     [self.tableView reloadData];
 }
 
@@ -139,7 +144,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
         if (indexPath.row == 0) {
             SwitchTableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:kSwitchTableCellId];
 
-            BOOL excluded = [self.model isExcludedFromAudit:self.item];
+            BOOL excluded = [self.model isExcludedFromAudit:self.itemId];
             
             [cell set:NSLocalizedString(@"audit_drill_down_audit_this_item_preference_title", @"Audit this Item") on:!excluded onChanged:^(BOOL on) {
                 [self onAuditOnOff:on];
@@ -172,7 +177,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
         cell.imageView.image = [UIImage imageNamed:@"security_checked"];
         
         if (self.flags.count == 0) {
-            if ([self.model isExcludedFromAudit:self.item]) {
+            if ([self.model isExcludedFromAudit:self.itemId]) {
                 cell.textLabel.text = NSLocalizedString(@"audit_status_item_is_exluded", @"This item is exluded from Audits");
                 cell.imageView.tintColor = UIColor.systemGrayColor;
             }
@@ -352,7 +357,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 
 
 - (void)onAuditOnOff:(BOOL)on {
-    [self.model setItemAuditExclusion:self.item exclude:!on];
+    [self.model setItemAuditExclusion:self.itemId exclude:!on];
 
     [self.model restartBackgroundAudit];
     
@@ -413,7 +418,15 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 - (void)checkHibp {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"audit_manual_pwn_progress_message", @"Checking HIBP")];
     
-    [self.model oneTimeHibpCheck:self.item.fields.password completion:^(BOOL pwned, NSError * _Nonnull error) {
+    Node* item = [self.model.database getItemById:self.itemId];
+    if ( !item ) {
+        NSLog(@"WARNWARN: Could not find item to check for HIBP");
+        return;
+    }
+    
+    NSString* password = item.fields.password;
+    
+    [self.model oneTimeHibpCheck:password completion:^(BOOL pwned, NSError * _Nonnull error) {
         NSLog(@"HIBP: %hhd - %@", pwned, error);
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
@@ -446,8 +459,9 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
         Node* node = (Node*)sender;
         
         vc.createNewItem = NO;
-        vc.item = node;
-        vc.parentGroup = node.parent;
+        
+        vc.itemId = node.uuid;
+        vc.parentGroupId = node.parent.uuid;
         vc.readOnly = NO;
         vc.databaseModel = self.model;
     }

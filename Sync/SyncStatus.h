@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 20/07/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (void)addLogMessage:(NSString*)message syncId:(NSUUID *)syncId;
-- (void)updateStatus:(SyncOperationState)state syncId:(NSUUID *)syncId error:(NSError*)error;
+- (void)updateStatus:(SyncOperationState)state syncId:(NSUUID *)syncId error:(NSError*_Nullable)error;
 - (void)updateStatus:(SyncOperationState)state syncId:(NSUUID *)syncId message:(NSString*)message;
 
 @property (readonly) NSArray<SyncStatusLogEntry*> *changeLog;

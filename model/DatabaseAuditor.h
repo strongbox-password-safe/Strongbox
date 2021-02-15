@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 17/04/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -33,7 +33,6 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
 typedef void (^AuditCompletionBlock)(BOOL userStopped);
 typedef void (^AuditProgressBlock)(double progress);
 typedef void (^AuditNodesChangedBlock)(void);
-typedef BOOL (^AuditIsDereferenceableTextBlock)(NSString* string);
 typedef void (^SaveConfigurationBlock)(DatabaseAuditorConfiguration* config);
 typedef BOOL (^IsExcludedBlock)(Node* item);
 
@@ -45,9 +44,8 @@ typedef BOOL (^IsExcludedBlock)(Node* item);
 
 @property AuditState state;
 
-- (BOOL)start:(NSArray<Node*>*)nodes
+- (BOOL)start:(DatabaseModel*)database
        config:(DatabaseAuditorConfiguration*)config
-isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
  nodesChanged:(AuditNodesChangedBlock)nodesChanged
      progress:(AuditProgressBlock)progress
    completion:(AuditCompletionBlock)completion;
@@ -56,17 +54,18 @@ isDereferenceable:(AuditIsDereferenceableTextBlock)isDereferenceable
 
 
 
-- (NSString *)getQuickAuditVeryBriefSummaryForNode:(Node *)item;
-- (NSString*)getQuickAuditSummaryForNode:(Node*)item;
-- (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(Node*)node;
+- (NSString *)getQuickAuditVeryBriefSummaryForNode:(NSUUID *)item;
+- (NSString*)getQuickAuditSummaryForNode:(NSUUID*)item;
+- (NSSet<NSNumber*>*)getQuickAuditFlagsForNode:(NSUUID*)node;
+
 @property (readonly) NSUInteger auditIssueNodeCount;
 @property (readonly) NSUInteger auditIssueCount;
 
 
 - (DatabaseAuditReport*)getAuditReport;
 
-- (NSSet<Node*>*)getSimilarPasswordNodeSet:(Node*)node;
-- (NSSet<Node*>*)getDuplicatedPasswordNodeSet:(Node*)node;
+- (NSSet<NSUUID*>*)getSimilarPasswordNodeSet:(NSUUID*)nodeId;
+- (NSSet<NSUUID*>*)getDuplicatedPasswordNodeSet:(NSUUID*)nodeId;
 
 @property (readonly) NSUInteger haveIBeenPwnedErrorCount;
 

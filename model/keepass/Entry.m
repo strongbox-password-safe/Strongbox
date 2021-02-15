@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 17/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Entry.h"
@@ -238,7 +238,7 @@ const static NSSet<NSString*> *wellKnownKeys;
     
     if ( self.autoType ) {
         
-        if (!self.autoType.enabled || self.autoType.dataTransferObfuscation || self.autoType.defaultSequence.length || self.autoType.asssociations.count) {
+        if (!self.autoType.enabled || self.autoType.dataTransferObfuscation != 0 || self.autoType.defaultSequence.length || self.autoType.asssociations.count) {
             if ( ![self.autoType writeXml:serializer] ) return NO;
         }
     }

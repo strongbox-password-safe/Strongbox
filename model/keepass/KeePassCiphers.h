@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 26/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -21,8 +21,11 @@ NSData* aesKdbx3KdfCipherUuidData(void);
 NSUUID* const aesKdbx4KdfCipherUuid(void);
 NSData* aesKdbx4KdfCipherUuidData(void);
 
-NSUUID* const argon2CipherUuid(void);
-NSData* argon2CipherUuidData(void);
+NSUUID* const argon2dCipherUuid(void);
+NSData* argon2dCipherUuidData(void);
+
+NSUUID* const argon2idCipherUuid(void);
+NSData* argon2idCipherUuidData(void);
 
 NSUUID* const chaCha20CipherUuid(void);
 NSData* chaCha20CipherUuidData(void);

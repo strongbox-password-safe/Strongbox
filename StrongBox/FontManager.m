@@ -3,7 +3,7 @@
 //  test-new-ui
 //
 //  Created by Mark on 18/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "FontManager.h"
@@ -53,12 +53,17 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
 
     
     
+    
+
+
+
+
+
+
     if (@available(iOS 11.0, *)) {
         _easyReadFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customFont];
         _easyReadBoldFont = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleBody] scaledFontForFont:customBoldFont];
-
         _easyReadFontForLargeTextView = [[UIFontMetrics metricsForTextStyle:UIFontTextStyleLargeTitle] scaledFontForFont:customFont];
-
     } else {
         _easyReadFont = customFont;
         _easyReadBoldFont = customBoldFont;

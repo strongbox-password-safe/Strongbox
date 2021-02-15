@@ -3,11 +3,12 @@
 //  Strongbox
 //
 //  Created by Mark on 01/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import "DatabaseModel.h"
+#import "QuickTypeAutoFillDisplayFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL isPossible;
 @property (readonly) BOOL isOnForStrongbox;
 
-- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid;
+- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat;
 - (void)clearAutoFillQuickTypeDatabase;
 
 @end

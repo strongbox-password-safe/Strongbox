@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 22/07/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Settings.h"
@@ -37,6 +37,7 @@ static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSet
 static NSString* const kHideExportFromDatabaseContextMenu = @"hideExportFromDatabaseContextMenu";
 static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
 static NSString* const kAppLockAllowDevicePasscodeFallbackForBio = @"appLockAllowDevicePasscodeFallbackForBio";
+static NSString* const kFullFileProtection = @"fullFileProtection";
 
 
 
@@ -54,6 +55,14 @@ static NSString* const kAppLockAllowDevicePasscodeFallbackForBio = @"appLockAllo
 }
 
 
+
+- (BOOL)fullFileProtection {
+    return [self getBool:kFullFileProtection fallback:YES]; 
+}
+
+- (void)setFullFileProtection:(BOOL)fullFileProtection {
+    [self setBool:kFullFileProtection value:fullFileProtection];
+}
 
 - (BOOL)appLockAllowDevicePasscodeFallbackForBio {
     return [self getBool:kAppLockAllowDevicePasscodeFallbackForBio fallback:YES]; 

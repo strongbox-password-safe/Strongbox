@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 20/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Serializator.h"
@@ -249,7 +249,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
                  legacyData:(NSData *)legacyData
                         ckf:(CompositeKeyFactors *)ckf
                      config:(DatabaseModelConfig *)config
-                 completion:(void (^)(BOOL, DatabaseModel * _Nullable, const NSError * _Nullable))completion {
+                 completion:(nonnull DeserializeCompletionBlock)completion {
     if (url) {
         [Serializator fromUrl:url ckf:ckf config:config completion:completion];
     }
@@ -272,6 +272,10 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
                                  format:format
                           xmlDumpStream:nil
                              completion:completion];
+}
+
++ (void)fromUrl:(NSURL *)url ckf:(CompositeKeyFactors *)ckf completion:(DeserializeCompletionBlock)completion {
+    [Serializator fromUrl:url ckf:ckf config:DatabaseModelConfig.defaults completion:completion];
 }
 
 + (void)fromUrl:(NSURL *)url

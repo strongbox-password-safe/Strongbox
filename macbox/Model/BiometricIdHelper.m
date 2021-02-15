@@ -44,7 +44,7 @@
         
         BOOL ret = [localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError];
         
-        
+        NSLog(@"DEBUG: Biometric available: [%d][%@]", ret, authError);
         
         return ret;
     }
@@ -52,8 +52,36 @@
     return NO;
 }
 
+- (BOOL)isWatchUnlockAvailable {
+    if(self.dummyMode) {
+        return YES;
+    }
+    
+    if ( @available(macOS 10.15, *) ) {
+        LAContext *localAuthContext = [[LAContext alloc] init];
+        NSError *authError;
+        return [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithWatch error:&authError];
+    }
+    
+    return NO;
+}
+
+- (BOOL)isTouchIdUnlockAvailable {
+    if(self.dummyMode) {
+        return YES;
+    }
+    
+    if ( @available (macOS 10.12.2, *) ) {
+        LAContext *localAuthContext = [[LAContext alloc] init];
+        NSError *authError;
+        return [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&authError];
+    }
+    
+    return NO;
+}
+
 - (NSUInteger)getLAPolicy {
-    if (@available(macOS 10.15, *)) {
+    if ( @available(macOS 10.15, *) ) {
         return Settings.sharedInstance.allowWatchUnlock ? LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch : LAPolicyDeviceOwnerAuthenticationWithBiometrics;
     }
     else {

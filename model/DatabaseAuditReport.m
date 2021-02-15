@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 17/04/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseAuditReport.h"
@@ -11,23 +11,23 @@
 
 @interface DatabaseAuditReport ()
 
-@property NSSet<Node*>* noPasswords;
-@property NSDictionary<NSString*, NSSet<Node *>*>* duplicatedPasswords;
-@property NSSet<Node*>* commonPasswords;
-@property NSDictionary<NSString*, NSSet<Node *>*>* similarPasswords;
-@property NSSet<Node*>* tooShort;
-@property NSSet<Node*>* pwned;
+@property NSSet<NSUUID*>* noPasswords;
+@property NSDictionary<NSString*, NSSet<NSUUID *>*>* duplicatedPasswords;
+@property NSSet<NSUUID*>* commonPasswords;
+@property NSDictionary<NSString*, NSSet<NSUUID *>*>* similarPasswords;
+@property NSSet<NSUUID*>* tooShort;
+@property NSSet<NSUUID*>* pwned;
 
 @end
 
 @implementation DatabaseAuditReport
 
-- (instancetype)initWithNoPasswordEntries:(NSSet<Node *> *)noPasswords
-                      duplicatedPasswords:(NSDictionary<NSString *,NSSet<Node *> *> *)duplicatedPasswords
-                          commonPasswords:(NSSet<Node *> *)commonPasswords
-                                  similar:(nonnull NSDictionary<NSUUID *,NSSet<Node *> *> *)similar
-                                 tooShort:(NSSet<Node *> *)tooShort
-                                    pwned:(NSSet<Node *> *)pwned {
+- (instancetype)initWithNoPasswordEntries:(NSSet<NSUUID *> *)noPasswords
+                      duplicatedPasswords:(NSDictionary<NSString *,NSSet<NSUUID *> *> *)duplicatedPasswords
+                          commonPasswords:(NSSet<NSUUID *> *)commonPasswords
+                                  similar:(nonnull NSDictionary<NSUUID *,NSSet<NSUUID *> *> *)similar
+                                 tooShort:(NSSet<NSUUID *> *)tooShort
+                                    pwned:(NSSet<NSUUID *> *)pwned {
     self = [super init];
     
     if (self) {
@@ -42,35 +42,35 @@
     return self;
 }
 
-- (NSSet<Node *> *)entriesWithNoPasswords {
+- (NSSet<NSUUID *> *)entriesWithNoPasswords {
     return self.noPasswords;
 }
 
-- (NSSet<Node *> *)entriesWithDuplicatePasswords {
-    NSArray<Node*>* flattened = [self.duplicatedPasswords.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
+- (NSSet<NSUUID *> *)entriesWithDuplicatePasswords {
+    NSArray<NSUUID*>* flattened = [self.duplicatedPasswords.allValues flatMap:^NSArray * _Nonnull(NSSet<NSUUID *> * _Nonnull obj, NSUInteger idx) {
         return obj.allObjects;
     }];
     
     return [NSSet setWithArray:flattened];
 }
 
-- (NSSet<Node *> *)entriesWithCommonPasswords {
+- (NSSet<NSUUID *> *)entriesWithCommonPasswords {
     return self.commonPasswords;
 }
 
-- (NSSet<Node *> *)entriesWithSimilarPasswords {
-    NSArray<Node*>* flattened = [self.similarPasswords.allValues flatMap:^NSArray * _Nonnull(NSSet<Node *> * _Nonnull obj, NSUInteger idx) {
+- (NSSet<NSUUID *> *)entriesWithSimilarPasswords {
+    NSArray<NSUUID*>* flattened = [self.similarPasswords.allValues flatMap:^NSArray * _Nonnull(NSSet<NSUUID *> * _Nonnull obj, NSUInteger idx) {
         return obj.allObjects;
     }];
     
     return [NSSet setWithArray:flattened];
 }
 
-- (NSSet<Node *> *)entriesTooShort {
+- (NSSet<NSUUID *> *)entriesTooShort {
     return self.tooShort;
 }
 
-- (NSSet<Node *> *)entriesPwned {
+- (NSSet<NSUUID *> *)entriesPwned {
     return self.pwned;
 }
 

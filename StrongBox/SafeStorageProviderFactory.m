@@ -3,10 +3,14 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 12/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SafeStorageProviderFactory.h"
+
+
+#if TARGET_OS_IPHONE
+
 #import "LocalDeviceStorageProvider.h"
 
 #ifndef IS_APP_EXTENSION
@@ -14,10 +18,16 @@
 #import "DropboxV2StorageProvider.h"
 #import "AppleICloudProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
-#import "SFTPStorageProvider.h"
-#import "WebDAVStorageProvider.h"
 #import "OneDriveStorageProvider.h"
 #import "GoogleDriveStorageProvider.h"
+
+#endif
+#endif
+
+#ifndef IS_APP_EXTENSION
+
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
 
 #endif
 
@@ -26,7 +36,14 @@
 #ifndef IS_APP_EXTENSION
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
-    if (providerId == kGoogleDrive) {
+    if(providerId == kWebDAV) {
+        return WebDAVStorageProvider.sharedInstance;
+    }
+    else if(providerId == kSFTP) {
+        return SFTPStorageProvider.sharedInstance;
+    }
+#if TARGET_OS_IPHONE
+    else if (providerId == kGoogleDrive) {
         return [GoogleDriveStorageProvider sharedInstance];
     }
     else if (providerId == kDropbox)
@@ -46,16 +63,13 @@
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
     }
-    else if(providerId == kSFTP) {
-        return SFTPStorageProvider.sharedInstance;
-    }
-    else if(providerId == kWebDAV) {
-        return WebDAVStorageProvider.sharedInstance;
-    }
-    
+
     [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
-    
     return [LocalDeviceStorageProvider sharedInstance];
+#else
+    [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
+    return nil;
+#endif
 }
 
 #else
@@ -67,7 +81,7 @@
 
 #endif
 
-+ (NSString*)getStorageDisplayName:(SafeMetaData*)database {
++ (NSString*)getStorageDisplayName:(METADATA_PTR )database {
     return [SafeStorageProviderFactory getDisplayNameForProvider:database.storageProvider database:database];
 }
 
@@ -75,7 +89,7 @@
     return [SafeStorageProviderFactory getDisplayNameForProvider:provider database:nil];
 }
 
-+ (NSString*)getDisplayNameForProvider:(StorageProvider)provider database:(SafeMetaData*)database {
++ (NSString*)getDisplayNameForProvider:(StorageProvider)provider database:(METADATA_PTR )database {
     NSString* _displayName;
     
     if (provider == kGoogleDrive) {
@@ -99,9 +113,13 @@
     }
     else if (provider == kLocalDevice) {
         if (database) {
+#if TARGET_OS_IPHONE
             _displayName = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
                 NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
                 NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
+#else
+            
+#endif
         }
         else {
             _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
@@ -141,7 +159,7 @@
     return _displayName;
 }
 
-+ (NSString*)getIcon:(SafeMetaData*)database {
++ (NSString*)getIcon:(METADATA_PTR )database {
     return [SafeStorageProviderFactory getIconForProvider:database.storageProvider];
 }
 

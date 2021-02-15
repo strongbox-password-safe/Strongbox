@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 17/10/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "AddNewVirtualYubiKeyController.h"
@@ -41,7 +41,7 @@
 }
 
 - (IBAction)onAdd:(id)sender {
-    NSData* yubikeySecretData = [Utils dataFromHexString:self.textFieldSecret.text];
+    NSData* yubikeySecretData = self.textFieldSecret.text.dataFromHex;
     
     NSString* hexSecret = [NSString stringWithFormat:@"%@%@", self.switchFixedLengthOnly.on ? @"P" : @"", yubikeySecretData.hexString];
     VirtualYubiKey *key = [VirtualYubiKey keyWithName:self.textFieldName.text secret:hexSecret autoFillOnly:self.switchAutoFillOnly.on];

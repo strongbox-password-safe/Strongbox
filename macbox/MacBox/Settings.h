@@ -75,7 +75,7 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL dereferenceInQuickView;
 @property BOOL dereferenceInOutlineView;
-@property BOOL dereferenceDuringSearch;
+@property (readonly) BOOL dereferenceDuringSearch;
 
 @property BOOL detectForeignChanges;
 @property BOOL autoReloadAfterForeignChanges;
@@ -109,6 +109,8 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL showAdvancedUnlockOptions;
 @property BOOL startWithSearch;
+
+@property BOOL showDatabasesManagerOnCloseAllWindows;
 
 @end
 

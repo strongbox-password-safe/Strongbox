@@ -3,7 +3,7 @@
 //  test-new-ui
 //
 //  Created by Mark on 18/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "GenericKeyValueTableViewCell.h"
@@ -43,8 +43,6 @@
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-
-    self.imageAuditError.image = [UIImage imageNamed:@"security_checked"];
 
     if (@available(iOS 13.0, *)) {
         self.horizontalLine.backgroundColor = UIColor.secondaryLabelColor;
@@ -91,6 +89,14 @@
           [[UITapGestureRecognizer alloc] initWithTarget:self
                                                   action:@selector(onAuditLabelTap)];
     [self.labelAudit addGestureRecognizer:tapGesture];
+
+    self.imageAuditError.image = [UIImage imageNamed:@"security_checked"];
+    self.imageAuditError.userInteractionEnabled = YES;
+    UITapGestureRecognizer *imageAuditErrorGesture =
+          [[UITapGestureRecognizer alloc] initWithTarget:self
+                                                  action:@selector(onAuditLabelTap)];
+    [self.imageAuditError addGestureRecognizer:imageAuditErrorGesture];
+
 }
 
 - (void)prepareForReuse {

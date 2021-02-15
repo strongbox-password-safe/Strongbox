@@ -1,20 +1,25 @@
 //
-//  SafesMetaDataViewer.m
-//  Macbox
+//  DatabasesManagerVC.m
+//  MacBox
 //
-//  Created by Mark on 04/04/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Created by Strongbox on 03/02/2021.
+//  Copyright © 2021 Mark McGuill. All rights reserved.
 //
 
-#import "DatabasesManagerView.h"
+#import "DatabasesManagerVC.h"
 #import "DatabasesManager.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "DocumentController.h"
 #import "Settings.h"
 #import "DatabaseCellView.h"
 #import "NSArray+Extensions.h"
 #import "CustomBackgroundTableView.h"
 #import "AutoFillManager.h"
+#import "SafeStorageProviderFactory.h"
+#import "AddDatabaseSelectStorageVC.h"
+#import "SFTPStorageProvider.h"
+
+NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
 
 static NSString* const kColumnIdUuid = @"uuid";
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
@@ -31,23 +36,84 @@ static NSString* const kDragAndDropId = @"com.markmcguill.strongbox.mac.database
 
 static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
-NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
-
-@interface DatabasesManagerView () <NSTableViewDelegate, NSTableViewDataSource>
+@interface DatabasesManagerVC () <NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
 
 @property (nonatomic, strong) NSArray<DatabaseMetadata*>* databases;
+
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
 @property (weak) IBOutlet NSButton *checkboxAutoOpenPrimary;
 @property (weak) IBOutlet NSButton *buttonRemove;
 @property (weak) IBOutlet NSButton *buttonRename;
+
 @property NSTimer* timerRefresh;
-@property BOOL debug;
+@property BOOL hasLoaded;
 
 @end
 
-@implementation DatabasesManagerView
+static DatabasesManagerVC* sharedInstance;
 
-static DatabasesManagerView* sharedInstance;
+@implementation DatabasesManagerVC
+
++ (void)show {
+    if ( sharedInstance == nil ) {
+        NSStoryboard* storyboard = [NSStoryboard storyboardWithName:@"DatabasesManager" bundle:nil];
+        NSWindowController* wc = [storyboard instantiateInitialController];
+        sharedInstance = (DatabasesManagerVC*)wc.contentViewController;
+    }
+ 
+    [sharedInstance.view.window.windowController showWindow:self];
+    [sharedInstance.view.window makeKeyAndOrderFront:self];
+    [sharedInstance.view.window center];
+}
+
+- (void)viewWillAppear {
+    [super viewWillAppear];
+
+    if(!self.hasLoaded) {
+        self.hasLoaded = YES;
+        [self doInitialSetup];
+    }
+}
+
+- (void)doInitialSetup {
+    self.view.window.delegate = self;
+    
+    NSButton *zoomButton = [self.view.window standardWindowButton:NSWindowZoomButton];
+    NSButton *minButton = [self.view.window standardWindowButton:NSWindowMiniaturizeButton];
+
+    [zoomButton setEnabled:NO];
+    [minButton setEnabled:NO];
+
+    [self.view.window makeKeyAndOrderFront:nil];
+    [self.view.window center];
+
+    self.tableView.dataSource = self;
+    self.tableView.delegate = self;
+    self.tableView.doubleAction = @selector(onDoubleClick:);
+
+    [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kDatabaseCellView bundle:nil]
+                  forIdentifier:kDatabaseCellView];
+
+    [self.tableView registerForDraggedTypes:@[kDragAndDropId]];
+    self.tableView.emptyString = NSLocalizedString(@"mac_no_databases_initial_message", @"No Databases Here Yet.\n\nClick 'Add Database...' below to get started...");
+
+    [self bindAutoOpenPrimary];
+    [self showHideColumns];
+
+    self.databases = DatabasesManager.sharedInstance.snapshot;
+    [self.tableView reloadData];
+
+    
+
+    if(self.databases.count) {
+        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
+    }
+
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
+
+    [self startRefreshTimer];
+}
 
 - (void)killRefreshTimer {
     if(self.timerRefresh) {
@@ -63,67 +129,16 @@ static DatabasesManagerView* sharedInstance;
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
 }
 
-+ (void)show:(BOOL)debug {
-    if (!sharedInstance) {
-        sharedInstance = [[DatabasesManagerView alloc] initWithWindowNibName:@"SafesMetaDataViewer"];
-    }
-    
-    sharedInstance.debug = debug;
-    [sharedInstance showWindow:nil];
-}
-
 - (void)cancel:(id)sender { 
-    [self.window orderBack:nil];
+    [self.view.window orderBack:self];
 }
 
 - (void)windowWillClose:(NSNotification *)notification {
-    if ([notification object] == [self window] && self == sharedInstance) {
+    if ( notification.object == self.view.window && self == sharedInstance) {
+        [self.view.window orderOut:self];
         [self killRefreshTimer];
         sharedInstance = nil;
     }
-}
-
-- (void)windowDidLoad {
-    [super windowDidLoad];
-    
-    NSButton *zoomButton = [self.window standardWindowButton:NSWindowZoomButton];
-    NSButton *minButton = [self.window standardWindowButton:NSWindowMiniaturizeButton];
-    
-    [zoomButton setEnabled:NO];
-    [minButton setEnabled:NO];
-    
-    [self.window makeKeyAndOrderFront:nil];
-    [self.window center];
-
-    
-    
-    
-    self.tableView.dataSource = self;
-    self.tableView.delegate = self;
-    self.tableView.doubleAction = @selector(onDoubleClick:);
-    
-    [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kDatabaseCellView bundle:nil]
-                  forIdentifier:kDatabaseCellView];
-
-    [self.tableView registerForDraggedTypes:@[kDragAndDropId]];
-    self.tableView.emptyString = NSLocalizedString(@"mac_no_databases_initial_message", @"No Databases Here Yet\n\nClick 'New Database...' or 'Add Existing...' below to get started.");
-
-    [self bindAutoOpenPrimary];
-    [self showHideColumns];
-    
-    self.databases = DatabasesManager.sharedInstance.snapshot;
-    [self.tableView reloadData];
-
-    
-    
-    if(self.databases.count) {
-        [self.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:0] byExtendingSelection:NO];
-    }
-    
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListChangedNotification object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
-    
-    [self startRefreshTimer];
 }
 
 - (void)bindAutoOpenPrimary {
@@ -137,18 +152,17 @@ static DatabasesManagerView* sharedInstance;
 }
 
 - (void)showHideColumns {
-    if (!self.debug) {
-        self.tableView.headerView = nil;
-    }
+    self.tableView.headerView = nil;
     
-    [self showHideColumn:kColumnIdUuid show:self.debug];
-    [self showHideColumn:kColumnIdFileName show:self.debug];
-    [self showHideColumn:kColumnIdFilePath show:self.debug];
-    [self showHideColumn:kColumnIdTouchIdPassword show:self.debug];
-    [self showHideColumn:kColumnIdTouchIdEnabled show:self.debug];
-    [self showHideColumn:kColumnIdFileUrl show:self.debug];
-    [self showHideColumn:kColumnIdStorageInfo show:self.debug];
-    [self showHideColumn:kColumnIdStorageId show:self.debug];
+    BOOL debug = NO;
+    [self showHideColumn:kColumnIdUuid show:debug];
+    [self showHideColumn:kColumnIdFileName show:debug];
+    [self showHideColumn:kColumnIdFilePath show:debug];
+    [self showHideColumn:kColumnIdTouchIdPassword show:debug];
+    [self showHideColumn:kColumnIdTouchIdEnabled show:debug];
+    [self showHideColumn:kColumnIdFileUrl show:debug];
+    [self showHideColumn:kColumnIdStorageInfo show:debug];
+    [self showHideColumn:kColumnIdStorageId show:debug];
 }
 
 - (IBAction)onRename:(id)sender {
@@ -156,7 +170,7 @@ static DatabasesManagerView* sharedInstance;
         DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
         
         NSString* loc = NSLocalizedString(@"mac_enter_new_name_for_db", @"Enter a new name for this database");
-        NSString* response = [[[Alerts alloc] init] input:loc defaultValue:safe.nickName allowEmpty:NO];
+        NSString* response = [[[MacAlerts alloc] init] input:loc defaultValue:safe.nickName allowEmpty:NO];
         
         if(response) {
             NSLog(@"Rename: [%@]", response);
@@ -167,15 +181,19 @@ static DatabasesManagerView* sharedInstance;
 }
 
 - (IBAction)onRemove:(id)sender {
+    if (self.tableView.selectedRowIndexes.count == 0) {
+        return;
+    }
+    
     NSString* single = NSLocalizedString(@"are_you_sure_delete_database_single", @"Are you sure you want to remove this database from Strongbox?\n\nNB: The underlying database file will not be deleted. Just Strongbox's settings for this database.");
     
     NSString* multiple = NSLocalizedString(@"are_you_sure_delete_database_multiple", @"Are you sure you want to remove these databases from Strongbox?\n\nNB: The underlying database files will not be deleted. Just Strongbox's settings for these databases.");
     
     NSString *message = self.tableView.selectedRowIndexes.count > 1 ? multiple : single;
     
-    [Alerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
+    [MacAlerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
   informativeText:message
-           window:self.window
+           window:self.view.window
        completion:^(BOOL yesNo) {
         if (yesNo) {
             NSMutableSet<DatabaseMetadata*>* set = NSMutableSet.set;
@@ -279,7 +297,7 @@ static DatabasesManagerView* sharedInstance;
     }
 }
 
-NSString* getStorageProviderName(StorageProvider sp) {
+static NSString* getStorageProviderName(StorageProvider sp) {
     switch (sp) {
         case kLocalDevice:
             {
@@ -337,38 +355,52 @@ NSString* getStorageProviderName(StorageProvider sp) {
            NSString* loc = NSLocalizedString(@"mac_problem_opening_db",
                                              @"There was a problem opening this file. It will be removed from your databases.");
 
-           [Alerts error:loc
+           [MacAlerts error:loc
                    error:error
-                  window:self.window
+                  window:self.view.window
               completion:nil];
-        }
-        else {
-
         }
     }];
 }
 
-- (IBAction)onOpen:(id)sender {
-    NSInteger row = self.tableView.selectedRow;
-    if(row == -1) {
-        return;
-    }
-    
-    DatabaseMetadata* database = self.databases[row];
-    [self openDatabase:database];
-}
-
-- (IBAction)onOpenFiles:(id)sender {
-
-    
+- (IBAction)onOpenFromFiles:(id)sender {
     DocumentController* dc = (DocumentController*)NSDocumentController.sharedDocumentController;
-    
     [dc originalOpenDocument:nil];
 }
 
 - (IBAction)onNewDatabase:(id)sender {
-
     [NSDocumentController.sharedDocumentController newDocument:nil];
+}
+
+- (IBAction)onAddSFTPDatabase:(id)sender {
+    AddDatabaseSelectStorageVC* vc = [AddDatabaseSelectStorageVC newViewController];
+    
+    SFTPStorageProvider* sftpProviderWithFastListing = [SafeStorageProviderFactory getStorageProviderFromProviderId:kSFTP];
+
+    
+    sftpProviderWithFastListing.maintainSessionForListing = YES;
+
+    vc.provider = sftpProviderWithFastListing;
+    
+    vc.onDone = ^(BOOL success, StorageBrowserItem * _Nonnull selectedItem) {
+        if (success) {
+            NSLog(@"selected: [%@]", selectedItem);
+            DatabaseMetadata *newDatabase = [sftpProviderWithFastListing getSafeMetaData:@"My New SFTP Database!" providerData:selectedItem.providerData]; 
+            
+            if (!newDatabase) {
+                
+                NSLog(@"Error! TODO");
+            }
+            else {
+                NSLog(@"[%@]", newDatabase.fileUrl.absoluteString);
+                
+                [DatabasesManager.sharedInstance add:newDatabase];
+                
+            }
+        }
+    };
+    
+    [self presentViewControllerAsSheet:vc];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
@@ -390,17 +422,16 @@ NSString* getStorageProviderName(StorageProvider sp) {
     NSString *chars = theEvent.charactersIgnoringModifiers;
     unichar aChar = [chars characterAtIndex:0];
 
-    if(aChar == NSDeleteCharacter) {
+    if( aChar == NSDeleteCharacter || aChar == NSBackspaceCharacter || aChar == 63272 ) {
         [self onRemove:nil];
     }
-    else if ((aChar == NSEnterCharacter) || (aChar == NSCarriageReturnCharacter)) {
-        NSLog(@"OPEN");
+    else if ( (aChar == NSEnterCharacter) || (aChar == NSCarriageReturnCharacter) ) {
+        NSLog(@"DatabasesManagerVC::keyDown - OPEN");
         [self performActionOnSelected:^(DatabaseMetadata* database) {
             [self openDatabase:database];
         }];
     }
     else {
-
 
         [super keyDown:theEvent];
     }

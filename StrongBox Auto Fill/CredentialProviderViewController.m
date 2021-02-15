@@ -3,7 +3,7 @@
 //  Strongbox AutoFill
 //
 //  Created by Mark on 11/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "CredentialProviderViewController.h"
@@ -15,12 +15,16 @@
 #import "QuickTypeRecordIdentifier.h"
 #import "OTPToken+Generation.h"
 #import "Utils.h"
-#import "OpenSafeSequenceHelper.h"
 #import "AutoFillManager.h"
 #import "AutoFillSettings.h"
 #import "LocalDeviceStorageProvider.h"
 #import "ClipboardManager.h"
 #import "SyncManager.h"
+#import "Model.h"
+#import "CompositeKeyDeterminer.h"
+#import "DatabaseUnlocker.h"
+#import "DuressActionHelper.h"
+#import "WorkingCopyManager.h"
 
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
@@ -66,40 +70,8 @@
         
         if(safe) {
             
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.15 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
-                [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                                   safe:safe
-                                                    canConvenienceEnrol:NO
-                                                         isAutoFillOpen:YES
-                                                isAutoFillQuickTypeOpen:YES
-                                                          openLocalOnly:NO
-                                            biometricAuthenticationDone:NO
-                                                    noConvenienceUnlock:NO
-                                                        allowOnboarding:NO
-                                                             completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
-                    
-                    
-
-                    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
-
-                    NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
-                    
-                    if(result == kUnlockDatabaseResultSuccess) {
-                        [self onUnlockedDatabase:model quickTypeIdentifier:identifier];
-                    }
-                    else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
-                        [self cancel:nil]; 
-                    }
-                    else if (result == kUnlockDatabaseResultError) {
-                        [Alerts error:self
-                                title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                                error:error
-                           completion:^{
-                            [self exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
-                        }];
-                    }
-                }];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self unlockDatabaseForQuickType:safe identifier:identifier];
             });
         }
         else {
@@ -123,6 +95,52 @@
             
             [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this record in Strongbox any longer." errorCode:-1]];
         }];
+    }
+}
+
+- (void)unlockDatabaseForQuickType:(SafeMetaData*)safe identifier:(QuickTypeRecordIdentifier*)identifier {
+    CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:YES biometricPreCleared:NO noConvenienceUnlock:NO];
+    [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        if (result == kGetCompositeKeyResultSuccess) {
+            AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
+            
+            DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:safe viewController:self forceReadOnly:NO isAutoFillOpen:YES offlineMode:YES];
+            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+                
+                [self onUnlockDone:result model:model identifier:identifier error:error];
+            }];
+        }
+        else if (result == kGetCompositeKeyResultError) {
+            [self messageErrorAndExit:error];
+        }
+        else if (result == kGetCompositeKeyResultDuressIndicated) {
+            [DuressActionHelper performDuressAction:self database:safe isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) { 
+                [self onUnlockDone:result model:model identifier:identifier error:error];
+            }];
+        }
+        else {
+            [self cancel:nil];
+        }
+    }];
+}
+
+- (void)onUnlockDone:(UnlockDatabaseResult)result model:(Model * _Nullable)model identifier:(QuickTypeRecordIdentifier*)identifier error:(NSError * _Nullable)error {
+    NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
+    
+    if(result == kUnlockDatabaseResultSuccess) {
+        [self onUnlockedDatabase:model quickTypeIdentifier:identifier];
+    }
+    else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
+        [self cancel:nil]; 
+    }
+    else if (result == kUnlockDatabaseResultIncorrectCredentials) {
+        
+        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+        [self exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
+    }
+    else if (result == kUnlockDatabaseResultError) {
+        [self messageErrorAndExit:error];
     }
 }
 
@@ -158,6 +176,15 @@
             [self exitWithErrorOccurred:[Utils createNSError:@"Could not find record in database" errorCode:-1]];
         }];
     }
+}
+
+- (void)messageErrorAndExit:(NSError*)error {
+    [Alerts error:self
+            title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+            error:error
+       completion:^{
+        [self exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
+    }];
 }
 
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
@@ -225,7 +252,7 @@
         return NO;
     }
         
-    return [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safeMetaData modified:nil];
+    return [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safeMetaData modified:nil];
 }
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers {

@@ -182,13 +182,15 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
 
     NSMutableArray<NSArray<NSString*>*> *allKeys = [[groupedByGroup allKeys] mutableCopy];
     
+    NSMutableSet<NSUUID*>* usedIds = NSMutableSet.set;
+
     for (NSArray<NSString*>* groupComponents in allKeys) {
         Node* group = [self addGroupUsingGroupComponents:root groupComponents:groupComponents];
         
         NSMutableArray<Record*>* recordsForThisGroup = [groupedByGroup objectForKey:groupComponents];
 
         for(Record* record in recordsForThisGroup) {
-            Node* recordNode = [self createNodeFromExistingRecord:record parent:group];
+            Node* recordNode = [self createNodeFromExistingRecord:record parent:group usedIds:usedIds];
             [group addChild:recordNode keePassGroupTitleRules:YES];
         }
     }
@@ -202,7 +204,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     return root;
 }
 
-+ (Node*)createNodeFromExistingRecord:(Record*)record parent:(Node*)group {
++ (Node*)createNodeFromExistingRecord:(Record*)record parent:(Node*)group usedIds:(NSMutableSet<NSUUID*>*)usedIds {
     NodeFields* fields = [[NodeFields alloc] init];
     
     fields.username = record.username;
@@ -216,8 +218,15 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     [fields setTouchPropertiesWithCreated:record.created accessed:record.accessed modified:record.modified locationChanged:nil usageCount:nil]; 
     
     fields.passwordModified = record.passwordModified;
-    
+
     NSUUID* uniqueId = record.uuid ? record.uuid : [NSUUID UUID];
+    BOOL alreadyUsedId = [usedIds containsObject:uniqueId];
+    if ( alreadyUsedId ) {
+        NSLog(@"WARNWARN: Duplicated ID: %@", uniqueId);
+        uniqueId = NSUUID.UUID;
+    }
+    [usedIds addObject:uniqueId];
+    
     Node* ret = [[Node alloc] initAsRecord:record.title parent:group fields:fields uuid:uniqueId];
     
     ret.linkedData = record;

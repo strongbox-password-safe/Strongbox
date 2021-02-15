@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 16/07/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -29,9 +29,11 @@ typedef void (^YubiKeyCRHandlerBlock)(NSData* challenge, YubiKeyCRResponseBlock 
 
 - (instancetype)clone;
 
-@property (nullable, nonatomic) NSString* password;
-@property (nullable, nonatomic) NSData* keyFileDigest;
-@property (nullable, copy) YubiKeyCRHandlerBlock yubiKeyCR;
+@property (readonly, nullable, nonatomic) NSString* password;
+@property (readonly, nullable, nonatomic) NSData* keyFileDigest;
+@property (readonly, nullable, copy) YubiKeyCRHandlerBlock yubiKeyCR;
+
+@property (readonly) BOOL isAmbiguousEmptyOrNullPassword;
 
 @end
 

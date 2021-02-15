@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 12/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -15,10 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId;
 
-+ (NSString*)getStorageDisplayName:(SafeMetaData*)database;
++ (NSString*)getStorageDisplayName:(METADATA_PTR)database;
 + (NSString*)getStorageDisplayNameForProvider:(StorageProvider)provider;
 
-+ (NSString*)getIcon:(SafeMetaData*)database;
++ (NSString*)getIcon:(METADATA_PTR)database;
 + (NSString*)getIconForProvider:(StorageProvider)provider;
 
 @end

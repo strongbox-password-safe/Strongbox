@@ -7,12 +7,25 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
-#import "SafeMetaData.h"
 #import "StorageBrowserItem.h"
 #import "StorageProviderReadOptions.h"
 #import "StorageProviderReadResult.h"
 #import "StorageProviderUpdateResult.h"
+#import "StorageProvider.h"
+
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+    #import "SafeMetaData.h"
+    typedef UIViewController* VIEW_CONTROLLER_PTR;
+    typedef UIImage* IMAGE_TYPE_PTR;
+    typedef SafeMetaData* METADATA_PTR;
+#else
+    #import <Cocoa/Cocoa.h>
+    #import "DatabaseMetadata.h"
+    typedef NSViewController* VIEW_CONTROLLER_PTR;
+    typedef NSImage* IMAGE_TYPE_PTR;
+    typedef DatabaseMetadata* METADATA_PTR;
+#endif
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,54 +41,41 @@ typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult
 @property (nonatomic, readonly) BOOL rootFolderOnly;
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline; 
+@property (nonatomic, readonly) BOOL defaultForImmediatelyOfferOfflineCache;
+@property (nonatomic, readonly) BOOL privacyOptInRequired;
 
 - (void)    create:(NSString *)nickName
          extension:(NSString *)extension
               data:(NSData *)data
       parentFolder:(NSObject * _Nullable)parentFolder
-    viewController:(UIViewController *_Nullable)viewController
-        completion:(void (^)(SafeMetaData *metadata, const NSError *error))completion;
+    viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController
+        completion:(void (^)(METADATA_PTR metadata, const NSError *error))completion;
 
-- (void)pullDatabase:(SafeMetaData *)safeMetaData
-       interactiveVC:(UIViewController *_Nullable)viewController
+- (void)pullDatabase:(METADATA_PTR )safeMetaData
+       interactiveVC:(VIEW_CONTROLLER_PTR _Nullable)viewController
              options:(StorageProviderReadOptions*)options
           completion:(StorageProviderReadCompletionBlock)completion;
 
-- (void)pushDatabase:(SafeMetaData *)safeMetaData
-       interactiveVC:(UIViewController *_Nullable)viewController
+- (void)pushDatabase:(METADATA_PTR )safeMetaData
+       interactiveVC:(VIEW_CONTROLLER_PTR _Nullable)viewController
                 data:(NSData *)data
           completion:(StorageProviderUpdateCompletionBlock)completion;
 
-- (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(const NSError *_Nullable error))completion;
+- (void)delete:(METADATA_PTR )safeMetaData completion:(void (^)(const NSError *_Nullable error))completion;
 
 - (void)      list:(NSObject *_Nullable)parentFolder
-    viewController:(UIViewController *_Nullable)viewController
+    viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController
         completion:(void (^)(BOOL userCancelled, NSArray<StorageBrowserItem *> *items, const NSError *error))completion;
 
 - (void)readWithProviderData:(NSObject * _Nullable)providerData
-              viewController:(UIViewController *_Nullable)viewController
+              viewController:(VIEW_CONTROLLER_PTR _Nullable)viewController
                      options:(StorageProviderReadOptions*)options
                   completion:(StorageProviderReadCompletionBlock)completionHandler;
 
-- (void)loadIcon:(NSObject *)providerData viewController:(UIViewController *)viewController
-      completion:(void (^)(UIImage *image))completionHandler;
+- (void)loadIcon:(NSObject *)providerData viewController:(VIEW_CONTROLLER_PTR )viewController
+      completion:(void (^)(IMAGE_TYPE_PTR image))completionHandler;
 
-- (SafeMetaData *_Nullable)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
+- (METADATA_PTR _Nullable)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
 
 @end
 

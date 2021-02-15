@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 04/06/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "MasterDetailViewController.h"
@@ -26,6 +26,8 @@
     
     self.cancelOtpTimer = NO;
     [self startOtpRefresh];
+    
+    [self.viewModel restartBackgroundAudit];
 }
 
 - (BOOL)splitViewController:(UISplitViewController *)splitViewController

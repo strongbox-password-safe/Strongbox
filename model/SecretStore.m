@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 13/01/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 // Reference Reading... Very helpful
 //
@@ -43,8 +43,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return sharedInstance;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self._secureEnclaveAvailable = [SecretStore isSecureEnclaveAvailable];

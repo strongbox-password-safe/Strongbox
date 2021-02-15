@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 26/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "Kdbx4Serialization.h"
@@ -11,7 +11,6 @@
 #import "KdbxSerializationCommon.h"
 #import "KdfParameters.h"
 #import "KeePassCiphers.h"
-#import "Argon2KdfCipher.h"
 #import "ChaCha20Cipher.h"
 #import "NSData+GZIP.h"
 #import <CommonCrypto/CommonCrypto.h>
@@ -27,6 +26,8 @@
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
 #import "HmacBlockStream.h"
+#import "Argon2dKdfCipher.h"
+#import "Argon2idKdfCipher.h"
 
 static const uint8_t kInnerHeaderTypeEnd = 0;
 static const uint8_t kInnerHeaderTypeInnerRandomStreamId = 1;
@@ -631,8 +632,18 @@ static BOOL checkHeaderHmac(NSData* headerData, NSData* hmacKey, NSInputStream* 
 }
 
 static id<KeyDerivationCipher> getKeyDerivationCipher(KdfParameters *kdfParameters, NSError** error) {
-    if([kdfParameters.uuid isEqual:argon2CipherUuid()]) {
-        id<KeyDerivationCipher> ret = [[Argon2KdfCipher alloc] initWithParametersDictionary:kdfParameters];
+    if([kdfParameters.uuid isEqual:argon2dCipherUuid()]) {
+        id<KeyDerivationCipher> ret = [[Argon2dKdfCipher alloc] initWithParametersDictionary:kdfParameters];
+        if(ret == nil) {
+            if(error) {
+                *error = [Utils createNSError:@"Could not initialize Argon2 with Parameters" errorCode:-1];
+            }
+        }
+        
+        return ret;
+    }
+    else if([kdfParameters.uuid isEqual:argon2idCipherUuid()]) {
+        id<KeyDerivationCipher> ret = [[Argon2idKdfCipher alloc] initWithParametersDictionary:kdfParameters];
         if(ret == nil) {
             if(error) {
                 *error = [Utils createNSError:@"Could not initialize Argon2 with Parameters" errorCode:-1];

@@ -47,7 +47,7 @@ static NSString* const kOutlineViewTitleIsReadonly = @"outlineViewTitleIsReadonl
 static NSString* const kOutlineViewEditableFieldsAreReadonly = @"outlineViewEditableFieldsAreReadonly";
 static NSString* const kDereferenceInQuickView = @"dereferenceInQuickView";
 static NSString* const kDereferenceInOutlineView = @"dereferenceInOutlineView";
-static NSString* const kDereferenceDuringSearch = @"dereferenceDuringSearch";
+
 static NSString* const kAutoReloadAfterForeignChanges = @"autoReloadAfterForeignChanges";
 static NSString* const kDetectForeignChanges = @"detectForeignChanges";
 static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
@@ -71,7 +71,7 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 static NSString* const kMigratedToNewSettings = @"migratedToNewSettings";
 static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kStartWithSearch = @"startWithSearch";
-
+static NSString* const kShowDatabasesManagerOnCloseAllWindows = @"showDatabasesManagerOnCloseAllWindows";
 
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
@@ -163,6 +163,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)showDatabasesManagerOnCloseAllWindows {
+    return [self getBool:kShowDatabasesManagerOnCloseAllWindows fallback:YES];
+}
+
+- (void)setShowDatabasesManagerOnCloseAllWindows:(BOOL)showDatabasesManagerOnCloseAllWindows {
+    [self setBool:kShowDatabasesManagerOnCloseAllWindows value:showDatabasesManagerOnCloseAllWindows];
+}
 
 - (BOOL)startWithSearch {
     return [self getBool:kStartWithSearch fallback:YES];
@@ -337,7 +345,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)revealDetailsImmediately {
-    return [self getBool:kRevealDetailsImmediately];
+    return [self getBool:kRevealDetailsImmediately fallback:YES];
 }
 
 - (void)setRevealDetailsImmediately:(BOOL)value {
@@ -621,12 +629,13 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)dereferenceDuringSearch {
-    return [self getBool:kDereferenceDuringSearch fallback:NO];
+    return YES;
+
 }
 
-- (void)setDereferenceDuringSearch:(BOOL)dereferenceDuringSearch {
-    [self setBool:kDereferenceDuringSearch value:dereferenceDuringSearch];
-}
+
+
+
 
 - (BOOL)autoReloadAfterForeignChanges {
     return [self getBool:kAutoReloadAfterForeignChanges fallback:YES];

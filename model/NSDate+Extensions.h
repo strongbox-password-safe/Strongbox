@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 10/08/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,6 +11,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSDate (Extensions)
+
++ (BOOL)isMoreThanXMinutesAgo:(NSDate*_Nullable)date minutes:(NSUInteger)minutes;
 
 - (BOOL)isEqualToDateWithinEpsilon:(NSDate*)other;
 - (BOOL)isLaterThan:(NSDate*)other;

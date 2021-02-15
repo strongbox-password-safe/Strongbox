@@ -3,7 +3,7 @@
 //  Strongbox AutoFill
 //
 //  Created by Mark on 14/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "PickCredentialsTableViewController.h"
@@ -103,7 +103,7 @@
                                                                             descending:descending
                                                                      foldersSeparately:foldersSeparately
                                                                       isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.model isFlaggedByAudit:node];
+        return [self.model isFlaggedByAudit:node.uuid];
     }];
 
     self.items = [searcher filterAndSortForBrowse:self.model.allRecords.mutableCopy
@@ -280,7 +280,7 @@
     BOOL descending = self.model.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.model.metadata.browseSortFoldersSeparately;
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
-        return [self.model isFlaggedByAudit:node];
+        return [self.model isFlaggedByAudit:node.uuid];
     }];
 
     return [searcher search:searchText
@@ -399,8 +399,8 @@
     }
 
     vc.createNewItem = YES;
-    vc.item = nil;
-    vc.parentGroup = self.model.database.effectiveRootGroup;
+    vc.itemId = nil;
+    vc.parentGroupId = self.model.database.effectiveRootGroup.uuid;
     vc.readOnly = NO;
     vc.databaseModel = self.model;
     vc.autoFillSuggestedUrl = suggestedUrl;

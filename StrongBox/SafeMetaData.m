@@ -12,6 +12,10 @@
 #import "FileManager.h"
 #import "ItemDetailsViewController.h"
 
+#ifndef IS_APP_EXTENSION
+#import "SafeStorageProviderFactory.h"
+#endif
+
 @interface SafeMetaData ()
 
 @property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
@@ -79,6 +83,9 @@
         self.colorizePasswords = YES;
         self.keePassIconSet = kKeePassIconSetSfSymbols;
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
+        
+        self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
+        self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
     }
     
     return self;
@@ -100,17 +107,23 @@
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
+        self.immediateOfflineOfferIfOfflineDetected = [SafeMetaData defaultImmediatelyOfferOfflineForProvider:storageProvider];
+        self.quickTypeEnabled = YES;
     }
     
     return self;
 }
 
-
-
-
-- (BOOL)quickTypeEnabled {
-    return YES;
++ (BOOL)defaultImmediatelyOfferOfflineForProvider:(StorageProvider)storageProvider {
+#ifndef IS_APP_EXTENSION
+    id <SafeStorageProvider> provider = [SafeStorageProviderFactory getStorageProviderFromProviderId:storageProvider];
+    return provider.defaultForImmediatelyOfferOfflineCache;
+#else
+    return NO;
+#endif
 }
+
+
 
 
 
@@ -183,7 +196,31 @@
 
     if ( jsonDictionary[@"outstandingUpdateId"] != nil) ret.outstandingUpdateId = [[NSUUID alloc] initWithUUIDString:jsonDictionary[@"outstandingUpdateId"]];
     if ( jsonDictionary[@"lastSyncRemoteModDate"] != nil ) ret.lastSyncRemoteModDate = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastSyncRemoteModDate"])).doubleValue];
+    if ( jsonDictionary[@"lastSyncAttempt"] != nil ) ret.lastSyncAttempt = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastSyncAttempt"])).doubleValue];
 
+    if ( jsonDictionary[@"conflictResolutionStrategy"] != nil ) ret.conflictResolutionStrategy = ((NSNumber*)jsonDictionary[@"conflictResolutionStrategy"]).unsignedIntegerValue;
+
+    if ( jsonDictionary[@"immediateOfflineOfferIfOfflineDetected"] != nil ) {
+        ret.immediateOfflineOfferIfOfflineDetected = ((NSNumber*)jsonDictionary[@"immediateOfflineOfferIfOfflineDetected"]).boolValue;
+    }
+    else { 
+        ret.immediateOfflineOfferIfOfflineDetected = [SafeMetaData defaultImmediatelyOfferOfflineForProvider:ret.storageProvider];
+    }
+    
+    if ( jsonDictionary[@"quickTypeEnabled"] != nil ) {
+        ret.quickTypeEnabled = ((NSNumber*)jsonDictionary[@"quickTypeEnabled"]).boolValue;
+    }
+    else { 
+        ret.quickTypeEnabled = YES;
+    }
+    
+    if ( jsonDictionary[@"quickTypeDisplayFormat"] != nil ) {
+        ret.quickTypeDisplayFormat = ((NSNumber*)jsonDictionary[@"quickTypeDisplayFormat"]).integerValue;
+    }
+    else { 
+        ret.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
+    }
+    
     return ret;
 }
 
@@ -238,6 +275,10 @@
         @"storageProvider" : @(self.storageProvider),
         @"duressAction" : @(self.duressAction),
         @"failedPinAttempts" : @(self.failedPinAttempts),
+        @"conflictResolutionStrategy" : @(self.conflictResolutionStrategy),
+        @"immediateOfflineOfferIfOfflineDetected" : @(self.immediateOfflineOfferIfOfflineDetected),
+        @"quickTypeEnabled" : @(self.quickTypeEnabled),
+        @"quickTypeDisplayFormat" : @(self.quickTypeDisplayFormat),
     }];
     
     if (self.nickName != nil) {
@@ -277,6 +318,10 @@
     
     if (self.lastSyncRemoteModDate != nil) {
         ret[@"lastSyncRemoteModDate"] = @(self.lastSyncRemoteModDate.timeIntervalSinceReferenceDate);
+    }
+
+    if (self.lastSyncAttempt != nil) {
+        ret[@"lastSyncAttempt"] = @(self.lastSyncAttempt.timeIntervalSinceReferenceDate);
     }
 
     return ret;

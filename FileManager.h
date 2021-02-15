@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 17/06/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* archivedCrashFile;
 @property (readonly, nullable) NSURL* appSupportDirectory;
 @property (readonly, nullable) NSURL* syncManagerLocalWorkingCachesDirectory;
+@property (readonly, nullable) NSURL* syncManagerMergeWorkingDirectory;
 @property (readonly, nullable) NSURL* sharedLocalDeviceDatabasesDirectory;
 
 @property (readonly, nullable) NSString* tmpAttachmentPreviewPath;
@@ -37,7 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deleteAllInboxItems;
 
 - (void)deleteAllTmpAttachmentPreviewFiles;
-- (void)deleteAllTmpEncryptedAttachmentFiles;
+- (void)deleteAllTmpWorkingFiles;
+
+- (void)setFileProtection:(BOOL)complete;
 
 @end
 

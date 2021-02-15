@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 05/12/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -20,8 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
-@property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline;
+@property (nonatomic, readonly) BOOL defaultForImmediatelyOfferOfflineCache;
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
+@property (nonatomic, readonly) BOOL privacyOptInRequired;
 
 - (NSString*)getJsonFileIdentifier:(NSData*)bookmark;
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData;

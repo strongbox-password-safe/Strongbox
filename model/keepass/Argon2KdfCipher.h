@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 26/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface Argon2KdfCipher : NSObject<KeyDerivationCipher>
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithDefaults;
+- (instancetype)initWithDefaults:(BOOL)argon2id;
 - (instancetype)initWithParametersDictionary:(KdfParameters*)parameters;
 
 - (NSData*)deriveKey:(NSData*)data;

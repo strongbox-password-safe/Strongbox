@@ -3,7 +3,7 @@
 //  test-new-ui
 //
 //  Created by Mark on 19/04/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -16,7 +16,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ItemDetailsModel : NSObject
+@interface EntryViewModel : NSObject
 
 + (instancetype)demoItem;
 
@@ -38,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)clone;
 - (BOOL)isValid;
-- (BOOL)isDifferentFrom:(ItemDetailsModel*)other;
+- (BOOL)isDifferentFrom:(EntryViewModel*)other;
 
 - (void)removeAttachment:(NSString*)filename; 
 - (NSUInteger)insertAttachment:(NSString*)filename attachment:(DatabaseAttachment*)attachment;

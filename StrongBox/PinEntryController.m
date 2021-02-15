@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 11/01/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "PinEntryController.h"
@@ -33,8 +33,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *logo;
 @property (weak, nonatomic) IBOutlet UIStackView *stackView;
 
-@property (weak, nonatomic) IBOutlet UILabel *labelWhichPIN;
-
 @end
 
 @implementation PinEntryController
@@ -59,8 +57,7 @@
     }
 }
 
-- (void)viewDidLoad
-{
+- (void)viewDidLoad {
     [super viewDidLoad];
 
     [self setupUi];
@@ -75,7 +72,7 @@
     self.labelWarning.hidden = self.warning.length == 0;
     if(self.warning.length) {
         if (@available(iOS 11.0, *)) {
-            [self.stackView setCustomSpacing:8 afterView:self.logo];
+            [self   .stackView setCustomSpacing:8 afterView:self.logo];
         }
         else {
             [self.stackView setSpacing:4]; 

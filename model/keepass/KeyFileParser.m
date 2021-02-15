@@ -3,11 +3,13 @@
 //  Strongbox
 //
 //  Created by Mark on 04/12/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "KeyFileParser.h"
 #import "NSData+Extensions.h"
+#import "NSArray+Extensions.h"
+#import "NSString+Extensions.h"
 
 #if TARGET_OS_IPHONE
 #import "KissXML.h" // Drop in replacements for the NSXML stuff available on Mac
@@ -16,6 +18,9 @@
 static NSString* const kKeyFileRootElementName = @"KeyFile";
 static NSString* const kKeyElementName = @"Key";
 static NSString* const kDataElementName = @"Data";
+static NSString* const kMetaElementName = @"Meta";
+static NSString* const kVersionElementName = @"Version";
+static NSString* const kHashAttributeName = @"Hash";
 
 @implementation KeyFileParser
 
@@ -118,6 +123,19 @@ BOOL isAll64CharactersAreHex(NSData* data) {
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
     NSError *error;
     NSXMLDocument *document = [[NSXMLDocument alloc] initWithData:data options:kNilOptions error:&error];
     
@@ -139,16 +157,63 @@ BOOL isAll64CharactersAreHex(NSData* data) {
         return nil;
     }
     
-    for (NSXMLNode* node in keyFileNode.children) {
-        if([node.name isEqualToString:kKeyElementName]) {
-            for (NSXMLNode* childNode in node.children) {
-                if([childNode.name isEqualToString:kDataElementName]) {
+    BOOL version2 = NO;
+    
+    
+    
+    NSXMLNode* meta = [keyFileNode.children firstOrDefault:^BOOL(NSXMLNode * _Nonnull obj) {
+        return [obj.name isEqualToString:kMetaElementName];
+    }];
+    
+    if ( meta ) {
+        NSXMLNode* version = [meta.children firstOrDefault:^BOOL(NSXMLNode * _Nonnull obj) {
+            return [obj.name isEqualToString:kVersionElementName];
+        }];
+        
+        if ( version ) {
+
+            version2 = version.stringValue.length && [[version.stringValue substringToIndex:1] isEqualToString:@"2"];
+        }
+    }
+
+    
+
+    NSXMLNode* keyElement = [keyFileNode.children firstOrDefault:^BOOL(NSXMLNode * _Nonnull obj) {
+        return [obj.name isEqualToString:kKeyElementName];
+    }];
+    
+    if ( keyElement ) {
+        NSXMLNode* data = [keyElement.children firstOrDefault:^BOOL(NSXMLNode * _Nonnull obj) {
+            return [obj.name isEqualToString:kDataElementName];
+        }];
+        
+        if ( data ) {
+
+            
+            if (version2) {
+                NSString* str = data.stringValue ? data.stringValue : @"";
+                NSData* key = str.dataFromHex;
+                
+                if ( key ) {
+                    NSXMLElement* elem = (NSXMLElement*)data;
+                    NSXMLNode* expectedHash = [elem.attributes firstOrDefault:^BOOL(NSXMLNode * _Nonnull obj) {
+                        return [obj.name isEqualToString:kHashAttributeName];
+                    }];
                     
                     
-                    NSData* key = [[NSData alloc] initWithBase64EncodedString:childNode.stringValue options:NSDataBase64DecodingIgnoreUnknownCharacters];
-                    
-                    return key; 
+
+                    NSString* actualHash = key.sha256.hexString;
+                    if ( expectedHash && expectedHash.stringValue.length && ![[actualHash substringToIndex:8] isEqualToString:expectedHash.stringValue] ) {
+                        NSLog(@"WARNWARN: Hash check failed for V2 Key File");
+                        return nil;
+                    }
+
+                    return key;
                 }
+            }
+            else {
+                NSData* key = [[NSData alloc] initWithBase64EncodedString:data.stringValue options:NSDataBase64DecodingIgnoreUnknownCharacters];
+                return key;
             }
         }
     }

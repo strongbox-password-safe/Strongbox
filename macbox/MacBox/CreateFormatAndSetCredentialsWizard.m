@@ -8,7 +8,7 @@
 
 #import "CreateFormatAndSetCredentialsWizard.h"
 #import "Settings.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "Utils.h"
 #import "KeyFileParser.h"
 #import "BookmarksHelper.h"
@@ -130,7 +130,7 @@
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:openPanel.URL readOnly:YES error:&error];
             
             if (error) {
-                [Alerts error:error window:self.window];
+                [MacAlerts error:error window:self.window];
             }
             else {
                 self->_selectedKeyFileBookmark = bookmark;
@@ -472,7 +472,7 @@
             NSLog(@"Could not read key file. Error: %@", error);
             
             NSString* loc = NSLocalizedString(@"mac_error_could_not_open_key_file", @"Could not open key file.");
-            [Alerts error:loc error:error window:self.window];
+            [MacAlerts error:loc error:error window:self.window];
             return;
         }
     }
@@ -494,7 +494,7 @@
 }
 
 - (CompositeKeyFactors *)generateCkfFromSelected:(NSWindow *)yubiKeyPressWindowHint {
-    CompositeKeyFactors* ret = [[CompositeKeyFactors alloc] initWithPassword:self.selectedPassword];
+    NSData* keyFileDigest = nil;
     
     if (self.selectedKeyFileBookmark) {
         NSError* error;
@@ -504,15 +504,16 @@
             return nil;
         }
         
-        ret.keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data
+        keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data
                                                             checkForXml:self.selectedDatabaseFormat != kKeePass1];
     }
     
+    YubiKeyCRHandlerBlock yubiKeyCR = nil;
     if (self.selectedYubiKeyConfiguration) {
         NSInteger slot = self.selectedYubiKeyConfiguration.slot;
         BOOL slotIsBlocking = [self slotIsBlocking:self.selectedYubiKeyConfiguration.slot];
         
-        ret.yubiKeyCR = ^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+        yubiKeyCR = ^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
             [MacYubiKeyManager.sharedInstance compositeKeyFactorCr:challenge
                                                         windowHint:yubiKeyPressWindowHint
                                                               slot:slot
@@ -521,7 +522,7 @@
         };
     }
 
-    return ret;
+    return [CompositeKeyFactors password:self.selectedPassword keyFileDigest:keyFileDigest yubiKeyCR:yubiKeyCR];
 }
 
 - (BOOL)slotIsBlocking:(NSInteger)slot {

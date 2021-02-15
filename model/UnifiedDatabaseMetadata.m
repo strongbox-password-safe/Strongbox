@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 05/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -11,7 +11,7 @@
 #import "KeePassConstants.h"
 #import "PwSafeSerialization.h"
 #import "PwSafeDatabase.h"
-#import "Argon2KdfCipher.h"
+#import "Argon2dKdfCipher.h"
 #import "NSUUID+Zero.h"
 #import "KeePassCiphers.h"
 #import "Utils.h"
@@ -65,7 +65,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
         
         
         
-        self.kdfParameters = [[Argon2KdfCipher alloc] initWithDefaults].kdfParameters; 
+        self.kdfParameters = [[Argon2dKdfCipher alloc] initWithDefaults].kdfParameters; 
         self.flags = kFlagsAes | kFlagsSha2; 
         self.versionInt = kKdb1DefaultVersion; 
         self.keyStretchIterations = DEFAULT_KEYSTRETCH_ITERATIONS; 
@@ -199,7 +199,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_key_derivation", @"Key Derivation") andValue:keyDerivationAlgorithmString(self.kdfParameters.uuid)];
     
-    if([self.kdfParameters.uuid isEqual:argon2CipherUuid()]) {
+    if([self.kdfParameters.uuid isEqual:argon2dCipherUuid()] || [self.kdfParameters.uuid isEqual:argon2idCipherUuid()]) {
         static NSString* const kParameterMemory = @"M";
         VariantObject* vo = self.kdfParameters.parameters[kParameterMemory];
         if(vo && vo.theObject) {

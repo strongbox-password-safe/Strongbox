@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 20/09/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -27,8 +27,9 @@
 @property (nonatomic, readonly) BOOL browsableNew;
 @property (nonatomic, readonly) BOOL browsableExisting;
 @property (nonatomic, readonly) BOOL rootFolderOnly;
-@property (nonatomic, readonly) BOOL immediatelyOfferCacheIfOffline;
+@property (nonatomic, readonly) BOOL defaultForImmediatelyOfferOfflineCache;
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
+@property (nonatomic, readonly) BOOL privacyOptInRequired;
 
 - (void)delete:(SafeMetaData*)safeMetaData completion:(void (^)(NSError *error))completion;
 

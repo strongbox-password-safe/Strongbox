@@ -3,14 +3,17 @@
 //  Strongbox
 //
 //  Created by Mark on 14/12/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "MergeSelectSecondDatabaseViewController.h"
 #import "SecondDatabaseListTableViewController.h"
-#import "OpenSafeSequenceHelper.h"
 #import "Alerts.h"
 #import "SelectComparisonTypeViewController.h"
+#import "CompositeKeyDeterminer.h"
+#import "DatabaseUnlocker.h"
+#import "DuressActionHelper.h"
+#import "NSDate+Extensions.h"
 
 @implementation MergeSelectSecondDatabaseViewController
 
@@ -32,37 +35,10 @@
     }
 }
 
-- (IBAction)onUnlockSecond:(id)sender {
+
+
+- (IBAction)onSelectSecond:(id)sender {
     [self performSegueWithIdentifier:@"segueToShowMergeSecondDatabasesList" sender:nil];
-}
-
-- (IBAction)onCancel:(id)sender {
-    [self dismiss];
-}
-
-- (void)dismiss {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)unlockSecondDatabase:(SafeMetaData*)database {
-    [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                       safe:database
-                                        canConvenienceEnrol:NO
-                                             isAutoFillOpen:NO
-                                              openLocalOnly:NO
-                                                 completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
-        if(result == kUnlockDatabaseResultSuccess) {
-            [self performSegueWithIdentifier:@"segueToSelectComparisonType" sender:model];
-        }
-        else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
-            self.onDone();
-        }
-        else if (result == kUnlockDatabaseResultError) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                    error:error];
-        }
-    }];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
@@ -70,9 +46,10 @@
         UINavigationController *nav = segue.destinationViewController;
         SecondDatabaseListTableViewController* vc = (SecondDatabaseListTableViewController*)nav.topViewController;
         vc.firstDatabase = self.firstDatabase;
+        __weak MergeSelectSecondDatabaseViewController* weakSelf = self;
         vc.onSelectedDatabase = ^(SafeMetaData * _Nonnull secondDatabase) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                [self unlockSecondDatabase:secondDatabase];
+            [weakSelf dismissViewControllerAnimated:YES completion:^{
+                [weakSelf onSecondDatabaseSelected:secondDatabase];
             }];
         };
     }
@@ -82,6 +59,85 @@
         vc.secondDatabase = sender;
         vc.onDone = self.onDone;
     }
+}
+
+- (void)onSecondDatabaseSelected:(SafeMetaData * _Nonnull)secondDatabase {
+    if ( [NSDate isMoreThanXMinutesAgo:secondDatabase.lastSyncAttempt minutes:3] ||
+         [NSDate isMoreThanXMinutesAgo:self.firstDatabase.metadata.lastSyncAttempt minutes:3] ) {
+        [Alerts info:self
+               title:NSLocalizedString(@"compare_merge_sync_possibly_required_title", @"Sync Possibly Required")
+             message:NSLocalizedString(@"compare_merge_sync_possibly_required_message", @"One or both of these databases hasn't been sync'd very recently. It is recommended that you return to the Home screen and pull down to initiate the Sync process. This will ensure you are working with the latest versions.")
+          completion:^{
+            [self unlockSecondDatabase:secondDatabase];
+        }];
+    }
+    else {
+        [self unlockSecondDatabase:secondDatabase];
+    }
+}
+
+- (void)unlockSecondDatabase:(SafeMetaData*)database {
+    CompositeKeyFactors* firstKey = self.firstDatabase.database.ckfs;
+
+    Model* expressAttempt = [DatabaseUnlocker expressTryUnlockWithKey:database key:firstKey];
+    if ( expressAttempt ) {
+        NSLog(@"YAY - Express Unlocked Second DB with same CKFs! No need to re-request CKFs...");
+        [self onUnlockDone:kUnlockDatabaseResultSuccess model:expressAttempt error:nil];
+    }
+    else {
+        CompositeKeyDeterminer* determiner = [CompositeKeyDeterminer determinerWithViewController:self database:database isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+        [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+            if (result == kGetCompositeKeyResultSuccess) {
+                DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:database viewController:self forceReadOnly:NO isAutoFillOpen:NO offlineMode:YES];
+                [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                    [self onUnlockDone:result model:model error:error];
+                }];
+            }
+            else if (result == kGetCompositeKeyResultError) {
+                [self displayError:error];
+            }
+            else if (result == kGetCompositeKeyResultDuressIndicated) {
+                [DuressActionHelper performDuressAction:self database:database isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                    [self onUnlockDone:result model:model error:error];
+                }];
+            }
+            else {
+                self.onDone(NO, nil, nil);
+            }
+        }];
+    }
+}
+
+- (void)onUnlockDone:(UnlockDatabaseResult)result model:(Model * _Nullable)model error:(NSError * _Nullable)error {
+    if(result == kUnlockDatabaseResultSuccess) {
+        [self performSegueWithIdentifier:@"segueToSelectComparisonType" sender:model];
+    }
+    else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
+        self.onDone(NO, nil, nil);
+    }
+    else if (result == kUnlockDatabaseResultIncorrectCredentials) {
+        
+        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+    }
+    else if (result == kUnlockDatabaseResultError) {
+        [self displayError:error];
+    }
+}
+
+
+
+- (void)displayError:(NSError*)error {
+    [Alerts error:self
+            title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+            error:error];
+}
+
+- (IBAction)onCancel:(id)sender {
+    [self dismiss];
+}
+
+- (void)dismiss {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

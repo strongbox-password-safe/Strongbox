@@ -45,6 +45,7 @@
 #import "UITableView+EmptyDataSet.h"
 #import "ItemPropertiesViewController.h"
 #import "KeyFileHelper.h"
+#import "SyncManager.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -139,6 +140,11 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                            selector:@selector(onClosed)
                                                name:kMasterDetailViewCloseNotification
                                              object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf
+                                           selector:@selector(onDatabaseReloaded:)
+                                               name:kDatabaseReloadedNotificationKey
+                                             object:nil];
 }
 
 - (void)unListenToNotifications {
@@ -152,6 +158,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [NSNotificationCenter.defaultCenter removeObserver:self name:kNotificationNameItemDetailsEditDone object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditCompletedNotificationKey object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kMasterDetailViewCloseNotification object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseReloadedNotificationKey object:nil];
 }
 
 
@@ -205,7 +212,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         [self addSearchBarToNav];
     }
     
-    if(self.currentGroup == self.viewModel.database.effectiveRootGroup) {
+    if([self isDisplayingRootGroup]) {
         
         
         
@@ -264,15 +271,19 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (BOOL)isDisplayingRootGroup {
-    return self.currentGroup == self.viewModel.database.effectiveRootGroup;
+    return [self.currentGroupId isEqual:self.viewModel.database.effectiveRootGroup.uuid];
 }
 
 - (void)refreshiOS14MoreMenu {
     if (@available(iOS 14.0, *)) {
         NSMutableArray<UIMenuElement*>* ma0 = [NSMutableArray array];
         __weak BrowseSafeView* weakSelf = self;
+        Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+
+        if ( currentGroup.childRecordsAllowed ) {
+            [ma0 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_new_entry", @"New Entry") systemImage:@"doc.badge.plus" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf onAddEntry]; }]];
+        }
         
-        [ma0 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_new_entry", @"New Entry") systemImage:@"doc.badge.plus" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf onAddEntry]; }]];
         [ma0 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_new_group", @"New Group") systemImage:@"folder.badge.plus" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf onAddGroup]; }]];
         [ma0 addObject:[self getContextualMenuItem:NSLocalizedString(@"generic_select", @"Select") systemImage:@"checkmark.circle" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf setEditing:YES animated:YES]; }]];
         
@@ -582,10 +593,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
     self.navigationItem.leftItemsSupplementBackButton = YES;
 
-    self.navigationItem.title = [NSString stringWithFormat:@"%@%@",
-                                 (self.currentGroup.parent == nil) ?
-                                 self.viewModel.metadata.nickName : self.currentGroup.title,
-                                 self.viewModel.isReadOnly ? NSLocalizedString(@"browse_vc_read_only_suffix", @" (Read Only)") : @""];
+    Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+    NSString* title = (currentGroup == nil || currentGroup.parent == nil) ? self.viewModel.metadata.nickName : currentGroup.title;
+    
+    NSString*suffix = self.viewModel.isInOfflineMode ? NSLocalizedString(@"browse_vc_offline_suffix", @" (Offline)") : (self.viewModel.isReadOnly ? NSLocalizedString(@"browse_vc_read_only_suffix", @" (Read Only)") : @"" );
+
+    self.navigationItem.title = [NSString stringWithFormat:@"%@%@", title, suffix];
     
     if (@available(iOS 11.0, *)) {
         self.navigationController.navigationBar.prefersLargeTitles = NO;
@@ -663,7 +676,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                 NSUInteger src = moveOp[0].unsignedIntegerValue;
                 NSUInteger dest = moveOp[1].unsignedIntegerValue;
 
-                BOOL s = [self.viewModel.database reorderChildFrom:src to:dest parentGroup:self.currentGroup];
+                Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+                BOOL s = [self.viewModel.database reorderChildFrom:src to:dest parentGroup:currentGroup];
                 if (s) {
                     NSLog(@"Reordering: %lu -> %lu Successful", (unsigned long)src, (unsigned long)dest);
                 }
@@ -708,7 +722,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         
         
         
-        self.navigationItem.hidesSearchBarWhenScrolling = self.currentGroup != self.viewModel.database.effectiveRootGroup;
+        self.navigationItem.hidesSearchBarWhenScrolling = ![self isDisplayingRootGroup];
     } else {
         self.tableView.tableHeaderView = self.searchController.searchBar;
         [self.searchController.searchBar sizeToFit];
@@ -726,7 +740,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         else {
             
 
-            if ((!self.currentGroup || self.currentGroup.parent == nil)) {
+            Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+            if ((!currentGroup || currentGroup.parent == nil)) {
                 [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_tip_fast_tap_title", @"Fast Tap Actions")
                                            message:NSLocalizedString(@"browse_vc_tip_fast_tap_message", @"You can long press, or double/triple tap to quickly copy fields... Give it a try!")
                                           duration:2.5f
@@ -772,6 +787,18 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.tableView.tableFooterView = [UIView new];
     
     self.clearsSelectionOnViewWillAppear = YES;
+    
+    
+    
+    UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
+
+    if (@available(iOS 10.0, *)) {
+        self.tableView.refreshControl = refreshControl;
+    }
+    else {
+        [self.tableView addSubview:refreshControl];
+    }
 }
 
 - (CGFloat)cellHeight {
@@ -823,6 +850,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
 - (IBAction)onSortItems:(id)sender {
     if(self.isEditing) {
+        Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+        
         [Alerts yesNo:self
                 title:NSLocalizedString(@"browse_vc_sort_by_title", @"Sort Items By Title?")
               message:NSLocalizedString(@"browse_vc_sort_by_title_message", @"Do you want to sort all the items in this folder by Title? This will set the order in which they are stored in your database.")
@@ -830,7 +859,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
             if(response) {
                 self.reorderItemOperations = nil; 
                 self.sortOrderForAutomaticSortDuringEditing = !self.sortOrderForAutomaticSortDuringEditing;
-                [self.currentGroup sortChildren:self.sortOrderForAutomaticSortDuringEditing];
+                [currentGroup sortChildren:self.sortOrderForAutomaticSortDuringEditing];
                 [self saveChangesToSafeAndRefreshView];
             }
         }];
@@ -1005,7 +1034,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (UIContextualAction*)getPinAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
     Node *item = [self getNodeFromIndexPath:indexPath];
     
-    BOOL pinned = [self.viewModel isPinned:item];
+    BOOL pinned = [self.viewModel isPinned:item.uuid];
     
     UIContextualAction *pinAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal
                                                                                title:pinned ?
@@ -1238,7 +1267,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }];
 
     UITableViewRowAction *pinAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                         title:[self.viewModel isPinned:item] ?
+                                                                         title:[self.viewModel isPinned:item.uuid] ?
                                        NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") :
                                        NSLocalizedString(@"browse_vc_action_pin", @"Pin")
                                                                                  handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
@@ -1260,11 +1289,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)showAuditDrillDown:(Node*)item {
-    [self performSegueWithIdentifier:@"segueToAuditDrillDown" sender:item];
+    [self performSegueWithIdentifier:@"segueToAuditDrillDown" sender:item.uuid];
 }
 
 - (void)togglePinEntry:(Node*)item {
-    [self.viewModel togglePin:item];
+    [self.viewModel togglePin:item.uuid];
     [self refreshItems];
 }
 
@@ -1279,9 +1308,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
            action:^(BOOL response) {
         if(response) {
             Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
-            
             [item touch:NO touchParents:YES];
-
             [self.viewModel addItem:item.parent item:dupe];
 
             [self saveChangesToSafeAndRefreshView];
@@ -1306,6 +1333,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 
+- (void)onDatabaseReloaded:(id)param {
+    if ( !self.isEditing ) {
+        NSLog(@"XXXXXX - Received Database Reloaded Notification from Model");
+        [self refreshItems];
+    }
+}
+
 - (void)updateSearchResultsForSearchController:(UISearchController *)searchController {
     if (!searchController.searchBar.text.length) {
         [self.quickViewsDataSource refresh]; 
@@ -1325,7 +1359,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         [self updateSearchResultsForSearchController:self.searchController];
     }
     else {
-        [self.configuredDataSource refreshItems:self.currentGroup];
+        [self.configuredDataSource refreshItems:self.currentGroupId];
         [self.tableView reloadData];
         
         self.editButtonItem.enabled = !self.viewModel.isReadOnly;
@@ -1408,7 +1442,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         if (item) {
             if(item.isGroup) {
-                [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+                [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item.uuid];
             }
             else {
                 [self performTapAction:item action:self.viewModel.metadata.tapAction];
@@ -1425,7 +1459,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)openDetails:(Node*)item {
     if (item) {
         if(item.isGroup) {
-            [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+            [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item.uuid];
         }
         else {
             [self openEntryDetails:item];
@@ -1486,10 +1520,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToRecord"]) {
+        Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+
         Node *record = (Node *)sender;
         RecordView *vc = segue.destinationViewController;
         vc.record = record;
-        vc.parentGroup = self.currentGroup;
+        vc.parentGroup = currentGroup;
         vc.viewModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToItemDetails"]) {
@@ -1501,8 +1537,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.createNewItem = record == nil;
         vc.editImmediately = editImmediately.boolValue;
         
-        vc.item = record;
-        vc.parentGroup = self.currentGroup;
+        vc.itemId = record.uuid;
+        vc.parentGroupId = self.currentGroupId;
         vc.readOnly = self.viewModel.isReadOnly;
         vc.databaseModel = self.viewModel;
     }
@@ -1513,7 +1549,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         __weak BrowseSafeView* weakSelf = self;
         
         vc.model = self.viewModel;
-        vc.item = sender;
+        vc.itemId = sender;
         vc.onDone =  ^(BOOL showAllAuditIssues) {
             NSLog(@"onDone: [%hhd]", showAllAuditIssues);
             
@@ -1536,14 +1572,14 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.createNewItem = record == nil;
         vc.editImmediately = editImmediately.boolValue;
         
-        vc.item = record;
-        vc.parentGroup = self.currentGroup;
+        vc.itemId = record ? record.uuid : nil;
+        vc.parentGroupId = self.currentGroupId;
         vc.readOnly = self.viewModel.isReadOnly;
         vc.databaseModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"sequeToSubgroup"]){
         BrowseSafeView *vc = segue.destinationViewController;
-        vc.currentGroup = (Node *)sender;
+        vc.currentGroupId = (NSUUID *)sender;
         vc.viewModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToSelectDestination"]) {
@@ -1555,8 +1591,8 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.currentGroup = self.viewModel.database.effectiveRootGroup;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
-        vc.onDone = ^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nonnull error) {
-            [self onUpdateDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged error:error];
+        vc.onDone = ^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nonnull error) {
+            [self onUpdateDone:userCancelled localWasChanged:localWasChanged error:error];
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToPreferencesAndManagement"]) {
@@ -1674,35 +1710,36 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             return;
         }
         
-        newCkf.keyFileDigest = keyFileDigest;
+        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:keyFileDigest];
     }
 
     
     
     if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
-        newCkf.yubiKeyCR = ^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:newCkf.keyFileDigest yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
             [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
-        };
+        }];
     }
 
     CompositeKeyFactors *rollbackCkf = [self.viewModel.database.ckfs clone];
-    self.viewModel.database.ckfs.password = newCkf.password;
-    self.viewModel.database.ckfs.keyFileDigest = newCkf.keyFileDigest;
-    self.viewModel.database.ckfs.yubiKeyCR = newCkf.yubiKeyCR;
+    self.viewModel.database.ckfs = newCkf;
+    
+    
     
     [self.viewModel update:self
-                   handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
-        if (userCancelled || error || conflictAndLocalWasChanged) {
+                   handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+        if (userCancelled || error) {
             
-            self.viewModel.database.ckfs.password = rollbackCkf.password;
-            self.viewModel.database.ckfs.keyFileDigest = rollbackCkf.keyFileDigest;
-            self.viewModel.database.ckfs.yubiKeyCR = rollbackCkf.yubiKeyCR;
+            self.viewModel.database.ckfs = rollbackCkf;
         
             if (error) {
                 [Alerts error:self
                         title:NSLocalizedString(@"db_management_couldnt_change_credentials", @"Could not change credentials")
                         error:error];
             }
+        }
+        else if ( localWasChanged ) {
+            
         }
         else {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -1763,14 +1800,16 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)onAddGroup {
     __weak BrowseSafeView* weakSelf = self;
-    
+
+    Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+
     [Alerts OkCancelWithTextField:self
              textFieldPlaceHolder:NSLocalizedString(@"browse_vc_group_name", @"Group Name")
                             title:NSLocalizedString(@"browse_vc_enter_group_name", @"Enter Group Name")
                           message:NSLocalizedString(@"browse_vc_enter_group_name_message", @"Please Enter the New Group Name:")
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
-                               if ([weakSelf.viewModel addNewGroup:weakSelf.currentGroup title:text] != nil) {
+                               if ([weakSelf.viewModel addNewGroup:currentGroup title:text] != nil) {
                                    [weakSelf saveChangesToSafeAndRefreshView];
                                }
                                else {
@@ -1790,7 +1829,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     NSString* locEntry = NSLocalizedString(@"browse_add_entry_button_title", @"Add Entry...");
     NSString* locGroup = NSLocalizedString(@"browse_add_group_button_title", @"Add Group...");
 
-    NSArray* options = self.currentGroup.childRecordsAllowed ? @[locGroup, locEntry] : @[locGroup];
+    Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+
+    NSArray* options = currentGroup.childRecordsAllowed ? @[locGroup, locEntry] : @[locGroup];
 
     [Alerts actionSheet:self
               barButton:self.buttonAddRecord
@@ -1902,7 +1943,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)onDeleteSingleItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
     Node *item = [self getNodeFromIndexPath:indexPath];
-    BOOL willRecycle = [self.viewModel canRecycle:item];
+    BOOL willRecycle = [self.viewModel canRecycle:item.uuid];
 
     [Alerts yesNo:self.searchController.isActive ? self.searchController : self
             title:NSLocalizedString(@"browse_vc_are_you_sure", @"Are you sure?")
@@ -1939,7 +1980,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     NSArray<Node *> *items = [self getSelectedItems:selected];
     
     NSDictionary* grouped = [items groupBy:^id _Nonnull(Node * _Nonnull obj) {
-        BOOL delete = [self.viewModel canRecycle:obj];
+        BOOL delete = [self.viewModel canRecycle:obj.uuid];
         return @(delete);
     }];
 
@@ -2037,24 +2078,25 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     [self refreshItems];
     
     [self.viewModel update:self
-                   handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
-        [self onUpdateDone:userCancelled conflictAndLocalWasChanged:conflictAndLocalWasChanged error:error];
+                   handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+        [self onUpdateDone:userCancelled localWasChanged:localWasChanged error:error];
     }];
 }
 
-- (void)onUpdateDone:(BOOL)userCancelled conflictAndLocalWasChanged:(BOOL)conflictAndLocalWasChanged error:(NSError*)error {
+- (void)onUpdateDone:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*)error {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         if (userCancelled) {
             [self dismissViewControllerAnimated:YES completion:nil]; 
         }
-        else if (conflictAndLocalWasChanged) {
-            [Alerts info:self
-                   title:NSLocalizedString(@"db_management_reopen_required_title", @"Re-Open Required")
-                 message:NSLocalizedString(@"db_management_reopen_required_message", @"You must close and reopen this database for changes to take effect.")
-              completion:^{
-                [self dismissViewControllerAnimated:YES completion:nil]; 
-            }];
-        }
+
+            
+
+
+
+
+
+
+
         else if (error) {
             [Alerts error:self
                     title:NSLocalizedString(@"browse_vc_error_saving", @"Error Saving")
@@ -2068,8 +2110,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                 [self setEditing:NO animated:YES];
             }
             
+            NSLog(@"XXXXXX - onUpdateDone");
+
             [self refreshItems];
-            
             [self updateSplitViewDetailsView:nil editMode:NO];
         }
     });
@@ -2090,7 +2133,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 
     if(item.isGroup) {
-        [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item];
+        [self performSegueWithIdentifier:@"sequeToSubgroup" sender:item.uuid];
     }
     else {
         NSLog(@"Single Tap on %@", item.title);
@@ -2544,12 +2587,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     
     if(!self.viewModel.isReadOnly) {
         
-
-
-
-
-  
-        
     
         [ma addObject:[self getContextualMenuMoveAction:indexPath item:item]];
 
@@ -2560,7 +2597,15 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         }
     
         
+        
+        if (item.isGroup) {
+            
+            if ( self.viewModel.database.originalFormat != kPasswordSafe ) {
+                [ma addObject:[self getContextualMenuSetIconAction:indexPath item:item]];
+            }
 
+            [ma addObject:[self getContextualMenuRenameAction:indexPath item:item]];
+        }
         
         
         
@@ -2576,8 +2621,22 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - (UIAction*)getContextualMenuTogglePinAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
-    BOOL pinned = [self.viewModel isPinned:item];
+    BOOL pinned = [self.viewModel isPinned:item.uuid];
     NSString* title = pinned ? NSLocalizedString(@"browse_vc_action_unpin", @"Unpin") : NSLocalizedString(@"browse_vc_action_pin", @"Pin");
 
     __weak BrowseSafeView* weakSelf = self;
@@ -2802,6 +2861,98 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                 [UIApplication.sharedApplication openURL:url];
             }
         });
+    }
+}
+
+
+
+- (void)onManualPulldownRefresh {
+    NSLog(@"Browse: onManualPulldownRefresh. Syncing.");
+    
+    __weak BrowseSafeView* weakSelf = self;
+    
+    if ( self.viewModel.isInOfflineMode ) {
+        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_title", @"Offline Mode")
+                                   message:NSLocalizedString(@"browse_vc_pulldown_refresh_offline_message", @"Database Not Refreshed")
+                                  duration:1.5f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeInfo
+                             alertPosition:ISAlertPositionTop
+                                   didHide:^(BOOL finished) {
+            [weakSelf.tableView.refreshControl endRefreshing];
+        }];
+
+        return;
+    }
+    
+    [SyncManager.sharedInstance sync:self.viewModel.metadata
+                       interactiveVC:self
+                                 key:self.viewModel.database.ckfs
+                                join:NO
+                          completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (result == kSyncAndMergeSuccess) {
+                [weakSelf onManualPulldownSyncSuccess:localWasChanged];
+            }
+            else {
+                [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_pulldown_refresh_error_title", @"Error Refreshing")
+                                           message:NSLocalizedString(@"browse_vc_pulldown_refresh_error_message", @"See Sync Log")
+                                          duration:1.5f
+                                       hideOnSwipe:YES
+                                         hideOnTap:YES
+                                         alertType:ISAlertTypeWarning
+                                     alertPosition:ISAlertPositionTop
+                                           didHide:nil];
+                
+                [weakSelf.tableView.refreshControl endRefreshing];
+            }
+        });
+    }];
+}
+
+- (void)onManualPulldownSyncSuccess:(BOOL)localWasChanged {
+    NSLog(@"Sync done... Success reloading model from local");
+    
+    __weak BrowseSafeView* weakSelf = self;
+    if (localWasChanged) {
+        [self.viewModel reloadDatabaseFromLocalWorkingCopy:self completion:^(BOOL success) {
+            [weakSelf.tableView.refreshControl endRefreshing];
+
+            if (success) {
+                [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_pulldown_refresh_updated_title", @"Database Refreshed")
+                                           message:nil 
+                                          duration:1.5f
+                                       hideOnSwipe:YES
+                                         hideOnTap:YES
+                                         alertType:ISAlertTypeSuccess
+                                     alertPosition:ISAlertPositionTop
+                                           didHide:nil];
+            }
+            else {
+                [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_pulldown_refresh_error_title", @"Error Refreshing")
+                                           message:NSLocalizedString(@"browse_vc_pulldown_refresh_error_message", @"See Sync Log")
+                                          duration:1.5f
+                                       hideOnSwipe:YES
+                                         hideOnTap:YES
+                                         alertType:ISAlertTypeWarning
+                                     alertPosition:ISAlertPositionTop
+                                           didHide:nil];
+            }
+        }];
+    }
+    else {
+        [weakSelf.tableView.refreshControl endRefreshing];
+
+        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"browse_vc_pulldown_refresh_no_changes_title", @"Database Refreshed - No Changes")
+                                   message:nil 
+                                  duration:1.5f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeInfo
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
+
     }
 }
 

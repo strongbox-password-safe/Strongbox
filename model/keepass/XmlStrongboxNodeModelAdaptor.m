@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 16/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "XmlStrongboxNodeModelAdaptor.h"
@@ -71,7 +71,7 @@
     Node* rootNode = [[Node alloc] initAsRoot:nil];
     
     if(existingXmlRoot) {
-        if(![self buildGroup:existingXmlRoot parentNode:rootNode attachmentsPool:attachmentsPool customIconPool:customIconPool]) {
+        if(![self buildGroup:existingXmlRoot parentNode:rootNode attachmentsPool:attachmentsPool customIconPool:customIconPool usedIds:NSMutableSet.set]) {
             if(error) {
                 *error = [Utils createNSError:@"Problem building Strongbox Node model from KeePass Xml" errorCode:-1];
             }
@@ -254,8 +254,19 @@
     return ret;
 }
 
-- (BOOL)buildGroup:(KeePassGroup*)group parentNode:(Node*)parentNode attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool {
-    Node* groupNode = [[Node alloc] initAsGroup:group.name parent:parentNode keePassGroupTitleRules:YES uuid:group.uuid];
+- (BOOL)buildGroup:(KeePassGroup*)group
+        parentNode:(Node*)parentNode
+   attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
+    customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool
+           usedIds:(NSMutableSet<NSUUID*>*)usedIds {
+    BOOL alreadyUsedId = [usedIds containsObject:group.uuid];
+    if ( alreadyUsedId ) {
+        NSLog(@"WARNWARN: %@", group.uuid);
+    }
+    NSUUID* nodeId = ( alreadyUsedId || group.uuid == nil ) ? NSUUID.UUID : group.uuid; 
+    [usedIds addObject:nodeId];
+    
+    Node* groupNode = [[Node alloc] initAsGroup:group.name parent:parentNode keePassGroupTitleRules:YES uuid:nodeId];
     
     [groupNode.fields setTouchPropertiesWithCreated:group.times.creationTime
                                            accessed:group.times.lastAccessTime
@@ -290,13 +301,13 @@
     
     for (id<KeePassGroupOrEntry> child in group.groupsAndEntries) {
         if (child.isGroup) {
-            if(![self buildGroup:(KeePassGroup*)child parentNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool]) {
+            if(![self buildGroup:(KeePassGroup*)child parentNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool usedIds:usedIds]) {
                 NSLog(@"Error Builing Child Group: [%@]", child);
                 return NO;
             }
         }
         else {
-            Node * entryNode = [self nodeFromEntry:(Entry*)child groupNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool]; 
+            Node * entryNode = [self nodeFromEntry:(Entry*)child groupNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool usedIds:usedIds historical:NO]; 
             
             if( entryNode == nil ) {
                 NSLog(@"Error building node from Entry: [%@]", child);
@@ -314,7 +325,12 @@
     return YES;
 }
 
-- (Node*)nodeFromEntry:(Entry *)childEntry groupNode:(Node*)groupNode attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool {
+- (Node*)nodeFromEntry:(Entry *)childEntry
+             groupNode:(Node*)groupNode
+       attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
+        customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool
+               usedIds:(NSMutableSet<NSUUID*>*)usedIds
+            historical:(BOOL)historical {
     NodeFields *fields = [[NodeFields alloc] initWithUsername:childEntry.username
                                                           url:childEntry.url
                                                      password:childEntry.password
@@ -379,10 +395,18 @@
     }
     
     
+    
+    BOOL alreadyUsedId = [usedIds containsObject:childEntry.uuid];
+    if ( alreadyUsedId && !historical ) {
+        NSLog(@"WARNWARN: Duplicated ID: %@", childEntry.uuid);
+    }
+    NSUUID* nodeId = ((alreadyUsedId && !historical) || childEntry.uuid == nil) ? NSUUID.UUID : childEntry.uuid; 
+    [usedIds addObject:nodeId];
+    
     Node* entryNode = [[Node alloc] initAsRecord:childEntry.title
                                           parent:groupNode
                                           fields:fields
-                                            uuid:childEntry.uuid]; 
+                                            uuid:nodeId];
     
     if (childEntry.customIcon) {
         NSData* data = customIconPool[childEntry.customIcon];
@@ -399,12 +423,10 @@
     
     if(childEntry.history && childEntry.history.entries) {
         for (Entry* historicalEntry in childEntry.history.entries) {
-            Node* historicalEntryNode = [self nodeFromEntry:historicalEntry groupNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool];
+            Node* historicalEntryNode = [self nodeFromEntry:historicalEntry groupNode:groupNode attachmentsPool:attachmentsPool customIconPool:customIconPool usedIds:usedIds historical:YES];
             [fields.keePassHistory addObject:historicalEntryNode];
         }
     }
-    
-    
     
     entryNode.linkedData = childEntry.unmanagedChildren;
     

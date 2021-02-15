@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 08/09/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SelectStorageProviderController.h"
@@ -130,7 +130,7 @@
     }
     else {
         id<SafeStorageProvider> provider = [_providers objectAtIndex:indexPath.row];
-        
+
         if (provider.storageId == kFilesAppUrlBookmark) {
             if (self.existing) {
                 [self onAddThroughFilesApp];
@@ -233,6 +233,19 @@
 }
 
 - (void)segueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
+    if ( provider.privacyOptInRequired ) {
+        [Alerts checkThirdPartyLibOptInOK:self completion:^(BOOL optInOK) {
+            if (optInOK) {
+                [self continueSegueToBrowserOrAdd:provider];
+            }
+        }];
+    }
+    else {
+        [self continueSegueToBrowserOrAdd:provider];
+    }
+}
+
+- (void)continueSegueToBrowserOrAdd:(id<SafeStorageProvider>)provider {
     BOOL storageBrowseRequired = (self.existing && provider.browsableExisting) || (!self.existing && provider.browsableNew);
 
     if (storageBrowseRequired) {

@@ -35,7 +35,7 @@
         _browsableNew = NO;
         _browsableExisting = YES;
         _rootFolderOnly = YES;
-        _immediatelyOfferCacheIfOffline = NO;
+        _defaultForImmediatelyOfferOfflineCache = NO;
         _supportsConcurrentRequests = YES;
         
         return self;

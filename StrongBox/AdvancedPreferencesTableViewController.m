@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 27/05/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "AdvancedPreferencesTableViewController.h"
@@ -38,6 +38,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
+@property (weak, nonatomic) IBOutlet UISwitch *switchCompleteFileProtection;
 
 @end
 
@@ -78,6 +79,13 @@
     [self bindPreferences];
 }
 
+- (IBAction)onFileProtectionChanged:(id)sender {
+    Settings.sharedInstance.fullFileProtection = self.switchCompleteFileProtection.on;
+    [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
+
+    [self bindPreferences];
+}
+
 - (IBAction)onPreferencesChanged:(id)sender {
     NSLog(@"Advanced Preference Changed: [%@]", sender);
 
@@ -93,7 +101,7 @@
     Settings.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
     Settings.sharedInstance.allowThirdPartyKeyboards = self.switchAllowThirdPartyKeyboards.on;
 
-    SharedAppAndAutoFillSettings.sharedInstance.legacyShowMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
+    SharedAppAndAutoFillSettings.sharedInstance.showMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
     
     if(SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
@@ -121,7 +129,9 @@
     self.switchHideExportOnDatabaseMenu.on = Settings.sharedInstance.hideExportFromDatabaseContextMenu;
     self.switchAllowThirdPartyKeyboards.on = Settings.sharedInstance.allowThirdPartyKeyboards;
     
-    self.switchShowMetadataOnDetailsScreen.on = SharedAppAndAutoFillSettings.sharedInstance.legacyShowMetadataOnDetailsScreen;
+    self.switchShowMetadataOnDetailsScreen.on = SharedAppAndAutoFillSettings.sharedInstance.showMetadataOnDetailsScreen;
+
+    self.switchCompleteFileProtection.on = Settings.sharedInstance.fullFileProtection;
 }
 
 - (void)bindAllowPinCodeOpen {

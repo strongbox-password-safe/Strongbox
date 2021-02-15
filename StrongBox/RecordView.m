@@ -3,7 +3,7 @@
 //  StrongBox
 //
 //  Created by Mark on 31/05/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "RecordView.h"
@@ -1193,8 +1193,8 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (void)sync:(void (^)(BOOL userCancelled, NSError * error))completion {
-    [self.viewModel update:self handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
-        if (conflictAndLocalWasChanged) {
+    [self.viewModel update:self handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+        if (localWasChanged) {
             error = [Utils createNSError:@"The underlying local database has changed and so a re-open is now required." errorCode:-1]; 
         }
         

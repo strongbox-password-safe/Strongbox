@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Strongbox on 13/06/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -64,7 +64,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL autoFillDidChangeDatabases;
 @property BOOL mainAppDidChangeDatabases;
 
-@property BOOL legacyShowMetadataOnDetailsScreen;
+@property BOOL showMetadataOnDetailsScreen;
+@property BOOL userHasOptedInToThirdPartyStorageLibraries;
 
 @end
 

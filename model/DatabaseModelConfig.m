@@ -3,7 +3,7 @@
 //  MacBox
 //
 //  Created by Strongbox on 15/06/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseModelConfig.h"

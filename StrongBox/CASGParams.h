@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 01/06/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -21,7 +21,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSData* oneTimeKeyFileData;
 @property DatabaseFormat format;
 @property BOOL readOnly;
-@property BOOL openLocalOnly;
 
 @end
 

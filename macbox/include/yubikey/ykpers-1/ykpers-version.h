@@ -42,7 +42,7 @@ extern "C" {
  * version number.  Used together with ykpers_check_version() to verify
  * header file and run-time library consistency.
  */
-#define YKPERS_VERSION_STRING "1.20.0"
+#define YKPERS_VERSION_STRING "1.20.1"
 
 /**
  * YKPERS_VERSION_NUMBER
@@ -52,7 +52,7 @@ extern "C" {
  * this symbol will have the value 0x01020300.  The last two digits
  * are only used between public releases, and will otherwise be 00.
  */
-#define YKPERS_VERSION_NUMBER 0x011400
+#define YKPERS_VERSION_NUMBER 0x011401
 
 /**
  * YKPERS_VERSION_MAJOR
@@ -79,7 +79,7 @@ extern "C" {
  * level of the header file version number.  For example, when the
  * header version is 1.2.3 this symbol will be 3.
  */
-#define YKPERS_VERSION_PATCH 0
+#define YKPERS_VERSION_PATCH 1
 
 const char *ykpers_check_version (const char *req_version);
 

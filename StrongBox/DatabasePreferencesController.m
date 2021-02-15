@@ -3,7 +3,7 @@
 //  Strongbox-iOS
 //
 //  Created by Mark on 21/03/2020.
-//  Copyright © 2020 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabasePreferencesController.h"
@@ -31,9 +31,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
 
-
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowAutoFillCache;
-@property (weak, nonatomic) IBOutlet UISwitch *switchReadOnly;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFill;
+@property (weak, nonatomic) IBOutlet UISwitch *switchQuickTypeAutoFill;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBiometric;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewBiometric;
@@ -45,9 +44,10 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewPreferences;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStats;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStats;
-
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAudit;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellQuickTypeFormat;
+@property (weak, nonatomic) IBOutlet UILabel *labelQuickTypeFormat;
 
 @end
 
@@ -64,15 +64,6 @@
     self.imageViewAudit.image = [UIImage imageNamed:@"security_checked"];
     
     [self bindUi];
-}
-
-- (IBAction)onReadOnlyChanged:(id)sender {
-    self.viewModel.metadata.readOnly = self.switchReadOnly.on;
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
-    
-    [Alerts info:self
-           title:NSLocalizedString(@"db_management_reopen_required_title", @"Re-Open Required")
-         message:NSLocalizedString(@"db_management_reopen_required_message", @"You must close and reopen this database for Read-Only changes to take effect.")];
 }
 
 - (IBAction)onSwitchBiometricUnlock:(id)sender {
@@ -144,46 +135,55 @@
     }
 }
 
-- (IBAction)onSwitchAllowAutoFillCache:(id)sender {
-    if (!self.switchAllowAutoFillCache.on) {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"db_management_disable_autofill_yesno_title", @"Disable AutoFill?")
-              message:NSLocalizedString(@"db_management_disable_autofill_yesno_message", @"Are you sure you want to do this?")
-               action:^(BOOL response) {
-                   if (response) {
-                       [self.viewModel disableAndClearAutoFill];
-                       [self bindUi];
+- (IBAction)onSwitchQuickTypeAutoFill:(id)sender {
+    if ( !self.switchQuickTypeAutoFill.on ) {
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    }
+    else {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                           databaseUuid:self.viewModel.metadata.uuid
+                                                          displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+    }
+    
+    self.viewModel.metadata.quickTypeEnabled = self.switchQuickTypeAutoFill.on;
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
+
+    [self bindUi];
+}
+
+- (IBAction)onSwitchAutoFill:(id)sender {
+    if (!self.switchAutoFill.on) {
+       [self.viewModel disableAndClearAutoFill];
+       [self bindUi];
                        
-                       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_done", @"AutoFill Disabled")
-                                                  message:nil
-                                                 duration:3.f
-                                              hideOnSwipe:YES
-                                                hideOnTap:YES
-                                                alertType:ISAlertTypeSuccess
-                                            alertPosition:ISAlertPositionTop
-                                                  didHide:nil];
-                   }
-                   else {
-                      [self bindUi];
-                   }
-               }];
+       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_done", @"AutoFill Disabled")
+                                  message:nil
+                                 duration:3.f
+                              hideOnSwipe:YES
+                                hideOnTap:YES
+                                alertType:ISAlertTypeSuccess
+                            alertPosition:ISAlertPositionTop
+                                  didHide:nil];
     }
     else {
         [self.viewModel enableAutoFill];
         
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
-                                                           databaseUuid:self.viewModel.metadata.uuid];
+        if ( self.viewModel.metadata.quickTypeEnabled ) {
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                               databaseUuid:self.viewModel.metadata.uuid
+                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+        }
         
         [self bindUi];
 
-        [ISMessages                 showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_done", @"AutoFill Enabled")
-                                                   message:nil
-                                                  duration:3.f
-                                               hideOnSwipe:YES
-                                                 hideOnTap:YES
-                                                 alertType:ISAlertTypeSuccess
-                                             alertPosition:ISAlertPositionTop
-                                                   didHide:nil];
+        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_done", @"AutoFill Enabled")
+                                   message:nil
+                                  duration:3.f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeSuccess
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
     }
 }
 
@@ -207,8 +207,21 @@
     
     self.switchAllowBiometric.enabled = [self canToggleTouchId];
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
-    self.switchAllowAutoFillCache.on = self.viewModel.metadata.autoFillEnabled;
-    self.switchReadOnly.on = self.viewModel.metadata.readOnly;
+
+    
+    
+    self.switchAutoFill.on = self.viewModel.metadata.autoFillEnabled;
+    self.switchQuickTypeAutoFill.on = self.viewModel.metadata.autoFillEnabled && self.viewModel.metadata.quickTypeEnabled;
+    self.switchQuickTypeAutoFill.enabled = self.switchAutoFill.on;
+        
+    self.cellQuickTypeFormat.userInteractionEnabled = self.switchQuickTypeAutoFill.on;
+    self.labelQuickTypeFormat.text = quickTypeFormatString(self.viewModel.metadata.quickTypeDisplayFormat);
+
+    if (@available(iOS 13.0, *)) {
+        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.labelColor : UIColor.secondaryLabelColor;
+    } else {
+        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.blackColor : UIColor.lightGrayColor;
+    }
 }
 
 - (IBAction)onDone:(id)sender {
@@ -247,11 +260,44 @@
     if (cell == self.cellDatabaseAutoLockDelay) {
         [self promptForAutoLockTimeout];
     }
-    else if (cell == self.cellPinCodes) {
+    else if ( cell == self.cellPinCodes) {
         [self performSegueWithIdentifier:@"segueToPinsConfiguration" sender:nil];
+    }
+    else if ( cell == self.cellQuickTypeFormat ) {
+        [self promptForQuickTypeFormat];
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)promptForQuickTypeFormat {
+    NSArray<NSNumber*>* options = @[@(kQuickTypeFormatTitleThenUsername),
+                                    @(kQuickTypeFormatUsernameOnly),
+                                    @(kQuickTypeFormatTitleOnly)];
+    
+    NSArray<NSString*>* optionsStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return quickTypeFormatString(obj.integerValue);
+    }];
+    
+    NSInteger currentlySelected = [options indexOfObject:@(self.viewModel.metadata.quickTypeDisplayFormat)];
+    
+    [self promptForChoice:NSLocalizedString(@"prefs_vc_quick_type_format", @"QuickType Format")
+                  options:optionsStrings
+     currentlySelectIndex:currentlySelected
+               completion:^(BOOL success, NSInteger selectedIndex) {
+        if (success) {
+            NSNumber *numFormat = options[selectedIndex];
+            self.viewModel.metadata.quickTypeDisplayFormat = numFormat.integerValue;
+            [SafesList.sharedInstance update:self.viewModel.metadata];
+            
+            
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                               databaseUuid:self.viewModel.metadata.uuid
+                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+            
+            [self bindUi];
+        }
+    }];
 }
 
 - (void)promptForAutoLockTimeout {
@@ -296,27 +342,36 @@
        formatAsIntervals:(BOOL)formatAsIntervals
             currentValue:(NSInteger)currentValue
               completion:(void(^)(BOOL success, NSInteger selectedValue))completion {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
-    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
-    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
     
     NSArray<NSString*>* items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return formatAsIntervals ? [Utils formatTimeInterval:obj.integerValue] : obj.stringValue;
     }];
-    
+
+    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
+
+    [self promptForChoice:title options:items currentlySelectIndex:currentlySelectIndex completion:^(BOOL success, NSInteger selectedIndex) {
+        completion(success, success ? options[selectedIndex].integerValue : -1);
+    }];
+}
+
+- (void)promptForChoice:(NSString*)title
+                options:(NSArray<NSString*>*)items
+    currentlySelectIndex:(NSInteger)currentlySelectIndex
+              completion:(void(^)(BOOL success, NSInteger selectedIndex))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+
     vc.groupItems = @[items];
     
-    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
     vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
     vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
         NSIndexSet* set = selectedIndices.firstObject;
-        NSInteger selectedValue = options[set.firstIndex].integerValue;
         [self.navigationController popViewControllerAnimated:YES];
-        completion(YES, selectedValue);
+        completion(YES, set.firstIndex);
     };
     
     vc.title = title;
-    
     [self.navigationController pushViewController:vc animated:YES];
 }
 

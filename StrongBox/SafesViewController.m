@@ -16,7 +16,7 @@
 #import "VersionConflictController.h"
 #import "AppleICloudProvider.h"
 #import "SafeStorageProviderFactory.h"
-#import "OpenSafeSequenceHelper.h"
+#import "UnlockDatabaseSequenceHelper.h"
 #import "SelectDatabaseFormatTableViewController.h"
 #import "AddNewSafeHelper.h"
 #import "StrongboxUIDocument.h"
@@ -55,6 +55,10 @@
 #import "MergeInitialViewController.h"
 #import "Platform.h"
 #import "Serializator.h"
+#import "DatabaseMerger.h"
+#import "DatabasePropertiesVC.h"
+#import "SecretStore.h"
+#import "WorkingCopyManager.h"
 
 @interface SafesViewController ()
 
@@ -84,9 +88,17 @@
 
 @implementation SafesViewController
 
+- (void)preHeatSecureEnclave {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
+        NSLog(@"Pre-Heat Secret Store: [%hhd]", SecretStore.sharedInstance.secureEnclaveAvailable);
+    });
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    [self preHeatSecureEnclave]; 
+    
     if (@available(iOS 13.0, *)) { 
         [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
     }
@@ -123,7 +135,7 @@
             }
         }
     }
-
+    
     
     
     
@@ -203,6 +215,13 @@
         NSLog(@"New User is not pro or in a free trial... Prompt for free trial opt in");
 
         [self promptToOptInToFreeTrial];
+    }
+    
+    
+    
+    if ( Settings.sharedInstance.fullFileProtection ) {
+        NSLog(@"Enabling Full File Protection at App Startup..."); 
+        [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
     }
 }
 
@@ -921,56 +940,52 @@
         return;
     }
     
-    [self openSafeAtIndexPath:indexPath openLocalOnly:NO];
+    [self openAtIndexPath:indexPath openOffline:NO];
 }
 
-- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath openLocalOnly:(BOOL)openLocalOnly {
-    [self openSafeAtIndexPath:indexPath openLocalOnly:openLocalOnly manualUnlock:NO];
+- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline {
+    [self openAtIndexPath:indexPath openOffline:openOffline manualUnlock:NO];
 }
 
-- (void)openSafeAtIndexPath:(NSIndexPath*)indexPath openLocalOnly:(BOOL)openLocalOnly manualUnlock:(BOOL)manualUnlock {
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline manualUnlock:(BOOL)manualUnlock {
+    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
 
-    [self openDatabase:safe openLocalOnly:openLocalOnly noConvenienceUnlock:manualUnlock userJustCompletedBiometricAuthentication:NO];
+    [self openDatabase:database openOffline:openOffline noConvenienceUnlock:manualUnlock biometricPreCleared:NO];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)openDatabase:(SafeMetaData*)safe
-       openLocalOnly:(BOOL)openLocalOnly
-userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthentication {
-    [self openDatabase:safe openLocalOnly:openLocalOnly noConvenienceUnlock:NO userJustCompletedBiometricAuthentication:userJustCompletedBiometricAuthentication];
+         openOffline:(BOOL)openOffline
+ biometricPreCleared:(BOOL)biometricPreCleared {
+    [self openDatabase:safe openOffline:openOffline noConvenienceUnlock:NO  biometricPreCleared:biometricPreCleared];
 }
 
 - (void)openDatabase:(SafeMetaData*)safe
-       openLocalOnly:(BOOL)openLocalOnly
+         openOffline:(BOOL)openOffline
  noConvenienceUnlock:(BOOL)noConvenienceUnlock
-userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthentication {
+ biometricPreCleared:(BOOL)biometricPreCleared {
     NSLog(@"======================== OPEN DATABASE: %@ ============================", safe);
     
-    if(safe.hasUnresolvedConflicts) {
+    if(safe.hasUnresolvedConflicts) { 
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
     else {
-        [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                           safe:safe
-                                            canConvenienceEnrol:YES
-                                                 isAutoFillOpen:NO
-                                                  openLocalOnly:openLocalOnly
-                                    biometricAuthenticationDone:userJustCompletedBiometricAuthentication
-                                            noConvenienceUnlock:noConvenienceUnlock
-                                                allowOnboarding:YES
-                                                     completion:^(UnlockDatabaseResult result, Model * _Nullable model, const NSError * _Nullable error) {
+        UnlockDatabaseSequenceHelper* helper = [UnlockDatabaseSequenceHelper helperWithViewController:self database:safe isAutoFillOpen:NO openOffline:openOffline];
+
+        [helper beginUnlockSequence:NO
+                biometricPreCleared:biometricPreCleared
+                noConvenienceUnlock:noConvenienceUnlock
+                         completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
             if (result == kUnlockDatabaseResultSuccess) {
-                if (@available(iOS 11.0, *)) { 
-                    [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
-                }
-                else {
-                    [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
-                }
+                [self onboardOrShowUnlockedDatabase:model];
             }
             else if (result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
                 [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
+            }
+            else if (result == kUnlockDatabaseResultIncorrectCredentials) {
+                
+                NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
             }
             else if (result == kUnlockDatabaseResultError) {
                 [Alerts error:self
@@ -978,6 +993,44 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                         error:error];
             }
         }];
+    }
+}
+
+- (void)onboardOrShowUnlockedDatabase:(Model*)model {
+    BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
+    BOOL pinPossible = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens;
+
+    BOOL conveniencePossible = [SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial] && (biometricPossible || pinPossible);
+    BOOL convenienceNotYetPrompted = !model.metadata.hasBeenPromptedForConvenience;
+    
+    BOOL quickLaunchPossible = SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil;
+    BOOL quickLaunchNotYetPrompted = !model.metadata.hasBeenPromptedForQuickLaunch;
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    if (conveniencePossible && convenienceNotYetPrompted) {
+        [self promptForConvenienceEnrolAndOpen:biometricPossible pinPossible:pinPossible model:model];
+    }
+    else if (quickLaunchPossible && quickLaunchNotYetPrompted) {
+        [self promptForQuickLaunch:model];
+    }
+    else {
+        [self showUnlockedDatabase:model];
+    }
+}
+
+- (void)showUnlockedDatabase:(Model*)model {
+    if (@available(iOS 11.0, *)) { 
+        [self performSegueWithIdentifier:@"segueToMasterDetail" sender:model];
+    }
+    else {
+        [self performSegueWithIdentifier:@"segueToOpenSafeView" sender:model];
     }
 }
 
@@ -995,8 +1048,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                              options:kNilOptions
                             children:@[
             [self getContextualMenuDatabaseNonMutatatingActions:indexPath],
+            [self getContextualMenuDatabaseActions:indexPath],
             [self getContextualMenuDatabaseStateActions:indexPath],
-            [self getContextualMenuDatabaseActions:indexPath]
         ]];
     }];
 }
@@ -1014,7 +1067,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-- (UIAction*)getContextualViewSyncLogAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualViewSyncLogAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
     UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
@@ -1027,7 +1080,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-- (UIMenu*)getContextualMenuDatabaseNonMutatatingActions:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIMenu*)getContextualMenuDatabaseNonMutatatingActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
@@ -1035,19 +1088,13 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     BOOL conveniencePossible = safe.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
     if (conveniencePossible) [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
 
-    NSURL* localCopyUrl = [SyncManager.sharedInstance getLocalWorkingCache:safe];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe];
 
     BOOL localCopyAvailable = safe.storageProvider != kLocalDevice && localCopyUrl != nil;
-    if (localCopyAvailable) [ma addObject:[self getContextualMenuOpenLocalAction:indexPath]];
+    if (localCopyAvailable) [ma addObject:[self getContextualMenuOpenOfflineAction:indexPath]];
 
-    if ( [BackupsManager.sharedInstance getAvailableBackups:safe].count ) [ma addObject:[self getContextualViewBackupsAction:indexPath]];
-    
     BOOL shareAllowed = !Settings.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil;
     if (shareAllowed) [ma addObject:[self getContextualShareAction:indexPath]];
-
-    SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
-    BOOL syncLogAvailable = syncStatus.changeLog.firstObject != nil;
-    if (syncLogAvailable) [ma addObject:[self getContextualViewSyncLogAction:indexPath]];
 
     if (self.collection.count > 1) {
         [ma addObject:[self getContextualReOrderDatabasesAction:indexPath]];
@@ -1070,7 +1117,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-- (UIMenu*)getContextualMenuDatabaseStateActions:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIMenu*)getContextualMenuDatabaseStateActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
@@ -1079,8 +1126,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     if (makeVisible) [ma addObject:[self getContextualMenuMakeVisibleAction:indexPath]];
 
     [ma addObject:[self getContextualMenuQuickLaunchAction:indexPath]];
-    
     [ma addObject:[self getContextualMenuReadOnlyAction:indexPath]];
+    [ma addObject:[self getContextualMenuPropertiesAction:indexPath]];
 
     return [UIMenu menuWithTitle:@""
                            image:nil
@@ -1088,13 +1135,13 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                         children:ma];
 }
 
-- (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIMenu*)getContextualMenuDatabaseActions:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
     NSMutableArray<UIAction*>* ma = [NSMutableArray array];
     SafeMetaData *safe = self.collection[indexPath.row];
 
     [ma addObject:[self getContextualMenuRenameAction:indexPath]];
 
-    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe];
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe];
     if (url) {
         [ma addObject:[self getContextualMenuCreateLocalCopyAction:indexPath]];
     }
@@ -1112,7 +1159,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
                         children:ma];
 }
 
-- (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
+- (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"generic_export", @"Export")
                                     systemImage:@"square.and.arrow.up"
                                     destructive:NO
@@ -1123,7 +1170,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-- (UIAction*)getContextualMenuMakeVisibleAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuMakeVisibleAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     
     BOOL shared = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:safe];
@@ -1141,7 +1188,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-- (UIAction*)getContextualMenuQuickLaunchAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuQuickLaunchAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     BOOL isAlreadyQuickLaunch = [SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
     
@@ -1159,7 +1206,22 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-- (UIAction*)getContextualMenuReadOnlyAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuPropertiesAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    
+    NSString* title = NSLocalizedString(@"browse_vc_action_properties", @"Properties");
+    
+    UIAction* ret = [self getContextualMenuItem:title
+                                 image:[UIImage systemImageNamed:@"list.bullet"]
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self showDatabaseProperties:safe];
+    }];
+       
+    return ret;
+}
+
+- (UIAction*)getContextualMenuReadOnlyAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     
     NSString* title = NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read Only");
@@ -1176,7 +1238,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     return ret;
 }
 
-- (UIAction*)getContextualMenuUnlockManualAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuUnlockManualAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_unlock_manual_action", @"Open ths database manually bypassing any convenience unlock")
                            systemImage:@"lock.open"
                            destructive:NO
@@ -1185,12 +1247,12 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     }];
 }
 
-- (UIAction*)getContextualMenuOpenLocalAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+- (UIAction*)getContextualMenuOpenOfflineAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
-                           systemImage:@"house"
+                           systemImage:@"bolt.horizontal.circle"
                            destructive:NO
                                handler:^(__kindof UIAction * _Nonnull action) {
-        [self openLocalOnly:indexPath];
+        [self openOffline:indexPath];
     }];
 }
 
@@ -1282,7 +1344,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];
     
-    NSURL* localCopyUrl = [SyncManager.sharedInstance getLocalWorkingCache:database];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
     if (!localCopyUrl) {
         [Alerts error:self error:[Utils createNSError:@"Could not get local copy" errorCode:-2145]];
         return;
@@ -1330,10 +1392,13 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [self removeSafe:indexPath];
     }];
 
+    
+    
+    
     UITableViewRowAction *offlineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                              title:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
                                                                            handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self openLocalOnly:indexPath];
+        [self openOffline:indexPath];
     }];
     offlineAction.backgroundColor = [UIColor darkGrayColor];
 
@@ -1347,8 +1412,8 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     moreActions.backgroundColor = [UIColor systemBlueColor];
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    BOOL offlineOption = safe.storageProvider != kLocalDevice && [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:nil];
-
+    BOOL offlineOption = safe.storageProvider != kLocalDevice && [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:nil];
+    
     return offlineOption ? @[removeAction, offlineAction, moreActions] : @[removeAction, moreActions];
 }
 
@@ -1358,7 +1423,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"safes_vc_database_actions_sheet_title", @"Title of the 'More Actions' alert/action sheet")
                                                                              message:nil
                                                                       preferredStyle:UIAlertControllerStyleAlert];
-
+    
     
     
     UIAlertAction *renameAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_rename_database", @"Button to Rename the Database")
@@ -1409,31 +1474,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     
     
     
-    if ( [BackupsManager.sharedInstance getAvailableBackups:safe].count ) {
-        UIAlertAction *viewBackupsOption = [UIAlertAction actionWithTitle:
-                NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
-                                                                style:UIAlertActionStyleDefault
-                                                              handler:^(UIAlertAction *a) {
-                [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
-            }];
-        
-        [alertController addAction:viewBackupsOption];
-    }
-    
-    
-    
-    if ( [SyncManager.sharedInstance getSyncStatus:safe].changeLog.count ) {
-        UIAlertAction *viewSyncStatus = [UIAlertAction actionWithTitle:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
-                                                                 style:UIAlertActionStyleDefault
-                                                               handler:^(UIAlertAction *a) {
-            [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
-        }];
-        [alertController addAction:viewSyncStatus];
-    }
-    
-    
-    
-    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe];
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe];
     if (url) {
         UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy")
                                                                  style:UIAlertActionStyleDefault
@@ -1443,6 +1484,15 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         [alertController addAction:action];
     }
     
+    
+    
+    UIAlertAction *action = [UIAlertAction actionWithTitle:NSLocalizedString(@"browse_vc_action_properties", @"Properties")
+                                                     style:UIAlertActionStyleDefault
+                                                   handler:^(UIAlertAction *a) {
+        [self showDatabaseProperties:safe];
+    }];
+    [alertController addAction:action];
+        
     
     
     UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel Button")
@@ -1505,11 +1555,11 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)manualUnlock:(NSIndexPath*)indexPath {
-    [self openSafeAtIndexPath:indexPath openLocalOnly:NO manualUnlock:YES];
+    [self openAtIndexPath:indexPath openOffline:NO manualUnlock:YES];
 }
 
-- (void)openLocalOnly:(NSIndexPath*)indexPath {
-    [self openSafeAtIndexPath:indexPath openLocalOnly:YES];
+- (void)openOffline:(NSIndexPath*)indexPath {
+    [self openAtIndexPath:indexPath openOffline:YES];
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
@@ -1598,7 +1648,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         }
         
         vc.viewModel = (Model *)sender;
-        vc.currentGroup = vc.viewModel.database.effectiveRootGroup;
+        vc.currentGroupId = vc.viewModel.database.effectiveRootGroup.uuid;
         self.lastOpenedDatabase = vc.viewModel.metadata;
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])
@@ -1735,7 +1785,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         wcdvc.onDone = ^(BOOL addExisting, SafeMetaData * _Nullable databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(databaseToOpen) {
-                     [self openDatabase:databaseToOpen openLocalOnly:NO userJustCompletedBiometricAuthentication:NO];
+                     [self openDatabase:databaseToOpen openOffline:NO  biometricPreCleared:NO];
                 }
             }];
         };
@@ -1770,15 +1820,58 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
             }
         }
     }
-    else if ( [segue.identifier isEqualToString:@"segueToMergeWizard"]) {
+    else if ( [segue.identifier isEqualToString:@"segueToMergeWizard"] ) {
         SafeMetaData* dest = (SafeMetaData*)sender;
         UINavigationController* nav = segue.destinationViewController;
         MergeInitialViewController* vc = (MergeInitialViewController*)nav.topViewController;
         vc.firstMetadata = dest;
-        vc.onDone = ^{
-            [self dismissViewControllerAnimated:YES completion:nil];
+        vc.onDone = ^(BOOL mergeRequested, Model * _Nullable first, Model * _Nullable second) {
+            [self dismissViewControllerAnimated:YES completion:^{
+                if ( mergeRequested ) {
+                    [self mergeDatabases:first second:second];
+                }
+            }];
         };
     }
+    else if ( [segue.identifier isEqualToString:@"segueToDatabaseProperties"] ) {
+        SafeMetaData* database = (SafeMetaData*)sender;
+        UINavigationController* nav = segue.destinationViewController;
+        DatabasePropertiesVC* vc = (DatabasePropertiesVC*)nav.topViewController;
+        vc.database = database;
+    }
+}
+
+- (void)mergeDatabases:(Model*)first second:(Model*)second {
+    NSString* msg = NSLocalizedString(@"merge_view_are_you_sure", @"Are you sure you want to merge the second database into the first?");
+    [Alerts areYouSure:self message:msg action:^(BOOL response) {
+        if (response) {
+            DatabaseMerger* syncer= [DatabaseMerger mergerFor:first.database theirs:second.database];
+            BOOL success = [syncer merge];
+
+            if (success) {
+                [first update:self handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+                    if (error) {
+                        [Alerts error:self error:error];
+                    }
+                    else if (userCancelled) {
+                        [Alerts error:self
+                                title:NSLocalizedString(@"merge_view_merge_title_error", @"There was an problem merging this database.")
+                                error:nil];
+                    }
+                    else {
+                        [Alerts info:self
+                               title:NSLocalizedString(@"merge_view_merge_title_success", @"Merge Successful")
+                             message:NSLocalizedString(@"merge_view_merge_message_success", @"The Merge was successful and your database is now up to date.")];
+                    }
+                }];
+            }
+            else {
+                [Alerts error:self
+                        title:NSLocalizedString(@"merge_view_merge_title_error", @"There was an problem merging this database.")
+                        error:nil];
+            }
+        }
+    }];
 }
 
 - (void)onOnboardingDoneWithAddDatabase:(BOOL)addExisting
@@ -1806,7 +1899,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         });
     }
     else if(databaseToOpen) {
-        [self openDatabase:databaseToOpen openLocalOnly:NO userJustCompletedBiometricAuthentication:NO];
+        [self openDatabase:databaseToOpen openOffline:NO  biometricPreCleared:NO];
     }
 }
 
@@ -2222,7 +2315,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
         return;
     }
     
-    [self openDatabase:safe openLocalOnly:NO userJustCompletedBiometricAuthentication:userJustCompletedBiometricAuthentication];
+    [self openDatabase:safe openOffline:NO  biometricPreCleared:userJustCompletedBiometricAuthentication];
 }
 
 
@@ -2236,11 +2329,15 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 }
 
 - (void)removeAllICloudSafes {
-    NSArray<SafeMetaData*> *icloudSafesToRemove = [self getICloudSafes];
     
-    for (SafeMetaData *item in icloudSafesToRemove) {
-        [SafesList.sharedInstance remove:item.uuid];
-    }
+    
+
+    
+    
+
+
+
+
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {
@@ -2528,7 +2625,7 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
 
 
 - (void)createLocalCopyDatabase:(SafeMetaData*)database {
-    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:database];
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
     
     NSError* error;
     NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&error];
@@ -2578,6 +2675,151 @@ userJustCompletedBiometricAuthentication:(BOOL)userJustCompletedBiometricAuthent
     else {
         [self performSegueWithIdentifier:@"segueToMergeWizard" sender:destinationDatabase];
     }
+}
+
+
+
+
+- (void)promptForConvenienceEnrolAndOpen:(BOOL)biometricPossible
+                             pinPossible:(BOOL)pinPossible
+                                   model:(Model*)model {
+    NSString *title;
+    NSString *message;
+    
+    NSString* biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
+    
+    if(biometricPossible && pinPossible) {
+        title = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_both_title_fmt", @"Convenience Unlock: Use %@ or PIN Code in Future?"), biometricIdName];
+        message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_both_message_fmt", @"You can use either %@ or a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use one of these methods, please select from below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password"), biometricIdName];
+    }
+    else if (biometricPossible) {
+        title = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_bio_title_fmt", @"Convenience Unlock: Use %@ to Unlock in Future?"), biometricIdName];
+        message = [NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_bio_message_fmt", @"You can use %@ to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password"), biometricIdName];
+    }
+    else if (pinPossible) {
+        title = NSLocalizedString(@"open_sequence_prompt_use_convenience_pin_title", @"Convenience Unlock: Use a PIN Code to Unlock in Future?");
+        message = NSLocalizedString(@"open_sequence_prompt_use_convenience_pin_message", @"You can use a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password");
+    }
+    
+    if (!SharedAppAndAutoFillSettings.sharedInstance.isPro) {
+        message = [message stringByAppendingFormat:NSLocalizedString(@"open_sequence_append_convenience_pro_warning", @"\n\nNB: Convenience Unlock is a Pro feature")];
+    }
+    
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                             message:message
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    
+    if(biometricPossible) {
+        UIAlertAction *biometricAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_use_bio_fmt", @"Use %@"), biometricIdName]
+                                                                  style:UIAlertActionStyleDefault
+                                                                handler:^(UIAlertAction *a) {
+            [self enrolForBiometrics:model];
+            [self showUnlockedDatabase:model];
+        }];
+        
+        [alertController addAction:biometricAction];
+    }
+    
+    if (pinPossible) {
+        UIAlertAction *pinCodeAction = [UIAlertAction actionWithTitle:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_prompt_use_convenience_use_pin", @"Use a PIN Code...")]
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) {
+            [self setupConveniencePinAndOpen:model];
+        }];
+        [alertController addAction:pinCodeAction];
+    }
+    
+    UIAlertAction *noAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"open_sequence_prompt_option_no", @"No")
+                                                       style:UIAlertActionStyleCancel
+                                                     handler:^(UIAlertAction *a) {
+        [self unenrolFromConvenience:model];
+        [self showUnlockedDatabase:model];
+    }];
+    
+
+    [alertController addAction:noAction];
+    
+    [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (void)enrolForBiometrics:(Model*)model {
+    model.metadata.isTouchIdEnabled = YES;
+    model.metadata.isEnrolledForConvenience = YES;
+    model.metadata.convenienceMasterPassword = model.database.ckfs.password;
+    model.metadata.hasBeenPromptedForConvenience = YES;
+    
+    [SafesList.sharedInstance update:model.metadata];
+}
+
+- (void)unenrolFromConvenience:(Model*)model {
+    model.metadata.isTouchIdEnabled = NO;
+    model.metadata.conveniencePin = nil;
+    model.metadata.isEnrolledForConvenience = NO;
+    model.metadata.convenienceMasterPassword = nil;
+    model.metadata.hasBeenPromptedForConvenience = YES;
+    [SafesList.sharedInstance update:model.metadata];
+}
+
+- (void)setupConveniencePinAndOpen:(Model*)model {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
+    PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
+    pinEntryVc.isDatabasePIN = YES;
+    pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            if(response == kOk) {
+                if(!(model.metadata.duressPin != nil && [pin isEqualToString:model.metadata.duressPin])) {
+                    [self enrolForPinCodeUnlock:model pin:pin];
+                    [self showUnlockedDatabase:model];
+                }
+                else {
+                    [Alerts warn:self
+                           title:NSLocalizedString(@"open_sequence_warn_pin_conflict_title", @"PIN Conflict")
+                        message:NSLocalizedString(@"open_sequence_warn_pin_conflict_message", @"Your Convenience PIN conflicts with your Duress PIN. Please configure in Database Settings")
+                    completion:^{
+                        [self showUnlockedDatabase:model];
+                    }];
+                }
+            }
+            else {
+                [self showUnlockedDatabase:model];
+            }
+        }];
+    };
+
+    [self presentViewController:pinEntryVc animated:YES completion:nil];
+}
+
+- (void)enrolForPinCodeUnlock:(Model*)model pin:(NSString*)pin {
+    model.metadata.conveniencePin = pin;
+    model.metadata.isEnrolledForConvenience = YES;
+    model.metadata.convenienceMasterPassword = model.database.ckfs.password;
+    model.metadata.hasBeenPromptedForConvenience = YES;
+
+    [SafesList.sharedInstance update:model.metadata];
+}
+
+- (void)promptForQuickLaunch:(Model*)model {
+    if(SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil && !model.metadata.hasBeenPromptedForQuickLaunch) {
+        [Alerts yesNo:self
+                title:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_title", @"Set Quick Launch?")
+              message:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_message", @"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious tap.")
+               action:^(BOOL response) {
+            if(response) {
+               SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = model.metadata.uuid;
+            }
+
+            model.metadata.hasBeenPromptedForQuickLaunch = YES;
+            [SafesList.sharedInstance update:model.metadata];
+
+            [self showUnlockedDatabase:model];
+        }];
+    }
+}
+
+
+
+- (void)showDatabaseProperties:(SafeMetaData*)database {
+    [self performSegueWithIdentifier:@"segueToDatabaseProperties" sender:database];
 }
 
 @end

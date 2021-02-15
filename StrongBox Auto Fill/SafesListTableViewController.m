@@ -3,7 +3,7 @@
 //  Strongbox AutoFill
 //
 //  Created by Mark on 11/10/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "SafesListTableViewController.h"
@@ -12,7 +12,6 @@
 #import "SafeStorageProviderFactory.h"
 #import <AuthenticationServices/AuthenticationServices.h>
 #import "CredentialProviderViewController.h"
-#import "OpenSafeSequenceHelper.h"
 #import "SVProgressHUD.h"
 #import "PickCredentialsTableViewController.h"
 #import "NSArray+Extensions.h"
@@ -26,6 +25,9 @@
 #import "SyncManager.h"
 #import "NSDate+Extensions.h"
 #import "UITableView+EmptyDataSet.h"
+#import "CompositeKeyDeterminer.h"
+#import "DatabaseUnlocker.h"
+#import "DuressActionHelper.h"
 
 @interface SafesListTableViewController ()
 
@@ -38,9 +40,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
- 
-    
-    
+
     [self setupUi];
     
     [self refreshSafes];
@@ -56,11 +56,6 @@
             });
         }
     }
-    
-    
-    
-    
-    
 }
 
 - (void)setupUi {
@@ -75,12 +70,6 @@
         [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
     }
 }
-
-
-
-
-
-
 
 - (void)refreshSafes {
     self.safes = SafesList.sharedInstance.snapshot;
@@ -101,10 +90,6 @@
 - (IBAction)onCancel:(id)sender {
     [[self getInitialViewController] exitWithUserCancelled];
 }
-
-        
-        
-        
 
 - (NSAttributedString *)getTitleForEmptyDataSet {
     NSString *text = NSLocalizedString(@"autofill_safes_vc_empty_title", @"You Have No Databases Yet :(");
@@ -164,36 +149,56 @@
 }
 
 - (void)openDatabase:(SafeMetaData*)safe {
-    AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
-
-    [OpenSafeSequenceHelper beginSequenceWithViewController:self
-                                                       safe:safe
-                                        canConvenienceEnrol:NO 
-                                             isAutoFillOpen:YES
-                                              openLocalOnly:NO
-                                biometricAuthenticationDone:NO
-                                                 completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
-        
-        
-
-        AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
-    
-        if(result == kUnlockDatabaseResultSuccess) {
-            [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
-        }
-        else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
-            [self onCancel:nil];
-        }
-        else if (result == kUnlockDatabaseResultError) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                    error:error
-               completion:^{
-                [[self getInitialViewController] exitWithErrorOccurred:error];
+    CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+    [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
+        if (result == kGetCompositeKeyResultSuccess) {
+            AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
+            DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:safe viewController:self forceReadOnly:NO isAutoFillOpen:YES offlineMode:YES];
+            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+                [self onUnlockDone:result model:model error:error];
             }];
         }
+        else if (result == kGetCompositeKeyResultError) {
+            [self messageErrorAndExit:error];
+        }
+        else if (result == kGetCompositeKeyResultDuressIndicated) {
+            [DuressActionHelper performDuressAction:self database:safe isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                [self onUnlockDone:result model:model error:error];
+                [self refreshSafes]; 
+            }];
+        }
+        else {
+            [self onCancel:nil];
+        }
+    }];
+}
+
+- (void)onUnlockDone:(UnlockDatabaseResult)result model:(Model * _Nullable)model error:(NSError * _Nullable)error {
+    NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
+    
+    if(result == kUnlockDatabaseResultSuccess) {
+        [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
+    }
+    else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
+        [self onCancel:nil];
+    }
+    else if (result == kUnlockDatabaseResultIncorrectCredentials) {
         
-        [self refreshSafes]; 
+        NSLog(@"INCORRECT CREDENTIALS - kUnlockDatabaseResultIncorrectCredentials");
+        [[self getInitialViewController] exitWithErrorOccurred:error ? error : [Utils createNSError:@"Could not open database" errorCode:-1]];
+    }
+    else if (result == kUnlockDatabaseResultError) {
+        [self messageErrorAndExit:error];
+    }
+}
+
+- (void)messageErrorAndExit:(NSError*)error {
+    [Alerts error:self
+            title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+            error:error
+       completion:^{
+        [[self getInitialViewController] exitWithErrorOccurred:error];
     }];
 }
 

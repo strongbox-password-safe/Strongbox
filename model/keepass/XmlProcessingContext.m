@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 06/11/2018.
-//  Copyright © 2018 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "XmlProcessingContext.h"

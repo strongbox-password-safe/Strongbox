@@ -3,7 +3,7 @@
 //  Strongbox
 //
 //  Created by Mark on 30/07/2019.
-//  Copyright © 2019 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import "DatabaseCell.h"
@@ -14,6 +14,7 @@
 #import "Utils.h"
 #import "NSDate+Extensions.h"
 #import "SyncManager.h"
+#import "WorkingCopyManager.h"
 #import "LocalDeviceStorageProvider.h"
 
 NSString* const kDatabaseCell = @"DatabaseCell";
@@ -253,19 +254,19 @@ rotateLastImage:(BOOL)rotateLastImage
 
 - (NSString*)getModifiedDate:(SafeMetaData*)safe {
     NSDate* mod;
-    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
     return mod ? mod.friendlyDateStringVeryShort : @"";
 }
 
 - (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
     NSDate* mod;
-    [SyncManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
     return mod ? mod.friendlyDateTimeStringPrecise : @"";
 }
 
 - (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
     unsigned long long fileSize;
-    NSURL* url = [SyncManager.sharedInstance getLocalWorkingCache:safe modified:nil fileSize:&fileSize];
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe modified:nil fileSize:&fileSize];
     return url ? friendlyFileSizeString(fileSize) : @"";
 }
 

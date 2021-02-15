@@ -9,7 +9,7 @@
 #import "SelectPredefinedIconController.h"
 #import "PredefinedKeePassIcon.h"
 #import "Utils.h"
-#import "Alerts.h"
+#import "MacAlerts.h"
 #import "CollectionViewHeader.h"
 #import "NodeIconHelper.h"
 
@@ -102,7 +102,7 @@
                 NSLog(@"Could not read file at %@. Error: %@", openPanel.URL, error);
                 
                 NSString* loc = NSLocalizedString(@"mac_could_not_open_this_file", @"Could not open this file.");
-                [Alerts error:loc error:error window:self.window];
+                [MacAlerts error:loc error:error window:self.window];
                 return;
             }
 

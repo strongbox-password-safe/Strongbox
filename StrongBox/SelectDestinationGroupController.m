@@ -87,10 +87,10 @@
 
     
     
-    [self.viewModel update:self handler:^(BOOL userCancelled, BOOL conflictAndLocalWasChanged, NSError * _Nullable error) {
+    [self.viewModel update:self handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{ 
             [self dismissViewControllerAnimated:YES completion:^{
-                self.onDone(userCancelled, conflictAndLocalWasChanged, error);
+                self.onDone(userCancelled, localWasChanged, error);
             }];
         });
     }];

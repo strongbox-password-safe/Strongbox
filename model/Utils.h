@@ -3,7 +3,7 @@
 //  MacBox
 //
 //  Created by Mark on 16/08/2017.
-//  Copyright © 2017 Mark McGuill. All rights reserved.
+//  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -80,7 +80,6 @@ int64_t littleEndianNBytesToInt64(uint8_t* bytes, int n);
 
 void hexdump(unsigned char *buffer, unsigned long index, unsigned long width);
 
-+ (NSData *)dataFromHexString:(NSString*)string;
 NSString*_Nullable sha1Base64String(NSString *string);
 NSData* hmacSha1(NSData *data, NSData* key);
 NSData*_Nullable getRandomData(uint32_t length);
