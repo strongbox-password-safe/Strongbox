@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="17701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17701"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -10,14 +10,14 @@
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <tableCellView id="N2M-pg-8m5" customClass="DatabaseCellView">
-            <rect key="frame" x="0.0" y="0.0" width="382" height="97"/>
+            <rect key="frame" x="0.0" y="0.0" width="673" height="169"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cbv-Fl-GGo">
-                    <rect key="frame" x="12" y="12" width="358" height="73"/>
+                    <rect key="frame" x="12" y="12" width="649" height="145"/>
                     <subviews>
                         <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="f6v-C9-DZb">
-                            <rect key="frame" x="0.0" y="21" width="32" height="32"/>
+                            <rect key="frame" x="0.0" y="57" width="32" height="32"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="32" id="4rT-BM-13O"/>
                                 <constraint firstAttribute="width" constant="32" id="oKM-UH-Hto"/>
@@ -26,22 +26,85 @@
                                 <imageReference key="image" image="lock" symbolScale="large"/>
                             </imageCell>
                         </imageView>
-                        <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dCj-0t-m2B">
-                            <rect key="frame" x="44" y="0.0" width="314" height="73"/>
+                        <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="12" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dCj-0t-m2B" userLabel="Stack View Master">
+                            <rect key="frame" x="44" y="0.0" width="605" height="145"/>
                             <subviews>
-                                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yax-RB-efd">
-                                    <rect key="frame" x="0.0" y="20" width="198" height="34"/>
+                                <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yax-RB-efd" userLabel="Left Column">
+                                    <rect key="frame" x="0.0" y="56" width="489" height="34"/>
                                     <subviews>
-                                        <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cJ7-mw-61v" customClass="ClickableTextField">
-                                            <rect key="frame" x="-2" y="18" width="202" height="16"/>
-                                            <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" sendsActionOnEndEditing="YES" title="&lt; Quite a Long Database Nick Name&gt;" usesSingleLineMode="YES" id="qYt-ET-qCd">
-                                                <font key="font" textStyle="headline" name=".SFNS-Bold"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </textField>
-                                        <textField horizontalHuggingPriority="255" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="lRH-Ia-FDf">
-                                            <rect key="frame" x="-2" y="0.0" width="202" height="16"/>
+                                        <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="5" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v2f-A6-wiR" userLabel="Left Top">
+                                            <rect key="frame" x="0.0" y="18" width="489" height="16"/>
+                                            <subviews>
+                                                <textField horizontalHuggingPriority="750" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cJ7-mw-61v" customClass="ClickableTextField">
+                                                    <rect key="frame" x="-2" y="0.0" width="246" height="16"/>
+                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" sendsActionOnEndEditing="YES" title="&lt; Quite a Long Database Nick Name &gt;" usesSingleLineMode="YES" id="qYt-ET-qCd">
+                                                        <font key="font" textStyle="headline" name=".SFNS-Bold"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                                <imageView horizontalHuggingPriority="750" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gqX-3h-SQd">
+                                                    <rect key="frame" x="247" y="0.0" width="16" height="16"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="Whp-Yq-gxJ"/>
+                                                        <constraint firstAttribute="width" constant="16" id="l7t-5l-eob"/>
+                                                    </constraints>
+                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="rocket" id="DJb-Ui-qGM"/>
+                                                    <color key="contentTintColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
+                                                </imageView>
+                                                <imageView horizontalHuggingPriority="750" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xAF-bp-hBr">
+                                                    <rect key="frame" x="268" y="0.0" width="16" height="16"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="16" id="nNK-1P-Rjj"/>
+                                                        <constraint firstAttribute="height" constant="16" id="s6V-Zd-1K5"/>
+                                                    </constraints>
+                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="upload" id="vDr-DW-cI6"/>
+                                                    <color key="contentTintColor" name="systemOrangeColor" catalog="System" colorSpace="catalog"/>
+                                                </imageView>
+                                                <imageView horizontalHuggingPriority="750" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="gW6-Jt-CKM">
+                                                    <rect key="frame" x="289" y="0.0" width="16" height="16"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="16" id="80q-nd-oiJ"/>
+                                                        <constraint firstAttribute="width" constant="16" id="QlM-1V-sJ9"/>
+                                                    </constraints>
+                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="glasses" id="G41-zI-DaH"/>
+                                                </imageView>
+                                                <imageView horizontalHuggingPriority="750" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8Fg-wr-BBV">
+                                                    <rect key="frame" x="310" y="0.0" width="16" height="16"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="width" constant="16" id="EST-Nh-XJB"/>
+                                                        <constraint firstAttribute="height" constant="16" id="F9h-g1-5nZ"/>
+                                                    </constraints>
+                                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="syncronize" id="P8a-a7-Vo4"/>
+                                                </imageView>
+                                                <textField horizontalHuggingPriority="1" verticalHuggingPriority="750" horizontalCompressionResistancePriority="251" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="T2k-X6-BMT" userLabel="Spacer" customClass="ClickableTextField">
+                                                    <rect key="frame" x="329" y="0.0" width="162" height="16"/>
+                                                    <textFieldCell key="cell" lineBreakMode="truncatingMiddle" selectable="YES" sendsActionOnEndEditing="YES" title=" " usesSingleLineMode="YES" id="Teo-Ki-7Fg">
+                                                        <font key="font" textStyle="headline" name=".SFNS-Bold"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </textField>
+                                            </subviews>
+                                            <visibilityPriorities>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                                <integer value="1000"/>
+                                            </visibilityPriorities>
+                                            <customSpacing>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                                <real value="3.4028234663852886e+38"/>
+                                            </customSpacing>
+                                        </stackView>
+                                        <textField horizontalHuggingPriority="255" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lRH-Ia-FDf">
+                                            <rect key="frame" x="-2" y="0.0" width="376" height="16"/>
                                             <textFieldCell key="cell" lineBreakMode="truncatingMiddle" title="/Users/mark/Desktop/my/long/path/to/database/file/./foo.kdbx" id="8Df-Ae-mD4">
                                                 <font key="font" metaFont="system"/>
                                                 <color key="textColor" name="secondaryLabelColor" catalog="System" colorSpace="catalog"/>
@@ -50,8 +113,9 @@
                                         </textField>
                                     </subviews>
                                     <constraints>
-                                        <constraint firstItem="cJ7-mw-61v" firstAttribute="leading" secondItem="yax-RB-efd" secondAttribute="leading" id="oSi-Ir-ePe"/>
-                                        <constraint firstAttribute="trailing" secondItem="cJ7-mw-61v" secondAttribute="trailing" id="rrt-YX-zEC"/>
+                                        <constraint firstAttribute="trailing" secondItem="v2f-A6-wiR" secondAttribute="trailing" id="bwP-TS-eqU"/>
+                                        <constraint firstItem="v2f-A6-wiR" firstAttribute="leading" secondItem="yax-RB-efd" secondAttribute="leading" id="j5O-Mp-dwk"/>
+                                        <constraint firstItem="v2f-A6-wiR" firstAttribute="top" secondItem="yax-RB-efd" secondAttribute="top" id="jGp-Rq-YMU"/>
                                     </constraints>
                                     <visibilityPriorities>
                                         <integer value="1000"/>
@@ -63,7 +127,7 @@
                                     </customSpacing>
                                 </stackView>
                                 <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="2" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Sh1-hH-WLp">
-                                    <rect key="frame" x="210" y="20" width="104" height="34"/>
+                                    <rect key="frame" x="501" y="56" width="104" height="34"/>
                                     <subviews>
                                         <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsExpansionToolTips="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AJc-Jm-l3O">
                                             <rect key="frame" x="-2" y="18" width="108" height="16"/>
@@ -104,7 +168,7 @@
                                 <constraint firstAttribute="trailing" secondItem="Sh1-hH-WLp" secondAttribute="trailing" id="wT9-Cm-eF8"/>
                             </constraints>
                             <visibilityPriorities>
-                                <integer value="1000"/>
+                                <real value="750"/>
                                 <integer value="1000"/>
                             </visibilityPriorities>
                             <customSpacing>
@@ -135,16 +199,24 @@
             </constraints>
             <connections>
                 <outlet property="imageView" destination="f6v-C9-DZb" id="c12-nJ-BCY"/>
+                <outlet property="imageViewOutstandingUpdate" destination="xAF-bp-hBr" id="WrS-Ok-raJ"/>
+                <outlet property="imageViewQuickLaunch" destination="gqX-3h-SQd" id="lm2-QH-Adw"/>
+                <outlet property="imageViewReadOnly" destination="gW6-Jt-CKM" id="c97-7d-gHb"/>
+                <outlet property="imageViewSyncing" destination="8Fg-wr-BBV" id="55T-Bi-7v5"/>
                 <outlet property="textField" destination="cJ7-mw-61v" id="mpb-sa-r4U"/>
                 <outlet property="textFieldName" destination="cJ7-mw-61v" id="l5S-ka-6A4"/>
                 <outlet property="textFieldSubtitleBottomRight" destination="jPm-0V-cvH" id="b3B-ST-wSt"/>
                 <outlet property="textFieldSubtitleLeft" destination="lRH-Ia-FDf" id="IqK-2N-c80"/>
                 <outlet property="textFieldSubtitleTopRight" destination="AJc-Jm-l3O" id="0MS-0J-UDF"/>
             </connections>
-            <point key="canvasLocation" x="-510" y="-16.5"/>
+            <point key="canvasLocation" x="-727.5" y="19.5"/>
         </tableCellView>
     </objects>
     <resources>
+        <image name="glasses" width="107" height="107"/>
         <image name="lock" width="30" height="30"/>
+        <image name="rocket" width="30" height="30"/>
+        <image name="syncronize" width="30" height="30"/>
+        <image name="upload" width="30" height="30"/>
     </resources>
 </document>

@@ -1002,7 +1002,7 @@ static NSString* trimField(NSTextField* textField) {
             }];
         }
         else {
-            onSelectedNewIcon(weakSelf.model, weakSelf.node, icon, weakSelf.view.window);
+            [weakSelf.model setItemIcon:weakSelf.node icon:icon];
         }
     };
     

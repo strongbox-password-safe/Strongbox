@@ -106,24 +106,26 @@ disableEscapeKey:(BOOL)disableEscapeKey
 }
 
 + (void)error:(NSString*)message error:(NSError*)error window:(NSWindow*)window completion:(void (^)(void))completion {
-    NSAlert *alert = [[NSAlert alloc] init];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
 
-    [alert setMessageText:message];
-    
-    if(error && error.localizedDescription) {
-        [alert setInformativeText:error.localizedDescription];
-    }
-    
-    [alert setAlertStyle:NSAlertStyleWarning];
-    
-    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
-    [alert addButtonWithTitle:loc];
-
-    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        if(completion) {
-            completion();
+        [alert setMessageText:message];
+        
+        if(error && error.localizedDescription) {
+            [alert setInformativeText:error.localizedDescription];
         }
-    }];
+        
+        [alert setAlertStyle:NSAlertStyleWarning];
+        
+        NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+        [alert addButtonWithTitle:loc];
+
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            if(completion) {
+                completion();
+            }
+        }];
+    });
 }
 
 - (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty {

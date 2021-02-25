@@ -53,6 +53,7 @@
 #import "QuickTypeRecordIdentifier.h"
 #import "SecretStore.h"
 #import "OutlineView.h"
+#import "Document.h"
 
 
 
@@ -69,11 +70,14 @@ static NSString* const kNewEntryKey = @"newEntry";
                                 NSTextFieldDelegate,
                                 QLPreviewPanelDataSource,
                                 QLPreviewPanelDelegate,
-                                NSSearchFieldDelegate>
+                                NSSearchFieldDelegate,
+                                NSOutlineViewDelegate,
+                                NSOutlineViewDataSource,
+                                NSTableViewDelegate,
+                                NSTableViewDataSource>
 
 @property (strong, nonatomic) SelectPredefinedIconController* selectPredefinedIconController;
 @property (strong, nonatomic) CreateFormatAndSetCredentialsWizard *changeMasterPassword;
-@property (strong, nonatomic) ProgressWindow* progressWindow;
 @property (nonatomic) BOOL showPassword;
 
 @property NSMutableDictionary<NSUUID*, NSArray<Node*>*> *itemsCache;
@@ -136,7 +140,6 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property NSArray<NSString*>* sortedAttachmentsFilenames;
 @property NSDictionary<NSString*, DatabaseAttachment*>* attachments;
 
-@property (weak, nonatomic) ViewModel* model;
 @property BOOL isPromptingAboutUnderlyingFileChange;
 @property NSArray* customFields;
 @property NSMutableDictionary<NSUUID*, NodeDetailsViewController*>* detailsViewControllers;
@@ -163,6 +166,14 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property NSString* currentYubiKeySerial;
 @property MMWormhole* wormhole;
 
+@property Document*_Nullable document;
+@property (readonly) ViewModel*_Nullable viewModel;
+@property (readonly) DatabaseMetadata*_Nullable databaseMetadata;
+
+@property BOOL hasLoaded;
+
+@property ProgressWindow* progressWindow;
+
 @end
 
 static NSImage* kStrongBox256Image;
@@ -175,15 +186,25 @@ static NSImage* kStrongBox256Image;
     }
 }
 
+- (ViewModel *)viewModel {
+    return self.document.viewModel;
+}
+
+- (DatabaseMetadata*)databaseMetadata {
+    return self.document.databaseMetadata;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    NSLog(@"ViewController::viewDidLoad: doc=[%@] - vm=[%@]", self.document, self.viewModel);
 
     
     
     
     self.detailsViewControllers = @{}.mutableCopy;
 
-    [self customizeUi]; 
+    [self customizeUi];
     
     [self enableDragDrop];
 
@@ -193,113 +214,47 @@ static NSImage* kStrongBox256Image;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
 }
 
-- (void)listenToAutoFillWormhole {
-    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
-                                                         optionalDirectory:kAutoFillWormholeName];
-
-    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeRequestId
-                                         listener:^(id messageObject) {
-        if ( self.model && !self.model.locked && messageObject) {
-            NSDictionary *dict = (NSDictionary*)messageObject;
-            NSString* json = dict[@"id"];
-            if (!json) {
-                return;
-            }
-            
-            QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
-            
-            if( identifier && self.model.databaseMetadata && [self.model.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
-                if (!self.model.databaseMetadata.quickWormholeFillEnabled) {
-                    return;
-                }
-                
-                
-
-                
-                
-                DatabaseModel* model = self.model.database;
-                Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
-                    return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
-                }];
-
-                NSString* secretStoreId = NSUUID.UUID.UUIDString;
-
-                if(node) {
-
-
-                    NSString* user = [model dereference:node.fields.username node:node];
-                    NSString* password = [model dereference:node.fields.password node:node];
-                    NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
-                    
-                    NSDictionary* securePayload = @{
-                        @"user" : user,
-                        @"password" : password,
-                        @"totp" : totp,
-                    };
-                    
-                    NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
-                    
-                    [SecretStore.sharedInstance setSecureObject:securePayload forIdentifier:secretStoreId expiresAt:expiry];
-                }
-                else {
-                    NSLog(@"[%@] - AutoFill could not find matching node - returning", self.model.databaseMetadata.nickName);
-                }
-                
-                [self.wormhole passMessageObject:@{@"success" : @(node != nil),
-                                                   @"secret-store-id" : secretStoreId }
-                                      identifier:kAutoFillWormholeResponseId];
-            }
-        }
-    }];
-}
-
-- (void)updateModel:(ViewModel *)model {
-    NSLog(@"updateModel [%@]", model);
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self setModelFromMainThread:model];
-    });
-}
-
-- (void)setInitialModel:(ViewModel*)model {
-    
-    NSLog(@"setInitialModel [%@]", model);
-
-    [self setModelFromMainThread:model];
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self autoPromptForTouchIdIfDesired];
-    });
-}
-
-- (void)setModelFromMainThread:(ViewModel *)model {
-    [self stopObservingModelChanges];
-    [self closeAllDetailsWindows:nil];
-        
-    self.model = model;
-
-    [self bindToModel];
-    [self setInitialFocus];
-}
-
 - (void)viewDidAppear {
     [super viewDidAppear];
     
-    self.view.window.delegate = self;
+    NSLog(@"ViewController::viewDidAppear: doc=[%@] - vm=[%@]", self.document, self.viewModel);
 
+    if(!self.hasLoaded) {
+        self.hasLoaded = YES;
+        [self doInitialViewSetup];
+    }
+    
     [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
 
     [self initializeFullOrTrialOrLiteUI];
-    
+
     [self setInitialFocus];
     
     [self startRefreshOtpTimer];
 }
 
-- (void)windowDidBecomeKey:(NSNotification *)notification {
-    
+- (void)doInitialViewSetup {
+    _document = self.view.window.windowController.document;
+    self.view.window.delegate = self;
 
-    if(self.model && self.model.locked) {
+    NSLog(@"ViewController::doInitialViewSetup - Initial Load - doc=[%@] - vm=[%@]", self.document, self.viewModel);
+
+    [self fullModelReload];  
+}
+
+- (void)fullModelReload { 
+    NSLog(@"ViewController::fullModelReload");
+    
+    [self stopObservingModelChanges];
+    [self closeAllDetailsWindows:nil];
+    [self bindToModel];
+    [self setInitialFocus];
+}
+
+- (void)windowDidBecomeKey:(NSNotification *)notification {
+    NSLog(@"[%@] Window Became Key!", self.databaseMetadata.nickName);
+
+    if(self.viewModel && self.viewModel.locked) {
         [self bindLockScreenUi];
     }
 
@@ -389,7 +344,7 @@ static NSImage* kStrongBox256Image;
         NodeDetailsViewController* vc = (NodeDetailsViewController*)(wc.contentViewController);
         
         vc.node = item;
-        vc.model = self.model;
+        vc.model = self.viewModel;
         vc.newEntry = newEntry.boolValue;
         vc.historical = NO;
         
@@ -409,20 +364,20 @@ static NSImage* kStrongBox256Image;
         MacKeePassHistoryViewController* vc = (MacKeePassHistoryViewController*)segue.destinationController;
         
         vc.onDeleteHistoryItem = ^(Node * _Nonnull node) {
-            [self.model deleteHistoryItem:item historicalItem:node];
+            [self.viewModel deleteHistoryItem:item historicalItem:node];
         };
         vc.onRestoreHistoryItem = ^(Node * _Nonnull node) {
-            [self.model restoreHistoryItem:item historicalItem:node];
+            [self.viewModel restoreHistoryItem:item historicalItem:node];
         };
         
-        vc.model = self.model;
+        vc.model = self.viewModel;
         vc.history = item.fields.keePassHistory;
     }
     else if([segue.identifier isEqualToString:@"segueToDatabasePreferences"]) {
         DatabaseSettingsTabViewController *vc = (DatabaseSettingsTabViewController*)segue.destinationController;
         
         NSNumber* tab = (NSNumber*)sender;
-        [vc setModel:self.model initialTab:tab.intValue];
+        [vc setModel:self.viewModel.database databaseMetadata:self.databaseMetadata initialTab:tab.intValue];
     }
     else if ([segue.identifier isEqualToString:@"segueToDatabaseOnboarding"]) {
         DatabaseOnboardingTabViewController *vc = (DatabaseOnboardingTabViewController*)segue.destinationController;
@@ -432,7 +387,7 @@ static NSImage* kStrongBox256Image;
         vc.convenienceUnlock = ((NSNumber*)foo[@"convenienceUnlock"]).boolValue;
         vc.autoFill = ((NSNumber*)foo[@"autoFill"]).boolValue;
         vc.ckfs = foo[@"compositeKeyFactors"];
-        vc.database = self.model.databaseMetadata;
+        vc.database = self.databaseMetadata;
         vc.model = foo[@"model"];
     }
 }
@@ -613,12 +568,12 @@ static NSImage* kStrongBox256Image;
 }
 
 - (BOOL)isColumnAvailableForModel:(NSString*)identifier {
-    if(!self.model) {
+    if(!self.viewModel) {
         return NO;
     }
     
     BOOL ret;
-    if (self.model.format == kPasswordSafe) {
+    if (self.viewModel.format == kPasswordSafe) {
         ret = (![identifier isEqualToString:kCustomFieldsColumn] && ![identifier isEqualToString:kAttachmentsColumn]);
     }
     else {
@@ -646,7 +601,7 @@ static NSImage* kStrongBox256Image;
 
 
 - (NSImage * )getIconForNode:(Node *)vm large:(BOOL)large {
-    return [NodeIconHelper getIconForNode:vm predefinedIconSet:kKeePassIconSetClassic format:self.model.format large:large];
+    return [NodeIconHelper getIconForNode:vm predefinedIconSet:kKeePassIconSetClassic format:self.viewModel.format large:large];
 }
 
 - (void)onDeleteHistoryItem:(Node*)node historicalItem:(Node*)historicalItem {
@@ -760,7 +715,7 @@ static NSImage* kStrongBox256Image;
                     NSLog(@"Got FavIcon on Change URL or New Entry: [%@]", image);
                     dispatch_async(dispatch_get_main_queue(), ^{
                         if(image) {
-                            [self.model setItemIcon:node image:image];
+                            [self.viewModel setItemIcon:node image:image];
                         }
                     });
             }];
@@ -795,7 +750,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)genericReloadOnUpdateAndMaintainSelection:(NSNotification*)notification popupMessage:(NSString*)popupMessage suppressPopupMessage:(BOOL)suppressPopupMessage {
-    if(notification.object != self.model) {
+    if(notification.object != self.viewModel) {
         return;
     }
     
@@ -815,7 +770,7 @@ static NSImage* kStrongBox256Image;
         Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
 
         NSString *loc = NSLocalizedString(@"mac_field_changed_popup_notification_fmt", @"'%@' %@ Changed... First parameter Title of Item, second parameter which field changed, e.g. Username or Password");
-        [self showPopupToastNotification:[NSString stringWithFormat:loc, node.title, popupMessage]];
+        [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, node.title, popupMessage]];
     }
 }
 
@@ -827,22 +782,21 @@ static NSImage* kStrongBox256Image;
     
     self.itemsCache = nil; 
     
-    if(self.model == nil || self.model.locked) {
+    if(self.viewModel == nil || self.viewModel.locked) {
         [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
         
-        self.selectedKeyFileBookmark = self.model ? self.model.databaseMetadata.keyFileBookmark : nil;
-        self.selectedYubiKeyConfiguration = self.model ? self.model.databaseMetadata.yubiKeyConfiguration : nil;
+        self.selectedKeyFileBookmark = self.viewModel ? self.databaseMetadata.keyFileBookmark : nil;
+        self.selectedYubiKeyConfiguration = self.viewModel ? self.databaseMetadata.yubiKeyConfiguration : nil;
         
         [self bindLockScreenUi];
     }
     else {
-        [self startObservingModelChanges];
         [self.tabViewLockUnlock selectTabViewItemAtIndex:1];
         
         [self bindColumnsToSettings];
         [self.outlineView reloadData];
         
-        Node* selectedItem = [self.model getItemFromSerializationId:self.model.selectedItem];
+        Node* selectedItem = [self.viewModel getItemFromSerializationId:self.viewModel.selectedItem];
         [self selectItem:selectedItem];
         
         [self bindDetailsPane];
@@ -854,13 +808,15 @@ static NSImage* kStrongBox256Image;
             [self.view.window makeFirstResponder:self.outlineView];
         }
     }
+    
+    [self startObservingModelChanges];
 }
 
 - (void)stopObservingModelChanges {
-    if(self.model) {
-        self.model.onNewItemAdded = nil;
-        self.model.onDeleteHistoryItem = nil;
-        self.model.onRestoreHistoryItem = nil;
+    if(self.viewModel) {
+        self.viewModel.onNewItemAdded = nil;
+        self.viewModel.onDeleteHistoryItem = nil;
+        self.viewModel.onRestoreHistoryItem = nil;
     }
 
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationItemsMoved object:nil];
@@ -877,19 +833,29 @@ static NSImage* kStrongBox256Image;
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationIconChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationAttachmentsChanged object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationTotpChanged object:nil];
+    
+    
+    
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationLongRunningOperationStart object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationLongRunningOperationDone object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationFullReload object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationDatabaseChangedByOther object:nil];
 }
 
 - (void)startObservingModelChanges {
     __weak ViewController* weakSelf = self;
-    self.model.onNewItemAdded = ^(Node * _Nonnull node, BOOL openEntryDetailsWindowWhenDone) {
-        [weakSelf onNewItemAdded:node openEntryDetailsWindowWhenDone:openEntryDetailsWindowWhenDone];
-    };
-    self.model.onDeleteHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
-        [weakSelf onDeleteHistoryItem:item historicalItem:historicalItem];
-    };
-    self.model.onRestoreHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
-        [weakSelf onRestoreHistoryItem:item historicalItem:historicalItem];
-    };
+    
+    if ( self.viewModel ) { 
+        self.viewModel.onNewItemAdded = ^(Node * _Nonnull node, BOOL openEntryDetailsWindowWhenDone) {
+            [weakSelf onNewItemAdded:node openEntryDetailsWindowWhenDone:openEntryDetailsWindowWhenDone];
+        };
+        self.viewModel.onDeleteHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
+            [weakSelf onDeleteHistoryItem:item historicalItem:historicalItem];
+        };
+        self.viewModel.onRestoreHistoryItem = ^(Node * _Nonnull item, Node * _Nonnull historicalItem) {
+            [weakSelf onRestoreHistoryItem:item historicalItem:historicalItem];
+        };
+    }
     
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onCustomFieldsChanged:) name:kModelUpdateNotificationCustomFieldsChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemTitleChanged:) name: kModelUpdateNotificationTitleChanged object:nil];
@@ -905,10 +871,18 @@ static NSImage* kStrongBox256Image;
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsDeletedNotification:) name:kModelUpdateNotificationItemsDeleted object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsUnDeletedNotification:) name:kModelUpdateNotificationItemsUnDeleted object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onItemsMovedNotification:) name:kModelUpdateNotificationItemsMoved object:nil];
+    
+    
+    
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onModelLongRunningOpStart:) name:kModelUpdateNotificationLongRunningOperationStart object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onModelLongRunningOpDone:) name:kModelUpdateNotificationLongRunningOperationDone object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onFullModelReloadNotification:) name:kModelUpdateNotificationFullReload object:nil];    
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onFileChangedByOtherApplication:) name:kModelUpdateNotificationDatabaseChangedByOther object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onBackgroundSyncDone:) name:kModelUpdateNotificationBackgroundSyncDone object:nil];
 }
 
 - (void)setInitialFocus {
-    if(self.model == nil || self.model.locked) {
+    if(self.viewModel == nil || self.viewModel.locked) {
         if([self biometricOpenIsAvailableForSafe]) {
             [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
         }
@@ -928,7 +902,7 @@ static NSImage* kStrongBox256Image;
     else if (it.isGroup) {
         [self.tabViewRightPane selectTabViewItemAtIndex:1];
         self.imageViewGroupDetails.image = [self getIconForNode:it large:YES];
-        self.imageViewGroupDetails.clickable = self.model.format != kPasswordSafe;
+        self.imageViewGroupDetails.clickable = self.viewModel.format != kPasswordSafe;
         self.imageViewGroupDetails.showClickableBorder = YES;
         self.imageViewGroupDetails.onClick = ^{ [self onEditNodeIcon:it]; };
 
@@ -937,10 +911,10 @@ static NSImage* kStrongBox256Image;
     }
     else {
         [self.tabViewRightPane selectTabViewItemAtIndex:0];
-        self.emailRow.hidden = self.model.format != kPasswordSafe;
+        self.emailRow.hidden = self.viewModel.format != kPasswordSafe;
         
         self.imageViewIcon.image = [self getIconForNode:it large:YES];
-        self.imageViewIcon.hidden = self.model.format == kPasswordSafe;
+        self.imageViewIcon.hidden = self.viewModel.format == kPasswordSafe;
 
         
         self.labelTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
@@ -999,7 +973,7 @@ static NSImage* kStrongBox256Image;
             return field;
         }];
         
-        self.customFieldsRow.hidden = self.model.format == kPasswordSafe || self.customFields.count == 0 || !Settings.sharedInstance.showCustomFieldsOnQuickViewPanel;
+        self.customFieldsRow.hidden = self.viewModel.format == kPasswordSafe || self.customFields.count == 0 || !Settings.sharedInstance.showCustomFieldsOnQuickViewPanel;
         [self.customFieldsTable reloadData];
         
         
@@ -1007,13 +981,13 @@ static NSImage* kStrongBox256Image;
         self.sortedAttachmentsFilenames = [it.fields.attachments.allKeys sortedArrayUsingComparator:finderStringComparator];
         self.attachments = it.fields.attachments.copy;
         
-        self.attachmentsRow.hidden = self.model.format == kPasswordSafe || self.sortedAttachmentsFilenames.count == 0 || !Settings.sharedInstance.showAttachmentsOnQuickViewPanel;
+        self.attachmentsRow.hidden = self.viewModel.format == kPasswordSafe || self.sortedAttachmentsFilenames.count == 0 || !Settings.sharedInstance.showAttachmentsOnQuickViewPanel;
         [self.attachmentsTable reloadData];
     }
 }
 
 - (NSString*)maybeDereference:(NSString*)text node:(Node*)node maybe:(BOOL)maybe {
-    return maybe ? [self.model dereference:text node:node] : text;
+    return maybe ? [self.viewModel dereference:text node:node] : text;
 }
                                        
 - (void)startRefreshOtpTimer {
@@ -1034,12 +1008,12 @@ static NSImage* kStrongBox256Image;
 
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item
 {
-    if(!self.model || self.model.locked) {
+    if(!self.viewModel || self.viewModel.locked) {
         return NO;
     }
     
     if(item == nil) {
-        NSArray<Node*> *items = [self getItems:self.model.rootGroup];
+        NSArray<Node*> *items = [self getItems:self.viewModel.rootGroup];
         
         return items.count > 0;
     }
@@ -1058,17 +1032,17 @@ static NSImage* kStrongBox256Image;
 }
 
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item {
-    if(!self.model || self.model.locked) {
+    if(!self.viewModel || self.viewModel.locked) {
         return 0;
     }
     
-    Node* group = (item == nil) ? self.model.rootGroup : ((Node*)item);
+    Node* group = (item == nil) ? self.viewModel.rootGroup : ((Node*)item);
     NSArray<Node*> *items = [self getItems:group];
     return items.count;
 }
 
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item {
-    Node* group = (item == nil) ? self.model.rootGroup : ((Node*)item);
+    Node* group = (item == nil) ? self.viewModel.rootGroup : ((Node*)item);
     NSArray<Node*> *items = [self getItems:group];
     return items.count == 0 ? nil : items[index];
 }
@@ -1197,7 +1171,7 @@ static NSImage* kStrongBox256Image;
     
     
     
-    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.model isDereferenceableText:text];
+    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.viewModel isDereferenceableText:text];
     
     cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly;
     cell.textField.action = selector;
@@ -1214,7 +1188,7 @@ static NSImage* kStrongBox256Image;
         self.italicFont = [NSFontManager.sharedFontManager convertFont:cell.textField.font toHaveTrait:NSFontItalicTrait];
     }
     
-    if(it.isGroup && self.model.recycleBinEnabled && self.model.recycleBinNode && self.model.recycleBinNode == it) {
+    if(it.isGroup && self.viewModel.recycleBinEnabled && self.viewModel.recycleBinNode && self.viewModel.recycleBinNode == it) {
         cell.textField.font = self.italicFont;
     }
     else {
@@ -1224,7 +1198,7 @@ static NSImage* kStrongBox256Image;
     cell.imageView.objectValue = [self getIconForNode:it large:NO];
     cell.textField.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
 
-    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.model isDereferenceableText:it.title];
+    BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.viewModel isDereferenceableText:it.title];
     cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly && !Settings.sharedInstance.outlineViewTitleIsReadonly;
     
     cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
@@ -1246,7 +1220,7 @@ static NSImage* kStrongBox256Image;
     NSTextField *textField = (NSTextField*)sender;
     NSString* newString =  [Utils trim:textField.stringValue];
     if(![item.fields.email isEqualToString:newString]) {
-        [self.model setItemEmail:item email:newString];
+        [self.viewModel setItemEmail:item email:newString];
     }
     else {
         textField.stringValue = newString;
@@ -1264,7 +1238,7 @@ static NSImage* kStrongBox256Image;
     NSTextField *textField = (NSTextField*)sender;
     NSString* newString =  textField.stringValue;
     if(![item.fields.notes isEqualToString:newString]) {
-        [self.model setItemNotes:item notes:newString];
+        [self.viewModel setItemNotes:item notes:newString];
     }
     else {
         textField.stringValue = newString;
@@ -1282,7 +1256,7 @@ static NSImage* kStrongBox256Image;
     NSTextField *textField = (NSTextField*)sender;
     NSString* newString =  [Utils trim:textField.stringValue];
     if(![item.fields.url isEqualToString:newString]) {
-        [self.model setItemUrl:item url:newString];
+        [self.viewModel setItemUrl:item url:newString];
     }
     else {
         textField.stringValue = newString;
@@ -1300,7 +1274,7 @@ static NSImage* kStrongBox256Image;
     NSTextField *textField = (NSTextField*)sender;
     NSString* newString =  [Utils trim:textField.stringValue];
     if(![item.fields.username isEqualToString:newString]) {
-        [self.model setItemUsername:item username:newString];
+        [self.viewModel setItemUsername:item username:newString];
     }
     else {
         textField.stringValue = newString;
@@ -1319,7 +1293,7 @@ static NSImage* kStrongBox256Image;
     
     NSString* newTitle = [Utils trim:textField.stringValue];
     if(![item.title isEqualToString:newTitle]) {
-        if(![self.model setItemTitle:item title:newTitle]) {
+        if(![self.viewModel setItemTitle:item title:newTitle]) {
             textField.stringValue = item.title;
         }
     }
@@ -1397,7 +1371,7 @@ static NSImage* kStrongBox256Image;
 
 
 - (NSArray<Node*> *)getItems:(Node*)parentGroup {
-    if(!self.model || self.model.locked) {
+    if(!self.viewModel || self.viewModel.locked) {
         NSLog(@"Request for safe items while model nil or locked!");
         return @[];
     }
@@ -1420,7 +1394,7 @@ static NSImage* kStrongBox256Image;
         return @[];
     }
     
-    BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.model.format == kPasswordSafe;
+    BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.viewModel.format == kPasswordSafe;
     
     NSArray<Node*>* sorted = sort ? [parentGroup.children sortedArrayUsingComparator:finderStyleNodeComparator] : parentGroup.children;
     
@@ -1429,17 +1403,17 @@ static NSImage* kStrongBox256Image;
     BOOL showRecycleBin = isSearching ? Settings.sharedInstance.showRecycleBinInSearchResults : !Settings.sharedInstance.doNotShowRecycleBinInBrowse;
 
     NSArray<Node*> *filtered = sorted;
-    if(self.model.format == kKeePass1) {
-        if(!showRecycleBin && self.model.keePass1BackupNode) {
+    if(self.viewModel.format == kKeePass1) {
+        if(!showRecycleBin && self.viewModel.keePass1BackupNode) {
             filtered = [sorted filter:^BOOL(Node * _Nonnull obj) {
-                return obj != self.model.keePass1BackupNode;
+                return obj != self.viewModel.keePass1BackupNode;
             }];
         }
     }
     else {
-        if(!showRecycleBin && self.model.recycleBinNode) {
+        if(!showRecycleBin && self.viewModel.recycleBinNode) {
             filtered = [sorted filter:^BOOL(Node * _Nonnull obj) {
-                return obj != self.model.recycleBinNode;
+                return obj != self.viewModel.recycleBinNode;
             }];
         }
     }
@@ -1477,25 +1451,25 @@ static NSImage* kStrongBox256Image;
 - (BOOL)immediateMatch:(NSString*)searchText item:(Node*)item scope:(NSInteger)scope {
     BOOL immediateMatch = NO;
 
-    NSArray<NSString*> *terms = [self.model getSearchTerms:searchText];
+    NSArray<NSString*> *terms = [self.viewModel getSearchTerms:searchText];
     
     
     
     for (NSString* term in terms) {
         if (scope == kSearchScopeTitle) {
-            immediateMatch = [self.model isTitleMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isTitleMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         else if (scope == kSearchScopeUsername) {
-            immediateMatch = [self.model isUsernameMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isUsernameMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         else if (scope == kSearchScopePassword) {
-            immediateMatch = [self.model isPasswordMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isPasswordMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         else if (scope == kSearchScopeUrl) {
-            immediateMatch = [self.model isUrlMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isUrlMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         else {
-            immediateMatch = [self.model isAllFieldsMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
+            immediateMatch = [self.viewModel isAllFieldsMatches:term node:item dereference:Settings.sharedInstance.dereferenceDuringSearch];
         }
         
         if(!immediateMatch) { 
@@ -1510,26 +1484,23 @@ static NSImage* kStrongBox256Image;
 
 - (NSString*)selectedItemSerializationId {
     Node* item = [self getCurrentSelectedItem];
-    return [self.model.database getCrossSerializationFriendlyIdId:item.uuid];
+    return [self.viewModel.database getCrossSerializationFriendlyIdId:item.uuid];
 }
 
 - (void)showProgressModal:(NSString*)operationDescription {
-    [self hideProgressModal];
-
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.progressWindow = [[ProgressWindow alloc] initWithWindowNibName:@"ProgressWindow"];
-        self.progressWindow.operationDescription = operationDescription;
-        [self.view.window beginSheet:self.progressWindow.window  completionHandler:nil];
+        if ( self.progressWindow ) {
+            [self.progressWindow hide];
+        }
+        self.progressWindow = [ProgressWindow newProgress:operationDescription];
+        [self.view.window beginSheet:self.progressWindow.window completionHandler:nil];
     });
 }
 
 - (void)hideProgressModal {
-    if(self.progressWindow) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.view.window endSheet:self.progressWindow.window];
-            self.progressWindow = nil;
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.progressWindow hide];
+    });
 }
 
 - (NSData*)getSelectedKeyFileDigest:(NSError**)error {
@@ -1538,7 +1509,7 @@ static NSImage* kStrongBox256Image;
         NSData* data = [BookmarksHelper dataWithContentsOfBookmark:self.selectedKeyFileBookmark error:error];
                 
         if(data) {
-            keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.model.format != kKeePass1];
+            keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.viewModel.format != kKeePass1];
             
         }
         else {
@@ -1624,7 +1595,7 @@ static NSImage* kStrongBox256Image;
 
 
 - (BOOL)biometricOpenIsAvailableForSafe {
-    DatabaseMetadata* metaData = self.model.databaseMetadata;
+    DatabaseMetadata* metaData = self.databaseMetadata;
     
     BOOL ret =  (metaData == nil ||
                  !metaData.isTouchIdEnabled ||
@@ -1636,16 +1607,11 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)autoPromptForTouchIdIfDesired {
-
-    
-    if(self.model && self.model.locked) {
+    if(self.viewModel && self.viewModel.locked) {
         BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
-
-
 
         if(weAreKeyWindow && [self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) {
             NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.lastAutoPromptForTouchIdThrottle];
-
             if(self.lastAutoPromptForTouchIdThrottle != nil && secondsBetween < 1.5) {
                 NSLog(@"Too many auto biometric requests too soon - ignoring...");
                 return;
@@ -1663,7 +1629,7 @@ static NSImage* kStrongBox256Image;
                 self.lastAutoPromptForTouchIdThrottle = NSDate.date;
 
                 if(success) {
-                    DatabaseMetadata* metaData = self.model.databaseMetadata;
+                    DatabaseMetadata* metaData = self.databaseMetadata;
 
                     NSError* err;
                     CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:metaData.conveniencePassword
@@ -1707,15 +1673,21 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-- (void)onFileChangedByOtherApplication {
+- (void)onFileChangedByOtherApplication:(NSNotification*)notification {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self onDatabaseChangedByExternalOther];
+    });
+}
+
+- (void)onDatabaseChangedByExternalOther {
     if(self.isPromptingAboutUnderlyingFileChange) {
         NSLog(@"Already in Use...");
         return;
     }
     
     self.isPromptingAboutUnderlyingFileChange = YES;
-    if(self.model && !self.model.locked) {
-        if(!self.model.document.isDocumentEdited) {
+    if(self.viewModel && !self.viewModel.locked) {
+        if(!self.viewModel.document.isDocumentEdited) {
             if(!Settings.sharedInstance.autoReloadAfterForeignChanges) {
                 NSString* loc = NSLocalizedString(@"mac_db_changed_externally_reload_yes_or_no", @"The database has been changed by another application, would you like to reload this latest version and automatically unlock?");
 
@@ -1725,11 +1697,11 @@ static NSImage* kStrongBox256Image;
                     if(yesNo) {
                         NSString* loc = NSLocalizedString(@"mac_db_reloading_after_external_changes_popup_notification", @"Reloading after external changes...");
 
-                        [self showPopupToastNotification:loc];
+                        [self showPopupChangeToastNotification:loc];
                         
-                        self.model.selectedItem = [self selectedItemSerializationId];
+                        self.viewModel.selectedItem = [self selectedItemSerializationId];
                         
-                        [self reloadAndUnlock:self.model.compositeKeyFactors isBiometricOpen:NO];
+                        [self reloadAndUnlock:self.viewModel.compositeKeyFactors isBiometricOpen:NO];
                     }
                     
                     self.isPromptingAboutUnderlyingFileChange = NO;
@@ -1739,10 +1711,10 @@ static NSImage* kStrongBox256Image;
             else {
                 NSString* loc = NSLocalizedString(@"mac_db_reloading_after_external_changes_popup_notification", @"Reloading after external changes...");
 
-                [self showPopupToastNotification:loc];
+                [self showPopupChangeToastNotification:loc];
 
-                self.model.selectedItem = [self selectedItemSerializationId];
-                [self reloadAndUnlock:self.model.compositeKeyFactors isBiometricOpen:NO];
+                self.viewModel.selectedItem = [self selectedItemSerializationId];
+                [self reloadAndUnlock:self.viewModel.compositeKeyFactors isBiometricOpen:NO];
                 
                 self.isPromptingAboutUnderlyingFileChange = NO;
 
@@ -1766,19 +1738,24 @@ static NSImage* kStrongBox256Image;
     [self.keyFilePopup setEnabled:enable];
 }
 
-- (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors isBiometricOpen:(BOOL)isBiometricOpen {
-    if(self.model) {
+- (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors
+        isBiometricOpen:(BOOL)isBiometricOpen {
+    if( self.viewModel ) {
+        
+        
+        if ( self.databaseMetadata && self.databaseMetadata.storageProvider != kLocalDevice && !Settings.sharedInstance.isProOrFreeTrial ) {
+            [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
+                     window:self.view.window];
+            return;
+        }
+        
         [self enableMasterCredentialsEntry:NO];
-        
-        NSString* loc = NSLocalizedString(@"generic_unlocking_ellipsis", @"Unlocking...");
-        [self showProgressModal:loc];
-        
+                
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.model reloadAndUnlock:compositeKeyFactors
-                         viewController:self
-                             completion:^(BOOL success, NSError * _Nullable error) {
+            [self.document revertWithUnlock:compositeKeyFactors
+                             viewController:self
+                                completion:^(BOOL success, NSError * _Nullable error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self hideProgressModal];
                     if(success) {
                         self.textFieldMasterPassword.stringValue = @"";
                     }
@@ -1800,7 +1777,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self enableMasterCredentialsEntry:YES];
     
     if(success) {
-        DatabaseMetadata* metaData = self.model.databaseMetadata;
+        DatabaseMetadata* metaData = self.databaseMetadata;
         
         BOOL pro = (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
         BOOL bioAvail = BiometricIdHelper.sharedInstance.biometricIdAvailable;
@@ -1820,10 +1797,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                 compositeKeyFactors:compositeKeyFactors];            
         }
                 
-        NSString* password = self.model.compositeKeyFactors.password;
+        NSString* password = self.viewModel.compositeKeyFactors.password;
         if( !isBiometricUnlock && touchIdIsPossible && metaData.isTouchIdEnabled && metaData.isTouchIdEnrolled && metaData.conveniencePassword == nil && password.length) {
             
-            [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:password];
+            [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:password];
         }
     
         
@@ -1852,7 +1829,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         @"convenienceUnlock" : @(shouldPromptForBiometricEnrol),
         @"autoFill" : @(shouldPromptForAutoFillEnrol),
         @"compositeKeyFactors" : compositeKeyFactors,
-        @"model" : self.model.database,
+        @"model" : self.viewModel.database,
     };
     
     [self performSegueWithIdentifier:@"segueToDatabaseOnboarding" sender:foo];
@@ -1861,7 +1838,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 
 - (void)onAutoLock:(NSNotification*)notification {
-    if(self.model && !self.model.locked && !self.model.document.isDocumentEdited) {
+    if(self.viewModel && !self.viewModel.locked && !self.viewModel.document.isDocumentEdited) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self onLock:nil];
         });
@@ -1869,15 +1846,15 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (IBAction)onLock:(id)sender {
-    if(self.model && !self.model.locked) {
-        if([self.model.document isDocumentEdited]) {
+    if(self.viewModel && !self.viewModel.locked) {
+        if([self.viewModel.document isDocumentEdited]) {
             NSString* loc = NSLocalizedString(@"mac_cant_lock_db_while_changes_pending", @"You cannot lock a database while changes are pending. Save changes and lock now?");
             
             [MacAlerts yesNo:loc window:self.view.window completion:^(BOOL yesNo) {
                 if(yesNo) {
                     NSString* loc = NSLocalizedString(@"generic_locking_ellipsis", @"Locking...");
                     [self showProgressModal:loc];
-                    [self.model.document saveDocumentWithDelegate:self didSaveSelector:@selector(lockSafeContinuation:) contextInfo:nil];
+                    [self.viewModel.document saveDocumentWithDelegate:self didSaveSelector:@selector(lockSafeContinuation:) contextInfo:nil];
                 }
                 else {
                     return;
@@ -1899,7 +1876,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSString* sid = [self selectedItemSerializationId];
     [self closeAllDetailsWindows:^{
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [self.model lock:sid];
+            [self.viewModel lock:sid];
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self onLockDone];
             });
@@ -1926,9 +1903,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
-    [self.model setCompositeKeyFactors:ckf];
+    [self.viewModel setCompositeKeyFactors:ckf];
 
-    DatabaseMetadata* metadata = self.model.databaseMetadata;
+    DatabaseMetadata* metadata = self.databaseMetadata;
     
     if(self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile) {
         metadata.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
@@ -1944,7 +1921,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
-    if(self.model && !self.model.locked) {
+    if(self.viewModel && !self.viewModel.locked) {
         dispatch_async(dispatch_get_main_queue(), ^{
             self.changeMasterPassword = [[CreateFormatAndSetCredentialsWizard alloc] initWithWindowNibName:@"ChangeMasterPasswordWindowController"];
             
@@ -1953,9 +1930,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             NSLocalizedString(@"mac_change_master_credentials", @"Change Master Credentials");
             
             self.changeMasterPassword.titleText = loc;
-            self.changeMasterPassword.initialDatabaseFormat = self.model.format;
-            self.changeMasterPassword.initialYubiKeyConfiguration = self.model.databaseMetadata.yubiKeyConfiguration;
-            self.changeMasterPassword.initialKeyFileBookmark = self.model.databaseMetadata.keyFileBookmark;
+            self.changeMasterPassword.initialDatabaseFormat = self.viewModel.format;
+            self.changeMasterPassword.initialYubiKeyConfiguration = self.databaseMetadata.yubiKeyConfiguration;
+            self.changeMasterPassword.initialKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
             
             [self.view.window beginSheet:self.changeMasterPassword.window
                        completionHandler:^(NSModalResponse returnCode) {
@@ -2071,7 +2048,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return;
     }
     
-    NSString* deref = [self.model dereference:text node:item];
+    NSString* deref = [self.viewModel dereference:text node:item];
     
     [ClipboardManager.sharedInstance copyConcealedString:deref];
 }
@@ -2137,7 +2114,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [ClipboardManager.sharedInstance copyConcealedString:derefed];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, field.key, NSLocalizedString(@"generic_fieldname_custom_field", @"Custom Field")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, field.key, NSLocalizedString(@"generic_fieldname_custom_field", @"Custom Field")]];
 }
 
 - (void)copyTitle:(Node*)item {
@@ -2146,7 +2123,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self dereferenceAndCopyToPasteboard:item.title item:item];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_title", @"Title")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_title", @"Title")]];
 }
 
 - (void)copyUsername:(Node*)item {
@@ -2154,7 +2131,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     [self dereferenceAndCopyToPasteboard:item.fields.username item:item];
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_username", @"Username")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_username", @"Username")]];
 }
 
 - (void)copyEmail:(Node*)item {
@@ -2162,7 +2139,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     [self dereferenceAndCopyToPasteboard:item.fields.email item:item];
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_email", @"Email")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_email", @"Email")]];
 }
 
 - (void)copyUrl:(Node*)item {
@@ -2171,7 +2148,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self dereferenceAndCopyToPasteboard:item.fields.url item:item];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_url", @"URL")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_url", @"URL")]];
 }
 
 - (void)copyNotes:(Node*)item {
@@ -2180,7 +2157,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self dereferenceAndCopyToPasteboard:item.fields.notes item:item];
 
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_notes", @"Notes")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_notes", @"Notes")]];
 }
 
 - (void)copyPassword:(Node*)item {
@@ -2191,7 +2168,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self dereferenceAndCopyToPasteboard:item.fields.password item:item];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_password", @"Password")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_password", @"Password")]];
 }
 
 - (void)copyTotp:(Node*)item {
@@ -2203,7 +2180,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [ClipboardManager.sharedInstance copyConcealedString:password];
     
     NSString* loc = NSLocalizedString(@"mac_field_copied_to_clipboard_fmt", @"'%@' %@ Copied");
-    [self showPopupToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"TOTP")]];
+    [self showPopupChangeToastNotification:[NSString stringWithFormat:loc, item.title, NSLocalizedString(@"generic_fieldname_totp", @"TOTP")]];
 }
 
 
@@ -2299,7 +2276,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
     
     Node* selected = [self getCurrentSelectedItem];
-    Node* destinationItem = self.model.rootGroup;
+    Node* destinationItem = self.viewModel.rootGroup;
     if(selected) {
         destinationItem = selected.isGroup ? selected : selected.parent;
     }
@@ -2323,7 +2300,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                kDragAndDropExternalUti]
                        owner:self];
     
-    NSArray<Node*>* minimalNodeSet = [self.model getMinimalNodeSet:items].allObjects;
+    NSArray<Node*>* minimalNodeSet = [self.viewModel getMinimalNodeSet:items].allObjects;
     
     
     
@@ -2340,7 +2317,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (NSArray<NSString*>*)getInternalSerializationIds:(NSArray<Node*>*)nodes {
     return [nodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return [self.model.database getCrossSerializationFriendlyIdId:obj.uuid];
+        return [self.viewModel.database getCrossSerializationFriendlyIdId:obj.uuid];
     }];
 }
 
@@ -2355,7 +2332,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             
     
     
-    NSDictionary *serialized = @{ @"sourceFormat" : @(self.model.format),
+    NSDictionary *serialized = @{ @"sourceFormat" : @(self.viewModel.format),
                                   @"nodes" : nodeDictionaries };
     
     
@@ -2373,15 +2350,15 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (NSDragOperation)outlineView:(NSOutlineView *)outlineView validateDrop:(id<NSDraggingInfo>)info
                   proposedItem:(id)item
             proposedChildIndex:(NSInteger)index {
-    Node* destinationItem = (item == nil) ? self.model.rootGroup : item;
+    Node* destinationItem = (item == nil) ? self.viewModel.rootGroup : item;
 
     if ([info draggingSource] == self.outlineView) {
         NSArray<NSString*>* serializationIds = [info.draggingPasteboard propertyListForType:kDragAndDropInternalUti];
         NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-            return [self.model getItemFromSerializationId:obj];
+            return [self.viewModel getItemFromSerializationId:obj];
         }];
 
-        BOOL valid = [self.model validateMove:sourceItems destination:destinationItem];
+        BOOL valid = [self.viewModel validateMove:sourceItems destination:destinationItem];
 
         return valid ? NSDragOperationMove : NSDragOperationNone;
     }
@@ -2395,7 +2372,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
               item:(id)item
         childIndex:(NSInteger)index {
     
-    Node* destinationItem = (item == nil) ? self.model.rootGroup : item;
+    Node* destinationItem = (item == nil) ? self.viewModel.rootGroup : item;
 
     return [self pasteItemsFromPasteboard:info.draggingPasteboard destinationItem:destinationItem source:info.draggingSource clear:YES];
 }
@@ -2412,10 +2389,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     if (source == self.outlineView) {
         NSArray<NSString*>* serializationIds = [pasteboard propertyListForType:kDragAndDropInternalUti];
         NSArray<Node*>* sourceItems = [serializationIds map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-            return [self.model getItemFromSerializationId:obj];
+            return [self.viewModel getItemFromSerializationId:obj];
         }];
 
-        BOOL result = [self.model move:sourceItems destination:destinationItem];
+        BOOL result = [self.viewModel move:sourceItems destination:destinationItem];
         
         if(clear) {
             [pasteboard clearContents];
@@ -2454,7 +2431,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     DatabaseFormat sourceFormat = sourceFormatNum.integerValue;
     NSArray<NSDictionary*>* serializedNodes = serialized[@"nodes"];
     
-    BOOL keePassGroupTitleRules = self.model.format != kPasswordSafe;
+    BOOL keePassGroupTitleRules = self.viewModel.format != kPasswordSafe;
     
     
     
@@ -2530,7 +2507,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return !obj.isGroup;
     }];
     
-    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.model.rootGroup) && rootEntries.count);
+    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.viewModel.rootGroup) && rootEntries.count);
     
     if(nodesWithEmails.count || pastingEntriesToRoot) {
         NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries", @"KeePass 1 does not support entries at the root level, these will be discarded. KeePass 1 also does not natively support the 'Email' field. Strongbox will append it instead to the end of the 'Notes' field.\nDo you want to continue?");
@@ -2626,7 +2603,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     NSArray<Node*>* rootEntries = [nodes filter:^BOOL(Node * _Nonnull obj) {
         return !obj.isGroup;
     }];
-    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.model.rootGroup) && rootEntries.count);
+    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.viewModel.rootGroup) && rootEntries.count);
 
     if(incompatibles.count || pastingEntriesToRoot) {
         NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries_or_attachments", @"The KeePass 1 (KDB) does not support entries at the root level, these will be discarded.\n\nThe KeePass 1 (KDB) format also does not support multiple attachments, custom fields or custom icons. If you continue only the first attachment from each item will be copied to this database. Custom Fields and Icons will be discarded.\nDo you want to continue?");
@@ -2638,7 +2615,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                    for (Node* incompatible in incompatibles) {
                        incompatible.icon = nil;
                        NSString* firstAttachmentFilename = incompatible.fields.attachments.allKeys.firstObject;
-                       if(firstAttachmentFilename) { 
+                       if ( firstAttachmentFilename ) { 
                            DatabaseAttachment* dbA = incompatible.fields.attachments[firstAttachmentFilename];
                            
                            [incompatible.fields.attachments removeAllObjects];
@@ -2712,19 +2689,19 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                  nodes:(NSArray<Node*>*)nodes
                        destinationItem:(Node*_Nonnull)destinationItem
                           sourceFormat:(DatabaseFormat)sourceFormat {
-    if (sourceFormat == kPasswordSafe && (self.model.format == kKeePass || self.model.format == kKeePass4)) {
+    if (sourceFormat == kPasswordSafe && (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4)) {
         [self processPasswordSafeToKeePass2:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
     }
-    else if (sourceFormat == kPasswordSafe && self.model.format == kKeePass1) {
+    else if (sourceFormat == kPasswordSafe && self.viewModel.format == kKeePass1) {
         [self processPasswordSafeToKeePass1:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
     }
-    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.model.format == kPasswordSafe) {
+    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.viewModel.format == kPasswordSafe) {
         [self processKeePass2ToPasswordSafe:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
     }
-    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.model.format == kKeePass1) {
+    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.viewModel.format == kKeePass1) {
         [self processKeePass2ToKeePass1:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
     }
-    else if (sourceFormat == kKeePass1 && self.model.format == kPasswordSafe) {
+    else if (sourceFormat == kKeePass1 && self.viewModel.format == kPasswordSafe) {
         [self processKeePass1ToPasswordSafe:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
     }
     else {
@@ -2736,7 +2713,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                 nodes:(NSArray<Node*>*)nodes
       destinationItem:(Node*)destinationItem
          sourceFormat:(DatabaseFormat)sourceFormat {
-    BOOL success = [self.model addChildren:nodes parent:destinationItem];
+    BOOL success = [self.viewModel addChildren:nodes parent:destinationItem];
     
     if(!success) {
         [MacAlerts info:@"Could Not Paste"
@@ -2750,9 +2727,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (IBAction)onCreateRecord:(id)sender {
     Node *item = [self getCurrentSelectedItem];
-    Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
-
-    if(![self.model addNewRecord:parent]) {
+    Node *parent = item ? (item.isGroup ? item : item.parent) : self.viewModel.rootGroup;
+    
+    if(![self.viewModel addNewRecord:parent]) {
         NSString* loc = NSLocalizedString(@"mac_alert_cannot_create_item_here", @"You cannot create a new item here. It must be within an existing folder.");
         [MacAlerts info:loc window:self.view.window];
         return;
@@ -2761,13 +2738,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
 - (IBAction)onCreateGroup:(id)sender {
     Node *item = [self getCurrentSelectedItem];
-    Node *parent = item && item.isGroup ? item : (item ? item.parent : self.model.rootGroup);
-    
+    Node *parent = item ? (item.isGroup ? item : item.parent) : self.viewModel.rootGroup;
+        
     NSString* loc = NSLocalizedString(@"mac_please_enter_a_title_for_new_group", @"Please enter a Title for your new Group");
     NSString* title = [[[MacAlerts alloc] init] input:loc defaultValue:kDefaultNewTitle allowEmpty:NO];
     
     if(title.length) {
-        [self.model addNewGroup:parent title:title];
+        [self.viewModel addNewGroup:parent title:title];
     }
 }
 
@@ -2797,7 +2774,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
     
     NSDictionary* grouped = [items groupBy:^id _Nonnull(Node * _Nonnull obj) {
-        BOOL delete = [self.model canRecycle:obj];
+        BOOL delete = [self.viewModel canRecycle:obj];
         return @(delete);
     }];
 
@@ -2826,9 +2803,9 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                    
                    
                    
-                   [self.model deleteItems:toBeDeleted];
+                   [self.viewModel deleteItems:toBeDeleted];
                    
-                   BOOL fail = ![self.model recycleItems:toBeRecycled];
+                   BOOL fail = ![self.viewModel recycleItems:toBeRecycled];
                    
                    if(fail) {
                        [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
@@ -2851,12 +2828,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else {
         Node* item = items.firstObject;
         message = [NSString stringWithFormat:NSLocalizedString(@"browse_vc_are_you_sure_delete_fmt", @"Are you sure you want to permanently delete '%@'?"),
-                   [self.model dereference:item.title node:item]];
+                   [self.viewModel dereference:item.title node:item]];
     }
     
     [MacAlerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
         if (yesNo) {
-            [self.model deleteItems:items];
+            [self.viewModel deleteItems:items];
         }
     }];
 }
@@ -2870,12 +2847,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     else {
         Node* item = items.firstObject;
         message = [NSString stringWithFormat:NSLocalizedString(@"mac_are_you_sure_recycle_bin_yes_no_fmt", @"Are you sure you want to send '%@' to the Recycle Bin?"),
-                                [self.model dereference:item.title node:item]];
+                                [self.viewModel dereference:item.title node:item]];
     }
     
     [MacAlerts yesNo:title informativeText:message window:self.view.window completion:^(BOOL yesNo) {
         if (yesNo) {
-            BOOL fail = ![self.model recycleItems:items];
+            BOOL fail = ![self.viewModel recycleItems:items];
 
             if(fail) {
                [MacAlerts info:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
@@ -2890,7 +2867,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (IBAction)onLaunchUrl:(id)sender {
     Node* item = [self getCurrentSelectedItem];
     
-    NSString *urlString = [self.model dereference:item.fields.url node:item];
+    NSString *urlString = [self.viewModel dereference:item.fields.url node:item];
     
     if (!urlString.length) {
         return;
@@ -2911,7 +2888,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 
     Node* item = nil;
     
-    if(self.model && !self.model.locked) {
+    if(self.viewModel && !self.viewModel.locked) {
         item = [self getCurrentSelectedItem];
     }
     
@@ -2945,19 +2922,19 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
     else if(theAction == @selector(onCreateGroup:) ||
             theAction == @selector(onCreateRecord:)) {
-        return self.model && !self.model.locked;
+        return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(onChangeMasterPassword:) ||
              theAction == @selector(onCopyAsCsv:) ||
              theAction == @selector(onImportFromCsvFile:) ||
              theAction == @selector(onLock:)) {
-        return self.model && !self.model.locked;
+        return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(onShowSafeSummary:)) {
-        return self.model && !self.model.locked;
+        return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(onFind:)) {
-        return self.model && !self.model.locked;
+        return self.viewModel && !self.viewModel.locked;
             
     }
     else if(theAction == @selector(onLaunchUrl:) ||
@@ -2971,7 +2948,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return item && !item.isGroup;
     }
     else if (theAction == @selector(onCopyEmail:)) {
-        return item && !item.isGroup && self.model.format == kPasswordSafe;
+        return item && !item.isGroup && self.viewModel.format == kPasswordSafe;
     }
     else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
         return item && !item.isGroup && item.fields.password.length;
@@ -2986,16 +2963,16 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
     else if (theAction == @selector(onDatabaseProperties:)) {
-        return self.model && !self.model.locked;
+        return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(onAutoFillSettings:)) {
-        return self.model && !self.model.locked && AutoFillManager.sharedInstance.isPossible;
+        return self.viewModel && !self.viewModel.locked && AutoFillManager.sharedInstance.isPossible;
     }
     else if (theAction == @selector(saveDocument:)) {
-        return !self.model.locked;
+        return !self.viewModel.locked;
     }
     else if (theAction == @selector(onSetItemIcon:)) {
-        return item != nil && self.model.format != kPasswordSafe;
+        return item != nil && self.viewModel.format != kPasswordSafe;
     }
     else if(theAction == @selector(onSetTotp:)) {
         return item && !item.isGroup;
@@ -3008,7 +2985,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             item != nil &&
             !item.isGroup &&
             item.fields.keePassHistory.count > 0 &&
-            (self.model.format == kKeePass || self.model.format == kKeePass4);
+            (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
     }
     else if(theAction == @selector(onOutlineHeaderColumnsChanged:)) {
         NSMenuItem* menuItem = (NSMenuItem*)anItem;
@@ -3016,16 +2993,16 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         return [self isColumnAvailableForModel:menuItem.identifier];
     }
     else if(theAction == @selector(onPrintDatabase:)) {
-        return self.model && !self.model.locked;
+        return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(onDownloadFavIcons:)) {
-        return !self.model.locked && (item == nil || ((self.model.format == kKeePass || self.model.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
+        return !self.viewModel.locked && (item == nil || ((self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
     }
     else if (theAction == @selector(onPreviewQuickViewAttachment:)) {
-        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
+        return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
     }
     else if (theAction == @selector(onSaveQuickViewAttachmentAs:)) {
-        return !self.model.locked && item != nil && !item.isGroup && self.model.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
+        return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
     }
     
     return YES;
@@ -3034,10 +3011,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)clearTouchId {
     NSLog(@"Clearing Touch ID data...");
     
-    self.model.databaseMetadata.hasPromptedForTouchIdEnrol = NO; 
-    self.model.databaseMetadata.isTouchIdEnrolled = NO;
-    [self.model.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:nil];
-    [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
+    self.databaseMetadata.hasPromptedForTouchIdEnrol = NO; 
+    self.databaseMetadata.isTouchIdEnrolled = NO;
+    [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:nil];
+    [DatabasesManager.sharedInstance update:self.databaseMetadata];
     
     [self bindLockScreenUi];
 }
@@ -3053,7 +3030,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (IBAction)onCopyAsCsv:(id)sender {
     [[NSPasteboard generalPasteboard] clearContents];
     
-    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.model.database] encoding:NSUTF8StringEncoding];
+    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database] encoding:NSUTF8StringEncoding];
     
     [[NSPasteboard generalPasteboard] setString:newStr forType:NSStringPboardType];
 }
@@ -3126,7 +3103,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                 
                 [MacAlerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
                     if(yesNo) {
-                        [self.model importRecordsFromCsvRows:rows];
+                        [self.viewModel importRecordsFromCsvRows:rows];
 
                         NSString* loc = NSLocalizedString(@"mac_csv_file_successfully_imported", @"CSV File Successfully Imported.");
                         [MacAlerts info:loc window:self.view.window];
@@ -3164,7 +3141,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
 
-        if(self.model == nil || self.model.locked) {
+        if(self.viewModel == nil || self.viewModel.locked) {
             [self.tabViewLockUnlock selectTabViewItemAtIndex:0];
             [self bindLockScreenUi];
         }
@@ -3213,7 +3190,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)tableView {
     if (tableView == self.tableViewSummary) {
-        MutableOrderedDictionary* dictionary = getSummaryDictionary(self.model);
+        MutableOrderedDictionary* dictionary = getSummaryDictionary(self.viewModel);
         return dictionary.count;
     }
     else if (tableView == self.attachmentsTable) {
@@ -3228,7 +3205,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     if(tableView == self.tableViewSummary) {
         NSTableCellView* cell = [self.tableViewSummary makeViewWithIdentifier:@"KeyCellIdentifier" owner:nil];
 
-        MutableOrderedDictionary *dict = getSummaryDictionary(self.model);
+        MutableOrderedDictionary *dict = getSummaryDictionary(self.viewModel);
         
         NSString *key = dict.allKeys[row];
         NSString *value = dict[key];
@@ -3292,7 +3269,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)buildAttachmentsIconCache {
-    NSArray *workingCopy = self.model.database.attachmentPool;
+    NSArray *workingCopy = self.viewModel.database.attachmentPool;
     NSMutableDictionary *tmp = @{}.mutableCopy;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
@@ -3407,20 +3384,20 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)onEditNodeIcon:(Node*)item {
-    if(self.model.format == kPasswordSafe) {
+    if(self.viewModel.format == kPasswordSafe) {
         return;
     }
     
     __weak ViewController* weakSelf = self;
     self.selectPredefinedIconController = [[SelectPredefinedIconController alloc] initWithWindowNibName:@"SelectPredefinedIconController"];
-    self.selectPredefinedIconController.customIcons = self.model.customIcons.allObjects;
-    self.selectPredefinedIconController.hideSelectFile = self.model.format == kKeePass1;
+    self.selectPredefinedIconController.customIcons = self.viewModel.customIcons.allObjects;
+    self.selectPredefinedIconController.hideSelectFile = self.viewModel.format == kKeePass1;
     self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) { 
         if(showFindFavIcons) {
             [weakSelf showFindFavIconsForItem:item];
         }
         else {
-            onSelectedNewIcon(weakSelf.model, item, icon, weakSelf.view.window);
+            [weakSelf.viewModel setItemIcon:item icon:icon];
         }
     };
 
@@ -3428,67 +3405,12 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
 }
 
-void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSWindow* window) {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        [model setItemIcon:item icon:selectedIcon];
-
-}
-
 - (IBAction)onViewItemHistory:(id)sender {
     Node *item = [self getCurrentSelectedItem];
     
     if(item == nil ||
        item.isGroup || item.fields.keePassHistory.count == 0 ||
-       (!(self.model.format == kKeePass || self.model.format == kKeePass4))) {
+       (!(self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4))) {
         return;
     }
 
@@ -3565,7 +3487,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
         [MacAlerts yesNo:loc
                window:self.view.window
            completion:^(BOOL yesNo) {
-            [self.model setTotp:item otp:response steam:yesNo];
+            [self.viewModel setTotp:item otp:response steam:yesNo];
         }];
     }
 }
@@ -3577,24 +3499,32 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
         return;
     }
     
-    [self.model clearTotp:item];
+    [self.viewModel clearTotp:item];
 }
 
-- (void)showPopupToastNotification:(NSString*)message {
+- (void)showPopupChangeToastNotification:(NSString*)message {
     if(Settings.sharedInstance.doNotShowChangeNotifications) {
         return;
     }
     
+    [self showToastNotification:message error:NO];
+}
+
+- (void)showToastNotification:(NSString*)message error:(BOOL)error {
+    NSColor *defaultColor = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
+    NSColor *errorColor = [NSColor colorWithDeviceRed:1 green:0.55 blue:0.05 alpha:0.60];
+
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     hud.labelText = message;
-    hud.color = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
+    hud.color = error ? errorColor : defaultColor;
     hud.mode = MBProgressHUDModeText;
     hud.margin = 10.f;
     hud.yOffset = 150.f;
     hud.removeFromSuperViewOnHide = YES;
     hud.dismissible = YES;
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    NSTimeInterval delay = error ? 3.0f : 1.0f;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [hud hide:YES];
     });
 }
@@ -3624,8 +3554,8 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
 - (IBAction)onPrintDatabase:(id)sender {
     NSString* loc = NSLocalizedString(@"mac_database_print_emergency_sheet_fmt", @"%@ Emergency Sheet");
     
-    NSString* databaseName = [NSString stringWithFormat:loc, self.model.databaseMetadata.nickName];
-    NSString* htmlString = [self.model getHtmlPrintString:databaseName];
+    NSString* databaseName = [NSString stringWithFormat:loc, self.databaseMetadata.nickName];
+    NSString* htmlString = [self.viewModel getHtmlPrintString:databaseName];
 
     
     
@@ -3656,11 +3586,11 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
 }
 
 - (void)showFindFavIconsForItem:(Node*)item {
-    NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.model.activeRecords;
+    NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.viewModel.activeRecords;
     
-    [FavIconDownloader showUi:self nodes:items viewModel:self.model onDone:^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
+    [FavIconDownloader showUi:self nodes:items viewModel:self.viewModel onDone:^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
         if(go) {
-            [self.model batchSetIcons:selectedFavIcons];
+            [self.viewModel batchSetIcons:selectedFavIcons];
         }
     }];
 }
@@ -3682,7 +3612,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
     
     
 
-    DatabaseMetadata *database = self.model.databaseMetadata;
+    DatabaseMetadata *database = self.databaseMetadata;
     NSURL* configuredUrl;
     if(database && database.keyFileBookmark) {
         NSString* updatedBookmark = nil;
@@ -3778,7 +3708,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
 }
 
 - (void)onSelectPreconfiguredKeyFile {
-    self.selectedKeyFileBookmark = self.model.databaseMetadata.keyFileBookmark;
+    self.selectedKeyFileBookmark = self.databaseMetadata.keyFileBookmark;
     [self refreshKeyFileDropdown];
 }
 
@@ -3789,7 +3719,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
 }
 
 - (DatabaseFormat)getHeuristicFormat {
-    BOOL probablyPasswordSafe = [self.model.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
+    BOOL probablyPasswordSafe = [self.viewModel.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
     DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; 
 
     return heuristicFormat;
@@ -3838,7 +3768,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
 }
 
 - (void)bindBiometricButtonsOnLockScreen {
-    DatabaseMetadata* metaData = self.model.databaseMetadata;
+    DatabaseMetadata* metaData = self.databaseMetadata;
 
     [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock", @"Unlock with Touch ID or Watch")];
     self.buttonUnlockWithTouchId.hidden = NO;
@@ -3848,7 +3778,7 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
         if(metaData.isTouchIdEnrolled) {
             if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
                 if (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) {
-                    if(self.model.databaseMetadata.conveniencePassword) {
+                    if(self.databaseMetadata.conveniencePassword) {
                         [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
                     }
                     else {
@@ -4019,15 +3949,136 @@ void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSW
     
     Node* item = nil;
     
-    if(self.model && !self.model.locked) {
+    if(self.viewModel && !self.viewModel.locked) {
         item = [self getCurrentSelectedItem];
     }
     
     if (item && !item.isGroup) {
         Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
         [item touch:NO touchParents:YES];        
-        [self.model addChildren:@[dupe] parent:item.parent];
+        [self.viewModel addChildren:@[dupe] parent:item.parent];
     }
+}
+
+
+
+- (void)listenToAutoFillWormhole { 
+    self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
+                                                         optionalDirectory:kAutoFillWormholeName];
+
+    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeRequestId
+                                         listener:^(id messageObject) {
+        if ( self.viewModel && !self.viewModel.locked && messageObject) {
+            NSDictionary *dict = (NSDictionary*)messageObject;
+            NSString* json = dict[@"id"];
+            if (!json) {
+                return;
+            }
+            
+            QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
+            
+            if( identifier && self.databaseMetadata && [self.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
+                if (!self.databaseMetadata.quickWormholeFillEnabled) {
+                    return;
+                }
+                
+                
+
+                
+                
+                DatabaseModel* model = self.viewModel.database;
+                Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
+                    return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
+                }];
+
+                NSString* secretStoreId = NSUUID.UUID.UUIDString;
+
+                if(node) {
+
+
+                    NSString* user = [model dereference:node.fields.username node:node];
+                    NSString* password = [model dereference:node.fields.password node:node];
+                    NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
+                    
+                    NSDictionary* securePayload = @{
+                        @"user" : user,
+                        @"password" : password,
+                        @"totp" : totp,
+                    };
+                    
+                    NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
+                    
+                    [SecretStore.sharedInstance setSecureObject:securePayload forIdentifier:secretStoreId expiresAt:expiry];
+                }
+                else {
+                    NSLog(@"[%@] - AutoFill could not find matching node - returning", self.databaseMetadata.nickName);
+                }
+                
+                [self.wormhole passMessageObject:@{@"success" : @(node != nil),
+                                                   @"secret-store-id" : secretStoreId }
+                                      identifier:kAutoFillWormholeResponseId];
+            }
+        }
+    }];
+}
+
+
+- (void)onModelLongRunningOpStart:(NSNotification*)notification {
+    if( notification.object != self.viewModel.document ) {
+        return;
+    }
+    
+    NSLog(@"onModelLongRunningOpStart notification.object = [%@]", notification.object);
+
+    NSString* status = (NSString*)notification.userInfo[kNotificationUserInfoLongRunningOperationStatus];
+
+    NSLog(@"onModelLongRunningOpStart [%@]", status);
+
+    [self showProgressModal:status];
+}
+
+- (void)onModelLongRunningOpDone:(NSNotification*)notification {
+    if( notification.object != self.viewModel.document ) {
+        return;
+    }
+
+    NSLog(@"onModelLongRunningOpDone notification.object = [%@]", notification.object);
+
+    [self hideProgressModal];
+}
+
+- (void)onFullModelReloadNotification:(NSNotification*)notification {
+    if( notification.object != self.viewModel.document ) {
+        return;
+    }
+
+    NSLog(@"onFullModelReloadNotification notification.object = [%@]", notification.object);
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self fullModelReload];
+    });
+}
+
+- (void)onBackgroundSyncDone:(NSNotification*)notification {
+    if( notification.object != self.viewModel.document ) {
+        return;
+    }
+
+    NSLog(@"onFullModelReloadNotification notification.object = [%@]", notification.object);
+
+    NSError* error = (NSError*)notification.userInfo[kNotificationUserInfoParamKey];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ( error ) {
+            NSString* message = [NSString stringWithFormat:@"%@: %@",
+                                 NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error"),
+                                 error.localizedDescription];
+            [self showToastNotification:message error:YES];
+        }
+        else {
+            [self showToastNotification:NSLocalizedString(@"notification_sync_successful", @"Sync Successful") error:NO];
+        }
+    });
 }
 
 @end

@@ -141,6 +141,8 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeObject:self.outstandingUpdateId forKey:@"outstandingUpdateId"];
     [encoder encodeObject:self.lastSyncRemoteModDate forKey:@"lastSyncRemoteModDate"];
     [encoder encodeObject:self.lastSyncAttempt forKey:@"lastSyncAttempt"];
+
+    [encoder encodeBool:self.launchAtStartup forKey:@"launchAtStartup"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -211,6 +213,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
         if ( [decoder containsValueForKey:@"lastSyncAttempt"] ) {
             self.lastSyncAttempt = [decoder decodeObjectForKey:@"lastSyncAttempt"];
+        }
+        
+        if([decoder containsValueForKey:@"launchAtStartup"]) {
+            self.launchAtStartup = [decoder decodeBoolForKey:@"launchAtStartup"];
         }
     }
     

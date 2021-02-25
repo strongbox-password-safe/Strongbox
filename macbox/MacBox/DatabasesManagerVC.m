@@ -18,19 +18,14 @@
 #import "SafeStorageProviderFactory.h"
 #import "AddDatabaseSelectStorageVC.h"
 #import "SFTPStorageProvider.h"
+#import "SyncLogViewController.h"
+#import "MacSyncManager.h"
+#import "Document.h"
+#import "WebDAVStorageProvider.h"
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
 
-static NSString* const kColumnIdUuid = @"uuid";
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
-static NSString* const kColumnIdTouchIdPassword = @"conveniencePassword";
-static NSString* const kColumnIdStorageId = @"storageProvider";
-static NSString* const kColumnIdTouchIdEnabled = @"isTouchIdEnabled";
-static NSString* const kColumnIdStorageInfo = @"storageInfo";
-static NSString* const kColumnIdFileUrl = @"fileUrl";
-static NSString* const kColumnIdFilePath = @"filePath";
-static NSString* const kColumnIdFileName = @"fileName";
-
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
 static NSString* const kDragAndDropId = @"com.markmcguill.strongbox.mac.databases.list";
 
@@ -41,9 +36,9 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 @property (nonatomic, strong) NSArray<DatabaseMetadata*>* databases;
 
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
-@property (weak) IBOutlet NSButton *checkboxAutoOpenPrimary;
 @property (weak) IBOutlet NSButton *buttonRemove;
 @property (weak) IBOutlet NSButton *buttonRename;
+@property (weak) IBOutlet NSButton *buttonSync;
 
 @property NSTimer* timerRefresh;
 @property BOOL hasLoaded;
@@ -90,15 +85,17 @@ static DatabasesManagerVC* sharedInstance;
     self.tableView.dataSource = self;
     self.tableView.delegate = self;
     self.tableView.doubleAction = @selector(onDoubleClick:);
-
+    self.tableView.rightClickSelectsItem = YES;
+    
     [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kDatabaseCellView bundle:nil]
                   forIdentifier:kDatabaseCellView];
 
     [self.tableView registerForDraggedTypes:@[kDragAndDropId]];
     self.tableView.emptyString = NSLocalizedString(@"mac_no_databases_initial_message", @"No Databases Here Yet.\n\nClick 'Add Database...' below to get started...");
+    
+    self.tableView.headerView = nil;
+    [self showHideColumn:@"dummy" show:NO]; 
 
-    [self bindAutoOpenPrimary];
-    [self showHideColumns];
 
     self.databases = DatabasesManager.sharedInstance.snapshot;
     [self.tableView reloadData];
@@ -111,8 +108,13 @@ static DatabasesManagerVC* sharedInstance;
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
-
     [self startRefreshTimer];
+}
+
+- (void)bindUi {
+    self.buttonRemove.enabled = self.tableView.selectedRowIndexes.count > 0;
+    self.buttonRename.enabled = self.tableView.selectedRowIndexes.count == 1;
+    self.buttonSync.enabled = self.tableView.selectedRowIndexes.count == 1;
 }
 
 - (void)killRefreshTimer {
@@ -139,30 +141,6 @@ static DatabasesManagerVC* sharedInstance;
         [self killRefreshTimer];
         sharedInstance = nil;
     }
-}
-
-- (void)bindAutoOpenPrimary {
-    self.checkboxAutoOpenPrimary.state = Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch ? NSOnState : NSOffState;
-}
-
-- (IBAction)onChangeAutoOpen:(id)sender {
-    Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch = self.checkboxAutoOpenPrimary.state == NSOnState;
-    
-    [self bindAutoOpenPrimary];
-}
-
-- (void)showHideColumns {
-    self.tableView.headerView = nil;
-    
-    BOOL debug = NO;
-    [self showHideColumn:kColumnIdUuid show:debug];
-    [self showHideColumn:kColumnIdFileName show:debug];
-    [self showHideColumn:kColumnIdFilePath show:debug];
-    [self showHideColumn:kColumnIdTouchIdPassword show:debug];
-    [self showHideColumn:kColumnIdTouchIdEnabled show:debug];
-    [self showHideColumn:kColumnIdFileUrl show:debug];
-    [self showHideColumn:kColumnIdStorageInfo show:debug];
-    [self showHideColumn:kColumnIdStorageId show:debug];
 }
 
 - (IBAction)onRename:(id)sender {
@@ -262,63 +240,39 @@ static DatabasesManagerVC* sharedInstance;
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
     DatabaseMetadata* database = [self.databases objectAtIndex:row];
 
-    if([tableColumn.identifier isEqualToString:kColumnIdFriendlyTitleAndSubtitles]) {
+
         DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
 
         [result setWithDatabase:database];
         
         return result;
-    }
-    else {
-        NSTableCellView *result = [tableView makeViewWithIdentifier:@"MyView" owner:self];
 
-        if([tableColumn.identifier isEqualToString:kColumnIdFileName]) {
-            NSURL* url = [database valueForKey:kColumnIdFileUrl];
-            NSString* loc = NSLocalizedString(@"generic_unknown", @"Unknown");
-            result.textField.stringValue = url && url.lastPathComponent ? url.lastPathComponent : loc;
-        }
-        else if([tableColumn.identifier isEqualToString:kColumnIdFilePath]) {
-            NSURL* url = [database valueForKey:kColumnIdFileUrl];
-            NSString* loc = NSLocalizedString(@"generic_unknown", @"Unknown");
-            
-            result.textField.stringValue = url && url.URLByDeletingLastPathComponent.path ? url.URLByDeletingLastPathComponent.path : loc;
-        }
-        else if([tableColumn.identifier isEqualToString:kColumnIdStorageId]) {
-            NSObject *obj = [database valueForKey:tableColumn.identifier];
-            NSNumber* num = (NSNumber*)obj;
-            result.textField.stringValue = getStorageProviderName((StorageProvider)num.integerValue);
-        }
-        else {
-            NSObject *obj = [database valueForKey:tableColumn.identifier];
-            result.textField.stringValue = obj == nil ? @"(nil)" : [obj description];
-        }
-        
-        return result;
-    }
-}
 
-static NSString* getStorageProviderName(StorageProvider sp) {
-    switch (sp) {
-        case kLocalDevice:
-            {
-                NSString* loc = NSLocalizedString(@"mac_storage_provider_name_file", @"File Based");
-                return loc;
-            }
-            break;
-        case kSFTP:
-            {
-                return @"SFTP";
-            }
-            break;
-        case kWebDAV:
-            {
-                return @"WebDAV";
-            }
-            break;
-        default:
-            return @"Unknown";
-            break;
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (void)showHideColumn:(NSString*)identifier show:(BOOL)show {
@@ -363,59 +317,61 @@ static NSString* getStorageProviderName(StorageProvider sp) {
     }];
 }
 
-- (IBAction)onOpenFromFiles:(id)sender {
+- (void)onOpenFromFiles:(id)sender {
     DocumentController* dc = (DocumentController*)NSDocumentController.sharedDocumentController;
     [dc originalOpenDocument:nil];
 }
 
-- (IBAction)onNewDatabase:(id)sender {
+- (void)onNewDatabase:(id)sender {
     [NSDocumentController.sharedDocumentController newDocument:nil];
 }
 
-- (IBAction)onAddSFTPDatabase:(id)sender {
+- (void)onAddSFTPDatabase:(id)sender {
+    SFTPStorageProvider* provider = [[SFTPStorageProvider alloc] init];
+    provider.maintainSessionForListing = YES;
+    
+    [self showStorageBrowserForProvider:provider];
+}
+
+- (IBAction)onAddWebDav:(id)sender {
+    WebDAVStorageProvider* provider = [[WebDAVStorageProvider alloc] init];
+    provider.maintainSessionForListings = YES;
+    
+    [self showStorageBrowserForProvider:provider];
+}
+
+- (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider {
     AddDatabaseSelectStorageVC* vc = [AddDatabaseSelectStorageVC newViewController];
-    
-    SFTPStorageProvider* sftpProviderWithFastListing = [SafeStorageProviderFactory getStorageProviderFromProviderId:kSFTP];
-
-    
-    sftpProviderWithFastListing.maintainSessionForListing = YES;
-
-    vc.provider = sftpProviderWithFastListing;
+    vc.provider = provider;
     
     vc.onDone = ^(BOOL success, StorageBrowserItem * _Nonnull selectedItem) {
-        if (success) {
-            NSLog(@"selected: [%@]", selectedItem);
-            DatabaseMetadata *newDatabase = [sftpProviderWithFastListing getSafeMetaData:@"My New SFTP Database!" providerData:selectedItem.providerData]; 
-            
-            if (!newDatabase) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (success) {
+                NSLog(@"selected: [%@]", selectedItem);
                 
-                NSLog(@"Error! TODO");
+                NSString* suggestedName = [selectedItem.name stringByDeletingPathExtension];
+                
+                DatabaseMetadata *newDatabase = [provider getSafeMetaData:suggestedName
+                                                             providerData:selectedItem.providerData];
+                
+                if (!newDatabase) {
+                    [MacAlerts error:nil window:self.view.window];
+                }
+                else {
+                    NSLog(@"[%@]", newDatabase.fileUrl.absoluteString);
+                    
+                    [DatabasesManager.sharedInstance add:newDatabase];
+                    [self openDatabase:newDatabase];
+                }
             }
-            else {
-                NSLog(@"[%@]", newDatabase.fileUrl.absoluteString);
-                
-                [DatabasesManager.sharedInstance add:newDatabase];
-                
-            }
-        }
+        });
     };
     
     [self presentViewControllerAsSheet:vc];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification *)notification {
-    self.buttonRemove.enabled = self.tableView.selectedRowIndexes.count > 0;
-    self.buttonRename.enabled = self.tableView.selectedRowIndexes.count == 1;
-    
-
-
-
-
-
-
-
-
-
+    [self bindUi];
 }
 
 - (void)keyDown:(NSEvent *)theEvent {
@@ -484,6 +440,98 @@ static NSString* getStorageProviderName(StorageProvider sp) {
     }
     
     return YES;
+}
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+    SEL theAction = [anItem action];
+
+
+
+    if (theAction == @selector(onViewSyncLog:)) {
+        if(self.tableView.selectedRow != -1) {
+            DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
+            return safe.storageProvider != kLocalDevice;
+        }
+    }
+    else if ( theAction == @selector(onAddSFTPDatabase:)) {
+        if ( !Settings.sharedInstance.isPro ) {
+            NSMenuItem* item = (NSMenuItem*)anItem;
+            item.title = NSLocalizedString(@"mac_add_sftp_pro_only", @"Add SFTP Database... (Pro)");
+        }
+        return Settings.sharedInstance.isProOrFreeTrial;
+    }
+    else if ( theAction == @selector(onAddWebDav:)) {
+        if ( !Settings.sharedInstance.isPro ) {
+            NSMenuItem* item = (NSMenuItem*)anItem;
+            item.title = NSLocalizedString(@"mac_add_webdav_pro_only",  @"Add WebDAV Database... (Pro)");
+        }
+
+        return Settings.sharedInstance.isProOrFreeTrial;
+    }
+    else if ( theAction == @selector(onOpenFromFiles:)) {
+        return YES;
+    }
+    else if ( theAction == @selector(onNewDatabase:)) {
+        return YES;
+    }
+    else if (theAction == @selector(onRemove:)) {
+        return self.tableView.selectedRowIndexes.count;
+    }
+    else if (theAction == @selector(onRename:)) {
+        return self.tableView.selectedRow != -1;
+    }
+    else if (theAction == @selector(onToggleLaunchAtStartup:)) {
+        if(self.tableView.selectedRow != -1) {
+            DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
+            NSMenuItem* item = (NSMenuItem*)anItem;
+            [item setState:safe.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff];
+        }
+        
+        return self.tableView.selectedRow != -1;
+    }
+
+    return NO;
+}
+
+- (IBAction)onViewSyncLog:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
+        if ( safe.storageProvider != kLocalDevice ) {
+            SyncLogViewController* vc = [SyncLogViewController showForDatabase:safe];
+            [self presentViewControllerAsSheet:vc];
+        }
+    }
+}
+
+- (IBAction)onToggleLaunchAtStartup:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
+        safe.launchAtStartup = !safe.launchAtStartup;
+        [DatabasesManager.sharedInstance update:safe];
+    }
+}
+
+- (IBAction)onSync:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
+        if (safe.storageProvider != kLocalDevice ) {
+            
+            [MacSyncManager.sharedInstance backgroundSyncDatabase:safe
+                                                       completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+                if ( error ) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [MacAlerts error:error window:self.view.window];
+                    });
+                }
+                else if ( localWasChanged ) {
+                    NSLog(@"XXXXX - localWasChanged");
+                    
+                    Document* doc = [DocumentController.sharedDocumentController documentForURL:safe.fileUrl];
+                    [doc onSyncChangedUnderlyingWorkingCopy];
+                }
+            }];
+        }
+    }
 }
 
 @end

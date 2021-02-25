@@ -15,7 +15,6 @@
 #import "MacAlerts.h"
 #import "Settings.h"
 #import "DatabaseModel.h"
-#import "ViewModel.h"
 #import "BookmarksHelper.h"
 #import "OTPToken+Generation.h"
 #import "ClipboardManager.h"
@@ -31,13 +30,15 @@
 #import "SecretStore.h"
 #import "Serializator.h"
 #import "MacYubiKeyManager.h"
+#import "WorkingCopyManager.h"
 
 @interface CredentialProviderViewController ()
 
 @property SelectAutoFillDatabaseViewController* selectDbVc;
 @property BOOL quickTypeMode;
-@property (strong, nonatomic) ProgressWindow* progressWindow;
 @property MMWormhole* wormhole;
+
+@property ProgressWindow* progressWindow;
 
 @end
 
@@ -92,6 +93,9 @@
         }
     }
 }
+
+
+
 
 - (void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
 
@@ -177,6 +181,9 @@
     }
 }
 
+
+
+
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     NSLog(@"AutoFill: prepareInterfaceToProvideCredentialForIdentity [%@]", credentialIdentity);
     
@@ -222,6 +229,9 @@
     }
 }
 
+
+
+
 - (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"prepareCredentialListForServiceIdentifiers -> serviceIdentifiers = [%@]", serviceIdentifiers);
 
@@ -237,6 +247,8 @@
         }
     };
 }
+
+
 
 - (void)viewWillAppear {
     [super viewWillAppear];
@@ -260,11 +272,43 @@
 
 
 
+
 - (void)unlockDatabase:(DatabaseMetadata*)database
    quickTypeIdentifier:(QuickTypeRecordIdentifier*_Nullable)quickTypeIdentifier
     serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    NSURL* url = nil;
+    if ( database.storageProvider == kLocalDevice ) {
+        [self unlockLegacyFileBasedDatabase:database quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+    }
+    else {
         
+        if ( !Settings.sharedInstance.isProOrFreeTrial ) {
+            [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
+            informativeText:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
+                     window:self.view.window
+                 completion:^{
+                [self exitWithUserCancelled];
+            }];
+            return;
+        }
+        
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
+        if ( !url ) {
+            NSLog(@"Could not find Working Copy");
+            NSError* error = [Utils createNSError:@"Could not find local working copy." errorCode:-123];
+            [self exitWithErrorOccurred:error];
+        }
+        else {
+            NSLog(@"Got Working Copy OK: [%@]", url);
+        }
+        
+        [self unlockDatabaseAtUrl:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+    }
+}
+
+- (void)unlockLegacyFileBasedDatabase:(DatabaseMetadata*)database
+                  quickTypeIdentifier:(QuickTypeRecordIdentifier*_Nullable)quickTypeIdentifier
+                   serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+    NSURL* url = nil;
     if (database.autoFillStorageInfo != nil) {
         url = [self tryRefreshBookmark:database];
     }
@@ -294,7 +338,10 @@
     }
 }
 
-- (void)unlockDatabaseAtUrl:(DatabaseMetadata*)database url:(NSURL*)url quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+- (void)unlockDatabaseAtUrl:(DatabaseMetadata*)database
+                        url:(NSURL*)url
+        quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
+         serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
     BOOL bioAvailable = BiometricIdHelper.sharedInstance.biometricIdAvailable;
     BOOL passwordAvailable = database.conveniencePassword.length;
@@ -309,7 +356,10 @@
         
         
 
-        [self convenienceUnlockDatabase:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        [self convenienceUnlockDatabase:database
+                                    url:url
+                    quickTypeIdentifier:quickTypeIdentifier
+                     serviceIdentifiers:serviceIdentifiers];
     }
     else {
         NSLog(@"Unlock Database: Biometric Not Possible or Available...");
@@ -317,7 +367,10 @@
     }
 }
 
-- (void)convenienceUnlockDatabase:(DatabaseMetadata*)database url:(NSURL*)url quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+- (void)convenienceUnlockDatabase:(DatabaseMetadata*)database
+                              url:(NSURL*)url
+              quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
+               serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSString* localizedFallbackTitle = NSLocalizedString(@"safes_vc_unlock_manual_action", @"Manual Unlock");
     
     [BiometricIdHelper.sharedInstance authorize:localizedFallbackTitle completion:^(BOOL success, NSError *error) {
@@ -467,22 +520,19 @@
 }
 
 - (void)showProgressModal:(NSString*)operationDescription {
-    [self hideProgressModal];
-
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.progressWindow = [[ProgressWindow alloc] initWithWindowNibName:@"ProgressWindow"];
-        self.progressWindow.operationDescription = operationDescription;
-        [self.view.window beginSheet:self.progressWindow.window  completionHandler:nil];
+        if ( self.progressWindow ) {
+            [self.progressWindow hide];
+        }
+        self.progressWindow = [ProgressWindow newProgress:operationDescription];
+        [self.view.window beginSheet:self.progressWindow.window completionHandler:nil];
     });
 }
 
 - (void)hideProgressModal {
-    if(self.progressWindow) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.view.window endSheet:self.progressWindow.window];
-            self.progressWindow = nil;
-        });
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.progressWindow hide];
+    });
 }
 
 - (void)unlockDatabaseWithCkf:(DatabaseMetadata*)database
@@ -491,7 +541,9 @@
                           ckf:(CompositeKeyFactors*)ckf
            serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        [self _unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf serviceIdentifiers:serviceIdentifiers];
+        [self _unlockDatabaseWithCkf:database
+                                 url:url
+                 quickTypeIdentifier:quickTypeIdentifier ckf:ckf serviceIdentifiers:serviceIdentifiers];
     });
 }
 
@@ -506,9 +558,9 @@
     [self showProgressModal:loc];
     
     [Serializator fromUrl:url
-                       ckf:ckf
-                    config:DatabaseModelConfig.defaults
-                completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+                      ckf:ckf
+                   config:DatabaseModelConfig.defaults
+               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
         NSLog(@"AutoFill: Open Database: userCancelled = [%d] - Model=[%@] - Error = [%@]", userCancelled, model, error);
         dispatch_async(dispatch_get_main_queue(), ^{
             [self hideProgressModal];

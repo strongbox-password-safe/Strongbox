@@ -20,14 +20,25 @@
 #import "BookmarksHelper.h"
 #import "Serializator.h"
 #import "MacUrlSchemes.h"
+#import "SafeStorageProviderFactory.h"
+#import "MacSyncManager.h"
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
+static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongbox Password Database (Non File)";
+
+@interface DocumentController ()
+
+@property BOOL hasDoneAppStartupTasks;
+@property (readonly) NSArray<DatabaseMetadata*>* startupDatabases;
+
+@end
 
 @implementation DocumentController
 
 
 
-- (NSInteger)runModalOpenPanel:(NSOpenPanel *)openPanel forTypes:(nullable NSArray<NSString *> *)types {
+- (NSInteger)runModalOpenPanel:(NSOpenPanel *)openPanel
+                      forTypes:(nullable NSArray<NSString *> *)types {
     return [super runModalOpenPanel:openPanel forTypes:nil];
 }
 
@@ -92,20 +103,21 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
         
             [self addDocument:document];
             
-            [document setDatabaseMetadata:database];
-            
             [document makeWindowControllers];
             [document showWindows];
         }];
     }
 }
 
-- (void)openDocumentWithContentsOfURL:(NSURL *)url display:(BOOL)displayDocument completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
-    NSLog(@"openDocumentWithContentsOfURL: [%@]", url);
-    [super openDocumentWithContentsOfURL:url display:displayDocument completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+- (void)openDocumentWithContentsOfURL:(NSURL *)url
+                              display:(BOOL)displayDocument
+                    completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
+
+    [super openDocumentWithContentsOfURL:url
+                                 display:displayDocument
+                       completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
         if ( document && !error ) {
-            DatabaseMetadata* database = [DatabasesManager.sharedInstance addOrGet:url];
-            [((Document*)document) setDatabaseMetadata:database];
+            [DatabasesManager.sharedInstance addOrGet:url]; 
         }
         
         completionHandler(document, documentWasAlreadyOpen, error);
@@ -113,16 +125,38 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 }
 
 - (void)openDocument:(id)sender {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     NSLog(@"openDocument: document count = [%ld]", self.documents.count);
     
+    if ( self.hasDoneAppStartupTasks ) {
+        NSLog(@"openDocument - regular call - Once off startup tasks are done.");
+        
+        
+        
+        
+        if( self.documents.count == 0 && DatabasesManager.sharedInstance.snapshot.count == 0 && NSApplication.sharedApplication.keyWindow == nil ) {
+            [self performEmptyLaunchTasksIfNecessary];
+        }
+        else {
+            [self originalOpenDocument:sender];
+        }
+    }
+    else {
+        NSLog(@"openDocument - startup call - Doing once off startup tasks are done.");
 
-
-
-
-        [self originalOpenDocument:sender];
-
-    
-    
+        [self doAppStartupTasksOnceOnly];
+    }
 }
 
 - (void)originalOpenDocument:(id)sender {
@@ -132,7 +166,7 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     NSURL* url = database.fileUrl;
 
-    if(database.storageProvider == kLocalDevice) { 
+    if ( database.storageProvider == kLocalDevice ) {
         if (database.storageInfo != nil) {
             NSError *error = nil;
             NSString* updatedBookmark;
@@ -158,10 +192,14 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
         else {
             NSLog(@"WARN: Storage info/Bookmark unavailable! Falling back solely on fileURL");
         }
-    }
         
-    if (url) {
         [url startAccessingSecurityScopedResource];
+    }
+    else {
+        NSLog(@"None Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
+    }
+    
+    if ( url ) {
         [self openDocumentWithContentsOfURL:url
                                     display:YES
                           completionHandler:^(NSDocument * _Nullable document,
@@ -179,35 +217,49 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     }
 }
 
-- (NSString *)typeForContentsOfURL:(NSURL *)url error:(NSError *__autoreleasing  _Nullable *)outError {
-    if ([url.scheme isEqualToString:kStrongboxSFTPUrlScheme]) {
-        return kStrongboxPasswordDatabaseDocumentType;
+- (NSString *)typeForContentsOfURL:(NSURL *)url
+                             error:(NSError *__autoreleasing  _Nullable *)outError {
+    if (! [url.scheme isEqualToString:kStrongboxFileUrlScheme]) {
+        return kStrongboxPasswordDatabaseNonFileDocumentType;
     }
-    
+
     return [super typeForContentsOfURL:url error:outError];
 }
 
 - (void)onAppStartup {
     NSLog(@"onAppStartup: document count = [%ld]", self.documents.count);
 
-    if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
-       Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
-        [self openPrimaryDatabase];
+    [self doAppStartupTasksOnceOnly];
+}
+
+- (void)doAppStartupTasksOnceOnly {
+    if ( !self.hasDoneAppStartupTasks ) {
+        self.hasDoneAppStartupTasks = YES;
+        
+        NSLog(@"doAppStartupTasksOnceOnly - Doing tasks as they have not yet been done");
+
+        if( self.startupDatabases.count ) {
+            [self launchStartupDatabases];
+        }
+        else if(self.documents.count == 0) { 
+            [DatabasesManagerVC show];
+        }
+        
+        [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     }
-    else if(self.documents.count == 0) {
-        [DatabasesManagerVC show];
+    else {
+        NSLog(@"doAppStartupTasksOnceOnly - Tasks Already Done - NOP");
     }
 }
 
 - (void)performEmptyLaunchTasksIfNecessary {
     NSLog(@"performEmptyLaunchTasks...");
     
-    if(self.documents.count == 0) { 
+    if( self.documents.count == 0 ) { 
         NSLog(@"performEmptyLaunchTasks: document count = [%ld]", self.documents.count);
         
-        if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
-           Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
-            [self openPrimaryDatabase];
+        if( self.startupDatabases.count ) {
+            [self launchStartupDatabases];
         }
         else {
             [DatabasesManagerVC show];
@@ -215,10 +267,21 @@ static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Pass
     }
 }
 
-- (void)openPrimaryDatabase {
-    if(DatabasesManager.sharedInstance.snapshot.count > 0 &&
-       Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch) {
-        [self openDatabase:DatabasesManager.sharedInstance.snapshot.firstObject completion:^(NSError *error) { }];
+- (NSArray<DatabaseMetadata*>*)startupDatabases {
+    NSArray<DatabaseMetadata*> *startupDatabases = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
+        return obj.launchAtStartup;
+    }];
+
+    return startupDatabases;
+}
+
+- (void)launchStartupDatabases {
+    NSArray<DatabaseMetadata*>* startupDatabases = self.startupDatabases;
+    
+    NSLog(@"Found %ld startup databases. Launching...", startupDatabases.count);
+    
+    for ( DatabaseMetadata* db in startupDatabases ) {
+        [self openDatabase:db completion:^(NSError *error) { }];
     }
 }
 

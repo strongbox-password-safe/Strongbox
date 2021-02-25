@@ -30,6 +30,28 @@
 			<key>NSDocumentClass</key>
 			<string>Document</string>
 		</dict>
+        <dict>
+            <key>CFBundleTypeExtensions</key>
+            <array>
+                <string>psafe3</string>
+                <string>dat</string>
+                <string>kdb</string>
+                <string>kdbx</string>
+                <string>*</string>
+            </array>
+            <key>CFBundleTypeIconFile</key>
+            <string>AppIcon</string>
+            <key>CFBundleTypeName</key>
+            <string>Strongbox Password Database (Non File)</string>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>LSHandlerRank</key>
+            <string>Owner</string>
+            <key>LSTypeIsPackage</key>
+            <integer>0</integer>
+            <key>NSDocumentClass</key>
+            <string>NonFileDocument</string>
+        </dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
@@ -44,9 +66,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.14.14</string>
+	<string>1.15.0</string>
 	<key>CFBundleVersion</key>
-	<string>2995</string>
+	<string>2997</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<true/>
 	<key>ITSEncryptionExportComplianceCode</key>

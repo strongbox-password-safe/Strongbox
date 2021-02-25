@@ -17,20 +17,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface ViewController : NSViewController<   NSOutlineViewDelegate,
-                                                NSOutlineViewDataSource,
-                                                NSTableViewDelegate,
-                                                NSTableViewDataSource>
-
-- (void)onFileChangedByOtherApplication;
-
-- (void)setInitialModel:(ViewModel*)model;
-- (void)updateModel:(ViewModel *)model;
-
-
-void onSelectedNewIcon(ViewModel* model, Node* item, NodeIcon* selectedIcon, NSWindow* window);
-
-- (void)autoPromptForTouchIdIfDesired;
+@interface ViewController : NSViewController
 
 @end
 

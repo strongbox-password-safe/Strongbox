@@ -63,6 +63,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nullable) NSDate* lastSyncAttempt;
 @property ConflictResolutionStrategy conflictResolutionStrategy;
 @property (readonly) BOOL readOnly; 
+@property BOOL launchAtStartup;
 
 @end
 

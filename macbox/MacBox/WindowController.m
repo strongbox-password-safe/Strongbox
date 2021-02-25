@@ -7,8 +7,8 @@
 //
 
 #import "WindowController.h"
-#import "Document.h"
 #import "Settings.h"
+#import "Document.h"
 
 @interface WindowController ()
 
@@ -28,7 +28,7 @@
 
 - (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {
     NSString* freeTrialLiteSuffix = @"";
-        
+
     if(![Settings sharedInstance].fullVersion) {
         if (![Settings sharedInstance].freeTrial) {
             NSString* loc = NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
@@ -36,7 +36,7 @@
         }
         else {
             long daysLeft = (long)[Settings sharedInstance].freeTrialDaysRemaining;
-            
+
             if(daysLeft < 1 || daysLeft > 88) {
                 NSString* loc = NSLocalizedString(@"mac_free_trial_window_title_suffix", @" - (Pro Upgrade Available)");
                 freeTrialLiteSuffix = loc;
@@ -47,7 +47,18 @@
             }
         }
     }
-    
+
+
+
+
+
+
+
+
+
+
+
+
     return [NSString stringWithFormat:@"%@%@", displayName, freeTrialLiteSuffix];
 }
 

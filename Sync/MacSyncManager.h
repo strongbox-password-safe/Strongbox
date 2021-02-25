@@ -21,6 +21,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)sync:(DatabaseMetadata *)database interactiveVC:(NSViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabaseMetadata *)database data:(NSData *)data error:(NSError**)error;
+- (SyncStatus*)getSyncStatus:(DatabaseMetadata *)database;
+
+- (void)backgroundSyncAll;
+- (void)backgroundSyncOutstandingUpdates;
+- (void)backgroundSyncDatabase:(DatabaseMetadata*)database;
+- (void)backgroundSyncDatabase:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion;
 
 @end
 

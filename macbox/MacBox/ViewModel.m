@@ -40,40 +40,25 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 @interface ViewModel ()
 
-
-
-
-
-@property (strong, nonatomic) DatabaseModel* passwordDatabase;
+@property (nullable) DatabaseModel* passwordDatabase;
 
 @end
 
 @implementation ViewModel
 
-- (instancetype)initLocked:(Document *)document {
-    return [self initUnlockedWithDatabase:document database:nil selectedItem:nil];
+- (instancetype)initLocked:(NSDocument *)document {
+    return [self initUnlockedWithDatabase:document
+                                 database:nil
+                             selectedItem:nil];
 }
 
-- (instancetype)initUnlockedWithDatabase:(Document *)document
-                                database:(DatabaseModel*)database
-                            selectedItem:(NSString*)selectedItem {
+- (instancetype)initUnlockedWithDatabase:(NSDocument *)document
+                                database:(DatabaseModel *)database
+                            selectedItem:(NSString *)selectedItem {
     if (self = [super init]) {
         _document = document;
         self.passwordDatabase = database;
         self.selectedItem = selectedItem;
-        
-        if(self.document.fileURL) { 
-            _databaseMetadata = [DatabasesManager.sharedInstance getDatabaseByFileUrl:self.document.fileURL];
-            
-            if(self.databaseMetadata == nil) {
-                NSLog(@"WARN: Could not add or get metadata for [%@]", document.fileURL);
-            }
-            else if ( database && self.databaseMetadata.autoFillEnabled && self.databaseMetadata.quickTypeEnabled ) {
-                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:database
-                                                                   databaseUuid:self.databaseMetadata.uuid
-                                                                  displayFormat:self.databaseMetadata.quickTypeDisplayFormat];
-            }
-        }
     }
     
     return self;
@@ -93,15 +78,6 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager removeAllActions];
     self.passwordDatabase = nil;
     self.selectedItem = selectedItem;
-}
-
-- (void)reloadAndUnlock:(CompositeKeyFactors *)compositeKeyFactors
-         viewController:(NSViewController*)viewController
-             completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    [self.document revertWithUnlock:compositeKeyFactors
-                     viewController:viewController
-                       selectedItem:self.selectedItem
-                         completion:completion]; 
 }
 
 
@@ -852,6 +828,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)addNewGroup:(Node *)parentGroup title:(NSString *)title {
+    if ( !parentGroup ) {
+        return NO;
+    }
+    
     Node* newGroup = [self getNewGroupWithSafeName:parentGroup title:title];
     return [self addItem:newGroup parent:parentGroup openEntryDetailsWindowWhenDone:NO];
 }
@@ -1142,6 +1122,10 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (Node*)getNewGroupWithSafeName:(Node *)parentGroup title:(NSString *)title {
+    if ( !parentGroup ) {
+        return nil;
+    }
+    
     NSInteger i = 0;
     BOOL success = NO;
     Node* newGroup;
@@ -1274,10 +1258,6 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName {
     return [self.passwordDatabase getHtmlPrintString:databaseName];
-}
-
-- (void)setDatabaseMetadata:(DatabaseMetadata *)databaseMetadata {
-    _databaseMetadata = databaseMetadata;
 }
 
 @end

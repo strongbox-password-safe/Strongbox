@@ -26,6 +26,7 @@
 #import "SFTPConfigurationVC.h"
 #import "MacAlerts.h"
 #import "MacUrlSchemes.h"
+#import "ProgressWindow.h"
 
 #endif
 
@@ -34,6 +35,8 @@
 
 @property NMSFTP* maintainedSessionForListing;
 @property SFTPSessionConfiguration* maintainedConfigurationForFastListing;
+
+@property ProgressWindow* progressWindow;
 
 @end
 
@@ -64,23 +67,27 @@
 }
 
 - (void)dismissProgressSpinner {
-#if TARGET_OS_IPHONE
     dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IPHONE
         [SVProgressHUD dismiss];
-    });
 #else
-    
+        [self.progressWindow hide];
 #endif
+    });
 }
 
-- (void)showProgressSpinner:(NSString*)message {
-#if TARGET_OS_IPHONE
+- (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD showWithStatus:message]; 
-    });
+#if TARGET_OS_IPHONE
+        [SVProgressHUD showWithStatus:message];
 #else
-    
+        if ( self.progressWindow ) {
+            [self.progressWindow hide];
+        }
+        self.progressWindow = [ProgressWindow newProgress:message];
+        [viewController.view.window beginSheet:self.progressWindow.window completionHandler:nil];
 #endif
+    });
 }
 
 - (void)create:(NSString *)nickName
@@ -139,6 +146,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     if(self.maintainSessionForListing && self.maintainedSessionForListing) {
         [self listWithSftpSession:self.maintainedSessionForListing
                      parentFolder:parentFolder
+                   viewController:viewController
                     configuration:self.maintainedConfigurationForFastListing
                        completion:completion];
     }
@@ -156,7 +164,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                 self.maintainedConfigurationForFastListing = configuration;
             }
                               
-            [self listWithSftpSession:sftp parentFolder:parentFolder configuration:configuration completion:completion];
+            [self listWithSftpSession:sftp parentFolder:parentFolder viewController:viewController configuration:configuration completion:completion];
                               
             if(!self.maintainSessionForListing) {
                 [sftp disconnect];
@@ -167,9 +175,10 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 
 - (void)listWithSftpSession:(NMSFTP*)sftp
                parentFolder:(NSObject *)parentFolder
+             viewController:(VIEW_CONTROLLER_PTR )viewController
               configuration:(SFTPSessionConfiguration *)configuration
                  completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, NSError *))completion {
-    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_listing", @"Listing...")];
+    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_listing", @"Listing...") viewController:viewController];
     
     NSString * dir = [self getDirectoryFromParentFolderObject:parentFolder sessionConfig:configuration];
     
@@ -209,7 +218,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
         }
     
         if (viewController) {
-            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:viewController];
         }
 
         if(![sftp writeContents:data toFileAtPath:providerData.filePath progress:nil]) {
@@ -247,7 +256,6 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 - (void)loadIcon:(NSObject *)providerData viewController:(VIEW_CONTROLLER_PTR )viewController completion:(void (^)(IMAGE_TYPE_PTR))completionHandler {
     
 }
-
 
 
 
@@ -290,14 +298,27 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     components.host = foo.sFtpConfiguration.host;
     components.path = foo.filePath;
     
-    return [[DatabaseMetadata alloc] initWithNickName:nickName storageProvider:self.storageId fileUrl:components.URL storageInfo:json];
+    
+    
+    DatabaseMetadata *ret = [[DatabaseMetadata alloc] initWithNickName:nickName
+                                                       storageProvider:self.storageId
+                                                               fileUrl:components.URL
+                                                           storageInfo:json];
+    
+    
+    
+    components.queryItems = @[[NSURLQueryItem queryItemWithName:@"uuid" value:ret.uuid]];
+    
+    ret.fileUrl = components.URL;
+    
+    return ret;
 #endif
 }
 
 - (void)pullDatabase:(METADATA_PTR)safeMetaData
-         interactiveVC:(VIEW_CONTROLLER_PTR )viewController
-                options:(StorageProviderReadOptions *)options
-             completion:(StorageProviderReadCompletionBlock)completion {
+       interactiveVC:(VIEW_CONTROLLER_PTR )viewController
+             options:(StorageProviderReadOptions *)options
+          completion:(StorageProviderReadCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
 }
@@ -317,7 +338,8 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
         }
         
         if (viewController) {
-            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
+            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")
+                       viewController:viewController];
         }
         
         NMSFTPFile* attr = [sftp infoForFileAtPath:foo.filePath];
@@ -456,7 +478,8 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     NSLog(@"Connecting to %@", sessionConfiguration.host);
     
     if (viewController) {
-        [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_connecting", @"Connecting...")];
+        [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_connecting", @"Connecting...")
+                   viewController:viewController];
     }
     
     NMSSHSession *session = [NMSSHSession connectToHost:sessionConfiguration.host
@@ -468,7 +491,8 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     
     if (session.isConnected) {
         if (viewController) {
-            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating", @"Authenticating...")];
+            [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating", @"Authenticating...")
+                       viewController:viewController];
         }
         
         NSLog(@"Supported Authentication Methods by Server: [%@]", session.supportedAuthenticationMethods);

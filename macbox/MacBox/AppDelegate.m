@@ -20,13 +20,25 @@
 #import "DatabasesManager.h"
 #import "SafeStorageProviderFactory.h"
 
+
+
 #define kIapFullVersionStoreId @"com.markmcguill.strongbox.mac.pro"
+
+
+
+static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
+static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.monthly";
+static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
+static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial";
+
+static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.mac.pro";
+static NSString * const kBundledFreemiumBundleId = @"com.markmcguill.strongbox"; 
+
+
 
 NSString* const kStrongboxPasteboardName = @"Strongbox-Pasteboard";
 NSString* const kDragAndDropInternalUti = @"com.markmcguill.strongbox.drag.and.drop.internal.uti";
 NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.drop.external.uti";
-
-static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.mac.pro";
 
 static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 static const NSInteger kTopLevelMenuItemTagFile = 1111;
@@ -116,6 +128,11 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     return [bundleId isEqualToString:kProFamilyEditionBundleId];
 }
 
+- (BOOL)isBundledFreemiumEdition {
+    NSString* bundleId = [Utils getAppBundleId];
+    return [bundleId isEqualToString:kBundledFreemiumBundleId];
+}
+
 - (void)showHideSystemStatusBarIcon {
     if(Settings.sharedInstance.showSystemTrayIcon) {
         if(!self.statusItem) {
@@ -157,6 +174,21 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)performMigrations {
+    if ( !Settings.sharedInstance.hasMigratedQuickLaunch ) { 
+        NSLog(@"Migrating Launch at Startup...");
+        
+        Settings.sharedInstance.hasMigratedQuickLaunch = YES;
+        
+        if ( Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch ) {
+            DatabaseMetadata* first = DatabasesManager.sharedInstance.snapshot.firstObject;
+            if (first) {
+                NSLog(@"Migrating Launch at Startup. Found and setting first database to be Launched at Startup...");
+
+                first.launchAtStartup = YES;
+                [DatabasesManager.sharedInstance update:first];
+            }
+        }
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -165,21 +197,15 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }
     
     
+    
     [self clearAppCustomClipboard];
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
-
-
     if(self.autoLockWorkBlock) {
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
     }
-
-
-
-
-
 }
 
 - (ViewController*)getActiveViewController {
@@ -246,15 +272,16 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 - (void)getValidIapProducts {
-    NSSet *productIdentifiers = [NSSet setWithObjects:kIapFullVersionStoreId, nil];
+    NSLog(@"getValidIapProducts");
+    
+    NSSet *productIdentifiers = [self isBundledFreemiumEdition] ? [NSSet setWithArray:@[kIapProId, kYearly, kMonthly, kIapFreeTrial]] : [NSSet setWithArray:@[kIapFullVersionStoreId]];
     self.productsRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
     self.productsRequest.delegate = self;
     [self.productsRequest start];
 }
 
 - (void)productsRequest:(SKProductsRequest *)request
-    didReceiveResponse:(SKProductsResponse *)response
-{
+     didReceiveResponse:(SKProductsResponse *)response {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self appStoreProductRequestCompleted:response.products error:nil];
     });
@@ -267,6 +294,8 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 }
 
 - (void)appStoreProductRequestCompleted:(NSArray<SKProduct *> *)products error:(NSError*)error {
+    NSLog(@"products = [%@]", products);
+    
     if(products) {
         NSUInteger count = [products count];
         if (count > 0) {

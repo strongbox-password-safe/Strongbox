@@ -14,6 +14,9 @@
 #import "MacUrlSchemes.h"
 #import "WorkingCopyManager.h"
 #import "FileManager.h"
+#import "Settings.h"
+#import "MacSyncManager.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface DatabaseCellView () <NSTextFieldDelegate>
 
@@ -21,6 +24,11 @@
 @property (weak) IBOutlet NSTextField *textFieldSubtitleLeft;
 @property (weak) IBOutlet NSTextField *textFieldSubtitleTopRight;
 @property (weak) IBOutlet NSTextField *textFieldSubtitleBottomRight;
+
+@property (weak) IBOutlet NSImageView *imageViewQuickLaunch;
+@property (weak) IBOutlet NSImageView *imageViewOutstandingUpdate;
+@property (weak) IBOutlet NSImageView *imageViewReadOnly;
+@property (weak) IBOutlet NSImageView *imageViewSyncing;
 
 @end
 
@@ -30,68 +38,114 @@
     [self setWithDatabase:metadata autoFill:NO];
 }
 
+- (void)determineFields:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill {
+    NSString* path = @"";
+    NSString* fileSize = @"";
+    NSString* fileMod = @"";
+    NSString* title = metadata.nickName ? metadata.nickName : @"";
+    
+    if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
+        NSURLComponents *comp = [[NSURLComponents alloc] init];
+        comp.scheme = metadata.fileUrl.scheme;
+        comp.host = metadata.fileUrl.host;
+        
+        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, comp.URL.absoluteString];
+        
+        NSDate* modDate;
+        unsigned long long size;
+        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata modified:&modDate fileSize:&size];
+        
+        if ( workingCopy ) {
+            fileSize = friendlyFileSizeString(size);
+            fileMod = modDate.friendlyDateTimeStringPrecise;
+        }
+    }
+    else {
+        NSString* storageInfo = autoFill ? metadata.autoFillStorageInfo : metadata.storageInfo;
+        
+        NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:storageInfo];
+        url = url ? url : metadata.fileUrl; 
+        
+        if ( url ) {
+            if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
+                path = [self getFriendlyICloudPath:url.path];
+            }
+            else {
+                path = [self getPathRelativeToUserHome:url.path];
+            }
+            
+            NSError* error;
+            NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+            if (error) {
+                NSLog(@"Error getting attributes of database file: [%@]", error);
+            }
+            else {
+                fileSize = friendlyFileSizeString(attr.fileSize);
+                fileMod = attr.fileModificationDate.friendlyDateTimeStringPrecise;
+            }
+        }
+    }
+
+    self.textFieldName.stringValue = title;
+    self.textFieldSubtitleLeft.stringValue = path;
+    self.textFieldSubtitleTopRight.stringValue = fileSize;
+    self.textFieldSubtitleBottomRight.stringValue = fileMod;
+}
+
 - (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill {
     self.textFieldName.stringValue = @"";
     self.textFieldSubtitleLeft.stringValue = @"";
     self.textFieldSubtitleTopRight.stringValue = @"";
     self.textFieldSubtitleBottomRight.stringValue = @"";
-
-    @try {
-        NSString* path = @"";
-        NSString* fileSize = @"";
-        NSString* fileMod = @"";
-        NSString* title = metadata.nickName ? metadata.nickName : @"";
-        
-        title = metadata.outstandingUpdateId ? [title stringByAppendingString:@" (Update Pending)"] : title; 
     
-        if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
-            NSURLComponents *comp = [[NSURLComponents alloc] init];
-            comp.scheme = metadata.fileUrl.scheme;
-            comp.host = metadata.fileUrl.host;
+    self.imageViewQuickLaunch.hidden = YES;
+    self.imageViewOutstandingUpdate.hidden = YES;
+    self.imageViewReadOnly.hidden = YES;
+    self.imageViewSyncing.hidden = YES;
+   
+    @try {
+        [self determineFields:metadata autoFill:autoFill];
+    
+        self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
+        self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
+        
+        SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [MacSyncManager.sharedInstance getSyncStatus:metadata].state;
+        if (syncState == kSyncOperationStateInProgress ||
+            syncState == kSyncOperationStateError ||
+            syncState == kSyncOperationStateBackgroundButUserInteractionRequired ||
+            syncState == kSyncOperationStateUserCancelled) {
             
-            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, comp.URL.absoluteString];
-            
-            NSDate* modDate;
-            unsigned long long size;
-            NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata modified:&modDate fileSize:&size];
-            
-            if ( workingCopy ) {
-                fileSize = friendlyFileSizeString(size);
-                fileMod = modDate.friendlyDateTimeStringPrecise;
+            self.imageViewSyncing.hidden = NO;
+            if (@available(macOS 10.14, *)) {
+                NSColor *tint = syncState == kSyncOperationStateError ? NSColor.systemRedColor : (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
+                self.imageViewSyncing.contentTintColor = tint;
             }
-        }
-        else {
-            NSString* storageInfo = autoFill ? metadata.autoFillStorageInfo : metadata.storageInfo;
             
-            NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:storageInfo];
-            url = url ? url : metadata.fileUrl; 
             
-            if ( url ) {
-                if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
-                    path = [self getFriendlyICloudPath:url.path];
-                }
-                else {
-                    path = [self getPathRelativeToUserHome:url.path];
-                }
-                
-                NSError* error;
-                NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-                if (error) {
-                    NSLog(@"Error getting attributes of database file: [%@]", error);
-                }
-                else {
-                    fileSize = friendlyFileSizeString(attr.fileSize);
-                    fileMod = attr.fileModificationDate.friendlyDateTimeStringPrecise;
-                }
-            }
-        }
+            
 
-        self.textFieldName.stringValue = title;
-        self.textFieldSubtitleLeft.stringValue = path;
-        self.textFieldSubtitleTopRight.stringValue = fileSize;
-        self.textFieldSubtitleBottomRight.stringValue = fileMod;
+            
+        }
     } @catch (NSException *exception) {
         NSLog(@"Exception getting display attributes for database: %@", exception);
+    }
+}
+
+- (void)runSpinAnimationOnView:(NSView*)view doIt:(BOOL)doIt duration:(CGFloat)duration rotations:(CGFloat)rotations repeat:(float)repeat {
+
+
+    [view.layer removeAllAnimations];
+    
+    if (doIt) {
+        CABasicAnimation* rotationAnimation;
+        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 /* full rotation*/ * rotations * duration ];
+        rotationAnimation.duration = duration;
+        rotationAnimation.cumulative = YES;
+        rotationAnimation.repeatCount = repeat ? HUGE_VALF : 0;
+        [rotationAnimation setRemovedOnCompletion:NO]; 
+        
+        [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     }
 }
 

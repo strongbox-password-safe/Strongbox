@@ -118,7 +118,10 @@
                 NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
                 NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
 #else
-            
+            _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
+            if([_displayName isEqualToString:@"storage_provider_name_local_device"]) {
+                _displayName = @"Local Device";
+            }
 #endif
         }
         else {
@@ -165,7 +168,7 @@
 
 + (NSString*)getIconForProvider:(StorageProvider)provider {
     if (provider == kGoogleDrive) {
-        return @"product32";
+        return @"google-drive-2021";
     }
     else if (provider == kDropbox) {
         return @"dropbox-blue-32x32-nologo";

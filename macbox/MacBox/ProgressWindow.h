@@ -12,9 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ProgressWindow : NSWindowController
 
-@property (weak) IBOutlet NSTextField *labelOperationDescription;
-
-@property NSString* operationDescription;
++ (instancetype)newProgress:(NSString *)status;
+- (void)hide;
 
 @end
 

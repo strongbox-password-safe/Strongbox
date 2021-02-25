@@ -43,4 +43,21 @@
     
 }
 
+
+- (NSMenu*) menuForEvent:(NSEvent*)event {
+    if (self.rightClickSelectsItem) {
+        
+        NSInteger row = [self rowAtPoint:[self convertPoint:event.locationInWindow fromView:nil]];
+        if (row >= 0) {
+            
+            if (! [self isRowSelected:row]) {
+                
+                [self selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+            }
+        }
+    }
+    
+    return [super menuForEvent:event];
+}
+
 @end

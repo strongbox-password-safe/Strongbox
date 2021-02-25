@@ -10,6 +10,7 @@
 #import "BookmarksHelper.h"
 #import "NSArray+Extensions.h"
 #import "Settings.h"
+#import "MacUrlSchemes.h"
 
 @interface DatabasesManager()
 
@@ -189,8 +190,10 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
         NSLog(@"Could not get Bookmark for this database will continue without... [%@]", error);
     }
 
+    StorageProvider provider = storageProviderFromUrl(url);
+    
     safe = [[DatabaseMetadata alloc] initWithNickName:[url.lastPathComponent stringByDeletingPathExtension]
-                                      storageProvider:kLocalDevice 
+                                      storageProvider:provider
                                               fileUrl:url
                                           storageInfo:fileIdentifier];
 

@@ -13,12 +13,12 @@
 #import "NSArray+Extensions.h"
 #import "ClipboardManager.h"
 #import "NSDate+Extensions.h"
-
+ 
 static NSString* const kSyncLogCellCellId = @"SyncLogCell";
 
 @interface SyncLogViewController ()
 
-@property NSArray<NSArray<SyncStatusLogEntry*>*> *syncs;
+@property NSArray<TableRow*> *syncs;
 
 @end
 

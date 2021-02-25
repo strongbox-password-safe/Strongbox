@@ -11,16 +11,30 @@
 @interface ProgressWindow ()
 
 @property (weak) IBOutlet NSProgressIndicator *progressBar;
+@property (weak) IBOutlet NSTextField *labelOperationDescription;
+@property NSString* status;
 
 @end
 
 @implementation ProgressWindow
 
++ (instancetype)newProgress:(NSString *)status {
+    ProgressWindow* ret = [[ProgressWindow alloc] initWithWindowNibName:@"ProgressWindow"];
+    ret.status = status;
+    return ret;
+}
+
+- (void)hide {
+    if ( self.window && self.window.sheetParent ) {
+        [self.window.sheetParent endSheet:self.window];
+    }
+}
+
 - (void)windowDidLoad {
     [super windowDidLoad];
     
-    self.labelOperationDescription.stringValue = self.operationDescription;
-    
+    self.labelOperationDescription.stringValue = self.status;
+
     [self.progressBar startAnimation:nil];
 }
 

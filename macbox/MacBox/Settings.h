@@ -84,8 +84,6 @@ extern NSString* const kCustomFieldsColumn;
 
 @property PasswordGenerationConfig *passwordGenerationConfig;
 
-@property BOOL autoOpenFirstDatabaseOnEmptyLaunch;
-
 @property BOOL autoPromptForTouchIdOnActivate;
 @property BOOL showSystemTrayIcon;
 
@@ -111,6 +109,14 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL startWithSearch;
 
 @property BOOL showDatabasesManagerOnCloseAllWindows;
+
+
+@property BOOL autoOpenFirstDatabaseOnEmptyLaunch; 
+@property BOOL hasMigratedQuickLaunch;
+
+@property (readonly) BOOL isProOrFreeTrial;
+@property (readonly) BOOL isPro;
+@property (readonly) BOOL isFreeTrial;
 
 @end
 

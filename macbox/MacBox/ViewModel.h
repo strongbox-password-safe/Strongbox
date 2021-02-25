@@ -7,12 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Document.h"
 #import "Node.h"
 #import "CHCSVParser.h"
 #import "DatabaseModel.h"
-#import "DatabaseMetadata.h"
 #import "UnifiedDatabaseMetadata.h"
+#import "AbstractDatabaseFormatAdaptor.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -36,17 +35,15 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 @interface ViewModel : NSObject
 
 - (instancetype _Nullable )init NS_UNAVAILABLE;
-- (instancetype)initUnlockedWithDatabase:(Document *)document database:(DatabaseModel*_Nullable)database selectedItem:(NSString*_Nullable)selectedItem;
-- (instancetype)initLocked:(Document*)document;
+
+- (instancetype)initUnlockedWithDatabase:(NSDocument *)document
+                                database:(DatabaseModel*_Nullable)database
+                            selectedItem:(NSString*_Nullable)selectedItem;
+
+- (instancetype)initLocked:(NSDocument*)document;
 
 @property (readonly, nonatomic) DatabaseModel* database;
-
-
-
-@property (readonly, nonatomic) DatabaseMetadata* databaseMetadata;
-- (void)setDatabaseMetadata:(DatabaseMetadata * _Nonnull)databaseMetadata;
-
-@property (nonatomic, readonly, weak) Document*  document;
+@property (nonatomic, readonly, weak) NSDocument*  document;
 @property (nonatomic, readonly) BOOL locked;
 @property (nonatomic, readonly) NSURL* fileUrl;
 @property (nonatomic, readonly) Node* rootGroup;
@@ -64,14 +61,10 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 - (void)lock:(NSString*_Nullable)selectedItem;
 
-- (void)reloadAndUnlock:(CompositeKeyFactors *)compositeKeyFactors
-         viewController:(NSViewController*)viewController
-             completion:(void (^)(BOOL, NSError * _Nullable))completion;
-
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
 
-- (void)getPasswordDatabaseAsData:(SaveCompletionBlock)completion;
+- (void)getPasswordDatabaseAsData:(SaveCompletionBlock)completion; 
 
 - (BOOL)setItemTitle:(Node* )item title:(NSString* )title;
 - (void)setItemUsername:(Node*)item username:(NSString*)username;

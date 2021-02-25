@@ -72,6 +72,7 @@ static NSString* const kMigratedToNewSettings = @"migratedToNewSettings";
 static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kStartWithSearch = @"startWithSearch";
 static NSString* const kShowDatabasesManagerOnCloseAllWindows = @"showDatabasesManagerOnCloseAllWindows";
+static NSString* const khasMigratedQuickLaunch = @"hasMigratedQuickLaunch";
 
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
@@ -163,6 +164,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)hasMigratedQuickLaunch {
+    return [self getBool:khasMigratedQuickLaunch];
+}
+
+- (void)setHasMigratedQuickLaunch:(BOOL)hasMigratedQuickLaunch {
+    [self setBool:khasMigratedQuickLaunch value:hasMigratedQuickLaunch];
+}
 
 - (BOOL)showDatabasesManagerOnCloseAllWindows {
     return [self getBool:kShowDatabasesManagerOnCloseAllWindows fallback:YES];
@@ -374,6 +383,18 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 -(void)setAlwaysShowPassword:(BOOL)alwaysShowPassword {
     [self setBool:kAlwaysShowPassword value:alwaysShowPassword];
+}
+
+- (BOOL)isProOrFreeTrial {
+    return self.isPro || self.freeTrial;
+}
+
+- (BOOL)isPro {
+    return self.fullVersion;
+}
+
+- (BOOL)isFreeTrial {
+    return self.freeTrial;
 }
 
 - (BOOL)freeTrial {

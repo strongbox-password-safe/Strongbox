@@ -7,8 +7,6 @@
 //
 
 #import "Document.h"
-#import "ViewController.h"
-#import "ViewModel.h"
 #import "Utils.h"
 #import "MacAlerts.h"
 #import "CreateFormatAndSetCredentialsWizard.h"
@@ -28,9 +26,17 @@
 #import "MacSyncManager.h"
 #import "WorkingCopyManager.h"
 
+NSString* const kModelUpdateNotificationLongRunningOperationStart = @"kModelUpdateNotificationLongRunningOperationStart"; 
+NSString* const kModelUpdateNotificationLongRunningOperationDone = @"kModelUpdateNotificationLongRunningOperationDone";
+NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationFullReload";
+NSString* const kModelUpdateNotificationDatabaseChangedByOther = @"kModelUpdateNotificationDatabaseChangedByOther";
+NSString* const kModelUpdateNotificationBackgroundSyncDone = @"kModelUpdateNotificationBackgroundSyncDone";
+
+NSString* const kNotificationUserInfoLongRunningOperationStatus = @"status";
+NSString* const kNotificationUserInfoParamKey = @"param";
+
 @interface Document ()
 
-@property (strong, nonatomic) ViewModel* model;
 @property WindowController* windowController;
 
 
@@ -47,6 +53,14 @@
     return Settings.sharedInstance.autoSave;
 }
 
+- (DatabaseMetadata *)databaseMetadata {
+    if ( self.fileURL ) {
+        return [DatabasesManager.sharedInstance getDatabaseByFileUrl:self.fileURL];
+    }
+    
+    return nil;
+}
+
 - (BOOL)canAsynchronouslyWriteToURL:(NSURL *)url ofType:(NSString *)typeName forSaveOperation:(NSSaveOperationType)saveOperation {
     return YES;
 }
@@ -57,161 +71,17 @@
 
 - (instancetype)initWithCredentials:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors {
     if (self = [super init]) {
-        NSLog(@"initWithCredentials - fileURL: [%@]", self.fileURL);
         DatabaseModel* db = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:compositeKeyFactors];
         [SampleItemsGenerator addSampleGroupAndRecordToRoot:db passwordConfig:Settings.sharedInstance.passwordGenerationConfig];
-        self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:nil];
+        _viewModel = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:nil];
     }
     
     return self;
 }
 
-- (instancetype)initWithContentsOfURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing  _Nullable *)outError {
-    NSLog(@"initWithContentsOfURL - : [%@]", url);
-
-    return [super initWithContentsOfURL:url ofType:typeName error:outError];
-}
-
 - (void)makeWindowControllers {
     self.windowController = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"Document Window Controller"];
     [self addWindowController:self.windowController];
-    [[self getViewController] setInitialModel:self.model]; 
-}
-
-- (ViewController*)getViewController {
-    return (ViewController*)self.windowController.contentViewController;
-}
-
-
-- (IBAction)saveDocument:(id)sender {
-    NSLog(@"Document::saveDocument");
-
-    if(self.model.locked) {
-        NSString* loc = NSLocalizedString(@"mac_cannot_save_db_while_locked", @"Cannot save database while it is locked.");
-        [MacAlerts info:loc window:self.windowController.window];
-        return;
-    }
-
-    [super saveDocument:sender];
-    
-    if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
-        AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
-        [appDelegate randomlyShowUpgradeMessage];
-    }
-}
-
-- (void)saveToURL:(NSURL *)url
-           ofType:(NSString *)typeName
- forSaveOperation:(NSSaveOperationType)saveOperation
-completionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError *error) {
-        completionHandler(error);
-        
-        
-        NSLog(@"saveToURL: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate, error);
-        
-        
-        
-        if (self.model && self.model.databaseMetadata.autoFillEnabled && self.model.databaseMetadata.quickTypeEnabled) {
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
-                                                               databaseUuid:self.model.databaseMetadata.uuid
-                                                              displayFormat:self.model.databaseMetadata.quickTypeDisplayFormat];
-        }
-        
-        
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListViewForceRefreshNotification object:nil];
-        });
-    }];
-}
-
-- (BOOL)writeSafelyToURL:(NSURL *)url
-                  ofType:(NSString *)typeName
-        forSaveOperation:(NSSaveOperationType)saveOperation
-                   error:(NSError *__autoreleasing  _Nullable *)outError {
-    if (url && url.scheme.length) {
-        if ([url.scheme isEqualToString:kStrongboxSFTPUrlScheme]) {
-            NSLog(@"writeSafelyToURL for SFTP... [%@]", url);
-            
-            NSData* data = [self dataOfType:typeName error:outError];
-            if ( !data ) {
-                NSLog(@"Could not get dataOfType");
-                return NO;
-            }
-
-            
-            
-            
-            
-            
-            
-            DatabaseMetadata* databaseMetadata = [DatabasesManager.sharedInstance getDatabaseByFileUrl:self.fileURL]; 
-            
-            BOOL success = [MacSyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:databaseMetadata data:data error:outError];
-
-            if (!success) {
-                NSLog(@"Could not updateLocalCopyMarkAsRequiringSync");
-                return NO;
-            }
-
-            
-            
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            
-            
-            
-            NSDate* modDate = NSDate.date; 
-            [self setFileModificationDate:modDate];
-            
-            return YES;
-        }
-    }
-
-    return [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
-}
-
-- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
-    NSLog(@"Document::dataOfType: [%@]", typeName);
-    
-    [self unblockUserInteraction];
-    return [self getDataFromModel:self.model error:outError];
 }
 
 
@@ -219,15 +89,13 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing  _Nullable *)outError {
     NSLog(@"readFromURL: [%@]", url.scheme);
-    
-    if (url && url.scheme.length) {
-        if ([url.scheme isEqualToString:kStrongboxSFTPUrlScheme]) {
-            NSLog(@"SFTP - Loading Locked Model...");
-            
-            
-            
-            return [self loadLockedModel];
-        }
+
+    if (url && url.scheme.length && ![url.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
+        NSLog(@"Non File - Loading Locked Model...");
+        
+        
+        
+        return [self loadLockedModel];
     }
     
     return [super readFromURL:url ofType:typeName error:outError];
@@ -263,13 +131,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (BOOL)loadLockedModel {
-    self.model = [[ViewModel alloc] initLocked:self];
-    
-    NSLog(@"loadLockedModel: Model initialized [%@]", self.model);
-    
-    
-    
-
+    _viewModel = [[ViewModel alloc] initLocked:self];
     return YES;
 }
 
@@ -290,92 +152,35 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
             *outError = error;
         }
         
-        if(self.model && !self.model.locked) {
-            self.model = [[ViewModel alloc] initLocked:self];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [[self getViewController] updateModel:self.model];
-            });
+        if(self.viewModel && !self.viewModel.locked) {
+            _viewModel = [[ViewModel alloc] initLocked:self];
+            [self notifyFullModelReload];
         }
         
         return NO;
     }
     
-    self.model = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:selectedItem];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [[self getViewController] updateModel:self.model];
-    });
+    _viewModel = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:selectedItem];
+    
+    [self updateQuickTypeAutoFill];
+    
+    [self notifyFullModelReload];
         
     return YES;
 }
 
-
-
-
-- (void)presentedItemDidChange {
-    if(!Settings.sharedInstance.detectForeignChanges) {
-        return;
-    }
-    
-    if(!self.fileModificationDate) {
-        NSLog(@"presentedItemDidChange but NO self.lastKnownModifiedDate?");
-        return;
-    }
-    
-    if([self fileHasBeenModified]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-           [[self getViewController] onFileChangedByOtherApplication];
-        });
-    }
-}
-
-- (BOOL)fileHasBeenModified {
-    if(!self.fileURL) {
-        NSLog(@"fileUrl is nil!");
-        return NO;
-    }
-    
-    NSError* error;
-    NSDictionary<NSFileAttributeKey, id> *attributes = [NSFileManager.defaultManager attributesOfItemAtPath:self.fileURL.path error:&error];
-    if(!attributes) {
-        NSLog(@"error: %@", error);
-        return NO;
-    }
-    
-    NSDate* mod = [attributes fileModificationDate];
-    if ([mod compare:self.fileModificationDate] == NSOrderedDescending) {
-        NSLog(@"X - Document Changed [%@]/[%@] - [%@] - XXXXXXXXXXXXX", mod, self.fileModificationDate, self.fileURL);
-        return YES;
-    }
-
-    return NO;
-}
-
 - (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
           viewController:(NSViewController*)viewController
-            selectedItem:(NSString *)selectedItem
               completion:(void (^)(BOOL, NSError * _Nullable))completion {
     NSLog(@"Document::revertWithUnlock: [%@]", self.fileURL);
 
-    if ( self.fileURL && self.fileURL.scheme.length ) {
-        if ( [self.fileURL.scheme isEqualToString:kStrongboxSFTPUrlScheme] ) {
-            NSLog(@"SFTP - revertWithUnlock... Loading Model...");
-            
-            
-            
-            
-            
-            
-            
-            DatabaseMetadata* databaseMetadata = [DatabasesManager.sharedInstance getDatabaseByFileUrl:self.fileURL];
-
-            [self syncWorkingCopyAndUnlock:databaseMetadata viewController:viewController key:compositeKeyFactors selectedItem:selectedItem completion:completion];
-        }
-        else {
-            [self legacyRevertWithUnlock:compositeKeyFactors viewController:viewController selectedItem:selectedItem completion:completion];
-        }
+    NSURL* url = self.fileURL;
+    if (url && url.scheme.length && ![url.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
+        NSLog(@"None File - revertWithUnlock... Loading Model...");
+        [self syncWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:compositeKeyFactors selectedItem:self.viewModel.selectedItem completion:completion];
     }
     else {
-        [self legacyRevertWithUnlock:compositeKeyFactors viewController:viewController selectedItem:selectedItem completion:completion];
+        [self legacyRevertWithUnlock:compositeKeyFactors viewController:viewController selectedItem:self.viewModel.selectedItem completion:completion];
     }
 }
 
@@ -417,77 +222,114 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     }
 }
 
-- (void)syncWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
-                  viewController:(NSViewController*)viewController
-                             key:(CompositeKeyFactors*)key
-                    selectedItem:(NSString *)selectedItem
-                      completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    NSLog(@"syncWorkingCopyAndUnlock ENTER");
+
+
+
+- (IBAction)saveDocument:(id)sender {
+    NSLog(@"Document::saveDocument");
+
+    if(self.viewModel.locked) {
+        NSString* loc = NSLocalizedString(@"mac_cannot_save_db_while_locked", @"Cannot save database while it is locked.");
+        [MacAlerts info:loc window:self.windowController.window];
+        return;
+    }
+
+    [super saveDocument:sender];
     
-    [MacSyncManager.sharedInstance sync:databaseMetadata
-                          interactiveVC:viewController
-                                    key:key
-                                   join:NO
-                             completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        if (result == kSyncAndMergeResultUserCancelled) {
-            NSLog(@"TODO: User Cancelled ");
-        }
-        else if ( result == kSyncAndMergeError ) {
-            if(completion) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(NO, error);
-                });
-            }
-        }
-        else if ( result == kSyncAndMergeSuccess ) {
-            [self loadWorkingCopyAndUnlock:databaseMetadata
-                            viewController:viewController
-                                       key:key
-                              selectedItem:selectedItem
-                                completion:completion];
-        }
-        else {
-            
-            NSLog(@"TODO: TODO: Check Result   kSyncAndMergeResultUserInteractionRequired,        
-        }
+    if(![Settings sharedInstance].fullVersion && ![Settings sharedInstance].freeTrial){
+        AppDelegate* appDelegate = (AppDelegate*)[NSApplication sharedApplication].delegate;
+        [appDelegate randomlyShowUpgradeMessage];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)saveToURL:(NSURL *)url
+           ofType:(NSString *)typeName
+ forSaveOperation:(NSSaveOperationType)saveOperation
+completionHandler:(void (^)(NSError * _Nullable))completionHandler {
+    NSLog(@"saveToURL... [%@]", url);
+
+    [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError *error) {
+        completionHandler(error);
+        
+        
+        NSLog(@"saveToURL Done: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate, error);
+        
+        [self updateQuickTypeAutoFill];
+        
+        
+        
+        [self notifyUpdatesDatabasesList];
     }];
 }
 
-- (void)loadWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
-                  viewController:(NSViewController*)viewController
-                             key:(CompositeKeyFactors*)key
-                    selectedItem:(NSString *)selectedItem
-                      completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:databaseMetadata];
+- (BOOL)writeSafelyToURL:(NSURL *)url
+                  ofType:(NSString *)typeName
+        forSaveOperation:(NSSaveOperationType)saveOperation
+                   error:(NSError *__autoreleasing  _Nullable *)outError {
+    NSLog(@"writeSafelyToURL - [%@]", url);
     
-    if (workingCopy == nil) {
+    if (url && url.scheme.length && ![url.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
+        NSLog(@"writeSafelyToURL for non file SFTP... [%@]", url);
         
-        NSLog(@"        
-        return;
-    }
-    
-    
-    
-    NSError* error;
-    NSData* sftpData = [NSData dataWithContentsOfURL:workingCopy options:kNilOptions error:&error];
-    if ( error ) {
         
-        NSLog(@"        
-        return;
+        
+        NSData* data = [self dataOfType:typeName error:outError];
+        if ( !data ) {
+            NSLog(@"Could not get dataOfType");
+            return NO;
+        }
+
+        if ( !self.databaseMetadata ) {
+            NSLog(@"self.databaseMetadata not found");
+            return NO;
+        }
+                    
+        BOOL success = [MacSyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.databaseMetadata data:data error:outError];
+        if (!success) {
+            NSLog(@"Could not updateLocalCopyMarkAsRequiringSync");
+            return NO;
+        }
+
+        
+        
+        NSDate* modDate = nil;
+        [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.databaseMetadata modified:&modDate];
+        [self setFileModificationDate:modDate ? modDate : NSDate.date];
+
+        [self syncAfterSave];
+        
+        
+        
+        return YES;
     }
 
-    NSLog(@"Read working copy bytes OK [%ld] - loading model", sftpData.length);
-    BOOL success = [self loadModelFromData:sftpData key:key selectedItem:selectedItem outError:&error];
-
-    if(completion) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completion(success, error);
-        });
-    }
+    return [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
 }
 
-- (void)setDatabaseMetadata:(id)databaseMetadata {
-    [self.model setDatabaseMetadata:databaseMetadata];
+- (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
+    NSLog(@"Document::dataOfType: [%@]", typeName);
+    
+    [self unblockUserInteraction];
+    return [self getDataFromModel:self.viewModel error:outError];
 }
 
 
@@ -500,7 +342,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
 
-    [self.model getPasswordDatabaseAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel getPasswordDatabaseAsData:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
         
         ret = data;
         retError = error;
@@ -520,6 +362,8 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     __block DatabaseModel* db = nil;
     __block NSError* retError = nil;
 
+    [self notifyLongRunningOpStart:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
+    
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
     
@@ -534,12 +378,15 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     }];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
+    [self notifyLongRunningOpDone];
+    
     if (outError) {
         *outError = retError;
     }
     
     return db;
 }
+
 
 
 
@@ -550,6 +397,19 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     
     if (NSDocumentController.sharedDocumentController.documents.count == 0 && Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows) {
         [DatabasesManagerVC show];
+    }
+}
+
+
+
+
+
+
+- (void)updateQuickTypeAutoFill {
+    if (self.viewModel && self.viewModel.database && self.databaseMetadata && self.databaseMetadata.autoFillEnabled && self.databaseMetadata.quickTypeEnabled) {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                           databaseUuid:self.databaseMetadata.uuid
+                                                          displayFormat:self.databaseMetadata.quickTypeDisplayFormat];
     }
 }
 
@@ -569,5 +429,193 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
     [super encodeRestorableStateWithCoder:coder];
 }
+
+
+
+
+
+- (void)onSyncChangedUnderlyingWorkingCopy {
+    NSLog(@"onSyncChangedUnderlyingWorkingCopy");
+
+    
+    
+    [self notifyDatabaseHasBeenChangedByOther];
+}
+
+- (void)presentedItemDidChange {
+    NSLog(@"presentedItemDidChange");
+
+    if(!Settings.sharedInstance.detectForeignChanges) {
+        return;
+    }
+    
+    if(!self.fileModificationDate) {
+        NSLog(@"presentedItemDidChange but NO self.fileModificationDate?");
+        return;
+    }
+    
+    if([self legacyFileBasedisFileHasBeenModified]) {
+        [self notifyDatabaseHasBeenChangedByOther];
+    }
+}
+
+- (BOOL)legacyFileBasedisFileHasBeenModified {
+    NSLog(@"legacyFileBasedisFileHasBeenModified");
+
+    if(!self.fileURL) {
+        NSLog(@"fileUrl is nil!");
+        return NO;
+    }
+    
+    NSError* error;
+    NSDictionary<NSFileAttributeKey, id> *attributes = [NSFileManager.defaultManager attributesOfItemAtPath:self.fileURL.path error:&error];
+    if(!attributes) {
+        NSLog(@"error: %@", error);
+        return NO;
+    }
+    
+    NSDate* mod = [attributes fileModificationDate];
+    if ([mod compare:self.fileModificationDate] == NSOrderedDescending) {
+        NSLog(@"X - Document Changed [%@]/[%@] - [%@] - XXXXXXXXXXXXX", mod, self.fileModificationDate, self.fileURL);
+        return YES;
+    }
+
+    return NO;
+}
+
+
+
+
+- (void)notifyLongRunningOpStart:(NSString*)status {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationLongRunningOperationStart
+                                                          object:self
+                                                        userInfo:@{ kNotificationUserInfoLongRunningOperationStatus : status }];
+    });
+}
+
+- (void)notifyLongRunningOpDone {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationLongRunningOperationDone
+                                                          object:self
+                                                        userInfo:@{ }];
+    });
+}
+
+- (void)notifyFullModelReload {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationFullReload
+                                                          object:self
+                                                        userInfo:@{ }];
+    });
+}
+
+- (void)notifyDatabaseHasBeenChangedByOther {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationDatabaseChangedByOther
+                                                          object:self
+                                                        userInfo:@{ }];
+    });
+}
+
+- (void)notifyUpdatesDatabasesList {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kDatabasesListViewForceRefreshNotification object:nil];
+    });
+}
+
+- (void)notifyViewsBackgroundSyncDone:(NSError*)error {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationBackgroundSyncDone
+                                                          object:self
+                                                        userInfo:error ? @{ kNotificationUserInfoParamKey : error } : @{}];
+    });
+}
+
+
+
+
+- (void)syncWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
+                  viewController:(NSViewController*)viewController
+                             key:(CompositeKeyFactors*)key
+                    selectedItem:(NSString *)selectedItem
+                      completion:(void (^)(BOOL, NSError * _Nullable))completion {
+    NSLog(@"syncWorkingCopyAndUnlock ENTER");
+    
+    [MacSyncManager.sharedInstance sync:databaseMetadata
+                          interactiveVC:viewController
+                                    key:key
+                                   join:NO
+                             completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        if ( result == kSyncAndMergeSuccess ) {
+            [self loadWorkingCopyAndUnlock:databaseMetadata
+                            viewController:viewController
+                                       key:key
+                              selectedItem:selectedItem
+                                completion:completion];
+        }
+        else {
+            if(completion) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(NO, error);
+                });
+            }
+        }
+    }];
+}
+
+- (void)loadWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
+                  viewController:(NSViewController*)viewController
+                             key:(CompositeKeyFactors*)key
+                    selectedItem:(NSString *)selectedItem
+                      completion:(void (^)(BOOL, NSError * _Nullable))completion {
+    NSDate* modDate;
+    NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:databaseMetadata modified:&modDate];
+    
+    if (workingCopy == nil) {
+        NSLog(@"loadWorkingCopyAndUnlock - Could not get local working copy");
+        completion(NO, [Utils createNSError:@"Could not get local working copy" errorCode:-123]);
+        return;
+    }
+        
+    NSError* error;
+    NSData* workingData = [NSData dataWithContentsOfURL:workingCopy options:kNilOptions error:&error];
+    if ( error ) {
+        NSLog(@"loadWorkingCopyAndUnlock - dataWithContentsOfURL error = [%@]", error);
+        completion(NO, error);
+        return;
+    }
+
+
+    BOOL success = [self loadModelFromData:workingData key:key selectedItem:selectedItem outError:&error];
+
+    
+    
+    
+    
+    
+    
+
+
+
+    if(completion) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            completion(success, error);
+        });
+    }
+}
+
+- (void)syncAfterSave {
+    [MacSyncManager.sharedInstance backgroundSyncDatabase:self.databaseMetadata completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        [self notifyViewsBackgroundSyncDone:error];
+    }];
+
+    
+    
+    
+    
+}
+
+
 
 @end

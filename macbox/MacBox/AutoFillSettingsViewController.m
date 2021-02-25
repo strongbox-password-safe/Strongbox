@@ -46,19 +46,19 @@
     self.enableSystemExtension.state = AutoFillManager.sharedInstance.isOnForStrongbox ? NSControlStateValueOn : NSControlStateValueOff;
     self.labelNavHelp.textColor = AutoFillManager.sharedInstance.isOnForStrongbox ? NSColor.secondaryLabelColor : nil;
     
-    self.enableAutoFill.state = self.model.databaseMetadata.autoFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    self.enableQuickType.state = self.model.databaseMetadata.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    self.useWormholeIfUnlocked.state = self.model.databaseMetadata.quickWormholeFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.enableAutoFill.state = self.databaseMetadata.autoFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.enableQuickType.state = self.databaseMetadata.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.useWormholeIfUnlocked.state = self.databaseMetadata.quickWormholeFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
 
     self.enableSystemExtension.enabled = AutoFillManager.sharedInstance.isPossible && !AutoFillManager.sharedInstance.isOnForStrongbox;
     self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox;
 
-    self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.model.databaseMetadata.autoFillEnabled;
+    self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.databaseMetadata.autoFillEnabled;
 
-    [self.popupDisplayFormat selectItemAtIndex:self.model.databaseMetadata.quickTypeDisplayFormat];
-    self.popupDisplayFormat.enabled = self.enableQuickType.enabled && self.model.databaseMetadata.quickTypeEnabled;
+    [self.popupDisplayFormat selectItemAtIndex:self.databaseMetadata.quickTypeDisplayFormat];
+    self.popupDisplayFormat.enabled = self.enableQuickType.enabled && self.databaseMetadata.quickTypeEnabled;
     
-    self.useWormholeIfUnlocked.enabled = self.enableQuickType.enabled && self.model.databaseMetadata.quickTypeEnabled;
+    self.useWormholeIfUnlocked.enabled = self.enableQuickType.enabled && self.databaseMetadata.quickTypeEnabled;
 
     
     
@@ -71,35 +71,35 @@
 - (IBAction)onDisplayFormatChanged:(id)sender {
     NSInteger newIndex = self.popupDisplayFormat.indexOfSelectedItem;
     
-    if ( newIndex != self.model.databaseMetadata.quickTypeDisplayFormat ) {
-        self.model.databaseMetadata.quickTypeDisplayFormat = newIndex;
-        [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
+    if ( newIndex != self.databaseMetadata.quickTypeDisplayFormat ) {
+        self.databaseMetadata.quickTypeDisplayFormat = newIndex;
+        [DatabasesManager.sharedInstance update:self.databaseMetadata];
         
         NSLog(@"AutoFill QuickType Format was changed - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
-                                                           databaseUuid:self.model.databaseMetadata.uuid
-                                                          displayFormat:self.model.databaseMetadata.quickTypeDisplayFormat];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.databaseModel
+                                                           databaseUuid:self.databaseMetadata.uuid
+                                                          displayFormat:self.databaseMetadata.quickTypeDisplayFormat];
         
         [self bindUI];
     }
 }
 
 - (IBAction)onChanged:(id)sender {
-    BOOL oldQuickType = self.model.databaseMetadata.quickTypeEnabled;
-    BOOL oldEnabled = self.model.databaseMetadata.autoFillEnabled;
+    BOOL oldQuickType = self.databaseMetadata.quickTypeEnabled;
+    BOOL oldEnabled = self.databaseMetadata.autoFillEnabled;
 
-    self.model.databaseMetadata.autoFillEnabled = self.enableAutoFill.state == NSControlStateValueOn;
-    self.model.databaseMetadata.quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
-    self.model.databaseMetadata.quickWormholeFillEnabled = self.useWormholeIfUnlocked.state == NSControlStateValueOn;
+    self.databaseMetadata.autoFillEnabled = self.enableAutoFill.state == NSControlStateValueOn;
+    self.databaseMetadata.quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
+    self.databaseMetadata.quickWormholeFillEnabled = self.useWormholeIfUnlocked.state == NSControlStateValueOn;
 
     
 
-    [DatabasesManager.sharedInstance update:self.model.databaseMetadata];
+    [DatabasesManager.sharedInstance update:self.databaseMetadata];
 
     
     
     BOOL quickTypeWasTurnOff = (oldQuickType == YES && oldEnabled == YES) &&
-        (self.model.databaseMetadata.quickTypeEnabled == NO || self.model.databaseMetadata.autoFillEnabled == NO);
+        (self.databaseMetadata.quickTypeEnabled == NO || self.databaseMetadata.autoFillEnabled == NO);
     
     if ( quickTypeWasTurnOff ) { 
         NSLog(@"AutoFill QuickType was turned off - Clearing Database....");
@@ -107,13 +107,13 @@
     }
 
     BOOL quickTypeWasTurnedOn = (oldQuickType == NO || oldEnabled == NO) &&
-        (self.model.databaseMetadata.quickTypeEnabled == YES && self.model.databaseMetadata.autoFillEnabled == YES);
+        (self.databaseMetadata.quickTypeEnabled == YES && self.databaseMetadata.autoFillEnabled == YES);
 
     if ( quickTypeWasTurnedOn ) {
         NSLog(@"AutoFill QuickType was turned off - Populating Database....");
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
-                                                           databaseUuid:self.model.databaseMetadata.uuid
-                                                          displayFormat:self.model.databaseMetadata.quickTypeDisplayFormat];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.databaseModel
+                                                           databaseUuid:self.databaseMetadata.uuid
+                                                          displayFormat:self.databaseMetadata.quickTypeDisplayFormat];
     }
     
     [self bindUI];

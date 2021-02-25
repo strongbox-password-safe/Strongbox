@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CustomBackgroundTableView : NSTableView
 
 @property NSString* emptyString;
+@property BOOL rightClickSelectsItem; // Useful for allowing a Right-Click select of item (context menus)
 
 @end
 

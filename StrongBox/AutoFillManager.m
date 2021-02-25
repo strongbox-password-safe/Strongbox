@@ -150,10 +150,6 @@ static NSString* const kMailToScheme = @"mailto";
     if (@available(macOS 11.0, *)) {
 #endif
 
-        if(!node.fields.username.length) {
-            return @[];
-        }
-        
         NSMutableArray<NSString*> *urls = [NSMutableArray array];
         
         NSString* urlField = [database dereference:node.fields.url node:node];
@@ -187,13 +183,14 @@ static NSString* const kMailToScheme = @"mailto";
             
             NSString* username = [database dereference:node.fields.username node:node];
             NSString* title = [database dereference:node.title node:node];
+            title = title.length ? title : NSLocalizedString(@"generic_unknown", @"Unknown");
             
             NSString* quickTypeText;
             
-            if ( displayFormat == kQuickTypeFormatTitleThenUsername ) {
+            if ( displayFormat == kQuickTypeFormatTitleThenUsername && username.length) {
                 quickTypeText = [NSString stringWithFormat:@"%@ (%@)", title, username];
             }
-            else if ( displayFormat == kQuickTypeFormatUsernameOnly ) {
+            else if ( displayFormat == kQuickTypeFormatUsernameOnly && username.length ) {
                 quickTypeText = username;
             }
             else {

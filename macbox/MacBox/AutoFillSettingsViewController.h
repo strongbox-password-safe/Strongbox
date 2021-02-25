@@ -8,13 +8,14 @@
 
 #import <Cocoa/Cocoa.h>
 #import "DatabaseMetadata.h"
-#import "ViewModel.h"
+#import "DatabaseModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AutoFillSettingsViewController : NSViewController
 
-@property (nonatomic) ViewModel* model;
+@property (nonatomic) DatabaseModel* databaseModel;
+@property (nonatomic) DatabaseMetadata* databaseMetadata;
 
 @end
 

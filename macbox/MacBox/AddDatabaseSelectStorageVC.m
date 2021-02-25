@@ -10,7 +10,6 @@
 #import "SafeStorageProvider.h"
 #import "MacAlerts.h"
 #import "SafeStorageProviderFactory.h"
-#import "SFTPStorageProvider.h"
 #import "Utils.h"
 
 @interface AddDatabaseSelectStorageVC () <NSOutlineViewDelegate, NSOutlineViewDataSource>
@@ -49,8 +48,6 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
 }
 
 - (void)setupUi {
-    NSLog(@"setupUi");
-    
     self.outlineView.dataSource = self;
     self.outlineView.delegate = self;
     
@@ -65,14 +62,17 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
              viewController:self
                  completion:^(BOOL userCancelled, NSArray<StorageBrowserItem *> * _Nonnull items, const NSError * _Nonnull error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (!userCancelled) {
+                if ( userCancelled ) {
+                    [self onCancel:nil];
+                }
+                else {
                     NSString* key = [self getCacheKey:sbi];
                     if ( error ) {
                         NSLog(@"error %@", error);
                         self.itemsCache[key] = @[[StorageBrowserItem itemWithName:error.description identifier:kLoadingItemErrorIdentifier folder:NO providerData:nil]];
                     }
                     else {
-                        NSLog(@"Got SFTP items: [%@]", items);
+                        
                         
                         NSArray<StorageBrowserItem*>* sorted = [items sortedArrayUsingComparator:^NSComparisonResult(StorageBrowserItem*  _Nonnull obj1, StorageBrowserItem*  _Nonnull obj2) {
                             if(obj1.folder && !obj2.folder) {
@@ -110,7 +110,7 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(nullable id)item {
     NSArray<StorageBrowserItem*>* ret = [self getChildItems:item];
 
-    NSLog(@"numberOfChildrenOfItem: [%@] - ret = [%@]", item, ret);
+
 
     if (!ret) {
         [self loadItems:item];
@@ -149,12 +149,18 @@ static NSString * const kLoadingItemErrorIdentifier = @"AddDatabaseSelectStorage
     StorageBrowserItem *sbi = item;
 
     cell.textField.stringValue = sbi.name;
-
+    if (@available(macOS 10.14, *)) {
+        cell.imageView.contentTintColor = nil;
+    }
+    
     if ( [sbi.identifier isEqualToString:kLoadingItemIdentifier] ) {
-        cell.imageView.image = [NSImage imageNamed:@"KPXC_C22_ASCII"]; 
+        cell.imageView.image = [NSImage imageNamed:@"syncronize"];
     }
     else if ([sbi.identifier isEqualToString:kLoadingItemErrorIdentifier]) {
-        cell.imageView.image = [NSImage imageNamed:@"cancel"]; 
+        cell.imageView.image = [NSImage imageNamed:@"cancel"];
+        if (@available(macOS 10.14, *)) {
+            cell.imageView.contentTintColor = NSColor.systemRedColor;
+        }
     }
     else {
         cell.imageView.image = sbi.folder ?  [NSImage imageNamed:@"KPXC_C48_Folder"] : [NSImage imageNamed:@"KPXC_C22_ASCII"];

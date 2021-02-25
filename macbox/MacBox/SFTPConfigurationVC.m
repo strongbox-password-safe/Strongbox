@@ -66,8 +66,12 @@
 }
 
 - (void)bindUi {
-    self.textFieldPrivateKey.placeholderString = self.privateKey ? @"<Configured>" : @"<Not Set>"; 
-
+    if (!self.privateKey) {
+        self.textFieldPrivateKey.stringValue = @"";
+    }
+    
+    self.buttonPrivateKey.state = self.privateKey ? NSControlStateValueOn : NSControlStateValueOff;
+    
     [self validateConnect];
 }
 
