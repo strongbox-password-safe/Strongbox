@@ -86,6 +86,7 @@
         
         self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
+        self.autoLockOnDeviceLock = YES;
     }
     
     return self;
@@ -221,6 +222,21 @@
         ret.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
     }
     
+    
+    
+    if ( jsonDictionary[@"emptyOrNilPwPreferNilCheckFirst"] != nil ) {
+        ret.emptyOrNilPwPreferNilCheckFirst = ((NSNumber*)jsonDictionary[@"emptyOrNilPwPreferNilCheckFirst"]).boolValue;
+    }
+    
+    
+    
+    if ( jsonDictionary[@"autoLockOnDeviceLock"] != nil ) {
+        ret.autoLockOnDeviceLock = ((NSNumber*)jsonDictionary[@"autoLockOnDeviceLock"]).boolValue;
+    }
+    else { 
+        ret.autoLockOnDeviceLock = YES;
+    }
+    
     return ret;
 }
 
@@ -279,6 +295,8 @@
         @"immediateOfflineOfferIfOfflineDetected" : @(self.immediateOfflineOfferIfOfflineDetected),
         @"quickTypeEnabled" : @(self.quickTypeEnabled),
         @"quickTypeDisplayFormat" : @(self.quickTypeDisplayFormat),
+        @"emptyOrNilPwPreferNilCheckFirst" : @(self.emptyOrNilPwPreferNilCheckFirst),
+        @"autoLockOnDeviceLock" : @(self.autoLockOnDeviceLock)
     }];
     
     if (self.nickName != nil) {

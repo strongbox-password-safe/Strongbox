@@ -26,6 +26,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
+
 typedef NS_ENUM (NSUInteger, SyncAndMergeResult) {
     kSyncAndMergeResultUserCancelled,
     kSyncAndMergeResultUserInteractionRequired,

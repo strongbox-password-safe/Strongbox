@@ -22,11 +22,14 @@
 #import "MacSyncManager.h"
 #import "Document.h"
 #import "WebDAVStorageProvider.h"
+#import "ProgressWindow.h"
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
 
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
+
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
+
 static NSString* const kDragAndDropId = @"com.markmcguill.strongbox.mac.databases.list";
 
 static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
@@ -42,6 +45,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 @property NSTimer* timerRefresh;
 @property BOOL hasLoaded;
+@property ProgressWindow* progressWindow;
 
 @end
 
@@ -72,7 +76,13 @@ static DatabasesManagerVC* sharedInstance;
 
 - (void)doInitialSetup {
     self.view.window.delegate = self;
+
     
+    
+    
+    
+
+
     NSButton *zoomButton = [self.view.window standardWindowButton:NSWindowZoomButton];
     NSButton *minButton = [self.view.window standardWindowButton:NSWindowMiniaturizeButton];
 
@@ -89,16 +99,22 @@ static DatabasesManagerVC* sharedInstance;
     
     [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kDatabaseCellView bundle:nil]
                   forIdentifier:kDatabaseCellView];
-
+    
     [self.tableView registerForDraggedTypes:@[kDragAndDropId]];
     self.tableView.emptyString = NSLocalizedString(@"mac_no_databases_initial_message", @"No Databases Here Yet.\n\nClick 'Add Database...' below to get started...");
     
+    [self.tableView setColumnAutoresizingStyle:NSTableViewUniformColumnAutoresizingStyle];
+    NSTableColumn *col = [self.tableView.tableColumns objectAtIndex:0];
+    [col setResizingMask:NSTableColumnAutoresizingMask];
     self.tableView.headerView = nil;
-    [self showHideColumn:@"dummy" show:NO]; 
+    
+    
 
 
     self.databases = DatabasesManager.sharedInstance.snapshot;
     [self.tableView reloadData];
+
+
 
     
 
@@ -108,6 +124,8 @@ static DatabasesManagerVC* sharedInstance;
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
+    
     [self startRefreshTimer];
 }
 
@@ -238,41 +256,13 @@ static DatabasesManagerVC* sharedInstance;
 }
 
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
+    DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
+
     DatabaseMetadata* database = [self.databases objectAtIndex:row];
-
-
-        DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
-
-        [result setWithDatabase:database];
-        
-        return result;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
+    [result setWithDatabase:database];
+    
+    return result;
 }
 
 - (void)showHideColumn:(NSString*)identifier show:(BOOL)show {
@@ -300,21 +290,39 @@ static DatabasesManagerVC* sharedInstance;
 }
 
 - (void)openDatabase:(DatabaseMetadata*)database {
+    [self showProgressModal:NSLocalizedString(@"generic_loading", "Loading...")];
+    
     DocumentController* dc = NSDocumentController.sharedDocumentController;
     
     [dc openDatabase:database completion:^(NSError *error) {
+        [self hideProgressModal];
+        
         if(error) {
-           [DatabasesManager.sharedInstance remove:database.uuid];
-
            NSString* loc = NSLocalizedString(@"mac_problem_opening_db",
-                                             @"There was a problem opening this file. It will be removed from your databases.");
+                                             @"There was a problem opening this file.");
 
            [MacAlerts error:loc
-                   error:error
-                  window:self.view.window
-              completion:nil];
+                      error:error
+                     window:self.view.window
+                 completion:nil];
         }
     }];
+}
+
+- (void)showProgressModal:(NSString*)operationDescription {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ( self.progressWindow ) {
+            [self.progressWindow hide];
+        }
+        self.progressWindow = [ProgressWindow newProgress:operationDescription];
+        [self.view.window beginSheet:self.progressWindow.window completionHandler:nil];
+    });
+}
+
+- (void)hideProgressModal {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.progressWindow hide];
+    });
 }
 
 - (void)onOpenFromFiles:(id)sender {

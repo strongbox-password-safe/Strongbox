@@ -477,7 +477,7 @@ static const int kMinNotesCellHeight = 160;
     self.textViewNotes.textColor = self.editing ? [UIColor blackColor] : [UIColor grayColor];
     self.textViewNotes.layer.borderColor = self.editing ? [UIColor darkGrayColor].CGColor : [UIColor lightGrayColor].CGColor;
     
-    UIImage *btnImage = [UIImage imageNamed:self.isEditing ? @"syncronize" : @"copy_64"];
+    UIImage *btnImage = [UIImage imageNamed:self.isEditing ? @"syncronize" : @"copy"];
     
     [self.buttonGeneratePassword setImage:btnImage forState:UIControlStateNormal];
     (self.buttonGeneratePassword).enabled = self.editing || (!self.isEditing && (self.record != nil && (self.record.fields.password).length));

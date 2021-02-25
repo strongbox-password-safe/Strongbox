@@ -8,7 +8,6 @@
 
 #import "DatabaseUnlocker.h"
 #import "Alerts.h"
-//#import "SyncManager.h"
 #import "Serializator.h"
 #import "AutoFillSettings.h"
 #import "SVProgressHUD.h"
@@ -140,11 +139,11 @@
         [self openSafeWithDataDone:nil error:error];
         return;
     }
-    
+
     dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD showWithStatus:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
     });
-    
+
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         DatabaseFormat format = [Serializator getDatabaseFormat:url];
         if(!self.keyFromConvenience && (format == kKeePass || format == kKeePass4) && key.isAmbiguousEmptyOrNullPassword) {
@@ -265,39 +264,56 @@
     
     
     
+    
+    
+    
+    
+    
+    
+    CompositeKeyFactors *emptyPw = [CompositeKeyFactors password:@"" keyFileDigest:key.keyFileDigest yubiKeyCR:key.yubiKeyCR];
+    CompositeKeyFactors *nilPw = [CompositeKeyFactors password:nil keyFileDigest:key.keyFileDigest yubiKeyCR:key.yubiKeyCR];
 
-    if (!key.yubiKeyCR) { 
-        [Serializator fromUrl:url ckf:key completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-            if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
-                CompositeKeyFactors *nilPw = [CompositeKeyFactors password:nil keyFileDigest:key.keyFileDigest];
-
-                [Serializator fromUrl:url ckf:nilPw completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                    [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+    CompositeKeyFactors *firstCheck = self.database.emptyOrNilPwPreferNilCheckFirst ? nilPw : emptyPw;
+    CompositeKeyFactors *secondCheck = self.database.emptyOrNilPwPreferNilCheckFirst ? emptyPw : nilPw;
+    
+    [Serializator fromUrl:url
+                      ckf:firstCheck
+               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+        if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
+            NSLog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
+            
+            self.database.emptyOrNilPwPreferNilCheckFirst = !self.database.emptyOrNilPwPreferNilCheckFirst;
+            [SafesList.sharedInstance update:self.database];
+            
+            if ( secondCheck.yubiKeyCR != nil ) { 
+                [Alerts areYouSure:self.viewController
+                           message:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
+                            action:^(BOOL response) {
+                    if (response) {
+                        [Serializator fromUrl:url
+                                          ckf:secondCheck
+                                   completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+                            [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+                        }];
+                    }
+                    else {
+                        completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+                    }
                 }];
             }
             else {
-                [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+                [Serializator fromUrl:url
+                                  ckf:secondCheck
+                           completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+                    [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+                }];
             }
-        }];
-    }
-    else { 
-        [Alerts twoOptionsWithCancel:self.viewController
-                               title:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
-                             message:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
-                   defaultButtonText:NSLocalizedString(@"casg_question_option_empty", @"Empty Password")
-                    secondButtonText:NSLocalizedString(@"casg_question_option_none", @"No Password")
-                              action:^(int response) {
-            CompositeKeyFactors *ckf = response == 1 ? key : [CompositeKeyFactors password:nil keyFileDigest:key.keyFileDigest];
-            
-            [Serializator fromUrl:url
-                              ckf:ckf
-                       completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                [self onGotDatabaseModelFromData:userCancelled model:model error:error];
-            }];
-        }];
-    }
+        }
+        else {
+            [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+        }
+    }];
 }
-
 
 
 

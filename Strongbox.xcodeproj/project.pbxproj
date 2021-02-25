@@ -4574,9 +4574,9 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4DED20C72168BF1800A5800A /* Home */,
 				4DC3B28C257E9462000DA6FD /* Components */,
-				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				4D192DD7257E8D0900FE90DC /* Merge */,
 				C8D5F02E24E2DD130056B6EE /* Sync */,
@@ -9460,7 +9460,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -9483,7 +9483,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.50.13;
+				MARKETING_VERSION = 1.52.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -9548,7 +9548,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -9571,7 +9571,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.50.13;
+				MARKETING_VERSION = 1.52.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -9635,7 +9635,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -9658,7 +9658,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/debug_universal",
 				);
-				MARKETING_VERSION = 1.50.9;
+				MARKETING_VERSION = 1.52.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -9715,7 +9715,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -9738,7 +9738,7 @@
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 					"$(PROJECT_DIR)/lib/YubiKit/release_universal",
 				);
-				MARKETING_VERSION = 1.50.9;
+				MARKETING_VERSION = 1.52.5;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -9798,7 +9798,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -9869,7 +9869,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -9938,7 +9938,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -9967,7 +9967,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.52.6;
+				MARKETING_VERSION = 1.52.5;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = NO;
@@ -10017,7 +10017,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3029;
+				CURRENT_PROJECT_VERSION = 3030;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";
@@ -10046,7 +10046,7 @@
 					"$(PROJECT_DIR)/lib/OpenSSL/lib",
 					"$(PROJECT_DIR)/lib/NMSSH/NMSSH-iOS/Libraries/lib",
 				);
-				MARKETING_VERSION = 1.52.6;
+				MARKETING_VERSION = 1.52.5;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

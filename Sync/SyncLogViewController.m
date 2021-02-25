@@ -18,7 +18,7 @@ static NSString* const kSyncLogCellCellId = @"SyncLogCell";
 
 @interface SyncLogViewController ()
 
-@property NSArray<TableRow*> *syncs;
+@property NSArray<NSArray<SyncStatusLogEntry*>*> *syncs;
 
 @end
 

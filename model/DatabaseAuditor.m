@@ -539,7 +539,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 }
 
 - (void)checkHibp {
-    NSLog(@"AUDIT: Checking HaveIBeenPwned...");
+
 
     if(!self.config.showCachedHibpHits && !self.config.checkHibp) {
         
@@ -557,7 +557,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     BOOL checkForNewBreaches = self.config.checkHibp;
 
     NSDate *lastChecked = self.config.lastHibpOnlineCheck;
-    NSLog(@"Last Checked for New Breaches: [%@]", lastChecked);
+
     if (checkForNewBreaches && lastChecked && self.config.hibpCheckForNewBreachesIntervalSeconds > 0) {
         NSCalendar *cal = [NSCalendar currentCalendar];
         NSDate *dueDate = [cal dateByAddingUnit:NSCalendarUnitSecond value:self.config.hibpCheckForNewBreachesIntervalSeconds toDate:lastChecked options:0];
@@ -574,7 +574,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         }
     }
     else {
-        NSLog(@"Will NOT check for new breaches, due to config or last check to recent.");
+
     }
     
     NSSet<NSString*>* pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
@@ -615,7 +615,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         self.state = kAuditStateStoppedIncomplete;
     }
     
-    NSLog(@"AUDIT: HaveIBeenPwned... Done!");
+
 }
 
 - (void)oneTimeHibpCheck:(NSString*)password completion:(void(^)(BOOL pwned, NSError* error))completion {

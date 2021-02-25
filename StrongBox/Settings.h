@@ -61,6 +61,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL appLockAllowDevicePasscodeFallbackForBio;
 @property BOOL fullFileProtection;
 
+@property BOOL haveAttemptedMigrationToFullFileProtection;
+
 NS_ASSUME_NONNULL_END
 
 @end

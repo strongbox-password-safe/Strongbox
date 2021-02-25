@@ -48,7 +48,7 @@ typedef NSViewController* VIEW_CONTROLLER_PTR;
 typedef DatabaseMetadata* METADATA_PTR;
 #endif
 
-
+NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
 
 
 
@@ -816,13 +816,9 @@ typedef DatabaseMetadata* METADATA_PTR;
 }
 
 - (void)publishSyncStatusChangeNotification:(SyncStatus*)info {
-#if TARGET_OS_IPHONE
-    
-    
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kSyncManagerDatabaseSyncStatusChanged object:info.databaseId];
     });
-#endif
 }
 
 - (void)logMessage:(METADATA_PTR)database syncId:(NSUUID*)syncId message:(NSString*)message {

@@ -153,6 +153,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL immediateOfflineOfferIfOfflineDetected;
 
 @property QuickTypeAutoFillDisplayFormat quickTypeDisplayFormat;
+@property BOOL emptyOrNilPwPreferNilCheckFirst; 
+@property BOOL autoLockOnDeviceLock;
 
 @end
 

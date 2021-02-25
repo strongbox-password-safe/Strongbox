@@ -239,7 +239,11 @@ static NSImage* kStrongBox256Image;
 
     NSLog(@"ViewController::doInitialViewSetup - Initial Load - doc=[%@] - vm=[%@]", self.document, self.viewModel);
 
-    [self fullModelReload];  
+    [self fullModelReload];
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self autoPromptForTouchIdIfDesired];
+    });
 }
 
 - (void)fullModelReload { 
@@ -467,8 +471,27 @@ static NSImage* kStrongBox256Image;
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
     if(control == self.searchField) { 
-        if (commandSelector == @selector(moveDown:)) {
 
+        
+        if (commandSelector == NSSelectorFromString(@"noop:")) { 
+            NSEvent *event = [self.searchField.window currentEvent];
+            if ( (event.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) {
+                NSString *chars = event.charactersIgnoringModifiers;
+                unichar aChar = [chars characterAtIndex:0];
+
+                
+                
+                if (aChar == 'c') {
+                    Node* item = [self getCurrentSelectedItem];
+                    if ( item && !item.isGroup ) {
+                        [self onCopyPassword:nil];
+                        return YES;
+                    }
+                }
+            }
+        }
+        
+        if (commandSelector == @selector(moveDown:)) {
             if (self.outlineView.numberOfRows > 0) {
                 [self.view.window makeFirstResponder:self.outlineView];
                 return YES;
@@ -622,6 +645,10 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)onItemsDeletedNotification:(NSNotification*)param {
+    if(param.object != self.viewModel) {
+        return;
+    }
+    
     NSArray<Node*>* deletedItems = param.userInfo[kNotificationUserInfoKeyNode];
     if (deletedItems) {
         NSArray<NSUUID*> *ids = [deletedItems map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
@@ -646,12 +673,20 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)onItemsUnDeletedNotification:(NSNotification*)param {
+    if(param.object != self.viewModel) {
+        return;
+    }
+
     self.itemsCache = nil; 
     [self.outlineView reloadData]; 
     [self bindDetailsPane];
 }
 
-- (void)onItemsMovedNotification:(NSNotificationCenter*)param {
+- (void)onItemsMovedNotification:(NSNotification*)param {
+    if(param.object != self.viewModel) {
+        return;
+    }
+
     self.itemsCache = nil; 
     [self.outlineView reloadData];
     [self bindDetailsPane];
@@ -663,7 +698,6 @@ static NSImage* kStrongBox256Image;
     NSString *loc = NSLocalizedString(@"generic_fieldname_icon", @"Icon");
     
     NSNumber* foo = (NSNumber*)notification.userInfo[kNotificationUserInfoKeyIsBatchIconUpdate];
-    
     
     [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc suppressPopupMessage:foo == nil || foo.boolValue == YES];
 }
@@ -697,8 +731,11 @@ static NSImage* kStrongBox256Image;
     NSString *loc = NSLocalizedString(@"generic_fieldname_url", @"URL");
     [self genericReloadOnUpdateAndMaintainSelection:notification popupMessage:loc];
 
+    if(notification.object != self.viewModel) {
+        return;
+    }
+    
     Node* node = (Node*)notification.userInfo[kNotificationUserInfoKeyNode];
-
     [self expressDownloadFavIconIfAppropriateForNewOrUpdatedNode:node];
 }
 
@@ -1673,12 +1710,6 @@ static NSImage* kStrongBox256Image;
     }
 }
 
-- (void)onFileChangedByOtherApplication:(NSNotification*)notification {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self onDatabaseChangedByExternalOther];
-    });
-}
-
 - (void)onDatabaseChangedByExternalOther {
     if(self.isPromptingAboutUnderlyingFileChange) {
         NSLog(@"Already in Use...");
@@ -2261,34 +2292,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     return items;
 }
 
-- (id)copy:(id)sender {
-    NSLog(@"Copied Items to Pasteboard...");
-    
-    NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-    NSArray* selected = [self getSelectedItems];
-    
-    [self placeItemsOnPasteboard:pasteboard items:selected];
-    
-    return nil;
-}
-
-- (id)paste:(id)sender {
-    NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-    
-    Node* selected = [self getCurrentSelectedItem];
-    Node* destinationItem = self.viewModel.rootGroup;
-    if(selected) {
-        destinationItem = selected.isGroup ? selected : selected.parent;
-    }
-    
-    BOOL ret = [self pasteItemsFromPasteboard:pasteboard destinationItem:destinationItem source:nil clear:NO];
-    if(!ret) {
-        [MacAlerts info:@"Could not paste! Unknown Error." window:self.view.window];
-    }
-    
-    return nil;
-}
-
 - (BOOL)outlineView:(NSOutlineView *)outlineView
          writeItems:(NSArray *)items
        toPasteboard:(NSPasteboard *)pasteboard {
@@ -2374,10 +2377,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     Node* destinationItem = (item == nil) ? self.viewModel.rootGroup : item;
 
-    return [self pasteItemsFromPasteboard:info.draggingPasteboard destinationItem:destinationItem source:info.draggingSource clear:YES];
+    return [self pasteItemsFromPasteboard:info.draggingPasteboard destinationItem:destinationItem source:info.draggingSource clear:YES] != 0;
 }
 
-- (BOOL)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
+- (NSUInteger)pasteItemsFromPasteboard:(NSPasteboard*)pasteboard
                  destinationItem:(Node*)destinationItem
                           source:(id)source
                            clear:(BOOL)clear {
@@ -2398,12 +2401,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
             [pasteboard clearContents];
         }
         
-        return result;
+        return result ? sourceItems.count : 0;
     }
     else if(destinationItem.isGroup) { 
         NSData* json = [pasteboard dataForType:kDragAndDropExternalUti];
         if(json && destinationItem.isGroup) {
-            BOOL ret = [self pasteFromExternal:json destinationItem:destinationItem];
+            NSUInteger ret = [self pasteFromExternal:json destinationItem:destinationItem];
             if(clear) {
                 [pasteboard clearContents];
             }
@@ -2415,10 +2418,10 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         [pasteboard clearContents];
     }
     
-    return NO;
+    return 0;
 }
 
-- (BOOL)pasteFromExternal:(NSData*)json destinationItem:(Node*)destinationItem {
+- (NSUInteger)pasteFromExternal:(NSData*)json destinationItem:(Node*)destinationItem {
     NSError* error;
     NSDictionary* serialized = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
 
@@ -2442,7 +2445,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         
         if(!n) {
             [MacAlerts error:err window:self.view.window];
-            return NO;
+            return 0;
         }
         
         [nodes addObject:n];
@@ -2450,7 +2453,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     [self processFormatIncompatibilities:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
     
-    return YES;
+    return nodes.count;
 }
 
 - (void)processPasswordSafeToKeePass2:(NSDictionary*)serialized
@@ -2879,133 +2882,6 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     }
     
     [[NSWorkspace sharedWorkspace] openURL:urlString.urlExtendedParse];
-}
-
-- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
-    SEL theAction = [anItem action];
-
-
-
-    Node* item = nil;
-    
-    if(self.viewModel && !self.viewModel.locked) {
-        item = [self getCurrentSelectedItem];
-    }
-    
-    if (theAction == @selector(onViewItemDetails:)) {
-        return item != nil && !item.isGroup;
-    }
-    if (theAction == @selector(onDuplicateEntry:)) {
-        return item != nil && !item.isGroup;
-    }
-    else if (theAction == @selector(copy:)) {
-        return item != nil;
-    }
-    else if (theAction == @selector(paste:)) {
-        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
-        NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
-        NSLog(@"Validate Paste - %d", blah != nil);
-        return blah != nil;
-    }
-    else if (theAction == @selector(onDelete:)) {
-        if(self.outlineView.selectedRowIndexes.count > 1) {
-            NSMenuItem* mi = (NSMenuItem*)anItem;
-            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
-            [mi setTitle:loc];
-        }
-        else {
-            NSMenuItem* mi = (NSMenuItem*)anItem;
-            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
-            [mi setTitle:loc];
-        }
-        return item != nil;
-    }
-    else if(theAction == @selector(onCreateGroup:) ||
-            theAction == @selector(onCreateRecord:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onChangeMasterPassword:) ||
-             theAction == @selector(onCopyAsCsv:) ||
-             theAction == @selector(onImportFromCsvFile:) ||
-             theAction == @selector(onLock:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onShowSafeSummary:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onFind:)) {
-        return self.viewModel && !self.viewModel.locked;
-            
-    }
-    else if(theAction == @selector(onLaunchUrl:) ||
-            theAction == @selector(onCopyUrl:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyTitle:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyUsername:)) {
-        return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onCopyEmail:)) {
-        return item && !item.isGroup && self.viewModel.format == kPasswordSafe;
-    }
-    else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
-        return item && !item.isGroup && item.fields.password.length;
-    }
-    else if (theAction == @selector(onCopyPassword:)) {
-        return item && !item.isGroup && item.fields.password.length;
-    }
-    else if (theAction == @selector(onCopyTotp:)) {
-        return item && !item.isGroup && item.fields.otpToken;
-    }
-    else if (theAction == @selector(onCopyNotes:)) {
-        return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
-    }
-    else if (theAction == @selector(onDatabaseProperties:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onAutoFillSettings:)) {
-        return self.viewModel && !self.viewModel.locked && AutoFillManager.sharedInstance.isPossible;
-    }
-    else if (theAction == @selector(saveDocument:)) {
-        return !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onSetItemIcon:)) {
-        return item != nil && self.viewModel.format != kPasswordSafe;
-    }
-    else if(theAction == @selector(onSetTotp:)) {
-        return item && !item.isGroup;
-    }
-    else if(theAction == @selector(onClearTotp:)) {
-        return item && !item.isGroup && item.fields.otpToken;
-    }
-    else if (theAction == @selector(onViewItemHistory:)) {
-        return
-            item != nil &&
-            !item.isGroup &&
-            item.fields.keePassHistory.count > 0 &&
-            (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
-    }
-    else if(theAction == @selector(onOutlineHeaderColumnsChanged:)) {
-        NSMenuItem* menuItem = (NSMenuItem*)anItem;
-        menuItem.state = [self isColumnVisible:menuItem.identifier];
-        return [self isColumnAvailableForModel:menuItem.identifier];
-    }
-    else if(theAction == @selector(onPrintDatabase:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onDownloadFavIcons:)) {
-        return !self.viewModel.locked && (item == nil || ((self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
-    }
-    else if (theAction == @selector(onPreviewQuickViewAttachment:)) {
-        return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
-    }
-    else if (theAction == @selector(onSaveQuickViewAttachmentAs:)) {
-        return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
-    }
-    
-    return YES;
 }
 
 - (void)clearTouchId {
@@ -3949,14 +3825,19 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     
     Node* item = nil;
     
-    if(self.viewModel && !self.viewModel.locked) {
+    if( self.viewModel && !self.viewModel.locked ) {
         item = [self getCurrentSelectedItem];
     }
     
-    if (item && !item.isGroup) {
+    if ( item ) {
+        Node* destinationItem = item.parent ? item.parent : self.viewModel.rootGroup;
+    
         Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
-        [item touch:NO touchParents:YES];        
-        [self.viewModel addChildren:@[dupe] parent:item.parent];
+        [item touch:NO touchParents:YES];
+        if ( [self.viewModel addChildren:@[dupe] parent:destinationItem] ) {
+            NSString* loc = NSLocalizedString(@"mac_item_duplicated", @"Item Duplicated");
+            [self showPopupChangeToastNotification:loc];
+        }
     }
 }
 
@@ -4081,4 +3962,236 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     });
 }
 
+- (void)onFileChangedByOtherApplication:(NSNotification*)notification {
+    if( notification.object != self.viewModel.document ) {
+        return;
+    }
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self onDatabaseChangedByExternalOther];
+    });
+}
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+    SEL theAction = [anItem action];
+
+
+
+    Node* item = nil;
+    
+    if(self.viewModel && !self.viewModel.locked) {
+        item = [self getCurrentSelectedItem];
+    }
+    
+    if (theAction == @selector(onViewItemDetails:)) {
+        return item != nil && !item.isGroup;
+    }
+    if (theAction == @selector(onDuplicateEntry:)) {
+        return item != nil; 
+    }
+    else if (theAction == @selector(copy:)) {
+        return item != nil;
+    }
+    else if (theAction == @selector(onCopySelectedItemsToClipboard:)) {
+        return item != nil;
+    }
+    else if (theAction == @selector(paste:)) {
+        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+        NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
+        NSLog(@"Validate Paste - %d", blah != nil);
+        return blah != nil;
+    }
+    else if (theAction == @selector(onDelete:)) {
+        if(self.outlineView.selectedRowIndexes.count > 1) {
+            NSMenuItem* mi = (NSMenuItem*)anItem;
+            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_items", @"Delete Items");
+            [mi setTitle:loc];
+        }
+        else {
+            NSMenuItem* mi = (NSMenuItem*)anItem;
+            NSString* loc = NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
+            [mi setTitle:loc];
+        }
+        return item != nil;
+    }
+    else if(theAction == @selector(onCreateGroup:) ||
+            theAction == @selector(onCreateRecord:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onChangeMasterPassword:) ||
+             theAction == @selector(onCopyAsCsv:) ||
+             theAction == @selector(onImportFromCsvFile:) ||
+             theAction == @selector(onLock:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onShowSafeSummary:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onFind:)) {
+        return self.viewModel && !self.viewModel.locked;
+            
+    }
+    else if(theAction == @selector(onLaunchUrl:) ||
+            theAction == @selector(onCopyUrl:)) {
+        return item && !item.isGroup;
+    }
+    else if (theAction == @selector(onCopyTitle:)) {
+        return item && !item.isGroup;
+    }
+    else if (theAction == @selector(onCopyUsername:)) {
+        return item && !item.isGroup;
+    }
+    else if (theAction == @selector(onCopyEmail:)) {
+        return item && !item.isGroup && self.viewModel.format == kPasswordSafe;
+    }
+    else if (theAction == @selector(onCopyPasswordAndLaunchUrl:)) {
+        return item && !item.isGroup && item.fields.password.length;
+    }
+    else if (theAction == @selector(onCopyPassword:)) {
+        return item && !item.isGroup && item.fields.password.length;
+    }
+    else if (theAction == @selector(onCopyTotp:)) {
+        return item && !item.isGroup && item.fields.otpToken;
+    }
+    else if (theAction == @selector(onCopyNotes:)) {
+        return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
+    }
+    else if (theAction == @selector(onDatabaseProperties:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onAutoFillSettings:)) {
+        return self.viewModel && !self.viewModel.locked && AutoFillManager.sharedInstance.isPossible;
+    }
+    else if (theAction == @selector(saveDocument:)) {
+        return !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onSetItemIcon:)) {
+        return item != nil && self.viewModel.format != kPasswordSafe;
+    }
+    else if(theAction == @selector(onSetTotp:)) {
+        return item && !item.isGroup;
+    }
+    else if(theAction == @selector(onClearTotp:)) {
+        return item && !item.isGroup && item.fields.otpToken;
+    }
+    else if (theAction == @selector(onViewItemHistory:)) {
+        return
+            item != nil &&
+            !item.isGroup &&
+            item.fields.keePassHistory.count > 0 &&
+            (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4);
+    }
+    else if(theAction == @selector(onOutlineHeaderColumnsChanged:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = [self isColumnVisible:menuItem.identifier];
+        return [self isColumnAvailableForModel:menuItem.identifier];
+    }
+    else if(theAction == @selector(onPrintDatabase:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onDownloadFavIcons:)) {
+        return !self.viewModel.locked && (item == nil || ((self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
+    }
+    else if (theAction == @selector(onPreviewQuickViewAttachment:)) {
+        return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
+    }
+    else if (theAction == @selector(onSaveQuickViewAttachmentAs:)) {
+        return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
+    }
+    
+    return YES;
+}
+
+- (id)copy:(id)sender {
+    NSLog(@"ViewController::copy");
+    
+    NSArray<Node*>* selected = [self getSelectedItems];
+    
+    if ( selected.count == 0) {
+        NSLog(@"Nothing selected!");
+        return nil;
+    }
+    
+    if (selected.count == 1 && !selected.firstObject.isGroup ) {
+        NSLog(@"Only one selected item and non group... copying password");
+        [self onCopyPassword:nil];
+    }
+    else {
+        NSLog(@"Multiple selected or group... copying items to clipboard");
+        [self onCopySelectedItemsToClipboard:nil];
+    }
+    
+    return nil;
+}
+
+- (id)paste:(id)sender {
+    NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+    NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
+    if ( blah == nil ) {
+        return nil;
+    }
+
+    Node* selected = [self getCurrentSelectedItem];
+    Node* destinationItem = self.viewModel.rootGroup;
+    if(selected) {
+        destinationItem = selected.isGroup ? selected : selected.parent;
+    }
+
+    NSUInteger itemCount = [self pasteItemsFromPasteboard:pasteboard destinationItem:destinationItem source:nil clear:NO];
+    if ( itemCount == 0 ) {
+        [MacAlerts info:@"Could not paste! Unknown Error." window:self.view.window];
+    }
+    else {
+        NSString* loc = itemCount == 1 ? NSLocalizedString(@"mac_item_pasted_from_clipboard", @"Item Pasted from Clipboard") :
+            NSLocalizedString(@"mac_items_pasted_from_clipboard", @"Items Pasted from Clipboard");
+        
+        [self showPopupChangeToastNotification:loc];
+    }
+
+    return nil;
+}
+
+- (IBAction)onCopySelectedItemsToClipboard:(id)sender {
+    NSArray* selected = [self getSelectedItems];
+    
+    if (selected.count) {
+        NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
+        [self placeItemsOnPasteboard:pasteboard items:selected];
+
+        NSString* loc = selected.count == 1 ? NSLocalizedString(@"mac_copied_item_to_clipboard", @"Item Copied to Clipboard") :
+            NSLocalizedString(@"mac_copied_items_to_clipboard", @"Items Copied to Clipboard");
+        
+        [self showPopupChangeToastNotification:loc];
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @end
+
+
+
+
+
+
+
+
+
+

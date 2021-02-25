@@ -17,10 +17,12 @@
 #import "Settings.h"
 #import "MacSyncManager.h"
 #import <QuartzCore/QuartzCore.h>
+#import "SafeStorageProviderFactory.h"
 
 @interface DatabaseCellView () <NSTextFieldDelegate>
 
-@property (weak) IBOutlet ClickableTextField *textFieldName;
+@property (weak) IBOutlet NSTextField *textFieldName;
+
 @property (weak) IBOutlet NSTextField *textFieldSubtitleLeft;
 @property (weak) IBOutlet NSTextField *textFieldSubtitleTopRight;
 @property (weak) IBOutlet NSTextField *textFieldSubtitleBottomRight;
@@ -29,6 +31,9 @@
 @property (weak) IBOutlet NSImageView *imageViewOutstandingUpdate;
 @property (weak) IBOutlet NSImageView *imageViewReadOnly;
 @property (weak) IBOutlet NSImageView *imageViewSyncing;
+@property (weak) IBOutlet NSProgressIndicator *syncProgressIndicator;
+
+@property (weak) IBOutlet NSTextField *textFieldStorage;
 
 @end
 
@@ -42,6 +47,8 @@
     NSString* path = @"";
     NSString* fileSize = @"";
     NSString* fileMod = @"";
+    NSString* storage = @"";
+    
     NSString* title = metadata.nickName ? metadata.nickName : @"";
     
     if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
@@ -61,11 +68,13 @@
         }
     }
     else {
-        NSString* storageInfo = autoFill ? metadata.autoFillStorageInfo : metadata.storageInfo;
         
-        NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:storageInfo];
-        url = url ? url : metadata.fileUrl; 
         
+        
+        
+        
+        
+        NSURL* url = metadata.fileUrl;
         if ( url ) {
             if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
                 path = [self getFriendlyICloudPath:url.path];
@@ -78,6 +87,7 @@
             NSDictionary* attr = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
             if (error) {
                 NSLog(@"Error getting attributes of database file: [%@]", error);
+                path = [NSString stringWithFormat:@"(%ld) %@", (long)error.code, error.localizedDescription];
             }
             else {
                 fileSize = friendlyFileSizeString(attr.fileSize);
@@ -85,11 +95,12 @@
             }
         }
     }
-
+    
     self.textFieldName.stringValue = title;
     self.textFieldSubtitleLeft.stringValue = path;
     self.textFieldSubtitleTopRight.stringValue = fileSize;
     self.textFieldSubtitleBottomRight.stringValue = fileMod;
+    self.textFieldStorage.stringValue = [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider];
 }
 
 - (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill {
@@ -97,12 +108,16 @@
     self.textFieldSubtitleLeft.stringValue = @"";
     self.textFieldSubtitleTopRight.stringValue = @"";
     self.textFieldSubtitleBottomRight.stringValue = @"";
+    self.textFieldStorage.stringValue = @"";
     
     self.imageViewQuickLaunch.hidden = YES;
     self.imageViewOutstandingUpdate.hidden = YES;
     self.imageViewReadOnly.hidden = YES;
+    
     self.imageViewSyncing.hidden = YES;
-   
+    self.syncProgressIndicator.hidden = YES;
+    [self.syncProgressIndicator stopAnimation:nil];
+    
     @try {
         [self determineFields:metadata autoFill:autoFill];
     
@@ -110,42 +125,26 @@
         self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
         
         SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [MacSyncManager.sharedInstance getSyncStatus:metadata].state;
+        
         if (syncState == kSyncOperationStateInProgress ||
             syncState == kSyncOperationStateError ||
-            syncState == kSyncOperationStateBackgroundButUserInteractionRequired ||
-            syncState == kSyncOperationStateUserCancelled) {
+            syncState == kSyncOperationStateBackgroundButUserInteractionRequired ) { 
             
             self.imageViewSyncing.hidden = NO;
+            self.imageViewSyncing.image = syncState == kSyncOperationStateError ? [NSImage imageNamed:@"error"] : [NSImage imageNamed:@"syncronize"];
+            
             if (@available(macOS 10.14, *)) {
-                NSColor *tint = syncState == kSyncOperationStateError ? NSColor.systemRedColor : (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
+                NSColor *tint = (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
                 self.imageViewSyncing.contentTintColor = tint;
             }
             
-            
-            
-
-            
+            if ( syncState == kSyncOperationStateInProgress ) {
+                self.syncProgressIndicator.hidden = NO;
+                [self.syncProgressIndicator startAnimation:nil];
+            }
         }
     } @catch (NSException *exception) {
         NSLog(@"Exception getting display attributes for database: %@", exception);
-    }
-}
-
-- (void)runSpinAnimationOnView:(NSView*)view doIt:(BOOL)doIt duration:(CGFloat)duration rotations:(CGFloat)rotations repeat:(float)repeat {
-
-
-    [view.layer removeAllAnimations];
-    
-    if (doIt) {
-        CABasicAnimation* rotationAnimation;
-        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
-        rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0 /* full rotation*/ * rotations * duration ];
-        rotationAnimation.duration = duration;
-        rotationAnimation.cumulative = YES;
-        rotationAnimation.repeatCount = repeat ? HUGE_VALF : 0;
-        [rotationAnimation setRemovedOnCompletion:NO]; 
-        
-        [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
     }
 }
 

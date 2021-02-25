@@ -26,8 +26,6 @@
 #import "Serializator.h"
 #import "WorkingCopyManager.h"
 
-NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
-
 @interface SyncManager ()
 
 @property (nonatomic, strong) dispatch_queue_t dispatchQueue;

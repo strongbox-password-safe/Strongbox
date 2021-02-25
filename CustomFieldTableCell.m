@@ -70,14 +70,14 @@ NSString *const CustomFieldCellHeightChanged = @"CustomFieldCellHeightChangedNot
 
 - (void)bindConcealed {
     if(self._concealed) {
-        [self.buttonShowHide setImage:[UIImage imageNamed:@"show"] forState:UIControlStateNormal];
+        [self.buttonShowHide setImage:[UIImage imageNamed:@"visible"] forState:UIControlStateNormal];
 
         self.valueLabel.text = NSLocalizedString(@"generic_masked_protected_field_text", @"*****************");
 
         self.valueLabel.textColor = [UIColor lightGrayColor];
     }
     else {
-        [self.buttonShowHide setImage:[UIImage imageNamed:@"hide"] forState:UIControlStateNormal];
+        [self.buttonShowHide setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateNormal];
 
         BOOL dark = NO;
         if (@available(iOS 12.0, *)) {

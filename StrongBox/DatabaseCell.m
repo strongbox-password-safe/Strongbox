@@ -161,7 +161,7 @@ rotateLastImage:(BOOL)rotateLastImage
     UIImage* databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:databaseIconName] : nil;
 
     if (disabled) {
-        databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel_32"] : nil;
+        databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel"] : nil;
         
         if (autoFill) {
             subtitle2 = database.autoFillEnabled ?

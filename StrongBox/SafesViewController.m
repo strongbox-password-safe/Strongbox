@@ -59,6 +59,7 @@
 #import "DatabasePropertiesVC.h"
 #import "SecretStore.h"
 #import "WorkingCopyManager.h"
+#import <notify.h>
 
 @interface SafesViewController ()
 
@@ -136,10 +137,28 @@
         }
     }
     
+    [self manuallySetFullFileProtection]; 
+
     
     
     
     
+}
+
+- (void)manuallySetFullFileProtection {
+    if ( !Settings.sharedInstance.haveAttemptedMigrationToFullFileProtection ) {
+        Settings.sharedInstance.haveAttemptedMigrationToFullFileProtection = YES;
+        
+        NSLog(@"Enabled full file protection for user one time.");
+        Settings.sharedInstance.fullFileProtection = YES;
+        
+        
+        
+
+            NSLog(@"Enabling Full File Protection at App Startup..."); 
+            [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
+
+    }
 }
 
 
@@ -215,13 +234,6 @@
         NSLog(@"New User is not pro or in a free trial... Prompt for free trial opt in");
 
         [self promptToOptInToFreeTrial];
-    }
-    
-    
-    
-    if ( Settings.sharedInstance.fullFileProtection ) {
-        NSLog(@"Enabling Full File Protection at App Startup..."); 
-        [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
     }
 }
 
@@ -386,16 +398,10 @@
     BOOL fallbackMethod = [visible isKindOfClass:PrivacyViewController.class];
     
     if (self.privacyAndLockVc || fallbackMethod) {
-        if ([self shouldLockOpenDatabase]) {
+        if ([self shouldLockUnlockedDatabase]) {
             NSLog(@"Should Lock Database now...");
 
-            self.lastOpenedDatabase = nil; 
-            
-            UINavigationController* nav = self.navigationController;
-            [nav popToRootViewControllerAnimated:NO];
-            
-            
-            [self dismissViewControllerAnimated:NO completion:^{
+            [self lockUnlockedDatabase:^{
                 [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
             }];
         }
@@ -425,7 +431,7 @@
     }
 }
 
-- (BOOL)shouldLockOpenDatabase {
+- (BOOL)shouldLockUnlockedDatabase {
     if (self.enterBackgroundTime && self.lastOpenedDatabase) {
         NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
         
@@ -441,6 +447,36 @@
     }
     
     return NO;
+}
+
+- (void)protectedDataWillBecomeUnavailable {
+    
+    NSLog(@"XXXXXX - protectedDataWillBecomeUnavailable");
+
+    [self onDeviceLocked];
+}
+
+- (void)onDeviceLocked {
+    NSLog(@"onDeviceLocked - Device Lock detected - locking open database if so configured...");
+    
+    if ( self.lastOpenedDatabase && self.lastOpenedDatabase.autoLockOnDeviceLock ) {
+        [self lockUnlockedDatabase:nil];
+    }
+}
+
+- (void)lockUnlockedDatabase:(void (^ __nullable)(void))completion {
+    if (self.lastOpenedDatabase) {
+        NSLog(@"Locking Unlocked Database...");
+
+        self.lastOpenedDatabase = nil; 
+        
+        UINavigationController* nav = self.navigationController;
+        [nav popToRootViewControllerAnimated:NO];
+        
+        
+        
+        [self dismissViewControllerAnimated:NO completion:completion];
+    }
 }
 
 
@@ -493,9 +529,12 @@
     if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
         [Alerts warn:self
                title:NSLocalizedString(@"safesvc_icloud_no_longer_available_title", @"iCloud no longer available")
-             message:NSLocalizedString(@"safesvc_icloud_no_longer_available_message", @"Some databases were removed from this device because iCloud has become unavailable, but they remain stored in iCloud.")];
+             message:NSLocalizedString(@"safesvc_icloud_no_longer_available_message", @"iCloud has become unavailable. Your iCloud database remain stored in iCloud but they will no longer sync to or from this device though you may still access them here.")];
         
-        [self removeAllICloudSafes];
+        
+        
+        
+        
     }
     
     
@@ -732,6 +771,11 @@
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseUpdated:)
                                                name:kSyncManagerDatabaseSyncStatusChanged
+                                             object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(protectedDataWillBecomeUnavailable)
+                                               name:UIApplicationProtectedDataWillBecomeUnavailable
                                              object:nil];
 }
 
@@ -2329,15 +2373,12 @@
 }
 
 - (void)removeAllICloudSafes {
+    NSArray<SafeMetaData*> *icloudSafesToRemove = [self getICloudSafes];
     
-    
-
-    
-    
-
-
-
-
+    for (SafeMetaData *item in icloudSafesToRemove) {
+        NSLog(@"Removing...");
+        [SafesList.sharedInstance remove:item.uuid];
+    }
 }
 
 - (BOOL)hasSafesOtherThanLocalAndiCloud {

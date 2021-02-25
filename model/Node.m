@@ -205,7 +205,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (Node*)duplicate:(NSString*)newTitle {
-    Node* ret = [self cloneOrDuplicate:NO cloneUuid:NO cloneRecursive:NO newTitle:newTitle parentNode:nil];
+    Node* ret = [self cloneOrDuplicate:NO cloneUuid:NO cloneRecursive:YES newTitle:newTitle parentNode:nil];
 
     [ret.fields.keePassHistory removeAllObjects];
 
@@ -256,12 +256,12 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
     ret.linkedData = self.linkedData;
     
-    if (ret.isGroup && cloneRecursive) {
+    if ( ret.isGroup && cloneRecursive ) {
         for (Node* child in self.children) {
             Node* clonedChild = [child cloneOrDuplicate:cloneMetadataDates
                                               cloneUuid:cloneUuid
                                          cloneRecursive:cloneRecursive
-                                               newTitle:newTitle
+                                               newTitle:nil
                                              parentNode:ret];
         
             [ret insertChild:clonedChild keePassGroupTitleRules:YES atPosition:-1];

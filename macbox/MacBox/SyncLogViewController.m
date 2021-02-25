@@ -160,7 +160,7 @@ static NSString* const kColumnLog = @"log";
 
             if([tableColumn.identifier isEqualToString:kColumnLog]) {
                 if (entry.state == kSyncOperationStateDone ) {
-                    result.textField.stringValue = @"Done. ✅"; 
+                    result.textField.stringValue = NSLocalizedString(@"sync_log_status_done", @"Done. ✅");
                 }
                 else {
                     result.textField.stringValue = log;

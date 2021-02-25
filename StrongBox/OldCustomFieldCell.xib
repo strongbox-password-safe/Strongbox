@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -38,7 +38,7 @@
                                     <constraint firstAttribute="height" constant="32" id="10E-UU-c26"/>
                                     <constraint firstAttribute="width" constant="32" id="bet-Q7-6Sd"/>
                                 </constraints>
-                                <state key="normal" image="show-24"/>
+                                <state key="normal" image="show"/>
                                 <connections>
                                     <action selector="toggleShowHide:" destination="2ui-jb-htS" eventType="touchUpInside" id="q72-n9-u9c"/>
                                 </connections>
@@ -65,6 +65,6 @@
         </tableViewCell>
     </objects>
     <resources>
-        <image name="show-24" width="24" height="24"/>
+        <image name="show" width="512" height="512"/>
     </resources>
 </document>

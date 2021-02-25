@@ -10,7 +10,6 @@
 #import "DebugHelper.h"
 #import "ClipboardManager.h"
 #import "Alerts.h"
-//#import "Settings.h"
 #import "SharedAppAndAutoFillSettings.h"
 #import "Utils.h"
 #import "ProUpgradeIAPManager.h"

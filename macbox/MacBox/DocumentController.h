@@ -16,6 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)originalOpenDocument:(id _Nullable)sender;
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion;
 
+
+
 - (void)onAppStartup;
 - (void)performEmptyLaunchTasksIfNecessary;
 

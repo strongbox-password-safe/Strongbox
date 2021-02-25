@@ -393,7 +393,7 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
     
     [image drawInRect:thumbnailRect
              fromRect:NSZeroRect
-            operation:NSCompositeSourceOver
+            operation:NSCompositingOperationSourceOver
              fraction:1.0];
     
     [ret unlockFocus];

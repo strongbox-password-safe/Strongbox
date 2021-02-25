@@ -43,6 +43,8 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 static const NSInteger kTopLevelMenuItemTagFile = 1111;
 static const NSInteger kTopLevelMenuItemTagView = 1113;
+static const NSInteger kTopLevelMenuItemTagDatabase = 1114;
+static const NSInteger kTopLevelMenuItemTagItem = 1115;
 
 @interface AppDelegate () 
 
@@ -356,6 +358,10 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 - (void)removeUnwantedMenuItems {
     [self removeMenuItem:kTopLevelMenuItemTagView action:@selector(onViewDebugDatabasesList:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(duplicateDocument:)];
+    
+    
+    
+
 }
 
 - (void)removeUpgradeMenuItem {
@@ -369,7 +375,7 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
         return obj.action == action;
     }];
     
-    if(index != NSNotFound) {
+    if( topLevelMenuItem &&  index != NSNotFound) {
 
         [topLevelMenuItem removeItemAtIndex:index];
     }
@@ -378,7 +384,24 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-
+- (void)changeMenuItemKeyEquivalent:(NSInteger)topLevelTag action:(SEL)action keyEquivalent:(NSString*)keyEquivalent modifierMask:(NSEventModifierFlags)modifierMask {
+    NSMenu* topLevelMenuItem = [NSApplication.sharedApplication.mainMenu itemWithTag:topLevelTag].submenu;
+    
+    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.action == action;
+    }];
+    
+    if( topLevelMenuItem && index != NSNotFound) {
+        NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
+        if ( menuItem ) {
+            [menuItem setKeyEquivalentModifierMask:modifierMask];
+            [menuItem setKeyEquivalent:keyEquivalent];
+        }
+    }
+    else {
+        NSLog(@"WARN: Menu Item %@ not found to remove.", NSStringFromSelector(action));
+    }
+}
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
 

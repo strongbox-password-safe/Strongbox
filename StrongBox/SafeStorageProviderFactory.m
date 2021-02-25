@@ -118,17 +118,18 @@
                 NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
                 NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
 #else
-            _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
-            if([_displayName isEqualToString:@"storage_provider_name_local_device"]) {
-                _displayName = @"Local Device";
-            }
+            _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
 #endif
         }
         else {
+#if TARGET_OS_IPHONE
             _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
             if([_displayName isEqualToString:@"storage_provider_name_local_device"]) {
                 _displayName = @"Local Device";
             }
+#else
+            _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
+#endif
         }
     }
     else if(provider == kOneDrive) {
@@ -150,10 +151,14 @@
         }
     }
     else if(provider == kWebDAV) {
+#if TARGET_OS_IPHONE
         _displayName = NSLocalizedString(@"storage_provider_name_webdav", @"WebDAV");
         if([_displayName isEqualToString:@"storage_provider_name_webdav"]) {
             _displayName = @"WebDAV";
         }
+#else
+            _displayName = @"DAV"; 
+#endif
     }
     else {
         _displayName = @"SafeStorageProviderFactory::getDisplayName Unknown";
@@ -174,7 +179,7 @@
         return @"dropbox-blue-32x32-nologo";
     }
     else if (provider == kiCloud) {
-        return @"icloud-32";
+        return @"cloud";
     }
     else if (provider == kLocalDevice) {
         return @"iphone_x";
@@ -186,10 +191,10 @@
         return @"lock";
     }
     else if(provider == kSFTP) {
-        return @"sftp-32x32";
+        return @"cloud-sftp";
     }
     else if(provider == kWebDAV) {
-        return @"webdav-32x32";
+        return @"cloud-webdav";
     }
     else {
         return @"SafeStorageProviderFactory::getIcon Unknown";

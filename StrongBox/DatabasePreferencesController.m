@@ -27,6 +27,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *labelDatabaseAutoLockDelay;
 @property (weak, nonatomic) IBOutlet UISwitch *switchDatabaseAutoLockEnabled;
+@property (weak, nonatomic) IBOutlet UISwitch *switchLockOnDeviceLock;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
@@ -222,6 +223,8 @@
     } else {
         self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.blackColor : UIColor.lightGrayColor;
     }
+    
+    self.switchLockOnDeviceLock.on = self.viewModel.metadata.autoLockOnDeviceLock;
 }
 
 - (IBAction)onDone:(id)sender {
@@ -377,6 +380,12 @@
 
 - (BOOL)canToggleTouchId {
     return BiometricsManager.isBiometricIdAvailable && [SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial];
+}
+
+- (IBAction)onSwitchLockOnDeviceLock:(id)sender {
+    self.viewModel.metadata.autoLockOnDeviceLock = self.switchLockOnDeviceLock.on;
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+    [self bindUi];
 }
 
 @end

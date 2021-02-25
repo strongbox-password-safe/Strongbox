@@ -65,16 +65,16 @@
     
     
     
+    if (@available(iOS 11.0, *)) {
+        [sp insertObject:FilesAppUrlBookmarkProvider.sharedInstance atIndex:0];
+    }
+
+    
+    
     if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn && !self.existing) {
         [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
-    
-    
-    
-    if (@available(iOS 11.0, *)) {
-        [sp addObject:FilesAppUrlBookmarkProvider.sharedInstance];
-    }
-    
+        
     
     
     if (!self.existing) {
@@ -99,7 +99,7 @@
     
     if(indexPath.row == self.providers.count) {
         cell.text.text = NSLocalizedString(@"sspc_copy_from_url_action", @"Copy from URL...");
-        cell.image.image =  [UIImage imageNamed:@"Disconnect-32x32"];
+        cell.image.image =  [UIImage imageNamed:@"cloud-url"];
     }
     else if(indexPath.row == self.providers.count + 1) {
         cell.text.text = NSLocalizedString(@"sspc_local_network_storage_location", @"Transfer Over Local Network");
@@ -109,7 +109,7 @@
         id<SafeStorageProvider> provider = [self.providers objectAtIndex:indexPath.row];
 
         if (provider.storageId == kFilesAppUrlBookmark) {
-            cell.text.text = NSLocalizedString(@"sspc_ios_files_storage_location", @"Files...");
+            cell.text.text = NSLocalizedString(@"sspc_ios_files_storage_location", @"Files");
             cell.image.image =  [UIImage imageNamed:@"folder"];
         }
         else {

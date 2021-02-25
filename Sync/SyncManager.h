@@ -14,8 +14,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
-
 @interface SyncManager : NSObject
 
 + (instancetype _Nullable)sharedInstance;

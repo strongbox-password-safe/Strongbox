@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="1ud-dC-1he">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="1ud-dC-1he">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -229,7 +229,7 @@
                                                         <constraint firstAttribute="height" constant="40" id="wId-vU-GnM"/>
                                                     </constraints>
                                                     <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                                                    <state key="normal" image="clock_64"/>
+                                                    <state key="normal" image="timer"/>
                                                     <connections>
                                                         <action selector="onViewHistory:" destination="1ud-dC-1he" eventType="touchUpInside" id="wYJ-8l-m0D"/>
                                                     </connections>
@@ -291,7 +291,7 @@
                                                         <constraint firstAttribute="width" constant="40" id="ViF-Fw-7th"/>
                                                     </constraints>
                                                     <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                                                    <state key="normal" image="copy_64"/>
+                                                    <state key="normal" image="copy"/>
                                                     <connections>
                                                         <action selector="onCopyTotp:" destination="1ud-dC-1he" eventType="touchUpInside" id="aeF-Rw-rH9"/>
                                                     </connections>
@@ -352,7 +352,7 @@
                                                         <constraint firstAttribute="width" constant="40" id="Ycn-5R-Jae"/>
                                                     </constraints>
                                                     <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                                                    <state key="normal" image="copy_64"/>
+                                                    <state key="normal" image="copy"/>
                                                     <connections>
                                                         <action selector="onCopyUsername:" destination="1ud-dC-1he" eventType="touchUpInside" id="Fpq-bm-QIq"/>
                                                     </connections>
@@ -393,7 +393,7 @@
                                                         <constraint firstAttribute="width" constant="40" id="tO7-rt-yJw"/>
                                                     </constraints>
                                                     <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                                                    <state key="normal" image="copy_64"/>
+                                                    <state key="normal" image="copy"/>
                                                     <connections>
                                                         <action selector="onCopyEmail:" destination="1ud-dC-1he" eventType="touchUpInside" id="FMB-BD-qtO"/>
                                                     </connections>
@@ -443,7 +443,7 @@
                                                         <constraint firstAttribute="height" constant="40" id="cK1-tI-dSF"/>
                                                     </constraints>
                                                     <inset key="imageEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
-                                                    <state key="normal" image="copy_64"/>
+                                                    <state key="normal" image="copy"/>
                                                     <connections>
                                                         <action selector="onCopyUrl:" destination="1ud-dC-1he" eventType="touchUpInside" id="ybQ-Vo-4km"/>
                                                     </connections>
@@ -627,10 +627,10 @@
     </scenes>
     <resources>
         <image name="C00_Password" width="48" height="48"/>
-        <image name="clock_64" width="64" height="64"/>
-        <image name="copy_64" width="64" height="64"/>
+        <image name="copy" width="30" height="30"/>
         <image name="document" width="30" height="30"/>
         <image name="services" width="30" height="30"/>
         <image name="syncronize" width="30" height="30"/>
+        <image name="timer" width="30" height="30"/>
     </resources>
 </document>

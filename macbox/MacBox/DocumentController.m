@@ -164,6 +164,12 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
 }
 
 - (void)openDatabase:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        [self openDatabaseWorker:database completion:completion]; 
+    });
+}
+
+- (void)openDatabaseWorker:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     NSURL* url = database.fileUrl;
 
     if ( database.storageProvider == kLocalDevice ) {
@@ -171,9 +177,9 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
             NSError *error = nil;
             NSString* updatedBookmark;
             url = [BookmarksHelper getUrlFromBookmark:database.storageInfo
-                                                    readOnly:NO
-                                             updatedBookmark:&updatedBookmark
-                                                       error:&error];
+                                             readOnly:NO
+                                      updatedBookmark:&updatedBookmark
+                                                error:&error];
             
             if(url == nil) {
                 NSLog(@"WARN: Could not resolve bookmark for database... will try the saved fileUrl...");
@@ -185,6 +191,7 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
                 if (updatedBookmark) {
                     database.storageInfo = updatedBookmark;
                 }
+                
                 database.fileUrl = url;
                 [DatabasesManager.sharedInstance update:database];
             }
@@ -198,13 +205,12 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
     else {
         NSLog(@"None Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
     }
-    
+
+    dispatch_async(dispatch_get_main_queue(), ^{
     if ( url ) {
         [self openDocumentWithContentsOfURL:url
                                     display:YES
-                          completionHandler:^(NSDocument * _Nullable document,
-                                             BOOL documentWasAlreadyOpen,
-                                             NSError * _Nullable error) {
+                          completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
             if(error) {
                 NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
             }
@@ -214,7 +220,7 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
     }
     else {
         completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
-    }
+    }});
 }
 
 - (NSString *)typeForContentsOfURL:(NSURL *)url
@@ -331,5 +337,23 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
 
     [super restoreWindowWithIdentifier:identifier state:state completionHandler:completionHandler];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @end

@@ -187,7 +187,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
     [self.checkboxProtected setButtonType:NSButtonTypeSwitch];
     self.checkboxProtected.target = self;
     self.checkboxProtected.action = @selector(onCheckboxProtected);
-    self.checkboxProtected.state = initProtected ? NSOnState : NSOffState;
+    self.checkboxProtected.state = initProtected ? NSControlStateValueOn : NSControlStateValueOff;
     
     NSTextField *keyLabel = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 77, 295, 16)];
     self.keyTextField = [[NSTextField alloc] initWithFrame:NSMakeRect(40, 75, 295, 24)];
@@ -238,7 +238,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
     
     NSInteger button = [alert runModal];
     
-    completion((button == NSAlertFirstButtonReturn), self.keyTextField.stringValue, self.valueTextField.stringValue, self.checkboxProtected.state == NSOnState);
+    completion((button == NSAlertFirstButtonReturn), self.keyTextField.stringValue, self.valueTextField.stringValue, self.checkboxProtected.state == NSControlStateValueOn);
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification {

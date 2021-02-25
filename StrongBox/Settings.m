@@ -38,6 +38,7 @@ static NSString* const kHideExportFromDatabaseContextMenu = @"hideExportFromData
 static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
 static NSString* const kAppLockAllowDevicePasscodeFallbackForBio = @"appLockAllowDevicePasscodeFallbackForBio";
 static NSString* const kFullFileProtection = @"fullFileProtection";
+static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttemptedMigrationToFullFileProtection";
 
 
 
@@ -55,6 +56,14 @@ static NSString* const kFullFileProtection = @"fullFileProtection";
 }
 
 
+
+- (BOOL)haveAttemptedMigrationToFullFileProtection {
+    return [self getBool:kHaveAttemptedMigrationToFullFileProtection];
+}
+
+- (void)setHaveAttemptedMigrationToFullFileProtection:(BOOL)haveAttemptedMigrationToFullFileProtection {
+    [self setBool:kHaveAttemptedMigrationToFullFileProtection value:haveAttemptedMigrationToFullFileProtection];
+}
 
 - (BOOL)fullFileProtection {
     return [self getBool:kFullFileProtection fallback:YES]; 

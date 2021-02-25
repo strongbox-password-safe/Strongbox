@@ -68,7 +68,6 @@
 		4D1FFAAA2403030100B75EA2 /* PasswordHistoryEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DA2074FA3500148741 /* PasswordHistoryEntry.m */; };
 		4D1FFAAB2403030100B75EA2 /* KdbEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB6219B479800C22CB4 /* KdbEntry.m */; };
 		4D1FFAAC2403030100B75EA2 /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D18219B4B2900C22CB4 /* core.c */; };
-		4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493522232A3200F48182 /* DAVRequests.m */; };
 		4D1FFAAE2403030100B75EA2 /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5E1F30DB7A00D68BFE /* Document.m */; };
 		4D1FFAAF2403030100B75EA2 /* SecretStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DACA5BF23CCD40F00891366 /* SecretStore.m */; };
 		4D1FFAB02403030100B75EA2 /* MacAlerts.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D00B1F71F3DB03300D7560B /* MacAlerts.m */; };
@@ -78,7 +77,6 @@
 		4D1FFAB62403030100B75EA2 /* KeePassDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E099D21825134007BA1E7 /* KeePassDatabase.m */; };
 		4D1FFAB72403030100B75EA2 /* PwSafeSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524C9C219B44BE00C22CB4 /* PwSafeSerialization.m */; };
 		4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D553B51219DD2CE00AA4BAB /* AttachmentItem.m */; };
-		4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493B22232A3200F48182 /* ISO8601DateFormatter.m */; };
 		4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */; };
 		4D1FFABC2403030100B75EA2 /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F22074FA6B00148741 /* NodeFields.m */; };
 		4D1FFABD2403030100B75EA2 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
@@ -101,7 +99,6 @@
 		4D1FFACF2403030100B75EA2 /* XmlProcessingContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CFE219B48D300C22CB4 /* XmlProcessingContext.m */; };
 		4D1FFAD02403030100B75EA2 /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493122232A3200F48182 /* DAVBaseRequest.m */; };
 		4D1FFAD22403030100B75EA2 /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
-		4D1FFAD32403030100B75EA2 /* DAVListingParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493622232A3200F48182 /* DAVListingParser.m */; };
 		4D1FFAD42403030100B75EA2 /* PasswordMaker.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D216F5422CBCCDE000954D0 /* PasswordMaker.m */; };
 		4D1FFAD52403030100B75EA2 /* TwoFishCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE6219B481200C22CB4 /* TwoFishCipher.m */; };
 		4D1FFAD62403030100B75EA2 /* CustomPasswordTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D553B48219DB2E400AA4BAB /* CustomPasswordTextField.m */; };
@@ -115,12 +112,10 @@
 		4D1FFADF2403030100B75EA2 /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493822232A3200F48182 /* NSDateRFC1123.m */; };
 		4D1FFAE02403030100B75EA2 /* NSAdvancedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */; };
 		4D1FFAE12403030100B75EA2 /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE5219B481200C22CB4 /* Keys.m */; };
-		4D1FFAE22403030100B75EA2 /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492722232A3200F48182 /* DAVResponseItem.m */; };
 		4D1FFAE32403030100B75EA2 /* CustomIconList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CF4219B48D200C22CB4 /* CustomIconList.m */; };
 		4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA6219B459A00C22CB4 /* AutoFillNewRecordSettings.m */; };
 		4D1FFAE52403030100B75EA2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F581F30DB7A00D68BFE /* main.m */; };
 		4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4972332D80A00C2E084 /* GZipInputStream.m */; };
-		4D1FFAE82403030100B75EA2 /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493022232A3200F48182 /* DAVRequest.m */; };
 		4D1FFAE92403030100B75EA2 /* XmlStrongboxNodeModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095121825103007BA1E7 /* XmlStrongboxNodeModelAdaptor.m */; };
 		4D1FFAEA2403030100B75EA2 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F551F30DB7A00D68BFE /* AppDelegate.m */; };
 		4D1FFAEB2403030100B75EA2 /* blake2b.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D1F219B4B2900C22CB4 /* blake2b.c */; };
@@ -148,7 +143,6 @@
 		4D1FFB042403030100B75EA2 /* PwSafeDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347DC2074FA3500148741 /* PwSafeDatabase.m */; };
 		4D1FFB052403030100B75EA2 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */; };
 		4D1FFB062403030100B75EA2 /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
-		4D1FFB072403030100B75EA2 /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492622232A3200F48182 /* DAVRequestGroup.m */; };
 		4D1FFB082403030100B75EA2 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		4D1FFB092403030100B75EA2 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D8DE9B221F898460043DDC0 /* OTPTokenType.m */; };
 		4D1FFB0A2403030100B75EA2 /* NSUUID+Zero.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDA01592242A1B300C7F0E2 /* NSUUID+Zero.m */; };
@@ -332,16 +326,10 @@
 		4DBCE222222414A100A2AFA2 /* SelectPredefinedIconController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE220222414A100A2AFA2 /* SelectPredefinedIconController.m */; };
 		4DBCE22722241D6700A2AFA2 /* PredefinedKeePassIcon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22522241D6700A2AFA2 /* PredefinedKeePassIcon.m */; };
 		4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */; };
-		4DBF493D22232A3200F48182 /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492622232A3200F48182 /* DAVRequestGroup.m */; };
-		4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492722232A3200F48182 /* DAVResponseItem.m */; };
 		4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492922232A3200F48182 /* DAVCredentials.m */; };
-		4DBF494022232A3200F48182 /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493022232A3200F48182 /* DAVRequest.m */; };
 		4DBF494122232A3200F48182 /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493122232A3200F48182 /* DAVBaseRequest.m */; };
 		4DBF494222232A3200F48182 /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493222232A3200F48182 /* DAVSession.m */; };
-		4DBF494322232A3200F48182 /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493522232A3200F48182 /* DAVRequests.m */; };
-		4DBF494422232A3200F48182 /* DAVListingParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493622232A3200F48182 /* DAVListingParser.m */; };
 		4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493822232A3200F48182 /* NSDateRFC1123.m */; };
-		4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493B22232A3200F48182 /* ISO8601DateFormatter.m */; };
 		4DBFD386225CFE2F00290488 /* SprCompilation.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD383225CFE2F00290488 /* SprCompilation.m */; };
 		4DBFD387225CFE2F00290488 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */; };
 		4DBFD38B225D12A300290488 /* MMcGACTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD38A225D12A300290488 /* MMcGACTextField.m */; };
@@ -439,6 +427,12 @@
 		C80C2BC5259A1DD300085E7F /* OutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = C80C2BC2259A1DD300085E7F /* OutlineView.m */; };
 		C80C2BC6259A1DD300085E7F /* OutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = C80C2BC2259A1DD300085E7F /* OutlineView.m */; };
 		C80FF039256D666E00A181B1 /* AutoFillSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C80FF038256D666E00A181B1 /* AutoFillSettingsViewController.m */; };
+		C81ABE4A25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
+		C81ABE4B25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
+		C81ABE4C25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
+		C81ABE4D25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
+		C81ABE4E25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
+		C81ABE4F25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
 		C81BBD0C2567E49A001BAB0D /* ClickableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */; };
 		C81BBD0D2567E49A001BAB0D /* ClickableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */; };
 		C81BBD0E2567E49A001BAB0D /* ClickableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */; };
@@ -545,9 +539,7 @@
 		C8441BD525CAFBB10070C7FE /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBC25CAFBB00070C7FE /* ISO8601DateFormatter.m */; };
 		C8441BD625CAFBB10070C7FE /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBC25CAFBB00070C7FE /* ISO8601DateFormatter.m */; };
 		C8441BD725CAFBB10070C7FE /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBC25CAFBB00070C7FE /* ISO8601DateFormatter.m */; };
-		C8441BD825CAFBB10070C7FE /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBF25CAFBB00070C7FE /* NSDateRFC1123.m */; };
 		C8441BD925CAFBB10070C7FE /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBF25CAFBB00070C7FE /* NSDateRFC1123.m */; };
-		C8441BDA25CAFBB10070C7FE /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBF25CAFBB00070C7FE /* NSDateRFC1123.m */; };
 		C8441BDB25CAFBB10070C7FE /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBF25CAFBB00070C7FE /* NSDateRFC1123.m */; };
 		C8441BDC25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC325CAFBB10070C7FE /* DAVRequestGroup.m */; };
 		C8441BDD25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC325CAFBB10070C7FE /* DAVRequestGroup.m */; };
@@ -557,21 +549,15 @@
 		C8441BE125CAFBB10070C7FE /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC425CAFBB10070C7FE /* DAVResponseItem.m */; };
 		C8441BE225CAFBB10070C7FE /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC425CAFBB10070C7FE /* DAVResponseItem.m */; };
 		C8441BE325CAFBB10070C7FE /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC425CAFBB10070C7FE /* DAVResponseItem.m */; };
-		C8441BE425CAFBB10070C7FE /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC625CAFBB10070C7FE /* DAVCredentials.m */; };
 		C8441BE525CAFBB10070C7FE /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC625CAFBB10070C7FE /* DAVCredentials.m */; };
-		C8441BE625CAFBB10070C7FE /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC625CAFBB10070C7FE /* DAVCredentials.m */; };
 		C8441BE725CAFBB10070C7FE /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC625CAFBB10070C7FE /* DAVCredentials.m */; };
 		C8441BE825CAFBB10070C7FE /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCD25CAFBB10070C7FE /* DAVRequest.m */; };
 		C8441BE925CAFBB10070C7FE /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCD25CAFBB10070C7FE /* DAVRequest.m */; };
 		C8441BEA25CAFBB10070C7FE /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCD25CAFBB10070C7FE /* DAVRequest.m */; };
 		C8441BEB25CAFBB10070C7FE /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCD25CAFBB10070C7FE /* DAVRequest.m */; };
-		C8441BEC25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCE25CAFBB10070C7FE /* DAVBaseRequest.m */; };
 		C8441BED25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCE25CAFBB10070C7FE /* DAVBaseRequest.m */; };
-		C8441BEE25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCE25CAFBB10070C7FE /* DAVBaseRequest.m */; };
 		C8441BEF25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCE25CAFBB10070C7FE /* DAVBaseRequest.m */; };
-		C8441BF025CAFBB10070C7FE /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCF25CAFBB10070C7FE /* DAVSession.m */; };
 		C8441BF125CAFBB10070C7FE /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCF25CAFBB10070C7FE /* DAVSession.m */; };
-		C8441BF225CAFBB10070C7FE /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCF25CAFBB10070C7FE /* DAVSession.m */; };
 		C8441BF325CAFBB10070C7FE /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCF25CAFBB10070C7FE /* DAVSession.m */; };
 		C8441BF425CAFBB10070C7FE /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BD225CAFBB10070C7FE /* DAVRequests.m */; };
 		C8441BF525CAFBB10070C7FE /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BD225CAFBB10070C7FE /* DAVRequests.m */; };
@@ -837,7 +823,6 @@
 		C879490825DAE8E90097005D /* KdbEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CB6219B479800C22CB4 /* KdbEntry.m */; };
 		C879490925DAE8E90097005D /* core.c in Sources */ = {isa = PBXBuildFile; fileRef = 4D524D18219B4B2900C22CB4 /* core.c */; };
 		C879490A25DAE8E90097005D /* SyncComparisonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCAE883257E6E8500072D4B /* SyncComparisonParams.m */; };
-		C879490B25DAE8E90097005D /* DAVRequests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493522232A3200F48182 /* DAVRequests.m */; };
 		C879490C25DAE8E90097005D /* AutoFillManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCE899B255D99FE002C02D9 /* AutoFillManager.m */; };
 		C879490D25DAE8E90097005D /* NMSSHSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441C9725CB01AB0070C7FE /* NMSSHSession.m */; };
 		C879490E25DAE8E90097005D /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8E2CB172477D5270029E1CB /* DeletedObjects.m */; };
@@ -866,7 +851,6 @@
 		C879492525DAE8E90097005D /* KeePassXmlModelAdaptor.m in Sources */ = {isa = PBXBuildFile; fileRef = C870739B258935500002070A /* KeePassXmlModelAdaptor.m */; };
 		C879492625DAE8E90097005D /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = C87073A62589356A0002070A /* Platform.m */; };
 		C879492725DAE8E90097005D /* AttachmentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D553B51219DD2CE00AA4BAB /* AttachmentItem.m */; };
-		C879492825DAE8E90097005D /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493B22232A3200F48182 /* ISO8601DateFormatter.m */; };
 		C879492925DAE8E90097005D /* KSPasswordField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBCE22C2224438700A2AFA2 /* KSPasswordField.m */; };
 		C879492A25DAE8E90097005D /* NodeFields.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347F22074FA6B00148741 /* NodeFields.m */; };
 		C879492B25DAE8E90097005D /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF347FB2074FA6C00148741 /* Utils.m */; };
@@ -885,11 +869,9 @@
 		C879493825DAE8E90097005D /* DatabasesManagerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C88307A825CB17CF001D8FE1 /* DatabasesManagerVC.m */; };
 		C879493925DAE8E90097005D /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5B1F30DB7A00D68BFE /* ViewController.m */; };
 		C879493A25DAE8E90097005D /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493222232A3200F48182 /* DAVSession.m */; };
-		C879493B25DAE8E90097005D /* DAVCredentials.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC625CAFBB10070C7FE /* DAVCredentials.m */; };
 		C879493C25DAE8E90097005D /* Csv.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D44680B216CE08A00F6358D /* Csv.m */; };
 		C879493D25DAE8E90097005D /* RootXmlDomainObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095921825103007BA1E7 /* RootXmlDomainObject.m */; };
 		C879493E25DAE8E90097005D /* MMcG_MF_Base32Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DD2BAB8238BE44400513271 /* MMcG_MF_Base32Additions.m */; };
-		C879493F25DAE8E90097005D /* DAVSession.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCF25CAFBB10070C7FE /* DAVSession.m */; };
 		C879494025DAE8E90097005D /* Salsa20Stream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E09A121825161007BA1E7 /* Salsa20Stream.m */; };
 		C879494125DAE8E90097005D /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = C831365A24A91F2300D475D9 /* Constants.m */; };
 		C879494225DAE8E90097005D /* Kdbx4SerializationData.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CCB219B47DA00C22CB4 /* Kdbx4SerializationData.m */; };
@@ -900,7 +882,6 @@
 		C879494725DAE8E90097005D /* FavIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87A993E255968EA0002BEF8 /* FavIcon.swift */; };
 		C879494825DAE8E90097005D /* OnboardingConvenienceViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AFD58C256AC46200290960 /* OnboardingConvenienceViewController.m */; };
 		C879494925DAE8E90097005D /* KeyFileParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8D9B921B6F391004F1812 /* KeyFileParser.m */; };
-		C879494A25DAE8E90097005D /* DAVListingParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493622232A3200F48182 /* DAVListingParser.m */; };
 		C879494B25DAE8E90097005D /* DetectedIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = C87A9938255968EA0002BEF8 /* DetectedIcon.swift */; };
 		C879494C25DAE8E90097005D /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BC425CAFBB10070C7FE /* DAVResponseItem.m */; };
 		C879494D25DAE8E90097005D /* SFTPProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441C3625CB009B0070C7FE /* SFTPProviderData.m */; };
@@ -925,7 +906,6 @@
 		C879496025DAE8E90097005D /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493822232A3200F48182 /* NSDateRFC1123.m */; };
 		C879496125DAE8E90097005D /* NSAdvancedTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEB21411F717AE3009E3729 /* NSAdvancedTextField.m */; };
 		C879496225DAE8E90097005D /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CE5219B481200C22CB4 /* Keys.m */; };
-		C879496325DAE8E90097005D /* DAVResponseItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492722232A3200F48182 /* DAVResponseItem.m */; };
 		C879496425DAE8E90097005D /* CustomIconList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CF4219B48D200C22CB4 /* CustomIconList.m */; };
 		C879496525DAE8E90097005D /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */; };
 		C879496625DAE8E90097005D /* AutoFillNewRecordSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA6219B459A00C22CB4 /* AutoFillNewRecordSettings.m */; };
@@ -935,7 +915,6 @@
 		C879496A25DAE8E90097005D /* FileManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC763E2497A90700C9C443 /* FileManager.m */; };
 		C879496B25DAE8E90097005D /* KeePassDatabaseWideProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9075246D88D70029623A /* KeePassDatabaseWideProperties.m */; };
 		C879496C25DAE8E90097005D /* UrlRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D8F2465463F00EEBFC9 /* UrlRequestOperation.m */; };
-		C879496D25DAE8E90097005D /* DAVRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF493022232A3200F48182 /* DAVRequest.m */; };
 		C879496E25DAE8E90097005D /* socket_helper.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441C8F25CB01AB0070C7FE /* socket_helper.m */; };
 		C879496F25DAE8E90097005D /* XMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9934255968EA0002BEF8 /* XMLDocument.m */; };
 		C879497025DAE8E90097005D /* CustomDataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C80B10872551F9F400FBDF72 /* CustomDataItem.m */; };
@@ -973,7 +952,6 @@
 		C879499025DAE8E90097005D /* SFTPConfigurationVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C8AFBF5525CC4014009D9519 /* SFTPConfigurationVC.m */; };
 		C879499125DAE8E90097005D /* DatabaseSyncOperationalData.m in Sources */ = {isa = PBXBuildFile; fileRef = C83741AB25D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m */; };
 		C879499225DAE8E90097005D /* Root.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E096E21825105007BA1E7 /* Root.m */; };
-		C879499325DAE8E90097005D /* DAVBaseRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BCE25CAFBB10070C7FE /* DAVBaseRequest.m */; };
 		C879499425DAE8E90097005D /* ProgressWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DDCE1C921BBFF7800D1DE09 /* ProgressWindow.m */; };
 		C879499525DAE8E90097005D /* HTMLDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C87A9935255968EA0002BEF8 /* HTMLDocument.m */; };
 		C879499625DAE8E90097005D /* NMSSHLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441C8E25CB01AB0070C7FE /* NMSSHLogger.m */; };
@@ -982,7 +960,6 @@
 		C879499925DAE8E90097005D /* SyncParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = C83741FA25D313B300EDE4F3 /* SyncParameters.m */; };
 		C879499A25DAE8E90097005D /* MMcGACTextViewEditor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD38D225D156D00290488 /* MMcGACTextViewEditor.m */; };
 		C879499B25DAE8E90097005D /* ConcurrentMutableSet.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D8B2465462200EEBFC9 /* ConcurrentMutableSet.m */; };
-		C879499C25DAE8E90097005D /* NSDateRFC1123.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441BBF25CAFBB00070C7FE /* NSDateRFC1123.m */; };
 		C879499D25DAE8E90097005D /* NSArray+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D446805216CDA4500F6358D /* NSArray+Extensions.m */; };
 		C879499E25DAE8E90097005D /* NMSSHConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441C9A25CB01AB0070C7FE /* NMSSHConfig.m */; };
 		C879499F25DAE8E90097005D /* DatabasesManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D524CA0219B458A00C22CB4 /* DatabasesManager.m */; };
@@ -998,7 +975,6 @@
 		C87949A925DAE8E90097005D /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */; };
 		C87949AA25DAE8E90097005D /* Base64DecodeOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C831365E24A91FC200D475D9 /* Base64DecodeOutputStream.m */; };
 		C87949AB25DAE8E90097005D /* PreferencesWindowController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D58A45A207368B10061E046 /* PreferencesWindowController.m */; };
-		C87949AC25DAE8E90097005D /* DAVRequestGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBF492622232A3200F48182 /* DAVRequestGroup.m */; };
 		C87949AD25DAE8E90097005D /* QuickTypeAutoFillDisplayFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */; };
 		C87949AE25DAE8E90097005D /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5AE1E91F432BBC000A34D7 /* Settings.m */; };
 		C87949AF25DAE8E90097005D /* AesOutputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C831366624A91FF200D475D9 /* AesOutputStream.m */; };
@@ -1030,7 +1006,6 @@
 		C87949CB25DAE8E90097005D /* MacKeePassHistory.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D40B07923BFB85800BAD0D2 /* MacKeePassHistory.storyboard */; };
 		C87949CC25DAE8E90097005D /* ykpers-1 in Resources */ = {isa = PBXBuildFile; fileRef = C85B9D7F2465454700EEBFC9 /* ykpers-1 */; };
 		C87949CD25DAE8E90097005D /* UpgradeWindowController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805A623A116E3001E742E /* UpgradeWindowController.xib */; };
-		C87949CE25DAE8E90097005D /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */; };
 		C87949CF25DAE8E90097005D /* diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F5E22CBCE0C000954D0 /* diceware.wordlist.utf8.txt */; };
 		C87949D025DAE8E90097005D /* DatabaseProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4D68255A23E498D7002DC4FB /* DatabaseProperties.storyboard */; };
 		C87949D125DAE8E90097005D /* italian-diceware.wordlist.utf8.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D216F6922CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt */; };
@@ -1296,7 +1271,6 @@
 		C8794AE725DAE9020097005D /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */; };
 		C8794AE925DAE9020097005D /* SelectCredential.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AD025714A3900251153 /* SelectCredential.xib */; };
 		C8794AEA25DAE9020097005D /* CredentialProviderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE79B8A255D987C00F59B10 /* CredentialProviderViewController.xib */; };
-		C8794AEB25DAE9020097005D /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */; };
 		C8794AEC25DAE9020097005D /* AutoFillCredentialCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C1F75825702E7B009991D4 /* AutoFillCredentialCell.xib */; };
 		C8794AED25DAE9020097005D /* PressYubiKeyWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8EDCD39250B770F00E427CB /* PressYubiKeyWindow.xib */; };
 		C8794AEE25DAE9020097005D /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805AF23A11702001E742E /* ProgressWindow.xib */; };
@@ -1444,9 +1418,6 @@
 		C8AA2137256BD0E400E9FF8D /* DatabaseOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8AA213B256BD0E400E9FF8D /* DatabaseOnboarding.storyboard */; };
 		C8AA2138256BD0E400E9FF8D /* DatabaseOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8AA213B256BD0E400E9FF8D /* DatabaseOnboarding.storyboard */; };
 		C8AA2170256BD15900E9FF8D /* ManualCredentialsEntry.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8AA2172256BD15900E9FF8D /* ManualCredentialsEntry.xib */; };
-		C8ACEBFF256572AB00F7420C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */; };
-		C8ACEC00256572AB00F7420C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */; };
-		C8ACEC01256572AB00F7420C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */; };
 		C8ACEC082565736A00F7420C /* DatabaseCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ACEC072565736A00F7420C /* DatabaseCellView.m */; };
 		C8ACEC092565736A00F7420C /* DatabaseCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ACEC072565736A00F7420C /* DatabaseCellView.m */; };
 		C8ACEC0A2565736A00F7420C /* DatabaseCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8ACEC072565736A00F7420C /* DatabaseCellView.m */; };
@@ -1620,7 +1591,6 @@
 		C8B946132573D01A00932C46 /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA02465480A00EEBFC9 /* libyubikey.a */; };
 		C8B946162573D01A00932C46 /* SelectCredential.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AD025714A3900251153 /* SelectCredential.xib */; };
 		C8B946172573D01A00932C46 /* CredentialProviderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE79B8A255D987C00F59B10 /* CredentialProviderViewController.xib */; };
-		C8B946182573D01A00932C46 /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */; };
 		C8B946192573D01A00932C46 /* AutoFillCredentialCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C1F75825702E7B009991D4 /* AutoFillCredentialCell.xib */; };
 		C8B9461A2573D01A00932C46 /* ProgressWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DC805AF23A11702001E742E /* ProgressWindow.xib */; };
 		C8B9461C2573D01A00932C46 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4D4A003B231317A900B69E09 /* Localizable.strings */; };
@@ -1732,7 +1702,6 @@
 		C8FD557325DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
 		C8FD557525DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
 		C8FD557725DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
-		C8FD559625DD3F9A009B8705 /* Mac-Outright-Pro-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = C8FD559525DD3F9A009B8705 /* Mac-Outright-Pro-Info.plist */; };
 		D26FCE46F1386598F6E19202 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */; };
 /* End PBXBuildFile section */
 
@@ -2343,6 +2312,7 @@
 		C80C2BC2259A1DD300085E7F /* OutlineView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OutlineView.m; sourceTree = "<group>"; };
 		C80FF037256D666E00A181B1 /* AutoFillSettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillSettingsViewController.h; path = MacBox/AutoFillSettingsViewController.h; sourceTree = "<group>"; };
 		C80FF038256D666E00A181B1 /* AutoFillSettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillSettingsViewController.m; path = MacBox/AutoFillSettingsViewController.m; sourceTree = "<group>"; };
+		C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = DatabaseCellView.xib; path = MacBox/DatabaseCellView.xib; sourceTree = "<group>"; };
 		C81BBD0A2567E49A001BAB0D /* ClickableTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableTextField.h; path = MacBox/ClickableTextField.h; sourceTree = "<group>"; };
 		C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClickableTextField.m; path = MacBox/ClickableTextField.m; sourceTree = "<group>"; };
 		C831365924A91F2300D475D9 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = ../StrongBox/Constants.h; sourceTree = "<group>"; };
@@ -2608,7 +2578,6 @@
 		C8AA2188256BD18100E9FF8D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/ManualCredentialsEntry.strings; sourceTree = "<group>"; };
 		C8AA218A256BD18200E9FF8D /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ManualCredentialsEntry.strings; sourceTree = "<group>"; };
 		C8AA218C256BD18300E9FF8D /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ManualCredentialsEntry.strings; sourceTree = "<group>"; };
-		C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = DatabaseCellView.xib; path = MacBox/DatabaseCellView.xib; sourceTree = "<group>"; };
 		C8ACEC062565736A00F7420C /* DatabaseCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseCellView.h; path = MacBox/DatabaseCellView.h; sourceTree = "<group>"; };
 		C8ACEC072565736A00F7420C /* DatabaseCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseCellView.m; path = MacBox/DatabaseCellView.m; sourceTree = "<group>"; };
 		C8AFBF5425CC4014009D9519 /* SFTPConfigurationVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPConfigurationVC.h; path = MacBox/SFTPConfigurationVC.h; sourceTree = "<group>"; };
@@ -3336,11 +3305,11 @@
 				C8F8CE1325D57BC500C93840 /* DatabasesManager.storyboard */,
 				C88307A725CB17CF001D8FE1 /* DatabasesManagerVC.h */,
 				C88307A825CB17CF001D8FE1 /* DatabasesManagerVC.m */,
-				C8ACEBFE256572AB00F7420C /* DatabaseCellView.xib */,
 				C8ACEC062565736A00F7420C /* DatabaseCellView.h */,
 				C8ACEC072565736A00F7420C /* DatabaseCellView.m */,
 				C8C0834C2569581F00FF280D /* CustomBackgroundTableView.h */,
 				C8C0834D2569581F00FF280D /* CustomBackgroundTableView.m */,
+				C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */,
 			);
 			name = "Databases Manager";
 			sourceTree = "<group>";
@@ -4485,7 +4454,7 @@
 			isa = PBXProject;
 			attributes = {
 				DefaultBuildSystemTypeForWorkspace = Original;
-				LastUpgradeCheck = 1230;
+				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Mark McGuill";
 				TargetAttributes = {
 					4D1FFA6A2403030100B75EA2 = {
@@ -4584,7 +4553,6 @@
 				4D1FFB1C2403030100B75EA2 /* MacKeePassHistory.storyboard in Resources */,
 				C85B9D892465454800EEBFC9 /* ykpers-1 in Resources */,
 				4D1FFB1E2403030100B75EA2 /* UpgradeWindowController.xib in Resources */,
-				C8ACEC00256572AB00F7420C /* DatabaseCellView.xib in Resources */,
 				4D1FFB1F2403030100B75EA2 /* diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB202403030100B75EA2 /* DatabaseProperties.storyboard in Resources */,
 				4D1FFB212403030100B75EA2 /* italian-diceware.wordlist.utf8.txt in Resources */,
@@ -4593,7 +4561,6 @@
 				C8E6D4FC246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB252403030100B75EA2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				C85B9DB724655D6700EEBFC9 /* first.names.us.txt in Resources */,
-				C8FD559625DD3F9A009B8705 /* Mac-Outright-Pro-Info.plist in Resources */,
 				C8AA2138256BD0E400E9FF8D /* DatabaseOnboarding.storyboard in Resources */,
 				C8B946C42573D6EC00932C46 /* CollectionViewHeader.xib in Resources */,
 				4D1FFB262403030100B75EA2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -4610,6 +4577,7 @@
 				4D1FFB2E2403030100B75EA2 /* Localizable.strings in Resources */,
 				C8F8CE6325D57F1C00C93840 /* AddDatabaseSelectStorageProvider.storyboard in Resources */,
 				4D1FFB2F2403030100B75EA2 /* starwars_8k_2018.utf8.txt in Resources */,
+				C81ABE4C25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
 				4D1FFB302403030100B75EA2 /* ProgressWindow.xib in Resources */,
 				C8F8CE3A25D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
 				4D1FFB312403030100B75EA2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
@@ -4648,9 +4616,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C81ABE4B25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
 				C8E78ACE25714A3900251153 /* SelectCredential.xib in Resources */,
 				4DE79B8C255D987C00F59B10 /* CredentialProviderViewController.xib in Resources */,
-				C8ACEC01256572AB00F7420C /* DatabaseCellView.xib in Resources */,
 				C8C1F75925702E7B009991D4 /* AutoFillCredentialCell.xib in Resources */,
 				C86FED1925C326A800386DD9 /* PressYubiKeyWindow.xib in Resources */,
 				C8E78ABD257147F700251153 /* ProgressWindow.xib in Resources */,
@@ -4675,7 +4643,6 @@
 				4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */,
 				C85B9D882465454800EEBFC9 /* ykpers-1 in Resources */,
 				4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */,
-				C8ACEBFF256572AB00F7420C /* DatabaseCellView.xib in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
 				4D68255823E498D7002DC4FB /* DatabaseProperties.storyboard in Resources */,
 				4D216F7822CBCE0D000954D0 /* italian-diceware.wordlist.utf8.txt in Resources */,
@@ -4700,6 +4667,7 @@
 				C85B9D862465454800EEBFC9 /* json in Resources */,
 				4D4A003D231317A900B69E09 /* Localizable.strings in Resources */,
 				C8F8CE6225D57F1C00C93840 /* AddDatabaseSelectStorageProvider.storyboard in Resources */,
+				C81ABE4A25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
 				4DC8059223A11493001E742E /* starwars_8k_2018.utf8.txt in Resources */,
 				4DC805AD23A11702001E742E /* ProgressWindow.xib in Resources */,
 				C8F8CE3825D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
@@ -4740,7 +4708,6 @@
 				C87949CB25DAE8E90097005D /* MacKeePassHistory.storyboard in Resources */,
 				C87949CC25DAE8E90097005D /* ykpers-1 in Resources */,
 				C87949CD25DAE8E90097005D /* UpgradeWindowController.xib in Resources */,
-				C87949CE25DAE8E90097005D /* DatabaseCellView.xib in Resources */,
 				C87949CF25DAE8E90097005D /* diceware.wordlist.utf8.txt in Resources */,
 				C87949D025DAE8E90097005D /* DatabaseProperties.storyboard in Resources */,
 				C87949D125DAE8E90097005D /* italian-diceware.wordlist.utf8.txt in Resources */,
@@ -4765,6 +4732,7 @@
 				C87949E325DAE8E90097005D /* json in Resources */,
 				C87949E425DAE8E90097005D /* Localizable.strings in Resources */,
 				C87949E525DAE8E90097005D /* AddDatabaseSelectStorageProvider.storyboard in Resources */,
+				C81ABE4E25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
 				C87949E625DAE8E90097005D /* starwars_8k_2018.utf8.txt in Resources */,
 				C87949E725DAE8E90097005D /* ProgressWindow.xib in Resources */,
 				C87949E825DAE8E90097005D /* SFTPConfigurationVC.storyboard in Resources */,
@@ -4796,9 +4764,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C81ABE4F25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
 				C8794AE925DAE9020097005D /* SelectCredential.xib in Resources */,
 				C8794AEA25DAE9020097005D /* CredentialProviderViewController.xib in Resources */,
-				C8794AEB25DAE9020097005D /* DatabaseCellView.xib in Resources */,
 				C8794AEC25DAE9020097005D /* AutoFillCredentialCell.xib in Resources */,
 				C8794AED25DAE9020097005D /* PressYubiKeyWindow.xib in Resources */,
 				C8794AEE25DAE9020097005D /* ProgressWindow.xib in Resources */,
@@ -4814,9 +4782,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C81ABE4D25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
 				C8B946162573D01A00932C46 /* SelectCredential.xib in Resources */,
 				C8B946172573D01A00932C46 /* CredentialProviderViewController.xib in Resources */,
-				C8B946182573D01A00932C46 /* DatabaseCellView.xib in Resources */,
 				C8B946192573D01A00932C46 /* AutoFillCredentialCell.xib in Resources */,
 				C86FED1F25C326A900386DD9 /* PressYubiKeyWindow.xib in Resources */,
 				C8B9461A2573D01A00932C46 /* ProgressWindow.xib in Resources */,
@@ -5115,7 +5083,6 @@
 				4D1FFAAB2403030100B75EA2 /* KdbEntry.m in Sources */,
 				C8E78B4325715C8700251153 /* MMWormholeCoordinatedFileTransiting.m in Sources */,
 				4D1FFAAC2403030100B75EA2 /* core.c in Sources */,
-				4D1FFAAD2403030100B75EA2 /* DAVRequests.m in Sources */,
 				4DCAE886257E6E8500072D4B /* SyncComparisonParams.m in Sources */,
 				4D1FFAAE2403030100B75EA2 /* Document.m in Sources */,
 				4DCE899E255D99FE002C02D9 /* AutoFillManager.m in Sources */,
@@ -5140,7 +5107,6 @@
 				C8441C3D25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8C0834F2569581F00FF280D /* CustomBackgroundTableView.m in Sources */,
 				4D1FFAB92403030100B75EA2 /* AttachmentItem.m in Sources */,
-				4D1FFABA2403030100B75EA2 /* ISO8601DateFormatter.m in Sources */,
 				C837417225D2EFD600EDE4F3 /* SyncAndMergeSequenceManager.m in Sources */,
 				C8441B8B25CAEB930070C7FE /* WebDAVSessionConfiguration.m in Sources */,
 				4D1FFABB2403030100B75EA2 /* KSPasswordField.m in Sources */,
@@ -5167,11 +5133,9 @@
 				4D1FFAC82403030100B75EA2 /* ViewController.m in Sources */,
 				4D1FFAC92403030100B75EA2 /* DAVSession.m in Sources */,
 				C8F39EAD25DD7CBA0045CAAB /* WebDAVConfigVC.m in Sources */,
-				C8441BE625CAFBB10070C7FE /* DAVCredentials.m in Sources */,
 				4D1FFACA2403030100B75EA2 /* Csv.m in Sources */,
 				4D1FFACB2403030100B75EA2 /* RootXmlDomainObject.m in Sources */,
 				4D1FFACC2403030100B75EA2 /* MMcG_MF_Base32Additions.m in Sources */,
-				C8441BF225CAFBB10070C7FE /* DAVSession.m in Sources */,
 				4D1FFACD2403030100B75EA2 /* Salsa20Stream.m in Sources */,
 				C831365C24A91F2300D475D9 /* Constants.m in Sources */,
 				C837419325D2F1B900EDE4F3 /* DiffSummary.m in Sources */,
@@ -5183,7 +5147,6 @@
 				C87A9952255968EB0002BEF8 /* FavIcon.swift in Sources */,
 				C8AFD58E256AC46200290960 /* OnboardingConvenienceViewController.m in Sources */,
 				4D1FFAD22403030100B75EA2 /* KeyFileParser.m in Sources */,
-				4D1FFAD32403030100B75EA2 /* DAVListingParser.m in Sources */,
 				C8441BE225CAFBB10070C7FE /* DAVResponseItem.m in Sources */,
 				C8441C4125CB009B0070C7FE /* SFTPProviderData.m in Sources */,
 				C87A9946255968EA0002BEF8 /* DetectedIcon.swift in Sources */,
@@ -5208,7 +5171,6 @@
 				4D1FFADF2403030100B75EA2 /* NSDateRFC1123.m in Sources */,
 				4D1FFAE02403030100B75EA2 /* NSAdvancedTextField.m in Sources */,
 				4D1FFAE12403030100B75EA2 /* Keys.m in Sources */,
-				4D1FFAE22403030100B75EA2 /* DAVResponseItem.m in Sources */,
 				4D1FFAE32403030100B75EA2 /* CustomIconList.m in Sources */,
 				C8BFECBB24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */,
@@ -5219,7 +5181,6 @@
 				C86E9077246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				C85B9D912465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
 				C8441CA925CB01AB0070C7FE /* socket_helper.m in Sources */,
-				4D1FFAE82403030100B75EA2 /* DAVRequest.m in Sources */,
 				C87A9942255968EA0002BEF8 /* XMLDocument.m in Sources */,
 				C83741F225D3129A00EDE4F3 /* MacSyncManager.m in Sources */,
 				C8969FEF25AF70EE006819E3 /* Argon2dKdfCipher.m in Sources */,
@@ -5254,7 +5215,6 @@
 				C8AFBF5825CC4014009D9519 /* SFTPConfigurationVC.m in Sources */,
 				C83741B325D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
 				C8DC763C2497A7F800C9C443 /* HmacBlockStream.m in Sources */,
-				C8441BEE25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */,
 				4D37D873244E074B00C3182D /* DatabaseAuditorConfiguration.m in Sources */,
 				4D1FFAFD2403030100B75EA2 /* ProgressWindow.m in Sources */,
 				C8441CA525CB01AB0070C7FE /* NMSSHLogger.m in Sources */,
@@ -5264,7 +5224,6 @@
 				C83741FD25D313B300EDE4F3 /* SyncParameters.m in Sources */,
 				4DAC40CF24F68311001B3BE2 /* NSDate+Extensions.m in Sources */,
 				4D1FFAFE2403030100B75EA2 /* MMcGACTextViewEditor.m in Sources */,
-				C8441BDA25CAFBB10070C7FE /* NSDateRFC1123.m in Sources */,
 				C85B9D8D2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
 				C8441CB525CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
 				4D1FFAFF2403030100B75EA2 /* NSArray+Extensions.m in Sources */,
@@ -5280,7 +5239,6 @@
 				4D1FFB052403030100B75EA2 /* KeePassXmlParser.m in Sources */,
 				C831366024A91FC200D475D9 /* Base64DecodeOutputStream.m in Sources */,
 				4D1FFB062403030100B75EA2 /* PreferencesWindowController.m in Sources */,
-				4D1FFB072403030100B75EA2 /* DAVRequestGroup.m in Sources */,
 				C867457D25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */,
 				4D1FFB082403030100B75EA2 /* Settings.m in Sources */,
 				C831366824A91FF200D475D9 /* AesOutputStream.m in Sources */,
@@ -5623,7 +5581,6 @@
 				4D524CBE219B479900C22CB4 /* KdbEntry.m in Sources */,
 				4D524D25219B4B2A00C22CB4 /* core.c in Sources */,
 				4DCAE884257E6E8500072D4B /* SyncComparisonParams.m in Sources */,
-				4DBF494322232A3200F48182 /* DAVRequests.m in Sources */,
 				4DCE899D255D99FE002C02D9 /* AutoFillManager.m in Sources */,
 				C8441CAB25CB01AB0070C7FE /* NMSSHSession.m in Sources */,
 				C8E2CB192477D5270029E1CB /* DeletedObjects.m in Sources */,
@@ -5653,7 +5610,6 @@
 				C870739C258935500002070A /* KeePassXmlModelAdaptor.m in Sources */,
 				C87073A72589356A0002070A /* Platform.m in Sources */,
 				4D553B53219DD2CE00AA4BAB /* AttachmentItem.m in Sources */,
-				4DBF494622232A3200F48182 /* ISO8601DateFormatter.m in Sources */,
 				4DBCE22E2224438800A2AFA2 /* KSPasswordField.m in Sources */,
 				4DF348022074FA6C00148741 /* NodeFields.m in Sources */,
 				4DF348052074FA6C00148741 /* Utils.m in Sources */,
@@ -5672,12 +5628,10 @@
 				C88307A925CB17CF001D8FE1 /* DatabasesManagerVC.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4DBF494222232A3200F48182 /* DAVSession.m in Sources */,
-				C8441BE425CAFBB10070C7FE /* DAVCredentials.m in Sources */,
 				C8F39EAC25DD7CBA0045CAAB /* WebDAVConfigVC.m in Sources */,
 				4D44680C216CE08B00F6358D /* Csv.m in Sources */,
 				4D9E098421825108007BA1E7 /* RootXmlDomainObject.m in Sources */,
 				4DD2BAB9238BE44400513271 /* MMcG_MF_Base32Additions.m in Sources */,
-				C8441BF025CAFBB10070C7FE /* DAVSession.m in Sources */,
 				4D9E09A221825161007BA1E7 /* Salsa20Stream.m in Sources */,
 				C831365B24A91F2300D475D9 /* Constants.m in Sources */,
 				4D524CD5219B47DB00C22CB4 /* Kdbx4SerializationData.m in Sources */,
@@ -5688,7 +5642,6 @@
 				C87A9951255968EB0002BEF8 /* FavIcon.swift in Sources */,
 				C8AFD58D256AC46200290960 /* OnboardingConvenienceViewController.m in Sources */,
 				4DC8D9BB21B6F392004F1812 /* KeyFileParser.m in Sources */,
-				4DBF494422232A3200F48182 /* DAVListingParser.m in Sources */,
 				C87A9945255968EA0002BEF8 /* DetectedIcon.swift in Sources */,
 				C8441BE025CAFBB10070C7FE /* DAVResponseItem.m in Sources */,
 				C8441C3F25CB009B0070C7FE /* SFTPProviderData.m in Sources */,
@@ -5713,7 +5666,6 @@
 				4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
 				4D524CEE219B481200C22CB4 /* Keys.m in Sources */,
-				4DBF493E22232A3200F48182 /* DAVResponseItem.m in Sources */,
 				4D524D01219B48D300C22CB4 /* CustomIconList.m in Sources */,
 				C8BFECBA24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D524CA8219B459B00C22CB4 /* AutoFillNewRecordSettings.m in Sources */,
@@ -5723,7 +5675,6 @@
 				C8DC763F2497A90700C9C443 /* FileManager.m in Sources */,
 				C86E9076246D88D70029623A /* KeePassDatabaseWideProperties.m in Sources */,
 				C85B9D902465463F00EEBFC9 /* UrlRequestOperation.m in Sources */,
-				4DBF494022232A3200F48182 /* DAVRequest.m in Sources */,
 				C8441CA725CB01AB0070C7FE /* socket_helper.m in Sources */,
 				C87A9941255968EA0002BEF8 /* XMLDocument.m in Sources */,
 				C80B10882551F9F400FBDF72 /* CustomDataItem.m in Sources */,
@@ -5761,7 +5712,6 @@
 				C8AFBF5625CC4014009D9519 /* SFTPConfigurationVC.m in Sources */,
 				C83741B125D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
-				C8441BEC25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
 				C87A9943255968EA0002BEF8 /* HTMLDocument.m in Sources */,
 				C8441CA325CB01AB0070C7FE /* NMSSHLogger.m in Sources */,
@@ -5771,7 +5721,6 @@
 				C83741FB25D313B300EDE4F3 /* SyncParameters.m in Sources */,
 				4DBFD38E225D156D00290488 /* MMcGACTextViewEditor.m in Sources */,
 				C85B9D8C2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
-				C8441BD825CAFBB10070C7FE /* NSDateRFC1123.m in Sources */,
 				4D446806216CDA4500F6358D /* NSArray+Extensions.m in Sources */,
 				C8441CB325CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
 				4D524CA4219B458B00C22CB4 /* DatabasesManager.m in Sources */,
@@ -5787,7 +5736,6 @@
 				4D2CB49B2332D82D00C2E084 /* KeePassXmlParser.m in Sources */,
 				C831365F24A91FC200D475D9 /* Base64DecodeOutputStream.m in Sources */,
 				4D58A45C207368B10061E046 /* PreferencesWindowController.m in Sources */,
-				4DBF493D22232A3200F48182 /* DAVRequestGroup.m in Sources */,
 				C867457B25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */,
 				4D5AE1EA1F432BBC000A34D7 /* Settings.m in Sources */,
 				C831366724A91FF200D475D9 /* AesOutputStream.m in Sources */,
@@ -5905,7 +5853,6 @@
 				C879490825DAE8E90097005D /* KdbEntry.m in Sources */,
 				C879490925DAE8E90097005D /* core.c in Sources */,
 				C879490A25DAE8E90097005D /* SyncComparisonParams.m in Sources */,
-				C879490B25DAE8E90097005D /* DAVRequests.m in Sources */,
 				C879490C25DAE8E90097005D /* AutoFillManager.m in Sources */,
 				C879490D25DAE8E90097005D /* NMSSHSession.m in Sources */,
 				C879490E25DAE8E90097005D /* DeletedObjects.m in Sources */,
@@ -5935,7 +5882,6 @@
 				C879492525DAE8E90097005D /* KeePassXmlModelAdaptor.m in Sources */,
 				C879492625DAE8E90097005D /* Platform.m in Sources */,
 				C879492725DAE8E90097005D /* AttachmentItem.m in Sources */,
-				C879492825DAE8E90097005D /* ISO8601DateFormatter.m in Sources */,
 				C879492925DAE8E90097005D /* KSPasswordField.m in Sources */,
 				C879492A25DAE8E90097005D /* NodeFields.m in Sources */,
 				C879492B25DAE8E90097005D /* Utils.m in Sources */,
@@ -5954,12 +5900,10 @@
 				C879493825DAE8E90097005D /* DatabasesManagerVC.m in Sources */,
 				C879493925DAE8E90097005D /* ViewController.m in Sources */,
 				C879493A25DAE8E90097005D /* DAVSession.m in Sources */,
-				C879493B25DAE8E90097005D /* DAVCredentials.m in Sources */,
 				C8F39EC925DD81930045CAAB /* WebDAVConfigVC.m in Sources */,
 				C879493C25DAE8E90097005D /* Csv.m in Sources */,
 				C879493D25DAE8E90097005D /* RootXmlDomainObject.m in Sources */,
 				C879493E25DAE8E90097005D /* MMcG_MF_Base32Additions.m in Sources */,
-				C879493F25DAE8E90097005D /* DAVSession.m in Sources */,
 				C879494025DAE8E90097005D /* Salsa20Stream.m in Sources */,
 				C879494125DAE8E90097005D /* Constants.m in Sources */,
 				C879494225DAE8E90097005D /* Kdbx4SerializationData.m in Sources */,
@@ -5970,7 +5914,6 @@
 				C879494725DAE8E90097005D /* FavIcon.swift in Sources */,
 				C879494825DAE8E90097005D /* OnboardingConvenienceViewController.m in Sources */,
 				C879494925DAE8E90097005D /* KeyFileParser.m in Sources */,
-				C879494A25DAE8E90097005D /* DAVListingParser.m in Sources */,
 				C879494B25DAE8E90097005D /* DetectedIcon.swift in Sources */,
 				C879494C25DAE8E90097005D /* DAVResponseItem.m in Sources */,
 				C879494D25DAE8E90097005D /* SFTPProviderData.m in Sources */,
@@ -5995,7 +5938,6 @@
 				C879496025DAE8E90097005D /* NSDateRFC1123.m in Sources */,
 				C879496125DAE8E90097005D /* NSAdvancedTextField.m in Sources */,
 				C879496225DAE8E90097005D /* Keys.m in Sources */,
-				C879496325DAE8E90097005D /* DAVResponseItem.m in Sources */,
 				C879496425DAE8E90097005D /* CustomIconList.m in Sources */,
 				C879496525DAE8E90097005D /* NodeHierarchyReconstructionData.m in Sources */,
 				C879496625DAE8E90097005D /* AutoFillNewRecordSettings.m in Sources */,
@@ -6005,7 +5947,6 @@
 				C879496A25DAE8E90097005D /* FileManager.m in Sources */,
 				C879496B25DAE8E90097005D /* KeePassDatabaseWideProperties.m in Sources */,
 				C879496C25DAE8E90097005D /* UrlRequestOperation.m in Sources */,
-				C879496D25DAE8E90097005D /* DAVRequest.m in Sources */,
 				C879496E25DAE8E90097005D /* socket_helper.m in Sources */,
 				C879496F25DAE8E90097005D /* XMLDocument.m in Sources */,
 				C879497025DAE8E90097005D /* CustomDataItem.m in Sources */,
@@ -6043,7 +5984,6 @@
 				C879499025DAE8E90097005D /* SFTPConfigurationVC.m in Sources */,
 				C879499125DAE8E90097005D /* DatabaseSyncOperationalData.m in Sources */,
 				C879499225DAE8E90097005D /* Root.m in Sources */,
-				C879499325DAE8E90097005D /* DAVBaseRequest.m in Sources */,
 				C879499425DAE8E90097005D /* ProgressWindow.m in Sources */,
 				C879499525DAE8E90097005D /* HTMLDocument.m in Sources */,
 				C879499625DAE8E90097005D /* NMSSHLogger.m in Sources */,
@@ -6053,7 +5993,6 @@
 				C879499925DAE8E90097005D /* SyncParameters.m in Sources */,
 				C879499A25DAE8E90097005D /* MMcGACTextViewEditor.m in Sources */,
 				C879499B25DAE8E90097005D /* ConcurrentMutableSet.m in Sources */,
-				C879499C25DAE8E90097005D /* NSDateRFC1123.m in Sources */,
 				C879499D25DAE8E90097005D /* NSArray+Extensions.m in Sources */,
 				C879499E25DAE8E90097005D /* NMSSHConfig.m in Sources */,
 				C879499F25DAE8E90097005D /* DatabasesManager.m in Sources */,
@@ -6069,7 +6008,6 @@
 				C87949A925DAE8E90097005D /* KeePassXmlParser.m in Sources */,
 				C87949AA25DAE8E90097005D /* Base64DecodeOutputStream.m in Sources */,
 				C87949AB25DAE8E90097005D /* PreferencesWindowController.m in Sources */,
-				C87949AC25DAE8E90097005D /* DAVRequestGroup.m in Sources */,
 				C87949AD25DAE8E90097005D /* QuickTypeAutoFillDisplayFormat.m in Sources */,
 				C87949AE25DAE8E90097005D /* Settings.m in Sources */,
 				C87949AF25DAE8E90097005D /* AesOutputStream.m in Sources */,
@@ -7054,7 +6992,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7085,7 +7023,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7166,7 +7104,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7204,7 +7142,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7349,7 +7287,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -7380,7 +7318,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -7410,7 +7348,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -7442,7 +7380,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -7474,7 +7412,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7512,7 +7450,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7548,7 +7486,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7587,7 +7525,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2997;
+				CURRENT_PROJECT_VERSION = 2998;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

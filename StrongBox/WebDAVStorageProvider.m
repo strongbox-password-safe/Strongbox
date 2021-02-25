@@ -34,7 +34,11 @@
 @property DAVSession* maintainedSessionForListings;
 @property WebDAVSessionConfiguration* maintainedConfigurationForListings;
 
+#if TARGET_OS_IPHONE
+
+#else
 @property ProgressWindow* progressWindow;
+#endif
 
 @end
 

@@ -36,7 +36,13 @@
 @property NMSFTP* maintainedSessionForListing;
 @property SFTPSessionConfiguration* maintainedConfigurationForFastListing;
 
+#if TARGET_OS_IPHONE
+
+#else
+
 @property ProgressWindow* progressWindow;
+
+#endif
 
 @end
 
