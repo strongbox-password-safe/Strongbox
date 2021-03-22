@@ -24,9 +24,12 @@ extern NSString* const kDatabasesListChangedNotification;
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 - (void)update:(DatabaseMetadata *_Nonnull)safe;
 
-+ (NSString *_Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
-- (BOOL)isValidNickName:(NSString *_Nonnull)nickName;
++ (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
 
+- (BOOL)isUnique:(NSString *)nickName;
+- (BOOL)isValid:(NSString *)nickName;
+
+- (DatabaseMetadata*_Nullable)getDatabaseById:(NSString*)uuid;
 - (DatabaseMetadata*_Nullable)getDatabaseByFileUrl:(NSURL *)url;
 - (DatabaseMetadata*)addOrGet:(NSURL *)url;
 

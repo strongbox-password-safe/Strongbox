@@ -7,7 +7,6 @@
 //
 
 #import "DatabaseCellView.h"
-#import "ClickableTextField.h"
 #import "BookmarksHelper.h"
 #import "Utils.h"
 #import "NSDate+Extensions.h"
@@ -18,6 +17,7 @@
 #import "MacSyncManager.h"
 #import <QuartzCore/QuartzCore.h>
 #import "SafeStorageProviderFactory.h"
+#import "DatabasesManager.h"
 
 @interface DatabaseCellView () <NSTextFieldDelegate>
 
@@ -32,22 +32,98 @@
 @property (weak) IBOutlet NSImageView *imageViewReadOnly;
 @property (weak) IBOutlet NSImageView *imageViewSyncing;
 @property (weak) IBOutlet NSProgressIndicator *syncProgressIndicator;
+@property (weak) IBOutlet NSImageView *imageViewUnlocked;
 
 @property (weak) IBOutlet NSTextField *textFieldStorage;
+
+@property NSClickGestureRecognizer *click;
+@property NSString* uuid;
+@property NSString* originalNickName;
 
 @end
 
 @implementation DatabaseCellView
 
+- (void)awakeFromNib {
+    [super awakeFromNib];
+        
+    self.textFieldName.delegate = self;
+
+    self.click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onNicknameClick)];
+    [self.textFieldName addGestureRecognizer:self.click];
+    
+    if (@available(macOS 11.0, *)) {
+        self.imageViewUnlocked.image = [NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil];
+        self.imageViewUnlocked.contentTintColor = NSColor.systemGreenColor;
+    }
+}
+
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    
+    self.uuid = nil;
+    self.originalNickName = nil;
+}
+
 - (void)setWithDatabase:(DatabaseMetadata*)metadata {
-    [self setWithDatabase:metadata autoFill:NO];
+    [self setWithDatabase:metadata autoFill:NO wormholeUnlocked:NO];
+}
+
+- (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill wormholeUnlocked:(BOOL)wormholeUnlocked {
+    self.uuid = metadata.uuid;
+    self.originalNickName = metadata.nickName;
+    
+    self.textFieldName.stringValue = @"";
+    self.textFieldSubtitleLeft.stringValue = @"";
+    self.textFieldSubtitleTopRight.stringValue = @"";
+    self.textFieldSubtitleBottomRight.stringValue = @"";
+    self.textFieldStorage.stringValue = @"";
+    
+    self.imageViewQuickLaunch.hidden = YES;
+    self.imageViewOutstandingUpdate.hidden = YES;
+    self.imageViewReadOnly.hidden = YES;
+    
+    self.imageViewSyncing.hidden = YES;
+    self.syncProgressIndicator.hidden = YES;
+    [self.syncProgressIndicator stopAnimation:nil];
+    
+    self.imageViewUnlocked.hidden = !wormholeUnlocked;
+    
+    @try {
+        [self determineFields:metadata autoFill:autoFill];
+    
+        self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
+        self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
+        
+        SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [MacSyncManager.sharedInstance getSyncStatus:metadata].state;
+        
+        if (syncState == kSyncOperationStateInProgress ||
+            syncState == kSyncOperationStateError ||
+            syncState == kSyncOperationStateBackgroundButUserInteractionRequired ) { 
+            
+            self.imageViewSyncing.hidden = NO;
+            self.imageViewSyncing.image = syncState == kSyncOperationStateError ? [NSImage imageNamed:@"error"] : [NSImage imageNamed:@"syncronize"];
+            
+            if (@available(macOS 10.14, *)) {
+                NSColor *tint = (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
+                self.imageViewSyncing.contentTintColor = tint;
+            }
+            
+            if ( syncState == kSyncOperationStateInProgress ) {
+                self.syncProgressIndicator.hidden = NO;
+                [self.syncProgressIndicator startAnimation:nil];
+            }
+        }
+    } @catch (NSException *exception) {
+        NSLog(@"Exception getting display attributes for database: %@", exception);
+    }
 }
 
 - (void)determineFields:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill {
     NSString* path = @"";
     NSString* fileSize = @"";
     NSString* fileMod = @"";
-    NSString* storage = @"";
+
     
     NSString* title = metadata.nickName ? metadata.nickName : @"";
     
@@ -103,51 +179,6 @@
     self.textFieldStorage.stringValue = [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider];
 }
 
-- (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill {
-    self.textFieldName.stringValue = @"";
-    self.textFieldSubtitleLeft.stringValue = @"";
-    self.textFieldSubtitleTopRight.stringValue = @"";
-    self.textFieldSubtitleBottomRight.stringValue = @"";
-    self.textFieldStorage.stringValue = @"";
-    
-    self.imageViewQuickLaunch.hidden = YES;
-    self.imageViewOutstandingUpdate.hidden = YES;
-    self.imageViewReadOnly.hidden = YES;
-    
-    self.imageViewSyncing.hidden = YES;
-    self.syncProgressIndicator.hidden = YES;
-    [self.syncProgressIndicator stopAnimation:nil];
-    
-    @try {
-        [self determineFields:metadata autoFill:autoFill];
-    
-        self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
-        self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
-        
-        SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [MacSyncManager.sharedInstance getSyncStatus:metadata].state;
-        
-        if (syncState == kSyncOperationStateInProgress ||
-            syncState == kSyncOperationStateError ||
-            syncState == kSyncOperationStateBackgroundButUserInteractionRequired ) { 
-            
-            self.imageViewSyncing.hidden = NO;
-            self.imageViewSyncing.image = syncState == kSyncOperationStateError ? [NSImage imageNamed:@"error"] : [NSImage imageNamed:@"syncronize"];
-            
-            if (@available(macOS 10.14, *)) {
-                NSColor *tint = (syncState == kSyncOperationStateInProgress ? NSColor.systemBlueColor : NSColor.systemOrangeColor);
-                self.imageViewSyncing.contentTintColor = tint;
-            }
-            
-            if ( syncState == kSyncOperationStateInProgress ) {
-                self.syncProgressIndicator.hidden = NO;
-                [self.syncProgressIndicator startAnimation:nil];
-            }
-        }
-    } @catch (NSException *exception) {
-        NSLog(@"Exception getting display attributes for database: %@", exception);
-    }
-}
-
 - (NSString*)getPathRelativeToUserHome:(NSString*)path {
     NSString* userHome = FileManager.sharedInstance.userHomePath;
     
@@ -189,8 +220,95 @@
     return [self getPathRelativeToUserHome:path];
 }
 
-- (void)enableEditing:(BOOL)enable {
-    self.textFieldName.editable = enable;
+- (void)onNicknameClick {
+    NSLog(@"onNicknameClick");
+    
+    if ( self.textFieldName.isEditable ) {
+        NSLog(@"Ignoring onNicknameClick - because isEditable");
+        return;
+    }
+    
+    [self beginEditingNickname];
+}
+
+- (void)controlTextDidChange:(NSNotification *)obj {
+    NSLog(@"controlTextDidChange!");
+    
+    if ( obj.object == self.textFieldName ) {
+        NSString* raw = self.textFieldName.stringValue;
+        NSString* trimmed = [DatabasesManager trimDatabaseNickName:raw];
+        
+        if ( [self.originalNickName isEqualToString:trimmed] || ( [DatabasesManager.sharedInstance isValid:trimmed] && [DatabasesManager.sharedInstance isUnique:trimmed] )) {
+            self.textFieldName.textColor = NSColor.labelColor;
+        }
+        else {
+            self.textFieldName.textColor = NSColor.systemOrangeColor;
+        }
+    }
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *)obj {
+    NSLog(@"controlTextDidEndEditing!");
+ 
+    [self endEditingNickname];
+    [self setNewNicknameIfValidOtherwiseRestore];
+}
+
+- (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
+    NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
+
+    if (commandSelector == NSSelectorFromString(@"insertNewline:")) { 
+        [self endEditingNickname];
+        [self setNewNicknameIfValidOtherwiseRestore];
+    }
+    else if (commandSelector == NSSelectorFromString(@"cancelOperation:")) { 
+        [self endEditingNickname];
+        [self restoreOriginalNickname];
+    }
+    
+    return NO;
+}
+
+- (void)setNewNicknameIfValidOtherwiseRestore {
+    NSString* raw = self.textFieldName.stringValue;
+    NSString* trimmed = [DatabasesManager trimDatabaseNickName:raw];
+
+    if ( ![self.originalNickName isEqualToString:trimmed] && [DatabasesManager.sharedInstance isValid:trimmed] && [DatabasesManager.sharedInstance isUnique:trimmed] ) {
+        DatabaseMetadata* metadata = [DatabasesManager.sharedInstance getDatabaseById:self.uuid];
+        metadata.nickName = trimmed;
+        [DatabasesManager.sharedInstance update:metadata];
+    }
+    else {
+        [self restoreOriginalNickname];
+    }
+}
+
+
+- (void)beginEditingNickname {
+    if ( self.onBeginEditingNickname ) {
+        __weak DatabaseCellView* weakSelf = self;
+        self.onBeginEditingNickname(weakSelf); 
+    }
+    
+    self.textFieldName.editable = YES;
+    [self.textFieldName becomeFirstResponder];
+    
+    NSRange range = self.textFieldName.currentEditor.selectedRange;
+    [self.textFieldName.currentEditor setSelectedRange:NSMakeRange(range.length, 0)];
+}
+
+- (void)endEditingNickname {
+    if ( self.onEndEditingNickname ) {
+        __weak DatabaseCellView* weakSelf = self;
+        self.onEndEditingNickname(weakSelf); 
+    }
+    
+    self.textFieldName.textColor = NSColor.labelColor;
+    self.textFieldName.editable = NO;
+}
+
+- (void)restoreOriginalNickname {
+    self.textFieldName.stringValue = self.originalNickName;
 }
 
 @end

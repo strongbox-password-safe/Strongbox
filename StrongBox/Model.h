@@ -93,6 +93,9 @@ extern NSString* const kDatabaseReloadedNotificationKey;
 - (BOOL)isPinned:(NSUUID*)itemId;
 - (void)togglePin:(NSUUID*)itemId;
 
+- (void)launchUrl:(Node*)item;
+- (void)launchUrlString:(NSString*)urlString;
+
 @property (readonly) NSSet<NSString*>* pinnedSet;
 @property (readonly) NSArray<Node*>* pinnedNodes;
 

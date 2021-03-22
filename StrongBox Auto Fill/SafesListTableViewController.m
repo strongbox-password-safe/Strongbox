@@ -20,14 +20,13 @@
 #import "LocalDeviceStorageProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "Alerts.h"
-#import "AutoFillSettings.h"
-#import "SharedAppAndAutoFillSettings.h"
 #import "SyncManager.h"
 #import "NSDate+Extensions.h"
 #import "UITableView+EmptyDataSet.h"
 #import "CompositeKeyDeterminer.h"
 #import "DatabaseUnlocker.h"
 #import "DuressActionHelper.h"
+#import "AppPreferences.h"
 
 @interface SafesListTableViewController ()
 
@@ -45,15 +44,37 @@
     
     [self refreshSafes];
 
-    if(SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
+    
+    
+    if ( AppPreferences.sharedInstance.autoFillQuickLaunchUuid ) {
         SafeMetaData* database = [self.safes firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-            return [obj.uuid isEqualToString:SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid];
+            return [obj.uuid isEqualToString:AppPreferences.sharedInstance.autoFillQuickLaunchUuid];
         }];
      
         if(database && [[self getInitialViewController] autoFillIsPossibleWithSafe:database]) {
+            NSLog(@"AutoFill - Quick Launch configured and possible... launching db");
+            
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 [self openDatabase:database];
             });
+            return;
+        }
+    }
+    
+    
+    
+    if ( AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
+        NSArray<SafeMetaData*> *possibles = [self.safes filter:^BOOL(SafeMetaData * _Nonnull obj) {
+            return [[self getInitialViewController] autoFillIsPossibleWithSafe:obj];
+        }];
+        
+        if ( possibles.count == 1 ) {
+            NSLog(@"AutoFill - single enabled database and Auto Proceed switched on... launching db");
+
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [self openDatabase:possibles.firstObject];
+            });
+            return;
         }
     }
 }
@@ -61,7 +82,7 @@
 - (void)setupUi {
     [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
     self.tableView.rowHeight = UITableViewAutomaticDimension;
-    self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
+    self.tableView.separatorStyle = AppPreferences.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
     self.tableView.tableFooterView = [UIView new];
     
     [SVProgressHUD setViewForExtension:self.view];
@@ -88,7 +109,7 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    [[self getInitialViewController] exitWithUserCancelled];
+    [[self getInitialViewController] exitWithUserCancelled:nil];
 }
 
 - (NSAttributedString *)getTitleForEmptyDataSet {
@@ -152,10 +173,10 @@
     CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
     [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
-            AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
+            AppPreferences.sharedInstance.autoFillExitedCleanly = NO; 
             DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:safe viewController:self forceReadOnly:NO isAutoFillOpen:YES offlineMode:YES];
             [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
-                AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+                AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
                 [self onUnlockDone:result model:model error:error];
             }];
         }
@@ -169,7 +190,7 @@
             }];
         }
         else {
-            [self onCancel:nil];
+
         }
     }];
 }
@@ -178,7 +199,7 @@
     NSLog(@"AutoFill: Open Database: Model=[%@] - Error = [%@]", model, error);
     
     if(result == kUnlockDatabaseResultSuccess) {
-        [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
+        [self onUnlockedSuccessfully:model];
     }
     else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
         [self onCancel:nil];
@@ -193,6 +214,26 @@
     }
 }
 
+- (void)onUnlockedSuccessfully:(Model*)model {
+    if (model.metadata.autoFillConvenienceAutoUnlockTimeout == -1 ) {
+        [self.rootViewController onboardForAutoFillConvenienceAutoUnlock:self database:model.metadata completion:^{
+            [self continueUnlockDatabase:model];
+        }];
+    }
+    else {
+        [self continueUnlockDatabase:model];
+    }
+}
+
+- (void)continueUnlockDatabase:(Model*)model  {
+    if ( model.metadata.autoFillConvenienceAutoUnlockTimeout > 0 ) {
+        model.metadata.autoFillConvenienceAutoUnlockPassword = model.database.ckfs.password;
+        [self.rootViewController markLastUnlockedAtTime:model.metadata];
+    }
+
+    [self performSegueWithIdentifier:@"toPickCredentialsFromSafes" sender:model];
+}
+
 - (void)messageErrorAndExit:(NSError*)error {
     [Alerts error:self
             title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
@@ -203,7 +244,7 @@
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if ([segue.identifier isEqualToString:@"toPickCredentialsFromSafes"]) {
+    if ( [segue.identifier isEqualToString:@"toPickCredentialsFromSafes"] ) {
         PickCredentialsTableViewController *vc = segue.destinationViewController;
         vc.model = (Model *)sender;
         vc.rootViewController = self.rootViewController;

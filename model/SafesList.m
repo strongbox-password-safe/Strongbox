@@ -8,7 +8,7 @@
 
 #import "SafesList.h"
 #import "IOsUtils.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "FileManager.h"
 #import "NSArray+Extensions.h"
 #import "WorkingCopyManager.h"
@@ -54,37 +54,37 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 
 - (BOOL)changedDatabaseSettingsFlag {
 #ifndef IS_APP_EXTENSION
-    return SharedAppAndAutoFillSettings.sharedInstance.autoFillDidChangeDatabases;
+    return AppPreferences.sharedInstance.autoFillDidChangeDatabases;
 #else
-    return SharedAppAndAutoFillSettings.sharedInstance.mainAppDidChangeDatabases;
+    return AppPreferences.sharedInstance.mainAppDidChangeDatabases;
 #endif
 }
 
 - (void)setChangedDatabaseSettings {
 #ifndef IS_APP_EXTENSION
-    SharedAppAndAutoFillSettings.sharedInstance.mainAppDidChangeDatabases = YES;
+    AppPreferences.sharedInstance.mainAppDidChangeDatabases = YES;
 #else
-    SharedAppAndAutoFillSettings.sharedInstance.autoFillDidChangeDatabases = YES;
+    AppPreferences.sharedInstance.autoFillDidChangeDatabases = YES;
 #endif
 }
 
 - (void)clearChangedDatabaseSettings { 
 #ifndef IS_APP_EXTENSION
-    SharedAppAndAutoFillSettings.sharedInstance.autoFillDidChangeDatabases = NO;
+    AppPreferences.sharedInstance.autoFillDidChangeDatabases = NO;
 #else
-    SharedAppAndAutoFillSettings.sharedInstance.mainAppDidChangeDatabases = NO;
+    AppPreferences.sharedInstance.mainAppDidChangeDatabases = NO;
 #endif
 }
 
 - (void)reloadIfChangedByOtherComponent {
     if ( self.changedDatabaseSettingsFlag ) { 
-        NSLog(@"reloadIfChangedByAutoFillOrMainApp: Databases List CHANGED by alternative App...");
+
 
         [self clearChangedDatabaseSettings];
         self.databasesList = [self deserialize];
     }
     else {
-        NSLog(@"reloadIfChangedByAutoFillOrMainApp: Databases List NOT changed by alternative App...");
+
     }
 }
 
@@ -105,7 +105,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 #ifndef IS_APP_EXTENSION 
                          
     if (self.migratedToNewStore) {
-        NSLog(@"Already Migrated to new store - not migrating");
+        
         return;
     }
     
@@ -147,7 +147,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 }
 
 static NSUserDefaults* getSharedAppGroupDefaults() {
-    return SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    return AppPreferences.sharedInstance.sharedAppGroupDefaults;
 }
 
 
@@ -367,21 +367,21 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 }
 
 - (NSString*)getUniqueNameFromSuggestedName:(NSString*)suggested {
-    suggested = [SafesList sanitizeSafeNickName:suggested];
+    suggested = [SafesList trimDatabaseNickName:suggested];
 
     NSString *suggestion = suggested;
     
     int attempt = 2;
-    while(![self isValidNickName:suggestion] && attempt < 100) {
+    while(![self isUnique:suggestion] && attempt < 100) {
         suggestion = [NSString stringWithFormat:@"%@ %d", suggested, attempt++];
     }
     
-    return [self isValidNickName:suggestion] ? suggestion : nil;
+    return [self isUnique:suggestion] ? suggestion : nil;
 }
 
 - (NSString*)getSuggestedDatabaseNameUsingDeviceName {
     NSString* name = [IOsUtils nameFromDeviceName];
-    name = [SafesList sanitizeSafeNickName:name];
+    name = [SafesList trimDatabaseNickName:name];
 
     NSString *suggestion = name.length ?
     [NSString stringWithFormat:
@@ -389,19 +389,28 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
         NSLocalizedString(@"casg_suggested_database_name_default", @"My Database");
    
     int attempt = 2;
-    while(![self isValidNickName:suggestion] && attempt < 100) {
+    while(![self isUnique:suggestion] && attempt < 100) {
         suggestion = [NSString stringWithFormat:
                       NSLocalizedString(@"casg_suggested_database_name_users_database_number_suffix_fmt", @"%@'s Database %d"), name, attempt++];
     }
     
-    return [self isValidNickName:suggestion] ? suggestion : nil;
+    return [self isUnique:suggestion] ? suggestion : nil;
 }
 
-+ (NSString *)sanitizeSafeNickName:(NSString *)string {
-    NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    
+- (NSArray<SafeMetaData*>*)getSafesOfProvider:(StorageProvider)storageProvider {
+    return [self.snapshot filteredArrayUsingPredicate:
+            [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        SafeMetaData* item = (SafeMetaData*)evaluatedObject;
+        return item.storageProvider == storageProvider;
+    }]];
+}
+
++ (NSString *)trimDatabaseNickName:(NSString *)string {
+    NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@""];
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet illegalCharacterSet]] componentsJoinedByString:@""];
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet nonBaseCharacterSet]] componentsJoinedByString:@""];
     trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"±|/\\`~@<>:;£$%^&()=+{}[]!\"|?*"]] componentsJoinedByString:@""];
     
     return trimmed;
@@ -417,20 +426,24 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     return set;
 }
 
-- (BOOL)isValidNickName:(NSString *)nickName {
-    NSString *sanitized = [SafesList sanitizeSafeNickName:nickName];
+- (BOOL)isValid:(NSString *)nickName {
+    NSString *sanitized = [SafesList trimDatabaseNickName:nickName];
     
-    NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
-    
-    return ([sanitized compare:nickName] == NSOrderedSame) && nickName.length > 0 && ![nicknamesLowerCase containsObject:nickName.lowercaseString];
+    return [sanitized compare:nickName] == NSOrderedSame && nickName.length > 0;
 }
 
-- (NSArray<SafeMetaData*>*)getSafesOfProvider:(StorageProvider)storageProvider {
-    return [self.snapshot filteredArrayUsingPredicate:
-            [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
-        SafeMetaData* item = (SafeMetaData*)evaluatedObject;
-        return item.storageProvider == storageProvider;
-    }]];
+- (BOOL)isUnique:(NSString *)nickName {
+    NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
+    
+    return ![nicknamesLowerCase containsObject:nickName.lowercaseString];
 }
+
+
+
+
+
+
+
+
 
 @end

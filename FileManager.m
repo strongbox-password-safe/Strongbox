@@ -9,7 +9,7 @@
 #import "FileManager.h"
 #import "SafesList.h"
 #import "DatabaseModel.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 
@@ -102,9 +102,9 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 }
 
 - (NSURL *)sharedAppGroupDirectory {
-    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:SharedAppAndAutoFillSettings.sharedInstance.appGroupName];
+    NSURL* url = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:AppPreferences.sharedInstance.appGroupName];
     if(!url) {
-        NSLog(@"Could not get container URL for App Group: [%@]", SharedAppAndAutoFillSettings.sharedInstance.appGroupName);
+        NSLog(@"Could not get container URL for App Group: [%@]", AppPreferences.sharedInstance.appGroupName);
         return nil;
     }
     
@@ -242,7 +242,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
         NSLog(@"Error setting include/exclude %@ from backup %@", [URL lastPathComponent], error);
     }
     else {
-        NSLog(@"%@ [%@] from backup", include ? @"Included" : @"Excluded", URL);
+
     }
 }
 
@@ -329,7 +329,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
         NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
     }
 
-    NSLog(@"Temp Attachment Path = [%@]", ret);
+
     
     return ret;
 }

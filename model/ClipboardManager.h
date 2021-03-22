@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)sharedInstance;
 
 - (void)copyStringWithDefaultExpiration:(NSString*)value;
+- (void)copyStringWithNoExpiration:(NSString *)value;
 
 #ifndef IS_APP_EXTENSION
 

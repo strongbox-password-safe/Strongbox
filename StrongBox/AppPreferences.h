@@ -11,16 +11,17 @@
 #import "AutoFillNewRecordSettings.h"
 #import "FavIconDownloadOptions.h"
 #import "DatabaseCellSubtitleField.h"
+#import "AppPrivacyShieldMode.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SharedAppAndAutoFillSettings : NSObject
+@interface AppPreferences : NSObject
 
 + (instancetype)sharedInstance;
 
 @property (nullable, readonly) NSUserDefaults* sharedAppGroupDefaults;
 @property (readonly) NSString* appGroupName;
-@property BOOL suppressPrivacyScreen; 
+@property BOOL suppressAppBackgroundTriggers; 
 
 @property BOOL colorizeUseColorBlindPalette;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
@@ -66,6 +67,27 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL showMetadataOnDetailsScreen;
 @property BOOL userHasOptedInToThirdPartyStorageLibraries;
+
+
+
+@property BOOL autoFillExitedCleanly;
+@property BOOL autoFillWroteCleanly;
+@property BOOL haveWarnedAboutAutoFillCrash;
+@property BOOL dontNotifyToSwitchToMainAppForSync;
+
+@property BOOL storeAutoFillServiceIdentifiersInNotes;
+@property BOOL useFullUrlAsURLSuggestion;
+@property BOOL autoProceedOnSingleMatch;
+@property BOOL showAutoFillTotpCopiedMessage;
+
+@property BOOL autoFillAutoLaunchSingleDatabase;
+@property (nullable) NSString* autoFillQuickLaunchUuid;
+@property BOOL migratedQuickLaunchToAutoFill;
+@property BOOL autoFillShowPinned;
+@property BOOL coalesceAppLockAndQuickLaunchBiometrics;
+
+@property AppPrivacyShieldMode appPrivacyShieldMode;
+@property BOOL migratedOfflineDetectedBehaviour;
 
 @end
 

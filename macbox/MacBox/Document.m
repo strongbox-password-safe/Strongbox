@@ -30,7 +30,7 @@ NSString* const kModelUpdateNotificationLongRunningOperationStart = @"kModelUpda
 NSString* const kModelUpdateNotificationLongRunningOperationDone = @"kModelUpdateNotificationLongRunningOperationDone";
 NSString* const kModelUpdateNotificationFullReload = @"kModelUpdateNotificationFullReload";
 NSString* const kModelUpdateNotificationDatabaseChangedByOther = @"kModelUpdateNotificationDatabaseChangedByOther";
-NSString* const kModelUpdateNotificationBackgroundSyncDone = @"kModelUpdateNotificationBackgroundSyncDone";
+NSString* const kModelUpdateNotificationSyncDone = @"kModelUpdateNotificationBackgroundSyncDone";
 
 NSString* const kNotificationUserInfoLongRunningOperationStatus = @"status";
 NSString* const kNotificationUserInfoParamKey = @"param";
@@ -117,6 +117,7 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
     NSLog(@"readFromData: %ld - [%@]", data.length, typeName);
+
     if ( self.credentialsForUnlock ) {
         BOOL ret = [self loadModelFromData:data key:self.credentialsForUnlock selectedItem:self.selectedItemForUnlock outError:outError];
 
@@ -126,6 +127,16 @@ NSString* const kNotificationUserInfoParamKey = @"param";
         return ret;
     }
     else {
+        NSError* error;
+
+        if(![Serializator isValidDatabaseWithPrefix:data error:&error]) {
+            if(outError != nil) {
+                *outError = error;
+            }
+            
+            return NO;
+        }
+
         return [self loadLockedModel];
     }
 }
@@ -524,11 +535,21 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     });
 }
 
-- (void)notifyViewsBackgroundSyncDone:(NSError*)error {
+- (void)notifyViewsSyncDone:(SyncAndMergeResult)result localWasChanged:(BOOL)localWasChanged error:(NSError*)error {
+    NSLog(@"notifyViewsSyncDone: %ld-%hhd", result, localWasChanged);
+    
+    NSDictionary *params = @{ @"result" : @(result),
+                              @"localWasChanged" : @(localWasChanged), };
+    
+    NSMutableDictionary *userInfo = params.mutableCopy;
+    if (error ) {
+        userInfo[@"error"] = error;
+    }
+    
     dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationBackgroundSyncDone
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationSyncDone
                                                           object:self
-                                                        userInfo:error ? @{ kNotificationUserInfoParamKey : error } : @{}];
+                                                        userInfo:userInfo];
     });
 }
 
@@ -562,6 +583,10 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
             }
         }
     }];
+}
+
+- (void)reloadFromLocalWorkingCopy:(NSViewController *)viewController key:(CompositeKeyFactors *)key selectedItem:(NSString *)selectedItem {
+    [self loadWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:key selectedItem:selectedItem completion:nil];
 }
 
 - (void)loadWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
@@ -606,15 +631,67 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)syncAfterSave {
-    [MacSyncManager.sharedInstance backgroundSyncDatabase:self.databaseMetadata completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        [self notifyViewsBackgroundSyncDone:error];
+    NSLog(@"syncAfterSave");
+
+    [MacSyncManager.sharedInstance backgroundSyncDatabase:self.databaseMetadata
+                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        [self notifyViewsSyncDone:result localWasChanged:localWasChanged error:error];
     }];
+}
+
+- (void)performFullInteractiveSync:(NSViewController*)viewController key:(CompositeKeyFactors*)key {
+    NSLog(@"performFullInteractiveSync");
+
+    [MacSyncManager.sharedInstance sync:self.databaseMetadata
+                          interactiveVC:viewController
+                                    key:key
+                                   join:NO
+                             completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        [self notifyViewsSyncDone:result localWasChanged:localWasChanged error:error];
+    }];
+}
+
+
+
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+        
+        
+        
+        
     
+
+            
     
+
+
+
+
     
-}
+
 
 
 

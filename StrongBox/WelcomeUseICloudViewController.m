@@ -10,7 +10,7 @@
 #import "WelcomeCreateDatabaseViewController.h"
 #import "Settings.h"
 #import "SafesList.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "iCloudSafesCoordinator.h"
 #import "AutoFillManager.h"
 #import "WelcomeAddDatabaseViewController.h"
@@ -66,7 +66,7 @@
 
 - (void)enableICloudAndContinue:(BOOL)enable {
     if (enable) {
-        SharedAppAndAutoFillSettings.sharedInstance.iCloudOn = enable; 
+        AppPreferences.sharedInstance.iCloudOn = enable; 
         Settings.sharedInstance.iCloudWasOn = enable; 
 
         [iCloudSafesCoordinator.sharedInstance startQuery];

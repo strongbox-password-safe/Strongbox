@@ -10,7 +10,7 @@
 #import "DebugHelper.h"
 #import "ClipboardManager.h"
 #import "Alerts.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "Utils.h"
 #import "ProUpgradeIAPManager.h"
 
@@ -27,7 +27,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    if([[SharedAppAndAutoFillSettings sharedInstance] isPro]) {
+    if([[AppPreferences sharedInstance] isPro]) {
         NSString* about = [NSString stringWithFormat:
                        NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@"), [Utils getAppVersion]];
 

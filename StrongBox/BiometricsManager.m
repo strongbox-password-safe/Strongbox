@@ -9,7 +9,7 @@
 #import "BiometricsManager.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "SecretStore.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface BiometricsManager ()
 
@@ -213,7 +213,7 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
         localAuthContext.localizedFallbackTitle = fallbackTitle;
     }
     
-    NSLog(@"REQUEST-BIOMETRIC: %d", SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen);
+    NSLog(@"REQUEST-BIOMETRIC: %d", AppPreferences.sharedInstance.suppressAppBackgroundTriggers);
     
     
     
@@ -226,14 +226,14 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
         return NO;
     }
     
-    SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = YES;
+    AppPreferences.sharedInstance.suppressAppBackgroundTriggers = YES;
     self.requestInProgress = YES;
     
     [localAuthContext evaluatePolicy:fallbackTitle ? LAPolicyDeviceOwnerAuthenticationWithBiometrics : LAPolicyDeviceOwnerAuthentication
                      localizedReason:reason
                                reply:^(BOOL success, NSError *error) {
                                    self.requestInProgress = NO;
-                                   SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = NO;
+                                   AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO;
 
                                    if(!success) {
                                        NSLog(@"requestBiometricId: NO -> ");

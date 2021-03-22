@@ -8,7 +8,7 @@
 
 #import "OfflineDetector.h"
 #import "Reachability.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface OfflineDetector ()
 
@@ -35,21 +35,20 @@
     
     
     
-    
-    
-    
-    [self.internetReachabilityDetector stopNotifier];
-    self.internetReachabilityDetector = nil;
-    self.offline = NO;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.internetReachabilityDetector stopNotifier];
+        self.internetReachabilityDetector = nil;
+        self.offline = NO;
+    });
 }
     
 - (void) startMonitoringConnectivitity {
-    if (!SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
+    if (!AppPreferences.sharedInstance.monitorInternetConnectivity) {
         NSLog(@"Not monitoring connectivity as configured OFF");
         return;
     }
    
-    if(!self.internetReachabilityDetector) { 
+    if ( !self.internetReachabilityDetector ) { 
         self.offline = NO;
     }
     
@@ -71,8 +70,11 @@
         NSLog(@"OfflineDetector: We Are Offline :(");
         weakSelf.offline = YES;
     };
-    
-    [self.internetReachabilityDetector startNotifier];
+
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.internetReachabilityDetector startNotifier];
+    });
 }
 
 - (BOOL) isOffline {

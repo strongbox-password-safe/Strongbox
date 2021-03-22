@@ -8,7 +8,7 @@
 
 #import "AdvancedPreferencesTableViewController.h"
 //#import "Settings.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "AutoFillManager.h"
 #import "Alerts.h"
 #import "SafesList.h"
@@ -39,6 +39,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCompleteFileProtection;
+@property (weak, nonatomic) IBOutlet UISwitch *switchCoalesceBiometrics;
 
 @end
 
@@ -89,63 +90,66 @@
 - (IBAction)onPreferencesChanged:(id)sender {
     NSLog(@"Advanced Preference Changed: [%@]", sender);
 
-    SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame = self.switchSyncForcePull.on;
-    SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts = self.switchSyncForcePush.on;
+    AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame = self.switchSyncForcePull.on;
+    AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts = self.switchSyncForcePush.on;
     
-    SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
-    SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
-    SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
-    SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
-    SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
-    SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
+    AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
+    AppPreferences.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
+    AppPreferences.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
+    AppPreferences.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
+    AppPreferences.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
+    AppPreferences.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
     Settings.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
     Settings.sharedInstance.allowThirdPartyKeyboards = self.switchAllowThirdPartyKeyboards.on;
 
-    SharedAppAndAutoFillSettings.sharedInstance.showMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
+    AppPreferences.sharedInstance.showMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
     
-    if(SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity) {
+    if(AppPreferences.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
     }
     else {
         [OfflineDetector.sharedInstance stopMonitoringConnectivitity];
     }
     
+    AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics = self.switchCoalesceBiometrics.on;
+    
     [self bindPreferences];
 }
 
 - (void)bindPreferences {
-    self.switchSyncForcePull.on = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
-    self.switchSyncForcePush.on = SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts;
+    self.switchSyncForcePull.on = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
+    self.switchSyncForcePush.on = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
     
-    self.instantPinUnlock.on = SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
-    self.switchHideKeyFileName.on = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock;
-    self.switchShowAllFilesInKeyFilesLocal.on = SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles;
-    self.switchDetectOffline.on = SharedAppAndAutoFillSettings.sharedInstance.monitorInternetConnectivity;
-    self.switchAllowClipboardHandoff.on = SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff;
-    self.switchUseColorBlindPalette.on = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
+    self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;
+    self.switchHideKeyFileName.on = AppPreferences.sharedInstance.hideKeyFileOnUnlock;
+    self.switchShowAllFilesInKeyFilesLocal.on = AppPreferences.sharedInstance.showAllFilesInLocalKeyFiles;
+    self.switchDetectOffline.on = AppPreferences.sharedInstance.monitorInternetConnectivity;
+    self.switchAllowClipboardHandoff.on = AppPreferences.sharedInstance.clipboardHandoff;
+    self.switchUseColorBlindPalette.on = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
 
     self.switchBackupFiles.on = Settings.sharedInstance.backupFiles;
     self.switchBackupImportedKeyFiles.on = Settings.sharedInstance.backupIncludeImportedKeyFiles;
     self.switchHideExportOnDatabaseMenu.on = Settings.sharedInstance.hideExportFromDatabaseContextMenu;
     self.switchAllowThirdPartyKeyboards.on = Settings.sharedInstance.allowThirdPartyKeyboards;
     
-    self.switchShowMetadataOnDetailsScreen.on = SharedAppAndAutoFillSettings.sharedInstance.showMetadataOnDetailsScreen;
+    self.switchShowMetadataOnDetailsScreen.on = AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
 
     self.switchCompleteFileProtection.on = Settings.sharedInstance.fullFileProtection;
+    self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
 }
 
 - (void)bindAllowPinCodeOpen {
-    self.switchAllowPinCodeOpen.on = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens;
+    self.switchAllowPinCodeOpen.on = !AppPreferences.sharedInstance.disallowAllPinCodeOpens;
 }
 
 - (void)bindAllowBiometric {
     self.labelAllowBiometric.text = [NSString stringWithFormat:NSLocalizedString(@"prefs_vc_enable_biometric_fmt", @"Allow %@ Unlock"), [BiometricsManager.sharedInstance getBiometricIdName]];
-    self.switchAllowBiometric.on = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
+    self.switchAllowBiometric.on = !AppPreferences.sharedInstance.disallowAllBiometricId;
 }
 
 - (IBAction)onAllowPinCodeOpen:(id)sender {
     if(self.switchAllowPinCodeOpen.on) {
-        SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
+        AppPreferences.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
         [self bindAllowPinCodeOpen];
     }
     else {
@@ -154,7 +158,7 @@
               message:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by PIN Codes")
                action:^(BOOL response) {
                     if(response) {
-                        SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
+                        AppPreferences.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
 
                         
 
@@ -183,7 +187,7 @@
     if(self.switchAllowBiometric.on) {
         NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
         
-        SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
+        AppPreferences.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
         
         [self bindAllowBiometric];
     }
@@ -195,7 +199,7 @@
                     if(response) {
                         NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
 
-                        SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
+                        AppPreferences.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
 
                         
 

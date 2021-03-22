@@ -54,6 +54,14 @@
 #import "SecretStore.h"
 #import "OutlineView.h"
 #import "Document.h"
+#import "SyncAndMergeSequenceManager.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
+
 
 
 
@@ -197,45 +205,42 @@ static NSImage* kStrongBox256Image;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    NSLog(@"ViewController::viewDidLoad: doc=[%@] - vm=[%@]", self.document, self.viewModel);
+    
 
     
     
     
     self.detailsViewControllers = @{}.mutableCopy;
-
-    [self customizeUi];
     
     [self enableDragDrop];
-
-    [self listenToAutoFillWormhole];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
 }
 
-- (void)viewDidAppear {
-    [super viewDidAppear];
+- (void)viewWillAppear {
+    [super viewWillAppear];
     
-    NSLog(@"ViewController::viewDidAppear: doc=[%@] - vm=[%@]", self.document, self.viewModel);
+    
 
     if(!self.hasLoaded) {
         self.hasLoaded = YES;
         [self doInitialViewSetup];
     }
-    
+}
+
+- (void)viewDidAppear {
+    [super viewDidAppear];
+        
     [self.view.window setLevel:Settings.sharedInstance.floatOnTop ? NSFloatingWindowLevel : NSNormalWindowLevel];
 
     [self initializeFullOrTrialOrLiteUI];
-
     [self setInitialFocus];
-    
     [self startRefreshOtpTimer];
 }
 
 - (void)doInitialViewSetup {
     _document = self.view.window.windowController.document;
     self.view.window.delegate = self;
+
+    [self customizeUi];
 
     NSLog(@"ViewController::doInitialViewSetup - Initial Load - doc=[%@] - vm=[%@]", self.document, self.viewModel);
 
@@ -244,6 +249,33 @@ static NSImage* kStrongBox256Image;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self autoPromptForTouchIdIfDesired];
     });
+    
+    [self listenToEventsOfInterest];
+    
+    [self listenToAutoFillWormhole];
+}
+
+- (void)listenToEventsOfInterest {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+    
+
+
+
+
+
+
+    NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
+    
+    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onScreenLocked) name:notificationName object:nil];
+}
+
+- (void)onScreenLocked {
+    if ( Settings.sharedInstance.lockDatabasesOnScreenLock ) {
+        NSLog(@"onScreenLocked: Locking Database");
+
+        [self onLock:nil];
+    }
 }
 
 - (void)fullModelReload { 
@@ -269,12 +301,19 @@ static NSImage* kStrongBox256Image;
     });
 }
 
-- (void)viewDidDisappear {
-    [super viewDidDisappear];
+- (void)windowWillClose:(NSNotification *)notification {
+    if ( notification.object == self.view.window) {
+        NSLog(@"ViewController::windowWillClose");
+        [self cleanupOnClose];
+    }
+}
 
+- (void)cleanupOnClose {
+    NSLog(@"ViewController::cleanupOnClose");
+    
     [self stopRefreshOtpTimer];
-
     [self closeAllDetailsWindows:nil];
+    [self cleanupWormhole];
 }
 
 - (void)closeAllDetailsWindows:(void (^)(void))completion {
@@ -322,18 +361,35 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)openItemDetails:(Node*)item newEntry:(BOOL)newEntry {
-    if(!item || item.isGroup) {
+    if(!item) {
         return;
     }
     
-    NodeDetailsViewController* vc = self.detailsViewControllers[item.uuid];
-    
-    if(vc) {
-        NSLog(@"Details window already exists... Activating... [%@]", item.title);
-        [vc.view.window makeKeyAndOrderFront:nil];
+    if (item.isGroup) {
+
     }
     else {
-        [self performSegueWithIdentifier:@"segueToShowItemDetails" sender:@{ kItemKey : item, kNewEntryKey : @(newEntry)}];
+        NodeDetailsViewController* vc = self.detailsViewControllers[item.uuid];
+        
+        if(vc) {
+            NSLog(@"Details window already exists... Activating... [%@]", item.title);
+            [vc.view.window makeKeyAndOrderFront:nil];
+        }
+        else {
+            [self performSegueWithIdentifier:@"segueToShowItemDetails" sender:@{ kItemKey : item, kNewEntryKey : @(newEntry)}];
+        }
+    }
+}
+
+- (void)showGroupDetails {
+    if (@available(macOS 10.15, *)) {
+        NSViewController *vc = [SwiftUIViewFactory makeSwiftUIViewWithDismissHandler:^{
+            NSLog(@"Dismiss");
+        }];
+        
+        [self presentViewControllerAsSheet:vc];
+    } else {
+        
     }
 }
 
@@ -394,6 +450,20 @@ static NSImage* kStrongBox256Image;
         vc.database = self.databaseMetadata;
         vc.model = foo[@"model"];
     }
+    else if ( [segue.identifier isEqualToString:@"segueToFavIconDownloader"] ) {
+        Node* item = sender;
+        NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.viewModel.activeRecords;
+        
+        FavIconDownloader *vc = segue.destinationController;
+        vc.nodes = items;
+        vc.viewModel = self.viewModel;
+
+        vc.onDone = ^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
+            if(go) {
+                [self.viewModel batchSetIcons:selectedFavIcons];
+            }
+        };
+    }
 }
 
 - (void)bindShowAdvancedOnUnlockScreen {
@@ -427,10 +497,8 @@ static NSImage* kStrongBox256Image;
     [self customizeLockStackViewSpacing];
     
     [self bindShowAdvancedOnUnlockScreen];
-    
-    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch"); 
-    
-    self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
+            
+    self.buttonUnlockWithTouchId.title = NSLocalizedString(@"mac_unlock_database_with_touch_or_watch", @"Unlock with Touch ID or Watch");
     self.buttonUnlockWithTouchId.hidden = YES;
     
     self.imageViewTogglePassword.clickable = YES;
@@ -498,7 +566,19 @@ static NSImage* kStrongBox256Image;
             }
         }
     }
-    
+    else if( control == self.textFieldMasterPassword ) {
+        if (commandSelector == @selector(insertTab:)) {
+            if([self convenienceUnlockIsPossible]) {
+                [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
+            }
+            else {
+                [self.view.window makeFirstResponder:self.buttonUnlockWithPassword];
+            }
+
+            return YES;
+        }
+    }
+
     return NO;
 }
 
@@ -850,6 +930,8 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)stopObservingModelChanges {
+    NSLog(@"stopObservingModelChanges");
+
     if(self.viewModel) {
         self.viewModel.onNewItemAdded = nil;
         self.viewModel.onDeleteHistoryItem = nil;
@@ -877,9 +959,12 @@ static NSImage* kStrongBox256Image;
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationLongRunningOperationDone object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationFullReload object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationDatabaseChangedByOther object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kModelUpdateNotificationSyncDone object:nil];
 }
 
 - (void)startObservingModelChanges {
+    NSLog(@"startObservingModelChanges");
+    
     __weak ViewController* weakSelf = self;
     
     if ( self.viewModel ) { 
@@ -915,12 +1000,12 @@ static NSImage* kStrongBox256Image;
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onModelLongRunningOpDone:) name:kModelUpdateNotificationLongRunningOperationDone object:nil];
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onFullModelReloadNotification:) name:kModelUpdateNotificationFullReload object:nil];    
     [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onFileChangedByOtherApplication:) name:kModelUpdateNotificationDatabaseChangedByOther object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onBackgroundSyncDone:) name:kModelUpdateNotificationBackgroundSyncDone object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf selector:@selector(onSyncDone:) name:kModelUpdateNotificationSyncDone object:nil];
 }
 
 - (void)setInitialFocus {
     if(self.viewModel == nil || self.viewModel.locked) {
-        if([self biometricOpenIsAvailableForSafe]) {
+        if([self convenienceUnlockIsPossible]) {
             [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
         }
         else {
@@ -1486,6 +1571,10 @@ static NSImage* kStrongBox256Image;
 }
 
 - (BOOL)immediateMatch:(NSString*)searchText item:(Node*)item scope:(NSInteger)scope {
+    if ( !item.isSearchable ) {
+        return NO;
+    }
+    
     BOOL immediateMatch = NO;
 
     NSArray<NSString*> *terms = [self.viewModel getSearchTerms:searchText];
@@ -1631,23 +1720,29 @@ static NSImage* kStrongBox256Image;
 
 
 
-- (BOOL)biometricOpenIsAvailableForSafe {
+- (BOOL)convenienceUnlockIsPossible {
     DatabaseMetadata* metaData = self.databaseMetadata;
     
-    BOOL ret =  (metaData == nil ||
-                 !metaData.isTouchIdEnabled ||
-                 !(metaData.conveniencePassword) ||
-                 !BiometricIdHelper.sharedInstance.biometricIdAvailable ||
-                 !(Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial));
+    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
 
-    return !ret;
+    BOOL convenienceMethodPossible = (watchAvailable && self.databaseMetadata.isWatchUnlockEnabled) || (touchAvailable && self.databaseMetadata.isTouchIdEnabled);
+
+    BOOL passwordAvailable = self.databaseMetadata.conveniencePassword != nil;
+
+    BOOL ret = metaData && convenienceMethodPossible && featureAvailable && passwordAvailable;
+
+    NSLog(@"convenienceUnlockIsPossible: %hhd", ret);
+    
+    return ret;
 }
 
 - (void)autoPromptForTouchIdIfDesired {
     if(self.viewModel && self.viewModel.locked) {
         BOOL weAreKeyWindow = NSApplication.sharedApplication.keyWindow == self.view.window;
 
-        if(weAreKeyWindow && [self biometricOpenIsAvailableForSafe] && (Settings.sharedInstance.autoPromptForTouchIdOnActivate)) {
+        if( weAreKeyWindow && self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate && [self convenienceUnlockIsPossible] ) {
             NSTimeInterval secondsBetween = [NSDate.date timeIntervalSinceDate:self.lastAutoPromptForTouchIdThrottle];
             if(self.lastAutoPromptForTouchIdThrottle != nil && secondsBetween < 1.5) {
                 NSLog(@"Too many auto biometric requests too soon - ignoring...");
@@ -1660,8 +1755,10 @@ static NSImage* kStrongBox256Image;
 }
 
 - (IBAction)onUnlockWithTouchId:(id)sender {
-    if([self biometricOpenIsAvailableForSafe]) {
-        [BiometricIdHelper.sharedInstance authorize:^(BOOL success, NSError *error) {
+    BOOL passwordAvailable = self.databaseMetadata.conveniencePassword != nil;
+
+    if( [self convenienceUnlockIsPossible] ) {
+        [BiometricIdHelper.sharedInstance authorize:self.databaseMetadata completion:^(BOOL success, NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 self.lastAutoPromptForTouchIdThrottle = NSDate.date;
 
@@ -1694,7 +1791,7 @@ static NSImage* kStrongBox256Image;
             });
         }];
     }
-    else if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
+    else if( !passwordAvailable ) {
         NSLog(@"Touch ID button pressed but no Touch ID Stored? Probably Expired...");
         
         NSString* loc = NSLocalizedString(@"mac_could_not_find_stored_credentials", @"Touch ID/Apple Watch Unlock is not possible because the stored credentials are unavailable. This is probably because they have expired. Please enter the password manually.");
@@ -1809,18 +1906,22 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     
     if(success) {
         DatabaseMetadata* metaData = self.databaseMetadata;
+                
+        BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+        BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+        BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+        BOOL convenienceAvailable = watchAvailable || touchAvailable;
+        BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
         
-        BOOL pro = (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial);
-        BOOL bioAvail = BiometricIdHelper.sharedInstance.biometricIdAvailable;
-        BOOL touchIdIsPossible = bioAvail && pro;
-        BOOL shouldPromptForBiometricEnrol = touchIdIsPossible && !metaData.hasPromptedForTouchIdEnrol && !metaData.isTouchIdEnabled;
+        BOOL convenienceIsPossible = convenienceAvailable && featureAvailable;
+        BOOL shouldPromptForBiometricEnrol = convenienceIsPossible && !metaData.hasPromptedForTouchIdEnrol && !convenienceEnabled;
         
         BOOL autoFillAvailable = NO;
         if ( @available(macOS 11.0, *) ) {
             autoFillAvailable = YES;
         }
         
-        BOOL shouldPromptForAutoFillEnrol = pro && autoFillAvailable && !metaData.autoFillEnabled && !metaData.hasPromptedForAutoFillEnrol;
+        BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !metaData.autoFillEnabled && !metaData.hasPromptedForAutoFillEnrol;
         
         if(shouldPromptForBiometricEnrol || shouldPromptForAutoFillEnrol) {
             [self onboardForBiometricsAndOrAutoFill:shouldPromptForBiometricEnrol
@@ -1829,7 +1930,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         }
                 
         NSString* password = self.viewModel.compositeKeyFactors.password;
-        if( !isBiometricUnlock && touchIdIsPossible && metaData.isTouchIdEnabled && metaData.isTouchIdEnrolled && metaData.conveniencePassword == nil && password.length) {
+        if( !isBiometricUnlock && convenienceIsPossible && convenienceEnabled && metaData.isTouchIdEnrolled && metaData.conveniencePassword == nil && password.length) {
             
             [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:password];
         }
@@ -1842,14 +1943,36 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         [DatabasesManager.sharedInstance update:metaData];
     }
     else {
-        if(isBiometricUnlock) {
-            [self clearTouchId];
+        if ( error && error.code == kStrongboxErrorCodeIncorrectCredentials ) {
+            if(isBiometricUnlock) { 
+                [self clearTouchId];
+            
+                [MacAlerts info:NSLocalizedString(@"open_sequence_problem_opening_title", @"Could not open database")
+                informativeText:NSLocalizedString(@"open_sequence_problem_opening_convenience_incorrect_message", @"The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled.")
+                         window:self.view.window
+                     completion:nil];
+            }
+            else {
+                if (compositeKeyFactors.keyFileDigest) {
+                    [MacAlerts info:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title", @"Incorrect Credentials")
+                    informativeText:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message_verify_key_file", @"The credentials were incorrect for this database. Are you sure you are using this key file?\n\nNB: A key files are not the same as your database file.")
+                             window:self.view.window
+                         completion:nil];
+                }
+                else {
+                    CGFloat yOffset = self.checkboxShowAdvanced.state == NSControlStateValueOn ? -75.0f : 0.0f; 
+                    [self showToastNotification:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message", @"The credentials were incorrect for this database.") error:YES yOffset:yOffset];
+                }
+            }
+        }
+        else {
+            NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
+            [MacAlerts error:loc error:error window:self.view.window];
         }
         
-        NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
-        [MacAlerts error:loc error:error window:self.view.window];
-    
         [self bindBiometricButtonsOnLockScreen];
+        
+        [self setInitialFocus];
     }
 }
 
@@ -2870,18 +2993,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (IBAction)onLaunchUrl:(id)sender {
     Node* item = [self getCurrentSelectedItem];
     
-    NSString *urlString = [self.viewModel dereference:item.fields.url node:item];
-    
-    if (!urlString.length) {
-        return;
-    }
-    
-    if (![urlString.lowercaseString hasPrefix:@"http:
-        ![urlString.lowercaseString hasPrefix:@"https:
-        urlString = [NSString stringWithFormat:@"http:
-    }
-    
-    [[NSWorkspace sharedWorkspace] openURL:urlString.urlExtendedParse];
+    [self.viewModel launchUrl:item];
 }
 
 - (void)clearTouchId {
@@ -3387,21 +3499,27 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)showToastNotification:(NSString*)message error:(BOOL)error {
-    NSColor *defaultColor = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
-    NSColor *errorColor = [NSColor colorWithDeviceRed:1 green:0.55 blue:0.05 alpha:0.60];
+    [self showToastNotification:message error:error yOffset:150.f];
+}
 
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    hud.labelText = message;
-    hud.color = error ? errorColor : defaultColor;
-    hud.mode = MBProgressHUDModeText;
-    hud.margin = 10.f;
-    hud.yOffset = 150.f;
-    hud.removeFromSuperViewOnHide = YES;
-    hud.dismissible = YES;
-    
-    NSTimeInterval delay = error ? 3.0f : 1.0f;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [hud hide:YES];
+- (void)showToastNotification:(NSString*)message error:(BOOL)error yOffset:(CGFloat)yOffset {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSColor *defaultColor = [NSColor colorWithDeviceRed:0.23 green:0.5 blue:0.82 alpha:0.60];
+        NSColor *errorColor = [NSColor colorWithDeviceRed:1 green:0.55 blue:0.05 alpha:0.90];
+
+        MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        hud.labelText = message;
+        hud.color = error ? errorColor : defaultColor;
+        hud.mode = MBProgressHUDModeText;
+        hud.margin = 10.f;
+        hud.yOffset = yOffset;
+        hud.removeFromSuperViewOnHide = YES;
+        hud.dismissible = YES;
+        
+        NSTimeInterval delay = error ? 3.0f : 1.0f;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [hud hide:YES];
+        });
     });
 }
 
@@ -3462,13 +3580,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)showFindFavIconsForItem:(Node*)item {
-    NSArray* items = item ? (item.isGroup ? item.allChildRecords : @[item]) : self.viewModel.activeRecords;
-    
-    [FavIconDownloader showUi:self nodes:items viewModel:self.viewModel onDone:^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
-        if(go) {
-            [self.viewModel batchSetIcons:selectedFavIcons];
-        }
-    }];
+    [self performSegueWithIdentifier:@"segueToFavIconDownloader" sender:item];
 }
 
 
@@ -3645,16 +3757,36 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (void)bindBiometricButtonsOnLockScreen {
     DatabaseMetadata* metaData = self.databaseMetadata;
+    
+    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
 
-    [self.buttonUnlockWithTouchId setTitle:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock", @"Unlock with Touch ID or Watch")];
+    BOOL convenienceMethodPossible = (watchAvailable && self.databaseMetadata.isWatchUnlockEnabled) || (touchAvailable && self.databaseMetadata.isTouchIdEnabled);
+
+    BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
+    BOOL passwordAvailable = self.databaseMetadata.conveniencePassword != nil;
+
+    NSString* convenienceTitle;
+    if ( (self.databaseMetadata.isTouchIdEnabled && touchAvailable) && (self.databaseMetadata.isWatchUnlockEnabled && watchAvailable) ) {
+        convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_or_watch", @"Unlock with Touch ID or Watch");
+    }
+    else if ( self.databaseMetadata.isTouchIdEnabled && touchAvailable) {
+        convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_id", @"Unlock with Touch ID");
+    }
+    else {
+        convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_apple_watch", @"Unlock with Watch");
+    }
+    
+    [self.buttonUnlockWithTouchId setTitle:convenienceTitle];
     self.buttonUnlockWithTouchId.hidden = NO;
     self.buttonUnlockWithTouchId.enabled = YES;
 
-    if(metaData.isTouchIdEnabled) {
-        if(metaData.isTouchIdEnrolled) {
-            if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
-                if (Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial) {
-                    if(self.databaseMetadata.conveniencePassword) {
+    if( convenienceEnabled ) {
+        if( metaData.isTouchIdEnrolled ) {
+            if( convenienceMethodPossible ) {
+                if ( featureAvailable ) {
+                    if( passwordAvailable ) {
                         [self.buttonUnlockWithTouchId setKeyEquivalent:@"\r"];
                     }
                     else {
@@ -3843,65 +3975,146 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 
 
-- (void)listenToAutoFillWormhole { 
+- (void)cleanupWormhole {
+    if ( self.wormhole ) {
+        NSLog(@"Cleaning up wormhole... %@", self.databaseMetadata.uuid);
+        [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeQuickTypeRequestId];
+
+        NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, self.databaseMetadata.uuid];
+        [self.wormhole stopListeningForMessageWithIdentifier:requestId];
+        
+        NSString* convRequestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, self.databaseMetadata.uuid];
+        [self.wormhole stopListeningForMessageWithIdentifier:convRequestId];
+
+        [self.wormhole clearAllMessageContents];
+        self.wormhole = nil;
+    }
+}
+
+- (void)listenToAutoFillWormhole {
     self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
                                                          optionalDirectory:kAutoFillWormholeName];
 
-    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeRequestId
+    
+    
+    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeQuickTypeRequestId
                                          listener:^(id messageObject) {
-        if ( self.viewModel && !self.viewModel.locked && messageObject) {
-            NSDictionary *dict = (NSDictionary*)messageObject;
-            NSString* json = dict[@"id"];
-            if (!json) {
-                return;
-            }
-            
-            QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
-            
-            if( identifier && self.databaseMetadata && [self.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
-                if (!self.databaseMetadata.quickWormholeFillEnabled) {
-                    return;
-                }
-                
-                
+        NSDictionary *dict = (NSDictionary*)messageObject;
+        NSString* userSession = dict[@"user-session-id"];
+        
+        if ([userSession isEqualToString:NSUserName()]) { 
+            NSString* json = dict ? dict[@"id"] : nil;
+            [self onQuickTypeAutoFillWormholeRequest:json];
+        }
+    }];
+    
+    
+    
+    NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, self.databaseMetadata.uuid];
 
-                
-                
-                DatabaseModel* model = self.viewModel.database;
-                Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
-                    return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
-                }];
+    [self.wormhole listenForMessageWithIdentifier:requestId
+                                         listener:^(id messageObject) {
+        NSDictionary *dict = (NSDictionary*)messageObject;
+        NSString* userSession = dict[@"user-session-id"];
+        
+        if ( [userSession isEqualToString:NSUserName()] ) { 
+            NSString* databaseId = dict[@"database-id"];
+            [self onAutoFillDatabaseUnlockedStatusWormholeRequest:databaseId];
+        }
+    }];
+    
+    
 
-                NSString* secretStoreId = NSUUID.UUID.UUIDString;
+    NSString* convRequestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, self.databaseMetadata.uuid];
 
-                if(node) {
-
-
-                    NSString* user = [model dereference:node.fields.username node:node];
-                    NSString* password = [model dereference:node.fields.password node:node];
-                    NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
-                    
-                    NSDictionary* securePayload = @{
-                        @"user" : user,
-                        @"password" : password,
-                        @"totp" : totp,
-                    };
-                    
-                    NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
-                    
-                    [SecretStore.sharedInstance setSecureObject:securePayload forIdentifier:secretStoreId expiresAt:expiry];
-                }
-                else {
-                    NSLog(@"[%@] - AutoFill could not find matching node - returning", self.databaseMetadata.nickName);
-                }
-                
-                [self.wormhole passMessageObject:@{@"success" : @(node != nil),
-                                                   @"secret-store-id" : secretStoreId }
-                                      identifier:kAutoFillWormholeResponseId];
-            }
+    [self.wormhole listenForMessageWithIdentifier:convRequestId
+                                         listener:^(id messageObject) {
+        NSDictionary *dict = (NSDictionary*)messageObject;
+        NSString* userSession = dict[@"user-session-id"];
+        
+        if ( [userSession isEqualToString:NSUserName()] ) { 
+            NSString* databaseId = dict[@"database-id"];
+            [self onAutoFillDatabaseConvUnlockWormholeRequest:databaseId];
         }
     }];
 }
+
+- (void)onAutoFillDatabaseConvUnlockWormholeRequest:(NSString*)databaseId {
+    if ( self.viewModel && !self.viewModel.locked && databaseId) {
+        if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
+            NSLog(@"Responding to Conv Unlock Req for Database - [%@]-%@", self, databaseId);
+
+            NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockResponseId, databaseId];
+            NSString* secretStoreId = NSUUID.UUID.UUIDString;
+            NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
+            [SecretStore.sharedInstance setSecureObject:self.viewModel.compositeKeyFactors.password forIdentifier:secretStoreId expiresAt:expiry];
+
+            [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(),
+                                                 @"secret-store-id" : secretStoreId }
+                                  identifier:responseId];
+        }
+    }
+}
+
+- (void)onAutoFillDatabaseUnlockedStatusWormholeRequest:(NSString*)databaseId {
+    if ( self.viewModel && !self.viewModel.locked && databaseId) {
+        if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
+
+
+            NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, databaseId];
+
+            [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(), @"unlocked" : databaseId }
+                                  identifier:responseId];
+        }
+    }
+}
+
+- (void)onQuickTypeAutoFillWormholeRequest:(NSString*)json {
+    if ( self.viewModel && !self.viewModel.locked && json) {
+        QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:json];
+        
+        if( identifier && self.databaseMetadata && [self.databaseMetadata.uuid isEqualToString:identifier.databaseId] ) {
+            if (!self.databaseMetadata.quickWormholeFillEnabled || !self.databaseMetadata.quickTypeEnabled ) {
+                return;
+            }
+            
+            
+            
+            DatabaseModel* model = self.viewModel.database;
+            Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
+                return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
+            }];
+
+            NSString* secretStoreId = NSUUID.UUID.UUIDString;
+
+            if(node) {
+
+
+                NSString* user = [model dereference:node.fields.username node:node];
+                NSString* password = [model dereference:node.fields.password node:node];
+                NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
+                
+                NSDictionary* securePayload = @{
+                    @"user" : user,
+                    @"password" : password,
+                    @"totp" : totp,
+                };
+                
+                NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
+                [SecretStore.sharedInstance setSecureObject:securePayload forIdentifier:secretStoreId expiresAt:expiry];
+            }
+            else {
+
+            }
+            
+            [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(),
+                                                @"success" : @(node != nil),
+                                                @"secret-store-id" : secretStoreId }
+                                  identifier:kAutoFillWormholeQuickTypeResponseId];
+        }
+    }
+}
+
 
 
 - (void)onModelLongRunningOpStart:(NSNotification*)notification {
@@ -3940,17 +4153,26 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     });
 }
 
-- (void)onBackgroundSyncDone:(NSNotification*)notification {
+- (void)onSyncDone:(NSNotification*)notification {
     if( notification.object != self.viewModel.document ) {
         return;
     }
 
-    NSLog(@"onFullModelReloadNotification notification.object = [%@]", notification.object);
+    NSLog(@"onSyncDone notification.object = [%@]", notification.object);
 
-    NSError* error = (NSError*)notification.userInfo[kNotificationUserInfoParamKey];
-
+    NSNumber* r = notification.userInfo[@"result"];
+    NSNumber* l = notification.userInfo[@"localWasChanged"];
+    
+    SyncAndMergeResult result = r.integerValue;
+    BOOL localWasChanged = l.boolValue;
+    NSError* error = notification.userInfo[@"error"];
+       
     dispatch_async(dispatch_get_main_queue(), ^{
-        if ( error ) {
+        if ( result == kSyncAndMergeResultUserInteractionRequired ) {
+            NSLog(@"Background sync failed, will now try an interactive sync...");
+            [self.document performFullInteractiveSync:self key:self.viewModel.compositeKeyFactors];
+        }
+        else if ( error ) {
             NSString* message = [NSString stringWithFormat:@"%@: %@",
                                  NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error"),
                                  error.localizedDescription];
@@ -3958,6 +4180,11 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         }
         else {
             [self showToastNotification:NSLocalizedString(@"notification_sync_successful", @"Sync Successful") error:NO];
+            
+            if ( localWasChanged ) {
+                NSLog(@"Sync successful and local was changed, reloading...");
+                [self.document reloadFromLocalWorkingCopy:self key:self.viewModel.compositeKeyFactors selectedItem:[self selectedItemSerializationId]];
+            }
         }
     });
 }
@@ -3984,7 +4211,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     }
     
     if (theAction == @selector(onViewItemDetails:)) {
-        return item != nil && !item.isGroup;
+        return item != nil; 
     }
     if (theAction == @selector(onDuplicateEntry:)) {
         return item != nil; 

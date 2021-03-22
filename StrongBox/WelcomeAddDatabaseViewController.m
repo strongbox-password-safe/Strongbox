@@ -11,7 +11,7 @@
 #import "SafesList.h"
 #import "Settings.h"
 #import "WelcomeUseICloudViewController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "AutoFillManager.h"
 
 @interface WelcomeAddDatabaseViewController ()

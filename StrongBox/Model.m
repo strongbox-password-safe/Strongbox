@@ -14,7 +14,7 @@
 #import "BackupsManager.h"
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "SyncManager.h"
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
@@ -61,7 +61,7 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 
         DatabaseModel* model = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:cpf];
         
-        [SampleItemsGenerator addSampleGroupAndRecordToRoot:model passwordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+        [SampleItemsGenerator addSampleGroupAndRecordToRoot:model passwordConfig:AppPreferences.sharedInstance.passwordGenerationConfig];
         
         data = [Serializator expressToData:model format:model.originalFormat];
         
@@ -172,11 +172,11 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 
 
 - (NSData*)getDuressDummyData {
-    return SharedAppAndAutoFillSettings.sharedInstance.duressDummyData; 
+    return AppPreferences.sharedInstance.duressDummyData; 
 }
 
 - (void)setDuressDummyData:(NSData*)data {
-    SharedAppAndAutoFillSettings.sharedInstance.duressDummyData = data;
+    AppPreferences.sharedInstance.duressDummyData = data;
 }
 
 
@@ -223,7 +223,7 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
 
     __weak Model* weakSelf = self;
-    self.auditor = [[DatabaseAuditor alloc] initWithPro:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:AppPreferences.sharedInstance.isProOrFreeTrial
                                              isExcluded:^BOOL(Node * _Nonnull item) {
         NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:item.uuid];
         return [weakSelf isExcludedFromAuditHelper:set sid:sid];
@@ -255,7 +255,7 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
     [self.auditor start:self.database
                  config:self.metadata.auditConfig
             nodesChanged:^{
-        NSLog(@"Audit Nodes Changed Callback...");
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditNodesChangedNotificationKey object:nil];
         });
@@ -265,7 +265,7 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditProgressNotificationKey object:@(progress)];
         });
     } completion:^(BOOL userStopped) {
-        NSLog(@"Audit Completed - User Cancelled: %d", userStopped);
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@(userStopped)];
         });
@@ -428,7 +428,7 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
             
             [SyncManager.sharedInstance sync:self.metadata interactiveVC:viewController key:key join:NO completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
                 if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
-                    if(self.metadata.autoFillEnabled) {
+                    if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
                         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid displayFormat:self.metadata.quickTypeDisplayFormat];
                     }
 
@@ -524,6 +524,44 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
     return ret;
 }
 
+- (void)launchUrl:(Node *)item {
+    NSURL* launchableUrl = [self.database launchableUrlForItem:item];
+        
+    if ( !launchableUrl ) {
+        NSLog(@"Could not get launchable URL for item.");
+        return;
+    }
+    
+    [self launchLaunchableUrl:launchableUrl];
+}
+
+- (void)launchUrlString:(NSString*)urlString {
+    NSURL* launchableUrl = [self.database launchableUrlForUrlString:urlString];
+        
+    if ( !launchableUrl ) {
+        NSLog(@"Could not get launchable URL for string.");
+        return;
+    }
+    
+    [self launchLaunchableUrl:launchableUrl];
+}
+- (void)launchLaunchableUrl:(NSURL*)launchableUrl {
+#ifndef IS_APP_EXTENSION
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        if (@available (iOS 10.0, *)) {
+            [UIApplication.sharedApplication openURL:launchableUrl options:@{} completionHandler:^(BOOL success) {
+                if (!success) {
+                    NSLog(@"Couldn't launch this URL!");
+                }
+            }];
+        }
+        else {
+            [UIApplication.sharedApplication openURL:launchableUrl];
+        }
+    });
+#endif
+}
+
 
 
 - (NSArray<Node*>*)pinnedNodes {
@@ -591,7 +629,7 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 }
 
 - (NSString *)generatePassword {
-    PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationConfig* config = AppPreferences.sharedInstance.passwordGenerationConfig;
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 }
 

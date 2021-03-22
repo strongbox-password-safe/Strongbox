@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SafesListTableViewController : UITableViewController
 
 @property (nonatomic, weak) CredentialProviderViewController *rootViewController;
-@property BOOL lastRunGood;
 
 @end
 

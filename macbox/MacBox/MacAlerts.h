@@ -20,6 +20,8 @@
 + (void)info:(NSString *)info window:(NSWindow*)window;
 + (void)info:(NSString *)message informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(void))completion;
 
++ (void)areYouSure:(NSString*)message window:(NSWindow*)window completion:(void (^) (BOOL response))completion;
+
 + (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
 + (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion;
 
@@ -28,6 +30,21 @@ informativeText:(NSString*)informativeText
        window:(NSWindow*)window
 disableEscapeKey:(BOOL)disableEscapeKey
    completion:(void (^)(BOOL yesNo))completion;
+
++ (void)twoOptions:(NSString *)messageText
+   informativeText:(NSString*)informativeText
+ option1AndDefault:(NSString*)option1AndDefault
+           option2:(NSString*)option2
+            window:(NSWindow*)window
+        completion:(void (^)(NSUInteger option))completion;
+
++ (void)threeOptions:(NSString *)messageText
+     informativeText:(NSString*)informativeText
+   option1AndDefault:(NSString*)option1AndDefault
+             option2:(NSString*)option2
+             option3:(NSString*)option3
+              window:(NSWindow*)window
+          completion:(void (^)(NSUInteger option))completion;
 
 + (void)twoOptionsWithCancel:(NSString *)messageText
              informativeText:(NSString*)informativeText

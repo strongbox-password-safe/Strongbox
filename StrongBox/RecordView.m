@@ -26,7 +26,7 @@
 #import "PasswordGenerationViewController.h"
 #import "ClipboardManager.h"
 #import "NSString+Extensions.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 static const int kMinNotesCellHeight = 160;
 
@@ -586,7 +586,7 @@ static const int kMinNotesCellHeight = 160;
 }
 
 - (Node*)createNewRecord {
-    AutoFillNewRecordSettings* settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings* settings = AppPreferences.sharedInstance.autoFillNewRecordSettings;
     
     NSString *title = settings.titleAutoFillMode == kDefault ? @"Untitled" : settings.titleCustomAutoFill;
     
@@ -662,22 +662,7 @@ static const int kMinNotesCellHeight = 160;
     NSString* pw = [self dereference:self.record.fields.password node:self.record];
     [self copyToClipboard:pw message:@"Password Copied. Launching URL..."];
     
-    if (![urlString.lowercaseString hasPrefix:@"http:
-        ![urlString.lowercaseString hasPrefix:@"https:
-        urlString = [NSString stringWithFormat:@"http:
-    }
-    
-    NSURL* url = urlString.urlExtendedParse;
-    if (url != nil) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            if (@available (iOS 10.0, *)) {
-                [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-            }
-            else {
-                [UIApplication.sharedApplication openURL:url];
-            }
-        });
-    }
+    [self.viewModel launchUrl:self.record];    
 }
 
 - (IBAction)onCopyEmail:(id)sender {
@@ -1167,7 +1152,7 @@ static const int kMinNotesCellHeight = 160;
         
         
         
-        if(SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.viewModel.metadata.tryDownloadFavIconForNewRecord &&
+        if(AppPreferences.sharedInstance.isProOrFreeTrial && self.viewModel.metadata.tryDownloadFavIconForNewRecord &&
            (self.viewModel.database.originalFormat == kKeePass || self.viewModel.database.originalFormat == kKeePass4)) {
             NSString* urlHint = trim(self.textFieldUrl.text);
             if(!urlHint.length) {

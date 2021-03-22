@@ -9,7 +9,7 @@
 #import "DebugHelper.h"
 #import "SafesList.h"
 #import "Settings.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "Utils.h"
 #import "git-version.h"
 #import "FileManager.h"
@@ -35,17 +35,22 @@
 + (NSArray<NSString*>*)getDebugLines {
     NSMutableArray<NSString*>* debugLines = [NSMutableArray array];
     
-    [debugLines addObject:[NSString stringWithFormat:@"Strongbox Debug Information at %@", NSDate.date.friendlyDateTimeStringBothPrecise]];
+    [debugLines addObject:[NSString stringWithFormat:@"Strongbox %@ Debug Information at %@", [Utils getAppVersion], NSDate.date.friendlyDateTimeStringBothPrecise]];
     [debugLines addObject:@"--------------------"];
+    
+    
+    
+    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION]];
 
     
-    
+
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Device"];
+    [debugLines addObject:@"--------------------"];
+
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
-    NSString* pro = [[SharedAppAndAutoFillSettings sharedInstance] isPro] ? @"P" : @"";
-    NSString* isFreeTrial = [[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial] ? @"F" : @"";
-    long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
 
     const NXArchInfo *info = NXGetLocalArchInfo();
     NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
@@ -54,9 +59,31 @@
     [debugLines addObject:[NSString stringWithFormat:@"CPU: %@", typeOfCpu]];
     [debugLines addObject:[NSString stringWithFormat:@"System Name: %@", systemName]];
     [debugLines addObject:[NSString stringWithFormat:@"System Version: %@", systemVersion]];
+
+    
+
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Preferences"];
+    [debugLines addObject:@"--------------------"];
+
+    NSUserDefaults *defs = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    NSDictionary* prefs = [defs persistentDomainForName:AppPreferences.sharedInstance.appGroupName];
+    
+    for (NSString* pref in prefs) {
+        [debugLines addObject:[NSString stringWithFormat:@"%@: %@", pref, [defs valueForKey:pref]]];
+    }
+    
+    NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
+    NSString* isFreeTrial = [[AppPreferences sharedInstance] isFreeTrial] ? @"F" : @"";
+    long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
     [debugLines addObject:[NSString stringWithFormat:@"Ep: %ld", epoch]];
     [debugLines addObject:[NSString stringWithFormat:@"Flags: %@%@%@", pro, isFreeTrial, [Settings.sharedInstance getFlagsStringForDiagnostics]]];
-    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION]];
+
+    
+
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Last Crash"];
+    [debugLines addObject:@"--------------------"];
 
     if ([NSFileManager.defaultManager fileExistsAtPath:FileManager.sharedInstance.archivedCrashFile.path]) {
         NSData* crashFileData = [NSData dataWithContentsOfURL:FileManager.sharedInstance.archivedCrashFile];
@@ -64,6 +91,8 @@
         [debugLines addObject:[NSString stringWithFormat:@"JSON Crash:%@", jsonCrash]];
     }
 
+    [debugLines addObject:@"--------------------"];
+    [debugLines addObject:@"Sync"];
     [debugLines addObject:@"--------------------"];
 
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {

@@ -39,13 +39,18 @@
 }
 
 - (void)bindUI {
-    self.enableTouchId.state = self.database.isTouchIdEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    BOOL convenienceEnabled = self.database.isTouchIdEnabled || self.database.isWatchUnlockEnabled;
+    
+    self.enableTouchId.state = convenienceEnabled ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (IBAction)onPreferencesChanged:(id)sender {
-    self.database.isTouchIdEnabled = self.enableTouchId.state == NSControlStateValueOn;
+    BOOL enable = self.enableTouchId.state == NSControlStateValueOn;
     
-    if(self.database.isTouchIdEnabled) {
+    self.database.isTouchIdEnabled = enable;
+    self.database.isWatchUnlockEnabled = enable;
+
+    if ( enable ) {
         self.database.isTouchIdEnrolled = YES;
         [self.database resetConveniencePasswordWithCurrentConfiguration:self.ckfs.password];
     }

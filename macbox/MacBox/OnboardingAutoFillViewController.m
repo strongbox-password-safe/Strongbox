@@ -19,6 +19,7 @@
 @property (weak) IBOutlet NSButton *enableExtension;
 @property (weak) IBOutlet NSStackView *stackView;
 @property (weak) IBOutlet NSTextField *labelSystemExtensionNaviagtionHelp;
+@property BOOL isOnForStrongbox;
 
 @end
 
@@ -30,7 +31,16 @@
     [self.stackView setCustomSpacing:8 afterView:self.enableExtension];
     [self.stackView setCustomSpacing:24 afterView:self.labelSystemExtensionNaviagtionHelp];
     
+    self.isOnForStrongbox = AutoFillManager.sharedInstance.isOnForStrongbox; 
     [self bindUI];
+
+    
+
+    __weak id weakSelf = self;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.isOnForStrongbox = AutoFillManager.sharedInstance.isOnForStrongbox; 
+        [weakSelf bindUI];
+    });
 }
 
 - (void)viewWillAppear {
@@ -40,22 +50,18 @@
 }
 
 - (void)bindUI {
-    self.enableExtension.state = AutoFillManager.sharedInstance.isOnForStrongbox ? NSControlStateValueOn : NSControlStateValueOff;
-    self.labelSystemExtensionNaviagtionHelp.textColor = AutoFillManager.sharedInstance.isOnForStrongbox ? NSColor.secondaryLabelColor : nil;
-    
+    self.enableExtension.enabled = AutoFillManager.sharedInstance.isPossible && !self.isOnForStrongbox;
+    self.enableExtension.state = self.isOnForStrongbox ? NSControlStateValueOn : NSControlStateValueOff;
+    self.labelSystemExtensionNaviagtionHelp.textColor = self.isOnForStrongbox ? NSColor.secondaryLabelColor : nil;
+
+    self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox;
     self.enableAutoFill.state = self.database.autoFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    self.enableQuickType.state = self.database.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    self.wormholeEnabled.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox && self.database.autoFillEnabled;
     self.wormholeEnabled.state = self.database.quickWormholeFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-
-    self.enableExtension.enabled = AutoFillManager.sharedInstance.isPossible && !AutoFillManager.sharedInstance.isOnForStrongbox;
-    self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox;
-    self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.database.autoFillEnabled;
-    self.wormholeEnabled.enabled = AutoFillManager.sharedInstance.isPossible && AutoFillManager.sharedInstance.isOnForStrongbox && self.database.autoFillEnabled && self.database.quickTypeEnabled;
-
-    __weak id weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [weakSelf bindUI];
-    });
+    
+    self.enableQuickType.state = self.database.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox && self.database.autoFillEnabled;
 }
 
 - (IBAction)onPreferencesChanged:(id)sender {

@@ -9,7 +9,7 @@
 #import "GettingStartedInitialViewController.h"
 #import "AutoFillManager.h"
 #import "Settings.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "WelcomeUseICloudViewController.h"
 #import "WelcomeAddDatabaseViewController.h"
 #import "TurnOnAutoFillViewController.h"
@@ -64,7 +64,7 @@
 
 - (IBAction)onOKLetsDoIt:(id)sender {
     if(Settings.sharedInstance.iCloudAvailable &&
-       !SharedAppAndAutoFillSettings.sharedInstance.iCloudOn) {
+       !AppPreferences.sharedInstance.iCloudOn) {
         [self performSegueWithIdentifier:@"segueToUseICloud" sender:nil];
     }
     else {

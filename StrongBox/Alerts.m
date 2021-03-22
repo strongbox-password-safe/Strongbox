@@ -8,7 +8,7 @@
 
 #import "Alerts.h"
 #import "utils.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 #if TARGET_OS_IPHONE
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -630,12 +630,10 @@
 }
 
 + (void)checkThirdPartyLibOptInOK:(UIViewController *)viewController completion:(void (^)(BOOL optInOk))completion {
-    if ( SharedAppAndAutoFillSettings.sharedInstance.userHasOptedInToThirdPartyStorageLibraries ) {
+    if ( AppPreferences.sharedInstance.userHasOptedInToThirdPartyStorageLibraries ) {
         completion(YES);
         return;
     }
-     
-    
     
     [Alerts oneOptionsWithCancel:viewController
                            title:NSLocalizedString(@"third_party_storage_privacy_opt_in_title", @"Third Party Storage Privacy Opt-In")
@@ -643,7 +641,7 @@
                       buttonText:NSLocalizedString(@"third_party_storage_privacy_option_opt_in", @"That's cool, opt in...")
                           action:^(BOOL response) {
         if ( response ) {
-            SharedAppAndAutoFillSettings.sharedInstance.userHasOptedInToThirdPartyStorageLibraries = YES;
+            AppPreferences.sharedInstance.userHasOptedInToThirdPartyStorageLibraries = YES;
         }
         
         completion(response);

@@ -16,7 +16,7 @@
 #import "Utils.h"
 #import "DatabaseSearchAndSorter.h"
 #import "BrowseTableViewCellHelper.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface KeePassHistoryController ()
 
@@ -34,7 +34,7 @@
     
     
     
-    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
+    if(AppPreferences.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     else {

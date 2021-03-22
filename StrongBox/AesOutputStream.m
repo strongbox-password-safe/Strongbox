@@ -16,6 +16,7 @@
 @property CCCryptorRef *cryptor;
 @property NSError* error;
 
+
 @end
 
 @implementation AesOutputStream
@@ -81,6 +82,7 @@
 
 - (NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
     size_t encRequired = CCCryptorGetOutputLength(*_cryptor, len, NO);
+    
     uint8_t* encBlock = malloc(encRequired);
     size_t encWritten;
 
@@ -92,8 +94,13 @@
         return - 1;
     }
 
-    NSInteger ret = [self.outputStream write:encBlock maxLength:encWritten];
+    NSInteger ret = 0;
+    if ( encWritten > 0 ) { 
+        ret = [self.outputStream write:encBlock maxLength:encWritten];
 
+
+    }
+    
     free(encBlock);
     
     return ret;

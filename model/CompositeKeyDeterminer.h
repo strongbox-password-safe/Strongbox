@@ -44,6 +44,8 @@ typedef void(^CompositeKeyDeterminedBlock)(GetCompositeKeyResult result, Composi
 
 - (void)getCredentials:(CompositeKeyDeterminedBlock)completion;
 
+@property (readonly) BOOL isAutoFillConvenienceAutoLockPossible;
+
 @end
 
 NS_ASSUME_NONNULL_END

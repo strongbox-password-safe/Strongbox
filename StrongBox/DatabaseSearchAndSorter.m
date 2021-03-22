@@ -81,7 +81,27 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
         includeRecycleBin:(BOOL)includeRecycleBin
            includeExpired:(BOOL)includeExpired
             includeGroups:(BOOL)includeGroups {
-    return [self searchNodes:self.database.effectiveRootGroup.allChildren
+    return [self search:searchText
+                  scope:scope
+            dereference:dereference
+  includeKeePass1Backup:includeKeePass1Backup
+      includeRecycleBin:includeRecycleBin
+         includeExpired:includeExpired
+          includeGroups:includeGroups
+               trueRoot:NO];
+}
+
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(SearchScope)scope
+              dereference:(BOOL)dereference
+    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups
+                 trueRoot:(BOOL)trueRoot {
+    NSArray<Node*>* nodes = trueRoot ? self.database.allSearchableTrueRoot : self.database.allSearchable;
+    
+    return [self searchNodes:nodes
                   searchText:searchText
                        scope:scope
                  dereference:dereference

@@ -176,7 +176,7 @@
         return @"google-drive-2021";
     }
     else if (provider == kDropbox) {
-        return @"dropbox-blue-32x32-nologo";
+        return @"Dropbox-2021";
     }
     else if (provider == kiCloud) {
         return @"cloud";
@@ -185,7 +185,7 @@
         return @"iphone_x";
     }
     else if(provider == kOneDrive) {
-        return @"one-drive-icon-only-32x32";
+        return @"onedrive-2021";
     }
     else if(provider == kFilesAppUrlBookmark) {
         return @"lock";

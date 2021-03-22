@@ -10,8 +10,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString* const kAutoFillWormholeRequestId;
-extern NSString* const kAutoFillWormholeResponseId;
+extern NSString* const kAutoFillWormholeQuickTypeRequestId;
+extern NSString* const kAutoFillWormholeQuickTypeResponseId;
+
+extern NSString* const kAutoFillWormholeDatabaseStatusRequestId;
+extern NSString* const kAutoFillWormholeDatabaseStatusResponseId;
+
+extern NSString* const kAutoFillWormholeConvUnlockRequestId;
+extern NSString* const kAutoFillWormholeConvUnlockResponseId;
+
 extern NSString* const kAutoFillWormholeName;
 
 @interface AutoFillWormhole : NSObject

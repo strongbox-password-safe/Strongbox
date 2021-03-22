@@ -9,7 +9,7 @@
 #import "Settings.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 static NSString* const kLaunchCountKey = @"launchCount";
 
@@ -88,13 +88,13 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 }
 
 - (NSString*)getString:(NSString*)key fallback:(NSString*)fallback {
-    NSString* obj = [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:key];
+    NSString* obj = [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:key];
     return obj != nil ? obj : fallback;
 }
 
 - (void)setString:(NSString*)key value:(NSString*)value {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setObject:value forKey:key];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setObject:value forKey:key];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (BOOL)getBool:(NSString*)key {
@@ -102,27 +102,27 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 }
 
 - (BOOL)getBool:(NSString*)key fallback:(BOOL)fallback {
-    NSNumber* obj = [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:key];
+    NSNumber* obj = [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:key];
     return obj != nil ? obj.boolValue : fallback;
 }
 
 - (void)setBool:(NSString*)key value:(BOOL)value {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setBool:value forKey:key];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:value forKey:key];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (NSInteger)getInteger:(NSString*)key {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults integerForKey:key];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:key];
 }
 
 - (NSInteger)getInteger:(NSString*)key fallback:(NSInteger)fallback {
-    NSNumber* obj = [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:key];
+    NSNumber* obj = [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:key];
     return obj != nil ? obj.integerValue : fallback;
 }
 
 - (void)setInteger:(NSString*)key value:(NSInteger)value {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setInteger:value forKey:key];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:value forKey:key];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 
@@ -167,29 +167,29 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
     return [self setBool:kBackupIncludeImportedKeyFiles value:backupIncludeImportedKeyFiles];
 }
 - (NSDate *)lastFreeTrialNudge {
-    NSDate* date = [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:kLastFreeTrialNudge];
+    NSDate* date = [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kLastFreeTrialNudge];
     return date ? date : NSDate.date; 
 }
 
 - (void)setLastFreeTrialNudge:(NSDate *)lastFreeTrialNudge {
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     [userDefaults setObject:lastFreeTrialNudge forKey:kLastFreeTrialNudge];
     [userDefaults synchronize];
 }
 
 - (NSDate*)installDate {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:kInstallDate];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kInstallDate];
 }
 
 - (void)setInstallDate:(NSDate *)installDate {
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     
     [userDefaults setObject:installDate forKey:kInstallDate];
     [userDefaults synchronize];
 }
 
 - (void)clearInstallDate {
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     
     [userDefaults removeObjectForKey:kInstallDate];
     [userDefaults synchronize];
@@ -216,7 +216,7 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 
 - (NSInteger)getLaunchCount
 {
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     
     NSInteger launchCount = [userDefaults integerForKey:kLaunchCountKey];
     
@@ -224,7 +224,7 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 }
 
 - (void)resetLaunchCount {
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     
     [userDefaults removeObjectForKey:kLaunchCountKey];
     
@@ -238,57 +238,57 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
     
     NSLog(@"Application has been launched %ld times", (long)launchCount);
     
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     [userDefaults setInteger:launchCount forKey:kLaunchCountKey];
     
     [userDefaults synchronize];
 }
 
 - (BOOL)iCloudWasOn {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudWasOn];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudWasOn];
 }
 
 -(void)setICloudWasOn:(BOOL)iCloudWasOn {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setBool:iCloudWasOn forKey:kiCloudWasOn];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:iCloudWasOn forKey:kiCloudWasOn];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (BOOL)iCloudPrompted {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudPrompted];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudPrompted];
 }
 
 - (void)setICloudPrompted:(BOOL)iCloudPrompted {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setBool:iCloudPrompted forKey:kiCloudPrompted];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:iCloudPrompted forKey:kiCloudPrompted];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 
 
 - (NSString*)getFlagsStringForDiagnostics {
     return [NSString stringWithFormat:@"[%d[%ld]%d%d%d[%ld]%d%d%d%d]",
-            SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial,
-            (long)SharedAppAndAutoFillSettings.sharedInstance.freeTrialDaysLeft,
-            SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial,
-            SharedAppAndAutoFillSettings.sharedInstance.isPro,
-            SharedAppAndAutoFillSettings.sharedInstance.isFreeTrial,
+            AppPreferences.sharedInstance.hasOptedInToFreeTrial,
+            (long)AppPreferences.sharedInstance.freeTrialDaysLeft,
+            AppPreferences.sharedInstance.isProOrFreeTrial,
+            AppPreferences.sharedInstance.isPro,
+            AppPreferences.sharedInstance.isFreeTrial,
             (long)self.getLaunchCount,
-            SharedAppAndAutoFillSettings.sharedInstance.iCloudOn,
+            AppPreferences.sharedInstance.iCloudOn,
             self.iCloudWasOn,
             self.iCloudPrompted,
             self.iCloudAvailable];
 }
 
 - (BOOL)showKeePassCreateSafeOptions {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults boolForKey:kShowKeePassCreateSafeOptions];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kShowKeePassCreateSafeOptions];
 }
 
 - (void)setShowKeePassCreateSafeOptions:(BOOL)showKeePassCreateSafeOptions {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (NSDate *)lastEntitlementCheckAttempt {
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     
     
     
@@ -296,7 +296,7 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 }
 
 - (void)setLastEntitlementCheckAttempt:(NSDate *)lastEntitlementCheckAttempt {
-    NSUserDefaults *userDefaults = SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults;
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     
     [userDefaults setObject:lastEntitlementCheckAttempt forKey:kLastEntitlementCheckAttempt];
     
@@ -304,62 +304,62 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 }
 
 - (NSUInteger)numberOfEntitlementCheckFails {
-    NSInteger ret =  [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults integerForKey:kNumberOfEntitlementCheckFails];
+    NSInteger ret =  [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kNumberOfEntitlementCheckFails];
     return ret;
 }
 
 
 - (void)setNumberOfEntitlementCheckFails:(NSUInteger)numberOfEntitlementCheckFails {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 
 
 - (AppLockMode)appLockMode {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults integerForKey:kAppLockMode];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kAppLockMode];
 }
 
 - (void)setAppLockMode:(AppLockMode)appLockMode {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setInteger:appLockMode forKey:kAppLockMode];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:appLockMode forKey:kAppLockMode];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (NSString *)appLockPin {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults objectForKey:kAppLockPin];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kAppLockPin];
 }
 
 -(void)setAppLockPin:(NSString *)appLockPin {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setObject:appLockPin forKey:kAppLockPin];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setObject:appLockPin forKey:kAppLockPin];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (NSInteger)appLockDelay {
-    NSInteger ret =  [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults integerForKey:kAppLockDelay];
+    NSInteger ret =  [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kAppLockDelay];
     return ret;
 }
 
 -(void)setAppLockDelay:(NSInteger)appLockDelay {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setInteger:appLockDelay forKey:kAppLockDelay];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:appLockDelay forKey:kAppLockDelay];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (NSInteger)deleteDataAfterFailedUnlockCount {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults integerForKey:kDeleteDataAfterFailedUnlockCount];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kDeleteDataAfterFailedUnlockCount];
 }
 
 - (void)setDeleteDataAfterFailedUnlockCount:(NSInteger)deleteDataAfterFailedUnlockCount {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setInteger:deleteDataAfterFailedUnlockCount forKey:kDeleteDataAfterFailedUnlockCount];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:deleteDataAfterFailedUnlockCount forKey:kDeleteDataAfterFailedUnlockCount];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (NSUInteger)failedUnlockAttempts {
-    return [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults integerForKey:kFailedUnlockAttempts];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kFailedUnlockAttempts];
 }
 
 - (void)setFailedUnlockAttempts:(NSUInteger)failedUnlockAttempts {
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults setInteger:failedUnlockAttempts forKey:kFailedUnlockAttempts];
-    [SharedAppAndAutoFillSettings.sharedInstance.sharedAppGroupDefaults synchronize];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:failedUnlockAttempts forKey:kFailedUnlockAttempts];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
 }
 
 - (BOOL)appLockAppliesToPreferences {

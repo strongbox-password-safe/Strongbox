@@ -58,10 +58,8 @@
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.inProgressBehaviour = kInProgressBehaviourJoin;
-
-    
-    params.syncForcePushDoNotCheckForConflicts = YES;
-    params.syncPullEvenIfModifiedDateSame = YES;
+    params.syncForcePushDoNotCheckForConflicts = NO;
+    params.syncPullEvenIfModifiedDateSame = NO;
 
     NSLog(@"BACKGROUND SYNC Start: [%@]", database.nickName);
 
@@ -82,10 +80,8 @@
     params.interactiveVC = interactiveVC;
     params.key = key;
     params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
-    
-    
-    params.syncForcePushDoNotCheckForConflicts = YES;
-    params.syncPullEvenIfModifiedDateSame = YES;
+    params.syncForcePushDoNotCheckForConflicts = NO;
+    params.syncPullEvenIfModifiedDateSame = NO;
 
     [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database
                                                  parameters:params

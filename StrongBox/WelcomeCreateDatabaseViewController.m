@@ -98,14 +98,15 @@
 }
 
 - (BOOL)nameIsValid {
-    return [SafesList.sharedInstance isValidNickName:trim(self.textFieldName.text)];
+    NSString* sanitized = [SafesList trimDatabaseNickName:self.textFieldName.text];
+    return [SafesList.sharedInstance isValid:sanitized] && [SafesList.sharedInstance isUnique:sanitized];
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToMasterPassword"]) {
         WelcomeMasterPasswordViewController* vc = (WelcomeMasterPasswordViewController*)segue.destinationViewController;
         
-        vc.name = [SafesList sanitizeSafeNickName:self.textFieldName.text];
+        vc.name = [SafesList trimDatabaseNickName:self.textFieldName.text];
         vc.onDone = self.onDone;
     }
 }

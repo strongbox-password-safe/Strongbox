@@ -19,79 +19,105 @@
 
 @interface DatabaseConvenienceUnlockPreferences ()
 
-@property (weak) IBOutlet NSTextField *textFieldPath;
-@property (weak) IBOutlet NSTextField *textFieldDatabaseName;
-@property (weak) IBOutlet NSTextField *textFieldKeyFile;
 @property (weak) IBOutlet NSButton *checkboxUseTouchId;
 @property (weak) IBOutlet NSSlider *sliderExpiry;
 @property (weak) IBOutlet NSTextField *labelExpiryPeriod;
 @property (weak) IBOutlet NSTextField *passwordStorageSummary;
 @property (weak) IBOutlet NSTextField *labelRequireReentry;
-@property (weak) IBOutlet NSTextField *labelHeaderConvenienceUnlock;
+@property (weak) IBOutlet NSButton *checkBoxEnableWatch;
+@property (weak) IBOutlet NSButton *checkboxAutomaticallyPrompt;
 
 @property NSArray<NSNumber*>* sliderNotches;
+
 @end
 
 @implementation DatabaseConvenienceUnlockPreferences
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-
-    self.sliderNotches = @[@0, @1, @2, @3, @4, @8, @24, @48, @72, @96, @(1*7*24), @(2*7*24), @(3*7*24), @(4*7*24), @(5*7*24), @(6*7*24), @(7*7*24), @(8*7*24), @(12*7*24), @-1];
-}
-
 - (void)viewDidAppear {
     [super viewDidAppear];
+
+    self.sliderNotches = @[@0, @1, @2, @3, @4, @8, @24, @48, @72, @96, @(1*7*24), @(2*7*24), @(3*7*24), @(4*7*24), @(5*7*24), @(6*7*24), @(7*7*24), @(8*7*24), @(12*7*24), @-1];
+
+    [self bindUi];
+}
+
+- (IBAction)onSettingChanged:(id)sender {
+    self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate = self.checkboxAutomaticallyPrompt.state == NSControlStateValueOn;
+    
+    [DatabasesManager.sharedInstance update:self.databaseMetadata];
     
     [self bindUi];
 }
 
 - (void)bindUi {
-    self.textFieldDatabaseName.stringValue = self.databaseMetadata.nickName;
-    
-    NSURL* url = [BookmarksHelper getExpressUrlFromBookmark:self.databaseMetadata.storageInfo];
-
-    self.textFieldPath.stringValue = url ? url.path : NSLocalizedString(@"generic_unknown", @"Unknown");
-    
-    self.textFieldKeyFile.stringValue = self.databaseMetadata.keyFileBookmark ?
-        [BookmarksHelper getExpressUrlFromBookmark:self.databaseMetadata.keyFileBookmark].absoluteString :
-        NSLocalizedString(@"mac_key_file_none", @"None");
-    
-    BOOL bioAvailable = BiometricIdHelper.sharedInstance.biometricIdAvailable;
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL convenienceAvailable = watchAvailable || touchAvailable;
     BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
-    
-    if(featureAvailable) {
-        self.labelHeaderConvenienceUnlock.stringValue = bioAvailable ?
-            NSLocalizedString(@"mac_convenience_unlock_title", @"Convenience Unlock") :
-            NSLocalizedString(@"mac_convenience_unlock_title_bio_unavailable", @"Convenience Unlock (Biometrics/Watch Unavailable)");
+    BOOL conveniencePossible = convenienceAvailable && featureAvailable;
+
+    if ( BiometricIdHelper.sharedInstance.isWatchUnlockAvailable ) {
+        self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock", @"Watch Unlock");
     }
     else {
-        self.labelHeaderConvenienceUnlock.stringValue = NSLocalizedString(@"mac_convenience_unlock_title_pro_only", @"Convenience Unlock (Pro Feature Only)");
+        self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Preferences > Security & Privacy)");
     }
+        
+    self.checkboxUseTouchId.enabled = touchAvailable && featureAvailable;
+    self.checkboxUseTouchId.state = self.databaseMetadata.isTouchIdEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkBoxEnableWatch.enabled = watchAvailable && featureAvailable;
+    self.checkBoxEnableWatch.state = self.databaseMetadata.isWatchUnlockEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     
-    BOOL conveniencePossible = bioAvailable && featureAvailable;
+    BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
     
-    self.checkboxUseTouchId.enabled = conveniencePossible;
-    self.checkboxUseTouchId.state = self.databaseMetadata.isTouchIdEnabled ? NSOnState : NSOffState;
-    
-    self.sliderExpiry.enabled = conveniencePossible && self.databaseMetadata.isTouchIdEnabled;
+    self.checkboxAutomaticallyPrompt.enabled = convenienceEnabled;
+    self.checkboxAutomaticallyPrompt.state = self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate ? NSControlStateValueOn : NSControlStateValueOff;
+
+    self.sliderExpiry.enabled = conveniencePossible && convenienceEnabled;
     self.sliderExpiry.integerValue = [self getSliderValueFromHours:self.databaseMetadata.touchIdPasswordExpiryPeriodHours];
     
     self.labelExpiryPeriod.stringValue = [self getExpiryPeriodString:self.databaseMetadata.touchIdPasswordExpiryPeriodHours];
-    self.labelExpiryPeriod.textColor = (conveniencePossible && self.databaseMetadata.isTouchIdEnabled) ? nil : NSColor.disabledControlTextColor;
-    self.labelRequireReentry.textColor = (conveniencePossible && self.databaseMetadata.isTouchIdEnabled) ? nil : NSColor.disabledControlTextColor;
+    self.labelExpiryPeriod.textColor = (conveniencePossible && convenienceEnabled) ? nil : NSColor.disabledControlTextColor;
+    self.labelRequireReentry.textColor = (conveniencePossible && convenienceEnabled) ? nil : NSColor.disabledControlTextColor;
     
     self.passwordStorageSummary.textColor = conveniencePossible ? nil : NSColor.disabledControlTextColor;
     self.passwordStorageSummary.stringValue = [self getSecureStorageSummary];
 }
 
+- (IBAction)onConvenienceUnlockMethodsChanged:(id)sender {
+    BOOL wasOff = !self.databaseMetadata.isTouchIdEnrolled;
+    
+    BOOL touch = self.checkboxUseTouchId.state == NSControlStateValueOn;
+    BOOL watch = self.checkBoxEnableWatch.state == NSControlStateValueOn;
+    BOOL on = touch || watch;
+    
+    self.databaseMetadata.isTouchIdEnabled = touch;
+    self.databaseMetadata.isWatchUnlockEnabled = watch;
+    self.databaseMetadata.isTouchIdEnrolled = on;
+    
+    if ( on && wasOff )  {
+        self.databaseMetadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
+    }
+    
+    [DatabasesManager.sharedInstance update:self.databaseMetadata];
+    
+    [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.databaseModel.ckfs.password];
+    
+    [self bindUi];
+}
+
 - (NSString*)getSecureStorageSummary {
     BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
-
-    if(featureAvailable) {
-        if(BiometricIdHelper.sharedInstance.biometricIdAvailable) {
-            if(self.databaseMetadata.isTouchIdEnabled) {
-                if(self.databaseMetadata.conveniencePassword != nil) {
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL convenienceAvailable = watchAvailable || touchAvailable;
+    BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
+    BOOL passwordAvailable = self.databaseMetadata.conveniencePassword != nil;
+    
+    if( featureAvailable ) {
+        if( convenienceAvailable ) {
+            if( convenienceEnabled ) {
+                if( passwordAvailable ) {
                     SecretExpiryMode mode = [self.databaseMetadata getConveniencePasswordExpiryMode];
                     if (mode == kExpiresAtTime) {
                         NSDate* date = [self.databaseMetadata getConveniencePasswordExpiryDate];
@@ -160,22 +186,6 @@
         
         return [fmt stringFromTimeInterval:expiryPeriodInHours * 60 * 60];
     }
-}
-
-- (IBAction)onTouchIdToggled:(id)sender {
-    if (self.checkboxUseTouchId.state == NSOnState) {
-        self.databaseMetadata.isTouchIdEnabled = YES;
-        self.databaseMetadata.isTouchIdEnrolled = YES;
-        self.databaseMetadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
-    }
-    else {
-        self.databaseMetadata.isTouchIdEnrolled = NO;
-        self.databaseMetadata.isTouchIdEnabled = NO;
-    }
-    
-    [DatabasesManager.sharedInstance update:self.databaseMetadata];
-    [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.databaseModel.ckfs.password];
-    [self bindUi];
 }
 
 - (IBAction)onSlider:(id)sender {

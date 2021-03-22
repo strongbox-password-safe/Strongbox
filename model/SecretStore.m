@@ -219,7 +219,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         NSDate* expiry = wrapped[kWrappedObjectExpiryKey];
         
         if([self entryIsExpired:expiry]) {
-            NSLog(@"Entry is present but expired [%@]... Cleaning up from secure store...", expiry);
+
 
             if(expired) {
                 *expired = YES;

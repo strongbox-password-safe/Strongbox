@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString* tmpEncryptedAttachmentPath;
 @property (readonly) NSString* tmpAttachmentPreviewPath;
 @property (readonly) NSURL* syncManagerLocalWorkingCachesDirectory;
+@property (readonly) NSURL* syncManagerMergeWorkingDirectory;
 
 - (void)deleteAllTmpAttachmentPreviewFiles;
 

@@ -23,35 +23,6 @@
     return sharedInstance;
 }
 
-
-
-
-
-
-
-
-
-- (BOOL)biometricIdAvailable {
-    if(self.dummyMode) {
-        return YES;
-    }
-    
-    if ( @available (macOS 10.12.1, *)) {
-        LAContext *localAuthContext = [[LAContext alloc] init];
-        
-        NSError *authError;
-        
-        
-        BOOL ret = [localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError];
-        
-        NSLog(@"DEBUG: Biometric available: [%d][%@]", ret, authError);
-        
-        return ret;
-    }
-    
-    return NO;
-}
-
 - (BOOL)isWatchUnlockAvailable {
     if(self.dummyMode) {
         return YES;
@@ -60,7 +31,11 @@
     if ( @available(macOS 10.15, *) ) {
         LAContext *localAuthContext = [[LAContext alloc] init];
         NSError *authError;
-        return [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithWatch error:&authError];
+        BOOL ret = [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithWatch error:&authError];
+        
+        NSLog(@"DEBUG: Watch Unlock available: [%d][%@]", ret, authError);
+        
+        return ret;
     }
     
     return NO;
@@ -80,26 +55,44 @@
     return NO;
 }
 
-- (NSUInteger)getLAPolicy {
-    if ( @available(macOS 10.15, *) ) {
-        return Settings.sharedInstance.allowWatchUnlock ? LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch : LAPolicyDeviceOwnerAuthenticationWithBiometrics;
+- (BOOL)convenienceAvailable:(DatabaseMetadata *)database {
+    if(self.dummyMode) {
+        return YES;
     }
-    else {
+
+    if ( !database.isTouchIdEnabled && !database.isWatchUnlockEnabled ) {
+        return NO;
+    }
+    
+    NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
+ 
+    LAContext *localAuthContext = [[LAContext alloc] init];
+    NSError *authError;
+    return [localAuthContext canEvaluatePolicy:policy error:&authError];
+}
+
+- (NSUInteger)getLAPolicy:(BOOL)touch watch:(BOOL)watch {
+    if ( @available(macOS 10.15, *) ) {
+        if ( touch && watch ) {
+            return LAPolicyDeviceOwnerAuthenticationWithBiometricsOrWatch;
+        }
+        
+        if ( watch ) {
+            return LAPolicyDeviceOwnerAuthenticationWithWatch;
+        }
+        
+        return LAPolicyDeviceOwnerAuthenticationWithBiometrics;
+    }
+    else { 
         return LAPolicyDeviceOwnerAuthenticationWithBiometrics;
     }
 }
 
-- (NSString*)biometricIdName {
-    NSString* loc = NSLocalizedString(@"settings_touch_id_name", @"Touch ID");
-    NSString* biometricIdName = loc;
-    return biometricIdName;
+- (void)authorize:(DatabaseMetadata *)database completion:(void (^)(BOOL, NSError *))completion {
+    [self authorize:nil database:database completion:completion];
 }
 
-- (void)authorize:(void (^)(BOOL success, NSError *error))completion {
-    [self authorize:nil completion:completion];
-}
-
-- (void)authorize:(NSString *)fallbackTitle completion:(void (^)(BOOL, NSError *))completion {
+- (void)authorize:(NSString *)fallbackTitle database:(DatabaseMetadata *)database completion:(void (^)(BOOL, NSError *))completion {
     if(self.dummyMode) {
         completion(YES, nil);
         return;
@@ -107,6 +100,11 @@
     
     if(self.biometricsInProgress) {
         completion(NO, [Utils createNSError:@"Already a biometrics request in progress, cannot instantiate 2" errorCode:-2412]);
+        return;
+    }
+    
+    if ( !database.isTouchIdEnabled && !database.isWatchUnlockEnabled ) {
+        completion(NO, [Utils createNSError:@"Neither touch nor watch enabled for this database." errorCode:-2412]);
         return;
     }
     
@@ -120,10 +118,12 @@
         NSString* loc = NSLocalizedString(@"mac_biometrics_identify_to_open_database", @"Identify to Unlock Database");
         
         NSError *authError;
-        if([localAuthContext canEvaluatePolicy:[self getLAPolicy] error:&authError]) {
+        NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
+        
+        if([localAuthContext canEvaluatePolicy:policy error:&authError]) {
             self.biometricsInProgress = YES;
             
-            [localAuthContext evaluatePolicy:[self getLAPolicy]
+            [localAuthContext evaluatePolicy:policy
                              localizedReason:loc
                                        reply:^(BOOL success, NSError *error) {
                                            completion(success, error);

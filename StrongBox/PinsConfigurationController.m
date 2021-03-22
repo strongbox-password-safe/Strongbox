@@ -9,7 +9,7 @@
 #import "PinsConfigurationController.h"
 #import "PinEntryController.h"
 #import "Alerts.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface PinsConfigurationController ()
 
@@ -100,7 +100,7 @@
         self.labelRemoveDatabaseWarning.textColor = [UIColor systemOrangeColor];
     }
     
-    if(!SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+    if(!AppPreferences.sharedInstance.isProOrFreeTrial) {
         self.buttonPinOnOff.enabled = NO;
         self.buttonChangePin.enabled = NO;
         self.buttonDuressPinOnOff.enabled = NO;
@@ -114,7 +114,7 @@
         self.cellDuressActionRemoveDatabase.textLabel.enabled = NO;
     }
     
-    if(!SharedAppAndAutoFillSettings.sharedInstance.isPro) {
+    if(!AppPreferences.sharedInstance.isPro) {
         if (@available(iOS 11.0, *)) {
             self.navigationController.navigationBar.prefersLargeTitles = NO;
         }

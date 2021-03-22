@@ -43,7 +43,6 @@
     
 }
 
-
 - (NSMenu*) menuForEvent:(NSEvent*)event {
     if (self.rightClickSelectsItem) {
         
@@ -58,6 +57,13 @@
     }
     
     return [super menuForEvent:event];
+}
+
+
+
+
+- (BOOL)validateProposedFirstResponder:(NSResponder *)responder forEvent:(NSEvent *)event {
+    return YES;
 }
 
 @end

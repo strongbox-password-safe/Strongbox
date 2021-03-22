@@ -124,41 +124,6 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
     }];
 }
 
-- (void)openDocument:(id)sender {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    NSLog(@"openDocument: document count = [%ld]", self.documents.count);
-    
-    if ( self.hasDoneAppStartupTasks ) {
-        NSLog(@"openDocument - regular call - Once off startup tasks are done.");
-        
-        
-        
-        
-        if( self.documents.count == 0 && DatabasesManager.sharedInstance.snapshot.count == 0 && NSApplication.sharedApplication.keyWindow == nil ) {
-            [self performEmptyLaunchTasksIfNecessary];
-        }
-        else {
-            [self originalOpenDocument:sender];
-        }
-    }
-    else {
-        NSLog(@"openDocument - startup call - Doing once off startup tasks are done.");
-
-        [self doAppStartupTasksOnceOnly];
-    }
-}
-
 - (void)originalOpenDocument:(id)sender {
     return [super openDocument:sender];
 }
@@ -232,8 +197,48 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
     return [super typeForContentsOfURL:url error:outError];
 }
 
+- (void)openDocument:(id)sender {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    NSLog(@"openDocument: document count = [%ld]", self.documents.count);
+    
+    if ( self.hasDoneAppStartupTasks ) {
+        NSWindow* keyWindow = NSApplication.sharedApplication.keyWindow;
+        
+        NSLog(@"openDocument - regular call - Once off startup tasks are done. - Key Window = [%@]", keyWindow);
+        
+        
+        
+         
+        if( 
+            
+            NSApplication.sharedApplication.keyWindow == nil ) {
+            NSLog(@"No open docs and no key window => Do empty launch tasks");
+            [self performEmptyLaunchTasksIfNecessary];
+        }
+        else {
+            [self originalOpenDocument:sender];
+        }
+    }
+    else {
+        NSLog(@"openDocument - startup call - Doing once off startup tasks are done.");
+
+        [self doAppStartupTasksOnceOnly];
+    }
+}
+
 - (void)onAppStartup {
-    NSLog(@"onAppStartup: document count = [%ld]", self.documents.count);
+    NSLog(@"applicationDidFinishLaunching => onAppStartup: document count = [%ld]", self.documents.count);
 
     [self doAppStartupTasksOnceOnly];
 }

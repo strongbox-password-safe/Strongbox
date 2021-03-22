@@ -43,8 +43,8 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 static const NSInteger kTopLevelMenuItemTagFile = 1111;
 static const NSInteger kTopLevelMenuItemTagView = 1113;
-static const NSInteger kTopLevelMenuItemTagDatabase = 1114;
-static const NSInteger kTopLevelMenuItemTagItem = 1115;
+
+
 
 @interface AppDelegate () 
 

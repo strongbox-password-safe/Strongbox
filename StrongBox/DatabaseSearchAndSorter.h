@@ -44,6 +44,15 @@ typedef BOOL (^FlaggedByAuditPredicate)(Node* node);
            includeExpired:(BOOL)includeExpired
             includeGroups:(BOOL)includeGroups;
 
+- (NSArray<Node*>*)search:(NSString *)searchText
+                    scope:(SearchScope)scope
+              dereference:(BOOL)dereference
+    includeKeePass1Backup:(BOOL)includeKeePass1Backup
+        includeRecycleBin:(BOOL)includeRecycleBin
+           includeExpired:(BOOL)includeExpired
+            includeGroups:(BOOL)includeGroups
+                 trueRoot:(BOOL)trueRoot;
+
 - (NSArray<Node*>*)searchNodes:(NSArray<Node*>*)nodes
                     searchText:(NSString *)searchText
                          scope:(SearchScope)scope

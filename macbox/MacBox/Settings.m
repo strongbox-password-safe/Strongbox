@@ -45,8 +45,8 @@ static NSString* const kDoNotShowAutoCompleteSuggestions = @"doNotShowAutoComple
 static NSString* const kDoNotShowChangeNotifications = @"doNotShowChangeNotifications";
 static NSString* const kOutlineViewTitleIsReadonly = @"outlineViewTitleIsReadonly";
 static NSString* const kOutlineViewEditableFieldsAreReadonly = @"outlineViewEditableFieldsAreReadonly";
-static NSString* const kDereferenceInQuickView = @"dereferenceInQuickView";
-static NSString* const kDereferenceInOutlineView = @"dereferenceInOutlineView";
+
+
 
 static NSString* const kAutoReloadAfterForeignChanges = @"autoReloadAfterForeignChanges";
 static NSString* const kDetectForeignChanges = @"detectForeignChanges";
@@ -73,6 +73,10 @@ static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions"
 static NSString* const kStartWithSearch = @"startWithSearch";
 static NSString* const kShowDatabasesManagerOnCloseAllWindows = @"showDatabasesManagerOnCloseAllWindows";
 static NSString* const khasMigratedQuickLaunch = @"hasMigratedQuickLaunch";
+static NSString* const kShowAutoFillTotpCopiedMessage = @"showAutoFillTotpCopiedMessage";
+static NSString* const kAutoLaunchSingleDatabase = @"autoLaunchSingleDatabase";
+static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock";
+
 
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
@@ -112,7 +116,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (void)migrateToNewStore {
 #ifndef IS_APP_EXTENSION
     if (self.migratedToNewStore) {
-        NSLog(@"Already Migrated to new store - not migrating");
+
         return;
     }
     
@@ -164,6 +168,30 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)lockDatabasesOnScreenLock {
+    return [self getBool:kLockDatabasesOnScreenLock fallback:YES];
+}
+
+- (void)setLockDatabasesOnScreenLock:(BOOL)lockDatabasesOnScreenLock {
+    [self setBool:kLockDatabasesOnScreenLock value:lockDatabasesOnScreenLock];
+}
+
+- (BOOL)autoFillAutoLaunchSingleDatabase {
+    return [self getBool:kAutoLaunchSingleDatabase fallback:YES];
+}
+
+- (void)setAutoFillAutoLaunchSingleDatabase:(BOOL)autoFillAutoLaunchSingleDatabase {
+    return [self setBool:kAutoLaunchSingleDatabase value:autoFillAutoLaunchSingleDatabase];
+}
+
+- (BOOL)showAutoFillTotpCopiedMessage {
+    return [self getBool:kShowAutoFillTotpCopiedMessage fallback:YES];
+}
+
+- (void)setShowAutoFillTotpCopiedMessage:(BOOL)showAutoFillTotpCopiedMessage {
+    [self setBool:kShowAutoFillTotpCopiedMessage value:showAutoFillTotpCopiedMessage];
+}
 
 - (BOOL)hasMigratedQuickLaunch {
     return [self getBool:khasMigratedQuickLaunch];
@@ -297,10 +325,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (BOOL)autoPromptForTouchIdOnActivate {
     return [self getBool:kAutoPromptForTouchIdOnActivate fallback:YES];
-}
-
-- (void)setAutoPromptForTouchIdOnActivate:(BOOL)autoPromptForTouchIdOnActivate {
-    [self setBool:kAutoPromptForTouchIdOnActivate value:autoPromptForTouchIdOnActivate];
 }
 
 - (BOOL)autoOpenFirstDatabaseOnEmptyLaunch {
@@ -634,20 +658,22 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)dereferenceInQuickView {
-    return [self getBool:kDereferenceInQuickView fallback:YES];
+    return YES;
+
 }
 
-- (void)setDereferenceInQuickView:(BOOL)dereferenceInQuickView {
-    [self setBool:kDereferenceInQuickView value:dereferenceInQuickView];
-}
+
+
+
 
 - (BOOL)dereferenceInOutlineView {
-    return [self getBool:kDereferenceInOutlineView fallback:YES];
+    return YES;
+
 }
 
-- (void)setDereferenceInOutlineView:(BOOL)dereferenceInOutlineView {
-    [self setBool:kDereferenceInOutlineView value:dereferenceInOutlineView];
-}
+
+
+
 
 - (BOOL)dereferenceDuringSearch {
     return YES;

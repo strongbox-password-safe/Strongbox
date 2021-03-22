@@ -16,7 +16,7 @@
 #import "DatabaseSearchAndSorter.h"
 #import "DatabaseDiffer.h"
 #import "SVProgressHUD.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface DatabaseDiffAndMergeViewController ()
 
@@ -72,7 +72,7 @@
 }
 
 - (BOOL)mergeIsPossible {
-    return self.isMergeDiff && self.diffSummary.diffExists && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    return self.isMergeDiff && self.diffSummary.diffExists && AppPreferences.sharedInstance.isProOrFreeTrial;
 }
 
 - (DiffSummary*)diff {
@@ -135,12 +135,12 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? 6 : 1;
+    return AppPreferences.sharedInstance.isProOrFreeTrial ? 6 : 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if (section == 0) {
-        return self.diffSummary.databasePropertiesDifferent && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? 2 : 1;
+        return self.diffSummary.databasePropertiesDifferent && AppPreferences.sharedInstance.isProOrFreeTrial ? 2 : 1;
     }
     else if (section == 1) {
         return self.willBeChangedOrEdited.count;
@@ -173,7 +173,7 @@
                 cell.accessoryType = UITableViewCellAccessoryNone;
             }
             else {
-                if (!SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+                if (!AppPreferences.sharedInstance.isProOrFreeTrial) {
                     cell.textLabel.text = NSLocalizedString(@"generic_pro_feature_only_please_upgrade", @"Pro feature only. Please Upgrade.");
                     cell.imageView.image = [UIImage imageNamed:@"rocket"];
                     cell.imageView.tintColor = nil;

@@ -21,6 +21,20 @@
     return [date isEarlierThan:ref];
 }
 
++ (BOOL)isMoreThanXSecondsAgo:(NSDate *)date seconds:(NSUInteger)seconds {
+    if (date == nil) {
+        return NO;
+    }
+    
+    NSDate* ref = [NSDate.date dateByAddingTimeInterval:-seconds];
+    
+    return [date isEarlierThan:ref];
+}
+
+- (BOOL)isMoreThanXSecondsAgo:(NSUInteger)seconds {
+    return [NSDate isMoreThanXSecondsAgo:self seconds:seconds];
+}
+
 - (BOOL)isEqualToDateWithinEpsilon:(NSDate *)other {
     if (other == nil) {
         return NO;

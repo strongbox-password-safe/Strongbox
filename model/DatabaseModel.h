@@ -58,6 +58,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)setItemTitle:(Node*)item title:(NSString*)title;
 
+- (NSURL*_Nullable)launchableUrlForItem:(Node*)item;
+- (NSURL*_Nullable)launchableUrlForUrlString:(NSString*)urlString;
+
 
 
 - (void)deleteItems:(const NSArray<Node *> *)items;
@@ -120,8 +123,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeRecords;
-@property (nonatomic, readonly, nonnull) NSArray<Node*> *activeGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
+
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allActiveEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allActiveGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableGroups;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allActive;
 
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull usernameSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*>* _Nonnull emailSet;

@@ -9,7 +9,7 @@
 #import "DatabaseCell.h"
 #import "SafeMetaData.h"
 #import "DatabaseCellSubtitleField.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "SafeStorageProviderFactory.h"
 #import "Utils.h"
 #import "NSDate+Extensions.h"
@@ -33,6 +33,7 @@ NSString* const kDatabaseCell = @"DatabaseCell";
 @property (weak, nonatomic) IBOutlet UIImageView *status3;
 @property (weak, nonatomic) IBOutlet UIImageView *status4;
 @property (weak, nonatomic) IBOutlet UIImageView *status5;
+@property (weak, nonatomic) IBOutlet UIImageView *status6;
 
 @end
 
@@ -58,6 +59,8 @@ NSString* const kDatabaseCell = @"DatabaseCell";
     self.status4.hidden = YES;
     self.status5.image = nil;
     self.status5.hidden = YES;
+    self.status6.image = nil;
+    self.status6.hidden = YES;
 }
 
 - (void)setEnabled:(BOOL)enabled {
@@ -76,6 +79,7 @@ NSString* const kDatabaseCell = @"DatabaseCell";
     self.status3.userInteractionEnabled = enabled;
     self.status4.userInteractionEnabled = enabled;
     self.status5.userInteractionEnabled = enabled;
+    self.status6.userInteractionEnabled = enabled;
 }
 
 - (void)set:(NSString*)name
@@ -104,7 +108,7 @@ rotateLastImage:(BOOL)rotateLastImage
     
     self.bottomRow.hidden = subtitle1 == nil && subtitle2 == nil;
 
-    NSArray<UIImageView*>* statusImageControls = @[self.status1, self.status2, self.status3, self.status4, self.status5];
+    NSArray<UIImageView*>* statusImageControls = @[self.status1, self.status2, self.status3, self.status4, self.status5, self.status6];
     
     for (int i = 0; i < statusImageControls.count; i++) {
         UIImage* image = i < statusImages.count ? statusImages[i] : nil;
@@ -153,15 +157,15 @@ rotateLastImage:(BOOL)rotateLastImage
     NSArray* tints;
     NSArray<UIImage*>* statusImages =  [self getStatusImages:database syncState:syncState tints:&tints];
         
-    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellTopSubtitle];
-    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle1];
-    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:SharedAppAndAutoFillSettings.sharedInstance.databaseCellSubtitle2];
+    NSString* topSubtitle = [self getDatabaseCellSubtitleField:database field:AppPreferences.sharedInstance.databaseCellTopSubtitle];
+    NSString* subtitle1 = [self getDatabaseCellSubtitleField:database field:AppPreferences.sharedInstance.databaseCellSubtitle1];
+    NSString* subtitle2 = [self getDatabaseCellSubtitleField:database field:AppPreferences.sharedInstance.databaseCellSubtitle2];
     
     NSString* databaseIconName = [SafeStorageProviderFactory getIcon:database];
-    UIImage* databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:databaseIconName] : nil;
+    UIImage* databaseIcon = AppPreferences.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:databaseIconName] : nil;
 
     if (disabled) {
-        databaseIcon = SharedAppAndAutoFillSettings.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel"] : nil;
+        databaseIcon = AppPreferences.sharedInstance.showDatabaseIcon ? [UIImage imageNamed:@"cancel"] : nil;
         
         if (autoFill) {
             subtitle2 = database.autoFillEnabled ?
@@ -192,10 +196,21 @@ rotateLastImage:(BOOL)rotateLastImage
         [tnts addObject:NSNull.null];
     }
     
-    if (SharedAppAndAutoFillSettings.sharedInstance.showDatabaseStatusIcon) {
-        if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+    if (AppPreferences.sharedInstance.showDatabaseStatusIcon) {
+        NSString* quickLaunchUuid = AppPreferences.sharedInstance.quickLaunchUuid;
+        NSString* afQuickLaunchUuid = AppPreferences.sharedInstance.autoFillQuickLaunchUuid;
+
+        BOOL isQuickLaunch = [quickLaunchUuid isEqualToString:database.uuid];
+        BOOL isAFQuickLaunch = [afQuickLaunchUuid isEqualToString:database.uuid];
+                
+        if ( isQuickLaunch ) {
             [ret addObject:[UIImage imageNamed:@"rocket"]];
             [tnts addObject:NSNull.null];
+        }
+        
+        if ( isAFQuickLaunch ) {
+            [ret addObject:[UIImage imageNamed:@"globe"]];
+            [tnts addObject:UIColor.systemGreenColor];
         }
         
         if(database.readOnly) {
@@ -205,7 +220,7 @@ rotateLastImage:(BOOL)rotateLastImage
                 [ret addObject:[UIImage imageNamed:@"glasses"]];
             }
 
-            [tnts addObject:NSNull.null];
+            [tnts addObject:UIColor.systemGrayColor];
         }
     }
     

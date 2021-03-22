@@ -16,7 +16,7 @@
 #import "OTPToken+Generation.h"
 #import "Utils.h"
 #import "AutoFillManager.h"
-#import "AutoFillSettings.h"
+#import "AppPreferences.h"
 #import "LocalDeviceStorageProvider.h"
 #import "ClipboardManager.h"
 #import "SyncManager.h"
@@ -25,13 +25,16 @@
 #import "DatabaseUnlocker.h"
 #import "DuressActionHelper.h"
 #import "WorkingCopyManager.h"
+#import "SecretStore.h"
+#import "NSDate+Extensions.h"
 
 @interface CredentialProviderViewController () <UIAdaptivePresentationControllerDelegate>
 
 @property (nonatomic, strong) UINavigationController* databasesListNavController;
 @property (nonatomic, strong) NSArray<ASCredentialServiceIdentifier *> * serviceIdentifiers;
 
-@property BOOL quickTypeMode;
+@property BOOL withUserInteraction;
+@property ASPasswordCredentialIdentity* credentialIdentity;
 
 @end
 
@@ -41,49 +44,101 @@
 
 - (void)provideCredentialWithoutUserInteractionForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     NSLog(@"provideCredentialWithoutUserInteractionForIdentity: [%@]", credentialIdentity);
+
+    self.credentialIdentity = credentialIdentity;
+    self.withUserInteraction = NO;
+    
+    QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
+    SafeMetaData* database = [self getDatabaseFromQuickTypeIdentifier:identifier];
+
+    if ( database ) {
+        NSLog(@"provideCredentialWithoutUserInteractionForIdentity - Got DB");
+        
+        CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:database isAutoFillOpen:YES isAutoFillQuickTypeOpen:YES biometricPreCleared:NO noConvenienceUnlock:NO];
+        if ( keyDeterminer.isAutoFillConvenienceAutoLockPossible ) {
+            NSLog(@"provideCredentialWithoutUserInteractionForIdentity - Within Timeout - Filling without UI");
+            [self unlockDatabaseForQuickType:database identifier:identifier];
+            return;
+        }
+    }
+ 
     [self exitWithUserInteractionRequired];
 }
 
 - (void)prepareInterfaceToProvideCredentialForIdentity:(ASPasswordCredentialIdentity *)credentialIdentity {
     NSLog(@"prepareInterfaceToProvideCredentialForIdentity = %@", credentialIdentity);
+     
+    self.credentialIdentity = credentialIdentity;
+    self.withUserInteraction = YES;
+}
+
+- (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+    NSLog(@"prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
     
-    BOOL lastRunGood = [self enterWithLastCrashCheck:YES];
+    self.serviceIdentifiers = serviceIdentifiers;
+    self.withUserInteraction = YES;
+}
+
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     
-    if (!lastRunGood) {
+    [self doStartupStuff];
+}
+
+- (void)doStartupStuff {
+    
+    
+    BOOL lastRunGood = AppPreferences.sharedInstance.autoFillExitedCleanly && AppPreferences.sharedInstance.autoFillWroteCleanly;
+
+    if(!lastRunGood) {
         [self showLastRunCrashedMessage:^{
-            [self initializeQuickType:credentialIdentity];
+            [self startup];
         }];
     }
     else {
-        [self initializeQuickType:credentialIdentity];
+        [self startup];
     }
 }
 
-- (void)initializeQuickType:(ASPasswordCredentialIdentity *)credentialIdentity {
-    QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:credentialIdentity.recordIdentifier];
-    NSLog(@"prepareInterfaceToProvideCredentialForIdentity: [%@] => Found: [%@]", credentialIdentity, identifier);
+- (void)startup {
+    if( !self.credentialIdentity ) {
+        [self initializeDatabasesListView];
+    }
+    else {
+        [self initializeQuickType];
+    }
+}
+
+- (void)initializeDatabasesListView {
+    [SafesList.sharedInstance reloadIfChangedByOtherComponent];
+
+    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainInterface" bundle:nil];
+    self.databasesListNavController = [mainStoryboard instantiateViewControllerWithIdentifier:@"SafesListNavigationController"];
+    self.databasesListNavController.presentationController.delegate = self;
     
-    if(identifier) {
-        SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-            return [obj.uuid isEqualToString:identifier.databaseId];
+    SafesListTableViewController* databasesList = ((SafesListTableViewController*)(self.databasesListNavController.topViewController));
+    databasesList.rootViewController = self;
+
+    if(self.presentedViewController) { 
+        [self dismissViewControllerAnimated:NO completion:^{
+            [self presentViewController:self.databasesListNavController animated:NO completion:nil];
         }];
-        
-        if(safe) {
-            
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                [self unlockDatabaseForQuickType:safe identifier:identifier];
-            });
-        }
-        else {
-            [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-            
-            [Alerts info:self
-                   title:NSLocalizedString(@"autofill_error_unknown_db_title", @"Strongbox: Unknown Database")
-                 message:NSLocalizedString(@"autofill_error_unknown_db_message", @"This appears to be a reference to an older Strongbox database which can no longer be found. Strongbox's QuickType AutoFill database has now been cleared, and so you will need to reopen your databases to refresh QuickType AutoFill.")
-              completion:^{
-                [self exitWithErrorOccurred:[Utils createNSError:@"Could not find this database in Strongbox any longer." errorCode:-1]];
-            }];
-        }
+    }
+    else {
+        [self presentViewController:self.databasesListNavController animated:NO completion:nil];
+    }
+}
+
+- (void)initializeQuickType {
+    self.withUserInteraction = YES;
+    QuickTypeRecordIdentifier* identifier = [QuickTypeRecordIdentifier fromJson:self.credentialIdentity.recordIdentifier];
+
+    NSLog(@"initializeQuickType: [%@] => Found: [%@]", self.credentialIdentity, identifier);
+
+    SafeMetaData* database = [self getDatabaseFromQuickTypeIdentifier:identifier];
+
+    if (database) {
+        [self unlockDatabaseForQuickType:database identifier:identifier];
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -102,11 +157,11 @@
     CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:YES biometricPreCleared:NO noConvenienceUnlock:NO];
     [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
-            AutoFillSettings.sharedInstance.autoFillExitedCleanly = NO; 
+            AppPreferences.sharedInstance.autoFillExitedCleanly = NO; 
             
             DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:safe viewController:self forceReadOnly:NO isAutoFillOpen:YES offlineMode:YES];
             [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
-                AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+                AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
                 
                 [self onUnlockDone:result model:model identifier:identifier error:error];
             }];
@@ -143,29 +198,30 @@
         [self messageErrorAndExit:error];
     }
 }
-
+ 
 - (void)onUnlockedDatabase:(Model*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)identifier {
-    Node* node = [model.database.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
-        return [obj.uuid.UUIDString isEqualToString:identifier.nodeId]; 
-    }];
+    if (model.metadata.autoFillConvenienceAutoUnlockTimeout == -1 && self.withUserInteraction ) {
+        [self onboardForAutoFillConvenienceAutoUnlock:self database:model.metadata completion:^{
+            [self continueUnlockedDatabase:model quickTypeIdentifier:identifier];
+        }];
+    }
+    else {
+        [self continueUnlockedDatabase:model quickTypeIdentifier:identifier];
+    }
+}
+
+- (void)continueUnlockedDatabase:(Model*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)identifier {
+    if ( model.metadata.autoFillConvenienceAutoUnlockTimeout > 0 ) {
+        model.metadata.autoFillConvenienceAutoUnlockPassword = model.database.ckfs.password;
+        [self markLastUnlockedAtTime:model.metadata];
+    }
+    
+    NSUUID *uuid = [[NSUUID alloc] initWithUUIDString:identifier.nodeId];
+    
+    Node* node = [model.database getItemById:uuid];
     
     if(node) {
-        NSString* user = [model.database dereference:node.fields.username node:node];
-        NSString* password = [model.database dereference:node.fields.password node:node];
-        
-        
-
-        
-        
-        if(node.fields.otpToken) {
-            NSString* value = node.fields.otpToken.password;
-            if (value.length) {
-                [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
-                NSLog(@"Copied TOTP to Pasteboard...");
-            }
-        }
-        
-        [self exitWithCredential:user password:password];
+        [self exitWithCredential:model item:node];
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -187,61 +243,6 @@
     }];
 }
 
-- (void)prepareCredentialListForServiceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    NSLog(@"prepareCredentialListForServiceIdentifiers = %@ - nav = [%@]", serviceIdentifiers, self.navigationController);
-    
-    self.serviceIdentifiers = serviceIdentifiers;
-    
-    BOOL lastRunGood = [self enterWithLastCrashCheck:NO];
-
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"MainInterface" bundle:nil];
-    self.databasesListNavController = [mainStoryboard instantiateViewControllerWithIdentifier:@"SafesListNavigationController"];
-    SafesListTableViewController* databasesList = ((SafesListTableViewController*)(self.databasesListNavController.topViewController));
-    
-    databasesList.rootViewController = self;
-    databasesList.lastRunGood = lastRunGood;
-}
-
-- (void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    
-    if(!self.quickTypeMode) {
-        [self showSafesListView];
-    }
-}
-
-- (void)showSafesListView {
-    if(self.presentedViewController) {
-        [self dismissViewControllerAnimated:NO completion:nil];
-    }
-    
-    if(!self.databasesListNavController) {
-        
-
-
-
-
-            [self exitWithErrorOccurred:[Utils createNSError:@"There was an error loading the Safes List View" errorCode:-1]];
-
-    }
-    else {
-        [SafesList.sharedInstance reloadIfChangedByOtherComponent];
-
-        SafesListTableViewController* databasesList = ((SafesListTableViewController*)(self.databasesListNavController.topViewController));
-
-        self.databasesListNavController.presentationController.delegate = self;
-
-        if(!databasesList.lastRunGood) {
-            [self showLastRunCrashedMessage:^{
-                [self presentViewController:self.databasesListNavController animated:NO completion:nil];
-            }];
-        }
-        else {
-            [self presentViewController:self.databasesListNavController animated:NO completion:nil];
-        }
-    }
-}
-
 - (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
     NSLog(@"presentationControllerDidDismiss");
     [self cancel:nil];
@@ -260,33 +261,14 @@
 }
 
 - (IBAction)cancel:(id)sender {
-    [self exitWithUserCancelled];
+    [self exitWithUserCancelled:nil];
 }
 
 
 
-
-- (BOOL)enterWithLastCrashCheck:(BOOL)quickType {
-    NSLog(@"Auto-Fill Entered - Quick Type Mode = [%d]", quickType);
-    
-    self.quickTypeMode = quickType;
-    
-    BOOL lastRunGood = AutoFillSettings.sharedInstance.autoFillExitedCleanly && AutoFillSettings.sharedInstance.autoFillWroteCleanly;
-    
-    
-    
-    
-    
-
-    if(!lastRunGood) {
-        NSLog(@"Last run of AutoFill did not exit cleanly! Warn User that a crash occurred...");
-    }
-    
-    return lastRunGood;
-}
 
 - (void)showLastRunCrashedMessage:(void (^)(void))completion {
-    NSLog(@"Exit Clean = %hhd, Wrote Clean = %hhd", AutoFillSettings.sharedInstance.autoFillExitedCleanly, AutoFillSettings.sharedInstance.autoFillWroteCleanly);
+    NSLog(@"Exit Clean = %hhd, Wrote Clean = %hhd", AppPreferences.sharedInstance.autoFillExitedCleanly, AppPreferences.sharedInstance.autoFillWroteCleanly);
     
     NSString* title = NSLocalizedString(@"autofill_did_not_close_cleanly_title", @"AutoFill Crash Occurred");
     NSString* message = NSLocalizedString(@"autofill_did_not_close_cleanly_message", @"It looks like the last time you used AutoFill you had a crash. This is usually due to a memory limitation. Please check your database file size and your Argon2 memory settings (should be <= 64MB).");
@@ -295,13 +277,17 @@
 
     
     
-    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
-    AutoFillSettings.sharedInstance.autoFillWroteCleanly = YES;
+    AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
+    AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
 }
 
-- (void)exitWithUserCancelled {
+- (void)exitWithUserCancelled:(SafeMetaData*)unlockedDatabase {
     NSLog(@"EXIT: User Cancelled");
-    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+    AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
+    
+    if ( unlockedDatabase ) {
+        [self markLastUnlockedAtTime:unlockedDatabase];
+    }
     
     [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
 }
@@ -315,42 +301,96 @@
 
 - (void)exitWithErrorOccurred:(NSError*)error {
     NSLog(@"EXIT: Error Occured [%@]", error);
-    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES; 
+    AppPreferences.sharedInstance.autoFillExitedCleanly = YES; 
     
     [self.extensionContext cancelRequestWithError:error];
 }
 
-- (void)exitWithCredential:(NSString*)username password:(NSString*)password {
-    NSLog(@"EXIT: Success");
-    AutoFillSettings.sharedInstance.autoFillExitedCleanly = YES;
+- (void)exitWithCredential:(Model*)model item:(Node*)item {
+    NSString* user = [model.database dereference:item.fields.username node:item];
+    NSString* password = [model.database dereference:item.fields.password node:item];
+
     
-    ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
+
+    
+    
+    NSString* totp = item.fields.otpToken ? item.fields.otpToken.password : @"";
+    if ( totp.length && model.metadata.autoFillCopyTotp ) {
+        [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:totp];
+        NSLog(@"Copied TOTP to Pasteboard... %hhd", self.withUserInteraction);
+        
+        if ( AppPreferences.sharedInstance.showAutoFillTotpCopiedMessage && self.withUserInteraction ) {
+            [Alerts twoOptions:self
+                         title:NSLocalizedString(@"autofill_info_totp_copied_title", @"TOTP Copied")
+                       message:NSLocalizedString(@"autofill_info_totp_copied_message", @"Your TOTP Code has been copied to the clipboard.")
+             defaultButtonText:NSLocalizedString(@"autofill_add_entry_sync_required_option_got_it", @"Got it!")
+              secondButtonText:NSLocalizedString(@"autofill_add_entry_sync_required_option_dont_tell_again", @"Don't tell me again")
+                        action:^(BOOL response) {
+                if ( !response ) { 
+
+                    AppPreferences.sharedInstance.showAutoFillTotpCopiedMessage = NO;
+                }
+                
+                [self exitWithCredential:model.metadata user:user password:password];
+            }];
+        }
+        else {
+            [self exitWithCredential:model.metadata user:user password:password];
+        }
+    }
+    else {
+        [self exitWithCredential:model.metadata user:user password:password];
+    }
+}
+
+- (void)exitWithCredential:(SafeMetaData*)database user:(NSString*)user password:(NSString*)password {
+    NSLog(@"EXIT: Success");
+ 
+    AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
+    
+    [self markLastUnlockedAtTime:database];
+    
+    ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:user password:password];
     [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
 }
 
+- (void)markLastUnlockedAtTime:(SafeMetaData*)database {
+    database.autoFillLastUnlockedAt = NSDate.date;
+    [SafesList.sharedInstance update:database];
+}
 
+- (void)onboardForAutoFillConvenienceAutoUnlock:(UIViewController *)viewController database:(SafeMetaData *)database completion:(void (^)(void))completion {
+    if ( !self.presentedViewController ) { 
+        [Alerts threeOptions:viewController
+                       title:NSLocalizedString(@"autofill_auto_unlock_title", @"Auto Unlock Feature")
+                     message:NSLocalizedString(@"autofill_auto_unlock_message", @"Auto Unlock lets you avoid repeatedly unlocking your database in AutoFill mode within a configurable time window. Would you like to use this handy feature?\n\nNB: Your password is stored in the Secure Enclave for this feature.")
+           defaultButtonText:NSLocalizedString(@"autofill_auto_unlock_try_3_minutes", @"Great, lets try 3 mins")
+            secondButtonText:NSLocalizedString(@"autofill_auto_unlock_try_10_minutes", @"I'd prefer 10 mins")
+             thirdButtonText:NSLocalizedString(@"mac_upgrade_no_thanks", @"No Thanks")
+                                action:^(int response) {
+            if (response == 0) {
+                database.autoFillConvenienceAutoUnlockTimeout = 180;
+                [SafesList.sharedInstance update:database];
+            }
+            else if (response == 1) {
+                database.autoFillConvenienceAutoUnlockTimeout = 600;
+                [SafesList.sharedInstance update:database];
+            }
+            else if (response == 2) {
+                database.autoFillConvenienceAutoUnlockTimeout = 0;
+                [SafesList.sharedInstance update:database];
+            }
+            
+            completion();
+        }];
+    }
+    else {
+        completion();
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- (SafeMetaData*)getDatabaseFromQuickTypeIdentifier:(QuickTypeRecordIdentifier*)identifier {
+    return identifier ? [SafesList.sharedInstance getById:identifier.databaseId] : nil;
+}
 
 @end

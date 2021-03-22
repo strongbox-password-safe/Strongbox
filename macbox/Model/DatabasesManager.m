@@ -140,33 +140,10 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     });
 }
 
-+ (NSString *)sanitizeSafeNickName:(NSString *)string {
-    NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
-    
-    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@""];
-    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet illegalCharacterSet]] componentsJoinedByString:@""];
-    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet nonBaseCharacterSet]] componentsJoinedByString:@""];
-    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"±|/\\`~@<>:;£$%^&()=+{}[]!\"|?*"]] componentsJoinedByString:@""];
-    
-    return trimmed;
-}
-
-- (NSSet *)getAllNickNamesLowerCase {
-    NSMutableSet *set = [[NSMutableSet alloc] initWithCapacity:self.snapshot.count];
-    
-    for (DatabaseMetadata *safe in self.snapshot) {
-        [set addObject:(safe.nickName).lowercaseString];
-    }
-    
-    return set;
-}
-
-- (BOOL)isValidNickName:(NSString *)nickName {
-    NSString *sanitized = [DatabasesManager sanitizeSafeNickName:nickName];
-    
-    NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
-    
-    return [sanitized isEqualToString:nickName] && nickName.length > 0 && ![nicknamesLowerCase containsObject:nickName.lowercaseString];
+- (DatabaseMetadata *)getDatabaseById:(NSString *)uuid {
+    return [self.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
+        return [obj.uuid isEqualToString:uuid];
+    }];
 }
 
 - (DatabaseMetadata *)getDatabaseByFileUrl:(NSURL *)url {
@@ -200,6 +177,39 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     [DatabasesManager.sharedInstance add:safe];
 
     return safe;
+}
+
++ (NSString *)trimDatabaseNickName:(NSString *)string {
+    NSString *trimmed = [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet controlCharacterSet]] componentsJoinedByString:@""];
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet illegalCharacterSet]] componentsJoinedByString:@""];
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet nonBaseCharacterSet]] componentsJoinedByString:@""];
+    trimmed = [[trimmed componentsSeparatedByCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"±|/\\`~@<>:;£$%^&()=+{}[]!\"|?*"]] componentsJoinedByString:@""];
+    
+    return trimmed;
+}
+
+- (NSSet *)getAllNickNamesLowerCase {
+    NSMutableSet *set = [[NSMutableSet alloc] initWithCapacity:self.snapshot.count];
+    
+    for (DatabaseMetadata *safe in self.snapshot) {
+        [set addObject:(safe.nickName).lowercaseString];
+    }
+    
+    return set;
+}
+
+- (BOOL)isValid:(NSString *)nickName {
+    NSString *sanitized = [DatabasesManager trimDatabaseNickName:nickName];
+    
+    return [sanitized compare:nickName] == NSOrderedSame && nickName.length > 0;
+}
+
+- (BOOL)isUnique:(NSString *)nickName {
+    NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
+    
+    return ![nicknamesLowerCase containsObject:nickName.lowercaseString];
 }
 
 @end

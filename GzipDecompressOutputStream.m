@@ -16,6 +16,7 @@
 @property z_stream* stream;
 @property NSError* error;
 
+
 @end
 
 @implementation GzipDecompressOutputStream
@@ -101,9 +102,20 @@
         }
         
         size_t writtenThisTime = len - self.stream->avail_out;
-        [self.outputStream write:decompressed maxLength:writtenThisTime];
         
+        if ( writtenThisTime > 0 ) {
+            NSInteger res = [self.outputStream write:decompressed maxLength:writtenThisTime];
+            if ( res < 0 ) {
+                NSLog(@"GzipDecompressOutputStream: Could not write to output stream.");
+                return res;
+            }
+        }
+        
+
         totalWritten += writtenThisTime;
+        
+
+
         remainingIn = self.stream->avail_in;
     }
     

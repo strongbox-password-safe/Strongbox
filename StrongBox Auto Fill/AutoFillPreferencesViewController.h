@@ -7,10 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Model.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AutoFillPreferencesViewController : UITableViewController
+
+@property Model* viewModel;
 
 @end
 

@@ -14,7 +14,7 @@
 #import "Alerts.h"
 #import "SVProgressHUD.h"
 #import "AuditConfigurationVcTableViewController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 const NSUInteger kSectionSettingsIdx = 0;
 const NSUInteger kSectionBasicIdx = 1;
@@ -73,7 +73,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     
     self.flags = [self.model getQuickAuditFlagsForNode:self.itemId];
     self.basicRows = [self getBasicRows:self.flags];
-    self.actions = [self.flags containsObject:@(kAuditFlagPwned)] || !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
+    self.actions = [self.flags containsObject:@(kAuditFlagPwned)] || !AppPreferences.sharedInstance.isProOrFreeTrial ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
     
     self.duplicates = [[mute.allObjects filter:^BOOL(Node * _Nonnull obj) {
         return ![obj.uuid isEqual:self.itemId];

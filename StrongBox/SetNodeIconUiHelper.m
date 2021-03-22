@@ -15,13 +15,13 @@
 #import "IconsCollectionViewController.h"
 #import "FavIconManager.h"
 #import "FavIconBulkViewController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "NSString+Extensions.h"
 
 @interface SetNodeIconUiHelper () <UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIDocumentPickerDelegate>
 
 @property UIViewController *viewController;
-@property ChangeIconCompletionBlock completionBlock;
+@property (copy) ChangeIconCompletionBlock completionBlock;
 
 @end
 
@@ -76,7 +76,7 @@
             UIAlertAction *fourthAction;
             
             if(node && node.isGroup) {
-                fourthAction = [UIAlertAction actionWithTitle:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:AppPreferences.sharedInstance.isProOrFreeTrial ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons", @"Download FavIcons") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicons_pro_only", @"Download FavIcons (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -85,7 +85,7 @@
                 }];
             }
             else {
-                fourthAction = [UIAlertAction actionWithTitle:SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
+                fourthAction = [UIAlertAction actionWithTitle:AppPreferences.sharedInstance.isProOrFreeTrial ?
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon", @"Download FavIcon") :
                                           NSLocalizedString(@"set_icon_vc_icon_source_download_favicon_pro_only", @"Download FavIcon (Pro Only)")
                                          style:UIAlertActionStyleDefault
@@ -98,7 +98,7 @@
                                                                    style:UIAlertActionStyleCancel
                                                                  handler:^(UIAlertAction *a) { self.completionBlock(NO, NO,  nil); }];
             
-            fourthAction.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+            fourthAction.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
             
             [alertController addAction:defaultAction];
             [alertController addAction:secondAction];
@@ -265,13 +265,15 @@
     vc.customIconSet = self.customIconPool;
     vc.modalPresentationStyle = UIModalPresentationFormSheet;
     
+    __weak SetNodeIconUiHelper* weakSelf = self;
+    __weak IconsCollectionViewController* weakVc = vc;
     vc.onDone = ^(BOOL response, NodeIcon * _Nullable icon) {
-        [self.viewController dismissViewControllerAnimated:YES completion:^{
+        [weakVc.presentingViewController dismissViewControllerAnimated:YES completion:^{
             if(response) {
-                self.completionBlock(YES, NO, icon ? @{ NSUUID.UUID : icon } : nil); 
+                weakSelf.completionBlock(YES, NO, icon ? @{ NSUUID.UUID : icon } : nil); 
             }
             else {
-                self.completionBlock(NO, NO, nil);
+                weakSelf.completionBlock(NO, NO, nil);
             }
         }];
     };
@@ -302,17 +304,19 @@
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey, id> *)info {
-    [picker dismissViewControllerAnimated:YES completion:^
-     {
-         [self onDonePickingCustomIcon:info];
+    __weak SetNodeIconUiHelper* weakSelf = self;
+
+    [picker dismissViewControllerAnimated:YES completion:^{
+         [weakSelf onDonePickingCustomIcon:info];
      }];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [picker dismissViewControllerAnimated:YES completion:^
-     {
-         self.completionBlock(NO, NO, nil);
-     }];
+    __weak SetNodeIconUiHelper* weakSelf = self;
+    
+    [picker dismissViewControllerAnimated:YES completion:^{
+        weakSelf.completionBlock(NO, NO, nil);
+    }];
 }
 
 - (void)onDonePickingCustomIcon:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {

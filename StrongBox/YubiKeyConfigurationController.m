@@ -7,7 +7,7 @@
 //
 
 #import "YubiKeyConfigurationController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "YubiManager.h"
 #import "VirtualYubiKeys.h"
 #import "Alerts.h"
@@ -55,15 +55,15 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
 
     self.cellMfiSlot2.accessoryType = (self.currentConfig != nil && self.currentConfig.mode == kMfi && self.currentConfig.slot == kSlot2) ?  UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
 
-    self.cellNfcSlot1.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
-    self.cellNfcSlot2.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
-    self.cellNfcSlot1.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
-    self.cellNfcSlot2.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
+    self.cellNfcSlot1.userInteractionEnabled = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
+    self.cellNfcSlot2.userInteractionEnabled = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
+    self.cellNfcSlot1.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
+    self.cellNfcSlot2.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
 
-    self.cellMfiSlot1.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
-    self.cellMfiSlot2.userInteractionEnabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
-    self.cellMfiSlot1.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
-    self.cellMfiSlot2.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
+    self.cellMfiSlot1.userInteractionEnabled = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
+    self.cellMfiSlot2.userInteractionEnabled = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey];
+    self.cellMfiSlot1.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
+    self.cellMfiSlot2.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && [self deviceAndContextSupportsHardwareYubiKey] ? nil : UIColor.lightGrayColor;
 
     [self reloadVirtualYubiKeys];
 }
@@ -154,7 +154,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
             return NSLocalizedString(@"yubikey_config_section_header_nfc_device_not_supported", @"NFC Yubikey (NFC Not Supported on Device)");
         }
         
-        if(!SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+        if(!AppPreferences.sharedInstance.isProOrFreeTrial) {
             return NSLocalizedString(@"yubikey_config_section_header_nfc_pro_only", @"NFC Yubikey (Pro Edition Only)");
         }
         #else
@@ -168,7 +168,7 @@ static NSString* const kVirtualYubiKeyCellId = @"VirtualYubiKeyCell";
             return NSLocalizedString(@"yubikey_config_section_header_lightning_device_not_supported", @"Lightning Yubikey (Lightning Not Supported on Device)");
         }
         
-        if(!SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+        if(!AppPreferences.sharedInstance.isProOrFreeTrial) {
             return NSLocalizedString(@"yubikey_config_section_header_lightning_pro_only", @"Lightning Yubikey (Pro Edition Only)");
         }
         #else

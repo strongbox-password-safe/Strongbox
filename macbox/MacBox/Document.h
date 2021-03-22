@@ -18,7 +18,7 @@ extern NSString* const kModelUpdateNotificationLongRunningOperationStart;
 extern NSString* const kModelUpdateNotificationLongRunningOperationDone;
 extern NSString* const kModelUpdateNotificationFullReload;
 extern NSString* const kModelUpdateNotificationDatabaseChangedByOther;
-extern NSString* const kModelUpdateNotificationBackgroundSyncDone;
+extern NSString* const kModelUpdateNotificationSyncDone;
 
 extern NSString* const kNotificationUserInfoParamKey;
 
@@ -30,9 +30,16 @@ extern NSString* const kNotificationUserInfoLongRunningOperationStatus;
 
 - (instancetype)initWithCredentials:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
 
+
 - (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
           viewController:(NSViewController*)viewController
               completion:(void (^)(BOOL success, NSError * _Nullable))completion;
+
+- (void)performFullInteractiveSync:(NSViewController*)viewController key:(CompositeKeyFactors*)key;
+
+- (void)reloadFromLocalWorkingCopy:(NSViewController*)viewController
+                               key:(CompositeKeyFactors*)key
+                      selectedItem:(NSString *)selectedItem;
 
 - (void)onSyncChangedUnderlyingWorkingCopy; 
 

@@ -11,6 +11,9 @@
 #import "DatabasesManager.h"
 #import "DatabaseCellView.h"
 #import "NSArray+Extensions.h"
+#import "Settings.h"
+#import "MMWormhole.h"
+#import "AutoFillWormhole.h"
 
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
 
@@ -19,6 +22,9 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
 @property (nonatomic, strong) NSArray<DatabaseMetadata*>* databases;
 @property (weak) IBOutlet NSButton *buttonSelect;
+
+@property BOOL firstAppearance;
+@property NSSet<NSString*> *unlockedDatabases;
 
 @end
 
@@ -39,13 +45,86 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     
     self.tableView.doubleAction = @selector(onSelect:);
     
+    self.firstAppearance = YES;
+    
+    self.unlockedDatabases = NSSet.set;
+
     [self refresh];
+    
+    [self checkWormholeForUnlockedDatabases];
 }
 
 - (void)viewDidAppear {
     [super viewDidAppear];
     
     self.view.window.frameAutosaveName = @"SelectAutoFillDatabase-AutoSave";
+    
+    if ( self.firstAppearance ) {
+        self.firstAppearance = NO;
+
+    
+        if ( self.databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
+            NSLog(@"Single Database Launching...");
+        
+            DatabaseMetadata* database = self.databases.firstObject;
+            
+            [self dismissViewController:self];
+            
+            self.onDone(NO, database);
+        }
+    }
+}
+
+- (void)checkWormholeForUnlockedDatabases {
+    [self.wormhole clearAllMessageContents];
+    
+    __block BOOL gotResponse = NO;
+    __block NSMutableSet<NSString*> *unlocked = NSMutableSet.set;
+        
+    for (DatabaseMetadata* database in self.databases) {
+        NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, database.uuid];
+
+        [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(), @"database-id" : database.uuid }
+                              identifier:requestId];
+
+        NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, database.uuid];
+
+        [self.wormhole listenForMessageWithIdentifier:responseId
+                                             listener:^(id messageObject) {
+
+            
+            NSDictionary* dict = messageObject;
+            NSString* userSession = dict[@"user-session-id"];
+
+            if ( [userSession isEqualToString:NSUserName()] ) { 
+                NSString* databaseId = dict[@"unlocked"];
+
+                NSLog(@"AutoFill-Wormhole: Got Database Status Response Message [%@] is unlocked", databaseId);
+
+                gotResponse = YES;
+                [unlocked addObject:databaseId];
+                
+                self.unlockedDatabases = unlocked;
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [self refresh];
+                });
+            }
+        }];
+    }
+    
+    CGFloat timeout = 0.5f;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (!gotResponse) {
+            NSLog(@"No wormhole response after %f seconds...", timeout);
+            
+            for (DatabaseMetadata* database in self.databases) {
+                NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusResponseId, database.uuid];
+                [self.wormhole stopListeningForMessageWithIdentifier:responseId];
+            }
+            
+            [self.wormhole clearAllMessageContents];
+        }
+    });
 }
 
 - (void)refresh {
@@ -88,7 +167,9 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
     DatabaseMetadata* database = [self.databases objectAtIndex:row];
 
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
-    [result setWithDatabase:database autoFill:YES];
+    
+    BOOL wormholeDetectedUnlocked = [self.unlockedDatabases containsObject:database.uuid];
+    [result setWithDatabase:database autoFill:YES wormholeUnlocked:wormholeDetectedUnlocked];
     
     return result;
 }

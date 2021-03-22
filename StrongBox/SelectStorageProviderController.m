@@ -21,7 +21,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "FileManager.h"
 #import "FilesAppUrlBookmarkProvider.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "NSString+Extensions.h"
 #import "SafeStorageProviderFactory.h"
 #import "Serializator.h"
@@ -71,7 +71,7 @@
 
     
     
-    if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn && !self.existing) {
+    if ([AppPreferences sharedInstance].iCloudOn && !self.existing) {
         [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
         

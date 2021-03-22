@@ -7,8 +7,11 @@
 //
 
 #import "SelectItemTableViewController.h"
-#import <ISMessages/ISMessages.h>
 #import "NSArray+Extensions.h"
+
+#ifndef IS_APP_EXTENSION
+#import <ISMessages/ISMessages.h>
+#endif
 
 @interface SelectItemTableViewController ()
 
@@ -21,9 +24,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.selected = [self.selectedIndexPaths map:^id _Nonnull(NSIndexSet * _Nonnull obj, NSUInteger idx) {
+    self.selected = self.selectedIndexPaths ? [self.selectedIndexPaths map:^id _Nonnull(NSIndexSet * _Nonnull obj, NSUInteger idx) {
         return obj.mutableCopy;
-    }];
+    }] : @[NSMutableIndexSet.indexSet];
     
     [self.tableView registerClass:UITableViewCell.class forCellReuseIdentifier:@"selectGenericItemCellIdentifier"];
     
@@ -79,6 +82,8 @@
         if (self.multipleSelectDisallowEmpty && selectedCount == 1) {
             if ( indexPath.row == sectionSet.firstIndex ) { 
                 [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+                
+#ifndef IS_APP_EXTENSION
                 [ISMessages showCardAlertWithTitle:NSLocalizedString(@"select_item_vc_title_select_one", @"Select One")
                                            message:NSLocalizedString(@"select_item_vc_message_select_one", @"You must select at least one item")
                                           duration:0.5f
@@ -87,6 +92,7 @@
                                          alertType:ISAlertTypeWarning
                                      alertPosition:ISAlertPositionTop
                                            didHide:nil];
+#endif
                 return;
             }
         }

@@ -12,7 +12,7 @@
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "ExcludedItemsViewController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "NSDate+Extensions.h"
 
 static const int kSectionIdxHibp = 2; 
@@ -128,21 +128,21 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
     
     
-    self.switchHibp.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
-    self.switchShowCached.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
-    self.labelCheckHaveIBeenPwned.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
-    self.labelLastOnlineCheckHeader.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
-    self.labelOnlineCheckInterval.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
-    self.labelCheckOfflinePwnedCache.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
-    self.labelCheckHaveIBeenPwned.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.switchHibp.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
+    self.switchShowCached.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
+    self.labelCheckHaveIBeenPwned.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.labelLastOnlineCheckHeader.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
+    self.labelOnlineCheckInterval.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchHibp.on ? nil : secondary;
+    self.labelCheckOfflinePwnedCache.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.labelCheckHaveIBeenPwned.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
 
     
 
-    self.switchSimilar.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
-    self.sliderSimilar.enabled = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on;
-    self.labelSimilar.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
-    self.labelSimilarityThresholdTitle.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
-    self.labelCheckSimilar.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : secondary;
+    self.switchSimilar.enabled = AppPreferences.sharedInstance.isProOrFreeTrial;
+    self.sliderSimilar.enabled = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchSimilar.on;
+    self.labelSimilar.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
+    self.labelSimilarityThresholdTitle.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
+    self.labelCheckSimilar.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
 
     [self bindAuditStatusWithProgress:nil];
 }
@@ -154,11 +154,11 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(section == kSectionIdxHibp && !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+    if(section == kSectionIdxHibp && !AppPreferences.sharedInstance.isProOrFreeTrial) {
         return NSLocalizedString(@"audit_hibp_pro_only_title", @"Have I Been Pwned? (Pro Edition Only)");
     }
     
-    if(section == kSectionIdxSimilarPasswords && !SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+    if(section == kSectionIdxSimilarPasswords && !AppPreferences.sharedInstance.isProOrFreeTrial) {
         return NSLocalizedString(@"audit_similar_passwords_pro_only_title", @"Similar Passwords (Pro Edition Only");
     }
 

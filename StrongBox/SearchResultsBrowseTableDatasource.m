@@ -68,7 +68,12 @@
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+    
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
+                                                                       browseSortField:sortField
+                                                                            descending:descending
+                                                                     foldersSeparately:foldersSeparately
+                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
         return [self.viewModel isFlaggedByAudit:node.uuid];
     }];
 
@@ -78,7 +83,8 @@
                     includeKeePass1Backup:self.viewModel.metadata.showKeePass1BackupGroup
                         includeRecycleBin:self.viewModel.metadata.showRecycleBinInSearchResults
                            includeExpired:self.viewModel.metadata.showExpiredInSearch
-                            includeGroups:YES];
+                            includeGroups:YES
+                                 trueRoot:YES];
 }
 
 @end

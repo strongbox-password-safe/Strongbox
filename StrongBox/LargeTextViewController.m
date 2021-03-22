@@ -9,7 +9,7 @@
 #import "LargeTextViewController.h"
 #import "FontManager.h"
 #import "ColoredStringHelper.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "Utils.h"
 
 @interface LargeTextViewController ()
@@ -49,7 +49,7 @@
         if (@available(iOS 12.0, *)) {
             dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
         }
-        BOOL colorBlind = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
+        BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
     
         self.labelLargeText.attributedText = [ColoredStringHelper getColorizedAttributedString:self.string
                                                                                       colorize:YES

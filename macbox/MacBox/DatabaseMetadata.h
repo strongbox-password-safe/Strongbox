@@ -39,6 +39,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nonatomic, strong) YubiKeyConfiguration* yubiKeyConfiguration;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
+@property (nonatomic) BOOL isWatchUnlockEnabled;
+
 @property (nonatomic) BOOL isTouchIdEnrolled;
 @property (nonatomic) BOOL hasPromptedForTouchIdEnrol;
 @property (nonatomic) NSInteger touchIdPasswordExpiryPeriodHours;
@@ -61,9 +63,15 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nullable) NSUUID* outstandingUpdateId;
 @property (nullable) NSDate* lastSyncRemoteModDate; 
 @property (nullable) NSDate* lastSyncAttempt;
-@property ConflictResolutionStrategy conflictResolutionStrategy;
 @property (readonly) BOOL readOnly; 
 @property BOOL launchAtStartup;
+@property BOOL autoPromptForConvenienceUnlockOnActivate;
+
+@property (nonatomic, strong, nullable) NSString* autoFillConvenienceAutoUnlockPassword;
+@property NSInteger autoFillConvenienceAutoUnlockTimeout; 
+@property (nullable) NSDate* autoFillLastUnlockedAt;
+
+@property (readonly) ConflictResolutionStrategy conflictResolutionStrategy;
 
 @end
 

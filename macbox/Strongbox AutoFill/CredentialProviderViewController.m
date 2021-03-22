@@ -31,21 +31,32 @@
 #import "Serializator.h"
 #import "MacYubiKeyManager.h"
 #import "WorkingCopyManager.h"
+#import "NSDate+Extensions.h"
 
 @interface CredentialProviderViewController ()
 
 @property SelectAutoFillDatabaseViewController* selectDbVc;
-@property BOOL quickTypeMode;
 @property MMWormhole* wormhole;
 
 @property ProgressWindow* progressWindow;
+@property NSArray<ASCredentialServiceIdentifier *> *serviceIdentifiers;
+
+@property BOOL withUserInteraction;
+@property BOOL quickTypeMode;
 
 @end
 
+static const CGFloat kWormholeWaitTimeout = 0.25f; 
+
 @implementation CredentialProviderViewController
 
-- (void)exitWithUserCancelled {
+- (void)exitWithUserCancelled:(DatabaseMetadata*)unlockedDatabase {
     NSLog(@"EXIT: User Cancelled");
+    
+    if ( unlockedDatabase ) {
+        [self markLastUnlockedAtTime:unlockedDatabase];
+    }
+    
     [self.extensionContext cancelRequestWithError:[NSError errorWithDomain:ASExtensionErrorDomain code:ASExtensionErrorCodeUserCanceled userInfo:nil]];
 }
 
@@ -61,8 +72,10 @@
     [self.extensionContext cancelRequestWithError:error];
 }
 
-- (void)exitWithCredential:(NSString*)username password:(NSString*)password totp:(NSString*)totp {
+- (void)exitWithCredential:(DatabaseMetadata*)unlockedDatabase username:(NSString*)username password:(NSString*)password totp:(NSString*)totp {
     BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    
+    [self markLastUnlockedAtTime:unlockedDatabase];
     
     if (pro) {
         NSLog(@"EXIT: Success");
@@ -70,10 +83,32 @@
         if (totp.length) {
             [ClipboardManager.sharedInstance copyConcealedString:totp];
             NSLog(@"Copied TOTP to Pasteboard...");
+            
+            if ( Settings.sharedInstance.showAutoFillTotpCopiedMessage ) {
+                [MacAlerts twoOptions:NSLocalizedString(@"autofill_info_totp_copied_title", @"TOTP Copied")
+                      informativeText:NSLocalizedString(@"autofill_info_totp_copied_message", @"Your TOTP Code has been copied to the clipboard.")
+                    option1AndDefault:NSLocalizedString(@"autofill_add_entry_sync_required_option_got_it", @"Got it!")
+                              option2:NSLocalizedString(@"autofill_add_entry_sync_required_option_dont_tell_again", @"Don't tell me again")
+                               window:self.view.window
+                           completion:^(NSUInteger zeroForCancel) {
+                    if ( zeroForCancel == 2 ) { 
+                        NSLog(@"Don't show again!");
+                        Settings.sharedInstance.showAutoFillTotpCopiedMessage = NO;
+                    }
+                    
+                    ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
+                    [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+                }];
+            }
+            else {
+                ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
+                [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+            }
         }
-
-        ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
-        [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+        else {
+            ASPasswordCredential *credential = [[ASPasswordCredential alloc] initWithUser:username password:password];
+            [self.extensionContext completeRequestWithSelectedCredential:credential completionHandler:nil];
+        }
     }
     else {
         NSLog(@"EXIT: Success but not Pro - Cancelling...");
@@ -81,15 +116,15 @@
         if (self.view && self.view.window) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [MacAlerts info:NSLocalizedString(@"mac_autofill_pro_feature_title", @"Pro Feature")
-             informativeText:NSLocalizedString(@"mac_autofill_pro_feature_upgrade-message", @"AutoFill is only available on the Pro edition of Strongbox. You can upgrade like this:\n\n1. Launch Strongbox\n2. Click the 'Strongbox' menu\n3. Click 'Upgrade to Pro...'.\n\nThank you!")
+                informativeText:NSLocalizedString(@"mac_autofill_pro_feature_upgrade-message", @"AutoFill is only available on the Pro edition of Strongbox. You can upgrade like this:\n\n1. Launch Strongbox\n2. Click the 'Strongbox' menu\n3. Click 'Upgrade to Pro...'.\n\nThank you!")
                       window:self.view.window
                   completion:^{
-                    [self exitWithUserCancelled];
+                    [self exitWithUserCancelled:unlockedDatabase];
                 }];
             });
         }
         else {
-            [self exitWithUserCancelled];
+            [self exitWithUserCancelled:unlockedDatabase];
         }
     }
 }
@@ -101,7 +136,7 @@
 
 
     self.quickTypeMode = YES;
-
+    
     BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
 
     if (!pro) {
@@ -116,7 +151,7 @@
         DatabaseMetadata* database = [DatabasesManager.sharedInstance.snapshot firstOrDefault:^BOOL(DatabaseMetadata * _Nonnull obj) {
             return [obj.uuid isEqualToString:identifier.databaseId];
         }];
-        
+
         if (database.quickWormholeFillEnabled) {
             [self doQuickWormholeFill:identifier];
             return;
@@ -132,52 +167,68 @@
 
     [self.wormhole clearAllMessageContents];
     
-    [self.wormhole passMessageObject:@{ @"id" : [identifier toJson] }
-                          identifier:kAutoFillWormholeRequestId];
+    [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(), @"id" : [identifier toJson] }
+                          identifier:kAutoFillWormholeQuickTypeRequestId];
     
     __block BOOL gotResponse = NO;
-    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeResponseId
+    
+    NSTimeInterval start = NSDate.timeIntervalSinceReferenceDate;
+    
+    [self.wormhole listenForMessageWithIdentifier:kAutoFillWormholeQuickTypeResponseId
                                          listener:^(id messageObject) {
-        
-        
+        NSTimeInterval interval = NSDate.timeIntervalSinceReferenceDate - start;
         gotResponse = YES;
-        [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeResponseId];
+
+        NSLog(@"==================================================================================");
+        NSLog(@"AUTOFILL-WORMHOLE - Got QuickType Credentials in [%f] seconds", interval);
+        NSLog(@"==================================================================================");
+
+        [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeQuickTypeResponseId];
         [self.wormhole clearAllMessageContents];
 
-        [self decodeWormholeMessage:messageObject];
+        DatabaseMetadata* metadata = [DatabasesManager.sharedInstance getDatabaseById:identifier.databaseId];
+        [self decodeWormholeMessage:messageObject metadata:metadata];
     }];
     
     
     
-    CGFloat timeout = 1.0f; 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(kWormholeWaitTimeout * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        NSTimeInterval interval = NSDate.timeIntervalSinceReferenceDate - start;
+
         if (!gotResponse) {
-            NSLog(@"No wormhole response after %f seconds. Requesting user interaction...", timeout);
-            [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeResponseId];
+            NSLog(@"==================================================================================");
+            NSLog(@"AUTOFILL-WORMHOLE - QuickType Credentials Timeout [%f] seconds", interval);
+            NSLog(@"==================================================================================");
+
+            [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeQuickTypeResponseId];
             [self.wormhole clearAllMessageContents];
             [self exitWithUserInteractionRequired];
         }
     });
 }
 
-- (void)decodeWormholeMessage:(id)messageObject {
+- (void)decodeWormholeMessage:(id)messageObject metadata:(DatabaseMetadata*)metadata {
     NSDictionary* message = (NSDictionary*)messageObject;
-    NSNumber* success = message[@"success"];
-    
-    if (!success.boolValue) {
-        [self exitWithUserInteractionRequired];
-    }
-    else {
-        NSString* secretStoreId = message[@"secret-store-id"];
+    NSString* userSession = message[@"user-session-id"];
 
-        NSDictionary* payload = [SecretStore.sharedInstance getSecureObject:secretStoreId];
-        [SecretStore.sharedInstance deleteSecureItem:secretStoreId];
-                
-        NSString* username = payload[@"user"];
-        NSString* password = payload[@"password"];
-        NSString* totp = payload[@"totp"];
+    if ( [userSession isEqualToString:NSUserName()] ) { 
+        NSNumber* success = message[@"success"];
         
-        [self exitWithCredential:username password:password totp:totp];
+        if (!success.boolValue) {
+            [self exitWithUserInteractionRequired];
+        }
+        else {
+            NSString* secretStoreId = message[@"secret-store-id"];
+
+            NSDictionary* payload = [SecretStore.sharedInstance getSecureObject:secretStoreId];
+            [SecretStore.sharedInstance deleteSecureItem:secretStoreId];
+                    
+            NSString* username = payload[@"user"];
+            NSString* password = payload[@"password"];
+            NSString* totp = payload[@"totp"];
+            
+            [self exitWithCredential:metadata username:username password:password totp:totp];
+        }
     }
 }
 
@@ -188,6 +239,7 @@
     NSLog(@"AutoFill: prepareInterfaceToProvideCredentialForIdentity [%@]", credentialIdentity);
     
     self.quickTypeMode = YES;
+    self.withUserInteraction = YES;
     
     [self initializeQuickType:credentialIdentity];
 }
@@ -237,10 +289,22 @@
 
     __weak CredentialProviderViewController* weakSelf = self;
     self.quickTypeMode = NO;
+    self.withUserInteraction = YES;
+
+    self.serviceIdentifiers = serviceIdentifiers;
+    
     self.selectDbVc = [[SelectAutoFillDatabaseViewController alloc] initWithNibName:@"SelectAutoFillDatabaseViewController" bundle:nil];
+
+    if ( !self.wormhole ) {
+        self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
+                                                             optionalDirectory:kAutoFillWormholeName];
+    }
+    
+    self.selectDbVc.wormhole = self.wormhole;
+    
     self.selectDbVc.onDone = ^(BOOL userCancelled, DatabaseMetadata * _Nonnull database) {
         if (userCancelled) {
-            [weakSelf exitWithUserCancelled];
+            [weakSelf exitWithUserCancelled:nil];
         }
         else {
             [weakSelf unlockDatabase:database quickTypeIdentifier:nil serviceIdentifiers:serviceIdentifiers];
@@ -252,10 +316,34 @@
 
 - (void)viewWillAppear {
     [super viewWillAppear];
-    NSLog(@"viewWillAppear - [%@]", self.selectDbVc);
+
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self doNonQuickTypeOnLoadTasks];
+    });
+}
+
+- (void)doNonQuickTypeOnLoadTasks {
+
     
     if(!self.quickTypeMode) {
-        [self showDatabases];
+        NSArray<DatabaseMetadata*> *databases = [DatabasesManager.sharedInstance.snapshot filter:^BOOL(DatabaseMetadata * _Nonnull obj) {
+            return obj.autoFillEnabled;
+        }];
+
+        if ( databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
+            NSLog(@"Single Database Launching...");
+
+            DatabaseMetadata* database = databases.firstObject;
+            __weak CredentialProviderViewController* weakSelf = self;
+
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [weakSelf unlockDatabase:database quickTypeIdentifier:nil serviceIdentifiers:weakSelf.serviceIdentifiers];
+            });
+        }
+        else {
+            [self showDatabases];
+        }
     }
 }
 
@@ -286,7 +374,7 @@
             informativeText:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                      window:self.view.window
                  completion:^{
-                [self exitWithUserCancelled];
+                [self exitWithUserCancelled:nil];
             }];
             return;
         }
@@ -301,7 +389,7 @@
             NSLog(@"Got Working Copy OK: [%@]", url);
         }
         
-        [self unlockDatabaseAtUrl:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        [self tryWormholeConvenienceUnlock:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
     }
 }
 
@@ -329,41 +417,140 @@
                 [self beginRelocateDatabaseFileProcedure:database quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
             }
             else {
-                [self exitWithUserCancelled];
+                [self exitWithUserCancelled:nil];
             }
         }];
     }
     else {
-        [self unlockDatabaseAtUrl:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        [self tryWormholeConvenienceUnlock:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
     }
+}
+
+- (BOOL)isAutoFillConvenienceAutoLockPossible:(DatabaseMetadata*)database {
+    BOOL isWithinAutoFillConvenienceAutoUnlockTime = NO;
+    
+    if ( database.autoFillLastUnlockedAt != nil && database.autoFillConvenienceAutoUnlockTimeout > 0 ) {
+        isWithinAutoFillConvenienceAutoUnlockTime = [database.autoFillLastUnlockedAt isMoreThanXSecondsAgo:database.autoFillConvenienceAutoUnlockTimeout];
+    }
+    
+    return isWithinAutoFillConvenienceAutoUnlockTime && database.autoFillConvenienceAutoUnlockPassword != nil;
+}
+
+- (void)tryWormholeConvenienceUnlock:(DatabaseMetadata*)database
+                                 url:(NSURL*)url
+                 quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
+                  serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+    if ( !self.wormhole ) {
+        self.wormhole = [[MMWormhole alloc] initWithApplicationGroupIdentifier:Settings.sharedInstance.appGroupName
+                                                             optionalDirectory:kAutoFillWormholeName];
+    }
+    
+    [self.wormhole clearAllMessageContents];
+    
+    NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockRequestId, database.uuid];
+
+    [self.wormhole passMessageObject:@{ @"user-session-id" : NSUserName(),
+                                        @"database-id" : database.uuid }
+                          identifier:requestId];
+    
+    __block NSString* ret = nil;
+    dispatch_group_t group = dispatch_group_create();
+    dispatch_group_enter(group);
+
+    NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockResponseId, database.uuid];
+    [self.wormhole listenForMessageWithIdentifier:responseId
+                                         listener:^(id messageObject) {
+
+        NSDictionary* dict = messageObject;
+        NSString* userSession = dict[@"user-session-id"];
+
+        if ( [userSession isEqualToString:NSUserName()] ) { 
+            NSString* secretStoreId = dict[@"secret-store-id"];
+            ret = secretStoreId;
+            dispatch_group_leave(group);
+        }
+    }];
+        
+    NSTimeInterval start = NSDate.timeIntervalSinceReferenceDate;
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        dispatch_group_wait(group, dispatch_time(DISPATCH_TIME_NOW, kWormholeWaitTimeout * NSEC_PER_SEC));
+
+        NSTimeInterval interval = NSDate.timeIntervalSinceReferenceDate - start;
+
+        NSLog(@"==================================================================================");
+        NSLog(@" AUTOFILL-WORMHOLE - Conv Unlock Wait Done: [%@] in [%f] seconds", ret, interval);
+        NSLog(@"==================================================================================");
+
+        [self.wormhole stopListeningForMessageWithIdentifier:responseId];
+        [self.wormhole clearAllMessageContents];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self unlockDatabaseAtUrl:database url:url wormholeConvenienceUnlock:ret quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        });
+    });
 }
 
 - (void)unlockDatabaseAtUrl:(DatabaseMetadata*)database
                         url:(NSURL*)url
+  wormholeConvenienceUnlock:(NSString*)wormholeConvenienceUnlock
         quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
          serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
-    BOOL bioAvailable = BiometricIdHelper.sharedInstance.biometricIdAvailable;
-    BOOL passwordAvailable = database.conveniencePassword.length;
+    NSString* conveniencePassword = nil;
+    if ( wormholeConvenienceUnlock ) {
+        NSLog(@"AUTOFILL: Wormhole convenience unlock found - will unlock database");
+        NSString* convUnlock = [SecretStore.sharedInstance getSecureObject:wormholeConvenienceUnlock];
+        [SecretStore.sharedInstance deleteSecureItem:wormholeConvenienceUnlock];
+
+        conveniencePassword = convUnlock;
+    }
+    else if ( [self isAutoFillConvenienceAutoLockPossible:database] ) {
+        NSLog(@"AUTOFILL: Within convenience auto unlock timeout. Will auto open...");
+        conveniencePassword = database.autoFillConvenienceAutoUnlockPassword;
+    }
     
-    BOOL keyFileNotSetButRequired = database.keyFileBookmark.length && !database.autoFillKeyFileBookmark.length;
-        
-    if (database.isTouchIdEnabled && pro && database.isTouchIdEnrolled && bioAvailable && passwordAvailable && !keyFileNotSetButRequired) {
-        NSLog(@"Unlock Database: Biometric Possible & Available...");
-
-        
-        
-        
-        
-
-        [self convenienceUnlockDatabase:database
-                                    url:url
-                    quickTypeIdentifier:quickTypeIdentifier
-                     serviceIdentifiers:serviceIdentifiers];
+    if ( conveniencePassword ) {
+        NSError* err;
+        CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:conveniencePassword
+                                                                     keyFileBookmark:database.autoFillKeyFileBookmark
+                                                                yubiKeyConfiguration:database.yubiKeyConfiguration
+                                                                                 url:url
+                                                                            metadata:database
+                                                                 isConvenienceUnlock:YES
+                                                                               error:&err];
+        if( !ckf || err) {
+            [MacAlerts error:err window:self.view.window completion:^{
+                [self exitWithErrorOccurred:err];
+            }];
+        }
+        else {
+            [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf isConvenienceUnlock:YES serviceIdentifiers:serviceIdentifiers];
+        }
     }
     else {
-        NSLog(@"Unlock Database: Biometric Not Possible or Available...");
-        [self manualUnlockDatabase:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+        BOOL convenienceAvailable = [BiometricIdHelper.sharedInstance convenienceAvailable:database];
+        BOOL convenienceEnabled = database.isTouchIdEnabled || database.isWatchUnlockEnabled;
+        BOOL passwordAvailable = database.conveniencePassword.length;
+        BOOL keyFileNotSetButRequired = database.keyFileBookmark.length && !database.autoFillKeyFileBookmark.length;
+            
+        if (convenienceEnabled && pro && database.isTouchIdEnrolled && convenienceAvailable && passwordAvailable && !keyFileNotSetButRequired) {
+            NSLog(@"Unlock Database: Biometric Possible & Available...");
+
+            
+            
+            
+            
+
+            [self convenienceUnlockDatabase:database
+                                        url:url
+                        quickTypeIdentifier:quickTypeIdentifier
+                         serviceIdentifiers:serviceIdentifiers];
+        }
+        else {
+            NSLog(@"Unlock Database: Biometric Not Possible or Available...");
+            [self manualUnlockDatabase:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        }
     }
 }
 
@@ -373,7 +560,7 @@
                serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSString* localizedFallbackTitle = NSLocalizedString(@"safes_vc_unlock_manual_action", @"Manual Unlock");
     
-    [BiometricIdHelper.sharedInstance authorize:localizedFallbackTitle completion:^(BOOL success, NSError *error) {
+    [BiometricIdHelper.sharedInstance authorize:localizedFallbackTitle database:database completion:^(BOOL success, NSError *error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if(success) {
                 NSError* err;
@@ -382,6 +569,8 @@
                                                                              keyFileBookmark:database.autoFillKeyFileBookmark
                                                                         yubiKeyConfiguration:database.yubiKeyConfiguration
                                                                                          url:url
+                                                                                    metadata:database
+                                                                         isConvenienceUnlock:YES
                                                                                        error:&err];
                 if( !ckf || err) {
                     [MacAlerts error:err window:self.view.window completion:^{
@@ -389,7 +578,7 @@
                     }];
                 }
                 else {
-                    [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf serviceIdentifiers:serviceIdentifiers];
+                    [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf isConvenienceUnlock:YES serviceIdentifiers:serviceIdentifiers];
                 }
             }
             else {
@@ -400,7 +589,7 @@
                 }
                 else if (error && (error.code == LAErrorUserCancel || error.code == -2412)) {
                     NSLog(@"User cancelled or selected fallback. Ignore...");
-                    [self exitWithUserCancelled];
+                    [self exitWithUserCancelled:nil];
                 }
                 else {
                     [MacAlerts error:error window:self.view.window];
@@ -421,11 +610,17 @@
     
     mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
         if (userCancelled) {
-            [self exitWithUserCancelled];
+            [self exitWithUserCancelled:nil];
         }
         else {
             NSError* error;
-            CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:password keyFileBookmark:keyFileBookmark yubiKeyConfiguration:yubiKeyConfiguration url:url error:&error];
+            CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:password
+                                                                         keyFileBookmark:keyFileBookmark
+                                                                    yubiKeyConfiguration:yubiKeyConfiguration
+                                                                                     url:url
+                                                                                metadata:database
+                                                                     isConvenienceUnlock:NO
+                                                                                   error:&error];
             
             if( !ckf || error) {
                 [MacAlerts error:error window:self.view.window completion:^{
@@ -436,7 +631,7 @@
                 database.autoFillKeyFileBookmark = keyFileBookmark;
                 [DatabasesManager.sharedInstance update:database];
                 
-                [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf serviceIdentifiers:serviceIdentifiers];
+                [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf isConvenienceUnlock:NO serviceIdentifiers:serviceIdentifiers];
             }
         }
     };
@@ -448,12 +643,14 @@
                                                     keyFileBookmark:(NSString*)keyFileBookmark
                                                yubiKeyConfiguration:(YubiKeyConfiguration * _Nullable)yubiKeyConfiguration
                                                                 url:(NSURL*)url
+                                                            metadata:(DatabaseMetadata*)metadata
+                                                isConvenienceUnlock:(BOOL)isConvenienceUnlock
                                                               error:(NSError**)error {
     [url startAccessingSecurityScopedResource];
     DatabaseFormat format = [Serializator getDatabaseFormat:url];
     [url stopAccessingSecurityScopedResource];
     
-    NSData* keyFileDigest = [self getSelectedKeyFileDigest:format bookmark:keyFileBookmark error:error];
+    NSData* keyFileDigest = [self getSelectedKeyFileDigest:metadata format:format bookmark:keyFileBookmark isConvenienceUnlock:isConvenienceUnlock error:error];
     if(*error) {
         return nil;
     }
@@ -500,7 +697,7 @@
     }
 }
 
-- (NSData*)getSelectedKeyFileDigest:(DatabaseFormat)format bookmark:(NSString*)bookmark error:(NSError**)error {
+- (NSData*)getSelectedKeyFileDigest:(DatabaseMetadata*)metadata format:(DatabaseFormat)format bookmark:(NSString*)bookmark isConvenienceUnlock:(BOOL)isConvenienceUnlock error:(NSError**)error {
     NSData* keyFileDigest = nil;
 
     if(bookmark) {
@@ -510,6 +707,12 @@
             keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:format != kKeePass1];
         }
         else {
+            if ( isConvenienceUnlock ) {
+                NSLog(@"Could not read Key File with Convenience Unlock. Clearing Secure Convenience Items");
+                [metadata resetConveniencePasswordWithCurrentConfiguration:nil];
+                metadata.autoFillConvenienceAutoUnlockPassword = nil;
+            }
+            
             if (error) {
                 *error = [Utils createNSError:@"Could not read key file..."  errorCode:-1];
             }
@@ -539,11 +742,15 @@
                           url:(NSURL*)url
           quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
                           ckf:(CompositeKeyFactors*)ckf
+          isConvenienceUnlock:(BOOL)isConvenienceUnlock
            serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [self _unlockDatabaseWithCkf:database
                                  url:url
-                 quickTypeIdentifier:quickTypeIdentifier ckf:ckf serviceIdentifiers:serviceIdentifiers];
+                 quickTypeIdentifier:quickTypeIdentifier
+                                 ckf:ckf
+                 isConvenienceUnlock:isConvenienceUnlock
+                  serviceIdentifiers:serviceIdentifiers];
     });
 }
 
@@ -551,6 +758,7 @@
                            url:(NSURL*)url
            quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
                            ckf:(CompositeKeyFactors*)ckf
+           isConvenienceUnlock:(BOOL)isConvenienceUnlock
             serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     [url startAccessingSecurityScopedResource];
 
@@ -566,12 +774,18 @@
             [self hideProgressModal];
             
             if(model) {
-                [self onUnlockedDatabase:model quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+                [self onSucccesfullyUnlockedDatabase:database model:model quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
             }
             else if(error == nil) {
-                [self exitWithUserCancelled]; 
+                [self exitWithUserCancelled:database]; 
             }
             else {
+                if ( isConvenienceUnlock && error.code == kStrongboxErrorCodeIncorrectCredentials ) {
+                    NSLog(@"Incorrect Credentials with Convenience Unlock. Clearing Secure Convenience Items");
+                    [database resetConveniencePasswordWithCurrentConfiguration:nil];
+                    database.autoFillConvenienceAutoUnlockPassword = nil;
+                }
+                
                 [MacAlerts error:NSLocalizedString(@"cred_vc_error_opening_title", @"Strongbox: Error Opening Database")
                         error:error
                        window:self.view.window
@@ -585,16 +799,67 @@
     }];
 }
 
-- (void)onUnlockedDatabase:(DatabaseModel*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    if (quickTypeIdentifier) {
-        [self autoFillWithQuickType:model quickTypeIdentifier:quickTypeIdentifier];
+
+
+- (void)onSucccesfullyUnlockedDatabase:(DatabaseMetadata*)metadata
+                                 model:(DatabaseModel*)model
+                   quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
+                    serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+    
+    if (metadata.autoFillConvenienceAutoUnlockTimeout == -1 && self.withUserInteraction ) {
+        [self onboardForAutoFillConvenienceAutoUnlock:metadata completion:^{
+            [self continueUnlockedDatabase:metadata model:model quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        }];
     }
     else {
-        [self presentCredentialSelector:model serviceIdentifiers:serviceIdentifiers];
+        [self continueUnlockedDatabase:metadata model:model quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
     }
 }
 
-- (void)autoFillWithQuickType:(DatabaseModel*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier {
+- (void)continueUnlockedDatabase:(DatabaseMetadata*)metadata
+                           model:(DatabaseModel*)model
+             quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
+              serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+    if ( metadata.autoFillConvenienceAutoUnlockTimeout > 0 ) {
+        metadata.autoFillConvenienceAutoUnlockPassword = model.ckfs.password;
+        [self markLastUnlockedAtTime:metadata];
+    }
+    
+    if (quickTypeIdentifier) {
+        [self autoFillWithQuickType:metadata model:model quickTypeIdentifier:quickTypeIdentifier];
+    }
+    else {
+        [self presentCredentialSelector:metadata model:model serviceIdentifiers:serviceIdentifiers];
+    }
+}
+
+- (void)onboardForAutoFillConvenienceAutoUnlock:(DatabaseMetadata *)database completion:(void (^)(void))completion {
+    [MacAlerts threeOptions:NSLocalizedString(@"autofill_auto_unlock_title", @"Auto Unlock Feature")
+            informativeText:NSLocalizedString(@"autofill_auto_unlock_message", @"Auto Unlock lets you avoid repeatedly unlocking your database in AutoFill mode within a configurable time window. Would you like to use this handy feature?\n\nNB: Your password is stored in the Secure Enclave for this feature.")
+          option1AndDefault:NSLocalizedString(@"autofill_auto_unlock_try_3_minutes", @"Great, lets try 3 mins")
+                    option2:NSLocalizedString(@"autofill_auto_unlock_try_10_minutes", @"I'd prefer 10 mins")
+                    option3:NSLocalizedString(@"mac_upgrade_no_thanks", @"No Thanks")
+                     window:self.view.window
+                 completion:^(NSUInteger option) {
+        if (option == 1) {
+            database.autoFillConvenienceAutoUnlockTimeout = 180;
+            [DatabasesManager.sharedInstance update:database];
+        }
+        else if (option == 2) {
+            database.autoFillConvenienceAutoUnlockTimeout = 600;
+            [DatabasesManager.sharedInstance update:database];
+        }
+        else if (option == 3) {
+            database.autoFillConvenienceAutoUnlockTimeout = 0;
+            [DatabasesManager.sharedInstance update:database];
+        }
+        
+        completion();
+    }];
+}
+
+
+- (void)autoFillWithQuickType:(DatabaseMetadata*)metadata model:(DatabaseModel*)model quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier {
     Node* node = [model.effectiveRootGroup.allChildRecords firstOrDefault:^BOOL(Node * _Nonnull obj) {
         return [obj.uuid.UUIDString isEqualToString:quickTypeIdentifier.nodeId]; 
     }];
@@ -604,7 +869,7 @@
         NSString* password = [model dereference:node.fields.password node:node];
         NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
         
-        [self exitWithCredential:user password:password totp:totp];
+        [self exitWithCredential:metadata username:user password:password totp:totp];
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -618,7 +883,7 @@
     }
 }
 
-- (void)presentCredentialSelector:(DatabaseModel*)model serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
+- (void)presentCredentialSelector:(DatabaseMetadata*)metadata model:(DatabaseModel*)model serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     NSLog(@"presentCredentialSelector: [%@]", model);
     
     SelectCredential* vc = [[SelectCredential alloc] initWithNibName:@"SelectCredential" bundle:nil];
@@ -626,10 +891,10 @@
     vc.serviceIdentifiers = serviceIdentifiers;
     vc.onDone = ^(BOOL userCancelled, NSString * _Nullable username, NSString * _Nullable password, NSString * _Nullable totp) {
         if (userCancelled) {
-            [self exitWithUserCancelled];
+            [self exitWithUserCancelled:metadata];
         }
         else {
-            [self exitWithCredential:username password:password totp:totp];
+            [self exitWithCredential:metadata username:username password:password totp:totp];
         }
     };
     
@@ -674,7 +939,7 @@
     NSModalResponse response = [op runModal];
     
     if (response == NSModalResponseCancel || op.URLs.firstObject == nil) {
-        [self exitWithUserCancelled];
+        [self exitWithUserCancelled:nil];
         return;
     }
     
@@ -693,7 +958,7 @@
         [MacAlerts error:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]")]
                 error:error
                window:self.view.window completion:^{
-            [self exitWithUserCancelled];
+            [self exitWithUserCancelled:nil];
         }];
         return;
     }
@@ -707,7 +972,7 @@
                [self updateFilesBookmarkWithRelocatedUrl:url database:database quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
            }
            else {
-               [self exitWithUserCancelled];
+               [self exitWithUserCancelled:nil];
            }
         }];
     }
@@ -726,7 +991,7 @@
     if (bookmark && !error) {
         database.autoFillStorageInfo = bookmark;
         [DatabasesManager.sharedInstance update:database];
-        [self unlockDatabaseAtUrl:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+        [self tryWormholeConvenienceUnlock:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
     }
     else {
         NSLog(@"WARNWARN: Could not bookmark user selected file in AutoFill: [%@]", error);
@@ -734,6 +999,11 @@
                 error:error
                window:self.view.window];
     }
+}
+
+- (void)markLastUnlockedAtTime:(DatabaseMetadata*)database {
+    database.autoFillLastUnlockedAt = NSDate.date;
+    [DatabasesManager.sharedInstance update:database];
 }
 
 @end

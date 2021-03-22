@@ -37,13 +37,12 @@
 #import "TagsViewTableViewCell.h"
 #import "AuditDrillDownController.h"
 #import "NSString+Extensions.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "FileManager.h"
 #import "StreamUtils.h"
 #import "NSData+Extensions.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
-#import "AutoFillSettings.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -177,7 +176,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     
     
-    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
+    if(AppPreferences.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     else {
@@ -188,7 +187,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.hideMetadataSection = !SharedAppAndAutoFillSettings.sharedInstance.showMetadataOnDetailsScreen;
+    self.hideMetadataSection = !AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
 
 #ifndef IS_APP_EXTENSION
     self.isAutoFillContext = NO;
@@ -1111,26 +1110,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSString* pw = [self dereference:self.model.password];
     [self copyToClipboard:pw
                   message:NSLocalizedString(@"item_details_password_copied_and_launching", @"Password Copied. Launching URL...")];
-    
-#ifndef IS_APP_EXTENSION
-    if (![urlString.lowercaseString hasPrefix:@"http:
-        ![urlString.lowercaseString hasPrefix:@"https:
-        urlString = [NSString stringWithFormat:@"http:
-    }
-    
-    NSURL* url = urlString.urlExtendedParse;
-    
-    if (url) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-            if (@available (iOS 10.0, *)) {
-                [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-            }
-            else {
-                [UIApplication.sharedApplication openURL:url];
-            }
-        });
-    }
-#endif
+        
+    [self.databaseModel launchUrlString:urlString];
 }
 
 - (NSString*)maybeDereference:(NSString*)text {
@@ -1179,7 +1160,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (Node*)createNewRecord {
-    AutoFillNewRecordSettings* settings = SharedAppAndAutoFillSettings.sharedInstance.autoFillNewRecordSettings;
+    AutoFillNewRecordSettings* settings = AppPreferences.sharedInstance.autoFillNewRecordSettings;
 
     NSString *title = settings.titleAutoFillMode == kDefault ?
         NSLocalizedString(@"item_details_vc_new_item_title", @"Untitled") :
@@ -1354,14 +1335,14 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     
     [self processIconBeforeSave:item completion:^{ 
 #ifdef IS_APP_EXTENSION
-        AutoFillSettings.sharedInstance.autoFillWroteCleanly = NO;
+        AppPreferences.sharedInstance.autoFillWroteCleanly = NO;
 #endif
 
         
         [self.databaseModel update:self
                            handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
             #ifdef IS_APP_EXTENSION
-                    AutoFillSettings.sharedInstance.autoFillWroteCleanly = YES;
+            AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
             #endif
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
@@ -1447,7 +1428,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             self.urlJustChanged = NO;
 #ifndef IS_APP_EXTENSION
             
-            BOOL favIconFetchPossible = (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4) && isValidUrl(self.model.url));
+            BOOL favIconFetchPossible = (AppPreferences.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4) && isValidUrl(self.model.url));
 
             if (favIconFetchPossible) {
                 if (!self.databaseModel.metadata.promptedForAutoFetchFavIcon) {
@@ -1649,7 +1630,7 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
             [PasswordMaker.sharedInstance promptWithUsernameSuggestions:weakSelf
-                                                             config:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
+                                                             config:AppPreferences.sharedInstance.passwordGenerationConfig
                                                              action:^(NSString * _Nonnull response) {
                 [weakCell pokeValue:response];
             }];
@@ -2122,9 +2103,11 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (void)showLargeText:(NSString*)text colorize:(BOOL)colorize {
+#ifndef IS_APP_EXTENSION     
     if (text) {
         [self performSegueWithIdentifier:@"segueToLargeView" sender:@{ @"text" : text, @"colorize" : @(colorize) }];
     }
+#endif
 }
 
 

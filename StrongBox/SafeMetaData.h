@@ -19,6 +19,7 @@
 #import "KeePassIconSet.h"
 #import "ConflictResolutionStrategy.h"
 #import "QuickTypeAutoFillDisplayFormat.h"
+#import "OfflineDetectedBehaviour.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,6 +46,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
 @property (nonatomic) BOOL isEnrolledForConvenience;
 @property (nonatomic, strong, nullable) NSString* convenienceMasterPassword;
+@property (nonatomic, strong, nullable) NSString* autoFillConvenienceAutoUnlockPassword;
 
 @property (nonatomic) BOOL isTouchIdEnabled;
 
@@ -150,11 +152,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property BOOL immediateOfflineOfferIfOfflineDetected;
+@property BOOL immediateOfflineOfferIfOfflineDetected; 
 
 @property QuickTypeAutoFillDisplayFormat quickTypeDisplayFormat;
 @property BOOL emptyOrNilPwPreferNilCheckFirst; 
 @property BOOL autoLockOnDeviceLock;
+
+@property NSInteger autoFillConvenienceAutoUnlockTimeout; 
+@property (nullable) NSDate* autoFillLastUnlockedAt;
+
+@property BOOL autoFillCopyTotp;
+@property BOOL forceOpenOffline;
+@property OfflineDetectedBehaviour offlineDetectedBehaviour;
 
 @end
 

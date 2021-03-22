@@ -113,7 +113,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
     self.database = database;
 
-    self.auditableNonEmptyPasswordNodes = [self.database.activeRecords filter:^BOOL(Node * _Nonnull obj) {
+    self.auditableNonEmptyPasswordNodes = [self.database.allSearchableEntries filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.password.length && ![self.database isDereferenceableText:obj.fields.password] && !self.isExcluded(obj);
     }];
 
@@ -407,7 +407,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         return NSSet.set;
     }
 
-    NSArray<Node*>* results = [self.database.activeRecords filter:^BOOL(Node * _Nonnull obj) {
+    NSArray<Node*>* results = [self.database.allActiveEntries filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.password.length == 0 && !self.isExcluded(obj);
     }];
 
@@ -584,7 +584,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         NSArray<Node*>* affectedNodes = nodesByPasswords[password];
         
         if ([pwnedCache containsObject:sha1HexPassword]) {
-            NSLog(@"Pwned: Cache HIT!");
+
             self.hibpCompletedCount++;
             NSArray<NSUUID*> *ids = [affectedNodes map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
                 return obj.uuid;
@@ -623,7 +623,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     NSSet<NSString*>* pwnedCache = [SecretStore.sharedInstance getSecureObject:kSecretStoreHibpPwnedSetCacheKey];
     
     if ([pwnedCache containsObject:sha1HexPassword]) {
-        NSLog(@"Pwned: Cache HIT!");
+
         completion(YES, nil);
     }
     else  {

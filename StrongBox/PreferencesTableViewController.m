@@ -11,7 +11,7 @@
 #import "Utils.h"
 
 #import "Settings.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 #import <MessageUI/MessageUI.h>
 #import "SafesList.h"
@@ -55,6 +55,8 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellManageKeyFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *appLockPasscodeFallback;
 @property (weak, nonatomic) IBOutlet UILabel *labelAppLockPasscodeFallback;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPrivacyShield;
+@property (weak, nonatomic) IBOutlet UILabel *labelPrivacyShield;
 
 @end
 
@@ -120,10 +122,10 @@
         [self promptForInteger:NSLocalizedString(@"prefs_vc_clear_clipboard_delay", @"Clear Clipboard Delay")
                        options:@[@30, @45, @60, @90, @120, @180]
              formatAsIntervals:YES
-                  currentValue:SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds
+                  currentValue:AppPreferences.sharedInstance.clearClipboardAfterSeconds
                     completion:^(BOOL success, NSInteger selectedValue) {
                         if (success) {
-                            SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds = selectedValue;
+                            AppPreferences.sharedInstance.clearClipboardAfterSeconds = selectedValue;
                         }
                         [self bindClearClipboard];
                     }];
@@ -146,6 +148,24 @@
     else if (cell == self.cellManageKeyFiles) {
         [self performSegueWithIdentifier:@"segueToManageKeyFiles" sender:nil];
     }
+    else if ( cell == self.cellPrivacyShield ) {
+        NSArray<NSNumber*>* options = @[@(kAppPrivacyShieldModeNone),
+                                        @(kAppPrivacyShieldModeBlur),
+                                        @(kAppPrivacyShieldModePixellate),
+                                        @(kAppPrivacyShieldModeBlueScreen)];
+        
+        NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+            return stringForPrivacyShieldMode(obj.integerValue);
+        }];
+        
+        [self promptForChoice:NSLocalizedString(@"prefs_vc_privacy_shield_view", @"Privacy Shield View")
+                      options:optionStrings
+         currentlySelectIndex:AppPreferences.sharedInstance.appPrivacyShieldMode
+                   completion:^(BOOL success, NSInteger selectedIndex) {
+            AppPreferences.sharedInstance.appPrivacyShieldMode = selectedIndex;
+            [self bindAppLock];
+        }];
+    }
 }
 
 - (void)customizeAppLockSectionFooter {
@@ -166,16 +186,16 @@
 
 - (void)bindAboutButton {
     NSString *aboutString;
-    if([[SharedAppAndAutoFillSettings sharedInstance] isPro]) {
+    if([[AppPreferences sharedInstance] isPro]) {
         aboutString = [NSString stringWithFormat:
                        NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@"), [Utils getAppVersion]];
     }
     else {
-        if(SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial) {
-            if([[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial]) {
+        if(AppPreferences.sharedInstance.hasOptedInToFreeTrial) {
+            if([[AppPreferences sharedInstance] isFreeTrial]) {
                 aboutString = [NSString stringWithFormat:
                                NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt", @"About Strongbox %@ (Pro Trial - %ld days left)"),
-                               [Utils getAppVersion], (long)SharedAppAndAutoFillSettings.sharedInstance.freeTrialDaysLeft];
+                               [Utils getAppVersion], (long)AppPreferences.sharedInstance.freeTrialDaysLeft];
             }
             else {
                 aboutString = [NSString stringWithFormat:
@@ -205,7 +225,7 @@
 
 
 
-    self.switchUseICloud.on = [[SharedAppAndAutoFillSettings sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
+    self.switchUseICloud.on = [[AppPreferences sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
     
     self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
@@ -214,11 +234,11 @@
 }
 
 - (void)bindHideTips {
-    self.switchShowTips.on = !SharedAppAndAutoFillSettings.sharedInstance.hideTips;
+    self.switchShowTips.on = !AppPreferences.sharedInstance.hideTips;
 }
 
 - (IBAction)onHideTips:(id)sender {
-    SharedAppAndAutoFillSettings.sharedInstance.hideTips = !self.switchShowTips.on;
+    AppPreferences.sharedInstance.hideTips = !self.switchShowTips.on;
     [self bindHideTips];
 }
 
@@ -292,7 +312,7 @@
                        NSLocalizedString(@"prefs_vc_master_password_icloud_migration_yesno_warning_message_fmt", @"It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings?"), biometricIdName, biometricIdName]
               action:^(BOOL response) {
             if(response) {
-                [[SharedAppAndAutoFillSettings sharedInstance] setICloudOn:self.switchUseICloud.on];
+                [[AppPreferences sharedInstance] setICloudOn:self.switchUseICloud.on];
                 
                 [self bindCloudSessions];
             }
@@ -302,7 +322,7 @@
         }];
     }
     else {
-        [[SharedAppAndAutoFillSettings sharedInstance] setICloudOn:self.switchUseICloud.on];
+        [[AppPreferences sharedInstance] setICloudOn:self.switchUseICloud.on];
         
         [self bindCloudSessions];
     }
@@ -359,14 +379,14 @@
 }
 
 - (IBAction)onSwitchClearClipboardEnable:(id)sender {
-    SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled = self.clearClipboardEnabled.on;
+    AppPreferences.sharedInstance.clearClipboardEnabled = self.clearClipboardEnabled.on;
     
     [self bindClearClipboard];
 }
 
 - (void)bindClearClipboard {
-    NSInteger seconds = SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds;
-    BOOL enabled = SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled;
+    NSInteger seconds = AppPreferences.sharedInstance.clearClipboardAfterSeconds;
+    BOOL enabled = AppPreferences.sharedInstance.clearClipboardEnabled;
     
     self.clearClipboardEnabled.on = enabled;
     self.cellClearClipboardDelay.userInteractionEnabled = enabled;
@@ -435,6 +455,25 @@
     
     NSString* fmt = NSLocalizedString(@"app_lock_allow_device_passcode_fallback_for_biometric_fmt", @"Passcode Fallback for %@");
     self.labelAppLockPasscodeFallback.text = [NSString stringWithFormat:fmt, BiometricsManager.sharedInstance.biometricIdName];
+    
+    
+    
+    self.labelPrivacyShield.text = stringForPrivacyShieldMode(AppPreferences.sharedInstance.appPrivacyShieldMode);
+}
+
+static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
+    if ( mode == kAppPrivacyShieldModeBlur ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_blur", @"Blur");
+    }
+    else if (mode == kAppPrivacyShieldModePixellate ) {
+        return NSLocalizedString(@"app_privacy_shield_mode_pixellate", @"Pixellate");
+    }
+    else if ( mode == kAppPrivacyShieldModeNone ) {
+        return NSLocalizedString(@"generic_none", @"None");
+    }
+    else {
+        return NSLocalizedString(@"app_privacy_shield_mode_blue_screen", @"Blue Screen");
+    }
 }
 
 - (void)promptForInteger:(NSString*)title
@@ -463,6 +502,27 @@
     
     vc.title = title;
     
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+- (void)promptForChoice:(NSString*)title
+                options:(NSArray<NSString*>*)items
+    currentlySelectIndex:(NSInteger)currentlySelectIndex
+              completion:(void(^)(BOOL success, NSInteger selectedIndex))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+
+    vc.groupItems = @[items];
+    
+    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSIndexSet* set = selectedIndices.firstObject;
+        [self.navigationController popViewControllerAnimated:YES];
+        completion(YES, set.firstIndex);
+    };
+    
+    vc.title = title;
     [self.navigationController pushViewController:vc animated:YES];
 }
 

@@ -14,7 +14,7 @@
 #import "SVProgressHUD.h"
 #import "Settings.h"
 #import "Model.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface WelcomeFreemiumViewController ()
 
@@ -61,7 +61,7 @@
 }
 
 - (void)onProStatusChanged {
-    if (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+    if (AppPreferences.sharedInstance.isProOrFreeTrial) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self onDismiss:nil];
         });

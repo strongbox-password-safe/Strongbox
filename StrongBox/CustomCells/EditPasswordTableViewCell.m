@@ -12,7 +12,7 @@
 #import "PasswordMaker.h"
 #import "FontManager.h"
 #import "ColoredStringHelper.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface EditPasswordTableViewCell () <UITextViewDelegate>
 
@@ -60,13 +60,13 @@
 }
 
 - (IBAction)onGenerate:(id)sender {
-    PasswordGenerationConfig* config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationConfig* config = AppPreferences.sharedInstance.passwordGenerationConfig;
     [self setPassword:[PasswordMaker.sharedInstance generateForConfigOrDefault:config]];
 }
 
 - (IBAction)onAlternativeGenerate:(id)sender {
     [PasswordMaker.sharedInstance promptWithSuggestions:self.parentVc
-                                                 config:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
+                                                 config:AppPreferences.sharedInstance.passwordGenerationConfig
                                                  action:^(NSString * _Nonnull response) {
         [self setPassword:response];
     }];
@@ -87,7 +87,7 @@
     if (@available(iOS 12.0, *)) {
         dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
     }
-    BOOL colorBlind = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
+    BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
     
     self.valueTextView.attributedText = [ColoredStringHelper getColorizedAttributedString:password
                                                                                  colorize:self.colorize

@@ -81,7 +81,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
     }
 
-    NSLog(@"Temp Attachment Path = [%@]", ret);
+
     
     return ret;
 }
@@ -123,6 +123,15 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         NSString* path = [NSString pathWithComponents:@[tmpPath, file]];
         [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
     }
+}
+
+- (NSURL *)syncManagerMergeWorkingDirectory {
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
+    NSURL* ret = [url URLByAppendingPathComponent:@"sync-manager/merge-working"];
+    
+    [self createIfNecessary:ret];
+    
+    return ret;
 }
 
 @end

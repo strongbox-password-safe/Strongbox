@@ -9,7 +9,7 @@
 #import "SyncManager.h"
 #import "SafesList.h"
 #import "SafeStorageProviderFactory.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "OfflineDetector.h"
 #import "LocalDeviceStorageProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
@@ -22,7 +22,7 @@
 #import "BackupsManager.h"
 #import "ConcurrentMutableDictionary.h"
 #import "SyncStatus.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "Serializator.h"
 #import "WorkingCopyManager.h"
 
@@ -71,8 +71,8 @@
     SyncParameters* params = [[SyncParameters alloc] init];
     
     params.inProgressBehaviour = kInProgressBehaviourJoin;
-    params.syncForcePushDoNotCheckForConflicts = SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts;
-    params.syncPullEvenIfModifiedDateSame = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
+    params.syncForcePushDoNotCheckForConflicts = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
+    params.syncPullEvenIfModifiedDateSame = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
 
     NSLog(@"BACKGROUND SYNC Start: [%@]", database.nickName);
 
@@ -87,8 +87,8 @@
     params.interactiveVC = interactiveVC;
     params.key = key;
     params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
-    params.syncForcePushDoNotCheckForConflicts = SharedAppAndAutoFillSettings.sharedInstance.syncForcePushDoNotCheckForConflicts;
-    params.syncPullEvenIfModifiedDateSame = SharedAppAndAutoFillSettings.sharedInstance.syncPullEvenIfModifiedDateSame;
+    params.syncForcePushDoNotCheckForConflicts = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
+    params.syncPullEvenIfModifiedDateSame = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
 
     [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         NSLog(@"INTERACTIVE SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
@@ -249,7 +249,7 @@
     NSArray<StorageBrowserItem*> *items = [self scanForNewDatabases];
     
     for(StorageBrowserItem* item in items) {
-        NSString* name = [SafesList sanitizeSafeNickName:[item.name stringByDeletingPathExtension]];
+        NSString* name = [SafesList trimDatabaseNickName:[item.name stringByDeletingPathExtension]];
         SafeMetaData *safe = [LocalDeviceStorageProvider.sharedInstance getSafeMetaData:name
                                                                            providerData:item.providerData];
         

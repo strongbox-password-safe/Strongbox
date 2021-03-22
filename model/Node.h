@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) BOOL isGroup;
 @property (nonatomic, readonly) BOOL childRecordsAllowed;
+@property (readonly) BOOL isSearchable;
+
 @property (nonatomic, strong, readonly, nonnull) NSString *title;
 @property (nonatomic, strong, readonly, nonnull) NSUUID *uuid;
 

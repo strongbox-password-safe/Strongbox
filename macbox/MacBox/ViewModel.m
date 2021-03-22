@@ -99,7 +99,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (NSArray<Node*>*)activeRecords {
-    return self.passwordDatabase.activeRecords;
+    return self.passwordDatabase.allActiveEntries;
 }
 
 - (NSString *)getGroupPathDisplayString:(Node *)node {
@@ -107,7 +107,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (NSArray<Node*>*)activeGroups {
-    return self.passwordDatabase.activeGroups;
+    return self.passwordDatabase.allActiveGroups;
 }
 
 -(Node*)rootGroup {
@@ -1074,6 +1074,28 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     [self.document.undoManager endUndoGrouping];
 }
 
+
+
+- (void)launchUrl:(Node*)item {
+    NSURL* launchableUrl = [self.database launchableUrlForItem:item];
+        
+    if ( !launchableUrl ) {
+        NSLog(@"Could not get launchable URL for item.");
+        return;
+    }
+    
+    if (@available(macOS 10.15, *)) {
+        [[NSWorkspace sharedWorkspace] openURL:launchableUrl
+                                 configuration:NSWorkspaceOpenConfiguration.configuration
+                             completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+            if ( error ) {
+                NSLog(@"Launch URL done. Error = [%@]", error);
+            }
+        }];
+    } else {
+        [[NSWorkspace sharedWorkspace] openURL:launchableUrl];
+    }
+}
 
 
 - (Node*)getDefaultNewEntryNode:(Node *_Nonnull)parentGroup {

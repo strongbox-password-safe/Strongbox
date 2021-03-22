@@ -12,7 +12,7 @@
 #import "NSArray+Extensions.h"
 #import "PasswordMaker.h"
 #import "Alerts.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface CustomFieldEditorViewController () <UITextFieldDelegate, UITextViewDelegate>
 
@@ -228,7 +228,7 @@ const static NSSet<NSString*> *keePassReservedNames;
 
 - (IBAction)onGenerate:(id)sender {
     [PasswordMaker.sharedInstance promptWithSuggestions:self
-                                                 config:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig
+                                                 config:AppPreferences.sharedInstance.passwordGenerationConfig
                                                  action:^(NSString * _Nonnull response) {
         self.textView.text = response;
     }];

@@ -10,6 +10,7 @@
 #import "KeePassConstants.h"
 #import "ConcurrentMutableDictionary.h"
 #import "MinimalPoolHelper.h"
+#import "NSString+Extensions.h"
 
 #if TARGET_OS_IPHONE
 #import "KissXML.h" // Drop in replacements for the NSXML stuff available on Mac
@@ -195,6 +196,32 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     }
     
     return ret;
+}
+
+- (NSURL *)launchableUrlForItem:(Node *)item {
+    NSString *urlString = [self dereference:item.fields.url node:item];
+
+    return [self launchableUrlForUrlString:urlString];
+}
+
+- (NSURL *)launchableUrlForUrlString:(NSString*)urlString {
+    if (!urlString.length) {
+        return nil;
+    }
+    
+    NSURL* url = urlString.urlExtendedParse;
+    if (!url) {
+        return nil;
+    }
+    
+    NSURLComponents* components = [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+    
+    if ( !components.scheme.length ) { 
+        urlString = [NSString stringWithFormat:@"https:
+        url = urlString.urlExtendedParse;
+    }
+    
+    return url;
 }
 
 
@@ -532,37 +559,49 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return path;
 }
 
-- (NSArray<Node *> *)activeGroups {
-    if(self.format == kPasswordSafe) {
-        return self.effectiveRootGroup.allChildGroups;
-    }
-    else if(self.format == kKeePass1) {
-        
-        Node* keePass1BackupNode = self.keePass1BackupNode;
-
-        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return node.isGroup && (keePass1BackupNode == nil || (node != keePass1BackupNode && ![keePass1BackupNode contains:node]));
-        }];
-    }
-    else {
-        
-        Node* recycleBin = self.recycleBinNode;
-
-        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return node.isGroup && (recycleBin == nil || (node != recycleBin && ![recycleBin contains:node]));
-        }];
-    }
+- (NSArray<Node *> *)allSearchableEntries {
+    return [self filterItems:NO includeEntries:YES searchableOnly:YES];
 }
 
-- (NSArray<Node *> *)activeRecords {
+- (NSArray<Node *> *)allSearchableGroups {
+    return [self filterItems:YES includeEntries:NO searchableOnly:YES];
+}
+
+- (NSArray<Node *> *)allSearchable {
+    return [self filterItems:YES includeEntries:YES searchableOnly:YES];
+}
+
+- (NSArray<Node *> *)allSearchableTrueRoot {
+    return [self filterItems:YES includeEntries:YES searchableOnly:YES trueRoot:YES];
+}
+
+- (NSArray<Node *> *)allActiveEntries {
+    return [self filterItems:NO includeEntries:YES searchableOnly:NO];
+}
+
+- (NSArray<Node *> *)allActiveGroups {
+    return [self filterItems:YES includeEntries:NO searchableOnly:NO];
+}
+
+- (NSArray<Node *> *)allActive {
+    return [self filterItems:YES includeEntries:YES searchableOnly:NO];
+}
+
+- (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly {
+    return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly trueRoot:NO];
+}
+
+- (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly trueRoot:(BOOL)trueRoot {
+    Node* root = trueRoot ? self.rootNode : self.effectiveRootGroup;
+    
     if(self.format == kPasswordSafe) {
-        return self.effectiveRootGroup.allChildRecords;
+        return root.allChildRecords;
     }
     else if(self.format == kKeePass1) {
         
         Node* keePass1BackupNode = self.keePass1BackupNode;
 
-        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
             return !node.isGroup && (keePass1BackupNode == nil || (node != keePass1BackupNode && ![keePass1BackupNode contains:node]));
         }];
     }
@@ -570,8 +609,20 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         
         Node* recycleBin = self.recycleBinNode;
 
-        return [self.effectiveRootGroup filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return !node.isGroup && (recycleBin == nil || (node != recycleBin && ![recycleBin contains:node]));
+        return [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+            if (!includeGroups && node.isGroup) {
+                return NO;
+            }
+
+            if (!includeEntries && !node.isGroup) {
+                return NO;
+            }
+
+            if ( recycleBin != nil && (node == recycleBin || [recycleBin contains:node]) ) {
+                return NO;
+            }
+            
+            return searchableOnly ? node.isSearchable : YES;
         }];
     }
 }
@@ -579,7 +630,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSSet<NSString*> *)urlSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *recordNode in self.activeRecords) {
+    for (Node *recordNode in self.allActiveEntries) {
         if ([Utils trim:recordNode.fields.url].length > 0) {
             [bag addObject:recordNode.fields.url];
         }
@@ -591,7 +642,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSSet<NSString*> *)usernameSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *recordNode in self.activeRecords) {
+    for (Node *recordNode in self.allActiveEntries) {
         if ([Utils trim:recordNode.fields.username].length > 0) {
             [bag addObject:recordNode.fields.username];
         }
@@ -601,7 +652,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (NSSet<NSString*> *)tagSet {
-    NSArray<NSString*>* allTags = [self.activeRecords flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+    NSArray<NSString*>* allTags = [self.allActiveEntries flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.fields.tags.allObjects;
     }];
 
@@ -619,7 +670,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSSet<NSString*> *)emailSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in self.activeRecords) {
+    for (Node *record in self.allActiveEntries) {
         if ([Utils trim:record.fields.email].length > 0) {
             [bag addObject:record.fields.email];
         }
@@ -631,7 +682,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSSet<NSString*> *)passwordSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in self.activeRecords) {
+    for (Node *record in self.allActiveEntries) {
         if ([Utils trim:record.fields.password].length > 0) {
             [bag addObject:record.fields.password];
         }
@@ -643,7 +694,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSString *)mostPopularEmail {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.activeRecords) {
+    for (Node *record in self.allActiveEntries) {
         if(record.fields.email.length) {
             [bag addObject:record.fields.email];
         }
@@ -655,7 +706,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSString *)mostPopularUsername {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.activeRecords) {
+    for (Node *record in self.allActiveEntries) {
         if(record.fields.username.length) {
             [bag addObject:record.fields.username];
         }
@@ -667,7 +718,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSString *)mostPopularPassword {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.activeRecords) {
+    for (Node *record in self.allActiveEntries) {
         [bag addObject:record.fields.password];
     }
     

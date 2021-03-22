@@ -33,7 +33,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "Utils.h"
 #import "DatabasesViewPreferencesController.h"
-#import "PrivacyViewController.h"
+#import "AppLockViewController.h"
 #import "iCloudSafesCoordinator.h"
 #import "FilesAppUrlBookmarkProvider.h"
 #import "BackupsManager.h"
@@ -44,7 +44,7 @@
 #import "YubiManager.h"
 #import "WelcomeFreemiumViewController.h"
 #import "MasterDetailViewController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "SyncManager.h"
 #import "SyncStatus.h"
 #import "SyncLogViewController.h"
@@ -60,6 +60,7 @@
 #import "SecretStore.h"
 #import "WorkingCopyManager.h"
 #import <notify.h>
+#import "AppDelegate.h"
 
 @interface SafesViewController ()
 
@@ -69,19 +70,16 @@
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonPreferences;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonCustomizeView;
 
-- (IBAction)onAddSafe:(id)sender;
-- (IBAction)onUpgrade:(id)sender;
-
 @property (nonatomic, copy) NSArray<SafeMetaData*> *collection;
-@property PrivacyViewController* privacyAndLockVc;
-@property (nonatomic, strong) NSDate *enterBackgroundTime;
 
 @property NSURL* enqueuedImportUrl;
 @property BOOL enqueuedImportCanOpenInPlace;
-@property BOOL privacyScreenSuppressedForBiometricAuth;
 
-@property BOOL hasAppearedOnce; 
-@property SafeMetaData* lastOpenedDatabase; 
+@property (nonatomic, strong) NSDate *unlockedDatabaseWentIntoBackgroundAt;
+@property SafeMetaData* unlockedDatabase; 
+@property BOOL appLockSuppressedForBiometricAuth;
+
+
 
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
 
@@ -95,11 +93,7 @@
     });
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-
-    [self preHeatSecureEnclave]; 
-    
+- (void)customizeUI {
     if (@available(iOS 13.0, *)) { 
         [self.buttonPreferences setImage:[UIImage systemImageNamed:@"gear"]];
     }
@@ -107,71 +101,77 @@
     [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"audit_drill_down_section_header_preferences", @"Preferences")];
     [self.buttonCustomizeView setAccessibilityLabel:NSLocalizedString(@"browse_context_menu_customize_view", @"Customize View")];
     [self.buttonAddSafe setAccessibilityLabel:NSLocalizedString(@"casg_add_action", @"Add")];
+    self.collection = [NSArray array];
+    [self setupTableview];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+
+    [self preHeatSecureEnclave]; 
+    
+    [self customizeUI];
     
     [self checkForPreviousCrash];
 
-    self.collection = [NSArray array];
-    [self setupTableview];
-    
     [self internalRefresh];
-    
-    [self listenToNotifications];
-    
-    
     
     [self setFreeTrialEndDateBasedOnIapPurchase]; 
 
-    if([Settings.sharedInstance getLaunchCount] == 1) {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self doFirstLaunchTasks]; 
-        });
-    }
-    else {
-        if (@available(iOS 14.0, *)) { 
-            
-            if (!self.hasAppearedOnce) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-                    [self appBecameActive];
-                });
-            }
-        }
-    }
+    
     
     [self manuallySetFullFileProtection]; 
+    [self migrateQuickLaunchToAutoFill]; 
+    [self migrateOfflineDetectedBehaviour]; 
+    
+    [self listenToNotifications];
+    
+    if([Settings.sharedInstance getLaunchCount] == 1) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self doOnboarding]; 
+        });
+    }
 
-    
-    
-    
-    
+
+
+
+    else {
+        if ( ![self isAppLocked] ) {
+            NSLog(@"Initial Activation/Load - App is not Locked...");
+            [self doAppActivationTasks:NO];
+        }
+    }
+}
+
+- (void)migrateQuickLaunchToAutoFill { 
+    if ( !AppPreferences.sharedInstance.migratedQuickLaunchToAutoFill ) {
+        NSLog(@"Migrating Quick Launch To AutoFill...");
+        
+        AppPreferences.sharedInstance.migratedQuickLaunchToAutoFill = YES;
+        AppPreferences.sharedInstance.autoFillQuickLaunchUuid = AppPreferences.sharedInstance.quickLaunchUuid;
+    }
 }
 
 - (void)manuallySetFullFileProtection {
     if ( !Settings.sharedInstance.haveAttemptedMigrationToFullFileProtection ) {
         Settings.sharedInstance.haveAttemptedMigrationToFullFileProtection = YES;
-        
         NSLog(@"Enabled full file protection for user one time.");
         Settings.sharedInstance.fullFileProtection = YES;
-        
-        
-        
-
-            NSLog(@"Enabling Full File Protection at App Startup..."); 
-            [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
-
+        [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
+- (void)migrateOfflineDetectedBehaviour {
+    if ( !AppPreferences.sharedInstance.migratedOfflineDetectedBehaviour ) {
+        NSLog(@"migrateOfflineDetectedBehaviour...");
+        AppPreferences.sharedInstance.migratedOfflineDetectedBehaviour = YES;
+        
+        for (SafeMetaData* database in self.collection) {
+            database.offlineDetectedBehaviour = database.immediateOfflineOfferIfOfflineDetected ? kOfflineDetectedBehaviourAsk : kOfflineDetectedBehaviourTryConnectThenAsk;
+            [SafesList.sharedInstance update:database];
+        }
+    }
+}
 
 - (NSString*)getCrashMessage {
     NSString* loc = NSLocalizedString(@"safes_vc_please_send_crash_report", @"Please send this crash to support@strongboxsafe.com");
@@ -225,8 +225,8 @@
     }
 }
 
-- (void)doFirstLaunchTasks {
-    if (SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+- (void)doOnboarding {
+    if (AppPreferences.sharedInstance.isProOrFreeTrial) {
         NSLog(@"New User is already Pro or in Free Trial... Standard Onboarding");
         [self startOnboarding];
     }
@@ -257,11 +257,11 @@
     NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
     if (freeTrialPurchaseDate) {
         NSLog(@"setFreeTrialEndDateBasedOnIapPurchase: [%@]", freeTrialPurchaseDate);
-        NSDate* endDate = [SharedAppAndAutoFillSettings.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
-        SharedAppAndAutoFillSettings.sharedInstance.freeTrialEnd = endDate;
+        NSDate* endDate = [AppPreferences.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
+        AppPreferences.sharedInstance.freeTrialEnd = endDate;
     }
     else {
-        NSLog(@"setFreeTrialEndDateBasedOnIapPurchase: No Free Trial purchase found.");
+
     }
 }
 
@@ -292,36 +292,36 @@
 }
 
 - (void)internalRefresh {
-    NSLog(@"REFRESH: Refreshing entire table...");
+
 
     self.collection = SafesList.sharedInstance.snapshot;
 
-    self.tableView.separatorStyle = SharedAppAndAutoFillSettings.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
+    self.tableView.separatorStyle = AppPreferences.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
 
     [self.tableView reloadData];
 }
 
-#pragma mark Startup Lock and Quick Launch Activation
+
 
 - (void)appResignActive {
     NSLog(@"appResignActive");
     
-    self.privacyScreenSuppressedForBiometricAuth = NO;
-    if(SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen) {
-        NSLog(@"appResignActive suppressPrivacyScreen... suppressing privacy and lock screen");
-        self.privacyScreenSuppressedForBiometricAuth = YES;
+    self.appLockSuppressedForBiometricAuth = NO;
+    if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
+        NSLog(@"appResignActive... suppressAppBackgroundTriggers");
+        self.appLockSuppressedForBiometricAuth = YES;
         return;
     }
-    
-    [self showPrivacyScreen:NO];
+
+    self.unlockedDatabaseWentIntoBackgroundAt = [[NSDate alloc] init];
 }
 
 - (void)appBecameActive {
-    NSLog(@"XXXXXXXXX - appBecameActive");
+    NSLog(@"SafesViewController - appBecameActive");
     
-    if(self.privacyScreenSuppressedForBiometricAuth) {
-        NSLog(@"App Active but Privacy Screen Suppressed... Nothing to do");
-        self.privacyScreenSuppressedForBiometricAuth = NO;
+    if( self.appLockSuppressedForBiometricAuth ) {
+        NSLog(@"App Active but Lock Screen Suppressed... Nothing to do");
+        self.appLockSuppressedForBiometricAuth = NO;
         return;
     }
 
@@ -333,115 +333,67 @@
     [SyncManager.sharedInstance backgroundSyncOutstandingUpdates];
     [self refresh]; 
 
-    if(!self.hasAppearedOnce) {
-        NSLog(@"XXXXXXXXX - appBecameActive - First Appearance - Doing First Activation Process");
-        [self doAppFirstActivationProcess];
+    
+    
+    if ( [self shouldLockUnlockedDatabase] ) {
+        [self lockUnlockedDatabase:nil];
+    }
+      
+
+
+
+
+        if ( ![self isAppLocked] ) {
+            NSLog(@"XXXXXXXXX - appBecameActive - App is not locked - Doing App Activation Tasks.");
+            [self doAppActivationTasks:NO];
+
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)onAppLockScreenWillBeDismissed:(void (^)(void))completion {
+    NSLog(@"XXXXXXXXXXXXXXXXXX - onAppLockWillBeDismissed");
+
+    if ( [self shouldLockUnlockedDatabase] ) {
+        [self lockUnlockedDatabase:completion];
     }
     else {
-        if(self.privacyAndLockVc) {
-            NSLog(@"XXXXXXXXX - appBecameActive - Privacy Screen is present - telling it that the app has become active.");
-
-            [self.privacyAndLockVc onAppBecameActive];
-        }
-        else {
-            NSLog(@"XXXXXXXXX - appBecameActive - Privacy Screen is NOT present - Doing App Activation Tasks.");
-
-            [self doAppActivationTasks:NO];
+        if ( completion ) {
+            completion();
         }
     }
 }
 
-- (void)doAppFirstActivationProcess {
-    if(!self.hasAppearedOnce) {
-        self.hasAppearedOnce = YES;
+- (void)onAppLockScreenWasDismissed:(BOOL)userJustCompletedBiometricAuthentication {
+    NSLog(@"XXXXXXXXXXXXXXXXXX - onAppLockWasDismissed [%hhd]", userJustCompletedBiometricAuthentication);
 
-        if (Settings.sharedInstance.appLockMode != kNoLock) {
-            NSLog(@"First App Became Active - App Lock in Place - Showing Privacy Screen...");
-            [self showPrivacyScreen:YES];
-        }
-        else {
-            NSLog(@"First App Became Active - No App Lock...");
-            [self doAppActivationTasks:NO];
-        }
-    }
-}
-
-- (void)showPrivacyScreen:(BOOL)startupLockMode {
-    if(self.privacyAndLockVc) {
-        NSLog(@"Privacy Screen Already Up... No need to re show");
-        return;
-    }
-    
-    self.enterBackgroundTime = [[NSDate alloc] init];
-    
-    __weak SafesViewController* weakSelf = self;
-    PrivacyViewController* privacyVc = [[PrivacyViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
-    privacyVc.onUnlockDone = ^(BOOL userJustCompletedBiometricAuthentication) {
-        [weakSelf hidePrivacyScreen:userJustCompletedBiometricAuthentication];
-    };
-    privacyVc.startupLockMode = startupLockMode;
-    privacyVc.modalPresentationStyle = UIModalPresentationOverFullScreen; 
-
-    
-    
-
-    UIViewController* visible = [self getVisibleViewController];
-    NSLog(@"Presenting Privacy Screen on [%@]", [visible class]);
-    [visible presentViewController:privacyVc animated:NO completion:^{
-        NSLog(@"Presented Privacy Screen Successfully...");
-        self.privacyAndLockVc = privacyVc; 
-    }];
-}
-
-- (void)hidePrivacyScreen:(BOOL)userJustCompletedBiometricAuthentication {
-    UIViewController* visible =[self getVisibleViewController];
-    BOOL fallbackMethod = [visible isKindOfClass:PrivacyViewController.class];
-    
-    if (self.privacyAndLockVc || fallbackMethod) {
-        if ([self shouldLockUnlockedDatabase]) {
-            NSLog(@"Should Lock Database now...");
-
-            [self lockUnlockedDatabase:^{
-                [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
-            }];
-        }
-        else {
-            NSLog(@"Dismissing Privacy Screen");
-
-            if (self.privacyAndLockVc) {
-                [self.privacyAndLockVc.presentingViewController dismissViewControllerAnimated:NO completion:^{
-                    NSLog(@"Dismissing Privacy Screen Done!");
-                    [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
-                }];
-            }
-            else { 
-                
-                [self dismissViewControllerAnimated:NO completion:^{
-                    [self onPrivacyScreenDismissed:userJustCompletedBiometricAuthentication];
-                }];
-            }
-        }
-        
-        self.enterBackgroundTime = nil;
-    }
-    else {
-        
-        
-        NSLog(@"XXXXX - Interesting Situation - hidePrivacyScreen but no Privacy Screen was up? - XXXX");
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
+    });
 }
 
 - (BOOL)shouldLockUnlockedDatabase {
-    if (self.enterBackgroundTime && self.lastOpenedDatabase) {
-        NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.enterBackgroundTime];
+    if ( self.unlockedDatabaseWentIntoBackgroundAt && self.unlockedDatabase ) {
+        NSTimeInterval secondsBetween = [[[NSDate alloc]init] timeIntervalSinceDate:self.unlockedDatabaseWentIntoBackgroundAt];
         
-        NSNumber *seconds = self.lastOpenedDatabase.autoLockTimeoutSeconds;
+        NSNumber *seconds = self.unlockedDatabase.autoLockTimeoutSeconds;
         
         NSLog(@"Autolock Time [%@s] - background Time: [%f].", seconds, secondsBetween);
         
         if (seconds.longValue != -1  && secondsBetween > seconds.longValue) 
         {
-            NSLog(@"Locking Database...");
+            NSLog(@"Should Lock Database [YES]");
             return YES;
         }
     }
@@ -451,7 +403,6 @@
 
 - (void)protectedDataWillBecomeUnavailable {
     
-    NSLog(@"XXXXXX - protectedDataWillBecomeUnavailable");
 
     [self onDeviceLocked];
 }
@@ -459,37 +410,47 @@
 - (void)onDeviceLocked {
     NSLog(@"onDeviceLocked - Device Lock detected - locking open database if so configured...");
     
-    if ( self.lastOpenedDatabase && self.lastOpenedDatabase.autoLockOnDeviceLock ) {
+    if ( self.unlockedDatabase && self.unlockedDatabase.autoLockOnDeviceLock ) {
         [self lockUnlockedDatabase:nil];
     }
 }
 
-- (void)lockUnlockedDatabase:(void (^ __nullable)(void))completion {
-    if (self.lastOpenedDatabase) {
-        NSLog(@"Locking Unlocked Database...");
+- (BOOL)isAppLocked {
+    AppDelegate* appDelegate = (AppDelegate*)UIApplication.sharedApplication.delegate;
+    return appDelegate.isAppLocked;
+}
 
-        self.lastOpenedDatabase = nil; 
-        
-        UINavigationController* nav = self.navigationController;
-        [nav popToRootViewControllerAnimated:NO];
-        
-        
-        
-        [self dismissViewControllerAnimated:NO completion:completion];
+- (void)lockUnlockedDatabase:(void (^ __nullable)(void))completion {
+    if (self.unlockedDatabase) {
+        NSLog(@"Locking Unlocked Database...");
+                
+        if ( ![self isAppLocked] ) {
+            NSLog(@"lockUnlockedDatabase: App is not locked... we can lock");
+            
+            UINavigationController* nav = self.navigationController;
+            [nav popToRootViewControllerAnimated:NO];
+            [self dismissViewControllerAnimated:NO completion:completion];
+            
+            self.unlockedDatabase = nil; 
+            self.unlockedDatabaseWentIntoBackgroundAt = nil;
+        }
+        else {
+            NSLog(@"lockUnlockedDatabase: Cannot lock unlocked database because App is locked");
+            if ( completion ) {
+                completion();
+            }
+        }
+    }
+    else {
+        NSLog(@"lockUnlockedDatabase: No unlocked database to lock");
+
+        if ( completion ) {
+            completion();
+        }
     }
 }
 
 
-
-- (void)onPrivacyScreenDismissed:(BOOL)userJustCompletedBiometricAuthentication {
-    self.privacyAndLockVc = nil;
-    
-    NSLog(@"XXXXXXXXXXXXXXXXXX - On Privacy Screen Dismissed");
-
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
-    });
-}
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
     
@@ -516,7 +477,7 @@
             [self onICloudNotAvailable:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
         }
         else {
-            NSLog(@"iCloud Available...");
+
             [self onICloudAvailable:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
         }
     }];
@@ -538,14 +499,14 @@
     }
     
     
-    [SharedAppAndAutoFillSettings sharedInstance].iCloudOn = NO;
+    [AppPreferences sharedInstance].iCloudOn = NO;
     [Settings sharedInstance].iCloudWasOn = NO;
     
     [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
 }
 
 - (void)onICloudAvailable:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation{
-    if (!SharedAppAndAutoFillSettings.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+    if (!AppPreferences.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
         BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
         BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
         
@@ -569,7 +530,7 @@
               secondButtonText:NSLocalizedString(@"safesvc_option_local_only", @"Local Only")
                         action:^(BOOL response) {
                             if(response) {
-                                SharedAppAndAutoFillSettings.sharedInstance.iCloudOn = YES;
+                                AppPreferences.sharedInstance.iCloudOn = YES;
                             }
                             [Settings sharedInstance].iCloudPrompted = YES;
                             [self onICloudAvailableContinuation:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
@@ -582,7 +543,7 @@
 }
 
 - (void)onICloudAvailableContinuation:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
-    BOOL iCloudOn = SharedAppAndAutoFillSettings.sharedInstance.iCloudOn;
+    BOOL iCloudOn = AppPreferences.sharedInstance.iCloudOn;
     BOOL iCloudWasOn = Settings.sharedInstance.iCloudWasOn;
     BOOL hasLocalDatabases = [self getLocalDeviceSafes].count != 0;
     
@@ -614,8 +575,8 @@
              thirdButtonText:NSLocalizedString(@"safesvc_icloud_unavailable_option_icloud_on", @"Switch iCloud Back On")
                       action:^(int response) {
                           if(response == 2) {           
-                              [SharedAppAndAutoFillSettings sharedInstance].iCloudOn = YES;
-                              [Settings sharedInstance].iCloudWasOn = [SharedAppAndAutoFillSettings sharedInstance].iCloudOn;
+                              [AppPreferences sharedInstance].iCloudOn = YES;
+                              [Settings sharedInstance].iCloudWasOn = [AppPreferences sharedInstance].iCloudOn;
                           }
                           else if(response == 1) {      
                               [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
@@ -628,7 +589,7 @@
                       }];
     }
     
-    Settings.sharedInstance.iCloudWasOn = SharedAppAndAutoFillSettings.sharedInstance.iCloudOn;
+    Settings.sharedInstance.iCloudWasOn = AppPreferences.sharedInstance.iCloudOn;
     [[iCloudSafesCoordinator sharedInstance] startQuery];
     
     [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
@@ -644,7 +605,7 @@
     NSLog(@"continueAppActivationTasks...");
     
     if([self isVisibleViewController]) {
-        if(!SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
+        if(!AppPreferences.sharedInstance.quickLaunchUuid) {
             BOOL userHasLocalDatabases = [self getLocalDeviceSafes].firstObject != nil;
             
             if (!Settings.sharedInstance.haveAskedAboutBackupSettings && userHasLocalDatabases) {
@@ -799,7 +760,7 @@
             NSLog(@"WARNWARN: Database Update for DB [%@] but DB not found in Collection!", databaseId);
         }
         else {
-            NSLog(@"[%@] - Database Changed", self.collection[index].nickName);
+
 
             dispatch_async(dispatch_get_main_queue(), ^(void) {
                 [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:index inSection:0]]
@@ -885,7 +846,7 @@
 }
 
 - (void)setupTips {
-    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
+    if(AppPreferences.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     else {
@@ -994,6 +955,8 @@
 - (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline manualUnlock:(BOOL)manualUnlock {
     SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
 
+    openOffline |= database.forceOpenOffline;
+    
     [self openDatabase:database openOffline:openOffline noConvenienceUnlock:manualUnlock biometricPreCleared:NO];
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -1010,6 +973,8 @@
  noConvenienceUnlock:(BOOL)noConvenienceUnlock
  biometricPreCleared:(BOOL)biometricPreCleared {
     NSLog(@"======================== OPEN DATABASE: %@ ============================", safe);
+    
+    biometricPreCleared = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics && biometricPreCleared;
     
     if(safe.hasUnresolvedConflicts) { 
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
@@ -1041,13 +1006,13 @@
 }
 
 - (void)onboardOrShowUnlockedDatabase:(Model*)model {
-    BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
-    BOOL pinPossible = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens;
+    BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !AppPreferences.sharedInstance.disallowAllBiometricId;
+    BOOL pinPossible = !AppPreferences.sharedInstance.disallowAllPinCodeOpens;
 
-    BOOL conveniencePossible = [SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial] && (biometricPossible || pinPossible);
+    BOOL conveniencePossible = [AppPreferences.sharedInstance isProOrFreeTrial] && (biometricPossible || pinPossible);
     BOOL convenienceNotYetPrompted = !model.metadata.hasBeenPromptedForConvenience;
     
-    BOOL quickLaunchPossible = SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil;
+    BOOL quickLaunchPossible = AppPreferences.sharedInstance.quickLaunchUuid == nil;
     BOOL quickLaunchNotYetPrompted = !model.metadata.hasBeenPromptedForQuickLaunch;
     
     
@@ -1129,7 +1094,7 @@
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
     
-    BOOL conveniencePossible = safe.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    BOOL conveniencePossible = safe.isEnrolledForConvenience && AppPreferences.sharedInstance.isProOrFreeTrial;
     if (conveniencePossible) [ma addObject:[self getContextualMenuUnlockManualAction:indexPath]];
 
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe];
@@ -1170,6 +1135,7 @@
     if (makeVisible) [ma addObject:[self getContextualMenuMakeVisibleAction:indexPath]];
 
     [ma addObject:[self getContextualMenuQuickLaunchAction:indexPath]];
+    [ma addObject:[self getContextualMenuAutoFillQuickLaunchAction:indexPath]];
     [ma addObject:[self getContextualMenuReadOnlyAction:indexPath]];
     [ma addObject:[self getContextualMenuPropertiesAction:indexPath]];
 
@@ -1234,7 +1200,7 @@
 
 - (UIAction*)getContextualMenuQuickLaunchAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    BOOL isAlreadyQuickLaunch = [SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
+    BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
     
     NSString* title = NSLocalizedString(@"databases_toggle_quick_launch_context_menu", @"Quick Launch");
     
@@ -1243,6 +1209,24 @@
                            destructive:NO
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self toggleQuickLaunch:safe];
+    }];
+   
+    ret.state = isAlreadyQuickLaunch ? UIMenuElementStateOn : UIMenuElementStateOff;
+   
+    return ret;
+}
+
+- (UIAction*)getContextualMenuAutoFillQuickLaunchAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)){
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:safe.uuid];
+    
+    NSString* title = NSLocalizedString(@"databases_toggle_autofill_quick_launch_context_menu", @"AutoFill Quick Launch");
+    
+    UIAction* ret = [self getContextualMenuItem:title
+                                 image:[UIImage imageNamed:@"globe"]
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self toggleAutoFillQuickLaunch:safe];
     }];
    
     ret.state = isAlreadyQuickLaunch ? UIMenuElementStateOn : UIMenuElementStateOff;
@@ -1479,7 +1463,7 @@
     
     
 
-    BOOL isAlreadyQuickLaunch = [SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
+    BOOL isAlreadyQuickLaunch = [AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid];
     UIAlertAction *quickLaunchAction = [UIAlertAction actionWithTitle:isAlreadyQuickLaunch ?
                                         NSLocalizedString(@"safes_vc_action_unset_as_quick_launch", @"Button Title to Unset Quick Launch") :
                                         NSLocalizedString(@"safes_vc_action_set_as_quick_launch", @"Button Title to Set Quick Launch")
@@ -1551,9 +1535,20 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+- (void)toggleAutoFillQuickLaunch:(SafeMetaData*)database {
+    if([AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:database.uuid]) {
+        AppPreferences.sharedInstance.autoFillQuickLaunchUuid = nil;
+        [self refresh];
+    }
+    else {
+        AppPreferences.sharedInstance.autoFillQuickLaunchUuid = database.uuid;
+        [self refresh];
+    }
+}
+
 - (void)toggleQuickLaunch:(SafeMetaData*)database {
-    if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
-        SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = nil;
+    if([AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:database.uuid]) {
+        AppPreferences.sharedInstance.quickLaunchUuid = nil;
         [self refresh];
     }
     else {
@@ -1562,7 +1557,7 @@
               message:NSLocalizedString(@"safes_vc_about_setting_quick_launch_and_confirm", @"Message about quick launch feature and asking to confirm yes or no")
                action:^(BOOL response) {
             if (response) {
-                SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = database.uuid;
+                AppPreferences.sharedInstance.quickLaunchUuid = database.uuid;
                 [self refresh];
             }
         }];
@@ -1616,7 +1611,7 @@
     
     NSString *message;
     
-    if(safe.storageProvider == kiCloud && [SharedAppAndAutoFillSettings sharedInstance].iCloudOn) {
+    if(safe.storageProvider == kiCloud && [AppPreferences sharedInstance].iCloudOn) {
         message = NSLocalizedString(@"safes_vc_remove_icloud_databases_warning", @"warning message about removing database from icloud");
     }
     else {
@@ -1664,10 +1659,15 @@
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     
     
-    if([SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
-        SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = nil;
-    }
     
+    if([AppPreferences.sharedInstance.quickLaunchUuid isEqualToString:safe.uuid]) {
+        AppPreferences.sharedInstance.quickLaunchUuid = nil;
+    }
+
+    if([AppPreferences.sharedInstance.autoFillQuickLaunchUuid isEqualToString:safe.uuid]) {
+        AppPreferences.sharedInstance.autoFillQuickLaunchUuid = nil;
+    }
+
     
     
     [BackupsManager.sharedInstance deleteAllBackups:safe];
@@ -1693,7 +1693,7 @@
         
         vc.viewModel = (Model *)sender;
         vc.currentGroupId = vc.viewModel.database.effectiveRootGroup.uuid;
-        self.lastOpenedDatabase = vc.viewModel.metadata;
+        self.unlockedDatabase = vc.viewModel.metadata;
     }
     else if ([segue.identifier isEqualToString:@"segueToStorageType"])
     {
@@ -1858,7 +1858,7 @@
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
         if (@available(iOS 13.0, *)) {
-            if (SharedAppAndAutoFillSettings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
+            if (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.modalInPresentation = YES;
             }
@@ -2093,7 +2093,7 @@
 }
 
 - (void)addManuallyDownloadedUrlDatabase:(NSString *)nickName modDate:(NSDate*)modDate data:(NSData *)data {
-    if(SharedAppAndAutoFillSettings.sharedInstance.iCloudOn) {
+    if(AppPreferences.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
                                title:NSLocalizedString(@"safes_vc_copy_icloud_or_local", @"Question Title: Copy to icloud or to local")
                              message:NSLocalizedString(@"safes_vc_copy_local_to_icloud", @"Question message: copy to iCloud or to Local")
@@ -2220,17 +2220,17 @@
 }
 
 -(void)bindProOrFreeTrialUi {
-    self.navigationController.toolbarHidden =  [[SharedAppAndAutoFillSettings sharedInstance] isPro];
-    self.navigationController.toolbar.hidden = [[SharedAppAndAutoFillSettings sharedInstance] isPro];
+    self.navigationController.toolbarHidden =  [[AppPreferences sharedInstance] isPro];
+    self.navigationController.toolbar.hidden = [[AppPreferences sharedInstance] isPro];
     
-    if(![[SharedAppAndAutoFillSettings sharedInstance] isPro]) {
+    if(![[AppPreferences sharedInstance] isPro]) {
         [self.buttonUpgrade setEnabled:YES];
     
         NSString *upgradeButtonTitle;
 
-        if (SharedAppAndAutoFillSettings.sharedInstance.hasOptedInToFreeTrial) {
-            if([[SharedAppAndAutoFillSettings sharedInstance] isFreeTrial]) {
-                NSInteger daysLeft = SharedAppAndAutoFillSettings.sharedInstance.freeTrialDaysLeft;
+        if (AppPreferences.sharedInstance.hasOptedInToFreeTrial) {
+            if([[AppPreferences sharedInstance] isFreeTrial]) {
+                NSInteger daysLeft = AppPreferences.sharedInstance.freeTrialDaysLeft;
                 
                 if(daysLeft > 30) {
                     upgradeButtonTitle = [NSString stringWithFormat:NSLocalizedString(@"safes_vc_upgrade_info_button_title", @"Upgrade Button Title - Upgrade Info")];
@@ -2345,13 +2345,13 @@
         return;
     }
     
-    if(!SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid) {
+    if(!AppPreferences.sharedInstance.quickLaunchUuid) {
         
         return;
     }
     
     SafeMetaData* safe = [SafesList.sharedInstance.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
-        return [obj.uuid isEqualToString:SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid];
+        return [obj.uuid isEqualToString:AppPreferences.sharedInstance.quickLaunchUuid];
     }];
     
     if(!safe) {
@@ -2514,7 +2514,7 @@
 - (void)checkForLocalFileOverwriteOrGetNickname:(NSData *)data url:(NSURL*)url editInPlace:(BOOL)editInPlace modDate:(NSDate*)modDate {
     if(editInPlace == NO) {
         NSString* filename = url.lastPathComponent;
-        if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && SharedAppAndAutoFillSettings.sharedInstance.iCloudOn == NO) {
+        if([LocalDeviceStorageProvider.sharedInstance fileNameExistsInDefaultStorage:filename] && AppPreferences.sharedInstance.iCloudOn == NO) {
             [Alerts twoOptionsWithCancel:self
                                    title:NSLocalizedString(@"safesvc_update_existing_database_title", @"Update Existing Database?")
                                  message:NSLocalizedString(@"safesvc_update_existing_question", @"A database using this file name was found in Strongbox. Should Strongbox update that database to use this file, or would you like to create a new database using this file?")
@@ -2571,7 +2571,7 @@
     
 
     
-    if(SharedAppAndAutoFillSettings.sharedInstance.iCloudOn) {
+    if(AppPreferences.sharedInstance.iCloudOn) {
         [Alerts twoOptionsWithCancel:self
                                title:NSLocalizedString(@"safesvc_copy_database_to_location_title", @"Copy to iCloud or Local?")
                              message:NSLocalizedString(@"safesvc_copy_database_to_location_message", @"iCloud is currently enabled. Would you like to copy this database to iCloud now, or would you prefer to keep on your local device only?")
@@ -2742,7 +2742,7 @@
         message = NSLocalizedString(@"open_sequence_prompt_use_convenience_pin_message", @"You can use a convenience PIN Code to unlock this database. While this is convenient, it may reduce the security of the database on this device. If you would like to use this then please select it below or select No to continue using your master password.\n\n*Important: You must ALWAYS remember your master password");
     }
     
-    if (!SharedAppAndAutoFillSettings.sharedInstance.isPro) {
+    if (!AppPreferences.sharedInstance.isPro) {
         message = [message stringByAppendingFormat:NSLocalizedString(@"open_sequence_append_convenience_pro_warning", @"\n\nNB: Convenience Unlock is a Pro feature")];
     }
     
@@ -2840,13 +2840,14 @@
 }
 
 - (void)promptForQuickLaunch:(Model*)model {
-    if(SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid == nil && !model.metadata.hasBeenPromptedForQuickLaunch) {
+    if(AppPreferences.sharedInstance.quickLaunchUuid == nil && !model.metadata.hasBeenPromptedForQuickLaunch) {
         [Alerts yesNo:self
                 title:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_title", @"Set Quick Launch?")
               message:NSLocalizedString(@"open_sequence_yesno_set_quick_launch_message", @"Would you like to use this as your Quick Launch database? Quick Launch means you will get prompted immediately to unlock when you open Strongbox, saving you a precious tap.")
                action:^(BOOL response) {
             if(response) {
-               SharedAppAndAutoFillSettings.sharedInstance.quickLaunchUuid = model.metadata.uuid;
+                AppPreferences.sharedInstance.quickLaunchUuid = model.metadata.uuid;
+                AppPreferences.sharedInstance.autoFillQuickLaunchUuid = model.metadata.uuid;
             }
 
             model.metadata.hasBeenPromptedForQuickLaunch = YES;

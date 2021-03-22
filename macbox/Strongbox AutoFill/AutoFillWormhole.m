@@ -8,8 +8,15 @@
 
 #import "AutoFillWormhole.h"
 
-NSString* const kAutoFillWormholeRequestId = @"AutoFill-Credentials-Request";
-NSString* const kAutoFillWormholeResponseId = @"AutoFill-Credentials-Response";
+NSString* const kAutoFillWormholeQuickTypeRequestId = @"AutoFill-Credentials-Request";
+NSString* const kAutoFillWormholeQuickTypeResponseId = @"AutoFill-Credentials-Response";
+
+NSString* const kAutoFillWormholeDatabaseStatusRequestId = @"AutoFill-Database-Status-Request";
+NSString* const kAutoFillWormholeDatabaseStatusResponseId = @"AutoFill-Database-Status-Response";
+
+NSString* const kAutoFillWormholeConvUnlockRequestId = @"AutoFill-Conv-Unlock-Request";
+NSString* const kAutoFillWormholeConvUnlockResponseId = @"AutoFill-Conv-Unlock-Response";
+
 NSString* const kAutoFillWormholeName = @"AutoFill-Wormhole";
 
 @implementation AutoFillWormhole

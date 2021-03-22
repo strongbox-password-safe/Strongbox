@@ -41,10 +41,6 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 @property (weak) IBOutlet NSTableView *tableViewResults;
 @property (weak) IBOutlet NSTableView *tableViewSelectPreferred;
 
-@property NSArray<Node*> *nodes;
-@property FavIconBulkDoneBlock onDone;
-@property ViewModel* viewModel;
-
 @property NSArray<Node*> *validNodes;
 @property NSArray<NSURL*> *validUniqueUrls;
 
@@ -56,33 +52,32 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 @property (weak) IBOutlet NSButton *buttonSetIcons;
 
 @property Node* nodeToChoosePreferredIconsFor;
+@property BOOL hasLoaded;
 
 @end
 
 @implementation FavIconDownloader
 
-+ (instancetype)instantiate:(NSArray<Node *> *)nodes viewModel:(ViewModel *)viewModel onDone:(FavIconBulkDoneBlock)onDone {
++ (instancetype)newVC {
     NSStoryboard* sb = [NSStoryboard storyboardWithName:@"DownloadFavIcons" bundle:nil];
+
     FavIconDownloader* instance = [sb instantiateInitialController];
-    
-    instance.nodes = nodes;
-    instance.onDone = onDone;
-    instance.viewModel = viewModel;
-    
+
     return instance;
 }
 
-+ (instancetype)showUi:(NSViewController *)parentVc nodes:(NSArray<Node *> *)nodes viewModel:(ViewModel *)viewModel onDone:(FavIconBulkDoneBlock)onDone {
-    FavIconDownloader* instance = [FavIconDownloader instantiate:nodes viewModel:viewModel onDone:onDone];
-  
-    [parentVc presentViewControllerAsSheet:instance];
-    
-    return instance;
+- (void)viewWillAppear {
+    [super viewWillAppear];
+
+
+
+    if(!self.hasLoaded) {
+        self.hasLoaded = YES;
+        [self doInitialSetup];
+    }
 }
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
+- (void)doInitialSetup {
     [self.tableViewResults registerNib:[[NSNib alloc] initWithNibNamed:@"FavIconResultTableCell" bundle:nil] forIdentifier:@"FavIconResultTableCellIdentifier"];
     self.tableViewResults.selectionHighlightStyle = NSTableViewSelectionHighlightStyleNone;
     
@@ -593,12 +588,12 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 - (IBAction)onCancel:(id)sender {
     [self.queue cancelAllOperations];
     self.queue = nil;
-    
-    [self.presentingViewController dismissViewController:self];
-    
+        
     if (self.onDone) {
         self.onDone(NO, nil);
     }
+        
+    [self.presentingViewController dismissViewController:self];
 }
 
 - (IBAction)onSetIcons:(id)sender {
@@ -626,11 +621,10 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
                 if (self.onDone) {
                     [self.queue cancelAllOperations];
                     self.queue = nil;
-
-                    [self.presentingViewController dismissViewController:self];
-                    
                     self.onDone(YES, selected);
                 }
+                
+                [self.presentingViewController dismissViewController:self];
             }
         }];
     }
@@ -638,11 +632,10 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
         if (self.onDone) {
             [self.queue cancelAllOperations];
             self.queue = nil;
-
-            [self.presentingViewController dismissViewController:self];
-            
             self.onDone(YES, selected);
         }
+        
+        [self.presentingViewController dismissViewController:self];
     }
 }
 

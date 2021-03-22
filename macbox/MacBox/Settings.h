@@ -73,8 +73,9 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL outlineViewTitleIsReadonly;
 @property BOOL outlineViewEditableFieldsAreReadonly;
 
-@property BOOL dereferenceInQuickView;
-@property BOOL dereferenceInOutlineView;
+@property (readonly) BOOL dereferenceInQuickView;
+@property (readonly) BOOL dereferenceInOutlineView;
+
 @property (readonly) BOOL dereferenceDuringSearch;
 
 @property BOOL detectForeignChanges;
@@ -84,7 +85,7 @@ extern NSString* const kCustomFieldsColumn;
 
 @property PasswordGenerationConfig *passwordGenerationConfig;
 
-@property BOOL autoPromptForTouchIdOnActivate;
+@property (readonly) BOOL autoPromptForTouchIdOnActivate;
 @property BOOL showSystemTrayIcon;
 
 @property FavIconDownloadOptions *favIconDownloadOptions;
@@ -117,6 +118,10 @@ extern NSString* const kCustomFieldsColumn;
 @property (readonly) BOOL isProOrFreeTrial;
 @property (readonly) BOOL isPro;
 @property (readonly) BOOL isFreeTrial;
+
+@property BOOL showAutoFillTotpCopiedMessage;
+@property BOOL autoFillAutoLaunchSingleDatabase;
+@property BOOL lockDatabasesOnScreenLock;
 
 @end
 

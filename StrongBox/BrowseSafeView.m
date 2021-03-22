@@ -12,7 +12,7 @@
 #import "RecordView.h"
 #import "Alerts.h"
 #import "Settings.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "DatabaseOperations.h"
 #import "NSArray+Extensions.h"
 #import "Utils.h"
@@ -127,7 +127,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                              object:nil];
 
     [NSNotificationCenter.defaultCenter addObserver:weakSelf
-                                           selector:@selector(refreshItems)
+                                           selector:@selector(refresh)
                                                name:kNotificationNameItemDetailsEditDone
                                              object:nil];
 
@@ -191,7 +191,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
     self.hasAlreadyAppeared = YES;
 
-    [self refreshItems];
+    [self refresh];
     [self updateSplitViewDetailsView:nil];
 }
 
@@ -265,7 +265,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         }
     }
     
-    [self refreshItems];
+    [self refresh];
         
     [self listenToNotifications];
 }
@@ -365,7 +365,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     [SafesList.sharedInstance update:self.viewModel.metadata];
     
-    [self refreshItems];
+    [self refresh];
     
     if (@available(iOS 14.0, *)) {
         [self refreshiOS14MoreMenu];
@@ -436,7 +436,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onAuditNodesChanged:(id)param {
-    [self refreshItems];
+    [self refresh];
 }
 
 - (void)onAuditCompleted:(id)param {
@@ -470,7 +470,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         }
     }
     
-    [self refreshItems]; 
+    [self refresh]; 
 }
 
 - (void)showAuditPopup:(NSUInteger)issueCount lastKnownAuditIssueCount:(NSNumber*)lastKnownAuditIssueCount {
@@ -511,13 +511,13 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onDatabaseViewPreferencesChanged:(id)param {
-    [self refreshItems];
+    [self refresh];
 }
 
 - (void)maybePromptToTryProFeatures {
     
     
-    if(SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+    if(AppPreferences.sharedInstance.isProOrFreeTrial) {
         return;
     }
 
@@ -528,7 +528,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     BOOL nudgeDue = dueDate.timeIntervalSinceNow < 0; 
     
-    if (!SharedAppAndAutoFillSettings.sharedInstance.freeTrialHasBeenOptedInAndExpired && nudgeDue) {
+    if (!AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired && nudgeDue) {
         Settings.sharedInstance.lastFreeTrialNudge = NSDate.date;
         
         NSString* locMsg = NSLocalizedString(@"browse_pro_nudge_message_fmt", @"Strongbox Pro is full of handy features like %@ Unlock.\n\nYou have a Free Trial available to use, would you like to try Strongbox Pro?");
@@ -559,7 +559,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (BOOL)userHasAlreadyTriedAppForMoreThan90Days {
-    return (SharedAppAndAutoFillSettings.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90);
+    return (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90);
 }
     
 - (void)showDetailTargetDidChange:(NSNotification *)notification{
@@ -593,16 +593,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
     self.navigationItem.leftItemsSupplementBackButton = YES;
 
-    Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
-    NSString* title = (currentGroup == nil || currentGroup.parent == nil) ? self.viewModel.metadata.nickName : currentGroup.title;
-    
-    NSString*suffix = self.viewModel.isInOfflineMode ? NSLocalizedString(@"browse_vc_offline_suffix", @" (Offline)") : (self.viewModel.isReadOnly ? NSLocalizedString(@"browse_vc_read_only_suffix", @" (Read Only)") : @"" );
-
-    self.navigationItem.title = [NSString stringWithFormat:@"%@%@", title, suffix];
+    [self refreshNavBarTitle];
     
     if (@available(iOS 11.0, *)) {
         self.navigationController.navigationBar.prefersLargeTitles = NO;
     }
+
     self.navigationController.toolbarHidden = NO;
     self.navigationController.toolbar.hidden = NO;
     [self.navigationController setNavigationBarHidden:NO];
@@ -730,7 +726,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)setupTips {
-    if(SharedAppAndAutoFillSettings.sharedInstance.hideTips) {
+    if(AppPreferences.sharedInstance.hideTips) {
         self.navigationItem.prompt = nil;
     }
     else {
@@ -904,9 +900,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)onSetIconForItem:(NSIndexPath * _Nonnull)indexPath completion:(void (^)(BOOL actionPerformed))completion {
     Node *item = [self getNodeFromIndexPath:indexPath];
     
-    self.sni = [[SetNodeIconUiHelper alloc] init];
+    if ( !self.sni ) {
+        self.sni = [[SetNodeIconUiHelper alloc] init];
+    }
     self.sni.customIconPool = self.viewModel.database.customIconPool;
-    
+
+    __weak BrowseSafeView* weakSelf = self;
     [self.sni changeIcon:self
                     node:item
              urlOverride:nil
@@ -915,14 +914,14 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
               completion:^(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selected) {
         if(goNoGo) {
             if (selected) {
-                [self setCustomIcons:item selected:selected isRecursiveGroupFavIconResult:isRecursiveGroupFavIconResult];
+                [weakSelf setCustomIcons:item selected:selected isRecursiveGroupFavIconResult:isRecursiveGroupFavIconResult];
             }
             else {
                 NodeIcon* icon = selected.allValues.firstObject;
                 item.icon = icon; 
             }
             
-            [self saveChangesToSafeAndRefreshView];
+            [weakSelf saveChangesToSafeAndRefreshView];
         }
         
         if(completion) {
@@ -1294,7 +1293,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)togglePinEntry:(Node*)item {
     [self.viewModel togglePin:item.uuid];
-    [self refreshItems];
+    [self refresh];
 }
 
 - (void)duplicateItem:(Node*)item {
@@ -1336,7 +1335,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)onDatabaseReloaded:(id)param {
     if ( !self.isEditing ) {
         NSLog(@"XXXXXX - Received Database Reloaded Notification from Model");
-        [self refreshItems];
+        [self refresh];
     }
 }
 
@@ -1354,6 +1353,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     [self updateSearchResultsForSearchController:self.searchController];
 }
 
+- (void)refresh {
+    [self refreshItems];
+    
+    [self refreshNavBarTitle];
+}
+
 - (void)refreshItems {
     if(self.searchController.isActive) {
         [self updateSearchResultsForSearchController:self.searchController];
@@ -1366,6 +1371,13 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
     
     [self updateToolbarButtonsState];
+}
+
+- (void)refreshNavBarTitle {
+    Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+    NSString* title = (currentGroup == nil || currentGroup.parent == nil) ? self.viewModel.metadata.nickName : currentGroup.title;
+    NSString* suffix = self.viewModel.isInOfflineMode ? NSLocalizedString(@"browse_vc_offline_suffix", @" (Offline)") : (self.viewModel.isReadOnly ? NSLocalizedString(@"browse_vc_read_only_suffix", @" (Read Only)") : @"" );
+    self.navigationItem.title = [NSString stringWithFormat:@"%@%@", title, suffix];
 }
 
 - (id<BrowseTableDatasource>)getTableDataSource {
@@ -1601,7 +1613,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         DatabasePreferencesController *vc = (DatabasePreferencesController*)nav.topViewController;
         vc.viewModel = self.viewModel;
         vc.onDatabaseBulkIconUpdate = ^(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
-            for(Node* node in self.viewModel.database.activeRecords) {
+            for(Node* node in self.viewModel.database.allActiveEntries) {
                 UIImage* img = selectedFavIcons[node.uuid];
                 if(img) {
                     NSData *data = UIImagePNGRepresentation(img);
@@ -1631,7 +1643,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             self.viewModel.metadata.browseSortField = field;
             self.viewModel.metadata.browseSortOrderDescending = descending;
             self.viewModel.metadata.browseSortFoldersSeparately = foldersSeparately;
-            [self refreshItems];
+            [self refresh];
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
@@ -2049,7 +2061,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                       title:NSLocalizedString(@"browse_vc_error_deleting", @"Error Deleting")
                     message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
                
-               [self refreshItems];
+               [self refresh];
            }
            else {
                [self saveChangesToSafeAndRefreshView];
@@ -2075,7 +2087,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)saveChangesToSafeAndRefreshView {
-    [self refreshItems];
+    [self refresh];
     
     [self.viewModel update:self
                    handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
@@ -2112,7 +2124,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             
             NSLog(@"XXXXXX - onUpdateDone");
 
-            [self refreshItems];
+            [self refresh];
             [self updateSplitViewDetailsView:nil editMode:NO];
         }
     });
@@ -2383,7 +2395,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 
-- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point  API_AVAILABLE(ios(13.0)){
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point API_AVAILABLE(ios(13.0)){
     if (self.isEditing || [self isShowingQuickViews]) {
         return nil;
     }
@@ -2848,18 +2860,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (void)copyAndLaunch:(Node*)item {
-    NSURL* url = [self getLaunchUrlForItem:item];
-    
-    if (url) {
+    if ( item.fields.url.length ) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, .25 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
             [self copyPassword:item];
-
-            if (@available (iOS 10.0, *)) {
-                [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
-            }
-            else {
-                [UIApplication.sharedApplication openURL:url];
-            }
+            [self.viewModel launchUrl:item];
         });
     }
 }

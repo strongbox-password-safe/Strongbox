@@ -55,7 +55,7 @@
                             </textFieldCell>
                         </textField>
                         <stackView distribution="fill" orientation="horizontal" alignment="centerY" spacing="4" horizontalStackHuggingPriority="250" verticalStackHuggingPriority="250" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="D5k-tq-p8q" userLabel="Status Icons">
-                            <rect key="frame" x="218" y="20" width="96" height="16"/>
+                            <rect key="frame" x="218" y="20" width="116" height="16"/>
                             <subviews>
                                 <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="8eo-Lq-QCv">
                                     <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -92,11 +92,21 @@
                                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="syncronize" id="i4y-VV-KgJ"/>
                                     <color key="contentTintColor" name="systemBlueColor" catalog="System" colorSpace="catalog"/>
                                 </imageView>
-                                <progressIndicator maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="Wza-bV-vlN">
+                                <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4f5-Uy-tr6">
                                     <rect key="frame" x="80" y="0.0" width="16" height="16"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="16" id="K8c-R5-WPD"/>
+                                        <constraint firstAttribute="height" constant="16" id="uJt-9y-mgD"/>
+                                    </constraints>
+                                    <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="unlock" id="Xua-VD-PFa"/>
+                                    <color key="contentTintColor" name="systemGreenColor" catalog="System" colorSpace="catalog"/>
+                                </imageView>
+                                <progressIndicator maxValue="100" indeterminate="YES" controlSize="small" style="spinning" translatesAutoresizingMaskIntoConstraints="NO" id="Wza-bV-vlN">
+                                    <rect key="frame" x="100" y="0.0" width="16" height="16"/>
                                 </progressIndicator>
                             </subviews>
                             <visibilityPriorities>
+                                <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
                                 <integer value="1000"/>
@@ -109,10 +119,11 @@
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
                                 <real value="3.4028234663852886e+38"/>
+                                <real value="3.4028234663852886e+38"/>
                             </customSpacing>
                         </stackView>
                         <textField horizontalHuggingPriority="249" verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="re4-jk-skV" userLabel="Size">
-                            <rect key="frame" x="324" y="21" width="254" height="14"/>
+                            <rect key="frame" x="344" y="21" width="234" height="14"/>
                             <constraints>
                                 <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="bF8-vc-3e7"/>
                             </constraints>
@@ -170,6 +181,7 @@
                 <outlet property="imageViewQuickLaunch" destination="8eo-Lq-QCv" id="Fql-ek-gag"/>
                 <outlet property="imageViewReadOnly" destination="Qaa-R4-HcO" id="u8B-BN-pg6"/>
                 <outlet property="imageViewSyncing" destination="fib-kd-ruM" id="Bf2-pI-F6J"/>
+                <outlet property="imageViewUnlocked" destination="4f5-Uy-tr6" id="197-W2-NbE"/>
                 <outlet property="syncProgressIndicator" destination="Wza-bV-vlN" id="ZTA-bQ-zev"/>
                 <outlet property="textFieldName" destination="Ydl-fJ-xJH" id="28L-Jv-bo6"/>
                 <outlet property="textFieldStorage" destination="8OX-P6-YzU" id="Prj-jC-FgK"/>
@@ -185,6 +197,7 @@
         <image name="lock" width="30" height="30"/>
         <image name="rocket" width="30" height="30"/>
         <image name="syncronize" width="30" height="30"/>
+        <image name="unlock" width="30" height="30"/>
         <image name="upload" width="30" height="30"/>
     </resources>
 </document>

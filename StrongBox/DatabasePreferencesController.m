@@ -20,8 +20,9 @@
 #import "PinsConfigurationController.h"
 #import "StatisticsPropertiesViewController.h"
 #import "AuditConfigurationVcTableViewController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "SyncManager.h"
+#import "AutoFillPreferencesViewController.h"
 
 @interface DatabasePreferencesController ()
 
@@ -31,9 +32,6 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
 @property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
-
-@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFill;
-@property (weak, nonatomic) IBOutlet UISwitch *switchQuickTypeAutoFill;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBiometric;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewBiometric;
@@ -47,8 +45,9 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStats;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAudit;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellQuickTypeFormat;
-@property (weak, nonatomic) IBOutlet UILabel *labelQuickTypeFormat;
+
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewAutoFill;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAutoFillPreferences;
 
 @end
 
@@ -63,6 +62,8 @@
     self.imageViewBiometric.image = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
     self.imageViewPinCodes.image = [UIImage imageNamed:@"keypad"];
     self.imageViewAudit.image = [UIImage imageNamed:@"security_checked"];
+    self.imageViewAudit.tintColor = UIColor.systemOrangeColor;
+    self.imageViewAutoFill.image = [UIImage imageNamed:@"password"];
     
     [self bindUi];
 }
@@ -136,64 +137,12 @@
     }
 }
 
-- (IBAction)onSwitchQuickTypeAutoFill:(id)sender {
-    if ( !self.switchQuickTypeAutoFill.on ) {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
-    else {
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
-                                                           databaseUuid:self.viewModel.metadata.uuid
-                                                          displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
-    }
-    
-    self.viewModel.metadata.quickTypeEnabled = self.switchQuickTypeAutoFill.on;
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
-
-    [self bindUi];
-}
-
-- (IBAction)onSwitchAutoFill:(id)sender {
-    if (!self.switchAutoFill.on) {
-       [self.viewModel disableAndClearAutoFill];
-       [self bindUi];
-                       
-       [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_disable_done", @"AutoFill Disabled")
-                                  message:nil
-                                 duration:3.f
-                              hideOnSwipe:YES
-                                hideOnTap:YES
-                                alertType:ISAlertTypeSuccess
-                            alertPosition:ISAlertPositionTop
-                                  didHide:nil];
-    }
-    else {
-        [self.viewModel enableAutoFill];
-        
-        if ( self.viewModel.metadata.quickTypeEnabled ) {
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
-                                                               databaseUuid:self.viewModel.metadata.uuid
-                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
-        }
-        
-        [self bindUi];
-
-        [ISMessages showCardAlertWithTitle:NSLocalizedString(@"db_management_enable_done", @"AutoFill Enabled")
-                                   message:nil
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeSuccess
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
-    }
-}
-
 - (void)bindUi {
     [self bindDatabaseLock];
     
     NSString *biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
 
-    if (![SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial]) {
+    if (![AppPreferences.sharedInstance isProOrFreeTrial]) {
         self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt_pro_only", @"%@ Unlock"), biometricIdName];
     }
     else {
@@ -208,22 +157,6 @@
     
     self.switchAllowBiometric.enabled = [self canToggleTouchId];
     self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
-
-    
-    
-    self.switchAutoFill.on = self.viewModel.metadata.autoFillEnabled;
-    self.switchQuickTypeAutoFill.on = self.viewModel.metadata.autoFillEnabled && self.viewModel.metadata.quickTypeEnabled;
-    self.switchQuickTypeAutoFill.enabled = self.switchAutoFill.on;
-        
-    self.cellQuickTypeFormat.userInteractionEnabled = self.switchQuickTypeAutoFill.on;
-    self.labelQuickTypeFormat.text = quickTypeFormatString(self.viewModel.metadata.quickTypeDisplayFormat);
-
-    if (@available(iOS 13.0, *)) {
-        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.labelColor : UIColor.secondaryLabelColor;
-    } else {
-        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.blackColor : UIColor.lightGrayColor;
-    }
-    
     self.switchLockOnDeviceLock.on = self.viewModel.metadata.autoLockOnDeviceLock;
 }
 
@@ -255,6 +188,11 @@
         vc.model = self.viewModel;
         vc.onDone = self.onDone;
     }
+    else if ( [segue.identifier isEqualToString:@"segueToAutoFillPreferences"] ) {
+        UINavigationController* nav = segue.destinationViewController;
+        AutoFillPreferencesViewController* vc = (AutoFillPreferencesViewController*)nav.topViewController;
+        vc.viewModel = sender;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -266,41 +204,11 @@
     else if ( cell == self.cellPinCodes) {
         [self performSegueWithIdentifier:@"segueToPinsConfiguration" sender:nil];
     }
-    else if ( cell == self.cellQuickTypeFormat ) {
-        [self promptForQuickTypeFormat];
+    else if ( cell == self.cellAutoFillPreferences ) {
+        [self performSegueWithIdentifier:@"segueToAutoFillPreferences" sender:self.viewModel];
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
-- (void)promptForQuickTypeFormat {
-    NSArray<NSNumber*>* options = @[@(kQuickTypeFormatTitleThenUsername),
-                                    @(kQuickTypeFormatUsernameOnly),
-                                    @(kQuickTypeFormatTitleOnly)];
-    
-    NSArray<NSString*>* optionsStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return quickTypeFormatString(obj.integerValue);
-    }];
-    
-    NSInteger currentlySelected = [options indexOfObject:@(self.viewModel.metadata.quickTypeDisplayFormat)];
-    
-    [self promptForChoice:NSLocalizedString(@"prefs_vc_quick_type_format", @"QuickType Format")
-                  options:optionsStrings
-     currentlySelectIndex:currentlySelected
-               completion:^(BOOL success, NSInteger selectedIndex) {
-        if (success) {
-            NSNumber *numFormat = options[selectedIndex];
-            self.viewModel.metadata.quickTypeDisplayFormat = numFormat.integerValue;
-            [SafesList.sharedInstance update:self.viewModel.metadata];
-            
-            
-            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
-                                                               databaseUuid:self.viewModel.metadata.uuid
-                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
-            
-            [self bindUi];
-        }
-    }];
 }
 
 - (void)promptForAutoLockTimeout {
@@ -379,7 +287,7 @@
 }
 
 - (BOOL)canToggleTouchId {
-    return BiometricsManager.isBiometricIdAvailable && [SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial];
+    return BiometricsManager.isBiometricIdAvailable && [AppPreferences.sharedInstance isProOrFreeTrial];
 }
 
 - (IBAction)onSwitchLockOnDeviceLock:(id)sender {

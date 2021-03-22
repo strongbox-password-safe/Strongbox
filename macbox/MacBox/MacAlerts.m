@@ -54,6 +54,14 @@ informativeText:(NSString*)informativeText
     }];
 }
 
++ (void)areYouSure:(NSString *)message window:(NSWindow *)window completion:(void (^)(BOOL))completion {
+    [MacAlerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
+     informativeText:message
+              window:window
+          completion:completion];
+
+}
+
 + (void)yesNo:(NSString *)messageText informativeText:(NSString*)informativeText
        window:(NSWindow*)window
    completion:(void (^)(BOOL yesNo))completion {
@@ -262,6 +270,66 @@ disableEscapeKey:(BOOL)disableEscapeKey
     self.okButton.enabled = self.keyTextField.stringValue.length;
 }
 
++ (void)twoOptions:(NSString *)messageText
+   informativeText:(NSString*)informativeText
+ option1AndDefault:(NSString*)option1AndDefault
+           option2:(NSString*)option2
+            window:(NSWindow*)window
+        completion:(void (^)(NSUInteger option))completion {
+    NSAlert *alert = [[NSAlert alloc] init];
+    
+    if (informativeText) [alert setInformativeText:informativeText];
+    if (messageText) [alert setMessageText:messageText];
+    
+    [alert setAlertStyle:NSAlertStyleInformational];
+    
+    [alert addButtonWithTitle:option1AndDefault];
+    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+    
+    [alert addButtonWithTitle:option2];
+    
+    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+        if(returnCode == NSAlertFirstButtonReturn) {
+            completion(1);
+        }
+        else {
+            completion(2);
+        }
+    }];
+}
+
++ (void)threeOptions:(NSString *)messageText
+     informativeText:(NSString *)informativeText
+   option1AndDefault:(NSString *)option1AndDefault
+             option2:(NSString *)option2
+             option3:(NSString *)option3
+              window:(NSWindow *)window
+          completion:(void (^)(NSUInteger))completion {
+    NSAlert *alert = [[NSAlert alloc] init];
+    
+    if (informativeText) [alert setInformativeText:informativeText];
+    if (messageText) [alert setMessageText:messageText];
+    
+    [alert setAlertStyle:NSAlertStyleInformational];
+    
+    [alert addButtonWithTitle:option1AndDefault];
+    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+    
+    [alert addButtonWithTitle:option2];
+    [alert addButtonWithTitle:option3];
+
+    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+        if(returnCode == NSAlertFirstButtonReturn) {
+            completion(1);
+        }
+        else if ( returnCode == NSAlertSecondButtonReturn ) {
+            completion(2);
+        }
+        else {
+            completion(3);
+        }
+    }];
+}
 
 + (void)twoOptionsWithCancel:(NSString *)messageText
              informativeText:(NSString*)informativeText

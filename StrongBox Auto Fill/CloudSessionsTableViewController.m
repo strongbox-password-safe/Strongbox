@@ -11,7 +11,7 @@
 #import "GoogleDriveManager.h"
 #import "OneDriveStorageProvider.h"
 #import "Alerts.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface CloudSessionsTableViewController ()
 

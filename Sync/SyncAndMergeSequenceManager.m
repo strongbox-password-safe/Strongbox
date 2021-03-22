@@ -43,9 +43,12 @@ typedef SafeMetaData* METADATA_PTR;
 #import <Cocoa/Cocoa.h>
 #import "DatabaseMetadata.h"
 #import "DatabasesManager.h"
+#import "ProgressWindow.h"
+#import "MacAlerts.h"
 
 typedef NSViewController* VIEW_CONTROLLER_PTR;
 typedef DatabaseMetadata* METADATA_PTR;
+
 #endif
 
 NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyncStatusChanged";
@@ -56,6 +59,14 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
 @property ConcurrentMutableDictionary<NSString*, DatabaseSyncOperationalData*>* operationalStateForDatabase;
 @property NSDictionary<NSNumber*, dispatch_queue_t>* storageProviderSerializedQueues; 
+
+#if TARGET_OS_IPHONE
+
+#else
+
+@property ProgressWindow* progressWindow;
+
+#endif
 
 @end
 
@@ -98,6 +109,33 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         self.storageProviderSerializedQueues = md.copy;
     }
     return self;
+}
+
+- (void)dismissProgressSpinner {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IPHONE
+        [SVProgressHUD dismiss];
+#else
+        [self.progressWindow hide];
+#endif
+    });
+}
+
+- (void)showProgressSpinner:(NSString*)message viewController:(VIEW_CONTROLLER_PTR)viewController {
+    dispatch_async(dispatch_get_main_queue(), ^{
+#if TARGET_OS_IPHONE
+        [SVProgressHUD showWithStatus:message];
+#else
+        if ( self.progressWindow ) {
+            [self.progressWindow hide];
+        }
+        
+        if (viewController) {
+            self.progressWindow = [ProgressWindow newProgress:message];
+            [viewController.view.window beginSheet:self.progressWindow.window completionHandler:nil];
+        }
+#endif
+    });
 }
 
 - (DatabaseSyncOperationalData*)getOperationData:(METADATA_PTR)database {
@@ -231,7 +269,13 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }];
 }
 
-- (void)onPulledRemoteDatabase:(METADATA_PTR)database syncId:(NSUUID*)syncId localModDate:(NSDate*)localModDate remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified parameters:(SyncParameters*)parameters  completion:(SyncAndMergeCompletionBlock)completion {
+- (void)onPulledRemoteDatabase:(METADATA_PTR)database
+                        syncId:(NSUUID*)syncId
+                  localModDate:(NSDate*)localModDate
+                    remoteData:(NSData*)remoteData
+                remoteModified:(NSDate*)remoteModified
+                    parameters:(SyncParameters*)parameters
+                    completion:(SyncAndMergeCompletionBlock)completion {
     [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Got Remote OK [remoteMod=%@]", remoteModified.friendlyDateTimeStringBothPrecise]];
         
     
@@ -247,7 +291,13 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }
 }
 
-- (void)handleOutstandingUpdate:(METADATA_PTR)database syncId:(NSUUID*)syncId remoteData:(NSData*)remoteData remoteModified:(NSDate*)remoteModified parameters:(SyncParameters*)parameters completion:(SyncAndMergeCompletionBlock)completion {
+- (void)handleOutstandingUpdate:(METADATA_PTR)database
+                         syncId:(NSUUID*)syncId
+                     remoteData:(NSData*)remoteData
+                 remoteModified:(NSDate*)remoteModified
+                     parameters:(SyncParameters*)parameters
+                     completion:(SyncAndMergeCompletionBlock)completion {
+    
     NSDate* localModDate;
     NSURL* localCopy = [self getExistingLocalCopy:database modified:&localModDate];
     NSData* localData;
@@ -277,20 +327,13 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
             [self setRemoteAndComplete:localData database:database syncId:syncId localWasChanged:NO interactiveVC:parameters.interactiveVC completion:completion];
         }
         else {
-#if TARGET_OS_IPHONE
-            
             [self doConflictResolution:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified parameters:parameters completion:completion];
-#else
-            NSLog(@"WARNWARN - Something very wrong to get here on MacOS... - TODO: BUild out conflict resolution on Mac");
-#endif
         }
     }
 }
 
 
 
-
-#if TARGET_OS_IPHONE
 
 - (void)doConflictResolution:(METADATA_PTR)database
                       syncId:(NSUUID*)syncId
@@ -302,7 +345,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                   completion:(SyncAndMergeCompletionBlock)completion {
     [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Remote has changed since last sync. Last Sync Remote Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
 
-    ConflictResolutionStrategy strategy = database.conflictResolutionStrategy; 
+    ConflictResolutionStrategy strategy = database.conflictResolutionStrategy;
     
     if ( ! parameters.interactiveVC ) {
         if ( strategy == kConflictResolutionStrategyAsk) {
@@ -326,12 +369,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     }
     
     
-    
-    if (strategy == kConflictResolutionStrategyAsk) {
-        
-        [self conflictResolutionAsk:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified parameters:parameters completion:completion];
-    }
-    else if (strategy == kConflictResolutionStrategyAutoMerge) {
+
+    if (strategy == kConflictResolutionStrategyAutoMerge) {
         [self conflictResolutionMerge:database syncId:syncId parameters:parameters localData:localData remoteData:remoteData compareFirst:NO completion:completion];
     }
     else if (strategy == kConflictResolutionStrategyForcePushLocal) { 
@@ -340,10 +379,18 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     else if (strategy == kConflictResolutionStrategyForcePullRemote) { 
         [self conflictResolutionForcePullRemote:database syncId:syncId remoteData:remoteData remoteModified:remoteModified interactiveVC:parameters.interactiveVC completion:completion];
     }
+#if TARGET_OS_IPHONE
+    else if (strategy == kConflictResolutionStrategyAsk) {
+        
+        [self conflictResolutionAsk:database syncId:syncId localData:localData localModDate:localModDate remoteData:remoteData remoteModified:remoteModified parameters:parameters completion:completion];
+    }
+#endif
     else {
         NSLog(@"WARNWARN: doConflictResolution - Unknown Conflict Resolution Strategy");
     }
 }
+
+#if TARGET_OS_IPHONE
 
 
 
@@ -451,6 +498,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     completion(kSyncAndMergeUserPostponedSync, NO, nil);
 }
 
+#endif
+
 - (void)conflictResolutionForcePushLocal:(METADATA_PTR)database
                                   syncId:(NSUUID*)syncId
                                localData:(NSData*)localData
@@ -537,14 +586,14 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                      parameters:(SyncParameters*)parameters
                    compareFirst:(BOOL)compareFirst
                      completion:(SyncAndMergeCompletionBlock)completion {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:parameters.interactiveVC];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [Serializator fromUrl:localUrl
                           ckf:parameters.key
                    completion:^(BOOL userCancelled, DatabaseModel * _Nullable mine, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
+                [self dismissProgressSpinner];
 
                 if ( userCancelled ) {
                     [self logMessage:database syncId:syncId message:@"User Cancelled Local Merge Unlock."];
@@ -555,13 +604,13 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                     completion(kSyncAndMergeError, NO, error);
                 }
                 else {
-                    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")]; 
+                    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:parameters.interactiveVC];
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
                         [Serializator fromUrl:remoteUrl
                                           ckf:parameters.key
                                    completion:^(BOOL userCancelled, DatabaseModel * _Nullable theirs, NSError * _Nullable error) {
                             dispatch_async(dispatch_get_main_queue(), ^{
-                                [SVProgressHUD dismiss];
+                                [self dismissProgressSpinner];
 
                                 if ( userCancelled ) {
                                     [self logMessage:database syncId:syncId message:@"User Cancelled Remote Merge Unlock."];
@@ -592,55 +641,60 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                      mine:(DatabaseModel*)mine
                    theirs:(DatabaseModel*)theirs
                completion:(SyncAndMergeCompletionBlock)completion {
-    Model* local = [[Model alloc] initWithDatabase:mine metaData:database forcedReadOnly:NO isAutoFill:NO];
-    Model* remote = [[Model alloc] initWithDatabase:theirs metaData:database forcedReadOnly:YES isAutoFill:NO];
+    DatabaseModel* merged = [mine clone];
+    DatabaseMerger* syncer= [DatabaseMerger mergerFor:merged theirs:theirs];
 
-    DatabaseModel* localDryRun = [local.database clone];
-    DatabaseMerger* syncer= [DatabaseMerger mergerFor:localDryRun theirs:remote.database];
-
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...")];
+    [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_syncing", @"Syncing...") viewController:parameters.interactiveVC];
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         BOOL success = [syncer merge];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
+            [self dismissProgressSpinner];
+            
             if ( success ) {
                 [self logMessage:database syncId:syncId message:@"Pre-Merge Succeeded..."];
-                Model* localAfterMerge = [[Model alloc] initWithDatabase:localDryRun metaData:database forcedReadOnly:YES isAutoFill:NO];
-                
-                [self compareOrMerge:database local:local localAfterMerge:localAfterMerge syncId:syncId compareFirst:compareFirst interactiveVC:parameters.interactiveVC completion:completion];
+                [self compareOrMerge:database mine:mine merged:merged syncId:syncId compareFirst:compareFirst interactiveVC:parameters.interactiveVC completion:completion];
             }
             else {
                 [self logMessage:database syncId:syncId message:@"Merge Failed"];
                 NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_could_not_merge_local_remote", @"Technical Error - Could not merge local and remote databases.") errorCode:-1];
+                
+#if TARGET_OS_IPHONE
                 [Alerts error:parameters.interactiveVC error:error completion:^{
-                    [self logAndPublishStatusChange:local.metadata syncId:syncId state:kSyncOperationStateError error:error];
+                    [self logAndPublishStatusChange:database syncId:syncId state:kSyncOperationStateError error:error];
                     completion(kSyncAndMergeError, NO, error);
                 }];
+#else
+                [MacAlerts error:error window:parameters.interactiveVC.view.window completion:^{
+                    [self logAndPublishStatusChange:database syncId:syncId state:kSyncOperationStateError error:error];
+                    completion(kSyncAndMergeError, NO, error);
+                }];
+#endif
             }
         });
     });
 }
 
 - (void)compareOrMerge:(METADATA_PTR)database
-                 local:(Model*)local
-       localAfterMerge:(Model*)localAfterMerge
+                  mine:(DatabaseModel*)mine
+                merged:(DatabaseModel*)merged
                 syncId:(NSUUID*)syncId
           compareFirst:(BOOL)compareFirst
          interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
             completion:(SyncAndMergeCompletionBlock)completion {
     if (compareFirst) {
+#if TARGET_OS_IPHONE 
         UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"CompareDatabases" bundle:nil];
         DatabaseDiffAndMergeViewController* vc = (DatabaseDiffAndMergeViewController*)[storyboard instantiateInitialViewController];
 
         vc.isMergeDiff = YES;
-        vc.firstDatabase = local;
-        vc.secondDatabase = localAfterMerge;
+        vc.firstDatabase = [[Model alloc] initWithDatabase:mine metaData:database forcedReadOnly:NO isAutoFill:NO];
+        vc.secondDatabase = [[Model alloc] initWithDatabase:merged metaData:database forcedReadOnly:YES isAutoFill:NO];
         vc.onDone = ^(BOOL mergeRequested, Model * _Nullable first, Model * _Nullable second) {
             [interactiveVC dismissViewControllerAnimated:YES completion:^{
                 if (mergeRequested) {
-                    [self mergeLocalAndRemote:database merged:localAfterMerge interactiveVC:interactiveVC syncId:syncId completion:completion];
+                    [self mergeLocalAndRemote:database merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
                 }
                 else {
                     [self logMessage:database syncId:syncId message:@"User Cancelled Compare & Merge"];
@@ -651,14 +705,16 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
         UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
         [interactiveVC presentViewController:nav animated:YES completion:nil];
+#endif
     }
     else {
-        [self mergeLocalAndRemote:database merged:localAfterMerge interactiveVC:interactiveVC syncId:syncId completion:completion];
+        [self mergeLocalAndRemote:database merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
     }
 }
 
-- (void)mergeLocalAndRemote:(METADATA_PTR)database merged:(Model*)merged interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC syncId:(NSUUID*)syncId completion:(SyncAndMergeCompletionBlock)completion {
-    if (merged.database.originalFormat != kKeePass && merged.database.originalFormat != kKeePass4) {
+- (void)mergeLocalAndRemote:(METADATA_PTR)database merged:(DatabaseModel*)merged interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC syncId:(NSUUID*)syncId completion:(SyncAndMergeCompletionBlock)completion {
+    if (merged.originalFormat != kKeePass && merged.originalFormat != kKeePass4) {
+#if TARGET_OS_IPHONE
         [Alerts areYouSure:interactiveVC
                    message:NSLocalizedString(@"merge_are_you_sure_less_than_ideal_format", @"Your database format does not support advanced synchronization features (available in KeePass 2). This means the merge may be less than ideal.\n\nAre you sure you want to continue with the merge?")
                     action:^(BOOL response) {
@@ -669,20 +725,31 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 [self conflictResolutionCancel:database syncId:syncId completion:completion];
             }
         }];
+#else
+        [MacAlerts areYouSure:NSLocalizedString(@"merge_are_you_sure_less_than_ideal_format", @"Your database format does not support advanced synchronization features (available in KeePass 2). This means the merge may be less than ideal.\n\nAre you sure you want to continue with the merge?")
+                       window:interactiveVC.view.window
+                   completion:^(BOOL response) {
+            if (response) {
+                [self mergeLocalAndRemoteAfterWarn:database merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
+            }
+            else {
+                [self conflictResolutionCancel:database syncId:syncId completion:completion];
+            }
+        }];
+#endif
     }
     else {
         [self mergeLocalAndRemoteAfterWarn:database merged:merged interactiveVC:interactiveVC syncId:syncId completion:completion];
     }
 }
 
-- (void)mergeLocalAndRemoteAfterWarn:(METADATA_PTR)database merged:(Model*)merged interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC syncId:(NSUUID*)syncId completion:(SyncAndMergeCompletionBlock)completion {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        [Serializator getAsData:merged.database format:merged.database.originalFormat completion:^(BOOL userCancelled, NSData * _Nullable mergedData, NSString * _Nullable debugXml, NSError * _Nullable error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [SVProgressHUD dismiss];
+- (void)mergeLocalAndRemoteAfterWarn:(METADATA_PTR)database merged:(DatabaseModel*)merged interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC syncId:(NSUUID*)syncId completion:(SyncAndMergeCompletionBlock)completion {
+    [self showProgressSpinner:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:interactiveVC];
 
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        [Serializator getAsData:merged format:merged.originalFormat completion:^(BOOL userCancelled, NSData * _Nullable mergedData, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self dismissProgressSpinner];
                 if (userCancelled) {
                     [self conflictResolutionCancel:database syncId:syncId completion:completion];
                 }
@@ -702,9 +769,6 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         }];
     });
 }
-
-#endif
-
 
 
 

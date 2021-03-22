@@ -7,7 +7,7 @@
 //
 
 #import "PinEntryController.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface PinEntryController ()
 
@@ -66,7 +66,7 @@
     
     
     
-    self.buttonDone.hidden = self.pinLength > 0 && SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking;
+    self.buttonDone.hidden = self.pinLength > 0 && AppPreferences.sharedInstance.instantPinUnlocking;
     
     self.labelWarning.text = self.warning;
     self.labelWarning.hidden = self.warning.length == 0;
@@ -157,7 +157,7 @@
     
     [self validateButtonsUi];
     
-    if(self.pinLength > 0 && self.enteredText.length == self.pinLength && SharedAppAndAutoFillSettings.sharedInstance.instantPinUnlocking) {
+    if(self.pinLength > 0 && self.enteredText.length == self.pinLength && AppPreferences.sharedInstance.instantPinUnlocking) {
         
         
         

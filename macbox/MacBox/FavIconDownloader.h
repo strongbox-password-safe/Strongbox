@@ -6,17 +6,21 @@
 //  Copyright © 2019 Mark McGuill. All rights reserved.
 //
 
-#import "ViewController.h"
+#import <Foundation/Foundation.h>
+#import <Cocoa/Cocoa.h>
+#import "ViewModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface FavIconDownloader : ViewController
-
 typedef void (^FavIconBulkDoneBlock)(BOOL go, NSDictionary<NSUUID*, NSImage*> * _Nullable selectedFavIcons);
 
+@interface FavIconDownloader : NSViewController
 
+@property NSArray<Node*> *nodes;
+@property FavIconBulkDoneBlock onDone;
+@property ViewModel* viewModel;
 
-+ (instancetype)showUi:(NSViewController*)parentVc nodes:(NSArray<Node*>*)nodes viewModel:(ViewModel*)viewModel onDone:(FavIconBulkDoneBlock)onDone;
++ (instancetype)newVC;
 
 @end
 

@@ -116,7 +116,7 @@ BOOL isValidUrl(NSString* urlString) {
     
     NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
     
-    fmt.allowedUnits =  NSCalendarUnitMinute | NSCalendarUnitSecond;
+    fmt.allowedUnits =  NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond;
     fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleShort;
     
     return [fmt stringFromTimeInterval:seconds];
@@ -486,6 +486,12 @@ NSString* localizedYesOrNoFromBool(BOOL george) {
 
 
 
+
+
+
+
+
+    
 
 
 

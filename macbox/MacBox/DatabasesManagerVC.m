@@ -40,7 +40,6 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
 @property (weak) IBOutlet NSButton *buttonRemove;
-@property (weak) IBOutlet NSButton *buttonRename;
 @property (weak) IBOutlet NSButton *buttonSync;
 
 @property NSTimer* timerRefresh;
@@ -131,7 +130,6 @@ static DatabasesManagerVC* sharedInstance;
 
 - (void)bindUi {
     self.buttonRemove.enabled = self.tableView.selectedRowIndexes.count > 0;
-    self.buttonRename.enabled = self.tableView.selectedRowIndexes.count == 1;
     self.buttonSync.enabled = self.tableView.selectedRowIndexes.count == 1;
 }
 
@@ -153,26 +151,38 @@ static DatabasesManagerVC* sharedInstance;
     [self.view.window orderBack:self];
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 - (void)windowWillClose:(NSNotification *)notification {
     if ( notification.object == self.view.window && self == sharedInstance) {
         [self.view.window orderOut:self];
         [self killRefreshTimer];
         sharedInstance = nil;
-    }
-}
-
-- (IBAction)onRename:(id)sender {
-    if(self.tableView.selectedRow != -1) {
-        DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
-        
-        NSString* loc = NSLocalizedString(@"mac_enter_new_name_for_db", @"Enter a new name for this database");
-        NSString* response = [[[MacAlerts alloc] init] input:loc defaultValue:safe.nickName allowEmpty:NO];
-        
-        if(response) {
-            NSLog(@"Rename: [%@]", response);
-            safe.nickName = response;
-            [DatabasesManager.sharedInstance update:safe];
-        }
     }
 }
 
@@ -257,11 +267,25 @@ static DatabasesManagerVC* sharedInstance;
 
 - (id)tableView:(NSTableView *)tableView viewForTableColumn:(nullable NSTableColumn *)tableColumn row:(NSInteger)row {
     DatabaseCellView *result = [tableView makeViewWithIdentifier:kDatabaseCellView owner:self];
-
     DatabaseMetadata* database = [self.databases objectAtIndex:row];
-    
     [result setWithDatabase:database];
+
+    __weak DatabasesManagerVC* weakSelf = self;
+
+    result.onBeginEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
+        NSInteger row = [weakSelf.tableView rowForView:cell];
+        if ( row != -1 && weakSelf.tableView.selectedRow != row ) {
+            NSLog(@"Extending Selection after nickname click");
+            [weakSelf.tableView selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        }
+        
+        [weakSelf killRefreshTimer];
+    };
     
+    result.onEndEditingNickname = ^(DatabaseCellView * _Nonnull cell) {
+        [weakSelf startRefreshTimer];
+    };
+            
     return result;
 }
 
@@ -485,9 +509,6 @@ static DatabasesManagerVC* sharedInstance;
     else if (theAction == @selector(onRemove:)) {
         return self.tableView.selectedRowIndexes.count;
     }
-    else if (theAction == @selector(onRename:)) {
-        return self.tableView.selectedRow != -1;
-    }
     else if (theAction == @selector(onToggleLaunchAtStartup:)) {
         if(self.tableView.selectedRow != -1) {
             DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
@@ -522,6 +543,7 @@ static DatabasesManagerVC* sharedInstance;
 - (IBAction)onSync:(id)sender {
     if(self.tableView.selectedRow != -1) {
         DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
+        
         if (safe.storageProvider != kLocalDevice ) {
             
             [MacSyncManager.sharedInstance backgroundSyncDatabase:safe
@@ -532,8 +554,7 @@ static DatabasesManagerVC* sharedInstance;
                     });
                 }
                 else if ( localWasChanged ) {
-                    NSLog(@"XXXXX - localWasChanged");
-                    
+                    NSLog(@"XXXXX - localWasChanged");                    
                     Document* doc = [DocumentController.sharedDocumentController documentForURL:safe.fileUrl];
                     [doc onSyncChangedUnderlyingWorkingCopy];
                 }

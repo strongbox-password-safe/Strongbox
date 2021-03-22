@@ -15,7 +15,7 @@
 #import "FontManager.h"
 #import "ClipboardManager.h"
 #import "ColoredStringHelper.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -69,7 +69,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.config = SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig;
+    self.config = AppPreferences.sharedInstance.passwordGenerationConfig;
 
     UILongPressGestureRecognizer* gr1 = [self makeLongPressGestureRecognizer];
     [self.sample1 addGestureRecognizer:gr1];
@@ -122,7 +122,7 @@
 - (IBAction)onWordCountChanged:(id)sender {
     UISlider* slider = (UISlider*)sender;
     self.config.wordCount = (NSInteger)slider.value;
-    SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+    AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
     
     [self bindWordCountSlider];
     
@@ -137,7 +137,7 @@
 - (IBAction)onBasicLengthChanged:(id)sender {
     UISlider* slider = (UISlider*)sender;
     self.config.basicLength = (NSInteger)slider.value;
-    SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+    AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
 
     [self bindBasicLengthSlider];
     
@@ -155,7 +155,7 @@
         dark = self.traitCollection.userInterfaceStyle == UIUserInterfaceStyleDark;
     }
     
-    BOOL colorBlind = SharedAppAndAutoFillSettings.sharedInstance.colorizeUseColorBlindPalette;
+    BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
     
     self.sample1.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
     self.sample2.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
@@ -253,7 +253,7 @@
                currentIndex:self.config.algorithm == kPasswordGenerationAlgorithmBasic ? 0 : 1
                  completion:^(NSInteger selected) {
                      self.config.algorithm = selected == 0 ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
-                     SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+                     AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
                      [self bindUi];
                      [self refreshGenerated];
                  }];
@@ -263,21 +263,21 @@
     }
     else if(cell == self.cellEasyReadCharactersOnly) {
         self.config.easyReadCharactersOnly = !self.config.easyReadCharactersOnly;
-        SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
 
         [self bindUi];
         [self refreshGenerated];
     }
     else if(cell == self.cellNoneAmbiguousOnly) {
         self.config.nonAmbiguousOnly = !self.config.nonAmbiguousOnly;
-        SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
 
         [self bindUi];
         [self refreshGenerated];
     }
     else if(cell == self.cellPickFromEveryGroup) {
         self.config.pickFromEveryGroup = !self.config.pickFromEveryGroup;
-        SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
 
         [self bindUi];
         [self refreshGenerated];
@@ -341,7 +341,7 @@
            currentIndex:index
              completion:^(NSInteger selected) {
                  self.config.saltConfig = opt[selected].integerValue;
-                 SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+                 AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
                  [self bindUi];
                  [self refreshGenerated];
              }];
@@ -365,7 +365,7 @@
            currentIndex:index
              completion:^(NSInteger selected) {
                  self.config.hackerify = opt[selected].integerValue;
-                 SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+                 AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
                  [self bindUi];
                  [self refreshGenerated];
              }];
@@ -389,7 +389,7 @@
            currentIndex:index
              completion:^(NSInteger selected) {
                  self.config.wordCasing = opt[selected].integerValue;
-                 SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+                 AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
                  [self bindUi];
                  [self refreshGenerated];
              }];
@@ -474,7 +474,7 @@
         }
         
         self.config.wordLists = selectedKeys;
-        SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+        AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
         [self bindUi];
         [self refreshGenerated];
     };
@@ -512,7 +512,7 @@
                       [selectedPools addObject:pools[idx]];
                   }];
                   self.config.useCharacterGroups = selectedPools.copy;
-                  SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+                  AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
                   
                   [self bindUi];
                   [self refreshGenerated];
@@ -528,7 +528,7 @@
                            completion:^(NSString *text, BOOL response) {
                                if(response) {
                                    self.config.wordSeparator = text;
-                                   SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+                                   AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
                                    [self bindUi];
                                    [self refreshGenerated];
                                }
@@ -542,7 +542,7 @@
                            completion:^(NSString *text, BOOL response) {
                                if(response) {
                                    self.config.wordSeparator = text;
-                                   SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig = self.config;
+                                   AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
                                    [self bindUi];
                                    [self refreshGenerated];
                                }

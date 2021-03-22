@@ -29,6 +29,7 @@ Big thank you to all the localization contributors
 - Italian - Marco Ermini
 - Japanese - Anonymous
 - Norwegian - Ole Aldric
+- Portuguese (PT-BR) - Wolfgang Marcos
 - Russian - Wishes to remain anonymous
 - Spanish - Wishes to remain anonymous
 - Swedish - Jari Häkkinen

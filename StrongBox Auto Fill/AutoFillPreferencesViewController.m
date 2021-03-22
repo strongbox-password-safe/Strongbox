@@ -7,14 +7,27 @@
 //
 
 #import "AutoFillPreferencesViewController.h"
-#import "AutoFillSettings.h"
+#import "AppPreferences.h"
+#import "AutoFillManager.h"
+#import "NSArray+Extensions.h"
+#import "SelectItemTableViewController.h"
+#import "Utils.h"
 
 @interface AutoFillPreferencesViewController ()
 
 @property (weak, nonatomic) IBOutlet UISwitch *autoProceed;
 @property (weak, nonatomic) IBOutlet UISwitch *addServiceIds;
 @property (weak, nonatomic) IBOutlet UISwitch *useHostOnlyUrl;
-@property (weak, nonatomic) IBOutlet UISwitch *mainAppSyncReminder;
+
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoFill;
+@property (weak, nonatomic) IBOutlet UISwitch *switchQuickTypeAutoFill;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellQuickTypeFormat;
+@property (weak, nonatomic) IBOutlet UILabel *labelQuickTypeFormat;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellConvenienceAutoUnlock;
+@property (weak, nonatomic) IBOutlet UILabel *labelConvenienceAutoUnlockTimeout;
+@property (weak, nonatomic) IBOutlet UISwitch *switchCopyTOTP;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAutoLaunchSingle;
+@property (weak, nonatomic) IBOutlet UISwitch *switchShowPinned;
 
 @end
 
@@ -27,10 +40,63 @@
 }
 
 - (void)bind {
-    self.autoProceed.on = AutoFillSettings.sharedInstance.autoProceedOnSingleMatch;
-    self.addServiceIds.on = AutoFillSettings.sharedInstance.storeAutoFillServiceIdentifiersInNotes;
-    self.useHostOnlyUrl.on = !AutoFillSettings.sharedInstance.useFullUrlAsURLSuggestion;
-    self.mainAppSyncReminder.on = !AutoFillSettings.sharedInstance.dontNotifyToSwitchToMainAppForSync;
+    self.autoProceed.on = AppPreferences.sharedInstance.autoProceedOnSingleMatch;
+    self.addServiceIds.on = AppPreferences.sharedInstance.storeAutoFillServiceIdentifiersInNotes;
+    self.useHostOnlyUrl.on = !AppPreferences.sharedInstance.useFullUrlAsURLSuggestion;
+    
+    self.switchAutoFill.on = self.viewModel.metadata.autoFillEnabled;
+    
+    
+    
+    self.switchQuickTypeAutoFill.on = self.viewModel.metadata.autoFillEnabled && self.viewModel.metadata.quickTypeEnabled;
+    self.switchQuickTypeAutoFill.enabled = self.switchAutoFill.on;
+        
+    
+    
+    self.cellQuickTypeFormat.userInteractionEnabled = self.switchQuickTypeAutoFill.on;
+    self.labelQuickTypeFormat.text = quickTypeFormatString(self.viewModel.metadata.quickTypeDisplayFormat);
+    if (@available(iOS 13.0, *)) {
+        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.labelColor : UIColor.secondaryLabelColor;
+    }
+    else {
+        self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.blackColor : UIColor.lightGrayColor;
+    }
+    
+    
+    
+    self.cellConvenienceAutoUnlock.userInteractionEnabled = self.viewModel.metadata.autoFillEnabled;
+    self.labelConvenienceAutoUnlockTimeout.text = stringForConvenienceAutoUnlock(self.viewModel.metadata.autoFillConvenienceAutoUnlockTimeout);
+
+    if (@available(iOS 13.0, *)) {
+        self.labelConvenienceAutoUnlockTimeout.textColor = self.viewModel.metadata.autoFillEnabled ? UIColor.labelColor : UIColor.secondaryLabelColor;
+    }
+    else {
+        self.labelConvenienceAutoUnlockTimeout.textColor = self.viewModel.metadata.autoFillEnabled ? UIColor.blackColor : UIColor.lightGrayColor;
+    }
+    
+    
+    
+    self.switchAutoLaunchSingle.on = AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase;
+    
+    
+    
+    self.switchCopyTOTP.on = self.viewModel.metadata.autoFillCopyTotp;
+    
+    
+    
+    self.switchShowPinned.on = AppPreferences.sharedInstance.autoFillShowPinned;
+}
+
+static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
+    if (val == -1) {
+        return NSLocalizedString(@"generic_preference_not_configured", @"Not Configured");
+    }
+    else if ( val == 0 ) {
+        return NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
+    }
+    else {
+        return [Utils formatTimeInterval:val];
+    }
 }
 
 - (IBAction)onDone:(id)sender {
@@ -38,12 +104,148 @@
 }
 
 - (IBAction)onChanged:(id)sender {
-    AutoFillSettings.sharedInstance.autoProceedOnSingleMatch = self.autoProceed.on;
-    AutoFillSettings.sharedInstance.storeAutoFillServiceIdentifiersInNotes = self.addServiceIds.on;
-    AutoFillSettings.sharedInstance.useFullUrlAsURLSuggestion = !self.useHostOnlyUrl.on;
-    AutoFillSettings.sharedInstance.dontNotifyToSwitchToMainAppForSync = !self.mainAppSyncReminder.on;
+    AppPreferences.sharedInstance.autoProceedOnSingleMatch = self.autoProceed.on;
+    AppPreferences.sharedInstance.storeAutoFillServiceIdentifiersInNotes = self.addServiceIds.on;
+    AppPreferences.sharedInstance.useFullUrlAsURLSuggestion = !self.useHostOnlyUrl.on;
+    AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase = self.switchAutoLaunchSingle.on;
+    AppPreferences.sharedInstance.autoFillShowPinned = self.switchShowPinned.on;
     
     [self bind];
+}
+
+- (IBAction)onCopyTotp:(id)sender {
+    self.viewModel.metadata.autoFillCopyTotp = self.switchCopyTOTP.on;
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
+
+    [self bind];
+}
+
+- (IBAction)onSwitchQuickTypeAutoFill:(id)sender {
+    if ( !self.switchQuickTypeAutoFill.on ) {
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+    }
+    else {
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                           databaseUuid:self.viewModel.metadata.uuid
+                                                          displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+    }
+    
+    self.viewModel.metadata.quickTypeEnabled = self.switchQuickTypeAutoFill.on;
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
+
+    [self bind];
+}
+
+- (IBAction)onSwitchAutoFill:(id)sender {
+    if (!self.switchAutoFill.on) {
+       [self.viewModel disableAndClearAutoFill];
+       [self bind];
+    }
+    else {
+        [self.viewModel enableAutoFill];
+        
+        if ( self.viewModel.metadata.quickTypeEnabled ) {
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                               databaseUuid:self.viewModel.metadata.uuid
+                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+        }
+        
+        [self bind];
+    }
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    
+    if ( cell == self.cellQuickTypeFormat ) {
+        [self promptForQuickTypeFormat];
+    }
+    else if ( cell == self.cellConvenienceAutoUnlock ) {
+        [self promptForConvenienceAutoUnlock];
+    }
+
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)promptForConvenienceAutoUnlock {
+    NSArray<NSNumber*>* options = @[@(0), @(15), @(30), @(60), @(120), @(180), @(300), @(600), @(1200), @(1800), @(3600), @(2 * 3600), @(8 * 3600), @(24 * 3600), @(48 * 3600), @(72 * 3600)];
+    
+    NSArray<NSString*>* optionsStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return stringForConvenienceAutoUnlock(obj.integerValue);
+    }];
+    
+    NSUInteger currentlySelected = [options indexOfObject:@(self.viewModel.metadata.autoFillConvenienceAutoUnlockTimeout)];
+    
+    [self promptForChoice:NSLocalizedString(@"prefs_vc_autofill_convenience_auto_unlock", @"Convenience Auto Unlock")
+                  options:optionsStrings
+     currentlySelectIndex:currentlySelected
+               completion:^(BOOL success, NSInteger selectedIndex) {
+        if (success) {
+            NSNumber *numFormat = options[selectedIndex];
+            self.viewModel.metadata.autoFillConvenienceAutoUnlockTimeout = numFormat.integerValue;
+            [SafesList.sharedInstance update:self.viewModel.metadata];
+            
+            if (self.viewModel.metadata.autoFillConvenienceAutoUnlockTimeout == 0) {
+                self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
+            }
+            
+            [self bind];
+        }
+    }];
+}
+
+- (void)promptForQuickTypeFormat {
+    NSArray<NSNumber*>* options = @[@(kQuickTypeFormatTitleThenUsername),
+                                    @(kQuickTypeFormatUsernameOnly),
+                                    @(kQuickTypeFormatTitleOnly)];
+    
+    NSArray<NSString*>* optionsStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+        return quickTypeFormatString(obj.integerValue);
+    }];
+    
+    NSUInteger currentlySelected = [options indexOfObject:@(self.viewModel.metadata.quickTypeDisplayFormat)];
+    
+    [self promptForChoice:NSLocalizedString(@"prefs_vc_quick_type_format", @"QuickType Format")
+                  options:optionsStrings
+     currentlySelectIndex:currentlySelected
+               completion:^(BOOL success, NSInteger selectedIndex) {
+        if (success) {
+            NSNumber *numFormat = options[selectedIndex];
+            self.viewModel.metadata.quickTypeDisplayFormat = numFormat.integerValue;
+            [SafesList.sharedInstance update:self.viewModel.metadata];
+            
+            
+            [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
+                                                               databaseUuid:self.viewModel.metadata.uuid
+                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+            
+            [self bind];
+        }
+    }];
+}
+
+- (void)promptForChoice:(NSString*)title
+                options:(NSArray<NSString*>*)items
+   currentlySelectIndex:(NSUInteger)currentlySelectIndex
+              completion:(void(^)(BOOL success, NSInteger selectedIndex))completion {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
+    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
+    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
+
+    vc.groupItems = @[items];
+    
+    if ( currentlySelectIndex != NSNotFound ) {
+        vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
+    }
+    
+    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
+        NSIndexSet* set = selectedIndices.firstObject;
+        [self.navigationController popViewControllerAnimated:YES];
+        completion(YES, set.firstIndex);
+    };
+    
+    vc.title = title;
+    [self.navigationController pushViewController:vc animated:YES];
 }
 
 @end

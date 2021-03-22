@@ -23,8 +23,7 @@
 #import "BiometricsManager.h"
 #import "BookmarksHelper.h"
 #import "YubiManager.h"
-#import "SharedAppAndAutoFillSettings.h"
-#import "AutoFillSettings.h"
+#import "AppPreferences.h"
 #import "Kdbx4Database.h"
 #import "Kdbx4Serialization.h"
 #import "KeePassCiphers.h"
@@ -141,12 +140,13 @@
 }
 
 - (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors {
-    NSDate* localCopyModDate;
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database modified:&localCopyModDate];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database];
+    BOOL userLikelyOffline = [self userIsLikelyOffline];
+    BOOL userOfflineLineAndConfiguredForImmediateOffline = self.database.offlineDetectedBehaviour == kOfflineDetectedBehaviourImmediateOffline;
+    
+    BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
 
-    BOOL isPro = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
-
-    if(self.isAutoFillOpen || self.offlineExplicitlyRequested) {
+    if( self.isAutoFillOpen || self.offlineExplicitlyRequested || userOfflineLineAndConfiguredForImmediateOffline ) {
         if(localCopyUrl == nil) {
             [Alerts warn:self.viewController
                    title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Offline")
@@ -160,12 +160,11 @@
         return;
     }
 
-    BOOL userLikelyOffline = [self userIsLikelyOffline];
-    BOOL immediateOfflineOfferIfOffline = self.database.immediateOfflineOfferIfOfflineDetected;
     BOOL offlinePossible = localCopyUrl != nil;
     BOOL notLocalDevice = self.database.storageProvider != kLocalDevice;
-    
-    if ( userLikelyOffline && immediateOfflineOfferIfOffline && offlinePossible && notLocalDevice ) {
+    BOOL offerIfOfflineDetected = self.database.offlineDetectedBehaviour != kOfflineDetectedBehaviourTryConnectThenAsk;
+
+    if ( userLikelyOffline && offlinePossible && notLocalDevice && offerIfOfflineDetected ) {
         NSString* primaryStorageDisplayName = [SyncManager.sharedInstance getPrimaryStorageDisplayName:self.database];
         NSString* loc1 = NSLocalizedString(@"open_sequence_user_looks_offline_open_local_ro_fmt", "It looks like you may be offline and '%@' may not be reachable. Would you like to open in offline mode instead?\n\nNB: You can also edit offline in the Pro version.");
         NSString* loc2 = NSLocalizedString(@"open_sequence_user_looks_offline_open_local_fmt", "It looks like you may be offline and '%@' may not be reachable. Would you like to open in offline mode instead?");
@@ -251,7 +250,7 @@
                     secondButtonText:viewSyncError
                               action:^(int response) {
             if (response == 0) {
-                BOOL isPro = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+                BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
                 [self unlockLocalCopy:factors forceReadOnly:!isPro offline:YES];
             }
             else if (response == 1) { 
@@ -289,7 +288,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
     
     NSString* relocateDatabase = NSLocalizedString(@"open_sequence_storage_provider_try_relocate_files_db", @"Locate Database...");
 
-    BOOL isPro = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
 
     NSString* openOfflineText = isPro ? NSLocalizedString(@"open_sequence_use_local_copy_option", @"Open Offline") : NSLocalizedString(@"open_sequence_use_local_copy_option_ro", @"Open Offline (Read-Only)");
     

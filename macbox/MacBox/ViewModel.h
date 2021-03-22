@@ -108,6 +108,8 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 - (BOOL)validateMove:(const NSArray<Node *> *)items destination:(Node*)destination;
 - (BOOL)move:(const NSArray<Node *> *)items destination:(Node*)destination;
 
+- (void)launchUrl:(Node*)item;
+
 - (NSSet<Node*>*)getMinimalNodeSet:(const NSArray<Node*>*)nodes;
 - (Node*_Nullable)getItemFromSerializationId:(NSString*)serializationId;
 

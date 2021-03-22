@@ -11,7 +11,7 @@
 #import "GTMSessionFetcherService.h"
 #import "SVProgressHUD.h"
 #import "real-secrets.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "NSDate+Extensions.h"
 
 static NSString *const kMimeType = @"application/octet-stream";
@@ -109,7 +109,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
                 [signIn restorePreviousSignIn];
             }
             else {
-                SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = YES;
+                AppPreferences.sharedInstance.suppressAppBackgroundTriggers = YES;
                 [signIn signIn];
             }
         });
@@ -128,7 +128,7 @@ typedef void (^Authenticationcompletion)(BOOL userCancelled, BOOL userInteractio
         self.driveService.authorizer = user.authentication.fetcherAuthorizer;
     }
     
-    SharedAppAndAutoFillSettings.sharedInstance.suppressPrivacyScreen = NO;
+    AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO;
 
 
     Authenticationcompletion authCompletion = self.pendingAuthCompletion;

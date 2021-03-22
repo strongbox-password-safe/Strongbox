@@ -14,7 +14,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "SVProgressHUD.h"
 #import "KeyFileHelper.h"
 #import "Serializator.h"
@@ -36,7 +36,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
         return;
     }
     
-    BOOL iCloud = SharedAppAndAutoFillSettings.sharedInstance.iCloudOn;
+    BOOL iCloud = AppPreferences.sharedInstance.iCloudOn;
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name
@@ -147,7 +147,7 @@ static DatabaseModel* getNewDatabase(NSString* password,
     
     DatabaseModel* database = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:ckf];
 
-    [SampleItemsGenerator addSampleGroupAndRecordToRoot:database passwordConfig:SharedAppAndAutoFillSettings.sharedInstance.passwordGenerationConfig];
+    [SampleItemsGenerator addSampleGroupAndRecordToRoot:database passwordConfig:AppPreferences.sharedInstance.passwordGenerationConfig];
     
     return database;
 }

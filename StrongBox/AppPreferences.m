@@ -6,7 +6,7 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "Model.h"
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
@@ -49,10 +49,28 @@ static NSString* const kShowMetadataOnDetailsScreen  = @"legacyShowMetadataOnDet
 static NSString* const kQuickTypeTitleThenUsername = @"quickTypeTitleThenUsername";
 static NSString* const kUserHasOptedInToThirdPartyStorageLibraries = @"userHasOptedInToThirdPartyStorageLibraries";
 
-@implementation SharedAppAndAutoFillSettings
+
+static NSString* const kAutoFillExitedCleanly = @"autoFillExitedCleanly";
+static NSString* const kAutoFillWroteCleanly = @"autoFillWroteCleanly";
+static NSString* const kHaveWarnedAboutAutoFillCrash = @"haveWarnedAboutAutoFillCrash";
+static NSString* const KDontNotifyToSwitchToMainAppForSync = @"dontNotifyToSwitchToMainAppForSync";
+static NSString* const kStoreAutoFillServiceIdentifiersInNotes = @"storeAutoFillServiceIdentifiersInNotes";
+static NSString* const kUseFullUrlAsURLSuggestion = @"useFullUrlAsURLSuggestion";
+static NSString* const kAutoProceedOnSingleMatch = @"autoProceedOnSingleMatch";
+static NSString* const kShowAutoFillTotpCopiedMessage = @"showAutoFillTotpCopiedMessage";
+static NSString* const kHasOnboardedForAutoFillConvenienceAutoUnlock = @"hasOnboardedForAutoFillConvenienceAutoUnlock";
+static NSString* const kAutoFillAutoLaunchSingleDatabase = @"autoFillAutoLaunchSingleDatabase";
+static NSString* const kAutoFillQuickLaunchUuid = @"autoFillQuickLaunchUuid";
+static NSString* const kMigratedQuickLaunchToAutoFill = @"migratedQuickLaunchToAutoFill";
+static NSString* const kAutoFillShowPinned = @"autoFillShowPinned";
+static NSString* const kCoalesceAppLockAndQuickLaunchBiometrics = @"coalesceAppLockAndQuickLaunchBiometrics";
+static NSString* const kAppPrivacyShieldMode = @"appPrivacyShieldMode";
+static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDetectedBehaviour";
+
+@implementation AppPreferences
 
 + (void)initialize {
-    if(self == [SharedAppAndAutoFillSettings class]) {
+    if(self == [AppPreferences class]) {
         
         
         
@@ -62,11 +80,11 @@ static NSString* const kUserHasOptedInToThirdPartyStorageLibraries = @"userHasOp
 }
 
 + (instancetype)sharedInstance {
-    static SharedAppAndAutoFillSettings *sharedInstance = nil;
+    static AppPreferences *sharedInstance = nil;
     static dispatch_once_t onceToken;
     
     dispatch_once(&onceToken, ^{
-        sharedInstance = [[SharedAppAndAutoFillSettings alloc] init];
+        sharedInstance = [[AppPreferences alloc] init];
     });
     
     return sharedInstance;
@@ -86,6 +104,130 @@ static NSString* const kUserHasOptedInToThirdPartyStorageLibraries = @"userHasOp
     }
     
     return defaults;
+}
+
+
+
+- (BOOL)migratedOfflineDetectedBehaviour {
+    return [self getBool:kMigratedOfflineDetectedBehaviour];
+}
+
+- (void)setMigratedOfflineDetectedBehaviour:(BOOL)migratedOfflineDetectedBehaviour {
+    [self setBool:kMigratedOfflineDetectedBehaviour value:migratedOfflineDetectedBehaviour];
+}
+
+- (AppPrivacyShieldMode)appPrivacyShieldMode {
+    return [self getInteger:kAppPrivacyShieldMode fallback:kAppPrivacyShieldModeBlur];
+}
+
+- (void)setAppPrivacyShieldMode:(AppPrivacyShieldMode)appPrivacyShieldMode {
+    [self setInteger:kAppPrivacyShieldMode value:appPrivacyShieldMode];
+}
+
+- (BOOL)coalesceAppLockAndQuickLaunchBiometrics {
+    return [self getBool:kCoalesceAppLockAndQuickLaunchBiometrics fallback:YES];
+}
+
+- (void)setCoalesceAppLockAndQuickLaunchBiometrics:(BOOL)coalesceAppLockAndQuickLaunchBiometrics {
+    [self setBool:kCoalesceAppLockAndQuickLaunchBiometrics value:coalesceAppLockAndQuickLaunchBiometrics];
+}
+
+- (BOOL)autoFillShowPinned {
+    return [self getBool:kAutoFillShowPinned fallback:YES];
+}
+
+- (void)setAutoFillShowPinned:(BOOL)autoFillShowPinned {
+    [self setBool:kAutoFillShowPinned value:autoFillShowPinned];
+}
+
+
+
+- (BOOL)migratedQuickLaunchToAutoFill {
+    return [self getBool:kMigratedQuickLaunchToAutoFill];
+}
+
+- (void)setMigratedQuickLaunchToAutoFill:(BOOL)migratedQuickLaunchToAutoFill {
+    [self setBool:kMigratedQuickLaunchToAutoFill value:migratedQuickLaunchToAutoFill];
+}
+
+- (NSString *)autoFillQuickLaunchUuid {
+    return [self getString:kAutoFillQuickLaunchUuid];
+}
+
+- (void)setAutoFillQuickLaunchUuid:(NSString *)autoFillQuickLaunchUuid {
+    [self setString:kAutoFillQuickLaunchUuid value:autoFillQuickLaunchUuid];
+}
+
+- (BOOL)autoFillAutoLaunchSingleDatabase {
+    return [self getBool:kAutoFillAutoLaunchSingleDatabase fallback:YES];
+}
+
+- (void)setAutoFillAutoLaunchSingleDatabase:(BOOL)autoFillAutoLaunchSingleDatabase {
+    [self setBool:kAutoFillAutoLaunchSingleDatabase value:autoFillAutoLaunchSingleDatabase];
+}
+
+- (BOOL)showAutoFillTotpCopiedMessage {
+    return [self getBool:kShowAutoFillTotpCopiedMessage fallback:YES];
+}
+
+- (void)setShowAutoFillTotpCopiedMessage:(BOOL)showAutoFillTotpCopiedMessage {
+    [self setBool:kShowAutoFillTotpCopiedMessage value:showAutoFillTotpCopiedMessage];
+}
+
+- (BOOL)autoFillWroteCleanly {
+    return [self getBool:kAutoFillWroteCleanly fallback:YES]; 
+}
+
+- (void)setAutoFillWroteCleanly:(BOOL)autoFillWroteCleanly {
+    [self setBool:kAutoFillWroteCleanly value:autoFillWroteCleanly];
+}
+
+- (BOOL)useFullUrlAsURLSuggestion {
+    return [self getBool:kUseFullUrlAsURLSuggestion];
+}
+
+- (void)setUseFullUrlAsURLSuggestion:(BOOL)useFullUrlAsURLSuggestion {
+    [self setBool:kUseFullUrlAsURLSuggestion value:useFullUrlAsURLSuggestion];
+}
+
+- (BOOL)autoProceedOnSingleMatch {
+    return [self getBool:kAutoProceedOnSingleMatch];
+}
+
+- (void)setAutoProceedOnSingleMatch:(BOOL)autoProceedOnSingleMatch {
+    return [self setBool:kAutoProceedOnSingleMatch value:autoProceedOnSingleMatch];
+}
+
+- (BOOL)storeAutoFillServiceIdentifiersInNotes {
+    return [self getBool:kStoreAutoFillServiceIdentifiersInNotes];
+}
+
+- (void)setStoreAutoFillServiceIdentifiersInNotes:(BOOL)storeAutoFillServiceIdentifiersInNotes {
+    [self setBool:kStoreAutoFillServiceIdentifiersInNotes value:storeAutoFillServiceIdentifiersInNotes];
+}
+
+- (BOOL)autoFillExitedCleanly {
+    return [self getBool:kAutoFillExitedCleanly fallback:YES];
+}
+
+- (void)setAutoFillExitedCleanly:(BOOL)autoFillExitedCleanly {
+    return [self setBool:kAutoFillExitedCleanly value:autoFillExitedCleanly];
+}
+
+- (BOOL)haveWarnedAboutAutoFillCrash {
+    return [self getBool:kHaveWarnedAboutAutoFillCrash];
+}
+
+- (void)setHaveWarnedAboutAutoFillCrash:(BOOL)haveWarnedAboutAutoFillCrash {
+    [self setBool:kHaveWarnedAboutAutoFillCrash value:haveWarnedAboutAutoFillCrash];
+}
+
+- (BOOL)dontNotifyToSwitchToMainAppForSync {
+    return [self getBool:KDontNotifyToSwitchToMainAppForSync];
+}
+
+- (void)setDontNotifyToSwitchToMainAppForSync:(BOOL)dontNotifyToSwitchToMainAppForSync {
+    [self setBool:KDontNotifyToSwitchToMainAppForSync value:dontNotifyToSwitchToMainAppForSync];
 }
 
 

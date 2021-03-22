@@ -12,7 +12,7 @@
 #import "FavIconSelectFromMultipleFavIconsTableViewController.h"
 #import "FavIconManager.h"
 #import "Alerts.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "NSString+Extensions.h"
 
 @interface FavIconDownloadResultsViewController ()
@@ -57,7 +57,7 @@
     self.successful = [success sortedArrayUsingComparator:finderStyleNodeComparator];
     self.failed = [fail sortedArrayUsingComparator:finderStyleNodeComparator];
     
-    self.title = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? NSLocalizedString(@"favicon_results_title", @"FavIcon Results") : NSLocalizedString(@"favicon_results_title_pro_only", @"FavIcon Results (Pro Only)");
+    self.title = AppPreferences.sharedInstance.isProOrFreeTrial ? NSLocalizedString(@"favicon_results_title", @"FavIcon Results") : NSLocalizedString(@"favicon_results_title_pro_only", @"FavIcon Results (Pro Only)");
                       
     [self refresh];
 }
@@ -205,7 +205,7 @@
 }
 
 - (void)refresh {
-    self.doneButton.enabled = self.successful.count > 0 && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    self.doneButton.enabled = self.successful.count > 0 && AppPreferences.sharedInstance.isProOrFreeTrial;
     [self.tableView reloadData];
 }
 

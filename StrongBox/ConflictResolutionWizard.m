@@ -9,7 +9,7 @@
 #import "ConflictResolutionWizard.h"
 #import <UIKit/UIKit.h>
 #import "RoundedBlueButton.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "NSDate+Extensions.h"
 #import "Alerts.h"
 
@@ -30,7 +30,7 @@
     
     self.navigationController.navigationBarHidden = YES;
     
-    BOOL pro = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial;
+    BOOL pro = AppPreferences.sharedInstance.isProOrFreeTrial;
     self.buttonCompare.enabled = pro;
 
 

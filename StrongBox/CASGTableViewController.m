@@ -15,7 +15,7 @@
 #import "Alerts.h"
 #import "YubiKeyConfigurationController.h"
 #import "YubiManager.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "BookmarksHelper.h"
 #import "VirtualYubiKeys.h"
 #import "FontManager.h"
@@ -115,7 +115,7 @@
                             forControlEvents:UIControlEventEditingChanged];
     
     self.textFieldPassword.delegate = self;
-    self.textFieldPassword.enablesReturnKeyAutomatically = !SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.textFieldPassword.enablesReturnKeyAutomatically = !AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
     
     self.textFieldConfirmPassword.delegate = self;
     
@@ -138,7 +138,7 @@
     [self addShowHideToTextField:self.textFieldConfirmPassword tag:2];
     
     self.textFieldPassword.placeholder =
-        (self.mode == kCASGModeGetCredentials || SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry) ?
+        (self.mode == kCASGModeGetCredentials || AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry) ?
             NSLocalizedString(@"casg_text_field_placeholder_password", @"Password") :
             NSLocalizedString(@"casg_text_field_placeholder_password_required", @"Password (Required)");
 }
@@ -176,7 +176,7 @@
 }
 
 - (IBAction)onDone:(id)sender {
-    self.selectedName = [SafesList sanitizeSafeNickName:self.textFieldName.text];
+    self.selectedName = [SafesList trimDatabaseNickName:self.textFieldName.text];
     self.selectedPassword = self.textFieldPassword.text;
     
     if(self.selectedPassword.length != 0 || self.mode == kCASGModeAddExisting || self.mode == kCASGModeRenameDatabase) {
@@ -337,7 +337,7 @@
     }
     else if ([segue.identifier isEqualToString:@"segueToSelectKeyFile"]) {
         KeyFilesTableViewController* vc = (KeyFilesTableViewController*)segue.destinationViewController;
-        vc.selectedUrl = SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock ? nil : self.selectedKeyFileUrl;
+        vc.selectedUrl = AppPreferences.sharedInstance.hideKeyFileOnUnlock ? nil : self.selectedKeyFileUrl;
         
         vc.onDone = ^(BOOL success, NSURL * _Nullable url, NSData * _Nullable oneTimeData) {
             if (success) {
@@ -370,7 +370,7 @@
         if ([NSFileManager.defaultManager fileExistsAtPath:self.selectedKeyFileUrl.path]) {
             self.cellKeyFile.imageView.image = [UIImage imageNamed:@"key"];
             
-            if(SharedAppAndAutoFillSettings.sharedInstance.hideKeyFileOnUnlock) {
+            if(AppPreferences.sharedInstance.hideKeyFileOnUnlock) {
                 self.cellKeyFile.textLabel.text = self.autoDetectedKeyFile ?
                 NSLocalizedString(@"casg_key_file_auto_detected", @"Auto-Detected") :
                 NSLocalizedString(@"casg_key_file_configured", @"Configured");
@@ -590,7 +590,7 @@
                                     self.initialFormat == kFormatUnknown ||
                                     (self.initialFormat == kKeePass1 && [self keyFileIsSet]);
     
-    return self.textFieldPassword.text.length || (formatAllowsEmptyOrNone && SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry);
+    return self.textFieldPassword.text.length || (formatAllowsEmptyOrNone && AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry);
 }
 
 - (BOOL)canSet {
@@ -602,12 +602,13 @@
 }
 
 - (BOOL)nameIsValid {
-    return [SafesList.sharedInstance isValidNickName:trim(self.textFieldName.text)];
+    NSString* sanitized = [SafesList trimDatabaseNickName:self.textFieldName.text];
+    return [SafesList.sharedInstance isValid:sanitized] && [SafesList.sharedInstance isUnique:sanitized];
 }
 
 - (BOOL)passwordIsValid {
     BOOL formatAllowsEmptyOrNone = self.selectedFormat != kPasswordSafe;
-    BOOL preferenceAllowsEmpty = SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    BOOL preferenceAllowsEmpty = AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
     
     return (preferenceAllowsEmpty && formatAllowsEmptyOrNone) ? YES : self.textFieldPassword.text.length > 0;
 }
@@ -622,13 +623,13 @@
 }
 
 - (IBAction)onAdvancedChanged:(id)sender {
-    SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
+    AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry = self.switchAllowEmpty.on;
     
     [self bindUi];
 }
 
 - (void)bindAdvanced {
-    self.switchAllowEmpty.on = SharedAppAndAutoFillSettings.sharedInstance.allowEmptyOrNoPasswordEntry;
+    self.switchAllowEmpty.on = AppPreferences.sharedInstance.allowEmptyOrNoPasswordEntry;
 }
 
 - (void)bindYubiKey {
@@ -655,21 +656,21 @@
         }
         else {
             if (self.selectedYubiKeyConfig.mode == kMfi) {
-                self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
+                self.cellYubiKey.textLabel.text = AppPreferences.sharedInstance.isProOrFreeTrial ?
                     NSLocalizedString(@"casg_yubikey_configured_mfi", @"Lightning") :
                     NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-                self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+                self.cellYubiKey.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
             }
             else {
-                self.cellYubiKey.textLabel.text = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ?
+                self.cellYubiKey.textLabel.text = AppPreferences.sharedInstance.isProOrFreeTrial ?
                     NSLocalizedString(@"casg_yubikey_configured_nfc", @"NFC") :
                     NSLocalizedString(@"casg_yubikey_configured_disabled_pro_only", @"Disabled (Pro Edition Only)");
-                self.cellYubiKey.textLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+                self.cellYubiKey.textLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
             }
     
             self.cellYubiKey.detailTextLabel.text = self.selectedYubiKeyConfig.slot == kSlot1 ? NSLocalizedString(@"casg_yubikey_configured_slot1", @"Slot 1") :
                 NSLocalizedString(@"casg_yubikey_configured_slot2", @"Slot 2");
-            self.cellYubiKey.detailTextLabel.textColor = SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
+            self.cellYubiKey.detailTextLabel.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : UIColor.systemRedColor;
         }
         
         self.cellYubiKey.imageView.image = [UIImage imageNamed:@"yubikey"];

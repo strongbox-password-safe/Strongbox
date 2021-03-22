@@ -14,7 +14,7 @@
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
 #import "FileManager.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "BookmarksHelper.h"
 #import "UITableView+EmptyDataSet.h"
 
@@ -82,7 +82,7 @@
             NSLog(@"%@", error);
         }
         else if (![isDirectory boolValue]) {
-            if(SharedAppAndAutoFillSettings.sharedInstance.showAllFilesInLocalKeyFiles || ![self isUnlikelyKeyFile:url]) {
+            if(AppPreferences.sharedInstance.showAllFilesInLocalKeyFiles || ![self isUnlikelyKeyFile:url]) {
                 [otherFiles addObject:url];
             }
         }

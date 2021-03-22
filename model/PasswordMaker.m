@@ -466,7 +466,7 @@ const static NSArray<NSString*> *kEmailDomains;
 
 - (NSArray<NSString*>*)loadWordsForList:(NSString*)wordList {
     NSString* fileRoot = [[NSBundle mainBundle] pathForResource:wordList ofType:@"txt"];
-    NSLog(@"%@ - fileRoot = [%@]", wordList, fileRoot);
+
     if(fileRoot == nil) {
         NSLog(@"WARNWARN: Could not load wordlist: %@", wordList);
         return @[];
@@ -474,14 +474,14 @@ const static NSArray<NSString*> *kEmailDomains;
     
     NSError* error;
     NSString* fileContents = [NSString stringWithContentsOfFile:fileRoot encoding:NSUTF8StringEncoding error:&error];
-    NSLog(@"Loaded File Contents: %lu bytes - %@", (unsigned long)fileContents.length, error);
+
     if(!fileContents) {
         NSLog(@"WARNWARN: Could not load wordlist: %@ - %@", wordList, error);
         return @[];
     }
     
     NSArray<NSString*>* lines = [fileContents componentsSeparatedByCharactersInSet:[NSCharacterSet newlineCharacterSet]];
-    NSLog(@"%lu lines", (unsigned long)lines.count);
+
     
     NSArray<NSString*>* trimmed = [lines map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
         return trim(obj);
@@ -491,7 +491,7 @@ const static NSArray<NSString*> *kEmailDomains;
         return obj.length != 0;
     }];
     
-    NSLog(@"%@ - %lu cleaned lines", wordList, (unsigned long)nonEmpty.count);
+
     
     return nonEmpty;
 }

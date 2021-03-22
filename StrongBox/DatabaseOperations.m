@@ -232,7 +232,7 @@
 
 - (void)onBulkUpdateFavIcons {
     [FavIconBulkViewController presentModal:self
-                                      nodes:self.viewModel.database.activeRecords
+                                      nodes:self.viewModel.database.allActiveEntries
                                      onDone:^(BOOL go, NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
         [self dismissViewControllerAnimated:YES completion:nil];
         

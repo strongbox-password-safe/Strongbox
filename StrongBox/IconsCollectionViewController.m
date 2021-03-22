@@ -45,11 +45,11 @@
                  withReuseIdentifier:@"IconsSectionHeaderReusableView"];
 }
 
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
-{
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section {
     if (![self hasCustomIcons]) {
         return CGSizeZero;
-    }else {
+    }
+    else {
         return CGSizeMake(collectionView.frame.size.width,50);
     }
 }
@@ -106,6 +106,8 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    NSLog(@"collectionView::didSelectItemAtIndexPath - [%@]", indexPath);
+    
     if([self hasCustomIcons] && indexPath.section == 0) {
         NodeIcon* icon = self.customIcons[indexPath.row];
         self.onDone(YES, icon);

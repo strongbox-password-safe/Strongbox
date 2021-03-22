@@ -9,13 +9,12 @@
 #import "DatabaseUnlocker.h"
 #import "Alerts.h"
 #import "Serializator.h"
-#import "AutoFillSettings.h"
 #import "SVProgressHUD.h"
 #import "Utils.h"
 #import "Kdbx4Serialization.h"
 #import "AutoFillManager.h"
 #import "KeePassCiphers.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "WorkingCopyManager.h"
 
 @interface DatabaseUnlocker ()
@@ -117,8 +116,8 @@
                 key:(CompositeKeyFactors*)key
  keyFromConvenience:(BOOL)keyFromConvenience
          completion:(UnlockDatabaseCompletionBlock)completion {
-    if(self.isAutoFillOpen && !AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseUnlocker isAutoFillLikelyToCrash:url]) { 
-        AutoFillSettings.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
+    if(self.isAutoFillOpen && !AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseUnlocker isAutoFillLikelyToCrash:url]) { 
+        AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
 
         [Alerts warn:self.viewController
                title:NSLocalizedString(@"open_sequence_autofill_creash_likely_title", @"AutoFill Crash Likely")
@@ -182,6 +181,7 @@
                 self.database.isEnrolledForConvenience = NO;
                 self.database.convenienceMasterPassword = nil;
                 self.database.conveniencePin = nil;
+                self.database.autoFillConvenienceAutoUnlockPassword = nil;
                 self.database.isTouchIdEnabled = NO;
                 self.database.hasBeenPromptedForConvenience = NO; 
                 
@@ -238,11 +238,11 @@
                                             isAutoFill:self.isAutoFillOpen
                                            offlineMode:self.offlineMode];
     
-    if(self.database.autoFillEnabled && !self.isAutoFillOpen) { 
+    if(self.database.autoFillEnabled && self.database.quickTypeEnabled && !self.isAutoFillOpen) { 
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.database.uuid displayFormat:self.database.quickTypeDisplayFormat];
     }
 
-    NSLog(@"Setting likelyFormat to [%ld]", (long)openedSafe.originalFormat);
+
     
     if (!self.isAutoFillOpen) { 
         self.database.likelyFormat = openedSafe.originalFormat;

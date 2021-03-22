@@ -31,8 +31,6 @@
 
 @property (weak) IBOutlet NSButton *checkboxTitleIsEditable;
 @property (weak) IBOutlet NSButton *checkboxOtherFieldsAreEditable;
-@property (weak) IBOutlet NSButton *checkboxDereferenceQuickView;
-@property (weak) IBOutlet NSButton *checkboxDereferenceOutlineView;
 @property (weak) IBOutlet NSButton *checkboxShowDatabasesManagerOnCloseAllWindows;
 @property (weak) IBOutlet NSButton *checkboxConcealEmptyProtected;
 @property (weak) IBOutlet NSButton *showCustomFieldsInQuickView;
@@ -89,7 +87,6 @@
 @property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
 @property (weak) IBOutlet NSButton *checkboxAutoSave;
 @property (weak) IBOutlet NSButton *checkboxAutoDownloadFavIcon;
-@property (weak) IBOutlet NSButton *allowAppleWatchUnlock;
 
 @property (weak) IBOutlet NSButton *switchAutoClearClipboard;
 @property (weak) IBOutlet NSTextField *textFieldClearClipboard;
@@ -100,7 +97,6 @@
 @property (weak) IBOutlet NSStepper *stepperLockDatabase;
 
 @property (weak) IBOutlet NSButton *switchShowInMenuBar;
-@property (weak) IBOutlet NSButton *switchAutoPromptTouchID;
 
 @property (weak) IBOutlet NSButton *useDuckDuckGo;
 @property (weak) IBOutlet NSButton *checkDomainOnly;
@@ -116,6 +112,12 @@
 @property (weak) IBOutlet NSButton *checkboxClipboardHandoff;
 @property (weak) IBOutlet NSButton *checkboxStartInSearchMode;
 @property (weak) IBOutlet NSButton *buttonCopySamplePassword;
+@property (weak) IBOutlet NSButton *checkboxLockOnLockScreen;
+
+
+
+
+
 
 @end
 
@@ -222,8 +224,7 @@
     self.checkboxShowPopupNotifications.state = Settings.sharedInstance.doNotShowChangeNotifications ? NSOffState : NSOnState;
     self.checkboxTitleIsEditable.state = Settings.sharedInstance.outlineViewTitleIsReadonly ? NSOffState : NSOnState;
     self.checkboxOtherFieldsAreEditable.state = Settings.sharedInstance.outlineViewEditableFieldsAreReadonly ? NSOffState : NSOnState;
-    self.checkboxDereferenceQuickView.state = Settings.sharedInstance.dereferenceInQuickView ? NSOnState : NSOffState;
-    self.checkboxDereferenceOutlineView.state = Settings.sharedInstance.dereferenceInOutlineView ? NSOnState : NSOffState;
+
     self.checkboxDetectForeignChanges.state = Settings.sharedInstance.detectForeignChanges ? NSOnState : NSOffState;
     self.checkboxReloadForeignChanges.state = Settings.sharedInstance.autoReloadAfterForeignChanges ? NSOnState : NSOffState;
     self.checkboxAutoDownloadFavIcon.state = Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged ? NSOnState : NSOffState;
@@ -234,17 +235,6 @@
     self.showAttachmentImagePreviewsInQuickView.state = Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel ? NSOnState : NSOffState;
     
     self.switchShowInMenuBar.state = Settings.sharedInstance.showSystemTrayIcon ? NSOnState : NSOffState;
-    self.switchAutoPromptTouchID.state = Settings.sharedInstance.autoPromptForTouchIdOnActivate ? NSOnState : NSOffState;
-
-    self.allowAppleWatchUnlock.state = Settings.sharedInstance.allowWatchUnlock ? NSOnState : NSOffState;
-    
-    self.allowAppleWatchUnlock.enabled = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable; 
-    if ( BiometricIdHelper.sharedInstance.isWatchUnlockAvailable ) {
-        self.allowAppleWatchUnlock.title = NSLocalizedString(@"preference_allow_watch_unlock", @"Allow Watch Unlock");
-    }
-    else {
-        self.allowAppleWatchUnlock.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Allow Watch Unlock - (Enable in System Preferences > Security & Privacy)");
-    }
     
     if(!Settings.sharedInstance.fullVersion) {
         self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
@@ -260,6 +250,7 @@
     self.checkboxStartInSearchMode.state = Settings.sharedInstance.startWithSearch ? NSOnState : NSOffState;
 
     self.checkboxShowDatabasesManagerOnCloseAllWindows.state = Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows ? NSOnState : NSOffState;
+    self.checkboxLockOnLockScreen.state = Settings.sharedInstance.lockDatabasesOnScreenLock ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -277,8 +268,7 @@
     Settings.sharedInstance.doNotShowChangeNotifications = self.checkboxShowPopupNotifications.state == NSOffState;
     Settings.sharedInstance.outlineViewTitleIsReadonly = self.checkboxTitleIsEditable.state == NSOffState;
     Settings.sharedInstance.outlineViewEditableFieldsAreReadonly = self.checkboxOtherFieldsAreEditable.state == NSOffState;
-    Settings.sharedInstance.dereferenceInQuickView = self.checkboxDereferenceQuickView.state == NSOnState;
-    Settings.sharedInstance.dereferenceInOutlineView = self.checkboxDereferenceOutlineView.state == NSOnState;
+
     Settings.sharedInstance.detectForeignChanges = self.checkboxDetectForeignChanges.state == NSOnState;
     Settings.sharedInstance.autoReloadAfterForeignChanges = Settings.sharedInstance.detectForeignChanges && (self.checkboxReloadForeignChanges.state == NSOnState);
     Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged = self.checkboxAutoDownloadFavIcon.state == NSOnState;
@@ -290,11 +280,7 @@
     Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel = self.showAttachmentImagePreviewsInQuickView.state == NSOnState;
     
     Settings.sharedInstance.showSystemTrayIcon = self.switchShowInMenuBar.state == NSOnState;
-    
-    Settings.sharedInstance.autoPromptForTouchIdOnActivate = self.switchAutoPromptTouchID.state == NSOnState;
-    
-    Settings.sharedInstance.allowWatchUnlock = self.allowAppleWatchUnlock.state ==  NSOnState;
-    
+        
     Settings.sharedInstance.hideKeyFileNameOnLockScreen = self.checkboxHideKeyFileName.state ==  NSOnState;
     Settings.sharedInstance.doNotRememberKeyFile = self.checkboxDoNotRememberKeyFile.state ==  NSOnState;
 
@@ -306,7 +292,9 @@
     Settings.sharedInstance.startWithSearch = self.checkboxStartInSearchMode.state == NSOnState;
     
     Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows = self.checkboxShowDatabasesManagerOnCloseAllWindows.state == NSOnState;
-
+    
+    Settings.sharedInstance.lockDatabasesOnScreenLock = self.checkboxLockOnLockScreen.state == NSControlStateValueOn;
+    
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }

@@ -70,7 +70,7 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
         _easyReadFontForLargeTextView = _easyReadFontForTotp;
     }
     
-    NSLog(@"Fonts built: [%@-%@-%@]", self.regularFont, self.easyReadFont, self.easyReadFontForTotp);
+
 }
 
 - (void)onFontSizeChanged:(NSNotificationCenter*)center {

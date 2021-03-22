@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isMoreThanXMinutesAgo:(NSDate*_Nullable)date minutes:(NSUInteger)minutes;
 
+- (BOOL)isMoreThanXSecondsAgo:(NSUInteger)seconds;
+
 - (BOOL)isEqualToDateWithinEpsilon:(NSDate*)other;
 - (BOOL)isLaterThan:(NSDate*)other;
 - (BOOL)isEarlierThan:(NSDate*)other;

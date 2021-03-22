@@ -11,7 +11,7 @@
 #import "LocalDeviceStorageProvider.h"
 #import "Strongbox.h"
 #import "SafesList.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @implementation iCloudSafesCoordinator
 
@@ -140,7 +140,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     NSURL *destURL = [self getFullICloudURLWithFileName:[self getUniqueICloudFilename:displayName extension:extension]];
     
     NSError * error;
-    BOOL success = [[NSFileManager defaultManager] setUbiquitous:[SharedAppAndAutoFillSettings sharedInstance].iCloudOn itemAtURL:fileURL destinationURL:destURL error:&error];
+    BOOL success = [[NSFileManager defaultManager] setUbiquitous:[AppPreferences sharedInstance].iCloudOn itemAtURL:fileURL destinationURL:destURL error:&error];
     
     if (success) {
         NSString* newNickName = [self displayNameFromUrl:destURL];
@@ -172,7 +172,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
                                                  completion:^(SafeMetaData *metadata, NSError *error)
          {
              if (error == nil) {
-                 NSLog(@"Copied %@ to %@ (%d)", newURL, metadata.fileIdentifier, [SharedAppAndAutoFillSettings sharedInstance].iCloudOn);
+                 NSLog(@"Copied %@ to %@ (%d)", newURL, metadata.fileIdentifier, [AppPreferences sharedInstance].iCloudOn);
                  
                  safe.nickName = metadata.nickName;
                  safe.storageProvider = kLocalDevice;
@@ -276,7 +276,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
     
     _iCloudURLsReady = YES;
     
-    if ([SharedAppAndAutoFillSettings sharedInstance].iCloudOn && !_migrationInProcessDoNotUpdateSafesCollection) {
+    if ([AppPreferences sharedInstance].iCloudOn && !_migrationInProcessDoNotUpdateSafesCollection) {
         [self syncICloudUpdateWithSafesCollection:_iCloudFiles];
     }
 

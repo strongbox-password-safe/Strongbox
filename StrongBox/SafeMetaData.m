@@ -87,6 +87,9 @@
         self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
         self.autoLockOnDeviceLock = YES;
+        self.autoFillConvenienceAutoUnlockTimeout = -1;
+        self.quickTypeEnabled = YES;
+        self.autoFillCopyTotp = YES;
     }
     
     return self;
@@ -108,8 +111,11 @@
         self.storageProvider = storageProvider;
         self.fileName = fileName;
         self.fileIdentifier = fileIdentifier;
-        self.immediateOfflineOfferIfOfflineDetected = [SafeMetaData defaultImmediatelyOfferOfflineForProvider:storageProvider];
-        self.quickTypeEnabled = YES;
+        
+        
+        
+        BOOL immediateOfflineOfferIfOfflineDetected = [SafeMetaData defaultImmediatelyOfferOfflineForProvider:storageProvider];
+        self.offlineDetectedBehaviour = immediateOfflineOfferIfOfflineDetected ? kOfflineDetectedBehaviourAsk : kOfflineDetectedBehaviourTryConnectThenAsk;
     }
     
     return self;
@@ -123,8 +129,6 @@
     return NO;
 #endif
 }
-
-
 
 
 
@@ -237,6 +241,44 @@
         ret.autoLockOnDeviceLock = YES;
     }
     
+    
+    
+    if ( jsonDictionary[@"autoFillConvenienceAutoUnlockTimeout"] != nil ) {
+        ret.autoFillConvenienceAutoUnlockTimeout = ((NSNumber*)jsonDictionary[@"autoFillConvenienceAutoUnlockTimeout"]).integerValue;
+    }
+    else { 
+        ret.autoFillConvenienceAutoUnlockTimeout = -1;
+    }
+    
+    
+    
+    if ( jsonDictionary[@"autoFillLastUnlockedAt"] != nil ) {
+        ret.autoFillLastUnlockedAt = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"autoFillLastUnlockedAt"])).doubleValue];
+    }
+    
+    
+    
+    if ( jsonDictionary[@"autoFillCopyTotp"] != nil ) {
+        ret.autoFillCopyTotp = ((NSNumber*)jsonDictionary[@"autoFillCopyTotp"]).boolValue;
+    }
+    else { 
+        ret.autoFillCopyTotp = YES;
+    }
+    
+    
+    
+    if ( jsonDictionary[@"forceOpenOffline"] != nil ) ret.forceOpenOffline = ((NSNumber*)jsonDictionary[@"forceOpenOffline"]).boolValue;
+
+    
+    
+    if ( jsonDictionary[@"offlineDetectedBehaviour"] != nil ) {
+        ret.offlineDetectedBehaviour = ((NSNumber*)jsonDictionary[@"offlineDetectedBehaviour"]).integerValue;
+    }
+    else { 
+        BOOL immediateOfflineOfferIfOfflineDetected = [SafeMetaData defaultImmediatelyOfferOfflineForProvider:ret.storageProvider];
+        ret.offlineDetectedBehaviour = immediateOfflineOfferIfOfflineDetected ? kOfflineDetectedBehaviourAsk : kOfflineDetectedBehaviourTryConnectThenAsk;
+    }
+
     return ret;
 }
 
@@ -296,7 +338,11 @@
         @"quickTypeEnabled" : @(self.quickTypeEnabled),
         @"quickTypeDisplayFormat" : @(self.quickTypeDisplayFormat),
         @"emptyOrNilPwPreferNilCheckFirst" : @(self.emptyOrNilPwPreferNilCheckFirst),
-        @"autoLockOnDeviceLock" : @(self.autoLockOnDeviceLock)
+        @"autoLockOnDeviceLock" : @(self.autoLockOnDeviceLock),
+        @"autoFillConvenienceAutoUnlockTimeout" : @(self.autoFillConvenienceAutoUnlockTimeout),
+        @"autoFillCopyTotp" : @(self.autoFillCopyTotp),
+        @"forceOpenOffline" : @(self.forceOpenOffline),
+        @"offlineDetectedBehaviour" : @(self.offlineDetectedBehaviour),
     }];
     
     if (self.nickName != nil) {
@@ -340,6 +386,10 @@
 
     if (self.lastSyncAttempt != nil) {
         ret[@"lastSyncAttempt"] = @(self.lastSyncAttempt.timeIntervalSinceReferenceDate);
+    }
+
+    if (self.autoFillLastUnlockedAt != nil) {
+        ret[@"autoFillLastUnlockedAt"] = @(self.autoFillLastUnlockedAt.timeIntervalSinceReferenceDate);
     }
 
     return ret;
@@ -676,6 +726,33 @@
     }
 }
 
+- (NSString *)autoFillConvenienceAutoUnlockPassword {
+    NSString *key = [NSString stringWithFormat:@"%@-autoFillConvenienceAutoUnlockPassword", self.uuid];
+
+    if( self.autoFillConvenienceAutoUnlockTimeout > 0 ) {
+        return [SecretStore.sharedInstance getSecureString:key];
+    }
+    else {
+        [SecretStore.sharedInstance deleteSecureItem:key];
+        return nil;
+    }
+}
+
+- (void)setAutoFillConvenienceAutoUnlockPassword:(NSString *)autoFillConvenienceAutoUnlockPassword {
+    NSString *key = [NSString stringWithFormat:@"%@-autoFillConvenienceAutoUnlockPassword", self.uuid];
+
+    if(self.autoFillConvenienceAutoUnlockTimeout > 0 && autoFillConvenienceAutoUnlockPassword) {
+        NSDate* expiry = [NSDate.date dateByAddingTimeInterval:self.autoFillConvenienceAutoUnlockTimeout];
+        
+        NSLog(@"Setting AutoFIll convenience auto unlock expiry to: [%@]", expiry);
+        
+        [SecretStore.sharedInstance setSecureObject:autoFillConvenienceAutoUnlockPassword forIdentifier:key expiresAt:expiry];
+    }
+    else {
+        [SecretStore.sharedInstance deleteSecureItem:key];
+    }
+}
+
 - (NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
     return [SecretStore.sharedInstance getSecureString:key];
@@ -710,7 +787,7 @@
 
 - (void)clearKeychainItems {
     self.convenienceMasterPassword = nil;
-    
+    self.autoFillConvenienceAutoUnlockPassword = nil;
     self.favourites = nil;
     self.duressPin = nil;
     self.conveniencePin = nil;

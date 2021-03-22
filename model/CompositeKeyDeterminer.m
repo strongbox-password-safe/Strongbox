@@ -11,7 +11,7 @@
 #import "CompositeKeyDeterminer.h"
 #import "BiometricsManager.h"
 #import "SafesList.h"
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 #import "Alerts.h"
 #import "PinEntryController.h"
 #import "SyncManager.h"
@@ -26,6 +26,7 @@
 #import "Utils.h"
 #import "VirtualYubiKeys.h"
 #import "WorkingCopyManager.h"
+#import "NSDate+Extensions.h"
 
 static const int kMaxFailedPinAttempts = 3;
 
@@ -51,7 +52,7 @@ static const int kMaxFailedPinAttempts = 3;
                          biometricPreCleared:(BOOL)biometricPreCleared
                          noConvenienceUnlock:(BOOL)noConvenienceUnlock {
     return [[CompositeKeyDeterminer alloc] initWithViewController:viewController
-                                                             database:database
+                                                         database:database
                                                    isAutoFillOpen:isAutoFillOpen
                                           isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
                                               biometricPreCleared:biometricPreCleared
@@ -83,12 +84,34 @@ static const int kMaxFailedPinAttempts = 3;
     });
 }
 
+- (BOOL)isAutoFillConvenienceAutoLockPossible {
+    BOOL isWithinAutoFillConvenienceAutoUnlockTime = NO;
+    
+    if ( self.isAutoFillOpen &&
+        self.database.autoFillLastUnlockedAt != nil &&
+        self.database.autoFillConvenienceAutoUnlockTimeout > 0 ) {
+        isWithinAutoFillConvenienceAutoUnlockTime = [self.database.autoFillLastUnlockedAt isMoreThanXSecondsAgo:self.database.autoFillConvenienceAutoUnlockTimeout];
+    }
+    
+    return isWithinAutoFillConvenienceAutoUnlockTime && self.database.autoFillConvenienceAutoUnlockPassword != nil;
+}
+
 - (void)innerGetCredentials:(CompositeKeyDeterminedBlock)completion {
     self.completion = completion;
 
-    if (!self.noConvenienceUnlock && self.database.isEnrolledForConvenience && SharedAppAndAutoFillSettings.sharedInstance.isProOrFreeTrial) {
+    if ( self.isAutoFillConvenienceAutoLockPossible ) {
+        NSLog(@"XXXX - AutoFill and within convenience auto unlock timeout. Will auto open...");
+        
+        [self onGotCredentials:self.database.autoFillConvenienceAutoUnlockPassword
+               keyFileBookmark:self.database.keyFileBookmark
+            oneTimeKeyFileData:nil
+                      readOnly:self.database.readOnly
+          yubikeyConfiguration:self.database.contextAwareYubiKeyConfig
+               usedConvenience:YES];
+    }
+    else if (!self.noConvenienceUnlock && self.database.isEnrolledForConvenience && AppPreferences.sharedInstance.isProOrFreeTrial) {
         BOOL biometricPossible = self.database.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
-        BOOL biometricAllowed = !SharedAppAndAutoFillSettings.sharedInstance.disallowAllBiometricId;
+        BOOL biometricAllowed = !AppPreferences.sharedInstance.disallowAllBiometricId;
         
         NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
                 
@@ -114,7 +137,7 @@ static const int kMaxFailedPinAttempts = 3;
                 [self showBiometricAuthentication];
             }
         }
-        else if(!SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil) {
+        else if(!AppPreferences.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil) {
             if (self.isAutoFillOpen && self.database.mainAppAndAutoFillYubiKeyConfigsIncoherent) { 
                 [self promptForManualCredentials];
             }
@@ -278,7 +301,7 @@ static const int kMaxFailedPinAttempts = 3;
             [BiometricsManager.sharedInstance recordBiometricDatabaseState:self.isAutoFillOpen]; 
         }
 
-        if(!SharedAppAndAutoFillSettings.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil) {
+        if(!AppPreferences.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self promptForConveniencePin];
             });
@@ -303,22 +326,44 @@ static const int kMaxFailedPinAttempts = 3;
                     }];
             });
         }
-        else if (error.code == LAErrorUserFallback)
-        {
+        else if (error.code == LAErrorUserFallback) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self promptForManualCredentials];
             });
         }
-        else if (error.code != LAErrorUserCancel)
-        {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [Alerts   warn:self.viewController
-                         title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
-                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
-                    completion:^{
-                        [self promptForManualCredentials];
-                    }];
-            });
+        else if (error.code != LAErrorUserCancel) {
+            if ( @available(iOS 14.5, *) ) { 
+                if ( self.isAutoFillQuickTypeOpen ) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [Alerts   warn:self.viewController
+                                 title:@"14.5 Beta Issue - Please report this issue to Apple."
+                               message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
+                            completion:^{
+                                [self promptForManualCredentials];
+                            }];
+                    });
+                }
+                else {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [Alerts   warn:self.viewController
+                                 title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
+                               message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
+                            completion:^{
+                                [self promptForManualCredentials];
+                            }];
+                    });
+                }
+            }
+            else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [Alerts   warn:self.viewController
+                             title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
+                           message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
+                        completion:^{
+                            [self promptForManualCredentials];
+                        }];
+                });
+            }
         }
         else {
             self.completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
@@ -433,6 +478,7 @@ static const int kMaxFailedPinAttempts = 3;
             if( usedConvenience ) {
                 self.database.isEnrolledForConvenience = NO;
                 self.database.convenienceMasterPassword = nil;
+                self.database.autoFillConvenienceAutoUnlockPassword = nil;
                 self.database.conveniencePin = nil;
                 self.database.isTouchIdEnabled = NO;
                 self.database.hasBeenPromptedForConvenience = NO; 
@@ -510,7 +556,7 @@ static const int kMaxFailedPinAttempts = 3;
 
 - (void)getYubiKeyChallengeResponse:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration challenge:(NSData*)challenge completion:(YubiKeyCRResponseBlock)completion {
 #ifndef IS_APP_EXTENSION
-    if([SharedAppAndAutoFillSettings.sharedInstance isProOrFreeTrial] || yubiKeyConfiguration.mode == kVirtual) {
+    if([AppPreferences.sharedInstance isProOrFreeTrial] || yubiKeyConfiguration.mode == kVirtual) {
         [YubiManager.sharedInstance getResponse:yubiKeyConfiguration
                                       challenge:challenge
                                      completion:completion];

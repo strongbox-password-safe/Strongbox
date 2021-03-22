@@ -21,12 +21,14 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 - (SafeMetaData *)getById:(NSString*)uuid;
 
-+ (NSString *_Nonnull)sanitizeSafeNickName:(NSString *_Nonnull)string;
 - (NSArray<SafeMetaData*>* _Nonnull)getSafesOfProvider:(StorageProvider)storageProvider;
-- (NSString*_Nullable)getSuggestedDatabaseNameUsingDeviceName;
-- (BOOL)isValidNickName:(NSString *_Nonnull)nickName;
 
++ (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
+- (NSString*_Nullable)getSuggestedDatabaseNameUsingDeviceName;
 - (NSString*_Nullable)getUniqueNameFromSuggestedName:(NSString*)suggested;
+
+- (BOOL)isUnique:(NSString *)nickName;
+- (BOOL)isValid:(NSString *)nickName;
 
 - (void)update:(SafeMetaData *_Nonnull)safe;
 - (void)remove:(NSString*_Nonnull)uuid;

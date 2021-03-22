@@ -992,14 +992,7 @@ static NSString* trimField(NSTextField* textField) {
     
     self.selectPredefinedIconController.onSelectedItem = ^(NodeIcon * _Nullable icon, BOOL showFindFavIcons) {
         if(showFindFavIcons) {
-            [FavIconDownloader showUi:weakSelf
-                                nodes:@[weakSelf.node]
-                            viewModel:weakSelf.model
-                               onDone:^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
-                if(go) {
-                    [weakSelf.model batchSetIcons:selectedFavIcons];
-                }
-            }];
+            [weakSelf showFavIconDownloader];
         }
         else {
             [weakSelf.model setItemIcon:weakSelf.node icon:icon];
@@ -1007,6 +1000,21 @@ static NSString* trimField(NSTextField* textField) {
     };
     
     [self.view.window beginSheet:self.selectPredefinedIconController.window  completionHandler:nil];
+}
+
+- (void)showFavIconDownloader {
+    FavIconDownloader *vc = [FavIconDownloader newVC];
+    vc.nodes = @[self.node];
+    vc.viewModel = self.model;
+
+    __weak NodeDetailsViewController* weakSelf = self;
+    vc.onDone = ^(BOOL go, NSDictionary<NSUUID *,NSImage *> * _Nullable selectedFavIcons) {
+        if(go) {
+            [weakSelf.model batchSetIcons:selectedFavIcons];
+        }
+    };
+    
+    [self presentViewControllerAsSheet:vc];
 }
 
 - (void)validateTitleAndIndicateValidityInUI {
@@ -1282,17 +1290,7 @@ static NSString* trimField(NSTextField* textField) {
     
     [self copyToPasteboard:self.node.fields.password];
 
-    NSString *urlString = [self.model dereference:self.node.fields.url node:self.node];
-    if (!urlString.length) {
-        return;
-    }
-    
-    if (![urlString.lowercaseString hasPrefix:@"http:
-        ![urlString.lowercaseString hasPrefix:@"https:
-        urlString = [NSString stringWithFormat:@"http:
-    }
-    
-    [[NSWorkspace sharedWorkspace] openURL:urlString.urlExtendedParse];
+    [self.model launchUrl:self.node];
     
     NSString* loc = NSLocalizedString(@"mac_node_details_password_copied_url_launched", @"Password Copied and URL Launched");
     [self showPopupToastNotification:loc];

@@ -14,9 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseCellView : NSTableCellView
 
 - (void)setWithDatabase:(DatabaseMetadata*)metadata;
-- (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill;
+- (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill wormholeUnlocked:(BOOL)wormholeUnlocked;
 
-- (void)enableEditing:(BOOL)enable;
+@property (copy)void (^onBeginEditingNickname)(DatabaseCellView* cell);
+@property (copy)void (^onEndEditingNickname)(DatabaseCellView* cell);
 
 @end
 

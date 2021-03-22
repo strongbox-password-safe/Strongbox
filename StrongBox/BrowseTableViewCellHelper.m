@@ -84,6 +84,11 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
                                   noFlags:(BOOL)noFlags
                       showGroupChildCount:(BOOL)showGroupChildCount
                          subtitleOverride:(NSNumber *)subtitleOverride {
+    if (!node) { 
+        BrowseItemCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kBrowseItemCell forIndexPath:indexPath];
+        return cell;
+    }
+        
     NSString* title = self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.title node:node] : node.title;
     UIImage* icon = [NodeIconHelper getIconForNode:node predefinedIconSet:self.viewModel.metadata.keePassIconSet format:self.viewModel.database.originalFormat];
 

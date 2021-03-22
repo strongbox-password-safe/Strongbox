@@ -6,7 +6,7 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
-#import "PrivacyViewController.h"
+#import "AppLockViewController.h"
 #import "PinEntryController.h"
 #import "Settings.h"
 #import "Alerts.h"
@@ -15,37 +15,26 @@
 #import "FileManager.h"
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "BiometricsManager.h"
+#import "AppPreferences.h"
 
-@interface PrivacyViewController ()
+@interface AppLockViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonUnlock;
-@property NSDate* startTime;
 @property (weak, nonatomic) IBOutlet UILabel *labelUnlockAttemptsRemaining;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewLogo;
 
 @end
 
-@implementation PrivacyViewController
+@implementation AppLockViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     [self setupImageView];
-    
-    self.startTime = [[NSDate alloc] init];
-    
-    if(!self.startupLockMode) {
-        self.buttonUnlock.hidden = YES; 
-        
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            self.buttonUnlock.hidden = NO; 
-        });
-    }
-    else {
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self beginUnlockSequence]; 
-        });
-    }
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self beginUnlockSequence]; 
+    });
     
     [self updateFailedUnlockAttemptsUI];
 }
@@ -57,18 +46,6 @@
     [self.imageViewLogo addGestureRecognizer:tapGesture1];
 }
 
-- (void)onAppBecameActive {
-    if(self.startupLockMode) {
-        NSLog(@"Ignore App Active events for startup lock screen...");
-        return; 
-    }
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.buttonUnlock.hidden = NO; 
-    });
-
-    [self beginUnlockSequence];
-}
-
 - (IBAction)onUnlock:(id)sender { 
     [self beginUnlockSequence];
 }
@@ -76,12 +53,6 @@
 - (void)beginUnlockSequence {
     NSLog(@"beginUnlockSequence....");
     
-    if (Settings.sharedInstance.appLockMode == kNoLock || ![self shouldLock]) {
-        Settings.sharedInstance.failedUnlockAttempts = 0;
-        self.onUnlockDone(NO);
-        return;
-    }
-
     if(Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) {
         if(BiometricsManager.isBiometricIdAvailable) {
             [self requestBiometric];
@@ -97,12 +68,11 @@
     }
     else {
         Settings.sharedInstance.failedUnlockAttempts = 0;
-        self.onUnlockDone(NO);
+        [self onDone:NO];
     }
 }
 
 - (void)requestBiometric {
-    
     [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"privacy_vc_prompt_identify_to_open", @"Identify to Open Strongbox")
                                            fallbackTitle:Settings.sharedInstance.appLockAllowDevicePasscodeFallbackForBio ? nil : @""
                                               completion:^(BOOL success, NSError * _Nullable error) {
@@ -113,7 +83,7 @@
                 }
                 else {
                     Settings.sharedInstance.failedUnlockAttempts = 0;
-                    self.onUnlockDone(YES);
+                    [self onDone:YES];
                 }
             });
         }
@@ -177,8 +147,7 @@
         if(response == kOk) {
             if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
                 Settings.sharedInstance.failedUnlockAttempts = 0;
-                self.onUnlockDone(afterSuccessfulBiometricAuthentication);
-                
+                [self onDone:afterSuccessfulBiometricAuthentication];
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
             }
@@ -197,20 +166,6 @@
     };
 
     [self presentViewController:pinEntryVc animated:YES completion:nil];
-}
-
-- (BOOL)shouldLock {
-    NSTimeInterval secondsBetween = [[NSDate date] timeIntervalSinceDate:self.startTime];
-    NSInteger seconds = Settings.sharedInstance.appLockDelay;
-    
-    if (self.startupLockMode || seconds == 0 || secondsBetween > seconds)
-    {
-        NSLog(@"Locking App. %ld - %f", (long)seconds, secondsBetween);
-        return YES;
-    }
-
-    NSLog(@"App Lock Not Required %f", secondsBetween);
-    return NO;
 }
 
 - (void)incrementFailedUnlockCount {
@@ -233,6 +188,12 @@
     [FileManager.sharedInstance deleteAllLocalAndAppGroupFiles]; 
 
     [SafesList.sharedInstance deleteAll]; 
+}
+
+- (void)onDone:(BOOL)userJustCompletedBiometricAuthentication {
+    if ( self.onUnlockDone ) {
+        self.onUnlockDone (userJustCompletedBiometricAuthentication);
+    }
 }
 
 @end

@@ -10,7 +10,7 @@
 
 #import <UIKit/UIKit.h>
 #import <MobileCoreServices/UTCoreTypes.h>
-#import "SharedAppAndAutoFillSettings.h"
+#import "AppPreferences.h"
 
 @interface ClipboardManager ()
 
@@ -41,25 +41,37 @@
     return self;
 }
 
+- (void)copyStringWithNoExpiration:(NSString *)value {
+    UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+    
+    if(@available(iOS 10.0, *)) {
+        [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
+                     options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
+    }
+    else {
+        [pasteboard setString:value];
+    }
+}
+
 - (void)copyStringWithDefaultExpiration:(NSString *)value {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
     if(@available(iOS 10.0, *)) {
-        if(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled && SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds > 0) {
+        if(AppPreferences.sharedInstance.clearClipboardEnabled && AppPreferences.sharedInstance.clearClipboardAfterSeconds > 0) {
             
             
             
-            NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds];
+            NSDate* expirationTime = [NSDate.date dateByAddingTimeInterval:AppPreferences.sharedInstance.clearClipboardAfterSeconds];
             
             NSLog(@"Expiration: %@", expirationTime);
             
             [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(!SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff) ,
+                         options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) ,
                                      UIPasteboardOptionExpirationDate : expirationTime }];
         }
         else {
             [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
-                         options: @{ UIPasteboardOptionLocalOnly : @(!SharedAppAndAutoFillSettings.sharedInstance.clipboardHandoff) }];
+                         options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
         }
     }
     else {
@@ -97,7 +109,7 @@
         self.clearClipboardAppBackgroundTask = UIBackgroundTaskInvalid;
     }];
     
-    NSLog(@"Creating New Clear Clipboard Background Task... with timeout = [%ld]", (long)SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds);
+    NSLog(@"Creating New Clear Clipboard Background Task... with timeout = [%ld]", (long)AppPreferences.sharedInstance.clearClipboardAfterSeconds);
 
     NSInteger clipboardChangeCount = UIPasteboard.generalPasteboard.changeCount;
     self.clearClipboardTask = dispatch_block_create(0, ^{
@@ -105,12 +117,12 @@
     });
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW,
-                                 (int64_t)(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
+                                 (int64_t)(AppPreferences.sharedInstance.clearClipboardAfterSeconds * NSEC_PER_SEC)),
                     dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), self.clearClipboardTask);
 }
 
 - (void)clearClipboardDelayedTask:(NSInteger)clipboardChangeCount {
-    if(!SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled) {
+    if(!AppPreferences.sharedInstance.clearClipboardEnabled) {
         [self unobserveClipboardChangeNotifications];
         return; 
     }
@@ -137,7 +149,7 @@
 }
 
 - (void)observeClipboardChangeNotifications {
-    if(SharedAppAndAutoFillSettings.sharedInstance.clearClipboardEnabled) {
+    if(AppPreferences.sharedInstance.clearClipboardEnabled) {
         if(!self.clipboardNotificationIdentifier) {
             
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{

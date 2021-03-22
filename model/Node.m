@@ -515,9 +515,11 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 }
 
 - (BOOL)validateChangeParent:(Node*)parent keePassGroupTitleRules:(BOOL)keePassGroupTitleRules {
-    return  parent != self &&
-            self.parent != parent &&
-            ![parent isChildOf:self] && [parent validateAddChild:self keePassGroupTitleRules:keePassGroupTitleRules];
+    return
+        parent != self &&
+        self.parent != nil && 
+        self.parent != parent &&
+        ![parent isChildOf:self] && [parent validateAddChild:self keePassGroupTitleRules:keePassGroupTitleRules];
 }
 
 
@@ -627,6 +629,22 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
     
     return matching;
+}
+
+- (BOOL)isSearchable {
+    if ( self.isGroup && self.fields.enableSearching != nil ) { 
+        return self.fields.enableSearching.boolValue;
+    }
+    
+    Node* parent = self;
+    while ( parent != nil ) {
+        if ( parent.fields.enableSearching != nil ) { 
+            return parent.fields.enableSearching.boolValue;
+        }
+        parent = parent.parent;
+    }
+    
+    return YES;
 }
 
 - (BOOL)preOrderTraverse:(BOOL (^)(Node*))function {
