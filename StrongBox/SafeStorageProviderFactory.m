@@ -22,6 +22,12 @@
 #import "GoogleDriveStorageProvider.h"
 
 #endif
+
+#else
+
+#import "MacUrlSchemes.h"
+#import "MacFileBasedBookmarkStorageProvider.h"
+
 #endif
 
 #ifndef IS_APP_EXTENSION
@@ -53,20 +59,24 @@
     else if (providerId == kiCloud) {
         return [AppleICloudProvider sharedInstance];
     }
-    else if (providerId == kLocalDevice)
-    {
-        return [LocalDeviceStorageProvider sharedInstance];
-    }
     else if(providerId == kOneDrive) {
         return [OneDriveStorageProvider sharedInstance];
     }
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
     }
+    else if (providerId == kLocalDevice)
+    {
+        return [LocalDeviceStorageProvider sharedInstance];
+    }
 
     [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
     return [LocalDeviceStorageProvider sharedInstance];
 #else
+    else if (providerId == kMacFile) {
+        return MacFileBasedBookmarkStorageProvider.sharedInstance;
+    }
+
     [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
     return nil;
 #endif
@@ -111,27 +121,36 @@
             _displayName = @"iCloud";
         }
     }
+#if TARGET_OS_IPHONE
     else if (provider == kLocalDevice) {
         if (database) {
-#if TARGET_OS_IPHONE
             _displayName = [LocalDeviceStorageProvider.sharedInstance isUsingSharedStorage:database] ?
                 NSLocalizedString(@"autofill_safes_vc_storage_local_name", @"Local") :
                 NSLocalizedString(@"autofill_safes_vc_storage_local_docs_name", @"Local (Documents)");
-#else
-            _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
-#endif
         }
         else {
-#if TARGET_OS_IPHONE
             _displayName = NSLocalizedString(@"storage_provider_name_local_device", @"Local Device");
             if([_displayName isEqualToString:@"storage_provider_name_local_device"]) {
                 _displayName = @"Local Device";
             }
-#else
-            _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
-#endif
         }
     }
+#else
+    else if (provider == kMacFile) {
+        if (database) {
+            if ( [database.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+                _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
+                _displayName = [_displayName stringByAppendingString:@"*"];
+            }
+            else {
+                _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
+            }
+        }
+        else {
+            _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
+        }
+    }
+#endif
     else if(provider == kOneDrive) {
         _displayName = NSLocalizedString(@"storage_provider_name_onedrive", @"OneDrive");
         if([_displayName isEqualToString:@"storage_provider_name_onedrive"]) {
@@ -181,9 +200,11 @@
     else if (provider == kiCloud) {
         return @"cloud";
     }
+#if TARGET_OS_IPHONE
     else if (provider == kLocalDevice) {
         return @"iphone_x";
     }
+#endif
     else if(provider == kOneDrive) {
         return @"onedrive-2021";
     }

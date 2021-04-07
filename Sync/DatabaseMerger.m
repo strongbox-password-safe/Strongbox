@@ -91,6 +91,8 @@
 }
 
 - (BOOL)merge {
+    NSLog(@"DatabaseMerger::merge BEGIN");
+    
     if ( ![self manageAdditionsAndEdits] ) {
         return NO;
     }

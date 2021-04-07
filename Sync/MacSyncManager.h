@@ -28,6 +28,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)backgroundSyncDatabase:(DatabaseMetadata*)database;
 - (void)backgroundSyncDatabase:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion;
 
+- (void)pollForChanges:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock)completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -9,7 +9,7 @@
 #import "TotpCell.h"
 #import "FontManager.h"
 #import "OTPToken+Generation.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "Model.h"
 
 @interface TotpCell ()

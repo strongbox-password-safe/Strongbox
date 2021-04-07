@@ -10,6 +10,7 @@
 #import "DatabaseConvenienceUnlockPreferences.h"
 #import "AutoFillSettingsViewController.h"
 #import "AutoFillManager.h"
+#import "GeneralDatabaseSettings.h"
 
 @interface DatabaseSettingsTabViewController () <NSWindowDelegate>
 
@@ -24,35 +25,39 @@
 - (void)cancel:(id)sender { 
    [self.view.window close];
 }
-    
+
 - (void)viewWillAppear {
-    [super viewWillAppear];
-    
+    [super viewWillAppear];    
     self.view.window.delegate = self; 
-    
-    [self initializeTabs];
 }
 
 - (void)setModel:(DatabaseModel *)databaseModel databaseMetadata:(DatabaseMetadata *)databaseMetadata initialTab:(NSInteger)initialTab {
     self.databaseModel = databaseModel;
     self.databaseMetadata = databaseMetadata;
     self.initialTab = initialTab;
+    
+    [self initializeTabs];
 }
 
 - (void)initializeTabs {
-    NSTabViewItem* item = self.tabViewItems[0];
-    
-    DatabaseConvenienceUnlockPreferences* preferences = (DatabaseConvenienceUnlockPreferences*)item.viewController;
+    NSTabViewItem* generalItem = self.tabViewItems[0];
+    NSTabViewItem* convenienceUnlockItem = self.tabViewItems[1];
+    NSTabViewItem* autoFillItem = self.tabViewItems[2];
+
+    GeneralDatabaseSettings* general = (GeneralDatabaseSettings*)generalItem.viewController;
+    general.databaseModel = self.databaseModel;
+    general.databaseMetadata = self.databaseMetadata;
+
+    DatabaseConvenienceUnlockPreferences* preferences = (DatabaseConvenienceUnlockPreferences*)convenienceUnlockItem.viewController;
     preferences.databaseModel = self.databaseModel;
     preferences.databaseMetadata = self.databaseMetadata;
 
-    NSTabViewItem* item2 = self.tabViewItems[1];
     
     if (!AutoFillManager.sharedInstance.isPossible) {
-        [self removeTabViewItem:item2];
+        [self removeTabViewItem:autoFillItem];
     }
     else {
-        NSViewController* iv = item2.viewController;
+        NSViewController* iv = autoFillItem.viewController;
         AutoFillSettingsViewController* af = (AutoFillSettingsViewController*)iv;
         af.databaseModel = self.databaseModel;
         af.databaseMetadata = self.databaseMetadata;

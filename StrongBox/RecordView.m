@@ -684,8 +684,8 @@ static const int kMinNotesCellHeight = 160;
         vc.model = self.record.fields.passwordHistory;
         vc.readOnly = self.readOnlyMode;
         
-        vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(BOOL userCancelled, NSError *error)) {
-            [self onPasswordHistoryChanged:changed onDone:onDone];
+        vc.saveFunction = ^(PasswordHistory *changed) {
+            [self onPasswordHistoryChanged:changed];
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToKeePassHistory"] && (self.record != nil)) {
@@ -848,15 +848,11 @@ static const int kMinNotesCellHeight = 160;
 
 
 
-- (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(BOOL userCancelled, NSError *error))onDone {
+- (void)onPasswordHistoryChanged:(PasswordHistory*)changed {
     self.record.fields.passwordHistory = changed;
     [self.record touch:YES touchParents:NO];
 
-    [self sync:^(BOOL userCancelled, NSError *error) {
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            onDone(userCancelled, error);
-        });
-    }];
+    [self sync:^(BOOL userCancelled, NSError *error) {  }];
 }
 
 - (void)onAttachmentsChanged:(Node*)node attachments:(NSDictionary<NSString*, DatabaseAttachment*>*)attachments {

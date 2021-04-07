@@ -332,38 +332,14 @@ static const int kMaxFailedPinAttempts = 3;
             });
         }
         else if (error.code != LAErrorUserCancel) {
-            if ( @available(iOS 14.5, *) ) { 
-                if ( self.isAutoFillQuickTypeOpen ) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [Alerts   warn:self.viewController
-                                 title:@"14.5 Beta Issue - Please report this issue to Apple."
-                               message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
-                            completion:^{
-                                [self promptForManualCredentials];
-                            }];
-                    });
-                }
-                else {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [Alerts   warn:self.viewController
-                                 title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
-                               message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
-                            completion:^{
-                                [self promptForManualCredentials];
-                            }];
-                    });
-                }
-            }
-            else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [Alerts   warn:self.viewController
-                             title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
-                           message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
-                        completion:^{
-                            [self promptForManualCredentials];
-                        }];
-                });
-            }
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts   warn:self.viewController
+                         title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_failed_title_fmt", @"%@ Failed"), biometricIdName]
+                       message:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_biometric_unlock_warn_not_configured_fmt", @"%@ has failed: %@. You must now enter your password manually to open the database."), biometricIdName, error]
+                    completion:^{
+                        [self promptForManualCredentials];
+                    }];
+            });
         }
         else {
             self.completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
@@ -523,7 +499,10 @@ static const int kMaxFailedPinAttempts = 3;
     [self completeRequestWithCredentials:password undigestedKeyFileData:undigestedKeyFileData yubiKeyConfiguration:yubiKeyConfiguration usedConvenience:usedConvenience];
 }
 
-- (void)completeRequestWithCredentials:(NSString*)password undigestedKeyFileData:(NSData*)undigestedKeyFileData yubiKeyConfiguration:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration usedConvenience:(BOOL)usedConvenience {
+- (void)completeRequestWithCredentials:(NSString*)password
+                 undigestedKeyFileData:(NSData*)undigestedKeyFileData
+                  yubiKeyConfiguration:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration
+                       usedConvenience:(BOOL)usedConvenience {
     NSData* keyFileDigest = nil;
     if (undigestedKeyFileData) {
         BOOL checkForXml = YES;

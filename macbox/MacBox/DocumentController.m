@@ -22,9 +22,12 @@
 #import "MacUrlSchemes.h"
 #import "SafeStorageProviderFactory.h"
 #import "MacSyncManager.h"
+#import "SampleItemsGenerator.h"
+#import "Serializator.h"
+
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
-static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongbox Password Database (Non File)";
+static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Strongbox Password Database (Non File)";
 
 @interface DocumentController ()
 
@@ -55,69 +58,109 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
     if(returnCode != NSModalResponseOK) {
         return;
     }
-    
+
+    CompositeKeyFactors* ckf = [wizard generateCkfFromSelected:nil];
+
+    [self createNewDatabase:ckf format:wizard.selectedDatabaseFormat keyFileBookmark:wizard.selectedKeyFileBookmark yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
+}
+
+- (void)createNewDatabase:(CompositeKeyFactors*)ckf format:(DatabaseFormat)format keyFileBookmark:(NSString*)keyFileBookmark yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
+    DatabaseModel* db = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:ckf];
+    [SampleItemsGenerator addSampleGroupAndRecordToRoot:db passwordConfig:Settings.sharedInstance.passwordGenerationConfig];
+        
+    [Serializator getAsData:db
+                     format:db.originalFormat
+                 completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( data && !userCancelled && !error ) {
+                [self saveNewFileBasedDatabase:format database:db data:data keyFileBookmark:keyFileBookmark yubiKeyConfig:yubiKeyConfig];
+            }
+            else if (! userCancelled ) {
+                NSLog(@"Error Saving New Database: [%@]", error);
+
+                if (NSApplication.sharedApplication.keyWindow) {
+                    [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
+                }
+            }
+        });
+    }];
+}
+
+- (void)saveNewFileBasedDatabase:(DatabaseFormat)format
+                        database:(DatabaseModel*)database
+                            data:(NSData*)data
+                 keyFileBookmark:(NSString*)keyFileBookmark
+                   yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
     NSSavePanel *panel = [NSSavePanel savePanel];
-    
     NSString* loc2 = NSLocalizedString(@"mac_save_new_database",  @"Save New Password Database...");
     panel.title = loc2;
-
     NSString* loc3 = NSLocalizedString(@"mac_save_action",  @"Save");
     panel.prompt = loc3;
-    
     NSString* loc4 = NSLocalizedString(@"mac_save_new_db_message",  @"You must save this new database before you can use it");
     panel.message = loc4;
-    
-    NSString* ext = [Serializator getDefaultFileExtensionForFormat:wizard.selectedDatabaseFormat];
-    
+    NSString* ext = [Serializator getDefaultFileExtensionForFormat:format];
     NSString* loc5 = NSLocalizedString(@"mac_untitled_database_filename_fmt", @"Untitled.%@");
     panel.nameFieldStringValue = [NSString stringWithFormat:loc5, ext ];
     
     NSInteger modalCode = [panel runModal];
 
-    if (modalCode == NSModalResponseOK) {
-        NSURL *URL = [panel URL];
-
-        CompositeKeyFactors* ckf = [wizard generateCkfFromSelected:nil];
-        
-        Document *document = [[Document alloc] initWithCredentials:wizard.selectedDatabaseFormat
-                                               compositeKeyFactors:ckf];
-
-        [document saveToURL:URL
-                     ofType:kStrongboxPasswordDatabaseDocumentType
-           forSaveOperation:NSSaveOperation
-          completionHandler:^(NSError * _Nullable errorOrNil) {
-            if(errorOrNil) {
-                NSLog(@"Error Saving New Database: [%@]", errorOrNil);
-            
-                if (NSApplication.sharedApplication.keyWindow) {
-                    [MacAlerts error:errorOrNil window:NSApplication.sharedApplication.keyWindow];
-                }
-                
-                return;
-            }
-
-            DatabaseMetadata* database = [DatabasesManager.sharedInstance addOrGet:URL];
-            database.keyFileBookmark = wizard.selectedKeyFileBookmark;
-            database.yubiKeyConfiguration = wizard.selectedYubiKeyConfiguration;
-            [DatabasesManager.sharedInstance update:database];
-        
-            [self addDocument:document];
-            
-            [document makeWindowControllers];
-            [document showWindows];
-        }];
+    if (modalCode != NSModalResponseOK) {
+        return;
     }
+    
+    NSURL *URL = [panel URL];
+
+    NSError* error;
+    BOOL success = [data writeToURL:URL options:kNilOptions error:&error];
+    if ( !success ) {
+        NSLog(@"Error Saving New Database: [%@]", error);
+
+        if (NSApplication.sharedApplication.keyWindow) {
+            [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
+        }
+        
+        return;
+    }
+    
+    NSURL* maybeManagedSyncUrl = [self maybeManagedSyncURL:URL];
+    
+    DatabaseMetadata* metadata = [DatabasesManager.sharedInstance addOrGet:maybeManagedSyncUrl];
+    metadata.keyFileBookmark = keyFileBookmark;
+    metadata.yubiKeyConfiguration = yubiKeyConfig;
+    [DatabasesManager.sharedInstance update:metadata];
+
+    [self openDatabase:metadata completion:^(NSError * _Nonnull error) {
+        if ( error ) {
+            if (NSApplication.sharedApplication.keyWindow) {
+                [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
+            }
+        }
+    }];
+}
+
+- (NSURL*)maybeManagedSyncURL:(NSURL*)url {
+    if ( !Settings.sharedInstance.useLegacyFileProvider ) {
+        NSLog(@"Managing Sync for File Based Database: [%@]", url);
+        return managedUrlFromFileUrl(url);
+    }
+
+     return url;
 }
 
 - (void)openDocumentWithContentsOfURL:(NSURL *)url
                               display:(BOOL)displayDocument
                     completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
 
-    [super openDocumentWithContentsOfURL:url
+    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseByFileUrl:url];
+    NSURL* maybeManaged = database ? url : [self maybeManagedSyncURL:url];
+
+    [super openDocumentWithContentsOfURL:maybeManaged
                                  display:displayDocument
                        completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
         if ( document && !error ) {
-            [DatabasesManager.sharedInstance addOrGet:url]; 
+            if ( !database ) {
+                [DatabasesManager.sharedInstance addOrGet:maybeManaged]; 
+            }
         }
         
         completionHandler(document, documentWasAlreadyOpen, error);
@@ -137,7 +180,7 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
 - (void)openDatabaseWorker:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     NSURL* url = database.fileUrl;
 
-    if ( database.storageProvider == kLocalDevice ) {
+    if ( [url.scheme isEqualToString:kStrongboxFileUrlScheme] ) { 
         if (database.storageInfo != nil) {
             NSError *error = nil;
             NSString* updatedBookmark;
@@ -190,8 +233,8 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
 
 - (NSString *)typeForContentsOfURL:(NSURL *)url
                              error:(NSError *__autoreleasing  _Nullable *)outError {
-    if (! [url.scheme isEqualToString:kStrongboxFileUrlScheme]) {
-        return kStrongboxPasswordDatabaseNonFileDocumentType;
+    if ( ![url.scheme isEqualToString:kStrongboxFileUrlScheme]) {
+        return kStrongboxPasswordDatabaseManagedSyncDocumentType;
     }
 
     return [super typeForContentsOfURL:url error:outError];
@@ -343,22 +386,35 @@ static NSString* const kStrongboxPasswordDatabaseNonFileDocumentType = @"Strongb
     [super restoreWindowWithIdentifier:identifier state:state completionHandler:completionHandler];
 }
 
+- (Document*)documentForDatabase:(DatabaseMetadata*)database {
+    NSArray<Document*> *docs = self.documents;
 
+    return [docs firstOrDefault:^BOOL(Document * _Nonnull obj) {
+        DatabaseMetadata* metadata = obj.databaseMetadata;
+        return (metadata != nil) && [metadata.uuid isEqualToString:database.uuid];
+    }];
+}
 
+- (BOOL)databaseIsDocumentWindow:(DatabaseMetadata *)database {
+    return [self documentForDatabase:database] != nil;
+}
 
+- (BOOL)databaseIsUnlockedInDocumentWindow:(DatabaseMetadata *)database {
+    Document* doc = [self documentForDatabase:database];
+    
+    if ( doc && doc.viewModel ) {
+        return !doc.viewModel.locked;
+    }
+    
+    return NO;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+- (void)closeDocumentWindowForDatabase:(DatabaseMetadata *)database {
+    Document* doc = [self documentForDatabase:database];
+    
+    if ( doc ) {
+        [doc close];
+    }
+}
 
 @end

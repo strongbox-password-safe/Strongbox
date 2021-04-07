@@ -127,13 +127,12 @@
     
     NSString* title = metadata.nickName ? metadata.nickName : @"";
     
-    if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
+    if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] && ![metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
         NSURLComponents *comp = [[NSURLComponents alloc] init];
-        comp.scheme = metadata.fileUrl.scheme;
+
         comp.host = metadata.fileUrl.host;
-        
-        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, comp.URL.absoluteString];
-        
+        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, metadata.fileUrl.host];
+    
         NSDate* modDate;
         unsigned long long size;
         NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata modified:&modDate fileSize:&size];
@@ -150,7 +149,15 @@
         
         
         
-        NSURL* url = metadata.fileUrl;
+        NSURL* url;
+        
+        if ( [metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+            url = fileUrlFromManagedUrl(metadata.fileUrl);
+        }
+        else {
+            url = metadata.fileUrl;
+        }
+        
         if ( url ) {
             if ( [NSFileManager.defaultManager isUbiquitousItemAtURL:url] ) {
                 path = [self getFriendlyICloudPath:url.path];
@@ -176,7 +183,7 @@
     self.textFieldSubtitleLeft.stringValue = path;
     self.textFieldSubtitleTopRight.stringValue = fileSize;
     self.textFieldSubtitleBottomRight.stringValue = fileMod;
-    self.textFieldStorage.stringValue = [SafeStorageProviderFactory getStorageDisplayNameForProvider:metadata.storageProvider];
+    self.textFieldStorage.stringValue = [SafeStorageProviderFactory getStorageDisplayName:metadata];
 }
 
 - (NSString*)getPathRelativeToUserHome:(NSString*)path {
@@ -221,7 +228,7 @@
 }
 
 - (void)onNicknameClick {
-    NSLog(@"onNicknameClick");
+
     
     if ( self.textFieldName.isEditable ) {
         NSLog(@"Ignoring onNicknameClick - because isEditable");
@@ -248,7 +255,7 @@
 }
 
 - (void)controlTextDidEndEditing:(NSNotification *)obj {
-    NSLog(@"controlTextDidEndEditing!");
+
  
     [self endEditingNickname];
     [self setNewNicknameIfValidOtherwiseRestore];

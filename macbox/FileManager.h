@@ -14,6 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
+@property (readonly, nullable) NSURL* sharedAppGroupDirectory;
+
 @property (readonly, nullable) NSString* userHomePath;
 @property (readonly, nullable) NSURL* iCloudRootURL;
 @property (readonly, nullable) NSURL* iCloudDriveRootURL;
@@ -24,6 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSURL* syncManagerMergeWorkingDirectory;
 
 - (void)deleteAllTmpAttachmentPreviewFiles;
+- (void)deleteAllTmpWorkingFiles;
+
+@property (readonly, nullable) NSURL* backupFilesDirectory;
+
+- (void)createIfNecessary:(NSURL*)url;
 
 @end
 

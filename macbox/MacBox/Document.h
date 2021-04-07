@@ -28,7 +28,7 @@ extern NSString* const kNotificationUserInfoLongRunningOperationStatus;
 @property (readonly) ViewModel* viewModel;
 @property (readonly, nullable) DatabaseMetadata* databaseMetadata;
 
-- (instancetype)initWithCredentials:(DatabaseFormat)format compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors;
+- (instancetype)initWithDatabase:(DatabaseModel*)database; 
 
 
 - (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
@@ -41,8 +41,9 @@ extern NSString* const kNotificationUserInfoLongRunningOperationStatus;
                                key:(CompositeKeyFactors*)key
                       selectedItem:(NSString *)selectedItem;
 
-- (void)onSyncChangedUnderlyingWorkingCopy; 
-
+@property (readonly) BOOL isModelLocked;
+- (void)checkForRemoteChanges;
+     
 @end
 
 NS_ASSUME_NONNULL_END

@@ -23,6 +23,10 @@
     return sharedInstance;
 }
 
+- (NSString *)biometricIdName {
+    return NSLocalizedString(@"settings_touch_id_name", @"Touch ID");
+}
+
 - (BOOL)isWatchUnlockAvailable {
     if(self.dummyMode) {
         return YES;
@@ -33,7 +37,7 @@
         NSError *authError;
         BOOL ret = [localAuthContext canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithWatch error:&authError];
         
-        NSLog(@"DEBUG: Watch Unlock available: [%d][%@]", ret, authError);
+        
         
         return ret;
     }

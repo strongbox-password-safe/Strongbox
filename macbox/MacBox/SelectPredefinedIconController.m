@@ -126,7 +126,7 @@
         return ret;
     }
     
-    return nil;
+    return NSView.new;
 }
 
 - (IBAction)onFindFavIcons:(id)sender {

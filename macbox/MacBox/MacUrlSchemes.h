@@ -14,9 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString* const kStrongboxSFTPUrlScheme;
 extern NSString* const kStrongboxWebDAVUrlScheme;
 extern NSString* const kStrongboxFileUrlScheme;
+extern NSString* const kStrongboxSyncManagedFileUrlScheme;
 
 StorageProvider storageProviderFromUrl(NSURL* url);
 StorageProvider storageProviderFromUrlScheme(NSString* scheme);
 NSString* schemeFromStorageProvider(StorageProvider storageProvider);
+
+NSURL* fileUrlFromManagedUrl(NSURL* managedUrl);
+NSURL* managedUrlFromFileUrl(NSURL* fileUrl);
 
 NS_ASSUME_NONNULL_END

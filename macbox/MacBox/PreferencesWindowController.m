@@ -17,6 +17,9 @@
 #import "ClipboardManager.h"
 #import "MBProgressHUD.h"
 #import "BiometricIdHelper.h"
+#import "AutoFillManager.h"
+#import "DatabasesManager.h"
+#import "MacUrlSchemes.h"
 
 @interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate, NSWindowDelegate>
 
@@ -83,8 +86,6 @@
 @property NSArray<NSString*> *sortedWordListKeys;
 
 @property (weak) IBOutlet NSButton *checkboxShowPopupNotifications;
-@property (weak) IBOutlet NSButton *checkboxDetectForeignChanges;
-@property (weak) IBOutlet NSButton *checkboxReloadForeignChanges;
 @property (weak) IBOutlet NSButton *checkboxAutoSave;
 @property (weak) IBOutlet NSButton *checkboxAutoDownloadFavIcon;
 
@@ -113,11 +114,7 @@
 @property (weak) IBOutlet NSButton *checkboxStartInSearchMode;
 @property (weak) IBOutlet NSButton *buttonCopySamplePassword;
 @property (weak) IBOutlet NSButton *checkboxLockOnLockScreen;
-
-
-
-
-
+@property (weak) IBOutlet NSButton *checkboxUseSyncManager;
 
 @end
 
@@ -207,7 +204,7 @@
 }
 
 - (void)bindGeneralUiToSettings {
-    NSLog(@"bindGeneralUiToSettings");
+
     
     self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
     self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
@@ -225,8 +222,6 @@
     self.checkboxTitleIsEditable.state = Settings.sharedInstance.outlineViewTitleIsReadonly ? NSOffState : NSOnState;
     self.checkboxOtherFieldsAreEditable.state = Settings.sharedInstance.outlineViewEditableFieldsAreReadonly ? NSOffState : NSOnState;
 
-    self.checkboxDetectForeignChanges.state = Settings.sharedInstance.detectForeignChanges ? NSOnState : NSOffState;
-    self.checkboxReloadForeignChanges.state = Settings.sharedInstance.autoReloadAfterForeignChanges ? NSOnState : NSOffState;
     self.checkboxAutoDownloadFavIcon.state = Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged ? NSOnState : NSOffState;
 
     self.checkboxConcealEmptyProtected.state = Settings.sharedInstance.concealEmptyProtectedFields ? NSOnState : NSOffState;
@@ -251,6 +246,10 @@
 
     self.checkboxShowDatabasesManagerOnCloseAllWindows.state = Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows ? NSOnState : NSOffState;
     self.checkboxLockOnLockScreen.state = Settings.sharedInstance.lockDatabasesOnScreenLock ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    
+    
+    self.checkboxUseSyncManager.state = !Settings.sharedInstance.useLegacyFileProvider ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -269,8 +268,6 @@
     Settings.sharedInstance.outlineViewTitleIsReadonly = self.checkboxTitleIsEditable.state == NSOffState;
     Settings.sharedInstance.outlineViewEditableFieldsAreReadonly = self.checkboxOtherFieldsAreEditable.state == NSOffState;
 
-    Settings.sharedInstance.detectForeignChanges = self.checkboxDetectForeignChanges.state == NSOnState;
-    Settings.sharedInstance.autoReloadAfterForeignChanges = Settings.sharedInstance.detectForeignChanges && (self.checkboxReloadForeignChanges.state == NSOnState);
     Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged = self.checkboxAutoDownloadFavIcon.state == NSOnState;
     
     Settings.sharedInstance.concealEmptyProtectedFields = self.checkboxConcealEmptyProtected.state == NSOnState;
@@ -366,6 +363,26 @@
     [self bindFavIconDownloading];
 }
 
+- (IBAction)onUseSyncManagerForLocal:(id)sender {
+    Settings.sharedInstance.useLegacyFileProvider = self.checkboxUseSyncManager.state == NSControlStateValueOff;
+    
+    [self migrateLocalDatabasesToFromSyncManager];
+    
+    [self bindGeneralUiToSettings];
+}
+
+- (void)migrateLocalDatabasesToFromSyncManager {
+    NSArray<DatabaseMetadata*>* databases = DatabasesManager.sharedInstance.snapshot;
+    for (DatabaseMetadata* database in databases) {
+        if (database.storageProvider == kMacFile ) {
+            NSURLComponents* components = [NSURLComponents componentsWithURL:database.fileUrl resolvingAgainstBaseURL:NO];
+            components.scheme = Settings.sharedInstance.useLegacyFileProvider ? kStrongboxFileUrlScheme : kStrongboxSyncManagedFileUrlScheme;
+            database.fileUrl = components.URL;
+            [DatabasesManager.sharedInstance update:database];
+            NSLog(@"Converted [%@] Database to [%@]", database.nickName, database.fileUrl);
+        }
+    }
+}
 
 
 
@@ -805,6 +822,10 @@
         self.buttonCopySamplePassword.enabled = YES;
         self.labelSamplePassword.textColor = nil;
     });
+}
+    
+- (IBAction)onClearQuickTypeAutoFillDatabase:(id)sender {
+    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 }
 
 @end

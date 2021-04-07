@@ -64,11 +64,12 @@
         [Kdb1Database isValidDatabase:prefix error:&k3];
 
     if(!ret && error) {
-        NSData* prefixBytes = [prefix subdataWithRange:NSMakeRange(0, MIN(12, prefix.length))];
+        NSData* prefixBytes = [prefix subdataWithRange:NSMakeRange(0, MIN(24, prefix.length))];
         
         NSString* errorSummary = @"Invalid Database. Debug Info:\n";
         
         NSString* prefix = prefixBytes.hexString;
+        NSString* utf8Prefix = [[NSString alloc] initWithData:prefixBytes encoding:NSUTF8StringEncoding];
         
         if([prefix hasPrefix:@"004D534D414D415250435259"]) { 
             NSString* loc = NSLocalizedString(@"error_database_is_encrypted_ms_intune", @"It looks like your database is encrypted by Microsoft InTune probably due to corporate policy.");
@@ -76,7 +77,7 @@
             errorSummary = loc;
         }
         else {
-            errorSummary = [errorSummary stringByAppendingFormat:@"PFX: [%@]\n", prefix];
+            errorSummary = [errorSummary stringByAppendingFormat:@"PFX: Hex: [%@] UTF8: [%@]\n", prefix, utf8Prefix ? utf8Prefix : @"-"];
             errorSummary = [errorSummary stringByAppendingFormat:@"PWS: [%@]\n", pw.localizedDescription];
             errorSummary = [errorSummary stringByAppendingFormat:@"KP:[%@]-[%@]\n", k1.localizedDescription, k2.localizedDescription];
             errorSummary = [errorSummary stringByAppendingFormat:@"KP1: [%@]\n", k3.localizedDescription];
@@ -172,7 +173,6 @@
 
 
 
-
 + (NSData *)expressToData:(DatabaseModel *)database format:(DatabaseFormat)format {
     __block NSData* ret;
 
@@ -199,7 +199,16 @@
 
     id<AbstractDatabaseFormatAdaptor> adaptor = [Serializator getAdaptor:format];
 
-    [adaptor save:database completion:completion];
+    NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
+        
+    [adaptor save:database
+       completion:^(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error){
+        NSLog(@"====================================== PERF ======================================");
+        NSLog(@"SERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startTime);
+        NSLog(@"====================================== PERF ======================================");
+
+        completion(userCancelled, data, debugXml, error);
+    }];
 }
 
 + (DatabaseModel *)expressFromData:(NSData *)data password:(NSString *)password {

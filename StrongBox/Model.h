@@ -10,6 +10,7 @@
 #import "DatabaseModel.h"
 #import "DatabaseAuditor.h"
 #import <UIKit/UIKit.h>
+#import "AsyncUpdateResult.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -23,6 +24,8 @@ extern NSString* const kMasterDetailViewCloseNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
 extern NSString *const kWormholeAutoFillUpdateMessageId;
 extern NSString* const kDatabaseReloadedNotificationKey;
+extern NSString* const kAsyncUpdateDone;
+extern NSString* const kAsyncUpdateStarting;
 
 @interface Model : NSObject
 
@@ -58,6 +61,7 @@ extern NSString* const kDatabaseReloadedNotificationKey;
                                 completion:(void(^_Nullable)(BOOL success))completion;
 
 - (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
+
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
 - (void)stopAndClearAuditor;
@@ -107,6 +111,14 @@ extern NSString* const kDatabaseReloadedNotificationKey;
 
 - (void)disableAndClearAutoFill;
 - (void)enableAutoFill;
+
+
+
+@property (nullable) AsyncUpdateResult* lastAsyncUpdateResult;
+@property (readonly) BOOL isRunningAsyncUpdate;
+
+- (BOOL)asyncUpdateAndSync;
+- (void)clearAsyncUpdateState;
 
 @end
 

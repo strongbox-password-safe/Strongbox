@@ -24,7 +24,7 @@
     return sharedInstance;
 }
 
-- (BOOL)writeBackup:(NSURL *)snapshot metadata:(SafeMetaData *)metadata {
+- (BOOL)writeBackup:(NSURL *)snapshot metadata:(METADATA_PTR)metadata {
     if(metadata.makeBackups) {
         NSDate* now = NSDate.date;
         NSString* filename = [NSString stringWithFormat:@"%@.bak", now.iso8601DateString];
@@ -55,7 +55,7 @@
     return YES;
 }
 
-- (void)deleteAllBackups:(SafeMetaData*)metadata {
+- (void)deleteAllBackups:(METADATA_PTR)metadata {
     NSArray* backups = [self getAvailableBackups:metadata];
     
     for (BackupItem* backup in backups) {
@@ -71,7 +71,7 @@
     }
 }
 
-- (NSArray<BackupItem*>*)getAvailableBackups:(SafeMetaData*)metadata {
+- (NSArray<BackupItem *> *)getAvailableBackups:(METADATA_PTR)metadata {
     NSError* error;
     
     NSArray<NSURLResourceKey>* keys = @[NSURLCreationDateKey, NSURLContentModificationDateKey, NSURLFileSizeKey];
@@ -98,7 +98,7 @@
             NSNumber* fileSize = attributesDictionary[NSURLFileSizeKey];
             
             [ret addObject:[BackupItem withUrl:file backupCreatedDate:dateCreate modDate:modDate fileSize:fileSize]];
-            NSLog(@"Found file with create date: [%@] Size: [%@]", dateCreate, friendlyFileSizeString(fileSize.unsignedIntegerValue));
+
         }
         else {
             NSLog(@"Error getting attributes for file: [%@]", file);
@@ -110,7 +110,7 @@
     }];
 }
 
-- (void)trimBackups:(SafeMetaData*)metadata {
+- (void)trimBackups:(METADATA_PTR)metadata {
     NSArray* backups = [self getAvailableBackups:metadata];
     
     if(backups.count > metadata.maxBackupKeepCount) {

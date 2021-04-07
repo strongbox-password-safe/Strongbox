@@ -12,7 +12,6 @@
 #import "PasswordHistoryViewController.h"
 #import "PreviousPasswordsTableViewController.h"
 #import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
-#import "Settings.h"
 #import "AppPreferences.h"
 #import "SafesViewController.h"
 #import "SafesViewController.h"
@@ -80,15 +79,15 @@
 
 - (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
     if (extensionPointIdentifier == UIApplicationKeyboardExtensionPointIdentifier) {
-        return Settings.sharedInstance.allowThirdPartyKeyboards;
+        return AppPreferences.sharedInstance.allowThirdPartyKeyboards;
     }
 
     return YES;
 }
 
 - (void)markDirectoriesForBackupInclusion {
-    [FileManager.sharedInstance setDirectoryInclusionFromBackup:Settings.sharedInstance.backupFiles
-                                               importedKeyFiles:Settings.sharedInstance.backupIncludeImportedKeyFiles];
+    [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
+                                               importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
 }
 
 - (void)performEarlyBasicICloudInitialization {
@@ -99,7 +98,7 @@
     
     [iCloudSafesCoordinator.sharedInstance initializeiCloudAccessWithCompletion:^(BOOL available) {
         NSLog(@"Early iCloud Initialization Done: Available = [%d]", available);
-        Settings.sharedInstance.iCloudAvailable = available;
+        AppPreferences.sharedInstance.iCloudAvailable = available;
     }];
 }
 
@@ -123,10 +122,10 @@
 }
 
 - (void)initializeInstallSettingsAndLaunchCount {
-    [[Settings sharedInstance] incrementLaunchCount];
+    [AppPreferences.sharedInstance incrementLaunchCount];
     
-    if(Settings.sharedInstance.installDate == nil) {
-        Settings.sharedInstance.installDate = [NSDate date];
+    if(AppPreferences.sharedInstance.installDate == nil) {
+        AppPreferences.sharedInstance.installDate = [NSDate date];
     }
     
     self.appLaunchTime = [NSDate date];
@@ -188,7 +187,7 @@
         
     
 
-    BOOL startupAppLock = !self.hasDoneInitialActivation && Settings.sharedInstance.appLockMode != kNoLock;
+    BOOL startupAppLock = !self.hasDoneInitialActivation && AppPreferences.sharedInstance.appLockMode != kNoLock;
 
     if ( [self shouldRequireAppLockTime] || startupAppLock) {
         [self showLockScreen];
@@ -225,7 +224,7 @@
 
     if(hoursSinceLaunch > 2) { 
         
-        NSInteger launchCount = [[Settings sharedInstance] getLaunchCount];
+        NSInteger launchCount = [AppPreferences.sharedInstance getLaunchCount];
 
         if (launchCount > 30) { 
             if (@available( iOS 10.3,*)) {
@@ -489,12 +488,12 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (BOOL)shouldRequireAppLockTime {
-    if ( Settings.sharedInstance.appLockMode == kNoLock ) {
+    if ( AppPreferences.sharedInstance.appLockMode == kNoLock ) {
         return NO;
     }
     
     NSTimeInterval secondsBetween = [[NSDate date] timeIntervalSinceDate:self.enterBackgroundTime];
-    NSInteger seconds = Settings.sharedInstance.appLockDelay;
+    NSInteger seconds = AppPreferences.sharedInstance.appLockDelay;
     
     if ( seconds == 0 || secondsBetween > seconds ) {
         NSLog(@"shouldRequireAppLock [YES] %ld - %f", (long)seconds, secondsBetween);

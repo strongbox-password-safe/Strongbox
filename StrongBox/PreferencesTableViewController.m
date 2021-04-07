@@ -10,7 +10,7 @@
 #import "Alerts.h"
 #import "Utils.h"
 
-#import "Settings.h"
+//#import "Settings.h"
 #import "AppPreferences.h"
 
 #import <MessageUI/MessageUI.h>
@@ -69,15 +69,15 @@
 - (IBAction)onGenericPreferencesChanged:(id)sender {
     NSLog(@"Generic Preference Changed: [%@]", sender);
 
-    Settings.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
-    Settings.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
+    AppPreferences.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
+    AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
     
     [self bindGenericPreferencesChanged];
 }
 
 - (void)bindGenericPreferencesChanged {
-    self.appLockOnPreferences.on = Settings.sharedInstance.appLockAppliesToPreferences;
-    self.appLockPasscodeFallback.on = Settings.sharedInstance.appLockAllowDevicePasscodeFallbackForBio;
+    self.appLockOnPreferences.on = AppPreferences.sharedInstance.appLockAppliesToPreferences;
+    self.appLockPasscodeFallback.on = AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio;
 }
 
 
@@ -104,10 +104,10 @@
          NSLocalizedString(@"prefs_vc_delete_data_attempt_count", @"Delete Data Failed Attempt Count")
                        options:@[@3, @5, @10, @15]
              formatAsIntervals:NO
-                  currentValue:Settings.sharedInstance.deleteDataAfterFailedUnlockCount
+                  currentValue:AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount
                     completion:^(BOOL success, NSInteger selectedValue) {
                         if (success) {
-                            Settings.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
+                            AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = selectedValue;
                         }
                         [self bindAppLock];
                     }];
@@ -134,10 +134,10 @@
         [self promptForInteger:NSLocalizedString(@"prefs_vc_app_lock_delay", @"App Lock Delay")
                        options:@[@0, @60, @120, @180, @300, @600, @900]
              formatAsIntervals:YES
-                  currentValue:Settings.sharedInstance.appLockDelay
+                  currentValue:AppPreferences.sharedInstance.appLockDelay
                     completion:^(BOOL success, NSInteger selectedValue) {
                         if (success) {
-                            Settings.sharedInstance.appLockDelay = selectedValue;
+                            AppPreferences.sharedInstance.appLockDelay = selectedValue;
                         }
                         [self bindAppLock];
                     }];
@@ -225,12 +225,12 @@
 
 
 
-    self.switchUseICloud.on = [[AppPreferences sharedInstance] iCloudOn] && Settings.sharedInstance.iCloudAvailable;
-    self.switchUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
+    self.switchUseICloud.on = [[AppPreferences sharedInstance] iCloudOn] && AppPreferences.sharedInstance.iCloudAvailable;
+    self.switchUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
     
-    self.labelUseICloud.text = Settings.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
+    self.labelUseICloud.text = AppPreferences.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
                                                                             NSLocalizedString(@"prefs_vc_use_icloud_disabled", @"Use iCloud (Unavailable)");
-    self.labelUseICloud.enabled = Settings.sharedInstance.iCloudAvailable;
+    self.labelUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
 }
 
 - (void)bindHideTips {
@@ -247,7 +247,7 @@
         [self requestAppLockPinCodeAndConfirm];
     }
     else {
-        Settings.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
+        AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
         [self bindAppLock];
     }
 }
@@ -267,8 +267,8 @@
                     [self dismissViewControllerAnimated:YES completion:^{
                         if(response2 == kOk) {
                             if ([pin isEqualToString:confirmPin]) {
-                                Settings.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
-                                Settings.sharedInstance.appLockPin = pin;
+                                AppPreferences.sharedInstance.appLockMode = self.segmentAppLock.selectedSegmentIndex;
+                                AppPreferences.sharedInstance.appLockPin = pin;
                                 [self bindAppLock];
                             }
                             else {
@@ -346,14 +346,14 @@
  
 - (IBAction)onDeleteDataChanged:(id)sender {
     if(self.switchDeleteDataEnabled.on) {
-        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 5; 
+        AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = 5; 
         
         [Alerts info:self
                title:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_title", @"DATA DELETION: Care Required")
              message:NSLocalizedString(@"prefs_vc_info_data_deletion_care_required_message", @"Please be extremely careful as this will delete permanently any local device databases and all preferences.")];
     }
     else {
-        Settings.sharedInstance.deleteDataAfterFailedUnlockCount = 0; 
+        AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = 0; 
     }
     
     [self bindAppLock];
@@ -404,8 +404,8 @@
 
 
 - (void)bindAppLock {
-    NSInteger mode = Settings.sharedInstance.appLockMode;
-    NSNumber* seconds = @(Settings.sharedInstance.appLockDelay);
+    NSInteger mode = AppPreferences.sharedInstance.appLockMode;
+    NSNumber* seconds = @(AppPreferences.sharedInstance.appLockDelay);
 
     NSInteger effectiveMode = mode;
     if (mode == kBiometric && !BiometricsManager.isBiometricIdAvailable) {
@@ -434,7 +434,7 @@
 
     NSLog(@"AppLock: [%ld] - [%@]", (long)mode, seconds);
     
-    BOOL deleteOnOff = Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
+    BOOL deleteOnOff = AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0;
     BOOL deleteEnabled = effectiveMode != kNoLock;
     
     self.switchDeleteDataEnabled.enabled = deleteEnabled;
@@ -442,7 +442,7 @@
     self.switchDeleteDataEnabled.on = deleteOnOff;
     self.cellDeleteDataAttempts.userInteractionEnabled = deleteOnOff && deleteEnabled;
     
-    NSString* str = @(Settings.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
+    NSString* str = @(AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount).stringValue;
     
     self.labelDeleteDataAttemptCount.text = deleteOnOff && deleteEnabled ? str : NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
     

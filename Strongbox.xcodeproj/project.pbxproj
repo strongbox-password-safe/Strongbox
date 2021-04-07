@@ -79,7 +79,6 @@
 		4D098B9F2429186F006D9430 /* TagsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D098B9E2429186F006D9430 /* TagsTests.m */; };
 		4D0AFD2222A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AFD2122A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m */; };
 		4D0AFD2522A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AFD2422A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m */; };
-		4D0BA7D81F23B844009243C9 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4D0BA7DB1F23CA2A009243C9 /* PreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */; };
 		4D0F121E21C1400500C4451D /* SFTPSessionConfigurationViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0F121C21C1400500C4451D /* SFTPSessionConfigurationViewController.m */; };
 		4D108BFE224A40EC00C17095 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D108BFD224A40EC00C17095 /* AesKdfCipher.m */; };
@@ -926,7 +925,6 @@
 		4DC4E0D123488BAA000743C4 /* WelcomeMasterPasswordViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0AFD2122A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m */; };
 		4DC4E0D223488BAA000743C4 /* OTPTokenType.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D004CCD21F4C26600E2B194 /* OTPTokenType.m */; };
 		4DC4E0D323488BAA000743C4 /* RMStoreKeychainPersistence.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D792A65222EF46A00250086 /* RMStoreKeychainPersistence.m */; };
-		4DC4E0D423488BAA000743C4 /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D0BA7D71F23B844009243C9 /* Settings.m */; };
 		4DC4E0D523488BAA000743C4 /* KdbxSerializationCommon.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3E14772183008A00A41CA0 /* KdbxSerializationCommon.m */; };
 		4DC4E0D723488BAA000743C4 /* PinsConfigurationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D25673121E8B086006260B7 /* PinsConfigurationController.m */; };
 		4DC4E0D823488BAA000743C4 /* ChaCha20Cipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D5F5B6D218B33A700A0739A /* ChaCha20Cipher.m */; };
@@ -1421,6 +1419,10 @@
 		4DFF400521806A9500B69383 /* MutableOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* MutableOrderedDictionary.m */; };
 		4DFF400621806AB700B69383 /* MutableOrderedDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DFF4003218066F900B69383 /* MutableOrderedDictionary.m */; };
 		9CFDBDBF5851E7F5D51F80E8 /* Pods_common_ios_Strongbox_Auto_Fill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 73B6CD85BB4ABAD0FB2AC26F /* Pods_common_ios_Strongbox_Auto_Fill.framework */; };
+		C804449F261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */ = {isa = PBXBuildFile; fileRef = C804449E261483EC0017B3BC /* ConcurrentMutableStack.m */; };
+		C80444A0261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */ = {isa = PBXBuildFile; fileRef = C804449E261483EC0017B3BC /* ConcurrentMutableStack.m */; };
+		C80444A1261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */ = {isa = PBXBuildFile; fileRef = C804449E261483EC0017B3BC /* ConcurrentMutableStack.m */; };
+		C80444A2261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */ = {isa = PBXBuildFile; fileRef = C804449E261483EC0017B3BC /* ConcurrentMutableStack.m */; };
 		C8053F7224E178FC00416031 /* SyncLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7124E178FC00416031 /* SyncLogViewController.m */; };
 		C8053F7324E178FC00416031 /* SyncLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F7124E178FC00416031 /* SyncLogViewController.m */; };
 		C8053F7624E1816100416031 /* SyncLogCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8053F7524E1816100416031 /* SyncLogCell.xib */; };
@@ -1435,6 +1437,10 @@
 		C8053F8424E1D6E800416031 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C8053F8024E1D6E800416031 /* NSDate+Extensions.m */; };
 		C8062DDC25B74FD700426E6B /* DatabaseMetadataProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8062DDF25B74FD700426E6B /* DatabaseMetadataProperties.storyboard */; };
 		C8062DDD25B74FD700426E6B /* DatabaseMetadataProperties.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8062DDF25B74FD700426E6B /* DatabaseMetadataProperties.storyboard */; };
+		C807359B2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */; };
+		C807359C2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */; };
+		C807359D2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */; };
+		C807359E2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */; };
 		C809F08425A8BF6400D28E6D /* DuressActionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C809F08325A8BF6400D28E6D /* DuressActionHelper.m */; };
 		C809F08525A8BF6400D28E6D /* DuressActionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C809F08325A8BF6400D28E6D /* DuressActionHelper.m */; };
 		C809F08625A8BF6400D28E6D /* DuressActionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C809F08325A8BF6400D28E6D /* DuressActionHelper.m */; };
@@ -1495,6 +1501,14 @@
 		C8453EDB254DCA2A006BE885 /* LoggingInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */; };
 		C8453EDC254DCA2A006BE885 /* LoggingInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */; };
 		C8453EDD254DCA2A006BE885 /* LoggingInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */; };
+		C846FE802612267D0019EB7E /* AsyncUpdateResult.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE7F2612267D0019EB7E /* AsyncUpdateResult.m */; };
+		C846FE812612267D0019EB7E /* AsyncUpdateResult.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE7F2612267D0019EB7E /* AsyncUpdateResult.m */; };
+		C846FE822612267D0019EB7E /* AsyncUpdateResult.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE7F2612267D0019EB7E /* AsyncUpdateResult.m */; };
+		C846FE832612267D0019EB7E /* AsyncUpdateResult.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE7F2612267D0019EB7E /* AsyncUpdateResult.m */; };
+		C846FE95261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE94261240E10019EB7E /* AsyncUpdateResultViewController.m */; };
+		C846FE96261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE94261240E10019EB7E /* AsyncUpdateResultViewController.m */; };
+		C846FE97261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE94261240E10019EB7E /* AsyncUpdateResultViewController.m */; };
+		C846FE98261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C846FE94261240E10019EB7E /* AsyncUpdateResultViewController.m */; };
 		C84F5C4C2543463E00961671 /* CustomizeView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84F5C512543463E00961671 /* CustomizeView.storyboard */; };
 		C84F5C4D2543463E00961671 /* CustomizeView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84F5C512543463E00961671 /* CustomizeView.storyboard */; };
 		C84F5C4E2543463E00961671 /* CustomizeView.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C84F5C512543463E00961671 /* CustomizeView.storyboard */; };
@@ -2046,8 +2060,6 @@
 		4D0AFD2122A7E88100DDBC5A /* WelcomeMasterPasswordViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WelcomeMasterPasswordViewController.m; path = StrongBox/WelcomeMasterPasswordViewController.m; sourceTree = "<group>"; };
 		4D0AFD2322A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WelcomeCreateDoneViewController.h; path = StrongBox/WelcomeCreateDoneViewController.h; sourceTree = "<group>"; };
 		4D0AFD2422A7F1BC00DDBC5A /* WelcomeCreateDoneViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WelcomeCreateDoneViewController.m; path = StrongBox/WelcomeCreateDoneViewController.m; sourceTree = "<group>"; };
-		4D0BA7D61F23B844009243C9 /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Settings.h; path = StrongBox/Settings.h; sourceTree = "<group>"; };
-		4D0BA7D71F23B844009243C9 /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Settings.m; path = StrongBox/Settings.m; sourceTree = "<group>"; };
 		4D0BA7D91F23CA2A009243C9 /* PreferencesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PreferencesTableViewController.h; path = StrongBox/PreferencesTableViewController.h; sourceTree = "<group>"; };
 		4D0BA7DA1F23CA2A009243C9 /* PreferencesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PreferencesTableViewController.m; path = StrongBox/PreferencesTableViewController.m; sourceTree = "<group>"; };
 		4D0F121B21C1400500C4451D /* SFTPSessionConfigurationViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPSessionConfigurationViewController.h; path = StrongBox/SFTPSessionConfigurationViewController.h; sourceTree = "<group>"; };
@@ -3244,6 +3256,8 @@
 		C803E1C92464977B001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C803E1CA2464977C001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C803E1CB2464977C001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/RMStore.strings; sourceTree = "<group>"; };
+		C804449D261483EC0017B3BC /* ConcurrentMutableStack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableStack.h; path = model/ConcurrentMutableStack.h; sourceTree = "<group>"; };
+		C804449E261483EC0017B3BC /* ConcurrentMutableStack.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableStack.m; path = model/ConcurrentMutableStack.m; sourceTree = "<group>"; };
 		C8053F7024E178FC00416031 /* SyncLogViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SyncLogViewController.h; path = Sync/SyncLogViewController.h; sourceTree = "<group>"; };
 		C8053F7124E178FC00416031 /* SyncLogViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SyncLogViewController.m; path = Sync/SyncLogViewController.m; sourceTree = "<group>"; };
 		C8053F7524E1816100416031 /* SyncLogCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = SyncLogCell.xib; path = Sync/SyncLogCell.xib; sourceTree = "<group>"; };
@@ -3253,6 +3267,21 @@
 		C8053F7F24E1D68500416031 /* NSDate+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "NSDate+Extensions.h"; path = "model/NSDate+Extensions.h"; sourceTree = "<group>"; };
 		C8053F8024E1D6E800416031 /* NSDate+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "NSDate+Extensions.m"; path = "model/NSDate+Extensions.m"; sourceTree = "<group>"; };
 		C8062DDE25B74FD700426E6B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DatabaseMetadataProperties.storyboard; sourceTree = "<group>"; };
+		C807359F2614B0A9006FA2FC /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/AsyncUpdateResultViewer.storyboard; sourceTree = "<group>"; };
+		C80735A92614B0B3006FA2FC /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AsyncUpdateResultViewer.strings"; sourceTree = "<group>"; };
+		C80735AB2614B0B5006FA2FC /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735AD2614B0B6006FA2FC /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735AF2614B0B8006FA2FC /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735B12614B0B9006FA2FC /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735B32614B0BB006FA2FC /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735B52614B0BC006FA2FC /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735B72614B0BF006FA2FC /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735B92614B0C0006FA2FC /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/AsyncUpdateResultViewer.strings"; sourceTree = "<group>"; };
+		C80735BB2614B0C2006FA2FC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735BD2614B0C4006FA2FC /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735BF2614B0C5006FA2FC /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735C12614B0C7006FA2FC /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
+		C80735C72614B2EB006FA2FC /* CouldNotConnectBehaviour.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CouldNotConnectBehaviour.h; sourceTree = "<group>"; };
 		C809F08225A8BF6400D28E6D /* DuressActionHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuressActionHelper.h; path = model/DuressActionHelper.h; sourceTree = "<group>"; };
 		C809F08325A8BF6400D28E6D /* DuressActionHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DuressActionHelper.m; path = model/DuressActionHelper.m; sourceTree = "<group>"; };
 		C80DDAB42600D68A00C9A01F /* OfflineDetectedBehaviour.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineDetectedBehaviour.h; path = StrongBox/OfflineDetectedBehaviour.h; sourceTree = "<group>"; };
@@ -3327,6 +3356,10 @@
 		C8453ED8254DCA2A006BE885 /* LoggingInputStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LoggingInputStream.h; path = model/LoggingInputStream.h; sourceTree = "<group>"; };
 		C8453ED9254DCA2A006BE885 /* LoggingInputStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LoggingInputStream.m; path = model/LoggingInputStream.m; sourceTree = "<group>"; };
 		C8467D16254307BC00DAC0DB /* KeePassGroupOrEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeePassGroupOrEntry.h; sourceTree = "<group>"; };
+		C846FE7E2612267D0019EB7E /* AsyncUpdateResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AsyncUpdateResult.h; path = model/AsyncUpdateResult.h; sourceTree = "<group>"; };
+		C846FE7F2612267D0019EB7E /* AsyncUpdateResult.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AsyncUpdateResult.m; path = model/AsyncUpdateResult.m; sourceTree = "<group>"; };
+		C846FE93261240E10019EB7E /* AsyncUpdateResultViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AsyncUpdateResultViewController.h; path = StrongBox/AsyncUpdateResultViewController.h; sourceTree = "<group>"; };
+		C846FE94261240E10019EB7E /* AsyncUpdateResultViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AsyncUpdateResultViewController.m; path = StrongBox/AsyncUpdateResultViewController.m; sourceTree = "<group>"; };
 		C849D1DA253C815A00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SyncLog.strings; sourceTree = "<group>"; };
 		C849D1DB253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = StrongBox/ja.lproj/Main.strings; sourceTree = "<group>"; };
 		C849D1DC253C815B00E05714 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/PrivacyViewController.strings; sourceTree = "<group>"; };
@@ -4823,6 +4856,8 @@
 				C809F08225A8BF6400D28E6D /* DuressActionHelper.h */,
 				C809F08325A8BF6400D28E6D /* DuressActionHelper.m */,
 				C867455D25C9AF98001453BE /* QuickTypeAutoFillDisplayFormat.h */,
+				C846FE7E2612267D0019EB7E /* AsyncUpdateResult.h */,
+				C846FE7F2612267D0019EB7E /* AsyncUpdateResult.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -5320,14 +5355,14 @@
 		4DBA028022A3EECA00BAC858 /* Database Preferences */ = {
 			isa = PBXGroup;
 			children = (
+				4D6C51961F6407580035640E /* DatabaseOperations.h */,
+				4D6C51971F6407580035640E /* DatabaseOperations.m */,
 				4DE7F0F122F89D790095F51F /* DatabaseOperations.storyboard */,
 				4DD72BF724264B18009F4091 /* DatabasePreferencesController.h */,
 				4DD72BF824264B18009F4091 /* DatabasePreferencesController.m */,
 				C84F5C512543463E00961671 /* CustomizeView.storyboard */,
 				4D376E4522AC4B4000BDB93A /* BrowsePreferencesTableViewController.h */,
 				4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */,
-				4D6C51961F6407580035640E /* DatabaseOperations.h */,
-				4D6C51971F6407580035640E /* DatabaseOperations.m */,
 				4D526AB92440BA4400B0B700 /* Export.storyboard */,
 				4DD755EA232F084900758824 /* ExportOptionsTableViewController.h */,
 				4DD755E9232F084900758824 /* ExportOptionsTableViewController.m */,
@@ -5338,6 +5373,7 @@
 				4D45BF632426605C0024F332 /* StatisticsPropertiesViewController.h */,
 				4D45BF642426605C0024F332 /* StatisticsPropertiesViewController.m */,
 				C80DDAB42600D68A00C9A01F /* OfflineDetectedBehaviour.h */,
+				C80735C72614B2EB006FA2FC /* CouldNotConnectBehaviour.h */,
 			);
 			name = "Database Preferences";
 			sourceTree = "<group>";
@@ -5807,8 +5843,6 @@
 		C87A8CD5249513BC00356966 /* App Settings */ = {
 			isa = PBXGroup;
 			children = (
-				4D0BA7D61F23B844009243C9 /* Settings.h */,
-				4D0BA7D71F23B844009243C9 /* Settings.m */,
 				C87A8CCE2495101100356966 /* AppPreferences.h */,
 				C87A8CCF2495101100356966 /* AppPreferences.m */,
 			);
@@ -6055,6 +6089,11 @@
 				C833BB9C25A60CB10039173B /* ConflictResolutionWizard.storyboard */,
 				C8DC0F7D25A4E00B00BF7754 /* ConflictResolutionWizard.h */,
 				C8DC0F7E25A4E00B00BF7754 /* ConflictResolutionWizard.m */,
+				C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */,
+				C846FE93261240E10019EB7E /* AsyncUpdateResultViewController.h */,
+				C846FE94261240E10019EB7E /* AsyncUpdateResultViewController.m */,
+				C804449D261483EC0017B3BC /* ConcurrentMutableStack.h */,
+				C804449E261483EC0017B3BC /* ConcurrentMutableStack.m */,
 			);
 			name = Sync;
 			sourceTree = "<group>";
@@ -6350,6 +6389,7 @@
 				C886885E25B878D1004C5D6B /* PropertySwitchTableViewCell.xib in Resources */,
 				4DE18BB622F09976007D902D /* DatabaseCell.xib in Resources */,
 				4D36B0B422C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
+				C807359B2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */,
 				C8855FB924854E8E001EE933 /* SwitchTableCell.xib in Resources */,
 				4D6C854E239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
@@ -6456,6 +6496,7 @@
 				C886885F25B878D1004C5D6B /* PropertySwitchTableViewCell.xib in Resources */,
 				4DC4E12623488BAA000743C4 /* DatabaseCell.xib in Resources */,
 				4DC4E12723488BAA000743C4 /* securedrop.wordlist.utf8.txt in Resources */,
+				C807359D2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */,
 				C8855FBA24854E8E001EE933 /* SwitchTableCell.xib in Resources */,
 				4D6C8550239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4DC4E12823488BAA000743C4 /* french-diceware.wordlist.utf8.txt in Resources */,
@@ -6619,6 +6660,7 @@
 				4DC4E26B23488BAE000743C4 /* NotesTableViewCell.xib in Resources */,
 				4DC4E26C23488BAE000743C4 /* IconCellView.xib in Resources */,
 				4D7F5A4023602000003ED785 /* ItemDetails.storyboard in Resources */,
+				C807359E2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */,
 				4DC4E26D23488BAE000743C4 /* ViewAttachmentCell.xib in Resources */,
 				C8E6D4F6246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E26E23488BAE000743C4 /* WebDAVConfigurationViewController.xib in Resources */,
@@ -6702,6 +6744,7 @@
 				4DAE98B32270B4E200A811C4 /* NotesTableViewCell.xib in Resources */,
 				4D766D5022204E0A00AEF439 /* IconCellView.xib in Resources */,
 				4D7F5A3F23601FFF003ED785 /* ItemDetails.storyboard in Resources */,
+				C807359C2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */,
 				4DAE98B12270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				C8E6D4F4246D5BBE00AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4D770FA0230326BE00CBE244 /* WebDAVConfigurationViewController.xib in Resources */,
@@ -7024,6 +7067,7 @@
 				C893D4E024EC30E000CEF588 /* GettingStartedInitialViewController.m in Sources */,
 				4D3A0F382587B951003D7BE8 /* KeyFileHelper.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
+				C804449F261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
 				C8BF76E82472E1820080A808 /* DeletedObjects.m in Sources */,
 				4D82332B22B01BE200A37BAC /* SortOrderTableViewController.m in Sources */,
@@ -7084,6 +7128,7 @@
 				4DFA67DA22C7F2D4000FC012 /* PasswordGenerationViewController.m in Sources */,
 				4D3E1480218315CD00A41CA0 /* VariantDictionary.m in Sources */,
 				4D4D3FAC2409CA7C0056A7E2 /* Foo.swift in Sources */,
+				C846FE95261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */,
 				4DAE98C42270B4E200A811C4 /* EntryViewModel.m in Sources */,
 				4DE18BBA22F09A3F007D902D /* DatabaseCell.m in Sources */,
 				C8F8A3912588EFDC00B9297C /* Pair.m in Sources */,
@@ -7305,7 +7350,6 @@
 				4D792A71222EF46A00250086 /* RMStoreKeychainPersistence.m in Sources */,
 				C8991AD624B0CF7200C2D604 /* StorageProviderReadOptions.m in Sources */,
 				C893D4E424EC34C300CEF588 /* TurnOnAutoFillViewController.m in Sources */,
-				4D0BA7D81F23B844009243C9 /* Settings.m in Sources */,
 				C87A991B255961DE0002BEF8 /* HTMLDocument.m in Sources */,
 				4D3E14782183008A00A41CA0 /* KdbxSerializationCommon.m in Sources */,
 				C8B2C6E72493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */,
@@ -7321,6 +7365,7 @@
 				4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */,
 				4D004CDC21F4C26700E2B194 /* OTPToken+Persistence.m in Sources */,
 				C8053F7A24E181CF00416031 /* SyncLogEntryTableViewCell.m in Sources */,
+				C846FE802612267D0019EB7E /* AsyncUpdateResult.m in Sources */,
 				4DD9D98A241D36BF00267D49 /* UpgradeAnswerViewController.m in Sources */,
 				4D18F2362257987E00768E18 /* SprCompilation.m in Sources */,
 				4D78AC2F1FB1E27700A68A92 /* DatabaseModel.m in Sources */,
@@ -7439,6 +7484,7 @@
 				4D08B5B8234C9613003D1953 /* GCDWebServer.m in Sources */,
 				4DC4E01F23488BAA000743C4 /* PasswordHistoryEntry.m in Sources */,
 				4DC4E02023488BAA000743C4 /* Kdb1Database.m in Sources */,
+				C80444A1261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */,
 				4DC4E02123488BAA000743C4 /* SortOrderTableViewController.m in Sources */,
 				4DC4E02223488BAA000743C4 /* UIImage+FixOrientation.m in Sources */,
 				4DC4E02323488BAA000743C4 /* DAVRequest.m in Sources */,
@@ -7499,6 +7545,7 @@
 				C8F8A3A22589001B00B9297C /* DiffDrilldownTableViewController.m in Sources */,
 				4D08B5B0234C9613003D1953 /* GCDWebUploader.m in Sources */,
 				4DC4E04423488BAA000743C4 /* Times.m in Sources */,
+				C846FE97261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */,
 				4DC4E04523488BAA000743C4 /* SetNodeIconUiHelper.m in Sources */,
 				4DC4E04623488BAA000743C4 /* ISO8601DateFormatter.m in Sources */,
 				4D45BF662426605C0024F332 /* StatisticsPropertiesViewController.m in Sources */,
@@ -7735,8 +7782,8 @@
 				C81A5FE725B74B9100038963 /* DatabasePropertiesVC.m in Sources */,
 				4D6B5058238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
 				C86791242561699B0038310E /* KeePassXmlAutoTypeAssociation.m in Sources */,
+				C846FE822612267D0019EB7E /* AsyncUpdateResult.m in Sources */,
 				4DC4E0D323488BAA000743C4 /* RMStoreKeychainPersistence.m in Sources */,
-				4DC4E0D423488BAA000743C4 /* Settings.m in Sources */,
 				4DC4E0D523488BAA000743C4 /* KdbxSerializationCommon.m in Sources */,
 				4D9098EE239956BE0063DAC7 /* FavIconPreferencesTableViewController.m in Sources */,
 				C8400FE424ED27BE0070849C /* AllSetAlreadyHasDatabaseViewController.m in Sources */,
@@ -7936,6 +7983,7 @@
 				4D4D3FAF2409CA7C0056A7E2 /* Foo.swift in Sources */,
 				4D79F7F2244DD6F100C278A5 /* DatabaseAuditor.m in Sources */,
 				4DC96912238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
+				C846FE98261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */,
 				4DC4E1AC23488BAE000743C4 /* regdom.c in Sources */,
 				4DC4E1AD23488BAE000743C4 /* DecryptionParameters.m in Sources */,
 				4DC4E1AF23488BAE000743C4 /* AesCipher.m in Sources */,
@@ -8116,6 +8164,7 @@
 				C8DE8D8E258F900400B4D9EA /* Serializator.m in Sources */,
 				4DC4E22C23488BAE000743C4 /* NodeIconHelper.m in Sources */,
 				C8B8C7882539DED300164B73 /* VirtualYubiKey.m in Sources */,
+				C846FE832612267D0019EB7E /* AsyncUpdateResult.m in Sources */,
 				4DC4E22D23488BAE000743C4 /* NSData+GZIP.m in Sources */,
 				4DC4E22E23488BAE000743C4 /* NSURL+QueryItems.m in Sources */,
 				4D526AB524407C8F00B0B700 /* WSTag.swift in Sources */,
@@ -8132,6 +8181,7 @@
 				C8413C5B2592843800BD9DE8 /* NodeIcon.m in Sources */,
 				4DC4E23823488BAE000743C4 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D160ABC24535D1C0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
+				C80444A2261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */,
 				C819B4D124EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */,
 				C8A2204B249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5059238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
@@ -8240,6 +8290,7 @@
 				4D4D3FAD2409CA7C0056A7E2 /* Foo.swift in Sources */,
 				4D79F7F0244DD6F000C278A5 /* DatabaseAuditor.m in Sources */,
 				4DC96910238FD4D700D6286F /* FavIconDownloadOptions.m in Sources */,
+				C846FE96261240E10019EB7E /* AsyncUpdateResultViewController.m in Sources */,
 				4D3652152184A24700A56519 /* regdom.c in Sources */,
 				4D4766F32178C82B00C4358F /* DecryptionParameters.m in Sources */,
 				4D9E08E721822F5C007BA1E7 /* AesCipher.m in Sources */,
@@ -8420,6 +8471,7 @@
 				C8DE8D8C258F900400B4D9EA /* Serializator.m in Sources */,
 				4D8144B52199B4A80044E617 /* NodeIconHelper.m in Sources */,
 				C8B8C7862539DED300164B73 /* VirtualYubiKey.m in Sources */,
+				C846FE812612267D0019EB7E /* AsyncUpdateResult.m in Sources */,
 				4D326EA7223037AE00DCD8C7 /* NSData+GZIP.m in Sources */,
 				4D004CED21F4F7C600E2B194 /* NSURL+QueryItems.m in Sources */,
 				4D526AB324407C8F00B0B700 /* WSTag.swift in Sources */,
@@ -8436,6 +8488,7 @@
 				C8413C592592843800BD9DE8 /* NodeIcon.m in Sources */,
 				4DC66F3E229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				4D160AB824535D1A0097C730 /* SearchResultsBrowseTableDatasource.m in Sources */,
+				C80444A0261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */,
 				C819B4D024EAE0550055CB10 /* AutoFillPreferencesViewController.m in Sources */,
 				C8A22049249158AD0025B8B0 /* AesInputStream.m in Sources */,
 				4D6B5057238BBA1F00DF2F88 /* SVProgressAnimatedView.m in Sources */,
@@ -9250,6 +9303,28 @@
 			path = StrongBox;
 			sourceTree = "<group>";
 		};
+		C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C807359F2614B0A9006FA2FC /* Base */,
+				C80735A92614B0B3006FA2FC /* zh-Hans */,
+				C80735AB2614B0B5006FA2FC /* cs */,
+				C80735AD2614B0B6006FA2FC /* nl */,
+				C80735AF2614B0B8006FA2FC /* fr */,
+				C80735B12614B0B9006FA2FC /* de */,
+				C80735B32614B0BB006FA2FC /* it */,
+				C80735B52614B0BC006FA2FC /* ja */,
+				C80735B72614B0BF006FA2FC /* nb */,
+				C80735B92614B0C0006FA2FC /* pt-BR */,
+				C80735BB2614B0C2006FA2FC /* ru */,
+				C80735BD2614B0C4006FA2FC /* es */,
+				C80735BF2614B0C5006FA2FC /* sv */,
+				C80735C12614B0C7006FA2FC /* uk */,
+			);
+			name = AsyncUpdateResultViewer.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
 		C833BB9C25A60CB10039173B /* ConflictResolutionWizard.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -9595,7 +9670,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -9683,7 +9758,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -9770,7 +9845,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -9850,7 +9925,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -9933,7 +10008,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -10004,7 +10079,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -10073,7 +10148,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -10152,7 +10227,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3046;
+				CURRENT_PROJECT_VERSION = 3052;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";

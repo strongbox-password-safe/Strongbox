@@ -383,7 +383,6 @@ NSImage* scaleImage(NSImage* image, CGSize newSize) {
     if (!ret || !ret.isValid) {
         return image;
     }
-    
     [ret lockFocus];
     
     NSRect thumbnailRect = { 0 };
@@ -492,6 +491,33 @@ NSString* localizedYesOrNoFromBool(BOOL george) {
 
 
     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

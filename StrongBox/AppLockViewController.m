@@ -8,7 +8,7 @@
 
 #import "AppLockViewController.h"
 #import "PinEntryController.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "Alerts.h"
 #import "SafesList.h"
 #import "AutoFillManager.h"
@@ -53,7 +53,7 @@
 - (void)beginUnlockSequence {
     NSLog(@"beginUnlockSequence....");
     
-    if(Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) {
+    if(AppPreferences.sharedInstance.appLockMode == kBiometric || AppPreferences.sharedInstance.appLockMode == kBoth) {
         if(BiometricsManager.isBiometricIdAvailable) {
             [self requestBiometric];
         }
@@ -63,26 +63,26 @@
                  message:NSLocalizedString(@"privacy_vc_prompt_biometrics_unavailable_message", @"This application requires a biometric unlock but biometrics is unavailable on this device. You must re-enable biometrics to continue unlocking this application.")];
         }
     }
-    else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
+    else if (AppPreferences.sharedInstance.appLockMode == kPinCode || AppPreferences.sharedInstance.appLockMode == kBoth) {
         [self requestPin:NO];
     }
     else {
-        Settings.sharedInstance.failedUnlockAttempts = 0;
+        AppPreferences.sharedInstance.failedUnlockAttempts = 0;
         [self onDone:NO];
     }
 }
 
 - (void)requestBiometric {
     [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"privacy_vc_prompt_identify_to_open", @"Identify to Open Strongbox")
-                                           fallbackTitle:Settings.sharedInstance.appLockAllowDevicePasscodeFallbackForBio ? nil : @""
+                                           fallbackTitle:AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio ? nil : @""
                                               completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
+                if (AppPreferences.sharedInstance.appLockMode == kPinCode || AppPreferences.sharedInstance.appLockMode == kBoth) {
                     [self requestPin:YES];
                 }
                 else {
-                    Settings.sharedInstance.failedUnlockAttempts = 0;
+                    AppPreferences.sharedInstance.failedUnlockAttempts = 0;
                     [self onDone:YES];
                 }
             });
@@ -101,11 +101,11 @@
 }
 
 - (void)updateFailedUnlockAttemptsUI {
-    NSUInteger failed = Settings.sharedInstance.failedUnlockAttempts;
+    NSUInteger failed = AppPreferences.sharedInstance.failedUnlockAttempts;
     
     if (failed > 0 ) {
-        if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
-            NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - failed;
+        if(AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
+            NSInteger remaining = AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount - failed;
             
             if(remaining > 0) {
                 self.labelUnlockAttemptsRemaining.text = [NSString stringWithFormat:NSLocalizedString(@"privacy_vc_label_unlock_attempts_fmt", @"Unlock Attempts Remaining: %ld"), (long)remaining];
@@ -132,11 +132,11 @@
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* pinEntryVc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
-    pinEntryVc.pinLength = Settings.sharedInstance.appLockPin.length;
+    pinEntryVc.pinLength = AppPreferences.sharedInstance.appLockPin.length;
     pinEntryVc.isDatabasePIN = NO;
     
-    if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0 && Settings.sharedInstance.failedUnlockAttempts > 0) {
-        NSInteger remaining = Settings.sharedInstance.deleteDataAfterFailedUnlockCount - Settings.sharedInstance.failedUnlockAttempts;
+    if(AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0 && AppPreferences.sharedInstance.failedUnlockAttempts > 0) {
+        NSInteger remaining = AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount - AppPreferences.sharedInstance.failedUnlockAttempts;
         
         if(remaining > 0) {
             pinEntryVc.warning = [NSString stringWithFormat:NSLocalizedString(@"privacy_vc_prompt_pin_attempts_remaining_fmt", @"%ld Attempts Remaining"), (long)remaining];
@@ -145,8 +145,8 @@
     
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {
-            if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
-                Settings.sharedInstance.failedUnlockAttempts = 0;
+            if([pin isEqualToString:AppPreferences.sharedInstance.appLockPin]) {
+                AppPreferences.sharedInstance.failedUnlockAttempts = 0;
                 [self onDone:afterSuccessfulBiometricAuthentication];
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
@@ -170,12 +170,12 @@
 
 - (void)incrementFailedUnlockCount {
     dispatch_async(dispatch_get_main_queue(), ^{
-        Settings.sharedInstance.failedUnlockAttempts = Settings.sharedInstance.failedUnlockAttempts + 1;
-        NSLog(@"Failed Unlocks: %lu", (unsigned long)Settings.sharedInstance.failedUnlockAttempts);
+        AppPreferences.sharedInstance.failedUnlockAttempts = AppPreferences.sharedInstance.failedUnlockAttempts + 1;
+        NSLog(@"Failed Unlocks: %lu", (unsigned long)AppPreferences.sharedInstance.failedUnlockAttempts);
         [self updateFailedUnlockAttemptsUI];
 
-        if(Settings.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
-            if(Settings.sharedInstance.failedUnlockAttempts >= Settings.sharedInstance.deleteDataAfterFailedUnlockCount) {
+        if(AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount > 0) {
+            if(AppPreferences.sharedInstance.failedUnlockAttempts >= AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount) {
                 [self deleteAllData];
             }
         }

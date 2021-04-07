@@ -11,7 +11,7 @@
 #import "Strongbox.h"
 #import "Utils.h"
 #import "SafesList.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "iCloudSafesCoordinator.h"
 #import "SVProgressHUD.h"
 #import "NSDate+Extensions.h"

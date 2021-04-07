@@ -142,10 +142,10 @@
 - (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors {
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database];
     BOOL userLikelyOffline = [self userIsLikelyOffline];
-    BOOL userOfflineLineAndConfiguredForImmediateOffline = self.database.offlineDetectedBehaviour == kOfflineDetectedBehaviourImmediateOffline;
     
     BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
 
+    BOOL userOfflineLineAndConfiguredForImmediateOffline = userLikelyOffline && self.database.offlineDetectedBehaviour == kOfflineDetectedBehaviourImmediateOffline;
     if( self.isAutoFillOpen || self.offlineExplicitlyRequested || userOfflineLineAndConfiguredForImmediateOffline ) {
         if(localCopyUrl == nil) {
             [Alerts warn:self.viewController
@@ -240,27 +240,42 @@
         [self askAboutRelocatingDatabase:factors];
     }
     else {
-        NSString* message = NSLocalizedString(@"open_sequence_storage_provider_error_open_local_ro_instead", @"A sync error occured. If this happens repeatedly you should try removing and re-adding your database.\n\n%@\nWould you like to open Strongbox's local copy in read-only mode instead?");
-        NSString* viewSyncError = NSLocalizedString(@"open_sequence_storage_provider_view_sync_error_details", @"View Error Details");
+        if ( self.database.couldNotConnectBehaviour == kCouldNotConnectBehaviourOpenOffline ) {
+            [self openOffline:factors];
+        }
+        else {
+            NSString* message = NSLocalizedString(@"open_sequence_storage_provider_error_open_local_ro_instead", @"A sync error occured. If this happens repeatedly you should try removing and re-adding your database.\n\n%@\nWould you like to open Strongbox's local copy in read-only mode instead?");
+            NSString* viewSyncError = NSLocalizedString(@"open_sequence_storage_provider_view_sync_error_details", @"View Error Details");
 
-        [Alerts twoOptionsWithCancel:self.viewController
-                               title:NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error")
-                             message:message
-                   defaultButtonText:NSLocalizedString(@"open_sequence_yes_use_local_copy_option", @"Yes, Open Offline")
-                    secondButtonText:viewSyncError
-                              action:^(int response) {
-            if (response == 0) {
-                BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
-                [self unlockLocalCopy:factors forceReadOnly:!isPro offline:YES];
-            }
-            else if (response == 1) { 
-                self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil);
-            }
-            else {
-                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
-            }
-        }];
+            [Alerts threeOptionsWithCancel:self.viewController
+                                     title:NSLocalizedString(@"open_sequence_storage_provider_error_title", @"Sync Error")
+                                   message:message
+                         defaultButtonText:NSLocalizedString(@"open_sequence_yes_use_local_copy_option", @"Yes, Open Offline")
+                          secondButtonText:NSLocalizedString(@"database_properties_title_always_offline", @"Always Open Offline")
+                           thirdButtonText:viewSyncError
+                                    action:^(int response) {
+                if ( response == 0 ) {
+                    [self openOffline:factors];
+                }
+                else if ( response == 1 ) {
+                    self.database.couldNotConnectBehaviour = kCouldNotConnectBehaviourOpenOffline;
+                    [SafesList.sharedInstance update:self.database];
+                    [self openOffline:factors];
+                }
+                else if ( response == 2) { 
+                    self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil);
+                }
+                else {
+                    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+                }
+            }];
+        }
     }
+}
+
+- (void)openOffline:(CompositeKeyFactors*)factors {
+    BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;
+    [self unlockLocalCopy:factors forceReadOnly:!isPro offline:YES];
 }
 
 - (void)unlockLocalCopy:(CompositeKeyFactors*)factors forceReadOnly:(BOOL)forceReadOnly offline:(BOOL)offline {

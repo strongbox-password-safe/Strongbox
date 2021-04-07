@@ -10,7 +10,6 @@
 #import "BrowseSafeView.h"
 #import "SafesList.h"
 #import "Alerts.h"
-#import "Settings.h"
 #import "SelectStorageProviderController.h"
 #import "DatabaseCell.h"
 #import "VersionConflictController.h"
@@ -126,7 +125,7 @@
     
     [self listenToNotifications];
     
-    if([Settings.sharedInstance getLaunchCount] == 1) {
+    if([AppPreferences.sharedInstance getLaunchCount] == 1) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [self doOnboarding]; 
         });
@@ -153,11 +152,11 @@
 }
 
 - (void)manuallySetFullFileProtection {
-    if ( !Settings.sharedInstance.haveAttemptedMigrationToFullFileProtection ) {
-        Settings.sharedInstance.haveAttemptedMigrationToFullFileProtection = YES;
+    if ( !AppPreferences.sharedInstance.haveAttemptedMigrationToFullFileProtection ) {
+        AppPreferences.sharedInstance.haveAttemptedMigrationToFullFileProtection = YES;
         NSLog(@"Enabled full file protection for user one time.");
-        Settings.sharedInstance.fullFileProtection = YES;
-        [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
+        AppPreferences.sharedInstance.fullFileProtection = YES;
+        [FileManager.sharedInstance setFileProtection:AppPreferences.sharedInstance.fullFileProtection];
     }
 }
 
@@ -470,9 +469,9 @@
 - (void)checkICloudAvailability:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
     NSLog(@"checkICloudAvailability... App Activate: [%d]", isAppActivation);
     [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccessWithCompletion:^(BOOL available) {
-        Settings.sharedInstance.iCloudAvailable = available;
+        AppPreferences.sharedInstance.iCloudAvailable = available;
         
-        if (!Settings.sharedInstance.iCloudAvailable) {
+        if (!AppPreferences.sharedInstance.iCloudAvailable) {
             NSLog(@"iCloud Not Available...");
             [self onICloudNotAvailable:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
         }
@@ -485,9 +484,9 @@
 
 - (void)onICloudNotAvailable:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
     
-    [Settings sharedInstance].iCloudPrompted = NO;
+    AppPreferences.sharedInstance.iCloudPrompted = NO;
     
-    if ([[Settings sharedInstance] iCloudWasOn] &&  [self getICloudSafes].count) {
+    if ([AppPreferences.sharedInstance iCloudWasOn] &&  [self getICloudSafes].count) {
         [Alerts warn:self
                title:NSLocalizedString(@"safesvc_icloud_no_longer_available_title", @"iCloud no longer available")
              message:NSLocalizedString(@"safesvc_icloud_no_longer_available_message", @"iCloud has become unavailable. Your iCloud database remain stored in iCloud but they will no longer sync to or from this device though you may still access them here.")];
@@ -500,13 +499,13 @@
     
     
     [AppPreferences sharedInstance].iCloudOn = NO;
-    [Settings sharedInstance].iCloudWasOn = NO;
+    AppPreferences.sharedInstance.iCloudWasOn = NO;
     
     [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
 }
 
 - (void)onICloudAvailable:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation{
-    if (!AppPreferences.sharedInstance.iCloudOn && !Settings.sharedInstance.iCloudPrompted) {
+    if (!AppPreferences.sharedInstance.iCloudOn && !AppPreferences.sharedInstance.iCloudPrompted) {
         BOOL existingLocalDeviceSafes = [self getLocalDeviceSafes].count > 0;
         BOOL hasOtherCloudSafes = [self hasSafesOtherThanLocalAndiCloud];
         
@@ -532,7 +531,7 @@
                             if(response) {
                                 AppPreferences.sharedInstance.iCloudOn = YES;
                             }
-                            [Settings sharedInstance].iCloudPrompted = YES;
+                            AppPreferences.sharedInstance.iCloudPrompted = YES;
                             [self onICloudAvailableContinuation:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
                         }];
         }
@@ -544,7 +543,7 @@
 
 - (void)onICloudAvailableContinuation:(BOOL)userJustCompletedBiometricAuthentication isAppActivation:(BOOL)isAppActivation {
     BOOL iCloudOn = AppPreferences.sharedInstance.iCloudOn;
-    BOOL iCloudWasOn = Settings.sharedInstance.iCloudWasOn;
+    BOOL iCloudWasOn = AppPreferences.sharedInstance.iCloudWasOn;
     BOOL hasLocalDatabases = [self getLocalDeviceSafes].count != 0;
     
     
@@ -576,7 +575,7 @@
                       action:^(int response) {
                           if(response == 2) {           
                               [AppPreferences sharedInstance].iCloudOn = YES;
-                              [Settings sharedInstance].iCloudWasOn = [AppPreferences sharedInstance].iCloudOn;
+                              AppPreferences.sharedInstance.iCloudWasOn = [AppPreferences sharedInstance].iCloudOn;
                           }
                           else if(response == 1) {      
                               [[iCloudSafesCoordinator sharedInstance] migrateiCloudToLocal:^(BOOL show) {
@@ -589,7 +588,7 @@
                       }];
     }
     
-    Settings.sharedInstance.iCloudWasOn = AppPreferences.sharedInstance.iCloudOn;
+    AppPreferences.sharedInstance.iCloudWasOn = AppPreferences.sharedInstance.iCloudOn;
     [[iCloudSafesCoordinator sharedInstance] startQuery];
     
     [self onICloudCheckDone:userJustCompletedBiometricAuthentication isAppActivation:isAppActivation];
@@ -608,7 +607,7 @@
         if(!AppPreferences.sharedInstance.quickLaunchUuid) {
             BOOL userHasLocalDatabases = [self getLocalDeviceSafes].firstObject != nil;
             
-            if (!Settings.sharedInstance.haveAskedAboutBackupSettings && userHasLocalDatabases) {
+            if (!AppPreferences.sharedInstance.haveAskedAboutBackupSettings && userHasLocalDatabases) {
                 NSString* title = NSLocalizedString(@"backup_settings_prompt_title", @"Backup Settings");
                 NSString* message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox now includes all your local documents and databases in Apple backups, however imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok?");
                 NSString* option1 = NSLocalizedString(@"backup_settings_prompt_option_yes_looks_good", @"Yes, the defaults sound good");
@@ -619,23 +618,23 @@
                                        message:message defaultButtonText:option1 secondButtonText:option2 thirdButtonText:option3 action:^(int response) {
                     NSLog(@"Selected: %d", response);
                     if (response == 0) {
-                        Settings.sharedInstance.backupFiles = YES;
-                        Settings.sharedInstance.backupIncludeImportedKeyFiles = NO;
+                        AppPreferences.sharedInstance.backupFiles = YES;
+                        AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
                     }
                     else if (response == 1) {
-                        Settings.sharedInstance.backupFiles = YES;
-                        Settings.sharedInstance.backupIncludeImportedKeyFiles = YES;
+                        AppPreferences.sharedInstance.backupFiles = YES;
+                        AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = YES;
                     }
                     else if (response == 2) {
-                        Settings.sharedInstance.backupFiles = NO;
-                        Settings.sharedInstance.backupIncludeImportedKeyFiles = NO;
+                        AppPreferences.sharedInstance.backupFiles = NO;
+                        AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
                     }
                     
                     if (response != 3) {
-                        [FileManager.sharedInstance setDirectoryInclusionFromBackup:Settings.sharedInstance.backupFiles
-                                                                   importedKeyFiles:Settings.sharedInstance.backupIncludeImportedKeyFiles];
+                        [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
+                                                                   importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
                         
-                        Settings.sharedInstance.haveAskedAboutBackupSettings = YES;
+                        AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
                     }
                 }];
             }
@@ -948,14 +947,28 @@
     [self openAtIndexPath:indexPath openOffline:NO];
 }
 
-- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline {
-    [self openAtIndexPath:indexPath openOffline:openOffline manualUnlock:NO];
+- (void)manualUnlock:(NSIndexPath*)indexPath {
+    [self openAtIndexPath:indexPath openOffline:NO manualUnlock:YES ignoreForceOpenOffline:NO];
 }
 
-- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline manualUnlock:(BOOL)manualUnlock {
+- (void)openOffline:(NSIndexPath*)indexPath {
+    [self openAtIndexPath:indexPath openOffline:YES];
+}
+
+- (void)forceOpenOnline:(NSIndexPath*)indexPath {
+    [self openAtIndexPath:indexPath openOffline:NO manualUnlock:NO ignoreForceOpenOffline:YES];
+}
+
+- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline {
+    [self openAtIndexPath:indexPath openOffline:openOffline manualUnlock:NO ignoreForceOpenOffline:NO];
+}
+
+- (void)openAtIndexPath:(NSIndexPath*)indexPath openOffline:(BOOL)openOffline manualUnlock:(BOOL)manualUnlock ignoreForceOpenOffline:(BOOL)ignoreForceOpenOffline {
     SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
 
-    openOffline |= database.forceOpenOffline;
+    if ( !ignoreForceOpenOffline ) {
+        openOffline |= database.forceOpenOffline;
+    }
     
     [self openDatabase:database openOffline:openOffline noConvenienceUnlock:manualUnlock biometricPreCleared:NO];
     
@@ -1099,10 +1112,21 @@
 
     NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe];
 
-    BOOL localCopyAvailable = safe.storageProvider != kLocalDevice && localCopyUrl != nil;
-    if (localCopyAvailable) [ma addObject:[self getContextualMenuOpenOfflineAction:indexPath]];
-
-    BOOL shareAllowed = !Settings.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil;
+    
+    
+    if ( safe.forceOpenOffline ) {
+        if (safe.storageProvider != kLocalDevice) {
+            [ma addObject:[self getContextualMenuOpenOnlineAction:indexPath]];
+        }
+    }
+    else {
+        BOOL localCopyAvailable = safe.storageProvider != kLocalDevice && localCopyUrl != nil && !safe.forceOpenOffline;
+        if (localCopyAvailable) [ma addObject:[self getContextualMenuOpenOfflineAction:indexPath]];
+    }
+    
+    
+    
+    BOOL shareAllowed = !AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu && localCopyUrl != nil;
     if (shareAllowed) [ma addObject:[self getContextualShareAction:indexPath]];
 
     if (self.collection.count > 1) {
@@ -1135,7 +1159,11 @@
     if (makeVisible) [ma addObject:[self getContextualMenuMakeVisibleAction:indexPath]];
 
     [ma addObject:[self getContextualMenuQuickLaunchAction:indexPath]];
-    [ma addObject:[self getContextualMenuAutoFillQuickLaunchAction:indexPath]];
+    
+    if ( safe.autoFillEnabled ) {
+        [ma addObject:[self getContextualMenuAutoFillQuickLaunchAction:indexPath]];
+    }
+    
     [ma addObject:[self getContextualMenuReadOnlyAction:indexPath]];
     [ma addObject:[self getContextualMenuPropertiesAction:indexPath]];
 
@@ -1284,6 +1312,15 @@
     }];
 }
 
+- (UIAction*)getContextualMenuOpenOnlineAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
+    return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_slide_left_open_online_action", @"Open this database online action")
+                           systemImage:@"bolt.horizontal.circle"
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self forceOpenOnline:indexPath];
+    }];
+}
+
 - (UIAction*)getContextualMenuRenameAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
     return [self getContextualMenuItem:NSLocalizedString(@"generic_rename", @"Rename")
                            systemImage:@"pencil"
@@ -1421,15 +1458,32 @@
     }];
 
     
-    
-    
-    UITableViewRowAction *offlineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                             title:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
-                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self openOffline:indexPath];
-    }];
-    offlineAction.backgroundColor = [UIColor darkGrayColor];
 
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+    
+    UITableViewRowAction *onOrOfflineAction = nil;
+    if ( safe.forceOpenOffline ) {
+        if (safe.storageProvider != kLocalDevice) {
+            onOrOfflineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                   title:NSLocalizedString(@"safes_vc_slide_left_open_online_action", @"Open this database online action")
+                                                                 handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+                [self forceOpenOnline:indexPath];
+            }];
+            onOrOfflineAction.backgroundColor = [UIColor systemGreenColor];
+        }
+    }
+    else {
+        BOOL offlineOption = safe.storageProvider != kLocalDevice && [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:nil];
+        if ( offlineOption ) {
+            onOrOfflineAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
+                                                                   title:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open this database offline table action")
+                                                                 handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
+                [self openOffline:indexPath];
+            }];
+            onOrOfflineAction.backgroundColor = [UIColor darkGrayColor];
+        }
+    }
+    
     
     
     UITableViewRowAction *moreActions = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
@@ -1439,10 +1493,7 @@
     }];
     moreActions.backgroundColor = [UIColor systemBlueColor];
 
-    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
-    BOOL offlineOption = safe.storageProvider != kLocalDevice && [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:nil];
-    
-    return offlineOption ? @[removeAction, offlineAction, moreActions] : @[removeAction, moreActions];
+    return onOrOfflineAction ? @[removeAction, onOrOfflineAction, moreActions] : @[removeAction, moreActions];
 }
 
 - (void)showDatabaseMoreActions:(NSIndexPath*)indexPath {
@@ -1591,14 +1642,6 @@
     if (![SyncManager.sharedInstance toggleLocalDatabaseFilesVisibility:metadata error:&error]) {
         [Alerts error:self title:NSLocalizedString(@"safes_vc_could_not_change_storage_location_error", @"error message could not change local storage") error:error];
     }
-}
-
-- (void)manualUnlock:(NSIndexPath*)indexPath {
-    [self openAtIndexPath:indexPath openOffline:NO manualUnlock:YES];
-}
-
-- (void)openOffline:(NSIndexPath*)indexPath {
-    [self openAtIndexPath:indexPath openOffline:YES];
 }
 
 - (void)renameSafe:(NSIndexPath * _Nonnull)indexPath {
@@ -1858,7 +1901,7 @@
     else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
         UIViewController* vc = segue.destinationViewController;
         if (@available(iOS 13.0, *)) {
-            if (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90) {
+            if (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || AppPreferences.sharedInstance.daysInstalled > 90) {
                 vc.modalPresentationStyle = UIModalPresentationFullScreen;
                 vc.modalInPresentation = YES;
             }
@@ -2251,7 +2294,7 @@
         }
         else {
             upgradeButtonTitle = NSLocalizedString(@"safes_vc_upgrade_info_trial_available_button_title", @"Upgrade Button Title - Upgrade Info");
-            if (Settings.sharedInstance.daysInstalled > 60) {
+            if (AppPreferences.sharedInstance.daysInstalled > 60) {
                 [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
             }
         }
@@ -2265,15 +2308,15 @@
 }
 
 - (IBAction)onPreferences:(id)sender {
-    if (!Settings.sharedInstance.appLockAppliesToPreferences || Settings.sharedInstance.appLockMode == kNoLock) {
+    if (!AppPreferences.sharedInstance.appLockAppliesToPreferences || AppPreferences.sharedInstance.appLockMode == kNoLock) {
         [self performSegueWithIdentifier:@"segueFromSafesToPreferences" sender:nil];
         return;
     }
     
-    if((Settings.sharedInstance.appLockMode == kBiometric || Settings.sharedInstance.appLockMode == kBoth) && BiometricsManager.isBiometricIdAvailable) {
+    if((AppPreferences.sharedInstance.appLockMode == kBiometric || AppPreferences.sharedInstance.appLockMode == kBoth) && BiometricsManager.isBiometricIdAvailable) {
         [self requestBiometricBeforeOpeningPreferences];
     }
-    else if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
+    else if (AppPreferences.sharedInstance.appLockMode == kPinCode || AppPreferences.sharedInstance.appLockMode == kBoth) {
         [self requestPin];
     }
 }
@@ -2283,7 +2326,7 @@
                                      completion:^(BOOL success, NSError * _Nullable error) {
         if (success) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                if (Settings.sharedInstance.appLockMode == kPinCode || Settings.sharedInstance.appLockMode == kBoth) {
+                if (AppPreferences.sharedInstance.appLockMode == kPinCode || AppPreferences.sharedInstance.appLockMode == kBoth) {
                     [self requestPin];
                 }
                 else {
@@ -2299,12 +2342,12 @@
     
     __weak PinEntryController* weakVc = pinEntryVc;
     
-    pinEntryVc.pinLength = Settings.sharedInstance.appLockPin.length;
+    pinEntryVc.pinLength = AppPreferences.sharedInstance.appLockPin.length;
     pinEntryVc.isDatabasePIN = NO;
     
     pinEntryVc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         if(response == kOk) {
-            if([pin isEqualToString:Settings.sharedInstance.appLockPin]) {
+            if([pin isEqualToString:AppPreferences.sharedInstance.appLockPin]) {
                 UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
                 [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
                 [self dismissViewControllerAnimated:YES completion:^{

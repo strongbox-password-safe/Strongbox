@@ -9,7 +9,7 @@
 #import "SFTPStorageProvider.h"
 #import "Utils.h"
 #import "NMSSH.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "SFTPProviderData.h"
 #import "Constants.h"
@@ -329,6 +329,28 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
 }
 
+- (void)getModDate:(METADATA_PTR)safeMetaData completion:(StorageProviderGetModDateCompletionBlock)completion {
+    SFTPProviderData* foo = [self getProviderDataFromMetaData:safeMetaData];
+
+    [self connectAndAuthenticate:foo.sFtpConfiguration
+                  viewController:nil
+                      completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
+        if(sftp == nil || error) {
+            completion(nil, error);
+            return;
+        }
+                
+        NMSFTPFile* attr = [sftp infoForFileAtPath:foo.filePath];
+        if(!attr) {
+            error = [Utils createNSError:NSLocalizedString(@"sftp_provider_could_not_read", @"Could not read file") errorCode:-3];
+            completion(nil, error);
+            return;
+        }
+        
+        completion(attr.modificationDate, nil);
+    }];
+}
+
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(VIEW_CONTROLLER_PTR )viewController
                      options:(StorageProviderReadOptions *)options
@@ -488,9 +510,30 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                    viewController:viewController];
     }
     
-    NMSSHSession *session = [NMSSHSession connectToHost:sessionConfiguration.host
-                                           withUsername:sessionConfiguration.username];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
+    NMSSHSession *session = nil;
+    @try {
+        session = [NMSSHSession connectToHost:sessionConfiguration.host withUsername:sessionConfiguration.username];
+    } @catch (NSException *exception) {
+        NSLog(@"WARNWARN: SSH Connect Exception: %@", exception);
+        if ( error ) {
+            *error = [Utils createNSError:exception.reason errorCode:-1234];
+        }
+        return nil;
+    }
+    
     if (viewController) {
         [self dismissProgressSpinner];
     }

@@ -9,11 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "Model.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface PasswordHistoryViewController : UITableViewController
 
 @property (nonatomic, retain) PasswordHistory *model;
 
-@property (nonatomic, copy) void (^ saveFunction)(PasswordHistory *changed, void (^onDone)(BOOL userCancelled, NSError *error));
+@property (nonatomic, copy) void (^saveFunction)(PasswordHistory *changed);
 
 @property (weak, nonatomic) IBOutlet UISwitch *uiSwitchEnabled;
 @property (weak, nonatomic) IBOutlet UILabel *uiLabelPreviousPasswords;
@@ -29,3 +31,5 @@
 @property (nonatomic) BOOL readOnly;
 
 @end
+
+NS_ASSUME_NONNULL_END

@@ -36,6 +36,8 @@
 #import "NSData+Extensions.h"
 #import "StreamUtils.h"
 #import "NSDate+Extensions.h"
+#import "EditCustomFieldController.h"
+#import "EditTagsViewController.h"
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -321,6 +323,7 @@ static NSString* trimField(NSTextField* textField) {
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onCustomFieldsChanged:) name:kModelUpdateNotificationCustomFieldsChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onAttachmentsChanged:) name:kModelUpdateNotificationAttachmentsChanged object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onTotpChanged:) name:kModelUpdateNotificationTotpChanged object:nil];
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(onTagsChanged:) name:kModelUpdateNotificationTagsChanged object:nil];
 }
 
 - (void)stopObservingModelChanges {
@@ -772,6 +775,21 @@ static NSString* trimField(NSTextField* textField) {
     [self showPopupToastNotification:foo];
 }
 
+- (void)onTagsChanged:(NSNotification*)notification {
+    if(notification.object != self.model) {
+        return;
+    }
+    
+    [self bindUiToSimpleFields]; 
+    
+    self.newEntry = NO;
+        
+    NSString* loc = NSLocalizedString(@"mac_field_changed_notification_fmt", @"%@ Changed");
+    NSString* loc2 = NSLocalizedString(@"generic_fieldname_tags", @"Tags");
+    NSString* foo = [NSString stringWithFormat:loc, loc2];
+    [self showPopupToastNotification:foo];
+}
+
 - (void)showPopupToastNotification:(NSString*)message {
     [self showPopupToastNotification:message duration:0.75];
 }
@@ -811,20 +829,17 @@ static NSString* trimField(NSTextField* textField) {
     if(self.historical) {
         return;
     }
-    MacAlerts* alert = [[MacAlerts alloc] init];
-    
-    NSString* loc = NSLocalizedString(@"mac_node_details_edit_custom_field", @"Edit Custom Field");
 
-    [alert inputKeyValue:loc
-                 initKey:field.key
-               initValue:field.value
-           initProtected:field.protected
-             placeHolder:NO
-              completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
-        if(yesNo) {
-            [self setCustomField:key value:value allowUpdate:YES protected:protected];
-        }
-    }];
+    [self performSegueWithIdentifier:@"segueToEditCustomField" sender:field];
+}
+
+- (IBAction)onAddCustomField:(id)sender {
+    if(self.historical) {
+        return;
+    }
+    
+    
+    [self performSegueWithIdentifier:@"segueToEditCustomField" sender:nil];
 }
 
 - (void)setCustomField:(NSString*)key value:(NSString*)value allowUpdate:(BOOL)allowUpdate protected:(BOOL)protected {
@@ -915,29 +930,6 @@ static NSString* trimField(NSTextField* textField) {
             }
         }];
     }
-}
-
-- (IBAction)onAddCustomField:(id)sender {
-    if(self.historical) {
-        return;
-    }
-    
-    MacAlerts* alert = [[MacAlerts alloc] init];
-    
-    NSString* loc1 = NSLocalizedString(@"mac_node_details_add_custom_field", @"Add Custom Field");
-    NSString* loc2 = NSLocalizedString(@"mac_alerts_input_custom_field_label_key", @"Key");
-    NSString* loc3 = NSLocalizedString(@"mac_alerts_input_custom_field_label_value", @"Value");
-
-    [alert inputKeyValue:loc1
-                 initKey:loc2
-               initValue:loc3
-           initProtected:NO
-             placeHolder:YES
-              completion:^(BOOL yesNo, NSString *key, NSString *value, BOOL protected) {
-        if(yesNo) {
-            [self setCustomField:key value:value allowUpdate:NO protected:protected];
-        }
-    }];
 }
 
 - (void)syncComboGroupWithNode {
@@ -1476,6 +1468,44 @@ static NSString* trimField(NSTextField* textField) {
         
         qr.qrCodeImage = image ? image : [NSImage imageNamed:@"error"];
     }
+    else if ( [segue.identifier isEqualToString:@"segueToEditCustomField"] ) {
+        EditCustomFieldController* vc = segue.destinationController;
+
+        NSArray<NSString*>* existingKeys = [self.customFields map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
+            return obj.key;
+        }];
+        
+        NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
+        
+        vc.field = sender;
+        vc.existingKeySet = existingKeySet;
+        
+        vc.onSetField = ^(NSString * _Nonnull key, NSString * _Nonnull value, BOOL protected) {
+            [self setCustomField:key value:value allowUpdate:(sender != nil) protected:protected];
+        };
+    }
+    else if ( [segue.identifier isEqualToString:@"segueToEditTags"] ) {
+        EditTagsViewController* vc = segue.destinationController;
+        vc.items = [self.node.fields.tags.allObjects sortedArrayUsingComparator:finderStringComparator];
+
+        __weak NodeDetailsViewController* weakSelf = self;
+        vc.onAdd = ^(NSString * _Nonnull tag) {
+            [weakSelf addTag:tag];
+        };
+        vc.onRemove = ^(NSString * _Nonnull tag) {
+            [weakSelf removeTag:tag];
+        };
+    }
+}
+
+- (void)addTag:(NSString*)tag {
+
+    [self.model addItemTag:self.node tag:trim(tag)];
+}
+
+- (void)removeTag:(NSString*)tag {
+
+    [self.model removeItemTag:self.node tag:tag];
 }
 
 - (IBAction)onExpiresCheckbox:(id)sender {

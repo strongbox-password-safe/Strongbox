@@ -72,27 +72,12 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    [self.navigationController dismissViewControllerAnimated:YES completion:^{  }];
+    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (IBAction)onMoveHere:(id)sender {
-    BOOL ret = [self.viewModel.database moveItems:self.itemsToMove destination:self.currentGroup];
-    
-    if (!ret) {
-        NSLog(@"Error Moving");
-        NSError* error = [Utils createNSError:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving") errorCode:-1];
-        self.onDone(NO, NO, error);
-        return;
-    }
-
-    
-    
-    [self.viewModel update:self handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        dispatch_async(dispatch_get_main_queue(), ^{ 
-            [self dismissViewControllerAnimated:YES completion:^{
-                self.onDone(userCancelled, localWasChanged, error);
-            }];
-        });
+    [self dismissViewControllerAnimated:YES completion:^{
+        self.onMoveItems(self.currentGroup);
     }];
 }
 
@@ -115,8 +100,6 @@
 }
 
 
-
-#pragma mark - Table view data source
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     return self.items.count;
@@ -156,7 +139,7 @@
         vc.currentGroup = item;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = self.itemsToMove;
-        vc.onDone = self.onDone;
+        vc.onMoveItems = self.onMoveItems;
     }
 }
 

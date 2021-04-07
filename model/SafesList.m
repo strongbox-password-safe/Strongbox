@@ -17,14 +17,12 @@
 
 @property (strong, nonatomic) NSMutableArray<SafeMetaData*> *databasesList;
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
-@property BOOL migratedToNewStore;
 
 @property (readonly) BOOL changedDatabaseSettingsFlag;
 
 @end
 
 static NSString* const kDatabasesFilename = @"databases.json";
-static NSString* const kMigratedToNewStore = @"migratedDatabasesToNewStore";
 
 NSString* _Nonnull const kDatabasesListChangedNotification = @"DatabasesListChanged";
 NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotification";
@@ -43,8 +41,6 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 
 - (instancetype)init {
     if (self = [super init]) {
-        [self migrateToNewStore];
-
         _dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
         _databasesList = [self deserialize];
     }
@@ -90,68 +86,6 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 
 
 
-
-- (BOOL)migratedToNewStore {
-    NSNumber* obj = [getSharedAppGroupDefaults() objectForKey:kMigratedToNewStore];
-    return obj != nil ? obj.boolValue : NO;
-}
-
-- (void)setMigratedToNewStore:(BOOL)migratedToNewStore {
-    [getSharedAppGroupDefaults() setBool:migratedToNewStore forKey:kMigratedToNewStore];
-    [getSharedAppGroupDefaults() synchronize];
-}
-
-- (void)migrateToNewStore {
-#ifndef IS_APP_EXTENSION 
-                         
-    if (self.migratedToNewStore) {
-        
-        return;
-    }
-    
-    self.databasesList = [self legacyLoad];
-    
-    NSLog(@"Migrating %lu databases to new store.", (unsigned long)self.databasesList.count);
-
-    [self serialize:YES];
-
-    NSLog(@"Migrated %lu databases to new store!", (unsigned long)self.databasesList.count);
-
-    self.migratedToNewStore = YES;
-#endif
-}
-
-
-
-
-
-
-
-
-
-
-
-
-- (NSMutableArray<SafeMetaData*>*)legacyLoad {
-    NSUserDefaults * defaults = getSharedAppGroupDefaults();
-    
-    static NSString* const kSafesList = @"safesList";
-    NSData *encodedObject = [defaults objectForKey:kSafesList];
-    
-    if(encodedObject == nil) {
-        return [[NSMutableArray<SafeMetaData*> alloc] init];
-    }
-    
-    NSArray<SafeMetaData*> *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
-    return [[NSMutableArray<SafeMetaData*> alloc]initWithArray:object];
-}
-
-static NSUserDefaults* getSharedAppGroupDefaults() {
-    return AppPreferences.sharedInstance.sharedAppGroupDefaults;
-}
-
-
-
 - (NSArray<SafeMetaData *> *)snapshot {
     __block NSArray<SafeMetaData *> *result;
     dispatch_sync(self.dataQueue, ^{ result = [NSArray arrayWithArray:self.databasesList]; });
@@ -159,45 +93,39 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
 }
 
 - (NSMutableArray<SafeMetaData*>*)deserialize {
-    if (self.migratedToNewStore) {
-        NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
-        
-        NSError* error;
-        __block NSError* readError;
-        __block NSData* json = nil;
-        NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
-        
-        [fileCoordinator coordinateReadingItemAtURL:fileUrl
-                                            options:kNilOptions
-                                              error:&error
-                                         byAccessor:^(NSURL * _Nonnull newURL) {
-            json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
-        }];
-        
-        if (!json || error || readError) {
-            NSLog(@"Error reading file for databases: [%@] - [%@]", error, readError);
-            return @[].mutableCopy;
-        }
-
-        NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
-
-        if (error) {
-            NSLog(@"Error getting json dictionaries for databases: [%@]", error);
-            return @[].mutableCopy;
-        }
-
-        NSMutableArray<SafeMetaData*> *ret = NSMutableArray.array;
-        for (NSDictionary* jsonDatabase in jsonDatabases) {
-            SafeMetaData* database = [SafeMetaData fromJsonSerializationDictionary:jsonDatabase];
-            [ret addObject:database];
-        }
-        
-        return ret;
-    }
-    else {
-        NSLog(@"Not migrated yet... probably stale auto-fill component. Force user to restart");
+    NSURL* fileUrl = [FileManager.sharedInstance.preferencesDirectory URLByAppendingPathComponent:kDatabasesFilename];
+    
+    NSError* error;
+    __block NSError* readError;
+    __block NSData* json = nil;
+    NSFileCoordinator *fileCoordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
+    
+    [fileCoordinator coordinateReadingItemAtURL:fileUrl
+                                        options:kNilOptions
+                                          error:&error
+                                     byAccessor:^(NSURL * _Nonnull newURL) {
+        json = [NSData dataWithContentsOfURL:fileUrl options:kNilOptions error:&readError];
+    }];
+    
+    if (!json || error || readError) {
+        NSLog(@"Error reading file for databases: [%@] - [%@]", error, readError);
         return @[].mutableCopy;
     }
+
+    NSArray* jsonDatabases = [NSJSONSerialization JSONObjectWithData:json options:kNilOptions error:&error];
+
+    if (error) {
+        NSLog(@"Error getting json dictionaries for databases: [%@]", error);
+        return @[].mutableCopy;
+    }
+
+    NSMutableArray<SafeMetaData*> *ret = NSMutableArray.array;
+    for (NSDictionary* jsonDatabase in jsonDatabases) {
+        SafeMetaData* database = [SafeMetaData fromJsonSerializationDictionary:jsonDatabase];
+        [ret addObject:database];
+    }
+    
+    return ret;
 }
 
 - (void)serialize:(BOOL)listChanged {
@@ -437,13 +365,5 @@ static NSUserDefaults* getSharedAppGroupDefaults() {
     
     return ![nicknamesLowerCase containsObject:nickName.lowercaseString];
 }
-
-
-
-
-
-
-
-
 
 @end

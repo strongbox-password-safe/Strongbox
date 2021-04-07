@@ -7,20 +7,34 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SafeMetaData.h"
 #import "BackupItem.h"
 
+#if TARGET_OS_IPHONE
+//    #import <UIKit/UIKit.h>
+    #import "SafeMetaData.h"
+//    typedef UIViewController* VIEW_CONTROLLER_PTR;
+//    typedef UIImage* IMAGE_TYPE_PTR;
+    typedef SafeMetaData* METADATA_PTR;
+#else
+
+    #import "DatabaseMetadata.h"
+
+
+    typedef DatabaseMetadata* METADATA_PTR;
+#endif
+
 NS_ASSUME_NONNULL_BEGIN
+
 
 @interface BackupsManager : NSObject
 
 + (instancetype)sharedInstance;
 
-- (BOOL)writeBackup:(NSURL*)snapshot metadata:(SafeMetaData*)metadata;
+- (BOOL)writeBackup:(NSURL*)snapshot metadata:(METADATA_PTR)metadata;
 - (void)deleteBackup:(BackupItem*)item;
-- (void)deleteAllBackups:(SafeMetaData*)metadata;
+- (void)deleteAllBackups:(METADATA_PTR)metadata;
 
-- (NSArray<BackupItem*>*)getAvailableBackups:(SafeMetaData*)metadata;
+- (NSArray<BackupItem*>*)getAvailableBackups:(METADATA_PTR)metadata;
 
 @end
 

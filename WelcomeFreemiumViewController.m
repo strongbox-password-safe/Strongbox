@@ -12,7 +12,7 @@
 #import "ProUpgradeIAPManager.h"
 #import "Alerts.h"
 #import "SVProgressHUD.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "Model.h"
 #import "AppPreferences.h"
 

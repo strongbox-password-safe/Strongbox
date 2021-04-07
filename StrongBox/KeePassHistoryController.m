@@ -11,7 +11,7 @@
 #import "RecordView.h"
 #import "Alerts.h"
 #import "ItemDetailsViewController.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "BrowseItemCell.h"
 #import "Utils.h"
 #import "DatabaseSearchAndSorter.h"

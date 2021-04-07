@@ -31,6 +31,7 @@ extern NSString* const kModelUpdateNotificationExpiryChanged;
 extern NSString* const kModelUpdateNotificationItemsDeleted;
 extern NSString* const kModelUpdateNotificationItemsUnDeleted;
 extern NSString* const kModelUpdateNotificationItemsMoved;
+extern NSString* const kModelUpdateNotificationTagsChanged;
 
 @interface ViewModel : NSObject
 
@@ -90,6 +91,9 @@ extern NSString* const kModelUpdateNotificationItemsMoved;
 
 - (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
 - (void)clearTotp:(Node *)item;
+
+- (void)addItemTag:(Node* )item tag:(NSString*)tag;
+- (void)removeItemTag:(Node* )item tag:(NSString*)tag;
 
 
 

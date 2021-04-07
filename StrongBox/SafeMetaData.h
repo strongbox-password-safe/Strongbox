@@ -20,6 +20,7 @@
 #import "ConflictResolutionStrategy.h"
 #import "QuickTypeAutoFillDisplayFormat.h"
 #import "OfflineDetectedBehaviour.h"
+#import "CouldNotConnectBehaviour.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -163,7 +164,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL autoFillCopyTotp;
 @property BOOL forceOpenOffline;
+
 @property OfflineDetectedBehaviour offlineDetectedBehaviour;
+@property CouldNotConnectBehaviour couldNotConnectBehaviour;
 
 @end
 

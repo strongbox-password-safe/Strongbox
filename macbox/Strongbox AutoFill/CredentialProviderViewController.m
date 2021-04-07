@@ -32,6 +32,7 @@
 #import "MacYubiKeyManager.h"
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
+#import "MacUrlSchemes.h"
 
 @interface CredentialProviderViewController ()
 
@@ -46,7 +47,7 @@
 
 @end
 
-static const CGFloat kWormholeWaitTimeout = 0.25f; 
+static const CGFloat kWormholeWaitTimeout = 0.35f; 
 
 @implementation CredentialProviderViewController
 
@@ -361,15 +362,19 @@ static const CGFloat kWormholeWaitTimeout = 0.25f;
 
 
 
+- (BOOL)isLegacyFileUrl:(NSURL*)url {
+    return ( url && url.scheme.length && [url.scheme isEqualToString:kStrongboxFileUrlScheme] );
+}
+
 - (void)unlockDatabase:(DatabaseMetadata*)database
    quickTypeIdentifier:(QuickTypeRecordIdentifier*_Nullable)quickTypeIdentifier
     serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    if ( database.storageProvider == kLocalDevice ) {
+    if ( [self isLegacyFileUrl:database.fileUrl] ) {
         [self unlockLegacyFileBasedDatabase:database quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
     }
     else {
         
-        if ( !Settings.sharedInstance.isProOrFreeTrial ) {
+        if ( !Settings.sharedInstance.isProOrFreeTrial && database.storageProvider != kMacFile ) {
             [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
             informativeText:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                      window:self.view.window
@@ -646,9 +651,11 @@ static const CGFloat kWormholeWaitTimeout = 0.25f;
                                                             metadata:(DatabaseMetadata*)metadata
                                                 isConvenienceUnlock:(BOOL)isConvenienceUnlock
                                                               error:(NSError**)error {
-    [url startAccessingSecurityScopedResource];
+    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
     DatabaseFormat format = [Serializator getDatabaseFormat:url];
-    [url stopAccessingSecurityScopedResource];
+    if ( securitySucceeded ) {
+        [url stopAccessingSecurityScopedResource];
+    }
     
     NSData* keyFileDigest = [self getSelectedKeyFileDigest:metadata format:format bookmark:keyFileBookmark isConvenienceUnlock:isConvenienceUnlock error:error];
     if(*error) {
@@ -760,7 +767,7 @@ static const CGFloat kWormholeWaitTimeout = 0.25f;
                            ckf:(CompositeKeyFactors*)ckf
            isConvenienceUnlock:(BOOL)isConvenienceUnlock
             serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
-    [url startAccessingSecurityScopedResource];
+    BOOL securitySucceeded = [url startAccessingSecurityScopedResource];
 
     NSString* loc = NSLocalizedString(@"generic_unlocking_ellipsis", @"Unlocking...");
     [self showProgressModal:loc];
@@ -794,7 +801,9 @@ static const CGFloat kWormholeWaitTimeout = 0.25f;
                 }];
             }
             
-            [url stopAccessingSecurityScopedResource];
+            if ( securitySucceeded ) {
+                [url stopAccessingSecurityScopedResource];
+            }
         });
     }];
 }

@@ -9,11 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "PasswordHistoryEntry.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface PasswordHistory : NSObject
 
 //    [12] Password History is an optional record. If it exists, it stores the
-//    creation times and values of the last few passwords used in the current
-//    entry, in the following format:
+
+
 
 
 
@@ -50,4 +52,8 @@ typedef struct _EntryHeader {
 
 @property (NS_NONATOMIC_IOSONLY, getter = getAsData, readonly, copy) NSData * _Nonnull asData;
 
+- (instancetype)clone;
+
 @end
+
+NS_ASSUME_NONNULL_END

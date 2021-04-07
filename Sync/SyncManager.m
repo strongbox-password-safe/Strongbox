@@ -68,9 +68,13 @@
 }
 
 - (void)backgroundSyncDatabase:(SafeMetaData*)database {
+    [self backgroundSyncDatabase:database join:YES];
+}
+
+- (void)backgroundSyncDatabase:(SafeMetaData*)database join:(BOOL)join {
     SyncParameters* params = [[SyncParameters alloc] init];
     
-    params.inProgressBehaviour = kInProgressBehaviourJoin;
+    params.inProgressBehaviour = join ? kInProgressBehaviourJoin : kInProgressBehaviourEnqueueAnotherSync;
     params.syncForcePushDoNotCheckForConflicts = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
     params.syncPullEvenIfModifiedDateSame = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
 

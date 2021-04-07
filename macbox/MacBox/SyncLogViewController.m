@@ -53,6 +53,10 @@ static NSString* const kColumnLog = @"log";
     [self.view.window orderOut:self];
 }
 
+- (IBAction)onClose:(id)sender {
+    [self cancel:nil];
+}
+
 - (void)viewWillAppear {
     [super viewWillAppear];
 

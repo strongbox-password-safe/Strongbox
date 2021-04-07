@@ -10,7 +10,7 @@
 #import "Alerts.h"
 #import "KeyFileParser.h"
 #import "AppleICloudProvider.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "LocalDeviceStorageProvider.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"

@@ -191,7 +191,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
     NSDictionary* wrapped = [self getWrappedObject:identifier];
     if(wrapped == nil) {
-
+        NSLog(@"Could not get wrapped object. [%@]", identifier);
         return nil;
     }
 
@@ -483,13 +483,21 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 - (id)getWrappedObject:(NSString *)identifier {
-    NSData* keychainBlob = [self getKeychainBlob:identifier];
-    if(!keychainBlob) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{ 
-
-            [self deleteSecureItem:identifier];
-        });
-        return nil;
+    BOOL itemNotFound;
+    NSData* keychainBlob = [self getKeychainBlob:identifier itemNotFound:&itemNotFound];
+    
+    if ( !keychainBlob ) {
+        if ( itemNotFound ) { 
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{ 
+                NSLog(@"No encrypted blob present... Cleaning Up... [%@]", identifier);
+                [self deleteSecureItem:identifier];
+            });
+            return nil;
+        }
+        else {
+            NSLog(@"Could not get encrypted blob but it appears to be present [%@]", identifier);
+            return nil;
+        }
     }
     
 #if TARGET_OS_IPHONE
@@ -606,7 +614,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return (status == errSecSuccess);
 }
 
-- (NSData*)getKeychainBlob:(NSString*)identifier {
+- (NSData*)getKeychainBlob:(NSString*)identifier itemNotFound:(BOOL*)itemNotFound {
 
         
     NSMutableDictionary *query = [self getBlobQuery:identifier];
@@ -621,11 +629,21 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 
     
-    if (status != errSecSuccess) {
+    if ( status == errSecSuccess ) {
+        *itemNotFound = NO;
+        return (__bridge_transfer NSData *)result;
+    }
+    else if (status == errSecItemNotFound) {
+        
+        NSLog(@"getKeychainBlob: Item Not Found in KeyChain");
+        *itemNotFound = YES;
         return nil;
     }
-
-    return (__bridge_transfer NSData *)result;
+    else {
+        *itemNotFound = NO;
+        NSLog(@"getKeychainBlob: Could not get: %d", (int)status);
+        return nil;
+    }
 }
 
 - (void)deleteKeychainBlob:(NSString*)identifier {

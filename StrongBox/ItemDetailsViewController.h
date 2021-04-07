@@ -43,6 +43,8 @@ extern NSString *const kNotificationNameItemDetailsEditDone;
 
 #endif
 
+- (void)performSynchronousUpdate;
+
 @end
 
 NS_ASSUME_NONNULL_END

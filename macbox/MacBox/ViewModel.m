@@ -19,6 +19,7 @@
 #import "NSString+Extensions.h"
 #import "AutoFillManager.h"
 #import "Serializator.h"
+#import "Utils.h"
 
 NSString* const kModelUpdateNotificationCustomFieldsChanged = @"kModelUpdateNotificationCustomFieldsChanged";
 NSString* const kModelUpdateNotificationPasswordChanged = @"kModelUpdateNotificationPasswordChanged";
@@ -34,6 +35,7 @@ NSString* const kModelUpdateNotificationTotpChanged = @"kModelUpdateNotification
 NSString* const kModelUpdateNotificationItemsDeleted = @"kModelUpdateNotificationItemsDeleted";
 NSString* const kModelUpdateNotificationItemsUnDeleted = @"kModelUpdateNotificationItemsUnDeleted";
 NSString* const kModelUpdateNotificationItemsMoved = @"kModelUpdateNotificationItemsMoved";
+NSString* const kModelUpdateNotificationTagsChanged = @"kModelUpdateNotificationTagsChanged";
 
 NSString* const kNotificationUserInfoKeyIsBatchIconUpdate = @"kNotificationUserInfoKeyIsBatchIconUpdate";
 NSString* const kNotificationUserInfoKeyNode = @"node";
@@ -808,6 +810,84 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     dispatch_async(dispatch_get_main_queue(), ^{
         [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTotpChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
+    });
+}
+
+- (void)addItemTag:(Node *)item tag:(NSString *)tag {
+    [self addItemTag:item tag:tag modified:nil];
+}
+
+- (void)removeItemTag:(Node *)item tag:(NSString *)tag {
+    [self removeItemTag:item tag:tag modified:nil];
+}
+
+- (void)addItemTag:(Node *)item tag:(NSString *)tag modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    if ( [item.fields.tags containsObject:tag] ) {
+        return;
+    }
+    
+    NSDate* oldModified = item.fields.modified;
+
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+
+    [item.fields.tags addObject:tag];
+    
+    [self touchAndModify:item modDate:modified];
+
+    [[self.document.undoManager prepareWithInvocationTarget:self] removeItemTag:item tag:tag modified:oldModified];
+    
+    if(!self.document.undoManager.isUndoing) {
+        NSString* loc = NSLocalizedString(@"mac_undo_action_add_tag", @"Add Tag");
+        [self.document.undoManager setActionName:loc];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
+    });
+}
+
+- (void)removeItemTag:(Node *)item tag:(NSString *)tag modified:(NSDate*)modified {
+    if(self.locked) {
+        [NSException raise:@"Attempt to alter model while locked." format:@"Attempt to alter model while locked"];
+    }
+
+    if ( ![item.fields.tags containsObject:tag] ) {
+        return;
+    }
+    
+    NSDate* oldModified = item.fields.modified;
+
+    if(self.document.undoManager.isUndoing) {
+        if(item.fields.keePassHistory.count > 0) [item.fields.keePassHistory removeLastObject];
+    }
+    else {
+        Node* cloneForHistory = [item cloneForHistory];
+        [item.fields.keePassHistory addObject:cloneForHistory];
+    }
+
+    [item.fields.tags removeObject:tag];
+    
+    [self touchAndModify:item modDate:modified];
+
+    [[self.document.undoManager prepareWithInvocationTarget:self] addItemTag:item tag:tag modified:oldModified];
+    
+    if(!self.document.undoManager.isUndoing) {
+        NSString* loc = NSLocalizedString(@"mac_undo_action_remove_tag", @"Remove Tag");
+        [self.document.undoManager setActionName:loc];
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationTagsChanged object:self userInfo:@{ kNotificationUserInfoKeyNode : item }];
     });
 }
 

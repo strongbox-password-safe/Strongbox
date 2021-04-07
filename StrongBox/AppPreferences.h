@@ -13,6 +13,16 @@
 #import "DatabaseCellSubtitleField.h"
 #import "AppPrivacyShieldMode.h"
 
+//#import "SFTPSessionConfiguration.h"
+#import "AppLockMode.h"
+
+
+
+
+
+
+
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AppPreferences : NSObject
@@ -88,6 +98,49 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property AppPrivacyShieldMode appPrivacyShieldMode;
 @property BOOL migratedOfflineDetectedBehaviour;
+@property BOOL useBackgroundUpdates;
+
+
+
+@property (nullable) NSDate* lastEntitlementCheckAttempt;
+@property NSUInteger numberOfEntitlementCheckFails;
+
+- (void)resetLaunchCount;
+- (NSInteger)getLaunchCount;
+- (void)incrementLaunchCount;
+
+- (NSString*)getFlagsStringForDiagnostics;
+
+@property (nonatomic) BOOL iCloudWasOn;
+@property (nonatomic) BOOL iCloudPrompted;
+@property (nonatomic) BOOL iCloudAvailable;
+
+@property (nonatomic) NSDate* installDate;
+@property (nonatomic, readonly) NSInteger daysInstalled;
+- (void)clearInstallDate;
+
+@property (nonatomic) BOOL showKeePassCreateSafeOptions;
+
+@property AppLockMode appLockMode;
+@property NSString* appLockPin;
+@property NSInteger appLockDelay;
+@property BOOL appLockAppliesToPreferences;
+@property NSInteger deleteDataAfterFailedUnlockCount;
+@property NSUInteger failedUnlockAttempts;
+
+@property NSDate* lastFreeTrialNudge;
+
+@property BOOL backupFiles;
+@property BOOL backupIncludeImportedKeyFiles;
+@property BOOL haveAskedAboutBackupSettings;
+
+@property BOOL hideExportFromDatabaseContextMenu;
+@property BOOL allowThirdPartyKeyboards;
+
+@property BOOL appLockAllowDevicePasscodeFallbackForBio;
+@property BOOL fullFileProtection;
+
+@property BOOL haveAttemptedMigrationToFullFileProtection;
 
 @end
 

@@ -19,6 +19,10 @@
 #import "ViewController.h"
 #import "DatabasesManager.h"
 #import "SafeStorageProviderFactory.h"
+#import "AboutViewController.h"
+#import "FileManager.h"
+#import "ClipboardManager.h"
+#import "DebugHelper.h"
 
 
 
@@ -42,7 +46,7 @@ NSString* const kDragAndDropExternalUti = @"com.markmcguill.strongbox.drag.and.d
 
 static const NSInteger kTopLevelMenuItemTagStrongbox = 1110;
 static const NSInteger kTopLevelMenuItemTagFile = 1111;
-static const NSInteger kTopLevelMenuItemTagView = 1113;
+
 
 
 
@@ -77,13 +81,13 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self performMigrations];
+        
+    [self initializeProFamilyEdition];
+    
+    [self cleanupWorkingDirectories];
     
     [self customizeMenu];
-    
-    [self installAppWideKeyDownInterceptor];
 
-    [self initializeProFamilyEdition];    
-    
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
@@ -99,9 +103,6 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
             [self initializeFreeTrialAndShowWelcomeMessage];
         }
     }
-    else {
-        [self removeUpgradeMenuItem];
-    }
     
     [self showHideSystemStatusBarIcon];
     
@@ -116,6 +117,11 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
         DocumentController* dc = NSDocumentController.sharedDocumentController;
         [dc onAppStartup];
     });
+}
+
+- (void)cleanupWorkingDirectories {
+    [FileManager.sharedInstance deleteAllTmpAttachmentPreviewFiles];
+    [FileManager.sharedInstance deleteAllTmpWorkingFiles];
 }
 
 - (void)initializeProFamilyEdition {
@@ -333,7 +339,6 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 
-- (void)installAppWideKeyDownInterceptor {
 
 
 
@@ -348,24 +353,43 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
 
 
 
-}
+
+
 
 - (void)customizeMenu {
-   [self removeUnwantedMenuItems];  
+    [self removeUnwantedMenuItems];
     
+    NSMenu* topLevelMenuItem = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagStrongbox].submenu;
+    
+    NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        return obj.action == @selector(onAbout:);
+    }];
+    
+    if( topLevelMenuItem &&  index != NSNotFound) {
+        NSMenuItem* menuItem = [topLevelMenuItem itemAtIndex:index];
+        
+        NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"prefs_vc_app_version_info_pro_fmt", @"About Strongbox Pro %@") : NSLocalizedString(@"prefs_vc_app_version_info_none_pro_fmt", @"About Strongbox %@");
+        
+        NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+
+        menuItem.title = about;
+    }
+    
+    if ( Settings.sharedInstance.fullVersion ) {
+        [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onUpgradeToFullVersion:)];
+    }
+}
+
+- (IBAction)onAbout:(id)sender {
+    [AboutViewController show];
 }
 
 - (void)removeUnwantedMenuItems {
-    [self removeMenuItem:kTopLevelMenuItemTagView action:@selector(onViewDebugDatabasesList:)];
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(duplicateDocument:)];
     
     
     
 
-}
-
-- (void)removeUpgradeMenuItem {
-    [self removeMenuItem:kTopLevelMenuItemTagStrongbox action:@selector(onUpgradeToFullVersion:)];
 }
 
 - (void)removeMenuItem:(NSInteger)topLevelTag action:(SEL)action {
@@ -426,10 +450,6 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     [DatabasesManagerVC show];
 }
 
-- (IBAction)onViewDebugDatabasesList:(id)sender {
-    [DatabasesManagerVC show];
-}
-
 - (IBAction)onPreferences:(id)sender {
     [PreferencesWindowController.sharedInstance show];
 }
@@ -448,33 +468,55 @@ static const NSInteger kTopLevelMenuItemTagView = 1113;
     }
 }
 
-- (IBAction)onEmailSupport:(id)sender {
-    NSString* subject = [NSString stringWithFormat:@"Strongbox %@ Support", [Utils getAppVersion]];
-    NSString* emailBody = @"Hi,\n\nI'm having some trouble with Strongbox.\n\n<Please include as much detail as possible here including screenshots where appropriate.>";
-    NSString* toAddress = @"support@strongboxsafe.com";
-    
-    NSSharingService* emailService = [NSSharingService sharingServiceNamed:NSSharingServiceNameComposeEmail];
-    emailService.recipients = @[toAddress];
-    emailService.subject = subject;
-    
-    if ([emailService canPerformWithItems:@[emailBody]]) {
-        [emailService performWithItems:@[emailBody]];
-    } else {
-        NSString *encodedSubject = [NSString stringWithFormat:@"SUBJECT=%@", [subject stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]];
-        NSString *encodedBody = [NSString stringWithFormat:@"BODY=%@", [emailBody stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]]];
-        NSString *encodedTo = [toAddress stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLFragmentAllowedCharacterSet]];
-        NSString *encodedURLString = [NSString stringWithFormat:@"mailto:%@?%@&%@", encodedTo, encodedSubject, encodedBody];
-        NSURL *mailtoURL = [NSURL URLWithString:encodedURLString];
-        
-        if(![[NSWorkspace sharedWorkspace] openURL:mailtoURL]) {
-            [MacAlerts info:@"Email Unavailable"
-         informativeText:@"Strongbox could not initialize an email for you, perhaps because it is not configured.\n\n"
-                        @"Please send an email to support@strongboxsafe.com with details of your issue."
-                  window:[NSApplication sharedApplication].mainWindow
-              completion:nil];
+- (IBAction)onContactSupport:(id)sender {
+    [MacAlerts yesNo:NSLocalizedString(@"prompt_title_copy_debug_info", @"Copy Debug Info?") informativeText:NSLocalizedString(@"prompt_message_copy_debug_info", @"Would you like to copy some helpful debug information that you can share with support before proceeding?") window:NSApplication.sharedApplication.mainWindow completion:^(BOOL yesNo) {
+        if ( yesNo ) {
+            NSString* debug = [DebugHelper getAboutDebugString];
+            [ClipboardManager.sharedInstance copyConcealedString:debug];
         }
-    }
+    
+        NSURL* url = [NSURL URLWithString:@"https:
+        if (@available(macOS 10.15, *)) {
+            [[NSWorkspace sharedWorkspace] openURL:url
+                                     configuration:NSWorkspaceOpenConfiguration.configuration
+                                 completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+                if ( error ) {
+                    NSLog(@"Launch URL done. Error = [%@]", error);
+                }
+            }];
+        } else {
+            [[NSWorkspace sharedWorkspace] openURL:url];
+        }
+    }];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -46,7 +46,6 @@ extern NSString* const kCustomFieldsColumn;
 @property (nonatomic) BOOL warnedAboutTouchId;
 
 @property (nonatomic) AutoFillNewRecordSettings *autoFillNewRecordSettings;
-@property (nonatomic) BOOL autoSave;
 
 @property BOOL uiDoNotSortKeePassNodesInBrowseView;
 
@@ -78,8 +77,6 @@ extern NSString* const kCustomFieldsColumn;
 
 @property (readonly) BOOL dereferenceDuringSearch;
 
-@property BOOL detectForeignChanges;
-@property BOOL autoReloadAfterForeignChanges;
 @property BOOL concealEmptyProtectedFields;
 @property BOOL showCustomFieldsOnQuickViewPanel;
 
@@ -111,8 +108,6 @@ extern NSString* const kCustomFieldsColumn;
 
 @property BOOL showDatabasesManagerOnCloseAllWindows;
 
-
-@property BOOL autoOpenFirstDatabaseOnEmptyLaunch; 
 @property BOOL hasMigratedQuickLaunch;
 
 @property (readonly) BOOL isProOrFreeTrial;
@@ -122,6 +117,13 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL showAutoFillTotpCopiedMessage;
 @property BOOL autoFillAutoLaunchSingleDatabase;
 @property BOOL lockDatabasesOnScreenLock;
+
+@property BOOL useLegacyFileProvider;
+@property (nonatomic) BOOL autoSave;
+
+@property BOOL autoOpenFirstDatabaseOnEmptyLaunch; 
+@property BOOL detectForeignChanges; 
+@property BOOL autoReloadAfterForeignChanges; 
 
 @end
 

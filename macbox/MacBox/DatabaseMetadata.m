@@ -10,27 +10,42 @@
 #import "SecretStore.h"
 #import "BookmarksHelper.h"
 #import "Settings.h"
+#import "FileManager.h"
 
 const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
 static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
 
 @implementation DatabaseMetadata
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
+        self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
+        self.autoFillConvenienceAutoUnlockTimeout = -1; 
+        self.monitorForExternalChanges = YES;
+        self.monitorForExternalChangesInterval = self.storageProvider == kMacFile ? 10 : 30; 
+        self.autoReloadAfterExternalChanges = YES;
+        self.makeBackups = YES;
+        self.maxBackupKeepCount = 10;
+        
+
+
+    }
+    return self;
+}
+
 - (instancetype)initWithNickName:(NSString *)nickName
                  storageProvider:(StorageProvider)storageProvider
                          fileUrl:(NSURL*)fileUrl
                      storageInfo:(NSString*)storageInfo {
-    if(self = [super init]) {
+    if(self = [self init]) {
         _nickName = nickName ? nickName : @"<Unknown>";
         _uuid = [[NSUUID UUID] UUIDString];
         self.storageProvider = storageProvider;
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
-        self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
-        self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
-        self.autoFillConvenienceAutoUnlockTimeout = -1; 
-
-
     }
     
     return self;
@@ -184,6 +199,13 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     
     [encoder encodeObject:self.autoFillLastUnlockedAt forKey:@"autoFillLastUnlockedAt"];
     [encoder encodeInteger:self.autoFillConvenienceAutoUnlockTimeout forKey:@"autoFillConvenienceAutoUnlockTimeout"];
+    
+    [encoder encodeBool:self.monitorForExternalChanges forKey:@"monitorForExternalChanges"];
+    [encoder encodeInteger:self.monitorForExternalChangesInterval forKey:@"monitorForExternalChangesInterval"];
+    [encoder encodeBool:self.autoReloadAfterExternalChanges forKey:@"autoReloadAfterExternalChanges"];
+
+    [encoder encodeInteger:self.maxBackupKeepCount forKey:@"maxBackupKeepCount"];
+    [encoder encodeBool:self.makeBackups forKey:@"makeBackups"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -281,12 +303,40 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
             self.autoFillConvenienceAutoUnlockTimeout = -1; 
         }
         
+        if( [decoder containsValueForKey:@"monitorForExternalChanges"] ) {
+            self.monitorForExternalChanges = [decoder decodeBoolForKey:@"monitorForExternalChanges"];
+        }
+        else {
+            self.monitorForExternalChanges = Settings.sharedInstance.detectForeignChanges; 
+        }
+
+        if( [decoder containsValueForKey:@"monitorForExternalChangesInterval"] ) {
+            self.monitorForExternalChangesInterval = [decoder decodeIntegerForKey:@"monitorForExternalChangesInterval"];
+        }
+        else {
+            self.monitorForExternalChangesInterval = self.storageProvider == kMacFile ? 10 : 30; 
+        }
+        
+        if( [decoder containsValueForKey:@"autoReloadAfterExternalChanges"] ) {
+            self.autoReloadAfterExternalChanges = [decoder decodeBoolForKey:@"autoReloadAfterExternalChanges"];
+        }
+        else {
+            self.autoReloadAfterExternalChanges = Settings.sharedInstance.autoReloadAfterForeignChanges; 
+        }
+
+        
         
 
+
+
         
-
-
-
+        if ( [decoder containsValueForKey:@"maxBackupKeepCount"] ) {
+            self.maxBackupKeepCount = [decoder decodeIntegerForKey:@"maxBackupKeepCount"];
+        }
+        
+        if ( [decoder containsValueForKey:@"makeBackups"] ) {
+            self.makeBackups = [decoder decodeBoolForKey:@"makeBackups"];
+        }
     }
     
     return self;
@@ -295,6 +345,14 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
 - (ConflictResolutionStrategy)conflictResolutionStrategy {
     return kConflictResolutionStrategyAutoMerge; 
+}
+
+- (NSURL *)backupsDirectory {
+    NSURL* url = [FileManager.sharedInstance.backupFilesDirectory URLByAppendingPathComponent:self.uuid isDirectory:YES];
+    
+    [FileManager.sharedInstance createIfNecessary:url];
+    
+    return url;
 }
 
 @end

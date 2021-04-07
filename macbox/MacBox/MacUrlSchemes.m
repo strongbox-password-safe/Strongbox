@@ -11,9 +11,10 @@
 NSString* const kStrongboxSFTPUrlScheme = @"sftp";
 NSString* const kStrongboxWebDAVUrlScheme = @"webdav";
 NSString* const kStrongboxFileUrlScheme = @"file";
+NSString* const kStrongboxSyncManagedFileUrlScheme = @"sb-sync-managed-file";
 
 StorageProvider storageProviderFromUrl(NSURL* url) {
-    return url ? storageProviderFromUrlScheme(url.scheme) : kLocalDevice;
+    return url ? storageProviderFromUrlScheme(url.scheme) : kMacFile;
 }
 
 StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
@@ -24,16 +25,37 @@ StorageProvider storageProviderFromUrlScheme(NSString* scheme) {
         return kWebDAV;
     }
     
-    return kLocalDevice;
+    return kMacFile;
 }
 
-NSString* schemeFromStorageProvider(StorageProvider storageProvider) {
-    if ( storageProvider == kSFTP ) {
-        return kStrongboxSFTPUrlScheme;
-    }
-    else if ( storageProvider == kWebDAV ) {
-        return kStrongboxWebDAVUrlScheme;
+
+NSURL* fileUrlFromManagedUrl(NSURL* managedUrl) {
+    if ( [managedUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+        NSURLComponents* components =  [NSURLComponents componentsWithURL:managedUrl resolvingAgainstBaseURL:NO];
+        components.scheme = kStrongboxFileUrlScheme;
+        return components.URL;
     }
     
-    return kStrongboxFileUrlScheme;
+    return managedUrl;
 }
+
+NSURL* managedUrlFromFileUrl(NSURL* fileUrl) {
+    if ( [fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] ) {
+        NSURLComponents* components =  [NSURLComponents componentsWithURL:fileUrl resolvingAgainstBaseURL:NO];
+        components.scheme = kStrongboxSyncManagedFileUrlScheme;
+        return components.URL;
+    }
+    
+    return fileUrl;
+}
+
+
+
+
+
+
+
+
+
+
+

@@ -98,6 +98,8 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
 - (instancetype)clone {
     UnifiedDatabaseMetadata* ret = [[UnifiedDatabaseMetadata alloc] initWithDefaultsForFormat:kKeePass4];
     
+    ret.adaptorTag = self.adaptorTag; 
+    
     ret.transformRounds = self.transformRounds;
     ret.generator = self.generator;
     ret.compressionFlags = self.compressionFlags;

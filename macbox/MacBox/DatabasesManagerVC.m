@@ -23,6 +23,10 @@
 #import "Document.h"
 #import "WebDAVStorageProvider.h"
 #import "ProgressWindow.h"
+#import "MacUrlSchemes.h"
+#import "BackupsViewController.h"
+#import "BackupsManager.h"
+#import "Utils.h"
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
 
@@ -45,6 +49,7 @@ static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 @property NSTimer* timerRefresh;
 @property BOOL hasLoaded;
 @property ProgressWindow* progressWindow;
+@property (weak) IBOutlet NSTextField *textFieldVersion;
 
 @end
 
@@ -131,18 +136,23 @@ static DatabasesManagerVC* sharedInstance;
 - (void)bindUi {
     self.buttonRemove.enabled = self.tableView.selectedRowIndexes.count > 0;
     self.buttonSync.enabled = self.tableView.selectedRowIndexes.count == 1;
+    
+    NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    
+    NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+    self.textFieldVersion.stringValue = about;
 }
 
 - (void)killRefreshTimer {
     if(self.timerRefresh) {
-        NSLog(@"Kill Refresh Timer");
+
         [self.timerRefresh invalidate];
         self.timerRefresh = nil;
     }
 }
 
 - (void)startRefreshTimer {
-    NSLog(@"Start Refresh Timer");
+
     self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refreshVisibleRows) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
 }
@@ -150,33 +160,6 @@ static DatabasesManagerVC* sharedInstance;
 - (void)cancel:(id)sender { 
     [self.view.window orderBack:self];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)windowWillClose:(NSNotification *)notification {
     if ( notification.object == self.view.window && self == sharedInstance) {
@@ -191,28 +174,48 @@ static DatabasesManagerVC* sharedInstance;
         return;
     }
     
+    NSMutableSet<DatabaseMetadata*>* selected = NSMutableSet.set;
+
+    [self performActionOnSelected:^(DatabaseMetadata *database) {
+        [selected addObject:database];
+    }];
+    
+    
+
+    DocumentController* dc = DocumentController.sharedDocumentController;
+
+    BOOL atLeastOneUnlocked = [selected.allObjects anyMatch:^BOOL(DatabaseMetadata * _Nonnull obj) {
+        return [dc databaseIsUnlockedInDocumentWindow:obj];
+    }];
+
+    if ( atLeastOneUnlocked ) {
+        [MacAlerts info:NSLocalizedString(@"mac_at_least_one_db_unlocked_cannot_remove", @"At least one of these databases is unlocked. You must lock this database before you can remove it.")
+                 window:self.view.window];
+        return;
+    }
+    
+    
+    
     NSString* single = NSLocalizedString(@"are_you_sure_delete_database_single", @"Are you sure you want to remove this database from Strongbox?\n\nNB: The underlying database file will not be deleted. Just Strongbox's settings for this database.");
     
     NSString* multiple = NSLocalizedString(@"are_you_sure_delete_database_multiple", @"Are you sure you want to remove these databases from Strongbox?\n\nNB: The underlying database files will not be deleted. Just Strongbox's settings for these databases.");
-    
-    NSString *message = self.tableView.selectedRowIndexes.count > 1 ? multiple : single;
+        
+    NSString *message = selected.count > 1 ? multiple : single;
     
     [MacAlerts yesNo:NSLocalizedString(@"generic_are_you_sure", @"Are You Sure?")
   informativeText:message
            window:self.view.window
        completion:^(BOOL yesNo) {
         if (yesNo) {
-            NSMutableSet<DatabaseMetadata*>* set = NSMutableSet.set;
-        
-            [self performActionOnSelected:^(DatabaseMetadata *database) {
-                [set addObject:database];
-            }];
-            
-            for (DatabaseMetadata* database in set) {
+            for (DatabaseMetadata* database in selected) {
+                BOOL isOpen = [dc databaseIsDocumentWindow:database];
+                if (isOpen) {
+                    [dc closeDocumentWindowForDatabase:database];
+                }
                 [self removeDatabase:database];
             }
-
-            BOOL quickTypeDb = [set.allObjects anyMatch:^BOOL(DatabaseMetadata * _Nonnull obj) {
+            
+            BOOL quickTypeDb = [selected.allObjects anyMatch:^BOOL(DatabaseMetadata * _Nonnull obj) {
                 return obj.autoFillEnabled && obj.quickTypeEnabled;
             }];
             
@@ -226,6 +229,7 @@ static DatabasesManagerVC* sharedInstance;
 - (void)removeDatabase:(DatabaseMetadata*)safe {
     [DatabasesManager.sharedInstance remove:safe.uuid];
     [safe clearSecureItems];
+    [BackupsManager.sharedInstance deleteAllBackups:safe];
 }
 
 - (void)refreshVisibleRows {
@@ -481,8 +485,14 @@ static DatabasesManagerVC* sharedInstance;
 
     if (theAction == @selector(onViewSyncLog:)) {
         if(self.tableView.selectedRow != -1) {
-            DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
-            return safe.storageProvider != kLocalDevice;
+
+            return YES;
+        }
+    }
+    else if (theAction == @selector(onViewBackups:)) {
+        if(self.tableView.selectedRow != -1) {
+
+            return YES;
         }
     }
     else if ( theAction == @selector(onAddSFTPDatabase:)) {
@@ -525,10 +535,10 @@ static DatabasesManagerVC* sharedInstance;
 - (IBAction)onViewSyncLog:(id)sender {
     if(self.tableView.selectedRow != -1) {
         DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
-        if ( safe.storageProvider != kLocalDevice ) {
+
             SyncLogViewController* vc = [SyncLogViewController showForDatabase:safe];
             [self presentViewControllerAsSheet:vc];
-        }
+
     }
 }
 
@@ -540,26 +550,50 @@ static DatabasesManagerVC* sharedInstance;
     }
 }
 
+- (BOOL)isLegacyFileUrl:(NSURL*)url {
+    return ( url && url.scheme.length && [url.scheme isEqualToString:kStrongboxFileUrlScheme] );
+}
+
 - (IBAction)onSync:(id)sender {
     if(self.tableView.selectedRow != -1) {
         DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
         
-        if (safe.storageProvider != kLocalDevice ) {
-            
-            [MacSyncManager.sharedInstance backgroundSyncDatabase:safe
-                                                       completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-                if ( error ) {
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                        [MacAlerts error:error window:self.view.window];
-                    });
-                }
-                else if ( localWasChanged ) {
-                    NSLog(@"XXXXX - localWasChanged");                    
-                    Document* doc = [DocumentController.sharedDocumentController documentForURL:safe.fileUrl];
-                    [doc onSyncChangedUnderlyingWorkingCopy];
-                }
-            }];
+        if ( ![self isLegacyFileUrl:safe.fileUrl] ) {
+            Document* doc = [DocumentController.sharedDocumentController documentForURL:safe.fileUrl];
+            if ( doc && !doc.isModelLocked ) {
+                NSLog(@"Document is already open ");
+                [doc checkForRemoteChanges];
+            }
+            else {
+                
+                [MacSyncManager.sharedInstance backgroundSyncDatabase:safe
+                                                           completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+                    if ( error ) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [MacAlerts error:error window:self.view.window];
+                        });
+                    }
+                    else if ( localWasChanged ) {
+                        NSLog(@"ManagerVC - Background Sync - localWasChanged");
+                    }
+                }];
+            }
         }
+    }
+}
+
+- (IBAction)onViewBackups:(id)sender {
+    if(self.tableView.selectedRow != -1) {
+        DatabaseMetadata *safe = [self.databases objectAtIndex:self.tableView.selectedRow];
+
+        [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
+    }
+}
+
+- (void)prepareForSegue:(NSStoryboardSegue *)segue sender:(id)sender {
+    if ( [segue.identifier isEqualToString:@"segueToBackups"] ) {
+        BackupsViewController* vc = segue.destinationController;
+        vc.database = sender;
     }
 }
 

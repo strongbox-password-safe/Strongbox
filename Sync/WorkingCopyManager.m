@@ -37,7 +37,7 @@
     NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase:database];
     [data writeToURL:localWorkingCacheUrl options:NSDataWritingAtomic error:error];
     
-    NSLog(@"SyncManager::setWorkingCacheWithData - Wrote to working file [%@]-[%@]", localWorkingCacheUrl, *error);
+
 
     if (*error) {
         return nil;

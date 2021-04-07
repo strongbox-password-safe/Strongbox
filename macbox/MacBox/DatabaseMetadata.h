@@ -24,7 +24,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
                          fileUrl:(NSURL*)fileUrl
                      storageInfo:(NSString*)storageInfo;
 
-
 @property (nonatomic, strong) NSString *uuid;
 @property (nonatomic, strong) NSString *nickName;
 @property (nonatomic, strong) NSURL *fileUrl; 
@@ -72,6 +71,15 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nullable) NSDate* autoFillLastUnlockedAt;
 
 @property (readonly) ConflictResolutionStrategy conflictResolutionStrategy;
+
+@property BOOL monitorForExternalChanges;
+@property NSInteger monitorForExternalChangesInterval;
+
+@property BOOL autoReloadAfterExternalChanges;
+
+@property (readonly) NSURL* backupsDirectory;
+@property NSUInteger maxBackupKeepCount;
+@property BOOL makeBackups;
 
 @end
 

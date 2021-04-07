@@ -8,6 +8,7 @@
 
 #import "AppPreferences.h"
 #import "Model.h"
+#import "NSArray+Extensions.h"
 
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mcguill";
 static NSString* cachedAppGroupName;
@@ -66,6 +67,40 @@ static NSString* const kAutoFillShowPinned = @"autoFillShowPinned";
 static NSString* const kCoalesceAppLockAndQuickLaunchBiometrics = @"coalesceAppLockAndQuickLaunchBiometrics";
 static NSString* const kAppPrivacyShieldMode = @"appPrivacyShieldMode";
 static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDetectedBehaviour";
+static NSString* const kUseBackgroundUpdates = @"useBackgroundUpdates-Default-On";
+
+
+
+static NSString* const kLaunchCountKey = @"launchCount";
+
+static NSString* const kiCloudWasOn = @"iCloudWasOn";
+static NSString* const kiCloudPrompted = @"iCloudPrompted";
+
+static NSString* const kInstallDate = @"installDate";
+static NSString* const kShowKeePassCreateSafeOptions = @"showKeePassCreateSafeOptions";
+
+static NSString* const kLastEntitlementCheckAttempt = @"lastEntitlementCheckAttempt";
+static NSString* const kNumberOfEntitlementCheckFails = @"numberOfEntitlementCheckFails";
+static NSString* const kDeleteDataAfterFailedUnlockCount = @"deleteDataAfterFailedUnlockCount";
+static NSString* const kFailedUnlockAttempts = @"failedUnlockAttempts";
+static NSString* const kAppLockAppliesToPreferences = @"appLockAppliesToPreferences";
+
+static NSString* const kAppLockMode = @"appLockMode2.0";
+static NSString* const kAppLockPin = @"appLockPin2.0";
+static NSString* const kAppLockDelay = @"appLockDelay2.0";
+
+static NSString* const kLastFreeTrialNudge = @"lastFreeTrialNudge";
+
+static NSString* const kBackupFiles = @"backupFiles";
+static NSString* const kBackupIncludeImportedKeyFiles = @"backupIncludeImportedKeyFiles";
+static NSString* const kHaveAskedAboutBackupSettings = @"haveAskedAboutBackupSettings";
+static NSString* const kHideExportFromDatabaseContextMenu = @"hideExportFromDatabaseContextMenu";
+static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
+static NSString* const kAppLockAllowDevicePasscodeFallbackForBio = @"appLockAllowDevicePasscodeFallbackForBio";
+static NSString* const kFullFileProtection = @"fullFileProtection";
+static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttemptedMigrationToFullFileProtection";
+
+
 
 @implementation AppPreferences
 
@@ -107,6 +142,14 @@ static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDete
 }
 
 
+
+- (BOOL)useBackgroundUpdates {
+    return [self getBool:kUseBackgroundUpdates fallback:YES];
+}
+
+- (void)setUseBackgroundUpdates:(BOOL)useBackgroundUpdates {
+    [self setBool:kUseBackgroundUpdates value:useBackgroundUpdates];
+}
 
 - (BOOL)migratedOfflineDetectedBehaviour {
     return [self getBool:kMigratedOfflineDetectedBehaviour];
@@ -612,6 +655,380 @@ static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDete
 
 - (void)setDatabaseCellSubtitle2:(DatabaseCellSubtitleField)databaseCellSubtitle2 {
     [self setInteger:kDatabaseCellSubtitle2 value:databaseCellSubtitle2];
+}
+
+
+
+- (BOOL)haveAttemptedMigrationToFullFileProtection {
+    return [self getBool:kHaveAttemptedMigrationToFullFileProtection];
+}
+
+- (void)setHaveAttemptedMigrationToFullFileProtection:(BOOL)haveAttemptedMigrationToFullFileProtection {
+    [self setBool:kHaveAttemptedMigrationToFullFileProtection value:haveAttemptedMigrationToFullFileProtection];
+}
+
+- (BOOL)fullFileProtection {
+    return [self getBool:kFullFileProtection fallback:YES]; 
+}
+
+- (void)setFullFileProtection:(BOOL)fullFileProtection {
+    [self setBool:kFullFileProtection value:fullFileProtection];
+}
+
+- (BOOL)appLockAllowDevicePasscodeFallbackForBio {
+    return [self getBool:kAppLockAllowDevicePasscodeFallbackForBio fallback:YES];
+}
+
+- (void)setAppLockAllowDevicePasscodeFallbackForBio:(BOOL)appLockAllowDevicePasscodeFallbackForBio {
+    [self setBool:kAppLockAllowDevicePasscodeFallbackForBio value:appLockAllowDevicePasscodeFallbackForBio];
+}
+
+- (BOOL)allowThirdPartyKeyboards {
+    return [self getBool:kAllowThirdPartyKeyboards];
+}
+
+- (void)setAllowThirdPartyKeyboards:(BOOL)allowThirdPartyKeyboards {
+    [self setBool:kAllowThirdPartyKeyboards value:allowThirdPartyKeyboards];
+}
+
+- (BOOL)hideExportFromDatabaseContextMenu {
+    return [self getBool:kHideExportFromDatabaseContextMenu];
+}
+
+- (void)setHideExportFromDatabaseContextMenu:(BOOL)hideExportFromDatabaseContextMenu {
+    [self setBool:kHideExportFromDatabaseContextMenu value:hideExportFromDatabaseContextMenu];
+}
+
+- (BOOL)haveAskedAboutBackupSettings {
+    return [self getBool:kHaveAskedAboutBackupSettings fallback:NO];
+}
+
+- (void)setHaveAskedAboutBackupSettings:(BOOL)haveAskedAboutBackupSettings {
+    [self setBool:kHaveAskedAboutBackupSettings value:haveAskedAboutBackupSettings];
+}
+
+- (BOOL)backupFiles {
+    return [self getBool:kBackupFiles fallback:YES];
+}
+
+- (void)setBackupFiles:(BOOL)backupFiles {
+    [self setBool:kBackupFiles value:backupFiles];
+}
+
+- (BOOL)backupIncludeImportedKeyFiles {
+    return [self getBool:kBackupIncludeImportedKeyFiles fallback:NO];
+}
+
+- (void)setBackupIncludeImportedKeyFiles:(BOOL)backupIncludeImportedKeyFiles {
+    return [self setBool:kBackupIncludeImportedKeyFiles value:backupIncludeImportedKeyFiles];
+}
+- (NSDate *)lastFreeTrialNudge {
+    NSDate* date = [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kLastFreeTrialNudge];
+    return date ? date : NSDate.date; 
+}
+
+- (void)setLastFreeTrialNudge:(NSDate *)lastFreeTrialNudge {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    [userDefaults setObject:lastFreeTrialNudge forKey:kLastFreeTrialNudge];
+    [userDefaults synchronize];
+}
+
+- (NSDate*)installDate {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kInstallDate];
+}
+
+- (void)setInstallDate:(NSDate *)installDate {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults setObject:installDate forKey:kInstallDate];
+    [userDefaults synchronize];
+}
+
+- (void)clearInstallDate {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults removeObjectForKey:kInstallDate];
+    [userDefaults synchronize];
+}
+
+- (NSInteger)daysInstalled {
+    NSDate* installDate = self.installDate;
+
+    if(!installDate) {
+        return 0;
+    }
+    
+    NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
+    NSDateComponents *components = [gregorian components:NSCalendarUnitDay
+                                                fromDate:installDate
+                                                  toDate:[NSDate date]
+                                                 options:0];
+
+    NSInteger daysInstalled = [components day];
+    
+    return daysInstalled;
+}
+
+- (NSInteger)getLaunchCount
+{
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    NSInteger launchCount = [userDefaults integerForKey:kLaunchCountKey];
+    
+    return launchCount;
+}
+
+- (void)resetLaunchCount {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults removeObjectForKey:kLaunchCountKey];
+    
+    [userDefaults synchronize];
+}
+
+- (void)incrementLaunchCount {
+    NSInteger launchCount = [self getLaunchCount];
+    
+    launchCount++;
+    
+    NSLog(@"Application has been launched %ld times", (long)launchCount);
+    
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    [userDefaults setInteger:launchCount forKey:kLaunchCountKey];
+    
+    [userDefaults synchronize];
+}
+
+- (BOOL)iCloudWasOn {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudWasOn];
+}
+
+-(void)setICloudWasOn:(BOOL)iCloudWasOn {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:iCloudWasOn forKey:kiCloudWasOn];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)iCloudPrompted {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kiCloudPrompted];
+}
+
+- (void)setICloudPrompted:(BOOL)iCloudPrompted {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:iCloudPrompted forKey:kiCloudPrompted];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+
+
+- (NSString*)getFlagsStringForDiagnostics {
+    return [NSString stringWithFormat:@"[%d[%ld]%d%d%d[%ld]%d%d%d%d]",
+            AppPreferences.sharedInstance.hasOptedInToFreeTrial,
+            (long)AppPreferences.sharedInstance.freeTrialDaysLeft,
+            AppPreferences.sharedInstance.isProOrFreeTrial,
+            AppPreferences.sharedInstance.isPro,
+            AppPreferences.sharedInstance.isFreeTrial,
+            (long)self.getLaunchCount,
+            AppPreferences.sharedInstance.iCloudOn,
+            self.iCloudWasOn,
+            self.iCloudPrompted,
+            self.iCloudAvailable];
+}
+
+- (BOOL)showKeePassCreateSafeOptions {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:kShowKeePassCreateSafeOptions];
+}
+
+- (void)setShowKeePassCreateSafeOptions:(BOOL)showKeePassCreateSafeOptions {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:showKeePassCreateSafeOptions forKey:kShowKeePassCreateSafeOptions];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (NSDate *)lastEntitlementCheckAttempt {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    
+    
+    return [userDefaults objectForKey:kLastEntitlementCheckAttempt];
+}
+
+- (void)setLastEntitlementCheckAttempt:(NSDate *)lastEntitlementCheckAttempt {
+    NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
+    
+    [userDefaults setObject:lastEntitlementCheckAttempt forKey:kLastEntitlementCheckAttempt];
+    
+    [userDefaults synchronize];
+}
+
+- (NSUInteger)numberOfEntitlementCheckFails {
+    NSInteger ret =  [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kNumberOfEntitlementCheckFails];
+    return ret;
+}
+
+
+- (void)setNumberOfEntitlementCheckFails:(NSUInteger)numberOfEntitlementCheckFails {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:numberOfEntitlementCheckFails forKey:kNumberOfEntitlementCheckFails];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+
+
+- (AppLockMode)appLockMode {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kAppLockMode];
+}
+
+- (void)setAppLockMode:(AppLockMode)appLockMode {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:appLockMode forKey:kAppLockMode];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (NSString *)appLockPin {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kAppLockPin];
+}
+
+-(void)setAppLockPin:(NSString *)appLockPin {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setObject:appLockPin forKey:kAppLockPin];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (NSInteger)appLockDelay {
+    NSInteger ret =  [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kAppLockDelay];
+    return ret;
+}
+
+-(void)setAppLockDelay:(NSInteger)appLockDelay {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:appLockDelay forKey:kAppLockDelay];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (NSInteger)deleteDataAfterFailedUnlockCount {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kDeleteDataAfterFailedUnlockCount];
+}
+
+- (void)setDeleteDataAfterFailedUnlockCount:(NSInteger)deleteDataAfterFailedUnlockCount {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:deleteDataAfterFailedUnlockCount forKey:kDeleteDataAfterFailedUnlockCount];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (NSUInteger)failedUnlockAttempts {
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults integerForKey:kFailedUnlockAttempts];
+}
+
+- (void)setFailedUnlockAttempts:(NSUInteger)failedUnlockAttempts {
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setInteger:failedUnlockAttempts forKey:kFailedUnlockAttempts];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)appLockAppliesToPreferences {
+    return [self getBool:kAppLockAppliesToPreferences];
+}
+
+- (void)setAppLockAppliesToPreferences:(BOOL)appLockAppliesToPreferences {
+    [self setBool:kAppLockAppliesToPreferences value:appLockAppliesToPreferences];
+}
+
+
+
++ (NSString*)getAppGroupFromProvisioningProfile {
+    NSString* profilePath = [NSBundle.mainBundle pathForResource:@"embedded" ofType:@"mobileprovision"];
+    
+    if (profilePath == nil) {
+        NSLog(@"INFO: getAppGroupFromProvisioningProfile - Could not find embedded.mobileprovision file");
+        return nil;
+    }
+    
+    NSData* plistData = [NSData dataWithContentsOfFile:profilePath];
+    if(!plistData) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - dataWithContentsOfFile nil");
+        return nil;
+    }
+    
+    NSString* plistDataString = [NSString stringWithFormat:@"%@", plistData];
+    if(plistDataString == nil) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - plistData - stringWithFormat nil");
+        return nil;
+    }
+    
+    NSString* plistString = [self extractPlist:plistDataString];
+    if(!plistString) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - extractPlist nil");
+        return nil;
+    }
+    
+    NSError* error;
+    NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:@"<key>com.apple.security.application-groups</key>.*?<array>.*?<string>(.*?)</string>.*?</array>" options:NSRegularExpressionCaseInsensitive | NSRegularExpressionDotMatchesLineSeparators
+                                                                             error:&error];
+    
+    if(error || regex == nil) {
+        NSLog(@"Error: getAppGroupFromProvisioningProfile - regularExpressionWithPattern %@", error);
+        return nil;
+    }
+    
+    NSTextCheckingResult* res = [regex firstMatchInString:plistString options:kNilOptions range:NSMakeRange(0, plistString.length)];
+    
+    if(res && [res numberOfRanges] > 1) {
+        NSRange rng = [res rangeAtIndex:1];
+        NSString* appGroup = [plistString substringWithRange:rng];
+        return appGroup;
+    }
+    else {
+        NSLog(@"INFO: getAppGroupFromProvisioningProfile - App Group Not Found - [%@]", res);
+        return nil;
+    }
+}
+
++ (NSString*)extractPlist:(NSString*)str {
+    
+    if(!str || str.length < 10) { 
+        return nil;
+    }
+    
+    str = [str substringWithRange:NSMakeRange(1, str.length-2)];
+    str = [str stringByReplacingOccurrencesOfString:@" " withString:@""];
+    
+    
+    
+    NSString* profileText = [self hexStringtoAscii:str];
+    return profileText;
+}
+
++ (NSString*)hexStringtoAscii:(NSString*)hexString {
+    NSString* pattern = @"(0x)?([0-9a-f]{2})";
+    NSError* error;
+    NSRegularExpression* regex = [NSRegularExpression regularExpressionWithPattern:pattern options:NSRegularExpressionCaseInsensitive error:&error];
+    
+    if(error) {
+        NSLog(@"hexStringToAscii Error: %@", error);
+        return nil;
+    }
+    
+    NSArray<NSTextCheckingResult*>* matches = [regex matchesInString:hexString options:kNilOptions range:NSMakeRange(0, hexString.length)];
+    if(!matches) {
+        NSLog(@"hexStringToAscii Error: Matches nil");
+        return nil;
+    }
+    
+    NSArray<NSNumber*> *characters = [matches map:^id _Nonnull(NSTextCheckingResult * _Nonnull obj, NSUInteger idx) {
+        if(obj.numberOfRanges > 1) {
+            NSRange range = [obj rangeAtIndex:2];
+            NSString *sub = [hexString substringWithRange:range];
+            
+            
+            NSScanner *scanner = [NSScanner scannerWithString:sub];
+            uint32_t u32;
+            [scanner scanHexInt:&u32];
+            return @(u32);
+        }
+        else {
+            NSLog(@"Do not know how to decode.");
+            return @(32); 
+        }
+    }];
+    
+    NSMutableString* foo = [NSMutableString string];
+    for (NSNumber* ch in characters) {
+        [foo appendFormat:@"%c", ch.unsignedCharValue];
+    }
+    
+    return foo.copy;
 }
 
 

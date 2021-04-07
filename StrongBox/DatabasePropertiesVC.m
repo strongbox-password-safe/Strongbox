@@ -23,16 +23,11 @@ static NSUInteger const kQuickLaunchRow = 1;
 static NSUInteger const kConflictResolutionStrategyRow = 2;
 static NSUInteger const kAlwaysOpenOffline = 3;
 static NSUInteger const kOfflineDetectedBehaviour = 4;
-static NSUInteger const kBackupsRow = 5;
-static NSUInteger const kViewSyncLogRow = 6;
+static NSUInteger const kCouldNotConnectBehaviour = 5;
+static NSUInteger const kBackupsRow = 6;
+static NSUInteger const kViewSyncLogRow = 7;
 
-static NSUInteger const kRowCount = 7;
-
-
-
-
-
-
+static NSUInteger const kRowCount = 8;
 
 @interface DatabasePropertiesVC ()
 
@@ -112,6 +107,18 @@ static NSUInteger const kRowCount = 7;
         
         return cell;
     }
+    else if ( indexPath.row == kCouldNotConnectBehaviour ) {
+        UITableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:@"DatabaseMetadataGenericCell" forIndexPath:indexPath];
+
+        cell.textLabel.text = NSLocalizedString( @"database_properties_title_could_not_connect_behaviour", @"Could Not Connect Behaviour");
+        
+        cell.detailTextLabel.text = stringForCouldNotConnectBehaviour(metadata.couldNotConnectBehaviour);
+                
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+        
+        return cell;
+    }
     else if ( indexPath.row == kAlwaysOpenOffline ) {
         PropertySwitchTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kPropertySwitchTableViewCellId forIndexPath:indexPath];
 
@@ -180,7 +187,26 @@ static NSUInteger const kRowCount = 7;
             }
         }];
     }
-    
+    else if ( indexPath.row == kCouldNotConnectBehaviour ) {
+        NSArray<NSNumber*>* options = @[@(kCouldNotConnectBehaviourPrompt),
+                                        @(kCouldNotConnectBehaviourOpenOffline)];
+        
+        NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+            return stringForCouldNotConnectBehaviour(obj.integerValue);
+        }];
+        
+        [self promptForChoice:NSLocalizedString( @"database_properties_title_could_not_connect_behaviour", @"Could Not Connect Behaviour")
+                      options:optionStrings
+         currentlySelectIndex:self.database.couldNotConnectBehaviour
+                   completion:^(BOOL success, NSInteger selectedIndex) {
+            if ( success ) {
+                self.database.couldNotConnectBehaviour = selectedIndex;
+                [SafesList.sharedInstance update:self.database];
+                [self.tableView reloadData];
+            }
+        }];
+    }
+
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
@@ -190,6 +216,15 @@ static NSString* stringForOfflineBehaviour(OfflineDetectedBehaviour mode ) {
     }
     else if (mode == kOfflineDetectedBehaviourTryConnectThenAsk ) {
         return NSLocalizedString(@"offline_detected_behaviour_try_connect_anyway", @"Try to Connect");
+    }
+    else {
+        return NSLocalizedString(@"offline_detected_behaviour_open_offline", @"Open Offline (No Prompt)");
+    }
+}
+
+static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mode ) {
+    if ( mode == kCouldNotConnectBehaviourPrompt ) {
+        return NSLocalizedString(@"offline_detected_behaviour_ask_immediately", @"Prompt");
     }
     else {
         return NSLocalizedString(@"offline_detected_behaviour_open_offline", @"Open Offline (No Prompt)");
@@ -235,7 +270,11 @@ static NSString* stringForOfflineBehaviour(OfflineDetectedBehaviour mode ) {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if ( indexPath.row == kAlwaysOpenOffline || indexPath.row == kOfflineDetectedBehaviour || indexPath.row == kViewSyncLogRow || indexPath.row == kConflictResolutionStrategyRow ) {
+    if ( indexPath.row == kAlwaysOpenOffline ||
+         indexPath.row == kOfflineDetectedBehaviour ||
+         indexPath.row == kCouldNotConnectBehaviour ||
+         indexPath.row == kViewSyncLogRow ||
+         indexPath.row == kConflictResolutionStrategyRow ) {
         if ( self.database.storageProvider == kLocalDevice ) {
             return 0.0f;
         }

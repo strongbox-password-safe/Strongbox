@@ -19,6 +19,7 @@
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
 #import "DatabaseUnlocker.h"
+#import "ConcurrentMutableStack.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
@@ -29,7 +30,10 @@ NSString* const kDatabaseViewPreferencesChangedNotificationKey = @"kDatabaseView
 NSString* const kProStatusChangedNotificationKey = @"proStatusChangedNotification";
 NSString* const kAppStoreSaleNotificationKey = @"appStoreSaleNotification";
 NSString *const kWormholeAutoFillUpdateMessageId = @"auto-fill-workhole-message-id";
+
 NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificationKey";
+NSString* const kAsyncUpdateDone = @"kAsyncUpdateDone";
+NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 @interface Model ()
 
@@ -39,11 +43,37 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 @property BOOL forcedReadOnly;
 @property BOOL isDuressDummyMode;
 @property DatabaseModel* theDatabase;
-@property BOOL offlineMode; 
+@property BOOL offlineMode;
+
+@property dispatch_queue_t asyncUpdateEncryptionQueue;
+
+@property ConcurrentMutableStack* asyncUpdatesStack;
 
 @end
 
 @implementation Model
+
+- (NSData*)getDuressDummyData {
+    return AppPreferences.sharedInstance.duressDummyData; 
+}
+
+- (void)setDuressDummyData:(NSData*)data {
+    AppPreferences.sharedInstance.duressDummyData = data;
+}
+
+- (void)dealloc {
+    NSLog(@"=====================================================================");
+    NSLog(@"Model DEALLOC...");
+    NSLog(@"=====================================================================");
+}
+
+- (void)closeAndCleanup { 
+    NSLog(@"Model closeAndCleanup...");
+    if (self.auditor) {
+        [self.auditor stop];
+        self.auditor = nil;
+    }
+}
 
 - (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
                  templateMetaData:(SafeMetaData*)templateMetaData {
@@ -96,6 +126,9 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
         }
         
         self.theDatabase = passwordDatabase;
+        self.asyncUpdateEncryptionQueue = dispatch_queue_create("Model-AsyncUpdateEncryptionQueue", DISPATCH_QUEUE_SERIAL);
+        self.asyncUpdatesStack = ConcurrentMutableStack.mutableStack;
+        
         _metadata = metaData;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
         
@@ -171,28 +204,233 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 
 
 
-- (NSData*)getDuressDummyData {
-    return AppPreferences.sharedInstance.duressDummyData; 
+- (void)clearAsyncUpdateState {
+    [self.asyncUpdatesStack clear];
+    self.lastAsyncUpdateResult = nil;
 }
 
-- (void)setDuressDummyData:(NSData*)data {
-    AppPreferences.sharedInstance.duressDummyData = data;
+- (BOOL)asyncUpdateAndSync {
+    NSLog(@"asyncUpdateAndSync ENTER");
+
+    if(self.isReadOnly) {
+        NSLog(@"WARNWARN - Database is Read Only - Will not UPDATE! Last Resort. - WARNWARN");
+        return NO;
+    }
+    
+    DatabaseModel* cloneForUpdate = [self.database clone];
+    [self.asyncUpdatesStack push:cloneForUpdate];
+    
+    dispatch_async(self.asyncUpdateEncryptionQueue, ^{
+        [self dequeueOutstandingAsyncUpdateAndProcess];
+    });
+
+    NSLog(@"asyncUpdateAndSync EXIT");
+
+    return YES;
 }
 
-
-- (void)dealloc {
-    NSLog(@"=====================================================================");
-    NSLog(@"Model DEALLOC...");
-    NSLog(@"=====================================================================");
-}
-
-- (void)closeAndCleanup { 
-    NSLog(@"Model closeAndCleanup...");
-    if (self.auditor) {
-        [self.auditor stop];
-        self.auditor = nil;
+- (void)dequeueOutstandingAsyncUpdateAndProcess {
+    DatabaseModel* cloneForUpdate = [self.asyncUpdatesStack popAndClear]; 
+    
+    if ( cloneForUpdate ) {
+        [self queueAsyncUpdateWithDatabaseClone:NSUUID.UUID cloneForUpdate:cloneForUpdate];
+    }
+    else {
+        NSLog(@"XXXX - NOP - No outstanding async updates found. All Done.");
     }
 }
+
+- (void)queueAsyncUpdateWithDatabaseClone:(NSUUID*)updateId cloneForUpdate:(DatabaseModel*)cloneForUpdate {
+    NSLog(@"queueAsyncUpdateWithDatabaseClone ENTER - [%@]", NSThread.currentThread.name);
+    
+    _isRunningAsyncUpdate = YES;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:nil];
+    });
+    
+    dispatch_group_t mutex = dispatch_group_create();
+    dispatch_group_enter(mutex);
+    
+    [Serializator getAsData:cloneForUpdate
+                     format:cloneForUpdate.originalFormat
+                 completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled data:data updateMutex:mutex error:error]; 
+    }];
+
+    dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
+    
+    NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
+}
+
+- (void)onAsyncUpdateSerializeDone:(NSUUID*)updateId userCancelled:(BOOL)userCancelled data:(NSData *_Nullable)data updateMutex:(dispatch_group_t)updateMutex error:(NSError * _Nullable)error {
+    if (userCancelled || data == nil || error) {
+        
+        [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+        return;
+    }
+    
+    if (self.isDuressDummyMode) {
+        [self setDuressDummyData:data];
+        [self onAsyncUpdateDone:updateId success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
+        return;
+    }
+
+    NSError* localUpdateError;
+    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata data:data error:&localUpdateError];
+    if (!success) { 
+        [self onAsyncUpdateDone:updateId success:NO userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+        return;
+    }
+
+    
+
+    if (self.metadata.auditConfig.auditInBackground) {
+        [self restartAudit];
+    }
+
+    
+    
+    if ( self.offlineMode ) { 
+        [self onAsyncUpdateDone:updateId success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
+        return;
+    }
+
+    [SyncManager.sharedInstance sync:self.metadata
+                       interactiveVC:nil
+                                 key:self.database.ckfs
+                                join:NO
+                          completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        if ( result == kSyncAndMergeSuccess ) {
+            if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
+                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid displayFormat:self.metadata.quickTypeDisplayFormat];
+            }
+
+            [self onAsyncUpdateDone:updateId success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
+        }
+        else if (result == kSyncAndMergeError) {
+            [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+        }
+        else if ( result == kSyncAndMergeResultUserInteractionRequired ) {
+            [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:YES localUpdated:NO updateMutex:updateMutex error:error];
+        }
+        else {
+            error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from async update sync: [%@]", @(result)] errorCode:-1];
+            [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+        }
+    }];
+}
+
+- (void)onAsyncUpdateDone:(NSUUID*)updateId
+                  success:(BOOL)success
+            userCancelled:(BOOL)userCancelled
+  userInteractionRequired:(BOOL)userInteractionRequired
+             localUpdated:(BOOL)localUpdated
+              updateMutex:(dispatch_group_t)updateMutex
+                    error:(NSError*)error {
+    NSLog(@"onAsyncUpdateDone: updateId=%@ success=%hhd, userInteractionRequired=%hhd, localUpdated=%hhd, error=%@", updateId, success, userInteractionRequired, localUpdated, error);
+
+    self.lastAsyncUpdateResult = [[AsyncUpdateResult alloc] init];
+    self.lastAsyncUpdateResult.success = success;
+    self.lastAsyncUpdateResult.error = error;
+    self.lastAsyncUpdateResult.userCancelled = userCancelled;
+    self.lastAsyncUpdateResult.localWasChanged = localUpdated;
+    self.lastAsyncUpdateResult.userInteractionRequired = userInteractionRequired;
+    
+    _isRunningAsyncUpdate = NO;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [NSNotificationCenter.defaultCenter postNotificationName:kAsyncUpdateDone object:nil];
+    });
+    
+    dispatch_group_leave(updateMutex);
+}
+
+
+
+- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
+    if(self.isReadOnly) {
+        handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
+        return;
+    }
+
+    [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        if (userCancelled || data == nil || error) {
+            handler(userCancelled, NO, error);
+            return;
+        }
+
+        [self onEncryptionDone:viewController data:data completion:handler];
+    }];
+}
+
+- (void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSString*_Nullable debugXml, NSError* error))completion {
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
+    
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
+        [Serializator getAsData:self.database format:self.database.originalFormat completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^(void){
+                [SVProgressHUD dismiss];
+                completion(userCancelled, data, debugXml, error);
+            });
+        }];
+    });
+}
+
+- (void)onEncryptionDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
+    if (self.isDuressDummyMode) {
+        [self setDuressDummyData:data];
+        completion(NO, NO, nil);
+        return;
+    }
+    
+    
+    NSError* error;
+    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata data:data error:&error];
+    if (!success) {
+        completion(NO, NO, error);
+        return;
+    }
+    
+    
+    
+    if (self.metadata.auditConfig.auditInBackground) {
+        [self restartAudit];
+    }
+
+    if ( self.offlineMode ) { 
+        completion(NO, NO, nil);
+    }
+    else {
+        [SyncManager.sharedInstance sync:self.metadata
+                           interactiveVC:viewController
+                                     key:self.database.ckfs
+                                    join:NO
+                              completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
+            if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
+                if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
+                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid displayFormat:self.metadata.quickTypeDisplayFormat];
+                }
+
+                completion(NO, localWasChanged, nil);
+            }
+            else if (result == kSyncAndMergeError) {
+                completion(NO, NO, error);
+            }
+            else if (result == kSyncAndMergeResultUserCancelled) {
+                
+                NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
+                error = [Utils createNSError:message errorCode:-1];
+                completion(YES, NO, error);
+            }
+            else { 
+                error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
+                completion(NO, NO, error);
+            }
+        }];
+    }
+}
+
+
 
 - (AuditState)auditState {
     return self.auditor.state;
@@ -244,8 +482,6 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 }
 
 - (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set sid:(NSString*)sid {
-    
-    
     return [set containsObject:sid];
 }
 
@@ -387,80 +623,6 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
     return self.metadata.readOnly || self.forcedReadOnly;
 }
 
-- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
-    if(self.isReadOnly) {
-        handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
-        return;
-    }
-
-    [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled || data == nil || error) {
-            handler(userCancelled, NO, error);
-            return;
-        }
-
-        [self onEncryptionDone:viewController data:data completion:handler];
-    }];
-}
-
-- (void)onEncryptionDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
-    if (self.isDuressDummyMode) {
-        [self setDuressDummyData:data];
-        completion(NO, NO, nil);
-        return;
-    }
-    else {
-        
-        
-        NSError* error;
-        BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata data:data error:&error];
-
-        if (!success) {
-            completion(NO, NO, error);
-            return;
-        }
-
-        if ( self.offlineMode ) { 
-            completion(NO, NO, nil);
-        }
-        else {
-            CompositeKeyFactors* key = self.database.ckfs;
-            
-            [SyncManager.sharedInstance sync:self.metadata interactiveVC:viewController key:key join:NO completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
-                if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
-                    if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-                        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid displayFormat:self.metadata.quickTypeDisplayFormat];
-                    }
-
-                    
-                    if (self.metadata.auditConfig.auditInBackground) {
-                        [self restartAudit];
-                    }
-
-                    completion(NO, localWasChanged, nil);
-                    
-                    if (localWasChanged) {
-                        [self reloadDatabaseFromLocalWorkingCopy:viewController completion:nil];
-                    }
-                }
-                else if (result == kSyncAndMergeError) {
-                    completion(NO, NO, error);
-                }
-                else if (result == kSyncAndMergeResultUserCancelled) {
-                    
-                    NSString* message = NSLocalizedString(@"sync_could_not_sync_your_changes", @"Strongbox could not sync your changes.");
-                    error = [Utils createNSError:message errorCode:-1];
-                    completion(YES, NO, error);
-                }
-                else { 
-                    error = [Utils createNSError:[NSString stringWithFormat:@"Unexpected result returned from interactive update sync: [%@]", @(result)] errorCode:-1];
-                    completion(NO, NO, error);
-                }
-            }];
-        }
-    }
-}
-
 - (void)disableAndClearAutoFill {
     self.metadata.autoFillEnabled = NO;
     [[SafesList sharedInstance] update:self.metadata];
@@ -545,6 +707,7 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
     
     [self launchLaunchableUrl:launchableUrl];
 }
+
 - (void)launchLaunchableUrl:(NSURL*)launchableUrl {
 #ifndef IS_APP_EXTENSION
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -614,19 +777,6 @@ NSString* const kDatabaseReloadedNotificationKey = @"kDatabaseReloadedNotificati
 }
 
 
-
-- (void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSString*_Nullable debugXml, NSError* error))completion {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
-    
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        [Serializator getAsData:self.database format:self.database.originalFormat completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-            dispatch_async(dispatch_get_main_queue(), ^(void){
-                [SVProgressHUD dismiss];
-                completion(userCancelled, data, debugXml, error);
-            });
-        }];
-    });
-}
 
 - (NSString *)generatePassword {
     PasswordGenerationConfig* config = AppPreferences.sharedInstance.passwordGenerationConfig;

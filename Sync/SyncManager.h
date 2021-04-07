@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)backgroundSyncOutstandingUpdates;
 - (void)backgroundSyncLocalDeviceDatabasesOnly;
 
-- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
+- (void)sync:(SafeMetaData *)database interactiveVC:(UIViewController *_Nullable)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error;
 

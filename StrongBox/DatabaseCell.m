@@ -208,9 +208,11 @@ rotateLastImage:(BOOL)rotateLastImage
             [tnts addObject:NSNull.null];
         }
         
-        if ( isAFQuickLaunch ) {
-            [ret addObject:[UIImage imageNamed:@"globe"]];
-            [tnts addObject:UIColor.systemGreenColor];
+        if ( isAFQuickLaunch && !isQuickLaunch ) {
+            if ( database.autoFillEnabled ) {
+                [ret addObject:[UIImage imageNamed:@"globe"]];
+                [tnts addObject:UIColor.systemGreenColor];
+            }
         }
         
         if(database.readOnly) {

@@ -181,6 +181,7 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property BOOL hasLoaded;
 
 @property ProgressWindow* progressWindow;
+@property (weak) IBOutlet NSTextField *textFieldVersion;
 
 @end
 
@@ -279,7 +280,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)fullModelReload { 
-    NSLog(@"ViewController::fullModelReload");
+
     
     [self stopObservingModelChanges];
     [self closeAllDetailsWindows:nil];
@@ -288,7 +289,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)windowDidBecomeKey:(NSNotification *)notification {
-    NSLog(@"[%@] Window Became Key!", self.databaseMetadata.nickName);
+
 
     if(self.viewModel && self.viewModel.locked) {
         [self bindLockScreenUi];
@@ -303,13 +304,13 @@ static NSImage* kStrongBox256Image;
 
 - (void)windowWillClose:(NSNotification *)notification {
     if ( notification.object == self.view.window) {
-        NSLog(@"ViewController::windowWillClose");
+
         [self cleanupOnClose];
     }
 }
 
 - (void)cleanupOnClose {
-    NSLog(@"ViewController::cleanupOnClose");
+
     
     [self stopRefreshOtpTimer];
     [self closeAllDetailsWindows:nil];
@@ -491,6 +492,11 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)customizeUi {
+    NSString* fmt2 = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    
+    NSString* about = [NSString stringWithFormat:fmt2, [Utils getAppVersion]];
+    self.textFieldVersion.stringValue = about;
+    
     [self.tabViewLockUnlock setTabViewType:NSNoTabsNoBorder];
     [self.tabViewRightPane setTabViewType:NSNoTabsNoBorder];
     
@@ -498,7 +504,8 @@ static NSImage* kStrongBox256Image;
     
     [self bindShowAdvancedOnUnlockScreen];
             
-    self.buttonUnlockWithTouchId.title = NSLocalizedString(@"mac_unlock_database_with_touch_or_watch", @"Unlock with Touch ID or Watch");
+    NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch");
+    self.buttonUnlockWithTouchId.title = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
     self.buttonUnlockWithTouchId.hidden = YES;
     
     self.imageViewTogglePassword.clickable = YES;
@@ -539,7 +546,7 @@ static NSImage* kStrongBox256Image;
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
     if(control == self.searchField) { 
-
+        NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
         
         if (commandSelector == NSSelectorFromString(@"noop:")) { 
             NSEvent *event = [self.searchField.window currentEvent];
@@ -930,7 +937,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)stopObservingModelChanges {
-    NSLog(@"stopObservingModelChanges");
+
 
     if(self.viewModel) {
         self.viewModel.onNewItemAdded = nil;
@@ -963,7 +970,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)startObservingModelChanges {
-    NSLog(@"startObservingModelChanges");
+
     
     __weak ViewController* weakSelf = self;
     
@@ -1111,7 +1118,7 @@ static NSImage* kStrongBox256Image;
 - (NSString*)maybeDereference:(NSString*)text node:(Node*)node maybe:(BOOL)maybe {
     return maybe ? [self.viewModel dereference:text node:node] : text;
 }
-                                       
+
 - (void)startRefreshOtpTimer {
     if(self.timerRefreshOtp == nil) {
         self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshOtpCode:) userInfo:nil repeats:YES];
@@ -1179,6 +1186,16 @@ static NSImage* kStrongBox256Image;
 
 - (nullable NSView *)outlineView:(NSOutlineView *)outlineView viewForTableColumn:(nullable NSTableColumn *)tableColumn item:(nonnull id)item {
     Node *it = (Node*)item;
+    
+    if ( it.isGroup ) {
+        if([tableColumn.identifier isEqualToString:kTitleColumn]) {
+            return [self getTitleCell:it];
+        }
+        else {
+            return [self getReadOnlyCell:@"" node:it];
+        }
+    }
+    
     if([tableColumn.identifier isEqualToString:kTitleColumn]) {
         return [self getTitleCell:it];
     }
@@ -1321,7 +1338,7 @@ static NSImage* kStrongBox256Image;
     cell.textField.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
 
     BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.viewModel isDereferenceableText:it.title];
-    cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly && !Settings.sharedInstance.outlineViewTitleIsReadonly;
+    cell.textField.editable = !possiblyDereferencedText && (it.isGroup || (!Settings.sharedInstance.outlineViewEditableFieldsAreReadonly && !Settings.sharedInstance.outlineViewTitleIsReadonly));
     
     cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
     
@@ -1733,7 +1750,7 @@ static NSImage* kStrongBox256Image;
 
     BOOL ret = metaData && convenienceMethodPossible && featureAvailable && passwordAvailable;
 
-    NSLog(@"convenienceUnlockIsPossible: %hhd", ret);
+
     
     return ret;
 }
@@ -1815,8 +1832,10 @@ static NSImage* kStrongBox256Image;
     
     self.isPromptingAboutUnderlyingFileChange = YES;
     if(self.viewModel && !self.viewModel.locked) {
+        NSLog(@"ViewController::onDatabaseChangedByExternalOther - Reloading...");
+        
         if(!self.viewModel.document.isDocumentEdited) {
-            if(!Settings.sharedInstance.autoReloadAfterForeignChanges) {
+            if( !self.databaseMetadata.autoReloadAfterExternalChanges ) {
                 NSString* loc = NSLocalizedString(@"mac_db_changed_externally_reload_yes_or_no", @"The database has been changed by another application, would you like to reload this latest version and automatically unlock?");
 
                 [MacAlerts yesNo:loc
@@ -1871,7 +1890,7 @@ static NSImage* kStrongBox256Image;
     if( self.viewModel ) {
         
         
-        if ( self.databaseMetadata && self.databaseMetadata.storageProvider != kLocalDevice && !Settings.sharedInstance.isProOrFreeTrial ) {
+        if ( self.databaseMetadata && self.databaseMetadata.storageProvider != kMacFile && !Settings.sharedInstance.isProOrFreeTrial ) {
             [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                      window:self.view.window];
             return;
@@ -3007,12 +3026,12 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self bindLockScreenUi];
 }
 
-- (IBAction)onAutoFillSettings:(id)sender {
-    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(1)];
+- (IBAction)onGeneralDatabaseSettings:(id)sender {
+    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(0)];
 }
 
-- (IBAction)onDatabaseProperties:(id)sender {
-    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(0)];
+- (IBAction)onConvenienceUnlockProperties:(id)sender {
+    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(1)];
 }
 
 - (IBAction)onCopyAsCsv:(id)sender {
@@ -3769,7 +3788,8 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
     NSString* convenienceTitle;
     if ( (self.databaseMetadata.isTouchIdEnabled && touchAvailable) && (self.databaseMetadata.isWatchUnlockEnabled && watchAvailable) ) {
-        convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_or_watch", @"Unlock with Touch ID or Watch");
+        NSString *fmt = NSLocalizedString(@"mac_unlock_database_with_biometric_fmt", @"Unlock with %@ or Watch");
+        convenienceTitle = [NSString stringWithFormat:fmt, BiometricIdHelper.sharedInstance.biometricIdName];
     }
     else if ( self.databaseMetadata.isTouchIdEnabled && touchAvailable) {
         convenienceTitle = NSLocalizedString(@"mac_unlock_database_with_touch_id", @"Unlock with Touch ID");
@@ -3977,7 +3997,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (void)cleanupWormhole {
     if ( self.wormhole ) {
-        NSLog(@"Cleaning up wormhole... %@", self.databaseMetadata.uuid);
+
         [self.wormhole stopListeningForMessageWithIdentifier:kAutoFillWormholeQuickTypeRequestId];
 
         NSString* requestId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeDatabaseStatusRequestId, self.databaseMetadata.uuid];
@@ -4122,11 +4142,11 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return;
     }
     
-    NSLog(@"onModelLongRunningOpStart notification.object = [%@]", notification.object);
+
 
     NSString* status = (NSString*)notification.userInfo[kNotificationUserInfoLongRunningOperationStatus];
 
-    NSLog(@"onModelLongRunningOpStart [%@]", status);
+
 
     [self showProgressModal:status];
 }
@@ -4146,7 +4166,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return;
     }
 
-    NSLog(@"onFullModelReloadNotification notification.object = [%@]", notification.object);
+
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self fullModelReload];
@@ -4239,7 +4259,10 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             NSString* loc = NSLocalizedString(@"mac_menu_item_delete_item", @"Delete Item");
             [mi setTitle:loc];
         }
-        return item != nil;
+        
+
+        
+        return item != nil && self.view.window.firstResponder == self.outlineView; 
     }
     else if(theAction == @selector(onCreateGroup:) ||
             theAction == @selector(onCreateRecord:)) {
@@ -4283,11 +4306,11 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     else if (theAction == @selector(onCopyNotes:)) {
         return item && !item.isGroup && self.textViewNotes.textStorage.string.length;
     }
-    else if (theAction == @selector(onDatabaseProperties:)) {
+    else if (theAction == @selector(onConvenienceUnlockProperties:)) {
         return self.viewModel && !self.viewModel.locked;
     }
-    else if (theAction == @selector(onAutoFillSettings:)) {
-        return self.viewModel && !self.viewModel.locked && AutoFillManager.sharedInstance.isPossible;
+    else if (theAction == @selector(onGeneralDatabaseSettings:)) {
+        return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.viewModel.locked;

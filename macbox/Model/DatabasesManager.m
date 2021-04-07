@@ -160,9 +160,15 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
         return safe;
     }
     
-    NSError* error;
-    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:url readOnly:NO error:&error];
+    NSURL* effectiveFileUrl = url;
+    if ( [url.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
+        NSURLComponents* components =  [NSURLComponents componentsWithURL:url resolvingAgainstBaseURL:NO];
+        components.scheme = kStrongboxFileUrlScheme;
+        effectiveFileUrl = components.URL;
+    }
     
+    NSError* error;
+    NSString * fileIdentifier = [BookmarksHelper getBookmarkFromUrl:effectiveFileUrl readOnly:NO error:&error];
     if(!fileIdentifier) {
         NSLog(@"Could not get Bookmark for this database will continue without... [%@]", error);
     }

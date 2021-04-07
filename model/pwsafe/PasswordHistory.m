@@ -182,4 +182,14 @@
     return strtoul(c, NULL, 16);
 }
 
+- (instancetype)clone {
+    PasswordHistory* ret = [[PasswordHistory alloc] init];
+    
+    ret.enabled = self.enabled;
+    ret.maximumSize = self.maximumSize;
+    ret.entries = self.entries.mutableCopy;
+    
+    return ret;
+}
+
 @end

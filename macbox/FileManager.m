@@ -114,17 +114,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     return ret;
 }
 
-- (void)deleteAllTmpAttachmentPreviewFiles {
-    NSString* tmpPath = [self tmpAttachmentPreviewPath];
-    
-    NSArray* tmpDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpPath error:NULL];
-    
-    for (NSString *file in tmpDirectoryContents) {
-        NSString* path = [NSString pathWithComponents:@[tmpPath, file]];
-        [[NSFileManager defaultManager] removeItemAtPath:path error:NULL];
-    }
-}
-
 - (NSURL *)syncManagerMergeWorkingDirectory {
     NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
     NSURL* ret = [url URLByAppendingPathComponent:@"sync-manager/merge-working"];
@@ -132,6 +121,47 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [self createIfNecessary:ret];
     
     return ret;
+}
+
+- (NSURL *)backupFilesDirectory {
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
+    NSURL* ret = [url URLByAppendingPathComponent:@"backups"];
+    
+    [self createIfNecessary:ret];
+    
+    return ret;
+}
+
+- (void)deleteAllTmpAttachmentPreviewFiles {
+    NSString* tmpPath = [self tmpAttachmentPreviewPath];
+    [self deleteAllFoo:tmpPath];
+}
+
+- (void)deleteAllTmpWorkingFiles { 
+    [self deleteAllTmpEncryptedAttachmentWorkingFiles];
+    [self deleteAllTmpSyncMergeWorkingFiles];
+}
+
+- (void)deleteAllTmpEncryptedAttachmentWorkingFiles { 
+    NSString* tmpPath = [self tmpEncryptedAttachmentPath];
+    [self deleteAllFoo:tmpPath];
+}
+
+- (void)deleteAllTmpSyncMergeWorkingFiles {
+    NSString* tmpPath = self.syncManagerMergeWorkingDirectory.path;
+    [self deleteAllFoo:tmpPath];
+}
+
+- (void)deleteAllFoo:(NSString*)tmpPath {
+    NSArray* tmpDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpPath error:NULL];
+    
+    for (NSString *file in tmpDirectoryContents) {
+        NSString* path = [NSString pathWithComponents:@[tmpPath, file]];
+        
+        NSError* error;
+        [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
+        NSLog(@"Deleted: [%@]-[%@]", path, error);
+    }
 }
 
 @end

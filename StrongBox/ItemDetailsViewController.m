@@ -43,6 +43,7 @@
 #import "NSData+Extensions.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+#import "AsyncUpdateResultViewController.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -86,7 +87,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 
 
-@interface ItemDetailsViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate>
+@interface ItemDetailsViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate, UIPopoverPresentationControllerDelegate> 
 
 @property EntryViewModel* model;
 @property EntryViewModel* preEditModelClone;
@@ -108,15 +109,23 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 #endif
 
 @property BOOL hideMetadataSection;
+@property UIBarButtonItem* syncBarButton;
+@property UIButton* syncButton;
 
 @end
 
 
 
-@implementation ItemDetailsViewController
+@implementation ItemDetailsViewController 
 
 + (NSArray<NSNumber*>*)defaultCollapsedSections {
    return @[@(0), @(0), @(0), @(0), @(1), @(1)];
+}
+
+- (void)dealloc {
+    NSLog(@"ItemDetailsViewController::DEALLOC [%@]", self);
+    
+    [self unListenToNotifications];
 }
 
 - (void)onCellHeightChangedNotification {
@@ -152,10 +161,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         self.navigationController.navigationBar.prefersLargeTitles = NO;
     }
 
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(onCellHeightChangedNotification)
-                                                 name:CellHeightsChangedNotification
-                                               object:nil];
+    [self listenToNotifications];
 
     [self.tableView reloadData];
 
@@ -164,11 +170,14 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [self.tableView endUpdates];
 
     [UIView setAnimationsEnabled:YES];
+    
+    [self updateSyncBarButtonItemState];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    [NSNotificationCenter.defaultCenter removeObserver:self name:CellHeightsChangedNotification object:nil];
+    
+    [self unListenToNotifications];
 }
 
 - (void)awakeFromNib {
@@ -195,11 +204,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     self.isAutoFillContext = YES;
 #endif
 
-    NSMutableArray* rightBarButtons = self.navigationItem.rightBarButtonItems ?  self.navigationItem.rightBarButtonItems.mutableCopy : @[].mutableCopy;
+    [self customizeRightBarButtons];
     
-    [rightBarButtons insertObject:self.editButtonItem atIndex:0];
-    
-    self.navigationItem.rightBarButtonItems = rightBarButtons;
     self.cancelOrDiscardBarButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(onCancel:)];
     
     [self setupTableview];
@@ -213,10 +219,21 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         [self setEditing:YES animated:YES];
     }
     
+    [self updateSyncBarButtonItemState];
+    
     [self listenToNotifications];
 }
 
 - (void)listenToNotifications {
+    [self unListenToNotifications];
+    
+    NSLog(@"ItemDetailsViewController: listenToNotifications");
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onCellHeightChangedNotification)
+                                                 name:CellHeightsChangedNotification
+                                               object:nil];
+    
     [NSNotificationCenter.defaultCenter addObserver:self
                                            selector:@selector(onDatabaseViewPreferencesChanged:)
                                                name:kDatabaseViewPreferencesChangedNotificationKey
@@ -231,10 +248,150 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                                            selector:@selector(onAuditChanged:)
                                                name:kAuditCompletedNotificationKey
                                              object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onAsyncUpdateStart:)
+                                               name:kAsyncUpdateStarting
+                                             object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onAsyncUpdateDone:)
+                                               name:kAsyncUpdateDone
+                                             object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onDatabaseReloaded:)
+                                               name:kDatabaseReloadedNotificationKey
+                                             object:nil];
+}
+
+- (void)unListenToNotifications {
+    NSLog(@"ItemDetailsViewController: unListenToNotifications");
+
+    [NSNotificationCenter.defaultCenter removeObserver:self name:CellHeightsChangedNotification object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseViewPreferencesChangedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditNodesChangedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditCompletedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kAsyncUpdateDone object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseReloadedNotificationKey object:nil];
+}
+
+- (void)onSyncButtonClicked:(id)sender {
+    if ( self.databaseModel.isRunningAsyncUpdate ) {
+        return;
+    }
+    
+    if ( !self.databaseModel.lastAsyncUpdateResult ) {
+        [self updateSyncBarButtonItemState];
+        return;
+    }
+    
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"AsyncUpdateResultViewer" bundle:nil];
+    AsyncUpdateResultViewController* vc = (AsyncUpdateResultViewController*)[storyboard instantiateInitialViewController];
+    vc.modalPresentationStyle = UIModalPresentationPopover;
+    vc.presentationController.delegate = self;
+    vc.popoverPresentationController.barButtonItem = self.syncBarButton;
+    vc.result = self.databaseModel.lastAsyncUpdateResult;
+    
+    __weak ItemDetailsViewController* weakSelf = self;
+    vc.onRetryClicked = ^{
+        [weakSelf onRetryUpdateSynchronouslyClicked];
+    };
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (UIModalPresentationStyle)adaptivePresentationStyleForPresentationController:(UIPresentationController *)controller traitCollection:(UITraitCollection *)traitCollection {
+    
+    
+    return UIModalPresentationNone;
+}
+
+- (void)customizeRightBarButtons {
+    self.syncButton = [[UIButton alloc] init];
+    [self.syncButton addTarget:self action:@selector(onSyncButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.syncButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
+    self.syncButton.contentMode = UIViewContentModeCenter;
+    self.syncButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.syncButton setTintColor:UIColor.systemBlueColor];
+    self.syncButton.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
+    
+    self.syncBarButton = [[UIBarButtonItem alloc] initWithCustomView:self.syncButton];
+    
+    NSMutableArray* rightBarButtons = @[].mutableCopy;
+    
+    if ( self.navigationItem.rightBarButtonItems ) {
+        rightBarButtons = self.navigationItem.rightBarButtonItems.mutableCopy;
+    }
+    else if ( self.navigationItem.rightBarButtonItem ) {
+        rightBarButtons = @[self.navigationItem.rightBarButtonItem].mutableCopy;
+    }
+
+    [rightBarButtons insertObject:self.editButtonItem atIndex:0];
+    [rightBarButtons addObject:self.syncBarButton];
+    
+    self.navigationItem.rightBarButtonItems = rightBarButtons;
+}
+
+- (void)runSpinAnimationOnView:(UIView*)view spin:(BOOL)spin {
+
+
+    [view.layer removeAllAnimations];
+    
+    if ( spin ) {
+        CABasicAnimation* rotationAnimation;
+        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0];
+        rotationAnimation.duration = 1.25f;
+        rotationAnimation.cumulative = YES;
+        rotationAnimation.repeatCount = HUGE_VALF;
+        [rotationAnimation setRemovedOnCompletion:NO]; 
+        
+        [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    }
+}
+
+- (void)updateSyncBarButtonItemState {
+    [self runSpinAnimationOnView:self.syncButton spin:NO];
+    [self.syncButton setTintColor:UIColor.clearColor];
+    self.syncButton.enabled = NO;
+
+    if ( self.databaseModel.isRunningAsyncUpdate ) {
+        [self runSpinAnimationOnView:self.syncButton spin:YES];
+        [self.syncButton setTintColor:UIColor.systemBlueColor];
+        self.syncButton.enabled = YES;
+    }
+    else if ( self.databaseModel.lastAsyncUpdateResult ) {
+        if ( !self.databaseModel.lastAsyncUpdateResult.success ) {
+            if ( self.databaseModel.lastAsyncUpdateResult.error ) {
+                [self runSpinAnimationOnView:self.syncButton spin:NO];
+                [self.syncButton setTintColor:UIColor.systemRedColor];
+                self.syncButton.enabled = YES;
+            }
+            else {
+                [self runSpinAnimationOnView:self.syncButton spin:NO];
+                [self.syncButton setTintColor:UIColor.systemOrangeColor];
+                self.syncButton.enabled = YES;
+            }
+        }
+    }
+}
+
+- (void)onRetryUpdateSynchronouslyClicked {
+    [self updateAndSync:NO];
 }
 
 - (void)onAuditChanged:(id)param {
-    [self performFullReload];
+    if ( !self.isEditing ) {
+        [self performFullReload];
+    }
+}
+
+- (void)onDatabaseReloaded:(id)param {
+    if ( !self.isEditing ) {
+        [self performFullReload];
+    }
 }
 
 - (void)onDatabaseViewPreferencesChanged:(id)param {
@@ -326,7 +483,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (void)bindNavBar {
-    if(self.isEditing) {
+    if( self.isEditing ) {
         self.navigationItem.leftItemsSupplementBackButton = NO;
         BOOL isDifferent = [self.model isDifferentFrom:self.preEditModelClone];
         BOOL saveable = [self.model isValid] && (isDifferent || self.createNewItem);
@@ -386,16 +543,16 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         [self.tableView performBatchUpdates:^{
             [self prepareTableViewForEditing];
         } completion:^(BOOL finished) {
-            if(self.isEditing) {
+            if ( self.isEditing ) {
                 self.preEditModelClone = [self.model clone];
                 UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]];
                 [cell becomeFirstResponder];
             }
             else {
-                if(self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone]) {
+                if( self.createNewItem || [self.model isDifferentFrom:self.preEditModelClone] ) {
                     self.urlJustChanged = [self.model.url compare:self.preEditModelClone.url] != NSOrderedSame;
                     self.preEditModelClone = nil;
-                    [self saveChanges];
+                    [self onDone];
                     return; 
                 }
                 else {
@@ -788,8 +945,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         
         vc.model = item.fields.passwordHistory;
         vc.readOnly = self.readOnly;
-        vc.saveFunction = ^(PasswordHistory *changed, void (^onDone)(BOOL userCancelled, NSError *error)) {
-            [self onPasswordHistoryChanged:changed onDone:onDone];
+        vc.saveFunction = ^(PasswordHistory *changed) {
+            [self onPasswordHistoryChanged:changed];
         };
     }
     else if ([segue.identifier isEqualToString:@"toKeePassHistory"] && (self.itemId != nil)) {
@@ -874,102 +1031,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }
 }
 
-- (void)performFullReload {
-    self.model = [self refreshViewModel]; 
-    [self.tableView reloadData];
-    [self bindNavBar];
-}
-
-
-
-- (void)onDeleteHistoryItem:(Node*)historicalNode {
-    Node* item = [self.databaseModel.database getItemById:self.itemId];
-    
-    [item touch:YES touchParents:NO];
-    [item.fields.keePassHistory removeObject:historicalNode];
-    
-    [self performFullReload];
-
-    
-    
-    [self.databaseModel update:self
-                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        
-        if(userCancelled || localWasChanged) {
-            [self dismissViewControllerAnimated:YES completion:nil]; 
-        }
-        else if (error != nil) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
-                    error:error completion:^{
-                [self dismissViewControllerAnimated:YES completion:nil]; 
-            }];
-            NSLog(@"%@", error);
-        }
-    }];
-}
-
-- (void)onRestoreFromHistoryNode:(Node*)historicalNode {
-    Node* item = [self.databaseModel.database getItemById:self.itemId];
-    
-    Node* clonedOriginalNodeForHistory = [item cloneForHistory];
-    
-    [self addHistoricalNode:item originalNodeForHistory:clonedOriginalNodeForHistory];
-    
-    
-    
-    [item touch:YES touchParents:NO];
-    
-    [item restoreFromHistoricalNode:historicalNode];
-    
-    [self performFullReload];
-    
-    
-    
-    [self.databaseModel update:self
-                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        
-        if(userCancelled || localWasChanged) {
-            [self dismissViewControllerAnimated:YES completion:nil];  
-        }
-        else if (error != nil) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
-                    error:error
-               completion:^{
-                [self dismissViewControllerAnimated:YES completion:nil]; 
-            }];
-            NSLog(@"%@", error);
-        }
-        else {
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
-            });
-        }
-    }];
-}
-
-- (void)onPasswordHistoryChanged:(PasswordHistory*)changed onDone:(void (^)(BOOL userCancelled, NSError *error))onDone {
-    Node* item = [self.databaseModel.database getItemById:self.itemId];
-    
-    item.fields.passwordHistory = changed;
-    [item touch:YES touchParents:NO];
-    
-    [self performFullReload];
-    
-    [self.databaseModel update:self
-                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        
-        dispatch_async(dispatch_get_main_queue(), ^(void) {
-            onDone(userCancelled, error);
-            if (!userCancelled && !error) {
-                dispatch_async(dispatch_get_main_queue(), ^(void) {
-                    [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
-                });
-            }
-        });
-    }];
-}
 
 - (UIImage*)getIconImageFromModel {
     if(self.databaseModel.database.originalFormat == kPasswordSafe) {
@@ -988,7 +1049,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
     
     [self.sni changeIcon:self
-                    node:self.itemId ? [self.databaseModel.database getItemById:self.itemId] : [self createNewRecord] 
+                    node:self.itemId ? [self.databaseModel.database getItemById:self.itemId] : [self createNewEntryNode] 
              urlOverride:urlHint
                   format:self.databaseModel.database.originalFormat
           keePassIconSet:self.databaseModel.metadata.keePassIconSet
@@ -1159,7 +1220,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     return metadata;
 }
 
-- (Node*)createNewRecord {
+- (Node*)createNewEntryNode {
     AutoFillNewRecordSettings* settings = AppPreferences.sharedInstance.autoFillNewRecordSettings;
 
     NSString *title = settings.titleAutoFillMode == kDefault ?
@@ -1205,69 +1266,16 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     return [[Node alloc] initAsRecord:title parent:parentGroup fields:fields uuid:nil];
 }
 
-- (EntryViewModel*)refreshViewModel {
-    DatabaseFormat format = self.databaseModel.database.originalFormat;
-    
-    
-
-    Node* item;
-    
-    if ( self.createNewItem ) { 
-        item = [self createNewRecord];
-    }
-    else {
-        item = [self.databaseModel.database getItemById:self.itemId];
-        if ( self.historicalIndex != nil) {
-            int index = self.historicalIndex.intValue;
-            if ( index >= 0 && index < item.fields.keePassHistory.count ) { 
-                item = item.fields.keePassHistory[index];
-                self.readOnly = YES;
-            }
-        }
-    }
-    
-    NSArray<ItemMetadataEntry*>* metadata = [self getMetadataFromItem:item format:format];
-    
-    
-    
-    BOOL keePassHistoryAvailable = item.fields.keePassHistory.count > 0 && (format == kKeePass || format == kKeePass4);
-    BOOL historyAvailable = format == kPasswordSafe || keePassHistoryAvailable;
-   
-    
-    
-    NSArray<CustomFieldViewModel*>* customFieldModels = [item.fields.customFields map:^id(NSString *key, StringValue* value) {
-        return [CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected];
-    }];
-    
-    
-        
-    EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
-                                                       username:item.fields.username
-                                                       password:item.fields.password
-                                                            url:item.fields.url
-                                                          notes:item.fields.notes
-                                                          email:item.fields.email
-                                                        expires:item.fields.expires
-                                                           tags:item.fields.tags
-                                                           totp:item.fields.otpToken
-                                                           icon:item.icon
-                                                   customFields:customFieldModels
-                                                    attachments:item.fields.attachments
-                                                       metadata:metadata
-                                                     hasHistory:historyAvailable];
-    
-    return ret;
-}
-
-- (Node*)nodeItemFromModel {
+- (void)applyModelChangesToDatabaseNode:(void (^)(Node* item))completion {
     Node* ret;
 
     if ( self.createNewItem ) {
-        ret = [self createNewRecord];
+        ret = [self createNewEntryNode];
         Node* parentGroup = [self.databaseModel.database getItemById:self.parentGroupId];
         Node* added = [self.databaseModel addItem:parentGroup item:ret];
         if ( !added ) {
-            return nil;
+            completion(nil);
+            return;
         }
     }
     else { 
@@ -1277,7 +1285,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }
 
     if (! [ret setTitle:self.model.title keePassGroupTitleRules:NO] ) {
-        return nil;
+        completion(nil);
+        return;
     }
     
     [ret touch:YES touchParents:NO];
@@ -1318,104 +1327,12 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [ret.fields.tags removeAllObjects];
     [ret.fields.tags addObjectsFromArray:self.model.tags];
     
-    return ret;
-}
-
-- (void)saveChanges {
-    Node* item = [self nodeItemFromModel];
     
-    if ( !item ) {
-        [Alerts info:self
-               title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
-             message:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")];
-        return;
-    }
     
-    [self disableUi];
     
-    [self processIconBeforeSave:item completion:^{ 
-#ifdef IS_APP_EXTENSION
-        AppPreferences.sharedInstance.autoFillWroteCleanly = NO;
-#endif
-
-        
-        [self.databaseModel update:self
-                           handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-            #ifdef IS_APP_EXTENSION
-            AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
-            #endif
-
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [self onSaveChangesDone:item userCancelled:userCancelled localWasChanged:localWasChanged error:error];
-            });
-        }];
+    [self processIconBeforeSave:ret completion:^{
+        completion(ret);
     }];
-}
-
-- (void)disableUi {
-    self.editButtonItem.enabled = NO; 
-    self.cancelOrDiscardBarButton.enabled = NO;
-    [self.tableView setUserInteractionEnabled:NO];
-    
-    CGRect screenRect = self.tableView.bounds; 
-    self.coverView = [[UIView alloc] initWithFrame:screenRect];
-    self.coverView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4];
-    [self.view addSubview:self.coverView];
-}
-
-- (void)enableUi {
-    self.editButtonItem.enabled = YES;
-    [self.tableView setUserInteractionEnabled:YES];
-    self.cancelOrDiscardBarButton.enabled = YES;
-    [self.coverView removeFromSuperview];
-}
-
-- (void)onSaveChangesDone:(Node*)item userCancelled:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*)error {
-    if(error || userCancelled || localWasChanged) {  
-        if (error != nil) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
-                    error:error
-               completion:^{
-                [self dismissViewControllerAnimated:YES completion:nil]; 
-            }];
-        }
-        else {
-            [self dismissViewControllerAnimated:YES completion:nil]; 
-        }
-        return;
-
-        
-        
-        
-
-        
-    }
-    else {
-        self.createNewItem = NO;
-        self.itemId = item.uuid;
-        self.model = [self refreshViewModel];
-    }
-    
-    [self enableUi];
-    
-    if (@available(iOS 11.0, *)) { 
-        [self.tableView performBatchUpdates:^{
-            [self prepareTableViewForEditing];
-        } completion:^(BOOL finished) {
-            [self bindNavBar];
-            
-            dispatch_async(dispatch_get_main_queue(), ^(void) {
-                [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
-            });
-            
-#ifdef IS_APP_EXTENSION
-            if (self.onAutoFillNewItemAdded) {
-                self.onAutoFillNewItemAdded(item.fields.username, item.fields.password);
-            }
-#endif
-        }];
-    }
 }
 
 - (void)processIconBeforeSave:(Node*)item completion:(void (^)(void))completion {
@@ -1482,6 +1399,24 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 #endif
+
+- (void)disableUi {
+    self.editButtonItem.enabled = NO; 
+    self.cancelOrDiscardBarButton.enabled = NO;
+    [self.tableView setUserInteractionEnabled:NO];
+    
+    CGRect screenRect = self.tableView.bounds; 
+    self.coverView = [[UIView alloc] initWithFrame:screenRect];
+    self.coverView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.4];
+    [self.view addSubview:self.coverView];
+}
+
+- (void)enableUi {
+    self.editButtonItem.enabled = YES;
+    [self.tableView setUserInteractionEnabled:YES];
+    self.cancelOrDiscardBarButton.enabled = YES;
+    [self.coverView removeFromSuperview];
+}
 
 - (void)addHistoricalNode:(Node*)item originalNodeForHistory:(Node*)originalNodeForHistory {
     BOOL shouldAddHistory = YES; 
@@ -2114,27 +2049,261 @@ suggestionProvider:^NSString*(NSString *text) {
 
 
 
+- (EntryViewModel*)refreshViewModel {
+    DatabaseFormat format = self.databaseModel.database.originalFormat;
+    
+    
 
+    Node* item;
+    
+    if ( self.createNewItem ) { 
+        item = [self createNewEntryNode];
+    }
+    else {
+        item = [self.databaseModel.database getItemById:self.itemId];
+        if ( self.historicalIndex != nil) {
+            int index = self.historicalIndex.intValue;
+            if ( index >= 0 && index < item.fields.keePassHistory.count ) {
+                item = item.fields.keePassHistory[index];
+                self.readOnly = YES;
+            }
+        }
+    }
+    
+    NSArray<ItemMetadataEntry*>* metadata = [self getMetadataFromItem:item format:format];
+    
+    
+    
+    BOOL keePassHistoryAvailable = item.fields.keePassHistory.count > 0 && (format == kKeePass || format == kKeePass4);
+    BOOL historyAvailable = format == kPasswordSafe || keePassHistoryAvailable;
+   
+    
+    
+    NSArray<CustomFieldViewModel*>* customFieldModels = [item.fields.customFields map:^id(NSString *key, StringValue* value) {
+        return [CustomFieldViewModel customFieldWithKey:key value:value.value protected:value.protected];
+    }];
+    
+    
+        
+    EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
+                                                       username:item.fields.username
+                                                       password:item.fields.password
+                                                            url:item.fields.url
+                                                          notes:item.fields.notes
+                                                          email:item.fields.email
+                                                        expires:item.fields.expires
+                                                           tags:item.fields.tags
+                                                           totp:item.fields.otpToken
+                                                           icon:item.icon
+                                                   customFields:customFieldModels
+                                                    attachments:item.fields.attachments
+                                                       metadata:metadata
+                                                     hasHistory:historyAvailable];
+    
+    return ret;
+}
 
+- (void)performFullReload {
+    self.model = [self refreshViewModel]; 
+    [self.tableView reloadData];
+    [self bindNavBar];
+    [self updateSyncBarButtonItemState];
+}
 
+- (void)refreshPublishAndSyncAfterModelEdit {
+    dispatch_async(dispatch_get_main_queue(), ^(void) {
+        [self performFullReload];
 
+        [NSNotificationCenter.defaultCenter postNotificationName:kNotificationNameItemDetailsEditDone object:self.itemId];
+        
+        [self updateAndSync];
+    });
+}
 
+- (void)onDeleteHistoryItem:(Node*)historicalNode {
+    Node* item = [self.databaseModel.database getItemById:self.itemId];
+    
+    [item touch:YES touchParents:NO];
+    [item.fields.keePassHistory removeObject:historicalNode];
+    
+    [self refreshPublishAndSyncAfterModelEdit];
+}
 
+- (void)onRestoreFromHistoryNode:(Node*)historicalNode {
+    Node* item = [self.databaseModel.database getItemById:self.itemId];
+    
+    Node* clonedOriginalNodeForHistory = [item cloneForHistory];
 
+    [self addHistoricalNode:item originalNodeForHistory:clonedOriginalNodeForHistory];
+    
+    [item touch:YES touchParents:NO];
+    
+    [item restoreFromHistoricalNode:historicalNode];
+    
+    [self refreshPublishAndSyncAfterModelEdit];
+}
 
+- (void)onPasswordHistoryChanged:(PasswordHistory*)changed {
+    Node* item = [self.databaseModel.database getItemById:self.itemId];
+    
+    item.fields.passwordHistory = changed;
+    [item touch:YES touchParents:NO];
+        
+    [self refreshPublishAndSyncAfterModelEdit];
+}
 
+- (void)onDone {
+    [self disableUi];
 
+    [self applyModelChangesToDatabaseNode:^(Node *item) { 
+        [self enableUi];
 
+        if ( !item ) {
+            [Alerts info:self
+                   title:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")
+                 message:NSLocalizedString(@"item_details_problem_saving", @"Problem Saving")];
+        }
+        else {
+            self.createNewItem = NO;
+            self.itemId = item.uuid;
+            self.model = [self refreshViewModel];
+            
+            if (@available(iOS 11.0, *)) {
+                [self.tableView performBatchUpdates:^{
+                    [self prepareTableViewForEditing];
+                } completion:^(BOOL finished) {
+                    [self bindNavBar];
+            
+                    [self refreshPublishAndSyncAfterModelEdit];
+                }];
+            }
+        }
+    }];
+}
 
+- (void)updateAndSync {
+    [self updateAndSync:!self.isAutoFillContext]; 
+}
 
+- (void)performSynchronousUpdate {
+    [self updateAndSync:NO];
+}
 
+- (void)updateAndSync:(BOOL)allowAsync {
+    [self updateAndSync:allowAsync synchronousCompletion:nil];
+}
 
+- (void)updateAndSync:(BOOL)allowAsync synchronousCompletion:(void (^)(BOOL synchronousUpdateCompleted))synchronousCompletion {
+    if ( AppPreferences.sharedInstance.useBackgroundUpdates && allowAsync) {
+        [self.databaseModel asyncUpdateAndSync];
 
+        [self updateSyncBarButtonItemState]; 
+    }
+    else {
+        [self.databaseModel clearAsyncUpdateState];
+        
+        [self updateSyncBarButtonItemState];
 
+        [self disableUi];
 
+#ifdef IS_APP_EXTENSION
+        AppPreferences.sharedInstance.autoFillWroteCleanly = NO;
+#endif
 
+        [self.databaseModel update:self.navigationController.visibleViewController
+                           handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+#ifdef IS_APP_EXTENSION
+            AppPreferences.sharedInstance.autoFillWroteCleanly = YES;
+#endif
 
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self enableUi];
+                [self onSynchronousUpdateDone:userCancelled localWasChanged:localWasChanged error:error synchronousCompletion:synchronousCompletion];
+            });
+        }];
+    }
+}
 
+- (void)onAsyncUpdateStart:(id)object { 
+    [self updateSyncBarButtonItemState];
+}
 
+- (void)onAsyncUpdateDone:(id)object { 
+    [self updateSyncBarButtonItemState];
+}
+
+- (void)onSynchronousUpdateDone:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*)error synchronousCompletion:(void (^)(BOOL synchronousUpdateCompleted))synchronousCompletion {
+    BOOL success = !userCancelled && !error;
+    
+    [self onUpdateDoneCommonCompletion:success localWasChanged:localWasChanged userCancelled:userCancelled userInteractionRequired:NO error:error];
+    
+    if ( synchronousCompletion ) {
+        synchronousCompletion( success );
+    }
+}
+
+- (void)onUpdateDoneCommonCompletion:(BOOL)success localWasChanged:(BOOL)localWasChanged userCancelled:(BOOL)userCancelled userInteractionRequired:(BOOL)userInteractionRequired error:(NSError*)error {
+    NSLog(@"ItemDetailsViewController::onUpdateDoneCommonCompletion ENTER");
+
+    if ( success ) {
+        if ( localWasChanged ) {
+            NSLog(@"ItemDetailsViewController::onAsyncUpdateDone - Database was changed by external actor... reloading");
+            [self.databaseModel reloadDatabaseFromLocalWorkingCopy:self completion:nil];
+        }
+                
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateSyncBarButtonItemState];
+        });
+        
+        
+#ifdef IS_APP_EXTENSION
+        if (self.onAutoFillNewItemAdded) {
+            self.onAutoFillNewItemAdded(self.model.username, self.model.password);
+        }
+#endif
+    }
+    else {
+        if ( userInteractionRequired ) { 
+            NSLog(@"ItemDetailsViewController::onAsyncUpdateDone - User Interaction is Required");
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts yesNo:self.navigationController.visibleViewController 
+                        title:NSLocalizedString(@"sync_status_user_interaction_required_prompt_title", @"Assistance Required")
+                      message:NSLocalizedString(@"sync_status_user_interaction_required_prompt_yes_or_no", @"There was a problem updating your database and your assistance is required to resolve. Would you like to resolve this problem now?")
+                       action:^(BOOL response) {
+                    if ( response ) {
+                        [self updateAndSync:NO];
+                    }
+                }];
+            });
+        }
+        else if ( error || userCancelled ) {
+            
+            
+            
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts error:self.navigationController.visibleViewController
+                        title:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
+                        error:error
+                   completion:^{
+                    [Alerts twoOptions:self.navigationController.visibleViewController
+                                 title:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
+                               message:NSLocalizedString(@"sync_status_error_updating_try_again_prompt", @"There was an error updating your database. Would you like to try updating again, or would you prefer to revert to the latest successful update?")
+                     defaultButtonText:NSLocalizedString(@"sync_status_error_updating_try_again_action", @"Try Again")
+                      secondButtonText:NSLocalizedString(@"sync_status_error_updating_revert_action", @"Revert to Latest")
+                                action:^(BOOL response) {
+                        if ( response ) {
+                            [self updateAndSync:NO];
+                        }
+                        else {
+                            [self.databaseModel reloadDatabaseFromLocalWorkingCopy:self completion:nil];
+                        }
+                    }];
+                }];
+            });
+        }
+    }
+}
 
 @end

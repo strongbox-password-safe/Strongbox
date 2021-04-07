@@ -9,7 +9,7 @@
 #import "PasswordHistoryViewController.h"
 #import "PreviousPasswordsTableViewController.h"
 #import "Alerts.h"
-#import "Settings.h"
+//#import "Settings.h"
 
 @interface PasswordHistoryViewController()
 
@@ -70,21 +70,7 @@
 }
 
 - (void)save {
-    self.saveFunction(self.model, ^(BOOL userCancelled, NSError *error) {
-        if (userCancelled) {
-            [self dismissViewControllerAnimated:YES completion:nil];
-        }
-        else if (error) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"pw_history_vc_error_problem_saving", @"Problem Saving Database")
-                    error:error];
-            
-            [self dismissViewControllerAnimated:YES completion:nil];
-        }
-        else {
-            [self bindToModel];
-        }
-    });
+    self.saveFunction(self.model);
 }
 
 - (void)bindToModel {    

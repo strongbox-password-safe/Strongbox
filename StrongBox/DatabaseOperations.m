@@ -9,7 +9,7 @@
 #import "DatabaseOperations.h"
 #import "IOsUtils.h"
 #import "Alerts.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "ISMessages.h"
 #import "Utils.h"
 #import "KeyFileParser.h"
@@ -108,10 +108,10 @@
         scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(success) {
-                        [self setCredentials:creds.password
-                             keyFileBookmark:creds.keyFileBookmark
-                          oneTimeKeyFileData:creds.oneTimeKeyFileData
-                                  yubiConfig:creds.yubiKeyConfig];
+                    [self setCredentials:creds.password
+                         keyFileBookmark:creds.keyFileBookmark
+                      oneTimeKeyFileData:creds.oneTimeKeyFileData
+                              yubiConfig:creds.yubiKeyConfig];
                 }
             }];
         };
@@ -126,86 +126,7 @@
        keyFileBookmark:(NSString*)keyFileBookmark
     oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
-    
-    
-    
-    if(keyFileBookmark != nil || oneTimeKeyFileData != nil) {
-        NSError* error;
-        NSData* keyFileDigest = getKeyFileDigest(keyFileBookmark, oneTimeKeyFileData, self.viewModel.database.originalFormat, &error);
-        
-        if(keyFileDigest == nil) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"db_management_error_title_couldnt_change_credentials", @"Could not change credentials")
-                    error:error];
-            return;
-        }
-        
-        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:keyFileDigest];
-    }
-
-    
-    
-    if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
-        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:newCkf.keyFileDigest yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
-            [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
-        }];
-    }
-
-    CompositeKeyFactors *rollbackCkf = [self.viewModel.database.ckfs clone];
-    self.viewModel.database.ckfs = newCkf;
-    
-    [self.viewModel update:self
-                   handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        if (userCancelled || error || localWasChanged) {
-            
-            self.viewModel.database.ckfs = rollbackCkf;
-        
-            
-            
-            if (error) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"db_management_couldnt_change_credentials", @"Could not change credentials")
-                        error:error];
-            }
-        }
-        else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self onSuccessfulCredentialsChanged:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
-            });
-        }
-    }];
-}
-
-- (void)onSuccessfulCredentialsChanged:(NSString*)keyFileBookmark
-                    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
-                            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
-        if(!oneTimeKeyFileData) {
-            self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
-            NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
-        }
-        else {
-            
-            self.viewModel.metadata.convenienceMasterPassword = nil;
-            self.viewModel.metadata.isEnrolledForConvenience = NO;
-        }
-    }
-    
-    self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
-    self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-
-    [ISMessages showCardAlertWithTitle:self.viewModel.database.originalFormat == kPasswordSafe ?
-     NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
-     NSLocalizedString(@"db_management_credentials_changed", @"Master Credentials Changed")
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
+    self.onSetMasterCredentials(password, keyFileBookmark, oneTimeKeyFileData, yubiConfig);
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {

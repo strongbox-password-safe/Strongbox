@@ -15,7 +15,7 @@
 #import "NSArray+Extensions.h"
 #import "OfflineDetector.h"
 #import "BiometricsManager.h"
-#import "Settings.h"
+
 #import "FileManager.h"
 
 @interface AdvancedPreferencesTableViewController ()
@@ -40,6 +40,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCompleteFileProtection;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCoalesceBiometrics;
+@property (weak, nonatomic) IBOutlet UISwitch *backgroundUpdateSync;
 
 @end
 
@@ -71,18 +72,18 @@
 }
 
 - (IBAction)onBackupSettingsChanged:(id)sender {
-    Settings.sharedInstance.backupFiles = self.switchBackupFiles.on;
-    Settings.sharedInstance.backupIncludeImportedKeyFiles = self.switchBackupImportedKeyFiles.on;
+    AppPreferences.sharedInstance.backupFiles = self.switchBackupFiles.on;
+    AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = self.switchBackupImportedKeyFiles.on;
     
-    [FileManager.sharedInstance setDirectoryInclusionFromBackup:Settings.sharedInstance.backupFiles
-                                               importedKeyFiles:Settings.sharedInstance.backupIncludeImportedKeyFiles];
+    [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
+                                               importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
     
     [self bindPreferences];
 }
 
 - (IBAction)onFileProtectionChanged:(id)sender {
-    Settings.sharedInstance.fullFileProtection = self.switchCompleteFileProtection.on;
-    [FileManager.sharedInstance setFileProtection:Settings.sharedInstance.fullFileProtection];
+    AppPreferences.sharedInstance.fullFileProtection = self.switchCompleteFileProtection.on;
+    [FileManager.sharedInstance setFileProtection:AppPreferences.sharedInstance.fullFileProtection];
 
     [self bindPreferences];
 }
@@ -92,6 +93,7 @@
 
     AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame = self.switchSyncForcePull.on;
     AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts = self.switchSyncForcePush.on;
+    AppPreferences.sharedInstance.useBackgroundUpdates = self.backgroundUpdateSync.on;
     
     AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
     AppPreferences.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
@@ -99,8 +101,8 @@
     AppPreferences.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
     AppPreferences.sharedInstance.clipboardHandoff = self.switchAllowClipboardHandoff.on;
     AppPreferences.sharedInstance.colorizeUseColorBlindPalette = self.switchUseColorBlindPalette.on;
-    Settings.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
-    Settings.sharedInstance.allowThirdPartyKeyboards = self.switchAllowThirdPartyKeyboards.on;
+    AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu = self.switchHideExportOnDatabaseMenu.on;
+    AppPreferences.sharedInstance.allowThirdPartyKeyboards = self.switchAllowThirdPartyKeyboards.on;
 
     AppPreferences.sharedInstance.showMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
     
@@ -119,6 +121,7 @@
 - (void)bindPreferences {
     self.switchSyncForcePull.on = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
     self.switchSyncForcePush.on = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
+    self.backgroundUpdateSync.on = AppPreferences.sharedInstance.useBackgroundUpdates;
     
     self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;
     self.switchHideKeyFileName.on = AppPreferences.sharedInstance.hideKeyFileOnUnlock;
@@ -127,14 +130,14 @@
     self.switchAllowClipboardHandoff.on = AppPreferences.sharedInstance.clipboardHandoff;
     self.switchUseColorBlindPalette.on = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
 
-    self.switchBackupFiles.on = Settings.sharedInstance.backupFiles;
-    self.switchBackupImportedKeyFiles.on = Settings.sharedInstance.backupIncludeImportedKeyFiles;
-    self.switchHideExportOnDatabaseMenu.on = Settings.sharedInstance.hideExportFromDatabaseContextMenu;
-    self.switchAllowThirdPartyKeyboards.on = Settings.sharedInstance.allowThirdPartyKeyboards;
+    self.switchBackupFiles.on = AppPreferences.sharedInstance.backupFiles;
+    self.switchBackupImportedKeyFiles.on = AppPreferences.sharedInstance.backupIncludeImportedKeyFiles;
+    self.switchHideExportOnDatabaseMenu.on = AppPreferences.sharedInstance.hideExportFromDatabaseContextMenu;
+    self.switchAllowThirdPartyKeyboards.on = AppPreferences.sharedInstance.allowThirdPartyKeyboards;
     
     self.switchShowMetadataOnDetailsScreen.on = AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
 
-    self.switchCompleteFileProtection.on = Settings.sharedInstance.fullFileProtection;
+    self.switchCompleteFileProtection.on = AppPreferences.sharedInstance.fullFileProtection;
     self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
 }
 

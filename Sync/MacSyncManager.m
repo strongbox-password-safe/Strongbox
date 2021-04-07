@@ -10,6 +10,9 @@
 #import "WorkingCopyManager.h"
 #import "Utils.h"
 #import "DatabasesManager.h"
+#import "Settings.h"
+#import "MacUrlSchemes.h"
+#import "BackupsManager.h"
 
 @implementation MacSyncManager
 
@@ -33,11 +36,15 @@
     }
 }
 
+- (BOOL)isLegacyFileUrl:(NSURL*)url {
+    return ( url && url.scheme.length && [url.scheme isEqualToString:kStrongboxFileUrlScheme] );
+}
+
 - (void)backgroundSyncAll {
     NSLog(@"backgroundSyncOutstandingUpdates START");
     
     for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
-        if ( database.storageProvider != kLocalDevice )
+        if ( ![self isLegacyFileUrl:database.fileUrl] )
             [self backgroundSyncDatabase:database];
         }
     }
@@ -47,7 +54,7 @@
 }
 
 - (void)backgroundSyncDatabase:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion {
-    if ( database.storageProvider == kLocalDevice ) {
+    if ( [self isLegacyFileUrl:database.fileUrl] ) {
         NSLog(@"WARNWARN: Attempt to Sync a Local Device database?!");
         if (completion) {
             completion(kSyncAndMergeSuccess, NO, nil);
@@ -73,7 +80,7 @@
 }
 
 - (void)sync:(DatabaseMetadata *)database interactiveVC:(NSViewController *)interactiveVC key:(CompositeKeyFactors *)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion {
-    NSLog(@"sync ENTER - [%@]", database);
+    NSLog(@"Sync ENTER - [%@]", database.nickName);
     
     SyncParameters* params = [[SyncParameters alloc] init];
     
@@ -86,7 +93,7 @@
     [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database
                                                  parameters:params
                                                  completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"INTERACTIVE SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
+        NSLog(@"INTERACTIVE SYNC DONE: [%@] [%@] - Local Changed: [%@] - [%@]", database.nickName, syncResultToString(result), localizedYesOrNoFromBool(localWasChanged), error);
         completion(result, localWasChanged, error);
     }];
 }
@@ -96,20 +103,16 @@
     
     NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
     if (localWorkingCache) {
+        if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
+            
+            NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
+            NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
 
-        
-        
-
-
-
-
-
-
-
-
-
-
-
+            if(error) {
+                *error = [Utils createNSError:em errorCode:-1];
+            }
+            return NO;
+        }
     }
     
     NSUUID* updateId = NSUUID.UUID;
@@ -123,6 +126,22 @@
 
 - (SyncStatus*)getSyncStatus:(DatabaseMetadata *)database {
     return [SyncAndMergeSequenceManager.sharedInstance getSyncStatus:database];
+}
+
+- (void)pollForChanges:(DatabaseMetadata *)database completion:(SyncAndMergeCompletionBlock)completion {
+    NSLog(@"pollForChanges ENTER - [%@]", database.nickName);
+    
+    SyncParameters* params = [[SyncParameters alloc] init];
+    
+    params.inProgressBehaviour = kInProgressBehaviourEnqueueAnotherSync;
+    params.testForRemoteChangesOnly = YES;
+    
+    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database
+                                                 parameters:params
+                                                 completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        NSLog(@"pollForChanges DONE: [%@] [%@] - Local Changed: [%@] - [%@]", database.nickName, syncResultToString(result), localizedYesOrNoFromBool(localWasChanged), error);
+        completion(result, localWasChanged, error);
+    }];
 }
 
 @end

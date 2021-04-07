@@ -9,7 +9,7 @@
 #import "UpgradeViewController.h"
 #import "SVProgressHUD.h"
 #import "ProUpgradeIAPManager.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "Alerts.h"
 #import "BiometricsManager.h"
 #import "Model.h"

@@ -31,6 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^StorageProviderReadCompletionBlock)(StorageProviderReadResult result, NSData *_Nullable data, NSDate*_Nullable dateModified, const NSError *_Nullable error);
 typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult result, NSDate*_Nullable newRemoteModDate, const NSError *_Nullable error);
+typedef void (^StorageProviderGetModDateCompletionBlock)(NSDate*_Nullable modDate, const NSError *_Nullable error);
 
 @protocol SafeStorageProvider <NSObject>
 
@@ -76,6 +77,9 @@ typedef void (^StorageProviderUpdateCompletionBlock)(StorageProviderUpdateResult
       completion:(void (^)(IMAGE_TYPE_PTR image))completionHandler;
 
 - (METADATA_PTR _Nullable)getSafeMetaData:(NSString *)nickName providerData:(NSObject *)providerData;
+
+- (void)getModDate:(METADATA_PTR)safeMetaData
+        completion:(StorageProviderGetModDateCompletionBlock)completion;
 
 @end
 

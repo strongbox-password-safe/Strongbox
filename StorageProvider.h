@@ -12,7 +12,11 @@
 typedef NS_ENUM (NSUInteger, StorageProvider) {
     kGoogleDrive,
     kDropbox,
-    kLocalDevice, 
+#if TARGET_OS_IPHONE
+    kLocalDevice,
+#else
+    kMacFile,
+#endif
     kiCloud,
     kOneDrive,
     kFilesAppUrlBookmark,

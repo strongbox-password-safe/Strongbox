@@ -9,7 +9,7 @@
 #import "WelcomeAddDatabaseViewController.h"
 #import "WelcomeCreateDatabaseViewController.h"
 #import "SafesList.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "WelcomeUseICloudViewController.h"
 #import "AppPreferences.h"
 #import "AutoFillManager.h"

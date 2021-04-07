@@ -34,6 +34,7 @@ typedef NS_ENUM (NSUInteger, SyncInProgressBehaviour) {
 @property SyncInProgressBehaviour inProgressBehaviour; 
 @property BOOL syncPullEvenIfModifiedDateSame; 
 @property BOOL syncForcePushDoNotCheckForConflicts; 
+@property BOOL testForRemoteChangesOnly; 
 
 @end
 

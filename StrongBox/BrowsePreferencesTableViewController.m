@@ -10,7 +10,7 @@
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
 #import "SafesList.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "Model.h"
 
 @interface BrowsePreferencesTableViewController () <UIAdaptivePresentationControllerDelegate> // Detect iOS13 swipe down dismiss

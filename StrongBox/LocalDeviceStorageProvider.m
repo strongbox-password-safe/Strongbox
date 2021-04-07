@@ -10,7 +10,7 @@
 #import "IOsUtils.h"
 #import "Utils.h"
 #import "SafesList.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "DatabaseModel.h"
 #import "FileManager.h"
 #import "LocalDatabaseIdentifier.h"

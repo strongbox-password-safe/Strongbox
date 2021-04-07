@@ -39,14 +39,16 @@
         options |= NSURLBookmarkCreationMinimalBookmark; 
     #endif
 
-    [url startAccessingSecurityScopedResource]; 
+    BOOL securitySucceeded = [url startAccessingSecurityScopedResource]; 
 
     NSData *bookmark = [url bookmarkDataWithOptions:options
                      includingResourceValuesForKeys:nil
                                       relativeToURL:nil
                                               error:error];
 
-    [url stopAccessingSecurityScopedResource];
+    if ( securitySucceeded ) {
+        [url stopAccessingSecurityScopedResource];
+    }
 
     if (!bookmark) {
         NSLog(@"Error while creating bookmark for URL (%@): %@", url, *error);
@@ -120,6 +122,7 @@
             NSData* fileIdentifier = [BookmarksHelper getBookmarkDataFromUrl:bookmarkFileURL readOnly:readOnly error:error];
             
             [bookmarkFileURL stopAccessingSecurityScopedResource];
+
             
             if(!fileIdentifier) {
                 NSLog(@"Error regenerating: [%@]", *error);

@@ -29,6 +29,9 @@ NS_ASSUME_NONNULL_BEGIN
                                      notes:(NSString*_Nonnull)notes
                                      email:(NSString*_Nonnull)email NS_DESIGNATED_INITIALIZER;
 
+
+
+
 @property (nonatomic, strong, nonnull) NSString *password;
 @property (nonatomic, strong, nonnull) NSString *username;
 @property (nonatomic, strong, nonnull) NSString *email;
@@ -55,6 +58,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* backgroundColor;
 @property (nullable) NSString* overrideURL;
 @property (nullable) AutoType* autoType;
+
+
 
 + (BOOL)isTotpCustomFieldKey:(NSString*)key;
 

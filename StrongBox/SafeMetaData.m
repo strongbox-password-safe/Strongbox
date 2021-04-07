@@ -8,7 +8,7 @@
 
 #import "SafeMetaData.h"
 #import "SecretStore.h"
-#import "Settings.h"
+//#import "Settings.h"
 #import "FileManager.h"
 #import "ItemDetailsViewController.h"
 
@@ -116,6 +116,7 @@
         
         BOOL immediateOfflineOfferIfOfflineDetected = [SafeMetaData defaultImmediatelyOfferOfflineForProvider:storageProvider];
         self.offlineDetectedBehaviour = immediateOfflineOfferIfOfflineDetected ? kOfflineDetectedBehaviourAsk : kOfflineDetectedBehaviourTryConnectThenAsk;
+        self.couldNotConnectBehaviour = kCouldNotConnectBehaviourPrompt;
     }
     
     return self;
@@ -279,6 +280,12 @@
         ret.offlineDetectedBehaviour = immediateOfflineOfferIfOfflineDetected ? kOfflineDetectedBehaviourAsk : kOfflineDetectedBehaviourTryConnectThenAsk;
     }
 
+    
+    
+    if ( jsonDictionary[@"couldNotConnectBehaviour"] != nil ) {
+        ret.couldNotConnectBehaviour = ((NSNumber*)jsonDictionary[@"couldNotConnectBehaviour"]).integerValue;
+    }
+    
     return ret;
 }
 
@@ -343,6 +350,7 @@
         @"autoFillCopyTotp" : @(self.autoFillCopyTotp),
         @"forceOpenOffline" : @(self.forceOpenOffline),
         @"offlineDetectedBehaviour" : @(self.offlineDetectedBehaviour),
+        @"couldNotConnectBehaviour" : @(self.couldNotConnectBehaviour),
     }];
     
     if (self.nickName != nil) {
@@ -393,284 +401,6 @@
     }
 
     return ret;
-}
-
-
-
-
-- (void)encodeWithCoder:(NSCoder *)encoder {
-    [encoder encodeObject:self.uuid forKey:@"uuid"];
-    [encoder encodeObject:self.nickName forKey:@"nickName"];
-    [encoder encodeObject:self.fileName forKey:@"fileName"];
-    [encoder encodeObject:self.fileIdentifier forKey:@"fileIdentifier"];
-    [encoder encodeInteger:self.storageProvider forKey:@"storageProvider"];
-
-    [encoder encodeBool:self.isTouchIdEnabled forKey:@"isTouchIdEnabled"];
-    
-    [encoder encodeBool:self.isEnrolledForConvenience forKey:@"isEnrolledForTouchId"];
-
-    [encoder encodeBool:self.hasUnresolvedConflicts forKey:@"hasUnresolvedConflicts"];
-    [encoder encodeBool:self.autoFillEnabled forKey:@"autoFillCacheEnabled"];
-    [encoder encodeBool:self.readOnly forKey:@"readOnly"];
-    
-    [encoder encodeInteger:self.duressAction forKey:@"duressAction"];
-    [encoder encodeBool:self.hasBeenPromptedForConvenience forKey:@"hasBeenPromptedForConvenience"];
-    [encoder encodeInteger:self.failedPinAttempts forKey:@"failedPinAttempts"];
-
-    [encoder encodeObject:self.keyFileBookmark forKey:@"keyFileBookmark"];
-    
-    [encoder encodeInteger:self.likelyFormat forKey:@"likelyFormat"];
-    [encoder encodeInteger:self.browseViewType forKey:@"browseViewType"];
-    
-    [encoder encodeInteger:self.tapAction forKey:@"tapAction"];
-    [encoder encodeInteger:self.doubleTapAction forKey:@"doubleTapAction"];
-    [encoder encodeInteger:self.tripleTapAction forKey:@"tripleTapAction"];
-    [encoder encodeInteger:self.longPressTapAction forKey:@"longPressTapAction"];
-        
-    
-
-    [encoder encodeInteger:self.browseSortField forKey:@"browseSortField"];
-    [encoder encodeBool:self.browseSortOrderDescending forKey:@"browseSortOrderDescending"];
-    [encoder encodeBool:self.browseSortFoldersSeparately forKey:@"browseSortFoldersSeparately"];
-    [encoder encodeInteger:self.browseItemSubtitleField forKey:@"browseItemSubtitleField"];
-    [encoder encodeBool:self.immediateSearchOnBrowse forKey:@"immediateSearchOnBrowse"];
-    [encoder encodeBool:self.hideTotpInBrowse forKey:@"hideTotpInBrowse"];
-    [encoder encodeBool:self.showKeePass1BackupGroup forKey:@"showKeePass1BackupGroup"];
-    [encoder encodeBool:self.showChildCountOnFolderInBrowse forKey:@"showChildCountOnFolderInBrowse"];
-    [encoder encodeBool:self.showFlagsInBrowse forKey:@"showFlagsInBrowse"];
-    [encoder encodeBool:self.doNotShowRecycleBinInBrowse forKey:@"doNotShowRecycleBinInBrowse"];
-    [encoder encodeBool:self.showRecycleBinInSearchResults forKey:@"showRecycleBinInSearchResults"];
-    [encoder encodeBool:self.viewDereferencedFields forKey:@"viewDereferencedFields"];
-    [encoder encodeBool:self.searchDereferencedFields forKey:@"searchDereferencedFields"];
-
-    
-    
-    [encoder encodeBool:self.showEmptyFieldsInDetailsView forKey:@"showEmptyFieldsInDetailsView"];
-    [encoder encodeObject:self.detailsViewCollapsedSections forKey:@"detailsViewCollapsedSections"];    
-    [encoder encodeBool:self.easyReadFontForAll forKey:@"easyReadFontForAll"];
-    [encoder encodeBool:self.hideTotp forKey:@"hideTotp"];
-    [encoder encodeBool:self.tryDownloadFavIconForNewRecord forKey:@"tryDownloadFavIconForNewRecord"];
-    [encoder encodeBool:self.showPasswordByDefaultOnEditScreen forKey:@"showPasswordByDefaultOnEditScreen"];
-    
-    
-    
-    [encoder encodeBool:self.hasBeenPromptedForQuickLaunch forKey:@"hasBeenPromptedForQuickLaunch"];
-    
-    [encoder encodeBool:self.showExpiredInSearch forKey:@"showExpiredInSearch"];
-    [encoder encodeBool:self.showExpiredInBrowse forKey:@"showExpiredInBrowse"];
-    
-    [encoder encodeObject:self.autoLockTimeoutSeconds forKey:@"autoLockTimeoutSeconds"];
-    
-    [encoder encodeBool:self.showQuickViewNearlyExpired forKey:@"showQuickViewNearlyExpired"];
-    [encoder encodeBool:self.showQuickViewFavourites forKey:@"showQuickViewFavourites"];
-    [encoder encodeBool:self.showQuickViewExpired forKey:@"showQuickViewExpired"];
-    
-    [encoder encodeBool:self.makeBackups forKey:@"makeBackups"];
-    [encoder encodeInteger:self.maxBackupKeepCount forKey:@"maxBackupKeepCount"];
-    
-    [encoder encodeBool:self.hideTotpCustomFieldsInViewMode forKey:@"hideTotpCustomFieldsInViewMode"];
-    [encoder encodeBool:self.hideIconInBrowse forKey:@"hideIconInBrowse"];
-    [encoder encodeObject:self.yubiKeyConfig forKey:@"yubiKeyConfig"];
-    [encoder encodeBool:self.colorizePasswords forKey:@"colorizePasswords"];
-    [encoder encodeInteger:self.keePassIconSet forKey:@"keePassIconSet"];
-    [encoder encodeBool:self.colorizeProtectedCustomFields forKey:@"colorizeProtectedCustomFields"];
-
-    [encoder encodeObject:self.auditConfig forKey:@"auditConfig"];
-    
-    [encoder encodeBool:self.promptedForAutoFetchFavIcon forKey:@"promptedForAutoFetchFavIcon"];
-}
-
-- (id)initWithCoder:(NSCoder *)decoder {
-    if((self = [self init])) {
-        self.uuid = [decoder decodeObjectForKey:@"uuid"];
-        self.nickName = [decoder decodeObjectForKey:@"nickName"];
-        if(!self.nickName.length) {
-            NSLog(@"WARNWARN: No Nick Name set... auto generating.");
-            self.nickName = NSUUID.UUID.UUIDString;
-        }
-        
-        self.fileName = [decoder decodeObjectForKey:@"fileName"];
-        self.fileIdentifier = [decoder decodeObjectForKey:@"fileIdentifier"];
-        self.storageProvider = (int)[decoder decodeIntegerForKey:@"storageProvider"];
-        
-        self.isTouchIdEnabled = [decoder decodeBoolForKey:@"isTouchIdEnabled"];
-        self.isEnrolledForConvenience = [decoder decodeBoolForKey:@"isEnrolledForTouchId"];
-        
-        self.hasUnresolvedConflicts = [decoder decodeBoolForKey:@"hasUnresolvedConflicts"];
-        
-        if([decoder containsValueForKey:@"autoFillCacheEnabled"]) {
-            self.autoFillEnabled = [decoder decodeBoolForKey:@"autoFillCacheEnabled"];
-        }
-        else {
-            self.autoFillEnabled = YES;
-        }
-
-        if([decoder containsValueForKey:@"readOnly"]) {
-            self.readOnly = [decoder decodeBoolForKey:@"readOnly"];
-        }
-
-        if([decoder containsValueForKey:@"duressAction"]) {
-            self.duressAction = (int)[decoder decodeIntegerForKey:@"duressAction"];
-        }
-
-        if([decoder containsValueForKey:@"hasBeenPromptedForConvenience"]) {
-            self.hasBeenPromptedForConvenience = [decoder decodeBoolForKey:@"hasBeenPromptedForConvenience"];
-        }
-        
-        if([decoder containsValueForKey:@"failedPinAttempts"]) {
-            self.failedPinAttempts = (int)[decoder decodeIntegerForKey:@"failedPinAttempts"];
-        }
-        
-        if([decoder containsValueForKey:@"keyFileBookmark"]) {
-            self.keyFileBookmark = [decoder decodeObjectForKey:@"keyFileBookmark"];
-        }
-        
-        if([decoder containsValueForKey:@"likelyFormat"]) {
-            self.likelyFormat = (DatabaseFormat)[decoder decodeIntegerForKey:@"likelyFormat"];
-        }
-        else {
-            self.likelyFormat = kFormatUnknown;
-        }
-        
-        if([decoder containsValueForKey:@"browseViewType"]) {
-            self.browseViewType = (BrowseViewType)[decoder decodeIntegerForKey:@"browseViewType"];
-        }
-
-        if([decoder containsValueForKey:@"tapAction"]) {
-            self.tapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"tapAction"];
-        }
-        if([decoder containsValueForKey:@"doubleTapAction"]) {
-            self.doubleTapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"doubleTapAction"];
-        }
-        if([decoder containsValueForKey:@"tripleTapAction"]) {
-            self.tripleTapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"tripleTapAction"];
-        }
-        if([decoder containsValueForKey:@"longPressTapAction"]) {
-            self.longPressTapAction = (BrowseTapAction)[decoder decodeIntegerForKey:@"longPressTapAction"];
-        }
-        
-        
-        
-        if([decoder containsValueForKey:@"browseSortField"]) {
-            self.browseSortField = (BrowseSortField)[decoder decodeIntegerForKey:@"browseSortField"];
-        }
-        if([decoder containsValueForKey:@"browseSortOrderDescending"]) {
-            self.browseSortOrderDescending = [decoder decodeBoolForKey:@"browseSortOrderDescending"];
-        }
-        if([decoder containsValueForKey:@"browseSortFoldersSeparately"]) {
-            self.browseSortFoldersSeparately = [decoder decodeBoolForKey:@"browseSortFoldersSeparately"];
-        }
-        if([decoder containsValueForKey:@"browseItemSubtitleField"]) {
-            self.browseItemSubtitleField = (BrowseItemSubtitleField)[decoder decodeIntegerForKey:@"browseItemSubtitleField"];
-        }
-        if([decoder containsValueForKey:@"immediateSearchOnBrowse"]) {
-            self.immediateSearchOnBrowse = [decoder decodeBoolForKey:@"immediateSearchOnBrowse"];
-        }
-        if([decoder containsValueForKey:@"hideTotpInBrowse"]) {
-            self.hideTotpInBrowse = [decoder decodeBoolForKey:@"hideTotpInBrowse"];
-        }
-        if([decoder containsValueForKey:@"showKeePass1BackupGroup"]) {
-            self.showKeePass1BackupGroup = [decoder decodeBoolForKey:@"showKeePass1BackupGroup"];
-        }
-        if([decoder containsValueForKey:@"showChildCountOnFolderInBrowse"]) {
-            self.showChildCountOnFolderInBrowse = [decoder decodeBoolForKey:@"showChildCountOnFolderInBrowse"];
-        }
-        if([decoder containsValueForKey:@"showFlagsInBrowse"]) {
-            self.showFlagsInBrowse = [decoder decodeBoolForKey:@"showFlagsInBrowse"];
-        }
-        if([decoder containsValueForKey:@"doNotShowRecycleBinInBrowse"]) {
-            self.doNotShowRecycleBinInBrowse = [decoder decodeBoolForKey:@"doNotShowRecycleBinInBrowse"];
-        }
-        if([decoder containsValueForKey:@"showRecycleBinInSearchResults"]) {
-            self.showRecycleBinInSearchResults = [decoder decodeBoolForKey:@"showRecycleBinInSearchResults"];
-        }
-        if([decoder containsValueForKey:@"showEmptyFieldsInDetailsView"]) {
-            self.showEmptyFieldsInDetailsView = [decoder decodeBoolForKey:@"showEmptyFieldsInDetailsView"];
-        }
-        if([decoder containsValueForKey:@"detailsViewCollapsedSections"]) {
-            self.detailsViewCollapsedSections = [decoder decodeObjectForKey:@"detailsViewCollapsedSections"];
-        }
-        if([decoder containsValueForKey:@"easyReadFontForAll"]) {
-            self.easyReadFontForAll = [decoder decodeBoolForKey:@"easyReadFontForAll"];
-        }
-        if([decoder containsValueForKey:@"hideTotp"]) {
-            self.hideTotp = [decoder decodeBoolForKey:@"hideTotp"];
-        }
-        if([decoder containsValueForKey:@"tryDownloadFavIconForNewRecord"]) {
-            self.tryDownloadFavIconForNewRecord = [decoder decodeBoolForKey:@"tryDownloadFavIconForNewRecord"];
-        }
-        if([decoder containsValueForKey:@"showPasswordByDefaultOnEditScreen"]) {
-            self.showPasswordByDefaultOnEditScreen = [decoder decodeBoolForKey:@"showPasswordByDefaultOnEditScreen"];
-        }
-        
-        if([decoder containsValueForKey:@"hasBeenPromptedForQuickLaunch"]) {
-            self.hasBeenPromptedForQuickLaunch = [decoder decodeBoolForKey:@"hasBeenPromptedForQuickLaunch"];
-        }
-        
-        if([decoder containsValueForKey:@"showExpiredInSearch"]) {
-            self.showExpiredInSearch = [decoder decodeBoolForKey:@"showExpiredInSearch"];
-        }
-        if([decoder containsValueForKey:@"showExpiredInBrowse"]) {
-            self.showExpiredInBrowse = [decoder decodeBoolForKey:@"showExpiredInBrowse"];
-        }
-        
-        if([decoder containsValueForKey:@"autoLockTimeoutSeconds"]) {
-            self.autoLockTimeoutSeconds = [decoder decodeObjectForKey:@"autoLockTimeoutSeconds"];
-        }
-
-        if([decoder containsValueForKey:@"showQuickViewNearlyExpired"]) {
-            self.showQuickViewNearlyExpired = [decoder decodeBoolForKey:@"showQuickViewNearlyExpired"];
-        }
-        
-        if([decoder containsValueForKey:@"showQuickViewFavourites"]) {
-            self.showQuickViewFavourites = [decoder decodeBoolForKey:@"showQuickViewFavourites"];
-        }
-        
-        if([decoder containsValueForKey:@"showQuickViewExpired"]) {
-            self.showQuickViewExpired = [decoder decodeBoolForKey:@"showQuickViewExpired"];
-        }
-
-        if([decoder containsValueForKey:@"makeBackups"]) {
-            self.makeBackups = [decoder decodeBoolForKey:@"makeBackups"];
-        }
-        if([decoder containsValueForKey:@"maxBackupKeepCount"]) {
-            self.maxBackupKeepCount = [decoder decodeIntegerForKey:@"maxBackupKeepCount"];
-        }
-
-        if([decoder containsValueForKey:@"hideTotpCustomFieldsInViewMode"]) {
-            self.hideTotpCustomFieldsInViewMode = [decoder decodeBoolForKey:@"hideTotpCustomFieldsInViewMode"];
-        }
-        
-        if([decoder containsValueForKey:@"hideIconInBrowse"]) {
-            self.hideIconInBrowse = [decoder decodeBoolForKey:@"hideIconInBrowse"];
-        }
-        
-        if([decoder containsValueForKey:@"yubiKeyConfig"]) {
-            self.yubiKeyConfig = [decoder decodeObjectForKey:@"yubiKeyConfig"];
-        }
-        
-        if([decoder containsValueForKey:@"colorizePasswords"]) {
-            self.colorizePasswords = [decoder decodeBoolForKey:@"colorizePasswords"];
-        }
-        
-        if([decoder containsValueForKey:@"keePassIconSet"]) {
-            self.keePassIconSet = [decoder decodeIntegerForKey:@"keePassIconSet"];
-        }
-        
-        if([decoder containsValueForKey:@"colorizeProtectedCustomFields"]) {
-            self.colorizeProtectedCustomFields = [decoder decodeBoolForKey:@"colorizeProtectedCustomFields"];
-        }
-        
-        if ([decoder containsValueForKey:@"auditConfig"]) {
-            self.auditConfig = [decoder decodeObjectForKey:@"auditConfig"];
-        }
-        
-        if ([decoder containsValueForKey:@"promptedForAutoFetchFavIcon"]) {
-            self.promptedForAutoFetchFavIcon = [decoder decodeBoolForKey:@"promptedForAutoFetchFavIcon"];
-        }
-    }
-    
-    return self;
 }
 
 

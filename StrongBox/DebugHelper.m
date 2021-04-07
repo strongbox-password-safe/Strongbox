@@ -7,18 +7,34 @@
 //
 
 #import "DebugHelper.h"
-#import "SafesList.h"
-#import "Settings.h"
-#import "AppPreferences.h"
 #import "Utils.h"
-#import "git-version.h"
 #import "FileManager.h"
 #import <mach-o/arch.h>
-#import "SyncManager.h"
 #import "NSDate+Extensions.h"
 #import "NSArray+Extensions.h"
 #import "SafeStorageProviderFactory.h"
 #import "WorkingCopyManager.h"
+
+#if TARGET_OS_IPHONE
+
+#import "SafesList.h"
+#import "AppPreferences.h"
+#import "git-version.h"
+#import "SyncManager.h"
+
+#else
+
+#import <objc/message.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#import "Settings.h"
+#import "DatabasesManager.h"
+#import "MacSyncManager.h"
+#import "FileManager.h"
+
+#endif
 
 @implementation DebugHelper
 
@@ -32,6 +48,55 @@
     return [lines componentsJoinedByString:@"\n"];
 }
 
+#if !TARGET_OS_IPHONE
+
+static NSString *ModelIdentifier()
+{
+    NSString *result=@"Unknown Mac";
+    size_t len=0;
+    sysctlbyname("hw.model", NULL, &len, NULL, 0);
+    if (len) {
+        NSMutableData *data=[NSMutableData dataWithLength:len];
+        sysctlbyname("hw.model", [data mutableBytes], &len, NULL, 0);
+        result=[NSString stringWithUTF8String:[data bytes]];
+    }
+    return result;
+}
+
+
++ (NSString *)systemVersion
+{
+  static NSString *systemVersion = nil;
+
+  if (!systemVersion) {
+    typedef struct {
+      NSInteger majorVersion;
+      NSInteger minorVersion;
+      NSInteger patchVersion;
+    } MyOperatingSystemVersion;
+
+    if ([[NSProcessInfo processInfo] respondsToSelector:@selector(operatingSystemVersion)]) {
+      MyOperatingSystemVersion version = ((MyOperatingSystemVersion(*)(id, SEL))objc_msgSend_stret)([NSProcessInfo processInfo], @selector(operatingSystemVersion));
+      systemVersion = [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, version.minorVersion, version.patchVersion];
+    }
+    else {
+        systemVersion = @"<Unknown>";
+
+
+
+
+
+
+
+
+    }
+  }
+
+  return systemVersion;
+}
+
+#endif
+
 + (NSArray<NSString*>*)getDebugLines {
     NSMutableArray<NSString*>* debugLines = [NSMutableArray array];
     
@@ -39,19 +104,27 @@
     [debugLines addObject:@"--------------------"];
     
     
-    
-    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION]];
 
+#if TARGET_OS_IPHONE
+    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)@%@]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber], GIT_SHA_VERSION]];
+#else
+    [debugLines addObject:[NSString stringWithFormat:@"App Version: %@ [%@ (%@)]", [Utils getAppBundleId], [Utils getAppVersion], [Utils getAppBuildNumber]]];
+#endif
     
 
     [debugLines addObject:@"--------------------"];
     [debugLines addObject:@"Device"];
     [debugLines addObject:@"--------------------"];
 
+#if TARGET_OS_IPHONE
     NSString* model = [[UIDevice currentDevice] model];
     NSString* systemName = [[UIDevice currentDevice] systemName];
     NSString* systemVersion = [[UIDevice currentDevice] systemVersion];
-
+#else
+    NSString* model = ModelIdentifier();
+    NSString* systemName = @"MacOS";
+    NSString* systemVersion = [DebugHelper systemVersion];
+#endif
     const NXArchInfo *info = NXGetLocalArchInfo();
     NSString *typeOfCpu = info ? [NSString stringWithUTF8String:info->description] : @"Unknown";
 
@@ -66,19 +139,31 @@
     [debugLines addObject:@"Preferences"];
     [debugLines addObject:@"--------------------"];
 
+#if TARGET_OS_IPHONE
     NSUserDefaults *defs = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     NSDictionary* prefs = [defs persistentDomainForName:AppPreferences.sharedInstance.appGroupName];
+#else
+    NSUserDefaults *defs = Settings.sharedInstance.sharedAppGroupDefaults;
+    NSDictionary* prefs = [defs persistentDomainForName:Settings.sharedInstance.appGroupName];
+#endif
     
     for (NSString* pref in prefs) {
-        [debugLines addObject:[NSString stringWithFormat:@"%@: %@", pref, [defs valueForKey:pref]]];
+        if ( ![pref hasPrefix:@"com.apple"] &&
+            ![pref hasPrefix:@"Apple"] &&
+            ![pref hasPrefix:@"NS"] &&
+            ![pref hasPrefix:@"searchFieldRecents"]) {
+            [debugLines addObject:[NSString stringWithFormat:@"%@: %@", pref, [defs valueForKey:pref]]];
+        }
     }
-    
+
+#if TARGET_OS_IPHONE
     NSString* pro = [[AppPreferences sharedInstance] isPro] ? @"P" : @"";
     NSString* isFreeTrial = [[AppPreferences sharedInstance] isFreeTrial] ? @"F" : @"";
-    long epoch = (long)Settings.sharedInstance.installDate.timeIntervalSince1970;
+    long epoch = (long)AppPreferences.sharedInstance.installDate.timeIntervalSince1970;
     [debugLines addObject:[NSString stringWithFormat:@"Ep: %ld", epoch]];
-    [debugLines addObject:[NSString stringWithFormat:@"Flags: %@%@%@", pro, isFreeTrial, [Settings.sharedInstance getFlagsStringForDiagnostics]]];
+    [debugLines addObject:[NSString stringWithFormat:@"Flags: %@%@%@", pro, isFreeTrial, [AppPreferences.sharedInstance getFlagsStringForDiagnostics]]];
 
+    
     
 
     [debugLines addObject:@"--------------------"];
@@ -90,14 +175,19 @@
         NSString* jsonCrash = [[NSString alloc] initWithData:crashFileData encoding:NSUTF8StringEncoding];
         [debugLines addObject:[NSString stringWithFormat:@"JSON Crash:%@", jsonCrash]];
     }
-
+#endif
+    
     [debugLines addObject:@"--------------------"];
     [debugLines addObject:@"Sync"];
     [debugLines addObject:@"--------------------"];
 
+#if TARGET_OS_IPHONE
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
         SyncStatus *syncStatus = [SyncManager.sharedInstance getSyncStatus:safe];
-
+#else
+    for(DatabaseMetadata *safe in [DatabasesManager sharedInstance].snapshot) {
+        SyncStatus *syncStatus = [MacSyncManager.sharedInstance getSyncStatus:safe];
+#endif
         NSMutableArray<NSArray*>* mutableSyncs = NSMutableArray.array;
         NSMutableSet<NSUUID*>* set = NSMutableSet.set;
         NSMutableArray *currentSync;
@@ -150,17 +240,22 @@
     [debugLines addObject:@"--------------------"];
 
     
-    
+
+#if TARGET_OS_IPHONE
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.appSupportDirectory]];
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.documentsDirectory]];
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.sharedAppGroupDirectory]];
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpEncryptedAttachmentPath isDirectory:YES]]];
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpAttachmentPreviewPath isDirectory:YES]]];
+#endif
+
+    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.sharedAppGroupDirectory]];
 
     
 
     [debugLines addObject:@"--------------------"];
 
+        
+#if TARGET_OS_IPHONE
     for(SafeMetaData *safe in [SafesList sharedInstance].snapshot) {
         NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
         [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
@@ -170,9 +265,64 @@
         NSString *thisSafe = [jsonDict description];
         [debugLines addObject:thisSafe];
     }
+#else
+    for(DatabaseMetadata *safe in [DatabasesManager sharedInstance].snapshot) {
+        NSString* spName = [SafeStorageProviderFactory getStorageDisplayName:safe];
+        [debugLines addObject:[NSString stringWithFormat:@"[%@] on [%@] Config", safe.nickName, spName]];
+
+        @autoreleasepool {
+            unsigned int count;
+            Ivar *ivars = class_copyIvarList([DatabaseMetadata class], &count);
+            for (unsigned int i = 0; i < count; i++) {
+                Ivar ivar = ivars[i];
+
+                const char *name = ivar_getName(ivar);
+                const char *type = ivar_getTypeEncoding(ivar);
+                ptrdiff_t offset = ivar_getOffset(ivar);
+
+                NSString* str;
+                if (strncmp(type, "i", 1) == 0) {
+                    int intValue = *(int*)((uintptr_t)safe + offset);
+                    str = [NSString stringWithFormat:@"%s = %i", name, intValue];
+                }
+                else if (strncmp(type, "f", 1) == 0) {
+                    float floatValue = *(float*)((uintptr_t)safe + offset);
+                    str = [NSString stringWithFormat:@"%s = %f", name, floatValue];
+                }
+                else if (strncmp(type, "c", 1) == 0) {
+                    char value = *(char*)((uintptr_t)safe + offset);
+                    str = [NSString stringWithFormat:@"%s = %d", name, value];
+                }
+                else if (strncmp(type, "q", 1) == 0) {
+                    long long value = *(long long*)((uintptr_t)safe + offset);
+                    str = [NSString stringWithFormat:@"%s = %lld", name, value];
+                }
+                else if (strncmp(type, "Q", 1) == 0) {
+                    unsigned long long value = *(unsigned long long*)((uintptr_t)safe + offset);
+                    str = [NSString stringWithFormat:@"%s = %lld", name, value];
+                }
+                else if (strncmp(type, "@", 1) == 0) {
+                    id value = object_getIvar(safe, ivar);
+                    str = [NSString stringWithFormat:@"%s = %@", name, value];
+                }
+                
+                
+                if ( str ) {
+                    [debugLines addObject:str];
+                }
+                else {
+                    NSLog(@"WARNWARN Unknown iVar Type: %s", type);
+                }
+            }
+            free(ivars);
+       }
+    }
+#endif
 
     [debugLines addObject:@"--------------------"];
 
+    
+    
     return debugLines;
 }
 

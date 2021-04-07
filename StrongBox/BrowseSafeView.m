@@ -11,7 +11,6 @@
 #import "SelectDestinationGroupController.h"
 #import "RecordView.h"
 #import "Alerts.h"
-#import "Settings.h"
 #import "AppPreferences.h"
 #import "DatabaseOperations.h"
 #import "NSArray+Extensions.h"
@@ -46,18 +45,26 @@
 #import "ItemPropertiesViewController.h"
 #import "KeyFileHelper.h"
 #import "SyncManager.h"
+#import "AsyncUpdateResultViewController.h"
+#import "Platform.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
 
-@interface BrowseSafeView () < UISearchBarDelegate, UISearchResultsUpdating, UIAdaptivePresentationControllerDelegate>
+@interface BrowseSafeView () < UISearchBarDelegate, UISearchResultsUpdating, UIAdaptivePresentationControllerDelegate, UIPopoverPresentationControllerDelegate>
 
 @property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonAddRecord;
 @property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonSafeSettings;
 @property (strong, nonatomic, nullable) IBOutlet UIBarButtonItem *buttonMove; 
 @property (strong, nonatomic) IBOutlet UIBarButtonItem *buttonDelete; 
-@property UIBarButtonItem* moreiOS14Button;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSortItems;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *exportBarButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
+
+@property UIBarButtonItem* moreiOS14Button;
+@property UIBarButtonItem* syncBarButton;
+@property UIButton* syncButton;
+@property NSString* originalCloseTitle;
 
 @property (strong, nonatomic) UISearchController *searchController;
 @property (strong, nonatomic) UILongPressGestureRecognizer *longPressRecognizer;
@@ -65,18 +72,10 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property (nonatomic) NSInteger tapCount;
 @property (nonatomic) NSIndexPath *tappedIndexPath;
 @property (strong, nonatomic) NSTimer *tapTimer;
-
 @property (strong) SetNodeIconUiHelper* sni; 
-
 @property NSMutableArray<NSArray<NSNumber*>*>* reorderItemOperations;
 @property BOOL sortOrderForAutomaticSortDuringEditing;
-
 @property BOOL hasAlreadyAppeared;
-
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *closeBarButton;
-@property NSString* originalCloseTitle;
-
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *exportBarButton;
 
 @property ConfiguredBrowseTableDatasource* configuredDataSource;
 @property SearchResultsBrowseTableDatasource* searchDataSource;
@@ -92,17 +91,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self onClosed];
 }
 
-- (void)viewDidDisappear:(BOOL)animated {
-    [super viewDidDisappear:animated];
-
-    NSLog(@"BrowseSafeView: viewDidDisappear");
-    
-    if(self.isMovingFromParentViewController) { 
-        NSLog(@"isMovingFromParentViewController [%@]", self);
-        [self onClosed];
-    }
-}
-
 - (void)onClosed {
     NSLog(@"onClosed [%@]", self);
 
@@ -110,6 +98,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)listenToNotifications {
+    [self unListenToNotifications];
+    
     __weak BrowseSafeView* weakSelf = self;
     
     if(self.splitViewController) {
@@ -145,6 +135,16 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                                            selector:@selector(onDatabaseReloaded:)
                                                name:kDatabaseReloadedNotificationKey
                                              object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf
+                                           selector:@selector(onAsyncUpdateStart:)
+                                               name:kAsyncUpdateStarting
+                                             object:nil];
+
+    [NSNotificationCenter.defaultCenter addObserver:weakSelf
+                                           selector:@selector(onAsyncUpdateDone:)
+                                               name:kAsyncUpdateDone
+                                             object:nil];
 }
 
 - (void)unListenToNotifications {
@@ -159,9 +159,22 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditCompletedNotificationKey object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kMasterDetailViewCloseNotification object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseReloadedNotificationKey object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kAsyncUpdateStarting object:nil];
+    [NSNotificationCenter.defaultCenter removeObserver:self name:kAsyncUpdateDone object:nil];
 }
 
 
+
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+
+    NSLog(@"BrowseSafeView: viewDidDisappear");
+    
+    if(self.isMovingFromParentViewController) { 
+        NSLog(@"isMovingFromParentViewController [%@]", self);
+        [self onClosed];
+    }
+}
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
@@ -198,13 +211,11 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setupTableview];
-    
-    [self setupTips];
-    
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.definesPresentationContext = YES;
 
+    [self setupTableview];
+    [self setupTips];
     [self setupNavBar];
     [self setupSearchBar];
     
@@ -227,47 +238,196 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     
     
-    if (@available(iOS 14.0, *)) {
-        self.moreiOS14Button =  [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"] menu:nil];
-        [self refreshiOS14MoreMenu];
-        
-        if (self.navigationItem.rightBarButtonItems) {
-            NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
-            
-            [rightBarButtons insertObject:self.moreiOS14Button atIndex:0];
-            
-            self.navigationItem.rightBarButtonItems = rightBarButtons;
-        }
-        else {
-            self.navigationItem.rightBarButtonItem = self.moreiOS14Button;
-        }
-        
-        if (@available(iOS 14.0, *)) { 
-            
-            UIBarButtonItem* flexibleSpace1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-            UIBarButtonItem* flexibleSpace2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-            UIBarButtonItem* flexibleSpace3 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-
-            NSArray *toolbarButtons = @[flexibleSpace1, self.buttonMove, flexibleSpace2, self.buttonDelete, flexibleSpace3];
-            [self setToolbarItems:toolbarButtons animated:NO];
-        }
-    }
-    else {
-        
-
-        if (self.navigationItem.rightBarButtonItems) {
-            NSMutableArray* rightBarButtons = [self.navigationItem.rightBarButtonItems mutableCopy];
-            [rightBarButtons insertObject:self.editButtonItem atIndex:0];
-            self.navigationItem.rightBarButtonItems = rightBarButtons;
-        }
-        else {
-            self.navigationItem.rightBarButtonItem = self.editButtonItem;
-        }
-    }
+    [self customizeRightBarButtons];
+    
+    [self customizeBottomToolbar];
     
     [self refresh];
         
     [self listenToNotifications];
+}
+
+- (void)setupNavBar {
+    self.originalCloseTitle = self.closeBarButton.title;
+    
+    if (self.splitViewController) {
+        if (![self isDisplayingRootGroup]) {
+            self.closeBarButton.enabled = NO;
+            [self.closeBarButton setTintColor:UIColor.clearColor];
+        }
+    }
+    else {
+        self.closeBarButton.enabled = NO;
+        [self.closeBarButton setTintColor:UIColor.clearColor];
+    }
+    self.navigationItem.leftItemsSupplementBackButton = YES;
+
+    [self refreshNavBarTitle];
+    
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = NO;
+    }
+
+    self.navigationController.toolbarHidden = NO;
+    self.navigationController.toolbar.hidden = NO;
+    [self.navigationController setNavigationBarHidden:NO];
+    self.navigationController.navigationBar.hidden = NO;
+    self.navigationController.navigationBarHidden = NO;
+}
+
+- (void)customizeRightBarButtons {
+    self.syncButton = [[UIButton alloc] init];
+    [self.syncButton addTarget:self action:@selector(onSyncButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [self.syncButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
+    self.syncButton.contentMode = UIViewContentModeCenter;
+    self.syncButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+    [self.syncButton setTintColor:UIColor.systemBlueColor];
+    self.syncButton.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
+    
+    self.syncBarButton = [[UIBarButtonItem alloc] initWithCustomView:self.syncButton];
+    
+    NSMutableArray* rightBarButtons = @[].mutableCopy;
+    
+    if ( self.navigationItem.rightBarButtonItems ) {
+        rightBarButtons = self.navigationItem.rightBarButtonItems.mutableCopy;
+    }
+    else if ( self.navigationItem.rightBarButtonItem ) {
+        rightBarButtons = @[self.navigationItem.rightBarButtonItem].mutableCopy;
+    }
+
+    if (@available(iOS 14.0, *)) {
+        self.moreiOS14Button =  [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"] menu:nil];
+        [rightBarButtons insertObject:self.moreiOS14Button atIndex:0];
+        [self refreshiOS14MoreMenu];
+    }
+    else {
+        [rightBarButtons insertObject:self.editButtonItem atIndex:0];
+    }
+
+    [rightBarButtons addObject:self.syncBarButton];
+    
+    self.navigationItem.rightBarButtonItems = rightBarButtons;
+}
+
+- (void)onAsyncUpdateStart:(id)object { 
+    [self updateToolbarButtonsState];
+}
+
+- (void)onAsyncUpdateDone:(id)object { 
+    [self updateToolbarButtonsState];
+}
+
+- (void)updateToolbarButtonsState {
+    [self.closeBarButton setTitle:self.isEditing ? NSLocalizedString(@"generic_cancel", @"Cancel") : self.originalCloseTitle];
+
+    BOOL ro = self.viewModel.isReadOnly;
+    BOOL moveAndDeleteEnabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
+
+    self.buttonMove.enabled = moveAndDeleteEnabled;
+    self.buttonDelete.enabled = moveAndDeleteEnabled;
+
+    if (@available(iOS 14.0, *)) { 
+        self.navigationController.toolbar.hidden = !self.editing;
+        self.navigationController.toolbarHidden = !self.editing;
+        
+        NSMutableArray *copy = self.navigationItem.rightBarButtonItems.mutableCopy;
+        [copy replaceObjectAtIndex:0 withObject:self.editing ? self.editButtonItem : self.moreiOS14Button];
+        self.navigationItem.rightBarButtonItems = copy;
+    }
+    else {
+        self.buttonAddRecord.enabled = !ro && !self.isEditing;
+        self.buttonSafeSettings.enabled = !self.isEditing;
+        self.buttonSortItems.enabled = !self.isEditing || (!ro && self.isEditing && self.viewModel.database.originalFormat != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone);
+
+        UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-desc" : @"sort-asc"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-desc" : @"sort-asc"];
+        [self.buttonSortItems setImage:sortImage];
+    }
+    
+    
+
+    [self runSpinAnimationOnView:self.syncButton spin:NO];
+    [self.syncButton setTintColor:UIColor.clearColor];
+    self.syncButton.enabled = NO;
+
+    if ( self.viewModel.isRunningAsyncUpdate ) {
+        [self runSpinAnimationOnView:self.syncButton spin:YES];
+        [self.syncButton setTintColor:UIColor.systemBlueColor];
+        self.syncButton.enabled = YES;
+    }
+    else if ( self.viewModel.lastAsyncUpdateResult ) {
+        if ( !self.viewModel.lastAsyncUpdateResult.success ) {
+            if ( self.viewModel.lastAsyncUpdateResult.error ) {
+                [self runSpinAnimationOnView:self.syncButton spin:NO];
+                [self.syncButton setTintColor:UIColor.systemRedColor];
+                self.syncButton.enabled = YES;
+            }
+            else {
+                [self runSpinAnimationOnView:self.syncButton spin:NO];
+                [self.syncButton setTintColor:UIColor.systemOrangeColor];
+                self.syncButton.enabled = YES;
+            }
+        }
+    }
+}
+
+- (void)onSyncButtonClicked:(id)sender {
+    if ( self.viewModel.isRunningAsyncUpdate ) {
+        return;
+    }
+    
+    if ( !self.viewModel.lastAsyncUpdateResult ) {
+        [self updateToolbarButtonsState];
+        return;
+    }
+    
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"AsyncUpdateResultViewer" bundle:nil];
+    AsyncUpdateResultViewController* vc = (AsyncUpdateResultViewController*)[storyboard instantiateInitialViewController];
+    vc.modalPresentationStyle = UIModalPresentationPopover;
+    vc.presentationController.delegate = self;
+    vc.popoverPresentationController.barButtonItem = self.syncBarButton;
+    vc.result = self.viewModel.lastAsyncUpdateResult;
+    
+    __weak BrowseSafeView* weakSelf = self;
+    vc.onRetryClicked = ^{
+        [weakSelf onRetryUpdateSynchronouslyClicked];
+    };
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (UIModalPresentationStyle)adaptivePresentationStyleForPresentationController:(UIPresentationController *)controller traitCollection:(UITraitCollection *)traitCollection {
+    return UIModalPresentationNone;
+}
+
+- (void)runSpinAnimationOnView:(UIView*)view spin:(BOOL)spin {
+
+
+    [view.layer removeAllAnimations];
+    
+    if ( spin ) {
+        CABasicAnimation* rotationAnimation;
+        rotationAnimation = [CABasicAnimation animationWithKeyPath:@"transform.rotation.z"];
+        rotationAnimation.toValue = [NSNumber numberWithFloat: M_PI * 2.0];
+        rotationAnimation.duration = 1.25f;
+        rotationAnimation.cumulative = YES;
+        rotationAnimation.repeatCount = HUGE_VALF;
+        [rotationAnimation setRemovedOnCompletion:NO]; 
+        
+        [view.layer addAnimation:rotationAnimation forKey:@"rotationAnimation"];
+    }
+}
+
+- (void)customizeBottomToolbar {
+    if (@available(iOS 14.0, *)) { 
+        
+        UIBarButtonItem* flexibleSpace1 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+        UIBarButtonItem* flexibleSpace2 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+        UIBarButtonItem* flexibleSpace3 = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+
+        NSArray *toolbarButtons = @[flexibleSpace1, self.buttonMove, flexibleSpace2, self.buttonDelete, flexibleSpace3];
+        [self setToolbarItems:toolbarButtons animated:NO];
+    }
 }
 
 - (BOOL)isDisplayingRootGroup {
@@ -474,7 +634,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)showAuditPopup:(NSUInteger)issueCount lastKnownAuditIssueCount:(NSNumber*)lastKnownAuditIssueCount {
-    NSLog(@"showAuditPopup... [%@] = [%ld/%@]", self, (unsigned long)issueCount, lastKnownAuditIssueCount);
+
     
     if (lastKnownAuditIssueCount == nil) { 
         if (issueCount == 0) {
@@ -524,12 +684,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
 
     const NSUInteger kProNudgeIntervalDays = 14;
-    NSDate* dueDate = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitDay value:kProNudgeIntervalDays toDate:Settings.sharedInstance.lastFreeTrialNudge options:kNilOptions];
+    NSDate* dueDate = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitDay value:kProNudgeIntervalDays toDate:AppPreferences.sharedInstance.lastFreeTrialNudge options:kNilOptions];
     
     BOOL nudgeDue = dueDate.timeIntervalSinceNow < 0; 
     
     if (!AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired && nudgeDue) {
-        Settings.sharedInstance.lastFreeTrialNudge = NSDate.date;
+        AppPreferences.sharedInstance.lastFreeTrialNudge = NSDate.date;
         
         NSString* locMsg = NSLocalizedString(@"browse_pro_nudge_message_fmt", @"Strongbox Pro is full of handy features like %@ Unlock.\n\nYou have a Free Trial available to use, would you like to try Strongbox Pro?");
         NSString* locMsgFmt = [NSString stringWithFormat:locMsg, BiometricsManager.sharedInstance.biometricIdName];
@@ -559,7 +719,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (BOOL)userHasAlreadyTriedAppForMoreThan90Days {
-    return (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || Settings.sharedInstance.daysInstalled > 90);
+    return (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || AppPreferences.sharedInstance.daysInstalled > 90);
 }
     
 - (void)showDetailTargetDidChange:(NSNotification *)notification{
@@ -578,85 +738,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
 }
 
-- (void)setupNavBar {
-    self.originalCloseTitle = self.closeBarButton.title;
-    
-    if(self.splitViewController) {
-        if(![self isDisplayingRootGroup]) {
-            self.closeBarButton.enabled = NO;
-            [self.closeBarButton setTintColor:UIColor.clearColor];
-        }
-    }
-    else {
-        self.closeBarButton.enabled = NO;
-        [self.closeBarButton setTintColor:UIColor.clearColor];
-    }
-    self.navigationItem.leftItemsSupplementBackButton = YES;
-
-    [self refreshNavBarTitle];
-    
-    if (@available(iOS 11.0, *)) {
-        self.navigationController.navigationBar.prefersLargeTitles = NO;
-    }
-
-    self.navigationController.toolbarHidden = NO;
-    self.navigationController.toolbar.hidden = NO;
-    [self.navigationController setNavigationBarHidden:NO];
-    self.navigationController.navigationBar.hidden = NO;
-    self.navigationController.navigationBarHidden = NO;
-}
-
-- (void)updateToolbarButtonsState {
-    [self.closeBarButton setTitle:self.isEditing ? NSLocalizedString(@"generic_cancel", @"Cancel") : self.originalCloseTitle];
-
-    BOOL ro = self.viewModel.isReadOnly;
-    BOOL moveAndDeleteEnabled = (!ro && self.isEditing && self.tableView.indexPathsForSelectedRows.count > 0 && self.reorderItemOperations.count == 0);
-
-    self.buttonMove.enabled = moveAndDeleteEnabled;
-    self.buttonDelete.enabled = moveAndDeleteEnabled;
-
-    if (@available(iOS 14.0, *)) { 
-        self.navigationController.toolbar.hidden = !self.editing;
-        self.navigationController.toolbarHidden = !self.editing;
-        self.navigationItem.rightBarButtonItems = self.editing ? @[self.editButtonItem] : @[self.moreiOS14Button];
-    }
-    else {
-        self.buttonAddRecord.enabled = !ro && !self.isEditing;
-        self.buttonSafeSettings.enabled = !self.isEditing;
-        self.buttonSortItems.enabled = !self.isEditing ||
-        (!ro && self.isEditing && self.viewModel.database.originalFormat != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone);
-
-        UIImage* sortImage = self.isEditing ? [UIImage imageNamed:self.sortOrderForAutomaticSortDuringEditing ? @"sort-desc" : @"sort-asc"] : [UIImage imageNamed:self.viewModel.metadata.browseSortOrderDescending ? @"sort-desc" : @"sort-asc"];
-        [self.buttonSortItems setImage:sortImage];
-    }
-}
-
--(void)insertToolbarButton:(UIBarButtonItem*)button index:(NSUInteger)index {
-    NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
-
-    if (![toolbarButtons containsObject:button]) {
-        [toolbarButtons insertObject:button atIndex:index];
-        [self setToolbarItems:toolbarButtons animated:NO];
-    }
-}
-
--(void)addToolbarButton:(UIBarButtonItem*)button {
-    NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
-
-    if (![toolbarButtons containsObject:button]) {
-        [toolbarButtons addObject:button];
-        [self setToolbarItems:toolbarButtons animated:NO];
-    }
-}
-
--(void)removeToolbarButton:(UIBarButtonItem*)button {
-    if (button) {
-        NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
-        [toolbarButtons removeObject:button];
-        [self setToolbarItems:toolbarButtons animated:NO];
-    }
-}
-
 - (void)setEditing:(BOOL)editing animated:(BOOL)animate {
     [super setEditing:editing animated:animate];
     
@@ -664,27 +745,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     [self updateToolbarButtonsState];
     
-    if (!editing) {
-        if(self.reorderItemOperations) {
-            NSLog(@"Reordering...");
-            
-            for (NSArray<NSNumber*>* moveOp in self.reorderItemOperations) {
-                NSUInteger src = moveOp[0].unsignedIntegerValue;
-                NSUInteger dest = moveOp[1].unsignedIntegerValue;
-
-                Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
-                BOOL s = [self.viewModel.database reorderChildFrom:src to:dest parentGroup:currentGroup];
-                if (s) {
-                    NSLog(@"Reordering: %lu -> %lu Successful", (unsigned long)src, (unsigned long)dest);
-                }
-                else {
-                    NSLog(@"WARNWARN: Move Unsucessful!: %lu -> %lu - Terminating further re-ordering", (unsigned long)src, (unsigned long)dest);
-                    break;
-                }
-            }
-            
-            self.reorderItemOperations = nil;
-            [self saveChangesToSafeAndRefreshView];
+    if ( !editing ) {
+        if( self.reorderItemOperations ) {
+            [self reorderPendingItems];
         }
     }
     else {
@@ -692,9 +755,26 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
 }
 
-- (void)cancelEditing {
+- (void)reorderPendingItems {
+    NSLog(@"Reordering...");
+    
+    for (NSArray<NSNumber*>* moveOp in self.reorderItemOperations) {
+        NSUInteger src = moveOp[0].unsignedIntegerValue;
+        NSUInteger dest = moveOp[1].unsignedIntegerValue;
+
+        Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
+        BOOL s = [self.viewModel.database reorderChildFrom:src to:dest parentGroup:currentGroup];
+        if (s) {
+            NSLog(@"Reordering: %lu -> %lu Successful", (unsigned long)src, (unsigned long)dest);
+        }
+        else {
+            NSLog(@"WARNWARN: Move Unsucessful!: %lu -> %lu - Terminating further re-ordering", (unsigned long)src, (unsigned long)dest);
+            break;
+        }
+    }
+    
     self.reorderItemOperations = nil;
-    [self setEditing:NO];
+    [self updateAndRefresh];
 }
 
 - (void)setupSearchBar {
@@ -786,14 +866,16 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     
     
     
-    UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
+    if ( !self.viewModel.isInOfflineMode ) {
+        UIRefreshControl* refreshControl = [[UIRefreshControl alloc] init];
+        [refreshControl addTarget:self action:@selector(onManualPulldownRefresh) forControlEvents:UIControlEventValueChanged];
 
-    if (@available(iOS 10.0, *)) {
-        self.tableView.refreshControl = refreshControl;
-    }
-    else {
-        [self.tableView addSubview:refreshControl];
+        if (@available(iOS 10.0, *)) {
+            self.tableView.refreshControl = refreshControl;
+        }
+        else {
+            [self.tableView addSubview:refreshControl];
+        }
     }
 }
 
@@ -802,8 +884,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (IBAction)onClose:(id)sender {
-    if (self.isEditing) {
-        [self cancelEditing];
+    if ( self.isEditing ) {
+        self.reorderItemOperations = nil;
+        [self setEditing:NO];
     }
     else {
         MasterDetailViewController* master = (MasterDetailViewController*)self.splitViewController;
@@ -856,7 +939,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                 self.reorderItemOperations = nil; 
                 self.sortOrderForAutomaticSortDuringEditing = !self.sortOrderForAutomaticSortDuringEditing;
                 [currentGroup sortChildren:self.sortOrderForAutomaticSortDuringEditing];
-                [self saveChangesToSafeAndRefreshView];
+                [self updateAndRefresh];
             }
         }];
     }
@@ -879,7 +962,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                        completion:^(NSString *text, BOOL response) {
         if(response) {
             if ([self.viewModel.database setItemTitle:item title:text]) {
-                [self saveChangesToSafeAndRefreshView];
+                [self updateAndRefresh];
             }
         }
         
@@ -921,7 +1004,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                 item.icon = icon; 
             }
             
-            [weakSelf saveChangesToSafeAndRefreshView];
+            [weakSelf updateAndRefresh];
         }
         
         if(completion) {
@@ -952,8 +1035,12 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (UIContextualAction*)getRemoveAction:(NSIndexPath *)indexPath API_AVAILABLE(ios(11.0)){
+    Node *item = [self getNodeFromIndexPath:indexPath];
+    BOOL willRecycle = [self.viewModel canRecycle:item.uuid];
+    NSString* title = willRecycle ? NSLocalizedString(@"generic_action_verb_recycle", @"Recycle") : NSLocalizedString(@"browse_vc_action_delete", @"Delete");
+    
     UIContextualAction *removeAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleDestructive
-                                                                               title:NSLocalizedString(@"browse_vc_action_delete", @"Delete")
+                                                                               title:title
                                                                              handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL)) {
         [self onDeleteSingleItem:indexPath completion:completionHandler];
     }];
@@ -1310,7 +1397,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             [item touch:NO touchParents:YES];
             [self.viewModel addItem:item.parent item:dupe];
 
-            [self saveChangesToSafeAndRefreshView];
+            [self updateAndRefresh];
             
             if(completion) {
                 completion(response);
@@ -1603,8 +1690,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.currentGroup = self.viewModel.database.effectiveRootGroup;
         vc.viewModel = self.viewModel;
         vc.itemsToMove = itemsToMove;
-        vc.onDone = ^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nonnull error) {
-            [self onUpdateDone:userCancelled localWasChanged:localWasChanged error:error];
+        
+        __weak BrowseSafeView* weakSelf = self;
+        
+        vc.onMoveItems = ^(Node * _Nonnull destination) {
+            [weakSelf onMoveItems:destination items:itemsToMove];
         };
     }
     else if ([segue.identifier isEqualToString:@"segueToPreferencesAndManagement"]) {
@@ -1612,21 +1702,30 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         DatabasePreferencesController *vc = (DatabasePreferencesController*)nav.topViewController;
         vc.viewModel = self.viewModel;
+        
+        __weak BrowseSafeView* weakSelf = self;
+        
         vc.onDatabaseBulkIconUpdate = ^(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons) {
-            for(Node* node in self.viewModel.database.allActiveEntries) {
+            for(Node* node in weakSelf.viewModel.database.allActiveEntries) {
                 UIImage* img = selectedFavIcons[node.uuid];
                 if(img) {
                     NSData *data = UIImagePNGRepresentation(img);
                     node.icon = [NodeIcon withCustom:data];
                 }
             }
-            [self saveChangesToSafeAndRefreshView];
+            [weakSelf updateAndRefresh];
+        
         };
+        
+        vc.onSetMasterCredentials = ^(NSString * _Nullable password, NSString * _Nullable keyFileBookmark, NSData * _Nullable oneTimeKeyFileData, YubiKeyHardwareConfiguration * _Nullable yubiConfig) {
+            [weakSelf setCredentials:password keyFileBookmark:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
+        };
+        
         vc.onDone =  ^(BOOL showAllAuditIssues) {
-            [self refreshiOS14MoreMenu];
-            [self dismissViewControllerAnimated:YES completion:^{
+            [weakSelf refreshiOS14MoreMenu];
+            [weakSelf dismissViewControllerAnimated:YES completion:^{
                 if (showAllAuditIssues) {
-                    [self showAllAuditIssues];
+                    [weakSelf showAllAuditIssues];
                 }
             }];
         };
@@ -1703,97 +1802,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 
-- (void)setCredentials:(NSString*)password
-       keyFileBookmark:(NSString*)keyFileBookmark
-    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
-            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
-    
-    
-    
-    if(keyFileBookmark != nil || oneTimeKeyFileData != nil) {
-        NSError* error;
-        NSData* keyFileDigest = getKeyFileDigest(keyFileBookmark, oneTimeKeyFileData, self.viewModel.database.originalFormat, &error);
-        
-        if(keyFileDigest == nil) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"db_management_error_title_couldnt_change_credentials", @"Could not change credentials")
-                    error:error];
-            return;
-        }
-        
-        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:keyFileDigest];
-    }
-
-    
-    
-    if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
-        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:newCkf.keyFileDigest yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
-            [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
-        }];
-    }
-
-    CompositeKeyFactors *rollbackCkf = [self.viewModel.database.ckfs clone];
-    self.viewModel.database.ckfs = newCkf;
-    
-    
-    
-    [self.viewModel update:self
-                   handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        if (userCancelled || error) {
-            
-            self.viewModel.database.ckfs = rollbackCkf;
-        
-            if (error) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"db_management_couldnt_change_credentials", @"Could not change credentials")
-                        error:error];
-            }
-        }
-        else if ( localWasChanged ) {
-            
-        }
-        else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self onSuccessfulCredentialsChanged:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
-            });
-        }
-    }];
-}
-
-- (void)onSuccessfulCredentialsChanged:(NSString*)keyFileBookmark
-                    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
-                            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
-        if(!oneTimeKeyFileData) {
-            self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
-            NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
-        }
-        else {
-            
-            self.viewModel.metadata.convenienceMasterPassword = nil;
-            self.viewModel.metadata.isEnrolledForConvenience = NO;
-        }
-    }
-    
-    self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
-    self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-
-    [ISMessages showCardAlertWithTitle:self.viewModel.database.originalFormat == kPasswordSafe ?
-     NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
-     NSLocalizedString(@"db_management_credentials_changed", @"Master Credentials Changed")
-                               message:nil
-                              duration:3.f
-                           hideOnSwipe:YES
-                             hideOnTap:YES
-                             alertType:ISAlertTypeSuccess
-                         alertPosition:ISAlertPositionTop
-                               didHide:nil];
-}
-
-
-
 - (void)showAllAuditIssues { 
     
     [self.searchController.searchBar becomeFirstResponder];
@@ -1822,7 +1830,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                        completion:^(NSString *text, BOOL response) {
                            if (response) {
                                if ([weakSelf.viewModel addNewGroup:currentGroup title:text] != nil) {
-                                   [weakSelf saveChangesToSafeAndRefreshView];
+                                   [weakSelf updateAndRefresh];
                                }
                                else {
                                    [Alerts warn:weakSelf
@@ -1978,7 +1986,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                              message:NSLocalizedString(@"browse_vc_delete_error_message", @"There was an error trying to delete this item.")];
                     }
                     else {
-                        [self saveChangesToSafeAndRefreshView];
+                        if(self.isEditing) {
+                            [self setEditing:NO animated:YES];
+                        }
+                        
+                        [self updateAndRefresh];
                     }
                 }
         
@@ -2031,7 +2043,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                      message:NSLocalizedString(@"browse_vc_error_deleting_message", @"There was a problem deleting a least one of these items.")];
             }
             
-            [self saveChangesToSafeAndRefreshView];
+            if(self.isEditing) {
+                [self setEditing:NO animated:YES];
+            }
+            [self updateAndRefresh];
         }
     }];
 }
@@ -2043,7 +2058,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
            action:^(BOOL response) {
                if (response) {
                    [self.viewModel deleteItems:items];
-                   [self saveChangesToSafeAndRefreshView];
+                   
+                   if(self.isEditing) {
+                       [self setEditing:NO animated:YES];
+                   }
+                   [self updateAndRefresh];
                }
            }];
 }
@@ -2064,7 +2083,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                [self refresh];
            }
            else {
-               [self saveChangesToSafeAndRefreshView];
+               if(self.isEditing) {
+                   [self setEditing:NO animated:YES];
+               }
+               
+               [self updateAndRefresh];
            }
        }
     }];
@@ -2084,50 +2107,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }
     
     return ret;
-}
-
-- (void)saveChangesToSafeAndRefreshView {
-    [self refresh];
-    
-    [self.viewModel update:self
-                   handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
-        [self onUpdateDone:userCancelled localWasChanged:localWasChanged error:error];
-    }];
-}
-
-- (void)onUpdateDone:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*)error {
-    dispatch_async(dispatch_get_main_queue(), ^(void) {
-        if (userCancelled) {
-            [self dismissViewControllerAnimated:YES completion:nil]; 
-        }
-
-            
-
-
-
-
-
-
-
-        else if (error) {
-            [Alerts error:self
-                    title:NSLocalizedString(@"browse_vc_error_saving", @"Error Saving")
-                    error:error
-               completion:^{
-                [self dismissViewControllerAnimated:YES completion:nil]; 
-            }];
-        }
-        else {
-            if(self.isEditing) {
-                [self setEditing:NO animated:YES];
-            }
-            
-            NSLog(@"XXXXXX - onUpdateDone");
-
-            [self refresh];
-            [self updateSplitViewDetailsView:nil editMode:NO];
-        }
-    });
 }
 
 
@@ -2786,8 +2765,9 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 }
 
 - (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)) {
-    NSString* title = NSLocalizedString(@"browse_vc_action_delete", @"Delete");
-          
+    BOOL willRecycle = [self.viewModel canRecycle:item.uuid];
+    NSString* title = willRecycle ? NSLocalizedString(@"generic_action_verb_recycle", @"Recycle") : NSLocalizedString(@"browse_vc_action_delete", @"Delete");
+
     __weak BrowseSafeView* weakSelf = self;
     
     return [self getContextualMenuItem:title
@@ -2983,6 +2963,200 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)onKeyCommandFind:(id)param {
     [self.searchController.searchBar becomeFirstResponder];
+}
+
+
+
+- (void)setCredentials:(NSString*)password
+       keyFileBookmark:(NSString*)keyFileBookmark
+    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
+    CompositeKeyFactors *newCkf = [[CompositeKeyFactors alloc] initWithPassword:password];
+        
+    if(keyFileBookmark != nil || oneTimeKeyFileData != nil) {
+        NSError* error;
+        NSData* keyFileDigest = getKeyFileDigest(keyFileBookmark, oneTimeKeyFileData, self.viewModel.database.originalFormat, &error);
+        
+        if(keyFileDigest == nil) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"db_management_error_title_couldnt_change_credentials", @"Could not change credentials")
+                    error:error];
+            return;
+        }
+        
+        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:keyFileDigest];
+    }
+
+    if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
+        newCkf = [CompositeKeyFactors password:newCkf.password keyFileDigest:newCkf.keyFileDigest yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
+            [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
+        }];
+    }
+
+    CompositeKeyFactors *rollbackCkf = [self.viewModel.database.ckfs clone];
+    self.viewModel.database.ckfs = newCkf;
+    
+    [self updateAndRefresh:NO synchronousCompletion:^(BOOL synchronousUpdateCompleted) {
+        if ( synchronousUpdateCompleted ) {
+            [self onSuccessfulCredentialsChanged:keyFileBookmark oneTimeKeyFileData:oneTimeKeyFileData yubiConfig:yubiConfig];
+        }
+        else { 
+            self.viewModel.database.ckfs = rollbackCkf;
+        }
+    }];
+}
+
+- (void)onSuccessfulCredentialsChanged:(NSString*)keyFileBookmark
+                    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+                            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
+    if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
+        if(!oneTimeKeyFileData) {
+            self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
+            NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
+        }
+        else {
+            
+            self.viewModel.metadata.convenienceMasterPassword = nil;
+            self.viewModel.metadata.isEnrolledForConvenience = NO;
+        }
+    }
+    
+    self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
+    self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [ISMessages showCardAlertWithTitle:self.viewModel.database.originalFormat == kPasswordSafe ?
+         NSLocalizedString(@"db_management_password_changed", @"Master Password Changed") :
+         NSLocalizedString(@"db_management_credentials_changed", @"Master Credentials Changed")
+                                   message:nil
+                                  duration:3.f
+                               hideOnSwipe:YES
+                                 hideOnTap:YES
+                                 alertType:ISAlertTypeSuccess
+                             alertPosition:ISAlertPositionTop
+                                   didHide:nil];
+    });
+}
+
+- (void)onMoveItems:(Node*)destination items:(NSArray<Node*>*)items {
+    BOOL ret = [self.viewModel.database moveItems:items destination:destination];
+        
+    if (!ret) {
+        NSLog(@"Error Moving");
+        NSError* error = [Utils createNSError:NSLocalizedString(@"moveentry_vc_error_moving", @"Error Moving") errorCode:-1];
+        [Alerts error:self error:error];
+        return;
+    }
+    
+    if(self.isEditing) {
+        [self setEditing:NO animated:YES];
+    }
+
+    [self updateAndRefresh];
+};
+
+
+
+
+- (void)onRetryUpdateSynchronouslyClicked {
+    [self updateAndRefresh:NO];
+}
+
+- (void)updateAndRefresh {
+    [self updateAndRefresh:YES];
+}
+
+- (void)performSynchronousUpdate {
+    [self updateAndRefresh:NO];
+}
+
+- (void)updateAndRefresh:(BOOL)allowAsync {
+    [self updateAndRefresh:allowAsync synchronousCompletion:nil];
+}
+
+- (void)updateAndRefresh:(BOOL)allowAsync synchronousCompletion:(void (^)(BOOL synchronousUpdateCompleted))synchronousCompletion {
+    if ( Platform.iOS11Available && AppPreferences.sharedInstance.useBackgroundUpdates && allowAsync) {
+        [self.viewModel asyncUpdateAndSync];
+
+        [self refresh]; 
+    }
+    else {
+        [self.viewModel clearAsyncUpdateState];
+        
+        [self refresh];
+
+        [self.viewModel update:self.navigationController.visibleViewController
+                       handler:^(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error) {
+            [self onSynchronousUpdateDone:userCancelled localWasChanged:localWasChanged error:error synchronousCompletion:synchronousCompletion];
+        }];
+    }
+}
+
+- (void)onSynchronousUpdateDone:(BOOL)userCancelled localWasChanged:(BOOL)localWasChanged error:(NSError*)error synchronousCompletion:(void (^)(BOOL synchronousUpdateCompleted))synchronousCompletion {
+    BOOL success = !userCancelled && !error;
+    
+    [self onUpdateDoneCommonCompletion:success localWasChanged:localWasChanged userCancelled:userCancelled userInteractionRequired:NO error:error];
+    
+    if ( synchronousCompletion ) {
+        synchronousCompletion( success );
+    }
+}
+
+- (void)onUpdateDoneCommonCompletion:(BOOL)success localWasChanged:(BOOL)localWasChanged userCancelled:(BOOL)userCancelled userInteractionRequired:(BOOL)userInteractionRequired error:(NSError*)error {
+    if ( success ) {
+        if ( localWasChanged ) {
+            NSLog(@"BrowseSafeView::onAsyncUpdateDone - Database was changed by external actor reloading...");
+            [self.viewModel reloadDatabaseFromLocalWorkingCopy:self completion:nil];
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self refresh];
+            [self updateSplitViewDetailsView:nil editMode:NO];
+        });
+    }
+    else {
+        if ( userInteractionRequired ) { 
+            NSLog(@"BrowseSafeView::onAsyncUpdateDone - User Interaction is Required");
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts yesNo:self.navigationController.visibleViewController 
+                        title:NSLocalizedString(@"sync_status_user_interaction_required_prompt_title", @"Assistance Required")
+                      message:NSLocalizedString(@"sync_status_user_interaction_required_prompt_yes_or_no", @"There was a problem updating your database and your assistance is required to resolve. Would you like to resolve this problem now?")
+                       action:^(BOOL response) {
+                    if ( response ) {
+                        [self updateAndRefresh:NO];
+                    }
+                }];
+            });
+        }
+        else if ( error || userCancelled ) {
+            
+            
+            
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [Alerts error:self.navigationController.visibleViewController
+                        title:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
+                        error:error
+                   completion:^{
+                    [Alerts twoOptions:self.navigationController.visibleViewController
+                                 title:NSLocalizedString(@"sync_status_error_updating_title", @"Error Updating")
+                               message:NSLocalizedString(@"sync_status_error_updating_try_again_prompt", @"There was an error updating your database. Would you like to try updating again, or would you prefer to revert to the latest successful update?")
+                     defaultButtonText:NSLocalizedString(@"sync_status_error_updating_try_again_action", @"Try Again")
+                      secondButtonText:NSLocalizedString(@"sync_status_error_updating_revert_action", @"Revert to Latest")
+                                action:^(BOOL response) {
+                        if ( response ) {
+                            [self updateAndRefresh:NO];
+                        }
+                        else {
+                            [self.viewModel reloadDatabaseFromLocalWorkingCopy:self completion:nil];
+                        }
+                    }];
+                }];
+            });
+        }
+    }
 }
 
 @end

@@ -14,7 +14,7 @@
 #import "RMAppReceipt.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
-#import "Settings.h"
+
 #import "Model.h"
 
 static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.pro";
@@ -68,17 +68,17 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 }
 
 - (void)performScheduledProEntitlementsCheckIfAppropriate:(UIViewController*)vc {
-    if(Settings.sharedInstance.lastEntitlementCheckAttempt != nil) {
+    if(AppPreferences.sharedInstance.lastEntitlementCheckAttempt != nil) {
         NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
         
         NSDateComponents *components = [gregorian components:NSCalendarUnitDay
-                                                    fromDate:Settings.sharedInstance.lastEntitlementCheckAttempt
+                                                    fromDate:AppPreferences.sharedInstance.lastEntitlementCheckAttempt
                                                       toDate:[NSDate date]
                                                      options:0];
         
         NSInteger days = [components day];
         
-        NSLog(@"%ld days since last entitlement check... [%@]", (long)days, Settings.sharedInstance.lastEntitlementCheckAttempt);
+        NSLog(@"%ld days since last entitlement check... [%@]", (long)days, AppPreferences.sharedInstance.lastEntitlementCheckAttempt);
         
         if(days == 0) { 
             NSLog(@"Already checked entitlements today... not rechecking...");
@@ -87,18 +87,18 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         
         
         
-        if(Settings.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 5) {
+        if(AppPreferences.sharedInstance.numberOfEntitlementCheckFails == 0 &&  days < 5) {
             NSLog(@"We had a successful check recently, not rechecking...");
             return;
         }
         else {
-            NSLog(@"Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)Settings.sharedInstance.numberOfEntitlementCheckFails, (long)days);
+            NSLog(@"Rechecking since numberOfFails = %lu and days = %ld...", (unsigned long)AppPreferences.sharedInstance.numberOfEntitlementCheckFails, (long)days);
         }
     }
 
     NSLog(@"Performing Scheduled Check of Entitlements...");
     
-    if(Settings.sharedInstance.numberOfEntitlementCheckFails < 10) {
+    if(AppPreferences.sharedInstance.numberOfEntitlementCheckFails < 10) {
         [self checkReceiptForTrialAndProEntitlements:vc];
     }
     else {
@@ -112,7 +112,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 }
 
 - (void)checkReceiptForTrialAndProEntitlements:(UIViewController*)vc { 
-    Settings.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
+    AppPreferences.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
     
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
     if ([verificator verifyAppReceipt]) {
@@ -129,17 +129,17 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
             }
             else {
                 NSLog(@"Receipt not good even after refresh");
-                Settings.sharedInstance.numberOfEntitlementCheckFails++;
+                AppPreferences.sharedInstance.numberOfEntitlementCheckFails++;
             }
         } failure:^(NSError *error) {
             NSLog(@"Refresh Receipt - Error [%@]", error);
-            Settings.sharedInstance.numberOfEntitlementCheckFails++;
+            AppPreferences.sharedInstance.numberOfEntitlementCheckFails++;
         }];
     }
 }
 
 - (void)checkVerifiedReceiptIsEntitledToPro:(UIViewController*)vc {
-    Settings.sharedInstance.numberOfEntitlementCheckFails = 0;
+    AppPreferences.sharedInstance.numberOfEntitlementCheckFails = 0;
     
     NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
     if(freeTrialPurchaseDate && !AppPreferences.sharedInstance.hasOptedInToFreeTrial) {

@@ -14,7 +14,7 @@
 #import "NSArray+Extensions.h"
 #import "Alerts.h"
 #import "BiometricsManager.h"
-#import "Settings.h"
+
 #import "ISMessages.h"
 #import "AutoFillManager.h"
 #import "PinsConfigurationController.h"
@@ -173,6 +173,7 @@
         DatabaseOperations *vc = (DatabaseOperations *)segue.destinationViewController;
         vc.viewModel = self.viewModel;
         vc.onDatabaseBulkIconUpdate = self.onDatabaseBulkIconUpdate;
+        vc.onSetMasterCredentials = self.onSetMasterCredentials;
     }
     else if([segue.identifier isEqualToString:@"segueToViewPreferences"]) {
         BrowsePreferencesTableViewController* vc = (BrowsePreferencesTableViewController*)segue.destinationViewController;

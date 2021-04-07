@@ -365,6 +365,56 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
 }
 
+- (void)getModDate:(METADATA_PTR)safeMetaData completion:(StorageProviderGetModDateCompletionBlock)completion {
+    WebDAVProviderData* pd = [self getProviderDataFromMetaData:safeMetaData];
+
+    [self connect:pd.sessionConfiguration viewController:nil
+       completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
+        if(!session) {
+            NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
+            completion(nil, error);
+            return;
+        }
+        
+        
+        
+                    
+        
+        
+        NSString* path = pd.href.stringByDeletingLastPathComponent; 
+        
+        DAVListingRequest* listingRequest = [[DAVListingRequest alloc] initWithPath:path];
+        listingRequest.delegate = self;
+        
+        listingRequest.strongboxCompletion = ^(BOOL success, id result, NSError *error) {
+            if(!success) {
+                completion(nil, error);
+            }
+            else {
+                NSArray<DAVResponseItem*>* listingResponse = (NSArray<DAVResponseItem*>*)result;
+                NSString* targetFileName = pd.href.lastPathComponent;       
+                NSString* urlDecodedTargetFileName = [targetFileName stringByRemovingPercentEncoding];
+                            
+                DAVResponseItem* responseItem = [listingResponse firstOrDefault:^BOOL(DAVResponseItem * _Nonnull obj) {
+                    NSString* foo = obj.href.path.lastPathComponent;
+                    return [foo isEqualToString:targetFileName] || [foo isEqualToString:urlDecodedTargetFileName];
+                }];
+
+                if (!responseItem) {
+                    NSError* error = [Utils createNSError:@"Could not get attributes of webdav file" errorCode:-2];
+                    completion(nil, error);
+                    return;
+                }
+                
+                NSDate* modDate = responseItem.modificationDate;
+                completion(modDate, nil);
+            }
+        };
+        
+        [session enqueueRequest:listingRequest];
+    }];
+}
+
 - (void)readWithProviderData:(NSObject *)providerData
               viewController:(VIEW_CONTROLLER_PTR)viewController
                      options:(StorageProviderReadOptions *)options

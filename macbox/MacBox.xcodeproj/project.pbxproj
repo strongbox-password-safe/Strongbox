@@ -403,6 +403,10 @@
 		519C2CAA704EB1D2C41D0116 /* Pods_common_mac_Strongbox_Outright_Pro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */; };
 		6B9B902F795918EE0444B2D8 /* Pods_common_mac_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */; };
 		9B9F816C1BF4C9C272AEADB5 /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1B19F3B8933C37A37BB3CF /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework */; };
+		C80735E02614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
+		C80735E12614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
+		C80735E22614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
+		C80735E32614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
 		C80798322562DEEC00FE0CA7 /* NSData+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C85B9D74246544C600EEBFC9 /* NSData+Extensions.m */; };
 		C80798332562DEEC00FE0CA7 /* NSDictionary+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBFD384225CFE2F00290488 /* NSDictionary+Extensions.m */; };
 		C80798342562DEEC00FE0CA7 /* NSDate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAC40CD24F68311001B3BE2 /* NSDate+Extensions.m */; };
@@ -678,6 +682,15 @@
 		C85B9DB724655D6700EEBFC9 /* first.names.us.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */; };
 		C85B9DB824655D6A00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */; };
 		C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */ = {isa = PBXBuildFile; fileRef = C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */; };
+		C8629F97260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */; };
+		C8629F98260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */; };
+		C8629F99260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */; };
+		C8629FDC260B998600DEDB8E /* EditCustomFieldController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629FDB260B998600DEDB8E /* EditCustomFieldController.m */; };
+		C8629FDD260B998600DEDB8E /* EditCustomFieldController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629FDB260B998600DEDB8E /* EditCustomFieldController.m */; };
+		C8629FDE260B998600DEDB8E /* EditCustomFieldController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8629FDB260B998600DEDB8E /* EditCustomFieldController.m */; };
+		C862A004260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */; };
+		C862A005260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */; };
+		C862A006260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */; };
 		C867457B25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */; };
 		C867457C25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */; };
 		C867457D25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */; };
@@ -1333,6 +1346,42 @@
 		C883079925CB167A001D8FE1 /* AddDatabaseSelectStorageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C883079725CB167A001D8FE1 /* AddDatabaseSelectStorageVC.m */; };
 		C88307A925CB17CF001D8FE1 /* DatabasesManagerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C88307A825CB17CF001D8FE1 /* DatabasesManagerVC.m */; };
 		C88307AA25CB17CF001D8FE1 /* DatabasesManagerVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C88307A825CB17CF001D8FE1 /* DatabasesManagerVC.m */; };
+		C8877328261DAAAC00C01406 /* BackupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877327261DAAAC00C01406 /* BackupsViewController.m */; };
+		C8877329261DAAAC00C01406 /* BackupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877327261DAAAC00C01406 /* BackupsViewController.m */; };
+		C887732A261DAAAC00C01406 /* BackupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877327261DAAAC00C01406 /* BackupsViewController.m */; };
+		C887732B261DAAAC00C01406 /* BackupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877327261DAAAC00C01406 /* BackupsViewController.m */; };
+		C887732C261DAAAC00C01406 /* BackupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877327261DAAAC00C01406 /* BackupsViewController.m */; };
+		C887732D261DAAAC00C01406 /* BackupsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877327261DAAAC00C01406 /* BackupsViewController.m */; };
+		C8877335261DD64900C01406 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C887733C261DD64900C01406 /* Backups.storyboard */; };
+		C8877336261DD64900C01406 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C887733C261DD64900C01406 /* Backups.storyboard */; };
+		C8877337261DD64900C01406 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C887733C261DD64900C01406 /* Backups.storyboard */; };
+		C8877338261DD64900C01406 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C887733C261DD64900C01406 /* Backups.storyboard */; };
+		C8877339261DD64900C01406 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C887733C261DD64900C01406 /* Backups.storyboard */; };
+		C887733A261DD64900C01406 /* Backups.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C887733C261DD64900C01406 /* Backups.storyboard */; };
+		C887737E261DE06800C01406 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C887737D261DE06800C01406 /* AboutViewController.m */; };
+		C887737F261DE06800C01406 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C887737D261DE06800C01406 /* AboutViewController.m */; };
+		C8877380261DE06800C01406 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C887737D261DE06800C01406 /* AboutViewController.m */; };
+		C8877381261DE06800C01406 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C887737D261DE06800C01406 /* AboutViewController.m */; };
+		C8877382261DE06800C01406 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C887737D261DE06800C01406 /* AboutViewController.m */; };
+		C8877383261DE06800C01406 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C887737D261DE06800C01406 /* AboutViewController.m */; };
+		C887739C261DEA8A00C01406 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C887739A261DEA8A00C01406 /* DebugHelper.m */; };
+		C887739D261DEA8A00C01406 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C887739A261DEA8A00C01406 /* DebugHelper.m */; };
+		C887739E261DEA8A00C01406 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C887739A261DEA8A00C01406 /* DebugHelper.m */; };
+		C887739F261DEA8A00C01406 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C887739A261DEA8A00C01406 /* DebugHelper.m */; };
+		C88773A0261DEA8A00C01406 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C887739A261DEA8A00C01406 /* DebugHelper.m */; };
+		C88773A1261DEA8A00C01406 /* DebugHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C887739A261DEA8A00C01406 /* DebugHelper.m */; };
+		C88773D0261E02E600C01406 /* AboutViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C88773D7261E02E600C01406 /* AboutViewController.storyboard */; };
+		C88773D1261E02E600C01406 /* AboutViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C88773D7261E02E600C01406 /* AboutViewController.storyboard */; };
+		C88773D2261E02E600C01406 /* AboutViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C88773D7261E02E600C01406 /* AboutViewController.storyboard */; };
+		C88773D3261E02E600C01406 /* AboutViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C88773D7261E02E600C01406 /* AboutViewController.storyboard */; };
+		C88773D4261E02E600C01406 /* AboutViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C88773D7261E02E600C01406 /* AboutViewController.storyboard */; };
+		C88773D5261E02E600C01406 /* AboutViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C88773D7261E02E600C01406 /* AboutViewController.storyboard */; };
+		C8877445261E16B300C01406 /* EditTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877444261E16B300C01406 /* EditTagsViewController.m */; };
+		C8877446261E16B300C01406 /* EditTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877444261E16B300C01406 /* EditTagsViewController.m */; };
+		C8877447261E16B300C01406 /* EditTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877444261E16B300C01406 /* EditTagsViewController.m */; };
+		C8877448261E16B300C01406 /* EditTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877444261E16B300C01406 /* EditTagsViewController.m */; };
+		C8877449261E16B300C01406 /* EditTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877444261E16B300C01406 /* EditTagsViewController.m */; };
+		C887744A261E16B300C01406 /* EditTagsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8877444261E16B300C01406 /* EditTagsViewController.m */; };
 		C890D26E259109430001E38B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C890D26C259109430001E38B /* ConcurrentMutableDictionary.m */; };
 		C890D26F259109430001E38B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C890D26C259109430001E38B /* ConcurrentMutableDictionary.m */; };
 		C890D270259109430001E38B /* ConcurrentMutableDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = C890D26C259109430001E38B /* ConcurrentMutableDictionary.m */; };
@@ -1354,6 +1403,9 @@
 		C8969FF925AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = C8969FF725AF70FF006819E3 /* Argon2idKdfCipher.m */; };
 		C8969FFA25AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = C8969FF725AF70FF006819E3 /* Argon2idKdfCipher.m */; };
 		C8969FFB25AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = C8969FF725AF70FF006819E3 /* Argon2idKdfCipher.m */; };
+		C89B444E2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = C89B444D2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m */; };
+		C89B444F2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = C89B444D2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m */; };
+		C89B44502608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = C89B444D2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m */; };
 		C89B8E5C2562952300B590C0 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE79B84255D987C00F59B10 /* AuthenticationServices.framework */; };
 		C89B8E612562953D00B590C0 /* BaseXmlDomainObjectHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D9E095C21825104007BA1E7 /* BaseXmlDomainObjectHandler.m */; };
 		C89B8E662562954800B590C0 /* SimpleXmlValueExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */; };
@@ -1633,6 +1685,9 @@
 		C8B946BB2573D68000932C46 /* FavIconDownloadOptions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DC8058A23A113EC001E742E /* FavIconDownloadOptions.m */; };
 		C8B946C32573D6EC00932C46 /* CollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */; };
 		C8B946C42573D6EC00932C46 /* CollectionViewHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */; };
+		C8BB7530261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */; };
+		C8BB7531261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */; };
+		C8BB7532261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */; };
 		C8BFECBA24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */; };
 		C8BFECBB24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */; };
 		C8C0834E2569581F00FF280D /* CustomBackgroundTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C0834D2569581F00FF280D /* CustomBackgroundTableView.m */; };
@@ -1730,6 +1785,18 @@
 		C8FD557325DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
 		C8FD557525DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
 		C8FD557725DD3E1A009B8705 /* NonFileDocument.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FD557225DD3E1A009B8705 /* NonFileDocument.m */; };
+		C8FDF2E0261CD38300F17CBE /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DC261CD38300F17CBE /* BackupItem.m */; };
+		C8FDF2E1261CD38300F17CBE /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DC261CD38300F17CBE /* BackupItem.m */; };
+		C8FDF2E2261CD38300F17CBE /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DC261CD38300F17CBE /* BackupItem.m */; };
+		C8FDF2E3261CD38300F17CBE /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DC261CD38300F17CBE /* BackupItem.m */; };
+		C8FDF2E4261CD38300F17CBE /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DC261CD38300F17CBE /* BackupItem.m */; };
+		C8FDF2E5261CD38300F17CBE /* BackupItem.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DC261CD38300F17CBE /* BackupItem.m */; };
+		C8FDF2E6261CD38300F17CBE /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DD261CD38300F17CBE /* BackupsManager.m */; };
+		C8FDF2E7261CD38300F17CBE /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DD261CD38300F17CBE /* BackupsManager.m */; };
+		C8FDF2E8261CD38300F17CBE /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DD261CD38300F17CBE /* BackupsManager.m */; };
+		C8FDF2E9261CD38300F17CBE /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DD261CD38300F17CBE /* BackupsManager.m */; };
+		C8FDF2EA261CD38300F17CBE /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DD261CD38300F17CBE /* BackupsManager.m */; };
+		C8FDF2EB261CD38300F17CBE /* BackupsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8FDF2DD261CD38300F17CBE /* BackupsManager.m */; };
 		D26FCE46F1386598F6E19202 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */; };
 /* End PBXBuildFile section */
 
@@ -2328,6 +2395,8 @@
 		C8055EF82544BF16005D7748 /* KeePassGroupOrEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeePassGroupOrEntry.h; path = ../KeePassGroupOrEntry.h; sourceTree = "<group>"; };
 		C8055EF92544BFD2005D7748 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ../StrongBox/ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C8055EFA2544BFD5005D7748 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = ../StrongBox/nb.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C80735DE2614D97E006FA2FC /* TableViewWithRightClickSelect.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = TableViewWithRightClickSelect.h; path = MacBox/TableViewWithRightClickSelect.h; sourceTree = "<group>"; };
+		C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = TableViewWithRightClickSelect.m; path = MacBox/TableViewWithRightClickSelect.m; sourceTree = "<group>"; };
 		C80798792563123400FE0CA7 /* ManualCredentialsEntry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ManualCredentialsEntry.h; sourceTree = "<group>"; };
 		C807987A2563123400FE0CA7 /* ManualCredentialsEntry.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ManualCredentialsEntry.m; sourceTree = "<group>"; };
 		C80B107E2551F92600FBDF72 /* MutableOrderedDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MutableOrderedDictionary.m; path = ../model/MutableOrderedDictionary.m; sourceTree = "<group>"; };
@@ -2529,6 +2598,24 @@
 		C85B9DAF24655D5C00EEBFC9 /* 10-million-password-list-top-10000.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "10-million-password-list-top-10000.txt"; path = "resources/10-million-password-list-top-10000.txt"; sourceTree = "<group>"; };
 		C85B9DB124655D5C00EEBFC9 /* surnames.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = surnames.us.txt; path = resources/names/surnames/surnames.us.txt; sourceTree = "<group>"; };
 		C85B9DB224655D5C00EEBFC9 /* first.names.us.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = first.names.us.txt; path = resources/names/first/first.names.us.txt; sourceTree = "<group>"; };
+		C8629F95260B45C000DEDB8E /* GeneralDatabaseSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = GeneralDatabaseSettings.h; path = MacBox/GeneralDatabaseSettings.h; sourceTree = "<group>"; };
+		C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GeneralDatabaseSettings.m; path = MacBox/GeneralDatabaseSettings.m; sourceTree = "<group>"; };
+		C8629FDA260B998600DEDB8E /* EditCustomFieldController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EditCustomFieldController.h; path = MacBox/EditCustomFieldController.h; sourceTree = "<group>"; };
+		C8629FDB260B998600DEDB8E /* EditCustomFieldController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = EditCustomFieldController.m; path = MacBox/EditCustomFieldController.m; sourceTree = "<group>"; };
+		C862A007260B9D8C00DEDB8E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/EditCustomField.storyboard; sourceTree = "<group>"; };
+		C862A011260B9D8F00DEDB8E /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A013260B9D9000DEDB8E /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A015260B9D9100DEDB8E /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A017260B9D9200DEDB8E /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A019260B9D9300DEDB8E /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/EditCustomField.strings"; sourceTree = "<group>"; };
+		C862A01B260B9D9400DEDB8E /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A01D260B9D9500DEDB8E /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A01F260B9D9600DEDB8E /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A021260B9D9700DEDB8E /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/EditCustomField.strings"; sourceTree = "<group>"; };
+		C862A023260B9D9800DEDB8E /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A025260B9D9900DEDB8E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A027260B9D9A00DEDB8E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C862A029260B9D9B00DEDB8E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/EditCustomField.strings; sourceTree = "<group>"; };
 		C867456F25C9BA1C001453BE /* QuickTypeAutoFillDisplayFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QuickTypeAutoFillDisplayFormat.h; path = ../model/QuickTypeAutoFillDisplayFormat.h; sourceTree = "<group>"; };
 		C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickTypeAutoFillDisplayFormat.m; path = ../model/QuickTypeAutoFillDisplayFormat.m; sourceTree = "<group>"; };
 		C86791632561A1630038310E /* KeePassXmlAutoType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassXmlAutoType.h; path = ../model/keepass/KeePassXmlAutoType.h; sourceTree = "<group>"; };
@@ -2594,12 +2681,50 @@
 		C883079725CB167A001D8FE1 /* AddDatabaseSelectStorageVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AddDatabaseSelectStorageVC.m; path = MacBox/AddDatabaseSelectStorageVC.m; sourceTree = "<group>"; };
 		C88307A725CB17CF001D8FE1 /* DatabasesManagerVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabasesManagerVC.h; path = MacBox/DatabasesManagerVC.h; sourceTree = "<group>"; };
 		C88307A825CB17CF001D8FE1 /* DatabasesManagerVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabasesManagerVC.m; path = MacBox/DatabasesManagerVC.m; sourceTree = "<group>"; };
+		C8877326261DAAAC00C01406 /* BackupsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = BackupsViewController.h; path = MacBox/BackupsViewController.h; sourceTree = "<group>"; };
+		C8877327261DAAAC00C01406 /* BackupsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = BackupsViewController.m; path = MacBox/BackupsViewController.m; sourceTree = "<group>"; };
+		C887733B261DD64900C01406 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Backups.storyboard; sourceTree = "<group>"; };
+		C887734E261DD64D00C01406 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Backups.strings"; sourceTree = "<group>"; };
+		C8877350261DD64F00C01406 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8877352261DD65000C01406 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8877354261DD65100C01406 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8877356261DD65300C01406 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8877358261DD65400C01406 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/Backups.strings; sourceTree = "<group>"; };
+		C887735A261DD65600C01406 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Backups.strings; sourceTree = "<group>"; };
+		C887735C261DD65700C01406 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Backups.strings; sourceTree = "<group>"; };
+		C887735E261DD65800C01406 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Backups.strings"; sourceTree = "<group>"; };
+		C8877360261DD65A00C01406 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8877362261DD65B00C01406 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8877364261DD65C00C01406 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Backups.strings; sourceTree = "<group>"; };
+		C8877366261DD65D00C01406 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Backups.strings; sourceTree = "<group>"; };
+		C887737C261DE06800C01406 /* AboutViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AboutViewController.h; path = MacBox/AboutViewController.h; sourceTree = "<group>"; };
+		C887737D261DE06800C01406 /* AboutViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AboutViewController.m; path = MacBox/AboutViewController.m; sourceTree = "<group>"; };
+		C887739A261DEA8A00C01406 /* DebugHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugHelper.m; path = ../StrongBox/DebugHelper.m; sourceTree = "<group>"; };
+		C887739B261DEA8A00C01406 /* DebugHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugHelper.h; path = ../StrongBox/DebugHelper.h; sourceTree = "<group>"; };
+		C88773D6261E02E600C01406 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/AboutViewController.storyboard; sourceTree = "<group>"; };
+		C88773E9261E02EA00C01406 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/AboutViewController.strings"; sourceTree = "<group>"; };
+		C88773EB261E02EB00C01406 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C88773ED261E02EC00C01406 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C88773EF261E02EE00C01406 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C88773F8261E02EF00C01406 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C88773FA261E02F100C01406 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C88773FC261E02F200C01406 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C8877405261E02F400C01406 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C8877407261E02F500C01406 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/AboutViewController.strings"; sourceTree = "<group>"; };
+		C8877409261E02F700C01406 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C887740B261E02F800C01406 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C8877414261E02FA00C01406 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C8877416261E02FB00C01406 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AboutViewController.strings; sourceTree = "<group>"; };
+		C8877443261E16B300C01406 /* EditTagsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EditTagsViewController.h; path = MacBox/EditTagsViewController.h; sourceTree = "<group>"; };
+		C8877444261E16B300C01406 /* EditTagsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = EditTagsViewController.m; path = MacBox/EditTagsViewController.m; sourceTree = "<group>"; };
 		C890D26C259109430001E38B /* ConcurrentMutableDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableDictionary.m; path = ../model/ConcurrentMutableDictionary.m; sourceTree = "<group>"; };
 		C890D26D259109430001E38B /* ConcurrentMutableDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableDictionary.h; path = ../model/ConcurrentMutableDictionary.h; sourceTree = "<group>"; };
 		C8969FEB25AF70EE006819E3 /* Argon2dKdfCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Argon2dKdfCipher.h; path = ../model/Argon2dKdfCipher.h; sourceTree = "<group>"; };
 		C8969FEC25AF70EE006819E3 /* Argon2dKdfCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Argon2dKdfCipher.m; path = ../model/Argon2dKdfCipher.m; sourceTree = "<group>"; };
 		C8969FF625AF70FF006819E3 /* Argon2idKdfCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Argon2idKdfCipher.h; path = ../model/keepass/Argon2idKdfCipher.h; sourceTree = "<group>"; };
 		C8969FF725AF70FF006819E3 /* Argon2idKdfCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Argon2idKdfCipher.m; path = ../model/keepass/Argon2idKdfCipher.m; sourceTree = "<group>"; };
+		C89B444C2608D54400486824 /* MacFileBasedBookmarkStorageProvider.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacFileBasedBookmarkStorageProvider.h; sourceTree = "<group>"; };
+		C89B444D2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacFileBasedBookmarkStorageProvider.m; sourceTree = "<group>"; };
 		C89F6B8A247FC5AE0070E754 /* changelog-mac.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-mac.txt"; path = "../build/changelog-mac.txt"; sourceTree = "<group>"; };
 		C89F6B8B247FC5AE0070E754 /* changelog-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "changelog-ios.txt"; path = "../build/changelog-ios.txt"; sourceTree = "<group>"; };
 		C89F6B8C247FC5AE0070E754 /* version-ios.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = "version-ios.txt"; path = "../build/version-ios.txt"; sourceTree = "<group>"; };
@@ -2655,6 +2780,20 @@
 		C8B946862573D59400932C46 /* AttachmentItem.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AttachmentItem.xib; path = MacBox/AttachmentItem.xib; sourceTree = "<group>"; };
 		C8B946A32573D63400932C46 /* CustomFieldTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CustomFieldTableCellView.xib; path = MacBox/CustomFieldTableCellView.xib; sourceTree = "<group>"; };
 		C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CollectionViewHeader.xib; path = MacBox/CollectionViewHeader.xib; sourceTree = "<group>"; };
+		C8BB7533261E23FE00D6FCB1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/EditTagsPopover.storyboard; sourceTree = "<group>"; };
+		C8BB753F261E240800D6FCB1 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/EditTagsPopover.strings"; sourceTree = "<group>"; };
+		C8BB7548261E240900D6FCB1 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB754A261E240A00D6FCB1 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB754C261E240C00D6FCB1 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB754E261E240D00D6FCB1 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB7550261E240F00D6FCB1 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB7552261E241000D6FCB1 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB7554261E241200D6FCB1 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB7556261E241300D6FCB1 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/EditTagsPopover.strings"; sourceTree = "<group>"; };
+		C8BB7558261E241500D6FCB1 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB755A261E241700D6FCB1 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB755C261E241900D6FCB1 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
+		C8BB755E261E241A00D6FCB1 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/EditTagsPopover.strings; sourceTree = "<group>"; };
 		C8BFECB824781C660051D21E /* NodeHierarchyReconstructionData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeHierarchyReconstructionData.h; path = ../model/NodeHierarchyReconstructionData.h; sourceTree = "<group>"; };
 		C8BFECB924781C660051D21E /* NodeHierarchyReconstructionData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NodeHierarchyReconstructionData.m; path = ../model/NodeHierarchyReconstructionData.m; sourceTree = "<group>"; };
 		C8C0834C2569581F00FF280D /* CustomBackgroundTableView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomBackgroundTableView.h; path = MacBox/CustomBackgroundTableView.h; sourceTree = "<group>"; };
@@ -2839,6 +2978,10 @@
 		C8FD557125DD3E1A009B8705 /* NonFileDocument.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NonFileDocument.h; path = Model/NonFileDocument.h; sourceTree = "<group>"; };
 		C8FD557225DD3E1A009B8705 /* NonFileDocument.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = NonFileDocument.m; path = Model/NonFileDocument.m; sourceTree = "<group>"; };
 		C8FD559525DD3F9A009B8705 /* Mac-Outright-Pro-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Mac-Outright-Pro-Info.plist"; sourceTree = "<group>"; };
+		C8FDF2DC261CD38300F17CBE /* BackupItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BackupItem.m; path = ../StrongBox/BackupItem.m; sourceTree = "<group>"; };
+		C8FDF2DD261CD38300F17CBE /* BackupsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BackupsManager.m; path = ../StrongBox/BackupsManager.m; sourceTree = "<group>"; };
+		C8FDF2DE261CD38300F17CBE /* BackupsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackupsManager.h; path = ../StrongBox/BackupsManager.h; sourceTree = "<group>"; };
+		C8FDF2DF261CD38300F17CBE /* BackupItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackupItem.h; path = ../StrongBox/BackupItem.h; sourceTree = "<group>"; };
 		EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; sourceTree = "<group>"; };
 		EBD47B91E82A65C6AA0A0FDA /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro-AutoFill/Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
 		F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.debug.xcconfig"; sourceTree = "<group>"; };
@@ -3271,20 +3414,20 @@
 		4D524D2B219B503F00C22CB4 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				C8C0834C2569581F00FF280D /* CustomBackgroundTableView.h */,
-				C8C0834D2569581F00FF280D /* CustomBackgroundTableView.m */,
-				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
+				C8877459261E16BB00C01406 /* Edit Tags */,
+				4DE2CA3E23C38B5E00F76255 /* Main */,
+				C8877392261DE80100C01406 /* About */,
+				4D14A13B224D211400C71ABF /* Node Details */,
+				4D88E6D123A924D100A75D1F /* Databases Manager */,
+				C8F1C4F125E94D5200E7BADD /* SwiftUI */,
+				4D88E6D023A9249E00A75D1F /* App Preferences */,
+				4D6EB45923DF23750045C8D5 /* Database Settings */,
 				C8F39F9625DD92130045CAAB /* Progress Spinner */,
 				C8C08355256978E600FF280D /* Database Onboarding */,
-				4D88E6D123A924D100A75D1F /* Databases Manager */,
-				4DE2CA3E23C38B5E00F76255 /* Main */,
 				C85B9D6E2465426A00EEBFC9 /* UI Components */,
 				4DAE28C724073089003D9221 /* Upgrade */,
-				4D6EB45923DF23750045C8D5 /* Database Settings */,
-				4D14A13B224D211400C71ABF /* Node Details */,
 				4DD9EB1D23C4FD1500887237 /* Set Icon */,
 				4DE2CA3D23C38B4100F76255 /* Change Password and Format */,
-				4D88E6D023A9249E00A75D1F /* Preferences */,
 				4D88E6CF23A9191000A75D1F /* FavIcon */,
 				C8E379DF25DC2E82006A26BF /* Sync Log */,
 				4D643BA023B67D48000C383A /* KeePass History */,
@@ -3296,6 +3439,7 @@
 				4DF299812243CED70080F9DC /* CollectionViewHeader.h */,
 				4DF299822243CED70080F9DC /* CollectionViewHeader.m */,
 				C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */,
+				C8629FE6260B99A200DEDB8E /* Edit Custom Fields */,
 			);
 			name = View;
 			sourceTree = "<group>";
@@ -3320,6 +3464,10 @@
 				4D6EB45D23DF26910045C8D5 /* DatabaseConvenienceUnlockPreferences.m */,
 				C80FF037256D666E00A181B1 /* AutoFillSettingsViewController.h */,
 				C80FF038256D666E00A181B1 /* AutoFillSettingsViewController.m */,
+				C8629F95260B45C000DEDB8E /* GeneralDatabaseSettings.h */,
+				C8629F96260B45C000DEDB8E /* GeneralDatabaseSettings.m */,
+				C80735DE2614D97E006FA2FC /* TableViewWithRightClickSelect.h */,
+				C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */,
 			);
 			name = "Database Settings";
 			sourceTree = "<group>";
@@ -3352,14 +3500,14 @@
 			name = FavIcon;
 			sourceTree = "<group>";
 		};
-		4D88E6D023A9249E00A75D1F /* Preferences */ = {
+		4D88E6D023A9249E00A75D1F /* App Preferences */ = {
 			isa = PBXGroup;
 			children = (
 				4DC805A023A116D5001E742E /* PreferencesWindowController.xib */,
 				4D58A459207368B10061E046 /* PreferencesWindowController.h */,
 				4D58A45A207368B10061E046 /* PreferencesWindowController.m */,
 			);
-			name = Preferences;
+			name = "App Preferences";
 			sourceTree = "<group>";
 		};
 		4D88E6D123A924D100A75D1F /* Databases Manager */ = {
@@ -3371,6 +3519,9 @@
 				C8ACEC062565736A00F7420C /* DatabaseCellView.h */,
 				C8ACEC072565736A00F7420C /* DatabaseCellView.m */,
 				C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */,
+				C887733C261DD64900C01406 /* Backups.storyboard */,
+				C8877326261DAAAC00C01406 /* BackupsViewController.h */,
+				C8877327261DAAAC00C01406 /* BackupsViewController.m */,
 			);
 			name = "Databases Manager";
 			sourceTree = "<group>";
@@ -3535,6 +3686,10 @@
 		4DCAE87C257E6E3600072D4B /* Sync */ = {
 			isa = PBXGroup;
 			children = (
+				C8FDF2DF261CD38300F17CBE /* BackupItem.h */,
+				C8FDF2DC261CD38300F17CBE /* BackupItem.m */,
+				C8FDF2DE261CD38300F17CBE /* BackupsManager.h */,
+				C8FDF2DD261CD38300F17CBE /* BackupsManager.m */,
 				C8E379ED25DC455F006A26BF /* SyncOperationState.h */,
 				C8E379EC25DC455F006A26BF /* SyncOperationState.m */,
 				C83741F925D313B300EDE4F3 /* SyncParameters.h */,
@@ -3715,14 +3870,14 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
-				C81F1DD02602146600251A2F /* Compare and Merge */,
-				C8F1C4F125E94D5200E7BADD /* SwiftUI */,
+				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
+				4D524D2B219B503F00C22CB4 /* View */,
+				C81F1DD02602146600251A2F /* Compare and Merge */,
 				C8FD559525DD3F9A009B8705 /* Mac-Outright-Pro-Info.plist */,
 				C8B9D494247E9F3800F6B9F5 /* Build */,
 				4DF347EF2074FA5A00148741 /* Model */,
 				4DCAE87C257E6E3600072D4B /* Sync */,
-				4D524D2B219B503F00C22CB4 /* View */,
 				C8DE8DA4258FD6C000B4D9EA /* Serialization */,
 				C8441B7D25CAEAFD0070C7FE /* Storage Providers */,
 				4DE79B86255D987C00F59B10 /* Strongbox AutoFill */,
@@ -3888,6 +4043,7 @@
 			isa = PBXGroup;
 			children = (
 				C8441C2F25CB00250070C7FE /* _Common */,
+				C89B44322608D41B00486824 /* File (Bookmark) */,
 				C8441C3025CB003C0070C7FE /* SFTP */,
 				C8441B7E25CAEB860070C7FE /* WebDAV */,
 				C8F8CE6525D57F1C00C93840 /* AddDatabaseSelectStorageProvider.storyboard */,
@@ -4092,6 +4248,8 @@
 		C85B9D6E2465426A00EEBFC9 /* UI Components */ = {
 			isa = PBXGroup;
 			children = (
+				C8C0834C2569581F00FF280D /* CustomBackgroundTableView.h */,
+				C8C0834D2569581F00FF280D /* CustomBackgroundTableView.m */,
 				4D50321B2412C36100766489 /* ClickableSecureTextField.h */,
 				4D50321C2412C36100766489 /* ClickableSecureTextField.m */,
 				4DC805D423A1176E001E742E /* CheckboxCell.xib */,
@@ -4248,6 +4406,16 @@
 			path = ..;
 			sourceTree = "<group>";
 		};
+		C8629FE6260B99A200DEDB8E /* Edit Custom Fields */ = {
+			isa = PBXGroup;
+			children = (
+				C8629FDA260B998600DEDB8E /* EditCustomFieldController.h */,
+				C8629FDB260B998600DEDB8E /* EditCustomFieldController.m */,
+				C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */,
+			);
+			name = "Edit Custom Fields";
+			sourceTree = "<group>";
+		};
 		C8794B0E25DAEA830097005D /* Bundled-with-iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -4293,6 +4461,37 @@
 				C87A9931255968EA0002BEF8 /* Strongbox-Outright-Pro-Bridging-Header.h */,
 			);
 			name = Swift;
+			sourceTree = "<group>";
+		};
+		C8877392261DE80100C01406 /* About */ = {
+			isa = PBXGroup;
+			children = (
+				C887739B261DEA8A00C01406 /* DebugHelper.h */,
+				C887739A261DEA8A00C01406 /* DebugHelper.m */,
+				C88773D7261E02E600C01406 /* AboutViewController.storyboard */,
+				C887737C261DE06800C01406 /* AboutViewController.h */,
+				C887737D261DE06800C01406 /* AboutViewController.m */,
+			);
+			name = About;
+			sourceTree = "<group>";
+		};
+		C8877459261E16BB00C01406 /* Edit Tags */ = {
+			isa = PBXGroup;
+			children = (
+				C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */,
+				C8877443261E16B300C01406 /* EditTagsViewController.h */,
+				C8877444261E16B300C01406 /* EditTagsViewController.m */,
+			);
+			name = "Edit Tags";
+			sourceTree = "<group>";
+		};
+		C89B44322608D41B00486824 /* File (Bookmark) */ = {
+			isa = PBXGroup;
+			children = (
+				C89B444C2608D54400486824 /* MacFileBasedBookmarkStorageProvider.h */,
+				C89B444D2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m */,
+			);
+			name = "File (Bookmark)";
 			sourceTree = "<group>";
 		};
 		C8B9D494247E9F3800F6B9F5 /* Build */ = {
@@ -4641,6 +4840,7 @@
 				4D1FFB1B2403030100B75EA2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB1C2403030100B75EA2 /* MacKeePassHistory.storyboard in Resources */,
 				C85B9D892465454800EEBFC9 /* ykpers-1 in Resources */,
+				C8877337261DD64900C01406 /* Backups.storyboard in Resources */,
 				4D1FFB1E2403030100B75EA2 /* UpgradeWindowController.xib in Resources */,
 				4D1FFB1F2403030100B75EA2 /* diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB202403030100B75EA2 /* DatabaseProperties.storyboard in Resources */,
@@ -4650,6 +4850,7 @@
 				C8E6D4FC246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB252403030100B75EA2 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				C85B9DB724655D6700EEBFC9 /* first.names.us.txt in Resources */,
+				C862A005260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */,
 				C8AA2138256BD0E400E9FF8D /* DatabaseOnboarding.storyboard in Resources */,
 				C8B946C42573D6EC00932C46 /* CollectionViewHeader.xib in Resources */,
 				4D1FFB262403030100B75EA2 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -4671,6 +4872,7 @@
 				C8F8CE3A25D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
 				4D1FFB312403030100B75EA2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4D1FFB322403030100B75EA2 /* german-diceware.wordlist.utf8.txt in Resources */,
+				C8BB7531261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */,
 				4D1FFB332403030100B75EA2 /* FavIconResultTableCell.xib in Resources */,
 				4D1FFB342403030100B75EA2 /* formatV3.txt in Resources */,
 				C85B9D832465454800EEBFC9 /* json-c in Resources */,
@@ -4687,6 +4889,7 @@
 				4D1FFB3C2403030100B75EA2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB3D2403030100B75EA2 /* Main.storyboard in Resources */,
 				4D1FFB3E2403030100B75EA2 /* eff_large_wordlist.utf8.txt in Resources */,
+				C88773D2261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				4D1FFB3F2403030100B75EA2 /* NodeDetails.storyboard in Resources */,
 				C85B9DB924655D6B00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
 				C8EDCD37250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
@@ -4706,7 +4909,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C81ABE4B25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
+				C88773D1261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				C8E78ACE25714A3900251153 /* SelectCredential.xib in Resources */,
+				C8877336261DD64900C01406 /* Backups.storyboard in Resources */,
 				4DE79B8C255D987C00F59B10 /* CredentialProviderViewController.xib in Resources */,
 				C8C1F75925702E7B009991D4 /* AutoFillCredentialCell.xib in Resources */,
 				C86FED1925C326A800386DD9 /* PressYubiKeyWindow.xib in Resources */,
@@ -4732,6 +4937,7 @@
 				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */,
 				C85B9D882465454800EEBFC9 /* ykpers-1 in Resources */,
+				C8877335261DD64900C01406 /* Backups.storyboard in Resources */,
 				4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
 				4D68255823E498D7002DC4FB /* DatabaseProperties.storyboard in Resources */,
@@ -4741,6 +4947,7 @@
 				C8E6D4FB246D5BD000AFFE13 /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				4D216F6F22CBCE0D000954D0 /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				C85B9DB624655D6600EEBFC9 /* first.names.us.txt in Resources */,
+				C862A004260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */,
 				C8AA2137256BD0E400E9FF8D /* DatabaseOnboarding.storyboard in Resources */,
 				C8B946C32573D6EC00932C46 /* CollectionViewHeader.xib in Resources */,
 				4D216F7422CBCE0D000954D0 /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -4762,6 +4969,7 @@
 				4DC805AD23A11702001E742E /* ProgressWindow.xib in Resources */,
 				C8F8CE3825D57EC300C93840 /* SFTPConfigurationVC.storyboard in Resources */,
 				4DC8059323A11493001E742E /* gameofthrones_8k_2018.utf8.txt in Resources */,
+				C8BB7530261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */,
 				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
@@ -4778,6 +4986,7 @@
 				4D216F7122CBCE0D000954D0 /* french-diceware.wordlist.utf8.txt in Resources */,
 				4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */,
 				4D216F6E22CBCE0D000954D0 /* eff_large_wordlist.utf8.txt in Resources */,
+				C88773D0261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				4D40B08423BFB8AA00BAD0D2 /* NodeDetails.storyboard in Resources */,
 				C85B9DB824655D6A00EEBFC9 /* 10-million-password-list-top-10000.txt in Resources */,
 				C8EDCD36250B770F00E427CB /* PressYubiKeyWindow.xib in Resources */,
@@ -4798,6 +5007,7 @@
 				C87949CA25DAE8E90097005D /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				C87949CB25DAE8E90097005D /* MacKeePassHistory.storyboard in Resources */,
 				C87949CC25DAE8E90097005D /* ykpers-1 in Resources */,
+				C8877339261DD64900C01406 /* Backups.storyboard in Resources */,
 				C87949CD25DAE8E90097005D /* UpgradeWindowController.xib in Resources */,
 				C87949CF25DAE8E90097005D /* diceware.wordlist.utf8.txt in Resources */,
 				C87949D025DAE8E90097005D /* DatabaseProperties.storyboard in Resources */,
@@ -4807,6 +5017,7 @@
 				C87949D425DAE8E90097005D /* icelandic-diceware.wordlist.utf8.txt in Resources */,
 				C87949D525DAE8E90097005D /* swedish-diceware.wordlist.utf8.txt in Resources */,
 				C87949D625DAE8E90097005D /* first.names.us.txt in Resources */,
+				C862A006260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */,
 				C87949D725DAE8E90097005D /* DatabaseOnboarding.storyboard in Resources */,
 				C87949D825DAE8E90097005D /* CollectionViewHeader.xib in Resources */,
 				C87949D925DAE8E90097005D /* google-10000-english-usa-no-swears-medium.txt in Resources */,
@@ -4828,6 +5039,7 @@
 				C87949E725DAE8E90097005D /* ProgressWindow.xib in Resources */,
 				C87949E825DAE8E90097005D /* SFTPConfigurationVC.storyboard in Resources */,
 				C87949E925DAE8E90097005D /* gameofthrones_8k_2018.utf8.txt in Resources */,
+				C8BB7532261E23FE00D6FCB1 /* EditTagsPopover.storyboard in Resources */,
 				C87949EA25DAE8E90097005D /* german-diceware.wordlist.utf8.txt in Resources */,
 				C87949EB25DAE8E90097005D /* FavIconResultTableCell.xib in Resources */,
 				C87949EC25DAE8E90097005D /* formatV3.txt in Resources */,
@@ -4844,6 +5056,7 @@
 				C87949F625DAE8E90097005D /* french-diceware.wordlist.utf8.txt in Resources */,
 				C87949F725DAE8E90097005D /* Main.storyboard in Resources */,
 				C87949F825DAE8E90097005D /* eff_large_wordlist.utf8.txt in Resources */,
+				C88773D4261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				C87949F925DAE8E90097005D /* NodeDetails.storyboard in Resources */,
 				C87949FA25DAE8E90097005D /* 10-million-password-list-top-10000.txt in Resources */,
 				C87949FB25DAE8E90097005D /* PressYubiKeyWindow.xib in Resources */,
@@ -4856,7 +5069,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C81ABE4F25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
+				C88773D5261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				C8794AE925DAE9020097005D /* SelectCredential.xib in Resources */,
+				C887733A261DD64900C01406 /* Backups.storyboard in Resources */,
 				C8794AEA25DAE9020097005D /* CredentialProviderViewController.xib in Resources */,
 				C8794AEC25DAE9020097005D /* AutoFillCredentialCell.xib in Resources */,
 				C8794AED25DAE9020097005D /* PressYubiKeyWindow.xib in Resources */,
@@ -4874,7 +5089,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C81ABE4D25E6B0250006E81C /* DatabaseCellView.xib in Resources */,
+				C88773D3261E02E600C01406 /* AboutViewController.storyboard in Resources */,
 				C8B946162573D01A00932C46 /* SelectCredential.xib in Resources */,
+				C8877338261DD64900C01406 /* Backups.storyboard in Resources */,
 				C8B946172573D01A00932C46 /* CredentialProviderViewController.xib in Resources */,
 				C8B946192573D01A00932C46 /* AutoFillCredentialCell.xib in Resources */,
 				C86FED1F25C326A900386DD9 /* PressYubiKeyWindow.xib in Resources */,
@@ -5079,6 +5296,7 @@
 				C8DE8DAB258FD71300B4D9EA /* Serializator.m in Sources */,
 				4D1FFA6D2403030100B75EA2 /* SimpleXmlValueExtractor.m in Sources */,
 				C83741B725D30E8B00EDE4F3 /* SyncDatabaseRequest.m in Sources */,
+				C8FDF2E2261CD38300F17CBE /* BackupItem.m in Sources */,
 				C8441BF625CAFBB10070C7FE /* DAVRequests.m in Sources */,
 				4D1FFA6E2403030100B75EA2 /* InnerRandomStreamFactory.m in Sources */,
 				4D1FFA6F2403030100B75EA2 /* CollectionViewHeader.m in Sources */,
@@ -5134,6 +5352,7 @@
 				4D50321E2412C36800766489 /* ClickableSecureTextField.m in Sources */,
 				C8969FFA25AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
 				4D1FFA8E2403030100B75EA2 /* Kdbx4Database.m in Sources */,
+				C8629FDD260B998600DEDB8E /* EditCustomFieldController.m in Sources */,
 				4D1FFA8F2403030100B75EA2 /* MMcGACTextFieldCell.m in Sources */,
 				4D1FFA902403030100B75EA2 /* AesCipher.m in Sources */,
 				C8AFD585256AC40B00290960 /* OnboardingWelcomeViewController.m in Sources */,
@@ -5184,6 +5403,7 @@
 				4D1FFAAF2403030100B75EA2 /* SecretStore.m in Sources */,
 				4DD30BB6255D9ACD000A923F /* QuickTypeRecordIdentifier.m in Sources */,
 				C83741D125D30F3700EDE4F3 /* SyncStatus.m in Sources */,
+				C887739E261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				C81BBD0D2567E49A001BAB0D /* ClickableTextField.m in Sources */,
 				C83741C625D30F0B00EDE4F3 /* ConcurrentMutableArray.m in Sources */,
 				4D1FFAB02403030100B75EA2 /* MacAlerts.m in Sources */,
@@ -5225,7 +5445,10 @@
 				4D1FFAC72403030100B75EA2 /* QRCodePresenterPopover.m in Sources */,
 				C88307AA25CB17CF001D8FE1 /* DatabasesManagerVC.m in Sources */,
 				4D1FFAC82403030100B75EA2 /* ViewController.m in Sources */,
+				C89B444F2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */,
+				C8629F98260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */,
 				4D1FFAC92403030100B75EA2 /* DAVSession.m in Sources */,
+				C8FDF2E8261CD38300F17CBE /* BackupsManager.m in Sources */,
 				C8F39EAD25DD7CBA0045CAAB /* WebDAVConfigVC.m in Sources */,
 				4D1FFACA2403030100B75EA2 /* Csv.m in Sources */,
 				4D1FFACB2403030100B75EA2 /* RootXmlDomainObject.m in Sources */,
@@ -5252,6 +5475,7 @@
 				4D1FFAD72403030100B75EA2 /* KdfParameters.m in Sources */,
 				C883079925CB167A001D8FE1 /* AddDatabaseSelectStorageVC.m in Sources */,
 				4D1FFAD92403030100B75EA2 /* PasswordGenerationConfig.m in Sources */,
+				C887732A261DAAAC00C01406 /* BackupsViewController.m in Sources */,
 				4D1FFADA2403030100B75EA2 /* CompositeKeyFactors.m in Sources */,
 				C8E6D500246D5C7600AFFE13 /* WordList.m in Sources */,
 				4D1FFADB2403030100B75EA2 /* FavIconDownloadOptions.m in Sources */,
@@ -5308,9 +5532,11 @@
 				4D1FFAFA2403030100B75EA2 /* V3Binary.m in Sources */,
 				4D1FFAFB2403030100B75EA2 /* Field.m in Sources */,
 				4D1FFAFC2403030100B75EA2 /* Root.m in Sources */,
+				C80735E22614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8AFBF5825CC4014009D9519 /* SFTPConfigurationVC.m in Sources */,
 				C83741B325D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
 				C8DC763C2497A7F800C9C443 /* HmacBlockStream.m in Sources */,
+				C8877380261DE06800C01406 /* AboutViewController.m in Sources */,
 				4D37D873244E074B00C3182D /* DatabaseAuditorConfiguration.m in Sources */,
 				4D1FFAFD2403030100B75EA2 /* ProgressWindow.m in Sources */,
 				C8441CA525CB01AB0070C7FE /* NMSSHLogger.m in Sources */,
@@ -5331,6 +5557,7 @@
 				4DCAE8BB257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
 				C87A9950255968EB0002BEF8 /* DownloadImageOperation.swift in Sources */,
 				4D1FFB032403030100B75EA2 /* SerializationData.m in Sources */,
+				C8877447261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				4D1FFB042403030100B75EA2 /* PwSafeDatabase.m in Sources */,
 				C831367724A9203A00D475D9 /* cencode.c in Sources */,
 				4D1FFB052403030100B75EA2 /* KeePassXmlParser.m in Sources */,
@@ -5431,6 +5658,7 @@
 				C8969FF925AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
 				C89B8FDB2562D32C00B590C0 /* GzipDecompressOutputStream.m in Sources */,
 				C8D8D3E1256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m in Sources */,
+				C80735E12614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8441C3C25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8441CB425CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
 				C89561CC2565521A001C747C /* PressYubiKeyWindow.m in Sources */,
@@ -5484,6 +5712,7 @@
 				C8C1F73D257010AE009991D4 /* NSMutableArray+Extensions.m in Sources */,
 				C86E60752562D5EB001953AD /* twofish.c in Sources */,
 				C89B8F8E2562D2CA00B590C0 /* V3Binary.m in Sources */,
+				C887739D261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				C89B8FAC2562D2CA00B590C0 /* KeyFileParser.m in Sources */,
 				C89B8FBE2562D2FE00B590C0 /* ChaCha20Stream.m in Sources */,
 				C86791692561A1630038310E /* KeePassXmlAutoType.m in Sources */,
@@ -5505,15 +5734,18 @@
 				C86E60642562D5A7001953AD /* OTPTokenType.m in Sources */,
 				C86E60352562D52D001953AD /* PasswordHistoryEntry.m in Sources */,
 				C86E608E2562D637001953AD /* argon2.c in Sources */,
+				C8FDF2E1261CD38300F17CBE /* BackupItem.m in Sources */,
 				C89B8FB42562D2FE00B590C0 /* Salsa20Stream.m in Sources */,
 				C8441C2225CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C89B8F992562D2CA00B590C0 /* CustomIconList.m in Sources */,
 				C83741BA25D30E8B00EDE4F3 /* WorkingCopyManager.m in Sources */,
 				C8441BED25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */,
+				C887737F261DE06800C01406 /* AboutViewController.m in Sources */,
 				C807983A2562DF1B00FE0CA7 /* StreamUtils.m in Sources */,
 				C89B8FA22562D2CA00B590C0 /* DeletedObject.m in Sources */,
 				C8C083502569581F00FF280D /* CustomBackgroundTableView.m in Sources */,
 				C83741B625D30E8B00EDE4F3 /* SyncDatabaseRequest.m in Sources */,
+				C8877329261DAAAC00C01406 /* BackupsViewController.m in Sources */,
 				C86E606B2562D5AF001953AD /* PasswordMaker.m in Sources */,
 				C870739D258935500002070A /* KeePassXmlModelAdaptor.m in Sources */,
 				C8E78B4A25715C8700251153 /* MMWormhole.m in Sources */,
@@ -5537,6 +5769,7 @@
 				C89B8F9D2562D2CA00B590C0 /* DecryptionParameters.m in Sources */,
 				C89B8FB92562D2FE00B590C0 /* ChaCha20Cipher.m in Sources */,
 				C89B8F922562D2CA00B590C0 /* Argon2KdfCipher.m in Sources */,
+				C8877446261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				C89B8F2E2562BCAF00B590C0 /* AutoFillManager.m in Sources */,
 				C807984E2562E22E00FE0CA7 /* ClipboardManager.m in Sources */,
 				C89B8F9A2562D2CA00B590C0 /* RootXmlDomainObject.m in Sources */,
@@ -5565,6 +5798,7 @@
 				C89561CB2565521A001C747C /* YubiKeyData.m in Sources */,
 				C86E60372562D52D001953AD /* PwSafeSerialization.m in Sources */,
 				C86E60582562D58B001953AD /* PasswordGenerationConfig.m in Sources */,
+				C8FDF2E7261CD38300F17CBE /* BackupsManager.m in Sources */,
 				C8E78B5025715C8700251153 /* MMWormholeFileTransiting.m in Sources */,
 				C8E78AC2257147FA00251153 /* ProgressWindow.m in Sources */,
 				C86E603F2562D540001953AD /* CustomData.m in Sources */,
@@ -5585,6 +5819,7 @@
 				C8DE8DA9258FD71300B4D9EA /* Serializator.m in Sources */,
 				4DA50D04244DFD2100364781 /* DatabaseAuditReport.m in Sources */,
 				C83741B525D30E8B00EDE4F3 /* SyncDatabaseRequest.m in Sources */,
+				C8FDF2E0261CD38300F17CBE /* BackupItem.m in Sources */,
 				C8441BF425CAFBB10070C7FE /* DAVRequests.m in Sources */,
 				4D2CB4952332D7C400C2E084 /* SimpleXmlValueExtractor.m in Sources */,
 				4D524CED219B481200C22CB4 /* InnerRandomStreamFactory.m in Sources */,
@@ -5640,6 +5875,7 @@
 				C8969FF825AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
 				4D0BD69923DF4205004C48BB /* DatabaseSettingsTabViewController.m in Sources */,
 				4D9E099721825108007BA1E7 /* Kdbx4Database.m in Sources */,
+				C8629FDC260B998600DEDB8E /* EditCustomFieldController.m in Sources */,
 				4DBFD391225D159200290488 /* MMcGACTextFieldCell.m in Sources */,
 				C8AFD584256AC40B00290960 /* OnboardingWelcomeViewController.m in Sources */,
 				4D9E098A21825108007BA1E7 /* AesCipher.m in Sources */,
@@ -5690,6 +5926,7 @@
 				4DD30BB5255D9ACD000A923F /* QuickTypeRecordIdentifier.m in Sources */,
 				C81BBD0C2567E49A001BAB0D /* ClickableTextField.m in Sources */,
 				C83741CF25D30F3700EDE4F3 /* SyncStatus.m in Sources */,
+				C887739C261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				4DACA5C023CCD40F00891366 /* SecretStore.m in Sources */,
 				C83741C425D30F0B00EDE4F3 /* ConcurrentMutableArray.m in Sources */,
 				4D00B1F81F3DB03300D7560B /* MacAlerts.m in Sources */,
@@ -5731,7 +5968,10 @@
 				C88307A925CB17CF001D8FE1 /* DatabasesManagerVC.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
 				4DBF494222232A3200F48182 /* DAVSession.m in Sources */,
+				C89B444E2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */,
+				C8629F97260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */,
 				C8F39EAC25DD7CBA0045CAAB /* WebDAVConfigVC.m in Sources */,
+				C8FDF2E6261CD38300F17CBE /* BackupsManager.m in Sources */,
 				4D44680C216CE08B00F6358D /* Csv.m in Sources */,
 				4D9E098421825108007BA1E7 /* RootXmlDomainObject.m in Sources */,
 				4DD2BAB9238BE44400513271 /* MMcG_MF_Base32Additions.m in Sources */,
@@ -5758,6 +5998,7 @@
 				C883079825CB167A001D8FE1 /* AddDatabaseSelectStorageVC.m in Sources */,
 				4DE206A022E5FB9700F15184 /* CompositeKeyFactors.m in Sources */,
 				C8E6D4FF246D5C7600AFFE13 /* WordList.m in Sources */,
+				C8877328261DAAAC00C01406 /* BackupsViewController.m in Sources */,
 				4DC8058C23A113EC001E742E /* FavIconDownloadOptions.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
 				C8E6D503246D71E800AFFE13 /* DeletedObject.m in Sources */,
@@ -5814,9 +6055,11 @@
 				4DF347E92074FA3500148741 /* Field.m in Sources */,
 				4D50321D2412C36100766489 /* ClickableSecureTextField.m in Sources */,
 				C8DC763B2497A7F800C9C443 /* HmacBlockStream.m in Sources */,
+				C80735E02614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8AFBF5625CC4014009D9519 /* SFTPConfigurationVC.m in Sources */,
 				C83741B125D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
+				C887737E261DE06800C01406 /* AboutViewController.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
 				C87A9943255968EA0002BEF8 /* HTMLDocument.m in Sources */,
 				C8441CA325CB01AB0070C7FE /* NMSSHLogger.m in Sources */,
@@ -5837,6 +6080,7 @@
 				4DCAE8B9257E711A00072D4B /* UnifiedDatabaseMetadata.m in Sources */,
 				C87A994F255968EB0002BEF8 /* DownloadImageOperation.swift in Sources */,
 				4D9E098821825108007BA1E7 /* SerializationData.m in Sources */,
+				C8877445261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				4DF347E62074FA3500148741 /* PwSafeDatabase.m in Sources */,
 				C831367624A9203A00D475D9 /* cencode.c in Sources */,
 				4D2CB49B2332D82D00C2E084 /* KeePassXmlParser.m in Sources */,
@@ -5933,6 +6177,7 @@
 				C87948EE25DAE8E90097005D /* ref.c in Sources */,
 				C87948EF25DAE8E90097005D /* KdbxSerializationCommon.m in Sources */,
 				C87948F025DAE8E90097005D /* PlaintextInnerStream.m in Sources */,
+				C887732C261DAAAC00C01406 /* BackupsViewController.m in Sources */,
 				C87948F125DAE8E90097005D /* NSDictionary+Extensions.m in Sources */,
 				C87948F225DAE8E90097005D /* SampleItemsGenerator.m in Sources */,
 				C87948F325DAE8E90097005D /* Sha256PassThroughOutputStream.m in Sources */,
@@ -5963,6 +6208,7 @@
 				C879490C25DAE8E90097005D /* AutoFillManager.m in Sources */,
 				C879490D25DAE8E90097005D /* NMSSHSession.m in Sources */,
 				C879490E25DAE8E90097005D /* DeletedObjects.m in Sources */,
+				C89B44502608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */,
 				C879490F25DAE8E90097005D /* Document.m in Sources */,
 				C879491025DAE8E90097005D /* QuickTypeRecordIdentifier.m in Sources */,
 				C879491125DAE8E90097005D /* ClickableTextField.m in Sources */,
@@ -5971,6 +6217,7 @@
 				C879491425DAE8E90097005D /* ConcurrentMutableArray.m in Sources */,
 				C879491525DAE8E90097005D /* MacAlerts.m in Sources */,
 				C879491625DAE8E90097005D /* CryptoParameters.m in Sources */,
+				C8877382261DE06800C01406 /* AboutViewController.m in Sources */,
 				C8FD557725DD3E1A009B8705 /* NonFileDocument.m in Sources */,
 				C879491725DAE8E90097005D /* CustomIcon.m in Sources */,
 				C879491825DAE8E90097005D /* WorkingCopyManager.m in Sources */,
@@ -5985,6 +6232,7 @@
 				C879492025DAE8E90097005D /* CustomBackgroundTableView.m in Sources */,
 				C879492125DAE8E90097005D /* MMWormholeFileTransiting.m in Sources */,
 				C81F1DD7260214D900251A2F /* DatabaseMerger.m in Sources */,
+				C8629FDE260B998600DEDB8E /* EditCustomFieldController.m in Sources */,
 				C879492225DAE8E90097005D /* WebDAVSessionConfiguration.m in Sources */,
 				C879492325DAE8E90097005D /* SyncAndMergeSequenceManager.m in Sources */,
 				C879492425DAE8E90097005D /* AutoFillSettingsViewController.m in Sources */,
@@ -6036,6 +6284,7 @@
 				C879495525DAE8E90097005D /* AddDatabaseSelectStorageVC.m in Sources */,
 				C879495625DAE8E90097005D /* CompositeKeyFactors.m in Sources */,
 				C879495725DAE8E90097005D /* WordList.m in Sources */,
+				C88773A0261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				C879495825DAE8E90097005D /* FavIconDownloadOptions.m in Sources */,
 				C879495925DAE8E90097005D /* thread.c in Sources */,
 				C879495A25DAE8E90097005D /* DeletedObject.m in Sources */,
@@ -6047,6 +6296,7 @@
 				C879496025DAE8E90097005D /* NSDateRFC1123.m in Sources */,
 				C879496125DAE8E90097005D /* NSAdvancedTextField.m in Sources */,
 				C879496225DAE8E90097005D /* Keys.m in Sources */,
+				C8FDF2E4261CD38300F17CBE /* BackupItem.m in Sources */,
 				C879496425DAE8E90097005D /* CustomIconList.m in Sources */,
 				C879496525DAE8E90097005D /* NodeHierarchyReconstructionData.m in Sources */,
 				C879496625DAE8E90097005D /* AutoFillNewRecordSettings.m in Sources */,
@@ -6066,6 +6316,7 @@
 				C879497525DAE8E90097005D /* blake2b.c in Sources */,
 				C879497625DAE8E90097005D /* AttachmentCollectionView.m in Sources */,
 				C879497725DAE8E90097005D /* Times.m in Sources */,
+				C8877449261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				C879497825DAE8E90097005D /* OTPToken+Serialization.m in Sources */,
 				C879497925DAE8E90097005D /* MacUrlSchemes.m in Sources */,
 				C879497A25DAE8E90097005D /* NodeIcon.m in Sources */,
@@ -6085,9 +6336,11 @@
 				C879498725DAE8E90097005D /* NodeIconHelper.m in Sources */,
 				C879498825DAE8E90097005D /* NSString+Extensions.m in Sources */,
 				C879498925DAE8E90097005D /* DAVRequestGroup.m in Sources */,
+				C8FDF2EA261CD38300F17CBE /* BackupsManager.m in Sources */,
 				C879498A25DAE8E90097005D /* DocumentController.m in Sources */,
 				C879498B25DAE8E90097005D /* DatabaseAuditorConfiguration.m in Sources */,
 				C879498C25DAE8E90097005D /* V3Binary.m in Sources */,
+				C8629F99260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */,
 				C879498D25DAE8E90097005D /* Field.m in Sources */,
 				C879498E25DAE8E90097005D /* ClickableSecureTextField.m in Sources */,
 				C879498F25DAE8E90097005D /* HmacBlockStream.m in Sources */,
@@ -6148,10 +6401,12 @@
 				C8794A1825DAE9020097005D /* SimpleXmlValueExtractor.m in Sources */,
 				C8794A1925DAE9020097005D /* AutoTypeAssociation.m in Sources */,
 				C8794A1A25DAE9020097005D /* SafeStorageProviderFactory.m in Sources */,
+				C8FDF2E5261CD38300F17CBE /* BackupItem.m in Sources */,
 				C8794A1B25DAE9020097005D /* MacSyncManager.m in Sources */,
 				C8794A1C25DAE9020097005D /* KeePass2TagPackage.m in Sources */,
 				C8794A1D25DAE9020097005D /* AesInputStream.m in Sources */,
 				C8794A1E25DAE9020097005D /* BaseXmlDomainObjectHandler.m in Sources */,
+				C8877383261DE06800C01406 /* AboutViewController.m in Sources */,
 				C8794A1F25DAE9020097005D /* Kdbx4Database.m in Sources */,
 				C8794A2025DAE9020097005D /* MinimalPoolHelper.m in Sources */,
 				C8794A2125DAE9020097005D /* DatabaseSyncOperationalData.m in Sources */,
@@ -6178,6 +6433,7 @@
 				C8794A3625DAE9020097005D /* KdbSerializationData.m in Sources */,
 				C8794A3725DAE9020097005D /* Keys.m in Sources */,
 				C8794A3825DAE9020097005D /* Constants.m in Sources */,
+				C887744A261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				C8794A3925DAE9020097005D /* KdfParameters.m in Sources */,
 				C8794A3A25DAE9020097005D /* PlaintextInnerStream.m in Sources */,
 				C8794A3B25DAE9020097005D /* KP31HashedBlockStream.m in Sources */,
@@ -6193,6 +6449,7 @@
 				C8794A4525DAE9020097005D /* KeePassGroup.m in Sources */,
 				C8794A4625DAE9020097005D /* WebDAVSessionConfiguration.m in Sources */,
 				C8794A4725DAE9020097005D /* SyncComparisonParams.m in Sources */,
+				C887732D261DAAAC00C01406 /* BackupsViewController.m in Sources */,
 				C8794A4825DAE9020097005D /* DeletedObjects.m in Sources */,
 				C8794A4925DAE9020097005D /* NSDictionary+Extensions.m in Sources */,
 				C8794A4A25DAE9020097005D /* OTPToken+Persistence.m in Sources */,
@@ -6211,6 +6468,7 @@
 				C8794A5725DAE9020097005D /* FileManager.m in Sources */,
 				C8794A5825DAE9020097005D /* Kdb1Database.m in Sources */,
 				C8794A5925DAE9020097005D /* DAVSession.m in Sources */,
+				C8FDF2EB261CD38300F17CBE /* BackupsManager.m in Sources */,
 				C8794A5A25DAE9020097005D /* OTPToken+Serialization.m in Sources */,
 				C8794A5B25DAE9020097005D /* Pair.m in Sources */,
 				C8794A5C25DAE9020097005D /* CustomField.m in Sources */,
@@ -6326,6 +6584,7 @@
 				C8794AC725DAE9020097005D /* Base64DecodeOutputStream.m in Sources */,
 				C8794AC825DAE9020097005D /* KeePassCiphers.m in Sources */,
 				C8794AC925DAE9020097005D /* SFTPProviderData.m in Sources */,
+				C88773A1261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				C8794ACA25DAE9020097005D /* DatabasesManager.m in Sources */,
 				C8794ACB25DAE9020097005D /* OutlineView.m in Sources */,
 				C8794ACC25DAE9020097005D /* MMcG_MF_Base32Additions.m in Sources */,
@@ -6423,6 +6682,7 @@
 				C8969FFB25AF70FF006819E3 /* Argon2idKdfCipher.m in Sources */,
 				C8B945982573D01A00932C46 /* GzipDecompressOutputStream.m in Sources */,
 				C8B945992573D01A00932C46 /* SelectAutoFillDatabaseViewController.m in Sources */,
+				C80735E32614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */,
 				C8441C3E25CB009B0070C7FE /* SFTPStorageProvider.m in Sources */,
 				C8441CB625CB01AB0070C7FE /* NMSSHConfig.m in Sources */,
 				C8B9459A2573D01A00932C46 /* PressYubiKeyWindow.m in Sources */,
@@ -6476,6 +6736,7 @@
 				C8B945BC2573D01A00932C46 /* NSMutableArray+Extensions.m in Sources */,
 				C8B945BD2573D01A00932C46 /* twofish.c in Sources */,
 				C8B945BE2573D01A00932C46 /* V3Binary.m in Sources */,
+				C887739F261DEA8A00C01406 /* DebugHelper.m in Sources */,
 				C8B945BF2573D01A00932C46 /* KeyFileParser.m in Sources */,
 				C8B945C02573D01A00932C46 /* ChaCha20Stream.m in Sources */,
 				C8B945C12573D01A00932C46 /* KeePassXmlAutoType.m in Sources */,
@@ -6497,15 +6758,18 @@
 				C8B945D12573D01A00932C46 /* OTPTokenType.m in Sources */,
 				C8B945D32573D01A00932C46 /* PasswordHistoryEntry.m in Sources */,
 				C8B945D42573D01A00932C46 /* argon2.c in Sources */,
+				C8FDF2E3261CD38300F17CBE /* BackupItem.m in Sources */,
 				C8B945D52573D01A00932C46 /* Salsa20Stream.m in Sources */,
 				C8441C2425CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C8B945D62573D01A00932C46 /* CustomIconList.m in Sources */,
 				C83741BC25D30E8B00EDE4F3 /* WorkingCopyManager.m in Sources */,
 				C8441BEF25CAFBB10070C7FE /* DAVBaseRequest.m in Sources */,
+				C8877381261DE06800C01406 /* AboutViewController.m in Sources */,
 				C8B945D72573D01A00932C46 /* StreamUtils.m in Sources */,
 				C8B945D82573D01A00932C46 /* DeletedObject.m in Sources */,
 				C8B945D92573D01A00932C46 /* CustomBackgroundTableView.m in Sources */,
 				C83741B825D30E8B00EDE4F3 /* SyncDatabaseRequest.m in Sources */,
+				C887732B261DAAAC00C01406 /* BackupsViewController.m in Sources */,
 				C8B945DA2573D01A00932C46 /* PasswordMaker.m in Sources */,
 				C870739F258935500002070A /* KeePassXmlModelAdaptor.m in Sources */,
 				C8B945DB2573D01A00932C46 /* MMWormhole.m in Sources */,
@@ -6529,6 +6793,7 @@
 				C8B945EA2573D01A00932C46 /* DecryptionParameters.m in Sources */,
 				C8B945EB2573D01A00932C46 /* ChaCha20Cipher.m in Sources */,
 				C8B945EC2573D01A00932C46 /* Argon2KdfCipher.m in Sources */,
+				C8877448261E16B300C01406 /* EditTagsViewController.m in Sources */,
 				C8B945ED2573D01A00932C46 /* AutoFillManager.m in Sources */,
 				C8B945EE2573D01A00932C46 /* ClipboardManager.m in Sources */,
 				C8B945EF2573D01A00932C46 /* RootXmlDomainObject.m in Sources */,
@@ -6557,6 +6822,7 @@
 				C8B946012573D01A00932C46 /* YubiKeyData.m in Sources */,
 				C8B946022573D01A00932C46 /* PwSafeSerialization.m in Sources */,
 				C8B946032573D01A00932C46 /* PasswordGenerationConfig.m in Sources */,
+				C8FDF2E9261CD38300F17CBE /* BackupsManager.m in Sources */,
 				C8B946052573D01A00932C46 /* MMWormholeFileTransiting.m in Sources */,
 				C8B946062573D01A00932C46 /* ProgressWindow.m in Sources */,
 				C8B946072573D01A00932C46 /* CustomData.m in Sources */,
@@ -6900,6 +7166,72 @@
 			path = MacBox;
 			sourceTree = "<group>";
 		};
+		C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C862A007260B9D8C00DEDB8E /* Base */,
+				C862A011260B9D8F00DEDB8E /* uk */,
+				C862A013260B9D9000DEDB8E /* sv */,
+				C862A015260B9D9100DEDB8E /* es */,
+				C862A017260B9D9200DEDB8E /* ru */,
+				C862A019260B9D9300DEDB8E /* pt-BR */,
+				C862A01B260B9D9400DEDB8E /* nb */,
+				C862A01D260B9D9500DEDB8E /* ja */,
+				C862A01F260B9D9600DEDB8E /* it */,
+				C862A021260B9D9700DEDB8E /* zh-Hans */,
+				C862A023260B9D9800DEDB8E /* cs */,
+				C862A025260B9D9900DEDB8E /* nl */,
+				C862A027260B9D9A00DEDB8E /* fr */,
+				C862A029260B9D9B00DEDB8E /* de */,
+			);
+			name = EditCustomField.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C887733C261DD64900C01406 /* Backups.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C887733B261DD64900C01406 /* Base */,
+				C887734E261DD64D00C01406 /* zh-Hans */,
+				C8877350261DD64F00C01406 /* cs */,
+				C8877352261DD65000C01406 /* nl */,
+				C8877354261DD65100C01406 /* fr */,
+				C8877356261DD65300C01406 /* de */,
+				C8877358261DD65400C01406 /* it */,
+				C887735A261DD65600C01406 /* ja */,
+				C887735C261DD65700C01406 /* nb */,
+				C887735E261DD65800C01406 /* pt-BR */,
+				C8877360261DD65A00C01406 /* ru */,
+				C8877362261DD65B00C01406 /* es */,
+				C8877364261DD65C00C01406 /* sv */,
+				C8877366261DD65D00C01406 /* uk */,
+			);
+			name = Backups.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C88773D7261E02E600C01406 /* AboutViewController.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C88773D6261E02E600C01406 /* Base */,
+				C88773E9261E02EA00C01406 /* zh-Hans */,
+				C88773EB261E02EB00C01406 /* cs */,
+				C88773ED261E02EC00C01406 /* nl */,
+				C88773EF261E02EE00C01406 /* fr */,
+				C88773F8261E02EF00C01406 /* de */,
+				C88773FA261E02F100C01406 /* it */,
+				C88773FC261E02F200C01406 /* ja */,
+				C8877405261E02F400C01406 /* nb */,
+				C8877407261E02F500C01406 /* pt-BR */,
+				C8877409261E02F700C01406 /* ru */,
+				C887740B261E02F800C01406 /* es */,
+				C8877414261E02FA00C01406 /* sv */,
+				C8877416261E02FB00C01406 /* uk */,
+			);
+			name = AboutViewController.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
 		C8AA213B256BD0E400E9FF8D /* DatabaseOnboarding.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -6941,6 +7273,28 @@
 				C86BB47325F91C3800425405 /* pt-BR */,
 			);
 			name = ManualCredentialsEntry.xib;
+			sourceTree = "<group>";
+		};
+		C8BB7534261E23FE00D6FCB1 /* EditTagsPopover.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8BB7533261E23FE00D6FCB1 /* Base */,
+				C8BB753F261E240800D6FCB1 /* zh-Hans */,
+				C8BB7548261E240900D6FCB1 /* cs */,
+				C8BB754A261E240A00D6FCB1 /* nl */,
+				C8BB754C261E240C00D6FCB1 /* fr */,
+				C8BB754E261E240D00D6FCB1 /* de */,
+				C8BB7550261E240F00D6FCB1 /* it */,
+				C8BB7552261E241000D6FCB1 /* ja */,
+				C8BB7554261E241200D6FCB1 /* nb */,
+				C8BB7556261E241300D6FCB1 /* pt-BR */,
+				C8BB7558261E241500D6FCB1 /* ru */,
+				C8BB755A261E241700D6FCB1 /* es */,
+				C8BB755C261E241900D6FCB1 /* sv */,
+				C8BB755E261E241A00D6FCB1 /* uk */,
+			);
+			name = EditTagsPopover.storyboard;
+			path = MacBox;
 			sourceTree = "<group>";
 		};
 		C8E78AC925714A2A00251153 /* SelectAutoFillDatabaseViewController.xib */ = {
@@ -7131,7 +7485,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7141,7 +7495,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.10;
+				MARKETING_VERSION = 1.15.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -7162,7 +7516,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7172,7 +7526,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.10;
+				MARKETING_VERSION = 1.15.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac.pro;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -7243,7 +7597,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7281,7 +7635,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7426,7 +7780,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -7436,7 +7790,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.10;
+				MARKETING_VERSION = 1.15.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -7457,7 +7811,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -7467,7 +7821,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
-				MARKETING_VERSION = 1.14.10;
+				MARKETING_VERSION = 1.15.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.markmcguill.strongbox.mac;
 				PRODUCT_NAME = Strongbox;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -7487,7 +7841,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -7519,7 +7873,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -7551,7 +7905,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7589,7 +7943,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7625,7 +7979,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7641,7 +7995,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.10;
+				MARKETING_VERSION = 1.15.8;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -7664,7 +8018,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3002;
+				CURRENT_PROJECT_VERSION = 3005;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7680,7 +8034,7 @@
 					"$(PROJECT_DIR)/lib",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.14.10;
+				MARKETING_VERSION = 1.15.8;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.markmcguill.strongbox.mac.pro.Strongbox-AutoFill";
 				PRODUCT_NAME = "$(TARGET_NAME)";

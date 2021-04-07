@@ -471,6 +471,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
     if(includeHistory) {
         to.keePassHistory = from.keePassHistory.mutableCopy;
+        to.passwordHistory = [from.passwordHistory clone];
     }
 }
 

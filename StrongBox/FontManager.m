@@ -7,7 +7,7 @@
 //
 
 #import "FontManager.h"
-#import "Settings.h"
+//#import "Settings.h"
 
 static NSString* const kEasyReadFontName = @"Menlo";
 static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
