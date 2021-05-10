@@ -17,6 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSUUID* uuid;
 @property (nonatomic) NSData* data;
+@property (nonatomic, nullable) NSString* name; 
+@property (nonatomic, nullable) NSDate* modified; 
 
 @end
 

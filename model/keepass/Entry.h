@@ -60,6 +60,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* overrideURL;
 @property (nullable) KeePassXmlAutoType* autoType;
 
+@property BOOL qualityCheck;
+@property (nullable) NSUUID* previousParentGroup;
+
 @end
 
 NS_ASSUME_NONNULL_END

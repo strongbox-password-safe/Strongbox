@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSString* friendlyTimeStringPrecise;
 @property (readonly) NSString* friendlyDateTimeStringBothPrecise;
 
++ (instancetype)fromYYYY_MM_DDString:(NSString*)string;
+
 @end
 
 NS_ASSUME_NONNULL_END

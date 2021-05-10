@@ -13,12 +13,14 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseAuditReport : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
+
 - (instancetype)initWithNoPasswordEntries:(NSSet<NSUUID*>*)noPasswords
                       duplicatedPasswords:(NSDictionary<NSString*, NSSet<NSUUID*>*>*)duplicatedPasswords
                           commonPasswords:(NSSet<NSUUID*>* )commonPasswords
                                   similar:(NSDictionary<NSUUID*, NSSet<NSUUID*>*>*)similar
                                  tooShort:(NSSet<NSUUID *> *)tooShort
-                                    pwned:(NSSet<NSUUID *> *)pwned NS_DESIGNATED_INITIALIZER;
+                                    pwned:(NSSet<NSUUID *> *)pwned
+                               lowEntropy:(NSSet<NSUUID *> *)lowEntropy NS_DESIGNATED_INITIALIZER;
 
 @property (readonly) NSSet<NSUUID*>* entriesWithNoPasswords;
 @property (readonly) NSSet<NSUUID*>* entriesWithDuplicatePasswords;
@@ -26,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) NSSet<NSUUID*>* entriesWithSimilarPasswords;
 @property (readonly) NSSet<NSUUID*>* entriesTooShort;
 @property (readonly) NSSet<NSUUID*>* entriesPwned;
+@property (readonly) NSSet<NSUUID*>* entriesWithLowEntropyPasswords;
 
 @end
 

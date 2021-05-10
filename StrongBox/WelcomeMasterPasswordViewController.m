@@ -13,6 +13,8 @@
 #import "Alerts.h"
 #import "SafesList.h"
 #import "FontManager.h"
+#import "PasswordStrengthTester.h"
+#import "AppPreferences.h"
 
 @interface WelcomeMasterPasswordViewController () <UITextFieldDelegate>
 
@@ -20,6 +22,9 @@
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPw;
 @property SafeMetaData* database;
 @property NSString* password;
+
+@property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
+@property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 
 @end
 
@@ -76,11 +81,13 @@
     self.textFieldPw.text = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
     
     [self.textFieldPw addTarget:self
-                           action:@selector(validateUi)
-                 forControlEvents:UIControlEventEditingChanged];
+                         action:@selector(textFieldPasswordDidChange:)
+               forControlEvents:UIControlEventEditingChanged];
     
     self.textFieldPw.delegate = self;
     self.textFieldPw.font = FontManager.sharedInstance.easyReadFont;
+    
+    [self bindStrength];
 }
 
 - (IBAction)onDismiss:(id)sender {
@@ -190,6 +197,31 @@
     }
     
     self.textFieldPw.secureTextEntry = !sender.selected;
+}
+
+- (void)textFieldPasswordDidChange:(id)sender {
+    [self validateUi];
+    [self bindStrength];
+}
+
+- (void)bindStrength {
+    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.textFieldPw.text
+                                                              config:AppPreferences.sharedInstance.passwordStrengthConfig];
+    
+    if ( self.textFieldPw.text.length == 0 ) {
+        self.labelStrength.text = @" "; 
+    }
+    else {
+        self.labelStrength.text = strength.summaryString;
+    }
+    
+    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
+        
+    double red = 1.0 - relativeStrength;
+    double green = relativeStrength;
+
+    self.progressStrength.progress = relativeStrength;
+    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
 }
 
 @end

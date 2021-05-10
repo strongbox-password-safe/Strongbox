@@ -20,8 +20,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeIcon : NSObject
 
-+ (instancetype)withCustom:(NSData*)custom;
-+ (instancetype)withCustom:(NSData *)custom preferredKeePassSerializationUuid:(NSUUID*_Nullable)preferredKeePassSerializationUuid;
++ (instancetype)withCustom:(NSData*)custom; 
++ (instancetype)withCustom:(NSData*)custom name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
++ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*_Nullable)uuid name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
 + (instancetype)withPreset:(NSInteger)preset;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -29,8 +30,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL isCustom;
 @property (readonly) NSInteger preset;
 @property (readonly) NSData* custom;
+@property (readonly, nullable) NSString* name; 
+@property (readonly, nullable) NSDate* modified;  
 @property (readonly) NSUInteger estimatedStorageBytes;
-@property (readonly, nullable) NSUUID* preferredKeePassSerializationUuid; 
+@property (readonly, nullable) NSUUID* uuid;
 
 @property IMAGE_TYPE_PTR cachedImage;
 

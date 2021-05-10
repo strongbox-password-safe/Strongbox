@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL compressed; 
 @property BOOL protectedInMemory; 
 
-- (NSInputStream*)getPlainTextInputStream;
+- (NSInputStream*_Nullable)getPlainTextInputStream; 
 
 - (instancetype)initNonPerformantWithData:(NSData*)data compressed:(BOOL)compressed protectedInMemory:(BOOL)protectedInMemory;
 @property (readonly) NSData* nonPerformantFullData;

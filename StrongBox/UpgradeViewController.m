@@ -9,11 +9,13 @@
 #import "UpgradeViewController.h"
 #import "SVProgressHUD.h"
 #import "ProUpgradeIAPManager.h"
-//#import "Settings.h"
 #import "Alerts.h"
 #import "BiometricsManager.h"
 #import "Model.h"
 #import "AppPreferences.h"
+#import "SaleScheduleManager.h"
+#import "Utils.h"
+#import "NSDate+Extensions.h"
 
 @interface UpgradeViewController ()
 
@@ -42,6 +44,9 @@
 @property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubtitle;
 @property (weak, nonatomic) IBOutlet UILabel *buttonStartFreeTrialSubSubTitle;
 @property (weak, nonatomic) IBOutlet UITextView *termsAndConditionsTextView;
+
+@property (weak, nonatomic) IBOutlet UIStackView *stackSale;
+@property (weak, nonatomic) IBOutlet UILabel *labelSaleTimeRemaining;
 
 @end
 
@@ -172,9 +177,28 @@
 }
 
 - (void)bindUi {
+    [self bindSale];
     [self bindMonthlyPricing];
     [self bindYearlyPricing];
     [self bindLifeTimePricing];
+}
+
+- (void)bindSale {
+    self.stackSale.hidden = !SaleScheduleManager.sharedInstance.saleNowOn;
+    
+    NSDate* endDate = SaleScheduleManager.sharedInstance.currentSaleEndDate;
+    if ( endDate ) {
+        NSTimeInterval interval = [endDate timeIntervalSinceDate:NSDate.date];
+        
+        NSDateComponentsFormatter* fmt =  [[NSDateComponentsFormatter alloc] init];
+        
+        fmt.allowedUnits =  NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute;
+        fmt.unitsStyle = NSDateComponentsFormatterUnitsStyleFull;
+        fmt.includesTimeRemainingPhrase = YES;
+        fmt.maximumUnitCount = 1;
+        
+        self.labelSaleTimeRemaining.text = [fmt stringFromTimeInterval:interval];
+    }
 }
 
 - (void)bindMonthlyPricing {

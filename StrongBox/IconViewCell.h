@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface IconViewCell : UICollectionViewCell
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UILabel *labelName;
 
 @end
 

@@ -20,7 +20,7 @@ NSData* getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, 
     return keyFileDigest;
 }
 
-NSData* getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NSError** error) {
+NSData* getKeyFileData(NSString*_Nullable keyFileBookmark, NSData*_Nullable onceOffKeyFileData, NSError** error) {
     NSData* keyFileData = nil;
     
     if (keyFileBookmark) {

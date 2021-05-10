@@ -42,6 +42,8 @@
     self.tagsField.contentInset = UIEdgeInsetsMake(2, 2, 2, 2);
     self.tagsField.layoutMargins = UIEdgeInsetsMake(2, 6, 2, 6);
     
+    self.tagsField.backgroundColor = UIColor.clearColor;
+    
     self.tagsField.textDelegate = self;
 }
 
@@ -77,11 +79,15 @@
 
     self.tagsField.onDidAddTag = ^(WSTagsField * _Nonnull field, NSString * _Nonnull text) {
         NSLog(@"Added Tag: %@", text);
-        onAdd(text);
+        if ( onAdd ) {
+            onAdd(text);
+        }
     };
     self.tagsField.onDidRemoveTag = ^(WSTagsField * _Nonnull field, NSString * _Nonnull text) {
         NSLog(@"Removed Tag: %@", text);
-        onRemove(text);
+        if ( onRemove ) {
+            onRemove(text);
+        }
     };
 }
 

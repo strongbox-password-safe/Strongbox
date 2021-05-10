@@ -77,6 +77,7 @@ static NSString* const kShowAutoFillTotpCopiedMessage = @"showAutoFillTotpCopied
 static NSString* const kAutoLaunchSingleDatabase = @"autoLaunchSingleDatabase";
 static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock";
 static NSString* const kUseLegacyFileProvider = @"useLegacyFileProvider-Release";
+static NSString* const kHasMigratedToSyncManager = @"hasMigratedToSyncManager";
 
 
 
@@ -169,6 +170,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)hasMigratedToSyncManager {
+    return [self getBool:kHasMigratedToSyncManager];
+}
+
+- (void)setHasMigratedToSyncManager:(BOOL)hasMigratedToSyncManager {
+    [self setBool:kHasMigratedToSyncManager value:hasMigratedToSyncManager];
+}
 
 - (BOOL)useLegacyFileProvider {
     return [self getBool:kUseLegacyFileProvider];

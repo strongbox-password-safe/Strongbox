@@ -121,10 +121,10 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 }
 
 - (IBAction)onSwitchQuickTypeAutoFill:(id)sender {
-    if ( !self.switchQuickTypeAutoFill.on ) {
-        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
-    }
-    else {
+    
+    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+
+    if ( self.switchQuickTypeAutoFill.on ) {
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
                                                            databaseUuid:self.viewModel.metadata.uuid
                                                           displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
@@ -137,6 +137,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 }
 
 - (IBAction)onSwitchAutoFill:(id)sender {
+    [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+
     if (!self.switchAutoFill.on) {
        [self.viewModel disableAndClearAutoFill];
        [self bind];
@@ -145,6 +147,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         [self.viewModel enableAutoFill];
         
         if ( self.viewModel.metadata.quickTypeEnabled ) {
+            
+            [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
                                                                databaseUuid:self.viewModel.metadata.uuid
                                                               displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
@@ -214,6 +219,10 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
             self.viewModel.metadata.quickTypeDisplayFormat = numFormat.integerValue;
             [SafesList.sharedInstance update:self.viewModel.metadata];
             
+            
+
+            
+            [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
             
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
                                                                databaseUuid:self.viewModel.metadata.uuid

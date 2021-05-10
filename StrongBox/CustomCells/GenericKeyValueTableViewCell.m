@@ -11,6 +11,7 @@
 #import "ItemDetailsViewController.h"
 #import "ColoredStringHelper.h"
 #import "AppPreferences.h"
+#import "PasswordStrengthTester.h"
 
 @interface GenericKeyValueTableViewCell ()
 
@@ -36,6 +37,9 @@
 @property UIImage* rightButtonImage;
 @property (weak, nonatomic) IBOutlet UILabel *rightButtonSplashLabel;
 @property UITapGestureRecognizer *rightButtonTap;
+@property (weak, nonatomic) IBOutlet UIStackView *stackStrength;
+@property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
+@property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 
 @end
 
@@ -136,6 +140,7 @@
     self.onRightButton = nil;
 
     self.auditStack.hidden = YES;
+    self.stackStrength.hidden = YES;
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {
@@ -165,30 +170,47 @@ rightButtonImage:nil
 
 
 
-- (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont {
-    [self setKey:key value:value editing:NO selectAllOnEdit:NO formatAsUrl:formatAsUrl suggestionProvider:nil useEasyReadFont:useEasyReadFont rightButtonImage:rightButtonImage concealed:NO colorizeValue:NO audit:nil];
+- (void)setForUrlOrCustomFieldUrl:(NSString*)key
+                            value:(NSString*)value
+                      formatAsUrl:(BOOL)formatAsUrl
+                 rightButtonImage:(UIImage*)rightButtonImage
+                  useEasyReadFont:(BOOL)useEasyReadFont {
+    [self setKey:key
+           value:value
+         editing:NO
+ selectAllOnEdit:NO
+     formatAsUrl:formatAsUrl
+suggestionProvider:nil
+ useEasyReadFont:useEasyReadFont
+rightButtonImage:rightButtonImage
+       concealed:NO
+   colorizeValue:NO
+           audit:nil
+    showStrength:NO];
 }
 
-- (void)setConfidentialKey:(NSString *)key
+- (void)setConcealableKey:(NSString *)key
                      value:(NSString *)value
                  concealed:(BOOL)concealed
                   colorize:(BOOL)colorize
-                     audit:(NSString *)audit {
+                     audit:(NSString *)audit
+              showStrength:(BOOL)showStrength {
     
         
     UIImage* image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
 
     [self setKey:key
-            value:value
-          editing:NO
+           value:value
+         editing:NO
   selectAllOnEdit:NO
-      formatAsUrl:NO
+     formatAsUrl:NO
 suggestionProvider:nil
  useEasyReadFont:YES
- rightButtonImage:image
-        concealed:concealed
+rightButtonImage:image
+       concealed:concealed
    colorizeValue:colorize
-           audit:audit];
+           audit:audit
+    showStrength:showStrength];
 }
 
 
@@ -203,7 +225,8 @@ suggestionProvider:nil
  rightButtonImage:(UIImage*)rightButtonImage
      concealed:(BOOL)concealed
  colorizeValue:(BOOL)colorizeValue {
-    [self setKey:key value:value
+    [self setKey:key
+           value:value
          editing:editing
  selectAllOnEdit:selectAllOnEdit
      formatAsUrl:formatAsUrl
@@ -212,20 +235,22 @@ suggestionProvider:suggestionProvider
 rightButtonImage:rightButtonImage
        concealed:concealed
    colorizeValue:colorizeValue
-           audit:nil];
+           audit:nil
+    showStrength:NO];
 }
 
 - (void)setKey:(NSString*)key
          value:(NSString*)value
        editing:(BOOL)editing
-    selectAllOnEdit:(BOOL)selectAllOnEdit
-    formatAsUrl:(BOOL)formatAsUrl
-    suggestionProvider:(SuggestionProvider)suggestionProvider
-    useEasyReadFont:(BOOL)useEasyReadFont
- rightButtonImage:(UIImage*)rightButtonImage
+selectAllOnEdit:(BOOL)selectAllOnEdit
+   formatAsUrl:(BOOL)formatAsUrl
+suggestionProvider:(SuggestionProvider)suggestionProvider
+useEasyReadFont:(BOOL)useEasyReadFont
+rightButtonImage:(UIImage*)rightButtonImage
      concealed:(BOOL)concealed
  colorizeValue:(BOOL)colorizeValue
-         audit:(NSString*_Nullable)audit {
+         audit:(NSString*_Nullable)audit
+  showStrength:(BOOL)showStrength {
     [self bindKey:key];
         
     self.selectAllOnEdit = selectAllOnEdit;
@@ -247,8 +272,8 @@ rightButtonImage:rightButtonImage
     self.valueText.hidden = !self.editing;
     
     [self bindAudit:audit];
-    
     [self bindRightButton];
+    [self bindStrength:showStrength];
 }
 
 - (void)setOnRightButton:(void (^)(void))onRightButton {
@@ -447,6 +472,31 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 - (void)onAuditLabelTap {
     if (self.onAuditTap) {
         self.onAuditTap();
+    }
+}
+
+- (void)bindStrength:(BOOL)showStrength {
+    if ( showStrength && self.value.length ) {
+        PasswordStrength* strength = [PasswordStrengthTester getStrength:self.value config:AppPreferences.sharedInstance.passwordStrengthConfig];
+        
+        self.labelStrength.text = strength.summaryString;
+        
+        double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
+            
+        double red = 1.0 - relativeStrength;
+        double green = relativeStrength;
+        
+        self.stackStrength.hidden = NO;
+
+        self.progressStrength.progress = relativeStrength;
+        
+        UIColor *color = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
+        self.progressStrength.progressTintColor = color;
+
+
+    }
+    else {
+        self.stackStrength.hidden = YES;
     }
 }
 

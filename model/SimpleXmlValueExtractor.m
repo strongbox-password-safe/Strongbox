@@ -140,7 +140,16 @@ static NSDate* dotNetBaseEpochDate;
 }
 
 + (BOOL)getBool:(id<XmlParsingDomainObject>)xmlObject {
-    return (xmlObject.originalText.length && xmlObject.originalText.isKeePassXmlBooleanStringTrue);
+    return [self getBool:xmlObject defaultValue:NO];
+}
+
++ (BOOL)getBool:(id<XmlParsingDomainObject>)xmlObject defaultValue:(BOOL)defaultValue {
+    if ( !xmlObject.originalText.length ) {
+        return defaultValue;
+    }
+    else {
+        return xmlObject.originalText.isKeePassXmlBooleanStringTrue;
+    }
 }
 
 @end

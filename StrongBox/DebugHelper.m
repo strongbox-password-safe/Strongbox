@@ -150,6 +150,7 @@ static NSString *ModelIdentifier()
     for (NSString* pref in prefs) {
         if ( ![pref hasPrefix:@"com.apple"] &&
             ![pref hasPrefix:@"Apple"] &&
+            ![pref hasPrefix:@"appLockPin2"] &&
             ![pref hasPrefix:@"NS"] &&
             ![pref hasPrefix:@"searchFieldRecents"]) {
             [debugLines addObject:[NSString stringWithFormat:@"%@: %@", pref, [defs valueForKey:pref]]];

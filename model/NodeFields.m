@@ -116,6 +116,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         self.keePassHistory = [NSMutableArray array];
         self.tags = [NSMutableSet set];
         self.customData = @{}.mutableCopy;
+        self.qualityCheck = YES;
     }
     
     return self;
@@ -183,6 +184,10 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     NSNumber* autoTypeDataTransferObfuscation = dict[@"autoTypeDataTransferObfuscation"];
     NSString* autoTypeDefaultSequence = dict[@"autoTypeDefaultSequence"];
     NSArray<NSDictionary*>* autoTypeAssoc = dict[@"autoTypeAssoc"];
+    NSNumber* ie = ((NSNumber*)dict[@"isExpanded"]);
+    NSNumber* qc = ((NSNumber*)dict[@"qualityCheck"]);
+    
+    NSUUID* ppg = dict[@"previousParentGroup"];
     
     NodeFields* ret = [[NodeFields alloc] initWithUsername:username
                                                        url:url
@@ -194,6 +199,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     
     ret.passwordModified = passwordModified != nil ? [NSDate dateWithTimeIntervalSince1970:passwordModified.unsignedIntegerValue] : nil;
     ret.expires = expires != nil ? [NSDate dateWithTimeIntervalSince1970:expires.unsignedIntegerValue] : nil;
+    ret.previousParentGroup = ppg;
     
     
     
@@ -218,15 +224,15 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     for (NSDictionary* obj in customData) {
         NSString* key = obj[@"key"];
         NSString* value = obj[@"value"];
-        ret.customData[key] = value;
+        NSNumber* modNum = obj[@"modified"];
+        NSDate* modified = modNum != nil ? [NSDate dateWithTimeIntervalSince1970:modNum.unsignedIntegerValue] : nil;
+        ret.customData[key] = [ValueWithModDate value:value modified:modified];
     }
     
     ret.defaultAutoTypeSequence = defaultAutoTypeSequence; 
     ret.enableAutoType = enableAutoType; 
     ret.enableSearching = enableSearching; 
     ret.lastTopVisibleEntry = lastTopVisibleEntry ? [[NSUUID alloc] initWithUUIDString:lastTopVisibleEntry] : nil; 
-    
-    
     
     ret.foregroundColor = foregroundColor;
     ret.backgroundColor = backgroundColor;
@@ -235,7 +241,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     if (autoTypeEnabled != nil) {
         ret.autoType = [[AutoType alloc] init];
         ret.autoType.enabled = autoTypeEnabled.boolValue;
-        ret.autoType.dataTransferObfuscation = autoTypeDataTransferObfuscation == nil ? NO : autoTypeDataTransferObfuscation.boolValue;
+        ret.autoType.dataTransferObfuscation = autoTypeDataTransferObfuscation == nil ? 0 : autoTypeDataTransferObfuscation.integerValue;
         ret.autoType.defaultSequence = autoTypeDefaultSequence;
 
         if (autoTypeAssoc) {
@@ -251,6 +257,11 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         }
     }
 
+    
+    
+    ret.isExpanded = ie != nil ? ie.boolValue : NO;
+    ret.qualityCheck = qc != nil ? qc.boolValue : YES;
+    
     return ret;
 }
 
@@ -293,8 +304,14 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     
     
     NSArray<NSDictionary*>* customData = [self.customData.allKeys map:^id _Nonnull(NSString * _Nonnull key, NSUInteger idx) {
-        NSString* value = self.customData[key];
-        return @{ @"key" : key, @"value" : value };
+        ValueWithModDate* vm = self.customData[key];
+        
+        if ( vm.modified ) {
+            return @{ @"key" : key, @"value" : vm.value, @"modified" : @((NSUInteger)[vm.modified timeIntervalSince1970]) };
+        }
+        else {
+            return @{ @"key" : key, @"value" : vm.value };
+        }
     }];
     ret[@"customData"] = customData;
   
@@ -319,7 +336,13 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     if (self.overrideURL) {
         ret[@"overrideURL"] = self.overrideURL;
     }
-
+    if (self.previousParentGroup) {
+        ret[@"previousParentGroup"] = self.previousParentGroup;
+    }
+    
+    ret [@"isExpanded"] = @(self.isExpanded);
+    ret [@"qualityCheck"] = @(self.qualityCheck);
+    
     if (self.autoType) {
         ret[@"autoTypeEnabled"] = @(self.autoType.enabled);
         ret[@"autoTypeDataTransferObfuscation"] = @(self.autoType.dataTransferObfuscation);
@@ -415,6 +438,16 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         }
     }
     
+    
+    
+
+
+
+
+
+
+
+
     return YES;
 }
 
@@ -460,6 +493,8 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     to.tags = from.tags.mutableCopy;
     to.customData = from.customData.mutableCopy;
     to.attachments = from.attachments.mutableCopy;
+    to.isExpanded = from.isExpanded;
+    to.qualityCheck = from.qualityCheck;
     
     if (copyTouchDates) {
         [to setTouchPropertiesWithCreated:from.created
@@ -474,6 +509,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         to.passwordHistory = [from.passwordHistory clone];
     }
 }
+
 
 
 - (void)setPassword:(NSString *)password {
@@ -622,55 +658,57 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     return token;
 }
 
-- (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes {
-    
-    
-    if(appendUrlToNotes) {
+- (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes addLegacyFields:(BOOL)addLegacyFields addOtpAuthUrl:(BOOL)addOtpAuthUrl {
+    if ( appendUrlToNotes ) {     
         self.notes = [self.notes stringByAppendingFormat:@"\n-----------------------------------------\nStrongbox TOTP Auth URL: [%@]", [token url:YES]];
     }
     else {
-        
-        
-        
         NSString* base32Secret = token.secret.mmcg_base32String;
-        self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:base32Secret protected:YES];
-        
-        if(token.algorithm == OTPAlgorithmSteam) {
-            NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
-            self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
-        }
-        else {
-            NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
-            self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
-        }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        if(self.usingLegacyKeeOtpStyle) {
-            NSURLComponents *components = [NSURLComponents componentsWithString:@"http:
-            NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret mmcg_base32String]];
+
+        if ( addLegacyFields ) {
             
-            if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
-                NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
-                NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
-                components.queryItems = @[key, step, size];
+            
+            
+            self.mutableCustomFields[kKeePassXcTotpSeedKey] = [StringValue valueWithString:base32Secret protected:YES];
+            
+            if ( token.algorithm == OTPAlgorithmSteam ) {
+                NSString* valueString = [NSString stringWithFormat:@"%lu;S", (unsigned long)token.period];
+                self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
             }
             else {
-                components.queryItems = @[key];
+                NSString* valueString = [NSString stringWithFormat:@"%lu;%lu", (unsigned long)token.period, (unsigned long)token.digits];
+                self.mutableCustomFields[kKeePassXcTotpSettingsKey] = [StringValue valueWithString:valueString protected:YES];
             }
-            self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:components.query protected:YES];
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            if ( self.usingLegacyKeeOtpStyle ) {
+                NSURLComponents *components = [NSURLComponents componentsWithString:@"http:
+                NSURLQueryItem *key = [NSURLQueryItem queryItemWithName:@"key" value:[token.secret mmcg_base32String]];
+                
+                if(token.period != OTPToken.defaultPeriod || token.digits != OTPToken.defaultDigits) {
+                    NSURLQueryItem *step = [NSURLQueryItem queryItemWithName:@"step" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.period]];
+                    NSURLQueryItem *size = [NSURLQueryItem queryItemWithName:@"size" value:[NSString stringWithFormat: @"%lu", (unsigned long)token.digits]];
+                    components.queryItems = @[key, step, size];
+                }
+                else {
+                    components.queryItems = @[key];
+                }
+                self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:components.query protected:YES];
+            }
         }
-        else {
+
+        if ( addOtpAuthUrl ) { 
             NSURL* otpauthUrl = [token url:YES];
             self.mutableCustomFields[kKeeOtpPluginKey] = [StringValue valueWithString:otpauthUrl.absoluteString protected:YES];
         }
-        
+
         
         
         if(token.algorithm != OTPAlgorithmSteam) {

@@ -10,6 +10,7 @@
 #import "MutableOrderedDictionary.h"
 #import "KdfParameters.h"
 #import "DatabaseFormat.h"
+#import "ValueWithModDate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSNumber *historyMaxItems;
 @property (nonatomic, nullable) NSNumber *historyMaxSize;
 
-@property (nonatomic) NSMutableDictionary* customData;
+@property (nonatomic) NSMutableDictionary<NSString*, ValueWithModDate*>* customData;
 
 @property NSDate* settingsChanged;
 @property (nonatomic) NSString *databaseName;

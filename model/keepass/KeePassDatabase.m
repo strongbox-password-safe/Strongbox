@@ -77,7 +77,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
 
     NSArray<DatabaseAttachment*>* attachments = [KeePassXmlModelAdaptor getV3Attachments:xmlRoot];
-    NSMutableDictionary<NSUUID*, NSData*>* customIconPool = [KeePassXmlModelAdaptor getCustomIcons:meta];
+    NSDictionary<NSUUID*, NodeIcon*>* customIconPool = [KeePassXmlModelAdaptor getCustomIcons:meta];
 
     
         
@@ -109,7 +109,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     adaptorTag.unknownHeaders = serializationData.extraUnknownHeaders;
     adaptorTag.originalMeta = meta;
     
-    DatabaseModel *ret = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:ckf metadata:metadata root:rootGroup deletedObjects:deletedObjects];
+    DatabaseModel *ret = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:ckf metadata:metadata root:rootGroup deletedObjects:deletedObjects iconPool:customIconPool];
     
     ret.meta.adaptorTag = adaptorTag;
     
@@ -139,10 +139,11 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
     NSArray<DatabaseAttachment*>* minimalAttachmentPool = @[];
     RootXmlDomainObject *rootXmlDocument = [xmlAdaptor toKeePassModel:database.rootNode
-                                                                 databaseProperties:databaseProperties
-                                                                            context:[XmlProcessingContext standardV3Context]
-                                                              minimalAttachmentPool:&minimalAttachmentPool
-                                                                              error:&err];
+                                                   databaseProperties:databaseProperties
+                                                              context:[XmlProcessingContext standardV3Context]
+                                                minimalAttachmentPool:&minimalAttachmentPool
+                                                             iconPool:database.iconPool
+                                                                error:&err];
         
     if(!rootXmlDocument) {
         NSLog(@"Could not convert Database to Xml Model.");

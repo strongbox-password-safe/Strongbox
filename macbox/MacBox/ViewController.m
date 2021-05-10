@@ -55,6 +55,7 @@
 #import "OutlineView.h"
 #import "Document.h"
 #import "SyncAndMergeSequenceManager.h"
+#import "PasswordStrengthTester.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -183,6 +184,9 @@ static NSString* const kNewEntryKey = @"newEntry";
 @property ProgressWindow* progressWindow;
 @property (weak) IBOutlet NSTextField *textFieldVersion;
 
+@property (weak) IBOutlet NSTextField *labelStrength;
+@property (weak) IBOutlet NSProgressIndicator *progressStrength;
+
 @end
 
 static NSImage* kStrongBox256Image;
@@ -267,7 +271,6 @@ static NSImage* kStrongBox256Image;
 
 
     NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
-    
     [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onScreenLocked) name:notificationName object:nil];
 }
 
@@ -1061,6 +1064,8 @@ static NSImage* kStrongBox256Image;
                                                                                             darkMode:dark
                                                                                           colorBlind:colorBlind
                                                                                                 font:self.labelPassword.font];
+        
+        [self bindPasswordStrength:pw];
         
         self.labelUrl.stringValue = [self maybeDereference:it.fields.url node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
         self.labelUsername.stringValue = [self maybeDereference:it.fields.username node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
@@ -4413,6 +4418,31 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         
         [self showPopupChangeToastNotification:loc];
     }
+}
+
+- (void)bindPasswordStrength:(NSString*)pw {
+    PasswordStrength* strength = [PasswordStrengthTester getStrength:pw config:PasswordStrengthConfig.defaults];
+
+    self.labelStrength.stringValue = strength.summaryString;
+
+    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
+
+    self.progressStrength.doubleValue = relativeStrength * 100.0f;
+
+    CIFilter *colorPoly = [CIFilter filterWithName:@"CIColorPolynomial"];
+    [colorPoly setDefaults];
+
+    double red = 1.0 - relativeStrength;
+    double green = relativeStrength;
+
+    CIVector *redVector = [CIVector vectorWithX:red Y:0 Z:0 W:0];
+    CIVector *greenVector = [CIVector vectorWithX:green Y:0 Z:0 W:0];
+    CIVector *blueVector = [CIVector vectorWithX:0 Y:0 Z:0 W:0];
+
+    [colorPoly setValue:redVector forKey:@"inputRedCoefficients"];
+    [colorPoly setValue:greenVector forKey:@"inputGreenCoefficients"];
+    [colorPoly setValue:blueVector forKey:@"inputBlueCoefficients"];
+    [self.progressStrength setContentFilters:@[colorPoly]];
 }
 
 

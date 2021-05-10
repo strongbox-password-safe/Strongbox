@@ -15,7 +15,7 @@
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kAutoTypeElementName context:context]) {
         self.enabled = NO;
-        self.dataTransferObfuscation = NO;
+        self.dataTransferObfuscation = 0;
         self.defaultSequence = @"";
         self.asssociations = NSMutableArray.array;
     }
@@ -37,8 +37,8 @@
         return YES;
     }
     if([withXmlElementName isEqualToString:kDataTransferObfuscationElementName]) {
-        
-        self.dataTransferObfuscation = [SimpleXmlValueExtractor getBool:completedObject];
+        NSNumber* num = [SimpleXmlValueExtractor getNumber:completedObject];
+        self.dataTransferObfuscation = num == nil ? 0 : num.integerValue;
         return YES;
     }
     if([withXmlElementName isEqualToString:kDefaultSequenceElementName]) {
@@ -62,8 +62,7 @@
 
     if (![serializer writeElement:kEnabledElementName boolean:self.enabled]) return NO;
 
-    
-    if (![serializer writeElement:kDataTransferObfuscationElementName integer:self.dataTransferObfuscation ? 1 : 0]) return NO;
+    if (![serializer writeElement:kDataTransferObfuscationElementName integer:self.dataTransferObfuscation]) return NO;
 
     if ( self.defaultSequence.length ) {
         if (![serializer writeElement:kDefaultSequenceElementName text:self.defaultSequence]) return NO;

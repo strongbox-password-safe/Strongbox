@@ -136,7 +136,9 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     NSArray<NSDictionary*> *children = dict[@"children"];
 
     NSNumber *iconId = dict[@"iconId"];
-    NSString* customIconData = dict[@"customIconData"]; 
+    NSString* customIconData = dict[@"customIconData"];
+    NSString* customIconName = dict[@"customIconName"];
+    NSNumber* customIconModified = dict[@"customIconModified"];
     
     NodeFields* nodeFields = [NodeFields deserialize:nodeFieldsDict];
     
@@ -158,7 +160,9 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     if (customIconData) {
         NSData* d = [[NSData alloc] initWithBase64EncodedString:customIconData options:kNilOptions];
-        ret.icon = [NodeIcon withCustom:d];
+        
+        NSDate* modified = customIconModified ? [NSDate dateWithTimeIntervalSince1970:customIconModified.doubleValue] : nil;
+        ret.icon = [NodeIcon withCustom:d name:customIconName modified:modified];
     }
     else if (iconId != nil) {
         ret.icon = [NodeIcon withPreset:iconId.integerValue];
@@ -195,6 +199,14 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if (self.icon) {
         if (self.icon.isCustom) {
             ret[@"customIconData"] =  self.icon.custom.base64String;
+            
+            if ( self.icon.name ) {
+                ret[@"customIconName"] = self.icon.name;
+            }
+            
+            if ( self.icon.modified ) {
+                ret[@"customIconModified"] = @(self.icon.modified.timeIntervalSince1970);
+            }
         }
         else {
             ret[@"iconId"] = @(self.icon.preset);
@@ -783,14 +795,16 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
 
 - (BOOL)setTotpWithString:(NSString *)string
          appendUrlToNotes:(BOOL)appendUrlToNotes
-               forceSteam:(BOOL)forceSteam {
+               forceSteam:(BOOL)forceSteam
+          addLegacyFields:(BOOL)addLegacyFields
+            addOtpAuthUrl:(BOOL)addOtpAuthUrl {
     OTPToken* token = [NodeFields getOtpTokenFromString:string
                                              forceSteam:forceSteam
                                                  issuer:self.title
                                                username:self.fields.username];
     
     if(token) {
-        [self.fields setTotp:token appendUrlToNotes:appendUrlToNotes];
+        [self.fields setTotp:token appendUrlToNotes:appendUrlToNotes addLegacyFields:addLegacyFields addOtpAuthUrl:addOtpAuthUrl];
         return YES;
     }
     

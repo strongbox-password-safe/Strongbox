@@ -220,7 +220,7 @@
     
     Node* node = [model.database getItemById:uuid];
     
-    if(node) {
+    if ( node ) {
         [self exitWithCredential:model item:node];
     }
     else {
@@ -310,7 +310,7 @@
     NSString* user = [model.database dereference:item.fields.username node:item];
     NSString* password = [model.database dereference:item.fields.password node:item];
 
-    
+
 
     
     

@@ -12,16 +12,8 @@
 #import "FavIconDownloadOptions.h"
 #import "DatabaseCellSubtitleField.h"
 #import "AppPrivacyShieldMode.h"
-
-//#import "SFTPSessionConfiguration.h"
 #import "AppLockMode.h"
-
-
-
-
-
-
-
+#import "PasswordStrengthConfig.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -141,6 +133,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL fullFileProtection;
 
 @property BOOL haveAttemptedMigrationToFullFileProtection;
+
+@property PasswordStrengthConfig* passwordStrengthConfig;
+@property NSInteger promptedForSale;
+
+@property BOOL addLegacySupplementaryTotpCustomFields;
+@property BOOL addOtpAuthUrl;
 
 @end
 

@@ -62,6 +62,19 @@
     return nil;
 }
 
+
+- (NSInteger)indexOfFirstMatch:(BOOL (^)(id obj))block {
+    NSInteger i = 0;
+    for(id obj in self) {
+        if(block(obj)) {
+            return i;
+        }
+        i++;
+    }
+    
+    return NSNotFound;
+}
+
 - (NSSet *)set {
     return [NSSet setWithArray:self];
 }

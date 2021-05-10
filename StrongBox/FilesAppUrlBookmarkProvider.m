@@ -78,6 +78,7 @@ viewController:(UIViewController *)viewController completion:(CreateCompletionBl
     
     [viewController presentViewController:vc animated:YES completion:nil];
 }
+
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
     NSLog(@"didPickDocumentsAtURLs: %@", urls);
     
@@ -266,6 +267,11 @@ viewController:(UIViewController *)viewController
     
     return nil;
 }
+
+- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    
+}
+
 
 
 

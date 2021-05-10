@@ -141,4 +141,8 @@ static NSUInteger const kTagSectionIdx = 1;
     }
 }
 
+- (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return NO;
+}
+
 @end

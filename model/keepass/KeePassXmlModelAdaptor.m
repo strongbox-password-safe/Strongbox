@@ -18,7 +18,10 @@
     return [KeePassXmlModelAdaptor toStrongboxModel:xmlRoot attachments:@[] customIconPool:@{} error:error];
 }
 
-+ (Node *)toStrongboxModel:(RootXmlDomainObject *)xmlRoot attachments:(NSArray<DatabaseAttachment *> *)attachments customIconPool:(NSDictionary<NSUUID *,NSData *> *)customIconPool error:(NSError *__autoreleasing  _Nullable *)error {
++ (Node *)toStrongboxModel:(RootXmlDomainObject *)xmlRoot
+               attachments:(NSArray<DatabaseAttachment *> *)attachments
+            customIconPool:(NSDictionary<NSUUID *,NodeIcon *> *)customIconPool
+                     error:(NSError *__autoreleasing  _Nullable *)error {
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
     
     KeePassGroup * rootGroup = getExistingRootKeePassGroup(xmlRoot);
@@ -64,38 +67,42 @@
     return metadata;
 }
 
-- (RootXmlDomainObject *)toKeePassModel:(Node *)rootNode databaseProperties:(KeePassDatabaseWideProperties *)databaseProperties context:(XmlProcessingContext *)context error:(NSError *__autoreleasing  _Nullable *)error {
-    return [self toKeePassModel:rootNode databaseProperties:databaseProperties context:context minimalAttachmentPool:nil error:error];
+- (RootXmlDomainObject *)toKeePassModel:(Node *)rootNode
+                     databaseProperties:(KeePassDatabaseWideProperties *)databaseProperties
+                                context:(XmlProcessingContext *)context
+                                  error:(NSError *__autoreleasing  _Nullable *)error {
+    return [self toKeePassModel:rootNode databaseProperties:databaseProperties context:context minimalAttachmentPool:nil iconPool:@{} error:error];
 }
 
 - (RootXmlDomainObject*)toKeePassModel:(Node*)rootNode
-                                  databaseProperties:(KeePassDatabaseWideProperties*)databaseProperties
-                                             context:(XmlProcessingContext*)context
-                               minimalAttachmentPool:(NSArray<DatabaseAttachment*>**)minimalAttachmentPool
-                                               error:(NSError **)error {
+                    databaseProperties:(KeePassDatabaseWideProperties*)databaseProperties
+                               context:(XmlProcessingContext*)context
+                 minimalAttachmentPool:(NSArray<DatabaseAttachment*>**)minimalAttachmentPool
+                              iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool
+                                 error:(NSError **)error {
     RootXmlDomainObject *ret = [[RootXmlDomainObject alloc] initWithDefaultsAndInstantiatedChildren:context];
-    
+
     Meta* originalMeta = databaseProperties.originalMeta;
-    
+
     if(originalMeta && originalMeta.unmanagedChildren) {
         for (id<XmlParsingDomainObject> child in originalMeta.unmanagedChildren) {
             [ret.keePassFile.meta addUnknownChildObject:child];
         }
     }
+
     
-    
-    
+
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
-    NSDictionary<NSUUID *,NSData *>* customIconPool;
-    KeePassGroup* rootXmlGroup = [adaptor toKeePassModel:rootNode context:context minimalAttachmentPool:minimalAttachmentPool customIconPool:&customIconPool error:error];
     
+    KeePassGroup* rootXmlGroup = [adaptor toKeePassModel:rootNode context:context minimalAttachmentPool:minimalAttachmentPool iconPool:iconPool error:error];
+
     if(!rootXmlGroup) {
         NSLog(@"Could not serialize groups/entries.");
         return nil;
     }
 
     ret.keePassFile.root.rootGroup = rootXmlGroup;
-    
+
     
 
     ret.keePassFile.meta.generator = kStrongboxGenerator;
@@ -115,18 +122,18 @@
     ret.keePassFile.meta.color = databaseProperties.metadata.color;
     ret.keePassFile.meta.entryTemplatesGroup = databaseProperties.metadata.entryTemplatesGroup;
     ret.keePassFile.meta.entryTemplatesGroupChanged = databaseProperties.metadata.entryTemplatesGroupChanged;
+
     
-    
-    
+
     if (databaseProperties.deletedObjects.count && !ret.keePassFile.root.deletedObjects) {
         ret.keePassFile.root.deletedObjects = [[DeletedObjects alloc] initWithContext:XmlProcessingContext.standardV3Context];
         
     }
-    
+
     if(ret.keePassFile.root.deletedObjects) {
         [ret.keePassFile.root.deletedObjects.deletedObjects removeAllObjects];
     }
-    
+
     for (NSUUID* uuid in databaseProperties.deletedObjects.allKeys) {
         DeletedObject* dob = [[DeletedObject alloc] initWithContext:XmlProcessingContext.standardV3Context];
         dob.uuid = uuid;
@@ -136,19 +143,24 @@
         
     
 
-    if(customIconPool.count && !ret.keePassFile.meta.customIconList) {
+    if ( iconPool.count && !ret.keePassFile.meta.customIconList ) {
         ret.keePassFile.meta.customIconList = [[CustomIconList alloc] initWithContext:[XmlProcessingContext standardV3Context]];
     }
-    
-    if(ret.keePassFile.meta.customIconList) {
+
+    if (ret.keePassFile.meta.customIconList ) {
         [ret.keePassFile.meta.customIconList.icons removeAllObjects];
     }
-    
-    for (NSUUID* uuid in customIconPool.allKeys) {
-        NSData* data = customIconPool[uuid];
+
+    for (NSUUID* uuid in iconPool.allKeys) {
+        NodeIcon* ci = iconPool[uuid];
+        
         CustomIcon *icon = [[CustomIcon alloc] initWithContext:[XmlProcessingContext standardV3Context]];
+        
         icon.uuid = uuid;
-        icon.data = data;
+        icon.data = ci.custom;
+        icon.name = ci.name;
+        icon.modified = ci.modified;
+        
         [ret.keePassFile.meta.customIconList.icons addObject:icon];
     }
 
@@ -182,16 +194,18 @@
     return @{};
 }
 
-+ (NSMutableDictionary<NSUUID *,NSData *> *)getCustomIcons:(Meta *)meta {
-    if(meta && meta.customIconList) {
-        if(meta.customIconList.icons) {
++ (NSDictionary<NSUUID *, NodeIcon *> *)getCustomIcons:(Meta *)meta {
+    if ( meta && meta.customIconList ) {
+        if ( meta.customIconList.icons ) {
             NSArray<CustomIcon*> *icons = meta.customIconList.icons;
-            NSMutableDictionary<NSUUID*, NSData*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
-            for (CustomIcon* icon in icons) {
-                if(icon.data != nil) { 
-                    [ret setObject:icon.data forKey:icon.uuid];
+            NSMutableDictionary<NSUUID*, NodeIcon*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
+            for ( CustomIcon* icon in icons ) {
+                if ( icon.data != nil ) { 
+                    NodeIcon* nodeIcon = [NodeIcon withCustom:icon.data uuid:icon.uuid name:icon.name modified:icon.modified];
+                    [ret setObject:nodeIcon forKey:icon.uuid];
                 }
             }
+        
             return ret;
         }
     }

@@ -55,13 +55,14 @@ const static NSSet<NSString*> *wellKnownKeys;
         self.strings = [NSMutableDictionary dictionary];
         self.binaries = [NSMutableArray array];
         self.tags = [NSMutableSet set];
-        self.icon = nil;
+        self.icon = nil; 
         self.customIcon = nil;
         self.customData = [[CustomData alloc] initWithContext:context];
         self.foregroundColor = nil;
         self.backgroundColor = nil;
         self.overrideURL = nil;
         self.autoType = nil;
+        self.qualityCheck = YES;
     }
     
     return self;
@@ -157,6 +158,14 @@ const static NSSet<NSString*> *wellKnownKeys;
         self.overrideURL = [SimpleXmlValueExtractor getStringFromText:completedObject];
         return YES;
     }
+    else if([withXmlElementName isEqualToString:kQualityCheckElementName]) {
+        self.qualityCheck = [SimpleXmlValueExtractor getBool:completedObject defaultValue:YES];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kPreviousParentGroupElementName]) {
+        self.previousParentGroup = [SimpleXmlValueExtractor getUuid:completedObject];
+        return YES;
+    }
 
     return NO;
 }
@@ -236,6 +245,10 @@ const static NSSet<NSString*> *wellKnownKeys;
         if ( ![serializer writeElement:kOverrideURLElementName text:self.overrideURL] ) return NO;
     }
     
+    if ( !self.qualityCheck ) { 
+        if ( ![serializer writeElement:kQualityCheckElementName boolean:self.qualityCheck] ) return NO;
+    }
+    
     if ( self.autoType ) {
         
         if (!self.autoType.enabled || self.autoType.dataTransferObfuscation != 0 || self.autoType.defaultSequence.length || self.autoType.asssociations.count) {
@@ -245,6 +258,10 @@ const static NSSet<NSString*> *wellKnownKeys;
     
     if(self.history && self.history.entries && self.history.entries.count) {
         [self.history writeXml:serializer];
+    }
+    
+    if ( self.previousParentGroup ) {
+        if ( ![serializer writeElement:kPreviousParentGroupElementName uuid:self.previousParentGroup]) return NO;
     }
     
     if(![super writeUnmanagedChildren:serializer]) {
@@ -407,6 +424,12 @@ const static NSSet<NSString*> *wellKnownKeys;
         return NO;
     }
     if ((self.autoType == nil && other.autoType != nil) || (self.autoType != nil && ![self.autoType isEqual:other.autoType])) {
+        return NO;
+    }
+    if ( self.qualityCheck != other.qualityCheck ) {
+        return NO;
+    }
+    if ((self.previousParentGroup == nil && other.previousParentGroup != nil) || (self.previousParentGroup != nil && ![self.previousParentGroup isEqual:other.previousParentGroup] )) {
         return NO;
     }
 

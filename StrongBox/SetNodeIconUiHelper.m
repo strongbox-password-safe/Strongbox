@@ -262,7 +262,7 @@
 - (void)presentKeePassAndDatabaseIconSets:(KeePassIconSet)iconSet {
     IconsCollectionViewController* vc = [[IconsCollectionViewController alloc] init];
     vc.predefinedKeePassIconSet = iconSet;
-    vc.customIconSet = self.customIconPool;
+    vc.iconPool = self.customIcons;
     vc.modalPresentationStyle = UIModalPresentationFormSheet;
     
     __weak SetNodeIconUiHelper* weakSelf = self;

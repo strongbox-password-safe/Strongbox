@@ -77,6 +77,23 @@ static NSString* const kLowerCaseNull = @"null";
     return _hostRegex;
 }
 
++ (NSRegularExpression *)hanChineseRegex {
+    static NSRegularExpression *hanChineseRegex;
+    static dispatch_once_t onceToken;
+    
+    dispatch_once(&onceToken, ^{
+        NSError* error;
+    
+        hanChineseRegex = [NSRegularExpression regularExpressionWithPattern:@"\\p{Script=Han}" options:NSRegularExpressionCaseInsensitive error:&error];
+
+        if(error) {
+            NSLog(@"Error compiling hanChineseRegex: %@", error);
+        }
+    });
+    
+    return hanChineseRegex;
+}
+
 - (NSData*)sha1Data {
     NSData* data = [self dataUsingEncoding:NSUTF8StringEncoding];
     
@@ -236,6 +253,50 @@ static NSString* const kLowerCaseNull = @"null";
 
 - (NSData *)utf8Data {
     return [self dataUsingEncoding:NSUTF8StringEncoding];
+}
+
+- (BOOL)containsSearchString:(NSString*)searchText {
+    if ( self.length == 0 ) {
+        return NO;
+    }
+    
+    BOOL simple = [self localizedStandardContainsString:searchText];
+
+    if ( simple ) {
+        return YES;
+    }
+    
+    
+    
+    
+    
+    NSTextCheckingResult* result = [[NSString hanChineseRegex] firstMatchInString:self options:kNilOptions range:NSMakeRange(0, self.length)];
+    
+    if ( result ) {
+        
+        
+        
+        
+        NSMutableString* latinized = self.mutableCopy;
+        CFStringTransform((__bridge CFMutableStringRef)latinized, nil, kCFStringTransformMandarinLatin, NO);
+        
+        
+        
+        
+
+        NSString* pinYinStr = [latinized stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        pinYinStr = [pinYinStr stringByReplacingOccurrencesOfString:@"\r" withString:@""];
+        pinYinStr = [pinYinStr stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        pinYinStr = [pinYinStr stringByReplacingOccurrencesOfString:@" " withString:@""];
+
+        
+
+        BOOL latinizedPinYin = [pinYinStr localizedStandardContainsString:searchText];
+
+        return latinizedPinYin;
+    }
+    
+    return NO;
 }
 
 @end

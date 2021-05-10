@@ -15,6 +15,7 @@
 #import "NSDate+Extensions.h"
 #import "ClipboardManager.h"
 #import "NSUUID+Zero.h"
+#import "TagsViewTableViewCell.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -23,14 +24,16 @@
 static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
 static NSString* const kGenericBasicCellId = @"GenericBasicCell";
+static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 const static NSUInteger kSectionPropertiesIdx = 0;
-const static NSUInteger kSectionNotesIdx = 1; 
-const static NSUInteger kSectionDatesIdx = 2;
-const static NSUInteger kSectionCustomDataIdx = 3;
+const static NSUInteger kSectionTagsIdx = 1; 
+const static NSUInteger kSectionNotesIdx = 2; 
+const static NSUInteger kSectionDatesIdx = 3;
+const static NSUInteger kSectionCustomDataIdx = 4;
 
-const static NSUInteger kSectionCount = 4;
-const static NSUInteger kSectionUuidIdx = 4; 
+const static NSUInteger kSectionCount = 5;
+const static NSUInteger kSectionUuidIdx = 5; 
 
 @interface ItemPropertiesViewController ()
 
@@ -56,11 +59,13 @@ const static NSUInteger kSectionUuidIdx = 4;
     [self.tableView registerNib:[UINib nibWithNibName:kSwitchTableCellId bundle:nil] forCellReuseIdentifier:kSwitchTableCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kGenericKeyValueCellId bundle:nil] forCellReuseIdentifier:kGenericKeyValueCellId];
     [self.tableView registerNib:[UINib nibWithNibName:kGenericBasicCellId bundle:nil] forCellReuseIdentifier:kGenericBasicCellId];
-
+    [self.tableView registerNib:[UINib nibWithNibName:kTagsViewCellId bundle:nil] forCellReuseIdentifier:kTagsViewCellId];
+    
     self.customData = [[MutableOrderedDictionary alloc] init];
     NSArray* sortedKeys = [self.item.fields.customData.allKeys sortedArrayUsingComparator:finderStringComparator];
     for (NSString* key in sortedKeys) {
-        [self.customData addKey:key andValue:self.item.fields.customData[key]];
+        ValueWithModDate* vm = self.item.fields.customData[key];
+        [self.customData addKey:key andValue:vm.value];
     }
     
     self.notes = self.item.isGroup ? self.item.fields.notes : @"";
@@ -74,10 +79,17 @@ const static NSUInteger kSectionUuidIdx = 4;
         
     NSString* value = keePassStringIdFromUuid(self.item.uuid);
     self.properties[@"ID"] = value;
+
+    self.properties[NSLocalizedString(@"item_properties_search_visible_state", @"Visible in Search")] = localizedYesOrNoFromBool (self.item.isSearchable);
+    
+    if ( self.item.fields.previousParentGroup ) {
+        self.properties[NSLocalizedString(@"item_properties_previous_parent_group", @"Previous Parent Group")] = keePassStringIdFromUuid(self.item.fields.previousParentGroup);
+    }
     
     if (self.item.isGroup) {
         self.properties[NSLocalizedString(@"item_properties_allow_search", @"Allow Search")] = [self optionalBoolString:self.item.fields.enableSearching];
         self.properties[NSLocalizedString(@"item_properties_allow_autotype", @"Allow AutoType")] = [self optionalBoolString:self.item.fields.enableAutoType];
+        self.properties[NSLocalizedString(@"item_properties_is_expanded", @"Is Expanded")] = localizedYesOrNoFromBool(self.item.fields.isExpanded);
         
         if (self.item.fields.defaultAutoTypeSequence.length) {
             self.properties[NSLocalizedString(@"item_properties_default_autotype_sequence", @"Default Auto Type Sequence")] = self.item.fields.defaultAutoTypeSequence;
@@ -88,6 +100,9 @@ const static NSUInteger kSectionUuidIdx = 4;
         }
     }
     else {
+        if ( !self.item.fields.qualityCheck ) {
+            self.properties[NSLocalizedString(@"audit_status_item_is_exluded", @"This item is excluded from Audits")] = localizedYesOrNoFromBool(!self.item.fields.qualityCheck);
+        }
         if (self.item.fields.foregroundColor.length) {
             self.properties[NSLocalizedString(@"item_properties_foreground_color", @"Foreground Color")] = self.item.fields.foregroundColor;
         }
@@ -99,7 +114,7 @@ const static NSUInteger kSectionUuidIdx = 4;
         }
         if (self.item.fields.autoType) {
             self.properties[NSLocalizedString(@"item_properties_autotype_enabled", @"AutoType Enabled")] = localizedYesOrNoFromBool (self.item.fields.autoType.enabled);
-            self.properties[NSLocalizedString(@"item_properties_autotype_obfuscation", @"AutoType Obfuscation")] = localizedYesOrNoFromBool (self.item.fields.autoType.dataTransferObfuscation);
+            self.properties[NSLocalizedString(@"item_properties_autotype_obfuscation", @"AutoType Obfuscation")] = @(self.item.fields.autoType.dataTransferObfuscation).stringValue;
 
             if (self.item.fields.autoType.defaultSequence.length) {
                 self.properties[NSLocalizedString(@"item_properties_default_autotype_sequence", @"Default Auto Type Sequence")] = self.item.fields.autoType.defaultSequence;
@@ -158,6 +173,9 @@ const static NSUInteger kSectionUuidIdx = 4;
     else if ( section == kSectionUuidIdx ) {
         return 1;
     }
+    else if ( section == kSectionTagsIdx ) {
+        return 1;
+    }
     else if ( section == kSectionDatesIdx ) {
         return self.dates.count;
     }
@@ -211,6 +229,9 @@ const static NSUInteger kSectionUuidIdx = 4;
         
         return cell;
     }
+    else if ( indexPath.section == kSectionTagsIdx ) {
+        return [self getTagsCell:indexPath];
+    }
     
     return [super tableView:tableView cellForRowAtIndexPath:indexPath];
 }
@@ -233,10 +254,11 @@ const static NSUInteger kSectionUuidIdx = 4;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section == kSectionPropertiesIdx && self.properties.count ) {
-        return NSLocalizedString(@"properties_vc_footer_basic", @"Some simple properties and settings of this item.");
-    }
-    else if ( section == kSectionNotesIdx && self.notes.length ) {
+
+
+
+
+    if ( section == kSectionNotesIdx && self.notes.length ) {
         return NSLocalizedString(@"properties_vc_footer_group_notes", @"Notes set on this group.");
     }
     else if ( section == kSectionCustomDataIdx && self.customData.count ) {
@@ -256,6 +278,9 @@ const static NSUInteger kSectionUuidIdx = 4;
     else if ( section == kSectionPropertiesIdx && self.properties.count == 0) {
         return CGFLOAT_MIN;
     }
+    else if ( section == kSectionTagsIdx && (!self.item.isGroup || self.item.fields.tags.count == 0 ) ) {
+        return CGFLOAT_MIN;
+    }
 
     return UITableViewAutomaticDimension;
 }
@@ -270,6 +295,9 @@ const static NSUInteger kSectionUuidIdx = 4;
     else if ( section == kSectionPropertiesIdx && self.properties.count == 0) {
         return CGFLOAT_MIN;
     }
+    else if ( section == kSectionTagsIdx && (!self.item.isGroup || self.item.fields.tags.count == 0 ) ) {
+        return CGFLOAT_MIN;
+    }
 
     return UITableViewAutomaticDimension;
 }
@@ -282,6 +310,9 @@ const static NSUInteger kSectionUuidIdx = 4;
         return CGFLOAT_MIN;
     }
     else if ( indexPath.section == kSectionPropertiesIdx && self.properties.count == 0) {
+        return CGFLOAT_MIN;
+    }
+    else if ( indexPath.section == kSectionTagsIdx && ( !self.item.isGroup || self.item.fields.tags.count == 0 ) ) {
         return CGFLOAT_MIN;
     }
 
@@ -340,6 +371,22 @@ const static NSUInteger kSectionUuidIdx = 4;
                          alertPosition:ISAlertPositionTop
                                didHide:nil];
 #endif
+}
+
+- (UITableViewCell*)getTagsCell:(NSIndexPath*)indexPath {
+    TagsViewTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:kTagsViewCellId forIndexPath:indexPath];
+
+
+    
+    NSArray<NSString*>* tags = [self.item.fields.tags.allObjects sortedArrayUsingComparator:finderStringComparator];
+
+    [cell setModel:YES
+              tags:tags
+   useEasyReadFont:self.model.metadata.easyReadFontForAll
+             onAdd:nil
+          onRemove:nil];
+
+    return cell;
 }
 
 @end

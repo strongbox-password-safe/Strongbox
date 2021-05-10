@@ -16,7 +16,7 @@
 #import "NSDate+Extensions.h"
 
 static const int kSectionIdxHibp = 2; 
-static const int kSectionIdxSimilarPasswords = 5; 
+static const int kSectionIdxSimilarPasswords = 6; 
 
 static const int kHibpAlwaysCheck = 0;
 static const int kHibpOnceADay = 24 * 60 * 60;
@@ -60,6 +60,11 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UILabel *labelLengthOfMinimumLength;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewExcluded;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchLowEntropy;
+@property (weak, nonatomic) IBOutlet UISlider *sliderEntropyThreshold;
+@property (weak, nonatomic) IBOutlet UILabel *labelEntropyThreshold;
+@property (weak, nonatomic) IBOutlet UILabel *labelLowEntropy;
+
 @end
 
 @implementation AuditConfigurationVcTableViewController
@@ -95,7 +100,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     self.switchNoPassword.on = self.model.metadata.auditConfig.checkForNoPasswords;
     self.switchCommon.on = self.model.metadata.auditConfig.checkForCommonPasswords;
-
+    
     
     
     self.switchDuplicates.on = self.model.metadata.auditConfig.checkForDuplicatedPasswords;
@@ -144,6 +149,20 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     self.labelSimilarityThresholdTitle.textColor = AppPreferences.sharedInstance.isProOrFreeTrial && self.switchSimilar.on ? nil : secondary;
     self.labelCheckSimilar.textColor = AppPreferences.sharedInstance.isProOrFreeTrial ? nil : secondary;
 
+    
+    
+    self.switchLowEntropy.on = self.model.metadata.auditConfig.checkForLowEntropy;
+    
+    self.sliderEntropyThreshold.enabled = self.switchLowEntropy.on;
+    self.labelLowEntropy.textColor = self.switchLowEntropy.on ? nil : secondary;
+    self.labelEntropyThreshold.textColor = self.switchLowEntropy.on ? nil : secondary;
+    
+    self.sliderEntropyThreshold.value = self.model.metadata.auditConfig.lowEntropyThreshold;
+    self.labelEntropyThreshold.text = [NSString stringWithFormat:@"%0.1f", (double)self.model.metadata.auditConfig.lowEntropyThreshold];
+
+    
+    
+    
     [self bindAuditStatusWithProgress:nil];
 }
 
@@ -251,7 +270,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     
     self.model.metadata.auditConfig.checkForCommonPasswords = self.switchCommon.on;
     self.model.metadata.auditConfig.checkForSimilarPasswords = self.switchSimilar.on;
-
+    
     self.model.metadata.auditConfig.checkForMinimumLength = self.switchMinLength.on;
     self.model.metadata.auditConfig.minimumLength = self.sliderMinLength.value;
     
@@ -261,6 +280,9 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     self.model.metadata.auditConfig.showAuditPopupNotifications = self.switchShowPopups.on;
     
     self.model.metadata.auditConfig.showCachedHibpHits = self.switchShowCached.on;
+
+    self.model.metadata.auditConfig.checkForLowEntropy = self.switchLowEntropy.on;
+    self.model.metadata.auditConfig.lowEntropyThreshold = self.sliderEntropyThreshold.value;
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(restartBackgroundAudit) object:nil];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(saveSettingsAndRestartBackgroundAudit) object:nil];

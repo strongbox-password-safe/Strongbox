@@ -32,8 +32,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSNumber* enableAutoType; 
 @property (nonatomic, nullable) NSNumber* enableSearching; 
 @property (nonatomic, nullable) NSUUID* lastTopVisibleEntry; 
+@property BOOL isExpanded;
 
 
+
+@property NSMutableSet<NSString*> *tags;
+@property (nullable) NSUUID* previousParentGroup;
 
 @end
 

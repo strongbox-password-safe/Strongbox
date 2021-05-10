@@ -99,6 +99,12 @@ static NSString* const kAllowThirdPartyKeyboards = @"allowThirdPartyKeyboards";
 static NSString* const kAppLockAllowDevicePasscodeFallbackForBio = @"appLockAllowDevicePasscodeFallbackForBio";
 static NSString* const kFullFileProtection = @"fullFileProtection";
 static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttemptedMigrationToFullFileProtection";
+static NSString* const kPasswordStrengthConfig = @"passwordStrengthConfig";
+
+static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupplementaryTotpCustomFields";
+static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
+
+static NSString* const kPromptedForSale = @"promptedForSale2";
 
 
 
@@ -142,6 +148,48 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 }
 
 
+
+- (BOOL)addOtpAuthUrl {
+    return [self getBool:kAddOtpAuthUrl fallback:YES];
+}
+
+- (void)setAddOtpAuthUrl:(BOOL)addOtpAuthUrl {
+    [self setBool:kAddOtpAuthUrl value:addOtpAuthUrl];
+}
+
+- (BOOL)addLegacySupplementaryTotpCustomFields {
+    return [self getBool:kAddLegacySupplementaryTotpCustomFields fallback:NO];
+}
+
+- (void)setAddLegacySupplementaryTotpCustomFields:(BOOL)addLegacySupplementaryTotpCustomFields {
+    [self setBool:kAddLegacySupplementaryTotpCustomFields value:addLegacySupplementaryTotpCustomFields];
+}
+
+- (NSInteger)promptedForSale {
+    return [self getInteger:kPromptedForSale fallback:-1];
+}
+
+- (void)setPromptedForSale:(NSInteger)promptedForSale {
+    [self setInteger:kPromptedForSale value:promptedForSale];
+}
+
+- (PasswordStrengthConfig *)passwordStrengthConfig {
+    NSData *encodedObject = [self.sharedAppGroupDefaults objectForKey:kPasswordStrengthConfig];
+
+    if(encodedObject == nil) {
+        return PasswordStrengthConfig.defaults;
+    }
+
+    PasswordStrengthConfig *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+
+    return object;
+}
+
+- (void)setPasswordStrengthConfig:(PasswordStrengthConfig *)passwordStrengthConfig {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordStrengthConfig];
+    [self.sharedAppGroupDefaults setObject:encodedObject forKey:kPasswordStrengthConfig];
+    [self.sharedAppGroupDefaults synchronize];
+}
 
 - (BOOL)useBackgroundUpdates {
     return [self getBool:kUseBackgroundUpdates fallback:YES];
@@ -722,6 +770,7 @@ static NSString* const kHaveAttemptedMigrationToFullFileProtection = @"haveAttem
 - (void)setBackupIncludeImportedKeyFiles:(BOOL)backupIncludeImportedKeyFiles {
     return [self setBool:kBackupIncludeImportedKeyFiles value:backupIncludeImportedKeyFiles];
 }
+
 - (NSDate *)lastFreeTrialNudge {
     NSDate* date = [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:kLastFreeTrialNudge];
     return date ? date : NSDate.date; 

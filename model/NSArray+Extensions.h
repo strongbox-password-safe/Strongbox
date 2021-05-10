@@ -18,6 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)anyMatch:(BOOL (^)(ObjectType obj))block;
 - (BOOL)allMatch:(BOOL (^)(ObjectType obj))block;
 
+- (NSInteger)indexOfFirstMatch:(BOOL (^)(ObjectType obj))block;
+
 - (NSArray *)flatMap:(NSArray* (^)(ObjectType obj, NSUInteger idx))block;
 
 @property (readonly) NSSet<ObjectType>* set;

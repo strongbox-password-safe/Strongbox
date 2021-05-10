@@ -125,6 +125,8 @@ extern NSString* const kCustomFieldsColumn;
 @property BOOL detectForeignChanges; 
 @property BOOL autoReloadAfterForeignChanges; 
 
+@property BOOL hasMigratedToSyncManager; 
+
 @end
 
 

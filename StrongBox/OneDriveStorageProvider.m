@@ -32,6 +32,10 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
     return sharedInstance;
 }
 
+- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    
+}
+
 - (instancetype)init {
     if (self = [super init]) {
         _storageId = kOneDrive;
@@ -204,7 +208,7 @@ static NSString * const kApplicationId = @"708058b4-71de-4c54-ae7f-0e6f5872e953"
 
         ODItem* item = (ODItem*)providerData;
         
-        NSLog(@"OneDrive Reading: [%@]-[%@]", item, item.lastModifiedDateTime);
+
                 
         NSDate* dtMod = item.lastModifiedDateTime;
         NSDate* dtMod2 = options.onlyIfModifiedDifferentFrom;

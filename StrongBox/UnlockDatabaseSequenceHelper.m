@@ -68,29 +68,29 @@
 @implementation UnlockDatabaseSequenceHelper
 
 + (instancetype)helperWithViewController:(UIViewController *)viewController database:(SafeMetaData *)database {
-    return [self helperWithViewController:viewController database:database isAutoFillOpen:NO openOffline:NO];
+    return [self helperWithViewController:viewController database:database isAutoFillOpen:NO offlineExplicitlyRequested:NO];
 }
 
 + (instancetype)helperWithViewController:(UIViewController*)viewController
                                 database:(SafeMetaData*)database
                           isAutoFillOpen:(BOOL)isAutoFillOpen
-                             openOffline:(BOOL)openOffline {
+              offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested {
     return [[UnlockDatabaseSequenceHelper alloc] initWithViewController:viewController
                                                                    safe:database
                                                          isAutoFillOpen:isAutoFillOpen
-                                                            openOffline:openOffline];
+                                             offlineExplicitlyRequested:offlineExplicitlyRequested];
 }
 
 - (instancetype)initWithViewController:(UIViewController*)viewController
                                   safe:(SafeMetaData*)safe
                         isAutoFillOpen:(BOOL)isAutoFillOpen
-                           openOffline:(BOOL)openOffline {
+            offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested {
     self = [super init];
     if (self) {
         self.viewController = viewController;
         self.database = safe;
         self.isAutoFillOpen = isAutoFillOpen;
-        self.offlineExplicitlyRequested = openOffline;
+        self.offlineExplicitlyRequested = offlineExplicitlyRequested;
     }
     
     return self;

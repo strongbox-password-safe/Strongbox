@@ -82,14 +82,14 @@
         [allKeys unionSet:me.customData.allKeys.set];
 
         for (NSString* key in allKeys) {
-            NSString* m = me.customData[key];
-            NSString* t = thee.customData[key];
+            ValueWithModDate* m = me.customData[key];
+            ValueWithModDate* t = thee.customData[key];
 
             if (m && t) {
-                if (t && ([m compare:t] != NSOrderedSame)) {
+                if (t && ![m isEqual:t]) {
                     NSString* foo = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_custom_data_will_change_fmt", @"Custom Data %@ will change.") : NSLocalizedString(@"diff_drill_down_custom_data_is_different_fmt", @"Custom Data %@ is different.");
                     NSString* k = [NSString stringWithFormat:foo, key];
-                    self.diffs[k] = [NSString stringWithFormat:prevNew, m, t];
+                    self.diffs[k] = [NSString stringWithFormat:prevNew, m.value, t.value];
                 }
             }
             else if (m) {
@@ -160,7 +160,10 @@
         
     locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_notes_will_change", @"Notes will change.") : NSLocalizedString(@"diff_drill_down_notes_are_different", @"Notes are different.");
     if ( [mine.fields.notes compare:other.fields.notes] != NSOrderedSame ) { self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.notes, other.fields.notes]; }
-        
+
+    locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_is_expanded_will_change", @"Expanded Group State will change.") : NSLocalizedString(@"diff_drill_down_expanded_states_are_different", @"Expanded Group States are different.");
+    if ( mine.fields.isExpanded != other.fields.isExpanded ) { self.diffs[locKey] = [NSString stringWithFormat:prevNew, localizedYesOrNoFromBool(mine.fields.isExpanded), localizedYesOrNoFromBool(other.fields.isExpanded)]; }
+
     locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_email_will_change", @"Email will change.") : NSLocalizedString(@"diff_drill_down_emails_are_different", @"Email will change.");
     if ( [mine.fields.email compare:other.fields.email] != NSOrderedSame ) { self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.email, other.fields.email]; }
     
@@ -209,14 +212,14 @@
         [allKeys unionSet:mine.fields.customData.allKeys.set];
 
         for (NSString* key in allKeys) {
-            NSString* m = mine.fields.customData[key];
-            NSString* t = other.fields.customData[key];
+            ValueWithModDate* m = mine.fields.customData[key];
+            ValueWithModDate* t = other.fields.customData[key];
 
             if (m && t) {
-                if (t && ([m compare:t] != NSOrderedSame)) {
+                if ( t && ![m isEqual:t] ) {
                     NSString* foo = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_custom_data_will_change_fmt", @"Custom Data %@ will change.") : NSLocalizedString(@"diff_drill_down_custom_data_is_different_fmt", @"Custom Data %@ is different.");
                     NSString* k = [NSString stringWithFormat:foo, key];
-                    self.diffs[k] = [NSString stringWithFormat:prevNew, m, t];
+                    self.diffs[k] = [NSString stringWithFormat:prevNew, m.value, t.value];
                 }
             }
             else if (m) {

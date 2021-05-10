@@ -26,7 +26,7 @@ typedef void (^ChangeIconCompletionBlock)(BOOL goNoGo, BOOL isRecursiveGroupFavI
 - (void)expressDownloadBestFavIcon:(NSString*)urlOverride
                         completion:(void (^)(UIImage * _Nullable))completion;
 
-@property NSSet<NodeIcon*>* customIconPool;
+@property NSDictionary<NSUUID*, NodeIcon*>* customIcons;
 
 @end
 

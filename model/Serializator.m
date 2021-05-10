@@ -16,6 +16,7 @@
 #import "Kdbx4Database.h"
 #import "Kdb1Database.h"
 #import "NSData+Extensions.h"
+#import "StreamUtils.h"
 
 @implementation Serializator
 
@@ -212,15 +213,26 @@
 }
 
 + (DatabaseModel *)expressFromData:(NSData *)data password:(NSString *)password {
-    return [self expressFromData:data password:password config:DatabaseModelConfig.defaults];
+    return [self expressFromData:data password:password config:DatabaseModelConfig.defaults xml:nil];
 }
 
-+ (DatabaseModel *)expressFromData:(NSData *)data password:(NSString *)password config:(DatabaseModelConfig *)config {
++ (NSString *)expressToXml:(NSData*)data password:(NSString*)password {
+    NSString* xml = nil;
+    
+    [self expressFromData:data password:password config:DatabaseModelConfig.defaults xml:&xml];
+
+    return xml;
+}
+
++ (DatabaseModel *)expressFromData:(NSData *)data password:(NSString *)password config:(DatabaseModelConfig *)config xml:(NSString**)xml {
     DatabaseFormat format = [Serializator getDatabaseFormatWithPrefix:data];
     id<AbstractDatabaseFormatAdaptor> adaptor = [Serializator getAdaptor:format];
     if (adaptor == nil) {
        return nil;
     }
+
+    NSOutputStream* xmlDumpStream = [NSOutputStream outputStreamToMemory];
+    [xmlDumpStream open];
 
     __block DatabaseModel* model = nil;
     dispatch_group_t group = dispatch_group_create();
@@ -230,7 +242,7 @@
     [stream open];
     [adaptor read:stream
               ckf:[CompositeKeyFactors password:password]
-    xmlDumpStream:nil
+    xmlDumpStream:xmlDumpStream
 sanityCheckInnerStream:config.sanityCheckInnerStream
        completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable error) {
         [stream close];
@@ -248,9 +260,20 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
 
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 
+    if ( model ) {
+        NSData *contents = [xmlDumpStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+        
+        if ( contents ) {
+            if ( xml ) {
+                *xml = [[NSString alloc] initWithData:contents encoding:NSUTF8StringEncoding];
+            }
+        }
+    }
+    
+    [xmlDumpStream close];
+    
     return model;
 }
-
 
 
 

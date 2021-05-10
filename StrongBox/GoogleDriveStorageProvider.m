@@ -25,6 +25,10 @@
     return sharedInstance;
 }
 
+- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    
+}
+
 - (instancetype)init {
     if (self = [super init]) {
         _storageId = kGoogleDrive;

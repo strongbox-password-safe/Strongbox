@@ -22,6 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL checkForDuplicatedPasswords;
 @property BOOL caseInsensitiveMatchForDuplicates;
 @property BOOL checkForCommonPasswords;
+@property BOOL checkForLowEntropy;
+@property NSUInteger lowEntropyThreshold;
 
 @property BOOL checkForSimilarPasswords;
 @property double levenshteinSimilarityThreshold;

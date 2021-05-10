@@ -14,6 +14,7 @@
 #import "MutableOrderedDictionary.h"
 #import "AutoType.h"
 #import "SyncComparisonParams.h"
+#import "ValueWithModDate.h"
 
 @class Node;
 
@@ -48,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) NSMutableSet<NSString*> *tags;
 @property (nonatomic, retain, nonnull) PasswordHistory *passwordHistory; 
 @property NSMutableArray<Node*> *keePassHistory;
-@property NSMutableDictionary<NSString*, NSString*> *customData;
+@property NSMutableDictionary<NSString*, ValueWithModDate*> *customData;
 
 @property (nonatomic, nullable) NSString* defaultAutoTypeSequence;
 @property (nonatomic, nullable) NSNumber* enableAutoType;
@@ -58,6 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSString* backgroundColor;
 @property (nullable) NSString* overrideURL;
 @property (nullable) AutoType* autoType;
+@property BOOL isExpanded;
+@property BOOL qualityCheck; 
+@property (nullable) NSUUID* previousParentGroup;
 
 
 
@@ -104,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
                                      issuer:(NSString*)issuer
                                    username:(NSString*)username;
 
-- (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes;
+- (void)setTotp:(OTPToken*)token appendUrlToNotes:(BOOL)appendUrlToNotes addLegacyFields:(BOOL)addLegacyFields addOtpAuthUrl:(BOOL)addOtpAuthUrl;
 
 - (void)clearTotp;
 

@@ -30,7 +30,15 @@
         self.data = [[NSData alloc] initWithBase64EncodedString:b64 options:NSDataBase64DecodingIgnoreUnknownCharacters ];
         return YES;
     }
-    
+    else if([withXmlElementName isEqualToString:kNameElementName]) {
+        self.name = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kLastModificationTimeElementName]) {
+        self.modified = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
+
     return NO;
 }
 
@@ -50,6 +58,14 @@
     
     [serializer writeElement:kUuidElementName uuid:self.uuid];
     [serializer writeElement:kCustomIconDataElementName text:b64];
+
+    if ( self.name.length ) {
+        if ( ![serializer writeElement:kNameElementName text:self.name] ) return NO;
+    }
+    
+    if ( self.modified ) {
+        if ( ![serializer writeElement:kLastModificationTimeElementName date:self.modified] ) return NO;
+    }
 
     if(![super writeUnmanagedChildren:serializer]) {
         return NO;

@@ -216,6 +216,13 @@ static const BOOL kEncrypt = YES;
         return [NSInputStream inputStreamWithData:NSData.data]; 
     }
  
+    NSError* error = nil;
+    [NSFileManager.defaultManager attributesOfItemAtPath:self.encryptedSessionFilePath error:&error];
+    if ( error ) {
+        NSLog(@"Could not find encrypted session file! Cannot return input stream;");
+        return nil;
+    }
+    
     NSInputStream* inStream = [NSInputStream inputStreamWithFileAtPath:self.encryptedSessionFilePath];
     
     NSInputStream* aesDecrypt = kEncrypt ? [[AesInputStream alloc] initWithStream:inStream key:self.encryptionKey iv:self.encryptionIV] : inStream;

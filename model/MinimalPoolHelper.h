@@ -14,7 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MinimalPoolHelper : NSObject
 
 + (NSArray<DatabaseAttachment*>*)getMinimalAttachmentPool:(Node*)rootNode;
-+ (NSDictionary<NSUUID*, NSData*>*)getMinimalIconPool:(Node*)rootNode;
+
+
 
 @end
 

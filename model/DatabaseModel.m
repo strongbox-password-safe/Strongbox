@@ -23,6 +23,8 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 @interface DatabaseModel ()
 
 @property (nonatomic, readonly) NSMutableDictionary<NSUUID*, NSDate*> *mutableDeletedObjects;
+@property (nonatomic) NSDictionary<NSUUID*, NodeIcon*> *backingIconPool;
+
 @property (nonatomic, readonly) DatabaseFormat format;
 @property (nonatomic, nonnull, readonly) UnifiedDatabaseMetadata* metadata;
 
@@ -46,7 +48,8 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                              compositeKeyFactors:ckfClone
                                         metadata:metadataClone
                                             root:treeClone
-                                  deletedObjects:self.deletedObjects.copy];
+                                  deletedObjects:self.deletedObjects
+                                        iconPool:self.iconPool];
 }
 
 - (instancetype)initWithFormat:(DatabaseFormat)format {
@@ -84,14 +87,16 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             compositeKeyFactors:compositeKeyFactors
                        metadata:metadata
                            root:root
-                 deletedObjects:@{}];
+                 deletedObjects:@{}
+                       iconPool:@{}];
 }
     
 - (instancetype)initWithFormat:(DatabaseFormat)format
            compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                       metadata:(UnifiedDatabaseMetadata*)metadata
                           root:(Node *_Nullable)root
-                deletedObjects:(NSDictionary<NSUUID *,NSDate *> *)deletedObjects {
+                deletedObjects:(NSDictionary<NSUUID *,NSDate *> *)deletedObjects
+                      iconPool:(NSDictionary<NSUUID *,NodeIcon *> *)iconPool {
     if (self = [super init]) {
         _fastNodeIdMap = [[ConcurrentMutableDictionary alloc] init];
         _format = format;
@@ -102,6 +107,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         [self rebuildFastNodeIdMap];
  
         _mutableDeletedObjects = deletedObjects.mutableCopy;
+        _backingIconPool = iconPool.mutableCopy;
     }
     return self;
 }
@@ -133,16 +139,58 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return [MinimalPoolHelper getMinimalAttachmentPool:self.rootNode];
 }
 
-- (NSSet<NodeIcon *> *)customIconPool {
-    NSDictionary<NSUUID *,NSData *> *min = [MinimalPoolHelper getMinimalIconPool:self.rootNode];
+- (NSDictionary<NSUUID *,NodeIcon *> *)iconPool {
+    NSArray<Node*>* allNodes = [self getAllNodesReferencingCustomIcons:self.rootNode];
+
     
-    NSSet<NodeIcon*> *ret = [min.allValues map:^id _Nonnull(NSData * _Nonnull obj, NSUInteger idx) {
-        return [NodeIcon withCustom:obj];
-    }].set;
+
+    NSMutableDictionary<NSUUID*, NodeIcon*>* newIconPool = self.backingIconPool.mutableCopy;
+    for (Node* node in allNodes) {
+        NodeIcon* icon = node.icon;
+        
+        if ( icon.uuid == nil ) {
+            NSUUID* newId = NSUUID.UUID;
+            NSLog(@"Found new custom icon - adding to the pool. - [%@]", newId);
+            NodeIcon* newIcon = [NodeIcon withCustom:icon.custom uuid:newId name:icon.name modified:icon.modified];
+            newIconPool[newIcon.uuid] = newIcon;
+            node.icon = newIcon;
+        }
+        else {
+            if ( self.backingIconPool[icon.uuid] == nil ) {
+                NSLog(@"WARNWARN: Found custom icon with a UUID but not in POOL. Adding to the pool.");
+                newIconPool[icon.uuid] = icon;
+            }
+        }
+    }
+
+    self.backingIconPool = newIconPool.copy;
     
-    NSLog(@"Got %@ custom icons", @(ret.count));
     
-    return ret;
+
+    return self.backingIconPool.copy;
+}
+
+- (NSArray<Node*>*)getAllNodesReferencingCustomIcons:(Node *)root {
+    NSArray<Node*>* currentCustomIconNodes = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return node.icon != nil && node.icon.isCustom;
+    }];
+    
+    NSArray<Node*>* allNodesWithHistoryAndCustomIcons = [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        return !node.isGroup && [node.fields.keePassHistory anyMatch:^BOOL(Node * _Nonnull obj) {
+            return obj.icon != nil && obj.icon.isCustom;
+        }];
+    }];
+    
+    NSArray<Node*>* allHistoricalNodesWithCustomIcons = [allNodesWithHistoryAndCustomIcons flatMap:^id _Nonnull(Node * _Nonnull node, NSUInteger idx) {
+        return [node.fields.keePassHistory filter:^BOOL(Node * _Nonnull obj) {
+            return obj.icon != nil && obj.icon.isCustom;
+        }];
+    }];
+    
+    NSMutableArray *customIconNodes = [NSMutableArray arrayWithArray:currentCustomIconNodes];
+    [customIconNodes addObjectsFromArray:allHistoricalNodesWithCustomIcons];
+
+    return customIconNodes;
 }
 
 - (DatabaseFormat)originalFormat {
@@ -593,44 +641,38 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly trueRoot:(BOOL)trueRoot {
     Node* root = trueRoot ? self.rootNode : self.effectiveRootGroup;
-    
-    if(self.format == kPasswordSafe) {
-        return root.allChildRecords;
-    }
-    else if(self.format == kKeePass1) {
-        
-        Node* keePass1BackupNode = self.keePass1BackupNode;
+    Node* keePass1BackupNode = self.keePass1BackupNode;
+    Node* recycleBin = self.recycleBinNode;
 
-        return [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            return !node.isGroup && (keePass1BackupNode == nil || (node != keePass1BackupNode && ![keePass1BackupNode contains:node]));
-        }];
-    }
-    else {
-        
-        Node* recycleBin = self.recycleBinNode;
+    return [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
+        if (!includeGroups && node.isGroup) {
+            return NO;
+        }
 
-        return [root filterChildren:YES predicate:^BOOL(Node * _Nonnull node) {
-            if (!includeGroups && node.isGroup) {
-                return NO;
-            }
+        if (!includeEntries && !node.isGroup) {
+            return NO;
+        }
 
-            if (!includeEntries && !node.isGroup) {
-                return NO;
-            }
-
+        if(self.format == kPasswordSafe) {
+            return YES;
+        }
+        else if(self.format == kKeePass1) { 
+            return (keePass1BackupNode == nil || (node != keePass1BackupNode && ![keePass1BackupNode contains:node]));
+        }
+        else { 
             if ( recycleBin != nil && (node == recycleBin || [recycleBin contains:node]) ) {
                 return NO;
             }
             
             return searchableOnly ? node.isSearchable : YES;
-        }];
-    }
+        }
+    }];
 }
 
 - (NSSet<NSString*> *)urlSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *recordNode in self.allActiveEntries) {
+    for (Node *recordNode in self.allSearchableEntries) {
         if ([Utils trim:recordNode.fields.url].length > 0) {
             [bag addObject:recordNode.fields.url];
         }
@@ -642,7 +684,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSSet<NSString*> *)usernameSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *recordNode in self.allActiveEntries) {
+    for (Node *recordNode in self.allSearchableEntries) {
         if ([Utils trim:recordNode.fields.username].length > 0) {
             [bag addObject:recordNode.fields.username];
         }
@@ -652,7 +694,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (NSSet<NSString*> *)tagSet {
-    NSArray<NSString*>* allTags = [self.allActiveEntries flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+    NSArray<NSString*>* allTags = [self.allSearchableTrueRoot flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) { 
         return obj.fields.tags.allObjects;
     }];
 
@@ -670,7 +712,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSSet<NSString*> *)emailSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in self.allActiveEntries) {
+    for (Node *record in self.allSearchableEntries) {
         if ([Utils trim:record.fields.email].length > 0) {
             [bag addObject:record.fields.email];
         }
@@ -682,7 +724,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSSet<NSString*> *)passwordSet {
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
-    for (Node *record in self.allActiveEntries) {
+    for (Node *record in self.allSearchableEntries) {
         if ([Utils trim:record.fields.password].length > 0) {
             [bag addObject:record.fields.password];
         }
@@ -694,7 +736,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSString *)mostPopularEmail {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.allActiveEntries) {
+    for ( Node *record in self.allSearchableEntries ) {
         if(record.fields.email.length) {
             [bag addObject:record.fields.email];
         }
@@ -706,7 +748,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSString *)mostPopularUsername {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.allActiveEntries) {
+    for (Node *record in self.allSearchableEntries) {
         if(record.fields.username.length) {
             [bag addObject:record.fields.username];
         }
@@ -718,7 +760,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 - (NSString *)mostPopularPassword {
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
-    for (Node *record in self.allActiveEntries) {
+    for (Node *record in self.allSearchableEntries) {
         [bag addObject:record.fields.password];
     }
     
@@ -750,37 +792,45 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 
-
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
-    return [foo localizedStandardContainsString:searchText];
+    return [foo containsSearchString:searchText];
 }
 
 - (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.username node:node maybe:dereference];
-    return [foo localizedStandardContainsString:searchText];
+    return [foo containsSearchString:searchText];
 }
 
 - (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.password node:node maybe:dereference];
-    return [foo localizedStandardContainsString:searchText];
+    return [foo containsSearchString:searchText];
+}
+
+- (BOOL)isEmailMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    NSString* foo = [self maybeDeref:node.fields.email node:node maybe:dereference];
+    return [foo containsSearchString:searchText];
+}
+- (BOOL)isNotesMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+    NSString* foo = [self maybeDeref:node.fields.notes node:node maybe:dereference];
+    return [foo containsSearchString:searchText];
 }
 
 - (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node {
     return [node.fields.tags.allObjects anyMatch:^BOOL(NSString * _Nonnull obj) {
-        return [obj localizedStandardContainsString:searchText];
+        return [obj containsSearchString:searchText];
     }];
 }
 
 - (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
-    if([foo localizedStandardContainsString:searchText]) {
+    if ( [foo containsSearchString:searchText] ) {
         return YES;
     }
 
     for (NSString* altUrl in node.fields.alternativeUrls) {
         NSString* foo = [self maybeDeref:altUrl node:node maybe:dereference];
-        if([foo localizedStandardContainsString:searchText]) {
+        if([foo containsSearchString:searchText]) {
             return YES;
         }
     }
@@ -789,20 +839,14 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    NSString* title = [self maybeDeref:node.title node:node maybe:dereference];
-    NSString* username = [self maybeDeref:node.fields.username node:node maybe:dereference];
-    NSString* password = [self maybeDeref:node.fields.password node:node maybe:dereference];
-    NSString* url = [self maybeDeref:node.fields.url node:node maybe:dereference];
-    NSString* email = [self maybeDeref:node.fields.email node:node maybe:dereference];
-    NSString* notes = [self maybeDeref:node.fields.notes node:node maybe:dereference];
-    
-    BOOL simple =   [title localizedStandardContainsString:searchText] ||
-    [username localizedStandardContainsString:searchText] ||
-    [password localizedStandardContainsString:searchText] ||
-    [email localizedStandardContainsString:searchText] ||
-    [url localizedStandardContainsString:searchText] ||
-    [notes localizedStandardContainsString:searchText];
-    
+    BOOL simple =   [self isTitleMatches:searchText node:node dereference:dereference] ||
+                    [self isUsernameMatches:searchText node:node dereference:dereference] ||
+                    [self isPasswordMatches:searchText node:node dereference:dereference] ||
+                    [self isEmailMatches:searchText node:node dereference:dereference] ||
+                    [self isUrlMatches:searchText node:node dereference:dereference] ||
+                    [self isNotesMatches:searchText node:node dereference:dereference] ||
+                    [self isTagsMatches:searchText node:node];
+        
     if(simple) {
         return YES;
     }
@@ -810,36 +854,27 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
         if (self.format == kKeePass4 || self.format == kKeePass) {
             
             
-            for (NSString* tag in node.fields.tags) {
-                if ([tag localizedStandardContainsString:searchText]) {
-                    return YES;
-                }
-            }
-
-            
-            
             for (NSString* key in node.fields.customFields.allKeys) {
                 NSString* value = node.fields.customFields[key].value;
                 NSString* derefed = [self maybeDeref:value node:node maybe:dereference];
                 
-                if ([key localizedStandardContainsString:searchText] || [derefed localizedStandardContainsString:searchText]) {
+                if ([key containsSearchString:searchText] || [derefed containsSearchString:searchText]) {
                     return YES;
                 }
             }
         }
-        
-        
-        
-        
+                
         if (self.format != kPasswordSafe) {
             BOOL attachmentMatch = [node.fields.attachments.allKeys anyMatch:^BOOL(NSString * _Nonnull obj) {
-                return [obj localizedStandardContainsString:searchText];
+                return [obj containsSearchString:searchText];
             }];
             
             if (attachmentMatch) {
                 return YES;
             }
         }
+        
+        
     }
     
     return NO;

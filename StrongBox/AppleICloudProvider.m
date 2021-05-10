@@ -69,6 +69,10 @@ suggestedFilename:nil
       completion:completion];
 }
 
+- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    
+}
+
 - (void)    create:(NSString *)nickName
          extension:(NSString *)extension
               data:(NSData *)data

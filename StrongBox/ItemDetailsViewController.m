@@ -227,7 +227,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 - (void)listenToNotifications {
     [self unListenToNotifications];
     
-    NSLog(@"ItemDetailsViewController: listenToNotifications");
+
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onCellHeightChangedNotification)
@@ -266,7 +266,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (void)unListenToNotifications {
-    NSLog(@"ItemDetailsViewController: unListenToNotifications");
+
 
     [NSNotificationCenter.defaultCenter removeObserver:self name:CellHeightsChangedNotification object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseViewPreferencesChangedNotificationKey object:nil];
@@ -569,6 +569,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 #pragma mark - Table view data source
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+
+    
     if (indexPath.section == kSimpleFieldsSectionIdx) {
         if(indexPath.row == kRowTitleAndIcon) {
             return [self getIconAndTitleCell:indexPath];
@@ -1044,7 +1046,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)onChangeIcon {
     self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIconPool = self.databaseModel.database.customIconPool;
+    self.sni.customIcons = self.databaseModel.database.iconPool;
     
     NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
     
@@ -1054,7 +1056,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                   format:self.databaseModel.database.originalFormat
           keePassIconSet:self.databaseModel.metadata.keePassIconSet
               completion:^(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selected) {
-        if(goNoGo) {
+        if ( goNoGo ) {
             self.model.icon = selected ? selected.allValues.firstObject : nil;
             self.iconExplicitlyChanged = YES;
             [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]] withRowAnimation:UITableViewRowAnimationAutomatic];
@@ -1313,7 +1315,9 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
         if(self.model.totp != nil) {
             [ret.fields setTotp:self.model.totp
-                appendUrlToNotes:self.databaseModel.database.originalFormat == kPasswordSafe || self.databaseModel.database.originalFormat == kKeePass1];
+               appendUrlToNotes:self.databaseModel.database.originalFormat == kPasswordSafe || self.databaseModel.database.originalFormat == kKeePass1
+                addLegacyFields:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
+                  addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl];
         }
     }
 
@@ -1336,7 +1340,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 }
 
 - (void)processIconBeforeSave:(Node*)item completion:(void (^)(void))completion {
-    if (self.iconExplicitlyChanged) {
+    if ( self.iconExplicitlyChanged ) {
         self.iconExplicitlyChanged = NO;
         item.icon = self.model.icon;
     }
@@ -1385,11 +1389,11 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)fetchFavIcon:(Node*)item completion:(void (^)(void))completion {
     self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIconPool = self.databaseModel.database.customIconPool;
-
+    self.sni.customIcons = self.databaseModel.database.iconPool;
+    
     [self.sni expressDownloadBestFavIcon:self.model.url
                               completion:^(UIImage * _Nullable favIcon) {
-                          if(favIcon) {
+                          if( favIcon ) {
                               NSData *data = UIImagePNGRepresentation(favIcon);
                               item.icon = [NodeIcon withCustom:data];
                           }
@@ -1636,11 +1640,12 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         
         NSString* audit = [self.databaseModel getQuickAuditSummaryForNode:self.itemId];
         
-        [cell setConfidentialKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
+        [cell setConcealableKey:NSLocalizedString(@"item_details_password_field_title", @"Password")
                            value:[self maybeDereference:self.model.password]
                        concealed:self.passwordConcealedInUi
                         colorize:self.databaseModel.metadata.colorizePasswords
-                           audit:audit];
+                           audit:audit
+                   showStrength:YES];
         
         __weak GenericKeyValueTableViewCell* weakCell = cell;
         cell.onRightButton = ^{
@@ -1827,11 +1832,12 @@ suggestionProvider:^NSString*(NSString *text) {
         CustomFieldViewModel* cf =  self.model.customFields[idx];
         
         if(cf.protected && !self.editing) {
-            [cell setConfidentialKey:cf.key
-                               value:[self maybeDereference:cf.value]
-                           concealed:cf.concealedInUI
-                            colorize:self.databaseModel.metadata.colorizeProtectedCustomFields
-                               audit:nil];
+            [cell setConcealableKey:cf.key
+                              value:[self maybeDereference:cf.value]
+                          concealed:cf.concealedInUI
+                           colorize:self.databaseModel.metadata.colorizeProtectedCustomFields
+                              audit:nil
+                       showStrength:NO];
 
             __weak GenericKeyValueTableViewCell* weakCell = cell;
             cell.onRightButton = ^{

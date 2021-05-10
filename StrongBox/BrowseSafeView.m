@@ -47,6 +47,7 @@
 #import "SyncManager.h"
 #import "AsyncUpdateResultViewController.h"
 #import "Platform.h"
+#import "Pair.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -73,7 +74,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property (nonatomic) NSIndexPath *tappedIndexPath;
 @property (strong, nonatomic) NSTimer *tapTimer;
 @property (strong) SetNodeIconUiHelper* sni; 
-@property NSMutableArray<NSArray<NSNumber*>*>* reorderItemOperations;
+@property NSMutableArray<Pair<NSIndexPath*, NSIndexPath*>*> * reorderItemOperations;
 @property BOOL sortOrderForAutomaticSortDuringEditing;
 @property BOOL hasAlreadyAppeared;
 
@@ -168,7 +169,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
 
-    NSLog(@"BrowseSafeView: viewDidDisappear");
+
     
     if(self.isMovingFromParentViewController) { 
         NSLog(@"isMovingFromParentViewController [%@]", self);
@@ -755,20 +756,68 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     }
 }
 
+
+
+- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return [[self getTableDataSource] canMoveRowAtIndexPath:indexPath];
+}
+
+- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
+    if(![sourceIndexPath isEqual:destinationIndexPath]) {
+        NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
+        
+        if(self.reorderItemOperations == nil) {
+            self.reorderItemOperations = [NSMutableArray array];
+        }
+        
+        [self.reorderItemOperations addObject:[Pair pairOfA:sourceIndexPath andB:destinationIndexPath]];
+        
+        [self updateToolbarButtonsState]; 
+    }
+}
+
 - (void)reorderPendingItems {
     NSLog(@"Reordering...");
     
-    for (NSArray<NSNumber*>* moveOp in self.reorderItemOperations) {
-        NSUInteger src = moveOp[0].unsignedIntegerValue;
-        NSUInteger dest = moveOp[1].unsignedIntegerValue;
+    for (Pair<NSIndexPath*, NSIndexPath*> *moveOp in self.reorderItemOperations) {
+        NSUInteger srcIndex;
+        NSUInteger destIndex;
 
         Node* currentGroup = [self.viewModel.database getItemById:self.currentGroupId];
-        BOOL s = [self.viewModel.database reorderChildFrom:src to:dest parentGroup:currentGroup];
-        if (s) {
-            NSLog(@"Reordering: %lu -> %lu Successful", (unsigned long)src, (unsigned long)dest);
+
+        if ( self.viewModel.metadata.browseSortFoldersSeparately ) {
+            
+            
+            Node* src = [self getNodeFromIndexPath:moveOp.a];
+            Node* dest = [self getNodeFromIndexPath:moveOp.b];
+            srcIndex = [currentGroup.children indexOfObject:src];
+
+            if ( src.isGroup == dest.isGroup ) { 
+                destIndex = [currentGroup.children indexOfObject:dest];
+            }
+            else {
+                if ( src.isGroup ) { 
+                    Node* lastGroup = currentGroup.childGroups.lastObject;
+                    destIndex = [currentGroup.children indexOfObject:lastGroup];
+                }
+                else { 
+                    Node* firstEntry = currentGroup.childRecords.firstObject;
+                    destIndex = [currentGroup.children indexOfObject:firstEntry];
+                }
+            }
         }
         else {
-            NSLog(@"WARNWARN: Move Unsucessful!: %lu -> %lu - Terminating further re-ordering", (unsigned long)src, (unsigned long)dest);
+            srcIndex = moveOp.a.row;
+            destIndex = moveOp.b.row;
+        }
+        
+        BOOL s = [self.viewModel.database reorderChildFrom:srcIndex to:destIndex parentGroup:currentGroup];
+        
+        if (s) {
+            NSLog(@"Reordering: %lu -> %lu Successful", (unsigned long)srcIndex, (unsigned long)destIndex);
+        }
+        else {
+            NSLog(@"WARNWARN: Move Unsucessful!: %lu -> %lu - Terminating further re-ordering", (unsigned long)srcIndex, (unsigned long)destIndex);
             break;
         }
     }
@@ -776,6 +825,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.reorderItemOperations = nil;
     [self updateAndRefresh];
 }
+
+
 
 - (void)setupSearchBar {
     self.searchController = [[UISearchController alloc] initWithSearchResultsController:nil];
@@ -902,23 +953,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     return YES;
 }
 
-- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
-    return self.viewModel.database.originalFormat != kPasswordSafe && self.viewModel.metadata.browseSortField == kBrowseSortFieldNone && self.viewModel.metadata.browseViewType == kBrowseViewTypeHierarchy;
-}
-
-- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
-    if(![sourceIndexPath isEqual:destinationIndexPath]) {
-        NSLog(@"Move Row at %@ to %@", sourceIndexPath, destinationIndexPath);
-        
-        if(self.reorderItemOperations == nil) {
-            self.reorderItemOperations = [NSMutableArray array];
-        }
-        [self.reorderItemOperations addObject:@[@(sourceIndexPath.row), @(destinationIndexPath.row)]];
-
-        [self updateToolbarButtonsState]; 
-    }
-}
-
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     return UITableViewAutomaticDimension;  
 }
@@ -986,7 +1020,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     if ( !self.sni ) {
         self.sni = [[SetNodeIconUiHelper alloc] init];
     }
-    self.sni.customIconPool = self.viewModel.database.customIconPool;
+    self.sni.customIcons = self.viewModel.database.iconPool; 
 
     __weak BrowseSafeView* weakSelf = self;
     [self.sni changeIcon:self
@@ -1652,7 +1686,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         vc.onDone =  ^(BOOL showAllAuditIssues) {
             NSLog(@"onDone: [%hhd]", showAllAuditIssues);
             
-            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{ 
                 [self dismissViewControllerAnimated:YES completion:^{
                     if (showAllAuditIssues) {
                         [weakSelf showAllAuditIssues];
@@ -1803,7 +1837,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 
 - (void)showAllAuditIssues { 
-    
     [self.searchController.searchBar becomeFirstResponder];
     
     self.searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;

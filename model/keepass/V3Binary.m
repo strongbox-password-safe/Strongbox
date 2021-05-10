@@ -70,6 +70,10 @@
     }
     
     NSInputStream* inputStream = [self.dbAttachment getPlainTextInputStream];
+    if ( !inputStream ) {
+        NSLog(@"WARNWARN: Could not serialize V3Binary! Could not read attachment PT stream.");
+        return NO;
+    }
 
     
     NSData* data = [NSData dataWithContentsOfStream:inputStream];

@@ -30,7 +30,9 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_N
 
 + (DatabaseModel*_Nullable)expressFromData:(NSData*)data password:(NSString*)password;
 
-+ (DatabaseModel*_Nullable)expressFromData:(NSData*)data password:(NSString*)password config:(DatabaseModelConfig*)config;
++ (DatabaseModel*_Nullable)expressFromData:(NSData*)data password:(NSString*)password config:(DatabaseModelConfig*)config xml:(NSString*_Nullable*_Nullable)xml;
+
++ (NSString *_Nullable)expressToXml:(NSData*)data password:(NSString*)password;
 
 + (void)fromLegacyData:legacyData
                    ckf:(CompositeKeyFactors *)ckf

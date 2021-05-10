@@ -162,6 +162,10 @@ static const BOOL kLogVerbose = NO;
     
     
     NSMutableData* inner = createInnerHeaders(serializationData.attachments, serializationData.innerRandomStreamId, serializationData.innerRandomStreamKey);
+    if ( !inner ) {
+        completion(NO, nil, [Utils createNSError:@"Could not serialize inner headers (probably could not serialize attachments). KDBX4." errorCode:-1]);
+        return;
+    }
     
     
     
@@ -382,6 +386,10 @@ static NSMutableData* createInnerHeaders(NSArray<DatabaseAttachment*> *attachmen
         NSMutableData *binary = [NSMutableData dataWithBytes:&protected length:1];
         
         NSInputStream* inputStream = [attachment getPlainTextInputStream];
+        if ( !inputStream ) {
+            NSLog(@"Could not get attachment screen, cannot serialize.");
+            return nil;
+        }
 
         
         NSData* data = [NSData dataWithContentsOfStream:inputStream];

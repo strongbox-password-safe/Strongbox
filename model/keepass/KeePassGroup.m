@@ -11,6 +11,8 @@
 #import "SimpleXmlValueExtractor.h"
 #import "CustomData.h"
 #import "NSUUID+Zero.h"
+#import "NSArray+Extensions.h"
+#import "Utils.h"
 
 @implementation KeePassGroup
 
@@ -30,6 +32,7 @@
         self.enableAutoType = nil;
         self.enableSearching = nil;
         self.lastTopVisibleEntry = nil;
+        self.tags = [NSMutableSet set];
     }
     
     return self;
@@ -117,7 +120,32 @@
         self.lastTopVisibleEntry = [SimpleXmlValueExtractor getUuid:completedObject];
         return YES;
     }
-    
+    else if([withXmlElementName isEqualToString:kTagsElementName]) {
+        NSString* tagsString = [SimpleXmlValueExtractor getStringFromText:completedObject];
+        
+        NSArray<NSString*>* tags = [tagsString componentsSeparatedByString:@";"]; 
+        
+        NSArray<NSString*>* trimmed = [tags map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+            return [Utils trim:obj];
+        }];
+        
+        NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+            return obj.length > 0;
+        }];
+        
+        [self.tags addObjectsFromArray:filtered];
+        
+        return YES;
+    }
+    else if ( [withXmlElementName isEqualToString:kIsExpandedElementName] ) {
+        self.isExpanded = [SimpleXmlValueExtractor getBool:completedObject];
+        return YES;
+    }
+    else if([withXmlElementName isEqualToString:kPreviousParentGroupElementName]) {
+        self.previousParentGroup = [SimpleXmlValueExtractor getUuid:completedObject];
+        return YES;
+    }
+
     return NO;
 }
 
@@ -135,6 +163,23 @@
 
     if(self.times && ![self.times writeXml:serializer]) return NO;
 
+    if (self.tags && self.tags.count) {
+        NSArray<NSString*>* trimmed = [self.tags.allObjects map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+            return [Utils trim:obj];
+        }];
+        
+        NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+            return obj.length > 0;
+        }];
+
+        NSString* str = [[NSSet setWithArray:filtered].allObjects componentsJoinedByString:@";"];
+        if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
+    }
+    
+    if ( self.isExpanded ) {
+        if ( ![serializer writeElement:kIsExpandedElementName boolean:self.isExpanded]) return NO;
+    }
+    
     if (self.groupsAndEntries) {
         for (id<KeePassGroupOrEntry> groupOrEntry in self.groupsAndEntries) {
             BaseXmlDomainObjectHandler *handler = (BaseXmlDomainObjectHandler*)groupOrEntry;
@@ -166,6 +211,10 @@
     
     if ( self.lastTopVisibleEntry && ![self.lastTopVisibleEntry isEqual:NSUUID.zero]) {
         if ( ![serializer writeElement:kLastTopVisibleElementName uuid:self.lastTopVisibleEntry]) return NO;
+    }
+    
+    if ( self.previousParentGroup ) {
+        if ( ![serializer writeElement:kPreviousParentGroupElementName uuid:self.previousParentGroup]) return NO;
     }
     
     if( ![super writeUnmanagedChildren:serializer]) {
@@ -206,6 +255,13 @@
     if (![self.times isEqual:other.times]) {
         return NO;
     }
+    if (![self.tags isEqualToSet:other.tags]) {
+        return NO;
+    }
+    
+    if ( self.isExpanded != other.isExpanded ) {
+        return NO;
+    }
     
     if (![self.customData isEqual:other.customData]) {
         return NO;
@@ -227,6 +283,10 @@
     }
         
     if ( !(self.lastTopVisibleEntry == nil && other.lastTopVisibleEntry == nil) && ![self.lastTopVisibleEntry isEqual:other.lastTopVisibleEntry] ) {
+        return NO;
+    }
+
+    if ((self.previousParentGroup == nil && other.previousParentGroup != nil) || (self.previousParentGroup != nil && ![self.previousParentGroup isEqual:other.previousParentGroup] )) {
         return NO;
     }
 

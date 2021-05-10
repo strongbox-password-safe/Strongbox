@@ -39,6 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSNumber*_Nullable)getOptionalBool:(id<XmlParsingDomainObject>)xmlObject;
 + (BOOL)getBool:(id<XmlParsingDomainObject>)xmlObject;
++ (BOOL)getBool:(id<XmlParsingDomainObject>)xmlObject defaultValue:(BOOL)defaultValue;
 
 @end
 

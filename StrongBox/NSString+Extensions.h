@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSData* dataFromBase64;
 @property (readonly, nullable) NSData* utf8Data;
 
+- (BOOL)containsSearchString:(NSString*)searchText;
 
 @end
 

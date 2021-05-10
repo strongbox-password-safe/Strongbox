@@ -130,7 +130,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (BOOL)setTotpWithString:(NSString *)string
          appendUrlToNotes:(BOOL)appendUrlToNotes
-               forceSteam:(BOOL)forceSteam;
+               forceSteam:(BOOL)forceSteam
+          addLegacyFields:(BOOL)addLegacyFields
+            addOtpAuthUrl:(BOOL)addOtpAuthUrl;
 
 
 

@@ -19,6 +19,7 @@
 #import "BookmarksHelper.h"
 #import "VirtualYubiKeys.h"
 #import "FontManager.h"
+#import "PasswordStrengthTester.h"
 
 @interface CASGTableViewController () <UITextFieldDelegate>
 
@@ -46,6 +47,10 @@
 
 @property DatabaseFormat selectedFormat;
 @property BOOL userHasChangedNameAtLeastOnce;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellStrength;
+@property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
+@property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 
 @end
 
@@ -129,6 +134,7 @@
     [self bindKeyFile];
     [self bindYubiKey];
     [self bindPasswordFields];
+    [self bindStrength];
     [self bindTableView]; 
     [self validateUi];
 }
@@ -292,6 +298,7 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellReadOnly setHidden:YES];
         [self cell:self.cellAllowEmpty setHidden:YES];
+        [self cell:self.cellStrength setHidden:YES];
     }
     else if(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress) {
         [self cell:self.cellDatabaseName setHidden:!(self.mode == kCASGModeCreate || self.mode == kCASGModeCreateExpress)];
@@ -321,6 +328,7 @@
         [self cell:self.cellConfirmPassword setHidden:YES];
         [self cell:self.cellKeyFile setHidden:self.initialFormat == kPasswordSafe];
         [self cell:self.cellYubiKey setHidden:![self yubiKeyAvailable:self.initialFormat]];
+        [self cell:self.cellStrength setHidden:YES];
     }
     
     [self reloadDataAnimated:YES];
@@ -479,6 +487,7 @@
 
 - (void)textFieldPasswordDidChange:(id)sender {
     [self validateUi];
+    [self bindStrength];
 }
 
 - (void)textFieldConfirmPasswordDidChange:(id)sender {
@@ -688,6 +697,26 @@
 
 - (BOOL)formatSupportsYubiKey:(DatabaseFormat)format {
     return format == kKeePass || format == kKeePass4;
+}
+
+- (void)bindStrength {
+    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.textFieldPassword.text
+                                                              config:AppPreferences.sharedInstance.passwordStrengthConfig];
+    
+    if ( self.textFieldPassword.text.length == 0 ) {
+        self.labelStrength.text = @" "; 
+    }
+    else {
+        self.labelStrength.text = strength.summaryString;
+    }
+    
+    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
+        
+    double red = 1.0 - relativeStrength;
+    double green = relativeStrength;
+
+    self.progressStrength.progress = relativeStrength;
+    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
 }
 
 @end

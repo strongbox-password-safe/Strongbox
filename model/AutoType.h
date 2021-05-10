@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface AutoType : NSObject
 
 @property BOOL enabled;
-@property BOOL dataTransferObfuscation;
+@property NSInteger dataTransferObfuscation;
 @property (nullable) NSString* defaultSequence;
 @property NSArray<AutoTypeAssociation*> *asssociations;
 

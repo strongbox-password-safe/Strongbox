@@ -57,7 +57,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"AutoType: [%d-%d-%@-[%@]]", self.enabled, self.dataTransferObfuscation, self.defaultSequence, self.asssociations];
+    return [NSString stringWithFormat:@"AutoType: [%d-%ld-%@-[%@]]", self.enabled, (long)self.dataTransferObfuscation, self.defaultSequence, self.asssociations];
 }
 
 @end

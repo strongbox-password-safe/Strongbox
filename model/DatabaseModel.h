@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSDictionary<NSUUID*, NSDate*> *deletedObjects;
 
 @property (readonly) NSArray<DatabaseAttachment*> *attachmentPool;
-@property (readonly) NSSet<NodeIcon*>* customIconPool;
+@property (readonly) NSDictionary<NSUUID*, NodeIcon*>* iconPool;
 
 - (instancetype)init;
 
@@ -49,7 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
            compositeKeyFactors:(CompositeKeyFactors *)compositeKeyFactors
                       metadata:(UnifiedDatabaseMetadata*)metadata
                           root:(Node *_Nullable)root
-                deletedObjects:(NSDictionary<NSUUID *,NSDate *> *)deletedObjects;
+                deletedObjects:(NSDictionary<NSUUID *, NSDate *> *)deletedObjects
+                      iconPool:(NSDictionary<NSUUID *, NodeIcon *> *)iconPool;
 
 
 

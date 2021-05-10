@@ -15,7 +15,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface IconsCollectionViewController : UIViewController
 
 @property (nonatomic, copy) void (^onDone)(BOOL response, NodeIcon*_Nullable icon);
-@property NSSet<NodeIcon*>* customIconSet;
+
+@property NSDictionary<NSUUID*, NodeIcon*>* iconPool;
 @property KeePassIconSet predefinedKeePassIconSet;
 
 @end

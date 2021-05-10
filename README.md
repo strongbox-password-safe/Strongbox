@@ -1,5 +1,3 @@
-<img src="https://github.com/strongbox-password-safe/Strongbox/blob/master/StrongBox/Images.xcassets/AppIcon-2019-1024.imageset/AppIcon-1024.png" width="100">
-
 # Strongbox
 A Personal Password Manager for iOS & OSX that can be found on the Apple App Store here: 
 
@@ -45,7 +43,7 @@ There are several ways you can help support continuous development. Obviously if
 
 - Patreon: https://www.patreon.com/strongboxpasswordsafe
 
-If you like the app, you can always help out by leaving a 5 star review in the App Store. This is very helpful, and helps get the word out about Strongbox. If you can, please leave a positive comment too. You can review the App here:
+If you like the app, you can always help out by leaving a *5 star review* in the App Store. This is very helpful, and helps get the word out about Strongbox. If you can, please leave a positive comment too. You can review the App here:
 
 https://apps.apple.com/app/strongbox-password-safe/id897283731
 
@@ -97,16 +95,17 @@ https://keeweb.info/
 ** Have I Been Pwned **
 The ['Have I Been Pwned?'](https://haveibeenpwned.com/) service is provided by Troy Hunt. Strongbox uses the Pwned Passwords API there. Many thanks for some amazing work. Please consider donating to him to keep the service running [here](https://haveibeenpwned.com/Donate).
 
+** zxcvbn Password Strength by Dan Wheeler **
+You can read more about this library [here](https://dropbox.tech/security/zxcvbn-realistic-password-strength-estimation). Strongbox uses the C port by tsyrogit [here](https://github.com/tsyrogit/zxcvbn-c). The original CoffeeScript version by Dan Wheeler is available [here](https://github.com/dropbox/zxcvbn). 
+
 I use many different libraries in the app here are just a few:
 
 - Dropbox-iOS-SDK
 - Google-API-Client
-- JNKeychain
 - SVProgressHUD
 - Reachability
 - ISMessages
 - libsodium
-- XWSI
 - DAVKit
 - NMSSH
 - FavIcon 

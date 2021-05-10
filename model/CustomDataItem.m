@@ -16,6 +16,7 @@
     if(self = [super initWithXmlElementName:kCustomDataItemElementName context:context]) {
         self.key = @"";
         self.value = @"";
+        self.modified = nil;
     }
 
     return self;
@@ -31,7 +32,12 @@
         self.value = [SimpleXmlValueExtractor getStringFromText:completedObject];
         return YES;
     }
-    
+
+    if([withXmlElementName isEqualToString:kLastModificationTimeElementName]) {
+        self.modified = [SimpleXmlValueExtractor getDate:completedObject v4Format:self.context.v4Format];
+        return YES;
+    }
+
     return NO;
 }
 

@@ -339,7 +339,6 @@
         @"promptedForAutoFetchFavIcon" : @(self.promptedForAutoFetchFavIcon),
         @"storageProvider" : @(self.storageProvider),
         @"duressAction" : @(self.duressAction),
-        @"failedPinAttempts" : @(self.failedPinAttempts),
         @"conflictResolutionStrategy" : @(self.conflictResolutionStrategy),
         @"immediateOfflineOfferIfOfflineDetected" : @(self.immediateOfflineOfferIfOfflineDetected),
         @"quickTypeEnabled" : @(self.quickTypeEnabled),

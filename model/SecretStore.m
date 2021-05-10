@@ -191,7 +191,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
     NSDictionary* wrapped = [self getWrappedObject:identifier];
     if(wrapped == nil) {
-        NSLog(@"Could not get wrapped object. [%@]", identifier);
+
         return nil;
     }
 
@@ -489,7 +489,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     if ( !keychainBlob ) {
         if ( itemNotFound ) { 
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{ 
-                NSLog(@"No encrypted blob present... Cleaning Up... [%@]", identifier);
+
                 [self deleteSecureItem:identifier];
             });
             return nil;
@@ -635,7 +635,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     }
     else if (status == errSecItemNotFound) {
         
-        NSLog(@"getKeychainBlob: Item Not Found in KeyChain");
+
         *itemNotFound = YES;
         return nil;
     }

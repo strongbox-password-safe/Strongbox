@@ -48,7 +48,9 @@
     }
 
     for (V3Binary *binary in self.binaries) {
-        [binary writeXml:serializer];
+        if ( ! [binary writeXml:serializer] ) {
+            return NO;
+        }
     }
 
     if(![super writeUnmanagedChildren:serializer]) {

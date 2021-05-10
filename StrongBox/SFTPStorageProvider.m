@@ -9,7 +9,6 @@
 #import "SFTPStorageProvider.h"
 #import "Utils.h"
 #import "NMSSH.h"
-//#import "Settings.h"
 #import "NSArray+Extensions.h"
 #import "SFTPProviderData.h"
 #import "Constants.h"
@@ -323,7 +322,7 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 
 - (void)pullDatabase:(METADATA_PTR)safeMetaData
        interactiveVC:(VIEW_CONTROLLER_PTR )viewController
-             options:(StorageProviderReadOptions *)options
+             options:(StorageProviderReadOptions     *)options
           completion:(StorageProviderReadCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
     [self readWithProviderData:providerData viewController:viewController options:options completion:completion];
@@ -332,6 +331,9 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 - (void)getModDate:(METADATA_PTR)safeMetaData completion:(StorageProviderGetModDateCompletionBlock)completion {
     SFTPProviderData* foo = [self getProviderDataFromMetaData:safeMetaData];
 
+    static int counter = 0;
+    NSLog(@"XXXX: getModDate: %d", counter++);
+    
     [self connectAndAuthenticate:foo.sFtpConfiguration
                   viewController:nil
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {

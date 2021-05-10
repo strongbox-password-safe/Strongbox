@@ -18,7 +18,7 @@
 				<string>*</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>AppIcon-BigSur</string>
+			<string>Document-Icon</string>
 			<key>CFBundleTypeIconSystemGenerated</key>
 			<integer>0</integer>
 			<key>CFBundleTypeName</key>
@@ -42,7 +42,7 @@
 				<string>*</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
-			<string>AppIcon-BigSur</string>
+			<string>Document-Icon</string>
 			<key>CFBundleTypeIconSystemGenerated</key>
 			<integer>0</integer>
 			<key>CFBundleTypeName</key>
@@ -70,9 +70,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.15.8</string>
+	<string>1.15.12</string>
 	<key>CFBundleVersion</key>
-	<string>3005</string>
+	<string>3010</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<true/>
 	<key>ITSEncryptionExportComplianceCode</key>

@@ -281,8 +281,24 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
                                  return [self compareNodesForSort:n1 node2:n2 field:field descending:self.descending foldersSeparately:self.foldersSeparately];
                              }];
     }
-    else {
-        return items;
+    else { 
+        if ( self.foldersSeparately ) { 
+            
+            return [items sortedArrayWithOptions:NSSortStable
+                                 usingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+                Node* node1 = (Node*)obj1;
+                Node* node2 = (Node*)obj2;
+                
+                if ( node1.isGroup == node2.isGroup ) {
+                    return NSOrderedSame;
+                }
+                
+                return node1.isGroup ? NSOrderedAscending : NSOrderedDescending;
+            }];
+        }
+        else {
+            return items;
+        }
     }
 }
 

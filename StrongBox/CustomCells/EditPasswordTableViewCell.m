@@ -13,12 +13,15 @@
 #import "FontManager.h"
 #import "ColoredStringHelper.h"
 #import "AppPreferences.h"
+#import "PasswordStrengthTester.h"
 
 @interface EditPasswordTableViewCell () <UITextViewDelegate>
 
 @property (weak, nonatomic) IBOutlet MBAutoGrowingTextView *valueTextView;
 @property (weak, nonatomic) IBOutlet UIButton *buttonGenerationSettings;
 @property BOOL internalShowGenerationSettings;
+@property (weak, nonatomic) IBOutlet UILabel *labelStrength;
+@property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
 
 @end
 
@@ -96,6 +99,7 @@
                                                                                      font:self.valueTextView.font];
     
     [self notifyChangedAndLayout];
+    [self bindStrength];
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
@@ -144,6 +148,25 @@
 
     
     return NO;
+}
+
+- (void)bindStrength {
+    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.password config:AppPreferences.sharedInstance.passwordStrengthConfig];
+    
+
+
+
+
+        self.labelStrength.text = strength.summaryString;
+
+
+    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
+        
+    double red = 1.0 - relativeStrength;
+    double green = relativeStrength;
+
+    self.progressStrength.progress = relativeStrength;
+    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
 }
 
 @end

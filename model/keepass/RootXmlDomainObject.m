@@ -46,7 +46,9 @@
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer {
     if(self.keePassFile) {
-        [self.keePassFile writeXml:serializer];
+        if ( ![self.keePassFile writeXml:serializer] ) {
+            return NO;
+        }
     }
     
     return [super writeUnmanagedChildren:serializer];

@@ -38,8 +38,8 @@
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="jLk-K8-cyU" userLabel="Status Indicators">
-                                                <rect key="frame" x="37" y="21" width="116" height="16"/>
+                                            <stackView opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" distribution="equalSpacing" alignment="center" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="jLk-K8-cyU" userLabel="Status Indicators">
+                                                <rect key="frame" x="37" y="21" width="111" height="16"/>
                                                 <subviews>
                                                     <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="bX8-2B-lfT" userLabel="Indicator 1">
                                                         <rect key="frame" x="0.0" y="0.0" width="16" height="16"/>
@@ -49,35 +49,35 @@
                                                         </constraints>
                                                     </imageView>
                                                     <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="DJB-OL-CMt" userLabel="Indicator 2">
-                                                        <rect key="frame" x="20" y="0.0" width="16" height="16"/>
+                                                        <rect key="frame" x="19" y="0.0" width="16" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="16" id="84z-c4-0g5"/>
                                                             <constraint firstAttribute="height" constant="16" id="8iJ-Bj-TPI"/>
                                                         </constraints>
                                                     </imageView>
                                                     <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="wB3-Jn-mhs" userLabel="Indicator 3">
-                                                        <rect key="frame" x="40" y="0.0" width="16" height="16"/>
+                                                        <rect key="frame" x="38" y="0.0" width="16" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="16" id="058-yP-YUd"/>
                                                             <constraint firstAttribute="height" constant="16" id="38E-Fh-iGv"/>
                                                         </constraints>
                                                     </imageView>
                                                     <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="GaG-rN-9MY" userLabel="Indicator 4">
-                                                        <rect key="frame" x="60" y="0.0" width="16" height="16"/>
+                                                        <rect key="frame" x="57" y="0.0" width="16" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="16" id="8rY-we-wKg"/>
                                                             <constraint firstAttribute="height" constant="16" id="Cnt-Bc-xUt"/>
                                                         </constraints>
                                                     </imageView>
                                                     <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="iuq-Zd-o95" userLabel="Indicator 5">
-                                                        <rect key="frame" x="80" y="0.0" width="16" height="16"/>
+                                                        <rect key="frame" x="76" y="0.0" width="16" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="height" constant="16" id="6ta-ul-N8Y"/>
                                                             <constraint firstAttribute="width" constant="16" id="tWU-bw-eRN"/>
                                                         </constraints>
                                                     </imageView>
                                                     <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleAspectFit" image="lock" translatesAutoresizingMaskIntoConstraints="NO" id="zjb-cw-F9P" userLabel="Indicator 6">
-                                                        <rect key="frame" x="100" y="0.0" width="16" height="16"/>
+                                                        <rect key="frame" x="95" y="0.0" width="16" height="16"/>
                                                         <constraints>
                                                             <constraint firstAttribute="width" constant="16" id="0be-C3-gh6"/>
                                                             <constraint firstAttribute="height" constant="16" id="5o3-Tk-Squ"/>

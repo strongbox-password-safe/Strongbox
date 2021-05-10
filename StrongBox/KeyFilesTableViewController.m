@@ -293,7 +293,9 @@
             return destination;
         }
         else {
-            *error = err;
+            if ( error ) {
+                *error = err;
+            }
         }
     }
     else {

@@ -7,7 +7,6 @@
 //
 
 #import "AdvancedPreferencesTableViewController.h"
-//#import "Settings.h"
 #import "AppPreferences.h"
 #import "AutoFillManager.h"
 #import "Alerts.h"
@@ -15,7 +14,6 @@
 #import "NSArray+Extensions.h"
 #import "OfflineDetector.h"
 #import "BiometricsManager.h"
-
 #import "FileManager.h"
 
 @interface AdvancedPreferencesTableViewController ()
@@ -41,6 +39,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchCompleteFileProtection;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCoalesceBiometrics;
 @property (weak, nonatomic) IBOutlet UISwitch *backgroundUpdateSync;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAddLegacyTotp;
+@property (weak, nonatomic) IBOutlet UISwitch *switchAddOtpAuthUrl;
 
 @end
 
@@ -114,7 +114,9 @@
     }
     
     AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics = self.switchCoalesceBiometrics.on;
-    
+    AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields = self.switchAddLegacyTotp.on;
+    AppPreferences.sharedInstance.addOtpAuthUrl = self.switchAddOtpAuthUrl.on;
+
     [self bindPreferences];
 }
 
@@ -139,6 +141,8 @@
 
     self.switchCompleteFileProtection.on = AppPreferences.sharedInstance.fullFileProtection;
     self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
+    self.switchAddLegacyTotp.on = AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields;
+    self.switchAddOtpAuthUrl.on = AppPreferences.sharedInstance.addOtpAuthUrl;
 }
 
 - (void)bindAllowPinCodeOpen {

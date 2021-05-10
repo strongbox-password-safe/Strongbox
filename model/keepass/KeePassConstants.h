@@ -34,6 +34,7 @@ static NSString* const kNameElementName = @"Name";
 static NSString* const kIconIdElementName = @"IconID";
 static NSString* const kCustomIconUuidElementName = @"CustomIconUUID";
 static NSString* const kTagsElementName = @"Tags";
+static NSString* const kIsExpandedElementName = @"IsExpanded";
 
 static NSString* const kUuidElementName = @"UUID";
 static NSString* const kTimesElementName = @"Times";
@@ -90,6 +91,8 @@ static NSString* const kDefaultSequenceElementName = @"DefaultSequence";
 static NSString* const kForegroundColorElementName = @"ForegroundColor";
 static NSString* const kBackgroundColorElementName = @"BackgroundColor";
 static NSString* const kOverrideURLElementName = @"OverrideURL";
+static NSString* const kQualityCheckElementName = @"QualityCheck";
+static NSString* const kPreviousParentGroupElementName = @"PreviousParentGroup";
 
 static NSString* const kWindowElementName = @"Window";
 static NSString* const kKeystrokeSequenceElementName = @"KeystrokeSequence";

@@ -28,8 +28,6 @@ extern NSString* const kNotificationUserInfoLongRunningOperationStatus;
 @property (readonly) ViewModel* viewModel;
 @property (readonly, nullable) DatabaseMetadata* databaseMetadata;
 
-- (instancetype)initWithDatabase:(DatabaseModel*)database; 
-
 
 - (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
           viewController:(NSViewController*)viewController

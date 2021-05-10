@@ -97,7 +97,7 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (NSSet<NodeIcon*>*)customIcons {
-    return self.passwordDatabase.customIconPool;
+    return self.passwordDatabase.iconPool.allValues.set;
 }
 
 - (NSArray<Node*>*)activeRecords {
@@ -764,7 +764,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
     
     [item setTotpWithString:otp
            appendUrlToNotes:self.format == kPasswordSafe || self.format == kKeePass1
-                 forceSteam:steam];
+                 forceSteam:steam
+            addLegacyFields:NO
+              addOtpAuthUrl:YES]; 
     
     [[self.document.undoManager prepareWithInvocationTarget:self] clearTotp:item];
     

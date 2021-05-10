@@ -23,45 +23,46 @@ static NSString* const kDatabaseCellView = @"DatabaseCellView";
 @property (nonatomic, strong) NSArray<DatabaseMetadata*>* databases;
 @property (weak) IBOutlet NSButton *buttonSelect;
 
-@property BOOL firstAppearance;
+@property BOOL viewWillAppearFirstTimeDone;
+@property BOOL firstAppearanceDone;
 @property NSSet<NSString*> *unlockedDatabases;
 
 @end
 
 @implementation SelectAutoFillDatabaseViewController
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (void)viewWillAppear {
+    [super viewWillAppear];
     
-    self.tableView.headerView = nil;
-    
-    self.tableView.delegate = self;
-    self.tableView.dataSource = self;
-    
-    [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kDatabaseCellView bundle:nil]
-                  forIdentifier:kDatabaseCellView];
+    if ( !self.viewWillAppearFirstTimeDone ) {
+        self.viewWillAppearFirstTimeDone = YES;
+        
+        self.tableView.headerView = nil;
+        
+        self.tableView.delegate = self;
+        self.tableView.dataSource = self;
+        
+        [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kDatabaseCellView bundle:nil]
+                      forIdentifier:kDatabaseCellView];
 
-    self.tableView.emptyString = NSLocalizedString(@"mac_no_autofill_enabled_databases_initial_message", @"No AutoFill Enabled Databases");
-    
-    self.tableView.doubleAction = @selector(onSelect:);
-    
-    self.firstAppearance = YES;
-    
-    self.unlockedDatabases = NSSet.set;
+        self.tableView.emptyString = NSLocalizedString(@"mac_no_autofill_enabled_databases_initial_message", @"No AutoFill Enabled Databases");
+        
+        self.tableView.doubleAction = @selector(onSelect:);
+        
+        self.unlockedDatabases = NSSet.set;
 
-    [self refresh];
-    
-    [self checkWormholeForUnlockedDatabases];
+        [self refresh];
+        
+        [self checkWormholeForUnlockedDatabases];
+    }
 }
 
 - (void)viewDidAppear {
     [super viewDidAppear];
-    
-    self.view.window.frameAutosaveName = @"SelectAutoFillDatabase-AutoSave";
-    
-    if ( self.firstAppearance ) {
-        self.firstAppearance = NO;
-
+        
+    if ( !self.firstAppearanceDone ) {
+        self.firstAppearanceDone = YES;
+        self.view.window.frameAutosaveName = @"SelectAutoFillDatabase-AutoSave";
     
         if ( self.databases.count == 1 && Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ) {
             NSLog(@"Single Database Launching...");

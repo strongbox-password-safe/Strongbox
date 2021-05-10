@@ -34,7 +34,7 @@
 
 
     if((range.location + range.length) != textField.text.length) { 
-        NSLog(@"Not autocompleting as edit is inside string...");
+
         return YES;
     }
     

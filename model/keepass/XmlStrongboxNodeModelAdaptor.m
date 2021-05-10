@@ -23,14 +23,14 @@
 @implementation XmlStrongboxNodeModelAdaptor
 
 - (KeePassGroup *)toKeePassModel:(Node *)rootNode context:(XmlProcessingContext *)context error:(NSError *__autoreleasing  _Nullable *)error {
-    return [self toKeePassModel:rootNode context:context minimalAttachmentPool:nil customIconPool:nil error:error];
+    return [self toKeePassModel:rootNode context:context minimalAttachmentPool:nil iconPool:@{} error:error];
 }
 
 - (KeePassGroup*)toKeePassModel:(Node*)rootNode
-                   context:(XmlProcessingContext*)context
-     minimalAttachmentPool:(NSArray<DatabaseAttachment*>**)minimalAttachmentPool
-            customIconPool:(NSDictionary<NSUUID*, NSData*>**)customIconPool
-                     error:(NSError**)error {
+                        context:(XmlProcessingContext*)context
+          minimalAttachmentPool:(NSArray<DatabaseAttachment*>**)minimalAttachmentPool
+                       iconPool:(nonnull NSDictionary<NSUUID *,NodeIcon *> *)iconPool
+                          error:(NSError *__autoreleasing  _Nullable * _Nullable)error {
     self.xmlParsingContext = context;
     
     
@@ -50,14 +50,9 @@
         *minimalAttachmentPool = attachmentsPool;
     }
 
-    NSDictionary<NSUUID*, NSData*>* iconPool = [MinimalPoolHelper getMinimalIconPool:rootNode];
-    if (customIconPool) {
-        *customIconPool = iconPool;
-    }
-
     Node* keePassRootGroup = [rootNode.children objectAtIndex:0];
     
-    return [self buildXmlGroup:keePassRootGroup attachmentsPool:attachmentsPool customIconPool:iconPool];
+    return [self buildXmlGroup:keePassRootGroup attachmentsPool:attachmentsPool iconPool:iconPool];
 }
 
 - (Node*)toStrongboxModel:(KeePassGroup *)existingXmlRoot error:(NSError *__autoreleasing  _Nullable *)error {
@@ -65,9 +60,9 @@
 }
 
 - (Node*)toStrongboxModel:(KeePassGroup*)existingXmlRoot
- attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
-  customIconPool:(NSDictionary<NSUUID *,NSData *> *)customIconPool
-           error:(NSError**)error {
+          attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
+           customIconPool:(NSDictionary<NSUUID *, NodeIcon *> *)customIconPool
+                    error:(NSError**)error {
     Node* rootNode = [[Node alloc] initAsRoot:nil];
     
     if(existingXmlRoot) {
@@ -79,14 +74,8 @@
             return nil;
         }
     }
-    else {
-        
-        
+    else {        
         NSString *rootGroupName = NSLocalizedString(@"generic_database", @"Database");
-        if ([rootGroupName isEqualToString:@"generic_database"]) { 
-          rootGroupName = kDefaultRootGroupName;
-        }
-
         Node* keePassRootGroup = [[Node alloc] initAsGroup:rootGroupName parent:rootNode keePassGroupTitleRules:YES uuid:nil];
         [rootNode addChild:keePassRootGroup keePassGroupTitleRules:YES];
     }
@@ -94,7 +83,7 @@
     return rootNode;
 }
 
-- (KeePassGroup*)buildXmlGroup:(Node*)group attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool {
+- (KeePassGroup*)buildXmlGroup:(Node*)group attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     KeePassGroup *ret = [[KeePassGroup alloc] initWithContext:self.xmlParsingContext];
 
     NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)group.linkedData;
@@ -118,9 +107,14 @@
     
     if ( group.icon ) {
         if ( group.icon.isCustom ) {
-            NSUUID* uuid = [self getUuidOfCustomIconInPool:customIconPool data:group.icon.custom];
-            ret.customIcon = uuid;
-            ret.icon = @(48); 
+            
+            if ( group.icon.uuid == nil || !iconPool[group.icon.uuid] ) {
+                NSLog(@"WARNWARN - Custom Icon is not in pool or is custom but nil UUID - [%@]", group.icon.uuid);
+            }
+            else {
+                ret.customIcon = group.icon.uuid;
+                ret.icon = @(48); 
+            }
         }
         else {
             ret.icon = @(group.icon.preset);
@@ -137,20 +131,23 @@
     [ret.groupsAndEntries removeAllObjects];
     for(Node* child in group.children) {
         if (child.isGroup) {
-            [ret.groupsAndEntries addObject:[self buildXmlGroup:child attachmentsPool:attachmentsPool customIconPool:customIconPool]];
+            [ret.groupsAndEntries addObject:[self buildXmlGroup:child attachmentsPool:attachmentsPool iconPool:iconPool]];
         }
         else {
-            [ret.groupsAndEntries addObject:[self buildXmlEntry:child stripHistory:NO attachmentsPool:attachmentsPool customIconPool:customIconPool]];
+            [ret.groupsAndEntries addObject:[self buildXmlEntry:child stripHistory:NO attachmentsPool:attachmentsPool iconPool:iconPool]];
         }
     }
     
     ret.name = group.title;
     ret.uuid = group.uuid;
+    ret.tags = group.fields.tags;
+    ret.isExpanded = group.fields.isExpanded;
+    ret.previousParentGroup = group.fields.previousParentGroup;
     
     return ret;
 }
 
-- (Entry*)buildXmlEntry:(Node*)node stripHistory:(BOOL)stripHistory attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool {
+- (Entry*)buildXmlEntry:(Node*)node stripHistory:(BOOL)stripHistory attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
   
     NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)node.linkedData;
@@ -164,9 +161,14 @@
 
     if ( node.icon ) {
         if ( node.icon.isCustom ) {
-            NSUUID* uuid = [self getUuidOfCustomIconInPool:customIconPool data:node.icon.custom];
-            ret.customIcon = uuid;
-            ret.icon = @(0); 
+            
+            if ( node.icon.uuid == nil || !iconPool[node.icon.uuid] ) {
+                NSLog(@"WARNWARN - Custom Icon is not in pool or is custom but nil UUID - [%@]", node.icon.uuid);
+            }
+            else {
+                ret.customIcon = node.icon.uuid;
+                ret.icon = @(0); 
+            }
         }
         else {
             ret.icon = @(node.icon.preset);
@@ -177,6 +179,8 @@
     ret.foregroundColor = node.fields.foregroundColor;
     ret.backgroundColor = node.fields.backgroundColor;
     ret.overrideURL = node.fields.overrideURL;
+    ret.qualityCheck = node.fields.qualityCheck;
+    ret.previousParentGroup = node.fields.previousParentGroup;
     
     if (node.fields.autoType) {
         ret.autoType = [[KeePassXmlAutoType alloc] initWithContext:self.xmlParsingContext];
@@ -244,7 +248,7 @@
     [ret.history.entries removeAllObjects];
     if(!stripHistory) {
         for(Node* historicalNode in node.fields.keePassHistory) {
-            Entry* historicalEntry = [self buildXmlEntry:historicalNode stripHistory:YES attachmentsPool:attachmentsPool customIconPool:customIconPool]; 
+            Entry* historicalEntry = [self buildXmlEntry:historicalNode stripHistory:YES attachmentsPool:attachmentsPool iconPool:iconPool]; 
             [ret.history.entries addObject:historicalEntry];
         }
     }
@@ -257,7 +261,7 @@
 - (BOOL)buildGroup:(KeePassGroup*)group
         parentNode:(Node*)parentNode
    attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
-    customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool
+    customIconPool:(NSDictionary<NSUUID *, NodeIcon *> *)customIconPool
            usedIds:(NSMutableSet<NSUUID*>*)usedIds {
     BOOL alreadyUsedId = [usedIds containsObject:group.uuid];
     if ( alreadyUsedId ) {
@@ -275,11 +279,15 @@
                                          usageCount:group.times.usageCount];
 
     groupNode.fields.expires = group.times.expires ? group.times.expiryTime : nil;
-
-    if (group.customIcon) {
-        NSData* data = customIconPool[group.customIcon];
-        if (data) {
-            groupNode.icon = [NodeIcon withCustom:data preferredKeePassSerializationUuid:group.customIcon];
+    
+    
+    
+    groupNode.fields.tags = group.tags;
+    
+    if ( group.customIcon ) {
+        NodeIcon* ni = customIconPool[group.customIcon];
+        if ( ni ) {
+            groupNode.icon = ni;
         }
         else {
             NSLog(@"WARNWARN: Custom Icon referenced by node not present in pool [%@]-[%@]", group.uuid, group.customIcon);
@@ -298,6 +306,8 @@
     groupNode.fields.enableAutoType = group.enableAutoType;
     groupNode.fields.enableSearching = group.enableSearching;
     groupNode.fields.lastTopVisibleEntry = group.lastTopVisibleEntry;
+    groupNode.fields.isExpanded = group.isExpanded;
+    groupNode.fields.previousParentGroup = group.previousParentGroup;
     
     for (id<KeePassGroupOrEntry> child in group.groupsAndEntries) {
         if (child.isGroup) {
@@ -328,7 +338,7 @@
 - (Node*)nodeFromEntry:(Entry *)childEntry
              groupNode:(Node*)groupNode
        attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool
-        customIconPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool
+        customIconPool:(NSDictionary<NSUUID*, NodeIcon*>*)customIconPool
                usedIds:(NSMutableSet<NSUUID*>*)usedIds
             historical:(BOOL)historical {
     NodeFields *fields = [[NodeFields alloc] initWithUsername:childEntry.username
@@ -394,6 +404,9 @@
         }
     }
     
+    fields.qualityCheck = childEntry.qualityCheck;
+    fields.previousParentGroup = childEntry.previousParentGroup;
+    
     
     
     BOOL alreadyUsedId = [usedIds containsObject:childEntry.uuid];
@@ -408,10 +421,10 @@
                                           fields:fields
                                             uuid:nodeId];
     
-    if (childEntry.customIcon) {
-        NSData* data = customIconPool[childEntry.customIcon];
-        if (data) {
-            entryNode.icon = [NodeIcon withCustom:data preferredKeePassSerializationUuid:childEntry.customIcon];
+    if ( childEntry.customIcon ) {
+        NodeIcon* ni = customIconPool[childEntry.customIcon];
+        if ( ni ) {
+            entryNode.icon = ni;
         }
         else {
             NSLog(@"WARNWARN: Custom Icon referenced by node not present in pool [%@]-[%@]", childEntry.uuid, childEntry.customIcon);
@@ -427,21 +440,10 @@
             [fields.keePassHistory addObject:historicalEntryNode];
         }
     }
-    
+
     entryNode.linkedData = childEntry.unmanagedChildren;
     
     return entryNode;
-}
-
-- (NSUUID*)getUuidOfCustomIconInPool:(NSDictionary<NSUUID*, NSData*>*)customIconPool data:(NSData*)data {
-    for (NSUUID* key in customIconPool.allKeys) {
-        NSData* d = customIconPool[key];
-        if ([d.sha1.hexString isEqualToString:data.sha1.hexString]) {
-            return key;
-        }
-    }
-    
-    return nil;
 }
 
 - (NSInteger)getIndexOfAttachmentInPool:(NSArray<DatabaseAttachment*>*)attachments attachment:(DatabaseAttachment*)attachment {

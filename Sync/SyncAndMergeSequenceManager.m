@@ -409,35 +409,35 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
               remoteModified:(NSDate*)remoteModified
                   parameters:(SyncParameters*)parameters
                   completion:(SyncAndMergeCompletionBlock)completion {
-    [self logMessage:database syncId:syncId message:[NSString stringWithFormat:@"Remote has changed since last sync. Last Sync Remote Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
+    [self logMessage:database
+              syncId:syncId
+             message:[NSString stringWithFormat:@"Remote has changed since last sync. Last Sync Remote Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
 
     ConflictResolutionStrategy strategy = database.conflictResolutionStrategy;
+
+#if TARGET_OS_IPHONE 
     
-    if ( ! parameters.interactiveVC ) {
-        if ( strategy == kConflictResolutionStrategyAsk) {
-            [self logAndPublishStatusChange:database
-                                     syncId:syncId
-                                      state:kSyncOperationStateBackgroundButUserInteractionRequired
-                                      message:@"Sync Conflict - User Interaction Required"];
-            
-            completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
-            return;
-        }
+    
 
-
-
-
-
-
-
-
-
-
+    if ( database.storageProvider == kLocalDevice && database.conflictResolutionStrategy == kConflictResolutionStrategyAsk ) {
+        strategy = (database.likelyFormat == kKeePass || database.likelyFormat == kKeePass4) ? kConflictResolutionStrategyAutoMerge : kConflictResolutionStrategyForcePushLocal;
+    }
+#endif
+    
+    if ( !parameters.interactiveVC && strategy == kConflictResolutionStrategyAsk ) {
+        
+        [self logAndPublishStatusChange:database
+                                 syncId:syncId
+                                  state:kSyncOperationStateBackgroundButUserInteractionRequired
+                                  message:@"Sync Conflict - User Interaction Required"];
+        
+        completion(kSyncAndMergeResultUserInteractionRequired, NO, nil);
+        return;
     }
     
     
 
-    if (strategy == kConflictResolutionStrategyAutoMerge) {
+    if ( strategy == kConflictResolutionStrategyAutoMerge ) {
         [self conflictResolutionMerge:database syncId:syncId parameters:parameters localData:localData remoteData:remoteData compareFirst:NO completion:completion];
     }
     else if (strategy == kConflictResolutionStrategyForcePushLocal) { 
@@ -613,8 +613,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                      completion:(SyncAndMergeCompletionBlock)completion {
     [self logMessage:database syncId:syncId message:@"Update to Push but Remote has also changed. Conflict. Auto Merging..."];
 
-    if (
-        !parameters.key ) {
+    if ( !parameters.key ) {
         NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_cannot_merge_in_background", @"Cannot merge without Master Credentials.") errorCode:-1];
         [self logAndPublishStatusChange:database
                                  syncId:syncId

@@ -19,7 +19,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setKey:(NSString *)key value:(NSString *)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*_Nullable)rightButtonImage suggestionProvider:(SuggestionProvider _Nullable)suggestionProvider;
 
-- (void)setConfidentialKey:(NSString*)key value:(NSString*)value concealed:(BOOL)concealed colorize:(BOOL)colorize audit:(NSString*_Nullable)audit;
+- (void)setConcealableKey:(NSString*)key
+                    value:(NSString*)value
+                concealed:(BOOL)concealed
+                 colorize:(BOOL)colorize
+                    audit:(NSString*_Nullable)audit
+             showStrength:(BOOL)showStrength;
 
 - (void)setForUrlOrCustomFieldUrl:(NSString*)key value:(NSString*)value formatAsUrl:(BOOL)formatAsUrl rightButtonImage:(UIImage*_Nullable)rightButtonImage useEasyReadFont:(BOOL)useEasyReadFont;
 

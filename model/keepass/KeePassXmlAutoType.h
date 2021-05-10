@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
 @property BOOL enabled;
-@property BOOL dataTransferObfuscation;
+@property NSInteger dataTransferObfuscation; 
 @property (nullable) NSString* defaultSequence;
 @property NSMutableArray<KeePassXmlAutoTypeAssociation*> *asssociations;
 

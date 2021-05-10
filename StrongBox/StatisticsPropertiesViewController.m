@@ -15,7 +15,7 @@
 
 @property MutableOrderedDictionary<NSString*, NSString*>* statistics;
 @property MutableOrderedDictionary<NSString*, NSString*> *metadataKvps;
-@property MutableOrderedDictionary<NSString*, NSString*> *customData;
+@property MutableOrderedDictionary<NSString*, ValueWithModDate*> *customData;
 
 @end
 
@@ -95,7 +95,8 @@ static NSString* const kGenericKeyValueCellId = @"GenericKeyValueTableViewCell";
     }
     else if ( indexPath.section == kSectionCustomDataIdx ) {
         key = self.customData.allKeys[indexPath.row];
-        value = self.customData[key];
+        ValueWithModDate* vm = self.customData[key];
+        value = vm.value;
     }
 
     [cell setKey:key value:value editing:NO useEasyReadFont:NO];

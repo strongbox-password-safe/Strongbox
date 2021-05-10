@@ -16,6 +16,7 @@
 #import "ClipboardManager.h"
 #import "ColoredStringHelper.h"
 #import "AppPreferences.h"
+#import "PasswordStrengthTester.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -26,8 +27,6 @@
 @property PasswordGenerationConfig *config;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *sample1;
-@property (weak, nonatomic) IBOutlet UITableViewCell *sample2;
-@property (weak, nonatomic) IBOutlet UITableViewCell *sample3;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAlgorithm;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBasicLength;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellUseCharacterGroups;
@@ -46,6 +45,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *wordCountLabel;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellInfoDiceware;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellInfoXkcd;
+@property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
+@property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 
 @end
 
@@ -74,15 +75,7 @@
     UILongPressGestureRecognizer* gr1 = [self makeLongPressGestureRecognizer];
     [self.sample1 addGestureRecognizer:gr1];
 
-    UILongPressGestureRecognizer* gr2 = [self makeLongPressGestureRecognizer];
-    [self.sample2 addGestureRecognizer:gr2];
-
-    UILongPressGestureRecognizer* gr3 = [self makeLongPressGestureRecognizer];
-    [self.sample3 addGestureRecognizer:gr3];
-
     self.sample1.textLabel.font = FontManager.sharedInstance.easyReadFont;
-    self.sample2.textLabel.font = FontManager.sharedInstance.easyReadFont;
-    self.sample3.textLabel.font = FontManager.sharedInstance.easyReadFont;
     
     [self bindUi];
     
@@ -158,8 +151,8 @@
     BOOL colorBlind = AppPreferences.sharedInstance.colorizeUseColorBlindPalette;
     
     self.sample1.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
-    self.sample2.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
-    self.sample3.textLabel.attributedText = [ColoredStringHelper getColorizedAttributedString:[self getSamplePassword] colorize:YES darkMode:dark colorBlind:colorBlind font:self.sample1.textLabel.font];
+   
+    [self bindStrength];
 }
 
 - (NSString*)getSamplePassword {
@@ -591,6 +584,22 @@
     
     vc.title = title;
     [self.navigationController pushViewController:vc animated:YES];
+}
+
+
+- (void)bindStrength {
+    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.sample1.textLabel.text
+                                                              config:AppPreferences.sharedInstance.passwordStrengthConfig];
+    
+    self.labelStrength.text = strength.summaryString;
+
+    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
+        
+    double red = 1.0 - relativeStrength;
+    double green = relativeStrength;
+
+    self.progressStrength.progress = relativeStrength;
+    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
 }
 
 @end

@@ -60,6 +60,7 @@
 #import "WorkingCopyManager.h"
 #import <notify.h>
 #import "AppDelegate.h"
+#import "SaleScheduleManager.h"
 
 @interface SafesViewController ()
 
@@ -119,8 +120,6 @@
 
     
     
-    [self manuallySetFullFileProtection]; 
-    [self migrateQuickLaunchToAutoFill]; 
     [self migrateOfflineDetectedBehaviour]; 
     
     [self listenToNotifications];
@@ -139,24 +138,6 @@
             NSLog(@"Initial Activation/Load - App is not Locked...");
             [self doAppActivationTasks:NO];
         }
-    }
-}
-
-- (void)migrateQuickLaunchToAutoFill { 
-    if ( !AppPreferences.sharedInstance.migratedQuickLaunchToAutoFill ) {
-        NSLog(@"Migrating Quick Launch To AutoFill...");
-        
-        AppPreferences.sharedInstance.migratedQuickLaunchToAutoFill = YES;
-        AppPreferences.sharedInstance.autoFillQuickLaunchUuid = AppPreferences.sharedInstance.quickLaunchUuid;
-    }
-}
-
-- (void)manuallySetFullFileProtection {
-    if ( !AppPreferences.sharedInstance.haveAttemptedMigrationToFullFileProtection ) {
-        AppPreferences.sharedInstance.haveAttemptedMigrationToFullFileProtection = YES;
-        NSLog(@"Enabled full file protection for user one time.");
-        AppPreferences.sharedInstance.fullFileProtection = YES;
-        [FileManager.sharedInstance setFileProtection:AppPreferences.sharedInstance.fullFileProtection];
     }
 }
 
@@ -348,18 +329,6 @@
 
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 - (void)onAppLockScreenWillBeDismissed:(void (^)(void))completion {
     NSLog(@"XXXXXXXXXXXXXXXXXX - onAppLockWillBeDismissed");
@@ -604,45 +573,67 @@
     NSLog(@"continueAppActivationTasks...");
     
     if([self isVisibleViewController]) {
-        if(!AppPreferences.sharedInstance.quickLaunchUuid) {
-            BOOL userHasLocalDatabases = [self getLocalDeviceSafes].firstObject != nil;
-            
-            if (!AppPreferences.sharedInstance.haveAskedAboutBackupSettings && userHasLocalDatabases) {
-                NSString* title = NSLocalizedString(@"backup_settings_prompt_title", @"Backup Settings");
-                NSString* message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox now includes all your local documents and databases in Apple backups, however imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok?");
-                NSString* option1 = NSLocalizedString(@"backup_settings_prompt_option_yes_looks_good", @"Yes, the defaults sound good");
-                NSString* option2 = NSLocalizedString(@"backup_settings_prompt_yes_but_include_key_files", @"Yes, but also backup Key Files");
-                NSString* option3 = NSLocalizedString(@"backup_settings_prompt_no_dont_backup_anything", @"No, do NOT backup anything");
-                
-                [Alerts threeOptionsWithCancel:self title:title
-                                       message:message defaultButtonText:option1 secondButtonText:option2 thirdButtonText:option3 action:^(int response) {
-                    NSLog(@"Selected: %d", response);
-                    if (response == 0) {
-                        AppPreferences.sharedInstance.backupFiles = YES;
-                        AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
-                    }
-                    else if (response == 1) {
-                        AppPreferences.sharedInstance.backupFiles = YES;
-                        AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = YES;
-                    }
-                    else if (response == 2) {
-                        AppPreferences.sharedInstance.backupFiles = NO;
-                        AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
-                    }
-                    
-                    if (response != 3) {
-                        [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
-                                                                   importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
-                        
-                        AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
-                    }
-                }];
-            }
+        BOOL userHasLocalDatabases = [self getLocalDeviceSafes].firstObject != nil;
+
+
+
+        
+        if (!AppPreferences.sharedInstance.haveAskedAboutBackupSettings && userHasLocalDatabases) {
+            [self promptForBackupSettings];
         }
-        else {
+        
+
+
+
+        else if ( AppPreferences.sharedInstance.quickLaunchUuid ) {
             [self openQuickLaunchDatabase:userJustCompletedBiometricAuthentication];
         }
     }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+- (void)promptForBackupSettings {
+    NSString* title = NSLocalizedString(@"backup_settings_prompt_title", @"Backup Settings");
+    NSString* message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox now includes all your local documents and databases in Apple backups, however imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok?");
+    NSString* option1 = NSLocalizedString(@"backup_settings_prompt_option_yes_looks_good", @"Yes, the defaults sound good");
+    NSString* option2 = NSLocalizedString(@"backup_settings_prompt_yes_but_include_key_files", @"Yes, but also backup Key Files");
+    NSString* option3 = NSLocalizedString(@"backup_settings_prompt_no_dont_backup_anything", @"No, do NOT backup anything");
+    
+    [Alerts threeOptionsWithCancel:self title:title
+                           message:message defaultButtonText:option1 secondButtonText:option2 thirdButtonText:option3 action:^(int response) {
+        NSLog(@"Selected: %d", response);
+        if (response == 0) {
+            AppPreferences.sharedInstance.backupFiles = YES;
+            AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
+        }
+        else if (response == 1) {
+            AppPreferences.sharedInstance.backupFiles = YES;
+            AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = YES;
+        }
+        else if (response == 2) {
+            AppPreferences.sharedInstance.backupFiles = NO;
+            AppPreferences.sharedInstance.backupIncludeImportedKeyFiles = NO;
+        }
+        
+        if (response != 3) {
+            [FileManager.sharedInstance setDirectoryInclusionFromBackup:AppPreferences.sharedInstance.backupFiles
+                                                       importedKeyFiles:AppPreferences.sharedInstance.backupIncludeImportedKeyFiles];
+            
+            AppPreferences.sharedInstance.haveAskedAboutBackupSettings = YES;
+        }
+    }];
 }
 
 - (UIViewController*)getVisibleViewController {
@@ -947,6 +938,8 @@
     [self openAtIndexPath:indexPath openOffline:NO];
 }
 
+
+
 - (void)manualUnlock:(NSIndexPath*)indexPath {
     [self openAtIndexPath:indexPath openOffline:NO manualUnlock:YES ignoreForceOpenOffline:NO];
 }
@@ -975,10 +968,12 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-- (void)openDatabase:(SafeMetaData*)safe
-         openOffline:(BOOL)openOffline
- biometricPreCleared:(BOOL)biometricPreCleared {
-    [self openDatabase:safe openOffline:openOffline noConvenienceUnlock:NO  biometricPreCleared:biometricPreCleared];
+- (void)openDatabase:(SafeMetaData*)database {
+    [self openDatabase:database biometricPreCleared:NO];
+}
+
+- (void)openDatabase:(SafeMetaData*)database biometricPreCleared:(BOOL)biometricPreCleared {
+    [self openDatabase:database openOffline:database.forceOpenOffline noConvenienceUnlock:NO biometricPreCleared:biometricPreCleared];
 }
 
 - (void)openDatabase:(SafeMetaData*)safe
@@ -993,7 +988,7 @@
         [self performSegueWithIdentifier:@"segueToVersionConflictResolution" sender:safe.fileIdentifier];
     }
     else {
-        UnlockDatabaseSequenceHelper* helper = [UnlockDatabaseSequenceHelper helperWithViewController:self database:safe isAutoFillOpen:NO openOffline:openOffline];
+        UnlockDatabaseSequenceHelper* helper = [UnlockDatabaseSequenceHelper helperWithViewController:self database:safe isAutoFillOpen:NO offlineExplicitlyRequested:openOffline];
 
         [helper beginUnlockSequence:NO
                 biometricPreCleared:biometricPreCleared
@@ -1017,6 +1012,8 @@
         }];
     }
 }
+
+
 
 - (void)onboardOrShowUnlockedDatabase:(Model*)model {
     BOOL biometricPossible = BiometricsManager.isBiometricIdAvailable && !AppPreferences.sharedInstance.disallowAllBiometricId;
@@ -1872,7 +1869,7 @@
         wcdvc.onDone = ^(BOOL addExisting, SafeMetaData * _Nullable databaseToOpen) {
             [self dismissViewControllerAnimated:YES completion:^{
                 if(databaseToOpen) {
-                     [self openDatabase:databaseToOpen openOffline:NO  biometricPreCleared:NO];
+                     [self openDatabase:databaseToOpen];
                 }
             }];
         };
@@ -1986,7 +1983,7 @@
         });
     }
     else if(databaseToOpen) {
-        [self openDatabase:databaseToOpen openOffline:NO  biometricPreCleared:NO];
+        [self openDatabase:databaseToOpen];
     }
 }
 
@@ -2299,7 +2296,13 @@
             }
         }
         
-        [self.buttonUpgrade setTitle:upgradeButtonTitle];
+        if ( SaleScheduleManager.sharedInstance.saleNowOn ) {
+            [self.buttonUpgrade setTitle:NSLocalizedString(@"safesvc_upgrade_button_sale_now_on_title", @"🚀 20% Off Now 🚀 Go Pro 🔥")];
+            [self.buttonUpgrade setTintColor:UIColor.systemRedColor];
+        }
+        else {
+            [self.buttonUpgrade setTitle:upgradeButtonTitle];
+        }
     }
     else {
         [self.buttonUpgrade setEnabled:NO];
@@ -2402,7 +2405,7 @@
         return;
     }
     
-    [self openDatabase:safe openOffline:NO  biometricPreCleared:userJustCompletedBiometricAuthentication];
+    [self openDatabase:safe biometricPreCleared:userJustCompletedBiometricAuthentication];
 }
 
 

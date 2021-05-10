@@ -11,6 +11,7 @@
 #import "DatabaseModel.h"
 #import "DatabaseAuditReport.h"
 #import "DatabaseAuditorConfiguration.h"
+#import "PasswordStrengthConfig.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -28,6 +29,7 @@ typedef NS_ENUM (unsigned int, AuditFlag) {
     kAuditFlagSimilarPassword,
     kAuditFlagTooShort,
     kAuditFlagPwned,
+    kAuditFlagLowEntropy,
 };
 
 typedef void (^AuditCompletionBlock)(BOOL userStopped);
@@ -40,7 +42,10 @@ typedef BOOL (^IsExcludedBlock)(Node* item);
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithPro:(BOOL)pro;
-- (instancetype)initWithPro:(BOOL)pro isExcluded:(IsExcludedBlock _Nullable)isExcluded saveConfig:(SaveConfigurationBlock _Nullable)saveConfig NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithPro:(BOOL)pro
+             strengthConfig:(PasswordStrengthConfig*_Nullable)strengthConfig
+                 isExcluded:(IsExcludedBlock _Nullable)isExcluded
+                 saveConfig:(SaveConfigurationBlock _Nullable)saveConfig NS_DESIGNATED_INITIALIZER;
 
 @property AuditState state;
 

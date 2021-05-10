@@ -11,6 +11,7 @@
 #import "QuickTypeRecordIdentifier.h"
 #import "NSArray+Extensions.h"
 #import "SprCompilation.h"
+#import "NSString+Extensions.h"
 
 #if TARGET_OS_IPHONE
 #import "SVProgressHUD.h"
@@ -154,12 +155,45 @@ static NSString* const kMailToScheme = @"mailto";
 #else
     if (@available(macOS 11.0, *)) {
 #endif
+        NSMutableSet<NSString*> *uniqueUrls = [NSMutableSet set];
 
-        NSMutableArray<NSString*> *urls = [NSMutableArray array];
+        NSMutableArray<NSString*> *explicitUrls = [NSMutableArray array];
+        
+        
         
         NSString* urlField = [database dereference:node.fields.url node:node];
         if(urlField.length) {
-            [urls addObject:urlField];
+            [explicitUrls addObject:urlField];
+        }
+        
+        
+        
+        for ( NSString* altUrl in node.fields.alternativeUrls) {
+            if(altUrl.length) {
+                NSString* derefed = [database dereference:altUrl node:node];
+                [explicitUrls addObject:derefed];
+            }
+        }
+        
+        
+
+        for ( NSString* expUrl in explicitUrls ) {
+            NSURL* parsed = expUrl.urlExtendedParse;
+
+            if ( parsed ) {
+                NSURLComponents* components = [NSURLComponents componentsWithURL:parsed resolvingAgainstBaseURL:NO];
+                
+                if ( !components.scheme.length ) { 
+                    NSString* urlString = [NSString stringWithFormat:@"https:
+                    [uniqueUrls addObject:urlString];
+                }
+                else {
+                    [uniqueUrls addObject:expUrl];
+                }
+            }
+            else {
+                [uniqueUrls addObject:expUrl];
+            }
         }
         
         
@@ -167,7 +201,7 @@ static NSString* const kMailToScheme = @"mailto";
         for(NSString* key in node.fields.customFields.allKeys) {
             StringValue* strValue = node.fields.customFields[key];
             NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
-            [urls addObjectsFromArray:foo];
+            [uniqueUrls addObjectsFromArray:foo];
         }
         
         
@@ -176,12 +210,12 @@ static NSString* const kMailToScheme = @"mailto";
 
         if(notesField.length) {
             NSArray<NSString*> *foo = [self findUrlsInString:notesField];
-            [urls addObjectsFromArray:foo];
+            [uniqueUrls addObjectsFromArray:foo];
         }
         
         NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
     
-        for (NSString* url in urls) {
+        for ( NSString* url in uniqueUrls ) {
             QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString];
             
             ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];

@@ -119,10 +119,15 @@ static const BOOL kLogVerbose = NO;
         [Kdb1Database addKeePassDefaultRootGroup:database.rootNode];
     }
     
-    [Kdb1Database nodeModelToGroupsAndEntries:0
-                                group:database.rootNode
-                    serializationData:serializationData
-                     existingGroupIds:[NSMutableSet<NSNumber*> set]];
+    if ( ! [Kdb1Database nodeModelToGroupsAndEntries:0
+                                               group:database.rootNode
+                                   serializationData:serializationData
+                                    existingGroupIds:[NSMutableSet<NSNumber*> set]] ) {
+        NSLog(@"WARNWARN: Could not convert to KDB.");
+        NSError* error = [Utils createNSError:@"Could not convert to KDB." errorCode:-3];
+        completion(NO, nil, nil, error);
+        return;
+    }
         
     serializationData.flags = database.meta.flags;
     serializationData.version = database.meta.versionInt;
@@ -155,7 +160,7 @@ static const BOOL kLogVerbose = NO;
     [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
 }
 
-+ (void)nodeModelToGroupsAndEntries:(int)level
++ (BOOL)nodeModelToGroupsAndEntries:(int)level
                              group:(Node*)group
                  serializationData:(KdbSerializationData*)serializationData
                   existingGroupIds:(NSMutableSet<NSNumber*>*)existingGroupIds {
@@ -165,15 +170,27 @@ static const BOOL kLogVerbose = NO;
         KdbGroup* kdbGroup = groupToKdbGroup(subGroup, level, existingGroupIds);
         [serializationData.groups addObject:kdbGroup];
 
-        NSArray<KdbEntry*> *entries = [[subGroup childRecords] map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-            return [Kdb1Database recordToKdbEntry:obj kdbGroup:kdbGroup];
-        }];
+        NSMutableArray<KdbEntry*>* entries = NSMutableArray.array;
+        for ( Node* obj in subGroup.childRecords ) {
+            KdbEntry* entry = [Kdb1Database recordToKdbEntry:obj kdbGroup:kdbGroup];
+            if ( !entry ) {
+                NSLog(@"WARNWARN: Could not get KDBEntry for Node.");
+                return NO;
+            }
+            [entries addObject:entry];
+        }
         
         [serializationData.entries addObjectsFromArray:entries];
 
-        [self nodeModelToGroupsAndEntries:level + 1 group:subGroup serializationData:serializationData
-                         existingGroupIds:existingGroupIds];
+        if ( ![self nodeModelToGroupsAndEntries:level + 1
+                                          group:subGroup
+                              serializationData:serializationData
+                               existingGroupIds:existingGroupIds] ) {
+            return NO;
+        }
     }
+    
+    return YES;
 }
 
 KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existingGroupIds) {
@@ -224,7 +241,11 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         ret.binaryFileName = filename;
         
         NSInputStream* inputStream = [theAttachment getPlainTextInputStream];
-
+        if ( !inputStream ) {
+            NSLog(@"WARNWARN: Could not serialize KDB Binary! Could not read attachment PT stream.");
+            return nil;
+        }
+        
         
         NSData* data = [NSData dataWithContentsOfStream:inputStream];
 

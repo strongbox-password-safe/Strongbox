@@ -13,6 +13,8 @@
 #import "KeyFileParser.h"
 #import "BookmarksHelper.h"
 #import "MacYubiKeyManager.h"
+#import "PasswordStrengthTester.h"
+#import <CoreImage/CoreImage.h>
 
 @interface CreateFormatAndSetCredentialsWizard () <NSTabViewDelegate>
 
@@ -45,6 +47,9 @@
 @property BOOL slot1IsBlocking;
 @property BOOL slot2IsBlocking;
 @property NSString* currentYubiKeySerial;
+@property (weak) IBOutlet NSProgressIndicator *progressStrength;
+@property (weak) IBOutlet NSTextField *labelStrength;
+@property (weak) IBOutlet NSStackView *stackStrength;
 
 @end
 
@@ -239,6 +244,10 @@
         self.textFieldNew.enabled = NO;
         self.textFieldConfirm.enabled = NO;
     }
+    
+    
+    
+    [self bindPasswordStrength];
     
     
     
@@ -539,6 +548,38 @@
     _selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
     _selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
     _selectedYubiKeyConfiguration.slot = 2;
+}
+
+- (void)bindPasswordStrength {
+    if ( self.checkboxUseAPassword.state == NSControlStateValueOff || self.textFieldNew.stringValue.length == 0) {
+        self.stackStrength.hidden = YES;
+        return;
+    }
+    self.stackStrength.hidden = NO;
+    
+    NSString* pw = self.textFieldNew.stringValue;
+    PasswordStrength* strength = [PasswordStrengthTester getStrength:pw config:PasswordStrengthConfig.defaults];
+    
+    self.labelStrength.stringValue = strength.summaryString;
+    
+    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
+        
+    self.progressStrength.doubleValue = relativeStrength * 100.0f;
+    
+    CIFilter *colorPoly = [CIFilter filterWithName:@"CIColorPolynomial"];
+    [colorPoly setDefaults];
+    
+    double red = 1.0 - relativeStrength;
+    double green = relativeStrength;
+
+    CIVector *redVector = [CIVector vectorWithX:red Y:0 Z:0 W:0];
+    CIVector *greenVector = [CIVector vectorWithX:green Y:0 Z:0 W:0];
+    CIVector *blueVector = [CIVector vectorWithX:0 Y:0 Z:0 W:0];
+    
+    [colorPoly setValue:redVector forKey:@"inputRedCoefficients"];
+    [colorPoly setValue:greenVector forKey:@"inputGreenCoefficients"];
+    [colorPoly setValue:blueVector forKey:@"inputBlueCoefficients"];
+    [self.progressStrength setContentFilters:@[colorPoly]];
 }
 
 @end

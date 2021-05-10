@@ -457,37 +457,45 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 }
 
 - (void)createNewAuditor {
+#ifndef IS_APP_EXTENSION
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
 
     __weak Model* weakSelf = self;
     self.auditor = [[DatabaseAuditor alloc] initWithPro:AppPreferences.sharedInstance.isProOrFreeTrial
+                                         strengthConfig:AppPreferences.sharedInstance.passwordStrengthConfig
                                              isExcluded:^BOOL(Node * _Nonnull item) {
-        NSString* sid = [weakSelf.database getCrossSerializationFriendlyIdId:item.uuid];
-        return [weakSelf isExcludedFromAuditHelper:set sid:sid];
+        return [weakSelf isExcludedFromAuditHelper:set uuid:item.uuid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
         
         [SafesList.sharedInstance update:weakSelf.metadata];
     }];
+#endif
 }
 
 - (BOOL)isExcludedFromAudit:(NSUUID *)item {
-    NSString* sid = [self.database getCrossSerializationFriendlyIdId:item];
-
     NSArray<NSString*> *excluded = self.metadata.auditExcludedItems;
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
     
-    return [self isExcludedFromAuditHelper:set sid:sid];
+    return [self isExcludedFromAuditHelper:set uuid:item];
 }
 
-- (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set sid:(NSString*)sid {
+- (BOOL)isExcludedFromAuditHelper:(NSSet<NSString*> *)set uuid:(NSUUID*)uuid {
+    Node* node = [self.database getItemById:uuid];
+    if ( !node.fields.qualityCheck ) { 
+        return YES;
+    }
+    
+    NSString* sid = [self.database getCrossSerializationFriendlyIdId:uuid];
+
     return [set containsObject:sid];
 }
 
 - (void)restartAudit {
     [self stopAndClearAuditor];
 
+#ifndef IS_APP_EXTENSION
     [self.auditor start:self.database
                  config:self.metadata.auditConfig
             nodesChanged:^{
@@ -506,6 +514,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
             [NSNotificationCenter.defaultCenter postNotificationName:kAuditCompletedNotificationKey object:@(userStopped)];
         });
     }];
+#endif
 }
 
 - (NSUInteger)auditHibpErrorCount {

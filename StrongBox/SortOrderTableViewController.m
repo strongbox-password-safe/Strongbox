@@ -67,7 +67,7 @@
     
     [self cell:self.cellAscending setHidden:self.field == kBrowseSortFieldNone];
     [self cell:self.cellDescending setHidden:self.field == kBrowseSortFieldNone];
-    [self cell:self.cellFolders setHidden:self.field == kBrowseSortFieldNone];
+    
     
     [self reloadDataAnimated:animated];
 }

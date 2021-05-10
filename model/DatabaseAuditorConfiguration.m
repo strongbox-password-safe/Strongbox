@@ -9,6 +9,7 @@
 #import "DatabaseAuditorConfiguration.h"
 
 const int kDefaultMinimumLength = 12;
+const NSUInteger kDefaultLowEntropyThreshold = 36; // bits
 
 @implementation DatabaseAuditorConfiguration
 
@@ -24,6 +25,9 @@ const int kDefaultMinimumLength = 12;
         self.checkForDuplicatedPasswords = YES;
         self.caseInsensitiveMatchForDuplicates = YES;
         self.checkForCommonPasswords = YES;
+        self.checkForLowEntropy = YES;
+        self.lowEntropyThreshold = kDefaultLowEntropyThreshold;
+        
         self.levenshteinSimilarityThreshold = 0.75f;
         self.minimumLength = kDefaultMinimumLength;
         self.checkForMinimumLength = NO;
@@ -53,6 +57,7 @@ const int kDefaultMinimumLength = 12;
     if (jsonDictionary[@"checkForDuplicatedPasswords"] != nil ) ret.checkForDuplicatedPasswords = ((NSNumber*)(jsonDictionary[@"checkForDuplicatedPasswords"])).boolValue;
     if (jsonDictionary[@"caseInsensitiveMatchForDuplicates"] != nil ) ret.caseInsensitiveMatchForDuplicates = ((NSNumber*)(jsonDictionary[@"caseInsensitiveMatchForDuplicates"])).boolValue;
     if (jsonDictionary[@"checkForCommonPasswords"] != nil ) ret.checkForCommonPasswords = ((NSNumber*)(jsonDictionary[@"checkForCommonPasswords"])).boolValue;
+    if (jsonDictionary[@"checkForLowEntropy"] != nil ) ret.checkForLowEntropy = ((NSNumber*)(jsonDictionary[@"checkForLowEntropy"])).boolValue;
     if (jsonDictionary[@"checkForSimilarPasswords"] != nil ) ret.checkForSimilarPasswords = ((NSNumber*)(jsonDictionary[@"checkForSimilarPasswords"])).boolValue;
     if (jsonDictionary[@"levenshteinSimilarityThreshold"] != nil ) ret.levenshteinSimilarityThreshold = ((NSNumber*)(jsonDictionary[@"levenshteinSimilarityThreshold"])).doubleValue;
     if (jsonDictionary[@"minimumLength"] != nil ) ret.minimumLength = ((NSNumber*)(jsonDictionary[@"minimumLength"])).unsignedIntegerValue;
@@ -64,7 +69,8 @@ const int kDefaultMinimumLength = 12;
     if (jsonDictionary[@"showCachedHibpHits"] != nil ) ret.showCachedHibpHits = ((NSNumber*)(jsonDictionary[@"showCachedHibpHits"])).boolValue;
     if (jsonDictionary[@"lastHibpOnlineCheck"] != nil ) ret.lastHibpOnlineCheck = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastHibpOnlineCheck"])).doubleValue];
     if (jsonDictionary[@"lastKnownAuditIssueCount"] != nil ) ret.lastKnownAuditIssueCount = ((NSNumber*)(jsonDictionary[@"lastKnownAuditIssueCount"]));
-    
+    if (jsonDictionary[@"lowEntropyThreshold"] != nil ) ret.lowEntropyThreshold = ((NSNumber*)(jsonDictionary[@"lowEntropyThreshold"])).unsignedIntegerValue;
+
     return ret;
 }
 
@@ -75,6 +81,7 @@ const int kDefaultMinimumLength = 12;
         @"checkForDuplicatedPasswords" : @(self.checkForDuplicatedPasswords),
         @"caseInsensitiveMatchForDuplicates" : @(self.caseInsensitiveMatchForDuplicates),
         @"checkForCommonPasswords" : @(self.checkForCommonPasswords),
+        @"checkForLowEntropy" : @(self.checkForLowEntropy),
         @"checkForSimilarPasswords" : @(self.checkForSimilarPasswords),
         @"levenshteinSimilarityThreshold" : @(self.levenshteinSimilarityThreshold),
         @"minimumLength" : @(self.minimumLength),
@@ -84,6 +91,7 @@ const int kDefaultMinimumLength = 12;
         @"hibpCaveatAccepted" : @(self.hibpCaveatAccepted),
         @"hibpCheckForNewBreachesIntervalSeconds" : @(self.hibpCheckForNewBreachesIntervalSeconds),
         @"showCachedHibpHits" : @(self.showCachedHibpHits),
+        @"lowEntropyThreshold" : @(self.lowEntropyThreshold),
     }];
 
     if( self.lastHibpOnlineCheck != nil) {
@@ -95,81 +103,6 @@ const int kDefaultMinimumLength = 12;
     }
 
     return ret;
-}
-
-
-
-
-- (instancetype)initWithCoder:(NSCoder *)coder {
-    if((self = [self init])) {
-        self.auditInBackground = [coder decodeBoolForKey:@"auditInBackground"];
-        self.checkForNoPasswords = [coder decodeBoolForKey:@"checkForNoPasswords"];
-        self.checkForDuplicatedPasswords = [coder decodeBoolForKey:@"checkForDuplicatedPasswords"];
-        self.caseInsensitiveMatchForDuplicates = [coder decodeBoolForKey:@"caseInsensitiveMatchForDuplicates"];
-        self.checkForCommonPasswords = [coder decodeBoolForKey:@"checkForCommonPasswords"];
-        self.checkForSimilarPasswords = [coder decodeBoolForKey:@"checkForSimilarPasswords"];
-        self.levenshteinSimilarityThreshold = [coder decodeFloatForKey:@"levenshteinSimilarityThreshold"];
-        
-        if ([coder containsValueForKey:@"minimumLength"]) {
-            self.minimumLength = [coder decodeIntegerForKey:@"minimumLength"];
-        }
-        else {
-            self.minimumLength = kDefaultMinimumLength;
-        }
-
-        if ([coder containsValueForKey:@"checkForMinimumLength"]) {
-            self.checkForMinimumLength = [coder decodeBoolForKey:@"checkForMinimumLength"];
-        }
-
-        if ([coder containsValueForKey:@"checkHibp"]) {
-            self.checkHibp = [coder decodeBoolForKey:@"checkHibp"];
-        }
-        
-        if ([coder containsValueForKey:@"lastKnownAuditIssueCount"]) {
-            self.lastKnownAuditIssueCount = [coder decodeObjectForKey:@"lastKnownAuditIssueCount"];
-        }
-        
-        if ([coder containsValueForKey:@"showAuditPopupNotifications"]) {
-            self.showAuditPopupNotifications = [coder decodeBoolForKey:@"showAuditPopupNotifications"];
-        }
-        
-        if ([coder containsValueForKey:@"hibpCaveatShown"]) {
-            self.hibpCaveatAccepted = [coder decodeBoolForKey:@"hibpCaveatShown"];
-        }
-        
-        if ([coder containsValueForKey:@"hibpCheckForNewBreachesIntervalSeconds"]) {
-            self.hibpCheckForNewBreachesIntervalSeconds = [coder decodeIntegerForKey:@"hibpCheckForNewBreachesIntervalSeconds"];
-        }
-        
-        if ([coder containsValueForKey:@"lastHibpOnlineCheck"]) {
-            self.lastHibpOnlineCheck = [coder decodeObjectForKey:@"lastHibpOnlineCheck"];
-        }
-        
-        if ([coder containsValueForKey:@"showCachedHibpHits"]) {
-            self.showCachedHibpHits = [coder decodeBoolForKey:@"showCachedHibpHits"];
-        }
-    }
-    
-    return self;
-}
-
-- (void)encodeWithCoder:(NSCoder *)coder {
-    [coder encodeBool:self.auditInBackground forKey:@"auditInBackground"];
-    [coder encodeBool:self.checkForNoPasswords forKey:@"checkForNoPasswords"];
-    [coder encodeBool:self.checkForDuplicatedPasswords forKey:@"checkForDuplicatedPasswords"];
-    [coder encodeBool:self.caseInsensitiveMatchForDuplicates forKey:@"caseInsensitiveMatchForDuplicates"];
-    [coder encodeBool:self.checkForCommonPasswords forKey:@"checkForCommonPasswords"];
-    [coder encodeBool:self.checkForSimilarPasswords forKey:@"checkForSimilarPasswords"];
-    [coder encodeFloat:self.levenshteinSimilarityThreshold forKey:@"levenshteinSimilarityThreshold"];
-    [coder encodeInteger:self.minimumLength forKey:@"minimumLength"];
-    [coder encodeBool:self.checkForMinimumLength forKey:@"checkForMinimumLength"];
-    [coder encodeBool:self.checkHibp forKey:@"checkHibp"];
-    [coder encodeObject:self.lastKnownAuditIssueCount forKey:@"lastKnownAuditIssueCount"];
-    [coder encodeBool:self.showAuditPopupNotifications forKey:@"showAuditPopupNotifications"];
-    [coder encodeBool:self.hibpCaveatAccepted forKey:@"hibpCaveatShown"];
-    [coder encodeInteger:self.hibpCheckForNewBreachesIntervalSeconds forKey:@"hibpCheckForNewBreachesIntervalSeconds"];
-    [coder encodeObject:self.lastHibpOnlineCheck forKey:@"lastHibpOnlineCheck"];
-    [coder encodeBool:self.showCachedHibpHits forKey:@"showCachedHibpHits"];
 }
 
 @end

@@ -175,7 +175,7 @@ const static NSArray<NSString*> *kEmailDomains;
             [suggestions addObject:[self generateRandomWord]];
         }
         else {
-            config.algorithm = config.algorithm == kBasic ? kXkcd : kBasic; 
+            config.algorithm = config.algorithm == kPasswordGenerationAlgorithmBasic ? kPasswordGenerationAlgorithmDiceware : kPasswordGenerationAlgorithmBasic; 
             [suggestions addObject:[self generateForConfigOrDefault:config]];
             [suggestions addObject:[self generateUsername].lowercaseString];
 
@@ -287,7 +287,7 @@ const static NSArray<NSString*> *kEmailDomains;
     PasswordGenerationConfig *config = PasswordGenerationConfig.defaults;
     
     config.wordCount = 1;
-    config.algorithm = kXkcd;
+    config.algorithm = kPasswordGenerationAlgorithmDiceware;
     
     return [self generateDicewareForConfig:config].lowercaseString;
 }
@@ -524,12 +524,22 @@ const static NSArray<NSString*> *kEmailDomains;
     
     
     
-    if(config.pickFromEveryGroup && ![self containsCharactersFromEveryGroup:allCharacters config:config]) {
-        NSLog(@"WARN: Could not generate password using config. Not possible to pick from every group.");
-        return nil;
+    if(config.pickFromEveryGroup) {
+        if ( ![self containsCharactersFromEveryGroup:allCharacters config:config] ) {
+            NSLog(@"WARN: Could not generate password using config. Not possible to pick from every group.");
+            return nil;
+        }
+        
+        if ( config.basicLength < config.useCharacterGroups.count ) {
+            NSLog(@"WARN: Could not generate password using config. Not possible to pick from every group because the length is too short.");
+            return nil;
+        }
     }
-
+    
     NSString *ret;
+    int iterationCount = 0;
+    const int kMaxIterations = 1024;
+    
     do {
         NSMutableString *mut = [NSMutableString string];
         for(int i=0;i<config.basicLength;i++) {
@@ -539,7 +549,13 @@ const static NSArray<NSString*> *kEmailDomains;
         }
         ret = [mut copy];
 
-    } while(config.pickFromEveryGroup && ![self containsCharactersFromEveryGroup:ret config:config]);
+        iterationCount++;
+    } while(iterationCount < kMaxIterations && config.pickFromEveryGroup && ![self containsCharactersFromEveryGroup:ret config:config]);
+    
+    if ( iterationCount >= kMaxIterations ) {
+        NSLog(@"WARN: Hit max iterations trying to create a password to match constraints... bailing");
+        return nil;
+    }
     
     return ret;
 }

@@ -58,7 +58,7 @@ static const int kMinNotesCellHeight = 160;
 
 - (void)onChangeIcon {
     self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIconPool = self.viewModel.database.customIconPool;
+    self.sni.customIcons = self.viewModel.database.iconPool;
     
     NSString* urlHint = trim(self.textFieldUrl.text);
     if(!urlHint.length) {
@@ -1023,7 +1023,9 @@ static const int kMinNotesCellHeight = 160;
                     
                     BOOL success = [self.record setTotpWithString:string
                                                  appendUrlToNotes:appendToNotes
-                                                       forceSteam:NO];
+                                                       forceSteam:NO
+                                                  addLegacyFields:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
+                                                    addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl];
                     if(!success) {
                         [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this QR Code."];
                     }
@@ -1049,7 +1051,9 @@ static const int kMinNotesCellHeight = 160;
                    
                    BOOL success = [self.record setTotpWithString:text
                                                 appendUrlToNotes:appendToNotes
-                                                      forceSteam:steam];
+                                                      forceSteam:steam
+                                                 addLegacyFields:AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields
+                                                   addOtpAuthUrl:AppPreferences.sharedInstance.addOtpAuthUrl];
 
                    if(!success) {
                        [Alerts warn:self title:@"Failed to Set TOTP" message:@"Could not set TOTP using this string."];
@@ -1156,7 +1160,7 @@ static const int kMinNotesCellHeight = 160;
             }
             
             self.sni = [[SetNodeIconUiHelper alloc] init];
-            self.sni.customIconPool = self.viewModel.database.customIconPool;
+            self.sni.customIcons = self.viewModel.database.iconPool;
             
             [self.sni expressDownloadBestFavIcon:urlHint completion:^(UIImage * _Nullable userSelectedNewCustomIcon) {
                 if(userSelectedNewCustomIcon) {

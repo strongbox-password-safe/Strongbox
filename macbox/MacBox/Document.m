@@ -46,6 +46,7 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 @property CompositeKeyFactors* credentialsForUnlock;
 @property NSString *selectedItemForUnlock;
 @property NSTimer* managedDatabasePollForChangesTimer;
+@property BOOL pollingInProgress;
 
 @end
 
@@ -75,13 +76,13 @@ NSString* const kNotificationUserInfoParamKey = @"param";
     return YES;
 }
 
-- (instancetype)initWithDatabase:(DatabaseModel *)database {
-    if (self = [super init]) {
-        _viewModel = [[ViewModel alloc] initUnlockedWithDatabase:self database:database selectedItem:nil];
-    }
-    
-    return self;
-}
+
+
+
+
+
+
+
 
 - (void)makeWindowControllers {
     self.windowController = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"Document Window Controller"];
@@ -244,23 +245,6 @@ NSString* const kNotificationUserInfoParamKey = @"param";
         });
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -466,6 +450,8 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 - (void)close {
     [super close];
 
+    [self unListenForSleepWakeEvents];
+    
     [self stopMonitoringManagedFile];
     
     
@@ -500,12 +486,72 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 
 
+- (void)listenForSleepWakeEvents {
+    [self unListenForSleepWakeEvents];
+    
+    NSLog(@"listenForSleepWakeEvents");
+    
+    
+    
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                           selector:@selector(onSleep)
+                                                               name:NSWorkspaceWillSleepNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                           selector:@selector(onSleep)
+                                                               name:NSWorkspaceScreensDidSleepNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                           selector:@selector(onSleep)
+                                                               name:NSWorkspaceSessionDidResignActiveNotification object:nil];
+
+    NSString* notificationName = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsLocked"];
+    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onSleep) name:notificationName object:nil];
+
+    
+    
+    
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                           selector:@selector(onWake)
+                                                               name:NSWorkspaceDidWakeNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                           selector:@selector(onWake)
+                                                               name:NSWorkspaceScreensDidWakeNotification object:nil];
+    [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self
+                                                           selector:@selector(onWake)
+                                                               name:NSWorkspaceSessionDidBecomeActiveNotification object:nil];
+
+    NSString* notificationName2 = [NSString stringWithFormat:@"%@.%@", @"com.apple", @"screenIsUnlocked"];
+    [NSDistributedNotificationCenter.defaultCenter addObserver:self selector:@selector(onWake) name:notificationName2 object:nil];
+}
+
+- (void)unListenForSleepWakeEvents {
+    NSLog(@"unListenForSleepWakeEvents");
+    
+    [NSDistributedNotificationCenter.defaultCenter removeObserver:self];
+    [NSWorkspace.sharedWorkspace.notificationCenter removeObserver:self];
+}
+
+- (void)onSleep {
+    NSLog(@"XXX - onSleep");
+    [self stopMonitoringManagedFile];
+}
+
+- (void)onWake {
+    NSLog(@"XXX - onWake");
+    [self startMonitoringManagedFile];
+}
+
 - (void)startMonitoringManagedFile {
-    if ( !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL] ) {
+    NSLog(@"startMonitoringManagedFile");
+    
+    if ( !self.databaseMetadata || self.viewModel.locked || !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL] ) {
         return;
     }
-    
+        
     if(self.managedDatabasePollForChangesTimer == nil) {
+        NSLog(@"startMonitoringManagedFile - OK");
+        
+        [self listenForSleepWakeEvents];
+        
         self.managedDatabasePollForChangesTimer = [NSTimer timerWithTimeInterval:self.databaseMetadata.monitorForExternalChangesInterval
                                                                           target:self
                                                                         selector:@selector(pollForDatabaseChanges)
@@ -519,13 +565,18 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 - (void)stopMonitoringManagedFile {
     NSLog(@"stopMonitoringManagedFile");
     
-    if(self.managedDatabasePollForChangesTimer) {
+    if ( self.managedDatabasePollForChangesTimer ) {
         [self.managedDatabasePollForChangesTimer invalidate];
         self.managedDatabasePollForChangesTimer = nil;
     }
 }
 
 - (void)pollForDatabaseChanges {
+    if ( self.pollingInProgress ) {
+        NSLog(@"pollingInProgress - Will not queue up another Poll.");
+        return;
+    }
+    
     if ( !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL]) {
         [self stopMonitoringManagedFile];
         return;
@@ -537,8 +588,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 - (void)checkForRemoteChanges {
     NSLog(@"checkForRemoteChanges");
     
+    self.pollingInProgress = YES;
     [MacSyncManager.sharedInstance pollForChanges:self.databaseMetadata
                                        completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+        self.pollingInProgress = NO;
+        
         if ( localWasChanged ) {
             [self notifyDatabaseHasBeenChangedByOther];
         }

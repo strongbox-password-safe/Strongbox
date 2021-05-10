@@ -9,10 +9,7 @@
 #import "PreferencesTableViewController.h"
 #import "Alerts.h"
 #import "Utils.h"
-
-//#import "Settings.h"
 #import "AppPreferences.h"
-
 #import <MessageUI/MessageUI.h>
 #import "SafesList.h"
 #import "PinEntryController.h"
@@ -57,6 +54,10 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelAppLockPasscodeFallback;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrivacyShield;
 @property (weak, nonatomic) IBOutlet UILabel *labelPrivacyShield;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellPasswordStrength;
+@property (weak, nonatomic) IBOutlet UILabel *labelPasswordStrengthAlgo;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAdversaryStrength;
+@property (weak, nonatomic) IBOutlet UILabel *labelAdversary;
 
 @end
 
@@ -66,18 +67,10 @@
     self.onDone();
 }
 
-- (IBAction)onGenericPreferencesChanged:(id)sender {
-    NSLog(@"Generic Preference Changed: [%@]", sender);
-
-    AppPreferences.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
-    AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
-    
-    [self bindGenericPreferencesChanged];
-}
-
-- (void)bindGenericPreferencesChanged {
-    self.appLockOnPreferences.on = AppPreferences.sharedInstance.appLockAppliesToPreferences;
-    self.appLockPasscodeFallback.on = AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio;
+- (void)bindGeneral {
+    self.labelPrivacyShield.text = stringForPrivacyShieldMode(AppPreferences.sharedInstance.appPrivacyShieldMode);
+    self.labelPasswordStrengthAlgo.text = stringForPasswordStrengthAlgo(AppPreferences.sharedInstance.passwordStrengthConfig.algorithm);
+    self.labelAdversary.text = stringForAdversaryStrength(AppPreferences.sharedInstance.passwordStrengthConfig.adversaryGuessesPerSecond);
 }
 
 
@@ -91,7 +84,8 @@
     [self bindClearClipboard];
     [self bindAppLock];
     [self customizeAppLockSectionFooter];
-    [self bindGenericPreferencesChanged];
+    [self bindAppLock2Preferences];
+    [self bindGeneral];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -162,8 +156,58 @@
                       options:optionStrings
          currentlySelectIndex:AppPreferences.sharedInstance.appPrivacyShieldMode
                    completion:^(BOOL success, NSInteger selectedIndex) {
-            AppPreferences.sharedInstance.appPrivacyShieldMode = selectedIndex;
-            [self bindAppLock];
+            if ( success ) {
+                AppPreferences.sharedInstance.appPrivacyShieldMode = selectedIndex;
+            }
+            [self bindGeneral];
+        }];
+    }
+    else if ( cell == self.cellPasswordStrength ) {
+        NSArray<NSNumber*>* options = @[@(kPasswordStrengthAlgorithmBasic),
+                                        @(kPasswordStrengthAlgorithmZxcvbn)];
+        
+        NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+            return stringForPasswordStrengthAlgo(obj.integerValue);
+        }];
+        
+        [self promptForChoice:NSLocalizedString(@"prefs_vc_password_strength_algorithm", @"Password Strength Algorithm")
+                      options:optionStrings
+         currentlySelectIndex:AppPreferences.sharedInstance.passwordStrengthConfig.algorithm
+                   completion:^(BOOL success, NSInteger selectedIndex) {
+            if ( success ) {
+                PasswordStrengthConfig* config = AppPreferences.sharedInstance.passwordStrengthConfig;
+                config.algorithm = selectedIndex;
+                AppPreferences.sharedInstance.passwordStrengthConfig = config;
+            }
+             
+            [self bindGeneral];
+        }];
+    }
+    else if ( cell == self.cellAdversaryStrength ) {
+        NSArray<NSNumber*>* options = @[
+            @(1000),
+            @(1000000),
+            @(1000000000),
+            @(100000000000),
+            @(100000000000000),
+            @(1000000000000000)];
+        
+        NSArray<NSString*>* optionStrings = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
+            return stringForAdversaryStrength(obj.integerValue);
+        }];
+
+        NSUInteger selected = [options indexOfObject:@(AppPreferences.sharedInstance.passwordStrengthConfig.adversaryGuessesPerSecond)];
+        
+        [self promptForChoice:NSLocalizedString(@"prefs_vc_password_strength_adversary_crack_rate", @"Adversary Guess Rate")
+                      options:optionStrings
+         currentlySelectIndex:selected
+                   completion:^(BOOL success, NSInteger selectedIndex) {
+            if ( success ) {
+                PasswordStrengthConfig* config = AppPreferences.sharedInstance.passwordStrengthConfig;
+                config.adversaryGuessesPerSecond = options[selectedIndex].unsignedIntegerValue;
+                AppPreferences.sharedInstance.passwordStrengthConfig = config;
+            }
+            [self bindGeneral];
         }];
     }
 }
@@ -328,22 +372,6 @@
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
 - (IBAction)onDeleteDataChanged:(id)sender {
     if(self.switchDeleteDataEnabled.on) {
         AppPreferences.sharedInstance.deleteDataAfterFailedUnlockCount = 5; 
@@ -455,10 +483,20 @@
     
     NSString* fmt = NSLocalizedString(@"app_lock_allow_device_passcode_fallback_for_biometric_fmt", @"Passcode Fallback for %@");
     self.labelAppLockPasscodeFallback.text = [NSString stringWithFormat:fmt, BiometricsManager.sharedInstance.biometricIdName];
+}
+
+- (IBAction)onAppLock2PreferencesChanged:(id)sender {
+    NSLog(@"Generic Preference Changed: [%@]", sender);
+
+    AppPreferences.sharedInstance.appLockAppliesToPreferences = self.appLockOnPreferences.on;
+    AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio = self.appLockPasscodeFallback.on;
     
-    
-    
-    self.labelPrivacyShield.text = stringForPrivacyShieldMode(AppPreferences.sharedInstance.appPrivacyShieldMode);
+    [self bindAppLock2Preferences];
+}
+
+- (void)bindAppLock2Preferences {
+    self.appLockOnPreferences.on = AppPreferences.sharedInstance.appLockAppliesToPreferences;
+    self.appLockPasscodeFallback.on = AppPreferences.sharedInstance.appLockAllowDevicePasscodeFallbackForBio;
 }
 
 static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
@@ -473,6 +511,46 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
     }
     else {
         return NSLocalizedString(@"app_privacy_shield_mode_blue_screen", @"Blue Screen");
+    }
+}
+
+static NSString* stringForAdversaryStrength(NSUInteger strength){
+    NSNumber* number = @(strength);
+    
+    
+    
+    long long num = [number longLongValue];
+
+    int s = ( (num < 0) ? -1 : (num > 0) ? 1 : 0 );
+    NSString* sign = (s == -1 ? @"-" : @"" );
+
+    num = llabs(num);
+
+    if (num < 1000000) {
+
+        return [NSString stringWithFormat:NSLocalizedString(@"adversary_guess_rate_fmt", @"%@ / second"), @(num)];
+    }
+    
+    int exp = (int) (log10l(num) / 3.f); 
+
+    NSArray* units = @[ NSLocalizedString(@"number_suffix_thousand", @"Thousand"),
+                        NSLocalizedString(@"number_suffix_million", @"Million"),
+                        NSLocalizedString(@"number_suffix_billion", @"Billion"),
+                        NSLocalizedString(@"number_suffix_trillion", @"Trillion"),
+                        NSLocalizedString(@"number_suffix_quadrillion", @"Quadrillion"),
+                        NSLocalizedString(@"number_suffix_quintillion", @"Quintillion")];
+
+    NSString* numerator = [NSString stringWithFormat:@"%@%d %@" ,sign, (int)(num / pow(1000, exp)), [units objectAtIndex:(exp-1)]];
+    
+    return [NSString stringWithFormat:NSLocalizedString(@"adversary_guess_rate_fmt", @"%@ / second"), numerator];
+}
+
+static NSString* stringForPasswordStrengthAlgo(PasswordStrengthAlgorithm algo ){
+    if ( algo == kPasswordStrengthAlgorithmZxcvbn ) {
+        return NSLocalizedString(@"password_strength_algo_zxcvbn_title", @"Zxcvbn (Smart)");
+    }
+    else {
+        return NSLocalizedString(@"password_strength_algo_basic_title", @"Basic (Pooled Entropy)");
     }
 }
 
@@ -515,7 +593,13 @@ static NSString* stringForPrivacyShieldMode(AppPrivacyShieldMode mode ){
 
     vc.groupItems = @[items];
     
-    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
+    if ( currentlySelectIndex != NSNotFound ) {
+        vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
+    }
+    else {
+        vc.selectedIndexPaths = nil;
+    }
+    
     vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
         NSIndexSet* set = selectedIndices.firstObject;
         [self.navigationController popViewControllerAnimated:YES];

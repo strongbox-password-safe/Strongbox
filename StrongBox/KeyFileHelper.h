@@ -13,8 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface KeyFileHelper : NSObject
 
-NSData*_Nullable getKeyFileDigest(NSString* keyFileBookmark, NSData* onceOffKeyFileData, DatabaseFormat format, NSError** error);
-NSData*_Nullable getKeyFileData(NSString* keyFileBookmark, NSData* onceOffKeyFileData, NSError** error);
+NSData*_Nullable getKeyFileDigest(NSString*_Nullable keyFileBookmark, NSData*_Nullable onceOffKeyFileData, DatabaseFormat format, NSError** error);
+NSData*_Nullable getKeyFileData(NSString*_Nullable keyFileBookmark, NSData*_Nullable onceOffKeyFileData, NSError** error);
 
 @end
 

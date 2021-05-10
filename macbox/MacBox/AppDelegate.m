@@ -23,6 +23,7 @@
 #import "FileManager.h"
 #import "ClipboardManager.h"
 #import "DebugHelper.h"
+#import "MacUrlSchemes.h"
 
 
 
@@ -84,10 +85,10 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
         
     [self initializeProFamilyEdition];
     
-    [self cleanupWorkingDirectories];
+
     
     [self customizeMenu];
-
+    
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
@@ -117,6 +118,52 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
         DocumentController* dc = NSDocumentController.sharedDocumentController;
         [dc onAppStartup];
     });
+}
+
+- (void)performMigrations {
+    [self migrateToSyncManager]; 
+    
+    [self migrateQuickLaunchSystem];
+}
+
+- (void)migrateQuickLaunchSystem {
+    if ( !Settings.sharedInstance.hasMigratedQuickLaunch ) { 
+        NSLog(@"Migrating Launch at Startup...");
+        
+        Settings.sharedInstance.hasMigratedQuickLaunch = YES;
+        
+        if ( Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch ) {
+            DatabaseMetadata* first = DatabasesManager.sharedInstance.snapshot.firstObject;
+            if (first) {
+                NSLog(@"Migrating Launch at Startup. Found and setting first database to be Launched at Startup...");
+
+                first.launchAtStartup = YES;
+                [DatabasesManager.sharedInstance update:first];
+            }
+        }
+    }
+}
+
+- (void)migrateToSyncManager {
+    if ( !Settings.sharedInstance.hasMigratedToSyncManager ) {
+         Settings.sharedInstance.hasMigratedToSyncManager = YES;
+        [self migrateLocalDatabasesToSyncManager];
+    }
+}
+
+- (void)migrateLocalDatabasesToSyncManager {
+    NSLog(@"migrateLocalDatabasesToSyncManager");
+
+    NSArray<DatabaseMetadata*>* databases = DatabasesManager.sharedInstance.snapshot;
+    for (DatabaseMetadata* database in databases) {
+        if (database.storageProvider == kMacFile ) {
+            NSURLComponents* components = [NSURLComponents componentsWithURL:database.fileUrl resolvingAgainstBaseURL:NO];
+            components.scheme = kStrongboxSyncManagedFileUrlScheme;
+            database.fileUrl = components.URL;
+            [DatabasesManager.sharedInstance update:database];
+            NSLog(@"Converted [%@] Database to [%@]", database.nickName, database.fileUrl);
+        }
+    }
 }
 
 - (void)cleanupWorkingDirectories {
@@ -179,24 +226,6 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
     DocumentController* dc = NSDocumentController.sharedDocumentController;
     [dc performEmptyLaunchTasksIfNecessary];
-}
-
-- (void)performMigrations {
-    if ( !Settings.sharedInstance.hasMigratedQuickLaunch ) { 
-        NSLog(@"Migrating Launch at Startup...");
-        
-        Settings.sharedInstance.hasMigratedQuickLaunch = YES;
-        
-        if ( Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch ) {
-            DatabaseMetadata* first = DatabasesManager.sharedInstance.snapshot.firstObject;
-            if (first) {
-                NSLog(@"Migrating Launch at Startup. Found and setting first database to be Launched at Startup...");
-
-                first.launchAtStartup = YES;
-                [DatabasesManager.sharedInstance update:first];
-            }
-        }
-    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {

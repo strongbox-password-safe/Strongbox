@@ -8,12 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "BaseXmlDomainObjectHandler.h"
+#import "ValueWithModDate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CustomData : BaseXmlDomainObjectHandler
 
-// <CustomData>
+
 
 
 
@@ -22,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 
-@property NSMutableDictionary<NSString*, NSString*> *dictionary;
+@property NSMutableDictionary<NSString*, ValueWithModDate*> *dictionary;
 
 @end
 

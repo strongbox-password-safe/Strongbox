@@ -182,7 +182,11 @@ const NSUInteger kSectionIdxLast = 3;
     BrowseSortField sortField = self.viewModel.metadata.browseSortField;
     BOOL descending = self.viewModel.metadata.browseSortOrderDescending;
     BOOL foldersSeparately = self.viewModel.metadata.browseSortFoldersSeparately;
-    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database browseSortField:sortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
+    DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
+                                                                       browseSortField:sortField
+                                                                            descending:descending
+                                                                     foldersSeparately:foldersSeparately
+                                                                      isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
         return [self.viewModel isFlaggedByAudit:node.uuid];
     }];
 
@@ -238,6 +242,15 @@ const NSUInteger kSectionIdxLast = 3;
     }
     
     return dataSource[indexPath.row];
+}
+
+
+
+- (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return indexPath.section == kSectionIdxLast &&
+    self.viewModel.database.originalFormat != kPasswordSafe &&
+    self.viewModel.metadata.browseSortField == kBrowseSortFieldNone &&
+    self.viewModel.metadata.browseViewType == kBrowseViewTypeHierarchy;
 }
 
 @end

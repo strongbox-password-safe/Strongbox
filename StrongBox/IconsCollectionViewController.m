@@ -34,7 +34,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.customIcons = self.customIconSet ? self.customIconSet.allObjects : @[];
+    self.customIcons = self.iconPool ? self.iconPool.allValues : @[];
         
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
@@ -50,7 +50,7 @@
         return CGSizeZero;
     }
     else {
-        return CGSizeMake(collectionView.frame.size.width,50);
+        return CGSizeMake(collectionView.frame.size.width, 50);
     }
 }
 
@@ -67,22 +67,23 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
+    IconViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CELL" forIndexPath:indexPath];
+
     if([self hasCustomIcons] && indexPath.section == 0) {
-        IconViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CELL" forIndexPath:indexPath];
         NodeIcon* icon = self.customIcons[indexPath.row];
         UIImage* image = [NodeIconHelper getNodeIcon:icon];
         
         if(image) {
             cell.imageView.image = image;
         }
-        
-        return cell;
+        cell.labelName.text = icon.name ? icon.name : @"";
     }
     else {
-        IconViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"CELL" forIndexPath:indexPath];
         cell.imageView.image = [NodeIconHelper getNodeIcon:[NodeIcon withPreset:indexPath.item] predefinedIconSet:self.predefinedKeePassIconSet];
-        return cell;
+        cell.labelName.text = @"";
     }
+
+    return cell;
 }
 
 -(UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind

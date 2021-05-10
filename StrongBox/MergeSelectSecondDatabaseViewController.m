@@ -110,7 +110,9 @@
 
 - (void)onUnlockDone:(UnlockDatabaseResult)result model:(Model * _Nullable)model error:(NSError * _Nullable)error {
     if(result == kUnlockDatabaseResultSuccess) {
-        [self performSegueWithIdentifier:@"segueToSelectComparisonType" sender:model];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self performSegueWithIdentifier:@"segueToSelectComparisonType" sender:model];
+        });
     }
     else if(result == kUnlockDatabaseResultUserCancelled || result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
         self.onDone(NO, nil, nil);
@@ -127,17 +129,20 @@
 
 
 - (void)displayError:(NSError*)error {
-    [Alerts error:self
-            title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-            error:error];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [Alerts error:self
+                title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+                error:error];
+    });
 }
-
 - (IBAction)onCancel:(id)sender {
     [self dismiss];
 }
 
 - (void)dismiss {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    });
 }
 
 @end

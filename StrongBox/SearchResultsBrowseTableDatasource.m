@@ -87,4 +87,8 @@
                                  trueRoot:YES];
 }
 
+- (BOOL)canMoveRowAtIndexPath:(NSIndexPath *)indexPath {
+    return NO;
+}
+
 @end

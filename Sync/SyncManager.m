@@ -224,7 +224,9 @@
                                                                                     error:&error];
     
     if (error) {
-        *ppError = error;
+        if ( ppError ) {
+            *ppError = error;
+        }
         return nil;
     }
     
@@ -273,8 +275,11 @@
     for (SafeMetaData* localSafe in localSafes) {
         NSURL* url = [self getLegacyLocalDatabaseFileUrl:localSafe];
         if(![NSFileManager.defaultManager fileExistsAtPath:url.path]) {
-            NSLog(@"Removing Safe [%@] because underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
-            [SafesList.sharedInstance remove:localSafe.uuid];
+            NSLog(@"WARNWARN: Database [%@] underlying file [%@] no longer exists in Documents Directory.", localSafe.nickName, localSafe.fileName);
+            
+            
+            
+            
         }
     }
     

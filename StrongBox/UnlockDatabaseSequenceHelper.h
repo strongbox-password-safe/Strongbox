@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)helperWithViewController:(UIViewController*)viewController
                                 database:(SafeMetaData*)database
                           isAutoFillOpen:(BOOL)isAutoFillOpen
-                           openOffline:(BOOL)openLocalOnly;
+              offlineExplicitlyRequested:(BOOL)offlineExplicitlyRequested;
 
 - (void)beginUnlockSequence:(UnlockDatabaseCompletionBlock)completion;
 

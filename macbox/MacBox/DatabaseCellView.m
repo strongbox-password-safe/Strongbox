@@ -36,7 +36,7 @@
 
 @property (weak) IBOutlet NSTextField *textFieldStorage;
 
-@property NSClickGestureRecognizer *click;
+@property NSClickGestureRecognizer *gestureRecognizerClick;
 @property NSString* uuid;
 @property NSString* originalNickName;
 
@@ -49,8 +49,8 @@
         
     self.textFieldName.delegate = self;
 
-    self.click = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onNicknameClick)];
-    [self.textFieldName addGestureRecognizer:self.click];
+    self.gestureRecognizerClick = [[NSClickGestureRecognizer alloc] initWithTarget:self action:@selector(onNicknameClick)];
+    [self.textFieldName addGestureRecognizer:self.gestureRecognizerClick];
     
     if (@available(macOS 11.0, *)) {
         self.imageViewUnlocked.image = [NSImage imageWithSystemSymbolName:@"lock.open.fill" accessibilityDescription:nil];
@@ -72,6 +72,8 @@
 - (void)setWithDatabase:(DatabaseMetadata*)metadata autoFill:(BOOL)autoFill wormholeUnlocked:(BOOL)wormholeUnlocked {
     self.uuid = metadata.uuid;
     self.originalNickName = metadata.nickName;
+    
+    self.gestureRecognizerClick.enabled = !autoFill;
     
     self.textFieldName.stringValue = @"";
     self.textFieldSubtitleLeft.stringValue = @"";

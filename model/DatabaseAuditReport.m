@@ -17,6 +17,7 @@
 @property NSDictionary<NSString*, NSSet<NSUUID *>*>* similarPasswords;
 @property NSSet<NSUUID*>* tooShort;
 @property NSSet<NSUUID*>* pwned;
+@property NSSet<NSUUID*>* lowEntropy;
 
 @end
 
@@ -27,7 +28,8 @@
                           commonPasswords:(NSSet<NSUUID *> *)commonPasswords
                                   similar:(nonnull NSDictionary<NSUUID *,NSSet<NSUUID *> *> *)similar
                                  tooShort:(NSSet<NSUUID *> *)tooShort
-                                    pwned:(NSSet<NSUUID *> *)pwned {
+                                    pwned:(NSSet<NSUUID *> *)pwned
+                               lowEntropy:(NSSet<NSUUID *> *)lowEntropy {
     self = [super init];
     
     if (self) {
@@ -37,6 +39,7 @@
         self.similarPasswords = similar.copy;
         self.tooShort = tooShort.copy;
         self.pwned = pwned.copy;
+        self.lowEntropy = lowEntropy.copy;
     }
     
     return self;
@@ -74,9 +77,13 @@
     return self.pwned;
 }
 
+- (NSSet<NSUUID *> *)entriesWithLowEntropyPasswords {
+    return self.lowEntropy;
+}
+
 - (NSString *)description {
-    return [NSString stringWithFormat:@"No Passswords = [%@], Duplicates = [%@], Common = [%@], Similar = [%@], tooShort = [%@], pwned = [%@]",
-            self.noPasswords, self.duplicatedPasswords, self.commonPasswords, self.similarPasswords, self.tooShort, self.pwned];
+    return [NSString stringWithFormat:@"No Passswords = [%@], Duplicates = [%@], Common = [%@], Similar = [%@], tooShort = [%@], pwned = [%@], lowEntropy = [%@]",
+            self.noPasswords, self.duplicatedPasswords, self.commonPasswords, self.similarPasswords, self.tooShort, self.pwned, self.lowEntropy];
 }
 
 @end

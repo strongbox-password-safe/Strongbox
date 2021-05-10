@@ -8,15 +8,20 @@
 
 #import "NodeIcon.h"
 #import "NSData+Extensions.h"
+#import "NSDate+Extensions.h"
 
 @implementation NodeIcon
 
 + (instancetype)withCustom:(NSData *)custom {
-    return [[NodeIcon alloc] initWithCustom:custom preferredKeePassSerializationUuid:nil];
+    return [self withCustom:custom name:nil modified:nil];
 }
 
-+ (instancetype)withCustom:(NSData *)custom preferredKeePassSerializationUuid:(NSUUID*_Nullable)preferredKeePassSerializationUuid {
-    return [[NodeIcon alloc] initWithCustom:custom preferredKeePassSerializationUuid:preferredKeePassSerializationUuid];
++ (instancetype)withCustom:(NSData *)custom name:(NSString*)name modified:(NSDate*)modified {
+    return [[NodeIcon alloc] initWithCustom:custom uuid:nil name:name modified:modified];
+}
+
++ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*_Nullable)uuid name:(NSString*)name modified:(NSDate*)modified {
+    return [[NodeIcon alloc] initWithCustom:custom uuid:uuid name:name modified:modified];
 }
 
 + (instancetype)withPreset:(NSInteger)preset {
@@ -31,11 +36,13 @@
     return self;
 }
 
-- (instancetype)initWithCustom:(NSData *)custom preferredKeePassSerializationUuid:(NSUUID*_Nullable)preferredKeePassSerializationUuid {
+- (instancetype)initWithCustom:(NSData *)custom uuid:(NSUUID*_Nullable)uuid name:(NSString*)name modified:(NSDate*)modified {
     self = [super init];
     if (self) {
         _custom = custom;
-        _preferredKeePassSerializationUuid = preferredKeePassSerializationUuid;
+        _uuid = uuid;
+        _name = name;
+        _modified = modified;
     }
     return self;
 }
@@ -63,12 +70,18 @@
     
     NodeIcon* other = (NodeIcon*)object;
 
-    if (self.isCustom != other.isCustom) {
+    if ( self.isCustom != other.isCustom ) {
         return NO;
     }
     
-    if (self.isCustom) {
-        return [self.custom.sha1.hexString isEqualToString:other.custom.sha1.hexString];
+    if ( self.isCustom ) {
+        BOOL namesEqual =  !((self.name == nil && other.name != nil) || (self.name != nil && ![self.name isEqualToString:other.name] ));
+        
+        BOOL modsEqual =  !((self.modified == nil && other.modified != nil) || (self.modified != nil && ![self.modified isEqualToDateWithinEpsilon:other.modified] ));
+        
+        BOOL dataEqual = [self.custom.sha1.hexString isEqualToString:other.custom.sha1.hexString];
+        
+        return namesEqual && modsEqual && dataEqual;
     }
     else {
         return self.preset == other.preset;
@@ -77,15 +90,14 @@
     
 - (NSUInteger)hash {
     if (self.isCustom) {
-        return self.custom.sha1.hash;
+        return [NSString stringWithFormat:@"%lu-%@-%f", (unsigned long)self.custom.sha1.hash, self.name, self.modified.timeIntervalSince1970].hash;
     }
     else {
         return self.preset;
     }
 }
 
-- (NSString *)description
-{
+- (NSString *)description {
     return [NSString stringWithFormat:self.isCustom ? @"Custom" : @"Preset: %ld", (long)self.preset];
 }
 

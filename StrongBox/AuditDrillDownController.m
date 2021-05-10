@@ -229,7 +229,9 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
             [self performSegueWithIdentifier:@"segueToDatabaseAuditPreferences" sender:nil];
         }
         else if (indexPath.row == 2) {
-            self.onDone(YES);
+            [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                self.onDone(YES);
+            }];
         }
     }
     else if (indexPath.section == kSectionActionsIdx) {
@@ -393,7 +395,10 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     else if (flag.intValue == kAuditFlagSimilarPassword) {
         return NSLocalizedString(@"audit_quick_summary_password_is_similar_to_another", @"Password is similar to one in another entry.");
     }
-    
+    else if (flag.intValue == kAuditFlagLowEntropy) {
+        return NSLocalizedString(@"audit_quick_summary_password_low_entropy", @"Password is weak (low entropy)");
+    }
+
     return NSLocalizedString(@"generic_unknown", @"Unknown");
 }
 

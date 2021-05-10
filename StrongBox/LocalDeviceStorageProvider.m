@@ -217,6 +217,10 @@ suggestedFilename:(NSString *)suggestedFilename
     }
 }
 
+- (void)getModDate:(nonnull METADATA_PTR)safeMetaData completion:(nonnull StorageProviderGetModDateCompletionBlock)completion {
+    
+}
+
 
 
 - (LocalDatabaseIdentifier*)getIdentifierFromMetadata:(SafeMetaData*)metaData {

@@ -16,6 +16,7 @@
 #import "UrlRequestOperation.h"
 #import "SecretStore.h"
 #import "Utils.h"
+#import "PasswordStrengthTester.h"
 
 static const int kHttpStatusOk = 200;
 static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwnedSetCacheKey";
@@ -35,6 +36,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
 
 @property NSSet<NSUUID*>* commonPasswords;
+@property NSSet<NSUUID*>* lowEntropy;
 @property NSDictionary<NSString*, NSSet<NSUUID*>*>* duplicatedPasswords;
 @property NSSet<NSUUID*>* noPasswords;
 @property NSDictionary<NSUUID*, NSSet<NSUUID*>*>* similar;
@@ -58,21 +60,24 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
 
 @property DatabaseModel* database;
 
+@property PasswordStrengthConfig* strengthConfig;
+
 @end
 
 @implementation DatabaseAuditor
 
-- (instancetype)initWithPro:(BOOL)pro {
-    return [self initWithPro:pro isExcluded:nil saveConfig:nil];
+- (instancetype)initWithPro:(BOOL)pro { 
+    return [self initWithPro:pro strengthConfig:nil isExcluded:nil saveConfig:nil];
 }
 
-- (instancetype)initWithPro:(BOOL)pro isExcluded:(IsExcludedBlock)isExcluded saveConfig:(SaveConfigurationBlock)saveConfig {
+- (instancetype)initWithPro:(BOOL)pro strengthConfig:(PasswordStrengthConfig *)strengthConfig isExcluded:(IsExcludedBlock)isExcluded saveConfig:(SaveConfigurationBlock)saveConfig {
     self = [super init];
     
     if (self) {
         self.state = kAuditStateInitial;
     
         self.commonPasswords = NSSet.set;
+        self.lowEntropy = NSSet.set;
         self.duplicatedPasswords = @{};
         self.noPasswords = NSSet.set;
         self.tooShort = NSSet.set;
@@ -90,6 +95,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
             return NO;
         };
         self.saveConfig = saveConfig;
+        self.strengthConfig = strengthConfig;
     }
     
     return self;
@@ -100,7 +106,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
  nodesChanged:(AuditNodesChangedBlock)nodesChanged
      progress:(AuditProgressBlock)progress
    completion:(AuditCompletionBlock)completion {
-    if (self.state != kAuditStateInitial) {
+    if ( self.state != kAuditStateInitial ) {
         NSLog(@"Audit cannot be started as it has already been run or is running");
         return NO;
     }
@@ -152,7 +158,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
                                                                          commonPasswords:self.commonPasswords
                                                                                  similar:self.similar
                                                                                 tooShort:self.tooShort
-                                                                                   pwned:self.mutablePwnedNodes.snapshot];
+                                                                                   pwned:self.mutablePwnedNodes.snapshot
+                                                                              lowEntropy:self.lowEntropy];
     
     return report;
 }
@@ -187,6 +194,10 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         if ([flags containsObject:@(kAuditFlagTooShort)]) {
             return NSLocalizedString(@"audit_quick_summary_very_brief_password_is_too_short", @"Short");
         }
+        
+        if ([flags containsObject:@(kAuditFlagLowEntropy)]) {
+            return NSLocalizedString(@"audit_quick_summary_very_brief_low_entropy", @"Weak/Entropy");
+        }
     }
     
     return @"";
@@ -213,11 +224,15 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         }
         
         if ([flags containsObject:@(kAuditFlagSimilarPassword)]) {
-            return NSLocalizedString(@"audit_quick_summary_password_is_similar_to_another", @"Audit: Password is similar to one in another entry.=");
+            return NSLocalizedString(@"audit_quick_summary_password_is_similar_to_another", @"Audit: Password is similar to one in another entry.");
         }
         
         if ([flags containsObject:@(kAuditFlagTooShort)]) {
             return NSLocalizedString(@"audit_quick_summary_password_is_too_short", @"Audit: Password is too short.");
+        }
+        
+        if ([flags containsObject:@(kAuditFlagLowEntropy)]) {
+            return NSLocalizedString(@"audit_quick_summary_password_low_entropy", @"Password is weak (low entropy)");
         }
     }
     
@@ -251,6 +266,10 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
         [ret addObject:@(kAuditFlagPwned)];
     }
     
+    if ( [self.lowEntropy containsObject:node] ) {
+        [ret addObject:@(kAuditFlagLowEntropy)];
+    }
+    
     return ret;
 }
 
@@ -262,6 +281,7 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     [set addObjectsFromArray:self.similarPasswordsNodeSet.allObjects];
     [set addObjectsFromArray:self.tooShort.allObjects];
     [set addObjectsFromArray:self.mutablePwnedNodes.arraySnapshot];
+    [set addObjectsFromArray:self.lowEntropy.allObjects];
     
     return set.count;
 }
@@ -272,7 +292,8 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
             self.duplicatedPasswordsNodeSet.count +
             self.similarPasswordsNodeSet.count +
             self.tooShort.count +
-            self.mutablePwnedNodes.count;
+            self.mutablePwnedNodes.count +
+            self.lowEntropy.count;
 }
 
 - (NSUInteger)haveIBeenPwnedErrorCount {
@@ -367,6 +388,10 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     
 
     self.commonPasswords = [self checkForCommonPasswords];
+
+    
+
+    self.lowEntropy = [self checkForLowEntropy];
 
     
     
@@ -477,6 +502,28 @@ static NSString* const kSecretStoreHibpPwnedSetCacheKey = @"SecretStoreHibpPwned
     }];
     
     return [common map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
+        return obj.uuid;
+    }].set;
+}
+
+- (NSSet<NSUUID*>*)checkForLowEntropy {
+    if ( !self.config.checkForLowEntropy ) {
+         return NSSet.set;
+    }
+
+    NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
+        
+    NSArray<Node*>* lowEntropy = [self.auditableNonEmptyPasswordNodes filter:^BOOL(Node * _Nonnull obj) {
+        PasswordStrength* strength = [PasswordStrengthTester getStrength:obj.fields.password config:self.strengthConfig];
+        BOOL low = strength.entropy < ((double)self.config.lowEntropyThreshold);
+        return low;
+    }];
+    
+    NSLog(@"====================================== PERF ======================================");
+    NSLog(@"LOW ENTROPY CHECK took [%f] seconds for %lu items", NSDate.timeIntervalSinceReferenceDate - startTime, (unsigned long)self.auditableNonEmptyPasswordNodes.count);
+    NSLog(@"====================================== PERF ======================================");
+
+    return [lowEntropy map:^id _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
         return obj.uuid;
     }].set;
 }

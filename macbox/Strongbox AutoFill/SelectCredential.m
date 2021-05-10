@@ -26,41 +26,46 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
 @property NSArray<Node*>* items;
 @property NSArray<Node*>* searchResults;
 
+@property BOOL viewWillAppearFirstTimeDone;
 @property BOOL doneFirstAppearanceTasks;
 
 @end
 
 @implementation SelectCredential
 
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (void)viewWillAppear {
+    [super viewWillAppear];
     
-    NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
-    [self.searchField setPlaceholderString:loc];
-    self.searchField.enabled = YES;
-    self.searchField.delegate = self;
-    self.tableView.dataSource = self;
-    self.tableView.delegate = self;
-    self.tableView.doubleAction = @selector(onSelect:);
+    if ( !self.viewWillAppearFirstTimeDone ) {
+        self.viewWillAppearFirstTimeDone = YES;
+        
+        NSString* loc = NSLocalizedString(@"mac_search_placeholder", @"Search (⌘F)");
+        [self.searchField setPlaceholderString:loc];
+        self.searchField.enabled = YES;
+        self.searchField.delegate = self;
+        self.tableView.dataSource = self;
+        self.tableView.delegate = self;
+        self.tableView.doubleAction = @selector(onSelect:);
 
-    [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kAutoFillCredentialCell bundle:nil]
-                  forIdentifier:kAutoFillCredentialCell];
+        [self.tableView registerNib:[[NSNib alloc] initWithNibNamed:kAutoFillCredentialCell bundle:nil]
+                      forIdentifier:kAutoFillCredentialCell];
 
-    [self bindSelectButton];
-    
-    [self loadItems];
-    
-    NSString *text = self.items.count ?
-        NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Entries") :
-        NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
-    
-    self.tableView.emptyString = text;
+        [self bindSelectButton];
+        
+        [self loadItems];
+        
+        NSString *text = self.items.count ?
+            NSLocalizedString(@"pick_creds_vc_empty_search_dataset_title", @"No Matching Entries") :
+            NSLocalizedString(@"pick_creds_vc_empty_dataset_title", @"Empty Database");
+        
+        self.tableView.emptyString = text;
+    }
 }
 
 - (void)viewDidAppear {
     [super viewDidAppear];
 
-    if (!self.doneFirstAppearanceTasks) {
+    if ( !self.doneFirstAppearanceTasks ) { 
         self.doneFirstAppearanceTasks = YES;
         self.view.window.frameAutosaveName = @"SelectCredential-AutoSave";
 

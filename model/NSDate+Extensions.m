@@ -98,7 +98,7 @@
 - (NSString *)friendlyDateTimeStringPrecise {
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
     
-    df.timeStyle = kCFDateFormatterMediumStyle;
+    df.timeStyle = NSDateFormatterMediumStyle;
     df.dateStyle = NSDateFormatterShortStyle;
     df.doesRelativeDateFormatting = YES;
     df.locale = NSLocale.currentLocale;
@@ -131,6 +131,16 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZZ"];
 
     return [dateFormatter stringFromDate:self];
+}
+
++ (instancetype)fromYYYY_MM_DDString:(NSString *)string {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    [dateFormatter setLocale:enUSPOSIXLocale];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+
+    return [dateFormatter dateFromString:string];
+
 }
 
 @end
