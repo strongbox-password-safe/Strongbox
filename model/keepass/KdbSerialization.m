@@ -18,6 +18,7 @@
 #import <CommonCrypto/CommonDigest.h>
 #import "NSString+Extensions.h"
 #import "NSData+Extensions.h"
+#import "StrongboxErrorCodes.h"
 
 typedef struct _KdbHeader {
     uint8_t signature1[4];
@@ -191,7 +192,7 @@ static NSData *getComposite(NSString * _Nonnull password, NSData * _Nullable key
     if(![pt.sha256 isEqualToData:contentsSha256]) {
         NSLog(@"Actual Database Contents Hash does not match expected. This file is corrupt or the password is incorect.");
         if(error) {
-            *error = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key) or Corrupt File." errorCode:kStrongboxErrorCodeIncorrectCredentials];
+            *error = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key) or Corrupt File." errorCode:StrongboxErrorCodes.incorrectCredentials];
         }
         return nil;
     }

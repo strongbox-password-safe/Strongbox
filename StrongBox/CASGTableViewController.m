@@ -20,6 +20,7 @@
 #import "VirtualYubiKeys.h"
 #import "FontManager.h"
 #import "PasswordStrengthTester.h"
+#import "PasswordStrengthUIHelper.h"
 
 @interface CASGTableViewController () <UITextFieldDelegate>
 
@@ -700,23 +701,11 @@
 }
 
 - (void)bindStrength {
-    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.textFieldPassword.text
-                                                              config:AppPreferences.sharedInstance.passwordStrengthConfig];
-    
-    if ( self.textFieldPassword.text.length == 0 ) {
-        self.labelStrength.text = @" "; 
-    }
-    else {
-        self.labelStrength.text = strength.summaryString;
-    }
-    
-    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-        
-    double red = 1.0 - relativeStrength;
-    double green = relativeStrength;
-
-    self.progressStrength.progress = relativeStrength;
-    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
+    [PasswordStrengthUIHelper bindStrengthUI:self.textFieldPassword.text
+                                      config:AppPreferences.sharedInstance.passwordStrengthConfig
+                          emptyPwHideSummary:YES
+                                       label:self.labelStrength
+                                    progress:self.progressStrength];
 }
 
 @end

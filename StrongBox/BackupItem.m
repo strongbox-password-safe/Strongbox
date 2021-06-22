@@ -29,7 +29,7 @@
     
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"%@-%@", self.backupCreatedDate.friendlyDateString, friendlyFileSizeString(self.fileSize.unsignedIntValue)];
+    return [NSString stringWithFormat:@"%@-%@", self.backupCreatedDate.friendlyDateTimeString, friendlyFileSizeString(self.fileSize.unsignedIntValue)];
 }
 
 @end

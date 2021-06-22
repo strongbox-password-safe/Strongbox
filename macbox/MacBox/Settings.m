@@ -21,9 +21,14 @@ NSString* const kExpiresColumn = @"ExpiresColumn";
 NSString* const kAttachmentsColumn = @"AttachmentsColumn";
 NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
 
+
+
+NSString *const kPreferenceGlobalShowShortcut = @"GlobalShowStrongboxHotKey-New";
+
+
 static const NSInteger kDefaultClearClipboardTimeout = 60;
 
-static NSString* const kRevealDetailsImmediately = @"revealDetailsImmediately";
+static NSString* const kShowQuickView = @"revealDetailsImmediately";
 static NSString* const kFullVersion = @"fullVersion";
 static NSString* const kEndFreeTrialDate = @"endFreeTrialDate";
 static NSString* const kAutoLockTimeout = @"autoLockTimeout";
@@ -45,20 +50,13 @@ static NSString* const kDoNotShowAutoCompleteSuggestions = @"doNotShowAutoComple
 static NSString* const kDoNotShowChangeNotifications = @"doNotShowChangeNotifications";
 static NSString* const kOutlineViewTitleIsReadonly = @"outlineViewTitleIsReadonly";
 static NSString* const kOutlineViewEditableFieldsAreReadonly = @"outlineViewEditableFieldsAreReadonly";
-
-
-
-static NSString* const kAutoReloadAfterForeignChanges = @"autoReloadAfterForeignChanges";
-static NSString* const kDetectForeignChanges = @"detectForeignChanges";
 static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
 static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
-static NSString* const kAutoOpenFirstDatabaseOnEmptyLaunch = @"autoOpenFirstDatabaseOnEmptyLaunch";
 static NSString* const kAutoPromptForTouchIdOnActivate = @"autoPromptForTouchIdOnActivate";
 static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
 static NSString* const kExpressDownloadFavIconOnNewOrUrlChanged = @"expressDownloadFavIconOnNewOrUrlChanged";
-static NSString* const kAllowWatchUnlock = @"allowWatchUnlock";
 static NSString* const kShowAttachmentsOnQuickViewPanel = @"showAttachmentsOnQuickViewPanel";
 static NSString* const kShowAttachmentImagePreviewsOnQuickViewPanel = @"showAttachmentImagePreviewsOnQuickViewPanel";
 static NSString* const kShowPasswordImmediatelyInOutline = @"showPasswordImmediatelyInOutline";
@@ -72,12 +70,12 @@ static NSString* const kMigratedToNewSettings = @"migratedToNewSettings";
 static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kStartWithSearch = @"startWithSearch";
 static NSString* const kShowDatabasesManagerOnCloseAllWindows = @"showDatabasesManagerOnCloseAllWindows";
-static NSString* const khasMigratedQuickLaunch = @"hasMigratedQuickLaunch";
 static NSString* const kShowAutoFillTotpCopiedMessage = @"showAutoFillTotpCopiedMessage";
 static NSString* const kAutoLaunchSingleDatabase = @"autoLaunchSingleDatabase";
 static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock";
 static NSString* const kUseLegacyFileProvider = @"useLegacyFileProvider-Release";
 static NSString* const kHasMigratedToSyncManager = @"hasMigratedToSyncManager";
+static NSString* const kHideDockIconOnAllMinimized = @"hideDockIconOnAllMinimized";
 
 
 
@@ -171,6 +169,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 
 
+- (BOOL)hideDockIconOnAllMinimized {
+    return [self getBool:kHideDockIconOnAllMinimized];
+}
+
+- (void)setHideDockIconOnAllMinimized:(BOOL)hideDockIconOnAllMinimized {
+    return [self setBool:kHideDockIconOnAllMinimized value:hideDockIconOnAllMinimized];
+}
+
 - (BOOL)hasMigratedToSyncManager {
     return [self getBool:kHasMigratedToSyncManager];
 }
@@ -187,11 +193,11 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kUseLegacyFileProvider value:useLegacyFileProvider];
 }
 
-- (BOOL)lockDatabasesOnScreenLock {
+- (BOOL)lockOnScreenLock {
     return [self getBool:kLockDatabasesOnScreenLock fallback:YES];
 }
 
-- (void)setLockDatabasesOnScreenLock:(BOOL)lockDatabasesOnScreenLock {
+- (void)setLockOnScreenLock:(BOOL)lockDatabasesOnScreenLock {
     [self setBool:kLockDatabasesOnScreenLock value:lockDatabasesOnScreenLock];
 }
 
@@ -209,14 +215,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setShowAutoFillTotpCopiedMessage:(BOOL)showAutoFillTotpCopiedMessage {
     [self setBool:kShowAutoFillTotpCopiedMessage value:showAutoFillTotpCopiedMessage];
-}
-
-- (BOOL)hasMigratedQuickLaunch {
-    return [self getBool:khasMigratedQuickLaunch];
-}
-
-- (void)setHasMigratedQuickLaunch:(BOOL)hasMigratedQuickLaunch {
-    [self setBool:khasMigratedQuickLaunch value:hasMigratedQuickLaunch];
 }
 
 - (BOOL)showDatabasesManagerOnCloseAllWindows {
@@ -299,14 +297,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kShowPasswordImmediatelyInOutline value:showPasswordImmediatelyInOutline];
 }
 
-- (BOOL)allowWatchUnlock {
-    return [self getBool:kAllowWatchUnlock fallback:YES];
-}
-
-- (void)setAllowWatchUnlock:(BOOL)allowWatchUnlock {
-    [self setBool:kAllowWatchUnlock value:allowWatchUnlock];
-}
-
 - (BOOL)expressDownloadFavIconOnNewOrUrlChanged {
     return [self getBool:kExpressDownloadFavIconOnNewOrUrlChanged fallback:YES];
 }
@@ -345,14 +335,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     return [self getBool:kAutoPromptForTouchIdOnActivate fallback:YES];
 }
 
-- (BOOL)autoOpenFirstDatabaseOnEmptyLaunch {
-    return [self getBool:kAutoOpenFirstDatabaseOnEmptyLaunch];
-}
-
-- (void)setAutoOpenFirstDatabaseOnEmptyLaunch:(BOOL)autoOpenFirstDatabaseOnEmptyLaunch {
-    [self setBool:kAutoOpenFirstDatabaseOnEmptyLaunch value:autoOpenFirstDatabaseOnEmptyLaunch];
-}
-
 - (PasswordGenerationConfig *)passwordGenerationConfig {
     NSData *encodedObject = [self.userDefaults objectForKey:kPasswordGenerationConfig];
     
@@ -371,7 +353,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self.userDefaults synchronize];
 }
 
-+ (NSArray<NSString*> *)kDefaultVisibleColumns
++ (NSArray<NSString*> *)kDefaultVisibleColumns 
 {
     static NSArray *_arr;
     static dispatch_once_t onceToken;
@@ -395,12 +377,12 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     return _arr;
 }
 
-- (BOOL)revealDetailsImmediately {
-    return [self getBool:kRevealDetailsImmediately fallback:YES];
+- (BOOL)showQuickView {
+    return [self getBool:kShowQuickView fallback:YES];
 }
 
-- (void)setRevealDetailsImmediately:(BOOL)value {
-    [self setBool:kRevealDetailsImmediately value:value];
+- (void)setShowQuickView:(BOOL)value {
+    [self setBool:kShowQuickView value:value];
 }
 
 - (BOOL)warnedAboutTouchId {
@@ -643,8 +625,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (NSArray<NSString *> *)visibleColumns {
-    
-    
     NSArray<NSString*>* ret = [self.userDefaults objectForKey:kVisibleColumns];
     
     return ret ? ret : [Settings kDefaultVisibleColumns];
@@ -677,45 +657,14 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (BOOL)dereferenceInQuickView {
     return YES;
-
 }
-
-
-
-
 
 - (BOOL)dereferenceInOutlineView {
     return YES;
-
 }
-
-
-
-
 
 - (BOOL)dereferenceDuringSearch {
     return YES;
-
-}
-
-
-
-
-
-- (BOOL)autoReloadAfterForeignChanges {
-    return [self getBool:kAutoReloadAfterForeignChanges fallback:YES];
-}
-
-- (void)setAutoReloadAfterForeignChanges:(BOOL)autoReloadAfterForeignChanges {
-    [self setBool:kAutoReloadAfterForeignChanges value:autoReloadAfterForeignChanges];
-}
-
-- (BOOL)detectForeignChanges {
-    return [self getBool:kDetectForeignChanges fallback:YES];
-}
-
--(void)setDetectForeignChanges:(BOOL)detectForeignChanges {
-    [self setBool:kDetectForeignChanges value:detectForeignChanges];
 }
 
 - (BOOL)concealEmptyProtectedFields {

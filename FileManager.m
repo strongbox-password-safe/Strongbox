@@ -366,4 +366,30 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     }
 }
 
+- (NSArray<NSURL *> *)importedKeyFiles {
+    NSMutableArray* files = [NSMutableArray array];
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSURL *directoryURL =  self.keyFilesDirectory;
+    
+    NSDirectoryEnumerator *enumerator = [fm
+                                         enumeratorAtURL:directoryURL
+                                         includingPropertiesForKeys:@[NSURLIsDirectoryKey]
+                                         options:0
+                                         errorHandler:nil];
+    
+    for (NSURL *url in enumerator) {
+        NSError *error;
+        NSNumber *isDirectory = nil;
+        if (![url getResourceValue:&isDirectory forKey:NSURLIsDirectoryKey error:&error]) {
+            
+            NSLog(@"%@", error);
+        }
+        else if (![isDirectory boolValue]) {
+            [files addObject:url];
+        }
+    }
+    
+    return [files copy];
+}
+
 @end

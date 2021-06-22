@@ -25,6 +25,10 @@
 
 @implementation OnboardingAutoFillViewController
 
+- (DatabaseMetadata*)database {
+    return [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     
@@ -68,16 +72,14 @@
     BOOL oldQuickType = self.database.quickTypeEnabled;
     BOOL oldEnabled = self.database.autoFillEnabled;
 
-    self.database.autoFillEnabled = self.enableAutoFill.state == NSControlStateValueOn;
-    self.database.quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
-    self.database.quickWormholeFillEnabled = self.wormholeEnabled.state == NSControlStateValueOn;
-
-    [DatabasesManager.sharedInstance update:self.database];
+    BOOL autoFillEnabled = self.enableAutoFill.state == NSControlStateValueOn;
+    BOOL quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
+    BOOL quickWormholeFillEnabled = self.wormholeEnabled.state == NSControlStateValueOn;
 
     
     
     BOOL quickTypeWasTurnOff = (oldQuickType == YES && oldEnabled == YES) &&
-        (self.database.quickTypeEnabled == NO || self.database.autoFillEnabled == NO);
+        (quickTypeEnabled == NO || autoFillEnabled == NO);
     
     if ( quickTypeWasTurnOff ) { 
         NSLog(@"AutoFill QuickType was turned off - Clearing Database....");
@@ -85,7 +87,7 @@
     }
 
     BOOL quickTypeWasTurnedOn = (oldQuickType == NO || oldEnabled == NO) &&
-        (self.database.quickTypeEnabled == YES && self.database.autoFillEnabled == YES);
+        (quickTypeEnabled == YES && autoFillEnabled == YES);
 
     if ( quickTypeWasTurnedOn ) {
         NSLog(@"AutoFill QuickType was turned on - Populating Database....");
@@ -93,14 +95,22 @@
                                                            databaseUuid:self.database.uuid
                                                           displayFormat:self.database.quickTypeDisplayFormat];
     }
+
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.autoFillEnabled = autoFillEnabled;
+        metadata.quickTypeEnabled = quickTypeEnabled;
+        metadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
+    }];
     
     [self bindUI];
 }
 
 - (IBAction)onDone:(id)sender {
-    self.database.hasPromptedForAutoFillEnrol = YES;
-    [DatabasesManager.sharedInstance update:self.database];
-    
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.hasPromptedForAutoFillEnrol = YES;
+    }];
+
     [self.view.window close];
 }
 

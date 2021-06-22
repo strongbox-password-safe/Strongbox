@@ -12,6 +12,7 @@
 #import "FileManager.h"
 #import "NSArray+Extensions.h"
 #import "WorkingCopyManager.h"
+#import "ConcurrentMutableSet.h"
 
 @interface SafesList()
 
@@ -19,6 +20,7 @@
 @property (strong, nonatomic) dispatch_queue_t dataQueue;
 
 @property (readonly) BOOL changedDatabaseSettingsFlag;
+@property ConcurrentMutableSet* editingSet; 
 
 @end
 
@@ -41,8 +43,9 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 
 - (instancetype)init {
     if (self = [super init]) {
-        _dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
-        _databasesList = [self deserialize];
+        self.dataQueue = dispatch_queue_create("SafesList", DISPATCH_QUEUE_CONCURRENT);
+        self.editingSet = ConcurrentMutableSet.mutableSet;
+        self.databasesList = [self deserialize];
     }
     
     return self;
@@ -197,6 +200,26 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     });
 }
 
+- (void)atomicUpdate:(NSString *)uuid touch:(void (^)(SafeMetaData * _Nonnull))touch {
+    dispatch_barrier_async(self.dataQueue, ^{
+        NSUInteger index = [self.databasesList indexOfObjectPassingTest:^BOOL(SafeMetaData * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return [obj.uuid isEqualToString:uuid];
+        }];
+        
+        if(index != NSNotFound) {
+            SafeMetaData* metadata = self.databasesList[index];
+
+            if ( touch ) {
+                touch ( metadata );
+                [self serialize:NO databaseIdChanged:uuid];
+            }
+        }
+        else {
+            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", uuid);
+        }
+    });
+}
+
 - (SafeMetaData *)getById:(NSString*)uuid {
     return [self.snapshot firstOrDefault:^BOOL(SafeMetaData * _Nonnull obj) {
         return [obj.uuid isEqualToString:uuid];
@@ -237,7 +260,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 - (void)_internalAdd:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
     if (initialCache) {
         NSError* error;
-        NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe error:&error];
+        NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData2:initialCache dateModified:initialCacheModDate database:safe.uuid error:&error];
 
         safe.lastSyncRemoteModDate = initialCacheModDate; 
         
@@ -319,7 +342,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     int attempt = 2;
     while(![self isUnique:suggestion] && attempt < 100) {
         suggestion = [NSString stringWithFormat:
-                      NSLocalizedString(@"casg_suggested_database_name_users_database_number_suffix_fmt", @"%@'s Database %d"), name, attempt++];
+                      NSLocalizedString(@"casg_suggested_database_name_users_database_number_suffix_fmt2", @"%@'s Database %@"), name, @(attempt++)];
     }
     
     return [self isUnique:suggestion] ? suggestion : nil;
@@ -364,6 +387,23 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     NSSet<NSString*> *nicknamesLowerCase = [self getAllNickNamesLowerCase];
     
     return ![nicknamesLowerCase containsObject:nickName.lowercaseString];
+}
+
+
+
+- (BOOL)isEditing:(SafeMetaData *)database {
+    return [self.editingSet containsObject:database.uuid];
+}
+
+- (void)setEditing:(SafeMetaData *)database editing:(BOOL)editing {
+    NSLog(@"setEditing: %@ => %hhd", database.nickName, editing);
+    
+    if ( editing ) {
+        [self.editingSet addObject:database.uuid];
+    }
+    else {
+        [self.editingSet removeObject:database.uuid];
+    }
 }
 
 @end

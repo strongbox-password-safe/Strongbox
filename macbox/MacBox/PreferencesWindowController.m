@@ -22,22 +22,12 @@
 #import "MacUrlSchemes.h"
 #import "PasswordStrengthTester.h"
 #import <CoreImage/CoreImage.h>
+#import "Shortcut.h"
 
 @interface PreferencesWindowController () <NSTableViewDelegate, NSTableViewDataSource, NSTextFieldDelegate, NSWindowDelegate>
 
-@property (weak) IBOutlet NSButton *checkboxShowTotpCodes;
-@property (weak) IBOutlet NSButton *checkboxShowRecycleBinInBrowse;
-@property (weak) IBOutlet NSButton *checkboxShowRecycleBinInSearch;
-@property (weak) IBOutlet NSButton *checkboxAlternatingGrid;
-@property (weak) IBOutlet NSButton *checkboxHorizontalGridLines;
-@property (weak) IBOutlet NSButton *checkboxVerticalGridLines;
-@property (weak) IBOutlet NSButton *checkboxShowAutoCompleteSuggestions;
-
-
-@property (weak) IBOutlet NSButton *checkboxTitleIsEditable;
-@property (weak) IBOutlet NSButton *checkboxOtherFieldsAreEditable;
 @property (weak) IBOutlet NSButton *checkboxShowDatabasesManagerOnCloseAllWindows;
-@property (weak) IBOutlet NSButton *checkboxConcealEmptyProtected;
+
 @property (weak) IBOutlet NSButton *showCustomFieldsInQuickView;
 @property (weak) IBOutlet NSTableView *tableViewWordLists;
 @property (weak) IBOutlet NSButton *showAttachmentsInQuickView;
@@ -69,8 +59,6 @@
 @property (weak) IBOutlet NSTextField *labelWordcount;
 
 @property (weak) IBOutlet NSButton *checkboxShowPasswordImmediatelyInOutline;
-@property (weak) IBOutlet NSButton *checkboxAlwaysShowPassword;
-@property (weak) IBOutlet NSButton *checkboxKeePassNoSort;
 
 @property (weak) IBOutlet NSSegmentedControl *segmentTitle;
 @property (weak) IBOutlet NSTextField *labelCustomTitle;
@@ -87,20 +75,14 @@
 
 @property NSArray<NSString*> *sortedWordListKeys;
 
-@property (weak) IBOutlet NSButton *checkboxShowPopupNotifications;
 @property (weak) IBOutlet NSButton *checkboxAutoSave;
-@property (weak) IBOutlet NSButton *checkboxAutoDownloadFavIcon;
-
 @property (weak) IBOutlet NSButton *switchAutoClearClipboard;
 @property (weak) IBOutlet NSTextField *textFieldClearClipboard;
 @property (weak) IBOutlet NSStepper *stepperClearClipboard;
-
 @property (weak) IBOutlet NSButton *switchAutoLockAfter;
 @property (weak) IBOutlet NSTextField *textFieldLockDatabase;
 @property (weak) IBOutlet NSStepper *stepperLockDatabase;
-
 @property (weak) IBOutlet NSButton *switchShowInMenuBar;
-
 @property (weak) IBOutlet NSButton *useDuckDuckGo;
 @property (weak) IBOutlet NSButton *checkDomainOnly;
 @property (weak) IBOutlet NSButton *useGoogle;
@@ -109,16 +91,15 @@
 @property (weak) IBOutlet NSButton *scanCommonFiles;
 @property (weak) IBOutlet NSButton *checkboxHideKeyFileName;
 @property (weak) IBOutlet NSButton *checkboxDoNotRememberKeyFile;
-
 @property (weak) IBOutlet NSButton *colorizePasswords;
 @property (weak) IBOutlet NSButton *useColorBlindPalette;
 @property (weak) IBOutlet NSButton *checkboxClipboardHandoff;
-@property (weak) IBOutlet NSButton *checkboxStartInSearchMode;
 @property (weak) IBOutlet NSButton *buttonCopySamplePassword;
-@property (weak) IBOutlet NSButton *checkboxLockOnLockScreen;
-@property (weak) IBOutlet NSButton *checkboxUseSyncManager;
 @property (weak) IBOutlet NSProgressIndicator *progressStrength;
 @property (weak) IBOutlet NSTextField *labelStrength;
+
+@property (weak) IBOutlet MASShortcutView *shortcutView;
+@property (weak) IBOutlet NSButton *checkboxHideDockIconOnAllMiniaturized;
 
 @end
 
@@ -145,12 +126,12 @@
 
 - (void)showFavIconPreferences {
     [self show];
-    [self.tabView selectTabViewItemAtIndex:6];
+    [self.tabView selectTabViewItemAtIndex:3];
 }
 
 - (void)showPasswordSettings {
     [self show];
-    [self.tabView selectTabViewItemAtIndex:4];
+    [self.tabView selectTabViewItemAtIndex:1];
 }
 
 - (void)windowDidLoad {
@@ -163,6 +144,16 @@
     
     [self refreshSamplePassword];
 
+    self.shortcutView.associatedUserDefaultsKey = kPreferenceGlobalShowShortcut;
+
+    
+    
+    
+    NSTabViewItem* tabViewQuickView = [self.tabView tabViewItemAtIndex:4];
+    NSTabViewItem* tabViewOutlineView = [self.tabView tabViewItemAtIndex:5];
+    [self.tabView removeTabViewItem:tabViewQuickView];
+    [self.tabView removeTabViewItem:tabViewOutlineView];
+    
     [self bindUi];
 }
 
@@ -211,34 +202,12 @@
 
     
     self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
-    self.checkboxAlwaysShowPassword.state = Settings.sharedInstance.alwaysShowPassword ? NSOnState : NSOffState;
     self.checkboxShowPasswordImmediatelyInOutline.state = Settings.sharedInstance.showPasswordImmediatelyInOutline ? NSOnState : NSOffState;
-    
-    self.checkboxKeePassNoSort.state = Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView ? NSOnState : NSOffState;
-    self.checkboxShowTotpCodes.state = Settings.sharedInstance.doNotShowTotp ? NSOffState : NSOnState;
-    self.checkboxShowRecycleBinInBrowse.state = Settings.sharedInstance.doNotShowRecycleBinInBrowse ? NSOffState : NSOnState;
-    self.checkboxShowRecycleBinInSearch.state = Settings.sharedInstance.showRecycleBinInSearchResults ? NSOnState : NSOffState;
-    self.checkboxAlternatingGrid.state = Settings.sharedInstance.noAlternatingRows ? NSOffState : NSOnState;
-    self.checkboxHorizontalGridLines.state = Settings.sharedInstance.showHorizontalGrid ? NSOnState : NSOffState;
-    self.checkboxVerticalGridLines.state = Settings.sharedInstance.showVerticalGrid ? NSOnState : NSOffState;
-    self.checkboxShowAutoCompleteSuggestions.state = Settings.sharedInstance.doNotShowAutoCompleteSuggestions ? NSOffState : NSOnState;
-    self.checkboxShowPopupNotifications.state = Settings.sharedInstance.doNotShowChangeNotifications ? NSOffState : NSOnState;
-    self.checkboxTitleIsEditable.state = Settings.sharedInstance.outlineViewTitleIsReadonly ? NSOffState : NSOnState;
-    self.checkboxOtherFieldsAreEditable.state = Settings.sharedInstance.outlineViewEditableFieldsAreReadonly ? NSOffState : NSOnState;
 
-    self.checkboxAutoDownloadFavIcon.state = Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged ? NSOnState : NSOffState;
-
-    self.checkboxConcealEmptyProtected.state = Settings.sharedInstance.concealEmptyProtectedFields ? NSOnState : NSOffState;
     self.showCustomFieldsInQuickView.state = Settings.sharedInstance.showCustomFieldsOnQuickViewPanel ? NSOnState : NSOffState;
     self.showAttachmentsInQuickView.state = Settings.sharedInstance.showAttachmentsOnQuickViewPanel ? NSOnState : NSOffState;
     self.showAttachmentImagePreviewsInQuickView.state = Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel ? NSOnState : NSOffState;
-    
-    self.switchShowInMenuBar.state = Settings.sharedInstance.showSystemTrayIcon ? NSOnState : NSOffState;
-    
-    if(!Settings.sharedInstance.fullVersion) {
-        self.checkboxAutoDownloadFavIcon.title = NSLocalizedString(@"mac_auto_download_favicon_pro_only", @"Automatically download FavIcon on URL Change (PRO Only)");
-    }
-    
+
     self.checkboxHideKeyFileName.state = Settings.sharedInstance.hideKeyFileNameOnLockScreen ? NSOnState : NSOffState;
     self.checkboxDoNotRememberKeyFile.state = Settings.sharedInstance.doNotRememberKeyFile ? NSOnState : NSOffState;
     
@@ -246,42 +215,24 @@
     self.useColorBlindPalette.state = Settings.sharedInstance.colorizeUseColorBlindPalette ? NSOnState : NSOffState;
     self.checkboxClipboardHandoff.state = Settings.sharedInstance.clipboardHandoff ? NSOnState : NSOffState;
 
-    self.checkboxStartInSearchMode.state = Settings.sharedInstance.startWithSearch ? NSOnState : NSOffState;
 
-    self.checkboxShowDatabasesManagerOnCloseAllWindows.state = Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows ? NSOnState : NSOffState;
-    self.checkboxLockOnLockScreen.state = Settings.sharedInstance.lockDatabasesOnScreenLock ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkboxShowDatabasesManagerOnCloseAllWindows.state = Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows ? NSOnState : NSOffState;    
     
-    
-    
-    self.checkboxUseSyncManager.state = !Settings.sharedInstance.useLegacyFileProvider ? NSControlStateValueOn : NSControlStateValueOff;
+        
+    self.switchShowInMenuBar.state = Settings.sharedInstance.showSystemTrayIcon ? NSOnState : NSOffState;
+    self.checkboxHideDockIconOnAllMiniaturized.enabled = Settings.sharedInstance.showSystemTrayIcon;
+    self.checkboxHideDockIconOnAllMiniaturized.state = Settings.sharedInstance.hideDockIconOnAllMinimized ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
     Settings.sharedInstance.showPasswordImmediatelyInOutline = self.checkboxShowPasswordImmediatelyInOutline.state == NSOnState;
-    Settings.sharedInstance.alwaysShowPassword = self.checkboxAlwaysShowPassword.state == NSOnState;
     Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
-    Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView = self.checkboxKeePassNoSort.state == NSOnState;
-    Settings.sharedInstance.doNotShowTotp = self.checkboxShowTotpCodes.state == NSOffState;
-    Settings.sharedInstance.doNotShowRecycleBinInBrowse = self.checkboxShowRecycleBinInBrowse.state == NSOffState;
-    Settings.sharedInstance.showRecycleBinInSearchResults = self.checkboxShowRecycleBinInSearch.state == NSOnState;
-    Settings.sharedInstance.noAlternatingRows = self.checkboxAlternatingGrid.state == NSOffState;
-    Settings.sharedInstance.showHorizontalGrid = self.checkboxHorizontalGridLines.state == NSOnState;
-    Settings.sharedInstance.showVerticalGrid = self.checkboxVerticalGridLines.state == NSOnState;
-    Settings.sharedInstance.doNotShowAutoCompleteSuggestions = self.checkboxShowAutoCompleteSuggestions.state == NSOffState;
-    Settings.sharedInstance.doNotShowChangeNotifications = self.checkboxShowPopupNotifications.state == NSOffState;
-    Settings.sharedInstance.outlineViewTitleIsReadonly = self.checkboxTitleIsEditable.state == NSOffState;
-    Settings.sharedInstance.outlineViewEditableFieldsAreReadonly = self.checkboxOtherFieldsAreEditable.state == NSOffState;
 
-    Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged = self.checkboxAutoDownloadFavIcon.state == NSOnState;
-    
-    Settings.sharedInstance.concealEmptyProtectedFields = self.checkboxConcealEmptyProtected.state == NSOnState;
     Settings.sharedInstance.showCustomFieldsOnQuickViewPanel = self.showCustomFieldsInQuickView.state == NSOnState;
 
     Settings.sharedInstance.showAttachmentsOnQuickViewPanel = self.showAttachmentsInQuickView.state == NSOnState;
     Settings.sharedInstance.showAttachmentImagePreviewsOnQuickViewPanel = self.showAttachmentImagePreviewsInQuickView.state == NSOnState;
     
-    Settings.sharedInstance.showSystemTrayIcon = self.switchShowInMenuBar.state == NSOnState;
-        
     Settings.sharedInstance.hideKeyFileNameOnLockScreen = self.checkboxHideKeyFileName.state ==  NSOnState;
     Settings.sharedInstance.doNotRememberKeyFile = self.checkboxDoNotRememberKeyFile.state ==  NSOnState;
 
@@ -290,11 +241,10 @@
     
     Settings.sharedInstance.clipboardHandoff = self.checkboxClipboardHandoff.state == NSOnState;
 
-    Settings.sharedInstance.startWithSearch = self.checkboxStartInSearchMode.state == NSOnState;
-    
     Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows = self.checkboxShowDatabasesManagerOnCloseAllWindows.state == NSOnState;
     
-    Settings.sharedInstance.lockDatabasesOnScreenLock = self.checkboxLockOnLockScreen.state == NSControlStateValueOn;
+    Settings.sharedInstance.showSystemTrayIcon = self.switchShowInMenuBar.state == NSOnState;
+    Settings.sharedInstance.hideDockIconOnAllMinimized = self.checkboxHideDockIconOnAllMiniaturized.state == NSControlStateValueOn;
     
     [self bindGeneralUiToSettings];
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
@@ -367,26 +317,18 @@
     [self bindFavIconDownloading];
 }
 
-- (IBAction)onUseSyncManagerForLocal:(id)sender {
-    Settings.sharedInstance.useLegacyFileProvider = self.checkboxUseSyncManager.state == NSControlStateValueOff;
-    
-    [self migrateLocalDatabasesToFromSyncManager];
-    
-    [self bindGeneralUiToSettings];
-}
 
-- (void)migrateLocalDatabasesToFromSyncManager {
-    NSArray<DatabaseMetadata*>* databases = DatabasesManager.sharedInstance.snapshot;
-    for (DatabaseMetadata* database in databases) {
-        if (database.storageProvider == kMacFile ) {
-            NSURLComponents* components = [NSURLComponents componentsWithURL:database.fileUrl resolvingAgainstBaseURL:NO];
-            components.scheme = Settings.sharedInstance.useLegacyFileProvider ? kStrongboxFileUrlScheme : kStrongboxSyncManagedFileUrlScheme;
-            database.fileUrl = components.URL;
-            [DatabasesManager.sharedInstance update:database];
-            NSLog(@"Converted [%@] Database to [%@]", database.nickName, database.fileUrl);
-        }
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

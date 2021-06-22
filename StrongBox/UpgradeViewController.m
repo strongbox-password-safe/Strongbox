@@ -17,7 +17,7 @@
 #import "Utils.h"
 #import "NSDate+Extensions.h"
 
-@interface UpgradeViewController ()
+@interface UpgradeViewController () <UIAdaptivePresentationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIView *buttonViewMonthly;
 @property (weak, nonatomic) IBOutlet UIView *buttonViewYearly;
@@ -70,6 +70,8 @@
         });
     };
     
+    self.presentationController.delegate = self;
+
     [ProUpgradeIAPManager.sharedInstance initialize]; 
 }
 
@@ -236,7 +238,7 @@
         NSString * bonusText;
         if(monthlyProduct) {
             int percentSavings = calculatePercentageSavings([self getEffectivePrice:product], [self getEffectivePrice:monthlyProduct], 12);
-            bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_with_percentage_saving_fmt", @"%@ / month (Save %d%%)"), [self getPriceTextFromProduct:product divisor:12], percentSavings];
+            bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_with_percentage_saving_fmt2", @"%@ / month (Save %@%%)"), [self getPriceTextFromProduct:product divisor:12], @(percentSavings)];
         }
         else {
             bonusText = [NSString stringWithFormat:NSLocalizedString(@"upgrade_vc_price_per_month_fmt", @"%@ / month"), [self getPriceTextFromProduct:product divisor:12]];
@@ -280,9 +282,22 @@
     [self dismiss];
 }
 
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
+
+
+    if ( self.onDone ) {
+        self.onDone();
+    }
+}
+
 - (void)dismiss {
     [SVProgressHUD dismiss];
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+        if ( self.onDone ) {
+            self.onDone();
+        }
+    }];
 }
 
 - (NSString *)getPriceTextFromProduct:(SKProduct*)product {

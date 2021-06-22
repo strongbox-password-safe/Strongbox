@@ -42,9 +42,12 @@
 }
 
 - (IBAction)onSettingChanged:(id)sender {
-    self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate = self.checkboxAutomaticallyPrompt.state == NSControlStateValueOn;
+    BOOL foo = self.checkboxAutomaticallyPrompt.state == NSControlStateValueOn;
     
-    [DatabasesManager.sharedInstance update:self.databaseMetadata];
+    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.autoPromptForConvenienceUnlockOnActivate = foo;
+    }];
     
     [self bindUi];
 }
@@ -63,20 +66,22 @@
         self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Preferences > Security & Privacy)");
     }
         
-    self.checkboxUseTouchId.enabled = touchAvailable && featureAvailable;
-    self.checkboxUseTouchId.state = self.databaseMetadata.isTouchIdEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    self.checkBoxEnableWatch.enabled = watchAvailable && featureAvailable;
-    self.checkBoxEnableWatch.state = self.databaseMetadata.isWatchUnlockEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    DatabaseMetadata* meta = self.model.databaseMetadata;
     
-    BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
+    self.checkboxUseTouchId.enabled = touchAvailable && featureAvailable;
+    self.checkboxUseTouchId.state = (meta.isTouchIdEnabled && touchAvailable) ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkBoxEnableWatch.enabled = watchAvailable && featureAvailable;
+    self.checkBoxEnableWatch.state = (meta.isWatchUnlockEnabled && watchAvailable) ? NSControlStateValueOn : NSControlStateValueOff;
+    
+    BOOL convenienceEnabled = meta.isTouchIdEnabled || meta.isWatchUnlockEnabled;
     
     self.checkboxAutomaticallyPrompt.enabled = convenienceEnabled;
-    self.checkboxAutomaticallyPrompt.state = self.databaseMetadata.autoPromptForConvenienceUnlockOnActivate ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkboxAutomaticallyPrompt.state = meta.autoPromptForConvenienceUnlockOnActivate ? NSControlStateValueOn : NSControlStateValueOff;
 
     self.sliderExpiry.enabled = conveniencePossible && convenienceEnabled;
-    self.sliderExpiry.integerValue = [self getSliderValueFromHours:self.databaseMetadata.touchIdPasswordExpiryPeriodHours];
+    self.sliderExpiry.integerValue = [self getSliderValueFromHours:meta.touchIdPasswordExpiryPeriodHours];
     
-    self.labelExpiryPeriod.stringValue = [self getExpiryPeriodString:self.databaseMetadata.touchIdPasswordExpiryPeriodHours];
+    self.labelExpiryPeriod.stringValue = [self getExpiryPeriodString:meta.touchIdPasswordExpiryPeriodHours];
     self.labelExpiryPeriod.textColor = (conveniencePossible && convenienceEnabled) ? nil : NSColor.disabledControlTextColor;
     self.labelRequireReentry.textColor = (conveniencePossible && convenienceEnabled) ? nil : NSColor.disabledControlTextColor;
     
@@ -85,51 +90,57 @@
 }
 
 - (IBAction)onConvenienceUnlockMethodsChanged:(id)sender {
-    BOOL wasOff = !self.databaseMetadata.isTouchIdEnrolled;
+    DatabaseMetadata* meta = self.model.databaseMetadata;
+    
+    BOOL wasOff = !meta.isTouchIdEnrolled;
     
     BOOL touch = self.checkboxUseTouchId.state == NSControlStateValueOn;
     BOOL watch = self.checkBoxEnableWatch.state == NSControlStateValueOn;
     BOOL on = touch || watch;
-    
-    self.databaseMetadata.isTouchIdEnabled = touch;
-    self.databaseMetadata.isWatchUnlockEnabled = watch;
-    self.databaseMetadata.isTouchIdEnrolled = on;
-    
-    if ( on && wasOff )  {
-        self.databaseMetadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
-    }
-    
-    [DatabasesManager.sharedInstance update:self.databaseMetadata];
-    
-    [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.databaseModel.ckfs.password];
+        
+    NSString* password = self.model.compositeKeyFactors.password;
+    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.isTouchIdEnabled = touch;
+        metadata.isWatchUnlockEnabled = watch;
+        metadata.isTouchIdEnrolled = on;
+        
+        if ( on && wasOff )  {
+            metadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
+        }
+        
+        [metadata resetConveniencePasswordWithCurrentConfiguration:password];
+    }];
     
     [self bindUi];
 }
 
 - (NSString*)getSecureStorageSummary {
+    DatabaseMetadata* meta = self.model.databaseMetadata;
+    
     BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
     BOOL convenienceAvailable = watchAvailable || touchAvailable;
-    BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
-    BOOL passwordAvailable = self.databaseMetadata.conveniencePassword != nil;
+    BOOL convenienceEnabled = (meta.isTouchIdEnabled && touchAvailable) || (meta.isWatchUnlockEnabled && watchAvailable);
+    BOOL passwordAvailable = meta.conveniencePassword != nil;
     
     if( featureAvailable ) {
         if( convenienceAvailable ) {
             if( convenienceEnabled ) {
                 if( passwordAvailable ) {
-                    SecretExpiryMode mode = [self.databaseMetadata getConveniencePasswordExpiryMode];
+                    SecretExpiryMode mode = [meta getConveniencePasswordExpiryMode];
                     if (mode == kExpiresAtTime) {
-                        NSDate* date = [self.databaseMetadata getConveniencePasswordExpiryDate];
+                        NSDate* date = [meta getConveniencePasswordExpiryDate];
                         if(SecretStore.sharedInstance.secureEnclaveAvailable) {
                             NSString* loc = NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_expire_fmt", @"Convenience Password is securely stored, protected by your device's Secure Enclave and will expire: %@.");
                             
-                            return [NSString stringWithFormat:loc, date.friendlyDateString];
+                            return [NSString stringWithFormat:loc, date.friendlyDateTimeString];
                         }
                         else {
                             NSString* loc = NSLocalizedString(@"mac_convenience_summary_keychain_and_will_expire_fmt", @"Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device) and will expire: %@.");
                             
-                            return [NSString stringWithFormat:loc, date.friendlyDateString];
+                            return [NSString stringWithFormat:loc, date.friendlyDateTimeString];
                         }
                     }
                     else if (mode == kNeverExpires) {
@@ -196,9 +207,15 @@
 }
 
 - (void)throttledSliderChanged {
-    self.databaseMetadata.touchIdPasswordExpiryPeriodHours = [self getHoursFromSliderValue:self.sliderExpiry.integerValue];
-    [DatabasesManager.sharedInstance update:self.databaseMetadata];
-    [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:self.databaseModel.ckfs.password];
+    NSInteger foo = [self getHoursFromSliderValue:self.sliderExpiry.integerValue];
+    NSString* password = self.model.compositeKeyFactors.password;
+    
+    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.touchIdPasswordExpiryPeriodHours = foo;
+        [metadata resetConveniencePasswordWithCurrentConfiguration:password];
+    }];
+    
     [self bindUi];
 }
 

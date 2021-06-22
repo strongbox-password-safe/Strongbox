@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OnboardingAutoFillViewController : NSViewController
 
-@property DatabaseMetadata* database;
+@property NSString* databaseUuid;
 @property DatabaseModel* model;
 
 @end

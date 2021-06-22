@@ -15,17 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ExportOptionsTableViewController : StaticDataTableViewController
 
-@property BOOL backupMode;
-
-
-
-@property (nullable) Model *viewModel; 
-
-
-
-@property (nullable) NSData *encrypted; 
-@property (nullable) SafeMetaData* metadata;
-@property (nullable) BackupItem* backupItem;
+@property BOOL hidePlaintextOptions;
+@property (nullable) Model *viewModel;
+@property (nonatomic, copy) void (^onDone)(void);
 
 @end
 

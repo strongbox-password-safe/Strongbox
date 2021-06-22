@@ -176,7 +176,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     if (self.lastUpdateTime) {
         [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_time", @"Last Update Time")
-            andValue:self.lastUpdateTime.friendlyDateString];
+            andValue:self.lastUpdateTime.friendlyDateTimeString];
     }
     
     if (self.lastUpdateUser.length) {
@@ -261,16 +261,16 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
 
 - (void)appendKeePassCommonMetadataKvps:(MutableOrderedDictionary<NSString*, NSString*>*)kvps {
     if (Platform.isSimulator) {
-        [kvps addKey:@"settingsChanged" andValue:self.settingsChanged.friendlyDateString];
+        [kvps addKey:@"settingsChanged" andValue:self.settingsChanged.friendlyDateTimeString];
         [kvps addKey:@"databaseName" andValue:self.databaseName];
-        [kvps addKey:@"databaseNameChanged" andValue:self.databaseNameChanged.friendlyDateString];
+        [kvps addKey:@"databaseNameChanged" andValue:self.databaseNameChanged.friendlyDateTimeString];
         [kvps addKey:@"databaseDescription" andValue:self.databaseDescription];
-        [kvps addKey:@"databaseDescriptionChanged" andValue:self.databaseDescriptionChanged.friendlyDateString];
+        [kvps addKey:@"databaseDescriptionChanged" andValue:self.databaseDescriptionChanged.friendlyDateTimeString];
         [kvps addKey:@"defaultUserName" andValue:self.defaultUserName];
-        [kvps addKey:@"defaultUserNameChanged" andValue:self.defaultUserNameChanged.friendlyDateString];
+        [kvps addKey:@"defaultUserNameChanged" andValue:self.defaultUserNameChanged.friendlyDateTimeString];
         [kvps addKey:@"color" andValue:self.color];
         [kvps addKey:@"entryTemplatesGroup" andValue:keePassStringIdFromUuid(self.entryTemplatesGroup)];
-        [kvps addKey:@"entryTemplatesGroupChanged" andValue:self.entryTemplatesGroupChanged.friendlyDateString];
+        [kvps addKey:@"entryTemplatesGroupChanged" andValue:self.entryTemplatesGroupChanged.friendlyDateTimeString];
     }
 }
 

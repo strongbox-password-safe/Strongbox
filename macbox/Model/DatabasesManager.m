@@ -126,6 +126,28 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
     });
 }
 
+- (void)atomicUpdate:(NSString *)uuid touch:(void (^)(DatabaseMetadata * _Nonnull))touch {
+    dispatch_barrier_async(self.dataQueue, ^{
+        NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];
+
+        NSUInteger index = [databases indexOfObjectPassingTest:^BOOL(DatabaseMetadata * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            return [obj.uuid isEqualToString:uuid];
+        }];
+        
+        if(index != NSNotFound) {
+            DatabaseMetadata* metadata = databases[index];
+            
+            if ( touch ) {
+                touch ( metadata );
+                [self serialize:databases];
+            }
+        }
+        else {
+            NSLog(@"WARN: Attempt to update a safe not found in list... [%@]", uuid);
+        }
+    });
+}
+
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex {
     dispatch_barrier_async(self.dataQueue, ^{
         NSMutableArray<DatabaseMetadata*>* databases = [self deserialize];

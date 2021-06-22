@@ -28,8 +28,6 @@ alpha:1.0]
 
 #endif
 
-#define kStrongboxErrorCodeIncorrectCredentials (-241)
-
 NS_ASSUME_NONNULL_BEGIN
 
 @interface Utils : NSObject

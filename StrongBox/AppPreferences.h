@@ -97,8 +97,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSDate* lastEntitlementCheckAttempt;
 @property NSUInteger numberOfEntitlementCheckFails;
 
+@property (readonly) NSUInteger launchCount;
+
 - (void)resetLaunchCount;
-- (NSInteger)getLaunchCount;
 - (void)incrementLaunchCount;
 
 - (NSString*)getFlagsStringForDiagnostics;
@@ -120,8 +121,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSInteger deleteDataAfterFailedUnlockCount;
 @property NSUInteger failedUnlockAttempts;
 
-@property NSDate* lastFreeTrialNudge;
-
 @property BOOL backupFiles;
 @property BOOL backupIncludeImportedKeyFiles;
 @property BOOL haveAskedAboutBackupSettings;
@@ -139,6 +138,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL addLegacySupplementaryTotpCustomFields;
 @property BOOL addOtpAuthUrl;
+
+@property BOOL pinYinSearchEnabled;
+
+@property (nullable) NSData* lastKnownGoodBiometricsDatabaseState;
+@property (nullable) NSData* autoFillLastKnownGoodBiometricsDatabaseState;
+
+@property BOOL scheduledTipsCheckDone;
+@property BOOL hasShownFirstRunWelcome;
+@property BOOL hasShownFirstRunFinalWelcome;
+@property (nullable) NSDate* lastAskToEnableAutoFill;
+@property BOOL promptToEnableAutoFill;
+
+@property NSDate* lastFreeTrialNudge;
+@property NSUInteger freeTrialNudgeCount;
+
+@property BOOL appHasBeenDowngradedToFreeEdition; 
+@property BOOL hasPromptedThatAppHasBeenDowngradedToFreeEdition;
+
+@property BOOL hasPromptedThatFreeTrialWillEndSoon;
 
 @end
 

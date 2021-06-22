@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-- (void)initializeiCloudAccessWithCompletion:(void (^)(BOOL available)) completion;
+- (void)initializeiCloudAccess;
 - (void)startQuery;
 
 @property (nonatomic, copy) void (^showMigrationUi)(BOOL show);
@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)migrateiCloudToLocal:(void (^)(BOOL show)) completion;
 
 @property (nullable, readonly) NSURL* iCloudDocumentsFolder;
+@property (readonly) BOOL fastAvailabilityTest;
 
 @end
 

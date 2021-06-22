@@ -42,6 +42,12 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchAddLegacyTotp;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAddOtpAuthUrl;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellFileProtection;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellInstantPin;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowPin;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowBio;
+@property (weak, nonatomic) IBOutlet UISwitch *switchPinYinSearch;
+
 @end
 
 @implementation AdvancedPreferencesTableViewController
@@ -61,6 +67,15 @@
     [self.navigationController setNavigationBarHidden:NO];
     
     self.tableView.tableFooterView = [UIView new];
+    
+    
+    
+    [self cell:self.cellFileProtection setHidden:YES];
+    [self cell:self.cellInstantPin setHidden:YES];
+    [self cell:self.cellAllowPin setHidden:YES];
+    [self cell:self.cellAllowBio setHidden:YES];
+    
+    
     
     [self bindPreferences];
     [self bindAllowPinCodeOpen];
@@ -117,6 +132,8 @@
     AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields = self.switchAddLegacyTotp.on;
     AppPreferences.sharedInstance.addOtpAuthUrl = self.switchAddOtpAuthUrl.on;
 
+    AppPreferences.sharedInstance.pinYinSearchEnabled = self.switchPinYinSearch.on;
+    
     [self bindPreferences];
 }
 
@@ -143,6 +160,7 @@
     self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
     self.switchAddLegacyTotp.on = AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields;
     self.switchAddOtpAuthUrl.on = AppPreferences.sharedInstance.addOtpAuthUrl;
+    self.switchPinYinSearch.on = AppPreferences.sharedInstance.pinYinSearchEnabled;
 }
 
 - (void)bindAllowPinCodeOpen {

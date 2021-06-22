@@ -13,7 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OnboardingWelcomeViewController : NSViewController
 
-@property DatabaseMetadata* database;
 @property (nonatomic, copy) void (^onNext)(void);
 
 @end

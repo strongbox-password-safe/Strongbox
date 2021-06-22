@@ -56,35 +56,45 @@
 }
 
 - (void)bindUi {
-    self.checkboxTakeBackups.state = self.database.makeBackups ? NSControlStateValueOn : NSControlStateValueOff;
-    self.textBoxMaximumKeepCount.stringValue = @(self.database.maxBackupKeepCount).stringValue;
-    self.stepperMaximumKeepCount.integerValue = self.database.maxBackupKeepCount;
+    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
 
-    self.textBoxMaximumKeepCount.enabled = self.database.makeBackups;
-    self.stepperMaximumKeepCount.enabled = self.database.makeBackups;
+    self.checkboxTakeBackups.state = database.makeBackups ? NSControlStateValueOn : NSControlStateValueOff;
+    self.textBoxMaximumKeepCount.stringValue = @(database.maxBackupKeepCount).stringValue;
+    self.stepperMaximumKeepCount.integerValue = database.maxBackupKeepCount;
+
+    self.textBoxMaximumKeepCount.enabled = database.makeBackups;
+    self.stepperMaximumKeepCount.enabled = database.makeBackups;
     
     [self refreshTableView];
 }
 
 - (void)refreshTableView {
-    self.items = [BackupsManager.sharedInstance getAvailableBackups:self.database];
+    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+
+    self.items = [BackupsManager.sharedInstance getAvailableBackups:database];
 
     [self.tableView reloadData];
 }
 
 - (IBAction)onTakeBackups:(id)sender {
-    self.database.makeBackups = self.checkboxTakeBackups.state == NSControlStateValueOn;
+    BOOL makeBackups = self.checkboxTakeBackups.state == NSControlStateValueOn;
     
-    [DatabasesManager.sharedInstance update:self.database];
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.makeBackups = makeBackups;
+    }];
     
     [self bindUi];
 }
 
 - (IBAction)onStepper:(id)sender {
-    self.database.maxBackupKeepCount = self.stepperMaximumKeepCount.integerValue;
+    NSInteger maxBackupKeepCount = self.stepperMaximumKeepCount.integerValue;
     
-    [DatabasesManager.sharedInstance update:self.database];
-    
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.maxBackupKeepCount = maxBackupKeepCount;
+    }];
+
     [self bindUi];
 }
 
@@ -145,7 +155,10 @@
 - (IBAction)onExportBackup:(id)sender {
     if(self.tableView.selectedRow != -1) {
         BackupItem *item = self.items[self.tableView.selectedRow];
-        NSString* suggestedFileName = [NSString stringWithFormat:@"Backup-of-%@", self.database.fileUrl.lastPathComponent];
+        
+        DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+
+        NSString* suggestedFileName = [NSString stringWithFormat:@"Backup-of-%@", database.fileUrl.lastPathComponent];
                                 
         NSSavePanel *savePanel = [NSSavePanel savePanel];
         savePanel.nameFieldStringValue = suggestedFileName;

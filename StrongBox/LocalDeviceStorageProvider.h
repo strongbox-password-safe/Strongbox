@@ -43,7 +43,7 @@ suggestedFilename:(NSString*)suggestedFilename
     completion:(void (^)(METADATA_PTR metadata, NSError *_Nullable error))completion;
 
 
-- (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data;
+- (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data modDate:(NSDate*_Nullable)modDate;
 
 - (NSURL *)getFileUrl:(METADATA_PTR )safeMetaData; 
 - (BOOL)fileNameExistsInDefaultStorage:(NSString*)filename; 

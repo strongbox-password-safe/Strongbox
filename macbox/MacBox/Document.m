@@ -76,16 +76,11 @@ NSString* const kNotificationUserInfoParamKey = @"param";
     return YES;
 }
 
-
-
-
-
-
-
-
-
 - (void)makeWindowControllers {
+    NSLog(@"makeWindowControllers -> viewModel = [%@]", self.viewModel);
+    
     self.windowController = [[NSStoryboard storyboardWithName:@"Main" bundle:nil] instantiateControllerWithIdentifier:@"Document Window Controller"];
+    
     [self addWindowController:self.windowController];
 }
 
@@ -152,7 +147,9 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 }
 
 - (BOOL)loadLockedModel {
-    _viewModel = [[ViewModel alloc] initLocked:self];
+    _viewModel = [[ViewModel alloc] initLocked:self
+                                      metadata:self.databaseMetadata];
+    
     return YES;
 }
 
@@ -167,21 +164,27 @@ NSString* const kNotificationUserInfoParamKey = @"param";
     }
 
     DatabaseModel *db = [self getModelFromData:data key:key error:&error];
-    
+
     if(!db) {
         if(outError != nil) {
             *outError = error;
         }
         
         if(self.viewModel && !self.viewModel.locked) {
-            _viewModel = [[ViewModel alloc] initLocked:self];
+            _viewModel = [[ViewModel alloc] initLocked:self
+                                              metadata:self.databaseMetadata];
+
             [self notifyFullModelReload];
         }
         
         return NO;
     }
     
-    _viewModel = [[ViewModel alloc] initUnlockedWithDatabase:self database:db selectedItem:selectedItem];
+    
+    _viewModel = [[ViewModel alloc] initUnlockedWithDatabase:self
+                                                    metadata:self.databaseMetadata
+                                                    database:db
+                                                selectedItem:selectedItem];
     
     [self updateQuickTypeAutoFill];
     
@@ -197,7 +200,16 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 
     if ( ![self isLegacyFileUrl:self.fileURL] ) {
         if ( self.databaseMetadata ) {
-            [self syncWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:compositeKeyFactors selectedItem:self.viewModel.selectedItem completion:completion];
+            if ( !self.databaseMetadata.offlineMode ) {
+                NSLog(@"ONLINE MODE: syncWorkingCopyAndUnlock");
+                
+                [self syncWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:compositeKeyFactors selectedItem:self.viewModel.selectedItem completion:completion];
+            }
+            else {
+                NSLog(@"OFFLINE MODE: syncWorkingCopyAndUnlock");
+
+                [self loadWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:compositeKeyFactors selectedItem:self.viewModel.selectedItem completion:completion];
+            }
         }
         else {
             NSLog(@"WARNWARN: No database metadata found!!");
@@ -248,6 +260,18 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 
 
 
+
+- (BOOL)validateUserInterfaceItem:(id <NSValidatedUserInterfaceItem>)anItem {
+    SEL theAction = [anItem action];
+
+
+    
+    if (theAction == @selector(saveDocument:)) {
+        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
+    }
+    
+    return [super validateUserInterfaceItem:anItem];
+}
 
 - (IBAction)saveDocument:(id)sender {
     NSLog(@"Document::saveDocument");
@@ -367,7 +391,9 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         return NO;
     }
                 
-    BOOL success = [MacSyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.databaseMetadata data:data error:outError];
+    BOOL success = [MacSyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.databaseMetadata
+                                                                                data:data
+                                                                               error:outError];
     if (!success) {
         NSLog(@"Could not updateLocalCopyMarkAsRequiringSync");
         return NO;
@@ -536,14 +562,14 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)onWake {
-    NSLog(@"XXX - onWake");
+
     [self startMonitoringManagedFile];
 }
 
 - (void)startMonitoringManagedFile {
-    NSLog(@"startMonitoringManagedFile");
+
     
-    if ( !self.databaseMetadata || self.viewModel.locked || !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL] ) {
+    if ( !self.databaseMetadata || self.viewModel.locked || self.viewModel.offlineMode || !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL] ) {
         return;
     }
         
@@ -577,11 +603,16 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         return;
     }
     
-    if ( !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL]) {
+    if ( !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL] || self.viewModel.offlineMode) {
         [self stopMonitoringManagedFile];
         return;
     }
 
+    if ( self.viewModel.offlineMode ) {
+        NSLog(@"WARNWARN: pollForDatabaseChanges called in Offline Mode!!");
+        return;
+    }
+    
     [self checkForRemoteChanges];
 }
 
@@ -729,6 +760,18 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
                       completion:(void (^)(BOOL, NSError * _Nullable))completion {
     NSLog(@"syncWorkingCopyAndUnlock ENTER");
     
+    if ( self.viewModel.offlineMode ) {
+        NSLog(@"WARNWARN: syncWorkingCopyAndUnlock called in Offline Mode!!");
+
+        if(completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completion(NO, nil);
+            });
+        }
+
+        return;
+    }
+    
     [MacSyncManager.sharedInstance sync:databaseMetadata
                           interactiveVC:viewController
                                     key:key
@@ -761,7 +804,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
                     selectedItem:(NSString *)selectedItem
                       completion:(void (^)(BOOL, NSError * _Nullable))completion {
     NSDate* modDate;
-    NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:databaseMetadata modified:&modDate];
+    NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:databaseMetadata.uuid modified:&modDate];
     
     if (workingCopy == nil) {
         NSLog(@"loadWorkingCopyAndUnlock - Could not get local working copy");
@@ -807,6 +850,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 - (void)backgroundSync {
 
 
+    if ( self.viewModel.offlineMode ) {
+        NSLog(@"WARNWARN: BACKGROUND SYNC called in Offline Mode!!");
+        return;
+    }
+    
     [MacSyncManager.sharedInstance backgroundSyncDatabase:self.databaseMetadata
                                                completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         [self onSyncDone:result localWasChanged:localWasChanged error:error];
@@ -815,6 +863,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 - (void)performFullInteractiveSync:(NSViewController*)viewController key:(CompositeKeyFactors*)key {
 
+
+    if ( self.viewModel.offlineMode ) {
+        NSLog(@"WARNWARN: performFullInteractiveSync called in Offline Mode!!");
+        return;
+    }
 
     [MacSyncManager.sharedInstance sync:self.databaseMetadata
                           interactiveVC:viewController

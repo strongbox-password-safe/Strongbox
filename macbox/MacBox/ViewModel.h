@@ -12,6 +12,7 @@
 #import "DatabaseModel.h"
 #import "UnifiedDatabaseMetadata.h"
 #import "AbstractDatabaseFormatAdaptor.h"
+#import "DatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,19 +39,24 @@ extern NSString* const kModelUpdateNotificationTagsChanged;
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (instancetype)initUnlockedWithDatabase:(NSDocument *)document
-                                database:(DatabaseModel*_Nullable)database
-                            selectedItem:(NSString*_Nullable)selectedItem;
+                                metadata:(DatabaseMetadata*)metadata
+                                database:(DatabaseModel *_Nullable)database
+                            selectedItem:(NSString *_Nullable)selectedItem;
 
-- (instancetype)initLocked:(NSDocument*)document;
+- (instancetype)initLocked:(NSDocument *)document
+                  metadata:(DatabaseMetadata*)metadata;
 
 @property (readonly, nonatomic) DatabaseModel* database;
+@property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
+@property (nonatomic, readonly) DatabaseMetadata *databaseMetadata;
+@property (nonatomic, readonly) NSString *databaseUuid;
+
 @property (nonatomic, readonly, weak) NSDocument*  document;
 @property (nonatomic, readonly) BOOL locked;
 @property (nonatomic, readonly) NSURL* fileUrl;
 @property (nonatomic, readonly) Node* rootGroup;
 @property (nonatomic, readonly) BOOL masterCredentialsSet;
 @property (nonatomic, readonly) DatabaseFormat format;
-@property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
 
 @property (nonatomic, readonly, nonnull) NSSet<NodeIcon*>* customIcons;
 
@@ -156,6 +162,41 @@ extern NSString* const kModelUpdateNotificationTagsChanged;
 @property (nullable) NSString* selectedItem;
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
+
+
+
+
+@property BOOL showTotp;
+@property BOOL showAutoCompleteSuggestions;
+@property BOOL showChangeNotifications;
+@property BOOL concealEmptyProtectedFields;
+@property BOOL lockOnScreenLock;
+@property BOOL showAdvancedUnlockOptions;
+@property BOOL showQuickView;
+@property BOOL showAlternatingRows;
+@property BOOL showVerticalGrid;
+@property BOOL showHorizontalGrid;
+@property NSArray<NSString*>* visibleColumns;
+@property BOOL downloadFavIconOnChange;
+@property BOOL startWithSearch;
+@property BOOL outlineViewTitleIsReadonly;
+@property BOOL outlineViewEditableFieldsAreReadonly;
+
+@property BOOL showRecycleBinInSearchResults;
+@property BOOL showRecycleBinInBrowse;
+@property BOOL sortKeePassNodes; 
+
+@property BOOL monitorForExternalChanges;
+@property NSInteger monitorForExternalChangesInterval;
+@property BOOL autoReloadAfterExternalChanges;
+
+@property BOOL autoPromptForConvenienceUnlockOnActivate;
+
+@property BOOL launchAtStartup;
+@property BOOL alwaysOpenOffline;
+@property BOOL readOnly;
+@property BOOL offlineMode;
+@property (readonly) BOOL isEffectivelyReadOnly; 
 
 @end
 

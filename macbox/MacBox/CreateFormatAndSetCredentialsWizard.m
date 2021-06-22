@@ -301,14 +301,14 @@
         self.useAYubiKey = NO;
     }
     else {
-        NSString* locBlocking = NSLocalizedString(@"mac_yubikey_serial_number_slot_n_touch_required_fmt", @"Yubikey %@ Slot %ld (Touch Required)");
-        NSString* locNonBlocking = NSLocalizedString(@"mac_yubikey_serial_number_slot_n_fmt", @"Yubikey %@ Slot %ld");
+        NSString* locBlocking = NSLocalizedString(@"mac_yubikey_serial_number_slot_n_touch_required_fmt2", @"YubiKey %@ Slot %@ (Touch Required)");
+        NSString* locNonBlocking = NSLocalizedString(@"mac_yubikey_serial_number_slot_n_fmt2", @"YubiKey %@ Slot %@");
 
         
         
         NSMenuItem* slot1MenuItem = nil;
         if (yubiKeyData.slot1CrStatus == YubiKeySlotCrStatusSupportedBlocking) {
-            NSString* fmt = [NSString stringWithFormat:locBlocking, yubiKeyData.serial, 1];
+            NSString* fmt = [NSString stringWithFormat:locBlocking, yubiKeyData.serial, @(1)];
             slot1MenuItem = [self.popupYubiKey.menu addItemWithTitle:fmt
                                                               action:@selector(onSelectSlot1)
                                                        keyEquivalent:@""];
@@ -316,7 +316,7 @@
             self.slot1IsBlocking = YES;
         }
         else if (yubiKeyData.slot1CrStatus == YubiKeySlotCrStatusSupportedNonBlocking) {
-            NSString* fmt = [NSString stringWithFormat:locNonBlocking, yubiKeyData.serial, 1];
+            NSString* fmt = [NSString stringWithFormat:locNonBlocking, yubiKeyData.serial, @(1)];
 
             slot1MenuItem = [self.popupYubiKey.menu addItemWithTitle:fmt
                                                               action:@selector(onSelectSlot1)
@@ -328,7 +328,7 @@
         
         NSMenuItem* slot2MenuItem = nil;
         if (yubiKeyData.slot2CrStatus == YubiKeySlotCrStatusSupportedBlocking) {
-            NSString* fmt = [NSString stringWithFormat:locBlocking, yubiKeyData.serial, 2];
+            NSString* fmt = [NSString stringWithFormat:locBlocking, yubiKeyData.serial, @(2)];
             slot2MenuItem = [self.popupYubiKey.menu addItemWithTitle:fmt
                                                               action:@selector(onSelectSlot2)
                                                        keyEquivalent:@""];
@@ -336,7 +336,7 @@
             self.slot2IsBlocking = YES;
         }
         else if (yubiKeyData.slot2CrStatus == YubiKeySlotCrStatusSupportedNonBlocking) {
-            NSString* fmt = [NSString stringWithFormat:locNonBlocking, yubiKeyData.serial, 2];
+            NSString* fmt = [NSString stringWithFormat:locNonBlocking, yubiKeyData.serial, @(2)];
             slot2MenuItem = [self.popupYubiKey.menu addItemWithTitle:fmt
                                                               action:@selector(onSelectSlot2)
                                                        keyEquivalent:@""];

@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "StaticDataTableViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AdvancedPreferencesTableViewController : UITableViewController
+@interface AdvancedPreferencesTableViewController : StaticDataTableViewController
 
 @property (nonatomic, copy) void (^onDone)(void);
 

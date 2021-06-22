@@ -19,6 +19,9 @@ extern const NSUInteger kMinimumDatabasePrefixLengthForValidation;
 extern const NSUInteger kStreamingSerializationChunkSize;
 extern const size_t kMaxAttachmentTableviewIconImageSize;
 
+@property (readonly, class) NSString* proEditionBundleId;
+@property (readonly, class) NSString* scotusEditionBundleId;
+
 @end
 
 NS_ASSUME_NONNULL_END

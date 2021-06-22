@@ -27,7 +27,7 @@
 - (BOOL)writeBackup:(NSURL *)snapshot metadata:(METADATA_PTR)metadata {
     if(metadata.makeBackups) {
         NSDate* now = NSDate.date;
-        NSString* filename = [NSString stringWithFormat:@"%@.bak", now.iso8601DateString];
+        NSString* filename = [NSString stringWithFormat:@"%@.bak", now.fileNameCompatibleDateTimePrecise];
 
         NSURL* url = [metadata.backupsDirectory URLByAppendingPathComponent:filename];
 

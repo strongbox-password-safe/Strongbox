@@ -8,6 +8,8 @@
 
 #import "OnboardingConvenienceViewController.h"
 #import "DatabasesManager.h"
+#import "BiometricIdHelper.h"
+#import "Settings.h"
 
 @interface OnboardingConvenienceViewController ()
 
@@ -38,42 +40,53 @@
     [self bindUI];
 }
 
+- (DatabaseMetadata*)database {
+    return [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+}
+
 - (void)bindUI {
-    BOOL convenienceEnabled = self.database.isTouchIdEnabled || self.database.isWatchUnlockEnabled;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL conveniencePossible = touchAvailable && featureAvailable;
+    BOOL convenienceEnabled = (self.database.isTouchIdEnabled && touchAvailable);
     
-    self.enableTouchId.state = convenienceEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    self.enableTouchId.enabled = conveniencePossible;
+    self.enableTouchId.state = (conveniencePossible && convenienceEnabled) ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (IBAction)onPreferencesChanged:(id)sender {
     BOOL enable = self.enableTouchId.state == NSControlStateValueOn;
     
-    self.database.isTouchIdEnabled = enable;
-    self.database.isWatchUnlockEnabled = enable;
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.isTouchIdEnabled = enable;
+        metadata.isWatchUnlockEnabled = enable;
 
-    if ( enable ) {
-        self.database.isTouchIdEnrolled = YES;
-        [self.database resetConveniencePasswordWithCurrentConfiguration:self.ckfs.password];
-    }
-    else {
-        self.database.isTouchIdEnrolled = NO;
-        [self.database resetConveniencePasswordWithCurrentConfiguration:nil];
-    }
-
-    [DatabasesManager.sharedInstance update:self.database];
+        if ( enable ) {
+            metadata.isTouchIdEnrolled = YES;
+            [metadata resetConveniencePasswordWithCurrentConfiguration:self.ckfs.password];
+        }
+        else {
+            metadata.isTouchIdEnrolled = NO;
+            [metadata resetConveniencePasswordWithCurrentConfiguration:nil];
+        }
+    }];
     
     [self bindUI];
 }
 
 - (IBAction)onDone:(id)sender {
-    self.database.hasPromptedForTouchIdEnrol = YES;
-    [DatabasesManager.sharedInstance update:self.database];
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.hasPromptedForTouchIdEnrol = YES;
+    }];
 
     [self.view.window close];
 }
 
 - (IBAction)onNext:(id)sender {
-    self.database.hasPromptedForTouchIdEnrol = YES;
-    [DatabasesManager.sharedInstance update:self.database];
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.hasPromptedForTouchIdEnrol = YES;
+    }];
 
     self.onNext();
 }

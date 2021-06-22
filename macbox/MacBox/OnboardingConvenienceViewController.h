@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OnboardingConvenienceViewController : NSViewController
 
-@property DatabaseMetadata* database;
+@property NSString* databaseUuid;
 @property (nonatomic, copy) void (^onNext)(void);
 @property BOOL autoFillIsAvailable;
 @property CompositeKeyFactors *ckfs;

@@ -161,7 +161,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     if (customIconData) {
         NSData* d = [[NSData alloc] initWithBase64EncodedString:customIconData options:kNilOptions];
         
-        NSDate* modified = customIconModified ? [NSDate dateWithTimeIntervalSince1970:customIconModified.doubleValue] : nil;
+        NSDate* modified = (customIconModified != nil) ? [NSDate dateWithTimeIntervalSince1970:customIconModified.doubleValue] : nil;
         ret.icon = [NodeIcon withCustom:d name:customIconName modified:modified];
     }
     else if (iconId != nil) {

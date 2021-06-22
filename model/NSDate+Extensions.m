@@ -26,9 +26,16 @@
         return NO;
     }
     
-    NSDate* ref = [NSDate.date dateByAddingTimeInterval:-seconds];
+    NSDate* ref = [NSDate.date dateByAddingTimeInterval:(-((NSTimeInterval)seconds))];
+    
+
     
     return [date isEarlierThan:ref];
+}
+
+- (BOOL)isMoreThanXDaysAgo:(NSUInteger)days {
+    NSUInteger seconds = days * 24 * 60 * 60;
+    return [self isMoreThanXSecondsAgo:seconds];
 }
 
 - (BOOL)isMoreThanXSecondsAgo:(NSUInteger)seconds {
@@ -46,7 +53,7 @@
     
     NSTimeInterval interval = fabs([self timeIntervalSinceDate:other]);
     
-    const NSTimeInterval epsilon = 0.00001;
+    const NSTimeInterval epsilon = 0.00001f;
     
     return interval < epsilon;
 }
@@ -77,6 +84,16 @@
 
 - (NSString *)friendlyDateString {
     NSDateFormatter *df = [[NSDateFormatter alloc] init];
+
+    df.dateStyle = NSDateFormatterMediumStyle;
+    df.doesRelativeDateFormatting = YES;
+    df.locale = NSLocale.currentLocale;
+    
+    return [df stringFromDate:self];
+}
+
+- (NSString *)friendlyDateTimeString {
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
     df.timeStyle = NSDateFormatterShortStyle;
     df.dateStyle = NSDateFormatterMediumStyle;
     df.doesRelativeDateFormatting = YES;
@@ -102,6 +119,24 @@
     df.dateStyle = NSDateFormatterShortStyle;
     df.doesRelativeDateFormatting = YES;
     df.locale = NSLocale.currentLocale;
+
+    return [df stringFromDate:self];
+}
+
+- (NSString *)fileNameCompatibleDateTime {
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    [df setLocale:enUSPOSIXLocale];
+    [df setDateFormat:@"yyyyMMdd_HHmmss"];
+
+    return [df stringFromDate:self];
+}
+
+- (NSString *)fileNameCompatibleDateTimePrecise {
+    NSDateFormatter *df = [[NSDateFormatter alloc] init];
+    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    [df setLocale:enUSPOSIXLocale];
+    [df setDateFormat:@"yyyyMMdd_HHmmss_SSS"];
 
     return [df stringFromDate:self];
 }

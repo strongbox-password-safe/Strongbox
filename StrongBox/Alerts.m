@@ -428,6 +428,51 @@
     });
 }
 
++ (void) fourOptionsWithCancel:(UIViewController *)viewController
+                         title:(NSString *)title
+                       message:(NSString *)message
+             defaultButtonText:(NSString *)defaultButtonText
+              secondButtonText:(NSString *)secondButtonText
+               thirdButtonText:(NSString *)thirdButtonText
+              fourthButtonText:(NSString *)fourthButtonText
+                        action:(void (^) (int response))action {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIAlertController *alertController = [UIAlertController alertControllerWithTitle:title
+                                                                                 message:message
+                                                                          preferredStyle:UIAlertControllerStyleAlert];
+        
+        
+        
+        UIAlertAction *defaultAction = [UIAlertAction actionWithTitle:defaultButtonText
+                                                                style:UIAlertActionStyleDefault
+                                                              handler:^(UIAlertAction *a) { action(0); }];
+        
+        UIAlertAction *secondAction = [UIAlertAction actionWithTitle:secondButtonText
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *a) { action(1); }];
+        
+        UIAlertAction *thirdAction = [UIAlertAction actionWithTitle:thirdButtonText
+                                                              style:UIAlertActionStyleDefault
+                                                            handler:^(UIAlertAction *a) { action(2); }];
+        
+        UIAlertAction *fourthAction = [UIAlertAction actionWithTitle:fourthButtonText
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *a) { action(3); }];
+        
+        UIAlertAction *cancelAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"generic_cancel", @"Cancel")
+                                                               style:UIAlertActionStyleCancel
+                                                             handler:^(UIAlertAction *a) { action(4); }];
+        
+        [alertController addAction:defaultAction];
+        [alertController addAction:secondAction];
+        [alertController addAction:thirdAction];
+        [alertController addAction:fourthAction];
+        [alertController addAction:cancelAction];
+    
+        [viewController presentViewController:alertController animated:YES completion:nil];
+    });
+}
+
 + (void)OkCancelWithPassword:(UIViewController *)viewController
                        title:(NSString *)title
                      message:(NSString *)message

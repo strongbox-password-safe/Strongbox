@@ -63,8 +63,13 @@
     NSLocalizedString(@"sbtvc_select_new_database_location", @"Select Folder For New Database");
 
     
+
+    BOOL dropboxDelayHack = NO;
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    dropboxDelayHack = (self.safeStorageProvider.storageId == kDropbox && self.parentFolder == nil);
+#endif
     
-    if(self.safeStorageProvider.storageId == kDropbox && self.parentFolder == nil) {
+    if ( dropboxDelayHack ) {
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 750 * NSEC_PER_MSEC), dispatch_get_main_queue(), ^{
             [self.safeStorageProvider list:self.parentFolder
                             viewController:self

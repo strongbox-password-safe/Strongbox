@@ -792,45 +792,46 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 
-- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+- (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.title node:node maybe:dereference];
-    return [foo containsSearchString:searchText];
+    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+- (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference  checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.username node:node maybe:dereference];
-    return [foo containsSearchString:searchText];
+    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+- (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.password node:node maybe:dereference];
-    return [foo containsSearchString:searchText];
+    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isEmailMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+- (BOOL)isEmailMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.email node:node maybe:dereference];
-    return [foo containsSearchString:searchText];
-}
-- (BOOL)isNotesMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    NSString* foo = [self maybeDeref:node.fields.notes node:node maybe:dereference];
-    return [foo containsSearchString:searchText];
+    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
 }
 
-- (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node {
+- (BOOL)isNotesMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    NSString* foo = [self maybeDeref:node.fields.notes node:node maybe:dereference];
+    return [foo containsSearchString:searchText checkPinYin:checkPinYin];
+}
+
+- (BOOL)isTagsMatches:(NSString*)searchText node:(Node*)node checkPinYin:(BOOL)checkPinYin {
     return [node.fields.tags.allObjects anyMatch:^BOOL(NSString * _Nonnull obj) {
-        return [obj containsSearchString:searchText];
+        return [obj containsSearchString:searchText checkPinYin:checkPinYin];
     }];
 }
 
-- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
+- (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     NSString* foo = [self maybeDeref:node.fields.url node:node maybe:dereference];
-    if ( [foo containsSearchString:searchText] ) {
+    if ( [foo containsSearchString:searchText checkPinYin:checkPinYin] ) {
         return YES;
     }
 
     for (NSString* altUrl in node.fields.alternativeUrls) {
         NSString* foo = [self maybeDeref:altUrl node:node maybe:dereference];
-        if([foo containsSearchString:searchText]) {
+        if([foo containsSearchString:searchText checkPinYin:checkPinYin]) {
             return YES;
         }
     }
@@ -838,14 +839,14 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return NO;
 }
 
-- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    BOOL simple =   [self isTitleMatches:searchText node:node dereference:dereference] ||
-                    [self isUsernameMatches:searchText node:node dereference:dereference] ||
-                    [self isPasswordMatches:searchText node:node dereference:dereference] ||
-                    [self isEmailMatches:searchText node:node dereference:dereference] ||
-                    [self isUrlMatches:searchText node:node dereference:dereference] ||
-                    [self isNotesMatches:searchText node:node dereference:dereference] ||
-                    [self isTagsMatches:searchText node:node];
+- (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
+    BOOL simple =   [self isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
+                    [self isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
+                    [self isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
+                    [self isEmailMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
+                    [self isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
+                    [self isNotesMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin] ||
+                    [self isTagsMatches:searchText node:node checkPinYin:checkPinYin];
         
     if(simple) {
         return YES;
@@ -858,7 +859,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                 NSString* value = node.fields.customFields[key].value;
                 NSString* derefed = [self maybeDeref:value node:node maybe:dereference];
                 
-                if ([key containsSearchString:searchText] || [derefed containsSearchString:searchText]) {
+                if ([key containsSearchString:searchText checkPinYin:checkPinYin] || [derefed containsSearchString:searchText checkPinYin:checkPinYin]) {
                     return YES;
                 }
             }
@@ -866,7 +867,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
                 
         if (self.format != kPasswordSafe) {
             BOOL attachmentMatch = [node.fields.attachments.allKeys anyMatch:^BOOL(NSString * _Nonnull obj) {
-                return [obj containsSearchString:searchText];
+                return [obj containsSearchString:searchText checkPinYin:checkPinYin];
             }];
             
             if (attachmentMatch) {

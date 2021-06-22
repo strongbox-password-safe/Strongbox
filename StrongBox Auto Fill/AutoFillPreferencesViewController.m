@@ -21,30 +21,107 @@
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoFill;
 @property (weak, nonatomic) IBOutlet UISwitch *switchQuickTypeAutoFill;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellQuickTypeFormat;
 @property (weak, nonatomic) IBOutlet UILabel *labelQuickTypeFormat;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellConvenienceAutoUnlock;
 @property (weak, nonatomic) IBOutlet UILabel *labelConvenienceAutoUnlockTimeout;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCopyTOTP;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAutoLaunchSingle;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowPinned;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSystemLevelEnabled;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSystemLevelDisabled;
+
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *howTo1;
+@property (weak, nonatomic) IBOutlet UITableViewCell *howTo2;
+@property (weak, nonatomic) IBOutlet UITableViewCell *howTo3;
+@property (weak, nonatomic) IBOutlet UITableViewCell *howTo4;
+@property (weak, nonatomic) IBOutlet UITableViewCell *howTo5;
+@property (weak, nonatomic) IBOutlet UITableViewCell *howTo6;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowAutoFill;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowQuickType;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellQuickTypeFormat;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellCopyTotp;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAutoLaunchDatabase;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAutoSelectSingle;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellShowPinned;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellConvenienceAutoUnlock;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellUseHostOnly;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAddServiceIds;
+
 @end
 
 @implementation AutoFillPreferencesViewController
 
+- (void)dealloc {
+    [NSNotificationCenter.defaultCenter removeObserver:self];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(bind)
+                                               name:UIApplicationDidBecomeActiveNotification
+                                             object:nil];
 
     [self bind];
 }
 
 - (void)bind {
-    self.autoProceed.on = AppPreferences.sharedInstance.autoProceedOnSingleMatch;
-    self.addServiceIds.on = AppPreferences.sharedInstance.storeAutoFillServiceIdentifiersInNotes;
-    self.useHostOnlyUrl.on = !AppPreferences.sharedInstance.useFullUrlAsURLSuggestion;
+    BOOL onForStrongbox = AutoFillManager.sharedInstance.isOnForStrongbox;
     
+    
+    
+    UIImage* check;
+    UIImage* notCheck;
+
+    if (@available(iOS 13.0, *)) {
+        check = [UIImage systemImageNamed:@"checkmark.circle"];
+        notCheck = [UIImage systemImageNamed:@"exclamationmark.triangle"];
+    } else {
+        check = [UIImage imageNamed:@"ok"];
+        notCheck = [UIImage imageNamed:@"error"];
+    }
+    
+    self.cellSystemLevelEnabled.imageView.image = check;
+    self.cellSystemLevelEnabled.imageView.tintColor = UIColor.systemGreenColor;
+
+    self.cellSystemLevelDisabled.imageView.image = notCheck;
+    self.cellSystemLevelDisabled.imageView.tintColor = UIColor.systemOrangeColor;
+
+    [self cell:self.cellSystemLevelEnabled setHidden:!onForStrongbox];
+    [self cell:self.cellSystemLevelDisabled setHidden:onForStrongbox];
+    
+    
+    
+    [self cell:self.howTo1 setHidden:onForStrongbox];
+    [self cell:self.howTo2 setHidden:onForStrongbox];
+    [self cell:self.howTo3 setHidden:onForStrongbox];
+    [self cell:self.howTo4 setHidden:onForStrongbox];
+    [self cell:self.howTo5 setHidden:onForStrongbox];
+    [self cell:self.howTo6 setHidden:onForStrongbox];
+    
+    
+    
+    [self cell:self.cellAllowAutoFill setHidden:!onForStrongbox];
+
     self.switchAutoFill.on = self.viewModel.metadata.autoFillEnabled;
+    
+    BOOL on = onForStrongbox && self.viewModel.metadata.autoFillEnabled;
+    
+    
+    
+    [self cell:self.cellAllowQuickType setHidden:!on];
+    [self cell:self.cellQuickTypeFormat setHidden:!on];
+    [self cell:self.cellCopyTotp setHidden:!on];
+    [self cell:self.cellAutoLaunchDatabase setHidden:!on];
+    [self cell:self.cellAutoSelectSingle setHidden:!on];
+    [self cell:self.cellShowPinned setHidden:!on];
+    [self cell:self.cellConvenienceAutoUnlock setHidden:!on];
+    [self cell:self.cellUseHostOnly setHidden:!on];
+    [self cell:self.cellAddServiceIds setHidden:!on];
     
     
     
@@ -62,6 +139,14 @@
         self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.blackColor : UIColor.lightGrayColor;
     }
     
+
+    
+    
+    self.autoProceed.on = AppPreferences.sharedInstance.autoProceedOnSingleMatch;
+    self.switchCopyTOTP.on = self.viewModel.metadata.autoFillCopyTotp;
+    self.switchAutoLaunchSingle.on = AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase;
+    self.switchShowPinned.on = AppPreferences.sharedInstance.autoFillShowPinned;
+    
     
     
     self.cellConvenienceAutoUnlock.userInteractionEnabled = self.viewModel.metadata.autoFillEnabled;
@@ -76,15 +161,10 @@
     
     
     
-    self.switchAutoLaunchSingle.on = AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase;
+    self.addServiceIds.on = AppPreferences.sharedInstance.storeAutoFillServiceIdentifiersInNotes;
+    self.useHostOnlyUrl.on = !AppPreferences.sharedInstance.useFullUrlAsURLSuggestion;
     
-    
-    
-    self.switchCopyTOTP.on = self.viewModel.metadata.autoFillCopyTotp;
-    
-    
-    
-    self.switchShowPinned.on = AppPreferences.sharedInstance.autoFillShowPinned;
+    [self reloadDataAnimated:YES];
 }
 
 static NSString* stringForConvenienceAutoUnlock(NSInteger val) {

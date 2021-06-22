@@ -105,8 +105,23 @@ static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupp
 static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
 
 static NSString* const kPromptedForSale = @"promptedForSale2";
+static NSString* const kPinYinSearchEnabled = @"pinYinSearchEnabled";
 
+static NSString* const kLastKnownGoodDatabaseState = @"lastKnownGoodDatabaseState";
+static NSString* const kAutoFillLastKnownGoodDatabaseState = @"autoFillLastKnownGoodDatabaseState";
 
+static NSString* const kScheduledTipsCheckDone = @"scheduledTipsCheckDone";
+static NSString* const kHasShownFirstRunWelcome = @"hasShownFirstRunWelcome";
+static NSString* const kHasShownFirstRunFinalWelcome = @"hasShownFirstRunFinalWelcome";
+
+static NSString* const kPromptToEnableAutoFill = @"promptToEnableAutoFill";
+static NSString* const kLastAskToEnableAutoFill = @"lastAskToEnableAutoFill";
+
+static NSString* const kFreeTrialNudgeCount = @"freeTrialNudgeCount";
+
+static NSString* const kHasPromptedThatFreeTrialWillEndSoon = @"hasPromptedThatFreeTrialWillEndSoon";
+static NSString* const kAppHasBeenDowngradedToFreeEdition = @"appHasBeenDowngradedToFreeEdition";
+static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"hasPromptedThatAppHasBeenDowngradedToFreeEdition";
 
 @implementation AppPreferences
 
@@ -148,6 +163,104 @@ static NSString* const kPromptedForSale = @"promptedForSale2";
 }
 
 
+
+- (BOOL)appHasBeenDowngradedToFreeEdition {
+    return [self getBool:kAppHasBeenDowngradedToFreeEdition];
+}
+
+- (void)setAppHasBeenDowngradedToFreeEdition:(BOOL)appHasBeenDowngradedToFreeEdition {
+    [self setBool:kAppHasBeenDowngradedToFreeEdition value:appHasBeenDowngradedToFreeEdition];
+}
+
+- (BOOL)hasPromptedThatAppHasBeenDowngradedToFreeEdition {
+    return [self getBool:kHasPromptedThatAppHasBeenDowngradedToFreeEdition];
+}
+
+- (void)setHasPromptedThatAppHasBeenDowngradedToFreeEdition:(BOOL)hasPromptedThatAppHasBeenDowngradedToFreeEdition {
+    [self setBool:kHasPromptedThatAppHasBeenDowngradedToFreeEdition value:hasPromptedThatAppHasBeenDowngradedToFreeEdition];
+}
+
+- (BOOL)hasPromptedThatFreeTrialWillEndSoon {
+    return [self getBool:kHasPromptedThatFreeTrialWillEndSoon];
+}
+
+- (void)setHasPromptedThatFreeTrialWillEndSoon:(BOOL)hasPromptedThatFreeTrialWillEndSoon {
+    [self setBool:kHasPromptedThatFreeTrialWillEndSoon value:hasPromptedThatFreeTrialWillEndSoon];
+}
+
+- (NSUInteger)freeTrialNudgeCount {
+    return [self getInteger:kFreeTrialNudgeCount fallback:0];
+}
+
+- (void)setFreeTrialNudgeCount:(NSUInteger)freeTrialNudgeCount {
+    [self setInteger:kFreeTrialNudgeCount value:freeTrialNudgeCount];
+}
+
+- (BOOL)promptToEnableAutoFill {
+    return [self getBool:kPromptToEnableAutoFill fallback:YES];
+}
+
+- (void)setPromptToEnableAutoFill:(BOOL)promptToEnableAutoFill {
+    return [self setBool:kPromptToEnableAutoFill value:promptToEnableAutoFill];
+}
+
+- (NSDate *)lastAskToEnableAutoFill {
+    return [self getDate:kLastAskToEnableAutoFill];
+}
+
+- (void)setLastAskToEnableAutoFill:(NSDate *)lastAskToEnableAutoFill {
+    [self setDate:kLastAskToEnableAutoFill value:lastAskToEnableAutoFill];
+}
+
+- (BOOL)hasShownFirstRunFinalWelcome {
+    return [self getBool:kHasShownFirstRunFinalWelcome];
+}
+
+- (void)setHasShownFirstRunFinalWelcome:(BOOL)hasShownFirstRunFinalWelcome {
+    return [self setBool:kHasShownFirstRunFinalWelcome value:hasShownFirstRunFinalWelcome];
+}
+
+- (BOOL)hasShownFirstRunWelcome {
+    return [self getBool:kHasShownFirstRunWelcome];
+}
+
+- (void)setHasShownFirstRunWelcome:(BOOL)hasShownFirstRunWelcome {
+    [self setBool:kHasShownFirstRunWelcome value:hasShownFirstRunWelcome];
+}
+
+- (BOOL)scheduledTipsCheckDone {
+    return [self getBool:kScheduledTipsCheckDone];
+}
+
+- (void)setScheduledTipsCheckDone:(BOOL)scheduledTipsCheckDone {
+    [self setBool:kScheduledTipsCheckDone value:scheduledTipsCheckDone];
+}
+
+- (NSData *)lastKnownGoodBiometricsDatabaseState {
+    return [self.sharedAppGroupDefaults objectForKey:kLastKnownGoodDatabaseState];
+}
+
+- (void)setLastKnownGoodBiometricsDatabaseState:(NSData *)lastKnownGoodBiometricsDatabaseState {
+    [self.sharedAppGroupDefaults setObject:lastKnownGoodBiometricsDatabaseState forKey:kLastKnownGoodDatabaseState];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (NSData *)autoFillLastKnownGoodBiometricsDatabaseState {
+    return [self.sharedAppGroupDefaults objectForKey:kAutoFillLastKnownGoodDatabaseState];
+}
+
+- (void)setAutoFillLastKnownGoodBiometricsDatabaseState:(NSData *)autoFillLastKnownGoodBiometricsDatabaseState {
+    [self.sharedAppGroupDefaults setObject:autoFillLastKnownGoodBiometricsDatabaseState forKey:kAutoFillLastKnownGoodDatabaseState];
+    [self.sharedAppGroupDefaults synchronize];
+}
+
+- (BOOL)pinYinSearchEnabled {
+    return [self getBool:kPinYinSearchEnabled fallback:NO];
+}
+
+- (void)setPinYinSearchEnabled:(BOOL)pinYinSearchEnabled {
+    [self setBool:kPinYinSearchEnabled value:pinYinSearchEnabled];
+}
 
 - (BOOL)addOtpAuthUrl {
     return [self getBool:kAddOtpAuthUrl fallback:YES];
@@ -818,8 +931,7 @@ static NSString* const kPromptedForSale = @"promptedForSale2";
     return daysInstalled;
 }
 
-- (NSInteger)getLaunchCount
-{
+- (NSUInteger)launchCount {
     NSUserDefaults *userDefaults = AppPreferences.sharedInstance.sharedAppGroupDefaults;
     
     NSInteger launchCount = [userDefaults integerForKey:kLaunchCountKey];
@@ -836,7 +948,7 @@ static NSString* const kPromptedForSale = @"promptedForSale2";
 }
 
 - (void)incrementLaunchCount {
-    NSInteger launchCount = [self getLaunchCount];
+    NSUInteger launchCount = self.launchCount;
     
     launchCount++;
     
@@ -875,7 +987,7 @@ static NSString* const kPromptedForSale = @"promptedForSale2";
             AppPreferences.sharedInstance.isProOrFreeTrial,
             AppPreferences.sharedInstance.isPro,
             AppPreferences.sharedInstance.isFreeTrial,
-            (long)self.getLaunchCount,
+            (long)self.launchCount,
             AppPreferences.sharedInstance.iCloudOn,
             self.iCloudWasOn,
             self.iCloudPrompted,
@@ -1124,4 +1236,13 @@ static NSString* const kPromptedForSale = @"promptedForSale2";
     [self.sharedAppGroupDefaults synchronize];
 }
 
+- (NSDate*)getDate:(NSString*)key {
+    return [self.sharedAppGroupDefaults objectForKey:key];
+}
+
+- (void)setDate:(NSString*)key value:(NSDate*)value {
+    [self.sharedAppGroupDefaults setObject:value forKey:key];
+    [self.sharedAppGroupDefaults synchronize];
+}
+    
 @end

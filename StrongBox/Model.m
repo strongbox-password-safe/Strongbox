@@ -46,7 +46,6 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 @property BOOL offlineMode;
 
 @property dispatch_queue_t asyncUpdateEncryptionQueue;
-
 @property ConcurrentMutableStack* asyncUpdatesStack;
 
 @end
@@ -81,9 +80,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                                                 storageProvider:templateMetaData.storageProvider
                                                        fileName:templateMetaData.fileName
                                                  fileIdentifier:templateMetaData.fileIdentifier];
-    meta.autoFillEnabled = NO;
-    meta.hasBeenPromptedForConvenience = YES; 
-    meta.hasBeenPromptedForQuickLaunch = YES;
+    self.isDuressDummyDatabase = YES;
     
     NSData* data = [self getDuressDummyData];
     if (!data) {

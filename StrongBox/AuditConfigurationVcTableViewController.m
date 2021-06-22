@@ -168,7 +168,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 
 - (void)bindLastOnlineCheckUi {
     self.labelOnlineCheckInterval.text = [self getHibpIntervalString:self.model.metadata.auditConfig.hibpCheckForNewBreachesIntervalSeconds];
-    self.labelLastOnineCheck.text = self.model.metadata.auditConfig.lastHibpOnlineCheck ? self.model.metadata.auditConfig.lastHibpOnlineCheck.friendlyDateString : @"";
+    self.labelLastOnineCheck.text = self.model.metadata.auditConfig.lastHibpOnlineCheck ? self.model.metadata.auditConfig.lastHibpOnlineCheck.friendlyDateTimeString : @"";
     self.stackViewLastOnlineCheck.hidden = self.model.metadata.auditConfig.lastHibpOnlineCheck == nil;
 }
 

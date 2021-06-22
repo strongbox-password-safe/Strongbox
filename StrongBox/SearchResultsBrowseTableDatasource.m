@@ -11,6 +11,7 @@
 #import "BrowseTableViewCellHelper.h"
 #import "BrowseSortField.h"
 #import "DatabaseModel.h"
+#import "AppPreferences.h"
 
 @interface SearchResultsBrowseTableDatasource ()
 
@@ -73,6 +74,7 @@
                                                                        browseSortField:sortField
                                                                             descending:descending
                                                                      foldersSeparately:foldersSeparately
+                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
                                                                       isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
         return [self.viewModel isFlaggedByAudit:node.uuid];
     }];

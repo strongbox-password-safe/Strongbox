@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "StaticDataTableViewController.h"
 
-@interface PreferencesTableViewController : UITableViewController
+@interface PreferencesTableViewController : StaticDataTableViewController
 
 @property (nonatomic, copy) void (^onDone)(void);
 

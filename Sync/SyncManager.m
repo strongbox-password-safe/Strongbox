@@ -80,7 +80,9 @@
 
     NSLog(@"BACKGROUND SYNC Start: [%@]", database.nickName);
 
-    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+    [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
+                                                              parameters:params
+                                                              completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         NSLog(@"BACKGROUND SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
     }];
 }
@@ -94,7 +96,9 @@
     params.syncForcePushDoNotCheckForConflicts = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
     params.syncPullEvenIfModifiedDateSame = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
 
-    [SyncAndMergeSequenceManager.sharedInstance enqueueSync:database parameters:params completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+    [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
+                                                              parameters:params
+                                                              completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         NSLog(@"INTERACTIVE SYNC DONE: [%@] - [%@][%@]", database.nickName, syncResultToString(result), error);
         completion(result, localWasChanged, error);
     }];
@@ -103,7 +107,7 @@
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error {
     
     
-    NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
+    NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
     if (localWorkingCache) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
@@ -121,13 +125,16 @@
     database.outstandingUpdateId = updateId;
     [SafesList.sharedInstance update:database];
         
-    NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:data dateModified:NSDate.date database:database error:error];
+    NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData2:data
+                                                                dateModified:NSDate.date
+                                                                    database:database.uuid
+                                                                       error:error];
     
     return url != nil;
 }
 
 - (SyncStatus*)getSyncStatus:(SafeMetaData *)database {
-    return [SyncAndMergeSequenceManager.sharedInstance getSyncStatus:database];
+    return [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:database.uuid];
 }
 
 
@@ -144,7 +151,9 @@
         [[AppleICloudProvider sharedInstance] delete:database completion:nil];
     }
 
-    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database];
+    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache2:database.uuid];
+    
+    [database clearKeychainItems];
 }
 
 

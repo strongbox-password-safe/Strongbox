@@ -17,6 +17,7 @@
 #import "ColoredStringHelper.h"
 #import "AppPreferences.h"
 #import "PasswordStrengthTester.h"
+#import "PasswordStrengthUIHelper.h"
 
 #ifndef IS_APP_EXTENSION
 #import "ISMessages/ISMessages.h"
@@ -27,7 +28,6 @@
 @property PasswordGenerationConfig *config;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *sample1;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellAlgorithm;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBasicLength;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellUseCharacterGroups;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEasyReadCharactersOnly;
@@ -47,13 +47,20 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellInfoXkcd;
 @property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
 @property (weak, nonatomic) IBOutlet UILabel *labelStrength;
+@property (weak, nonatomic) IBOutlet UISegmentedControl *segmentAlgorithm;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAlgorithm;
 
 @end
 
 @implementation PasswordGenerationViewController
 
 - (IBAction)onDone:(id)sender {
-    self.onDone();
+    if ( self.onDone ) {
+        self.onDone();
+    }
+    else {
+        [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    }
 }
 
 - (UILongPressGestureRecognizer*)makeLongPressGestureRecognizer {
@@ -77,6 +84,9 @@
 
     self.sample1.textLabel.font = FontManager.sharedInstance.easyReadFont;
     
+    [self.segmentAlgorithm setTitle:NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic") forSegmentAtIndex:0];
+    [self.segmentAlgorithm setTitle: NSLocalizedString(@"password_gen_vc_mode_diceware_xkcd_title", @"Diceware (XKCD)") forSegmentAtIndex:1];
+
     [self bindUi];
     
     [self refreshGenerated];
@@ -161,9 +171,7 @@
 }
 
 - (void)bindUi {
-    self.cellAlgorithm.detailTextLabel.text = self.config.algorithm == kPasswordGenerationAlgorithmBasic ?
-        NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic") :
-        NSLocalizedString(@"password_gen_vc_mode_diceware_xkcd_title", @"Diceware (XKCD)");
+    self.segmentAlgorithm.selectedSegmentIndex = self.config.algorithm == kPasswordGenerationAlgorithmBasic ? 0 : 1;
     
     NSArray<NSString*> *characterGroups = [self.config.useCharacterGroups map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
         return [PasswordGenerationConfig characterPoolToPoolString:(PasswordGenerationCharacterPool)obj.integerValue];
@@ -234,24 +242,20 @@
     [self reloadDataAnimated:YES];
 }
 
+- (IBAction)onChangeAlgorithm:(id)sender {    
+    self.config.algorithm = self.segmentAlgorithm.selectedSegmentIndex == 0 ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
+    AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
+
+    [self bindUi];
+    [self refreshGenerated];
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
-    if(cell == self.cellAlgorithm) {
-        [self promptForItem:NSLocalizedString(@"password_gen_vc_select_mode", @"Select Algorithm")
-                    options:@[NSLocalizedString(@"password_gen_vc_mode_basic_title", @"Basic"),
-                              @"Diceware (XKCD)"]
-               currentIndex:self.config.algorithm == kPasswordGenerationAlgorithmBasic ? 0 : 1
-                 completion:^(NSInteger selected) {
-                     self.config.algorithm = selected == 0 ? kPasswordGenerationAlgorithmBasic : kPasswordGenerationAlgorithmDiceware;
-                     AppPreferences.sharedInstance.passwordGenerationConfig = self.config;
-                     [self bindUi];
-                     [self refreshGenerated];
-                 }];
-    }
-    else if(cell == self.cellUseCharacterGroups) {
+    if(cell == self.cellUseCharacterGroups) {
         [self changeCharacterGroups];
     }
     else if(cell == self.cellEasyReadCharactersOnly) {
@@ -311,6 +315,9 @@
             [UIApplication.sharedApplication openURL:url];
         }
 #endif
+    }
+    else if ( cell == self.cellAlgorithm ) {
+        
     }
     else { 
         [self refreshGenerated];
@@ -588,18 +595,11 @@
 
 
 - (void)bindStrength {
-    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.sample1.textLabel.text
-                                                              config:AppPreferences.sharedInstance.passwordStrengthConfig];
-    
-    self.labelStrength.text = strength.summaryString;
-
-    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-        
-    double red = 1.0 - relativeStrength;
-    double green = relativeStrength;
-
-    self.progressStrength.progress = relativeStrength;
-    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
+    [PasswordStrengthUIHelper bindStrengthUI:self.sample1.textLabel.text
+                                      config:AppPreferences.sharedInstance.passwordStrengthConfig
+                          emptyPwHideSummary:NO
+                                       label:self.labelStrength
+                                    progress:self.progressStrength];
 }
 
 @end

@@ -62,7 +62,7 @@
         vc.node = sender;
         vc.model = self.model;
         vc.newEntry = NO;
-        vc.historical = YES;
+        vc.historicalItem = YES;
         vc.onClosed = nil;
     }
 }
@@ -157,8 +157,8 @@
 }
 
 - (void)enableDisableButtons {
-    self.buttonDelete.enabled = self.tableViewHistory.selectedRowIndexes.count > 0;
-    self.buttonRestore.enabled = self.tableViewHistory.selectedRowIndexes.count > 0;
+    self.buttonDelete.enabled = !self.model.isEffectivelyReadOnly && self.tableViewHistory.selectedRowIndexes.count > 0;
+    self.buttonRestore.enabled = !self.model.isEffectivelyReadOnly && self.tableViewHistory.selectedRowIndexes.count > 0;
 }
 
 - (IBAction)onDelete:(id)sender {

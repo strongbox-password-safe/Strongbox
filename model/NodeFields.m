@@ -741,6 +741,16 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     
     
     
+    self.mutableCustomFields[kOriginalWindowsSecretKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsSecretHexKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsSecretBase64Key] = nil;
+    self.mutableCustomFields[kOriginalWindowsSecretBase32Key] = nil;
+    self.mutableCustomFields[kOriginalWindowsOtpPeriodKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsOtpLengthKey] = nil;
+    self.mutableCustomFields[kOriginalWindowsOtpAlgoKey] = nil;
+    
+    
+    
     self.mutableCustomFields[kKeePassXcTotpSeedKey] = nil;
     self.mutableCustomFields[kKeePassXcTotpSettingsKey] = nil;
     

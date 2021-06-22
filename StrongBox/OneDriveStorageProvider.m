@@ -12,7 +12,7 @@
 #import "OneDriveSDK.h"
 #import "NSDate+Extensions.h"
 
-@interface OneDriveStorageProvider()
+@interface OneDriveStorageProvider ()
 
 @property (nonatomic) ODClient *odClient;
 

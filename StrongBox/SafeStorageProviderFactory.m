@@ -15,11 +15,18 @@
 
 #ifndef IS_APP_EXTENSION
 
-#import "DropboxV2StorageProvider.h"
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
 #import "AppleICloudProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
+
+#endif
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+
 #import "OneDriveStorageProvider.h"
 #import "GoogleDriveStorageProvider.h"
+#import "DropboxV2StorageProvider.h"
 
 #endif
 
@@ -27,11 +34,6 @@
 
 #import "MacUrlSchemes.h"
 #import "MacFileBasedBookmarkStorageProvider.h"
-
-#endif
-
-#ifndef IS_APP_EXTENSION
-
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 
@@ -49,6 +51,10 @@
         return SFTPStorageProvider.sharedInstance;
     }
 #if TARGET_OS_IPHONE
+    else if (providerId == kiCloud) {
+        return [AppleICloudProvider sharedInstance];
+    }
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if (providerId == kGoogleDrive) {
         return [GoogleDriveStorageProvider sharedInstance];
     }
@@ -56,12 +62,10 @@
     {
         return [DropboxV2StorageProvider sharedInstance];
     }
-    else if (providerId == kiCloud) {
-        return [AppleICloudProvider sharedInstance];
-    }
     else if(providerId == kOneDrive) {
         return [OneDriveStorageProvider sharedInstance];
     }
+#endif
     else if(providerId == kFilesAppUrlBookmark) {
         return FilesAppUrlBookmarkProvider.sharedInstance;
     }
@@ -69,17 +73,14 @@
     {
         return [LocalDeviceStorageProvider sharedInstance];
     }
-
-    [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
-    return [LocalDeviceStorageProvider sharedInstance];
-#else
+#elif TARGET_OS_OSX
     else if (providerId == kMacFile) {
         return MacFileBasedBookmarkStorageProvider.sharedInstance;
     }
-
-    [NSException raise:@"Unknown Storage Provider!" format:@"New One, Mark?"];
-    return nil;
 #endif
+    
+    NSLog(@"WARNWARN: Unknown Storage Provider!");
+    return nil;
 }
 
 #else
@@ -102,20 +103,7 @@
 + (NSString*)getDisplayNameForProvider:(StorageProvider)provider database:(METADATA_PTR )database {
     NSString* _displayName;
     
-    if (provider == kGoogleDrive) {
-        _displayName = NSLocalizedString(@"storage_provider_name_google_drive", @"Google Drive");
-        if([_displayName isEqualToString:@"storage_provider_name_google_drive"]) {
-            _displayName = @"Google Drive";
-        }
-    }
-    else if (provider == kDropbox) {
-        _displayName = NSLocalizedString(@"storage_provider_name_dropbox", @"Dropbox");
-        if([_displayName isEqualToString:@"storage_provider_name_dropbox"]) {
-            _displayName = @"Dropbox";
-        }
-        return _displayName;
-    }
-    else if (provider == kiCloud) {
+    if (provider == kiCloud) {
         _displayName = NSLocalizedString(@"storage_provider_name_icloud", @"iCloud");
         if([_displayName isEqualToString:@"storage_provider_name_icloud"]) {
             _displayName = @"iCloud";
@@ -151,12 +139,29 @@
         }
     }
 #endif
+    
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    else if (provider == kGoogleDrive) {
+        _displayName = NSLocalizedString(@"storage_provider_name_google_drive", @"Google Drive");
+        if([_displayName isEqualToString:@"storage_provider_name_google_drive"]) {
+            _displayName = @"Google Drive";
+        }
+    }
+    else if (provider == kDropbox) {
+        _displayName = NSLocalizedString(@"storage_provider_name_dropbox", @"Dropbox");
+        if([_displayName isEqualToString:@"storage_provider_name_dropbox"]) {
+            _displayName = @"Dropbox";
+        }
+        return _displayName;
+    }
     else if(provider == kOneDrive) {
         _displayName = NSLocalizedString(@"storage_provider_name_onedrive", @"OneDrive");
         if([_displayName isEqualToString:@"storage_provider_name_onedrive"]) {
             _displayName = @"OneDrive";
         }
     }
+#endif
+    
     else if(provider == kFilesAppUrlBookmark) {
         _displayName = NSLocalizedString(@"storage_provider_name_ios_files", @"iOS Files");
         if([_displayName isEqualToString:@"storage_provider_name_ios_files"]) {
@@ -191,13 +196,7 @@
 }
 
 + (NSString*)getIconForProvider:(StorageProvider)provider {
-    if (provider == kGoogleDrive) {
-        return @"google-drive-2021";
-    }
-    else if (provider == kDropbox) {
-        return @"Dropbox-2021";
-    }
-    else if (provider == kiCloud) {
+    if (provider == kiCloud) {
         return @"cloud";
     }
 #if TARGET_OS_IPHONE
@@ -205,9 +204,18 @@
         return @"iphone_x";
     }
 #endif
+    
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+    else if (provider == kGoogleDrive) {
+        return @"google-drive-2021";
+    }
+    else if (provider == kDropbox) {
+        return @"Dropbox-2021";
+    }
     else if(provider == kOneDrive) {
         return @"onedrive-2021";
     }
+#endif
     else if(provider == kFilesAppUrlBookmark) {
         return @"lock";
     }

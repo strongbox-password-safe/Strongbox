@@ -33,6 +33,7 @@
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
 #import "MacUrlSchemes.h"
+#import "StrongboxErrorCodes.h"
 
 @interface CredentialProviderViewController ()
 
@@ -385,7 +386,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
             return;
         }
         
-        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
         if ( !url ) {
             NSLog(@"Could not find Working Copy");
             NSError* error = [Utils createNSError:@"Could not find local working copy." errorCode:-123];
@@ -492,7 +493,11 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
         [self.wormhole clearAllMessageContents];
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self unlockDatabaseAtUrl:database url:url wormholeConvenienceUnlock:ret quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+            [self unlockDatabaseAtUrl:database
+                                  url:url
+            wormholeConvenienceUnlock:ret
+                  quickTypeIdentifier:quickTypeIdentifier
+                   serviceIdentifiers:serviceIdentifiers];
         });
     });
 }
@@ -515,7 +520,13 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
         conveniencePassword = database.autoFillConvenienceAutoUnlockPassword;
     }
     
-    if ( conveniencePassword ) {
+    BOOL keyFileNotSetButRequired = database.keyFileBookmark.length && !database.autoFillKeyFileBookmark.length;
+
+    if ( keyFileNotSetButRequired ) {
+        NSLog(@"Unlock Database: keyFileNotSetButRequired Showing Manual Unlock to allow user to select...");
+        [self manualUnlockDatabase:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+    }
+    else if ( conveniencePassword ) {
         NSError* err;
         CompositeKeyFactors* ckf = [self getCompositeKeyFactorsWithSelectedUiFactors:conveniencePassword
                                                                      keyFileBookmark:database.autoFillKeyFileBookmark
@@ -538,9 +549,8 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
         BOOL convenienceAvailable = [BiometricIdHelper.sharedInstance convenienceAvailable:database];
         BOOL convenienceEnabled = database.isTouchIdEnabled || database.isWatchUnlockEnabled;
         BOOL passwordAvailable = database.conveniencePassword.length;
-        BOOL keyFileNotSetButRequired = database.keyFileBookmark.length && !database.autoFillKeyFileBookmark.length;
             
-        if (convenienceEnabled && pro && database.isTouchIdEnrolled && convenienceAvailable && passwordAvailable && !keyFileNotSetButRequired) {
+        if (convenienceEnabled && pro && database.isTouchIdEnrolled && convenienceAvailable && passwordAvailable ) {
             NSLog(@"Unlock Database: Biometric Possible & Available...");
 
             
@@ -611,7 +621,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
          quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier
           serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     ManualCredentialsEntry* mce = [[ManualCredentialsEntry alloc] initWithNibName:@"ManualCredentialsEntry" bundle:nil];
-    mce.database = database;
+    mce.databaseUuid = database.uuid;
     mce.isAutoFillOpen = YES;
     
     mce.onDone = ^(BOOL userCancelled, NSString * _Nullable password, NSString * _Nullable keyFileBookmark, YubiKeyConfiguration * _Nullable yubiKeyConfiguration) {
@@ -635,9 +645,16 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
             }
             else {
                 database.autoFillKeyFileBookmark = keyFileBookmark;
-                [DatabasesManager.sharedInstance update:database];
+                [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                    metadata.autoFillKeyFileBookmark = keyFileBookmark;
+                }];
                 
-                [self unlockDatabaseWithCkf:database url:url quickTypeIdentifier:quickTypeIdentifier ckf:ckf isConvenienceUnlock:NO serviceIdentifiers:serviceIdentifiers];
+                [self unlockDatabaseWithCkf:database
+                                        url:url
+                        quickTypeIdentifier:quickTypeIdentifier
+                                        ckf:ckf
+                        isConvenienceUnlock:NO
+                         serviceIdentifiers:serviceIdentifiers];
             }
         }
     };
@@ -782,13 +799,16 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
             [self hideProgressModal];
             
             if(model) {
-                [self onSucccesfullyUnlockedDatabase:database model:model quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
+                [self onSucccesfullyUnlockedDatabase:database
+                                               model:model
+                                 quickTypeIdentifier:quickTypeIdentifier
+                                  serviceIdentifiers:serviceIdentifiers];
             }
             else if(error == nil) {
                 [self exitWithUserCancelled:database]; 
             }
             else {
-                if ( isConvenienceUnlock && error.code == kStrongboxErrorCodeIncorrectCredentials ) {
+                if ( isConvenienceUnlock && error.code == StrongboxErrorCodes.incorrectCredentials ) {
                     NSLog(@"Incorrect Credentials with Convenience Unlock. Clearing Secure Convenience Items");
                     [database resetConveniencePasswordWithCurrentConfiguration:nil];
                     database.autoFillConvenienceAutoUnlockPassword = nil;
@@ -817,7 +837,8 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
                     serviceIdentifiers:(NSArray<ASCredentialServiceIdentifier *> *)serviceIdentifiers {
     
     if (metadata.autoFillConvenienceAutoUnlockTimeout == -1 && self.withUserInteraction ) {
-        [self onboardForAutoFillConvenienceAutoUnlock:metadata completion:^{
+        [self onboardForAutoFillConvenienceAutoUnlock:metadata
+                                           completion:^{
             [self continueUnlockedDatabase:metadata model:model quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
         }];
     }
@@ -853,15 +874,21 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
                  completion:^(NSUInteger option) {
         if (option == 1) {
             database.autoFillConvenienceAutoUnlockTimeout = 180;
-            [DatabasesManager.sharedInstance update:database];
+            [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                metadata.autoFillConvenienceAutoUnlockTimeout = 180;
+            }];
         }
         else if (option == 2) {
             database.autoFillConvenienceAutoUnlockTimeout = 600;
-            [DatabasesManager.sharedInstance update:database];
+            [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                metadata.autoFillConvenienceAutoUnlockTimeout = 600;
+            }];
         }
         else if (option == 3) {
             database.autoFillConvenienceAutoUnlockTimeout = 0;
-            [DatabasesManager.sharedInstance update:database];
+            [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                metadata.autoFillConvenienceAutoUnlockTimeout = 0;
+            }];
         }
         
         completion();
@@ -926,7 +953,9 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     }
     else if (updatedBookmark) {
         database.autoFillStorageInfo = updatedBookmark;
-        [DatabasesManager.sharedInstance update:database];
+        [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+            metadata.autoFillStorageInfo = updatedBookmark;
+        }];
     }
     
     return url;
@@ -1000,7 +1029,10 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     
     if (bookmark && !error) {
         database.autoFillStorageInfo = bookmark;
-        [DatabasesManager.sharedInstance update:database];
+        [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+            metadata.autoFillStorageInfo = bookmark;
+        }];
+
         [self tryWormholeConvenienceUnlock:database url:url quickTypeIdentifier:quickTypeIdentifier serviceIdentifiers:serviceIdentifiers];
     }
     else {
@@ -1013,7 +1045,10 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
 
 - (void)markLastUnlockedAtTime:(DatabaseMetadata*)database {
     database.autoFillLastUnlockedAt = NSDate.date;
-    [DatabasesManager.sharedInstance update:database];
+    [DatabasesManager.sharedInstance atomicUpdate:database.uuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.autoFillLastUnlockedAt = database.autoFillLastUnlockedAt;
+    }];
 }
 
 @end

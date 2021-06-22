@@ -27,12 +27,14 @@ typedef BOOL (^FlaggedByAuditPredicate)(Node* node);
 - (instancetype)initWithModel:(DatabaseModel*)databaseModel
               browseSortField:(BrowseSortField)browseSortField
                    descending:(BOOL)descending
-            foldersSeparately:(BOOL)foldersSeparately;
+            foldersSeparately:(BOOL)foldersSeparately
+                  checkPinYin:(BOOL)checkPinYin;
 
 - (instancetype)initWithModel:(DatabaseModel*)databaseModel
               browseSortField:(BrowseSortField)browseSortField
                    descending:(BOOL)descending
             foldersSeparately:(BOOL)foldersSeparately
+                  checkPinYin:(BOOL)checkPinYin
              isFlaggedByAudit:(FlaggedByAuditPredicate _Nullable)isFlaggedByAudit;
 
 

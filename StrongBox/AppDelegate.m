@@ -11,7 +11,6 @@
 #import "BrowseSafeView.h"
 #import "PasswordHistoryViewController.h"
 #import "PreviousPasswordsTableViewController.h"
-#import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
 #import "AppPreferences.h"
 #import "SafesViewController.h"
 #import "SafesViewController.h"
@@ -22,13 +21,21 @@
 #import "FileManager.h"
 #import "SyncManager.h"
 #import "ClipboardManager.h"
-#import "GoogleDriveManager.h"
 #import "iCloudSafesCoordinator.h"
 #import "SecretStore.h"
 #import "Alerts.h"
 #import "SafesList.h"
 #import "VirtualYubiKeys.h"
 #import "AppLockViewController.h"
+#import "CustomizationManager.h"
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+
+#import "ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h"
+#import "GoogleDriveManager.h"
+
+#endif
+
 
 @interface AppDelegate ()
 
@@ -43,6 +50,8 @@
 @property BOOL appLockSuppressedForBiometricAuth;
 
 @end
+
+static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.preheat-secure-enclave";
 
 @implementation AppDelegate
 
@@ -59,13 +68,23 @@
     
     [self initializeInstallSettingsAndLaunchCount];   
     
-    [self initializeProFamilyEdition];
+    
+    
+    
+    
+    
+    
+    
+
+    [CustomizationManager applyCustomizations];
     
     [self markDirectoriesForBackupInclusion];
     
     [self cleanupWorkingDirectories:launchOptions];
         
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
+    
+    
     
     [ProUpgradeIAPManager.sharedInstance initialize]; 
         
@@ -75,6 +94,20 @@
     NSLog(@"STARTUP - Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
 
     return YES;
+}
+
+- (void)preHeatSecureEnclave {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0L), ^{
+        NSTimeInterval start = NSDate.timeIntervalSinceReferenceDate;
+
+
+
+        double perf = NSDate.timeIntervalSinceReferenceDate - start;
+
+        NSLog(@"====================================== PERF ======================================");
+        NSLog(@"preHeatSecureEnclave [%f] seconds - [%hhd]", perf, SecretStore.sharedInstance.secureEnclaveAvailable);
+        NSLog(@"====================================== PERF ======================================");
+    });
 }
 
 - (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
@@ -96,17 +129,9 @@
     
     
     
-    [iCloudSafesCoordinator.sharedInstance initializeiCloudAccessWithCompletion:^(BOOL available) {
-        NSLog(@"Early iCloud Initialization Done: Available = [%d]", available);
-        AppPreferences.sharedInstance.iCloudAvailable = available;
-    }];
-}
-
-- (void)initializeProFamilyEdition {
-    if([ProUpgradeIAPManager isProFamilyEdition]) {
-        NSLog(@"Pro Family Edition... setting Pro");
-        [AppPreferences.sharedInstance setPro:YES];
-    }
+    
+    
+    [iCloudSafesCoordinator.sharedInstance initializeiCloudAccess];
 }
 
 - (void)cleanupWorkingDirectories:(NSDictionary *)launchOptions {
@@ -126,6 +151,15 @@
     
     if(AppPreferences.sharedInstance.installDate == nil) {
         AppPreferences.sharedInstance.installDate = [NSDate date];
+        
+
+    }
+    else if ( !AppPreferences.sharedInstance.scheduledTipsCheckDone ) {
+        NSTimeInterval interval = [NSDate.date timeIntervalSinceDate:AppPreferences.sharedInstance.installDate];
+        if ( interval > 60 * 24 * 60 * 60 ) { 
+            AppPreferences.sharedInstance.scheduledTipsCheckDone = YES;
+            AppPreferences.sharedInstance.hideTips = YES;
+        }
     }
     
     self.appLaunchTime = [NSDate date];
@@ -141,6 +175,7 @@
         NSLog(@"Strongbox URL Scheme: NOP - [%@]", url);
         return YES;
     }
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if ([url.absoluteString hasPrefix:@"db"]) {
         [DBClientsManager handleRedirectURL:url completion:^(DBOAuthResult * _Nullable authResult) {
             if (authResult != nil) {
@@ -153,6 +188,7 @@
     else if ([url.absoluteString hasPrefix:@"com.googleusercontent.apps"]) {
         return [GoogleDriveManager.sharedInstance handleUrl:url];
     }
+#endif
     else {
         SafesViewController *safesViewController = [self getInitialViewController];
 
@@ -178,6 +214,10 @@
         self.appLockSuppressedForBiometricAuth = NO;
         return;
     }
+
+    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccess];
+
+    [self preHeatSecureEnclave]; 
 
     NSLog(@"XXXXXXXXXX - applicationDidBecomeActive- %@]", self.window.rootViewController);
 
@@ -220,24 +260,33 @@
 - (void)performedScheduledEntitlementsCheck {
     NSTimeInterval timeDifference = [NSDate.date timeIntervalSinceDate:self.appLaunchTime];
     double minutes = timeDifference / 60;
-    double hoursSinceLaunch = minutes / 60;
 
-    if(hoursSinceLaunch > 2) { 
+
+    if( minutes > 30 ) {
         
-        NSInteger launchCount = [AppPreferences.sharedInstance getLaunchCount];
+        
+        NSInteger launchCount = AppPreferences.sharedInstance.launchCount;
 
-        if (launchCount > 30) { 
+        
+
+        
+        
+        if ( launchCount > 30 ) { 
             if (@available( iOS 10.3,*)) {
                 [SKStoreReviewController requestReview];
             }
-
-            [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate:self.window.rootViewController];
         }
+        
+        
+        
+        [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
     }
 }
 
 - (void)initializeDropbox {
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
+#endif
 }
 
 
@@ -491,7 +540,7 @@ void uncaughtExceptionHandler(NSException *exception) {
     if ( AppPreferences.sharedInstance.appLockMode == kNoLock ) {
         return NO;
     }
-    
+        
     NSTimeInterval secondsBetween = [[NSDate date] timeIntervalSinceDate:self.enterBackgroundTime];
     NSInteger seconds = AppPreferences.sharedInstance.appLockDelay;
     

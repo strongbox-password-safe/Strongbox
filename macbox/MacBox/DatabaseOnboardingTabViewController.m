@@ -40,19 +40,19 @@
     OnboardingAutoFillViewController* autoFillVc = (OnboardingAutoFillViewController*)tab3.viewController;
         
     __weak DatabaseOnboardingTabViewController* weakSelf = self;
-    welcomeVc.database = self.database;
+
     welcomeVc.onNext = ^{
         [weakSelf setSelectedTabViewItemIndex:1];
     };
     
-    convenienceVc.database = self.database;
+    convenienceVc.databaseUuid = self.databaseUuid;
     convenienceVc.autoFillIsAvailable = self.autoFill;
     convenienceVc.ckfs = self.ckfs;
     convenienceVc.onNext = ^{
         [weakSelf setSelectedTabViewItemIndex:2];
     };
     
-    autoFillVc.database = self.database;
+    autoFillVc.databaseUuid = self.databaseUuid;
     autoFillVc.model = self.model;
 }
 

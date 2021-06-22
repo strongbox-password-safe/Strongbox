@@ -19,9 +19,6 @@
 
 @end
 
-static NSString* const kBiometricDatabaseStateKey = @"biometricDatabaseStateKey";
-static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricDatabaseStateKey"; 
-
 @implementation BiometricsManager
 
 + (instancetype)sharedInstance {
@@ -38,8 +35,13 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.lastKnownGoodDatabaseState = [SecretStore.sharedInstance getSecureObject:kBiometricDatabaseStateKey];
-        self.autoFillLastKnownGoodDatabaseState = [SecretStore.sharedInstance getSecureObject:kAutoFillBiometricDatabaseStateKey];
+        
+        
+
+
+        
+        self.lastKnownGoodDatabaseState = AppPreferences.sharedInstance.lastKnownGoodBiometricsDatabaseState;
+        self.autoFillLastKnownGoodDatabaseState = AppPreferences.sharedInstance.autoFillLastKnownGoodBiometricsDatabaseState;
     }
     return self;
 }
@@ -72,9 +74,9 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
 }
 
 - (void)clearBiometricRecordedDatabaseState {
-    [SecretStore.sharedInstance deleteSecureItem:kBiometricDatabaseStateKey];
-    [SecretStore.sharedInstance deleteSecureItem:kAutoFillBiometricDatabaseStateKey];
-
+    AppPreferences.sharedInstance.lastKnownGoodBiometricsDatabaseState = nil;
+    AppPreferences.sharedInstance.autoFillLastKnownGoodBiometricsDatabaseState = nil;
+    
     self.lastKnownGoodDatabaseState = nil;
     self.autoFillLastKnownGoodDatabaseState = nil;
 }
@@ -99,11 +101,11 @@ static NSString* const kAutoFillBiometricDatabaseStateKey = @"autoFillBiometricD
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
         if(autoFill) {
             self.autoFillLastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
-            [SecretStore.sharedInstance setSecureObject:self.autoFillLastKnownGoodDatabaseState forIdentifier:kAutoFillBiometricDatabaseStateKey];
+            AppPreferences.sharedInstance.autoFillLastKnownGoodBiometricsDatabaseState = self.autoFillLastKnownGoodDatabaseState;
         }
         else {
             self.lastKnownGoodDatabaseState = localAuthContext.evaluatedPolicyDomainState;
-            [SecretStore.sharedInstance setSecureObject:self.lastKnownGoodDatabaseState forIdentifier:kBiometricDatabaseStateKey];
+            AppPreferences.sharedInstance.lastKnownGoodBiometricsDatabaseState = self.lastKnownGoodDatabaseState;
         }
     });
 }

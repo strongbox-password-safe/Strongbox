@@ -15,8 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface DatabaseSyncOperationalData : NSObject
 
 - (instancetype)init NS_UNAVAILABLE;
-
-- (instancetype)initWithDatabase:(METADATA_PTR)database NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithDatabaseId:(NSString*)databaseUuid NS_DESIGNATED_INITIALIZER;
 
 @property (readonly) SyncStatus* status;
 @property (readonly) dispatch_queue_t dispatchSerialQueue;

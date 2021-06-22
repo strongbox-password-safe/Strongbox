@@ -23,6 +23,7 @@
 #import "NSData+Extensions.h"
 #import "NSString+Extensions.h"
 #import "KP31HashedBlockStream.h"
+#import "StrongboxErrorCodes.h"
 
 typedef struct _HeaderEntryHeader {
     uint8_t id;
@@ -310,7 +311,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
 
 
         free(start);
-        NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:kStrongboxErrorCodeIncorrectCredentials];
+        NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:StrongboxErrorCodes.incorrectCredentials];
         completion(NO, nil, error);
         return;
     }

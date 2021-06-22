@@ -58,7 +58,7 @@
 
 - (void)setupUi {
     UITapGestureRecognizer *trial = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                            action:@selector(onStartTrial:)];
+                                                                            action:@selector(onStartTrial)];
     [self.startButton addGestureRecognizer:trial];
 
     NSString* loc2 = NSLocalizedString(@"upgrade_vc_start_your_free_trial_price_free", @"Free");
@@ -69,27 +69,18 @@
     self.startButtonL3.text = loc3;
 }
 
-- (IBAction)onStartTrial:(id)sender {
+- (void)onStartTrial {
     self.buttonRestorePurchases.enabled = NO;
     self.startButton.userInteractionEnabled = NO;
     self.startButton.backgroundColor = UIColor.systemGrayColor;
     
     [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"Loading...")];
     
+    __weak FreemiumStartFreeTrialViewController* weakSelf = self;
+    
     [ProUpgradeIAPManager.sharedInstance startFreeTrial:^(NSError * _Nullable error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [SVProgressHUD dismiss];
-            self.startButton.userInteractionEnabled = YES;
-            self.startButton.backgroundColor = UIColor.systemBlueColor;
-            
-            NSLog(@"Purchases done... [%@]", error);
-
-            if (!error) {
-                self.onDone(YES);
-            }
-            else {
-                [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
-            }
+            [weakSelf onStartFreeTrialDone:error];
         });
     }];
 }
@@ -101,37 +92,66 @@
     
     BOOL optedInToFreeTrial = AppPreferences.sharedInstance.hasOptedInToFreeTrial;
     
+    __weak FreemiumStartFreeTrialViewController* weakSelf = self;
+
     [ProUpgradeIAPManager.sharedInstance restorePrevious:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            self.buttonRestorePurchases.enabled = YES;
-            self.startButton.userInteractionEnabled = YES;
-            [SVProgressHUD dismiss];
-            
-            if(error) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"upgrade_vc_problem_restoring", @"Issue Restoring Purchase")
-                        error:error];
-            }
-            else {
-                BOOL freeTrialStarted = AppPreferences.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
-                
-                if(!AppPreferences.sharedInstance.isPro && !freeTrialStarted) {
-                    [Alerts info:self
-                           title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
-                         message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
-                      completion:nil];
-                }
-                else {
-                    self.onDone(YES);
-                }
-            }
+            [weakSelf onRestorePreviousDone:error optedInToFreeTrial:optedInToFreeTrial];
         });
     }];
+}
 
+- (void)onStartFreeTrialDone:(NSError*)error {
+    [SVProgressHUD dismiss];
+    self.startButton.userInteractionEnabled = YES;
+    self.startButton.backgroundColor = UIColor.systemBlueColor;
+    self.buttonRestorePurchases.enabled = YES;
+
+    NSLog(@"Purchases done... [%@]", error);
+
+    if (!error) {
+        [self dismiss:YES];
+    }
+    else {
+        [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
+    }
+}
+
+- (void)onRestorePreviousDone:(NSError*)error optedInToFreeTrial:(BOOL)optedInToFreeTrial {
+    self.buttonRestorePurchases.enabled = YES;
+    self.startButton.userInteractionEnabled = YES;
+    [SVProgressHUD dismiss];
+    
+    if(error) {
+        [Alerts error:self
+                title:NSLocalizedString(@"upgrade_vc_problem_restoring", @"Issue Restoring Purchase")
+                error:error];
+    }
+    else {
+        BOOL freeTrialStarted = AppPreferences.sharedInstance.hasOptedInToFreeTrial != optedInToFreeTrial;
+        
+        if(!AppPreferences.sharedInstance.isPro && !freeTrialStarted) {
+            [Alerts info:self
+                   title:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_title", @"Restoration Unsuccessful")
+                 message:NSLocalizedString(@"upgrade_vc_restore_unsuccessful_message", @"Upgrade could not be restored from previous purchase. Are you sure you have purchased this item?")
+              completion:nil];
+        }
+        else {
+            [self dismiss:YES];
+        }
+    }
 }
 
 - (IBAction)onDismiss:(id)sender {
-    self.onDone(NO);
+    [self dismiss:NO];
+}
+
+- (void)dismiss:(BOOL)freeTrialStarted {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+        if ( self.onDone ) {
+            self.onDone(freeTrialStarted);
+        }
+    }];
 }
 
 @end

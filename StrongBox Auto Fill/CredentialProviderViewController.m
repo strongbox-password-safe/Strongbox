@@ -244,7 +244,7 @@
 }
 
 - (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
-    NSLog(@"presentationControllerDidDismiss");
+
     [self cancel:nil];
 }
 
@@ -253,7 +253,7 @@
         return NO;
     }
         
-    return [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safeMetaData modified:nil];
+    return [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable2:safeMetaData.uuid modified:nil];
 }
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers {

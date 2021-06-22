@@ -32,6 +32,12 @@ NS_ASSUME_NONNULL_BEGIN
                         password:(NSString *)password
                       completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion;
 
++ (void)createNewExpressDatabase:(UIViewController*)vc
+                            name:(NSString *)name
+                        password:(NSString *)password
+                      forceLocal:(BOOL)forceLocal
+                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion;
+
 @end
 
 NS_ASSUME_NONNULL_END

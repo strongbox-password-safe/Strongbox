@@ -14,10 +14,8 @@
 #import "RMAppReceipt.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
-
 #import "Model.h"
-
-static NSString * const kProFamilyEditionBundleId = @"com.markmcguill.strongbox.pro";
+#import "CustomizationManager.h"
 
 static NSString* const kIapProId =  @"com.markmcguill.strongbox.pro";
 static NSString* const kMonthly =  @"com.strongbox.markmcguill.upgrade.pro.monthly";
@@ -59,15 +57,16 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
         if ([verificator verifyAppReceipt]) {
             NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-            [self checkVerifiedReceiptIsEntitledToPro:nil];
+            [self checkVerifiedReceiptIsEntitledToPro];
         }
         else {
+            
             NSLog(@"Startup receipt check failed...");
         }
     });
 }
 
-- (void)performScheduledProEntitlementsCheckIfAppropriate:(UIViewController*)vc {
+- (void)performScheduledProEntitlementsCheckIfAppropriate {
     if(AppPreferences.sharedInstance.lastEntitlementCheckAttempt != nil) {
         NSCalendar *gregorian = [[NSCalendar alloc] initWithCalendarIdentifier:NSCalendarIdentifierGregorian];
         
@@ -80,7 +79,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         
         NSLog(@"%ld days since last entitlement check... [%@]", (long)days, AppPreferences.sharedInstance.lastEntitlementCheckAttempt);
         
-        if(days == 0) { 
+        if ( days == 0 ) { 
             NSLog(@"Already checked entitlements today... not rechecking...");
             return;
         }
@@ -98,26 +97,22 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 
     NSLog(@"Performing Scheduled Check of Entitlements...");
     
-    if(AppPreferences.sharedInstance.numberOfEntitlementCheckFails < 10) {
-        [self checkReceiptForTrialAndProEntitlements:vc];
+    if ( AppPreferences.sharedInstance.numberOfEntitlementCheckFails < 10 ) {
+        [self checkReceiptForTrialAndProEntitlements];
     }
     else {
-        
-        [Alerts info:vc
-               title:NSLocalizedString(@"upgrade_mgr_entitlements_error_title", @"Strongbox Entitlements Error")
-             message:NSLocalizedString(@"upgrade_mgr_entitlements_error_message", @"Strongbox is having trouble verifying its App Store entitlements. This means the App must be downgraded to the Free version. Please contact support@strongboxsafe.com if you think this is in error.")];
-    
+        AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = YES;
         [AppPreferences.sharedInstance setPro:NO];
     }
 }
 
-- (void)checkReceiptForTrialAndProEntitlements:(UIViewController*)vc { 
+- (void)checkReceiptForTrialAndProEntitlements { 
     AppPreferences.sharedInstance.lastEntitlementCheckAttempt = [NSDate date];
     
     RMStoreAppReceiptVerifier *verificator = [[RMStoreAppReceiptVerifier alloc] init];
-    if ([verificator verifyAppReceipt]) {
+    if ( [verificator verifyAppReceipt] ) {
         NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-        [self checkVerifiedReceiptIsEntitledToPro:vc];
+        [self checkVerifiedReceiptIsEntitledToPro];
     }
     else {
         NSLog(@"Receipt Not Good... Refreshing...");
@@ -125,7 +120,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         [[RMStore defaultStore] refreshReceiptOnSuccess:^{
             if ([verificator verifyAppReceipt]) {
                 NSLog(@"App Receipt looks ok... checking for Valid Pro IAP purchases...");
-                [self checkVerifiedReceiptIsEntitledToPro:vc];
+                [self checkVerifiedReceiptIsEntitledToPro];
             }
             else {
                 NSLog(@"Receipt not good even after refresh");
@@ -138,11 +133,11 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }
 }
 
-- (void)checkVerifiedReceiptIsEntitledToPro:(UIViewController*)vc {
+- (void)checkVerifiedReceiptIsEntitledToPro {
     AppPreferences.sharedInstance.numberOfEntitlementCheckFails = 0;
     
     NSDate* freeTrialPurchaseDate = ProUpgradeIAPManager.sharedInstance.freeTrialPurchaseDate;
-    if(freeTrialPurchaseDate && !AppPreferences.sharedInstance.hasOptedInToFreeTrial) {
+    if ( freeTrialPurchaseDate && !AppPreferences.sharedInstance.hasOptedInToFreeTrial ) {
         NSLog(@"Found Free Trial Purchase: [%@] - Setting free trial end date accordingly", freeTrialPurchaseDate);
         NSDate* endDate = [AppPreferences.sharedInstance calculateFreeTrialEndDateFromDate:freeTrialPurchaseDate];
         AppPreferences.sharedInstance.freeTrialEnd = endDate;
@@ -151,23 +146,23 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
         [[NSNotificationCenter defaultCenter] postNotificationName:kProStatusChangedNotificationKey object:nil];
     }
     
-    if ([ProUpgradeIAPManager isProFamilyEdition]) {
-        NSLog(@"Upgrading App to Pro as Receipt is Good and this is the Pro Family edition...");
+    if ( CustomizationManager.isAProBundle ) {
+        NSLog(@"Upgrading App to Pro as Receipt is Good and this is a Pro edition...");
         [AppPreferences.sharedInstance setPro:YES];
+        AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = NO;
     }
-    else if([self receiptHasProEntitlements]) {
+    else if ( [self receiptHasProEntitlements] ) {
         NSLog(@"Upgrading App to Pro as Entitlement found in Receipt...");
         [AppPreferences.sharedInstance setPro:YES];
+        
+        AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = NO;
     }
     else {
-        if(AppPreferences.sharedInstance.isPro) {
+        if ( AppPreferences.sharedInstance.isPro ) {
             NSLog(@"Downgrading App as Entitlement NOT found in Receipt...");
             
-            if(vc) {
-                [Alerts info:vc
-                       title:NSLocalizedString(@"upgrade_mgr_downgrade_title", @"Strongbox Downgrade")
-                     message:NSLocalizedString(@"upgrade_mgr_downgrade_message", @"It looks like this app is no longer entitled to all the Pro features. These will be limited now. If you believe this is incorrect, please get in touch with support@strongboxsafe.com to get some help with this. Please include your purchase receipt.")];
-            }
+            AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = YES;
+            AppPreferences.sharedInstance.hasPromptedThatAppHasBeenDowngradedToFreeEdition = NO;
             [AppPreferences.sharedInstance setPro:NO];
         }
         else {
@@ -238,7 +233,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
             NSLog(@"%@-%@", pt.originalTransaction.payment.productIdentifier, pt.originalTransaction.transactionDate);
         }
         
-        [self checkReceiptForTrialAndProEntitlements:nil];
+        [self checkReceiptForTrialAndProEntitlements];
         
         completion(nil);
     } failure:^(NSError *error) {
@@ -256,18 +251,13 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
                                success:^(SKPaymentTransaction *transaction) {
         NSLog(@"Product purchased: [%@]", transaction);
         
-        [self checkReceiptForTrialAndProEntitlements:nil];
+        [self checkReceiptForTrialAndProEntitlements];
 
         completion(nil);
     } failure:^(SKPaymentTransaction *transaction, NSError *error) {
         NSLog(@"Something went wrong: [%@] error = [%@]", transaction, error);
         completion(error);
     }];
-}
-
-+ (BOOL)isProFamilyEdition {
-    NSString* bundleId = [Utils getAppBundleId];
-    return [bundleId isEqualToString:kProFamilyEditionBundleId];
 }
 
 
@@ -300,8 +290,14 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }];
     
     if (freeTrialIap) {
-        NSDate* date = freeTrialIap.originalPurchaseDate;
-        NSLog(@"Date vs Orig: [%@] vs [%@]", date, freeTrialIap.originalPurchaseDate);
+        NSDate* date;
+        if ( freeTrialIap.originalPurchaseDate ) {
+            date = freeTrialIap.originalPurchaseDate;
+        }
+        else {
+            NSLog(@"Could not get original purchase date using purchaseDate instead");
+            date = freeTrialIap.purchaseDate;
+        }
         
         if (date) {
             return date;
@@ -318,7 +314,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
 }
 
 - (void)startFreeTrial:(PurchaseCompletionBlock)completion {
-    if (self.freeTrialProduct) {
+    if ( self.freeTrialProduct ) {
         [self purchaseAndCheckReceipts:self.freeTrialProduct completion:completion];
     }
     else {

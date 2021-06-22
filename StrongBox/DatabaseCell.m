@@ -271,19 +271,19 @@ rotateLastImage:(BOOL)rotateLastImage
 
 - (NSString*)getModifiedDate:(SafeMetaData*)safe {
     NSDate* mod;
-    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable2:safe.uuid modified:&mod];
     return mod ? mod.friendlyDateStringVeryShort : @"";
 }
 
 - (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
     NSDate* mod;
-    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe modified:&mod];
+    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable2:safe.uuid modified:&mod];
     return mod ? mod.friendlyDateTimeStringPrecise : @"";
 }
 
 - (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
     unsigned long long fileSize;
-    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe modified:nil fileSize:&fileSize];
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:safe.uuid modified:nil fileSize:&fileSize];
     return url ? friendlyFileSizeString(fileSize) : @"";
 }
 

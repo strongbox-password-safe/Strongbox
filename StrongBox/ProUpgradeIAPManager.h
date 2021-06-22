@@ -40,9 +40,7 @@ typedef void (^ProductsAvailableNotificationBlock)(void);
 
 - (void)purchaseAndCheckReceipts:(SKProduct*)product completion:(PurchaseCompletionBlock)completion;
 
-- (void)performScheduledProEntitlementsCheckIfAppropriate:(UIViewController*)vc;
-
-+ (BOOL)isProFamilyEdition;
+- (void)performScheduledProEntitlementsCheckIfAppropriate;
 
 - (void)startFreeTrial:(PurchaseCompletionBlock)completion;
 

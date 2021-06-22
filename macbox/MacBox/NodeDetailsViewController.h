@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property Node* node;
 @property (weak) ViewModel* model;
 @property BOOL newEntry;
-@property BOOL historical;
+@property BOOL historicalItem;
 
 @property (nullable) dispatch_block_t onClosed;
 

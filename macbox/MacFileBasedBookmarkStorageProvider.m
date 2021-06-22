@@ -87,7 +87,7 @@
     NSData* data = [NSData dataWithContentsOfURL:url options:kNilOptions error:&readError];
     
     if ( securitySucceeded ) {
-        [url stopAccessingSecurityScopedResource];
+        [self stopAccessingSecurityScopedResource:url];
     }
     
 
@@ -124,7 +124,7 @@
     }
 
     if ( securitySucceeded ) {
-        [url stopAccessingSecurityScopedResource];
+        [self stopAccessingSecurityScopedResource:url];
     }
     
     completion(attr.fileModificationDate, error);
@@ -164,7 +164,7 @@
     }
 
     if ( securitySucceeded ) {
-        [url stopAccessingSecurityScopedResource];
+        [self stopAccessingSecurityScopedResource:url];
     }
     
     if ( success ) {
@@ -201,19 +201,30 @@
             if ( updatedBookmark ) {
                 NSLog(@"INFO: Bookmark has changed for Database updating...");
                 database.storageInfo = updatedBookmark;
-                [DatabasesManager.sharedInstance update:database];
+                [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                    metadata.storageInfo = updatedBookmark;
+                }];
             }
             
             NSURL* defaultRet = fileUrlFromManagedUrl(database.fileUrl);
             if ( ![url.absoluteString isEqualToString:defaultRet.absoluteString] ) {
                 NSLog(@"INFO: URL has changed for Database updating...");
+
                 database.fileUrl = managedUrlFromFileUrl(url);
-                [DatabasesManager.sharedInstance update:database];
+                [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                    metadata.fileUrl = database.fileUrl;
+                }];
             }
         }
     }
     
     return fileUrlFromManagedUrl(database.fileUrl);
+}
+
+- (void)stopAccessingSecurityScopedResource:(NSURL*)url {
+    if ( @available(macOS 11.0, *) ) { 
+        [url stopAccessingSecurityScopedResource];
+    }
 }
 
 @end

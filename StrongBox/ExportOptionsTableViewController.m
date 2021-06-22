@@ -24,7 +24,7 @@
 
 @end
 
-@interface ExportOptionsTableViewController () <UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate>
+@interface ExportOptionsTableViewController () <UIDocumentPickerDelegate, MFMailComposeViewControllerDelegate, UIAdaptivePresentationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellShare;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellFiles;
@@ -35,6 +35,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellXml;
 
 @property NSURL* temporaryExportUrl;
+@property (readonly) NSString* exportFileName;
 
 @end
 
@@ -43,11 +44,13 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.navigationController.presentationController.delegate = self;
+
     self.clearsSelectionOnViewWillAppear = NO;
     
     self.tableView.tableFooterView = [UIView new];
     
-    if (self.backupMode) {
+    if (self.hidePlaintextOptions) {
         [self cell:self.cellEmailCsv setHidden:YES];
         [self cell:self.cellCopy setHidden:YES];
         [self cell:self.cellHtml setHidden:YES];
@@ -106,28 +109,23 @@
 }
 
 - (void)onShare {
-    if(self.backupMode) {
-        [self onShareWithData:self.encrypted];
-    }
-    else {
-        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-            if (userCancelled) {
-                
-            }
-            else if (!data) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
-                        error:error];
-            }
-            else {
-                [self onShareWithData:data];
-            }
-        }];
-    }
+    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        if (userCancelled) {
+            
+        }
+        else if (!data) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
+                    error:error];
+        }
+        else {
+            [self onShareWithData:data];
+        }
+    }];
 }
 
 - (void)onShareWithData:(NSData*)data {
-    NSString* filename = self.backupMode ? self.metadata.fileName : self.viewModel.metadata.fileName;
+    NSString* filename = self.exportFileName;
     NSString* f = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
     
     [NSFileManager.defaultManager removeItemAtPath:f error:nil];
@@ -150,21 +148,26 @@
     activityViewController.popoverPresentationController.sourceView = self.view;
     activityViewController.popoverPresentationController.sourceRect = CGRectMake(CGRectGetMidX(self.view.bounds), CGRectGetMidY(self.view.bounds),0,0);
     activityViewController.popoverPresentationController.permittedArrowDirections = 0L; 
-    
+
+    __weak ExportOptionsTableViewController* weakSelf = self;
+
     [activityViewController setCompletionWithItemsHandler:^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
         NSError *errorBlock;
         if([[NSFileManager defaultManager] removeItemAtURL:url error:&errorBlock] == NO) {
             NSLog(@"error deleting file %@", errorBlock);
             return;
         }
+        
+        if ( completed ) {
+            [weakSelf informSuccessAndDismiss];
+        }
     }];
     
     [self presentViewController:activityViewController animated:YES completion:nil];
 }
 
-- (NSString *)activityViewController:(UIActivityViewController *)activityViewController subjectForActivityType:(NSString *)activityType
-{
-    NSString* nickname = self.backupMode ? self.metadata.nickName : self.viewModel.metadata.nickName;
+- (NSString *)activityViewController:(UIActivityViewController *)activityViewController subjectForActivityType:(NSString *)activityType {
+    NSString* nickname = self.viewModel.metadata.nickName;
     NSString* subject = [NSString stringWithFormat:NSLocalizedString(@"export_vc_email_subject", @"Strongbox Database: '%@'"), nickname];
 
     return subject;
@@ -183,6 +186,8 @@
                              alertType:ISAlertTypeSuccess
                          alertPosition:ISAlertPositionTop
                                didHide:nil];
+
+    [self informSuccessAndDismiss];
 }
 
 - (void)copyXml {
@@ -207,6 +212,8 @@
                                  alertType:ISAlertTypeSuccess
                              alertPosition:ISAlertPositionTop
                                    didHide:nil];
+        
+        [self informSuccessAndDismiss];
     }];
 }
 
@@ -225,35 +232,26 @@
 }
 
 - (void)exportEncryptedSafeByEmail {
-    if(!self.backupMode) {
-        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-            if (userCancelled) {
-                return;
-            }
-            else if(!data) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
-                        error:error];
-                return;
-            }
-            
-            NSString* likelyExtension = [Serializator getDefaultFileExtensionForFormat:self.viewModel.database.originalFormat];
-            NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
-            NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.viewModel.metadata.fileName, appendExtension];
-            
-            [self composeEmail:attachmentName
-                      mimeType:@"application/octet-stream"
-                          data:data
-                      nickname:self.viewModel.metadata.nickName];
-        }];
-    }
-    else {
-        NSString* likelyExtension = [Serializator getDefaultFileExtensionForFormat:self.metadata.likelyFormat];
-        NSString* appendExtension = self.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
-        NSString *attachmentName = [NSString stringWithFormat:@"%@-%@-%@", self.metadata.fileName, self.backupItem.backupCreatedDate.iso8601DateString, appendExtension];
-
-        [self composeEmail:attachmentName mimeType:@"application/octet-stream" data:self.encrypted nickname:self.metadata.nickName];
-    }
+    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        if (userCancelled) {
+            return;
+        }
+        else if(!data) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
+                    error:error];
+            return;
+        }
+        
+        NSString* likelyExtension = [Serializator getDefaultFileExtensionForFormat:self.viewModel.database.originalFormat];
+        NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
+        NSString *attachmentName = [NSString stringWithFormat:@"%@%@", self.exportFileName, appendExtension];
+        
+        [self composeEmail:attachmentName
+                  mimeType:@"application/octet-stream"
+                      data:data
+                  nickname:self.viewModel.metadata.nickName];
+    }];
 }
 
 - (void)composeEmail:(NSString*)attachmentName mimeType:(NSString*)mimeType data:(NSData*)data nickname:(NSString*)nickname {
@@ -287,39 +285,42 @@
                     error:error];
         }
         else if(result == MFMailComposeResultSent) {
-            [Alerts info:self
-                   title:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
-                 message:NSLocalizedString(@"export_vc_export_successful_message", @"Your database was successfully exported.")
-              completion:^{
-                [self.navigationController popViewControllerAnimated:YES];
-            }];
+            [self informSuccessAndDismiss];
         }
     }];
 }
 
-- (void)onFiles {
-    if(self.backupMode) {
-        [self onFilesGotData:self.encrypted  metadata:self.metadata];
-    }
-    else {
-        [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-            if (userCancelled) {
-                
-            }
-            else if (!data) {
-                [Alerts error:self
-                        title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
-                        error:error];
-            }
-            else {
-                [self onFilesGotData:data metadata:self.viewModel.metadata];
-            }
+- (void)informSuccessAndDismiss {
+    __weak ExportOptionsTableViewController* weakSelf = self;
+
+    [Alerts info:self
+           title:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
+         message:NSLocalizedString(@"export_vc_export_successful_message", @"Your database was successfully exported.")
+      completion:^{
+        [weakSelf.presentingViewController dismissViewControllerAnimated:YES completion:^{
+            [weakSelf onDismissed:YES];
         }];
-    }
+    }];
+}
+
+- (void)onFiles {
+    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        if (userCancelled) {
+            
+        }
+        else if (!data) {
+            [Alerts error:self
+                    title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
+                    error:error];
+        }
+        else {
+            [self onFilesGotData:data metadata:self.viewModel.metadata];
+        }
+    }];
 }
 
 - (void)onFilesGotData:(NSData*)data metadata:(SafeMetaData*)metadata {
-    self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:metadata.fileName];
+    self.temporaryExportUrl = [NSFileManager.defaultManager.temporaryDirectory URLByAppendingPathComponent:self.exportFileName];
     
     NSError* error;
     [data writeToURL:self.temporaryExportUrl options:kNilOptions error:&error];
@@ -375,12 +376,7 @@
                  message:@""];
         }
         else {
-            [Alerts info:self
-                   title:NSLocalizedString(@"export_vc_export_successful_title", @"Export Successful")
-                 message:NSLocalizedString(@"export_vc_export_successful_message", @"Your database was successfully exported.")
-              completion:^{
-                [self.navigationController popViewControllerAnimated:YES];
-            }];
+            [self informSuccessAndDismiss];
         }
     }];
     
@@ -388,8 +384,36 @@
 }
 #pragma GCC diagnostic pop
 
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
+    [self onDismissed:NO];
+}
+
 - (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    __weak ExportOptionsTableViewController* weakSelf = self;
+
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+        [weakSelf onDismissed:NO];
+    }];
+}
+
+- (void)onDismissed:(BOOL)didExport {
+    NSLog(@"Dismissing Export: %hhd successful", didExport);
+    
+    if ( self.onDone ) {
+        self.onDone();
+    }
+}
+
+- (NSString*)exportFileName {
+    NSString* extension = self.viewModel.metadata.fileName.pathExtension;
+    NSString* withoutExtension = [self.viewModel.metadata.fileName stringByDeletingPathExtension];
+    NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
+    
+    NSString* ret = [newFileName stringByAppendingPathExtension:extension];
+    
+    NSLog(@"Export Filename: [%@]", ret);
+    
+    return  ret;
 }
 
 @end

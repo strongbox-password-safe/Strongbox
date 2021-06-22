@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TurnOnAutoFillViewController : UIViewController
 
-@property (nonatomic, copy) void (^onDone)(BOOL addExisting, SafeMetaData* _Nullable databaseToOpen);
+@property (nonatomic, copy) void (^onDone)(void);
 
 @end
 

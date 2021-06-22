@@ -42,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)setFileProtection:(BOOL)complete;
 
+@property (readonly) NSArray<NSURL*>* importedKeyFiles;
+
 @end
 
 NS_ASSUME_NONNULL_END

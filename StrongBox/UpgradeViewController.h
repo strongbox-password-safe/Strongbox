@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface UpgradeViewController : UIViewController
 
+@property (nonatomic, copy, nullable) void (^onDone)(void);
+
 @end
 
 NS_ASSUME_NONNULL_END

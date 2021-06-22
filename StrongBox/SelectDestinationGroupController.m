@@ -11,6 +11,7 @@
 #import "Utils.h"
 #import "BrowseTableViewCellHelper.h"
 #import "DatabaseSearchAndSorter.h"
+#import "AppPreferences.h"
 
 @interface SelectDestinationGroupController ()
 
@@ -44,7 +45,8 @@
     DatabaseSearchAndSorter *sorter = [[DatabaseSearchAndSorter alloc] initWithModel:self.viewModel.database
                                                                      browseSortField:self.viewModel.metadata.browseSortField
                                                                           descending:self.viewModel.metadata.browseSortOrderDescending
-                                                                   foldersSeparately:YES];
+                                                                   foldersSeparately:YES
+                                                                         checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled];
     
     self.items = [sorter sortItemsForBrowse:self.currentGroup.childGroups];
     

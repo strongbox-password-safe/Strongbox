@@ -44,6 +44,7 @@
 #import "Constants.h"
 #import "NSDate+Extensions.h"
 #import "AsyncUpdateResultViewController.h"
+#import <MobileCoreServices/MobileCoreServices.h>
 
 #ifndef IS_APP_EXTENSION
 
@@ -87,7 +88,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 
 
-@interface ItemDetailsViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate, UIPopoverPresentationControllerDelegate> 
+@interface ItemDetailsViewController () <QLPreviewControllerDataSource, QLPreviewControllerDelegate, UIPopoverPresentationControllerDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
 @property EntryViewModel* model;
 @property EntryViewModel* preEditModelClone;
@@ -124,7 +125,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)dealloc {
     NSLog(@"ItemDetailsViewController::DEALLOC [%@]", self);
-    
+
     [self unListenToNotifications];
 }
 
@@ -538,6 +539,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     [super setEditing:editing animated:animated];
+    
+    [SafesList.sharedInstance setEditing:self.databaseModel.metadata editing:editing];
     
     if (@available(iOS 11.0, *)) { 
         [self.tableView performBatchUpdates:^{
@@ -1084,12 +1087,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)onSetTotp {
 #ifndef IS_APP_EXTENSION
-    [Alerts threeOptionsWithCancel:self
+    [Alerts fourOptionsWithCancel:self
                              title:NSLocalizedString(@"item_details_setup_totp_how_title", @"How would you like to setup TOTP?")
                            message:NSLocalizedString(@"item_details_setup_totp_how_message", @"You can setup TOTP by using a QR Code, or manually by entering the secret or an OTPAuth URL")
-                 defaultButtonText:NSLocalizedString(@"item_details_setup_totp_qr_code", @"QR Code...")
-                  secondButtonText:NSLocalizedString(@"item_details_setup_totp_manual_rfc", @"Manual (Standard/RFC 6238)...")
-                   thirdButtonText:NSLocalizedString(@"item_details_setup_totp_manual_steam", @"Manual (Steam Token)...")
+                 defaultButtonText:NSLocalizedString(@"scan_qr_code_from_camera", @"Scan QR Code with Camera")
+                  secondButtonText:NSLocalizedString(@"key_files_vc_one_time_key_file_source_option_photos", @"Photo Library...")
+                   thirdButtonText:NSLocalizedString(@"item_details_setup_totp_manual_rfc", @"Manual (Standard/RFC 6238)...")
+                  fourthButtonText:NSLocalizedString(@"item_details_setup_totp_manual_steam", @"Manual (Steam Token)...")
                             action:^(int response) {
         if(response == 0){
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
@@ -1104,14 +1108,17 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
             
             [self presentViewController:vc animated:YES completion:nil];
         }
-        else if(response == 1 || response == 2) {
+        else if(response == 1) {
+            [self scanPhotoLibraryImageForQRCode];
+        }
+        else if(response == 2 || response == 3) {
             [Alerts OkCancelWithTextField:self
                      textFieldPlaceHolder:NSLocalizedString(@"item_details_setup_totp_secret_title", @"Secret or OTPAuth URL")
                                     title:NSLocalizedString(@"item_details_setup_totp_secret_message", @"Please enter the secret or an OTPAuth URL")
                                   message:@""
                                completion:^(NSString *text, BOOL success) {
                 if(success) {
-                    [self setTotpWithString:text steam:(response == 2)];
+                    [self setTotpWithString:text steam:(response == 3)];
                 }
             }];
         }
@@ -1136,6 +1143,80 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         [Alerts warn:self
                title:NSLocalizedString(@"item_details_setup_totp_failed_title", @"Failed to Set TOTP")
              message:NSLocalizedString(@"item_details_setup_totp_failed_message", @"Could not set TOTP because it could not be initialized.")];
+    }
+}
+
+- (void)scanPhotoLibraryImageForQRCode {
+    BOOL available = [UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary];
+    
+    if(!available) {
+        [Alerts info:self
+               title:NSLocalizedString(@"add_attachment_vc_error_source_unavailable_title", @"Source Unavailable")
+             message:NSLocalizedString(@"add_attachment_vc_error_source_unavailable_photos", @"Strongbox could not access photos. Does it have permission?")];
+        return;
+    }
+
+    UIImagePickerController *vc = [[UIImagePickerController alloc] init];
+    vc.delegate = self;
+    vc.videoQuality = UIImagePickerControllerQualityTypeHigh;
+    vc.modalPresentationStyle = UIModalPresentationFormSheet;
+    vc.mediaTypes = @[(NSString*)kUTTypeMovie, (NSString*)kUTTypeImage];
+    vc.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
+
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker
+didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info {
+    UIImage* image = [info objectForKey:UIImagePickerControllerOriginalImage];
+    
+    if(!image) {
+        [Alerts warn:self
+               title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
+             message:NSLocalizedString(@"add_attachment_vc_error_reading_message", @"Could not read the data for this item.")];
+        return;
+    }
+
+    [picker dismissViewControllerAnimated:YES completion:^{
+        NSString *qrCodeString = [self detectQRCode:image];
+        
+        if (qrCodeString != nil) {
+            [self setTotpWithString:qrCodeString steam:NO];
+        }
+        else {
+            NSLog(@"Couldn't find QR Code!");
+
+            [Alerts warn:self
+                   title:NSLocalizedString(@"add_attachment_vc_error_reading_title", @"Error Reading")
+                 message:NSLocalizedString(@"could_not_find_qr_code", @"Strongbox could not find a QR Code in this image.")];
+        }
+    }];
+}
+
+- (NSString*)detectQRCode:(UIImage *)image {
+    @autoreleasepool {
+        CIImage* ciImage = image.CIImage ? image.CIImage : [CIImage imageWithCGImage:image.CGImage];
+ 
+        if ( !ciImage ) {
+            NSLog(@"WARNWARN: Could not get CIImage for QR Code");
+            return nil;
+        }
+        
+        CIDetector* qrDetector = [CIDetector detectorOfType:CIDetectorTypeQRCode
+                                                    context:CIContext.context
+                                                    options:@{ CIDetectorAccuracy : CIDetectorAccuracyHigh }];
+        
+        id orientation = ciImage.properties[(NSString*)kCGImagePropertyOrientation];
+        
+        NSArray<CIFeature*>* features = [qrDetector featuresInImage:ciImage
+                                                            options:@{ CIDetectorImageOrientation : orientation ? orientation : @1}];
+
+        if ( features.firstObject && [features.firstObject isKindOfClass:CIQRCodeFeature.class] ) {
+            CIQRCodeFeature* feature = (CIQRCodeFeature*)features.firstObject;
+            return feature.messageString;
+        }
+        
+        return nil;
     }
 }
 
@@ -1196,7 +1277,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
 
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
-                                                  value:item.fields.created ? item.fields.created.friendlyDateString : @""
+                                                  value:item.fields.created ? item.fields.created.friendlyDateTimeString : @""
                                                copyable:NO]];
     
 
@@ -1204,7 +1285,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
-                                                  value:item.fields.modified ? item.fields.modified.friendlyDateString : @""
+                                                  value:item.fields.modified ? item.fields.modified.friendlyDateTimeString : @""
                                                copyable:NO]];
         
 
@@ -1762,7 +1843,7 @@ suggestionProvider:^NSString*(NSString *text) {
         [cell setDate:self.model.expires];
         
         cell.onDateChanged = ^(NSDate * _Nullable date) {
-            NSLog(@"Setting Expiry Date to %@", date ? date.friendlyDateString : @"");
+            NSLog(@"Setting Expiry Date to %@", date ? date.friendlyDateTimeString : @"");
             weakSelf.model.expires = date;
             [weakSelf onModelEdited];
         };
@@ -1772,7 +1853,7 @@ suggestionProvider:^NSString*(NSString *text) {
         GenericKeyValueTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kGenericKeyValueCellId forIndexPath:indexPath];
         
         NSDate* expires = self.model.expires;
-        NSString *str = expires ? expires.friendlyDateString : NSLocalizedString(@"item_details_expiry_never", @"Never");
+        NSString *str = expires ? expires.friendlyDateTimeString : NSLocalizedString(@"item_details_expiry_never", @"Never");
         
         [cell setKey:NSLocalizedString(@"item_details_expires_field_title", @"Expires")
                value:str

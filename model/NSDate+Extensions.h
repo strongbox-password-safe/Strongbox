@@ -14,13 +14,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isMoreThanXMinutesAgo:(NSDate*_Nullable)date minutes:(NSUInteger)minutes;
 
+- (BOOL)isMoreThanXDaysAgo:(NSUInteger)days;
 - (BOOL)isMoreThanXSecondsAgo:(NSUInteger)seconds;
 
 - (BOOL)isEqualToDateWithinEpsilon:(NSDate*)other;
 - (BOOL)isLaterThan:(NSDate*)other;
 - (BOOL)isEarlierThan:(NSDate*)other;
 
+@property (readonly) NSString* fileNameCompatibleDateTime;
+@property (readonly) NSString* fileNameCompatibleDateTimePrecise;
+
 @property (readonly) NSString* friendlyDateString;
+@property (readonly) NSString* friendlyDateTimeString;
 @property (readonly) NSString* friendlyDateStringVeryShort;
 @property (readonly) NSString* friendlyDateTimeStringPrecise;
 @property (readonly) NSString* iso8601DateString;

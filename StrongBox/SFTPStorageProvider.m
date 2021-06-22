@@ -331,9 +331,9 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 - (void)getModDate:(METADATA_PTR)safeMetaData completion:(StorageProviderGetModDateCompletionBlock)completion {
     SFTPProviderData* foo = [self getProviderDataFromMetaData:safeMetaData];
 
-    static int counter = 0;
-    NSLog(@"XXXX: getModDate: %d", counter++);
-    
+
+
+
     [self connectAndAuthenticate:foo.sFtpConfiguration
                   viewController:nil
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {

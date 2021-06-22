@@ -8,14 +8,10 @@
 
 #import "SelectStorageProviderController.h"
 #import "LocalDeviceStorageProvider.h"
-#import "GoogleDriveStorageProvider.h"
-#import "DropboxV2StorageProvider.h"
 #import "CustomStorageProviderTableViewCell.h"
 #import "DatabaseModel.h"
 #import "Alerts.h"
 #import "StorageBrowserTableViewController.h"
-#import "AppleICloudProvider.h"
-#import "OneDriveStorageProvider.h"
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
 #import <MobileCoreServices/MobileCoreServices.h>
@@ -25,6 +21,16 @@
 #import "NSString+Extensions.h"
 #import "SafeStorageProviderFactory.h"
 #import "Serializator.h"
+
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+
+#import "OneDriveStorageProvider.h"
+#import "GoogleDriveStorageProvider.h"
+#import "DropboxV2StorageProvider.h"
+
+#endif
+
+#import "AppleICloudProvider.h"
 
 @interface SelectStorageProviderController () <UIDocumentPickerDelegate>
 
@@ -57,11 +63,14 @@
     WebDAVStorageProvider* webDavProvider = [[WebDAVStorageProvider alloc] init];
     webDavProvider.maintainSessionForListings = YES;
     
-    NSMutableArray<id<SafeStorageProvider>>* sp = @[GoogleDriveStorageProvider.sharedInstance,
-                                                    DropboxV2StorageProvider.sharedInstance,
-                                                    OneDriveStorageProvider.sharedInstance,
-                                                    webDavProvider,
-                                                    sftpProviderWithFastListing].mutableCopy;
+    NSMutableArray<id<SafeStorageProvider>>* sp = @[
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS 
+        GoogleDriveStorageProvider.sharedInstance,
+        DropboxV2StorageProvider.sharedInstance,
+        OneDriveStorageProvider.sharedInstance,
+#endif
+        webDavProvider,
+        sftpProviderWithFastListing].mutableCopy;
     
     
     

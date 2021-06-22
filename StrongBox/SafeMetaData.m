@@ -8,13 +8,17 @@
 
 #import "SafeMetaData.h"
 #import "SecretStore.h"
-//#import "Settings.h"
 #import "FileManager.h"
 #import "ItemDetailsViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "SafeStorageProviderFactory.h"
 #endif
+
+#import "AppPreferences.h"
+
+static const NSInteger kDefaultConvenienceExpiryPeriod = 2 * 7 * 24;  
+static const NSUInteger kDefaultScheduledExportIntervalDays = 28;  
 
 @interface SafeMetaData ()
 
@@ -38,26 +42,15 @@
     if (self) {
         self.uuid = [[NSUUID UUID] UUIDString];
         self.failedPinAttempts = 0;
-        self.autoFillEnabled = YES;
         self.likelyFormat = kFormatUnknown;
         self.browseViewType = kBrowseViewTypeHierarchy;
         self.browseSortField = kBrowseSortFieldTitle;
-        self.browseSortOrderDescending = NO;
         self.browseSortFoldersSeparately = YES;
         self.browseItemSubtitleField = kBrowseItemSubtitleUsername;
-        self.immediateSearchOnBrowse = NO;
-        self.hideTotpInBrowse = NO;
-        self.showKeePass1BackupGroup = NO;
         self.showChildCountOnFolderInBrowse = YES;
         self.showFlagsInBrowse = YES;
-        self.doNotShowRecycleBinInBrowse = NO;
-        self.showRecycleBinInSearchResults = NO;
-        self.showEmptyFieldsInDetailsView = NO;
         self.detailsViewCollapsedSections = ItemDetailsViewController.defaultCollapsedSections;
-        self.easyReadFontForAll = NO;
-        self.hideTotp = NO;
         self.tryDownloadFavIconForNewRecord = YES;
-        self.showPasswordByDefaultOnEditScreen = NO;
         self.showExpiredInBrowse = YES;
         self.showExpiredInSearch = YES;
         self.autoLockTimeoutSeconds = @60;
@@ -71,7 +64,6 @@
         self.makeBackups = YES;
         self.maxBackupKeepCount = 10;
         self.hideTotpCustomFieldsInViewMode = YES;
-        self.hideIconInBrowse = NO;
         
         self.tapAction = kBrowseTapActionOpenDetails;
 
@@ -90,6 +82,9 @@
         self.autoFillConvenienceAutoUnlockTimeout = -1;
         self.quickTypeEnabled = YES;
         self.autoFillCopyTotp = YES;
+        self.convenienceExpiryPeriod = kDefaultConvenienceExpiryPeriod;
+        self.showConvenienceExpiryMessage = YES;
+        self.scheduleExportIntervalDays = kDefaultScheduledExportIntervalDays;
     }
     
     return self;
@@ -180,6 +175,7 @@
     if ( jsonDictionary[@"showQuickViewExpired"] != nil ) ret.showQuickViewExpired = ((NSNumber*)jsonDictionary[@"showQuickViewExpired"]).boolValue;
     if ( jsonDictionary[@"colorizeProtectedCustomFields"] != nil ) ret.colorizeProtectedCustomFields = ((NSNumber*)jsonDictionary[@"colorizeProtectedCustomFields"]).boolValue;
     if ( jsonDictionary[@"promptedForAutoFetchFavIcon"] != nil ) ret.promptedForAutoFetchFavIcon = ((NSNumber*)jsonDictionary[@"promptedForAutoFetchFavIcon"]).boolValue;
+    if ( jsonDictionary[@"lockEvenIfEditing"] != nil ) ret.lockEvenIfEditing = ((NSNumber*)jsonDictionary[@"lockEvenIfEditing"]).boolValue;
     
     if ( jsonDictionary[@"keePassIconSet"] != nil ) ret.keePassIconSet = ((NSNumber*)jsonDictionary[@"keePassIconSet"]).unsignedIntegerValue;
     if ( jsonDictionary[@"browseItemSubtitleField"] != nil ) ret.browseItemSubtitleField = ((NSNumber*)jsonDictionary[@"browseItemSubtitleField"]).unsignedIntegerValue;
@@ -205,13 +201,6 @@
     if ( jsonDictionary[@"lastSyncAttempt"] != nil ) ret.lastSyncAttempt = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastSyncAttempt"])).doubleValue];
 
     if ( jsonDictionary[@"conflictResolutionStrategy"] != nil ) ret.conflictResolutionStrategy = ((NSNumber*)jsonDictionary[@"conflictResolutionStrategy"]).unsignedIntegerValue;
-
-    if ( jsonDictionary[@"immediateOfflineOfferIfOfflineDetected"] != nil ) {
-        ret.immediateOfflineOfferIfOfflineDetected = ((NSNumber*)jsonDictionary[@"immediateOfflineOfferIfOfflineDetected"]).boolValue;
-    }
-    else { 
-        ret.immediateOfflineOfferIfOfflineDetected = [SafeMetaData defaultImmediatelyOfferOfflineForProvider:ret.storageProvider];
-    }
     
     if ( jsonDictionary[@"quickTypeEnabled"] != nil ) {
         ret.quickTypeEnabled = ((NSNumber*)jsonDictionary[@"quickTypeEnabled"]).boolValue;
@@ -286,6 +275,87 @@
         ret.couldNotConnectBehaviour = ((NSNumber*)jsonDictionary[@"couldNotConnectBehaviour"]).integerValue;
     }
     
+    
+    
+    if ( jsonDictionary[@"convenienceExpiryPeriod"] != nil ) {
+        ret.convenienceExpiryPeriod = ((NSNumber*)jsonDictionary[@"convenienceExpiryPeriod"]).integerValue;
+    }
+    else { 
+        ret.convenienceExpiryPeriod = -1; 
+    }
+    
+    
+    
+    if ( jsonDictionary[@"showConvenienceExpiryMessage"] != nil ) {
+        ret.showConvenienceExpiryMessage = ((NSNumber*)jsonDictionary[@"showConvenienceExpiryMessage"]).boolValue;
+    }
+    else { 
+        ret.showConvenienceExpiryMessage = YES;
+    }
+
+    
+    
+    if ( jsonDictionary[@"hasShownInitialOnboardingScreen"] != nil ) {
+        ret.hasShownInitialOnboardingScreen = ((NSNumber*)jsonDictionary[@"hasShownInitialOnboardingScreen"]).boolValue;
+    }
+    else { 
+        ret.hasShownInitialOnboardingScreen = YES;
+    }
+    
+    
+    
+    
+    if ( jsonDictionary[@"convenienceExpiryOnboardingDone"] != nil ) {
+        ret.convenienceExpiryOnboardingDone = ((NSNumber*)jsonDictionary[@"convenienceExpiryOnboardingDone"]).boolValue;
+    }
+
+    if ( jsonDictionary[@"autoFillOnboardingDone"] != nil ) {
+        ret.autoFillOnboardingDone = ((NSNumber*)jsonDictionary[@"autoFillOnboardingDone"]).boolValue;
+    }
+    else { 
+        ret.autoFillOnboardingDone = YES;
+    }
+
+    
+    
+    if ( jsonDictionary[@"hasAcknowledgedAppLockBiometricQuickLaunchCoalesceIssue"] != nil ) {
+        ret.hasAcknowledgedAppLockBiometricQuickLaunchCoalesceIssue = ((NSNumber*)jsonDictionary[@"hasAcknowledgedAppLockBiometricQuickLaunchCoalesceIssue"]).boolValue;
+    }
+    
+    
+    
+    if ( jsonDictionary[@"onboardingDoneHasBeenShown"] != nil ) {
+        ret.onboardingDoneHasBeenShown = ((NSNumber*)jsonDictionary[@"onboardingDoneHasBeenShown"]).boolValue;
+    }
+    else { 
+        ret.onboardingDoneHasBeenShown = YES;
+    }
+
+    
+    
+    if ( jsonDictionary[@"scheduledExport"] != nil ) {
+        ret.scheduledExport = ((NSNumber*)jsonDictionary[@"scheduledExport"]).boolValue;
+    }
+    
+    if ( jsonDictionary[@"scheduledExportOnboardingDone"] != nil ) {
+        ret.scheduledExportOnboardingDone = ((NSNumber*)jsonDictionary[@"scheduledExportOnboardingDone"]).boolValue;
+    }
+
+    if ( jsonDictionary[@"scheduleExportIntervalDays"] != nil ) {
+        ret.scheduleExportIntervalDays = ((NSNumber*)jsonDictionary[@"scheduleExportIntervalDays"]).unsignedIntegerValue;
+    }
+    else {
+        ret.scheduleExportIntervalDays = kDefaultScheduledExportIntervalDays;
+    }
+    
+    if ( jsonDictionary[@"nextScheduledExport"] != nil ) {
+        ret.nextScheduledExport = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"nextScheduledExport"])).doubleValue];
+    }
+
+    if ( jsonDictionary[@"lastScheduledExportModDate"] != nil ) {
+        ret.lastScheduledExportModDate = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastScheduledExportModDate"])).doubleValue];
+    }
+    
     return ret;
 }
 
@@ -340,7 +410,6 @@
         @"storageProvider" : @(self.storageProvider),
         @"duressAction" : @(self.duressAction),
         @"conflictResolutionStrategy" : @(self.conflictResolutionStrategy),
-        @"immediateOfflineOfferIfOfflineDetected" : @(self.immediateOfflineOfferIfOfflineDetected),
         @"quickTypeEnabled" : @(self.quickTypeEnabled),
         @"quickTypeDisplayFormat" : @(self.quickTypeDisplayFormat),
         @"emptyOrNilPwPreferNilCheckFirst" : @(self.emptyOrNilPwPreferNilCheckFirst),
@@ -350,6 +419,17 @@
         @"forceOpenOffline" : @(self.forceOpenOffline),
         @"offlineDetectedBehaviour" : @(self.offlineDetectedBehaviour),
         @"couldNotConnectBehaviour" : @(self.couldNotConnectBehaviour),
+        @"convenienceExpiryPeriod" : @(self.convenienceExpiryPeriod),
+        @"showConvenienceExpiryMessage" : @(self.showConvenienceExpiryMessage),
+        @"hasShownInitialOnboardingScreen" : @(self.hasShownInitialOnboardingScreen),
+        @"convenienceExpiryOnboardingDone" : @(self.convenienceExpiryOnboardingDone),
+        @"autoFillOnboardingDone" : @(self.autoFillOnboardingDone),
+        @"hasAcknowledgedAppLockBiometricQuickLaunchCoalesceIssue" : @(self.hasAcknowledgedAppLockBiometricQuickLaunchCoalesceIssue),
+        @"onboardingDoneHasBeenShown" : @(self.onboardingDoneHasBeenShown),
+        @"scheduledExport" : @(self.scheduledExport),
+        @"scheduledExportOnboardingDone" : @(self.scheduledExportOnboardingDone),
+        @"scheduleExportIntervalDays" : @(self.scheduleExportIntervalDays),
+        @"lockEvenIfEditing" : @(self.lockEvenIfEditing),
     }];
     
     if (self.nickName != nil) {
@@ -397,6 +477,14 @@
 
     if (self.autoFillLastUnlockedAt != nil) {
         ret[@"autoFillLastUnlockedAt"] = @(self.autoFillLastUnlockedAt.timeIntervalSinceReferenceDate);
+    }
+
+    if (self.nextScheduledExport != nil) {
+        ret[@"nextScheduledExport"] = @(self.nextScheduledExport.timeIntervalSinceReferenceDate);
+    }
+    
+    if (self.lastScheduledExportModDate != nil) {
+        ret[@"lastScheduledExportModDate"] = @(self.lastScheduledExportModDate.timeIntervalSinceReferenceDate);
     }
 
     return ret;
@@ -447,11 +535,21 @@
 }
 
 - (void)setConvenienceMasterPassword:(NSString *)convenienceMasterPassword {
-    if(convenienceMasterPassword) {
+    NSInteger expiringAfterHours = self.convenienceExpiryPeriod;
+    
+
+    if(expiringAfterHours == -1) {
         [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:self.uuid];
     }
+    else if(expiringAfterHours == 0) {
+        [SecretStore.sharedInstance setSecureEphemeralObject:convenienceMasterPassword forIdentifer:self.uuid];
+    }
     else {
-        [SecretStore.sharedInstance deleteSecureItem:self.uuid];
+        NSCalendar *cal = [NSCalendar currentCalendar];
+        
+        NSDate *date = [cal dateByAddingUnit:NSCalendarUnitHour value:expiringAfterHours toDate:[NSDate date] options:0];
+
+        [SecretStore.sharedInstance setSecureObject:convenienceMasterPassword forIdentifier:self.uuid expiresAt:date];
     }
 }
 
@@ -484,16 +582,33 @@
 
 - (NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
-    return [SecretStore.sharedInstance getSecureString:key];
+    
+    if ( [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:key] ) { 
+        if ( [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:key] ) {
+            return [SecretStore.sharedInstance getSecureString:key];
+        }
+        else {
+            return nil;
+        }
+    }
+    else {
+        NSString* ret = [SecretStore.sharedInstance getSecureString:key];
+
+        [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:(ret != nil) forKey:key]; 
+
+        return ret;
+    }
 }
 
 - (void)setConveniencePin:(NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
 
-    if(conveniencePin) {
+    if ( conveniencePin ) {
+        [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:YES forKey:key]; 
         [SecretStore.sharedInstance setSecureString:conveniencePin forIdentifier:key];
     }
     else {
+        [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:NO forKey:key]; 
         [SecretStore.sharedInstance deleteSecureItem:key];
     }
 }

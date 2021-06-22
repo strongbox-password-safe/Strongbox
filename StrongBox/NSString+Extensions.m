@@ -255,8 +255,8 @@ static NSString* const kLowerCaseNull = @"null";
     return [self dataUsingEncoding:NSUTF8StringEncoding];
 }
 
-- (BOOL)containsSearchString:(NSString*)searchText {
-    if ( self.length == 0 ) {
+- (BOOL)containsSearchString:(NSString*)searchText checkPinYin:(BOOL)checkPinYin {
+    if ( self.length == 0 || searchText.length == 0) {
         return NO;
     }
     
@@ -264,6 +264,10 @@ static NSString* const kLowerCaseNull = @"null";
 
     if ( simple ) {
         return YES;
+    }
+    
+    if ( !checkPinYin ) {
+        return NO;
     }
     
     
@@ -279,10 +283,7 @@ static NSString* const kLowerCaseNull = @"null";
         
         NSMutableString* latinized = self.mutableCopy;
         CFStringTransform((__bridge CFMutableStringRef)latinized, nil, kCFStringTransformMandarinLatin, NO);
-        
-        
-        
-        
+        CFStringTransform((__bridge CFMutableStringRef)latinized, nil, kCFStringTransformStripDiacritics, NO);
 
         NSString* pinYinStr = [latinized stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
         pinYinStr = [pinYinStr stringByReplacingOccurrencesOfString:@"\r" withString:@""];

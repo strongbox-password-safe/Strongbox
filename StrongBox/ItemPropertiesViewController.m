@@ -139,19 +139,19 @@ const static NSUInteger kSectionUuidIdx = 5;
     self.dates = [[MutableOrderedDictionary alloc] init];
     
     if (self.item.fields.created) {
-        self.dates[NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")] = self.item.fields.created.friendlyDateString;
+        self.dates[NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")] = self.item.fields.created.friendlyDateTimeString;
     }
     
     if (self.item.fields.modified) {
-        self.dates[NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")] = self.item.fields.modified.friendlyDateString;
+        self.dates[NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")] = self.item.fields.modified.friendlyDateTimeString;
     }
 
     if ( self.model.database.originalFormat == kKeePass4 || self.model.database.originalFormat == kKeePass ) {
         if (self.item.fields.modified) {
-            self.dates[NSLocalizedString(@"item_details_metadata_location_changed_field_title", @"Location Changed")] = self.item.fields.locationChanged.friendlyDateString;
+            self.dates[NSLocalizedString(@"item_details_metadata_location_changed_field_title", @"Location Changed")] = self.item.fields.locationChanged.friendlyDateTimeString;
         }
         if (self.item.fields.expires) {
-            self.dates[NSLocalizedString(@"item_details_expires_field_title", @"Expires")] = self.item.fields.expires.friendlyDateString;
+            self.dates[NSLocalizedString(@"item_details_expires_field_title", @"Expires")] = self.item.fields.expires.friendlyDateTimeString;
         }
     }
 }

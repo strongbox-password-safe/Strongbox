@@ -14,6 +14,7 @@
 #import "ColoredStringHelper.h"
 #import "AppPreferences.h"
 #import "PasswordStrengthTester.h"
+#import "PasswordStrengthUIHelper.h"
 
 @interface EditPasswordTableViewCell () <UITextViewDelegate>
 
@@ -151,22 +152,11 @@
 }
 
 - (void)bindStrength {
-    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.password config:AppPreferences.sharedInstance.passwordStrengthConfig];
-    
-
-
-
-
-        self.labelStrength.text = strength.summaryString;
-
-
-    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-        
-    double red = 1.0 - relativeStrength;
-    double green = relativeStrength;
-
-    self.progressStrength.progress = relativeStrength;
-    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
+    [PasswordStrengthUIHelper bindStrengthUI:self.password
+                                      config:AppPreferences.sharedInstance.passwordStrengthConfig
+                          emptyPwHideSummary:NO
+                                       label:self.labelStrength
+                                    progress:self.progressStrength];
 }
 
 @end

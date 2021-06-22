@@ -111,6 +111,15 @@
                 thirdButtonText:(NSString *)thirdButtonText
                          action:(void (^) (int response))action;
 
++ (void) fourOptionsWithCancel:(UIViewController *)viewController
+                         title:(NSString *)title
+                       message:(NSString *)message
+             defaultButtonText:(NSString *)defaultButtonText
+              secondButtonText:(NSString *)secondButtonText
+               thirdButtonText:(NSString *)thirdButtonText
+              fourthButtonText:(NSString *)fourthButtonText
+                        action:(void (^) (int response))action;
+
 + (void)OkCancelWithPassword:(VIEW_CONTROLLER_PTR)viewController
                        title:(NSString *)title
                      message:(NSString *)message

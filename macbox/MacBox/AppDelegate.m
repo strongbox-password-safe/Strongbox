@@ -24,6 +24,9 @@
 #import "ClipboardManager.h"
 #import "DebugHelper.h"
 #import "MacUrlSchemes.h"
+#import "Shortcut.h"
+#import "NodeDetailsViewController.h"
+#import "Document.h"
 
 
 
@@ -82,13 +85,33 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     [self performMigrations];
-        
-    [self initializeProFamilyEdition];
     
+    [self cleanupWorkingDirectories];
 
     
-    [self customizeMenu];
     
+    
+    
+    
+
+    [self applyCustomizations];
+            
+    [self showHideSystemStatusBarIcon];
+    
+    [self installGlobalHotKeys];
+            
+    
+
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        DocumentController* dc = NSDocumentController.sharedDocumentController;
+        
+        [dc onAppStartup];
+        
+        [self listenToEvents];
+    });
+}
+
+- (void)customizeForNonPro {
     if(!Settings.sharedInstance.fullVersion) {
         [self getValidIapProducts];
 
@@ -104,44 +127,121 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
             [self initializeFreeTrialAndShowWelcomeMessage];
         }
     }
-    
-    [self showHideSystemStatusBarIcon];
+}
+
+- (void)listenToEvents {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onWindowDidMiniaturizeOrClose:)
+                                                 name:NSWindowDidMiniaturizeNotification
+                                               object:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onWindowDidMiniaturizeOrClose:)
+                                                 name:NSWindowWillCloseNotification
+                                               object:nil];
+
+
+
+
+
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onPreferencesChanged:)
                                                  name:kPreferencesChangedNotification
                                                object:nil];
+}
+
+
+
+- (void)onWindowDidMiniaturizeOrClose:(NSNotification*)notification {
+    if ( ![notification.object isMemberOfClass:NSWindow.class] ) { 
+        NSLog(@"Ignoring non-window based notification");
+        return;
+    }
+
+    NSWindow* win = notification.object;
     
+    BOOL interesting = win.contentViewController &&
+    ( [win.contentViewController isKindOfClass:ViewController.class] ||
+      [win.contentViewController isKindOfClass:NodeDetailsViewController.class]);
+
+
+
+    NSLog(@"onWindowDidMiniaturizeOrClose: [%@-%@-%@]", win, win.title, win.contentViewController.className);
+
+    if ( !interesting ) {
+        NSLog(@"Ignoring non View Controller based notification");
+        return;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    NSArray* docs = DocumentController.sharedDocumentController.documents;
+    NSArray* mainWindows = [docs map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
+        Document* doc = obj;
+        NSWindowController* wc = (NSWindowController*)doc.windowControllers.firstObject;
+        return wc.window;
+    }];
+
+    for(NSWindow* win in mainWindows) {
+        NSLog(@"Full List: [%@-%@-%@]", win, win.title, win.contentViewController.className);
+    }
+
+    BOOL allMiniaturized = [mainWindows allMatch:^BOOL(NSWindow * _Nonnull obj) {
+        return obj.miniaturized;
+    }];
+    
+    if ( allMiniaturized ) {
+        NSLog(@"allMiniaturized.");
+        
+        if ( Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.hideDockIconOnAllMinimized ) {
+            [self showHideDockIcon:NO];
+        }
+    }
+    else {
+        NSArray *a = [mainWindows filter:^BOOL(NSWindow * _Nonnull obj) {
+            return !obj.miniaturized;
+        }];
+
+        for(NSWindow* win in a) {
+            NSLog(@"Not Miniaturized: [%@-%@-%@]", win, win.title, win.contentViewController.className);
+        }
+    }
+}
+
+- (void)showHideDockIcon:(BOOL)show {
     
 
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        DocumentController* dc = NSDocumentController.sharedDocumentController;
-        [dc onAppStartup];
-    });
+    if ( show ) {
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+    }
+    else {
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
+        
+        
+        
+
+
+
+    }
 }
+
+
 
 - (void)performMigrations {
     [self migrateToSyncManager]; 
-    
-    [self migrateQuickLaunchSystem];
-}
-
-- (void)migrateQuickLaunchSystem {
-    if ( !Settings.sharedInstance.hasMigratedQuickLaunch ) { 
-        NSLog(@"Migrating Launch at Startup...");
-        
-        Settings.sharedInstance.hasMigratedQuickLaunch = YES;
-        
-        if ( Settings.sharedInstance.autoOpenFirstDatabaseOnEmptyLaunch ) {
-            DatabaseMetadata* first = DatabasesManager.sharedInstance.snapshot.firstObject;
-            if (first) {
-                NSLog(@"Migrating Launch at Startup. Found and setting first database to be Launched at Startup...");
-
-                first.launchAtStartup = YES;
-                [DatabasesManager.sharedInstance update:first];
-            }
-        }
-    }
 }
 
 - (void)migrateToSyncManager {
@@ -159,8 +259,11 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
         if (database.storageProvider == kMacFile ) {
             NSURLComponents* components = [NSURLComponents componentsWithURL:database.fileUrl resolvingAgainstBaseURL:NO];
             components.scheme = kStrongboxSyncManagedFileUrlScheme;
-            database.fileUrl = components.URL;
-            [DatabasesManager.sharedInstance update:database];
+            
+            [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                metadata.fileUrl = components.URL;
+            }];
+            
             NSLog(@"Converted [%@] Database to [%@]", database.nickName, database.fileUrl);
         }
     }
@@ -171,11 +274,15 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
     [FileManager.sharedInstance deleteAllTmpWorkingFiles];
 }
 
-- (void)initializeProFamilyEdition {
+- (void)applyCustomizations {
     if([self isProFamilyEdition]) {
         NSLog(@"Initial launch of Pro/Family Edition... setting Pro");
         [Settings.sharedInstance setFullVersion:YES];
     }
+    
+    [self customizeMenu];
+    
+    [self customizeForNonPro];
 }
 
 - (BOOL)isProFamilyEdition {
@@ -188,7 +295,7 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
     return [bundleId isEqualToString:kBundledFreemiumBundleId];
 }
 
-- (void)showHideSystemStatusBarIcon {
+- (void)showHideSystemStatusBarIcon {   
     if(Settings.sharedInstance.showSystemTrayIcon) {
         if(!self.statusItem) {
             NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
@@ -214,16 +321,24 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 }
 
 - (IBAction)onSystemTrayShow:(id)sender {
-    [NSApp arrangeInFront:sender];
-    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:sender];
+    [self showAndActivateStrongbox];
+}
+
+- (void)showAndActivateStrongbox {
+    NSLog(@"showAndActivateStrongbox");
+    
+    [NSApp arrangeInFront:nil];
+    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     [NSApp activateIgnoringOtherApps:YES];
     
-    for(NSWindow* win in [NSApp windows]) { 
+    for ( NSWindow* win in [NSApp windows] ) { 
         if([win isMiniaturized]) {
             [win deminiaturize:self];
         }
     }
 
+    [self showHideDockIcon:YES];
+    
     DocumentController* dc = NSDocumentController.sharedDocumentController;
     [dc performEmptyLaunchTasksIfNecessary];
 }
@@ -368,6 +483,16 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 
 
+- (void)installGlobalHotKeys {
+    MASShortcut *globalShowShortcut = [MASShortcut shortcutWithKeyCode:kVK_ANSI_K modifierFlags:NSEventModifierFlagCommand | NSEventModifierFlagOption];
+    NSData *globalLaunchShortcutData = [NSKeyedArchiver archivedDataWithRootObject:globalShowShortcut];
+
+    [NSUserDefaults.standardUserDefaults registerDefaults:@{ kPreferenceGlobalShowShortcut : globalLaunchShortcutData }];
+    
+    [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferenceGlobalShowShortcut toAction:^{
+        [self showAndActivateStrongbox];
+    }];
+}
 
 
 
@@ -377,6 +502,71 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
 
 
 
@@ -387,7 +577,7 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 - (void)customizeMenu {
     [self removeUnwantedMenuItems];
-    
+
     NSMenu* topLevelMenuItem = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagStrongbox].submenu;
     
     NSUInteger index = [topLevelMenuItem.itemArray indexOfObjectPassingTest:^BOOL(NSMenuItem * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -415,6 +605,27 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 - (void)removeUnwantedMenuItems {
     [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(duplicateDocument:)];
+    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(saveDocumentAs:)];
+    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(renameDocument:)];
+    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(revertDocumentToSaved:)];
+    [self removeMenuItem:kTopLevelMenuItemTagFile action:@selector(moveDocument:)];
+
+
+    
+    
+    
+    
+    NSMenu* fileMenu = [NSApplication.sharedApplication.mainMenu itemWithTag:kTopLevelMenuItemTagFile].submenu;
+    NSInteger openDocumentMenuItemIndex = [fileMenu indexOfItemWithTarget:nil andAction:@selector(openDocument:)];
+
+    if (openDocumentMenuItemIndex>=0 &&
+        [[fileMenu itemAtIndex:openDocumentMenuItemIndex+1] hasSubmenu])
+    {
+        
+        
+        
+        [fileMenu removeItemAtIndex:openDocumentMenuItemIndex+1];
+    }
     
     
     
@@ -669,5 +880,10 @@ static NSInteger clipboardChangeCount;
     
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
+
+
+
+
+
 
 @end

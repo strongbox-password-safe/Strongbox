@@ -153,8 +153,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property BOOL immediateOfflineOfferIfOfflineDetected; 
-
 @property QuickTypeAutoFillDisplayFormat quickTypeDisplayFormat;
 @property BOOL emptyOrNilPwPreferNilCheckFirst; 
 @property BOOL autoLockOnDeviceLock;
@@ -167,6 +165,26 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property OfflineDetectedBehaviour offlineDetectedBehaviour;
 @property CouldNotConnectBehaviour couldNotConnectBehaviour;
+
+@property NSInteger convenienceExpiryPeriod;
+@property BOOL showConvenienceExpiryMessage;
+@property BOOL hasShownInitialOnboardingScreen;
+@property BOOL convenienceExpiryOnboardingDone;
+@property BOOL autoFillOnboardingDone;
+@property BOOL hasAcknowledgedAppLockBiometricQuickLaunchCoalesceIssue;
+@property BOOL onboardingDoneHasBeenShown;
+
+
+
+@property BOOL scheduledExport;
+@property BOOL scheduledExportOnboardingDone;
+@property NSUInteger scheduleExportIntervalDays;
+@property (nullable) NSDate* nextScheduledExport;
+@property (nullable) NSDate* lastScheduledExportModDate;
+
+
+
+@property BOOL lockEvenIfEditing;
 
 @end
 

@@ -286,9 +286,9 @@ const int kMaxRecommendedAttachmentSize = 512 * 1024;
     NSString* size = friendlyFileSizeString(data.length);
     UIAlertAction *originalAction =
         [UIAlertAction actionWithTitle:[NSString stringWithFormat:resized.count > 0 ?
-            NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_original_size_fmt", @"Original (%d x %d) %@") :
-            NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_use_anyway_size_fmt", @"Use Anyway (%d x %d) %@"),
-                                                                    (int)image.size.width, (int)image.size.height, size]
+            NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_original_size_fmt2", @"Original (%@ x %@) %@") :
+            NSLocalizedString(@"add_attachment_vc_large_image_prompt_option_use_anyway_size_fmt2", @"Use Anyway (%@ x %@) %@"),
+                                                                    @((int)image.size.width), @((int)image.size.height), size]
                                                              style:UIAlertActionStyleDefault
                                                            handler:^(UIAlertAction *a) {
                                                                [self addAttachmentNoWarn:suggestedFilename data:data];

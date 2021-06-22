@@ -10,19 +10,19 @@
 #import "SyncParameters.h"
 #import "SyncStatus.h"
 
-#if TARGET_OS_IPHONE
-//    #import <UIKit/UIKit.h>
-    #import "SafeMetaData.h"
-//    typedef UIViewController* VIEW_CONTROLLER_PTR;
-
-    typedef SafeMetaData* METADATA_PTR;
-#else
-
-    #import "DatabaseMetadata.h"
+//#if TARGET_OS_IPHONE
+////    #import <UIKit/UIKit.h>
+//    #import "SafeMetaData.h"
+////    typedef UIViewController* VIEW_CONTROLLER_PTR;
 
 
-    typedef DatabaseMetadata* METADATA_PTR;
-#endif
+
+
+
+
+
+
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -44,9 +44,11 @@ NSString* syncResultToString(SyncAndMergeResult result);
 
 + (instancetype _Nullable)sharedInstance;
 
-- (SyncStatus*)getSyncStatus:(METADATA_PTR)database;
+- (SyncStatus*)getSyncStatusForDatabaseId:(NSString*)databaseUuid;
 
-- (void)enqueueSync:(METADATA_PTR)database parameters:(SyncParameters*)parameters completion:(SyncAndMergeCompletionBlock)completion;
+- (void)enqueueSyncForDatabaseId:(NSString*)databaseUuid
+                      parameters:(SyncParameters*)parameters
+                      completion:(SyncAndMergeCompletionBlock)completion;
 
 @end
 

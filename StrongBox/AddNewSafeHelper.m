@@ -10,7 +10,6 @@
 #import "Alerts.h"
 #import "KeyFileParser.h"
 #import "AppleICloudProvider.h"
-//#import "Settings.h"
 #import "LocalDeviceStorageProvider.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
@@ -19,6 +18,7 @@
 #import "KeyFileHelper.h"
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
+#import "iCloudSafesCoordinator.h"
 
 const DatabaseFormat kDefaultFormat = kKeePass4;
 
@@ -27,6 +27,14 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
 + (void)createNewExpressDatabase:(UIViewController*)vc
                             name:(NSString *)name
                         password:(NSString *)password
+                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion  {
+    [AddNewSafeHelper createNewExpressDatabase:vc name:name password:password forceLocal:NO completion:completion];
+}
+
++ (void)createNewExpressDatabase:(UIViewController*)vc
+                            name:(NSString *)name
+                        password:(NSString *)password
+                      forceLocal:(BOOL)forceLocal
                       completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
     NSError* error;
     DatabaseModel *database = getNewDatabase(password, nil, nil, nil, kDefaultFormat, &error);
@@ -36,7 +44,7 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
         return;
     }
     
-    BOOL iCloud = AppPreferences.sharedInstance.iCloudOn;
+    BOOL iCloud = !forceLocal && AppPreferences.sharedInstance.iCloudOn && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name

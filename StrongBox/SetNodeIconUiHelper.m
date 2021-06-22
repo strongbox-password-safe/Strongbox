@@ -363,7 +363,7 @@ static const int kMaxRecommendedCustomIconDimension = 256;
                     NSUInteger saving = dataOriginal.length - rescaledData.length;
                     NSString* savingString = friendlyFileSizeString(saving);
                     NSString* message = [NSString stringWithFormat:
-                                         NSLocalizedString(@"set_icon_vc_prompt_rescale_image_message_fmt", @"This is a rather large image (%dx%d), would you like to rescale it to a maximum dimension of %d pixels for a file size saving of roughly %@"), (int)image.size.width, (int)image.size.height, kMaxRecommendedCustomIconDimension, savingString];
+                                         NSLocalizedString(@"set_icon_vc_prompt_rescale_image_message_fmt", @"This is a rather large image (%@x%@), would you like to rescale it to a maximum dimension of %@ pixels for a file size saving of roughly %@"), @((int)image.size.width), @((int)image.size.height), @(kMaxRecommendedCustomIconDimension), savingString];
                     
                     [Alerts yesNo:self.viewController
                             title:NSLocalizedString(@"set_icon_vc_prompt_rescale_image_title", @"Large Custom Icon Image, Rescale?")

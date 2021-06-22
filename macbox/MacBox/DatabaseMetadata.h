@@ -62,7 +62,6 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nullable) NSUUID* outstandingUpdateId;
 @property (nullable) NSDate* lastSyncRemoteModDate; 
 @property (nullable) NSDate* lastSyncAttempt;
-@property (readonly) BOOL readOnly; 
 @property BOOL launchAtStartup;
 @property BOOL autoPromptForConvenienceUnlockOnActivate;
 
@@ -80,6 +79,36 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
 @property BOOL makeBackups;
+
+@property (readonly) BOOL isLocalDeviceDatabase;
+
+@property BOOL offlineMode; 
+@property BOOL alwaysOpenOffline;
+@property BOOL readOnly;
+
+/* =================================================================================================== */
+/* Migrated to Per Database Settings - Begin 14 Jun 2021 - Give 3 months migration time -> 14-Sep-2021 */
+
+@property BOOL showQuickView;
+@property BOOL doNotShowTotp;
+@property BOOL noAlternatingRows;
+@property BOOL showHorizontalGrid;
+@property BOOL showVerticalGrid;
+@property BOOL doNotShowAutoCompleteSuggestions;
+@property BOOL doNotShowChangeNotifications;
+@property BOOL outlineViewTitleIsReadonly;
+@property BOOL outlineViewEditableFieldsAreReadonly;
+@property BOOL concealEmptyProtectedFields;
+@property BOOL startWithSearch;
+@property BOOL showAdvancedUnlockOptions;
+@property BOOL lockOnScreenLock;
+@property BOOL expressDownloadFavIconOnNewOrUrlChanged; 
+@property BOOL doNotShowRecycleBinInBrowse;
+@property BOOL showRecycleBinInSearchResults;
+@property BOOL uiDoNotSortKeePassNodesInBrowseView; 
+@property NSArray<NSString*>* visibleColumns;
+
+/* =================================================================================================== */
 
 @end
 

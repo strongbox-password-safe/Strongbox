@@ -13,22 +13,20 @@
 
 @property ConcurrentMutableArray<SyncDatabaseRequest*>* requestQueue;
 
-@property METADATA_PTR database;
-
 @end
 
 @implementation DatabaseSyncOperationalData
 
-- (instancetype)initWithDatabase:(METADATA_PTR)database  {
+- (instancetype)initWithDatabaseId:(NSString *)databaseUuid {
     self = [super init];
     
     if (self) {
         self.requestQueue = ConcurrentMutableArray.mutableArray;
         
-        const char* queuename = [database.nickName cStringUsingEncoding:NSASCIIStringEncoding];
+        const char* queuename = [databaseUuid cStringUsingEncoding:NSASCIIStringEncoding];
         
         _dispatchSerialQueue = dispatch_queue_create(queuename ? queuename : "database-sync-queue", DISPATCH_QUEUE_SERIAL);
-        _status = [[SyncStatus alloc] initWithDatabaseId:database.uuid];
+        _status = [[SyncStatus alloc] initWithDatabaseId:databaseUuid];
     }
     
     return self;

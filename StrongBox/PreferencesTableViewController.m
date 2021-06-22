@@ -16,9 +16,6 @@
 #import "NSArray+Extensions.h"
 #import "AutoFillManager.h"
 #import "SelectItemTableViewController.h"
-#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
-#import "GoogleDriveManager.h"
-#import "OneDriveStorageProvider.h"
 #import "AutoFillNewRecordSettingsController.h"
 #import "CloudSessionsTableViewController.h"
 #import "AboutViewController.h"
@@ -27,6 +24,7 @@
 #import "PasswordGenerationViewController.h"
 #import "DebugHelper.h"
 #import "BiometricsManager.h"
+#import "ClipboardManager.h"
 
 @interface PreferencesTableViewController ()
 
@@ -238,8 +236,8 @@
         if(AppPreferences.sharedInstance.hasOptedInToFreeTrial) {
             if([[AppPreferences sharedInstance] isFreeTrial]) {
                 aboutString = [NSString stringWithFormat:
-                               NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt", @"About Strongbox %@ (Pro Trial - %ld days left)"),
-                               [Utils getAppVersion], (long)AppPreferences.sharedInstance.freeTrialDaysLeft];
+                               NSLocalizedString(@"prefs_vc_app_version_info_pro_trial_fmt2", @"About Strongbox %@ (Pro Trial - %@ days left)"),
+                               [Utils getAppVersion], @((long)AppPreferences.sharedInstance.freeTrialDaysLeft)];
             }
             else {
                 aboutString = [NSString stringWithFormat:
@@ -256,25 +254,17 @@
 }
 
 - (void)bindCloudSessions {
-    
-
-    
-
-
-
-
-
-
-
-
-
-
     self.switchUseICloud.on = [[AppPreferences sharedInstance] iCloudOn] && AppPreferences.sharedInstance.iCloudAvailable;
     self.switchUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
     
     self.labelUseICloud.text = AppPreferences.sharedInstance.iCloudAvailable ?    NSLocalizedString(@"prefs_vc_use_icloud_action", @"Use iCloud") :
                                                                             NSLocalizedString(@"prefs_vc_use_icloud_disabled", @"Use iCloud (Unavailable)");
     self.labelUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
+    
+#ifdef NO_3RD_PARTY_STORAGE_PROVIDERS 
+    [self cell:self.cellCloudSessions setHidden:YES];
+    [self reloadDataAnimated:NO];
+#endif
 }
 
 - (void)bindHideTips {
@@ -348,28 +338,28 @@
 - (IBAction)onUseICloud:(id)sender {
     NSLog(@"Setting iCloudOn to %d", self.switchUseICloud.on);
     
-    NSString *biometricIdName = [[BiometricsManager sharedInstance] getBiometricIdName];
-    if([self hasLocalOrICloudSafes]) {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"prefs_vc_master_password_icloud_migration_yesno_warning_title", @"Master Password Warning")
-              message:[NSString stringWithFormat:
-                       NSLocalizedString(@"prefs_vc_master_password_icloud_migration_yesno_warning_message_fmt", @"It is very important that you know your master password for your databases, and that you are not relying entirely on %@.\nThe migration and importation process makes every effort to maintain %@ data but it is not guaranteed. In any case it is important that you always know your master passwords.\n\nDo you want to continue changing iCloud usage settings?"), biometricIdName, biometricIdName]
-              action:^(BOOL response) {
-            if(response) {
-                [[AppPreferences sharedInstance] setICloudOn:self.switchUseICloud.on];
-                
-                [self bindCloudSessions];
-            }
-            else {
-                self.switchUseICloud.on = !self.switchUseICloud.on;
-            }
-        }];
-    }
-    else {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         [[AppPreferences sharedInstance] setICloudOn:self.switchUseICloud.on];
         
         [self bindCloudSessions];
-    }
+
 }
 
 - (IBAction)onDeleteDataChanged:(id)sender {
@@ -393,7 +383,7 @@
           message:NSLocalizedString(@"prompt_message_copy_debug_info", @"Would you like to copy some helpful debug information that you can share with support before proceeding?")
            action:^(BOOL response) {
         if ( response ) {
-            [UIPasteboard.generalPasteboard setString:[DebugHelper getAboutDebugString]];
+            [ClipboardManager.sharedInstance copyStringWithNoExpiration:[DebugHelper getAboutDebugString]];
         }
     
         NSURL* url = [NSURL URLWithString:@"https:

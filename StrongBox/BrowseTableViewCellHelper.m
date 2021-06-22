@@ -229,10 +229,10 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             return node.fields.email;
             break;
         case kBrowseItemSubtitleModified:
-            return node.fields.modified ? node.fields.modified.friendlyDateString : @"";
+            return node.fields.modified ? node.fields.modified.friendlyDateTimeString : @"";
             break;
         case kBrowseItemSubtitleCreated:
-            return node.fields.created ? node.fields.created.friendlyDateString : @"";
+            return node.fields.created ? node.fields.created.friendlyDateTimeString : @"";
             break;
         case kBrowseItemSubtitleNotes:
             return self.viewModel.metadata.viewDereferencedFields ? [self dereference:node.fields.notes node:node] : node.fields.notes;

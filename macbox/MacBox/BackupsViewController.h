@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface BackupsViewController : NSViewController
 
-@property DatabaseMetadata* database;
+@property NSString* databaseUuid;
 
 @end
 

@@ -32,8 +32,7 @@
     return sharedInstance;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.clearClipboardAppBackgroundTask = UIBackgroundTaskInvalid;
@@ -44,6 +43,10 @@
 - (void)copyStringWithNoExpiration:(NSString *)value {
     UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
     
+#ifndef IS_APP_EXTENSION
+    [self unobserveClipboardChangeNotifications];
+#endif
+    
     if(@available(iOS 10.0, *)) {
         [pasteboard setItems:@[@{ ((NSString*)kUTTypeUTF8PlainText) : value }]
                      options: @{ UIPasteboardOptionLocalOnly : @(!AppPreferences.sharedInstance.clipboardHandoff) }];
@@ -51,6 +54,10 @@
     else {
         [pasteboard setString:value];
     }
+    
+#ifndef IS_APP_EXTENSION
+    [self observeClipboardChangeNotifications];
+#endif
 }
 
 - (void)copyStringWithDefaultExpiration:(NSString *)value {

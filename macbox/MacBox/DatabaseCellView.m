@@ -27,6 +27,8 @@
 @property (weak) IBOutlet NSTextField *textFieldSubtitleTopRight;
 @property (weak) IBOutlet NSTextField *textFieldSubtitleBottomRight;
 
+
+
 @property (weak) IBOutlet NSImageView *imageViewQuickLaunch;
 @property (weak) IBOutlet NSImageView *imageViewOutstandingUpdate;
 @property (weak) IBOutlet NSImageView *imageViewReadOnly;
@@ -84,7 +86,6 @@
     self.imageViewQuickLaunch.hidden = YES;
     self.imageViewOutstandingUpdate.hidden = YES;
     self.imageViewReadOnly.hidden = YES;
-    
     self.imageViewSyncing.hidden = YES;
     self.syncProgressIndicator.hidden = YES;
     [self.syncProgressIndicator stopAnimation:nil];
@@ -96,7 +97,8 @@
     
         self.imageViewQuickLaunch.hidden = !metadata.launchAtStartup;
         self.imageViewOutstandingUpdate.hidden = metadata.outstandingUpdateId == nil;
-        
+        self.imageViewReadOnly.hidden = !metadata.readOnly;
+
         SyncOperationState syncState = autoFill ? kSyncOperationStateInitial : [MacSyncManager.sharedInstance getSyncStatus:metadata].state;
         
         if (syncState == kSyncOperationStateInProgress ||
@@ -137,7 +139,9 @@
     
         NSDate* modDate;
         unsigned long long size;
-        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata modified:&modDate fileSize:&size];
+        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:metadata.uuid
+                                                                             modified:&modDate
+                                                                             fileSize:&size];
         
         if ( workingCopy ) {
             fileSize = friendlyFileSizeString(size);
@@ -282,10 +286,12 @@
     NSString* raw = self.textFieldName.stringValue;
     NSString* trimmed = [DatabasesManager trimDatabaseNickName:raw];
 
-    if ( ![self.originalNickName isEqualToString:trimmed] && [DatabasesManager.sharedInstance isValid:trimmed] && [DatabasesManager.sharedInstance isUnique:trimmed] ) {
-        DatabaseMetadata* metadata = [DatabasesManager.sharedInstance getDatabaseById:self.uuid];
-        metadata.nickName = trimmed;
-        [DatabasesManager.sharedInstance update:metadata];
+    if ( ![self.originalNickName isEqualToString:trimmed] &&
+        [DatabasesManager.sharedInstance isValid:trimmed] &&
+        [DatabasesManager.sharedInstance isUnique:trimmed] ) {
+        [DatabasesManager.sharedInstance atomicUpdate:self.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+            metadata.nickName = trimmed;
+        }];
     }
     else {
         [self restoreOriginalNickname];

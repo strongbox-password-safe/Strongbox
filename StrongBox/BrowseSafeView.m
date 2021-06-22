@@ -48,6 +48,7 @@
 #import "AsyncUpdateResultViewController.h"
 #import "Platform.h"
 #import "Pair.h"
+#import "ConvenienceUnlockPreferences.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -81,6 +82,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property ConfiguredBrowseTableDatasource* configuredDataSource;
 @property SearchResultsBrowseTableDatasource* searchDataSource;
 @property QuickViewsBrowseTableDataSource* quickViewsDataSource;
+
+@property NSString *pwSafeRefreshSerializationId;
 
 @end
 
@@ -212,6 +215,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.pwSafeRefreshSerializationId = [self.viewModel.database getCrossSerializationFriendlyIdId:self.currentGroupId]; 
+
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.definesPresentationContext = YES;
 
@@ -228,9 +233,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         
         
         
-        [self addSearchBarToNav];
-        
-        [self maybePromptToTryProFeatures];        
+        [self addSearchBarToNav];        
     }
 
     if (@available(iOS 13.0, *)) { 
@@ -446,8 +449,9 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         }
         
         [ma0 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_new_group", @"New Group") systemImage:@"folder.badge.plus" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf onAddGroup]; }]];
-        [ma0 addObject:[self getContextualMenuItem:NSLocalizedString(@"generic_select", @"Select") systemImage:@"checkmark.circle" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf setEditing:YES animated:YES]; }]];
         
+        [ma0 addObject:[self getContextualMenuItem:NSLocalizedString(@"generic_select", @"Select") systemImage:@"checkmark.circle" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf setEditing:YES animated:YES]; }]];
+                
         UIMenu* menu0 = [UIMenu menuWithTitle:@""
                                        image:nil
                                   identifier:nil
@@ -481,6 +485,11 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
                 [weakSelf onSortItems:nil];
             }
         }]];
+        
+        if ( self.viewModel.metadata.browseSortField == kBrowseSortFieldNone ) {
+            [ma1 addObject:[self getContextualMenuItem:NSLocalizedString(@"generic_rearrange", @"Rearrange") systemImage:@"arrow.up.arrow.down.square.fill" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf setEditing:YES animated:YES]; }]];
+        }
+
 
         [ma1 addObject:menu15];
 
@@ -495,13 +504,23 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
         
         
         NSMutableArray<UIMenuElement*>* ma2 = [NSMutableArray array];
-
-        
-        [ma2 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_database_settings", @"Database Settings") systemImage:@"gear" destructive:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf onDatabasePreferences:nil]; }]];
-        
-        [ma2 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_set_master_credentials", @"Set Master Credentials") systemImage:@"ellipsis.rectangle" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf performSegueWithIdentifier:@"segueToChangeMasterCredentials" sender:nil]; }]];
         
         [ma2 addObject:[self getContextualMenuItem:NSLocalizedString(@"generic_export", @"Export") systemImage:@"square.and.arrow.up" destructive:NO handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf onExport:nil]; }]];
+
+        [ma2 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_set_master_credentials", @"Set Master Credentials") systemImage:@"ellipsis.rectangle" destructive:NO enabled:!self.viewModel.isReadOnly checked:NO handler:^(__kindof UIAction * _Nonnull action) {  [weakSelf performSegueWithIdentifier:@"segueToChangeMasterCredentials" sender:nil]; }]];
+
+        NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"convenience_unlock_preferences_title_fmt", @"%@ & PIN Codes"), BiometricsManager.sharedInstance.biometricIdName];
+        UIImage *bioImage = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
+
+        [ma2 addObject:[self getContextualMenuItem:fmt
+                                             image:bioImage
+                                       destructive:NO
+                                           handler:^(__kindof UIAction * _Nonnull action) {
+            [self performSegueWithIdentifier:@"segueToConvenienceUnlock" sender:nil];
+        }]];
+
+        [ma2 addObject:[self getContextualMenuItem:NSLocalizedString(@"browse_context_menu_database_settings", @"Database Settings") systemImage:@"gear" destructive:NO handler:^(__kindof UIAction * _Nonnull action) { [weakSelf onDatabasePreferences:nil]; }]];
+
         
 
         UIMenu* menu2 = [UIMenu menuWithTitle:@""
@@ -675,54 +694,6 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     [self refresh];
 }
 
-- (void)maybePromptToTryProFeatures {
-    
-    
-    if(AppPreferences.sharedInstance.isProOrFreeTrial) {
-        return;
-    }
-
-    
-
-    const NSUInteger kProNudgeIntervalDays = 14;
-    NSDate* dueDate = [NSCalendar.currentCalendar dateByAddingUnit:NSCalendarUnitDay value:kProNudgeIntervalDays toDate:AppPreferences.sharedInstance.lastFreeTrialNudge options:kNilOptions];
-    
-    BOOL nudgeDue = dueDate.timeIntervalSinceNow < 0; 
-    
-    if (!AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired && nudgeDue) {
-        AppPreferences.sharedInstance.lastFreeTrialNudge = NSDate.date;
-        
-        NSString* locMsg = NSLocalizedString(@"browse_pro_nudge_message_fmt", @"Strongbox Pro is full of handy features like %@ Unlock.\n\nYou have a Free Trial available to use, would you like to try Strongbox Pro?");
-        NSString* locMsgFmt = [NSString stringWithFormat:locMsg, BiometricsManager.sharedInstance.biometricIdName];
-        
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"browse_pro_nudge_title", @"Try Strongbox Pro?")
-              message:locMsgFmt
-               action:^(BOOL response) {
-            if (response) {
-                [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
-            }
-        }];
-    }
-    else {
-        
-        if ([self userHasAlreadyTriedAppForMoreThan90Days]) {
-            const NSUInteger percentageChanceOfShowing = 4;
-            NSInteger random = arc4random_uniform(100);
-
-            if(random < percentageChanceOfShowing) {
-                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1.0 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-                    [self performSegueWithIdentifier:@"segueToUpgrade" sender:nil];
-                });
-            }
-        }
-    }
-}
-
-- (BOOL)userHasAlreadyTriedAppForMoreThan90Days {
-    return (AppPreferences.sharedInstance.freeTrialHasBeenOptedInAndExpired || AppPreferences.sharedInstance.daysInstalled > 90);
-}
-    
 - (void)showDetailTargetDidChange:(NSNotification *)notification{
     NSLog(@"showDetailTargetDidChange");
     if(!self.splitViewController.isCollapsed) {
@@ -1456,6 +1427,17 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)onDatabaseReloaded:(id)param {
     if ( !self.isEditing ) {
         NSLog(@"XXXXXX - Received Database Reloaded Notification from Model");
+        
+        if ( self.viewModel.database.originalFormat == kPasswordSafe ) { 
+            Node* node = [self.viewModel.database getItemByCrossSerializationFriendlyId:self.pwSafeRefreshSerializationId];
+            if ( node ) {
+                self.currentGroupId = node.uuid;
+            }
+            else {
+                self.currentGroupId = self.viewModel.database.effectiveRootGroup.uuid;
+            }
+        }
+        
         [self refresh];
     }
 }
@@ -1764,6 +1746,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             }];
         };
     }
+    else if ([segue.identifier isEqualToString:@"segueToConvenienceUnlock"]) {
+        UINavigationController* nav = segue.destinationViewController;
+        ConvenienceUnlockPreferences* vc = (ConvenienceUnlockPreferences*)nav.topViewController;
+        vc.viewModel = self.viewModel;
+    }
     else if ([segue.identifier isEqualToString:@"segueToSortOrder"]){
         UINavigationController* nav = segue.destinationViewController;
         SortOrderTableViewController* vc = (SortOrderTableViewController*)nav.topViewController;
@@ -1776,17 +1763,10 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
             self.viewModel.metadata.browseSortField = field;
             self.viewModel.metadata.browseSortOrderDescending = descending;
             self.viewModel.metadata.browseSortFoldersSeparately = foldersSeparately;
+
+            [self refreshiOS14MoreMenu];
             [self refresh];
         };
-    }
-    else if ([segue.identifier isEqualToString:@"segueToUpgrade"]) {
-        UIViewController* vc = segue.destinationViewController;
-        if (@available(iOS 13.0, *)) {
-            if ([self userHasAlreadyTriedAppForMoreThan90Days]) {
-                vc.modalPresentationStyle = UIModalPresentationFullScreen;
-                vc.modalInPresentation = YES;
-            }
-        }
     }
     else if ([segue.identifier isEqualToString:@"segueToCustomizeView"]){
         UINavigationController* nav = segue.destinationViewController;
@@ -2930,10 +2910,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 
 - (void)onManualPulldownSyncSuccess:(BOOL)localWasChanged {
     NSLog(@"Sync done... Success reloading model from local");
-    
+        
     __weak BrowseSafeView* weakSelf = self;
     if (localWasChanged) {
-        [self.viewModel reloadDatabaseFromLocalWorkingCopy:self completion:^(BOOL success) {
+        [self.viewModel reloadDatabaseFromLocalWorkingCopy:self
+                                                completion:^(BOOL success) {
             [weakSelf.tableView.refreshControl endRefreshing];
 
             if (success) {

@@ -124,12 +124,15 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     
     NSURL* maybeManagedSyncUrl = [self maybeManagedSyncURL:URL];
     
-    DatabaseMetadata* metadata = [DatabasesManager.sharedInstance addOrGet:maybeManagedSyncUrl];
-    metadata.keyFileBookmark = keyFileBookmark;
-    metadata.yubiKeyConfiguration = yubiKeyConfig;
-    [DatabasesManager.sharedInstance update:metadata];
+    DatabaseMetadata* dbm = [DatabasesManager.sharedInstance addOrGet:maybeManagedSyncUrl];
+    dbm.keyFileBookmark = keyFileBookmark;
+    dbm.yubiKeyConfiguration = yubiKeyConfig;
+    [DatabasesManager.sharedInstance atomicUpdate:dbm.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.keyFileBookmark = keyFileBookmark;
+        metadata.yubiKeyConfiguration = yubiKeyConfig;
+    }];
 
-    [self openDatabase:metadata completion:^(NSError * _Nonnull error) {
+    [self openDatabase:dbm completion:^(NSError * _Nonnull error) {
         if ( error ) {
             if (NSApplication.sharedApplication.keyWindow) {
                 [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
@@ -194,14 +197,14 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
                 url = database.fileUrl;
             }
             else {
-                
-                
-                if (updatedBookmark) {
-                    database.storageInfo = updatedBookmark;
-                }
-                
-                database.fileUrl = url;
-                [DatabasesManager.sharedInstance update:database];
+                [DatabasesManager.sharedInstance atomicUpdate:database.uuid
+                                                        touch:^(DatabaseMetadata * _Nonnull metadata) {
+                    if (updatedBookmark) {
+                        metadata.storageInfo = updatedBookmark;
+                    }
+                    
+                    metadata.fileUrl = url;
+                }];
             }
         }
         else {
@@ -211,7 +214,7 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
         [url startAccessingSecurityScopedResource];
     }
     else {
-        NSLog(@"None Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
+        NSLog(@"Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -415,6 +418,10 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     if ( doc ) {
         [doc close];
     }
+}
+
+- (BOOL)allowsAutomaticShareMenu { 
+    return NO;
 }
 
 @end

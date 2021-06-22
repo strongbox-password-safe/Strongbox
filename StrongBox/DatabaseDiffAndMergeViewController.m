@@ -81,7 +81,8 @@
     DatabaseSearchAndSorter *sorter = [[DatabaseSearchAndSorter alloc] initWithModel:self.firstDatabase.database
                                                                      browseSortField:self.firstDatabase.metadata.browseSortField
                                                                           descending:self.firstDatabase.metadata.browseSortOrderDescending
-                                                                   foldersSeparately:YES];
+                                                                   foldersSeparately:YES
+                                                                         checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled];
     
     
     

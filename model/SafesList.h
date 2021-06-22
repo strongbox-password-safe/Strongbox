@@ -30,7 +30,8 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 - (BOOL)isUnique:(NSString *)nickName;
 - (BOOL)isValid:(NSString *)nickName;
 
-- (void)update:(SafeMetaData *_Nonnull)safe;
+- (void)atomicUpdate:(NSString *_Nonnull)uuid touch:(void (^_Nonnull)(SafeMetaData* metadata))touch;
+- (void)update:(SafeMetaData *_Nonnull)safe; 
 - (void)remove:(NSString*_Nonnull)uuid;
 
 - (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe initialCache:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;
@@ -41,6 +42,11 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 - (void)deleteAll;
+
+
+
+- (BOOL)isEditing:(SafeMetaData*)database;
+- (void)setEditing:(SafeMetaData*)database editing:(BOOL)editing;
 
 
 

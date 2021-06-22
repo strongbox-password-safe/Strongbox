@@ -6,12 +6,15 @@
 //  Copyright © 2014-2021 Mark McGuill. All rights reserved.
 //
 
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+
 #import "CloudSessionsTableViewController.h"
-#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
-#import "GoogleDriveManager.h"
-#import "OneDriveStorageProvider.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
+
+#import "OneDriveStorageProvider.h"
+#import <ObjectiveDropboxOfficial/ObjectiveDropboxOfficial.h>
+#import "GoogleDriveManager.h"
 
 @interface CloudSessionsTableViewController ()
 
@@ -74,6 +77,7 @@
 
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
     if(indexPath.row == 0) {
         [self onSignoutGoogleDrive];
     }
@@ -82,10 +86,12 @@
     }
     else if(indexPath.row == 2) {
         [self onSignoutOneDrive];
+
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
+
 
 - (void)onSignoutGoogleDrive {
     [Alerts checkThirdPartyLibOptInOK:self completion:^(BOOL optInOK) {
@@ -154,6 +160,7 @@
         if ( !optInOK ) {
             return;
         }
+        
         if ([OneDriveStorageProvider.sharedInstance isSignedIn]) {
             [Alerts yesNo:self
                     title:NSLocalizedString(@"cloud_sessions_prompt_signout_onedrive_title", @"Sign out of OneDrive?")
@@ -190,3 +197,6 @@
 }
 
 @end
+
+#endif
+

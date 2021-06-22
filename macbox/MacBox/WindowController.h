@@ -10,6 +10,4 @@
 
 @interface WindowController : NSWindowController
 
-//@property (nonatomic) BOOL dirty;
-
 @end

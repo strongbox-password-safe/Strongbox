@@ -120,6 +120,10 @@ extern NSString* const kAsyncUpdateStarting;
 - (BOOL)asyncUpdateAndSync;
 - (void)clearAsyncUpdateState;
 
+
+
+@property BOOL isDuressDummyDatabase; 
+
 @end
 
 NS_ASSUME_NONNULL_END

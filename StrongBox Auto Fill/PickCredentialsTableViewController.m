@@ -307,6 +307,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                                                                        browseSortField:sortField
                                                                             descending:descending
                                                                      foldersSeparately:foldersSeparately
+                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
                                                                       isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
         return [self.model isFlaggedByAudit:node.uuid];
     }];
@@ -331,6 +332,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                                                                        browseSortField:sortField
                                                                             descending:descending
                                                                      foldersSeparately:foldersSeparately
+                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
                                                                       isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
         return [self.model isFlaggedByAudit:node.uuid];
     }];
@@ -392,6 +394,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
                                                                        browseSortField:sortField
                                                                             descending:descending
                                                                      foldersSeparately:foldersSeparately
+                                                                           checkPinYin:AppPreferences.sharedInstance.pinYinSearchEnabled
                                                                       isFlaggedByAudit:^BOOL(Node * _Nonnull node) {
         return [self.model isFlaggedByAudit:node.uuid];
     }];
@@ -478,7 +481,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
             cell.userInteractionEnabled = [self canCreateNewCredential];
         }
         else {
-            cell.textLabel.text = NSLocalizedString(@"audit_drill_down_section_header_preferences", @"Preferences");
+            cell.textLabel.text = NSLocalizedString(@"generic_preferences", @"Preferences");
             if (@available(iOS 13.0, *)) {
                 cell.imageView.image = [UIImage systemImageNamed:@"gear"];
             }
@@ -570,7 +573,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         return NSLocalizedString(@"autofill_search_title_service_id_section_header", @"Service ID");
     }
     else if ( [group isEqualToString:kGroupActions] ) {
-        return NSLocalizedString(@"audit_drill_down_section_header_actions", @"Actions");
+        return NSLocalizedString(@"generic_actions", @"Actions");
     }
     else if ( [group isEqualToString:kGroupAllItems] ) {
         return NSLocalizedString(@"quick_view_title_all_entries_title", @"All Entries");

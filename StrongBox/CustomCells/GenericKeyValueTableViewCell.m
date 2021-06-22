@@ -12,6 +12,7 @@
 #import "ColoredStringHelper.h"
 #import "AppPreferences.h"
 #import "PasswordStrengthTester.h"
+#import "PasswordStrengthUIHelper.h"
 
 @interface GenericKeyValueTableViewCell ()
 
@@ -475,25 +476,16 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
     }
 }
 
+
 - (void)bindStrength:(BOOL)showStrength {
     if ( showStrength && self.value.length ) {
-        PasswordStrength* strength = [PasswordStrengthTester getStrength:self.value config:AppPreferences.sharedInstance.passwordStrengthConfig];
-        
-        self.labelStrength.text = strength.summaryString;
-        
-        double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-            
-        double red = 1.0 - relativeStrength;
-        double green = relativeStrength;
+        [PasswordStrengthUIHelper bindStrengthUI:self.value
+                                          config:AppPreferences.sharedInstance.passwordStrengthConfig
+                              emptyPwHideSummary:NO
+                                           label:self.labelStrength
+                                        progress:self.progressStrength];
         
         self.stackStrength.hidden = NO;
-
-        self.progressStrength.progress = relativeStrength;
-        
-        UIColor *color = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
-        self.progressStrength.progressTintColor = color;
-
-
     }
     else {
         self.stackStrength.hidden = YES;

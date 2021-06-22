@@ -119,7 +119,8 @@ static NSString* const kAutoFillCredentialCell = @"AutoFillCredentialCell";
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model
                                                                        browseSortField:kBrowseSortFieldTitle
                                                                             descending:NO
-                                                                     foldersSeparately:YES];
+                                                                     foldersSeparately:YES
+                                                                           checkPinYin:NO];
     
     self.items = [searcher filterAndSortForBrowse:self.model.effectiveRootGroup.allChildRecords.mutableCopy
                                   includeKeePass1Backup:NO
@@ -253,7 +254,8 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     DatabaseSearchAndSorter* searcher = [[DatabaseSearchAndSorter alloc] initWithModel:self.model
                                                                        browseSortField:kBrowseSortFieldTitle
                                                                             descending:NO
-                                                                     foldersSeparately:YES];
+                                                                     foldersSeparately:YES
+                                                                           checkPinYin:NO];
     
     return [searcher search:searchText
                       scope:scope

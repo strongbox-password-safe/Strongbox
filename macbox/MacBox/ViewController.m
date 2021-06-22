@@ -56,6 +56,7 @@
 #import "Document.h"
 #import "SyncAndMergeSequenceManager.h"
 #import "PasswordStrengthTester.h"
+#import "StrongboxErrorCodes.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -204,14 +205,12 @@ static NSImage* kStrongBox256Image;
 }
 
 - (DatabaseMetadata*)databaseMetadata {
-    return self.document.databaseMetadata;
+    return self.viewModel.databaseMetadata;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    
-
     
     
     
@@ -220,15 +219,18 @@ static NSImage* kStrongBox256Image;
     [self enableDragDrop];
 }
 
+- (void)onDocumentLoaded { 
+
+
+    [self load];
+}
+
 - (void)viewWillAppear {
     [super viewWillAppear];
     
-    
 
-    if(!self.hasLoaded) {
-        self.hasLoaded = YES;
-        [self doInitialViewSetup];
-    }
+
+    [self load];
 }
 
 - (void)viewDidAppear {
@@ -241,13 +243,18 @@ static NSImage* kStrongBox256Image;
     [self startRefreshOtpTimer];
 }
 
-- (void)doInitialViewSetup {
+- (void)load {
+    if(self.hasLoaded) {
+        return;
+    }
+    
+    self.hasLoaded = YES;
     _document = self.view.window.windowController.document;
     self.view.window.delegate = self;
 
     [self customizeUi];
 
-    NSLog(@"ViewController::doInitialViewSetup - Initial Load - doc=[%@] - vm=[%@]", self.document, self.viewModel);
+    NSLog(@"ViewController::load - Initial Load - doc=[%@] - vm=[%@]", self.document, self.viewModel);
 
     [self fullModelReload];
     
@@ -263,7 +270,8 @@ static NSImage* kStrongBox256Image;
 - (void)listenToEventsOfInterest {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onAutoLock:) name:kAutoLockTime object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onPreferencesChanged:) name:kPreferencesChangedNotification object:nil];
+
 
 
 
@@ -275,9 +283,8 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)onScreenLocked {
-    if ( Settings.sharedInstance.lockDatabasesOnScreenLock ) {
+    if ( self.viewModel.lockOnScreenLock ) {
         NSLog(@"onScreenLocked: Locking Database");
-
         [self onLock:nil];
     }
 }
@@ -288,6 +295,7 @@ static NSImage* kStrongBox256Image;
     [self stopObservingModelChanges];
     [self closeAllDetailsWindows:nil];
     [self bindToModel];
+    [self.view.window.windowController synchronizeWindowTitleWithDocumentName]; 
     [self setInitialFocus];
 }
 
@@ -311,6 +319,13 @@ static NSImage* kStrongBox256Image;
         [self cleanupOnClose];
     }
 }
+
+
+
+
+
+
+
 
 - (void)cleanupOnClose {
 
@@ -410,7 +425,6 @@ static NSImage* kStrongBox256Image;
         vc.node = item;
         vc.model = self.viewModel;
         vc.newEntry = newEntry.boolValue;
-        vc.historical = NO;
         
         vc.onClosed = ^{
             NSLog(@"Removing Details View from List: [%@]", item.title);
@@ -441,7 +455,7 @@ static NSImage* kStrongBox256Image;
         DatabaseSettingsTabViewController *vc = (DatabaseSettingsTabViewController*)segue.destinationController;
         
         NSNumber* tab = (NSNumber*)sender;
-        [vc setModel:self.viewModel.database databaseMetadata:self.databaseMetadata initialTab:tab.intValue];
+        [vc setModel:self.viewModel initialTab:tab.intValue];
     }
     else if ([segue.identifier isEqualToString:@"segueToDatabaseOnboarding"]) {
         DatabaseOnboardingTabViewController *vc = (DatabaseOnboardingTabViewController*)segue.destinationController;
@@ -451,7 +465,7 @@ static NSImage* kStrongBox256Image;
         vc.convenienceUnlock = ((NSNumber*)foo[@"convenienceUnlock"]).boolValue;
         vc.autoFill = ((NSNumber*)foo[@"autoFill"]).boolValue;
         vc.ckfs = foo[@"compositeKeyFactors"];
-        vc.database = self.databaseMetadata;
+        vc.databaseUuid = self.databaseMetadata.uuid;
         vc.model = foo[@"model"];
     }
     else if ( [segue.identifier isEqualToString:@"segueToFavIconDownloader"] ) {
@@ -471,7 +485,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)bindShowAdvancedOnUnlockScreen {
-    BOOL show = Settings.sharedInstance.showAdvancedUnlockOptions;
+    BOOL show = self.viewModel.showAdvancedUnlockOptions;
     
     self.checkboxShowAdvanced.state = show ? NSControlStateValueOn : NSControlStateValueOff;
     
@@ -483,7 +497,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (IBAction)onShowAdvancedOnUnlockScreen:(id)sender {
-    Settings.sharedInstance.showAdvancedUnlockOptions = !Settings.sharedInstance.showAdvancedUnlockOptions;
+    self.viewModel.showAdvancedUnlockOptions = !self.viewModel.showAdvancedUnlockOptions;
     
     [self bindShowAdvancedOnUnlockScreen];
 }
@@ -535,7 +549,7 @@ static NSImage* kStrongBox256Image;
     
     [self customizeOutlineView];
     
-    self.quickViewColumn.hidden = !Settings.sharedInstance.revealDetailsImmediately;
+    self.quickViewColumn.hidden = !self.viewModel.showQuickView;
     [self bindQuickViewButton];
     
     
@@ -547,51 +561,6 @@ static NSImage* kStrongBox256Image;
     self.searchSegmentedControl.enabled = YES;
 }
 
-- (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
-    if(control == self.searchField) { 
-        NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
-        
-        if (commandSelector == NSSelectorFromString(@"noop:")) { 
-            NSEvent *event = [self.searchField.window currentEvent];
-            if ( (event.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) {
-                NSString *chars = event.charactersIgnoringModifiers;
-                unichar aChar = [chars characterAtIndex:0];
-
-                
-                
-                if (aChar == 'c') {
-                    Node* item = [self getCurrentSelectedItem];
-                    if ( item && !item.isGroup ) {
-                        [self onCopyPassword:nil];
-                        return YES;
-                    }
-                }
-            }
-        }
-        
-        if (commandSelector == @selector(moveDown:)) {
-            if (self.outlineView.numberOfRows > 0) {
-                [self.view.window makeFirstResponder:self.outlineView];
-                return YES;
-            }
-        }
-    }
-    else if( control == self.textFieldMasterPassword ) {
-        if (commandSelector == @selector(insertTab:)) {
-            if([self convenienceUnlockIsPossible]) {
-                [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
-            }
-            else {
-                [self.view.window makeFirstResponder:self.buttonUnlockWithPassword];
-            }
-
-            return YES;
-        }
-    }
-
-    return NO;
-}
-
 - (void)customizeOutlineView {
     
     
@@ -599,8 +568,8 @@ static NSImage* kStrongBox256Image;
     NSNib* nib = [[NSNib alloc] initWithNibNamed:@"CustomFieldTableCellView" bundle:nil];
     [self.outlineView registerNib:nib forIdentifier:kPasswordCellIdentifier];
 
-    self.outlineView.usesAlternatingRowBackgroundColors = !Settings.sharedInstance.noAlternatingRows;
-    self.outlineView.gridStyleMask = (Settings.sharedInstance.showVerticalGrid ? NSTableViewSolidVerticalGridLineMask : 0) | (Settings.sharedInstance.showHorizontalGrid ? NSTableViewSolidHorizontalGridLineMask : 0);
+    self.outlineView.usesAlternatingRowBackgroundColors = self.viewModel.showAlternatingRows;
+    self.outlineView.gridStyleMask = (self.viewModel.showVerticalGrid ? NSTableViewSolidVerticalGridLineMask : 0) | (self.viewModel.showHorizontalGrid ? NSTableViewSolidHorizontalGridLineMask : 0);
     
     self.outlineView.headerView.menu = self.outlineHeaderColumnsMenu;
     self.outlineView.autosaveTableColumns = YES;
@@ -621,7 +590,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (void)bindColumnsToSettings {
-    NSArray<NSString*>* visible = Settings.sharedInstance.visibleColumns;
+    NSArray<NSString*>* visible = self.viewModel.visibleColumns;
     
     
     
@@ -651,19 +620,19 @@ static NSImage* kStrongBox256Image;
     
     
     
-    NSMutableArray<NSString*>* newColumns = [Settings.sharedInstance.visibleColumns mutableCopy];
+    NSMutableArray<NSString*>* newColumns = [self.viewModel.visibleColumns mutableCopy];
     
     if(menuItem.state == NSOnState) 
     {
         [newColumns removeObject:menuItem.identifier];
-        Settings.sharedInstance.visibleColumns = newColumns;
+        self.viewModel.visibleColumns = newColumns;
         [self showHideOutlineViewColumn:menuItem.identifier show:NO];
         [self.outlineView reloadData];
     }
     else { 
         if(![newColumns containsObject:menuItem.identifier]) { 
             [newColumns addObject:menuItem.identifier];
-            Settings.sharedInstance.visibleColumns = newColumns;
+            self.viewModel.visibleColumns = newColumns;
         }
         [self showHideOutlineViewColumn:menuItem.identifier show:[self isColumnAvailableForModel:menuItem.identifier]];
         [self.outlineView reloadData];
@@ -699,7 +668,7 @@ static NSImage* kStrongBox256Image;
 }
 
 - (BOOL)isColumnVisible:(NSString*)identifier {
-    return [Settings.sharedInstance.visibleColumns containsObject:identifier];
+    return [self.viewModel.visibleColumns containsObject:identifier];
 }
 
 - (void)initializeFullOrTrialOrLiteUI {
@@ -834,7 +803,7 @@ static NSImage* kStrongBox256Image;
         
     BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
 
-    if(url && featureAvailable && Settings.sharedInstance.expressDownloadFavIconOnNewOrUrlChanged) {
+    if( url && featureAvailable && self.viewModel.downloadFavIconOnChange ) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0L), ^{
             [FavIconManager.sharedInstance downloadPreferred:url
                                                      options:FavIconDownloadOptions.express
@@ -926,9 +895,12 @@ static NSImage* kStrongBox256Image;
         Node* selectedItem = [self.viewModel getItemFromSerializationId:self.viewModel.selectedItem];
         [self selectItem:selectedItem];
         
+        self.buttonCreateGroup.enabled = !self.viewModel.isEffectivelyReadOnly;
+        self.buttonCreateRecord.enabled = !self.viewModel.isEffectivelyReadOnly;
+        
         [self bindDetailsPane];
         
-        if (Settings.sharedInstance.startWithSearch) {
+        if ( self.viewModel.startWithSearch ) {
             [self.view.window makeFirstResponder:self.searchField];
         }
         else {
@@ -1038,7 +1010,6 @@ static NSImage* kStrongBox256Image;
         self.imageViewGroupDetails.showClickableBorder = YES;
         self.imageViewGroupDetails.onClick = ^{ [self onEditNodeIcon:it]; };
 
-        
         self.textFieldSummaryTitle.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInQuickView];;
     }
     else {
@@ -1078,14 +1049,14 @@ static NSImage* kStrongBox256Image;
         [self.textViewNotes checkTextInDocument:nil];
         [self.textViewNotes setEditable:NO];
         
-        self.imageViewTogglePassword.hidden = (self.labelPassword.stringValue.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-        self.showPassword = Settings.sharedInstance.alwaysShowPassword || (self.labelPassword.stringValue.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
+        self.imageViewTogglePassword.hidden = (self.labelPassword.stringValue.length == 0 && !self.viewModel.concealEmptyProtectedFields);
+        self.showPassword = Settings.sharedInstance.alwaysShowPassword || (self.labelPassword.stringValue.length == 0 && !self.viewModel.concealEmptyProtectedFields);
         [self showOrHideQuickViewPassword];
         
         
         
         self.expiresRow.hidden = it.fields.expires == nil;
-        self.labelExpires.stringValue = it.fields.expires ? it.fields.expires.friendlyDateString : @"";
+        self.labelExpires.stringValue = it.fields.expires ? it.fields.expires.friendlyDateTimeString : @"";
         self.labelExpires.textColor = it.expired ? NSColor.redColor : it.nearlyExpired ? NSColor.orangeColor : nil;
         
         
@@ -1213,8 +1184,8 @@ static NSImage* kStrongBox256Image;
         NSString* password = [self maybeDereference:it.fields.password node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
         
         cell.value = it.isGroup ? @"" : password;
-        cell.protected = !it.isGroup && !(password.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-        cell.valueHidden = !it.isGroup && !(password.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields) && !Settings.sharedInstance.showPasswordImmediatelyInOutline;
+        cell.protected = !it.isGroup && !(password.length == 0 && !self.viewModel.concealEmptyProtectedFields);
+        cell.valueHidden = !it.isGroup && !(password.length == 0 && !self.viewModel.concealEmptyProtectedFields) && !Settings.sharedInstance.showPasswordImmediatelyInOutline;
         
         cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
 
@@ -1317,7 +1288,10 @@ static NSImage* kStrongBox256Image;
     
     BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.viewModel isDereferenceableText:text];
     
-    cell.textField.editable = !possiblyDereferencedText && !Settings.sharedInstance.outlineViewEditableFieldsAreReadonly;
+    cell.textField.editable = !possiblyDereferencedText &&
+        !self.viewModel.outlineViewEditableFieldsAreReadonly &&
+        !self.viewModel.isEffectivelyReadOnly;
+    
     cell.textField.action = selector;
     
     cell.alphaValue = node.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
@@ -1343,7 +1317,9 @@ static NSImage* kStrongBox256Image;
     cell.textField.stringValue = [self maybeDereference:it.title node:it maybe:Settings.sharedInstance.dereferenceInOutlineView];
 
     BOOL possiblyDereferencedText = Settings.sharedInstance.dereferenceInOutlineView && [self.viewModel isDereferenceableText:it.title];
-    cell.textField.editable = !possiblyDereferencedText && (it.isGroup || (!Settings.sharedInstance.outlineViewEditableFieldsAreReadonly && !Settings.sharedInstance.outlineViewTitleIsReadonly));
+    cell.textField.editable = !possiblyDereferencedText
+        && !self.viewModel.isEffectivelyReadOnly
+        && (it.isGroup || (!self.viewModel.outlineViewTitleIsReadonly));
     
     cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
     
@@ -1460,12 +1436,12 @@ static NSImage* kStrongBox256Image;
     
     
     
-    NSMutableArray<NSString*>* newColumns = [Settings.sharedInstance.visibleColumns mutableCopy];
+    NSMutableArray<NSString*>* newColumns = [self.viewModel.visibleColumns mutableCopy];
    
     [newColumns removeObject:column.identifier];
     [newColumns insertObject:column.identifier atIndex:newNum.integerValue];
     
-    Settings.sharedInstance.visibleColumns = newColumns;
+    self.viewModel.visibleColumns = newColumns;
 }
 
 - (IBAction)onOutlineViewDoubleClick:(id)sender {
@@ -1538,13 +1514,13 @@ static NSImage* kStrongBox256Image;
         return @[];
     }
     
-    BOOL sort = !Settings.sharedInstance.uiDoNotSortKeePassNodesInBrowseView || self.viewModel.format == kPasswordSafe;
+    BOOL sort = self.viewModel.sortKeePassNodes || self.viewModel.format == kPasswordSafe;
     
     NSArray<Node*>* sorted = sort ? [parentGroup.children sortedArrayUsingComparator:finderStyleNodeComparator] : parentGroup.children;
     
     NSString* searchText = self.searchField.stringValue;
     BOOL isSearching = searchText.length != 0;
-    BOOL showRecycleBin = isSearching ? Settings.sharedInstance.showRecycleBinInSearchResults : !Settings.sharedInstance.doNotShowRecycleBinInBrowse;
+    BOOL showRecycleBin = isSearching ? self.viewModel.showRecycleBinInSearchResults : self.viewModel.showRecycleBinInBrowse;
 
     NSArray<Node*> *filtered = sorted;
     if(self.viewModel.format == kKeePass1) {
@@ -1929,7 +1905,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
     [self enableMasterCredentialsEntry:YES];
     
     if(success) {
-        DatabaseMetadata* metaData = self.databaseMetadata;
+        DatabaseMetadata* databaseMetadata = self.databaseMetadata;
                 
         BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
         BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
@@ -1938,14 +1914,14 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
         
         BOOL convenienceIsPossible = convenienceAvailable && featureAvailable;
-        BOOL shouldPromptForBiometricEnrol = convenienceIsPossible && !metaData.hasPromptedForTouchIdEnrol && !convenienceEnabled;
+        BOOL shouldPromptForBiometricEnrol = convenienceIsPossible && !databaseMetadata.hasPromptedForTouchIdEnrol && !convenienceEnabled;
         
         BOOL autoFillAvailable = NO;
         if ( @available(macOS 11.0, *) ) {
             autoFillAvailable = YES;
         }
         
-        BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !metaData.autoFillEnabled && !metaData.hasPromptedForAutoFillEnrol;
+        BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !databaseMetadata.autoFillEnabled && !databaseMetadata.hasPromptedForAutoFillEnrol;
         
         if(shouldPromptForBiometricEnrol || shouldPromptForAutoFillEnrol) {
             [self onboardForBiometricsAndOrAutoFill:shouldPromptForBiometricEnrol
@@ -1954,20 +1930,20 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         }
                 
         NSString* password = self.viewModel.compositeKeyFactors.password;
-        if( !isBiometricUnlock && convenienceIsPossible && convenienceEnabled && metaData.isTouchIdEnrolled && metaData.conveniencePassword == nil && password.length) {
+        if( !isBiometricUnlock && convenienceIsPossible && convenienceEnabled && databaseMetadata.isTouchIdEnrolled && databaseMetadata.conveniencePassword == nil && password.length) {
             
             [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:password];
         }
     
-        
-        
-        metaData.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
-        metaData.yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
-
-        [DatabasesManager.sharedInstance update:metaData];
+        [DatabasesManager.sharedInstance atomicUpdate:databaseMetadata.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+            
+            
+            metadata.keyFileBookmark = Settings.sharedInstance.doNotRememberKeyFile ? nil : self.selectedKeyFileBookmark;
+            metadata.yubiKeyConfiguration = self.selectedYubiKeyConfiguration;
+        }];
     }
     else {
-        if ( error && error.code == kStrongboxErrorCodeIncorrectCredentials ) {
+        if ( error && error.code == StrongboxErrorCodes.incorrectCredentials ) {
             if(isBiometricUnlock) { 
                 [self clearTouchId];
             
@@ -2083,19 +2059,19 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)changeMasterCredentials:(CompositeKeyFactors*)ckf {
     [self.viewModel setCompositeKeyFactors:ckf];
 
-    DatabaseMetadata* metadata = self.databaseMetadata;
+    DatabaseMetadata* md = self.databaseMetadata;
+        
+    [md resetConveniencePasswordWithCurrentConfiguration:ckf.password];
     
-    if(self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile) {
-        metadata.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
-    }
-    else {
-        metadata.keyFileBookmark = nil;
-    }
-    metadata.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
-    
-    [metadata resetConveniencePasswordWithCurrentConfiguration:ckf.password];
-    
-    [DatabasesManager.sharedInstance update:metadata];
+    [DatabasesManager.sharedInstance atomicUpdate:md.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+        if(self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile) {
+            metadata.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
+        }
+        else {
+            metadata.keyFileBookmark = nil;
+        }
+        metadata.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
+    }];
 }
 
 - (void)promptForMasterPassword:(BOOL)new completion:(void (^)(BOOL okCancel))completion {
@@ -3023,11 +2999,13 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 - (void)clearTouchId {
     NSLog(@"Clearing Touch ID data...");
     
-    self.databaseMetadata.hasPromptedForTouchIdEnrol = NO; 
-    self.databaseMetadata.isTouchIdEnrolled = NO;
-    [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:nil];
-    [DatabasesManager.sharedInstance update:self.databaseMetadata];
-    
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseMetadata.uuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.hasPromptedForTouchIdEnrol = NO; 
+        metadata.isTouchIdEnrolled = NO;
+        [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:nil];
+    }];
+
     [self bindLockScreenUi];
 }
 
@@ -3272,8 +3250,8 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             NSString* derefed = [self maybeDereference:field.value node:it maybe:Settings.sharedInstance.dereferenceInQuickView];
             
             cell.value = derefed;
-            cell.protected = field.protected && !(derefed.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-            cell.valueHidden = field.protected && !(derefed.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); 
+            cell.protected = field.protected && !(derefed.length == 0 && !self.viewModel.concealEmptyProtectedFields);
+            cell.valueHidden = field.protected && !(derefed.length == 0 && !self.viewModel.concealEmptyProtectedFields); 
             
             return cell;
         }
@@ -3459,7 +3437,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return;
     }
     
-    if(!Settings.sharedInstance.doNotShowTotp && item.fields.otpToken) {
+    if( self.viewModel.showTotp && item.fields.otpToken ) {
         self.totpRow.hidden = NO;
         
         
@@ -3515,7 +3493,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)showPopupChangeToastNotification:(NSString*)message {
-    if(Settings.sharedInstance.doNotShowChangeNotifications) {
+    if( !self.viewModel.showChangeNotifications ) {
         return;
     }
     
@@ -3548,8 +3526,8 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (IBAction)onShowHideQuickView:(id)sender {
-    Settings.sharedInstance.revealDetailsImmediately = !Settings.sharedInstance.revealDetailsImmediately;
-    self.quickViewColumn.hidden = !Settings.sharedInstance.revealDetailsImmediately;
+    self.viewModel.showQuickView = !self.viewModel.showQuickView;
+    self.quickViewColumn.hidden = !self.viewModel.showQuickView;
     [self bindQuickViewButton];
 }
 
@@ -3641,8 +3619,10 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         }
         
         if(updatedBookmark) {
-            database.keyFileBookmark = updatedBookmark;
-            [DatabasesManager.sharedInstance update:database];
+            [DatabasesManager.sharedInstance atomicUpdate:database.uuid
+                                                    touch:^(DatabaseMetadata * _Nonnull metadata) {
+                metadata.keyFileBookmark = updatedBookmark;
+            }];
         }
     }
 
@@ -4059,20 +4039,26 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         
         if ( [userSession isEqualToString:NSUserName()] ) { 
             NSString* databaseId = dict[@"database-id"];
-            [self onAutoFillDatabaseConvUnlockWormholeRequest:databaseId];
+            [self onAutoFillWormholeMasterCredentialsRequest:databaseId];
         }
     }];
 }
 
-- (void)onAutoFillDatabaseConvUnlockWormholeRequest:(NSString*)databaseId {
+- (void)onAutoFillWormholeMasterCredentialsRequest:(NSString*)databaseId {
     if ( self.viewModel && !self.viewModel.locked && databaseId) {
+        if (!self.databaseMetadata.quickWormholeFillEnabled ) {
+            return;
+        }
+
         if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
             NSLog(@"Responding to Conv Unlock Req for Database - [%@]-%@", self, databaseId);
 
             NSString* responseId = [NSString stringWithFormat:@"%@-%@", kAutoFillWormholeConvUnlockResponseId, databaseId];
             NSString* secretStoreId = NSUUID.UUID.UUIDString;
             NSDate* expiry = [NSDate.date dateByAddingTimeInterval:5]; 
-            [SecretStore.sharedInstance setSecureObject:self.viewModel.compositeKeyFactors.password forIdentifier:secretStoreId expiresAt:expiry];
+            [SecretStore.sharedInstance setSecureObject:self.viewModel.compositeKeyFactors.password
+                                          forIdentifier:secretStoreId
+                                              expiresAt:expiry];
 
             [self.wormhole passMessageObject:@{  @"user-session-id" : NSUserName(),
                                                  @"secret-store-id" : secretStoreId }
@@ -4083,6 +4069,10 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (void)onAutoFillDatabaseUnlockedStatusWormholeRequest:(NSString*)databaseId {
     if ( self.viewModel && !self.viewModel.locked && databaseId) {
+        if (!self.databaseMetadata.quickWormholeFillEnabled ) {
+            return;
+        }
+        
         if ( [self.databaseMetadata.uuid isEqualToString:databaseId] ) {
 
 
@@ -4238,8 +4228,53 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     if (theAction == @selector(onViewItemDetails:)) {
         return item != nil; 
     }
-    if (theAction == @selector(onDuplicateEntry:)) {
-        return item != nil; 
+    else if ( theAction == @selector(onVCToggleReadOnly:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.viewModel.isEffectivelyReadOnly ? NSControlStateValueOn : NSControlStateValueOff;
+        return !self.viewModel.offlineMode; 
+    }
+    else if ( theAction == @selector(onVCToggleOfflineMode:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.databaseMetadata.offlineMode ? NSControlStateValueOn : NSControlStateValueOff;
+        return !self.databaseMetadata.isLocalDeviceDatabase;
+    }
+    else if ( theAction == @selector(onVCToggleLaunchAtStartup:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.databaseMetadata.launchAtStartup ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleStartInSearchMode:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.viewModel.startWithSearch ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowVerticalGridlines:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.viewModel.showVerticalGrid ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowHorizontalGridlines:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.viewModel.showHorizontalGrid ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowAlternatingGridRows:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.viewModel.showAlternatingRows ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowTotpCodes:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.viewModel.showTotp ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if ( theAction == @selector(onVCToggleShowEditToasts:)) {
+        NSMenuItem* menuItem = (NSMenuItem*)anItem;
+        menuItem.state = self.viewModel.showChangeNotifications ? NSControlStateValueOn : NSControlStateValueOff;
+        return YES;
+    }
+    else if (theAction == @selector(onDuplicateEntry:)) {
+        return item != nil && !self.viewModel.isEffectivelyReadOnly; 
     }
     else if (theAction == @selector(copy:)) {
         return item != nil;
@@ -4251,7 +4286,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         NSPasteboard* pasteboard = [NSPasteboard pasteboardWithName:kStrongboxPasteboardName];
         NSData* blah = [pasteboard dataForType:kDragAndDropExternalUti];
         NSLog(@"Validate Paste - %d", blah != nil);
-        return blah != nil;
+        return blah != nil && !self.viewModel.isEffectivelyReadOnly;
     }
     else if (theAction == @selector(onDelete:)) {
         if(self.outlineView.selectedRowIndexes.count > 1) {
@@ -4267,15 +4302,17 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         
 
         
-        return item != nil && self.view.window.firstResponder == self.outlineView; 
+        return item != nil && self.view.window.firstResponder == self.outlineView && !self.viewModel.isEffectivelyReadOnly; 
     }
     else if(theAction == @selector(onCreateGroup:) ||
             theAction == @selector(onCreateRecord:)) {
-        return self.viewModel && !self.viewModel.locked;
+        return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
     }
     else if (theAction == @selector(onChangeMasterPassword:) ||
-             theAction == @selector(onCopyAsCsv:) ||
-             theAction == @selector(onImportFromCsvFile:) ||
+             theAction == @selector(onImportFromCsvFile:)) {
+        return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
+    }
+    else if (theAction == @selector(onCopyAsCsv:) ||
              theAction == @selector(onLock:)) {
         return self.viewModel && !self.viewModel.locked;
     }
@@ -4318,16 +4355,16 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(saveDocument:)) {
-        return !self.viewModel.locked;
+        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
     }
     else if (theAction == @selector(onSetItemIcon:)) {
-        return item != nil && self.viewModel.format != kPasswordSafe;
+        return item != nil && self.viewModel.format != kPasswordSafe && !self.viewModel.isEffectivelyReadOnly;
     }
     else if(theAction == @selector(onSetTotp:)) {
-        return item && !item.isGroup;
+        return item && !item.isGroup && !self.viewModel.isEffectivelyReadOnly;
     }
     else if(theAction == @selector(onClearTotp:)) {
-        return item && !item.isGroup && item.fields.otpToken;
+        return item && !item.isGroup && item.fields.otpToken && !self.viewModel.isEffectivelyReadOnly;
     }
     else if (theAction == @selector(onViewItemHistory:)) {
         return
@@ -4345,7 +4382,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
         return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(onDownloadFavIcons:)) {
-        return !self.viewModel.locked && (item == nil || ((self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
+        return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly && (item == nil || ((self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4) && (item.isGroup || item.fields.url.length)));
     }
     else if (theAction == @selector(onPreviewQuickViewAttachment:)) {
         return !self.viewModel.locked && item != nil && !item.isGroup && self.viewModel.format != kPasswordSafe && self.sortedAttachmentsFilenames.count > 0 && self.attachmentsTable.selectedRow != -1;
@@ -4447,22 +4484,138 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 
 
+- (IBAction)onVCToggleOfflineMode:(id)sender {
+    self.viewModel.offlineMode = !self.viewModel.offlineMode;
+    [self fullModelReload];
+}
+
+- (IBAction)onVCToggleLaunchAtStartup:(id)sender {
+    self.viewModel.launchAtStartup = !self.viewModel.launchAtStartup;
+}
+
+- (IBAction)onVCToggleReadOnly:(id)sender {
+    self.viewModel.readOnly = !self.viewModel.readOnly;
+    [self fullModelReload];
+}
+
+- (IBAction)onVCToggleStartInSearchMode:(id)sender {
+    self.viewModel.startWithSearch = !self.viewModel.startWithSearch;
+}
+
+- (IBAction)onVCToggleShowVerticalGridlines:(id)sender {
+    self.viewModel.showVerticalGrid = !self.viewModel.showVerticalGrid;
+    [self onPreferencesChanged:nil];
+}
+
+- (IBAction)onVCToggleShowHorizontalGridlines:(id)sender {
+    self.viewModel.showHorizontalGrid = !self.viewModel.showHorizontalGrid;
+    [self onPreferencesChanged:nil];
+}
+
+- (IBAction)onVCToggleShowAlternatingGridRows:(id)sender {
+    self.viewModel.showAlternatingRows = !self.viewModel.showAlternatingRows;
+    [self onPreferencesChanged:nil];
+}
+
+- (IBAction)onVCToggleShowTotpCodes:(id)sender {
+    self.viewModel.showTotp = !self.viewModel.showTotp;
+    [self onPreferencesChanged:nil];
+}
+
+- (IBAction)onVCToggleShowEditToasts:(id)sender {
+    self.viewModel.showChangeNotifications = !self.viewModel.showChangeNotifications;
+}
 
 
 
+- (void)keyDown:(NSEvent *)event {
+    BOOL cmd = ((event.modifierFlags & NSEventModifierFlagCommand) == NSEventModifierFlagCommand);
+    unichar key = [[event charactersIgnoringModifiers] characterAtIndex:0];
+    
+    if ( cmd && key > 48 && key < 58 ) {
+        NSUInteger number = key - 48;
 
 
 
+        [self onCmdPlusNumberPressed:number];
+        return;
+    }
+    
+    [super keyDown:event];
+}
+
+- (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
+    NSEvent *event = [control.window currentEvent];
 
 
+    if (commandSelector == NSSelectorFromString(@"noop:")) { 
+        if ( (event.modifierFlags & NSCommandKeyMask ) == NSCommandKeyMask) {
+            NSString *chars = event.charactersIgnoringModifiers;
+            unichar aChar = [chars characterAtIndex:0];
+            
+            if ( aChar > 48 && aChar < 58 ) {
+                NSUInteger number = aChar - 48;
 
+                [self onCmdPlusNumberPressed:number];
+                return YES;
+            }
+        }
+    }
+    
+    if(control == self.searchField) { 
+        if (commandSelector == NSSelectorFromString(@"noop:")) { 
+            if ( (event.modifierFlags & NSCommandKeyMask) == NSCommandKeyMask) {
+                NSString *chars = event.charactersIgnoringModifiers;
+                unichar aChar = [chars characterAtIndex:0];
 
+                
+                
+                if (aChar == 'c') {
+                    Node* item = [self getCurrentSelectedItem];
+                    if ( item && !item.isGroup ) {
+                        [self onCopyPassword:nil];
+                        return YES;
+                    }
+                }
+            }
+        }
+        
+        if (commandSelector == @selector(moveDown:)) {
+            if (self.outlineView.numberOfRows > 0) {
+                [self.view.window makeFirstResponder:self.outlineView];
+                return YES;
+            }
+        }
+    }
+    else if( control == self.textFieldMasterPassword ) {
+        if (commandSelector == @selector(insertTab:)) {
+            if([self convenienceUnlockIsPossible]) {
+                [self.view.window makeFirstResponder:self.buttonUnlockWithTouchId];
+            }
+            else {
+                [self.view.window makeFirstResponder:self.buttonUnlockWithPassword];
+            }
 
+            return YES;
+        }
+    }
 
+    return NO;
+}
 
+- (void)onCmdPlusNumberPressed:(NSUInteger)number {
+    NSLog(@"Cmd+Number %lu", (unsigned long)number);
+    
+    if (@available(macOS 10.13, *)) {
 
-
-
+      
+        NSWindowTabGroup* group = self.view.window.tabGroup;
+        
+        if ( self.view.window.tabbedWindows && number <= self.view.window.tabbedWindows.count ) {
+            group.selectedWindow = self.view.window.tabbedWindows[number - 1];
+        }
+    }
+}
 
 @end
 

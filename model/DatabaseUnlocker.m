@@ -16,6 +16,7 @@
 #import "KeePassCiphers.h"
 #import "AppPreferences.h"
 #import "WorkingCopyManager.h"
+#import "StrongboxErrorCodes.h"
 
 @interface DatabaseUnlocker ()
 
@@ -64,7 +65,7 @@
         return nil;
     }
     
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
 
     if(localCopyUrl == nil) {
         return nil;
@@ -98,7 +99,7 @@
 - (void)unlockLocalWithKey:(CompositeKeyFactors*)key
         keyFromConvenience:(BOOL)keyFromConvenience
                 completion:(UnlockDatabaseCompletionBlock)completion {
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:self.database.uuid];
 
     if(localCopyUrl == nil) {
         [Alerts warn:self.viewController
@@ -116,7 +117,7 @@
                 key:(CompositeKeyFactors*)key
  keyFromConvenience:(BOOL)keyFromConvenience
          completion:(UnlockDatabaseCompletionBlock)completion {
-    if(self.isAutoFillOpen && !AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseUnlocker isAutoFillLikelyToCrash:url]) { 
+    if ( self.isAutoFillOpen && !AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseUnlocker isAutoFillLikelyToCrash:url] ) { 
         AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
 
         [Alerts warn:self.viewController
@@ -176,7 +177,10 @@
     [SVProgressHUD dismiss];
     
     if (dbModel == nil) {
-        if(error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
+        UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
+        [gen notificationOccurred:UINotificationFeedbackTypeError];
+        
+        if(error && error.code == StrongboxErrorCodes.incorrectCredentials) {
             if(self.keyFromConvenience) { 
                 self.database.isEnrolledForConvenience = NO;
                 self.database.convenienceMasterPassword = nil;
@@ -220,7 +224,7 @@
             NSLog(@"WARNWARN - No database but error not set?!");
             error = [Utils createNSError:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") errorCode:-1];
         }
-        
+
         self.completion(kUnlockDatabaseResultError, nil, error);
     }
     else {
@@ -241,12 +245,23 @@
     if(self.database.autoFillEnabled && self.database.quickTypeEnabled && !self.isAutoFillOpen) { 
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.database.uuid displayFormat:self.database.quickTypeDisplayFormat];
     }
-
-
     
-    if (!self.isAutoFillOpen) { 
+    if ( !self.isAutoFillOpen ) { 
+        
         self.database.likelyFormat = openedSafe.originalFormat;
         [SafesList.sharedInstance update:self.database];
+    }
+
+    BOOL enrolled = self.database.isEnrolledForConvenience;
+    if ( enrolled ) {
+        BOOL convenienceEnabled = self.database.isTouchIdEnabled || self.database.conveniencePin != nil;
+        NSString* pw = self.database.convenienceMasterPassword;
+        BOOL expired = (pw == nil) && (self.database.convenienceExpiryPeriod != -1); 
+
+        if ( convenienceEnabled && expired ) {
+            NSLog(@"XXXX - Convenience Unlock enabled, successful open, and password expired... re-enrolling...");
+            self.database.convenienceMasterPassword = openedSafe.ckfs.password;
+        }
     }
     
     self.completion(kUnlockDatabaseResultSuccess, viewModel, nil);
@@ -279,7 +294,7 @@
     [Serializator fromUrl:url
                       ckf:firstCheck
                completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-        if(model == nil && error && error.code == kStrongboxErrorCodeIncorrectCredentials) {
+        if(model == nil && error && error.code == StrongboxErrorCodes.incorrectCredentials) {
             NSLog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
             
             self.database.emptyOrNilPwPreferNilCheckFirst = !self.database.emptyOrNilPwPreferNilCheckFirst;

@@ -15,6 +15,8 @@
 #import "FontManager.h"
 #import "PasswordStrengthTester.h"
 #import "AppPreferences.h"
+#import "PasswordStrengthUIHelper.h"
+#import "StrongboxErrorCodes.h"
 
 @interface WelcomeMasterPasswordViewController () <UITextFieldDelegate>
 
@@ -95,31 +97,42 @@
 }
 
 - (IBAction)onCreate:(id)sender {
-    if([self passwordIsValid]) {
+    if( [self passwordIsValid] ) {
         self.password = self.textFieldPw.text;
         
-        [AddNewSafeHelper createNewExpressDatabase:self
-                                              name:self.name
-                                          password:self.password
-                                        completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
-            if (userCancelled) {
-                self.onDone(NO, nil);
-            }
-            else if(error) {
-                    [Alerts error:self
-                            title:NSLocalizedString(@"welcome_vc_error_creating", @"Error Creating Database")
-                            error:error
-                       completion:^{
-                        self.onDone(NO, nil);
-                    }];
-                }
-                else {
-                    self.database = metadata;
-                    [SafesList.sharedInstance addWithDuplicateCheck:self.database initialCache:initialSnapshot initialCacheModDate:NSDate.date];
-                    [self performSegueWithIdentifier:@"segueToDone" sender:nil];
-                }
-            }];
+        [self create:NO];
     }
+}
+
+- (void)create:(BOOL)forceLocal {
+    [AddNewSafeHelper createNewExpressDatabase:self
+                                          name:self.name
+                                      password:self.password
+                                    forceLocal:forceLocal
+                                    completion:^(BOOL userCancelled, SafeMetaData * _Nonnull metadata, NSData * _Nonnull initialSnapshot, NSError * _Nonnull error) {
+        if (userCancelled) {
+            self.onDone(NO, nil);
+        }
+        else if ( error ) {
+            if ( error.code == StrongboxErrorCodes.couldNotCreateICloudFile ) {
+                NSLog(@"WARNWARN: Could not create an iCloud File, switching to Local only because we are in App Onboarding.");
+                [self create:YES];
+            }
+            else {
+                [Alerts error:self
+                        title:NSLocalizedString(@"welcome_vc_error_creating", @"Error Creating Database")
+                        error:error
+                   completion:^{
+                    self.onDone(NO, nil);
+                }];
+            }
+        }
+        else {
+            self.database = metadata;
+            [SafesList.sharedInstance addWithDuplicateCheck:self.database initialCache:initialSnapshot initialCacheModDate:NSDate.date];
+            [self performSegueWithIdentifier:@"segueToDone" sender:nil];
+        }
+    }];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
@@ -205,23 +218,11 @@
 }
 
 - (void)bindStrength {
-    PasswordStrength* strength = [PasswordStrengthTester getStrength:self.textFieldPw.text
-                                                              config:AppPreferences.sharedInstance.passwordStrengthConfig];
-    
-    if ( self.textFieldPw.text.length == 0 ) {
-        self.labelStrength.text = @" "; 
-    }
-    else {
-        self.labelStrength.text = strength.summaryString;
-    }
-    
-    double relativeStrength = MIN(strength.entropy / 128.0f, 1.0f); 
-        
-    double red = 1.0 - relativeStrength;
-    double green = relativeStrength;
-
-    self.progressStrength.progress = relativeStrength;
-    self.progressStrength.progressTintColor = [UIColor colorWithRed:red green:green blue:0.0 alpha:1.0];
+    [PasswordStrengthUIHelper bindStrengthUI:self.textFieldPw.text
+                                      config:AppPreferences.sharedInstance.passwordStrengthConfig
+                          emptyPwHideSummary:YES
+                                       label:self.labelStrength
+                                    progress:self.progressStrength];
 }
 
 @end

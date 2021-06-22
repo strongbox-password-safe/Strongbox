@@ -48,17 +48,21 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 @implementation ViewModel
 
-- (instancetype)initLocked:(NSDocument *)document {
+- (instancetype)initLocked:(NSDocument *)document
+                  metadata:(DatabaseMetadata *)metadata {
     return [self initUnlockedWithDatabase:document
-                                 database:nil
-                             selectedItem:nil];
+                                 metadata:metadata
+                                database:nil
+                            selectedItem:nil];
 }
 
 - (instancetype)initUnlockedWithDatabase:(NSDocument *)document
+                                metadata:(DatabaseMetadata *)metadata
                                 database:(DatabaseModel *)database
                             selectedItem:(NSString *)selectedItem {
     if (self = [super init]) {
         _document = document;
+        _databaseUuid = metadata.uuid;
         self.passwordDatabase = database;
         self.selectedItem = selectedItem;
     }
@@ -83,6 +87,24 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 
+
+
+
+
+- (DatabaseMetadata *)databaseMetadata {
+    return [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+}
+
+- (void)updateDatabaseMetadata:(void (^)(DatabaseMetadata * _Nonnull metadata))touch {
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid
+                                            touch:touch];
+}
+
+
+
+- (BOOL)isEffectivelyReadOnly {
+    return self.readOnly || self.offlineMode;
+}
 
 - (DatabaseModel *)database {
     return self.passwordDatabase;
@@ -1337,23 +1359,23 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 }
 
 - (BOOL)isTitleMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isTitleMatches:searchText node:node dereference:dereference];
+    return [self.passwordDatabase isTitleMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isUsernameMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isUsernameMatches:searchText node:node dereference:dereference];
+    return [self.passwordDatabase isUsernameMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isPasswordMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isPasswordMatches:searchText node:node dereference:dereference];
+    return [self.passwordDatabase isPasswordMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isUrlMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isUrlMatches:searchText node:node dereference:dereference];
+    return [self.passwordDatabase isUrlMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (BOOL)isAllFieldsMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference {
-    return [self.passwordDatabase isAllFieldsMatches:searchText node:node dereference:dereference];
+    return [self.passwordDatabase isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:NO];
 }
 
 - (NSArray<NSString*>*)getSearchTerms:(NSString *)searchText {
@@ -1362,6 +1384,262 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName {
     return [self.passwordDatabase getHtmlPrintString:databaseName];
+}
+
+
+
+- (BOOL)showTotp {
+    return !self.databaseMetadata.doNotShowTotp;
+}
+
+- (void)setShowTotp:(BOOL)showTotp {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.doNotShowTotp = !showTotp;
+    }];
+}
+
+- (BOOL)showAutoCompleteSuggestions {
+    return !self.databaseMetadata.doNotShowAutoCompleteSuggestions;
+}
+
+- (void)setShowAutoCompleteSuggestions:(BOOL)showAutoCompleteSuggestions {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.doNotShowAutoCompleteSuggestions = !showAutoCompleteSuggestions;
+    }];
+}
+
+- (BOOL)showChangeNotifications {
+    return !self.databaseMetadata.doNotShowChangeNotifications;
+}
+
+- (void)setShowChangeNotifications:(BOOL)showChangeNotifications {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.doNotShowChangeNotifications = !showChangeNotifications;
+    }];
+}
+
+- (BOOL)concealEmptyProtectedFields {
+    return self.databaseMetadata.concealEmptyProtectedFields;
+}
+
+- (void)setConcealEmptyProtectedFields:(BOOL)concealEmptyProtectedFields {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.concealEmptyProtectedFields = concealEmptyProtectedFields;
+    }];
+}
+
+- (BOOL)lockOnScreenLock {
+    return self.databaseMetadata.lockOnScreenLock;
+}
+
+- (void)setLockOnScreenLock:(BOOL)lockOnScreenLock {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+            metadata.lockOnScreenLock = lockOnScreenLock;
+    }];
+}
+
+- (BOOL)showAdvancedUnlockOptions {
+    return self.databaseMetadata.showAdvancedUnlockOptions;
+}
+
+- (void)setShowAdvancedUnlockOptions:(BOOL)showAdvancedUnlockOptions {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showAdvancedUnlockOptions = showAdvancedUnlockOptions;
+    }];
+}
+
+- (BOOL)showQuickView {
+    return self.databaseMetadata.showQuickView;
+}
+
+- (void)setShowQuickView:(BOOL)showQuickView {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showQuickView = showQuickView;
+    }];
+}
+
+- (BOOL)showAlternatingRows {
+    return !self.databaseMetadata.noAlternatingRows;
+}
+
+- (void)setShowAlternatingRows:(BOOL)showAlternatingRows {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.noAlternatingRows = !showAlternatingRows;
+    }];
+
+}
+
+- (BOOL)showVerticalGrid {
+    return self.databaseMetadata.showVerticalGrid;
+}
+
+- (void)setShowVerticalGrid:(BOOL)showVerticalGrid {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showVerticalGrid = showVerticalGrid;
+    }];
+}
+
+- (BOOL)showHorizontalGrid {
+    return self.databaseMetadata.showHorizontalGrid;
+}
+
+- (void)setShowHorizontalGrid:(BOOL)showHorizontalGrid {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showHorizontalGrid = showHorizontalGrid;
+    }];
+}
+
+- (NSArray *)visibleColumns {
+    return self.databaseMetadata.visibleColumns;
+}
+
+- (void)setVisibleColumns:(NSArray *)visibleColumns {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.visibleColumns = visibleColumns;
+    }];
+}
+
+- (BOOL)downloadFavIconOnChange {
+    return self.databaseMetadata.expressDownloadFavIconOnNewOrUrlChanged;
+}
+
+- (void)setDownloadFavIconOnChange:(BOOL)downloadFavIconOnChange {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.expressDownloadFavIconOnNewOrUrlChanged = downloadFavIconOnChange;
+    }];
+}
+
+- (BOOL)startWithSearch {
+    return self.databaseMetadata.startWithSearch;
+}
+
+- (void)setStartWithSearch:(BOOL)startWithSearch {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.startWithSearch = startWithSearch;
+    }];
+}
+
+- (BOOL)outlineViewTitleIsReadonly {
+    return self.databaseMetadata.outlineViewTitleIsReadonly;
+}
+
+- (void)setOutlineViewTitleIsReadonly:(BOOL)outlineViewTitleIsReadonly {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.outlineViewTitleIsReadonly = outlineViewTitleIsReadonly;
+    }];
+}
+
+- (BOOL)outlineViewEditableFieldsAreReadonly {
+    return self.databaseMetadata.outlineViewEditableFieldsAreReadonly;
+}
+
+- (void)setOutlineViewEditableFieldsAreReadonly:(BOOL)outlineViewEditableFieldsAreReadonly {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.outlineViewEditableFieldsAreReadonly = outlineViewEditableFieldsAreReadonly;
+    }];
+}
+
+- (BOOL)showRecycleBinInSearchResults {
+    return self.databaseMetadata.showRecycleBinInSearchResults;
+}
+
+- (void)setShowRecycleBinInSearchResults:(BOOL)showRecycleBinInSearchResults {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showRecycleBinInSearchResults = showRecycleBinInSearchResults;
+    }];
+}
+
+- (BOOL)sortKeePassNodes {
+    return !self.databaseMetadata.uiDoNotSortKeePassNodesInBrowseView;
+}
+
+- (void)setSortKeePassNodes:(BOOL)sortKeePassNodes {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.uiDoNotSortKeePassNodesInBrowseView = !sortKeePassNodes;
+    }];
+}
+
+- (BOOL)showRecycleBinInBrowse {
+    return !self.databaseMetadata.doNotShowRecycleBinInBrowse;
+}
+
+- (void)setShowRecycleBinInBrowse:(BOOL)showRecycleBinInBrowse {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.doNotShowRecycleBinInBrowse = !showRecycleBinInBrowse;
+    }];
+}
+
+- (BOOL)monitorForExternalChanges {
+    return self.databaseMetadata.monitorForExternalChanges;
+
+}
+
+- (void)setMonitorForExternalChanges:(BOOL)monitorForExternalChanges {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.monitorForExternalChanges = monitorForExternalChanges;
+    }];
+}
+
+- (NSInteger)monitorForExternalChangesInterval {
+    return self.databaseMetadata.monitorForExternalChangesInterval;
+}
+
+- (void)setMonitorForExternalChangesInterval:(NSInteger)monitorForExternalChangesInterval {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.monitorForExternalChangesInterval = monitorForExternalChangesInterval;
+    }];
+}
+
+- (BOOL)autoReloadAfterExternalChanges {
+    return self.databaseMetadata.autoReloadAfterExternalChanges;
+}
+
+- (void)setAutoReloadAfterExternalChanges:(BOOL)autoReloadAfterExternalChanges {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.autoReloadAfterExternalChanges = autoReloadAfterExternalChanges;
+    }];
+}
+
+- (BOOL)launchAtStartup {
+    return self.databaseMetadata.launchAtStartup;
+
+}
+
+- (void)setLaunchAtStartup:(BOOL)launchAtStartup {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.launchAtStartup = launchAtStartup;
+    }];
+}
+
+- (BOOL)alwaysOpenOffline {
+    return self.databaseMetadata.alwaysOpenOffline;
+
+}
+
+- (void)setAlwaysOpenOffline:(BOOL)alwaysOpenOffline {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.alwaysOpenOffline = alwaysOpenOffline;
+    }];
+}
+
+- (BOOL)readOnly {
+    return self.databaseMetadata.readOnly;
+}
+
+- (void)setReadOnly:(BOOL)readOnly {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.readOnly = readOnly;
+    }];
+}
+
+- (BOOL)offlineMode {
+    return self.databaseMetadata.offlineMode;
+}
+
+- (void)setOfflineMode:(BOOL)offlineMode {
+    [self updateDatabaseMetadata:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.offlineMode = offlineMode;
+    }];
 }
 
 @end

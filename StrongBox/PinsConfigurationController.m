@@ -13,13 +13,25 @@
 
 @interface PinsConfigurationController ()
 
+@property (weak, nonatomic) IBOutlet UILabel *labelRemoveDatabaseWarning;
+@property (weak, nonatomic) IBOutlet UILabel *labelRemoveDatabaseWarning2;
+
+@property (weak, nonatomic) IBOutlet UIButton *buttonPinOnOff;
+@property (weak, nonatomic) IBOutlet UIButton *buttonDuressPinOnOff;
+@property (weak, nonatomic) IBOutlet UIButton *buttonChangePin;
+@property (weak, nonatomic) IBOutlet UIButton *buttonChangeDuressPin;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDuressActionOpenDummy;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDuressActionTechnicalError;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDuressActionRemoveDatabase;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDuressActionOpenDummyAndRemove;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDuressOn;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeDuress;
+
 @end
 
 @implementation PinsConfigurationController
-
-- (IBAction)onDone:(id)sender {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -56,6 +68,8 @@
         self.cellDuressActionTechnicalError.textLabel.enabled = YES;
         self.cellDuressActionRemoveDatabase.userInteractionEnabled = YES;
         self.cellDuressActionRemoveDatabase.textLabel.enabled = YES;
+        self.cellDuressActionOpenDummyAndRemove.userInteractionEnabled = YES;
+        self.cellDuressActionOpenDummyAndRemove.textLabel.enabled = YES;
     }
     else {
         [self.buttonDuressPinOnOff setTitle:NSLocalizedString(@"pins_config_vc_button_title_turn_duress_pin_on", @"Turn Duress PIN On")
@@ -68,12 +82,15 @@
         self.cellDuressActionTechnicalError.textLabel.enabled = NO;
         self.cellDuressActionRemoveDatabase.userInteractionEnabled = NO;
         self.cellDuressActionRemoveDatabase.textLabel.enabled = NO;
+        self.cellDuressActionOpenDummyAndRemove.userInteractionEnabled = NO;
+        self.cellDuressActionOpenDummyAndRemove.textLabel.enabled = NO;
     }
     
     self.cellDuressActionTechnicalError.accessoryType = UITableViewCellAccessoryNone;
     self.cellDuressActionRemoveDatabase.accessoryType = UITableViewCellAccessoryNone;
     self.cellDuressActionOpenDummy.accessoryType = UITableViewCellAccessoryNone;
-    
+    self.cellDuressActionOpenDummyAndRemove.accessoryType = UITableViewCellAccessoryNone;
+
     if(self.viewModel.metadata.duressAction == kOpenDummy) {
         self.cellDuressActionOpenDummy.accessoryType = UITableViewCellAccessoryCheckmark;
     }
@@ -83,24 +100,32 @@
     else if(self.viewModel.metadata.duressAction == kPresentError) {
         self.cellDuressActionTechnicalError.accessoryType = UITableViewCellAccessoryCheckmark;
     }
-    
+    else if(self.viewModel.metadata.duressAction == kOpenDummyAndRemoveDatabase) {
+        self.cellDuressActionOpenDummyAndRemove.accessoryType = UITableViewCellAccessoryCheckmark;
+    }
+
     if(self.viewModel.metadata.storageProvider == kLocalDevice) {
-        self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_delete_database", @"Delete Database");
         self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_delete_database_local_permanent", @"Local Device database will be permanently deleted.");
         self.labelRemoveDatabaseWarning.textColor = [UIColor systemRedColor];
+
+        self.labelRemoveDatabaseWarning2.text = NSLocalizedString(@"pins_config_vc_label_delete_database_local_permanent", @"Local Device database will be permanently deleted.");
+        self.labelRemoveDatabaseWarning2.textColor = [UIColor systemRedColor];
+
     }
     else if(self.viewModel.metadata.storageProvider == kiCloud) {
-        self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_delete_database", @"Delete Database");
         self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_delete_database_icloud_permanent", @"iCloud database will be permanently deleted from iCloud.");
         self.labelRemoveDatabaseWarning.textColor = [UIColor systemRedColor];
+        self.labelRemoveDatabaseWarning2.text = NSLocalizedString(@"pins_config_vc_label_delete_database_icloud_permanent", @"iCloud database will be permanently deleted from iCloud.");
+        self.labelRemoveDatabaseWarning2.textColor = [UIColor systemRedColor];
     }
     else {
-        self.labelRemoveDatabase.text = NSLocalizedString(@"pins_config_vc_label_remove_database", @"Remove Database from Strongbox");
         self.labelRemoveDatabaseWarning.text = NSLocalizedString(@"pins_config_vc_label_remove_database_warning", @"NB: Database file will remain on remote storage.");
         self.labelRemoveDatabaseWarning.textColor = [UIColor systemOrangeColor];
+        self.labelRemoveDatabaseWarning2.text = NSLocalizedString(@"pins_config_vc_label_remove_database_warning", @"NB: Database file will remain on remote storage.");
+        self.labelRemoveDatabaseWarning2.textColor = [UIColor systemOrangeColor];
     }
     
-    if(!AppPreferences.sharedInstance.isProOrFreeTrial) {
+    if( !AppPreferences.sharedInstance.isProOrFreeTrial ) {
         self.buttonPinOnOff.enabled = NO;
         self.buttonChangePin.enabled = NO;
         self.buttonDuressPinOnOff.enabled = NO;
@@ -112,7 +137,11 @@
         self.cellDuressActionTechnicalError.textLabel.enabled = NO;
         self.cellDuressActionRemoveDatabase.userInteractionEnabled = NO;
         self.cellDuressActionRemoveDatabase.textLabel.enabled = NO;
+        self.cellDuressActionOpenDummyAndRemove.userInteractionEnabled = NO;
+        self.cellDuressActionOpenDummyAndRemove.textLabel.enabled = NO;
     }
+    
+    
     
     if(!AppPreferences.sharedInstance.isPro) {
         if (@available(iOS 11.0, *)) {
@@ -120,6 +149,23 @@
         }
         self.title = NSLocalizedString(@"pins_config_vc_title_pro_only", @"PIN Codes (Pro Feature Only)");
     }
+    
+    
+    
+    BOOL duressAvailable = AppPreferences.sharedInstance.isPro && self.viewModel.metadata.conveniencePin != nil;
+    
+    [self cell:self.cellDuressOn setHidden:!duressAvailable];
+    [self cell:self.cellChangeDuress setHidden:!duressAvailable];
+    
+    BOOL duressEnabled = duressAvailable && self.viewModel.metadata.duressPin != nil;
+    
+    [self cell:self.cellDuressActionOpenDummy setHidden:!duressEnabled];
+    [self cell:self.cellDuressActionTechnicalError setHidden:!duressEnabled];
+    [self cell:self.cellDuressActionRemoveDatabase setHidden:!duressEnabled];
+    [self cell:self.cellDuressActionOpenDummyAndRemove setHidden:!duressEnabled];
+    
+    
+    [self reloadDataAnimated:YES];
 }
 
 - (IBAction)onPinOnOff:(id)sender {
@@ -223,7 +269,7 @@
         else if (indexPath.row == 1) {
             self.viewModel.metadata.duressAction = kPresentError;
         }
-        else if (indexPath.row == 2) {
+        else if ( indexPath.row == 2 || indexPath.row == 3 ) {
             BOOL delete = self.viewModel.metadata.storageProvider == kLocalDevice || self.viewModel.metadata.storageProvider == kiCloud;
             
             [Alerts warn:self
@@ -231,12 +277,17 @@
                  message:delete ?
              NSLocalizedString(@"pins_config_vc_warn_remove_database_delete_message", @"This will permanently delete the database file.") :
              NSLocalizedString(@"pins_config_vc_warn_remove_database_remove_message", @"This will remove the database from Strongbox but the underlying file will remain on cloud storage")];
-            self.viewModel.metadata.duressAction = kRemoveDatabase;
+            
+            self.viewModel.metadata.duressAction = indexPath.row == 2 ? kRemoveDatabase : kOpenDummyAndRemoveDatabase;
         }
 
         [[SafesList sharedInstance] update:self.viewModel.metadata];
         [self bindUiToModel];
     }
+}
+
+- (IBAction)onDone:(id)sender {
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

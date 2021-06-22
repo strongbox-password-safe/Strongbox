@@ -13,9 +13,6 @@
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "Alerts.h"
-#import "BiometricsManager.h"
-
-#import "ISMessages.h"
 #import "AutoFillManager.h"
 #import "PinsConfigurationController.h"
 #import "StatisticsPropertiesViewController.h"
@@ -23,20 +20,17 @@
 #import "AppPreferences.h"
 #import "SyncManager.h"
 #import "AutoFillPreferencesViewController.h"
+#import "ConvenienceUnlockPreferences.h"
+#import "BiometricsManager.h"
+#import "ScheduledExportConfigurationViewController.h"
 
 @interface DatabasePreferencesController ()
 
 @property (weak, nonatomic) IBOutlet UILabel *labelDatabaseAutoLockDelay;
 @property (weak, nonatomic) IBOutlet UISwitch *switchDatabaseAutoLockEnabled;
 @property (weak, nonatomic) IBOutlet UISwitch *switchLockOnDeviceLock;
+@property (weak, nonatomic) IBOutlet UISwitch *switchLockDuringEditing;
 
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
-@property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometricSetting;
-
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellBiometric;
-@property (weak, nonatomic) IBOutlet UIImageView *imageViewBiometric;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellPinCodes;
-@property (weak, nonatomic) IBOutlet UIImageView *imageViewPinCodes;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseOperations;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewDatabaseOperations;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewPreferences;
@@ -48,6 +42,11 @@
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAutoFill;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAutoFillPreferences;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellConvenienceUnlock;
+@property (weak, nonatomic) IBOutlet UILabel *labelConvenienceUnlock;
+@property (weak, nonatomic) IBOutlet UIImageView *imageConvenienceUnlock;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellScheduledExport;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewScheduledExport;
 
 @end
 
@@ -59,105 +58,35 @@
     self.imageViewDatabaseOperations.image = [UIImage imageNamed:@"maintenance"];
     self.imageViewPreferences.image = [UIImage imageNamed:@"list"];
     self.imageViewStats.image = [UIImage imageNamed:@"statistics"];
-    self.imageViewBiometric.image = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
-    self.imageViewPinCodes.image = [UIImage imageNamed:@"keypad"];
     self.imageViewAudit.image = [UIImage imageNamed:@"security_checked"];
     self.imageViewAudit.tintColor = UIColor.systemOrangeColor;
     self.imageViewAutoFill.image = [UIImage imageNamed:@"password"];
+    self.imageViewScheduledExport.image = [UIImage imageNamed:@"delivery"];
     
+    NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"convenience_unlock_preferences_title_fmt", @"%@ & PIN Codes"), BiometricsManager.sharedInstance.biometricIdName];
+    
+    self.labelConvenienceUnlock.text = fmt;
+    self.imageConvenienceUnlock.image = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
+
     [self bindUi];
 }
 
-- (IBAction)onSwitchBiometricUnlock:(id)sender {
-    NSString* bIdName = [BiometricsManager.sharedInstance getBiometricIdName];
-    
-    if (!self.switchAllowBiometric.on) {
-        NSString *message = self.viewModel.metadata.isEnrolledForConvenience && self.viewModel.metadata.conveniencePin == nil ?
-        
-        NSLocalizedString(@"db_management_disable_biometric_warning_fmt", @"Disabling %@ for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?") :
-        
-        NSLocalizedString(@"db_management_disable_biomtric_simple_fmt", @"Are you sure you want to disable %@ for this database?");
-        
-        [Alerts yesNo:self
-                title:[NSString stringWithFormat:NSLocalizedString(@"db_management_disable_biometric_question_fmt", @"Disable %@?"), bIdName]
-              message:[NSString stringWithFormat:message, bIdName]
-               action:^(BOOL response) {
-                   if (response) {
-                       self.viewModel.metadata.isTouchIdEnabled = NO;
-                       
-                       if(self.viewModel.metadata.conveniencePin == nil) {
-                           self.viewModel.metadata.isEnrolledForConvenience = NO;
-                           self.viewModel.metadata.convenienceMasterPassword = nil;
-                       }
-                       
-                       [[SafesList sharedInstance] update:self.viewModel.metadata];
-
-                       [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:
-                                                           NSLocalizedString(@"db_management_disable_biometric_notify_title_fmt", @"%@ Disabled"), bIdName]
-                                                  message:[NSString stringWithFormat:
-                                            
-                                                           NSLocalizedString(@"db_management_disable_biometric_notify_message_fmt", @"%@ for this database has been disabled."), bIdName]
-                                                 duration:3.f
-                                              hideOnSwipe:YES
-                                                hideOnTap:YES
-                                                alertType:ISAlertTypeSuccess
-                                            alertPosition:ISAlertPositionTop
-                                                  didHide:nil];
-                   }
-                   
-                   [self bindUi];
-               }];
-    }
-    else {
-        if (self.viewModel.database.ckfs.keyFileDigest && !self.viewModel.metadata.keyFileBookmark) {
-            [Alerts warn:self
-                   title:NSLocalizedString(@"config_error_one_time_key_file_convenience_title", @"One Time Key File Problem")
-                 message:NSLocalizedString(@"config_error_one_time_key_file_convenience_message", @"You cannot use convenience unlock with a one time key file.")];
-            
-            return;
-        }
-
-        self.viewModel.metadata.isTouchIdEnabled = YES;
-        self.viewModel.metadata.isEnrolledForConvenience = YES;
-        self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
-        
-        [[SafesList sharedInstance] update:self.viewModel.metadata];
-        [self bindUi];
-
-        [ISMessages showCardAlertWithTitle:[NSString stringWithFormat:
-                                            NSLocalizedString(@"db_management_enable_biometric_notify_title_fmt", @"%@ Enabled"), bIdName]
-                                   message:[NSString stringWithFormat:
-                                            NSLocalizedString(@"db_management_enable_biometric_notify_message_fmt", @"%@ has been enabled for this database."), bIdName]
-                                  duration:3.f
-                               hideOnSwipe:YES
-                                 hideOnTap:YES
-                                 alertType:ISAlertTypeSuccess
-                             alertPosition:ISAlertPositionTop
-                                   didHide:nil];
-    }
-}
-
 - (void)bindUi {
-    [self bindDatabaseLock];
+    NSNumber* seconds = self.viewModel.metadata.autoLockTimeoutSeconds ? self.viewModel.metadata.autoLockTimeoutSeconds : @(-1);
     
-    NSString *biometricIdName = [BiometricsManager.sharedInstance getBiometricIdName];
-
-    if (![AppPreferences.sharedInstance isProOrFreeTrial]) {
-        self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt_pro_only", @"%@ Unlock"), biometricIdName];
+    if(seconds.integerValue == -1) {
+        self.switchDatabaseAutoLockEnabled.on = NO;
+        self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
+        self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
     }
     else {
-        self.labelAllowBiometricSetting.text = [NSString stringWithFormat:NSLocalizedString(@"db_management_biometric_unlock_fmt", @"%@ Unlock"), biometricIdName];
+        self.switchDatabaseAutoLockEnabled.on = YES;
+        self.labelDatabaseAutoLockDelay.text = [Utils formatTimeInterval:seconds.integerValue];
+        self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
     }
-    
-    if (@available(iOS 13.0, *)) {
-        self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.labelColor : UIColor.secondaryLabelColor;
-    } else {
-        self.labelAllowBiometricSetting.textColor = [self canToggleTouchId] ? UIColor.blackColor : UIColor.lightGrayColor;
-    }
-    
-    self.switchAllowBiometric.enabled = [self canToggleTouchId];
-    self.switchAllowBiometric.on = self.viewModel.metadata.isTouchIdEnabled;
+
     self.switchLockOnDeviceLock.on = self.viewModel.metadata.autoLockOnDeviceLock;
+    self.switchLockDuringEditing.on = self.viewModel.metadata.lockEvenIfEditing;
 }
 
 - (IBAction)onDone:(id)sender {
@@ -194,6 +123,15 @@
         AutoFillPreferencesViewController* vc = (AutoFillPreferencesViewController*)nav.topViewController;
         vc.viewModel = sender;
     }
+    else if ( [segue.identifier isEqualToString:@"segueToConvenienceUnlock"] ) {
+        UINavigationController* nav = segue.destinationViewController;
+        ConvenienceUnlockPreferences* vc = (ConvenienceUnlockPreferences*)nav.topViewController;
+        vc.viewModel = sender;
+    }
+    else if ( [segue.identifier isEqualToString:@"segueToScheduledExport"] ) {
+        ScheduledExportConfigurationViewController* vc = (ScheduledExportConfigurationViewController*)segue.destinationViewController;
+        vc.model = sender;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -202,11 +140,14 @@
     if (cell == self.cellDatabaseAutoLockDelay) {
         [self promptForAutoLockTimeout];
     }
-    else if ( cell == self.cellPinCodes) {
-        [self performSegueWithIdentifier:@"segueToPinsConfiguration" sender:nil];
-    }
     else if ( cell == self.cellAutoFillPreferences ) {
         [self performSegueWithIdentifier:@"segueToAutoFillPreferences" sender:self.viewModel];
+    }
+    else if ( cell == self.cellConvenienceUnlock ) {
+        [self performSegueWithIdentifier:@"segueToConvenienceUnlock" sender:self.viewModel];
+    }
+    else if ( cell == self.cellScheduledExport ) {
+        [self performSegueWithIdentifier:@"segueToScheduledExport" sender:self.viewModel];
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -222,31 +163,26 @@
                         self.viewModel.metadata.autoLockTimeoutSeconds = @(selectedValue);
                         [SafesList.sharedInstance update:self.viewModel.metadata];
                     }
-                    [self bindDatabaseLock];
+                    [self bindUi];
                 }];
 }
 
 - (IBAction)onSwitchDatabaseAutoLockEnabled:(id)sender {
     self.viewModel.metadata.autoLockTimeoutSeconds = self.switchDatabaseAutoLockEnabled.on ? @(60) : @(-1);
     [SafesList.sharedInstance update:self.viewModel.metadata];
-    [self bindDatabaseLock];
+    [self bindUi];
 }
 
-- (void)bindDatabaseLock {
-    NSNumber* seconds = self.viewModel.metadata.autoLockTimeoutSeconds ? self.viewModel.metadata.autoLockTimeoutSeconds : @(-1);
-    
-    if(seconds.integerValue == -1) {
-        self.switchDatabaseAutoLockEnabled.on = NO;
-        self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
+- (IBAction)onSwitchLockOnDeviceLock:(id)sender {
+    self.viewModel.metadata.autoLockOnDeviceLock = self.switchLockOnDeviceLock.on;
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+    [self bindUi];
+}
 
-        self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
-    }
-    else {
-        self.switchDatabaseAutoLockEnabled.on = YES;
-        self.labelDatabaseAutoLockDelay.text = [Utils formatTimeInterval:seconds.integerValue];
-
-        self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
-    }
+- (IBAction)onSwitchLockEvenIfEditing:(id)sender {
+    self.viewModel.metadata.lockEvenIfEditing = self.switchLockDuringEditing.on;
+    [SafesList.sharedInstance update:self.viewModel.metadata];
+    [self bindUi];
 }
 
 - (void)promptForInteger:(NSString*)title
@@ -287,14 +223,5 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
-- (BOOL)canToggleTouchId {
-    return BiometricsManager.isBiometricIdAvailable && [AppPreferences.sharedInstance isProOrFreeTrial];
-}
-
-- (IBAction)onSwitchLockOnDeviceLock:(id)sender {
-    self.viewModel.metadata.autoLockOnDeviceLock = self.switchLockOnDeviceLock.on;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-    [self bindUi];
-}
 
 @end

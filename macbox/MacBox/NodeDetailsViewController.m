@@ -107,9 +107,15 @@
 @property (weak) IBOutlet NSProgressIndicator *progressStrength;
 @property (weak) IBOutlet NSTextField *labelStrength;
 
+@property (readonly) BOOL isEffectivelyReadOnly;
+
 @end
 
 @implementation NodeDetailsViewController
+
+- (BOOL)isEffectivelyReadOnly {
+    return self.historicalItem || self.model.isEffectivelyReadOnly;
+}
 
 static NSString* trimField(NSTextField* textField) {
     return [Utils trim:textField.stringValue];
@@ -290,9 +296,25 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)updateTitle {
     NSString* title = [self.model dereference:self.node.title node:self.node];
-    
+
     NSString* loc = NSLocalizedString(@"mac_node_details_historical_item_suffix_fmt", @"%@ (Historical Item)");
-    NSString* aTitle = [NSString stringWithFormat:self.historical ? loc : @"%@", title];
+    NSString* aTitle = [NSString stringWithFormat:self.historicalItem ? loc : @"%@", title];
+    
+    NSMutableArray* statusii = NSMutableArray.array;
+
+
+
+    if ( self.model.isEffectivelyReadOnly ) {
+        [statusii addObject:NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read-Only")];
+    }
+        
+    NSString* statusSuffix = @"";
+    if ( statusii.firstObject ) {
+        NSString* statusiiStrings = [statusii componentsJoinedByString:@", "];
+        statusSuffix = [NSString stringWithFormat:@" (%@)", statusiiStrings];
+    }
+    
+    aTitle = [aTitle stringByAppendingString:statusSuffix];
     
     [self.view.window setTitle:aTitle];
 }
@@ -519,8 +541,8 @@ static NSString* trimField(NSTextField* textField) {
     self.sortedAttachmentFileNames = [self.node.fields.attachments.allKeys sortedArrayUsingComparator:finderStringComparator];
     [self.attachmentsView reloadData];
     
-    self.buttonAddAttachment.enabled = !self.historical && !(self.model.format == kKeePass1 && self.sortedAttachmentFileNames.count > 0);
-    self.buttonRemoveAttachment.enabled = !self.historical;
+    self.buttonAddAttachment.enabled = !self.isEffectivelyReadOnly && !(self.model.format == kKeePass1 && self.sortedAttachmentFileNames.count > 0);
+    self.buttonRemoveAttachment.enabled = !self.isEffectivelyReadOnly;
 }
 
 - (void)bindUiToSimpleFields {
@@ -543,28 +565,28 @@ static NSString* trimField(NSTextField* textField) {
     self.imageViewIcon.showClickableBorder = YES;
     
     self.labelID.stringValue = self.model.format == kPasswordSafe ? self.node.uuid.UUIDString : keePassStringIdFromUuid(self.node.uuid);
-    self.labelCreated.stringValue = self.node.fields.created ? self.node.fields.created.friendlyDateString : @"";
-    self.labelModified.stringValue = self.node.fields.modified ? self.node.fields.modified.friendlyDateString : @"";
+    self.labelCreated.stringValue = self.node.fields.created ? self.node.fields.created.friendlyDateTimeString : @"";
+    self.labelModified.stringValue = self.node.fields.modified ? self.node.fields.modified.friendlyDateTimeString : @"";
     
-    self.imageViewIcon.clickable = self.model.format != kPasswordSafe && !self.historical;
-    self.textFieldTitle.enabled = !self.historical;
-    self.textFieldUsername.enabled = !self.historical;
-    self.revealedPasswordField.enabled = !self.historical;
-    self.textFieldEmail.enabled = !self.historical;
+    self.imageViewIcon.clickable = self.model.format != kPasswordSafe && !self.isEffectivelyReadOnly;
+    self.textFieldTitle.enabled = !self.isEffectivelyReadOnly;
+    self.textFieldUsername.enabled = !self.isEffectivelyReadOnly;
+    self.revealedPasswordField.enabled = !self.isEffectivelyReadOnly;
+    self.textFieldEmail.enabled = !self.isEffectivelyReadOnly;
     
-    self.tagsField.enabled = !self.historical;
+    self.tagsField.enabled = !self.isEffectivelyReadOnly;
     
-    self.textFieldUrl.enabled = !self.historical;
-    self.textViewNotes.editable = !self.historical;
-    self.comboGroup.enabled = !self.historical;
-    self.buttonGenerate.enabled = !self.historical;
-    self.buttonSettings.enabled = !self.historical;
+    self.textFieldUrl.enabled = !self.isEffectivelyReadOnly;
+    self.textViewNotes.editable = !self.isEffectivelyReadOnly;
+    self.comboGroup.enabled = !self.isEffectivelyReadOnly;
+    self.buttonGenerate.enabled = !self.isEffectivelyReadOnly;
+    self.buttonSettings.enabled = !self.isEffectivelyReadOnly;
         
     self.checkboxExpires.state = self.node.fields.expires == nil ? NSOffState : NSOnState;
     self.datePickerExpires.dateValue = self.node.fields.expires;
     
-    self.checkboxExpires.enabled = !self.historical;
-    self.datePickerExpires.enabled = !self.historical && self.node.fields.expires != nil;
+    self.checkboxExpires.enabled = !self.isEffectivelyReadOnly;
+    self.datePickerExpires.enabled = !self.isEffectivelyReadOnly && self.node.fields.expires != nil;
     
     [self validateTitleAndIndicateValidityInUI];
     
@@ -614,7 +636,7 @@ static NSString* trimField(NSTextField* textField) {
 - (void)initializeTotp {
     [self bindUiToTotp];
     
-    if(!Settings.sharedInstance.doNotShowTotp && self.node.fields.otpToken) {
+    if( self.model.showTotp && self.node.fields.otpToken ) {
         if(self.timerRefreshOtp == nil) {
             self.timerRefreshOtp = [NSTimer timerWithTimeInterval:1.0f target:self selector:@selector(refreshTotp:) userInfo:nil repeats:YES];
             [[NSRunLoop mainRunLoop] addTimer:self.timerRefreshOtp forMode:NSRunLoopCommonModes];
@@ -634,7 +656,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)bindUiToTotp {
-    if(!Settings.sharedInstance.doNotShowTotp && self.node.fields.otpToken) {
+    if( self.model.showTotp && self.node.fields.otpToken ) {
         self.totpRow.hidden = NO;
         
         uint64_t remainingSeconds = self.node.fields.otpToken.period - ((uint64_t)([NSDate date].timeIntervalSince1970) % (uint64_t)self.node.fields.otpToken.period);
@@ -660,17 +682,17 @@ static NSString* trimField(NSTextField* textField) {
 
 - (void)setupEmailAutoComplete {
     self.textFieldEmail.completions = self.model.emailSet.allObjects;
-    self.textFieldEmail.completionEnabled = !Settings.sharedInstance.doNotShowAutoCompleteSuggestions;
+    self.textFieldEmail.completionEnabled = self.model.showAutoCompleteSuggestions;
 }
 
 - (void)setupUrlAutoComplete {
     self.textFieldUrl.completions = self.model.urlSet.allObjects;
-    self.textFieldUrl.completionEnabled = !Settings.sharedInstance.doNotShowAutoCompleteSuggestions;
+    self.textFieldUrl.completionEnabled = self.model.showAutoCompleteSuggestions;
 }
 
 - (void)setupUsernameAutoComplete {
     self.textFieldUsername.completions = self.model.usernameSet.allObjects;
-    self.textFieldUsername.completionEnabled = !Settings.sharedInstance.doNotShowAutoCompleteSuggestions;
+    self.textFieldUsername.completionEnabled = self.model.showAutoCompleteSuggestions;
 }
 
 - (void)onPreferencesChanged:(NSNotification*)notification {
@@ -826,7 +848,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)showPopupToastNotification:(NSString*)message duration:(CGFloat)duration {
-    if(Settings.sharedInstance.doNotShowChangeNotifications) {
+    if ( !self.model.showChangeNotifications ) {
         return;
     }
     
@@ -857,7 +879,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)onEditCustomField:(CustomField*)field {
-    if(self.historical) {
+    if(self.isEffectivelyReadOnly) {
         return;
     }
 
@@ -865,7 +887,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onAddCustomField:(id)sender {
-    if(self.historical) {
+    if(self.isEffectivelyReadOnly) {
         return;
     }
     
@@ -921,7 +943,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onDeleteCustomField:(id)sender {
-    if(self.historical) {
+    if(self.isEffectivelyReadOnly) {
         return;
     }
     
@@ -944,7 +966,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onRemoveCustomField:(id)sender {
-    if(self.historical) {
+    if(self.isEffectivelyReadOnly) {
         return;
     }
     
@@ -992,8 +1014,8 @@ static NSString* trimField(NSTextField* textField) {
     self.customFields = [fields copy];
     [self.tableViewCustomFields reloadData];
     
-    self.buttonRemoveCustomField.enabled = !self.historical;
-    self.buttonAddCustomField.enabled = !self.historical;
+    self.buttonRemoveCustomField.enabled = !self.isEffectivelyReadOnly;
+    self.buttonAddCustomField.enabled = !self.isEffectivelyReadOnly;
 }
 
 - (NSImage * )getIconForNode {
@@ -1156,8 +1178,8 @@ static NSString* trimField(NSTextField* textField) {
         CustomFieldTableCellView* cell = [self.tableViewCustomFields makeViewWithIdentifier:cellId owner:nil];
         
         cell.value = field.value;
-        cell.protected = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields);
-        cell.valueHidden = field.protected && !(field.value.length == 0 && !Settings.sharedInstance.concealEmptyProtectedFields); 
+        cell.protected = field.protected && !(field.value.length == 0 && !self.model.concealEmptyProtectedFields);
+        cell.valueHidden = field.protected && !(field.value.length == 0 && !self.model.concealEmptyProtectedFields); 
         
         return cell;
     }
@@ -1357,7 +1379,7 @@ static NSString* trimField(NSTextField* textField) {
     if(theAction == @selector(onAddCustomField:) ||
        theAction == @selector(onRemoveCustomField:) ||
        theAction == @selector(onEditCustomField:)) {
-        return !self.historical;
+        return !self.isEffectivelyReadOnly;
     }
     
    if (theAction == @selector(onPreviewAttachment:)) {
@@ -1408,7 +1430,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onRemoveAttachment:(id)sender {
-    if(self.historical) {
+    if(self.isEffectivelyReadOnly) {
         return;
     }
     
@@ -1429,7 +1451,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onAddAttachment:(id)sender {
-    if(self.historical || (self.model.format == kKeePass1 && self.sortedAttachmentFileNames.count > 0)) {
+    if(self.isEffectivelyReadOnly || (self.model.format == kKeePass1 && self.sortedAttachmentFileNames.count > 0)) {
         return;
     }
     

@@ -134,7 +134,7 @@
 
         if (ret) {
             NSString* locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_mod_will_change", @"Modified Date will change.") : NSLocalizedString(@"diff_drill_down_mods_are_different", @"Modified Dates are different.");
-            self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.modified.friendlyDateString, other.fields.modified.friendlyDateString];
+            self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.modified.friendlyDateTimeString, other.fields.modified.friendlyDateTimeString];
         }
         
         return;
@@ -169,17 +169,17 @@
     
     if ((mine.fields.created == nil && other.fields.created != nil) || (mine.fields.created != nil && ![mine.fields.created isEqualToDate:other.fields.created] ))     {
         NSString* locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_create_date_will_change", @"Created Date will change.") : NSLocalizedString(@"diff_drill_down_created_dates_are_different", @"Created Dates are different.");
-        self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.created.friendlyDateString, other.fields.created.friendlyDateString];
+        self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.created.friendlyDateTimeString, other.fields.created.friendlyDateTimeString];
     }
 
     if ((mine.fields.modified == nil && other.fields.modified != nil) || (mine.fields.modified != nil && ![mine.fields.modified isEqualToDate:other.fields.modified] ))     {
         NSString* locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_mod_date_will_change", @"Modified Date will change.") : NSLocalizedString(@"diff_drill_down_mod_dates_are_different", @"Modified Dates are different.");
-        self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.modified.friendlyDateString, other.fields.modified.friendlyDateString];
+        self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.modified.friendlyDateTimeString, other.fields.modified.friendlyDateTimeString];
     }
 
     if ((mine.fields.expires == nil && other.fields.expires != nil) || (mine.fields.expires != nil && ![mine.fields.expires isEqualToDate:other.fields.expires] )) {
         NSString* locKey = self.isMergeDiff ? NSLocalizedString(@"diff_drill_down_expiry_date_will_change", @"Expiry Date will change.") : NSLocalizedString(@"diff_drill_down_expiry_are_different", @"Expiry Dates are different.");
-        self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.expires.friendlyDateString, other.fields.expires.friendlyDateString];
+        self.diffs[locKey] = [NSString stringWithFormat:prevNew, mine.fields.expires.friendlyDateTimeString, other.fields.expires.friendlyDateTimeString];
     }
         
     if ((mine.fields.foregroundColor.length == 0 && other.fields.foregroundColor.length) || (mine.fields.foregroundColor.length && ![mine.fields.foregroundColor isEqualToString:other.fields.foregroundColor] )) {

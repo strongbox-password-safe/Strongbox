@@ -69,9 +69,9 @@ suggestedFilename:(NSString *)suggestedFilename
     
     
     
-    if(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data]) {
+    if(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data modDate:nil]) {
         suggestedFilename = [NSString stringWithFormat:@"%@.%@", nickName, extension];
-        while(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data]) {
+        while(![self writeToDefaultStorageWithFilename:suggestedFilename overwrite:NO data:data modDate:nil]) {
             suggestedFilename = [Utils insertTimestampInFilename:suggestedFilename];
         }
     }
@@ -96,27 +96,45 @@ suggestedFilename:(NSString *)suggestedFilename
     completion(metadata, nil);
 }
 
-- (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data {
+- (BOOL)writeToDefaultStorageWithFilename:(NSString*)filename overwrite:(BOOL)overwrite data:(NSData *)data modDate:(NSDate*_Nullable)modDate {
     NSLog(@"Trying to write local file with filename [%@]", filename);
     NSString *path = [self getDefaultStorageFileUrl:filename].path;
 
     
     
+    BOOL ret;
     if ([[NSFileManager defaultManager] fileExistsAtPath:path]) {
         
         if(overwrite) {
             
-            return [self write:data path:path overwrite:overwrite];
+            ret = [self write:data path:path overwrite:overwrite];
         }
         else {
             
             NSLog(@"File [%@] but not allowed to overwrite...", filename);
-            return NO;
+            ret = NO;
         }
     }
     else {
         
-        return [self write:data path:path overwrite:overwrite];
+        ret = [self write:data path:path overwrite:overwrite];
+    }
+    
+    if ( !ret ) {
+        return NO;
+    }
+    else {
+        if ( modDate ) {
+            NSError* err2;
+            [NSFileManager.defaultManager setAttributes:@{ NSFileModificationDate : modDate }
+                                           ofItemAtPath:path
+                                                  error:&err2];
+            if ( err2 ) {
+                NSLog(@"WARNWARN: writeToDefaultStorageWithFilename -> could not set mod date: [%@]", err2);
+            }
+        }
+        
+        return YES;
     }
 }
 

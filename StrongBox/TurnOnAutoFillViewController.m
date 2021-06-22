@@ -7,15 +7,15 @@
 //
 
 #import "TurnOnAutoFillViewController.h"
-#import "WelcomeAddDatabaseViewController.h"
 #import "AutoFillManager.h"
 #import "SafesList.h"
-#import "AllSetAlreadyHasDatabaseViewController.h"
+#import "RoundedBlueButton.h"
+#import "AppPreferences.h"
 
 @interface TurnOnAutoFillViewController ()
 
 @property (weak, nonatomic) IBOutlet UIButton *buttonDone;
-@property (weak, nonatomic) IBOutlet UIButton *buttonDismiss;
+@property (weak, nonatomic) IBOutlet RoundedBlueButton *buttonDontUse;
 
 @end
 
@@ -61,7 +61,7 @@
                                                name:UIApplicationDidBecomeActiveNotification
                                              object:nil];
 
-    self.buttonDone.layer.cornerRadius = 5.0f;
+    self.buttonDontUse.backgroundColor = UIColor.systemOrangeColor;
 }
 
 - (void)appBecameActive {
@@ -69,7 +69,7 @@
         NSLog(@"AutoFill has been switched on!");
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self onDone:nil];
+            [self onSetupLater:nil];
         });
     }
     else {
@@ -77,32 +77,20 @@
     }
 }
 
-- (IBAction)onDone:(id)sender {
+- (IBAction)onSetupLater:(id)sender {
     [NSNotificationCenter.defaultCenter removeObserver:self];
+
+    AppPreferences.sharedInstance.lastAskToEnableAutoFill = NSDate.date;
     
-    if (SafesList.sharedInstance.snapshot.count != 0) {
-        [self performSegueWithIdentifier:@"segueAutoFillToAlreadyHasDatabase" sender:nil];
-    }
-    else {
-        [self performSegueWithIdentifier:@"segueAutoFillToAddFirst" sender:nil];
-    }
+    self.onDone();
 }
 
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    if([segue.identifier isEqualToString:@"segueAutoFillToAddFirst"]) {
-        WelcomeAddDatabaseViewController* vc = (WelcomeAddDatabaseViewController*)segue.destinationViewController;
-        vc.onDone = self.onDone;
-    }
-    else if ([segue.identifier isEqualToString:@"segueAutoFillToAlreadyHasDatabase"]) {
-        AllSetAlreadyHasDatabaseViewController* vc = (AllSetAlreadyHasDatabaseViewController*)segue.destinationViewController;
-        vc.onDone = self.onDone;
-    }
-}
-
-- (IBAction)onDismiss:(id)sender {
+- (IBAction)onDontUse:(id)sender {
     [NSNotificationCenter.defaultCenter removeObserver:self];
     
-    self.onDone(NO, nil);
+    AppPreferences.sharedInstance.promptToEnableAutoFill = NO;
+    
+    self.onDone();
 }
 
 @end

@@ -150,9 +150,12 @@ static NSString *ModelIdentifier()
     for (NSString* pref in prefs) {
         if ( ![pref hasPrefix:@"com.apple"] &&
             ![pref hasPrefix:@"Apple"] &&
-            ![pref hasPrefix:@"appLockPin2"] &&
+            ![pref hasPrefix:@"appLockPin"] &&
             ![pref hasPrefix:@"NS"] &&
-            ![pref hasPrefix:@"searchFieldRecents"]) {
+            ![pref hasPrefix:@"searchFieldRecents"] &&
+            ![pref hasPrefix:@"passwordGenerationConfig"] &&
+            ![pref hasPrefix:@"passwordGenerationSettings"] &&
+            ![pref hasPrefix:@"autoFillNewRecordSettings"] ) {
             [debugLines addObject:[NSString stringWithFormat:@"%@: %@", pref, [defs valueForKey:pref]]];
         }
     }
@@ -225,7 +228,7 @@ static NSString *ModelIdentifier()
         
         NSDate* mod;
         unsigned long long fileSize;
-        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe modified:&mod fileSize:&fileSize];
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:safe.uuid modified:&mod fileSize:&fileSize];
         
         NSString* syncState;
         if (url) {

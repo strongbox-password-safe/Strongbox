@@ -8,10 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import "Model.h"
+#import "StaticDataTableViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AutoFillPreferencesViewController : UITableViewController
+@interface AutoFillPreferencesViewController : StaticDataTableViewController
 
 @property Model* viewModel;
 

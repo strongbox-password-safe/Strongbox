@@ -25,8 +25,7 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
     return sharedInstance;
 }
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         [self buildFonts];
@@ -39,6 +38,7 @@ static NSString* const kEasyReadBoldFontName = @"Menlo-Bold";
     _regularFont = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     _title2Font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle2];
     _title3Font = [UIFont preferredFontForTextStyle:UIFontTextStyleTitle3];
+    _headlineFont = [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline]; 
     _caption1Font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption1];
     _caption2Font = [UIFont preferredFontForTextStyle:UIFontTextStyleCaption2];
 

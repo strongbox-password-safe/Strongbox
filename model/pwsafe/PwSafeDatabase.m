@@ -5,6 +5,7 @@
 #import <CommonCrypto/CommonHMAC.h>
 #import "Record.h"
 #import "Constants.h"
+#import "StrongboxErrorCodes.h"
 
 const NSInteger kPwSafeDefaultVersionMajor = 0x03;
 const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
@@ -278,7 +279,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
         NSLog(@"Invalid password!");
         
         if (ppError != nil) {
-            *ppError = [Utils createNSError:@"The password is incorrect." errorCode:kStrongboxErrorCodeIncorrectCredentials];
+            *ppError = [Utils createNSError:@"The password is incorrect." errorCode:StrongboxErrorCodes.incorrectCredentials];
         }
         
         return nil;

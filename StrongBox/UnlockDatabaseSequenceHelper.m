@@ -140,7 +140,7 @@
 }
 
 - (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors {
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:self.database.uuid];
     BOOL userLikelyOffline = [self userIsLikelyOffline];
     
     BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;

@@ -47,7 +47,7 @@
                                               error:error];
 
     if ( securitySucceeded ) {
-        [url stopAccessingSecurityScopedResource];
+        [BookmarksHelper stopAccessingSecurityScopedResource:url];
     }
 
     if (!bookmark) {
@@ -116,29 +116,23 @@
     }
     
     if(bookmarkDataIsStale) {
-        if ([bookmarkFileURL startAccessingSecurityScopedResource]) {
+        BOOL securitySucceeded = [bookmarkFileURL startAccessingSecurityScopedResource]; 
 
-            
-            NSData* fileIdentifier = [BookmarksHelper getBookmarkDataFromUrl:bookmarkFileURL readOnly:readOnly error:error];
-            
-            [bookmarkFileURL stopAccessingSecurityScopedResource];
-
-            
-            if(!fileIdentifier) {
-                NSLog(@"Error regenerating: [%@]", *error);
-                return nil;
-            }
-
-            *updatedBookmark = fileIdentifier;
-            return bookmarkFileURL;
+    
+        
+        NSData* fileIdentifier = [BookmarksHelper getBookmarkDataFromUrl:bookmarkFileURL readOnly:readOnly error:error];
+        
+        if ( securitySucceeded ) {
+            [BookmarksHelper stopAccessingSecurityScopedResource:bookmarkFileURL];
         }
-        else {
-            NSLog(@"Regen Bookmark security failed....");
-            if(error) {
-                *error = [Utils createNSError:@"Regen Bookmark security failed." errorCode:-1];
-            }
+
+        if(!fileIdentifier) {
+            NSLog(@"Error regenerating: [%@]", *error);
             return nil;
         }
+
+        *updatedBookmark = fileIdentifier;
+        return bookmarkFileURL;
     }
 
     return bookmarkFileURL;
@@ -149,11 +143,11 @@
     
     NSURL* url = [BookmarksHelper getUrlFromBookmark:bookmarkInB64 readOnly:NO updatedBookmark:&updatedBookmark error:error];
 
-    if(url && [url startAccessingSecurityScopedResource]) {
+    if ( url && [url startAccessingSecurityScopedResource] ) {
         
         NSData* ret = [NSData dataWithContentsOfURL:url options:kNilOptions error:error];
         
-        [url stopAccessingSecurityScopedResource];
+        [BookmarksHelper stopAccessingSecurityScopedResource:url];
         
         return ret;
     }
@@ -162,6 +156,16 @@
     }
     
     return nil;
+}
+
++ (void)stopAccessingSecurityScopedResource:(NSURL*)url {
+#if !TARGET_OS_IPHONE
+    if ( @available(macOS 11.0, *) ) { 
+        [url stopAccessingSecurityScopedResource];
+    }
+#else
+    [url stopAccessingSecurityScopedResource];
+#endif
 }
 
 @end

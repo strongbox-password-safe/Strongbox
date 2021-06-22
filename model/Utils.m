@@ -142,7 +142,14 @@ NSString* keePassStringIdFromUuid(NSUUID* uuid) {
     return [NSData dataWithBytes:uid length:sizeof(uuid_t)].hexString;
 }
 
-NSUUID* uuidFromKeePassStringId(NSString* stringId) {
+NSUUID* uuidFromKeePassStringId(NSString* foo) {
+    if ( foo.length == 0 ) {
+        return nil;
+    }
+    
+    
+    
+    NSString* stringId = [[foo.trimmed stringByReplacingOccurrencesOfString:@"-" withString:@""] stringByReplacingOccurrencesOfString:@" " withString:@""];
     if(stringId.length != 32) {
         return nil;
     }

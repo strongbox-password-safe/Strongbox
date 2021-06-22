@@ -10,10 +10,11 @@
 #import "BackupsManager.h"
 #import "Utils.h"
 #import "Alerts.h"
-#import "ExportOptionsTableViewController.h"
+//#import "ExportOptionsTableViewController.h"
 #import "LocalDeviceStorageProvider.h"
 #import "NSDate+Extensions.h"
 #import "Serializator.h"
+#import "SafesList.h"
 
 @interface BackupsBrowserTableViewController ()
 
@@ -53,8 +54,8 @@
     
     BackupItem* item = self.items[indexPath.row];
 
-    cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_modified_title_fmt", @"Modified %@"), item.modDate.friendlyDateString];
-    cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_taken_at_subtitle_fmt", @"%@ (Backup taken %@)"), friendlyFileSizeString(item.fileSize.unsignedIntegerValue), item.backupCreatedDate.friendlyDateString];
+    cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_modified_title_fmt", @"Modified %@"), item.modDate.friendlyDateTimeString];
+    cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_taken_at_subtitle_fmt", @"%@ (Backup taken %@)"), friendlyFileSizeString(item.fileSize.unsignedIntegerValue), item.backupCreatedDate.friendlyDateTimeString];
 
 
 
@@ -80,13 +81,13 @@
         }];
     }];
 
-    UITableViewRowAction *exportAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
-                                                                             title:NSLocalizedString(@"generic_export", @"Export")
-                                                                           handler:^(UITableViewRowAction * _Nonnull action, NSIndexPath * _Nonnull indexPath) {
-        [self performSegueWithIdentifier:@"segueToExport" sender:item];
-    }];
-    
-    exportAction.backgroundColor = [UIColor systemBlueColor];
+
+
+
+
+
+
+
 
     UITableViewRowAction *addLocalAction = [UITableViewRowAction rowActionWithStyle:UITableViewRowActionStyleNormal
                                                                              title:NSLocalizedString(@"backups_add_local", @"Add as Local Database")
@@ -98,7 +99,9 @@
 
     
     
-    return @[removeAction, exportAction, addLocalAction];
+    return @[removeAction,
+             
+             addLocalAction];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -107,22 +110,22 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([segue.identifier isEqualToString:@"segueToExport"]) {
-        ExportOptionsTableViewController *vc = (ExportOptionsTableViewController *)segue.destinationViewController;
-    
-        BackupItem* item = sender;
-           
-        NSError* error;
-        NSData* data = [NSData dataWithContentsOfURL:item.url options:kNilOptions error:&error];
-        if (!data) {
-            [Alerts error:self title:NSLocalizedString(@"generic_error", @"Error") error:error];
-            return;
-        }
-        
-        vc.backupMode = YES;
-        vc.encrypted = data;
-        vc.metadata = self.metadata;
-        vc.backupItem = item;
-        vc.viewModel = nil;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
 

@@ -27,6 +27,7 @@
 #import "VirtualYubiKeys.h"
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
+#import "SVProgressHUD.h"
 
 static const int kMaxFailedPinAttempts = 3;
 
@@ -108,50 +109,133 @@ static const int kMaxFailedPinAttempts = 3;
                       readOnly:self.database.readOnly
           yubikeyConfiguration:self.database.contextAwareYubiKeyConfig
                usedConvenience:YES];
+        return;
     }
-    else if (!self.noConvenienceUnlock && self.database.isEnrolledForConvenience && AppPreferences.sharedInstance.isProOrFreeTrial) {
+
+    
+    
+    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"Loading...")];
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0L), ^{
+        [self continueGetCredentialsInBackground];
+    });
+}
+
+- (void)continueGetCredentialsInBackground {
+    BOOL convenienceUnlockIsPossible = !self.noConvenienceUnlock &&
+                                        self.database.isEnrolledForConvenience &&
+                                        AppPreferences.sharedInstance.isProOrFreeTrial &&
+                                        !( self.isAutoFillOpen && self.database.mainAppAndAutoFillYubiKeyConfigsIncoherent ); 
+    
+    BOOL askForBio = NO;
+    BOOL askForPin = NO;
+    BOOL bioDbHasChanged = NO;
+
+    if ( convenienceUnlockIsPossible ) {
         BOOL biometricPossible = self.database.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
         BOOL biometricAllowed = !AppPreferences.sharedInstance.disallowAllBiometricId;
         
         NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
                 
-        if(biometricPossible && biometricAllowed) {
-            BOOL bioDbHasChanged = [BiometricsManager.sharedInstance isBiometricDatabaseStateHasChanged:self.isAutoFillOpen];
+        if ( biometricPossible && biometricAllowed ) {
+            bioDbHasChanged = [BiometricsManager.sharedInstance isBiometricDatabaseStateHasChanged:self.isAutoFillOpen];
 
-            if(bioDbHasChanged) {
-                [self clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState];
-                
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [Alerts warn:self.viewController
-                           title:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_title", @"Biometrics Database Changed")
-                         message:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_message", @"It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons.")
-                      completion:^{
-                        [self promptForManualCredentials];
-                    }];
-                });
-            }
-            else if (self.isAutoFillOpen && self.database.mainAppAndAutoFillYubiKeyConfigsIncoherent) { 
-                [self promptForManualCredentials];
-            }
-            else {
-                [self showBiometricAuthentication];
+            if( !bioDbHasChanged) {
+                askForBio = YES;
             }
         }
-        else if(!AppPreferences.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil) {
-            if (self.isAutoFillOpen && self.database.mainAppAndAutoFillYubiKeyConfigsIncoherent) { 
-                [self promptForManualCredentials];
-            }
-            else {
-                [self promptForConveniencePin];
-            }
+
+        if( !AppPreferences.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil ) {
+            askForPin = YES;
+        }
+    }
+    
+    NSString* pw = self.database.convenienceMasterPassword;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD dismiss];
+        
+        BOOL convenienceUnlock = askForPin || askForBio;
+        BOOL expired = (pw == nil) && (self.database.convenienceExpiryPeriod != -1); 
+        
+        BOOL displayConvenienceExpiryMessage = convenienceUnlock && expired;
+
+        
+
+        if ( bioDbHasChanged ) {
+            [self clearBioDbAndPrompManual];
+        }
+        else if ( displayConvenienceExpiryMessage ) {
+            [self displayConvenienceExpiryMessage];
+        }
+        else if ( convenienceUnlock ) {
+            [self beginConvenienceUnlock:pw askForBio:askForBio askForPin:askForPin];
         }
         else {
             [self promptForManualCredentials];
         }
-    }
-    else {
-        [self promptForManualCredentials];
-    }
+    });
+}
+
+- (void)beginConvenienceUnlock:(NSString*)password askForBio:(BOOL)askForBio askForPin:(BOOL)askForPin {
+    
+    
+
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ( askForBio ) {
+            [self showBiometricAuthentication:password];
+        }
+        else if ( askForPin ) {
+            [self promptForConveniencePin:password];
+        }
+        else {
+            [self promptForManualCredentials];
+        }
+    });
+}
+
+- (void)displayConvenienceExpiryMessage {
+    NSLog(@"XXXX - displayConvenienceExpiryMessage");
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if ( self.database.showConvenienceExpiryMessage ) {
+            [Alerts twoOptionsWithCancel:self.viewController
+                                   title:NSLocalizedString(@"mac_unlock_screen_button_title_convenience_unlock_expired", @"Master Password Required")
+                                 message:NSLocalizedString(@"composite_key_determiner_convenience_expired_message", @"It's time now to re-enter your Master Password manually. You can change this master password expiry interval in Database Settings.")
+                       defaultButtonText:NSLocalizedString(@"alerts_ok", @"OK")
+                        secondButtonText:NSLocalizedString(@"generic_dont_tell_again", @"Don't Tell Me Again")
+                                  action:^(int response) {
+                if ( response == 0 ) { 
+                    [self promptForManualCredentials];
+                }
+                else if ( response == 1) { 
+                    self.database.showConvenienceExpiryMessage = NO;
+                    [SafesList.sharedInstance update:self.database];
+                    
+                    [self promptForManualCredentials];
+                }
+                else {
+                    self.completion(kGetCompositeKeyResultUserCancelled, nil, NO, nil);
+                }
+            }];
+        }
+        else {
+            [self promptForManualCredentials];
+        }
+    });
+}
+
+- (void)clearBioDbAndPrompManual {
+    [self clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [Alerts warn:self.viewController
+               title:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_title", @"Biometrics Database Changed")
+             message:NSLocalizedString(@"open_sequence_warn_biometrics_db_changed_message", @"It looks like your biometrics database has changed, probably because you added a new face or fingerprint. Strongbox now requires you to re-enter your master credentials manually for security reasons.")
+          completion:^{
+            [self promptForManualCredentials];
+        }];
+    });
 }
 
 - (void)clearAllBiometricConvenienceSecretsAndResetBiometricsDatabaseGoodState {
@@ -179,7 +263,7 @@ static const int kMaxFailedPinAttempts = 3;
 
 
 
-- (void)promptForConveniencePin {
+- (void)promptForConveniencePin:(NSString*)password {
     UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"PinEntry" bundle:nil];
     PinEntryController* vc = (PinEntryController*)[storyboard instantiateInitialViewController];
     
@@ -194,7 +278,7 @@ static const int kMaxFailedPinAttempts = 3;
     
     vc.onDone = ^(PinEntryResponse response, NSString * _Nullable pin) {
         [self.viewController dismissViewControllerAnimated:YES completion:^{
-            [self onPinEntered:response pin:pin];
+            [self onPinEntered:password response:response pin:pin];
         }];
     };
     
@@ -202,7 +286,7 @@ static const int kMaxFailedPinAttempts = 3;
     [self.viewController presentViewController:vc animated:YES completion:nil];
 }
 
-- (void)onPinEntered:(PinEntryResponse)response pin:(NSString*)pin {
+- (void)onPinEntered:(NSString*)password response:(PinEntryResponse)response pin:(NSString*)pin {
     if(response == kOk) {
         if([pin isEqualToString:self.database.conveniencePin]) {
             if (self.database.failedPinAttempts != 0) { 
@@ -210,12 +294,11 @@ static const int kMaxFailedPinAttempts = 3;
                 [SafesList.sharedInstance update:self.database];
             }
             
-            [self onGotCredentials:self.database.convenienceMasterPassword
-                   keyFileBookmark:self.database.keyFileBookmark
-                oneTimeKeyFileData:nil
-                          readOnly:self.database.readOnly
-              yubikeyConfiguration:self.database.contextAwareYubiKeyConfig
-                   usedConvenience:YES];
+            [self onConvenienceMethodsSucceeded:password
+                                keyFileBookmark:self.database.keyFileBookmark
+                             oneTimeKeyFileData:nil
+                                       readOnly:self.database.readOnly
+                           yubikeyConfiguration:self.database.contextAwareYubiKeyConfig];
         }
         else if (self.database.duressPin != nil && [pin isEqualToString:self.database.duressPin]) {
             UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
@@ -246,7 +329,7 @@ static const int kMaxFailedPinAttempts = 3;
             }
             else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [self promptForConveniencePin];
+                    [self promptForConveniencePin:password];
                 });
             }
         }
@@ -261,12 +344,12 @@ static const int kMaxFailedPinAttempts = 3;
 
 
 
-- (void)showBiometricAuthentication {
+- (void)showBiometricAuthentication:(NSString*)password {
     
     
     if(self.biometricPreCleared) {
         NSLog(@"BIOMETRIC has been PRE-CLEARED - Coalescing Auths - Proceeding without prompting for auth");
-        [self onBiometricAuthenticationDone:YES error:nil];
+        [self onBiometricAuthenticationDone:password success:YES error:nil];
     }
     else {
         
@@ -279,7 +362,7 @@ static const int kMaxFailedPinAttempts = 3;
         BOOL ret = [BiometricsManager.sharedInstance requestBiometricId:NSLocalizedString(@"open_sequence_biometric_unlock_prompt_title", @"Identify to Unlock Database")
                                                           fallbackTitle:NSLocalizedString(@"open_sequence_biometric_unlock_fallback", @"Unlock Manually...")
                                                              completion:^(BOOL success, NSError * _Nullable error) {
-            [self onBiometricAuthenticationDone:success error:error];
+            [self onBiometricAuthenticationDone:password success:success error:error];
             
             if (self.isAutoFillQuickTypeOpen) {
                 self.viewController.view.alpha = previousAlpha;
@@ -292,7 +375,8 @@ static const int kMaxFailedPinAttempts = 3;
     }
 }
 
-- (void)onBiometricAuthenticationDone:(BOOL)success
+- (void)onBiometricAuthenticationDone:(NSString*)password
+                              success:(BOOL)success
                                 error:(NSError *)error {
     NSString* biometricIdName = BiometricsManager.sharedInstance.biometricIdName;
     
@@ -303,16 +387,15 @@ static const int kMaxFailedPinAttempts = 3;
 
         if(!AppPreferences.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self promptForConveniencePin];
+                [self promptForConveniencePin:password];
             });
         }
         else {
-            [self onGotCredentials:self.database.convenienceMasterPassword
-                   keyFileBookmark:self.database.keyFileBookmark
-                oneTimeKeyFileData:nil
-                          readOnly:self.database.readOnly
-              yubikeyConfiguration:self.database.contextAwareYubiKeyConfig
-                   usedConvenience:YES];
+            [self onConvenienceMethodsSucceeded:password
+                                keyFileBookmark:self.database.keyFileBookmark
+                             oneTimeKeyFileData:nil
+                                       readOnly:self.database.readOnly
+                           yubikeyConfiguration:self.database.contextAwareYubiKeyConfig];
         }
     }
     else {
@@ -349,18 +432,17 @@ static const int kMaxFailedPinAttempts = 3;
 
 
 
-- (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename {
+- (NSString*)getExpectedAssociatedLocalKeyFileName:(NSString*)filename keyFileExtension:(NSString*)keyFileExtension {
     NSString* veryLastFilename = [filename lastPathComponent];
     NSString* filenameOnly = [veryLastFilename stringByDeletingPathExtension];
-    NSString* expectedKeyFileName = [filenameOnly stringByAppendingPathExtension:@"key"];
+    NSString* expectedKeyFileName = [filenameOnly stringByAppendingPathExtension:keyFileExtension];
     
     return  expectedKeyFileName;
 }
 
 - (NSString*)getAutoDetectedKeyFileUrl {
     NSURL *directory = FileManager.sharedInstance.documentsDirectory;
-    NSString* expectedKeyFileName = [self getExpectedAssociatedLocalKeyFileName:self.database.fileName];
- 
+
     NSError* error;
     NSFileManager *fm = [NSFileManager defaultManager];
     NSArray<NSString*>* files = [fm contentsOfDirectoryAtPath:directory.path error:&error];
@@ -369,9 +451,13 @@ static const int kMaxFailedPinAttempts = 3;
         NSLog(@"Error looking for auto detected key file url: %@", error);
         return nil;
     }
-    
+
+    NSString* expectedKeyFileName = [self getExpectedAssociatedLocalKeyFileName:self.database.fileName keyFileExtension:@"key"];
+    NSString* expectedKeyFileName2 = [self getExpectedAssociatedLocalKeyFileName:self.database.fileName keyFileExtension:@"keyx"];
+
     for (NSString *file in files) {
-        if([file caseInsensitiveCompare:expectedKeyFileName] == NSOrderedSame) {
+        if([file caseInsensitiveCompare:expectedKeyFileName] == NSOrderedSame ||
+           [file caseInsensitiveCompare:expectedKeyFileName2] == NSOrderedSame ) {
             NSURL* found = [directory URLByAppendingPathComponent:file];
             NSString* bookmark = [BookmarksHelper getBookmarkFromUrl:found readOnly:YES error:&error];
             
@@ -434,6 +520,25 @@ static const int kMaxFailedPinAttempts = 3;
     };
 
     [self.viewController presentViewController:nav animated:YES completion:nil];
+}
+
+
+
+- (void)onConvenienceMethodsSucceeded:(NSString*)password
+                      keyFileBookmark:(NSString*)keyFileBookmark
+                   oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+                             readOnly:(BOOL)readOnly
+                 yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration {
+
+    
+    NSString* pw = password;
+    
+    [self onGotCredentials:pw
+           keyFileBookmark:self.database.keyFileBookmark
+        oneTimeKeyFileData:nil
+                  readOnly:self.database.readOnly
+      yubikeyConfiguration:self.database.contextAwareYubiKeyConfig
+           usedConvenience:YES];
 }
 
 - (void)onGotCredentials:(NSString*)password
@@ -507,7 +612,7 @@ static const int kMaxFailedPinAttempts = 3;
     if (undigestedKeyFileData) {
         BOOL checkForXml = YES;
 
-        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database];
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:self.database.uuid];
         if (url) {
             DatabaseFormat format = [Serializator getDatabaseFormat:url];
             checkForXml = format != kKeePass1;

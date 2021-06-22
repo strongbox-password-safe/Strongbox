@@ -13,6 +13,7 @@
 #import "AppPreferences.h"
 #import "Utils.h"
 #import "ProUpgradeIAPManager.h"
+#import "CustomizationManager.h"
 
 @interface AboutViewController ()
 
@@ -34,7 +35,7 @@
         self.navigationItem.title = about;
     }
 
-    self.upgradeOptions.hidden = ProUpgradeIAPManager.isProFamilyEdition || ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime; 
+    self.upgradeOptions.hidden = CustomizationManager.isAProBundle || ProUpgradeIAPManager.sharedInstance.hasPurchasedLifeTime; 
     
     self.debugTextView.layer.cornerRadius = 2.0f;
     if (@available(iOS 13.0, *)) {
@@ -74,7 +75,8 @@
 }
 
 - (IBAction)onCopy:(id)sender {
-    [UIPasteboard.generalPasteboard setString:[DebugHelper getAboutDebugString]];
+    [ClipboardManager.sharedInstance copyStringWithNoExpiration:[DebugHelper getAboutDebugString]];
+    
     [Alerts info:self title:@"Done" message:@"Debug Info copied to clipboard"];
 }
 

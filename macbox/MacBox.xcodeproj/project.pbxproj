@@ -211,6 +211,7 @@
 		4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */ = {isa = PBXBuildFile; fileRef = 4D23BBF3216136D10054C8D0 /* formatV4.txt */; };
 		4D29663821AD7318009B7936 /* MB1Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29663721AD7318009B7936 /* MB1Tests.m */; };
 		4D29664121ADAC0B009B7936 /* CustomField.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D29664021ADAC0B009B7936 /* CustomField.m */; };
+		4D2BA97A39DC8B9A43CDA522 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */; };
 		4D2CB4952332D7C400C2E084 /* SimpleXmlValueExtractor.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4942332D7C400C2E084 /* SimpleXmlValueExtractor.m */; };
 		4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB4972332D80A00C2E084 /* GZipInputStream.m */; };
 		4D2CB49B2332D82D00C2E084 /* KeePassXmlParser.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D2CB49A2332D82D00C2E084 /* KeePassXmlParser.m */; };
@@ -374,7 +375,7 @@
 		4DE79B85255D987C00F59B10 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4DE79B84255D987C00F59B10 /* AuthenticationServices.framework */; };
 		4DE79B89255D987C00F59B10 /* CredentialProviderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DE79B88255D987C00F59B10 /* CredentialProviderViewController.m */; };
 		4DE79B8C255D987C00F59B10 /* CredentialProviderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE79B8A255D987C00F59B10 /* CredentialProviderViewController.xib */; };
-		4DE79B91255D987C00F59B10 /* Strongbox AutoFill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4DE79B83255D987C00F59B10 /* Strongbox AutoFill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		4DE79B91255D987C00F59B10 /* Strongbox-AutoFill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 4DE79B83255D987C00F59B10 /* Strongbox-AutoFill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4DEA5897224BFA7300013808 /* StringValue.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5895224BFA7200013808 /* StringValue.m */; };
 		4DEA5898224BFA7300013808 /* AesKdfCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEA5896224BFA7200013808 /* AesKdfCipher.m */; };
 		4DEAEC291F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DEAEC271F3DDF61000CE3A6 /* CreateFormatAndSetCredentialsWizard.m */; };
@@ -400,9 +401,10 @@
 		4DF59F5F1F30DB7A00D68BFE /* Document.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DF59F5E1F30DB7A00D68BFE /* Document.m */; };
 		4DF59F611F30DB7A00D68BFE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F601F30DB7A00D68BFE /* Assets.xcassets */; };
 		4DF59F641F30DB7A00D68BFE /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F621F30DB7A00D68BFE /* Main.storyboard */; };
-		519C2CAA704EB1D2C41D0116 /* Pods_common_mac_Strongbox_Outright_Pro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */; };
+		620A078CA5F0FF3D8DB92ECE /* Pods_common_mac_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */; };
 		6B9B902F795918EE0444B2D8 /* Pods_common_mac_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */; };
-		9B9F816C1BF4C9C272AEADB5 /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BF1B19F3B8933C37A37BB3CF /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework */; };
+		90B3CB52841F3537EA3AEABA /* Pods_common_mac_Strongbox_Pro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3513216123E1521206CFC31C /* Pods_common_mac_Strongbox_Pro.framework */; };
+		9C6DD574EEE978315083315A /* Pods_common_mac_Strongbox_Pro_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6CE03C354C8E7230D5515DE /* Pods_common_mac_Strongbox_Pro_AutoFill.framework */; };
 		C80735E02614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
 		C80735E12614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
 		C80735E22614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
@@ -697,6 +699,36 @@
 		C862A004260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */; };
 		C862A005260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */; };
 		C862A006260B9D8C00DEDB8E /* EditCustomField.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C862A008260B9D8C00DEDB8E /* EditCustomField.storyboard */; };
+		C86733EF26739F860063237B /* MASHotKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733D226739F860063237B /* MASHotKey.m */; };
+		C86733F026739F860063237B /* MASHotKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733D226739F860063237B /* MASHotKey.m */; };
+		C86733F126739F860063237B /* MASHotKey.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733D226739F860063237B /* MASHotKey.m */; };
+		C86733F826739F860063237B /* MASShortcutMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733D726739F860063237B /* MASShortcutMonitor.m */; };
+		C86733F926739F860063237B /* MASShortcutMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733D726739F860063237B /* MASShortcutMonitor.m */; };
+		C86733FA26739F860063237B /* MASShortcutMonitor.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733D726739F860063237B /* MASShortcutMonitor.m */; };
+		C86733FB26739F860063237B /* MASShortcutBinder.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733DB26739F860063237B /* MASShortcutBinder.m */; };
+		C86733FC26739F860063237B /* MASShortcutBinder.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733DB26739F860063237B /* MASShortcutBinder.m */; };
+		C86733FD26739F860063237B /* MASShortcutBinder.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733DB26739F860063237B /* MASShortcutBinder.m */; };
+		C867340126739F860063237B /* MASDictionaryTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733DD26739F860063237B /* MASDictionaryTransformer.m */; };
+		C867340226739F860063237B /* MASDictionaryTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733DD26739F860063237B /* MASDictionaryTransformer.m */; };
+		C867340326739F860063237B /* MASDictionaryTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733DD26739F860063237B /* MASDictionaryTransformer.m */; };
+		C867340726739F860063237B /* MASLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E126739F860063237B /* MASLocalization.m */; };
+		C867340826739F860063237B /* MASLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E126739F860063237B /* MASLocalization.m */; };
+		C867340926739F860063237B /* MASLocalization.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E126739F860063237B /* MASLocalization.m */; };
+		C867340A26739F860063237B /* MASShortcutView.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E226739F860063237B /* MASShortcutView.m */; };
+		C867340B26739F860063237B /* MASShortcutView.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E226739F860063237B /* MASShortcutView.m */; };
+		C867340C26739F860063237B /* MASShortcutView.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E226739F860063237B /* MASShortcutView.m */; };
+		C867340D26739F860063237B /* MASShortcutView+Bindings.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E626739F860063237B /* MASShortcutView+Bindings.m */; };
+		C867340E26739F860063237B /* MASShortcutView+Bindings.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E626739F860063237B /* MASShortcutView+Bindings.m */; };
+		C867340F26739F860063237B /* MASShortcutView+Bindings.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E626739F860063237B /* MASShortcutView+Bindings.m */; };
+		C867341026739F860063237B /* MASShortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E826739F860063237B /* MASShortcut.m */; };
+		C867341126739F860063237B /* MASShortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E826739F860063237B /* MASShortcut.m */; };
+		C867341226739F860063237B /* MASShortcut.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E826739F860063237B /* MASShortcut.m */; };
+		C867341326739F860063237B /* MASShortcutValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E926739F860063237B /* MASShortcutValidator.m */; };
+		C867341426739F860063237B /* MASShortcutValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E926739F860063237B /* MASShortcutValidator.m */; };
+		C867341526739F860063237B /* MASShortcutValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = C86733E926739F860063237B /* MASShortcutValidator.m */; };
+		C867342A2673A09B0063237B /* MAS-Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C867341A2673A09B0063237B /* MAS-Localizable.strings */; };
+		C867342B2673A09B0063237B /* MAS-Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C867341A2673A09B0063237B /* MAS-Localizable.strings */; };
+		C867342C2673A09B0063237B /* MAS-Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C867341A2673A09B0063237B /* MAS-Localizable.strings */; };
 		C867457B25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */; };
 		C867457C25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */; };
 		C867457D25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m in Sources */ = {isa = PBXBuildFile; fileRef = C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */; };
@@ -1030,7 +1062,6 @@
 		C87949BD25DAE8E90097005D /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D2CB49C2332D8E100C2E084 /* libxml2.2.dylib */; };
 		C87949BE25DAE8E90097005D /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C883055025CB0C03001D8FE1 /* libcrypto.a */; };
 		C87949BF25DAE8E90097005D /* libykpers-1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA12465480A00EEBFC9 /* libykpers-1.a */; };
-		C87949C025DAE8E90097005D /* Pods_common_mac_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */; };
 		C87949C125DAE8E90097005D /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA02465480A00EEBFC9 /* libyubikey.a */; };
 		C87949C225DAE8E90097005D /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9D9F2465480A00EEBFC9 /* libjson-c.a */; };
 		C87949C325DAE8E90097005D /* libssh2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C883055125CB0C04001D8FE1 /* libssh2.a */; };
@@ -1305,7 +1336,6 @@
 		C8794AE425DAE9020097005D /* libjson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA22465480B00EEBFC9 /* libjson.a */; };
 		C8794AE525DAE9020097005D /* libjson-c.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9D9F2465480A00EEBFC9 /* libjson-c.a */; };
 		C8794AE625DAE9020097005D /* libyubikey.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C85B9DA02465480A00EEBFC9 /* libyubikey.a */; };
-		C8794AE725DAE9020097005D /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */; };
 		C8794AE925DAE9020097005D /* SelectCredential.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AD025714A3900251153 /* SelectCredential.xib */; };
 		C8794AEA25DAE9020097005D /* CredentialProviderViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 4DE79B8A255D987C00F59B10 /* CredentialProviderViewController.xib */; };
 		C8794AEC25DAE9020097005D /* AutoFillCredentialCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C1F75825702E7B009991D4 /* AutoFillCredentialCell.xib */; };
@@ -1692,7 +1722,7 @@
 		C8B9461D2573D01A00932C46 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4DF59F601F30DB7A00D68BFE /* Assets.xcassets */; };
 		C8B9461E2573D01A00932C46 /* ManualCredentialsEntry.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8AA2172256BD15900E9FF8D /* ManualCredentialsEntry.xib */; };
 		C8B9461F2573D01A00932C46 /* SelectAutoFillDatabaseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8E78AC925714A2A00251153 /* SelectAutoFillDatabaseViewController.xib */; };
-		C8B9463B2573D19E00932C46 /* Strongbox-Outright-Pro-AutoFill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C8B946232573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C8B9463B2573D19E00932C46 /* Strongbox-Pro-AutoFill.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C8B946232573D01A00932C46 /* Strongbox-Pro-AutoFill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C8B946492573D44B00932C46 /* AutoFillSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C80FF038256D666E00A181B1 /* AutoFillSettingsViewController.m */; };
 		C8B946872573D59400932C46 /* AttachmentItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8B946862573D59400932C46 /* AttachmentItem.xib */; };
 		C8B946882573D59400932C46 /* AttachmentItem.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8B946862573D59400932C46 /* AttachmentItem.xib */; };
@@ -1718,6 +1748,12 @@
 		C8C1F75325702E65009991D4 /* AutoFillCredentialCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75225702E65009991D4 /* AutoFillCredentialCell.m */; };
 		C8C1F75925702E7B009991D4 /* AutoFillCredentialCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8C1F75825702E7B009991D4 /* AutoFillCredentialCell.xib */; };
 		C8C1F7612570353A009991D4 /* regdom.c in Sources */ = {isa = PBXBuildFile; fileRef = C8C1F75E2570353A009991D4 /* regdom.c */; };
+		C8C60F432667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
+		C8C60F442667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
+		C8C60F452667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
+		C8C60F462667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
+		C8C60F472667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
+		C8C60F482667F990005832BD /* StrongboxErrorCodes.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C60F412667F990005832BD /* StrongboxErrorCodes.m */; };
 		C8D8D3E1256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */; };
 		C8DC76312497A79000C9C443 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC762A2497A79000C9C443 /* ChaCha20ReadStream.m */; };
 		C8DC76322497A79000C9C443 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8DC762A2497A79000C9C443 /* ChaCha20ReadStream.m */; };
@@ -1862,7 +1898,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				4DE79B91255D987C00F59B10 /* Strongbox AutoFill.appex in Embed App Extensions */,
+				4DE79B91255D987C00F59B10 /* Strongbox-AutoFill.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1884,7 +1920,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				C8B9463B2573D19E00932C46 /* Strongbox-Outright-Pro-AutoFill.appex in Embed App Extensions */,
+				C8B9463B2573D19E00932C46 /* Strongbox-Pro-AutoFill.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1893,13 +1929,16 @@
 
 /* Begin PBXFileReference section */
 		017EC729AC7266E294E65B3B /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro-AutoFill/Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig"; sourceTree = "<group>"; };
-		02769ADB3F07590BDCA1F7CF /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
 		0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.release.xcconfig"; sourceTree = "<group>"; };
 		16E4979B89A05E87EE4710DA /* Pods-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
 		175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		20AAFFE8C54DE9BFD02C348A /* Pods-common-mac-Strongbox-Pro-AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Pro-AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Pro-AutoFill/Pods-common-mac-Strongbox-Pro-AutoFill.release.xcconfig"; sourceTree = "<group>"; };
 		25312FC61159071EEA97749B /* Pods-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Strongbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Strongbox/Pods-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_AutoFill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		339719FF7E16E312FFCC3CFC /* Pods-common-mac-Strongbox-Pro-AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Pro-AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Pro-AutoFill/Pods-common-mac-Strongbox-Pro-AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
 		34629E3CBC779E0F1547E434 /* Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig"; sourceTree = "<group>"; };
+		3513216123E1521206CFC31C /* Pods_common_mac_Strongbox_Pro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Pro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		4615C234123A7AE34AABF61B /* Pods-common-mac-Strongbox-Pro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Pro.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Pro/Pods-common-mac-Strongbox-Pro.debug.xcconfig"; sourceTree = "<group>"; };
 		4D00B1F61F3DB03300D7560B /* MacAlerts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MacAlerts.h; path = MacBox/MacAlerts.h; sourceTree = "<group>"; };
 		4D00B1F71F3DB03300D7560B /* MacAlerts.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MacAlerts.m; path = MacBox/MacAlerts.m; sourceTree = "<group>"; };
 		4D01BA2B22BD31F00044226F /* SearchScope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SearchScope.h; path = ../model/SearchScope.h; sourceTree = "<group>"; };
@@ -2331,7 +2370,7 @@
 		4DE68C7823A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/ProgressWindow.strings; sourceTree = "<group>"; };
 		4DE68C7923A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/PredefinedKeePassIcon.strings; sourceTree = "<group>"; };
 		4DE68C7B23A53261007C445C /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SelectPredefinedIconController.strings; sourceTree = "<group>"; };
-		4DE79B83255D987C00F59B10 /* Strongbox AutoFill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox AutoFill.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4DE79B83255D987C00F59B10 /* Strongbox-AutoFill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox-AutoFill.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4DE79B84255D987C00F59B10 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		4DE79B87255D987C00F59B10 /* CredentialProviderViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CredentialProviderViewController.h; sourceTree = "<group>"; };
 		4DE79B88255D987C00F59B10 /* CredentialProviderViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CredentialProviderViewController.m; sourceTree = "<group>"; };
@@ -2390,13 +2429,14 @@
 		4DF59F601F30DB7A00D68BFE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = MacBox/Assets.xcassets; sourceTree = "<group>"; };
 		4DF59F631F30DB7A00D68BFE /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		4DF59F651F30DB7A00D68BFE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = MacBox/Info.plist; sourceTree = "<group>"; };
-		50F27062B3FD89F6D407C032 /* Pods-common-mac-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
-		645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
+		81DEEB72FC47F3376839BB6B /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
+		9336D582CE379900DEDAFB72 /* Pods-common-mac-Strongbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox.debug.xcconfig"; sourceTree = "<group>"; };
 		963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Strongbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		A3B3AD6EAF58D421F9BB2641 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.release.xcconfig"; sourceTree = "<group>"; };
+		A7A658167DFD24D820135E96 /* Pods-common-mac-Strongbox-Pro.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Pro.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Pro/Pods-common-mac-Strongbox-Pro.release.xcconfig"; sourceTree = "<group>"; };
+		A7CD3048033B4834F0CAF082 /* Pods-common-mac-Strongbox.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox.release.xcconfig"; sourceTree = "<group>"; };
+		AF1EBC56BCA9A181C08FED45 /* Pods-common-mac-Strongbox-AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-AutoFill/Pods-common-mac-Strongbox-AutoFill.release.xcconfig"; sourceTree = "<group>"; };
 		B5775E930C35CCA891076DB8 /* Pods_Macbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Macbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Outright_Pro.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		BF1B19F3B8933C37A37BB3CF /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B6CE03C354C8E7230D5515DE /* Pods_common_mac_Strongbox_Pro_AutoFill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Pro_AutoFill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C803E1CD2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		C803E1CE2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		C803E1CF2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Main.strings; sourceTree = "<group>"; };
@@ -2635,6 +2675,42 @@
 		C862A025260B9D9900DEDB8E /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/EditCustomField.strings; sourceTree = "<group>"; };
 		C862A027260B9D9A00DEDB8E /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/EditCustomField.strings; sourceTree = "<group>"; };
 		C862A029260B9D9B00DEDB8E /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/EditCustomField.strings; sourceTree = "<group>"; };
+		C86733D226739F860063237B /* MASHotKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASHotKey.m; sourceTree = "<group>"; };
+		C86733D526739F860063237B /* MASShortcutMonitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcutMonitor.h; sourceTree = "<group>"; };
+		C86733D626739F860063237B /* MASHotKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASHotKey.h; sourceTree = "<group>"; };
+		C86733D726739F860063237B /* MASShortcutMonitor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcutMonitor.m; sourceTree = "<group>"; };
+		C86733D826739F860063237B /* Shortcut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Shortcut.h; path = ../lib/MASShortcut/Framework/Shortcut.h; sourceTree = "<group>"; };
+		C86733DA26739F860063237B /* MASDictionaryTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASDictionaryTransformer.h; sourceTree = "<group>"; };
+		C86733DB26739F860063237B /* MASShortcutBinder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcutBinder.m; sourceTree = "<group>"; };
+		C86733DD26739F860063237B /* MASDictionaryTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASDictionaryTransformer.m; sourceTree = "<group>"; };
+		C86733DF26739F860063237B /* MASShortcutBinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcutBinder.h; sourceTree = "<group>"; };
+		C86733E126739F860063237B /* MASLocalization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASLocalization.m; sourceTree = "<group>"; };
+		C86733E226739F860063237B /* MASShortcutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcutView.m; sourceTree = "<group>"; };
+		C86733E326739F860063237B /* MASShortcutView+Bindings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MASShortcutView+Bindings.h"; sourceTree = "<group>"; };
+		C86733E426739F860063237B /* MASLocalization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASLocalization.h; sourceTree = "<group>"; };
+		C86733E526739F860063237B /* MASShortcutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcutView.h; sourceTree = "<group>"; };
+		C86733E626739F860063237B /* MASShortcutView+Bindings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MASShortcutView+Bindings.m"; sourceTree = "<group>"; };
+		C86733E826739F860063237B /* MASShortcut.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcut.m; sourceTree = "<group>"; };
+		C86733E926739F860063237B /* MASShortcutValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MASShortcutValidator.m; sourceTree = "<group>"; };
+		C86733EA26739F860063237B /* MASShortcut.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcut.h; sourceTree = "<group>"; };
+		C86733EB26739F860063237B /* MASKeyMasks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASKeyMasks.h; sourceTree = "<group>"; };
+		C86733EC26739F860063237B /* MASShortcutValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASShortcutValidator.h; sourceTree = "<group>"; };
+		C86733ED26739F860063237B /* MASKeyCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MASKeyCodes.h; sourceTree = "<group>"; };
+		C867341B2673A09B0063237B /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = "de.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C867341C2673A09B0063237B /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C867341D2673A09B0063237B /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = "ja.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C867341E2673A09B0063237B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = "en.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C867341F2673A09B0063237B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = "es.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734202673A09B0063237B /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = "it.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734212673A09B0063237B /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = "sv.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734222673A09B0063237B /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = "cs.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734232673A09B0063237B /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = "ko.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734242673A09B0063237B /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734252673A09B0063237B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = "pl.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734262673A09B0063237B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = "ru.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734272673A09B0063237B /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = "fr.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734282673A09B0063237B /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = "nl.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
+		C86734292673A09B0063237B /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = "pt.lproj/MAS-Localizable.strings"; sourceTree = "<group>"; };
 		C867456F25C9BA1C001453BE /* QuickTypeAutoFillDisplayFormat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = QuickTypeAutoFillDisplayFormat.h; path = ../model/QuickTypeAutoFillDisplayFormat.h; sourceTree = "<group>"; };
 		C867457A25C9BECC001453BE /* QuickTypeAutoFillDisplayFormat.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = QuickTypeAutoFillDisplayFormat.m; path = ../model/QuickTypeAutoFillDisplayFormat.m; sourceTree = "<group>"; };
 		C86791632561A1630038310E /* KeePassXmlAutoType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KeePassXmlAutoType.h; path = ../model/keepass/KeePassXmlAutoType.h; sourceTree = "<group>"; };
@@ -2804,7 +2880,7 @@
 		C8B679CD26271DB200E295A3 /* zxcvbn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zxcvbn.h; path = ../lib/zxcvbn/zxcvbn.h; sourceTree = "<group>"; };
 		C8B679CE26271DB200E295A3 /* zxcvbn.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zxcvbn.c; path = ../lib/zxcvbn/zxcvbn.c; sourceTree = "<group>"; };
 		C8B679CF26271DB200E295A3 /* dict-src.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "dict-src.h"; path = "../lib/zxcvbn/dict-src.h"; sourceTree = "<group>"; };
-		C8B946232573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox-Outright-Pro-AutoFill.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8B946232573D01A00932C46 /* Strongbox-Pro-AutoFill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Strongbox-Pro-AutoFill.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B946862573D59400932C46 /* AttachmentItem.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = AttachmentItem.xib; path = MacBox/AttachmentItem.xib; sourceTree = "<group>"; };
 		C8B946A32573D63400932C46 /* CustomFieldTableCellView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CustomFieldTableCellView.xib; path = MacBox/CustomFieldTableCellView.xib; sourceTree = "<group>"; };
 		C8B946C22573D6EC00932C46 /* CollectionViewHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = CollectionViewHeader.xib; path = MacBox/CollectionViewHeader.xib; sourceTree = "<group>"; };
@@ -2841,6 +2917,8 @@
 		C8C1F75E2570353A009991D4 /* regdom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = regdom.c; path = ../../lib/psl/regdom.c; sourceTree = "<group>"; };
 		C8C1F75F2570353A009991D4 /* regdom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = regdom.h; path = ../../lib/psl/regdom.h; sourceTree = "<group>"; };
 		C8C1F7602570353A009991D4 /* tld-canon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "tld-canon.h"; path = "../../lib/psl/tld-canon.h"; sourceTree = "<group>"; };
+		C8C60F412667F990005832BD /* StrongboxErrorCodes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = StrongboxErrorCodes.m; path = ../model/StrongboxErrorCodes.m; sourceTree = "<group>"; };
+		C8C60F422667F990005832BD /* StrongboxErrorCodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StrongboxErrorCodes.h; path = ../model/StrongboxErrorCodes.h; sourceTree = "<group>"; };
 		C8D8D3DE256FD572001BD8BE /* SelectAutoFillDatabaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SelectAutoFillDatabaseViewController.h; sourceTree = "<group>"; };
 		C8D8D3DF256FD572001BD8BE /* SelectAutoFillDatabaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SelectAutoFillDatabaseViewController.m; sourceTree = "<group>"; };
 		C8DC76292497A79000C9C443 /* KP31HashedBlockStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = KP31HashedBlockStream.h; path = ../model/KP31HashedBlockStream.h; sourceTree = "<group>"; };
@@ -3010,8 +3088,10 @@
 		C8FDF2DD261CD38300F17CBE /* BackupsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = BackupsManager.m; path = ../StrongBox/BackupsManager.m; sourceTree = "<group>"; };
 		C8FDF2DE261CD38300F17CBE /* BackupsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackupsManager.h; path = ../StrongBox/BackupsManager.h; sourceTree = "<group>"; };
 		C8FDF2DF261CD38300F17CBE /* BackupItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BackupItem.h; path = ../StrongBox/BackupItem.h; sourceTree = "<group>"; };
+		D74E4B4D29FF81ABB90AB260 /* Pods-common-mac-Strongbox-AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-AutoFill/Pods-common-mac-Strongbox-AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
 		EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig"; sourceTree = "<group>"; };
 		EBD47B91E82A65C6AA0A0FDA /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro-AutoFill/Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig"; sourceTree = "<group>"; };
+		F1CA5EB27D4FD04924F2361C /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox AutoFill/Pods-common-mac-Strongbox AutoFill.release.xcconfig"; sourceTree = "<group>"; };
 		F4659CF9556F8A7FF1217762 /* Pods-Macbox.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Macbox.debug.xcconfig"; path = "../Pods/Target Support Files/Pods-Macbox/Pods-Macbox.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -3025,12 +3105,12 @@
 				C883055425CB0C04001D8FE1 /* libssl.a in Frameworks */,
 				4D1FFB122403030100B75EA2 /* libxml2.2.dylib in Frameworks */,
 				C85B9DA82465480B00EEBFC9 /* libykpers-1.a in Frameworks */,
-				519C2CAA704EB1D2C41D0116 /* Pods_common_mac_Strongbox_Outright_Pro.framework in Frameworks */,
 				C883055C25CB0C04001D8FE1 /* libssh2.a in Frameworks */,
 				C883055825CB0C04001D8FE1 /* libcrypto.a in Frameworks */,
 				4DB3DD2E257E7A4000DC6560 /* CloudKit.framework in Frameworks */,
 				C85B9DA62465480B00EEBFC9 /* libyubikey.a in Frameworks */,
 				C85B9DA42465480B00EEBFC9 /* libjson-c.a in Frameworks */,
+				90B3CB52841F3537EA3AEABA /* Pods_common_mac_Strongbox_Pro.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3054,6 +3134,7 @@
 				C89561D5256552DE001C747C /* libjson-c.a in Frameworks */,
 				C89561D8256552DE001C747C /* libyubikey.a in Frameworks */,
 				D26FCE46F1386598F6E19202 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */,
+				4D2BA97A39DC8B9A43CDA522 /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3073,6 +3154,7 @@
 				C85B9DA52465480B00EEBFC9 /* libyubikey.a in Frameworks */,
 				C85B9DA32465480B00EEBFC9 /* libjson-c.a in Frameworks */,
 				C883055A25CB0C04001D8FE1 /* libssh2.a in Frameworks */,
+				620A078CA5F0FF3D8DB92ECE /* Pods_common_mac_Strongbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3088,7 +3170,6 @@
 				C87949BD25DAE8E90097005D /* libxml2.2.dylib in Frameworks */,
 				C87949BE25DAE8E90097005D /* libcrypto.a in Frameworks */,
 				C87949BF25DAE8E90097005D /* libykpers-1.a in Frameworks */,
-				C87949C025DAE8E90097005D /* Pods_common_mac_Strongbox.framework in Frameworks */,
 				C87949C125DAE8E90097005D /* libyubikey.a in Frameworks */,
 				C87949C225DAE8E90097005D /* libjson-c.a in Frameworks */,
 				C87949C325DAE8E90097005D /* libssh2.a in Frameworks */,
@@ -3107,7 +3188,6 @@
 				C8794AE425DAE9020097005D /* libjson.a in Frameworks */,
 				C8794AE525DAE9020097005D /* libjson-c.a in Frameworks */,
 				C8794AE625DAE9020097005D /* libyubikey.a in Frameworks */,
-				C8794AE725DAE9020097005D /* Pods_common_mac_Strongbox_AutoFill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3123,7 +3203,7 @@
 				C8B946112573D01A00932C46 /* libjson.a in Frameworks */,
 				C8B946122573D01A00932C46 /* libjson-c.a in Frameworks */,
 				C8B946132573D01A00932C46 /* libyubikey.a in Frameworks */,
-				9B9F816C1BF4C9C272AEADB5 /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework in Frameworks */,
+				9C6DD574EEE978315083315A /* Pods_common_mac_Strongbox_Pro_AutoFill.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3163,10 +3243,10 @@
 				B5775E930C35CCA891076DB8 /* Pods_Macbox.framework */,
 				963EE7F5C61569B10CECCE66 /* Pods_Strongbox.framework */,
 				175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */,
-				BBB44F0B9D49ACC8C1CEF9CD /* Pods_common_mac_Strongbox_Outright_Pro.framework */,
 				4DE79B84255D987C00F59B10 /* AuthenticationServices.framework */,
 				2854503AFF7A05949E5E6AEA /* Pods_common_mac_Strongbox_AutoFill.framework */,
-				BF1B19F3B8933C37A37BB3CF /* Pods_common_mac_Strongbox_Outright_Pro_AutoFill.framework */,
+				3513216123E1521206CFC31C /* Pods_common_mac_Strongbox_Pro.framework */,
+				B6CE03C354C8E7230D5515DE /* Pods_common_mac_Strongbox_Pro_AutoFill.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -3901,10 +3981,12 @@
 		4DF59F481F30DB7A00D68BFE = {
 			isa = PBXGroup;
 			children = (
-				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4DF59F551F30DB7A00D68BFE /* AppDelegate.m */,
-				4DE79B86255D987C00F59B10 /* Strongbox AutoFill */,
+				4DF59F601F30DB7A00D68BFE /* Assets.xcassets */,
 				4D524D2B219B503F00C22CB4 /* View */,
+				C8C60F422667F990005832BD /* StrongboxErrorCodes.h */,
+				C8C60F412667F990005832BD /* StrongboxErrorCodes.m */,
+				4DE79B86255D987C00F59B10 /* Strongbox AutoFill */,
 				C81F1DD02602146600251A2F /* Compare and Merge */,
 				C8FD559525DD3F9A009B8705 /* Mac-Outright-Pro-Info.plist */,
 				C8B9D494247E9F3800F6B9F5 /* Build */,
@@ -3957,8 +4039,8 @@
 				4DF59F511F30DB7A00D68BFE /* Strongbox.app */,
 				4D29663521AD7318009B7936 /* MB1Tests.xctest */,
 				4D1FFB482403030100B75EA2 /* Strongbox.app */,
-				4DE79B83255D987C00F59B10 /* Strongbox AutoFill.appex */,
-				C8B946232573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill.appex */,
+				4DE79B83255D987C00F59B10 /* Strongbox-AutoFill.appex */,
+				C8B946232573D01A00932C46 /* Strongbox-Pro-AutoFill.appex */,
 				C8794A0325DAE8E90097005D /* Strongbox-Bundle-Mac.app */,
 				C8794AF725DAE9020097005D /* Strongbox-AutoFill-Bundle-Mac.appex */,
 			);
@@ -3977,6 +4059,7 @@
 		4DFC06D5226467AA00A4254A /* libs */ = {
 			isa = PBXGroup;
 			children = (
+				C86733D026739F6F0063237B /* MASShortcut */,
 				C8B679CC26271D9500E295A3 /* zxcvbn */,
 				C83741D825D30F4B00EDE4F3 /* ConcurrentCircularBuffer.h */,
 				C83741D925D30F4B00EDE4F3 /* ConcurrentCircularBuffer.m */,
@@ -4017,14 +4100,20 @@
 				0A6A32A38A7A3A57CBCDA3A2 /* Pods-Macbox.release.xcconfig */,
 				25312FC61159071EEA97749B /* Pods-Strongbox.debug.xcconfig */,
 				16E4979B89A05E87EE4710DA /* Pods-Strongbox.release.xcconfig */,
-				50F27062B3FD89F6D407C032 /* Pods-common-mac-Strongbox.debug.xcconfig */,
-				645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */,
 				EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */,
 				34629E3CBC779E0F1547E434 /* Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig */,
-				02769ADB3F07590BDCA1F7CF /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */,
-				A3B3AD6EAF58D421F9BB2641 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */,
 				EBD47B91E82A65C6AA0A0FDA /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig */,
 				017EC729AC7266E294E65B3B /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig */,
+				9336D582CE379900DEDAFB72 /* Pods-common-mac-Strongbox.debug.xcconfig */,
+				A7CD3048033B4834F0CAF082 /* Pods-common-mac-Strongbox.release.xcconfig */,
+				81DEEB72FC47F3376839BB6B /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */,
+				F1CA5EB27D4FD04924F2361C /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */,
+				D74E4B4D29FF81ABB90AB260 /* Pods-common-mac-Strongbox-AutoFill.debug.xcconfig */,
+				AF1EBC56BCA9A181C08FED45 /* Pods-common-mac-Strongbox-AutoFill.release.xcconfig */,
+				4615C234123A7AE34AABF61B /* Pods-common-mac-Strongbox-Pro.debug.xcconfig */,
+				A7A658167DFD24D820135E96 /* Pods-common-mac-Strongbox-Pro.release.xcconfig */,
+				339719FF7E16E312FFCC3CFC /* Pods-common-mac-Strongbox-Pro-AutoFill.debug.xcconfig */,
+				20AAFFE8C54DE9BFD02C348A /* Pods-common-mac-Strongbox-Pro-AutoFill.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -4448,6 +4537,80 @@
 			name = "Edit Custom Fields";
 			sourceTree = "<group>";
 		};
+		C86733D026739F6F0063237B /* MASShortcut */ = {
+			isa = PBXGroup;
+			children = (
+				C86734192673A09B0063237B /* Resources */,
+				C86733D826739F860063237B /* Shortcut.h */,
+				C86733E726739F860063237B /* Model */,
+				C86733D126739F860063237B /* Monitoring */,
+				C86733E026739F860063237B /* UI */,
+				C86733D926739F860063237B /* User Defaults Storage */,
+			);
+			name = MASShortcut;
+			sourceTree = "<group>";
+		};
+		C86733D126739F860063237B /* Monitoring */ = {
+			isa = PBXGroup;
+			children = (
+				C86733D226739F860063237B /* MASHotKey.m */,
+				C86733D526739F860063237B /* MASShortcutMonitor.h */,
+				C86733D626739F860063237B /* MASHotKey.h */,
+				C86733D726739F860063237B /* MASShortcutMonitor.m */,
+			);
+			name = Monitoring;
+			path = ../lib/MASShortcut/Framework/Monitoring;
+			sourceTree = "<group>";
+		};
+		C86733D926739F860063237B /* User Defaults Storage */ = {
+			isa = PBXGroup;
+			children = (
+				C86733DA26739F860063237B /* MASDictionaryTransformer.h */,
+				C86733DB26739F860063237B /* MASShortcutBinder.m */,
+				C86733DD26739F860063237B /* MASDictionaryTransformer.m */,
+				C86733DF26739F860063237B /* MASShortcutBinder.h */,
+			);
+			name = "User Defaults Storage";
+			path = "../lib/MASShortcut/Framework/User Defaults Storage";
+			sourceTree = "<group>";
+		};
+		C86733E026739F860063237B /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				C86733E126739F860063237B /* MASLocalization.m */,
+				C86733E226739F860063237B /* MASShortcutView.m */,
+				C86733E326739F860063237B /* MASShortcutView+Bindings.h */,
+				C86733E426739F860063237B /* MASLocalization.h */,
+				C86733E526739F860063237B /* MASShortcutView.h */,
+				C86733E626739F860063237B /* MASShortcutView+Bindings.m */,
+			);
+			name = UI;
+			path = ../lib/MASShortcut/Framework/UI;
+			sourceTree = "<group>";
+		};
+		C86733E726739F860063237B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				C86733E826739F860063237B /* MASShortcut.m */,
+				C86733E926739F860063237B /* MASShortcutValidator.m */,
+				C86733EA26739F860063237B /* MASShortcut.h */,
+				C86733EB26739F860063237B /* MASKeyMasks.h */,
+				C86733EC26739F860063237B /* MASShortcutValidator.h */,
+				C86733ED26739F860063237B /* MASKeyCodes.h */,
+			);
+			name = Model;
+			path = ../lib/MASShortcut/Framework/Model;
+			sourceTree = "<group>";
+		};
+		C86734192673A09B0063237B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				C867341A2673A09B0063237B /* MAS-Localizable.strings */,
+			);
+			name = Resources;
+			path = ../lib/MASShortcut/Resources;
+			sourceTree = "<group>";
+		};
 		C8794B0E25DAEA830097005D /* Bundled-with-iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -4652,9 +4815,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4D1FFA6A2403030100B75EA2 /* Strongbox-Outright-Pro */ = {
+		4D1FFA6A2403030100B75EA2 /* Strongbox-Pro */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4D1FFB452403030100B75EA2 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro" */;
+			buildConfigurationList = 4D1FFB452403030100B75EA2 /* Build configuration list for PBXNativeTarget "Strongbox-Pro" */;
 			buildPhases = (
 				EB990A80726BEB171877A069 /* [CP] Check Pods Manifest.lock */,
 				4D1FFA6C2403030100B75EA2 /* Sources */,
@@ -4669,7 +4832,7 @@
 				C8B9463A2573D17700932C46 /* PBXTargetDependency */,
 				C8B9463D2573D19E00932C46 /* PBXTargetDependency */,
 			);
-			name = "Strongbox-Outright-Pro";
+			name = "Strongbox-Pro";
 			productName = MacBox;
 			productReference = 4D1FFB482403030100B75EA2 /* Strongbox.app */;
 			productType = "com.apple.product-type.application";
@@ -4692,9 +4855,9 @@
 			productReference = 4D29663521AD7318009B7936 /* MB1Tests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		4DE79B82255D987C00F59B10 /* Strongbox AutoFill */ = {
+		4DE79B82255D987C00F59B10 /* Strongbox-AutoFill */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4DE79B95255D987C00F59B10 /* Build configuration list for PBXNativeTarget "Strongbox AutoFill" */;
+			buildConfigurationList = 4DE79B95255D987C00F59B10 /* Build configuration list for PBXNativeTarget "Strongbox-AutoFill" */;
 			buildPhases = (
 				74B3792ECD8387CAFEC8AE4F /* [CP] Check Pods Manifest.lock */,
 				4DE79B7F255D987C00F59B10 /* Sources */,
@@ -4705,9 +4868,9 @@
 			);
 			dependencies = (
 			);
-			name = "Strongbox AutoFill";
+			name = "Strongbox-AutoFill";
 			productName = "Strongbox AutoFill";
-			productReference = 4DE79B83255D987C00F59B10 /* Strongbox AutoFill.appex */;
+			productReference = 4DE79B83255D987C00F59B10 /* Strongbox-AutoFill.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 		4DF59F501F30DB7A00D68BFE /* Strongbox */ = {
@@ -4735,11 +4898,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C8794A0025DAE8E90097005D /* Build configuration list for PBXNativeTarget "Strongbox-Bundle-Mac" */;
 			buildPhases = (
-				C87948A625DAE8E90097005D /* [CP] Check Pods Manifest.lock */,
 				C87948A725DAE8E90097005D /* Sources */,
 				C87949B725DAE8E90097005D /* Frameworks */,
 				C87949C425DAE8E90097005D /* Resources */,
-				C87949FD25DAE8E90097005D /* [CP] Embed Pods Frameworks */,
 				C87949FE25DAE8E90097005D /* Embed App Extensions */,
 			);
 			buildRules = (
@@ -4756,7 +4917,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C8794AF425DAE9020097005D /* Build configuration list for PBXNativeTarget "Strongbox-AutoFill-Bundle-Mac" */;
 			buildPhases = (
-				C8794A0C25DAE9020097005D /* [CP] Check Pods Manifest.lock */,
 				C8794A0D25DAE9020097005D /* Sources */,
 				C8794ADE25DAE9020097005D /* Frameworks */,
 				C8794AE825DAE9020097005D /* Resources */,
@@ -4770,9 +4930,9 @@
 			productReference = C8794AF725DAE9020097005D /* Strongbox-AutoFill-Bundle-Mac.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		C8B945632573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill */ = {
+		C8B945632573D01A00932C46 /* Strongbox-Pro-AutoFill */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C8B946202573D01A00932C46 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro-AutoFill" */;
+			buildConfigurationList = C8B946202573D01A00932C46 /* Build configuration list for PBXNativeTarget "Strongbox-Pro-AutoFill" */;
 			buildPhases = (
 				D0B7F388F948E4D238927520 /* [CP] Check Pods Manifest.lock */,
 				C8B945652573D01A00932C46 /* Sources */,
@@ -4783,9 +4943,9 @@
 			);
 			dependencies = (
 			);
-			name = "Strongbox-Outright-Pro-AutoFill";
+			name = "Strongbox-Pro-AutoFill";
 			productName = "Strongbox AutoFill";
-			productReference = C8B946232573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill.appex */;
+			productReference = C8B946232573D01A00932C46 /* Strongbox-Pro-AutoFill.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -4864,6 +5024,10 @@
 				cs,
 				nl,
 				"pt-BR",
+				ko,
+				"zh-Hant",
+				pl,
+				pt,
 			);
 			mainGroup = 4DF59F481F30DB7A00D68BFE;
 			productRefGroup = 4DF59F521F30DB7A00D68BFE /* Products */;
@@ -4871,9 +5035,9 @@
 			projectRoot = "";
 			targets = (
 				4DF59F501F30DB7A00D68BFE /* Strongbox */,
-				4DE79B82255D987C00F59B10 /* Strongbox AutoFill */,
-				4D1FFA6A2403030100B75EA2 /* Strongbox-Outright-Pro */,
-				C8B945632573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill */,
+				4DE79B82255D987C00F59B10 /* Strongbox-AutoFill */,
+				4D1FFA6A2403030100B75EA2 /* Strongbox-Pro */,
+				C8B945632573D01A00932C46 /* Strongbox-Pro-AutoFill */,
 				4D29663421AD7318009B7936 /* MB1Tests */,
 				C87948A325DAE8E90097005D /* Strongbox-Bundle-Mac */,
 				C8794A0B25DAE9020097005D /* Strongbox-AutoFill-Bundle-Mac */,
@@ -4931,6 +5095,7 @@
 				4D1FFB332403030100B75EA2 /* FavIconResultTableCell.xib in Resources */,
 				4D1FFB342403030100B75EA2 /* formatV3.txt in Resources */,
 				C85B9D832465454800EEBFC9 /* json-c in Resources */,
+				C867342B2673A09B0063237B /* MAS-Localizable.strings in Resources */,
 				4D1FFB352403030100B75EA2 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */,
 				C8F39F6F25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */,
@@ -5028,6 +5193,7 @@
 				4D216F6C22CBCE0D000954D0 /* german-diceware.wordlist.utf8.txt in Resources */,
 				4D3F190023AD26B8008A58AF /* FavIconResultTableCell.xib in Resources */,
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
+				C867342A2673A09B0063237B /* MAS-Localizable.strings in Resources */,
 				C85B9D822465454800EEBFC9 /* json-c in Resources */,
 				4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DC805A723A116E9001E742E /* ChangeMasterPasswordWindowController.xib in Resources */,
@@ -5098,6 +5264,7 @@
 				C87949EA25DAE8E90097005D /* german-diceware.wordlist.utf8.txt in Resources */,
 				C87949EB25DAE8E90097005D /* FavIconResultTableCell.xib in Resources */,
 				C87949EC25DAE8E90097005D /* formatV3.txt in Resources */,
+				C867342C2673A09B0063237B /* MAS-Localizable.strings in Resources */,
 				C87949ED25DAE8E90097005D /* json-c in Resources */,
 				C87949EE25DAE8E90097005D /* polish-diceware.wordlist.utf8.txt in Resources */,
 				C87949EF25DAE8E90097005D /* ChangeMasterPasswordWindowController.xib in Resources */,
@@ -5177,7 +5344,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox AutoFill-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox-AutoFill-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -5202,64 +5369,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C87948A625DAE8E90097005D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C87949FD25DAE8E90097005D /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/libsodium.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox/Pods-common-mac-Strongbox-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C8794A0C25DAE9020097005D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox AutoFill-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		D0B7F388F948E4D238927520 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -5275,7 +5384,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox-Outright-Pro-AutoFill-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox-Pro-AutoFill-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -5288,7 +5397,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox-Pro/Pods-common-mac-Strongbox-Pro-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/libsodium-macOS/libsodium.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -5297,7 +5406,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox-Outright-Pro/Pods-common-mac-Strongbox-Outright-Pro-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-mac-Strongbox-Pro/Pods-common-mac-Strongbox-Pro-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E8957E36C777D4AF2AFDE57D /* [CP] Embed Pods Frameworks */ = {
@@ -5333,7 +5442,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox-Outright-Pro-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-common-mac-Strongbox-Pro-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -5352,8 +5461,10 @@
 				4D1FFA6D2403030100B75EA2 /* SimpleXmlValueExtractor.m in Sources */,
 				C83741B725D30E8B00EDE4F3 /* SyncDatabaseRequest.m in Sources */,
 				C8FDF2E2261CD38300F17CBE /* BackupItem.m in Sources */,
+				C867340B26739F860063237B /* MASShortcutView.m in Sources */,
 				C8441BF625CAFBB10070C7FE /* DAVRequests.m in Sources */,
 				4D1FFA6E2403030100B75EA2 /* InnerRandomStreamFactory.m in Sources */,
+				C867340E26739F860063237B /* MASShortcutView+Bindings.m in Sources */,
 				4D1FFA6F2403030100B75EA2 /* CollectionViewHeader.m in Sources */,
 				C8441C1425CAFC3E0070C7FE /* SafeStorageProviderFactory.m in Sources */,
 				4D1FFA702403030100B75EA2 /* Binary.m in Sources */,
@@ -5398,6 +5509,7 @@
 				C8441B9D25CAEC300070C7FE /* StorageProviderReadOptions.m in Sources */,
 				C85B9D9D246547BA00EEBFC9 /* YubiKeyConfiguration.m in Sources */,
 				C85B9D78246544C600EEBFC9 /* NSData+Extensions.m in Sources */,
+				C86733FC26739F860063237B /* MASShortcutBinder.m in Sources */,
 				4D1FFA8D2403030100B75EA2 /* DatabaseSettingsTabViewController.m in Sources */,
 				C8DC76342497A79000C9C443 /* AesInputStream.m in Sources */,
 				C8B45C8D24ACC97700318562 /* StreamUtils.m in Sources */,
@@ -5424,6 +5536,7 @@
 				C87A9940255968EA0002BEF8 /* URLRequestOperation.swift in Sources */,
 				4D1FFA982403030100B75EA2 /* KdbxSerializationCommon.m in Sources */,
 				4D1FFA992403030100B75EA2 /* NSDictionary+Extensions.m in Sources */,
+				C867340826739F860063237B /* MASLocalization.m in Sources */,
 				C8A101B625FBB8F200293456 /* SwiftUIViewFactory.swift in Sources */,
 				C8453ED7254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */,
 				4D1FFA9A2403030100B75EA2 /* OTPToken.m in Sources */,
@@ -5438,6 +5551,7 @@
 				C87A9948255968EB0002BEF8 /* Utils.swift in Sources */,
 				4D1FFAA12403030100B75EA2 /* FavIconResultTableCellView.m in Sources */,
 				4D1FFAA22403030100B75EA2 /* ClickableImageView.m in Sources */,
+				C86733F026739F860063237B /* MASHotKey.m in Sources */,
 				C8441CB925CB01AB0070C7FE /* NMSFTPFile.m in Sources */,
 				C8E379EF25DC455F006A26BF /* SyncOperationState.m in Sources */,
 				4D1FFAA42403030100B75EA2 /* XmlSerializer.m in Sources */,
@@ -5502,6 +5616,7 @@
 				C88307AA25CB17CF001D8FE1 /* DatabasesManagerVC.m in Sources */,
 				4D1FFAC82403030100B75EA2 /* ViewController.m in Sources */,
 				C89B444F2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */,
+				C867340226739F860063237B /* MASDictionaryTransformer.m in Sources */,
 				C8629F98260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */,
 				4D1FFAC92403030100B75EA2 /* DAVSession.m in Sources */,
 				C8FDF2E8261CD38300F17CBE /* BackupsManager.m in Sources */,
@@ -5535,6 +5650,7 @@
 				4D1FFADA2403030100B75EA2 /* CompositeKeyFactors.m in Sources */,
 				C8E6D500246D5C7600AFFE13 /* WordList.m in Sources */,
 				4D1FFADB2403030100B75EA2 /* FavIconDownloadOptions.m in Sources */,
+				C8C60F452667F990005832BD /* StrongboxErrorCodes.m in Sources */,
 				4D1FFADC2403030100B75EA2 /* thread.c in Sources */,
 				C8441CB125CB01AB0070C7FE /* NMSFTP.m in Sources */,
 				C8E6D504246D71E800AFFE13 /* DeletedObject.m in Sources */,
@@ -5584,6 +5700,7 @@
 				C8397AE92593989F000F5158 /* NodeIconHelper.m in Sources */,
 				C86791792561A1910038310E /* AutoTypeAssociation.m in Sources */,
 				C8441BDE25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
+				C867341126739F860063237B /* MASShortcut.m in Sources */,
 				C85B9D7A246544C600EEBFC9 /* NSString+Extensions.m in Sources */,
 				4D1FFAF72403030100B75EA2 /* Argon2KdfCipher.m in Sources */,
 				4D1FFAFA2403030100B75EA2 /* V3Binary.m in Sources */,
@@ -5594,6 +5711,7 @@
 				C83741B325D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
 				C8DC763C2497A7F800C9C443 /* HmacBlockStream.m in Sources */,
 				C8877380261DE06800C01406 /* AboutViewController.m in Sources */,
+				C86733F926739F860063237B /* MASShortcutMonitor.m in Sources */,
 				4D37D873244E074B00C3182D /* DatabaseAuditorConfiguration.m in Sources */,
 				4D1FFAFD2403030100B75EA2 /* ProgressWindow.m in Sources */,
 				C8441CA525CB01AB0070C7FE /* NMSSHLogger.m in Sources */,
@@ -5611,6 +5729,7 @@
 				4D1FFB012403030100B75EA2 /* Group.m in Sources */,
 				C8441C2325CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C8B679D126271DB200E295A3 /* zxcvbn.c in Sources */,
+				C867341426739F860063237B /* MASShortcutValidator.m in Sources */,
 				4D1FFB022403030100B75EA2 /* Kdbx4Serialization.m in Sources */,
 				C8F1C4FB25E94D7B00E7BADD /* MyFirstSwiftUIView.swift in Sources */,
 				C822849A2639BA9C00103002 /* ValueWithModDate.m in Sources */,
@@ -5725,6 +5844,7 @@
 				C89561CC2565521A001C747C /* PressYubiKeyWindow.m in Sources */,
 				C86E60842562D614001953AD /* cdecode.c in Sources */,
 				C86E604E2562D561001953AD /* FileManager.m in Sources */,
+				C8C60F442667F990005832BD /* StrongboxErrorCodes.m in Sources */,
 				C89B8F7B2562D24A00B590C0 /* Kdb1Database.m in Sources */,
 				C8441BF125CAFBB10070C7FE /* DAVSession.m in Sources */,
 				C86E60632562D5A7001953AD /* OTPToken+Serialization.m in Sources */,
@@ -5881,8 +6001,10 @@
 				4DA50D04244DFD2100364781 /* DatabaseAuditReport.m in Sources */,
 				C83741B525D30E8B00EDE4F3 /* SyncDatabaseRequest.m in Sources */,
 				C8FDF2E0261CD38300F17CBE /* BackupItem.m in Sources */,
+				C867340A26739F860063237B /* MASShortcutView.m in Sources */,
 				C8441BF425CAFBB10070C7FE /* DAVRequests.m in Sources */,
 				4D2CB4952332D7C400C2E084 /* SimpleXmlValueExtractor.m in Sources */,
+				C867340D26739F860063237B /* MASShortcutView+Bindings.m in Sources */,
 				4D524CED219B481200C22CB4 /* InnerRandomStreamFactory.m in Sources */,
 				C8441C1225CAFC3E0070C7FE /* SafeStorageProviderFactory.m in Sources */,
 				4DF299832243CED70080F9DC /* CollectionViewHeader.m in Sources */,
@@ -5927,6 +6049,7 @@
 				C81F1DE2260214FB00251A2F /* DatabaseDiffer.m in Sources */,
 				C85B9D9C246547BA00EEBFC9 /* YubiKeyConfiguration.m in Sources */,
 				C85B9D77246544C600EEBFC9 /* NSData+Extensions.m in Sources */,
+				C86733FB26739F860063237B /* MASShortcutBinder.m in Sources */,
 				4DF348012074FA6C00148741 /* DatabaseModel.m in Sources */,
 				C8DC76332497A79000C9C443 /* AesInputStream.m in Sources */,
 				C8B45C8C24ACC97700318562 /* StreamUtils.m in Sources */,
@@ -5953,6 +6076,7 @@
 				C87A993F255968EA0002BEF8 /* URLRequestOperation.swift in Sources */,
 				4D524D28219B4B2A00C22CB4 /* ref.c in Sources */,
 				4D524D02219B48D300C22CB4 /* KdbxSerializationCommon.m in Sources */,
+				C867340726739F860063237B /* MASLocalization.m in Sources */,
 				C8453ED6254DC0A7006BE885 /* PlaintextInnerStream.m in Sources */,
 				C8A101B525FBB8F200293456 /* SwiftUIViewFactory.swift in Sources */,
 				4DBFD387225CFE2F00290488 /* NSDictionary+Extensions.m in Sources */,
@@ -5967,6 +6091,7 @@
 				4D9E098621825108007BA1E7 /* BaseXmlDomainObjectHandler.m in Sources */,
 				4D524D24219B4B2A00C22CB4 /* argon2.c in Sources */,
 				C87A9947255968EA0002BEF8 /* Utils.swift in Sources */,
+				C86733EF26739F860063237B /* MASHotKey.m in Sources */,
 				4D3F190323AE5A2E008A58AF /* FavIconResultTableCellView.m in Sources */,
 				C8441CB725CB01AB0070C7FE /* NMSFTPFile.m in Sources */,
 				4DBCE21E222410A200A2AFA2 /* ClickableImageView.m in Sources */,
@@ -6031,6 +6156,7 @@
 				4DF522BB23C8BBA900CD948E /* QRCodePresenterPopover.m in Sources */,
 				C88307A925CB17CF001D8FE1 /* DatabasesManagerVC.m in Sources */,
 				4DF59F5C1F30DB7A00D68BFE /* ViewController.m in Sources */,
+				C867340126739F860063237B /* MASDictionaryTransformer.m in Sources */,
 				4DBF494222232A3200F48182 /* DAVSession.m in Sources */,
 				C89B444E2608D54400486824 /* MacFileBasedBookmarkStorageProvider.m in Sources */,
 				C8629F97260B45C000DEDB8E /* GeneralDatabaseSettings.m in Sources */,
@@ -6064,6 +6190,7 @@
 				C8E6D4FF246D5C7600AFFE13 /* WordList.m in Sources */,
 				C8877328261DAAAC00C01406 /* BackupsViewController.m in Sources */,
 				4DC8058C23A113EC001E742E /* FavIconDownloadOptions.m in Sources */,
+				C8C60F432667F990005832BD /* StrongboxErrorCodes.m in Sources */,
 				4D524D23219B4B2A00C22CB4 /* thread.c in Sources */,
 				C8E6D503246D71E800AFFE13 /* DeletedObject.m in Sources */,
 				C8441CAF25CB01AB0070C7FE /* NMSFTP.m in Sources */,
@@ -6113,6 +6240,7 @@
 				C8397AE72593989F000F5158 /* NodeIconHelper.m in Sources */,
 				C85B9D79246544C600EEBFC9 /* NSString+Extensions.m in Sources */,
 				C8441BDC25CAFBB10070C7FE /* DAVRequestGroup.m in Sources */,
+				C867341026739F860063237B /* MASShortcut.m in Sources */,
 				4DCA65AF1F4B45800078B962 /* DocumentController.m in Sources */,
 				4DA50D05244DFD2100364781 /* DatabaseAuditorConfiguration.m in Sources */,
 				4D524D03219B48D300C22CB4 /* V3Binary.m in Sources */,
@@ -6123,6 +6251,7 @@
 				C8AFBF5625CC4014009D9519 /* SFTPConfigurationVC.m in Sources */,
 				C83741B125D30E8B00EDE4F3 /* DatabaseSyncOperationalData.m in Sources */,
 				4D9E098F21825108007BA1E7 /* Root.m in Sources */,
+				C86733F826739F860063237B /* MASShortcutMonitor.m in Sources */,
 				C887737E261DE06800C01406 /* AboutViewController.m in Sources */,
 				4DDCE1CB21BBFF7800D1DE09 /* ProgressWindow.m in Sources */,
 				C87A9943255968EA0002BEF8 /* HTMLDocument.m in Sources */,
@@ -6140,6 +6269,7 @@
 				4DF347E72074FA3500148741 /* Group.m in Sources */,
 				C8441C2125CAFE180070C7FE /* StorageBrowserItem.m in Sources */,
 				C8B679D026271DB200E295A3 /* zxcvbn.c in Sources */,
+				C867341326739F860063237B /* MASShortcutValidator.m in Sources */,
 				4D524CD4219B47DB00C22CB4 /* Kdbx4Serialization.m in Sources */,
 				C8F1C4FA25E94D7B00E7BADD /* MyFirstSwiftUIView.swift in Sources */,
 				C82284982639BA9C00103002 /* ValueWithModDate.m in Sources */,
@@ -6170,6 +6300,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C87948A825DAE8E90097005D /* ConcurrentMutableDictionary.m in Sources */,
+				C867341226739F860063237B /* MASShortcut.m in Sources */,
 				C87948A925DAE8E90097005D /* Serializator.m in Sources */,
 				C87948AA25DAE8E90097005D /* DatabaseAuditReport.m in Sources */,
 				C87948AB25DAE8E90097005D /* SyncDatabaseRequest.m in Sources */,
@@ -6240,6 +6371,7 @@
 				C87948E925DAE8E90097005D /* KeePassFile.m in Sources */,
 				C87948EA25DAE8E90097005D /* UpgradeWindowController.m in Sources */,
 				C87948EB25DAE8E90097005D /* twofish.c in Sources */,
+				C867340326739F860063237B /* MASDictionaryTransformer.m in Sources */,
 				C87948EC25DAE8E90097005D /* KeePass2TagPackage.m in Sources */,
 				C87948ED25DAE8E90097005D /* URLRequestOperation.swift in Sources */,
 				C87948EE25DAE8E90097005D /* ref.c in Sources */,
@@ -6259,6 +6391,7 @@
 				C87948FA25DAE8E90097005D /* argon2.c in Sources */,
 				C87948FB25DAE8E90097005D /* Utils.swift in Sources */,
 				C87948FC25DAE8E90097005D /* FavIconResultTableCellView.m in Sources */,
+				C867340926739F860063237B /* MASLocalization.m in Sources */,
 				C87948FD25DAE8E90097005D /* NMSFTPFile.m in Sources */,
 				C87948FE25DAE8E90097005D /* ClickableImageView.m in Sources */,
 				C8E379F025DC455F006A26BF /* SyncOperationState.m in Sources */,
@@ -6366,6 +6499,8 @@
 				C879496125DAE8E90097005D /* NSAdvancedTextField.m in Sources */,
 				C879496225DAE8E90097005D /* Keys.m in Sources */,
 				C8FDF2E4261CD38300F17CBE /* BackupItem.m in Sources */,
+				C867340F26739F860063237B /* MASShortcutView+Bindings.m in Sources */,
+				C867341526739F860063237B /* MASShortcutValidator.m in Sources */,
 				C879496425DAE8E90097005D /* CustomIconList.m in Sources */,
 				C879496525DAE8E90097005D /* NodeHierarchyReconstructionData.m in Sources */,
 				C879496625DAE8E90097005D /* AutoFillNewRecordSettings.m in Sources */,
@@ -6422,9 +6557,11 @@
 				C879499725DAE8E90097005D /* DatabaseCellView.m in Sources */,
 				C8E379E425DC2EB3006A26BF /* SyncLogViewController.m in Sources */,
 				C879499825DAE8E90097005D /* NSDate+Extensions.m in Sources */,
+				C86733FD26739F860063237B /* MASShortcutBinder.m in Sources */,
 				C879499925DAE8E90097005D /* SyncParameters.m in Sources */,
 				C879499A25DAE8E90097005D /* MMcGACTextViewEditor.m in Sources */,
 				C879499B25DAE8E90097005D /* ConcurrentMutableSet.m in Sources */,
+				C867340C26739F860063237B /* MASShortcutView.m in Sources */,
 				C879499D25DAE8E90097005D /* NSArray+Extensions.m in Sources */,
 				C879499E25DAE8E90097005D /* NMSSHConfig.m in Sources */,
 				C879499F25DAE8E90097005D /* DatabasesManager.m in Sources */,
@@ -6444,9 +6581,12 @@
 				C87949AD25DAE8E90097005D /* QuickTypeAutoFillDisplayFormat.m in Sources */,
 				C87949AE25DAE8E90097005D /* Settings.m in Sources */,
 				C87949AF25DAE8E90097005D /* AesOutputStream.m in Sources */,
+				C86733FA26739F860063237B /* MASShortcutMonitor.m in Sources */,
+				C86733F126739F860063237B /* MASHotKey.m in Sources */,
 				C87949B025DAE8E90097005D /* OTPTokenType.m in Sources */,
 				C87949B125DAE8E90097005D /* OnboardingAutoFillViewController.m in Sources */,
 				C87949B225DAE8E90097005D /* KeePassXmlAutoTypeAssociation.m in Sources */,
+				C8C60F472667F990005832BD /* StrongboxErrorCodes.m in Sources */,
 				C87949B325DAE8E90097005D /* NSUUID+Zero.m in Sources */,
 				C87949B425DAE8E90097005D /* BiometricIdHelper.m in Sources */,
 				C87949B525DAE8E90097005D /* OTPAlgorithm.m in Sources */,
@@ -6636,6 +6776,7 @@
 				C8794AB725DAE9020097005D /* SampleItemsGenerator.m in Sources */,
 				C8794AB825DAE9020097005D /* DAVRequest.m in Sources */,
 				C8794AB925DAE9020097005D /* DecryptionParameters.m in Sources */,
+				C8C60F482667F990005832BD /* StrongboxErrorCodes.m in Sources */,
 				C8794ABA25DAE9020097005D /* ChaCha20Cipher.m in Sources */,
 				C8794ABB25DAE9020097005D /* Argon2KdfCipher.m in Sources */,
 				C8794ABC25DAE9020097005D /* AutoFillManager.m in Sources */,
@@ -6760,6 +6901,7 @@
 				C8B9459A2573D01A00932C46 /* PressYubiKeyWindow.m in Sources */,
 				C8B9459B2573D01A00932C46 /* cdecode.c in Sources */,
 				C8B9459C2573D01A00932C46 /* FileManager.m in Sources */,
+				C8C60F462667F990005832BD /* StrongboxErrorCodes.m in Sources */,
 				C8B9459D2573D01A00932C46 /* Kdb1Database.m in Sources */,
 				C8441BF325CAFBB10070C7FE /* DAVSession.m in Sources */,
 				C8B9459E2573D01A00932C46 /* OTPToken+Serialization.m in Sources */,
@@ -6917,22 +7059,22 @@
 		};
 		4DE79B90255D987C00F59B10 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4DE79B82255D987C00F59B10 /* Strongbox AutoFill */;
+			target = 4DE79B82255D987C00F59B10 /* Strongbox-AutoFill */;
 			targetProxy = 4DE79B8F255D987C00F59B10 /* PBXContainerItemProxy */;
 		};
 		C87948A425DAE8E90097005D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4DE79B82255D987C00F59B10 /* Strongbox AutoFill */;
+			target = 4DE79B82255D987C00F59B10 /* Strongbox-AutoFill */;
 			targetProxy = C87948A525DAE8E90097005D /* PBXContainerItemProxy */;
 		};
 		C8B9463A2573D17700932C46 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C8B945632573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill */;
+			target = C8B945632573D01A00932C46 /* Strongbox-Pro-AutoFill */;
 			targetProxy = C8B946392573D17700932C46 /* PBXContainerItemProxy */;
 		};
 		C8B9463D2573D19E00932C46 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = C8B945632573D01A00932C46 /* Strongbox-Outright-Pro-AutoFill */;
+			target = C8B945632573D01A00932C46 /* Strongbox-Pro-AutoFill */;
 			targetProxy = C8B9463C2573D19E00932C46 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -7260,6 +7402,28 @@
 			path = MacBox;
 			sourceTree = "<group>";
 		};
+		C867341A2673A09B0063237B /* MAS-Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C867341B2673A09B0063237B /* de */,
+				C867341C2673A09B0063237B /* zh-Hans */,
+				C867341D2673A09B0063237B /* ja */,
+				C867341E2673A09B0063237B /* en */,
+				C867341F2673A09B0063237B /* es */,
+				C86734202673A09B0063237B /* it */,
+				C86734212673A09B0063237B /* sv */,
+				C86734222673A09B0063237B /* cs */,
+				C86734232673A09B0063237B /* ko */,
+				C86734242673A09B0063237B /* zh-Hant */,
+				C86734252673A09B0063237B /* pl */,
+				C86734262673A09B0063237B /* ru */,
+				C86734272673A09B0063237B /* fr */,
+				C86734282673A09B0063237B /* nl */,
+				C86734292673A09B0063237B /* pt */,
+			);
+			name = "MAS-Localizable.strings";
+			sourceTree = "<group>";
+		};
 		C887733C261DD64900C01406 /* Backups.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -7548,7 +7712,7 @@
 /* Begin XCBuildConfiguration section */
 		4D1FFB462403030100B75EA2 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EA5BD11E3C032D200DA1743E /* Pods-common-mac-Strongbox-Outright-Pro.debug.xcconfig */;
+			baseConfigurationReference = 4615C234123A7AE34AABF61B /* Pods-common-mac-Strongbox-Pro.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur-Pro";
@@ -7557,7 +7721,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7579,7 +7743,7 @@
 		};
 		4D1FFB472403030100B75EA2 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 34629E3CBC779E0F1547E434 /* Pods-common-mac-Strongbox-Outright-Pro.release.xcconfig */;
+			baseConfigurationReference = A7A658167DFD24D820135E96 /* Pods-common-mac-Strongbox-Pro.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur-Pro";
@@ -7588,7 +7752,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7659,7 +7823,7 @@
 		};
 		4DE79B93255D987C00F59B10 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 02769ADB3F07590BDCA1F7CF /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */;
+			baseConfigurationReference = D74E4B4D29FF81ABB90AB260 /* Pods-common-mac-Strongbox-AutoFill.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -7669,7 +7833,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7697,7 +7861,7 @@
 		};
 		4DE79B94255D987C00F59B10 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A3B3AD6EAF58D421F9BB2641 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */;
+			baseConfigurationReference = AF1EBC56BCA9A181C08FED45 /* Pods-common-mac-Strongbox-AutoFill.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -7707,7 +7871,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7843,7 +8007,7 @@
 		};
 		4DF59F691F30DB7A00D68BFE /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 50F27062B3FD89F6D407C032 /* Pods-common-mac-Strongbox.debug.xcconfig */;
+			baseConfigurationReference = 9336D582CE379900DEDAFB72 /* Pods-common-mac-Strongbox.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
@@ -7852,7 +8016,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -7874,7 +8038,7 @@
 		};
 		4DF59F6A1F30DB7A00D68BFE /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */;
+			baseConfigurationReference = A7CD3048033B4834F0CAF082 /* Pods-common-mac-Strongbox.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
@@ -7883,7 +8047,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -7904,7 +8068,6 @@
 		};
 		C8794A0125DAE8E90097005D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 50F27062B3FD89F6D407C032 /* Pods-common-mac-Strongbox.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
@@ -7913,7 +8076,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -7936,7 +8099,6 @@
 		};
 		C8794A0225DAE8E90097005D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 645B76AEE006D37A5CF5958D /* Pods-common-mac-Strongbox.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-BigSur";
@@ -7945,7 +8107,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -7967,7 +8129,6 @@
 		};
 		C8794AF525DAE9020097005D /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 02769ADB3F07590BDCA1F7CF /* Pods-common-mac-Strongbox AutoFill.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -7977,7 +8138,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8005,7 +8166,6 @@
 		};
 		C8794AF625DAE9020097005D /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A3B3AD6EAF58D421F9BB2641 /* Pods-common-mac-Strongbox AutoFill.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -8015,7 +8175,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8041,7 +8201,7 @@
 		};
 		C8B946212573D01A00932C46 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = EBD47B91E82A65C6AA0A0FDA /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.debug.xcconfig */;
+			baseConfigurationReference = 339719FF7E16E312FFCC3CFC /* Pods-common-mac-Strongbox-Pro-AutoFill.debug.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -8051,7 +8211,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8080,7 +8240,7 @@
 		};
 		C8B946222573D01A00932C46 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 017EC729AC7266E294E65B3B /* Pods-common-mac-Strongbox-Outright-Pro-AutoFill.release.xcconfig */;
+			baseConfigurationReference = 20AAFFE8C54DE9BFD02C348A /* Pods-common-mac-Strongbox-Pro-AutoFill.release.xcconfig */;
 			buildSettings = {
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -8090,7 +8250,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3010;
+				CURRENT_PROJECT_VERSION = 3013;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8118,7 +8278,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4D1FFB452403030100B75EA2 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro" */ = {
+		4D1FFB452403030100B75EA2 /* Build configuration list for PBXNativeTarget "Strongbox-Pro" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4D1FFB462403030100B75EA2 /* Debug */,
@@ -8136,7 +8296,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4DE79B95255D987C00F59B10 /* Build configuration list for PBXNativeTarget "Strongbox AutoFill" */ = {
+		4DE79B95255D987C00F59B10 /* Build configuration list for PBXNativeTarget "Strongbox-AutoFill" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4DE79B93255D987C00F59B10 /* Debug */,
@@ -8181,7 +8341,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C8B946202573D01A00932C46 /* Build configuration list for PBXNativeTarget "Strongbox-Outright-Pro-AutoFill" */ = {
+		C8B946202573D01A00932C46 /* Build configuration list for PBXNativeTarget "Strongbox-Pro-AutoFill" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C8B946212573D01A00932C46 /* Debug */,

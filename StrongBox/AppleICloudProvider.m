@@ -11,10 +11,10 @@
 #import "Strongbox.h"
 #import "Utils.h"
 #import "SafesList.h"
-//#import "Settings.h"
 #import "iCloudSafesCoordinator.h"
 #import "SVProgressHUD.h"
 #import "NSDate+Extensions.h"
+#import "StrongboxErrorCodes.h"
 
 @implementation AppleICloudProvider
 
@@ -115,7 +115,7 @@ suggestedFilename:nil
             
             if (!success) {
                 NSLog(@"Failed to create file at %@", fileURL);
-                completion(nil, [Utils createNSError:@"Failed to create file" errorCode:-5]);
+                completion(nil, [Utils createNSError:@"Failed to create file" errorCode:StrongboxErrorCodes.couldNotCreateICloudFile]);
                 return;
             }
             

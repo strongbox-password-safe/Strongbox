@@ -56,8 +56,9 @@
 
     self.concealed = YES;
     
-    self.selectedKeyFileBookmark = self.database.autoFillKeyFileBookmark;
-    self.selectedYubiKeyConfiguration = self.database.yubiKeyConfiguration;
+    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+    self.selectedKeyFileBookmark = database.autoFillKeyFileBookmark;
+    self.selectedYubiKeyConfiguration = database.yubiKeyConfiguration;
 
     [self bindUi];
     [self validateUI];
@@ -102,7 +103,9 @@
 }
 
 - (void)bindAdvanced {
-    BOOL advanced = Settings.sharedInstance.showAdvancedUnlockOptions;
+    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+
+    BOOL advanced = database.showAdvancedUnlockOptions;
     self.acceptEmptyPassword.hidden = !advanced;
     self.labelKeyFile.hidden = !advanced;
     self.popupKeyFile.hidden = !advanced;
@@ -158,7 +161,9 @@
 }
 
 - (IBAction)onToggleAdvanced:(id)sender {
-    Settings.sharedInstance.showAdvancedUnlockOptions = !Settings.sharedInstance.showAdvancedUnlockOptions;
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.showAdvancedUnlockOptions = !metadata.showAdvancedUnlockOptions;
+    }];
     
     [self bindAdvanced];
 }
@@ -214,7 +219,7 @@
 
     
 
-    DatabaseMetadata *database = self.database;
+    DatabaseMetadata *database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
     NSURL* configuredUrl;
     NSString* configuredBookmarkForKeyFile = self.isAutoFillOpen ? database.autoFillKeyFileBookmark : database.keyFileBookmark;
     
@@ -234,13 +239,14 @@
         }
 
         if(updatedBookmark) {
-            if (self.isAutoFillOpen) {
-                database.autoFillKeyFileBookmark = updatedBookmark;
-            }
-            else {
-                database.keyFileBookmark = updatedBookmark;
-            }
-            [DatabasesManager.sharedInstance update:database];
+            [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                if ( self.isAutoFillOpen ) {
+                    database.autoFillKeyFileBookmark = updatedBookmark;
+                }
+                else {
+                    database.keyFileBookmark = updatedBookmark;
+                }
+            }];
         }
     }
 
@@ -318,7 +324,9 @@
 }
 
 - (void)onSelectPreconfiguredKeyFile {
-    self.selectedKeyFileBookmark = self.isAutoFillOpen ? self.database.autoFillKeyFileBookmark : self.database.keyFileBookmark;
+    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+    
+    self.selectedKeyFileBookmark = self.isAutoFillOpen ? database.autoFillKeyFileBookmark : database.keyFileBookmark;
     [self refreshKeyFileDropdown];
 }
 
@@ -329,7 +337,9 @@
 }
 
 - (DatabaseFormat)getHeuristicFormat {
-    BOOL probablyPasswordSafe = [self.database.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
+    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+
+    BOOL probablyPasswordSafe = [database.fileUrl.pathExtension caseInsensitiveCompare:@"psafe3"] == NSOrderedSame;
     DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; 
     return heuristicFormat;
 }

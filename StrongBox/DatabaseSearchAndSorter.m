@@ -24,19 +24,20 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
 @property BrowseSortField browseSortField;
 @property BOOL descending;
 @property BOOL foldersSeparately;
-
+@property BOOL checkPinYin;
 @end
 
 @implementation DatabaseSearchAndSorter
 
-- (instancetype)initWithModel:(DatabaseModel *)databaseModel browseSortField:(BrowseSortField)browseSortField descending:(BOOL)descending foldersSeparately:(BOOL)foldersSeparately {
-    return [self initWithModel:databaseModel browseSortField:browseSortField descending:descending foldersSeparately:foldersSeparately isFlaggedByAudit:nil];
+- (instancetype)initWithModel:(DatabaseModel *)databaseModel browseSortField:(BrowseSortField)browseSortField descending:(BOOL)descending foldersSeparately:(BOOL)foldersSeparately checkPinYin:(BOOL)checkPinYin {
+    return [self initWithModel:databaseModel browseSortField:browseSortField descending:descending foldersSeparately:foldersSeparately checkPinYin:checkPinYin isFlaggedByAudit:nil];
 }
 
 - (instancetype)initWithModel:(DatabaseModel *)databaseModel
               browseSortField:(BrowseSortField)browseSortField
                    descending:(BOOL)descending
             foldersSeparately:(BOOL)foldersSeparately
+                  checkPinYin:(BOOL)checkPinYin
              isFlaggedByAudit:(FlaggedByAuditPredicate)isFlaggedByAudit {
     self = [super init];
     
@@ -46,6 +47,7 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
         self.browseSortField = browseSortField;
         self.descending = descending;
         self.foldersSeparately= foldersSeparately;
+        self.checkPinYin = checkPinYin;
     }
     
     return self;
@@ -171,58 +173,58 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
         }];
     }
     else if (scope == kSearchScopeTitle) {
-        [self searchTitle:searchNodes searchText:searchText dereference:dereference];
+        [self searchTitle:searchNodes searchText:searchText dereference:dereference checkPinYin:self.checkPinYin];
     }
     else if (scope == kSearchScopeUsername) {
-        [self searchUsername:searchNodes searchText:searchText dereference:dereference];
+        [self searchUsername:searchNodes searchText:searchText dereference:dereference checkPinYin:self.checkPinYin];
     }
     else if (scope == kSearchScopePassword) {
-        [self searchPassword:searchNodes searchText:searchText dereference:dereference];
+        [self searchPassword:searchNodes searchText:searchText dereference:dereference checkPinYin:self.checkPinYin];
     }
     else if (scope == kSearchScopeUrl) {
-        [self searchUrl:searchNodes searchText:searchText dereference:dereference];
+        [self searchUrl:searchNodes searchText:searchText dereference:dereference checkPinYin:self.checkPinYin];
     }
     else if (scope == kSearchScopeTags) {
-        [self searchTags:searchNodes searchText:searchText];
+        [self searchTags:searchNodes searchText:searchText checkPinYin:self.checkPinYin];
     }
     else {
-        [self searchAllFields:searchNodes searchText:searchText dereference:dereference];
+        [self searchAllFields:searchNodes searchText:searchText dereference:dereference checkPinYin:self.checkPinYin];
     }
 }
 
-- (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+- (void)searchTitle:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isTitleMatches:searchText node:node dereference:dereference];
+        return [self.database isTitleMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
     }];
 }
 
-- (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+- (void)searchUsername:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUsernameMatches:searchText node:node dereference:dereference];
+        return [self.database isUsernameMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
     }];
 }
 
-- (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+- (void)searchPassword:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isPasswordMatches:searchText node:node dereference:dereference];
+        return [self.database isPasswordMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
     }];
 }
 
-- (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+- (void)searchUrl:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isUrlMatches:searchText node:node dereference:dereference];
+        return [self.database isUrlMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
     }];
 }
 
-- (void)searchTags:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText {
+- (void)searchTags:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isTagsMatches:searchText node:node];
+        return [self.database isTagsMatches:searchText node:node checkPinYin:checkPinYin];
     }];
 }
 
-- (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference {
+- (void)searchAllFields:(NSMutableArray<Node*>*)searchNodes searchText:(NSString*)searchText dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
     [searchNodes mutableFilter:^BOOL(Node * _Nonnull node) {
-        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference];
+        return [self.database isAllFieldsMatches:searchText node:node dereference:dereference checkPinYin:checkPinYin];
     }];
 }
 

@@ -22,7 +22,8 @@ extern NSString* const kDatabasesListChangedNotification;
 - (void)add:(DatabaseMetadata *_Nonnull)safe;
 - (void)remove:(NSString*_Nonnull)uuid;
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
-- (void)update:(DatabaseMetadata *_Nonnull)safe;
+
+- (void)atomicUpdate:(NSString *_Nonnull)uuid touch:(void (^_Nonnull)(DatabaseMetadata* metadata))touch;
 
 + (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
 

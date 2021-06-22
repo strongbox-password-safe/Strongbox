@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL convenienceUnlock;
 @property BOOL autoFill;
 
-@property DatabaseMetadata* database;
+@property NSString* databaseUuid;
 @property CompositeKeyFactors *ckfs;
 @property DatabaseModel* model;
 

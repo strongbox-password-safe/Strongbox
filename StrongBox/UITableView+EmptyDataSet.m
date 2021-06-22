@@ -46,7 +46,18 @@
     [self setEmptyTitle:title description:description buttonTitle:nil buttonAction:nil];
 }
 
-- (void)setEmptyTitle:(NSAttributedString *)title description:(NSAttributedString *)description buttonTitle:(NSAttributedString *)buttonTitle buttonAction:(dispatch_block_t)buttonAction {
+- (void)setEmptyTitle:(NSAttributedString *)title
+          description:(NSAttributedString *)description
+          buttonTitle:(NSAttributedString *)buttonTitle
+         buttonAction:(dispatch_block_t)buttonAction {
+    [self setEmptyTitle:title description:description buttonTitle:buttonTitle bigBlueBounce:NO buttonAction:buttonAction];
+}
+
+- (void)setEmptyTitle:(NSAttributedString *)title
+          description:(NSAttributedString *)description
+          buttonTitle:(NSAttributedString *)buttonTitle
+        bigBlueBounce:(BOOL)bigBlueBounce
+         buttonAction:(dispatch_block_t)buttonAction {
     if (title == nil) {
         self.backgroundView = nil;
     }
@@ -59,7 +70,7 @@
         
         UIStackView* stackView = [[UIStackView alloc] initWithArrangedSubviews:@[labelTitle]];
 
-        stackView.spacing = 8;
+        stackView.spacing = 4;
         stackView.axis = UILayoutConstraintAxisVertical;
         stackView.alignment = UIStackViewAlignmentCenter;
         stackView.distribution = UIStackViewDistributionFill;
@@ -78,6 +89,7 @@
         
         if (buttonTitle) {
             UIButton* button = [[UIButton alloc] init];
+            
             [button setAttributedTitle:buttonTitle forState:UIControlStateNormal];
             
             if (@available(iOS 14.0, *)) {
@@ -94,13 +106,31 @@
             }
             
             [stackView addArrangedSubview:button];
+
+            if ( bigBlueBounce ) {
+                button.backgroundColor = UIColor.systemBlueColor;
+                button.layer.cornerRadius = 5.0;
+                
+                NSLayoutConstraint *widthContraints = [NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:200];
+                
+                NSLayoutConstraint *heightContraints = [NSLayoutConstraint constraintWithItem:button attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:45];
+                
+                [NSLayoutConstraint activateConstraints:@[heightContraints,widthContraints]];
+
+                if (@available(iOS 11.0, *)) {
+                    [stackView setCustomSpacing:24 afterView:labelDescription ? labelDescription : labelTitle];
+                }
+
+                [self bounce:button];
+            }
         }
         
         [self.backgroundView addSubview:stackView];
         
         [NSLayoutConstraint activateConstraints:@[
             [stackView.centerXAnchor constraintEqualToAnchor:self.backgroundView.centerXAnchor],
-            [stackView.centerYAnchor constraintEqualToAnchor:self.backgroundView.centerYAnchor],
+            [stackView.centerYAnchor constraintEqualToAnchor:self.backgroundView.centerYAnchor constant:0],
+            
             [stackView.leftAnchor constraintGreaterThanOrEqualToAnchor:self.backgroundView.leftAnchor constant:20],
             [stackView.rightAnchor constraintGreaterThanOrEqualToAnchor:self.backgroundView.rightAnchor constant:20],
             
@@ -110,8 +140,25 @@
     }
 }
 
-- (void)blah {
-    NSLog(@"Blah!");
+- (void)bounce:(UIButton*)yourButton {
+    CABasicAnimation *anim = [CABasicAnimation animationWithKeyPath:@"transform"];
+    
+    CGFloat bounceDuration = 0.30f;
+    
+    anim.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+    anim.duration = bounceDuration;
+    anim.repeatCount = 3.0f;
+    anim.autoreverses = YES;
+    anim.removedOnCompletion = YES;
+    anim.toValue = [NSValue valueWithCATransform3D:CATransform3DMakeScale(1.06, 1.05, 1.0)];
+    
+    
+    CAAnimationGroup* group = [CAAnimationGroup new];
+    group.animations = @[anim];
+    group.duration = bounceDuration + 3.0f;
+    group.repeatCount = INFINITY;
+    
+    [yourButton.layer addAnimation:group forKey:nil];
 }
 
 @end

@@ -14,6 +14,7 @@ typedef NS_ENUM (NSUInteger, DuressAction) {
     kOpenDummy,
     kPresentError,
     kRemoveDatabase,
+    kOpenDummyAndRemoveDatabase,
 };
 
 #endif /* DuressAction_h */

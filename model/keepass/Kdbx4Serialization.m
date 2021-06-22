@@ -28,6 +28,7 @@
 #import "HmacBlockStream.h"
 #import "Argon2dKdfCipher.h"
 #import "Argon2idKdfCipher.h"
+#import "StrongboxErrorCodes.h"
 
 static const uint8_t kInnerHeaderTypeEnd = 0;
 static const uint8_t kInnerHeaderTypeInnerRandomStreamId = 1;
@@ -290,7 +291,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
 
     if(!checkHeaderHmac(headerDataForIntegrityCheck, keys.hmacKey, inputStream)) {
         NSError* error = [Utils createNSError:@"Incorrect Passphrase/Key File (Composite Key)"
-                                    errorCode:kStrongboxErrorCodeIncorrectCredentials];
+                                    errorCode:StrongboxErrorCodes.incorrectCredentials];
         completion(NO, nil, error);
         return;
     }

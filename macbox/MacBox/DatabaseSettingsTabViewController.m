@@ -14,8 +14,7 @@
 
 @interface DatabaseSettingsTabViewController () <NSWindowDelegate>
 
-@property DatabaseModel* databaseModel;
-@property DatabaseMetadata* databaseMetadata;
+@property ViewModel* viewModel;
 @property NSInteger initialTab;
 
 @end
@@ -31,9 +30,8 @@
     self.view.window.delegate = self; 
 }
 
-- (void)setModel:(DatabaseModel *)databaseModel databaseMetadata:(DatabaseMetadata *)databaseMetadata initialTab:(NSInteger)initialTab {
-    self.databaseModel = databaseModel;
-    self.databaseMetadata = databaseMetadata;
+- (void)setModel:(ViewModel *)model initialTab:(NSInteger)initialTab {
+    self.viewModel = model;
     self.initialTab = initialTab;
     
     [self initializeTabs];
@@ -45,13 +43,10 @@
     NSTabViewItem* autoFillItem = self.tabViewItems[2];
 
     GeneralDatabaseSettings* general = (GeneralDatabaseSettings*)generalItem.viewController;
-    general.databaseModel = self.databaseModel;
-    general.databaseMetadata = self.databaseMetadata;
-
+    general.model = self.viewModel;
+    
     DatabaseConvenienceUnlockPreferences* preferences = (DatabaseConvenienceUnlockPreferences*)convenienceUnlockItem.viewController;
-    preferences.databaseModel = self.databaseModel;
-    preferences.databaseMetadata = self.databaseMetadata;
-
+    preferences.model = self.viewModel;
     
     if (!AutoFillManager.sharedInstance.isPossible) {
         [self removeTabViewItem:autoFillItem];
@@ -59,8 +54,7 @@
     else {
         NSViewController* iv = autoFillItem.viewController;
         AutoFillSettingsViewController* af = (AutoFillSettingsViewController*)iv;
-        af.databaseModel = self.databaseModel;
-        af.databaseMetadata = self.databaseMetadata;
+        af.model = self.viewModel;
     }
     
     if (AutoFillManager.sharedInstance.isPossible) {
