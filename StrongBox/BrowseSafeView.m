@@ -43,12 +43,12 @@
 #import "LargeTextViewController.h"
 #import "UITableView+EmptyDataSet.h"
 #import "ItemPropertiesViewController.h"
-#import "KeyFileHelper.h"
 #import "SyncManager.h"
 #import "AsyncUpdateResultViewController.h"
 #import "Platform.h"
 #import "Pair.h"
 #import "ConvenienceUnlockPreferences.h"
+#import "KeyFileParser.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -283,12 +283,16 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.syncButton = [[UIButton alloc] init];
     [self.syncButton addTarget:self action:@selector(onSyncButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     
-    [self.syncButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
-    self.syncButton.contentMode = UIViewContentModeCenter;
-    self.syncButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    [self.syncButton setTintColor:UIColor.systemBlueColor];
-    self.syncButton.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
-    
+    if (@available(iOS 14.0, *)) {
+        [self.syncButton setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
+    }
+    else {
+        [self.syncButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
+        self.syncButton.contentMode = UIViewContentModeCenter;
+        self.syncButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [self.syncButton setTintColor:UIColor.systemBlueColor];
+        self.syncButton.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
+    }
     self.syncBarButton = [[UIBarButtonItem alloc] initWithCustomView:self.syncButton];
     
     NSMutableArray* rightBarButtons = @[].mutableCopy;
@@ -1654,7 +1658,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         vc.itemId = record.uuid;
         vc.parentGroupId = self.currentGroupId;
-        vc.readOnly = self.viewModel.isReadOnly;
+        vc.forcedReadOnly = self.viewModel.isReadOnly;
         vc.databaseModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"segueToAuditDrillDown"]) {
@@ -1689,7 +1693,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
         vc.itemId = record ? record.uuid : nil;
         vc.parentGroupId = self.currentGroupId;
-        vc.readOnly = self.viewModel.isReadOnly;
+        vc.forcedReadOnly = self.viewModel.isReadOnly;
         vc.databaseModel = self.viewModel;
     }
     else if ([segue.identifier isEqualToString:@"sequeToSubgroup"]){
@@ -2989,7 +2993,11 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         
     if(keyFileBookmark != nil || oneTimeKeyFileData != nil) {
         NSError* error;
-        NSData* keyFileDigest = getKeyFileDigest(keyFileBookmark, oneTimeKeyFileData, self.viewModel.database.originalFormat, &error);
+        NSData* keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+                                                 onceOffKeyFileData:oneTimeKeyFileData
+                                                        streamLarge:AppPreferences.sharedInstance.streamReadLargeKeyFiles
+                                                             format:self.viewModel.database.originalFormat
+                                                              error:&error];
         
         if(keyFileDigest == nil) {
             [Alerts error:self

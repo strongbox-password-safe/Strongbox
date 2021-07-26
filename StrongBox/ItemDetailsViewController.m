@@ -113,6 +113,10 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 @property UIBarButtonItem* syncBarButton;
 @property UIButton* syncButton;
 
+@property (readonly) BOOL isEffectivelyReadOnly;
+@property (readonly) DatabaseFormat databaseFormat;
+@property (readonly) BOOL emailFieldEnabled;
+
 @end
 
 
@@ -144,6 +148,10 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         
         self.inCellHeightsChangedProcess = NO;
     }
+}
+
+- (BOOL)isEffectivelyReadOnly {
+    return self.forcedReadOnly || self.databaseModel.isReadOnly;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -312,11 +320,16 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     self.syncButton = [[UIButton alloc] init];
     [self.syncButton addTarget:self action:@selector(onSyncButtonClicked:) forControlEvents:UIControlEventTouchUpInside];
     
-    [self.syncButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
-    self.syncButton.contentMode = UIViewContentModeCenter;
-    self.syncButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
-    [self.syncButton setTintColor:UIColor.systemBlueColor];
-    self.syncButton.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
+    if (@available(iOS 14.0, *)) {
+        [self.syncButton setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
+    }
+    else {
+        [self.syncButton setImage:[UIImage imageNamed:@"syncronize"] forState:UIControlStateNormal];
+        self.syncButton.contentMode = UIViewContentModeCenter;
+        self.syncButton.imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [self.syncButton setTintColor:UIColor.systemBlueColor];
+        self.syncButton.imageEdgeInsets = UIEdgeInsetsMake(3, 3, 3, 3);
+    }
     
     self.syncBarButton = [[UIBarButtonItem alloc] initWithCustomView:self.syncButton];
     
@@ -493,7 +506,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     }
     else {
         self.navigationItem.leftItemsSupplementBackButton = YES;
-        self.editButtonItem.enabled = !self.readOnly;
+        self.editButtonItem.enabled = !self.isEffectivelyReadOnly;
         self.navigationItem.leftBarButtonItem = self.splitViewController ? self.splitViewController.displayModeButtonItem : nil;
         
         [self bindTitle];
@@ -502,7 +515,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
 
 - (void)bindTitle {
     self.navigationItem.title = [NSString stringWithFormat:@"%@%@", [self maybeDereference:self.model.title],
-                                 self.readOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
+                                 self.isEffectivelyReadOnly ? NSLocalizedString(@"item_details_read_only_suffix", @" (Read Only)") : @""];
 }
 
 - (void)prepareTableViewForEditing {
@@ -687,11 +700,11 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                 return CGFLOAT_MIN;
             }
         }
-        else if(indexPath.row == kRowURL && shouldHideEmpty && !self.model.url.length) {
+        else if ( indexPath.row == kRowURL && shouldHideEmpty && !self.model.url.length ) {
             return CGFLOAT_MIN;
         }
-        else if(indexPath.row == kRowEmail) {
-            if(self.databaseModel.database.originalFormat != kPasswordSafe || (shouldHideEmpty && !self.model.email.length)) {
+        else if ( indexPath.row == kRowEmail ) {
+            if ( !self.emailFieldEnabled || (shouldHideEmpty && !self.model.email.length)) {
                 return CGFLOAT_MIN;
             }
         }
@@ -725,6 +738,14 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                 BOOL shouldHideTotpFields = self.databaseModel.metadata.hideTotpCustomFieldsInViewMode && !self.editing;
                 if (shouldHideTotpFields && [NodeFields isTotpCustomFieldKey:f.key]) {
                     return CGFLOAT_MIN;
+                }
+                
+                
+                
+                if ( self.emailFieldEnabled && self.databaseFormat != kPasswordSafe ) {
+                    if ( [self.model.keePassEmailFieldKey isEqualToString:f.key] ) {
+                        return CGFLOAT_MIN;
+                    }
                 }
             }
 #ifdef IS_APP_EXTENSION
@@ -949,7 +970,7 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         Node* item = [self.databaseModel.database getItemById:self.itemId];
         
         vc.model = item.fields.passwordHistory;
-        vc.readOnly = self.readOnly;
+        vc.readOnly = self.isEffectivelyReadOnly;
         vc.saveFunction = ^(PasswordHistory *changed) {
             [self onPasswordHistoryChanged:changed];
         };
@@ -1035,7 +1056,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         }];
     }
 }
-
 
 - (UIImage*)getIconImageFromModel {
     if(self.databaseModel.database.originalFormat == kPasswordSafe) {
@@ -1377,7 +1397,6 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     ret.fields.username = self.model.username;
     ret.fields.password = self.model.password;
     ret.fields.url = self.model.url;
-    ret.fields.email = self.model.email;
     ret.fields.notes = self.model.notes;
     ret.fields.expires = self.model.expires;
 
@@ -1389,6 +1408,17 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         [ret.fields setCustomField:field.key value:value];
     }
 
+    
+    
+    if ( self.databaseFormat == kPasswordSafe ) {
+        ret.fields.email = self.model.email;
+    }
+    else if ( self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4 ) {
+        if ( AppPreferences.sharedInstance.keePassEmailField ) {
+            ret.fields.keePassEmail = self.model.email;
+        }
+    }
+    
     
 
     if([OTPToken areDifferent:ret.fields.otpToken b:self.model.totp]) {
@@ -1430,7 +1460,10 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
             self.urlJustChanged = NO;
 #ifndef IS_APP_EXTENSION
             
-            BOOL favIconFetchPossible = (AppPreferences.sharedInstance.isProOrFreeTrial && (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4) && isValidUrl(self.model.url));
+            BOOL formatGood = (self.databaseModel.database.originalFormat == kKeePass || self.databaseModel.database.originalFormat == kKeePass4);
+            BOOL featureAvailable = AppPreferences.sharedInstance.isProOrFreeTrial && !AppPreferences.sharedInstance.disableFavIconFeature;
+            
+            BOOL favIconFetchPossible = (featureAvailable && formatGood && isValidUrl(self.model.url));
 
             if (favIconFetchPossible) {
                 if (!self.databaseModel.metadata.promptedForAutoFetchFavIcon) {
@@ -1627,7 +1660,14 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
     __weak ItemDetailsViewController* weakSelf = self;
     
-    UIImage* image = self.editing ? [UIImage imageNamed:@"syncronize"] : nil;
+    
+    UIImage* refresh = [UIImage imageNamed:@"syncronize"];
+    
+    if (@available(iOS 14.0, *)) { 
+        refresh = [UIImage systemImageNamed:@"arrow.triangle.2.circlepath"];
+    }
+
+    UIImage* image = self.editing ? refresh : nil;
 
     [cell setKey:NSLocalizedString(@"item_details_username_field_title", @"Username")
            value:[self maybeDereference:self.model.username]
@@ -2136,6 +2176,23 @@ suggestionProvider:^NSString*(NSString *text) {
 
 
 
+- (DatabaseFormat)databaseFormat {
+    return self.databaseModel.database.originalFormat;
+}
+
+- (BOOL)emailFieldEnabled {
+    if ( self.databaseFormat == kPasswordSafe ) {
+        return YES;
+    }
+    else if ( self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4 ) {
+        if ( AppPreferences.sharedInstance.keePassEmailField ) {
+            return YES;
+        }
+    }
+    
+    return NO;
+}
+
 - (EntryViewModel*)refreshViewModel {
     DatabaseFormat format = self.databaseModel.database.originalFormat;
     
@@ -2152,7 +2209,7 @@ suggestionProvider:^NSString*(NSString *text) {
             int index = self.historicalIndex.intValue;
             if ( index >= 0 && index < item.fields.keePassHistory.count ) {
                 item = item.fields.keePassHistory[index];
-                self.readOnly = YES;
+                self.forcedReadOnly = YES;
             }
         }
     }
@@ -2171,13 +2228,27 @@ suggestionProvider:^NSString*(NSString *text) {
     }];
     
     
+    
+    NSString* email = @"";
+    NSString* keePassEmailFieldKey = nil;
+    
+    if ( self.databaseFormat == kPasswordSafe ) {
+        email = item.fields.email;
+    }
+    else if ( self.databaseFormat == kKeePass || self.databaseFormat == kKeePass4 ) {
+        if ( AppPreferences.sharedInstance.keePassEmailField ) {
+            email = item.fields.keePassEmail;
+            keePassEmailFieldKey = item.fields.keePassEmailFieldKey;
+        }
+    }
         
     EntryViewModel *ret = [[EntryViewModel alloc] initWithTitle:item.title
                                                        username:item.fields.username
                                                        password:item.fields.password
                                                             url:item.fields.url
                                                           notes:item.fields.notes
-                                                          email:item.fields.email
+                                                          email:email
+                                           keePassEmailFieldKey:keePassEmailFieldKey
                                                         expires:item.fields.expires
                                                            tags:item.fields.tags
                                                            totp:item.fields.otpToken

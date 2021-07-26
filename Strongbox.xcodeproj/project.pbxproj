@@ -304,10 +304,6 @@
 		4D3A0F2E2587AB1B003D7BE8 /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F2C2587AB1B003D7BE8 /* Platform.m */; };
 		4D3A0F2F2587AB1B003D7BE8 /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F2C2587AB1B003D7BE8 /* Platform.m */; };
 		4D3A0F302587AB1B003D7BE8 /* Platform.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F2C2587AB1B003D7BE8 /* Platform.m */; };
-		4D3A0F382587B951003D7BE8 /* KeyFileHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */; };
-		4D3A0F392587B951003D7BE8 /* KeyFileHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */; };
-		4D3A0F3A2587B951003D7BE8 /* KeyFileHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */; };
-		4D3A0F3B2587B951003D7BE8 /* KeyFileHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */; };
 		4D3A0F432587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F422587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m */; };
 		4D3A0F442587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F422587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m */; };
 		4D3A0F4C2587CBCA003D7BE8 /* SecondDatabaseListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F4B2587CBCA003D7BE8 /* SecondDatabaseListTableViewController.m */; };
@@ -1751,7 +1747,6 @@
 		C843322C26692A7C00D496D2 /* StorageBrowserItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D40EEF01ED878DB006532F8 /* StorageBrowserItem.m */; };
 		C843322D26692A7C00D496D2 /* BrowsePreferencesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D376E4622AC4B4000BDB93A /* BrowsePreferencesTableViewController.m */; };
 		C843322E26692A7C00D496D2 /* PlaintextInnerStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C85D9BBA254D8820000482C8 /* PlaintextInnerStream.m */; };
-		C843322F26692A7C00D496D2 /* KeyFileHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */; };
 		C843323026692A7C00D496D2 /* GZipInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D1BF4FD232441D2007DF0E6 /* GZipInputStream.m */; };
 		C843323126692A7C00D496D2 /* TwoFishReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E02493882300F6EA12 /* TwoFishReadStream.m */; };
 		C843323226692A7C00D496D2 /* Keys.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3AC32221908D4A0010CFCD /* Keys.m */; };
@@ -2408,7 +2403,6 @@
 		C8AF2ED226692CA600F845B1 /* cencode.c in Sources */ = {isa = PBXBuildFile; fileRef = C872B72224A64A150042CE02 /* cencode.c */; };
 		C8AF2ED326692CA600F845B1 /* YubiKeyHardwareConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DBBDE3523EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m */; };
 		C8AF2ED426692CA600F845B1 /* EditAttachmentCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DAE98942270B4E200A811C4 /* EditAttachmentCell.m */; };
-		C8AF2ED526692CA600F845B1 /* KeyFileHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */; };
 		C8AF2ED626692CA600F845B1 /* NSString+DDXML.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B5A2E625599E8C0087CED1 /* NSString+DDXML.m */; };
 		C8AF2ED726692CA600F845B1 /* DeletedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C86E9079246D99C80029623A /* DeletedObject.m */; };
 		C8AF2ED826692CA600F845B1 /* CompositeKeyFactors.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D3169A622DE33AF003FAD3F /* CompositeKeyFactors.m */; };
@@ -3369,8 +3363,6 @@
 		4D376F8322425A6C0031049E /* XmlTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = XmlTests.m; path = StrongboxTests/XmlTests.m; sourceTree = "<group>"; };
 		4D3A0F2B2587AB1B003D7BE8 /* Platform.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Platform.h; path = model/Platform.h; sourceTree = "<group>"; };
 		4D3A0F2C2587AB1B003D7BE8 /* Platform.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Platform.m; path = model/Platform.m; sourceTree = "<group>"; };
-		4D3A0F362587B951003D7BE8 /* KeyFileHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = KeyFileHelper.h; path = StrongBox/KeyFileHelper.h; sourceTree = "<group>"; };
-		4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KeyFileHelper.m; path = StrongBox/KeyFileHelper.m; sourceTree = "<group>"; };
 		4D3A0F412587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MergeSelectSecondDatabaseViewController.h; path = StrongBox/MergeSelectSecondDatabaseViewController.h; sourceTree = "<group>"; };
 		4D3A0F422587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MergeSelectSecondDatabaseViewController.m; path = StrongBox/MergeSelectSecondDatabaseViewController.m; sourceTree = "<group>"; };
 		4D3A0F4A2587CBCA003D7BE8 /* SecondDatabaseListTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SecondDatabaseListTableViewController.h; path = StrongBox/SecondDatabaseListTableViewController.h; sourceTree = "<group>"; };
@@ -6155,8 +6147,6 @@
 				4DE46658233D2BBD00398A65 /* BackupItem.m */,
 				4D3A0F2B2587AB1B003D7BE8 /* Platform.h */,
 				4D3A0F2C2587AB1B003D7BE8 /* Platform.m */,
-				4D3A0F362587B951003D7BE8 /* KeyFileHelper.h */,
-				4D3A0F372587B951003D7BE8 /* KeyFileHelper.m */,
 				C8F8A38F2588EFDC00B9297C /* Pair.h */,
 				C8F8A3902588EFDC00B9297C /* Pair.m */,
 				C8650084258CDA87002951BA /* UIColor+Extensions.h */,
@@ -7712,8 +7702,8 @@
 				4DBE5B2E1C8356C700C310BC /* Frameworks */,
 				4DBE5B2F1C8356C700C310BC /* Resources */,
 				6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */,
-				E82C278FED855BD63C77CDDD /* [CP] Copy Pods Resources */,
 				4D67FDF0216F3FA2005C0E12 /* Embed App Extensions */,
+				D7ABA54D5C5AAFEF38260C52 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -7736,7 +7726,7 @@
 				4DC4E12223488BAA000743C4 /* Resources */,
 				4D058EEB2348A79C00F8B536 /* Embed App Extensions */,
 				27770DC6BEA7CCCC65222D78 /* [CP] Embed Pods Frameworks */,
-				66E74F89A0154949DC4A06DE /* [CP] Copy Pods Resources */,
+				7CF79A230E3303D8297F0627 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -8689,24 +8679,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		66E74F89A0154949DC4A06DE /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Pro/Pods-common-ios-Strongbox-iOS-Pro-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Pro/Pods-common-ios-Strongbox-iOS-Pro-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		6B1F7FAA4877FC3B1B22302C /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -8745,6 +8717,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7CF79A230E3303D8297F0627 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Pro/Pods-common-ios-Strongbox-iOS-Pro-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-Pro/Pods-common-ios-Strongbox-iOS-Pro-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		82ADEB68650D5D350DB3DA98 /* [CP] Check Pods Manifest.lock */ = {
@@ -8864,6 +8854,24 @@
 			shellPath = /bin/sh;
 			shellScript = "version=$(git rev-parse --verify HEAD | cut -c 1-7)\ncurdate=$(date +\"%d.%m.%y\")\n\nfilesource=\"//\\n//  GitVersion.h\\n//\\n//  Created by Mark McGuill on $curdate.\\n//\\n\\n#ifndef GitVersion_h\\n#define GitVersion_h\\n\\n#define GIT_SHA_VERSION @\\\"$version\\\"\\n\\n#endif\"\n\ncd ${SOURCE_ROOT}\necho \"$filesource\" > build/git-version.h\n\ntouch build/git-version.h\n";
 		};
+		D7ABA54D5C5AAFEF38260C52 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		E4414104AF4EAE8B5F06F894 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -8886,24 +8894,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS-SCOTUS/Pods-common-ios-Strongbox-iOS-SCOTUS-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E82C278FED855BD63C77CDDD /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh",
-				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-common-ios-Strongbox-iOS/Pods-common-ios-Strongbox-iOS-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F663CF914C5F47C63EEFAE33 /* [CP] Check Pods Manifest.lock */ = {
@@ -8999,7 +8989,6 @@
 				C82180052652DBFE007F1DFF /* AutoFillOnboardingModule.m in Sources */,
 				4D08B5B7234C9613003D1953 /* GCDWebServer.m in Sources */,
 				C8144FDC265CF32300B1D1ED /* StrongboxErrorCodes.m in Sources */,
-				4D3A0F382587B951003D7BE8 /* KeyFileHelper.m in Sources */,
 				4D8C148D2074F5F800CE9CAE /* PasswordHistoryEntry.m in Sources */,
 				C804449F261483EC0017B3BC /* ConcurrentMutableStack.m in Sources */,
 				4D6FE2C02194451D00EB9997 /* Kdb1Database.m in Sources */,
@@ -9668,7 +9657,6 @@
 				4DC4E09923488BAA000743C4 /* StorageBrowserItem.m in Sources */,
 				4DC4E09A23488BAA000743C4 /* BrowsePreferencesTableViewController.m in Sources */,
 				C85D9BBD254D8820000482C8 /* PlaintextInnerStream.m in Sources */,
-				4D3A0F3A2587B951003D7BE8 /* KeyFileHelper.m in Sources */,
 				4DC4E09B23488BAA000743C4 /* GZipInputStream.m in Sources */,
 				C8B2C6E32493882300F6EA12 /* TwoFishReadStream.m in Sources */,
 				4DC4E09C23488BAA000743C4 /* Keys.m in Sources */,
@@ -9935,7 +9923,6 @@
 				C872B72A24A64A160042CE02 /* cencode.c in Sources */,
 				4DBBDE3923EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
 				4DC4E19523488BAE000743C4 /* EditAttachmentCell.m in Sources */,
-				4D3A0F3B2587B951003D7BE8 /* KeyFileHelper.m in Sources */,
 				C8B5A2FE25599E8D0087CED1 /* NSString+DDXML.m in Sources */,
 				C86E907D246D99C80029623A /* DeletedObject.m in Sources */,
 				4DC4E19723488BAE000743C4 /* CompositeKeyFactors.m in Sources */,
@@ -10250,7 +10237,6 @@
 				C872B72824A64A160042CE02 /* cencode.c in Sources */,
 				4DBBDE3723EE15CF004B56A1 /* YubiKeyHardwareConfiguration.m in Sources */,
 				4DAE98BB2270B4E200A811C4 /* EditAttachmentCell.m in Sources */,
-				4D3A0F392587B951003D7BE8 /* KeyFileHelper.m in Sources */,
 				C8B5A2FC25599E8D0087CED1 /* NSString+DDXML.m in Sources */,
 				C86E907B246D99C80029623A /* DeletedObject.m in Sources */,
 				4D3169A822DE33AF003FAD3F /* CompositeKeyFactors.m in Sources */,
@@ -10739,7 +10725,6 @@
 				C843322C26692A7C00D496D2 /* StorageBrowserItem.m in Sources */,
 				C843322D26692A7C00D496D2 /* BrowsePreferencesTableViewController.m in Sources */,
 				C843322E26692A7C00D496D2 /* PlaintextInnerStream.m in Sources */,
-				C843322F26692A7C00D496D2 /* KeyFileHelper.m in Sources */,
 				C843323026692A7C00D496D2 /* GZipInputStream.m in Sources */,
 				C843323126692A7C00D496D2 /* TwoFishReadStream.m in Sources */,
 				C843323226692A7C00D496D2 /* Keys.m in Sources */,
@@ -11006,7 +10991,6 @@
 				C8AF2ED226692CA600F845B1 /* cencode.c in Sources */,
 				C8AF2ED326692CA600F845B1 /* YubiKeyHardwareConfiguration.m in Sources */,
 				C8AF2ED426692CA600F845B1 /* EditAttachmentCell.m in Sources */,
-				C8AF2ED526692CA600F845B1 /* KeyFileHelper.m in Sources */,
 				C8AF2ED626692CA600F845B1 /* NSString+DDXML.m in Sources */,
 				C8AF2ED726692CA600F845B1 /* DeletedObject.m in Sources */,
 				C8AF2ED826692CA600F845B1 /* CompositeKeyFactors.m in Sources */,
@@ -12634,7 +12618,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -12722,7 +12706,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -12809,7 +12793,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -12889,7 +12873,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -12972,7 +12956,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13045,7 +13029,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13116,7 +13100,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13196,7 +13180,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";
@@ -13268,7 +13252,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -13348,7 +13332,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -13431,7 +13415,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13505,7 +13489,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3086;
+				CURRENT_PROJECT_VERSION = 3091;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";

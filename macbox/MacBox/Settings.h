@@ -75,8 +75,8 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 
 @property BOOL showCustomFieldsOnQuickViewPanel;
 @property BOOL showAttachmentsOnQuickViewPanel;
-@property (nonatomic) BOOL showPasswordImmediatelyInOutline;
 @property BOOL showAttachmentImagePreviewsOnQuickViewPanel;
+@property (nonatomic) BOOL showPasswordImmediatelyInOutline;
 @property (nonatomic) BOOL alwaysShowPassword;
 
 /* =================================================================================================== */

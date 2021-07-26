@@ -128,10 +128,10 @@
         if (database) {
             if ( [database.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
                 _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
-                _displayName = [_displayName stringByAppendingString:@"*"];
             }
             else {
                 _displayName = NSLocalizedString(@"storage_provider_name_mac_file_short", @"File");
+                _displayName = [_displayName stringByAppendingString:@"*"];
             }
         }
         else {
@@ -139,8 +139,6 @@
         }
     }
 #endif
-    
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if (provider == kGoogleDrive) {
         _displayName = NSLocalizedString(@"storage_provider_name_google_drive", @"Google Drive");
         if([_displayName isEqualToString:@"storage_provider_name_google_drive"]) {
@@ -160,8 +158,6 @@
             _displayName = @"OneDrive";
         }
     }
-#endif
-    
     else if(provider == kFilesAppUrlBookmark) {
         _displayName = NSLocalizedString(@"storage_provider_name_ios_files", @"iOS Files");
         if([_displayName isEqualToString:@"storage_provider_name_ios_files"]) {
@@ -204,8 +200,6 @@
         return @"iphone_x";
     }
 #endif
-    
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if (provider == kGoogleDrive) {
         return @"google-drive-2021";
     }
@@ -215,7 +209,6 @@
     else if(provider == kOneDrive) {
         return @"onedrive-2021";
     }
-#endif
     else if(provider == kFilesAppUrlBookmark) {
         return @"lock";
     }

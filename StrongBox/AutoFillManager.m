@@ -199,9 +199,11 @@ static NSString* const kMailToScheme = @"mailto";
         
         
         for(NSString* key in node.fields.customFields.allKeys) {
-            StringValue* strValue = node.fields.customFields[key];
-            NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
-            [uniqueUrls addObjectsFromArray:foo];
+            if ( ![NodeFields isAlternativeURLCustomFieldKey:key] ) { 
+                StringValue* strValue = node.fields.customFields[key];
+                NSArray<NSString*> *foo = [self findUrlsInString:strValue.value];
+                [uniqueUrls addObjectsFromArray:foo];
+            }
         }
         
         
@@ -236,7 +238,7 @@ static NSString* const kMailToScheme = @"mailto";
                 quickTypeText = title;
             }
 
-
+            
             
             ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:quickTypeText recordIdentifier:[recordIdentifier toJson]];
             [identities addObject:iden];

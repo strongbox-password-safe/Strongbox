@@ -128,6 +128,11 @@ static DatabasesManagerVC* sharedInstance;
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kDatabasesListViewForceRefreshNotification object:nil];
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(refreshVisibleRows) name:kSyncManagerDatabaseSyncStatusChanged object:nil];
     
+    NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
+    
+    NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
+    self.textFieldVersion.stringValue = about;
+
     [self startRefreshTimer];
 }
 
@@ -139,11 +144,6 @@ static DatabasesManagerVC* sharedInstance;
 
 - (void)bindUi {
     self.buttonProperties.enabled = self.tableView.selectedRowIndexes.count == 1;
-    
-    NSString* fmt = Settings.sharedInstance.fullVersion ? NSLocalizedString(@"subtitle_app_version_info_pro_fmt", @"Strongbox Pro %@") : NSLocalizedString(@"subtitle_app_version_info_none_pro_fmt", @"Strongbox %@");
-    
-    NSString* about = [NSString stringWithFormat:fmt, [Utils getAppVersion]];
-    self.textFieldVersion.stringValue = about;
 }
 
 - (void)killRefreshTimer {

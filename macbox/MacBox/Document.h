@@ -35,8 +35,7 @@ extern NSString* const kNotificationUserInfoLongRunningOperationStatus;
 
 - (void)performFullInteractiveSync:(NSViewController*)viewController key:(CompositeKeyFactors*)key;
 
-- (void)reloadFromLocalWorkingCopy:(NSViewController*)viewController
-                               key:(CompositeKeyFactors*)key
+- (void)reloadFromLocalWorkingCopy:(CompositeKeyFactors*)key
                       selectedItem:(NSString *)selectedItem;
 
 @property (readonly) BOOL isModelLocked;

@@ -18,15 +18,15 @@ PODS:
   - GTMAppAuth (1.2.2):
     - AppAuth/Core (~> 1.4)
     - GTMSessionFetcher/Core (~> 1.5)
-  - GTMSessionFetcher (1.5.0):
-    - GTMSessionFetcher/Full (= 1.5.0)
-  - GTMSessionFetcher/Core (1.5.0)
-  - GTMSessionFetcher/Full (1.5.0):
-    - GTMSessionFetcher/Core (= 1.5.0)
+  - GTMSessionFetcher (1.6.1):
+    - GTMSessionFetcher/Full (= 1.6.1)
+  - GTMSessionFetcher/Core (1.6.1)
+  - GTMSessionFetcher/Full (1.6.1):
+    - GTMSessionFetcher/Core (= 1.6.1)
   - ISMessages (1.3.1)
   - libsodium (1.0.12)
   - MTBBarcodeScanner (5.0.11)
-  - ObjectiveDropboxOfficial (6.0.0)
+  - ObjectiveDropboxOfficial (6.0.1)
   - OneDriveSDK (1.3.0):
     - OneDriveSDK/Auth (= 1.3.0)
     - OneDriveSDK/Common (= 1.3.0)
@@ -51,6 +51,7 @@ PODS:
 DEPENDENCIES:
   - GoogleAPIClientForREST/Drive
   - GoogleSignIn
+  - GoogleSignIn (= 5.0.2)
   - ISMessages
   - libsodium
   - MTBBarcodeScanner
@@ -81,14 +82,14 @@ SPEC CHECKSUMS:
   GoogleAPIClientForREST: 538a8ad0014fd88b78894e77100775a6b0a4f7ed
   GoogleSignIn: 7137d297ddc022a7e0aa4619c86d72c909fa7213
   GTMAppAuth: ad5c2b70b9a8689e1a04033c9369c4915bfcbe89
-  GTMSessionFetcher: b3503b20a988c4e20cc189aa798fd18220133f52
+  GTMSessionFetcher: 36689134877faeb055b27dfa4ccc9ceaa42e029e
   ISMessages: 562cddc3e960359de95f934a4e5c4e1f4ea6fd7d
   libsodium: 9a8faa5ef2fa0d2d57bd7f7d79bf8fb7c1a9f0ea
   MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
-  ObjectiveDropboxOfficial: bca5b00db1989dd1999c04a70ac4f5e782cc1e54
+  ObjectiveDropboxOfficial: f6357b632e763f3f6bec2df41d9e66372f5fa401
   OneDriveSDK: 90ab8781f0992c37d96b68cc340585f5cf36701f
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
 
-PODFILE CHECKSUM: 59922f097286d2bc6b90d59ec1289342643909cd
+PODFILE CHECKSUM: 220f815e06ad5af97618328421b4311b90356ddd
 
 COCOAPODS: 1.10.0

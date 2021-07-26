@@ -59,7 +59,7 @@
     __weak typeof(self) weakSelf = self;
     self.internetReachabilityDetector.reachableBlock = ^(Reachability *reach)
     {
-        NSLog(@"OfflineDetector: We Are Online :)");
+
         weakSelf.offline = NO;
     };
     

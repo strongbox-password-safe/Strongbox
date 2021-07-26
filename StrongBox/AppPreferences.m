@@ -21,10 +21,8 @@ static NSString* const kClipboardHandoff = @"clipboardHandoff";
 static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
 static NSString* const kHideTips = @"hideTips";
-static NSString* const kDisallowAllPinCodeOpens = @"disallowAllPinCodeOpens";
 static NSString* const kClearClipboardEnabled = @"clearClipboardEnabled";
 static NSString* const kClearClipboardAfterSeconds = @"clearClipboardAfterSeconds";
-static NSString* const kDisallowBiometricId = @"disallowBiometricId";
 static NSString* const kAutoFillNewRecordSettings = @"autoFillNewRecordSettings";
 static NSString* const kQuickLaunchUuid = @"quickLaunchUuid";
 static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEntry";
@@ -123,6 +121,17 @@ static NSString* const kHasPromptedThatFreeTrialWillEndSoon = @"hasPromptedThatF
 static NSString* const kAppHasBeenDowngradedToFreeEdition = @"appHasBeenDowngradedToFreeEdition";
 static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"hasPromptedThatAppHasBeenDowngradedToFreeEdition";
 
+static NSString* const kDisableReadOnlyToggles = @"disableReadOnlyToggles";
+static NSString* const kDatabasesAreAlwaysReadOnly = @"databasesAreAlwaysReadOnly";
+static NSString* const kDisableFavIconFeature = @"disableFavIconFeature";
+static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetworkStorageOptions";
+
+static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
+static NSString* const kUseLegacyDropboxApi = @"useLegacyDropboxApi";
+static NSString* const kUseMinimalDropboxScopes = @"useMinimalDropboxScopes";
+static NSString* const kStreamReadLargeKeyFiles = @"streamReadLargeKeyFiles";
+static NSString* const kKeePassEmailField = @"keePassEmailField";
+
 @implementation AppPreferences
 
 + (void)initialize {
@@ -163,6 +172,78 @@ static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"has
 }
 
 
+
+- (BOOL)keePassEmailField {
+    return [self getBool:kKeePassEmailField];
+}
+
+- (void)setKeePassEmailField:(BOOL)keePassEmailField {
+    [self setBool:kKeePassEmailField value:keePassEmailField];
+}
+
+- (BOOL)streamReadLargeKeyFiles {
+    return [self getBool:kStreamReadLargeKeyFiles fallback:YES];
+}
+
+- (void)setStreamReadLargeKeyFiles:(BOOL)streamReadLargeKeyFiles {
+    [self setBool:kStreamReadLargeKeyFiles value:streamReadLargeKeyFiles];
+}
+
+- (BOOL)useIsolatedDropbox {
+    return [self getBool:kUseIsolatedDropbox];
+}
+
+- (void)setUseIsolatedDropbox:(BOOL)useIsolatedDropbox {
+    [self setBool:kUseIsolatedDropbox value:useIsolatedDropbox];
+}
+
+- (BOOL)useLegacyDropboxApi {
+    return [self getBool:kUseLegacyDropboxApi];
+}
+
+- (void)setUseLegacyDropboxApi:(BOOL)useLegacyDropboxApi {
+    [self setBool:kUseLegacyDropboxApi value:useLegacyDropboxApi];
+}
+
+- (BOOL)useMinimalDropboxScopes {
+    return [self getBool:kUseMinimalDropboxScopes fallback:YES];
+}
+
+- (void)setUseMinimalDropboxScopes:(BOOL)useMinimalDropboxScopes {
+    [self setBool:kUseMinimalDropboxScopes value:useMinimalDropboxScopes];
+}
+
+- (BOOL)disableNativeNetworkStorageOptions {
+    return [self getBool:kDisableNativeNetworkStorageOptions];
+}
+
+- (void)setDisableNativeNetworkStorageOptions:(BOOL)disableNativeNetworkStorageOptions {
+    [self setBool:kDisableNativeNetworkStorageOptions value:disableNativeNetworkStorageOptions];
+}
+
+- (BOOL)disableReadOnlyToggles {
+    return [self getBool:kDisableReadOnlyToggles];
+}
+
+- (void)setDisableReadOnlyToggles:(BOOL)disableReadOnlyToggles {
+    [self setBool:kDisableReadOnlyToggles value:disableReadOnlyToggles];
+}
+
+- (BOOL)databasesAreAlwaysReadOnly {
+    return [self getBool:kDatabasesAreAlwaysReadOnly];
+}
+
+- (void)setDatabasesAreAlwaysReadOnly:(BOOL)databasesAreAlwaysReadOnly {
+    [self setBool:kDatabasesAreAlwaysReadOnly value:databasesAreAlwaysReadOnly];
+}
+
+- (BOOL)disableFavIconFeature {
+    return [self getBool:kDisableFavIconFeature];
+}
+
+- (void)setDisableFavIconFeature:(BOOL)disableFavIconFeature {
+    [self setBool:kDisableFavIconFeature value:disableFavIconFeature];
+}
 
 - (BOOL)appHasBeenDowngradedToFreeEdition {
     return [self getBool:kAppHasBeenDowngradedToFreeEdition];
@@ -640,12 +721,12 @@ static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"has
     [self setBool:kHideTips value:hideTips];
 }
 
-- (BOOL)disallowAllPinCodeOpens {
-    return [self getBool:kDisallowAllPinCodeOpens];
+- (BOOL)disallowAllBiometricId {
+    return NO;
 }
 
-- (void)setDisallowAllPinCodeOpens:(BOOL)disallowAllPinCodeOpens {
-    [self setBool:kDisallowAllPinCodeOpens value:disallowAllPinCodeOpens];
+- (BOOL)disallowAllPinCodeOpens {
+    return NO;
 }
 
 - (BOOL)clearClipboardEnabled {
@@ -669,14 +750,6 @@ static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"has
 
 -(void)setClearClipboardAfterSeconds:(NSInteger)clearClipboardAfterSeconds {
     return [self setInteger:kClearClipboardAfterSeconds value:clearClipboardAfterSeconds];
-}
-
-- (BOOL)disallowAllBiometricId {
-    return [self getBool:kDisallowBiometricId];
-}
-
-- (void)setDisallowAllBiometricId:(BOOL)disallowAllBiometricId {
-    [self setBool:kDisallowBiometricId value:disallowAllBiometricId];
 }
 
 - (AutoFillNewRecordSettings*)autoFillNewRecordSettings {
@@ -740,9 +813,9 @@ static NSString* const kHasPromptedThatAppHasBeenDowngradedToFreeEdition = @"has
     return [self getBool:kInstantPinUnlocking fallback:YES];
 }
 
-- (void)setInstantPinUnlocking:(BOOL)instantPinUnlocking {
-    [self setBool:kInstantPinUnlocking value:instantPinUnlocking];
-}
+
+
+
 
 - (BOOL)iCloudOn {
     return [self getBool:kiCloudOn];

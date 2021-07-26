@@ -35,6 +35,8 @@ static NSString* const kOriginalWindowsOtpAlgoKey = @"TimeOtp-Algorithm";
 static NSString* const kOriginalWindowsOtpAlgoValueSha256 = @"HMAC-SHA-256";
 static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
+static NSString* const kDefaultKeePassEmailFieldKey = @"Email";
+
 @interface NodeFields ()
 
 @property BOOL hasCachedOtpToken;
@@ -80,6 +82,12 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 + (BOOL)isTotpCustomFieldKey:(NSString*)key {
     return [[NodeFields totpCustomFieldKeys] containsObject:key];
 }
+
++ (BOOL)isAlternativeURLCustomFieldKey:(NSString*)key {
+    return [key hasPrefix:@"KP2A_URL"] || [key hasPrefix:@"URL"];
+}
+
+
 
 - (instancetype _Nullable)init {
     return [self initWithUsername:@""
@@ -1093,9 +1101,11 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     return days < 14;
 }
 
+
+
 - (NSArray<NSString *> *)alternativeUrls {
     NSDictionary<NSString*, StringValue*> *filtered = [self.mutableCustomFields filter:^BOOL(NSString * _Nonnull key, StringValue * _Nonnull value) {
-        return [key hasPrefix:@"KP2A_URL"] || [key hasPrefix:@"URL"];
+        return [NodeFields isAlternativeURLCustomFieldKey:key];
     }];
     
     NSArray<NSString*>* values = [filtered map:^id _Nonnull(NSString * _Nonnull key, StringValue * _Nonnull value) {
@@ -1104,6 +1114,52 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     
     return [values sortedArrayUsingComparator:finderStringComparator];
 }
+
+
+
+- (NSString*)keePassEmailFieldKey {
+    NSArray<NSString*>* possibles = @[kDefaultKeePassEmailFieldKey];
+    
+    
+    for (NSString* key in possibles) {
+        if ( self.mutableCustomFields[key] != nil ) {
+            return key;
+        }
+    }
+    
+    return nil;
+}
+
+- (NSString *)keePassEmail {
+    NSString* key = [self keePassEmailFieldKey];
+    if ( key ) {
+        return self.mutableCustomFields[key].value;
+    }
+    else {
+        return @"";
+    }
+}
+
+- (void)setKeePassEmail:(NSString *)keePassEmail {
+    NSString* key = [self keePassEmailFieldKey];
+
+    if ( keePassEmail.length && key == nil ) {
+        key = kDefaultKeePassEmailFieldKey; 
+    }
+    
+    if ( key ) {
+        if ( keePassEmail.length ) {
+            StringValue* sv = self.customFields[key];
+            StringValue* newSv = [StringValue valueWithString:keePassEmail protected:sv ? sv.protected : NO];
+            [self setCustomField:key value:newSv];
+        }
+        else {
+            [self removeCustomField:key];
+        }
+    }
+}
+
+
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"{ username = [%@]\n    email = [%@]\n    url = [%@]\n}",

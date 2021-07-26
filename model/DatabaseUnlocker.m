@@ -248,7 +248,10 @@
     
     if ( !self.isAutoFillOpen ) { 
         
+        
         self.database.likelyFormat = openedSafe.originalFormat;
+        self.database.unlockCount++;
+        
         [SafesList.sharedInstance update:self.database];
     }
 

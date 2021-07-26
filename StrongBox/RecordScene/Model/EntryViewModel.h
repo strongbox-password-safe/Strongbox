@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
                           url:(NSString*)url
                         notes:(NSString*)notes
                         email:(NSString*)email
+         keePassEmailFieldKey:(NSString*_Nullable)keePassEmailFieldKey
                       expires:(NSDate*_Nullable)expires
                          tags:(NSSet<NSString*>*_Nullable)tags
                          totp:(OTPToken*_Nullable)totp
@@ -53,6 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString* url;
 @property NSString* notes;
 @property NSString* email;
+@property (nullable) NSString* keePassEmailFieldKey;
 @property (nullable) NSDate* expires;
 
 @property (nullable) OTPToken* totp;

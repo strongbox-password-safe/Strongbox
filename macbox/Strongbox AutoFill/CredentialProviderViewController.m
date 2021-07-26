@@ -729,7 +729,7 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
         NSData* data = [BookmarksHelper dataWithContentsOfBookmark:bookmark error:error];
 
         if(data) {
-            keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:format != kKeePass1];
+            keyFileDigest = [KeyFileParser getNonePerformantKeyFileDigest:data checkForXml:format != kKeePass1];
         }
         else {
             if ( isConvenienceUnlock ) {

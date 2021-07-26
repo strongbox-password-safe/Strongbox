@@ -467,7 +467,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
         
         vc.itemId = node.uuid;
         vc.parentGroupId = node.parent.uuid;
-        vc.readOnly = NO;
+        vc.forcedReadOnly = NO;
         vc.databaseModel = self.model;
     }
     else if ([segue.identifier isEqualToString:@"segueToDatabaseAuditPreferences"]) {

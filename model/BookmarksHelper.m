@@ -38,7 +38,7 @@
     #else
         options |= NSURLBookmarkCreationMinimalBookmark; 
     #endif
-
+    
     BOOL securitySucceeded = [url startAccessingSecurityScopedResource]; 
 
     NSData *bookmark = [url bookmarkDataWithOptions:options

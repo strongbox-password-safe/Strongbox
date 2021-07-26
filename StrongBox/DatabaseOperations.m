@@ -9,7 +9,6 @@
 #import "DatabaseOperations.h"
 #import "IOsUtils.h"
 #import "Alerts.h"
-//#import "Settings.h"
 #import "ISMessages.h"
 #import "Utils.h"
 #import "KeyFileParser.h"
@@ -23,7 +22,7 @@
 #import "FavIconBulkViewController.h"
 #import "YubiManager.h"
 #import "BookmarksHelper.h"
-#import "KeyFileHelper.h"
+#import "AppPreferences.h"
 
 @interface DatabaseOperations ()
 
@@ -53,7 +52,10 @@
 }
 
 - (void)setupTableView {
-    [self cell:self.cellBulkUpdateFavIcons setHidden:self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1];
+    BOOL formatUnsupported = self.viewModel.database.originalFormat == kPasswordSafe || self.viewModel.database.originalFormat == kKeePass1;
+    BOOL featureDisabled = AppPreferences.sharedInstance.disableFavIconFeature;
+    
+    [self cell:self.cellBulkUpdateFavIcons setHidden:formatUnsupported || featureDisabled];
     [self cell:self.cellViewAttachments setHidden:self.viewModel.database.attachmentPool.count == 0];
 }
 

@@ -53,7 +53,8 @@
     [self backgroundSyncDatabase:database completion:nil];
 }
 
-- (void)backgroundSyncDatabase:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion {
+- (void)backgroundSyncDatabase:(DatabaseMetadata*)database
+                    completion:(SyncAndMergeCompletionBlock _Nullable)completion {
     NSLog(@"backgroundSyncDatabase enter [%@]", database);
     
     if ( [self isLegacyFileUrl:database.fileUrl] ) {

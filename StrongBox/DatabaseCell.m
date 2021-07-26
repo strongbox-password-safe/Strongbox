@@ -231,8 +231,20 @@ rotateLastImage:(BOOL)rotateLastImage
         [tnts addObject:UIColor.orangeColor];
     }
     
-    if (syncState == kSyncOperationStateInProgress || syncState == kSyncOperationStateError || syncState == kSyncOperationStateBackgroundButUserInteractionRequired || syncState == kSyncOperationStateUserCancelled) {
-        [ret addObject:[UIImage imageNamed:@"syncronize"]];
+    if (syncState == kSyncOperationStateInProgress ||
+        syncState == kSyncOperationStateError ||
+        syncState == kSyncOperationStateBackgroundButUserInteractionRequired ||
+        syncState == kSyncOperationStateUserCancelled) {
+        
+        UIImage* syncImage;
+        if (@available(iOS 14.0, *)) { 
+            syncImage = [UIImage systemImageNamed:@"arrow.triangle.2.circlepath"];
+        }
+        else {
+            syncImage = [UIImage imageNamed:@"syncronize"];
+        }
+        
+        [ret addObject:syncImage];
         [tnts addObject:syncState == kSyncOperationStateError ? UIColor.redColor : (syncState == kSyncOperationStateInProgress ? NSNull.null : UIColor.orangeColor)];
     }
     

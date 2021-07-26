@@ -52,7 +52,7 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         BOOL available = (_iCloudRoot != nil);
         
-        NSLog(@"iCloud Initialization Done: Available = [%d]", available);
+
         AppPreferences.sharedInstance.iCloudAvailable = available;
     });
 }

@@ -332,6 +332,10 @@
         [self cell:self.cellStrength setHidden:YES];
     }
     
+    if ( AppPreferences.sharedInstance.disableReadOnlyToggles ) {
+        [self cell:self.cellReadOnly setHidden:YES];
+    }
+    
     [self reloadDataAnimated:YES];
 }
 

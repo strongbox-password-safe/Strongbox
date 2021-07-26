@@ -1616,6 +1616,12 @@ static NSImage* kStrongBox256Image;
         if ( self.progressWindow ) {
             [self.progressWindow hide];
         }
+        
+        if ( self.view.window.isMiniaturized ) {
+            NSLog(@"Not showing Progress Modal because miniaturized...");
+            return; 
+        }
+        
         self.progressWindow = [ProgressWindow newProgress:operationDescription];
         [self.view.window beginSheet:self.progressWindow.window completionHandler:nil];
     });
@@ -1633,7 +1639,7 @@ static NSImage* kStrongBox256Image;
         NSData* data = [BookmarksHelper dataWithContentsOfBookmark:self.selectedKeyFileBookmark error:error];
                 
         if(data) {
-            keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data checkForXml:self.viewModel.format != kKeePass1];
+            keyFileDigest = [KeyFileParser getNonePerformantKeyFileDigest:data checkForXml:self.viewModel.format != kKeePass1];
             
         }
         else {
@@ -1707,11 +1713,11 @@ static NSImage* kStrongBox256Image;
         return [CompositeKeyFactors password:password
                               keyFileDigest:keyFileDigest
                                   yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
-            [MacYubiKeyManager.sharedInstance compositeKeyFactorCr:challenge
-                                                        windowHint:windowHint
-                                                              slot:slot
-                                                    slotIsBlocking:blocking
-                                                        completion:completion];
+                [MacYubiKeyManager.sharedInstance compositeKeyFactorCr:challenge
+                                                            windowHint:windowHint
+                                                                  slot:slot
+                                                        slotIsBlocking:blocking
+                                                            completion:completion];
         }];
     }
 }
@@ -1842,8 +1848,10 @@ static NSImage* kStrongBox256Image;
                 [self showPopupChangeToastNotification:loc];
 
                 self.viewModel.selectedItem = [self selectedItemSerializationId];
-                [self reloadAndUnlock:self.viewModel.compositeKeyFactors isBiometricOpen:NO];
                 
+                BOOL background = self.view.window.isMiniaturized;
+                [self reloadAndUnlock:self.viewModel.compositeKeyFactors isBiometricOpen:NO backgroundSync:background];
+            
                 self.isPromptingAboutUnderlyingFileChange = NO;
 
                 return;
@@ -1868,10 +1876,18 @@ static NSImage* kStrongBox256Image;
 
 - (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors
         isBiometricOpen:(BOOL)isBiometricOpen {
+    [self reloadAndUnlock:compositeKeyFactors isBiometricOpen:isBiometricOpen backgroundSync:NO];
+}
+
+- (void)reloadAndUnlock:(CompositeKeyFactors*)compositeKeyFactors
+        isBiometricOpen:(BOOL)isBiometricOpen
+         backgroundSync:(BOOL)backgroundSync {
     if( self.viewModel ) {
         
         
-        if ( self.databaseMetadata && self.databaseMetadata.storageProvider != kMacFile && !Settings.sharedInstance.isProOrFreeTrial ) {
+        if ( self.databaseMetadata &&
+            self.databaseMetadata.storageProvider != kMacFile &&
+            !Settings.sharedInstance.isProOrFreeTrial ) {
             [MacAlerts info:NSLocalizedString(@"mac_non_file_database_pro_message", @"This database can only be unlocked by Strongbox Pro because it is stored via SFTP or WebDAV.\n\nPlease Upgrade.")
                      window:self.view.window];
             return;
@@ -1881,7 +1897,7 @@ static NSImage* kStrongBox256Image;
                 
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [self.document revertWithUnlock:compositeKeyFactors
-                             viewController:self
+                             viewController:backgroundSync ? nil : self
                                 completion:^(BOOL success, NSError * _Nullable error) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if(success) {
@@ -2110,14 +2126,20 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
 }
 
 - (IBAction)onChangeMasterPassword:(id)sender {
-    [self promptForMasterPassword:NO completion:^(BOOL okCancel) {
+    [self promptForMasterPassword:NO
+                       completion:^(BOOL okCancel) {
         if(okCancel) {
-            [[NSApplication sharedApplication] sendAction:@selector(saveDocument:) to:nil from:self];
-            
-            NSString* loc = NSLocalizedString(@"mac_master_credentials_changed_and_saved", @"Master Credentials Changed and Database Saved");
-            [MacAlerts info:loc window:self.view.window];
+            [self.viewModel.document saveDocumentWithDelegate:self
+                                              didSaveSelector:@selector(onMasterCredentialsChangedAndSaved:)
+                                                  contextInfo:nil];
         }
     }];
+}
+
+- (void)onMasterCredentialsChangedAndSaved:(id)param {
+    NSString* loc = NSLocalizedString(@"mac_master_credentials_changed_and_saved", @"Master Credentials Changed and Database Saved");
+    
+    [MacAlerts info:loc window:self.view.window];
 }
 
 
@@ -3003,7 +3025,7 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
                                             touch:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.hasPromptedForTouchIdEnrol = NO; 
         metadata.isTouchIdEnrolled = NO;
-        [self.databaseMetadata resetConveniencePasswordWithCurrentConfiguration:nil];
+        [metadata resetConveniencePasswordWithCurrentConfiguration:nil];
     }];
 
     [self bindLockScreenUi];
@@ -3496,11 +3518,16 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     if( !self.viewModel.showChangeNotifications ) {
         return;
     }
-    
+        
     [self showToastNotification:message error:NO];
 }
 
 - (void)showToastNotification:(NSString*)message error:(BOOL)error {
+    if ( self.view.window.isMiniaturized ) {
+        NSLog(@"Not Showing Popup Change notification because window is miniaturized");
+        return;
+    }
+
     [self showToastNotification:message error:error yOffset:150.f];
 }
 
@@ -4198,7 +4225,8 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             
             if ( localWasChanged ) {
                 NSLog(@"Sync successful and local was changed, reloading...");
-                [self.document reloadFromLocalWorkingCopy:self key:self.viewModel.compositeKeyFactors selectedItem:[self selectedItemSerializationId]];
+                [self.document reloadFromLocalWorkingCopy:self.viewModel.compositeKeyFactors
+                                             selectedItem:[self selectedItemSerializationId]];
             }
         }
     });

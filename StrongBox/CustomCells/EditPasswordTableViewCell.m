@@ -23,6 +23,8 @@
 @property BOOL internalShowGenerationSettings;
 @property (weak, nonatomic) IBOutlet UILabel *labelStrength;
 @property (weak, nonatomic) IBOutlet UIProgressView *progressStrength;
+@property (weak, nonatomic) IBOutlet UIButton *barButtonAlternativeGenerate;
+@property (weak, nonatomic) IBOutlet UIButton *buttonGenerate;
 
 @end
 
@@ -31,11 +33,6 @@
 - (void)awakeFromNib {
     [super awakeFromNib];
   
-    
-
-
-
-
     self.valueTextView.delegate = self;
     self.valueTextView.font = FontManager.sharedInstance.easyReadFont;
     
@@ -46,6 +43,23 @@
     self.valueTextView.accessibilityLabel = NSLocalizedString(@"edit_password_cell_value_textfield_accessibility_label", @"Password Text Field");
     
     self.buttonGenerationSettings.hidden = !self.showGenerationSettings;
+    
+    if (@available(iOS 14.0, *)) { 
+        [self.buttonGenerationSettings setImage:[UIImage systemImageNamed:@"gear"] forState:UIControlStateNormal];
+
+        [self.buttonGenerationSettings setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                       forImageInState:UIControlStateNormal];
+
+        [self.barButtonAlternativeGenerate setImage:[UIImage systemImageNamed:@"die.face.6"] forState:UIControlStateNormal];
+        
+        [self.barButtonAlternativeGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                           forImageInState:UIControlStateNormal];
+        
+        [self.buttonGenerate setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
+
+        [self.buttonGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                       forImageInState:UIControlStateNormal];
+    }
 }
 
 - (BOOL)showGenerationSettings {

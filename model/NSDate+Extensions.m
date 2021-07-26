@@ -27,10 +27,12 @@
     }
     
     NSDate* ref = [NSDate.date dateByAddingTimeInterval:(-((NSTimeInterval)seconds))];
-    
+
+    BOOL ret = [date isEarlierThan:ref];
+
 
     
-    return [date isEarlierThan:ref];
+    return ret;
 }
 
 - (BOOL)isMoreThanXDaysAgo:(NSUInteger)days {

@@ -56,6 +56,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *labelPasswordStrengthAlgo;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAdversaryStrength;
 @property (weak, nonatomic) IBOutlet UILabel *labelAdversary;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellUseICloud;
 
 @end
 
@@ -265,6 +266,10 @@
     [self cell:self.cellCloudSessions setHidden:YES];
     [self reloadDataAnimated:NO];
 #endif
+    
+    if ( AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+        [self cell:self.cellUseICloud setHidden:YES];
+    }
 }
 
 - (void)bindHideTips {

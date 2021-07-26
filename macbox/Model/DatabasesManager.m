@@ -85,8 +85,20 @@ NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotifi
 - (NSArray<DatabaseMetadata *> *)snapshot {
     __block NSArray<DatabaseMetadata *> *result;
 
-    dispatch_sync(self.dataQueue, ^{ result = [self deserialize].copy; });
-
+    
+    
+    
+    
+    
+    
+    
+    if ( dispatch_get_current_queue() == self.dataQueue ) { 
+        result = [self deserialize].copy;
+    }
+    else {
+        dispatch_sync(self.dataQueue, ^{ result = [self deserialize].copy; });
+    }
+    
     return result;
 }
 

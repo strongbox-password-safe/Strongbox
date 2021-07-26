@@ -513,7 +513,7 @@
             return nil;
         }
         
-        keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:data
+        keyFileDigest = [KeyFileParser getNonePerformantKeyFileDigest:data
                                                             checkForXml:self.selectedDatabaseFormat != kKeePass1];
     }
     

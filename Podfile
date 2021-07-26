@@ -50,7 +50,7 @@ abstract_target 'common-ios' do
         pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
         pod 'GoogleAPIClientForREST/Drive'
-        pod 'GoogleSignIn'
+        pod 'GoogleSignIn', '5.0.2'
     end    
 
     target 'Strongbox-iOS-SCOTUS' do

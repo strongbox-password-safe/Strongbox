@@ -153,7 +153,10 @@ NSString* const kNotificationUserInfoParamKey = @"param";
     return YES;
 }
 
-- (BOOL)loadModelFromData:(NSData*)data key:(CompositeKeyFactors*)key selectedItem:(NSString*)selectedItem outError:(NSError **)outError {
+- (BOOL)loadModelFromData:(NSData*)data
+                      key:(CompositeKeyFactors*)key
+             selectedItem:(NSString*)selectedItem
+                 outError:(NSError **)outError {
     NSError* error;
     if(![Serializator isValidDatabaseWithPrefix:data error:&error]) {
         if(outError != nil) {
@@ -203,12 +206,19 @@ NSString* const kNotificationUserInfoParamKey = @"param";
             if ( !self.databaseMetadata.offlineMode ) {
                 NSLog(@"ONLINE MODE: syncWorkingCopyAndUnlock");
                 
-                [self syncWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:compositeKeyFactors selectedItem:self.viewModel.selectedItem completion:completion];
+                [self syncWorkingCopyAndUnlock:self.databaseMetadata
+                                viewController:viewController
+                                           key:compositeKeyFactors
+                                  selectedItem:self.viewModel.selectedItem
+                                    completion:completion];
             }
             else {
                 NSLog(@"OFFLINE MODE: syncWorkingCopyAndUnlock");
 
-                [self loadWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:compositeKeyFactors selectedItem:self.viewModel.selectedItem completion:completion];
+                [self loadWorkingCopyAndUnlock:self.databaseMetadata
+                                           key:compositeKeyFactors
+                                  selectedItem:self.viewModel.selectedItem
+                                    completion:completion];
             }
         }
         else {
@@ -310,8 +320,11 @@ NSString* const kNotificationUserInfoParamKey = @"param";
   didSaveSelector:(SEL)didSaveSelector
       contextInfo:(void *)contextInfo {
     NSLog(@"saveToURL delegate... [%@]", url);
+    
+    
+    
     [super saveToURL:url ofType:typeName forSaveOperation:saveOperation
-            delegate:delegate didSaveSelector:didSaveSelector contextInfo:contextInfo];
+                delegate:delegate didSaveSelector:didSaveSelector contextInfo:contextInfo];
 }
 
 - (void)saveToURL:(NSURL *)url
@@ -340,19 +353,23 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     else {
         NSLog(@"saveToURL... NEW [%@]", url);
 
-        NSError* error;
-        BOOL success = [self writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:&error];
-        NSLog(@"saveToURL Done: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, error);
-        
-        completionHandler(error);
-        
-        if ( success ) {
-            [self updateQuickTypeAutoFill];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+            NSError* error;
+            BOOL success = [self writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:&error];
+            NSLog(@"saveToURL Done: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, error);
 
-            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                completionHandler(error);
 
-            [self notifyUpdatesDatabasesList];
-        }
+                if ( success ) {
+                    [self updateQuickTypeAutoFill];
+
+                    
+
+                    [self notifyUpdatesDatabasesList];
+                }
+            });
+        });
     }
 }
 
@@ -360,6 +377,10 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
                   ofType:(NSString *)typeName
         forSaveOperation:(NSSaveOperationType)saveOperation
                    error:(NSError *__autoreleasing  _Nullable *)outError {
+    if ( NSThread.isMainThread ) {
+        NSLog(@"WARNWARN: writeSafelyToURL called on main thread- this will break YubiKeys requiring Touch! ");
+    }
+    
     if ( ![self isLegacyFileUrl:self.fileURL] ) {
         return [self syncManagerWriteSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
     }
@@ -402,7 +423,9 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     [self backgroundSync];
     
     if (saveOperation != NSSaveToOperation) {
-        [self updateChangeCount:NSChangeCleared];
+        dispatch_async(dispatch_get_main_queue(), ^{ 
+            [self updateChangeCount:NSChangeCleared];
+        });
     }
     
     return YES;
@@ -732,7 +755,9 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     });
 }
 
-- (void)notifyViewsSyncDone:(SyncAndMergeResult)result localWasChanged:(BOOL)localWasChanged error:(NSError*)error {
+- (void)notifyViewsSyncDone:(SyncAndMergeResult)result
+            localWasChanged:(BOOL)localWasChanged
+                      error:(NSError*)error {
 
     
     NSDictionary *params = @{ @"result" : @(result),
@@ -779,7 +804,6 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
                              completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         if ( result == kSyncAndMergeSuccess ) {
             [self loadWorkingCopyAndUnlock:databaseMetadata
-                            viewController:viewController
                                        key:key
                               selectedItem:selectedItem
                                 completion:completion];
@@ -794,12 +818,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     }];
 }
 
-- (void)reloadFromLocalWorkingCopy:(NSViewController *)viewController key:(CompositeKeyFactors *)key selectedItem:(NSString *)selectedItem {
-    [self loadWorkingCopyAndUnlock:self.databaseMetadata viewController:viewController key:key selectedItem:selectedItem completion:nil];
+- (void)reloadFromLocalWorkingCopy:(CompositeKeyFactors *)key selectedItem:(NSString *)selectedItem {
+    [self loadWorkingCopyAndUnlock:self.databaseMetadata key:key selectedItem:selectedItem completion:nil];
 }
 
 - (void)loadWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
-                  viewController:(NSViewController*)viewController
                              key:(CompositeKeyFactors*)key
                     selectedItem:(NSString *)selectedItem
                       completion:(void (^)(BOOL, NSError * _Nullable))completion {

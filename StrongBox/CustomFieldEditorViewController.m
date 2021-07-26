@@ -24,6 +24,7 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchProtected;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonDone;
 @property (weak, nonatomic) IBOutlet UILabel *labelError;
+@property (weak, nonatomic) IBOutlet UIButton *buttonGenerate;
 
 @end
 
@@ -75,6 +76,15 @@ const static NSSet<NSString*> *keePassReservedNames;
     self.keyTextField.accessibilityLabel = NSLocalizedString(@"custom_field_vc_accessibility_label_name", @"Custom Field Name");
     self.textView.accessibilityLabel = NSLocalizedString(@"custom_field_vc_accessibility_label_value", @"Custom Field Value");
     self.switchProtected.accessibilityLabel = NSLocalizedString(@"custom_field_vc_accessibility_label_protected", @"Custom Field Protected");
+
+    
+    
+    if (@available(iOS 14.0, *)) { 
+        [self.buttonGenerate setImage:[UIImage systemImageNamed:@"arrow.triangle.2.circlepath"] forState:UIControlStateNormal];
+
+        [self.buttonGenerate setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                       forImageInState:UIControlStateNormal];
+    }
     
     [self.keyTextField becomeFirstResponder];
     

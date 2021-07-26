@@ -215,6 +215,8 @@
                     metadata.fileUrl = database.fileUrl;
                 }];
             }
+            
+            return url; 
         }
     }
     

@@ -17,7 +17,7 @@
 
 #import "AppPreferences.h"
 
-static const NSInteger kDefaultConvenienceExpiryPeriod = 2 * 7 * 24;  
+static const NSInteger kDefaultConvenienceExpiryPeriodHours = 2 * 7 * 24;  
 static const NSUInteger kDefaultScheduledExportIntervalDays = 28;  
 
 @interface SafeMetaData ()
@@ -82,9 +82,11 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.autoFillConvenienceAutoUnlockTimeout = -1;
         self.quickTypeEnabled = YES;
         self.autoFillCopyTotp = YES;
-        self.convenienceExpiryPeriod = kDefaultConvenienceExpiryPeriod;
+        self.convenienceExpiryPeriod = kDefaultConvenienceExpiryPeriodHours;
         self.showConvenienceExpiryMessage = YES;
         self.scheduleExportIntervalDays = kDefaultScheduledExportIntervalDays;
+        self.databaseCreated = NSDate.date;
+        self.unlockCount = 0;
     }
     
     return self;
@@ -356,6 +358,17 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret.lastScheduledExportModDate = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastScheduledExportModDate"])).doubleValue];
     }
     
+    if ( jsonDictionary[@"databaseCreated"] != nil ) {
+        ret.databaseCreated = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"databaseCreated"])).doubleValue];
+    }
+    else {
+        ret.databaseCreated = NSDate.date;
+    }
+    
+    if ( jsonDictionary[@"unlockCount"] != nil ) {
+        ret.unlockCount = ((NSNumber*)jsonDictionary[@"unlockCount"]).unsignedIntegerValue;
+    }
+    
     return ret;
 }
 
@@ -430,6 +443,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"scheduledExportOnboardingDone" : @(self.scheduledExportOnboardingDone),
         @"scheduleExportIntervalDays" : @(self.scheduleExportIntervalDays),
         @"lockEvenIfEditing" : @(self.lockEvenIfEditing),
+        @"unlockCount" : @(self.unlockCount),
     }];
     
     if (self.nickName != nil) {
@@ -485,6 +499,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     
     if (self.lastScheduledExportModDate != nil) {
         ret[@"lastScheduledExportModDate"] = @(self.lastScheduledExportModDate.timeIntervalSinceReferenceDate);
+    }
+
+    if (self.databaseCreated != nil) {
+        ret[@"databaseCreated"] = @(self.databaseCreated.timeIntervalSinceReferenceDate);
     }
 
     return ret;

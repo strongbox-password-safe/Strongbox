@@ -129,7 +129,7 @@
         vc.itemId = node.uuid;
         vc.historicalIndex = index;
         vc.parentGroupId = node.parent.uuid;
-        vc.readOnly = YES;
+        vc.forcedReadOnly = YES;
         vc.databaseModel = self.viewModel;
     }
 }

@@ -84,10 +84,10 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
+    if ( !CustomizationManager.isAProBundle ) {
+        [ProUpgradeIAPManager.sharedInstance initialize]; 
+    }
     
-    
-    [ProUpgradeIAPManager.sharedInstance initialize]; 
-        
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
         
     NSLog(@"STARTUP - Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
@@ -97,17 +97,17 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 }
 
 - (void)preHeatSecureEnclave {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0L), ^{
-        NSTimeInterval start = NSDate.timeIntervalSinceReferenceDate;
 
 
 
-        double perf = NSDate.timeIntervalSinceReferenceDate - start;
 
-        NSLog(@"====================================== PERF ======================================");
-        NSLog(@"preHeatSecureEnclave [%f] seconds - [%hhd]", perf, SecretStore.sharedInstance.secureEnclaveAvailable);
-        NSLog(@"====================================== PERF ======================================");
-    });
+
+
+
+
+
+
+
 }
 
 - (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
@@ -219,7 +219,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
     [self preHeatSecureEnclave]; 
 
-    NSLog(@"XXXXXXXXXX - applicationDidBecomeActive- %@]", self.window.rootViewController);
+
 
     [OfflineDetector.sharedInstance startMonitoringConnectivitity]; 
     
@@ -285,7 +285,12 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
 - (void)initializeDropbox {
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
-    [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
+    if ( ( AppPreferences.sharedInstance.useIsolatedDropbox ) ) {
+        [DBClientsManager setupWithAppKey:DROPBOX_APP_ISOLATED_KEY];
+    }
+    else {
+        [DBClientsManager setupWithAppKey:DROPBOX_APP_KEY];
+    }
 #endif
 }
 
@@ -370,7 +375,7 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (void)hidePrivacyShield {
-    NSLog(@"hidePrivacyShield - [%@]", self.privacyScreen);
+
 
     if ( self.privacyScreen ) {
 
@@ -387,7 +392,7 @@ void uncaughtExceptionHandler(NSException *exception) {
         self.privacyScreen = nil;
     }
     else {
-        NSLog(@"Privacy Screen not around to hide... NOP");
+
     }
 }
 

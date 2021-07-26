@@ -28,6 +28,7 @@
                           url:(NSString *)url
                         notes:(NSString *)notes
                         email:(NSString *)email
+         keePassEmailFieldKey:(NSString *_Nullable)keePassEmailFieldKey
                       expires:(NSDate*)expires
                          tags:(NSSet<NSString*>*)tags
                          totp:(OTPToken *)totp
@@ -43,6 +44,7 @@
         self.totp = totp ? [OTPToken tokenWithURL:totp.url secret:totp.secret] : nil;
         self.url = url;
         self.email = email;
+        self.keePassEmailFieldKey = keePassEmailFieldKey;
         self.expires = expires;
         self.mutableTags = tags ? tags.mutableCopy : [NSMutableSet set];
         self.notes = notes;
@@ -65,19 +67,20 @@
 
 - (instancetype)clone {
     EntryViewModel* model = [[EntryViewModel alloc] initWithTitle:self.title
-                                                             username:self.username
-                                                             password:self.password
-                                                                  url:self.url
-                                                                notes:self.notes
-                                                                email:self.email
-                                                              expires:self.expires
-                                                                 tags:self.mutableTags
-                                                                 totp:self.totp
-                                                                 icon:self.icon
-                                                         customFields:self.customFields
-                                                          attachments:self.attachments.dictionary
-                                                             metadata:self.metadata
-                                                           hasHistory:self.hasHistory];
+                                                         username:self.username
+                                                         password:self.password
+                                                              url:self.url
+                                                            notes:self.notes
+                                                            email:self.email
+                                             keePassEmailFieldKey:self.keePassEmailFieldKey
+                                                          expires:self.expires
+                                                             tags:self.mutableTags
+                                                             totp:self.totp
+                                                             icon:self.icon
+                                                     customFields:self.customFields
+                                                      attachments:self.attachments.dictionary
+                                                         metadata:self.metadata
+                                                       hasHistory:self.hasHistory];
 
     return model;
 }
@@ -125,7 +128,7 @@
         
     
     
-    if(self.customFields.count != other.customFields.count) {
+    if ( self.customFields.count != other.customFields.count ) {
         return YES;
     }
     
@@ -243,19 +246,20 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
     }
 
     EntryViewModel* ret = [[EntryViewModel alloc] initWithTitle:@"Acme Inc."
-                                                           username:@"mark.mc"
-                                                           password:@"very very secret that is waaaaaay too long to fit on one line"
-                                                                url:@"https:
-                                                              notes:notes
-                                                              email:@"markmc@gmail.com"
-                                                            expires:nil
-                                                               tags:nil
-                                                               totp:token
-                                                               icon:[NodeIcon withPreset:12]
-                                                       customFields:@[ c1, c2, c3]
-                                                        attachments:attachments
-                                                           metadata:metadata
-                                                         hasHistory:YES];
+                                                       username:@"mark.mc"
+                                                       password:@"very very secret that is waaaaaay too long to fit on one line"
+                                                            url:@"https:
+                                                          notes:notes
+                                                          email:@"markmc@gmail.com"
+                                           keePassEmailFieldKey:@"Email"
+                                                        expires:nil
+                                                           tags:nil
+                                                           totp:token
+                                                           icon:[NodeIcon withPreset:12]
+                                                   customFields:@[ c1, c2, c3]
+                                                    attachments:attachments
+                                                       metadata:metadata
+                                                     hasHistory:YES];
     
     return ret;
 }

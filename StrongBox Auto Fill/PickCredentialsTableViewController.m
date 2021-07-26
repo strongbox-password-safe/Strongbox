@@ -616,6 +616,20 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     return UITableViewAutomaticDimension;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NSString* group = self.groups[indexPath.section];
+
+    if ( [group isEqualToString:kGroupActions] ) {
+        if ( indexPath.row == 0 ) {
+            if ( self.model.isReadOnly ) {
+                return 0.0f;
+            }
+        }
+    }
+    
+    return [super tableView:tableView heightForRowAtIndexPath:indexPath];
+}
+
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section {
     NSString* group = self.groups[section];
 
@@ -794,7 +808,7 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
     vc.createNewItem = YES;
     vc.itemId = nil;
     vc.parentGroupId = self.model.database.effectiveRootGroup.uuid;
-    vc.readOnly = NO;
+    vc.forcedReadOnly = NO;
     vc.databaseModel = self.model;
     vc.autoFillSuggestedUrl = suggestedUrl;
     vc.autoFillSuggestedTitle = suggestedTitle;

@@ -12,6 +12,7 @@
 #import "SVProgressHUD.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+#import "AppPreferences.h"
 
 @implementation DropboxV2StorageProvider
 
@@ -104,12 +105,18 @@
     }];
 }
 
-- (void)readWithProviderData:(NSObject *)providerData viewController:(UIViewController *)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completionHandler {
+- (void)readWithProviderData:(NSObject *)providerData
+              viewController:(UIViewController *)viewController
+                     options:(StorageProviderReadOptions *)options
+                  completion:(StorageProviderReadCompletionBlock)completionHandler {
     DBFILESFileMetadata *file = (DBFILESFileMetadata *)providerData;
     [self readFileWithPath:file.pathLower viewController:viewController options:options completion:completionHandler];
 }
 
-- (void)readFileWithPath:(NSString *)path viewController:(UIViewController*)viewController options:(StorageProviderReadOptions *)options completion:(StorageProviderReadCompletionBlock)completion {
+- (void)readFileWithPath:(NSString *)path
+          viewController:(UIViewController*)viewController
+                 options:(StorageProviderReadOptions *)options
+              completion:(StorageProviderReadCompletionBlock)completion {
     if (viewController) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD showWithStatus:NSLocalizedString(@"storage_provider_status_reading", @"A storage provider is in the process of reading. This is the status displayed on the progress dialog. In english:  Reading...")];
@@ -152,7 +159,11 @@
                     completion(kReadResultSuccess, fileContents, result.serverModified, nil);
                 }
                 else {
-                    NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@\n", routeError, networkError];
+                    NSString *message = [self handleRequestError:networkError];
+                    if ( !message) {
+                        message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
+                    }
+
                     completion(kReadResultError, nil, nil, [Utils createNSError:message errorCode:-1]);
                 }
             }]
@@ -204,8 +215,11 @@
             completion(kUpdateResultSuccess, result.serverModified, nil);
         }
         else {
-            NSLog(@"%@\n%@\n", routeError, networkError);
-            NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
+            NSString *message = [self handleRequestError:networkError];
+            if ( !message) {
+                message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
+            }
+
             completion(kUpdateResultError, nil, [Utils createNSError:message errorCode:-1]);
         }
     }] setProgressBlock:^(int64_t bytesUploaded, int64_t totalBytesUploaded, int64_t totalBytesExpectedToUploaded) {
@@ -216,7 +230,8 @@
 - (void)      list:(NSObject *)parentFolder
     viewController:(UIViewController *)viewController
         completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
-    [self performTaskWithAuthorizationIfNecessary:viewController task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
+    [self performTaskWithAuthorizationIfNecessary:viewController
+                                             task:^(BOOL userCancelled, BOOL userInteractionRequired, NSError *error) {
         if (error) {
             completion(userCancelled, nil, error);
         }
@@ -224,6 +239,17 @@
             [self listFolder:parentFolder completion:completion];
         }
     }];
+}
+
+- (void (^)(NSURL * _Nonnull))openUrlHandler {
+    return ^(NSURL * _Nonnull url) {
+        if (@available (iOS 10.0, *)) {
+            [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+        }
+        else {
+            [UIApplication.sharedApplication openURL:url];
+        }
+    };
 }
 
 - (void)performTaskWithAuthorizationIfNecessary:(UIViewController *)viewController
@@ -235,7 +261,10 @@
         }
         
         NSNotificationCenter * __weak center = [NSNotificationCenter defaultCenter];
-        id __block token = [center addObserverForName:@"isDropboxLinked" object:nil queue:nil usingBlock:^(NSNotification *_Nonnull note) {
+        id __block token = [center addObserverForName:@"isDropboxLinked"
+                                               object:nil
+                                                queue:nil
+                                           usingBlock:^(NSNotification *_Nonnull note) {
             [center removeObserver:token];
   
             if (DBClientsManager.authorizedClient) {
@@ -259,16 +288,40 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss]; 
             
-            [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
-                                           controller:viewController
-                                              openURL:^(NSURL *url) {
-                if (@available (iOS 10.0, *)) {
-                    [UIApplication.sharedApplication openURL:url options:@{} completionHandler:nil];
+            if ( !AppPreferences.sharedInstance.useLegacyDropboxApi ) {
+                NSArray<NSString*>* minimalScopes = @[ @"account_info.read",
+                                                       @"files.metadata.read",
+                                                       @"files.metadata.write",
+                                                       @"files.content.read",
+                                                       @"files.content.write"];
+                
+                NSMutableArray* scopes = [NSMutableArray arrayWithArray:minimalScopes];
+                
+                if ( !AppPreferences.sharedInstance.useMinimalDropboxScopes ) { 
+                    NSArray<NSString*>* possiblyRequiredScopes = @[@"sharing.read",
+                                                                   @"sharing.write",
+                                                                   @"file_requests.read",
+                                                                   @"file_requests.write",
+                                                                   @"contacts.read",
+                                                                   @"contacts.write"];
+                    [scopes addObjectsFromArray:possiblyRequiredScopes];
                 }
-                else {
-                    [UIApplication.sharedApplication openURL:url];
-                }
-            }];
+                
+                DBScopeRequest *scopeRequest = [[DBScopeRequest alloc] initWithScopeType:DBScopeTypeUser
+                                                                                  scopes:scopes.copy
+                                                                    includeGrantedScopes:NO];
+                
+                [DBClientsManager authorizeFromControllerV2:UIApplication.sharedApplication
+                                                 controller:viewController
+                                      loadingStatusDelegate:nil
+                                                    openURL:[self openUrlHandler]
+                                               scopeRequest:scopeRequest];
+            }
+            else {
+                [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
+                                               controller:viewController
+                                                  openURL:[self openUrlHandler]];
+            }
         });
     }
     else {
@@ -283,9 +336,7 @@
     NSMutableArray<StorageBrowserItem *> *items = [[NSMutableArray alloc] init];
     DBFILESMetadata *parent = (DBFILESMetadata *)parentFolder;
     
-    [[DBClientsManager.authorizedClient.filesRoutes listFolder:parent ? parent.
-      pathLower : @""]
-     setResponseBlock:^(DBFILESListFolderResult *_Nullable response, DBFILESListFolderError *_Nullable routeError,
+    [[DBClientsManager.authorizedClient.filesRoutes listFolder:parent ? parent.pathLower : @""] setResponseBlock:^(DBFILESListFolderResult *_Nullable response, DBFILESListFolderError *_Nullable routeError,
                         DBRequestError *_Nullable networkError) {
          if (response) {
             NSArray<DBFILESMetadata *> *entries = response.entries;
@@ -308,15 +359,32 @@
             }
          }
          else {
-            NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
+            NSString *message = [self handleRequestError:networkError];
+            if ( !message) {
+                message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
+            }
 
-            dispatch_async(dispatch_get_main_queue(), ^{
+             dispatch_async(dispatch_get_main_queue(), ^{
                 [SVProgressHUD dismiss];
             });
 
             completion(NO, nil, [Utils createNSError:message errorCode:-1]);
          }
      }];
+}
+
+- (NSString*)handleRequestError:(DBRequestError*)networkError {
+    if ( networkError && networkError.structuredAuthError ) {
+        if ( networkError.structuredAuthError.tag == DBAUTHAuthErrorExpiredAccessToken ||
+             networkError.structuredAuthError.tag == DBAUTHAuthErrorOther ||
+             networkError.structuredAuthError.tag == DBAUTHAuthErrorInvalidAccessToken ) {
+            [DBClientsManager unlinkAndResetClients];
+        }
+        
+        return [NSString stringWithFormat:@"%@", networkError];
+    }
+    
+    return nil;
 }
 
 - (void)listFolderContinue:(NSString *)cursor
@@ -348,7 +416,11 @@
             }
          }
          else {
-            NSString *message = [[NSString alloc] initWithFormat:@"%@\n%@\n", routeError, networkError];
+            NSString *message = [self handleRequestError:networkError];
+            if ( !message) {
+                message = [[NSString alloc] initWithFormat:@"%@\n%@", routeError, networkError];
+            }
+
             dispatch_async(dispatch_get_main_queue(), ^{
                 [SVProgressHUD dismiss];
             });

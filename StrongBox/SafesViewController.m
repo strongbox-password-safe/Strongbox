@@ -115,7 +115,7 @@
     [self listenToNotifications];
         
     if ( ![self isAppLocked] ) { 
-        NSLog(@"SafesViewController::viewDidLoad -> Initial Activation/Load - App is not Locked...");
+
         
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{  
             [self doAppActivationTasks:NO];
@@ -201,8 +201,8 @@
     
     __weak SafesViewController* weakSelf = self;
     [OnboardingManager.sharedInstance startAppOnboarding:self completion:^{
-        NSLog(@"App Onboarding Done...");
-        NSLog(@"====================================================================================================");
+
+
         
         if ( weakSelf.enqueuedImportUrl ) {
             [weakSelf processEnqueuedImport];
@@ -391,7 +391,7 @@
         }
     } while (--attempts); 
 
-    NSLog(@"VISIBLE: [%@]", visibleSoFar);
+
     
     return visibleSoFar;
 }
@@ -400,7 +400,7 @@
     UIViewController* visible =[self getVisibleViewController];
     BOOL ret = visible == self;
 
-    NSLog(@"isVisibleViewController: %d [Actual Visible: [%@]]", ret, visible);
+
     
     return ret;
 }
@@ -860,7 +860,10 @@
         [ma addObject:[self getContextualMenuAutoFillQuickLaunchAction:indexPath]];
     }
     
-    [ma addObject:[self getContextualMenuReadOnlyAction:indexPath]];
+    if ( !AppPreferences.sharedInstance.disableReadOnlyToggles ) {
+        [ma addObject:[self getContextualMenuReadOnlyAction:indexPath]];
+    }
+    
     [ma addObject:[self getContextualMenuPropertiesAction:indexPath]];
 
     return [UIMenu menuWithTitle:@""

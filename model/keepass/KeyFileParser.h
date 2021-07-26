@@ -7,12 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DatabaseFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface KeyFileParser : NSObject
 
-+ (nullable NSData *)getKeyFileDigestFromFileData:(NSData *)data checkForXml:(BOOL)checkForXml;
++ (nullable NSData *)getNonePerformantKeyFileDigest:(NSData*)data
+                                        checkForXml:(BOOL)checkForXml; 
+
++ (nullable NSData *)getDigestFromSources:(NSString*_Nullable)keyFileBookmark
+                       onceOffKeyFileData:(NSData*_Nullable)onceOffKeyFileData
+                              streamLarge:(BOOL)streamLarge
+                                   format:(DatabaseFormat)format
+                                    error:(NSError**)error;
 
 @end
 

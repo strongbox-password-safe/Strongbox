@@ -19,7 +19,6 @@
 #import "CASGTableViewController.h"
 #import "BookmarksHelper.h"
 #import "FileManager.h"
-#import "KeyFileHelper.h"
 #import "Serializator.h"
 #import "KeyFileParser.h"
 #import "YubiManager.h"
@@ -91,8 +90,10 @@ static const int kMaxFailedPinAttempts = 3;
     if ( self.isAutoFillOpen &&
         self.database.autoFillLastUnlockedAt != nil &&
         self.database.autoFillConvenienceAutoUnlockTimeout > 0 ) {
-        isWithinAutoFillConvenienceAutoUnlockTime = [self.database.autoFillLastUnlockedAt isMoreThanXSecondsAgo:self.database.autoFillConvenienceAutoUnlockTimeout];
+        isWithinAutoFillConvenienceAutoUnlockTime = ![self.database.autoFillLastUnlockedAt isMoreThanXSecondsAgo:self.database.autoFillConvenienceAutoUnlockTimeout];
     }
+    
+
     
     return isWithinAutoFillConvenienceAutoUnlockTime && self.database.autoFillConvenienceAutoUnlockPassword != nil;
 }
@@ -547,13 +548,26 @@ static const int kMaxFailedPinAttempts = 3;
                 readOnly:(BOOL)readOnly
     yubikeyConfiguration:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration
          usedConvenience:(BOOL)usedConvenience {
-    NSData* undigestedKeyFileData;
+    NSData* keyFileDigest = nil;
     
-    if(keyFileBookmark || oneTimeKeyFileData) {
+    if( keyFileBookmark || oneTimeKeyFileData ) {
         NSError *error;
-        undigestedKeyFileData = getKeyFileData(keyFileBookmark, oneTimeKeyFileData, &error);
+        DatabaseFormat format = kKeePass4;
+        
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:self.database.uuid];
+        if (url) {
+            format = [Serializator getDatabaseFormat:url];
+        }
 
-        if( undigestedKeyFileData == nil ) {
+        keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+                                         onceOffKeyFileData:oneTimeKeyFileData
+                                                streamLarge:AppPreferences.sharedInstance.streamReadLargeKeyFiles
+                                                     format:format
+                                                      error:&error];
+                
+        if( keyFileDigest == nil ) {
+            NSLog(@"WARNWARN: Could not read Key File [%@]", error);
+            
             
             
             if( usedConvenience ) {
@@ -601,26 +615,16 @@ static const int kMaxFailedPinAttempts = 3;
         [SafesList.sharedInstance update:self.database];
     }
     
-    [self completeRequestWithCredentials:password undigestedKeyFileData:undigestedKeyFileData yubiKeyConfiguration:yubiKeyConfiguration usedConvenience:usedConvenience];
+    [self completeRequestWithCredentials:password
+                           keyFileDigest:keyFileDigest
+                    yubiKeyConfiguration:yubiKeyConfiguration
+                         usedConvenience:usedConvenience];
 }
 
 - (void)completeRequestWithCredentials:(NSString*)password
-                 undigestedKeyFileData:(NSData*)undigestedKeyFileData
+                         keyFileDigest:(NSData*)keyFileDigest
                   yubiKeyConfiguration:(YubiKeyHardwareConfiguration*)yubiKeyConfiguration
                        usedConvenience:(BOOL)usedConvenience {
-    NSData* keyFileDigest = nil;
-    if (undigestedKeyFileData) {
-        BOOL checkForXml = YES;
-
-        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:self.database.uuid];
-        if (url) {
-            DatabaseFormat format = [Serializator getDatabaseFormat:url];
-            checkForXml = format != kKeePass1;
-        }
-        
-        keyFileDigest = [KeyFileParser getKeyFileDigestFromFileData:undigestedKeyFileData checkForXml:checkForXml];
-    }
-
     CompositeKeyFactors* ret;
     if (yubiKeyConfiguration && yubiKeyConfiguration.mode != kNoYubiKey) {
         ret = [CompositeKeyFactors password:password

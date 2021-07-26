@@ -186,6 +186,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL lockEvenIfEditing;
 
+@property (nullable) NSDate* databaseCreated;
+@property NSUInteger unlockCount;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -15,7 +15,6 @@
 #import "BookmarksHelper.h"
 #import "AppPreferences.h"
 #import "SVProgressHUD.h"
-#import "KeyFileHelper.h"
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
 #import "iCloudSafesCoordinator.h"
@@ -132,13 +131,18 @@ static DatabaseModel* getNewDatabase(NSString* password,
                                      YubiKeyHardwareConfiguration *yubiConfig,
                                      DatabaseFormat format,
                                      NSError** error) {
-    NSData* keyFileDigest = getKeyFileDigest(keyFileBookmark, onceOffKeyFileData, format, error);
-    if (*error) {
+    NSData* keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
+                                             onceOffKeyFileData:onceOffKeyFileData
+                                                    streamLarge:AppPreferences.sharedInstance.streamReadLargeKeyFiles
+                                                         format:format
+                                                          error:error];
+    
+    if ( *error ) {
         return nil;
     }
     
     CompositeKeyFactors* ckf;
-    if (yubiConfig && yubiConfig.mode != kNoYubiKey) {
+    if ( yubiConfig && yubiConfig.mode != kNoYubiKey ) {
         ckf = [CompositeKeyFactors password:password
                               keyFileDigest:keyFileDigest
                                   yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {

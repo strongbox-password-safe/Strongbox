@@ -97,18 +97,36 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
     DatabaseModel* model = [Serializator expressFromData:data password:@"1234"];
     
-    return [self initWithDatabase:model metaData:meta forcedReadOnly:NO isAutoFill:isAutoFillOpen offlineMode:NO isDuressDummyMode:YES];
+    return [self initWithDatabase:model
+                         metaData:meta
+                   forcedReadOnly:NO
+                       isAutoFill:isAutoFillOpen
+                      offlineMode:NO
+                isDuressDummyMode:YES];
 }
 
 - (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
                         metaData:(SafeMetaData *)metaData
                   forcedReadOnly:(BOOL)forcedReadOnly
                       isAutoFill:(BOOL)isAutoFill {
-    return [self initWithDatabase:passwordDatabase metaData:metaData forcedReadOnly:forcedReadOnly isAutoFill:isAutoFill offlineMode:NO];
+    return [self initWithDatabase:passwordDatabase
+                         metaData:metaData
+                   forcedReadOnly:forcedReadOnly
+                       isAutoFill:isAutoFill
+                      offlineMode:NO];
 }
 
-- (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase metaData:(SafeMetaData *)metaData forcedReadOnly:(BOOL)forcedReadOnly isAutoFill:(BOOL)isAutoFill offlineMode:(BOOL)offlineMode {
-    return [self initWithDatabase:passwordDatabase metaData:metaData forcedReadOnly:forcedReadOnly isAutoFill:isAutoFill offlineMode:offlineMode isDuressDummyMode:NO];
+- (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
+                        metaData:(SafeMetaData *)metaData
+                  forcedReadOnly:(BOOL)forcedReadOnly
+                      isAutoFill:(BOOL)isAutoFill
+                     offlineMode:(BOOL)offlineMode {
+    return [self initWithDatabase:passwordDatabase
+                         metaData:metaData
+                   forcedReadOnly:forcedReadOnly
+                       isAutoFill:isAutoFill
+                      offlineMode:offlineMode
+                isDuressDummyMode:NO];
 }
 
 - (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
@@ -128,8 +146,14 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         
         _metadata = metaData;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
+                
+        if ( AppPreferences.sharedInstance.databasesAreAlwaysReadOnly ) {
+            self.forcedReadOnly = YES;
+        }
+        else {
+            self.forcedReadOnly = forcedReadOnly;
+        }
         
-        self.forcedReadOnly = forcedReadOnly;
         self.isAutoFillOpen = isAutoFill;
         self.isDuressDummyMode = isDuressDummyMode;
         self.offlineMode = offlineMode;

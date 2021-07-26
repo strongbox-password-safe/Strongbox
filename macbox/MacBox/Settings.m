@@ -290,7 +290,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)showPasswordImmediatelyInOutline {
-    return [self getBool:kShowPasswordImmediatelyInOutline];
+    return NO;
+
 }
 
 - (void)setShowPasswordImmediatelyInOutline:(BOOL)showPasswordImmediatelyInOutline {
@@ -402,7 +403,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)alwaysShowPassword {
-    return [self getBool:kAlwaysShowPassword];
+    return NO;
+
 }
 
 -(void)setAlwaysShowPassword:(BOOL)alwaysShowPassword {
@@ -677,7 +679,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)showCustomFieldsOnQuickViewPanel {
-    return [self getBool:kShowCustomFieldsOnQuickView fallback:YES];
+    return YES;
+
 }
 
 - (void)setShowCustomFieldsOnQuickViewPanel:(BOOL)showCustomFieldsOnQuickViewPanel {
@@ -685,7 +688,9 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)showAttachmentsOnQuickViewPanel {
-    return [self getBool:kShowAttachmentsOnQuickViewPanel fallback:YES];
+    return YES;
+
+
 }
 
 - (void)setShowAttachmentsOnQuickViewPanel:(BOOL)showAttachmentsOnQuickViewPanel {
@@ -693,7 +698,8 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (BOOL)showAttachmentImagePreviewsOnQuickViewPanel {
-    return [self getBool:kShowAttachmentImagePreviewsOnQuickViewPanel fallback:YES];
+    return YES;
+
 }
 
 - (void)setShowAttachmentImagePreviewsOnQuickViewPanel:(BOOL)showAttachmentImagePreviewsOnQuickViewPanel {

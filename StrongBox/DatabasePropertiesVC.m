@@ -280,6 +280,12 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
         }
     }
     
+    if ( indexPath.row == kReadOnlyRow ) {
+        if ( AppPreferences.sharedInstance.disableReadOnlyToggles ) {
+            return 0.0f;
+        }
+    }
+    
     return [super tableView:tableView heightForRowAtIndexPath:indexPath];
 }
 

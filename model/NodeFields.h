@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nonnull) NSString *password;
 @property (nonatomic, strong, nonnull) NSString *username;
 @property (nonatomic, strong, nonnull) NSString *email;
+@property (nonatomic, strong, nonnull) NSString* keePassEmail;
+@property (nonatomic, strong, nullable, readonly) NSString* keePassEmailFieldKey;
 @property (nonatomic, strong, nonnull) NSString *url;
 @property (nonatomic, strong, nonnull) NSString *notes;
 @property (readonly, nonatomic, strong, nullable) NSDate *created;
@@ -66,6 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 + (BOOL)isTotpCustomFieldKey:(NSString*)key;
++ (BOOL)isAlternativeURLCustomFieldKey:(NSString*)key;
 
 + (NodeFields *)deserialize:(NSDictionary *)dict;
 - (NSDictionary*)serialize:(SerializationPackage*)serialization;

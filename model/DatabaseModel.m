@@ -713,8 +713,10 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     NSMutableSet<NSString*> *bag = [[NSMutableSet alloc]init];
     
     for (Node *record in self.allSearchableEntries) {
-        if ([Utils trim:record.fields.email].length > 0) {
-            [bag addObject:record.fields.email];
+        NSString* email = self.originalFormat == kPasswordSafe ? record.fields.email : record.fields.keePassEmail;
+
+        if ([Utils trim:email].length > 0) {
+            [bag addObject:email];
         }
     }
     
@@ -737,8 +739,10 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     NSCountedSet<NSString*> *bag = [[NSCountedSet alloc]init];
     
     for ( Node *record in self.allSearchableEntries ) {
-        if(record.fields.email.length) {
-            [bag addObject:record.fields.email];
+        NSString* email = self.originalFormat == kPasswordSafe ? record.fields.email : record.fields.keePassEmail;
+
+        if( email.length ) {
+            [bag addObject:email];
         }
     }
     
@@ -808,7 +812,9 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (BOOL)isEmailMatches:(NSString*)searchText node:(Node*)node dereference:(BOOL)dereference checkPinYin:(BOOL)checkPinYin {
-    NSString* foo = [self maybeDeref:node.fields.email node:node maybe:dereference];
+    NSString* email = self.originalFormat == kPasswordSafe ? node.fields.email : node.fields.keePassEmail;
+
+    NSString* foo = [self maybeDeref:email node:node maybe:dereference];
     return [foo containsSearchString:searchText checkPinYin:checkPinYin];
 }
 

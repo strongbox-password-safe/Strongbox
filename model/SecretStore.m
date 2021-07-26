@@ -373,7 +373,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 + (BOOL)isSecureEnclaveAvailable {
     if (TARGET_OS_SIMULATOR != 0) { 
-        NSLog(@"Secure Enclave not available on Simulator");
+
         return NO;
     }
 

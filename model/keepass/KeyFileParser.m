@@ -10,9 +10,15 @@
 #import "NSData+Extensions.h"
 #import "NSArray+Extensions.h"
 #import "NSString+Extensions.h"
+#import "BookmarksHelper.h"
+#import "Utils.h"
+
+#import "Sha256PassThroughOutputStream.h"
+#import "StreamUtils.h"
+#import <CommonCrypto/CommonCrypto.h>
 
 #if TARGET_OS_IPHONE
-#import "KissXML.h" // Drop in replacements for the NSXML stuff available on Mac
+#import "KissXML.h" 
 #endif
 
 static NSString* const kKeyFileRootElementName = @"KeyFile";
@@ -22,9 +28,51 @@ static NSString* const kMetaElementName = @"Meta";
 static NSString* const kVersionElementName = @"Version";
 static NSString* const kHashAttributeName = @"Hash";
 
+static const NSUInteger kStreamReadThreshold = 16 * 1024;
+
 @implementation KeyFileParser
 
-+ (NSData *)getKeyFileDigestFromFileData:(NSData *)data checkForXml:(BOOL)checkForXml {
++ (NSData *)getDigest:(NSInputStream*)inStream
+         streamLength:(NSUInteger)streamLength
+          streamLarge:(BOOL)streamLarge
+          checkForXml:(BOOL)checkForXml {
+    if ( inStream == nil ) {
+        return nil;
+    }
+    
+    if ( streamLarge && ( streamLength > kStreamReadThreshold ) ) {
+        NSLog(@"INFO: Large Key File, will stream the digest and skip XML, Hex etc checks. Pure SHA256");
+             
+        [inStream open];
+        
+        CC_SHA256_CTX *sha256context = malloc(sizeof(CC_SHA256_CTX));
+        CC_SHA256_Init(sha256context);
+        
+        const NSUInteger kChunkSize = 4 * 1024;
+        uint8_t buffer[kChunkSize];
+
+        NSInteger len;
+        while ( ( len = [inStream read:buffer maxLength:kChunkSize] ) > 0 ) {
+            CC_SHA256_Update(sha256context, buffer, (CC_LONG)len);
+        }
+        
+        if ( len != 0 ) {
+            NSLog(@"WARNWARN: Could not read key file stream: [%ld] - [%@]", (long)len, inStream.streamError);
+            [inStream close];
+            free(sha256context);
+            return nil;
+        }
+        [inStream close];
+
+        NSMutableData* foo = [NSMutableData dataWithLength:CC_SHA256_DIGEST_LENGTH];
+        CC_SHA256_Final(foo.mutableBytes, sha256context);
+        
+        free(sha256context);
+        
+        return foo.copy;
+    }
+    
+    NSData* data = [NSData dataWithContentsOfStream:inStream];
     if(!data) {
         return nil;
     }
@@ -55,7 +103,9 @@ static NSString* const kHashAttributeName = @"Hash";
     
     
 
-    return data.sha256;
+    NSData* ret = data.sha256;
+    
+    return ret;
 }
 
 + (NSData*)getHexTextKey:(NSData*)data {
@@ -219,6 +269,64 @@ BOOL isAll64CharactersAreHex(NSData* data) {
     }
     
     return nil;
+}
+
+
+
++ (NSData *)getNonePerformantKeyFileDigest:(NSData *)data checkForXml:(BOOL)checkForXml {
+    return [self getDigestFromSources:nil
+                   onceOffKeyFileData:data
+                          streamLarge:NO
+                               format:checkForXml ? kKeePass4 : kKeePass1 error:nil];
+}
+
++ (NSData *)getDigestFromSources:(NSString *)keyFileBookmark
+              onceOffKeyFileData:(NSData *)onceOffKeyFileData
+                     streamLarge:(BOOL)streamLarge
+                          format:(DatabaseFormat)format
+                           error:(NSError *__autoreleasing  _Nullable *)error {
+    if ( !keyFileBookmark && !onceOffKeyFileData ) {
+        return nil;
+    }
+    
+    NSData* keyFileData = nil;
+    
+    if ( keyFileBookmark ) {
+        NSString* updated;
+        NSURL* keyFileUrl = [BookmarksHelper getUrlFromBookmark:keyFileBookmark
+                                                       readOnly:YES
+                                                updatedBookmark:&updated
+                                                          error:error];
+        if ( keyFileUrl ) {
+            keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
+        }
+        else {
+            NSLog(@"WARNWARN: Could not read Key File Bookmark.");
+
+            return nil;
+        }
+    }
+    else if ( onceOffKeyFileData ) {
+        keyFileData = onceOffKeyFileData;
+    }
+    
+    if ( keyFileData ) {
+        NSInputStream* inStream = [NSInputStream inputStreamWithData:keyFileData];
+        
+        return [KeyFileParser getDigest:inStream
+                           streamLength:keyFileData.length
+                            streamLarge:streamLarge
+                            checkForXml:format != kKeePass1];
+    }
+    else {
+        NSLog(@"WARNWARN: keyFileData is nil");
+        
+        if ( error ) {
+            *error = [Utils createNSError:@"Could not read Key File from sources" errorCode:-123456];
+        }
+        
+        return nil;
+    }
 }
 
 @end

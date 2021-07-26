@@ -73,7 +73,7 @@
                                                                    style:UIAlertActionStyleDefault
                                                                  handler:^(UIAlertAction *a) { [self presentCustomIconImagePicker]; }];
             
-            UIAlertAction *fourthAction;
+            UIAlertAction *fourthAction = nil;
             
             if(node && node.isGroup) {
                 fourthAction = [UIAlertAction actionWithTitle:AppPreferences.sharedInstance.isProOrFreeTrial ?

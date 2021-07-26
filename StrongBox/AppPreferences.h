@@ -27,8 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL colorizeUseColorBlindPalette;
 @property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
-@property (nonatomic) BOOL disallowAllPinCodeOpens;
-@property (nonatomic) BOOL disallowAllBiometricId;
 @property (nullable) NSString* quickLaunchUuid;
 @property BOOL allowEmptyOrNoPasswordEntry;
 @property BOOL hideKeyFileOnUnlock;
@@ -51,7 +49,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL showAllFilesInLocalKeyFiles;
 @property BOOL monitorInternetConnectivity;
-@property BOOL instantPinUnlocking;
 @property (nonatomic) BOOL iCloudOn;
 @property FavIconDownloadOptions *favIconDownloadOptions;
 @property BOOL showDatabasesSeparator;
@@ -129,7 +126,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL allowThirdPartyKeyboards;
 
 @property BOOL appLockAllowDevicePasscodeFallbackForBio;
-@property BOOL fullFileProtection;
 
 @property BOOL haveAttemptedMigrationToFullFileProtection;
 
@@ -157,6 +153,28 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hasPromptedThatAppHasBeenDowngradedToFreeEdition;
 
 @property BOOL hasPromptedThatFreeTrialWillEndSoon;
+
+@property BOOL disableReadOnlyToggles;
+@property BOOL databasesAreAlwaysReadOnly;
+@property BOOL disableFavIconFeature;
+@property BOOL disableNativeNetworkStorageOptions; 
+
+
+@property BOOL useIsolatedDropbox;
+
+
+
+@property BOOL useLegacyDropboxApi;
+@property BOOL useMinimalDropboxScopes;
+
+@property BOOL streamReadLargeKeyFiles;
+@property BOOL keePassEmailField;
+
+
+
+@property (readonly) BOOL disallowAllPinCodeOpens;
+@property (readonly) BOOL disallowAllBiometricId;
+@property (readonly) BOOL instantPinUnlocking;
 
 @end
 

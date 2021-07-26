@@ -54,7 +54,12 @@
     if ( database ) {
         NSLog(@"provideCredentialWithoutUserInteractionForIdentity - Got DB");
         
-        CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:database isAutoFillOpen:YES isAutoFillQuickTypeOpen:YES biometricPreCleared:NO noConvenienceUnlock:NO];
+        CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self
+                                                                                            database:database
+                                                                                      isAutoFillOpen:YES
+                                                                             isAutoFillQuickTypeOpen:YES
+                                                                                 biometricPreCleared:NO
+                                                                                 noConvenienceUnlock:NO];
         if ( keyDeterminer.isAutoFillConvenienceAutoLockPossible ) {
             NSLog(@"provideCredentialWithoutUserInteractionForIdentity - Within Timeout - Filling without UI");
             [self unlockDatabaseForQuickType:database identifier:identifier];

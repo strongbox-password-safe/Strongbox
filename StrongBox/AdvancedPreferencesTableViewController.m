@@ -48,6 +48,12 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowBio;
 @property (weak, nonatomic) IBOutlet UISwitch *switchPinYinSearch;
 
+@property (weak, nonatomic) IBOutlet UISwitch *switchDropboxFolderOnly;
+@property (weak, nonatomic) IBOutlet UISwitch *switchLegacyDropboxApi;
+@property (weak, nonatomic) IBOutlet UISwitch *switchMinimalDropboxScopes;
+@property (weak, nonatomic) IBOutlet UISwitch *switchStreamReadLargeKeyFiles;
+@property (weak, nonatomic) IBOutlet UISwitch *switchNativeKeePassEmailField;
+
 @end
 
 @implementation AdvancedPreferencesTableViewController
@@ -97,10 +103,10 @@
 }
 
 - (IBAction)onFileProtectionChanged:(id)sender {
-    AppPreferences.sharedInstance.fullFileProtection = self.switchCompleteFileProtection.on;
-    [FileManager.sharedInstance setFileProtection:AppPreferences.sharedInstance.fullFileProtection];
 
-    [self bindPreferences];
+
+
+
 }
 
 - (IBAction)onPreferencesChanged:(id)sender {
@@ -110,7 +116,7 @@
     AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts = self.switchSyncForcePush.on;
     AppPreferences.sharedInstance.useBackgroundUpdates = self.backgroundUpdateSync.on;
     
-    AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
+
     AppPreferences.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     AppPreferences.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
     AppPreferences.sharedInstance.monitorInternetConnectivity = self.switchDetectOffline.on;
@@ -134,6 +140,12 @@
 
     AppPreferences.sharedInstance.pinYinSearchEnabled = self.switchPinYinSearch.on;
     
+    AppPreferences.sharedInstance.useIsolatedDropbox = self.switchDropboxFolderOnly.on;    
+    AppPreferences.sharedInstance.useLegacyDropboxApi = self.switchLegacyDropboxApi.on;
+    AppPreferences.sharedInstance.useMinimalDropboxScopes = self.switchMinimalDropboxScopes.on;
+    AppPreferences.sharedInstance.streamReadLargeKeyFiles = self.switchStreamReadLargeKeyFiles.on;
+    AppPreferences.sharedInstance.keePassEmailField = self.switchNativeKeePassEmailField.on;
+
     [self bindPreferences];
 }
 
@@ -156,11 +168,17 @@
     
     self.switchShowMetadataOnDetailsScreen.on = AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
 
-    self.switchCompleteFileProtection.on = AppPreferences.sharedInstance.fullFileProtection;
+
     self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
     self.switchAddLegacyTotp.on = AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields;
     self.switchAddOtpAuthUrl.on = AppPreferences.sharedInstance.addOtpAuthUrl;
     self.switchPinYinSearch.on = AppPreferences.sharedInstance.pinYinSearchEnabled;
+    
+    self.switchDropboxFolderOnly.on = AppPreferences.sharedInstance.useIsolatedDropbox;
+    self.switchLegacyDropboxApi.on = AppPreferences.sharedInstance.useLegacyDropboxApi;
+    self.switchMinimalDropboxScopes.on = AppPreferences.sharedInstance.useMinimalDropboxScopes;
+    self.switchStreamReadLargeKeyFiles.on = AppPreferences.sharedInstance.streamReadLargeKeyFiles;
+    self.switchNativeKeePassEmailField.on = AppPreferences.sharedInstance.keePassEmailField;
 }
 
 - (void)bindAllowPinCodeOpen {
@@ -173,80 +191,80 @@
 }
 
 - (IBAction)onAllowPinCodeOpen:(id)sender {
-    if(self.switchAllowPinCodeOpen.on) {
-        AppPreferences.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
-        [self bindAllowPinCodeOpen];
-    }
-    else {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_title", @"Clear PIN Codes")
-              message:NSLocalizedString(@"prefs_vc_clear_pin_codes_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by PIN Codes")
-               action:^(BOOL response) {
-                    if(response) {
-                        AppPreferences.sharedInstance.disallowAllPinCodeOpens = !self.switchAllowPinCodeOpen.on;
 
-                        
 
-                        NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-                            return obj.conveniencePin != nil && obj.isEnrolledForConvenience;
-                        }];
 
-                        for (SafeMetaData* safe in clear) {
-                            safe.isEnrolledForConvenience = NO;
-                            safe.isTouchIdEnabled = NO;
-                            safe.convenienceMasterPassword = nil;
-                            safe.conveniencePin = nil;
-                            safe.duressPin = nil;
-                            safe.hasBeenPromptedForConvenience = NO; 
 
-                            [SafesList.sharedInstance update:safe];
-                        }
-                    }
 
-                    [self bindAllowPinCodeOpen];
-               }];
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 - (IBAction)onAllowBiometric:(id)sender {
-    if(self.switchAllowBiometric.on) {
-        NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
-        
-        AppPreferences.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
-        
-        [self bindAllowBiometric];
-    }
-    else {
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"prefs_vc_clear_biometrics_yesno_title", @"Clear Biometrics")
-              message:NSLocalizedString(@"prefs_vc_clear_biometrics_yesno_message", @"This will clear any existing databases with stored Master Credentials that are backed by Biometric Open. Are you sure?")
-               action:^(BOOL response) {
-                    if(response) {
-                        NSLog(@"Setting Allow Biometric Id to %d", self.switchAllowBiometric.on);
 
-                        AppPreferences.sharedInstance.disallowAllBiometricId = !self.switchAllowBiometric.on;
 
-                        
 
-                        NSArray<SafeMetaData*>* clear = [SafesList.sharedInstance.snapshot filter:^BOOL(SafeMetaData * _Nonnull obj) {
-                        return obj.isTouchIdEnabled && obj.isEnrolledForConvenience;
-                        }];
 
-                        for (SafeMetaData* safe in clear) {
-                            safe.isEnrolledForConvenience = NO;
-                            safe.convenienceMasterPassword = nil;
-                            safe.conveniencePin = nil;
-                            safe.isTouchIdEnabled = NO;
-                            safe.duressPin = nil;
-                            safe.hasBeenPromptedForConvenience = NO; 
 
-                            [SafesList.sharedInstance update:safe];
-                        }
-                    }
-            
-                    [self bindAllowBiometric];
-               }];
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 @end

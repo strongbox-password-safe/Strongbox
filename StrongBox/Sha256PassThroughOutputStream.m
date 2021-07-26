@@ -29,7 +29,7 @@
         self.sha256context = malloc(sizeof(CC_SHA256_CTX));
         
         CC_SHA256_Init(_sha256context);
-    
+
         _length = 0;
         _digest = nil;
         
@@ -64,7 +64,7 @@
 
 - (NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
     CC_SHA256_Update(_sha256context, buffer, (CC_LONG)len);
-    
+
     _length += len;
     
     return [self.outputStream write:buffer maxLength:len];

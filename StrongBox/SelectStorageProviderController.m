@@ -69,8 +69,12 @@
         DropboxV2StorageProvider.sharedInstance,
         OneDriveStorageProvider.sharedInstance,
 #endif
-        webDavProvider,
-        sftpProviderWithFastListing].mutableCopy;
+        ].mutableCopy;
+    
+    if ( !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+        [sp addObject:webDavProvider];
+        [sp addObject:sftpProviderWithFastListing];
+    }
     
     
     
@@ -80,7 +84,9 @@
 
     
     
-    if ([AppPreferences sharedInstance].iCloudOn && !self.existing) {
+    if ( !self.existing &&
+        AppPreferences.sharedInstance.iCloudOn &&
+        !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
         [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
         
@@ -100,7 +106,8 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.providers.count + (self.existing ? 2 : 0);
+    BOOL showNativeNetworkProviders = self.existing && !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions;
+    return self.providers.count + (showNativeNetworkProviders ? 2 : 0);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

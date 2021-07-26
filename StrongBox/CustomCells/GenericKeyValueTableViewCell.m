@@ -101,7 +101,6 @@
           [[UITapGestureRecognizer alloc] initWithTarget:self
                                                   action:@selector(onAuditLabelTap)];
     [self.imageAuditError addGestureRecognizer:imageAuditErrorGesture];
-
 }
 
 - (void)prepareForReuse {
@@ -142,6 +141,11 @@
 
     self.auditStack.hidden = YES;
     self.stackStrength.hidden = YES;
+    
+    if (@available(iOS 13.0, *)) {
+        [self.buttonRightButton setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                                forImageInState:UIControlStateNormal];
+    }
 }
 
 - (void)setKey:(NSString*)key value:(NSString*)value editing:(BOOL)editing useEasyReadFont:(BOOL)useEasyReadFont {

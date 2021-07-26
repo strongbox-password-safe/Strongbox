@@ -10,8 +10,8 @@
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
 #import "SafesList.h"
-//#import "Settings.h"
 #import "Model.h"
+#import "AppPreferences.h"
 
 @interface BrowsePreferencesTableViewController () <UIAdaptivePresentationControllerDelegate> // Detect iOS13 swipe down dismiss
 
@@ -60,6 +60,8 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowTotpCustom;
 @property (weak, nonatomic) IBOutlet UISwitch *switchColorizePasswords;
 @property (weak, nonatomic) IBOutlet UISwitch *switchColorizeProtectedCustomFields;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellFetchFavIcon;
+
 
 @end
 
@@ -87,6 +89,10 @@
         [self cell:self.cellDoubleTapAction setHidden:YES];
         [self cell:self.cellTripleTapAction setHidden:YES];
         [self cell:self.cellLongPressAction setHidden:YES];
+    }
+    
+    if ( AppPreferences.sharedInstance.disableFavIconFeature ) {
+        [self cell:self.cellFetchFavIcon setHidden:YES];
     }
     
     [self reloadDataAnimated:NO];

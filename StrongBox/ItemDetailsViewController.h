@@ -30,7 +30,7 @@ extern NSString *const kNotificationNameItemDetailsEditDone;
 @property NSUUID*_Nullable itemId;
 @property NSNumber*_Nullable historicalIndex;
 
-@property BOOL readOnly;
+@property BOOL forcedReadOnly;
 @property Model* databaseModel;
 
 #ifdef IS_APP_EXTENSION
