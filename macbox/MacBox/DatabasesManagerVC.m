@@ -28,6 +28,9 @@
 #import "BackupsManager.h"
 #import "Utils.h"
 #import "WorkingCopyManager.h"
+#import "SFTPConnectionsManager.h"
+#import "WebDAVConnectionsManager.h"
+#import "NSDate+Extensions.h"
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
 
@@ -68,6 +71,23 @@ static DatabasesManagerVC* sharedInstance;
     [sharedInstance.view.window center];
 }
 
+- (void)close {
+    if ( self.presentingViewController ) {
+        [self.presentingViewController dismissViewController:self];
+    }
+    else {
+        [self.view.window orderOut:self];
+    }
+    
+    [self killRefreshTimer];
+    sharedInstance = nil;
+}
+
+- (void)cancel:(id)sender {
+    
+    [self close];
+}
+
 - (void)viewWillAppear {
     [super viewWillAppear];
 
@@ -80,7 +100,6 @@ static DatabasesManagerVC* sharedInstance;
 - (void)doInitialSetup {
     self.view.window.delegate = self;
 
-    
     
     
     
@@ -158,18 +177,6 @@ static DatabasesManagerVC* sharedInstance;
 
     self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refreshVisibleRows) userInfo:nil repeats:YES];
     [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
-}
-
-- (void)cancel:(id)sender { 
-    [self.view.window orderBack:self];
-}
-
-- (void)windowWillClose:(NSNotification *)notification {
-    if ( notification.object == self.view.window && self == sharedInstance) {
-        [self.view.window orderOut:self];
-        [self killRefreshTimer];
-        sharedInstance = nil;
-    }
 }
 
 - (IBAction)onRemove:(id)sender {
@@ -366,6 +373,11 @@ static DatabasesManagerVC* sharedInstance;
                      window:self.view.window
                  completion:nil];
         }
+        else {
+            if ( Settings.sharedInstance.closeManagerOnLaunch ) {
+                [self close];
+            }
+        }
     }];
 }
 
@@ -395,17 +407,33 @@ static DatabasesManagerVC* sharedInstance;
 }
 
 - (void)onAddSFTPDatabase:(id)sender {
-    SFTPStorageProvider* provider = [[SFTPStorageProvider alloc] init];
-    provider.maintainSessionForListing = YES;
+    SFTPConnectionsManager* vc = [SFTPConnectionsManager instantiateFromStoryboard];
+
+    __weak DatabasesManagerVC* weakSelf = self;
+    vc.onSelected = ^(SFTPSessionConfiguration * _Nonnull connection) {
+        SFTPStorageProvider* provider = [[SFTPStorageProvider alloc] init];
+        provider.explicitConnection = connection;
+        provider.maintainSessionForListing = YES;
     
-    [self showStorageBrowserForProvider:provider];
+        [weakSelf showStorageBrowserForProvider:provider];
+    };
+        
+    [self presentViewControllerAsSheet:vc];
 }
 
 - (IBAction)onAddWebDav:(id)sender {
-    WebDAVStorageProvider* provider = [[WebDAVStorageProvider alloc] init];
-    provider.maintainSessionForListings = YES;
+    WebDAVConnectionsManager* vc = [WebDAVConnectionsManager instantiateFromStoryboard];
     
-    [self showStorageBrowserForProvider:provider];
+    __weak DatabasesManagerVC* weakSelf = self;
+    vc.onSelected = ^(WebDAVSessionConfiguration * _Nonnull connection) {
+        WebDAVStorageProvider* provider = [[WebDAVStorageProvider alloc] init];
+        provider.explicitConnection = connection;
+        provider.maintainSessionForListing = YES;
+    
+        [weakSelf showStorageBrowserForProvider:provider];
+    };
+        
+    [self presentViewControllerAsSheet:vc];
 }
 
 - (void)showStorageBrowserForProvider:(id<SafeStorageProvider>)provider {
@@ -534,7 +562,7 @@ static DatabasesManagerVC* sharedInstance;
             return YES;
         }
     }
-    else if (theAction == @selector(onExport:)) {
+    else if (theAction == @selector(onExportDatabase:)) {
         if(self.tableView.selectedRow != -1) {
             return YES;
         }
@@ -668,7 +696,7 @@ static DatabasesManagerVC* sharedInstance;
     [NSMenu popUpContextMenu:self.tableView.menu withEvent:NSApp.currentEvent forView:self.tableView];
 }
 
-- (IBAction)onExport:(id)sender {
+- (IBAction)onExportDatabase:(id)sender {
     if(self.tableView.selectedRow == -1) {
         return;
     }
@@ -677,7 +705,7 @@ static DatabasesManagerVC* sharedInstance;
     DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
 
     NSSavePanel* panel = [NSSavePanel savePanel];
-    panel.nameFieldStringValue = database.fileUrl.lastPathComponent;
+    panel.nameFieldStringValue = [self exportFileName:database];
     
     if ( [panel runModal] != NSModalResponseOK ) {
         return;
@@ -700,6 +728,18 @@ static DatabasesManagerVC* sharedInstance;
     else {
         [self syncBeforeExport:database dest:dest showSpinner:NO];
     }
+}
+
+- (NSString*)exportFileName:(DatabaseMetadata*)metadata {
+    NSString* extension = metadata.fileUrl.path.pathExtension;
+    NSString* withoutExtension = [metadata.fileUrl.path.lastPathComponent stringByDeletingPathExtension];
+    NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
+    
+    NSString* ret = [newFileName stringByAppendingPathExtension:extension];
+    
+    NSLog(@"Export Filename: [%@]", ret);
+    
+    return  ret;
 }
 
 - (void)syncBeforeExport:(DatabaseMetadata *)database dest:(NSURL*)dest showSpinner:(BOOL)showSpinner {

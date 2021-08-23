@@ -30,7 +30,8 @@
         
         
         if (![self getFieldForType:FIELD_TYPE_UUID]) {
-            [self generateNewUUID];
+            NSUUID *unique = [[NSUUID alloc] init];
+            [self setUuid:unique];
         }
         
         return self;
@@ -177,11 +178,10 @@
     return [self getUUIDForField:FIELD_TYPE_UUID];
 }
 
-- (void)generateNewUUID {
-    NSUUID *unique = [[NSUUID alloc] init];
+- (void)setUuid:(NSUUID *)uuid {
     unsigned char bytes[16];
-
-    [unique getUUIDBytes:bytes];
+    [uuid getUUIDBytes:bytes];
+    
     NSData *d = [[NSData alloc] initWithBytes:bytes length:16];
 
     [self setFieldWithData:FIELD_TYPE_UUID data:d];

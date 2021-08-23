@@ -187,9 +187,7 @@ const NSUInteger kSectionIdxLast = 3;
             ret = current.allChildRecords;
             break;
         case kBrowseViewTypeTotpList:
-            ret = [self.viewModel.database.effectiveRootGroup.allChildRecords filter:^BOOL(Node * _Nonnull obj) {
-                return obj.fields.otpToken != nil;
-            }];
+            ret = self.viewModel.database.totpEntries;
             break;
         default:
             break;

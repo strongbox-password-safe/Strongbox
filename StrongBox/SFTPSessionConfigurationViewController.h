@@ -13,8 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SFTPSessionConfigurationViewController : UIViewController
 
-@property (nonatomic, copy) void (^onDone)(BOOL success);
-@property (nullable) SFTPSessionConfiguration* configuration;
+@property (nonatomic, copy) void (^onDone)(BOOL success, SFTPSessionConfiguration*_Nullable configuration);
+@property (nullable) SFTPSessionConfiguration* initialConfiguration;
 
 @end
 

@@ -85,11 +85,13 @@
 
 - (KeePassGroup*)buildXmlGroup:(Node*)group attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     KeePassGroup *ret = [[KeePassGroup alloc] initWithContext:self.xmlParsingContext];
-
-    NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)group.linkedData;
-    if(unmanagedChildren) {
-        for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
-            [ret addUnknownChildObject:unmanagedChild];
+    
+    if ( group.linkedData && [ group.linkedData isKindOfClass:NSArray.class ] ) { 
+        NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)group.linkedData;
+        if ( unmanagedChildren && unmanagedChildren.count ) {
+            for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
+                [ret addUnknownChildObject:unmanagedChild];
+            }
         }
     }
 
@@ -150,10 +152,13 @@
 - (Entry*)buildXmlEntry:(Node*)node stripHistory:(BOOL)stripHistory attachmentsPool:(NSArray<DatabaseAttachment *> *)attachmentsPool iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool {
     Entry *ret = [[Entry alloc] initWithContext:self.xmlParsingContext];
   
-    NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)node.linkedData;
-    if(unmanagedChildren) {
-        for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
-            [ret addUnknownChildObject:unmanagedChild];
+    if ( node.linkedData && [node.linkedData isKindOfClass:NSArray.class] ) { 
+        NSArray<id<XmlParsingDomainObject>> *unmanagedChildren = (NSArray<id<XmlParsingDomainObject>>*)node.linkedData;
+    
+        if ( unmanagedChildren && unmanagedChildren.count ) {
+            for (id<XmlParsingDomainObject> unmanagedChild in unmanagedChildren) {
+                [ret addUnknownChildObject:unmanagedChild];
+            }
         }
     }
     

@@ -68,6 +68,16 @@
 
 #import "OnboardingManager.h"
 
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
+#import "WebDAVConnections.h"
+#import "SFTPConnections.h"
+#import "WebDAVConnectionsViewController.h"
+#import "SFTPConnectionsViewController.h"
+
+#import "StorageBrowserTableViewController.h"
+#import "Constants.h"
+
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddSafe;
@@ -112,6 +122,8 @@
     
     [self setFreeTrialEndDateBasedOnIapPurchase]; 
 
+    [self performMigrations];
+    
     [self listenToNotifications];
         
     if ( ![self isAppLocked] ) { 
@@ -141,6 +153,59 @@
     }
     
     [self bindProOrFreeTrialUi];
+}
+
+- (void)performMigrations {
+    if ( !AppPreferences.sharedInstance.migratedConnections ) {
+        int wcount = 0;
+        int scount = 0;
+        
+        NSArray* databases = SafesList.sharedInstance.snapshot;
+        
+        for ( SafeMetaData *database in  databases ) {
+            if ( database.storageProvider == kWebDAV ) {
+                WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+                if (  pd.sessionConfiguration ) {
+                    if ( pd.sessionConfiguration.name.length == 0 ) {
+                        pd.sessionConfiguration.name = [NSString stringWithFormat:@"%@ %@", pd.sessionConfiguration.host, @(++wcount)];
+                    }
+                    [WebDAVConnections.sharedInstance addOrUpdate:pd.sessionConfiguration];
+                    
+                    SafeMetaData* newDatabase = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+                    
+                    database.fileName = newDatabase.fileName;
+                    database.fileIdentifier = newDatabase.fileIdentifier;
+                    
+                    [SafesList.sharedInstance update:database];
+                    
+                    NSLog(@"Migrated WebDAV Connection");
+                }
+            }
+            else if ( database.storageProvider == kSFTP ) {
+                SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+                SFTPSessionConfiguration* connection = pd.sFtpConfiguration;
+                
+                if ( connection ) {
+                    if ( connection.name.length == 0 ) {
+                        connection.name = [NSString stringWithFormat:@"%@ %@", connection.host, @(++scount)];
+                    }
+
+                    [SFTPConnections.sharedInstance addOrUpdate:connection];
+                    
+                    SafeMetaData* newDatabase = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+                    
+                    database.fileName = newDatabase.fileName;
+                    database.fileIdentifier = newDatabase.fileIdentifier;
+                    
+                    [SafesList.sharedInstance update:database];
+                    
+                    NSLog(@"Migrated SFTP Connection = [%@] - %@", pd.connectionIdentifier, connection.identifier);
+                }
+            }
+        }
+        
+        AppPreferences.sharedInstance.migratedConnections = YES;
+    }
 }
 
 - (void)setupTips {
@@ -731,7 +796,12 @@
             else if (result == kUnlockDatabaseResultError) {
                 [Alerts error:self
                         title:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
-                        error:error];
+                        error:error
+                   completion:^{
+                    if ( error.code == kStorageProviderSFTPorWebDAVSecretMissingErrorCode ) {
+                        [self editConnection:safe];
+                    }
+                }];
             }
         }];
     }
@@ -760,15 +830,30 @@
     return [UIContextMenuConfiguration configurationWithIdentifier:nil
                                                    previewProvider:nil
                                                     actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
-        return [UIMenu menuWithTitle:@""
-                               image:nil
-                          identifier:nil
-                             options:kNilOptions
-                            children:@[
+        NSMutableArray *array = [NSMutableArray arrayWithArray:@[
             [self getContextualMenuDatabaseNonMutatatingActions:indexPath],
             [self getContextualMenuDatabaseActions:indexPath],
             [self getContextualMenuDatabaseStateActions:indexPath],
         ]];
+
+        SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+        if ( safe.storageProvider == kWebDAV || safe.storageProvider == kSFTP ) {
+            UIMenu* m = [UIMenu menuWithTitle:@""
+                                        image:nil
+                                   identifier:nil
+                                      options:UIMenuOptionsDisplayInline
+                                     children:@[[self getContextualMenuEditConnectionAction:indexPath],
+                                                [self getContextualMenuEditFilePathAction:indexPath]]];
+
+            [array insertObject:m atIndex:2];
+        }
+        
+        return [UIMenu menuWithTitle:@""
+                               image:nil
+                          identifier:nil
+                             options:kNilOptions
+                            children:array];
     }];
 }
 
@@ -831,7 +916,8 @@
     
     return [UIMenu menuWithTitle:@""
                            image:nil
-                      identifier:nil options:UIMenuOptionsDisplayInline
+                      identifier:nil
+                         options:UIMenuOptionsDisplayInline
                         children:ma];
 }
 
@@ -1060,6 +1146,36 @@
                            destructive:NO
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self beginMergeWizard:safe];
+    }];
+}
+
+- (UIAction*)getContextualMenuEditConnectionAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    UIImage* img = Platform.iOS14Available ? [UIImage systemImageNamed:@"externaldrive.connected.to.line.below"] : [UIImage imageNamed:@"link"];
+
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    NSString* foo = safe.storageProvider == kSFTP ? NSLocalizedString(@"generic_action_edit_sftp_connection_ellipsis", @"SFTP Connection...") : NSLocalizedString(@"generic_action_edit_webdav_connection_ellipsis", @"WebDAV Connection...");
+    
+    return [self getContextualMenuItem:foo
+                                 image:img
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self editConnection:safe];
+    }];
+}
+
+- (UIAction*)getContextualMenuEditFilePathAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
+    UIImage* img = [UIImage systemImageNamed:@"location"];
+
+    SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
+
+    NSString* foo = safe.storageProvider == kSFTP ? NSLocalizedString(@"reselect_sftp_file_ellipsis", @"Reselect SFTP File...") : NSLocalizedString(@"reselect_webdav_file_ellipsis", @"Reselect WebDAV File...");
+    
+    return [self getContextualMenuItem:foo
+                                 image:img
+                           destructive:NO
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [self editFilePath:safe];
     }];
 }
 
@@ -2465,5 +2581,150 @@
     
     return UIModalPresentationNone;
 }
+
+- (void)editConnection:(SafeMetaData*)database {
+    if ( database.storageProvider == kWebDAV ) {
+        WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
+        vc.selectMode = YES;
+        
+        WebDAVSessionConfiguration* config = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:database];
+        vc.initialSelected = config.identifier;
+        
+        vc.onSelected = ^(WebDAVSessionConfiguration * _Nonnull connection) {
+            if ( ![connection.identifier isEqualToString:config.identifier] ) {
+                [Alerts areYouSure:self
+                           message:NSLocalizedString(@"are_you_sure_change_connection", @"Are you sure you want to change the connection for this database?")
+                            action:^(BOOL response) {
+                    if ( response ) {
+                        [self changeWebDAVDatabaseConnection:database connection:connection];
+                    }
+                }];
+            }
+        };
+        
+        [vc presentFromViewController:self];
+    }
+    else if ( database.storageProvider == kSFTP ) {
+        SFTPConnectionsViewController* vc = [SFTPConnectionsViewController instantiateFromStoryboard];
+        vc.selectMode = YES;
+        
+        SFTPSessionConfiguration* config = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:database];
+        vc.initialSelected = config.identifier;
+        
+        vc.onSelected = ^(SFTPSessionConfiguration * _Nonnull connection) {
+            if ( ![connection.identifier isEqualToString:config.identifier] ) {
+                [Alerts areYouSure:self
+                           message:NSLocalizedString(@"are_you_sure_change_connection", @"Are you sure you want to change the connection for this database?")
+                            action:^(BOOL response) {
+                    if ( response ) {
+                        [self changeSFTPDatabaseConnection:database connection:connection];
+                    }
+                }];
+            }
+        };
+        
+        [vc presentFromViewController:self];
+    }
+}
+
+- (void)changeWebDAVDatabaseConnection:(SafeMetaData*)database connection:(WebDAVSessionConfiguration*)connection {
+    WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+    pd.connectionIdentifier = connection.identifier;
+    
+    SafeMetaData* newDb = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+    database.fileIdentifier = newDb.fileIdentifier;
+    [SafesList.sharedInstance update:database];
+}
+
+- (void)changeSFTPDatabaseConnection:(SafeMetaData*)database connection:(SFTPSessionConfiguration*)connection {
+    SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+    pd.connectionIdentifier = connection.identifier;
+    
+    SafeMetaData* newDb = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+    database.fileIdentifier = newDb.fileIdentifier;
+    [SafesList.sharedInstance update:database];
+}
+
+- (void)editFilePath:(SafeMetaData*)database {
+    if ( database.storageProvider == kWebDAV ) {
+        StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
+        UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+        
+        WebDAVStorageProvider* sp = [[WebDAVStorageProvider alloc] init];
+        sp.explicitConnection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:database];
+        sp.maintainSessionForListing = YES;
+        
+        vc.existing = YES;
+        vc.safeStorageProvider = sp;
+        vc.onDone = ^(SelectedStorageParameters *params) {
+            [nav.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                if ( params.method == kStorageMethodErrorOccurred ) {
+                    [Alerts error:self error:params.error];
+                }
+                else if ( params.method == kStorageMethodNativeStorageProvider ) {
+                    [Alerts areYouSure:self
+                               message:NSLocalizedString(@"are_you_sure_use_this_file_this_database", @"Are you want to use this file for this database?")
+                                action:^(BOOL response) {
+                        if ( response ) {
+                            NSLog(@"Done [%@]", params.file.providerData );
+                            [self changeWebDAVFilePath:database providerData:(WebDAVProviderData*)params.file.providerData];
+                        }
+                    }];
+                }
+            }];
+        };
+        
+        [self presentViewController:nav animated:YES completion:nil];
+    }
+    else if ( database.storageProvider == kSFTP ) {
+        StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
+        UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
+
+        SFTPStorageProvider* sp = [[SFTPStorageProvider alloc] init];
+        sp.explicitConnection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:database];
+        sp.maintainSessionForListing = YES;
+        
+        vc.existing = YES;
+        vc.safeStorageProvider = sp;
+        vc.onDone = ^(SelectedStorageParameters *params) {
+            [nav.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                if ( params.method == kStorageMethodErrorOccurred ) {
+                    [Alerts error:self error:params.error];
+                }
+                else if ( params.method == kStorageMethodNativeStorageProvider ) {
+                    [Alerts areYouSure:self
+                               message:NSLocalizedString(@"are_you_sure_use_this_file_this_database", @"Are you want to use this file for this database?")
+                                action:^(BOOL response) {
+                        if ( response ) {
+                            NSLog(@"Done [%@]", params.file.providerData );
+                            [self changeSFTPFilePath:database providerData:(SFTPProviderData*)params.file.providerData];
+                        }
+                    }];
+                }
+            }];
+        };
+        
+        [self presentViewController:nav animated:YES completion:nil];
+    }
+}
+
+- (void)changeSFTPFilePath:(SafeMetaData*)database providerData:(SFTPProviderData*)providerData {
+    SafeMetaData* newDb = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:providerData];
+    
+    database.fileName = newDb.fileName;
+    database.fileIdentifier = newDb.fileIdentifier;
+    
+    [SafesList.sharedInstance update:database];
+}
+
+- (void)changeWebDAVFilePath:(SafeMetaData*)database providerData:(WebDAVProviderData*)providerData {
+    SafeMetaData* newDb = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:providerData];
+    
+    database.fileName = newDb.fileName;
+    database.fileIdentifier = newDb.fileIdentifier;
+    
+    [SafesList.sharedInstance update:database];
+}
+
 
 @end

@@ -72,7 +72,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.52.24</string>
+	<string>1.53.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -124,7 +124,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>3091</string>
+	<string>3095</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>dbapi-1</string>

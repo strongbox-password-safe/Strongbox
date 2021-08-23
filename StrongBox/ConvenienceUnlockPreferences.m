@@ -95,10 +95,12 @@
     
     
     
+        
     BOOL bio = self.viewModel.metadata.isTouchIdEnabled && [self canToggleTouchId];
     BOOL pin = self.viewModel.metadata.conveniencePin != nil;
+    BOOL hideForEmptyNil = self.viewModel.metadata.convenienceMasterPassword.length == 0 && !self.viewModel.metadata.conveniencePasswordHasExpired && self.viewModel.metadata.convenienceExpiryPeriod == -1;
     
-    [self cell:self.cellExpiry setHidden:!(bio || pin)];
+    [self cell:self.cellExpiry setHidden:(!(bio || pin) || hideForEmptyNil)];
 
     
     

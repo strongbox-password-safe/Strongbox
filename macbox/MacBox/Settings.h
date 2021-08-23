@@ -67,6 +67,7 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property BOOL hideDockIconOnAllMinimized;
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
+@property (nonatomic) BOOL revealPasswordsImmediately;
 
 @property (nonatomic) NSInteger autoLockTimeoutSeconds; 
 
@@ -76,8 +77,6 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property BOOL showCustomFieldsOnQuickViewPanel;
 @property BOOL showAttachmentsOnQuickViewPanel;
 @property BOOL showAttachmentImagePreviewsOnQuickViewPanel;
-@property (nonatomic) BOOL showPasswordImmediatelyInOutline;
-@property (nonatomic) BOOL alwaysShowPassword;
 
 /* =================================================================================================== */
 /* Migrated to Per Database Settings - Begin 14 Jun 2021 - Give 3 months migration time -> 14-Sep-2021 */
@@ -102,5 +101,10 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property NSArray<NSString*>* visibleColumns;
 
 /* =================================================================================================== */
+
+@property BOOL migratedConnections;
+
+@property BOOL closeManagerOnLaunch;
+@property BOOL makeLocalRollingBackups;
 
 @end

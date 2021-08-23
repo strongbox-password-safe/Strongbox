@@ -405,6 +405,14 @@
 		6B9B902F795918EE0444B2D8 /* Pods_common_mac_Strongbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 175E67FE2B017DA2FA2AA693 /* Pods_common_mac_Strongbox.framework */; };
 		90B3CB52841F3537EA3AEABA /* Pods_common_mac_Strongbox_Pro.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3513216123E1521206CFC31C /* Pods_common_mac_Strongbox_Pro.framework */; };
 		9C6DD574EEE978315083315A /* Pods_common_mac_Strongbox_Pro_AutoFill.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B6CE03C354C8E7230D5515DE /* Pods_common_mac_Strongbox_Pro_AutoFill.framework */; };
+		C80043B026BD7C6E0090C90D /* ConnectionCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C80043AF26BD7C6E0090C90D /* ConnectionCellView.xib */; };
+		C80043B126BD7C6E0090C90D /* ConnectionCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C80043AF26BD7C6E0090C90D /* ConnectionCellView.xib */; };
+		C80043B426BD7CB30090C90D /* ConnectionCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = C80043B326BD7CB30090C90D /* ConnectionCellView.m */; };
+		C80043B526BD7CB30090C90D /* ConnectionCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = C80043B326BD7CB30090C90D /* ConnectionCellView.m */; };
+		C80043BB26BD83D40090C90D /* WebDAVConnectionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C80043BA26BD83D40090C90D /* WebDAVConnectionsManager.m */; };
+		C80043BC26BD83D40090C90D /* WebDAVConnectionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C80043BA26BD83D40090C90D /* WebDAVConnectionsManager.m */; };
+		C80043C126BD900B0090C90D /* WebDAVConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80043C426BD900B0090C90D /* WebDAVConnectionsManager.storyboard */; };
+		C80043C226BD900B0090C90D /* WebDAVConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80043C426BD900B0090C90D /* WebDAVConnectionsManager.storyboard */; };
 		C80735E02614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
 		C80735E12614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
 		C80735E22614D97E006FA2FC /* TableViewWithRightClickSelect.m in Sources */ = {isa = PBXBuildFile; fileRef = C80735DF2614D97E006FA2FC /* TableViewWithRightClickSelect.m */; };
@@ -433,6 +441,8 @@
 		C80C2BC5259A1DD300085E7F /* OutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = C80C2BC2259A1DD300085E7F /* OutlineView.m */; };
 		C80C2BC6259A1DD300085E7F /* OutlineView.m in Sources */ = {isa = PBXBuildFile; fileRef = C80C2BC2259A1DD300085E7F /* OutlineView.m */; };
 		C80FF039256D666E00A181B1 /* AutoFillSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C80FF038256D666E00A181B1 /* AutoFillSettingsViewController.m */; };
+		C819D6BE26BD921300886363 /* SFTPConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */; };
+		C819D6BF26BD921300886363 /* SFTPConnectionsManager.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */; };
 		C81ABE4A25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
 		C81ABE4B25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
 		C81ABE4C25E6B0250006E81C /* DatabaseCellView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */; };
@@ -442,6 +452,16 @@
 		C81BBD0C2567E49A001BAB0D /* ClickableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */; };
 		C81BBD0D2567E49A001BAB0D /* ClickableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */; };
 		C81BBD0E2567E49A001BAB0D /* ClickableTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */; };
+		C81F164626BC2F2800CDAEAF /* SFTPConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164226BC2F2700CDAEAF /* SFTPConnections.m */; };
+		C81F164726BC2F2800CDAEAF /* SFTPConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164226BC2F2700CDAEAF /* SFTPConnections.m */; };
+		C81F164826BC2F2800CDAEAF /* WebDAVConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164526BC2F2700CDAEAF /* WebDAVConnections.m */; };
+		C81F164926BC2F2800CDAEAF /* WebDAVConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164526BC2F2700CDAEAF /* WebDAVConnections.m */; };
+		C81F164A26BC2F4800CDAEAF /* SFTPConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164226BC2F2700CDAEAF /* SFTPConnections.m */; };
+		C81F164B26BC2F4800CDAEAF /* WebDAVConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164526BC2F2700CDAEAF /* WebDAVConnections.m */; };
+		C81F164C26BC2F4800CDAEAF /* SFTPConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164226BC2F2700CDAEAF /* SFTPConnections.m */; };
+		C81F164D26BC2F4800CDAEAF /* WebDAVConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F164526BC2F2700CDAEAF /* WebDAVConnections.m */; };
+		C81F165326BC432A00CDAEAF /* SFTPConnectionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F165226BC432A00CDAEAF /* SFTPConnectionsManager.m */; };
+		C81F165426BC432A00CDAEAF /* SFTPConnectionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F165226BC432A00CDAEAF /* SFTPConnectionsManager.m */; };
 		C81F1DD3260214D900251A2F /* DatabaseMerger.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F1DD2260214D900251A2F /* DatabaseMerger.m */; };
 		C81F1DD4260214D900251A2F /* DatabaseMerger.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F1DD2260214D900251A2F /* DatabaseMerger.m */; };
 		C81F1DD5260214D900251A2F /* DatabaseMerger.m in Sources */ = {isa = PBXBuildFile; fileRef = C81F1DD2260214D900251A2F /* DatabaseMerger.m */; };
@@ -549,6 +569,8 @@
 		C8397AE82593989F000F5158 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C8397AE62593989E000F5158 /* NodeIconHelper.m */; };
 		C8397AE92593989F000F5158 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C8397AE62593989E000F5158 /* NodeIconHelper.m */; };
 		C8397AEA2593989F000F5158 /* NodeIconHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C8397AE62593989E000F5158 /* NodeIconHelper.m */; };
+		C83F7D7A26B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C83F7D7926B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m */; };
+		C83F7D7B26B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C83F7D7926B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m */; };
 		C8441B8525CAEB930070C7FE /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441B8025CAEB930070C7FE /* WebDAVProviderData.m */; };
 		C8441B8625CAEB930070C7FE /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441B8025CAEB930070C7FE /* WebDAVProviderData.m */; };
 		C8441B8725CAEB930070C7FE /* WebDAVProviderData.m in Sources */ = {isa = PBXBuildFile; fileRef = C8441B8025CAEB930070C7FE /* WebDAVProviderData.m */; };
@@ -1526,9 +1548,6 @@
 		C8A101CE25FBB95A00293456 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A101CD25FBB95A00293456 /* SwiftUIView.swift */; };
 		C8A101CF25FBB95A00293456 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A101CD25FBB95A00293456 /* SwiftUIView.swift */; };
 		C8A101D025FBB95A00293456 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A101CD25FBB95A00293456 /* SwiftUIView.swift */; };
-		C8A101D925FBBBF800293456 /* GroupDetailsViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8A101D825FBBBF800293456 /* GroupDetailsViewController.storyboard */; };
-		C8A101DA25FBBBF800293456 /* GroupDetailsViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8A101D825FBBBF800293456 /* GroupDetailsViewController.storyboard */; };
-		C8A101DB25FBBBF800293456 /* GroupDetailsViewController.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8A101D825FBBBF800293456 /* GroupDetailsViewController.storyboard */; };
 		C8AA2137256BD0E400E9FF8D /* DatabaseOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8AA213B256BD0E400E9FF8D /* DatabaseOnboarding.storyboard */; };
 		C8AA2138256BD0E400E9FF8D /* DatabaseOnboarding.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8AA213B256BD0E400E9FF8D /* DatabaseOnboarding.storyboard */; };
 		C8AA2170256BD15900E9FF8D /* ManualCredentialsEntry.xib in Resources */ = {isa = PBXBuildFile; fileRef = C8AA2172256BD15900E9FF8D /* ManualCredentialsEntry.xib */; };
@@ -2437,6 +2456,37 @@
 		AF1EBC56BCA9A181C08FED45 /* Pods-common-mac-Strongbox-AutoFill.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-common-mac-Strongbox-AutoFill.release.xcconfig"; path = "../Pods/Target Support Files/Pods-common-mac-Strongbox-AutoFill/Pods-common-mac-Strongbox-AutoFill.release.xcconfig"; sourceTree = "<group>"; };
 		B5775E930C35CCA891076DB8 /* Pods_Macbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Macbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B6CE03C354C8E7230D5515DE /* Pods_common_mac_Strongbox_Pro_AutoFill.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_common_mac_Strongbox_Pro_AutoFill.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C80043AF26BD7C6E0090C90D /* ConnectionCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ConnectionCellView.xib; path = MacBox/ConnectionCellView.xib; sourceTree = "<group>"; };
+		C80043B226BD7CB30090C90D /* ConnectionCellView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ConnectionCellView.h; path = MacBox/ConnectionCellView.h; sourceTree = "<group>"; };
+		C80043B326BD7CB30090C90D /* ConnectionCellView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConnectionCellView.m; path = MacBox/ConnectionCellView.m; sourceTree = "<group>"; };
+		C80043B926BD83D40090C90D /* WebDAVConnectionsManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WebDAVConnectionsManager.h; path = MacBox/WebDAVConnectionsManager.h; sourceTree = "<group>"; };
+		C80043BA26BD83D40090C90D /* WebDAVConnectionsManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebDAVConnectionsManager.m; path = MacBox/WebDAVConnectionsManager.m; sourceTree = "<group>"; };
+		C80043C326BD900B0090C90D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/WebDAVConnectionsManager.storyboard; sourceTree = "<group>"; };
+		C80043C826BD90120090C90D /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/WebDAVConnectionsManager.strings"; sourceTree = "<group>"; };
+		C80043CA26BD90180090C90D /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043CC26BD90190090C90D /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043CE26BD901B0090C90D /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043D026BD901C0090C90D /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043D226BD901D0090C90D /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/WebDAVConnectionsManager.strings"; sourceTree = "<group>"; };
+		C80043D426BD901F0090C90D /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043D626BD90200090C90D /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043D826BD90210090C90D /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043DA26BD90220090C90D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043DC26BD90230090C90D /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043DE26BD90250090C90D /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043E026BD90260090C90D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043E226BD90270090C90D /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043E426BD90280090C90D /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043E626BD90290090C90D /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/WebDAVConnectionsManager.strings; sourceTree = "<group>"; };
+		C80043E826BD902C0090C90D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/WebDAVConnectionsManager.strings"; sourceTree = "<group>"; };
+		C800440E26BD906F0090C90D /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/WebDAVConfigVC.strings; sourceTree = "<group>"; };
+		C800441026BD90700090C90D /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/WebDAVConfigVC.strings; sourceTree = "<group>"; };
+		C800441226BD90710090C90D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/WebDAVConfigVC.strings; sourceTree = "<group>"; };
+		C800441426BD90730090C90D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/WebDAVConfigVC.strings"; sourceTree = "<group>"; };
+		C800441826BD907F0090C90D /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/SFTPConfigurationVC.strings"; sourceTree = "<group>"; };
+		C800441A26BD90800090C90D /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/SFTPConfigurationVC.strings; sourceTree = "<group>"; };
+		C800441C26BD90820090C90D /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SFTPConfigurationVC.strings; sourceTree = "<group>"; };
+		C800441E26BD90820090C90D /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SFTPConfigurationVC.strings; sourceTree = "<group>"; };
 		C803E1CD2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/UpgradeWindowController.strings; sourceTree = "<group>"; };
 		C803E1CE2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/DatabaseProperties.strings; sourceTree = "<group>"; };
 		C803E1CF2464978D001EB9A5 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/Main.strings; sourceTree = "<group>"; };
@@ -2466,9 +2516,33 @@
 		C80C2BC2259A1DD300085E7F /* OutlineView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OutlineView.m; sourceTree = "<group>"; };
 		C80FF037256D666E00A181B1 /* AutoFillSettingsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AutoFillSettingsViewController.h; path = MacBox/AutoFillSettingsViewController.h; sourceTree = "<group>"; };
 		C80FF038256D666E00A181B1 /* AutoFillSettingsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AutoFillSettingsViewController.m; path = MacBox/AutoFillSettingsViewController.m; sourceTree = "<group>"; };
+		C819D6C026BD921300886363 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SFTPConnectionsManager.storyboard; sourceTree = "<group>"; };
+		C819D6C526BD921B00886363 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
+		C819D6C726BD922900886363 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
+		C819D6C926BD922A00886363 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6CB26BD922B00886363 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6CD26BD922C00886363 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6CF26BD922D00886363 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6D126BD922D00886363 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6D326BD922E00886363 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6D526BD923000886363 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6D726BD923100886363 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6D926BD923200886363 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SFTPConnectionsManager.strings"; sourceTree = "<group>"; };
+		C819D6DB26BD923200886363 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6DD26BD923400886363 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6DF26BD923500886363 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6E126BD923600886363 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6E326BD923700886363 /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
+		C819D6E526BD923800886363 /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/SFTPConnectionsManager.strings; sourceTree = "<group>"; };
 		C81ABE4925E6B0250006E81C /* DatabaseCellView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = DatabaseCellView.xib; path = MacBox/DatabaseCellView.xib; sourceTree = "<group>"; };
 		C81BBD0A2567E49A001BAB0D /* ClickableTextField.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ClickableTextField.h; path = MacBox/ClickableTextField.h; sourceTree = "<group>"; };
 		C81BBD0B2567E49A001BAB0D /* ClickableTextField.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ClickableTextField.m; path = MacBox/ClickableTextField.m; sourceTree = "<group>"; };
+		C81F164226BC2F2700CDAEAF /* SFTPConnections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SFTPConnections.m; path = ../StrongBox/SFTPConnections.m; sourceTree = "<group>"; };
+		C81F164326BC2F2700CDAEAF /* WebDAVConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDAVConnections.h; path = ../StrongBox/WebDAVConnections.h; sourceTree = "<group>"; };
+		C81F164426BC2F2700CDAEAF /* SFTPConnections.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SFTPConnections.h; path = ../StrongBox/SFTPConnections.h; sourceTree = "<group>"; };
+		C81F164526BC2F2700CDAEAF /* WebDAVConnections.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDAVConnections.m; path = ../StrongBox/WebDAVConnections.m; sourceTree = "<group>"; };
+		C81F165126BC432A00CDAEAF /* SFTPConnectionsManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPConnectionsManager.h; path = MacBox/SFTPConnectionsManager.h; sourceTree = "<group>"; };
+		C81F165226BC432A00CDAEAF /* SFTPConnectionsManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SFTPConnectionsManager.m; path = MacBox/SFTPConnectionsManager.m; sourceTree = "<group>"; };
 		C81F1DD1260214D900251A2F /* DatabaseMerger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseMerger.h; path = ../Sync/DatabaseMerger.h; sourceTree = "<group>"; };
 		C81F1DD2260214D900251A2F /* DatabaseMerger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseMerger.m; path = ../Sync/DatabaseMerger.m; sourceTree = "<group>"; };
 		C81F1DE0260214FB00251A2F /* DatabaseDiffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseDiffer.h; path = ../model/DatabaseDiffer.h; sourceTree = "<group>"; };
@@ -2528,6 +2602,8 @@
 		C8397AE62593989E000F5158 /* NodeIconHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeIconHelper.m; path = ../StrongBox/NodeIconHelper.m; sourceTree = "<group>"; };
 		C8397AF525939A38000F5158 /* KeePassIconSet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KeePassIconSet.h; sourceTree = "<group>"; };
 		C8397B3D25939C81000F5158 /* DatabaseFormat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseFormat.h; path = ../model/DatabaseFormat.h; sourceTree = "<group>"; };
+		C83F7D7826B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DatabaseFormatIncompatibilityHelper.h; path = ../model/DatabaseFormatIncompatibilityHelper.h; sourceTree = "<group>"; };
+		C83F7D7926B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DatabaseFormatIncompatibilityHelper.m; path = ../model/DatabaseFormatIncompatibilityHelper.m; sourceTree = "<group>"; };
 		C8441B7F25CAEB930070C7FE /* WebDAVSessionConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebDAVSessionConfiguration.h; path = ../StrongBox/WebDAVSessionConfiguration.h; sourceTree = "<group>"; };
 		C8441B8025CAEB930070C7FE /* WebDAVProviderData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDAVProviderData.m; path = ../StrongBox/WebDAVProviderData.m; sourceTree = "<group>"; };
 		C8441B8125CAEB930070C7FE /* WebDAVSessionConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebDAVSessionConfiguration.m; path = ../StrongBox/WebDAVSessionConfiguration.m; sourceTree = "<group>"; };
@@ -2812,6 +2888,10 @@
 		C8877416261E02FB00C01406 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AboutViewController.strings; sourceTree = "<group>"; };
 		C8877443261E16B300C01406 /* EditTagsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = EditTagsViewController.h; path = MacBox/EditTagsViewController.h; sourceTree = "<group>"; };
 		C8877444261E16B300C01406 /* EditTagsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = EditTagsViewController.m; path = MacBox/EditTagsViewController.m; sourceTree = "<group>"; };
+		C887825526BECE6B000F8B3F /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/PreferencesWindowController.strings"; sourceTree = "<group>"; };
+		C887825726BECE6C000F8B3F /* ko */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ko; path = ko.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
+		C887825926BECE6D000F8B3F /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
+		C887825B26BECE6E000F8B3F /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/PreferencesWindowController.strings; sourceTree = "<group>"; };
 		C890D26C259109430001E38B /* ConcurrentMutableDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ConcurrentMutableDictionary.m; path = ../model/ConcurrentMutableDictionary.m; sourceTree = "<group>"; };
 		C890D26D259109430001E38B /* ConcurrentMutableDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ConcurrentMutableDictionary.h; path = ../model/ConcurrentMutableDictionary.h; sourceTree = "<group>"; };
 		C8969FEB25AF70EE006819E3 /* Argon2dKdfCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Argon2dKdfCipher.h; path = ../model/Argon2dKdfCipher.h; sourceTree = "<group>"; };
@@ -3933,6 +4013,8 @@
 		4DF347EF2074FA5A00148741 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C83F7D7826B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.h */,
+				C83F7D7926B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m */,
 				C82284962639BA9C00103002 /* ValueWithModDate.h */,
 				C82284972639BA9C00103002 /* ValueWithModDate.m */,
 				C8B6799326271D2700E295A3 /* Password Strength */,
@@ -4177,6 +4259,8 @@
 		C8441B7E25CAEB860070C7FE /* WebDAV */ = {
 			isa = PBXGroup;
 			children = (
+				C81F164326BC2F2700CDAEAF /* WebDAVConnections.h */,
+				C81F164526BC2F2700CDAEAF /* WebDAVConnections.m */,
 				C8441BBA25CAFB770070C7FE /* DAVKit */,
 				C8441B8325CAEB930070C7FE /* WebDAVProviderData.h */,
 				C8441B8025CAEB930070C7FE /* WebDAVProviderData.m */,
@@ -4187,6 +4271,9 @@
 				C8F39EAA25DD7CBA0045CAAB /* WebDAVConfigVC.h */,
 				C8F39EAB25DD7CBA0045CAAB /* WebDAVConfigVC.m */,
 				C8F39F3B25DD90A80045CAAB /* WebDAVConfigVC.storyboard */,
+				C80043C426BD900B0090C90D /* WebDAVConnectionsManager.storyboard */,
+				C80043B926BD83D40090C90D /* WebDAVConnectionsManager.h */,
+				C80043BA26BD83D40090C90D /* WebDAVConnectionsManager.m */,
 			);
 			name = WebDAV;
 			sourceTree = "<group>";
@@ -4267,6 +4354,9 @@
 		C8441C3025CB003C0070C7FE /* SFTP */ = {
 			isa = PBXGroup;
 			children = (
+				C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */,
+				C81F164426BC2F2700CDAEAF /* SFTPConnections.h */,
+				C81F164226BC2F2700CDAEAF /* SFTPConnections.m */,
 				C8441CC825CB02080070C7FE /* NMSSH-iOS */,
 				C8441C8B25CB01AB0070C7FE /* NMSSH */,
 				C8441C3325CB009B0070C7FE /* SFTPProviderData.h */,
@@ -4278,6 +4368,11 @@
 				C8F8CE3D25D57EC300C93840 /* SFTPConfigurationVC.storyboard */,
 				C8AFBF5425CC4014009D9519 /* SFTPConfigurationVC.h */,
 				C8AFBF5525CC4014009D9519 /* SFTPConfigurationVC.m */,
+				C81F165126BC432A00CDAEAF /* SFTPConnectionsManager.h */,
+				C81F165226BC432A00CDAEAF /* SFTPConnectionsManager.m */,
+				C80043AF26BD7C6E0090C90D /* ConnectionCellView.xib */,
+				C80043B226BD7CB30090C90D /* ConnectionCellView.h */,
+				C80043B326BD7CB30090C90D /* ConnectionCellView.m */,
 			);
 			name = SFTP;
 			sourceTree = "<group>";
@@ -5051,7 +5146,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C85B9DAE24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
-				C8A101DA25FBBBF800293456 /* GroupDetailsViewController.storyboard in Resources */,
 				C8E6D4FA246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB182403030100B75EA2 /* PreferencesWindowController.xib in Resources */,
 				4D1FFB192403030100B75EA2 /* CheckboxCell.xib in Resources */,
@@ -5059,6 +5153,7 @@
 				4D1FFB1B2403030100B75EA2 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D1FFB1C2403030100B75EA2 /* MacKeePassHistory.storyboard in Resources */,
 				C85B9D892465454800EEBFC9 /* ykpers-1 in Resources */,
+				C819D6BF26BD921300886363 /* SFTPConnectionsManager.storyboard in Resources */,
 				C8877337261DD64900C01406 /* Backups.storyboard in Resources */,
 				4D1FFB1E2403030100B75EA2 /* UpgradeWindowController.xib in Resources */,
 				4D1FFB1F2403030100B75EA2 /* diceware.wordlist.utf8.txt in Resources */,
@@ -5097,7 +5192,9 @@
 				C85B9D832465454800EEBFC9 /* json-c in Resources */,
 				C867342B2673A09B0063237B /* MAS-Localizable.strings in Resources */,
 				4D1FFB352403030100B75EA2 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				C80043C226BD900B0090C90D /* WebDAVConnectionsManager.storyboard in Resources */,
 				4D1FFB362403030100B75EA2 /* ChangeMasterPasswordWindowController.xib in Resources */,
+				C80043B126BD7C6E0090C90D /* ConnectionCellView.xib in Resources */,
 				C8F39F6F25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */,
 				4D1FFB372403030100B75EA2 /* formatV4.txt in Resources */,
 				4D1FFB382403030100B75EA2 /* securedrop.wordlist.utf8.txt in Resources */,
@@ -5149,7 +5246,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C85B9DAD24655CA600EEBFC9 /* norwegian-diceware.wordlist.utf8.txt in Resources */,
-				C8A101D925FBBBF800293456 /* GroupDetailsViewController.storyboard in Resources */,
 				C8E6D4F9246D5BD000AFFE13 /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				4DC8059E23A116D5001E742E /* PreferencesWindowController.xib in Resources */,
 				4DC805D223A1176E001E742E /* CheckboxCell.xib in Resources */,
@@ -5157,6 +5253,7 @@
 				4D216F7222CBCE0D000954D0 /* catalan-diceware.wordlist.utf8.txt in Resources */,
 				4D40B07723BFB85800BAD0D2 /* MacKeePassHistory.storyboard in Resources */,
 				C85B9D882465454800EEBFC9 /* ykpers-1 in Resources */,
+				C819D6BE26BD921300886363 /* SFTPConnectionsManager.storyboard in Resources */,
 				C8877335261DD64900C01406 /* Backups.storyboard in Resources */,
 				4DC805A423A116E3001E742E /* UpgradeWindowController.xib in Resources */,
 				4D216F6D22CBCE0D000954D0 /* diceware.wordlist.utf8.txt in Resources */,
@@ -5195,7 +5292,9 @@
 				4D23BBF4216136D10054C8D0 /* formatV3.txt in Resources */,
 				C867342A2673A09B0063237B /* MAS-Localizable.strings in Resources */,
 				C85B9D822465454800EEBFC9 /* json-c in Resources */,
+				C80043C126BD900B0090C90D /* WebDAVConnectionsManager.storyboard in Resources */,
 				4D216F7022CBCE0D000954D0 /* polish-diceware.wordlist.utf8.txt in Resources */,
+				C80043B026BD7C6E0090C90D /* ConnectionCellView.xib in Resources */,
 				4DC805A723A116E9001E742E /* ChangeMasterPasswordWindowController.xib in Resources */,
 				C8F39F6E25DD91270045CAAB /* SyncLogViewController.storyboard in Resources */,
 				4D23BBF5216136D10054C8D0 /* formatV4.txt in Resources */,
@@ -5220,7 +5319,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C87949C525DAE8E90097005D /* norwegian-diceware.wordlist.utf8.txt in Resources */,
-				C8A101DB25FBBBF800293456 /* GroupDetailsViewController.storyboard in Resources */,
 				C87949C625DAE8E90097005D /* finnish-diceware.wordlist.utf8.txt in Resources */,
 				C87949C725DAE8E90097005D /* PreferencesWindowController.xib in Resources */,
 				C87949C825DAE8E90097005D /* CheckboxCell.xib in Resources */,
@@ -5610,6 +5708,8 @@
 				4D1FFAC42403030100B75EA2 /* DAVCredentials.m in Sources */,
 				C8441CC125CB01AB0070C7FE /* NMSSHHostConfig.m in Sources */,
 				4D1FFAC52403030100B75EA2 /* KeePassGroup.m in Sources */,
+				C81F165426BC432A00CDAEAF /* SFTPConnectionsManager.m in Sources */,
+				C81F164726BC2F2800CDAEAF /* SFTPConnections.m in Sources */,
 				4D1FFAC62403030100B75EA2 /* ChaCha20Stream.m in Sources */,
 				C85B9D972465478D00EEBFC9 /* PressYubiKeyWindow.m in Sources */,
 				4D1FFAC72403030100B75EA2 /* QRCodePresenterPopover.m in Sources */,
@@ -5644,6 +5744,7 @@
 				4D1FFAD52403030100B75EA2 /* TwoFishCipher.m in Sources */,
 				4D1FFAD62403030100B75EA2 /* CustomPasswordTextField.m in Sources */,
 				4D1FFAD72403030100B75EA2 /* KdfParameters.m in Sources */,
+				C80043BC26BD83D40090C90D /* WebDAVConnectionsManager.m in Sources */,
 				C883079925CB167A001D8FE1 /* AddDatabaseSelectStorageVC.m in Sources */,
 				4D1FFAD92403030100B75EA2 /* PasswordGenerationConfig.m in Sources */,
 				C887732A261DAAAC00C01406 /* BackupsViewController.m in Sources */,
@@ -5661,11 +5762,13 @@
 				4D1FFADE2403030100B75EA2 /* encoding.c in Sources */,
 				4D1FFADF2403030100B75EA2 /* NSDateRFC1123.m in Sources */,
 				4D1FFAE02403030100B75EA2 /* NSAdvancedTextField.m in Sources */,
+				C83F7D7B26B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				4D1FFAE12403030100B75EA2 /* Keys.m in Sources */,
 				4D1FFAE32403030100B75EA2 /* CustomIconList.m in Sources */,
 				C8BFECBB24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D1FFAE42403030100B75EA2 /* AutoFillNewRecordSettings.m in Sources */,
 				4D1FFAE52403030100B75EA2 /* main.m in Sources */,
+				C81F164926BC2F2800CDAEAF /* WebDAVConnections.m in Sources */,
 				C8441CBD25CB01AB0070C7FE /* NMSSHChannel.m in Sources */,
 				4D1FFAE62403030100B75EA2 /* GZipInputStream.m in Sources */,
 				C8DC76402497A90700C9C443 /* FileManager.m in Sources */,
@@ -5719,6 +5822,7 @@
 				C87A9944255968EA0002BEF8 /* HTMLDocument.m in Sources */,
 				C8E379E325DC2EB3006A26BF /* SyncLogViewController.m in Sources */,
 				C8ACEC092565736A00F7420C /* DatabaseCellView.m in Sources */,
+				C80043B526BD7CB30090C90D /* ConnectionCellView.m in Sources */,
 				C83741FD25D313B300EDE4F3 /* SyncParameters.m in Sources */,
 				4DAC40CF24F68311001B3BE2 /* NSDate+Extensions.m in Sources */,
 				4D1FFAFE2403030100B75EA2 /* MMcGACTextViewEditor.m in Sources */,
@@ -5854,6 +5958,7 @@
 				C89B8E6B2562956700B590C0 /* StringValue.m in Sources */,
 				C86E602C2562D510001953AD /* HmacBlockStream.m in Sources */,
 				C86E60622562D5A7001953AD /* OTPToken+Generation.m in Sources */,
+				C81F164B26BC2F4800CDAEAF /* WebDAVConnections.m in Sources */,
 				C89B8F8B2562D2CA00B590C0 /* XMLWriter.m in Sources */,
 				C81F1DD4260214D900251A2F /* DatabaseMerger.m in Sources */,
 				C89B8F732562D22C00B590C0 /* DatabaseModelConfig.m in Sources */,
@@ -5888,6 +5993,7 @@
 				C87073A82589356A0002070A /* Platform.m in Sources */,
 				C837417C25D2F13000EDE4F3 /* ConcurrentMutableQueue.m in Sources */,
 				C8DE8DAA258FD71300B4D9EA /* Serializator.m in Sources */,
+				C81F164A26BC2F4800CDAEAF /* SFTPConnections.m in Sources */,
 				C83741C525D30F0B00EDE4F3 /* ConcurrentMutableArray.m in Sources */,
 				C80798582562E27800FE0CA7 /* AutoFillNewRecordSettings.m in Sources */,
 				C8C1F73D257010AE009991D4 /* NSMutableArray+Extensions.m in Sources */,
@@ -6150,6 +6256,8 @@
 				4DBF493F22232A3200F48182 /* DAVCredentials.m in Sources */,
 				C81F1DD3260214D900251A2F /* DatabaseMerger.m in Sources */,
 				C8441CBF25CB01AB0070C7FE /* NMSSHHostConfig.m in Sources */,
+				C81F165326BC432A00CDAEAF /* SFTPConnectionsManager.m in Sources */,
+				C81F164626BC2F2800CDAEAF /* SFTPConnections.m in Sources */,
 				4D9E099421825108007BA1E7 /* KeePassGroup.m in Sources */,
 				4D524CF0219B481200C22CB4 /* ChaCha20Stream.m in Sources */,
 				C85B9D962465478D00EEBFC9 /* PressYubiKeyWindow.m in Sources */,
@@ -6184,6 +6292,7 @@
 				4D553B49219DB2E400AA4BAB /* CustomPasswordTextField.m in Sources */,
 				C837418625D2F18B00EDE4F3 /* Pair.m in Sources */,
 				4D524CD9219B47DB00C22CB4 /* KdfParameters.m in Sources */,
+				C80043BB26BD83D40090C90D /* WebDAVConnectionsManager.m in Sources */,
 				4D216F5822CBCD17000954D0 /* PasswordGenerationConfig.m in Sources */,
 				C883079825CB167A001D8FE1 /* AddDatabaseSelectStorageVC.m in Sources */,
 				4DE206A022E5FB9700F15184 /* CompositeKeyFactors.m in Sources */,
@@ -6201,11 +6310,13 @@
 				C81F1DF12602152C00251A2F /* MergeDryRunReport.m in Sources */,
 				4DBF494522232A3200F48182 /* NSDateRFC1123.m in Sources */,
 				4DEB21421F717AE3009E3729 /* NSAdvancedTextField.m in Sources */,
+				C83F7D7A26B1AB5E00676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				4D524CEE219B481200C22CB4 /* Keys.m in Sources */,
 				4D524D01219B48D300C22CB4 /* CustomIconList.m in Sources */,
 				C8BFECBA24781C660051D21E /* NodeHierarchyReconstructionData.m in Sources */,
 				4D524CA8219B459B00C22CB4 /* AutoFillNewRecordSettings.m in Sources */,
 				4DF59F591F30DB7A00D68BFE /* main.m in Sources */,
+				C81F164826BC2F2800CDAEAF /* WebDAVConnections.m in Sources */,
 				4D2CB4982332D80A00C2E084 /* GZipInputStream.m in Sources */,
 				C8441CBB25CB01AB0070C7FE /* NMSSHChannel.m in Sources */,
 				C8DC763F2497A90700C9C443 /* FileManager.m in Sources */,
@@ -6259,6 +6370,7 @@
 				C8ACEC082565736A00F7420C /* DatabaseCellView.m in Sources */,
 				C8E379E225DC2EB3006A26BF /* SyncLogViewController.m in Sources */,
 				4DAC40CE24F68311001B3BE2 /* NSDate+Extensions.m in Sources */,
+				C80043B426BD7CB30090C90D /* ConnectionCellView.m in Sources */,
 				C83741FB25D313B300EDE4F3 /* SyncParameters.m in Sources */,
 				4DBFD38E225D156D00290488 /* MMcGACTextViewEditor.m in Sources */,
 				C85B9D8C2465462200EEBFC9 /* ConcurrentMutableSet.m in Sources */,
@@ -6911,6 +7023,7 @@
 				C8B945A22573D01A00932C46 /* StringValue.m in Sources */,
 				C8B945A32573D01A00932C46 /* HmacBlockStream.m in Sources */,
 				C8B945A42573D01A00932C46 /* OTPToken+Generation.m in Sources */,
+				C81F164D26BC2F4800CDAEAF /* WebDAVConnections.m in Sources */,
 				C8B945A52573D01A00932C46 /* XMLWriter.m in Sources */,
 				C81F1DD6260214D900251A2F /* DatabaseMerger.m in Sources */,
 				C8B945A62573D01A00932C46 /* DatabaseModelConfig.m in Sources */,
@@ -6945,6 +7058,7 @@
 				C87073AA2589356A0002070A /* Platform.m in Sources */,
 				C837417E25D2F13000EDE4F3 /* ConcurrentMutableQueue.m in Sources */,
 				C8DE8DAC258FD71300B4D9EA /* Serializator.m in Sources */,
+				C81F164C26BC2F4800CDAEAF /* SFTPConnections.m in Sources */,
 				C83741C725D30F0B00EDE4F3 /* ConcurrentMutableArray.m in Sources */,
 				C8B945BB2573D01A00932C46 /* AutoFillNewRecordSettings.m in Sources */,
 				C8B945BC2573D01A00932C46 /* NSMutableArray+Extensions.m in Sources */,
@@ -7206,6 +7320,10 @@
 				C8445C27256FB3AE00AF1110 /* cs */,
 				C8FB342B25B9F564003C0F24 /* nl */,
 				C86BB46A25F91C3300425405 /* pt-BR */,
+				C887825526BECE6B000F8B3F /* zh-Hant */,
+				C887825726BECE6C000F8B3F /* ko */,
+				C887825926BECE6D000F8B3F /* pl */,
+				C887825B26BECE6E000F8B3F /* pt */,
 			);
 			name = PreferencesWindowController.xib;
 			path = MacBox;
@@ -7377,6 +7495,58 @@
 				C86BB46325F91C2E00425405 /* pt-BR */,
 			);
 			name = Main.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C80043C426BD900B0090C90D /* WebDAVConnectionsManager.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C80043C326BD900B0090C90D /* Base */,
+				C80043C826BD90120090C90D /* zh-Hans */,
+				C80043CA26BD90180090C90D /* uk */,
+				C80043CC26BD90190090C90D /* sv */,
+				C80043CE26BD901B0090C90D /* es */,
+				C80043D026BD901C0090C90D /* ru */,
+				C80043D226BD901D0090C90D /* pt-BR */,
+				C80043D426BD901F0090C90D /* pt */,
+				C80043D626BD90200090C90D /* pl */,
+				C80043D826BD90210090C90D /* nb */,
+				C80043DA26BD90220090C90D /* ko */,
+				C80043DC26BD90230090C90D /* ja */,
+				C80043DE26BD90250090C90D /* it */,
+				C80043E026BD90260090C90D /* de */,
+				C80043E226BD90270090C90D /* fr */,
+				C80043E426BD90280090C90D /* nl */,
+				C80043E626BD90290090C90D /* cs */,
+				C80043E826BD902C0090C90D /* zh-Hant */,
+			);
+			name = WebDAVConnectionsManager.storyboard;
+			path = MacBox;
+			sourceTree = "<group>";
+		};
+		C819D6C126BD921300886363 /* SFTPConnectionsManager.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C819D6C026BD921300886363 /* Base */,
+				C819D6C526BD921B00886363 /* zh-Hans */,
+				C819D6C726BD922900886363 /* zh-Hant */,
+				C819D6C926BD922A00886363 /* cs */,
+				C819D6CB26BD922B00886363 /* nl */,
+				C819D6CD26BD922C00886363 /* fr */,
+				C819D6CF26BD922D00886363 /* de */,
+				C819D6D126BD922D00886363 /* it */,
+				C819D6D326BD922E00886363 /* ja */,
+				C819D6D526BD923000886363 /* nb */,
+				C819D6D726BD923100886363 /* pt */,
+				C819D6D926BD923200886363 /* pt-BR */,
+				C819D6DB26BD923200886363 /* ru */,
+				C819D6DD26BD923400886363 /* uk */,
+				C819D6DF26BD923500886363 /* sv */,
+				C819D6E126BD923600886363 /* es */,
+				C819D6E326BD923700886363 /* pl */,
+				C819D6E526BD923800886363 /* ko */,
+			);
+			name = SFTPConnectionsManager.storyboard;
 			path = MacBox;
 			sourceTree = "<group>";
 		};
@@ -7614,6 +7784,10 @@
 				C8F39F6125DD90CE0045CAAB /* it */,
 				C8F39F6325DD90CF0045CAAB /* ja */,
 				C86BB47025F91C3600425405 /* pt-BR */,
+				C800440E26BD906F0090C90D /* pt */,
+				C800441026BD90700090C90D /* pl */,
+				C800441226BD90710090C90D /* ko */,
+				C800441426BD90730090C90D /* zh-Hant */,
 			);
 			name = WebDAVConfigVC.storyboard;
 			path = MacBox;
@@ -7680,6 +7854,10 @@
 				C8F8CE5A25D57F0B00C93840 /* sv */,
 				C8F8CE5C25D57F0C00C93840 /* uk */,
 				C86BB46F25F91C3600425405 /* pt-BR */,
+				C800441826BD907F0090C90D /* zh-Hant */,
+				C800441A26BD90800090C90D /* ko */,
+				C800441C26BD90820090C90D /* pl */,
+				C800441E26BD90820090C90D /* pt */,
 			);
 			name = SFTPConfigurationVC.storyboard;
 			path = MacBox;
@@ -7721,7 +7899,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7752,7 +7930,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Mac-Outright-Pro-Info.plist";
@@ -7833,7 +8011,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -7871,7 +8049,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8016,7 +8194,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -8047,7 +8225,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = MacBox/Info.plist;
@@ -8076,7 +8254,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -8107,7 +8285,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = "Strongbox copy-Info.plist";
@@ -8138,7 +8316,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8175,7 +8353,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8211,7 +8389,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -8250,7 +8428,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Strongbox AutoFill/Strongbox_AutoFill.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3016;
+				CURRENT_PROJECT_VERSION = 3017;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;

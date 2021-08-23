@@ -65,7 +65,7 @@ static NSString* const kAutoFillShowPinned = @"autoFillShowPinned";
 static NSString* const kCoalesceAppLockAndQuickLaunchBiometrics = @"coalesceAppLockAndQuickLaunchBiometrics";
 static NSString* const kAppPrivacyShieldMode = @"appPrivacyShieldMode";
 static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDetectedBehaviour";
-static NSString* const kUseBackgroundUpdates = @"useBackgroundUpdates-Default-On";
+
 
 
 
@@ -132,6 +132,17 @@ static NSString* const kUseMinimalDropboxScopes = @"useMinimalDropboxScopes";
 static NSString* const kStreamReadLargeKeyFiles = @"streamReadLargeKeyFiles";
 static NSString* const kKeePassEmailField = @"keePassEmailField";
 
+static NSString* const kExportItemsPreserveUUIDs = @"exportItemsPreserveUUIDs";
+static NSString* const kExportItemsReplaceExisting = @"exportItemsReplaceExisting";
+
+static NSString* const kExportItemsPreserveTimestamps = @"exportItemsPreserveTimestamps";
+static NSString* const kDuplicateItemPreserveTimestamp = @"duplicateItemPreserveTimestamp";
+static NSString* const kDuplicateItemReferencePassword = @"duplicateItemReferencePassword";
+static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenceUsername";
+
+static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
+static NSString* const kMigratedConnections = @"migratedConnections";
+
 @implementation AppPreferences
 
 + (void)initialize {
@@ -172,6 +183,70 @@ static NSString* const kKeePassEmailField = @"keePassEmailField";
 }
 
 
+
+- (BOOL)migratedConnections {
+    return [self getBool:kMigratedConnections];
+}
+
+- (void)setMigratedConnections:(BOOL)migratedConnections {
+    [self setBool:kMigratedConnections value:migratedConnections];
+}
+
+- (BOOL)duplicateItemEditAfterwards {
+    return [self getBool:kDuplicateItemEditAfterwards];
+}
+
+- (void)setDuplicateItemEditAfterwards:(BOOL)duplicateItemEditAfterwards {
+    [self setBool:kDuplicateItemEditAfterwards value:duplicateItemEditAfterwards];
+}
+
+- (BOOL)exportItemsPreserveTimestamps {
+    return [self getBool:kExportItemsPreserveTimestamps];
+}
+
+- (void)setExportItemsPreserveTimestamps:(BOOL)exportItemsPreserveTimestamps {
+    [self setBool:kExportItemsPreserveTimestamps value:exportItemsPreserveTimestamps];
+}
+
+- (BOOL)duplicateItemPreserveTimestamp {
+    return [self getBool:kDuplicateItemPreserveTimestamp];
+}
+
+- (void)setDuplicateItemPreserveTimestamp:(BOOL)duplicateItemPreserveTimestamp {
+    [self setBool:kDuplicateItemPreserveTimestamp value:duplicateItemPreserveTimestamp];
+}
+
+- (BOOL)duplicateItemReferencePassword {
+    return [self getBool:kDuplicateItemReferencePassword];
+}
+
+- (void)setDuplicateItemReferencePassword:(BOOL)duplicateItemReferencePassword {
+    [self setBool:kDuplicateItemReferencePassword value:duplicateItemReferencePassword];
+}
+
+- (BOOL)duplicateItemReferenceUsername {
+    return [self getBool:kDuplicateItemReferenceUsername];
+}
+
+- (void)setDuplicateItemReferenceUsername:(BOOL)duplicateItemReferenceUsername {
+    [self setBool:kDuplicateItemReferenceUsername value:duplicateItemReferenceUsername];
+}
+
+- (BOOL)exportItemsPreserveUUIDs {
+    return [self getBool:kExportItemsPreserveUUIDs fallback:YES];
+}
+
+- (void)setExportItemsPreserveUUIDs:(BOOL)exportItemsPreserveUUIDs {
+    [self setBool:kExportItemsPreserveUUIDs value:exportItemsPreserveUUIDs];
+}
+
+- (BOOL)exportItemsReplaceExisting {
+    return [self getBool:kExportItemsReplaceExisting fallback:YES];
+}
+
+- (void)setExportItemsReplaceExisting:(BOOL)exportItemsReplaceExisting {
+    [self setBool:kExportItemsReplaceExisting value:exportItemsReplaceExisting];
+}
 
 - (BOOL)keePassEmailField {
     return [self getBool:kKeePassEmailField];
@@ -386,12 +461,13 @@ static NSString* const kKeePassEmailField = @"keePassEmailField";
 }
 
 - (BOOL)useBackgroundUpdates {
-    return [self getBool:kUseBackgroundUpdates fallback:YES];
+    return YES;
+
 }
 
-- (void)setUseBackgroundUpdates:(BOOL)useBackgroundUpdates {
-    [self setBool:kUseBackgroundUpdates value:useBackgroundUpdates];
-}
+
+
+
 
 - (BOOL)migratedOfflineDetectedBehaviour {
     return [self getBool:kMigratedOfflineDetectedBehaviour];

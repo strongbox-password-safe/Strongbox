@@ -11,6 +11,8 @@
 
 @implementation Constants
 
+const NSInteger kStorageProviderSFTPorWebDAVSecretMissingErrorCode = 172924134;
+
 const NSInteger kStorageProviderUserInteractionRequiredErrorCode = 17292412;
 NSString* const kStorageProviderUserInteractionRequiredErrorMessage = @"User Interaction Required";
 const NSError* kUserInteractionRequiredError;
@@ -20,6 +22,8 @@ const size_t kMaxAttachmentTableviewIconImageSize = 4 * 1024 * 1024;
 
 static NSString * const kProEditionBundleId = @"com.markmcguill.strongbox.pro";
 static NSString * const kScotusEditionBundleId = @"com.markmcguill.strongbox.scotus";
+
+NSString* const kDefaultKeePassEmailFieldKey = @"Email";
 
 +(void)initialize {
     if(self == [Constants class]) {

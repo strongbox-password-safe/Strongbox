@@ -43,24 +43,32 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (void)refresh {
-    QuickViewConfig *allItems, *auditEntries, *totpEntries;
-
     NSString *loc1 = NSLocalizedString(@"quick_view_title_all_entries_title", @"All Entries");
     NSString *loc2 = NSLocalizedString(@"quick_view_title_all_entries_subtitle", @"View every entry in a flat list...");
-    allItems = [QuickViewConfig title:loc1 subtitle:loc2 image:[UIImage imageNamed:@"globe"] searchTerm:kSpecialSearchTermAllEntries];
+    QuickViewConfig *allItems = [QuickViewConfig title:loc1 subtitle:loc2 image:[UIImage imageNamed:@"globe"] searchTerm:kSpecialSearchTermAllEntries];
+
+    NSMutableArray<QuickViewConfig*>* ret = @[allItems].mutableCopy;
     
     NSUInteger auditCount = self.viewModel.auditIssueNodeCount;
-    NSString *loc3 = NSLocalizedString(@"quick_view_title_audit_issues_title_fmt", @"Audit Issues (%ld)");
-    NSString* title = [NSString stringWithFormat:loc3, auditCount];
     
-    NSString *loc4 = NSLocalizedString(@"quick_view_title_audit_issues_subtitle", @"View all entries with audit issues");
-    auditEntries = [QuickViewConfig title:title subtitle:loc4 image:[UIImage imageNamed:@"security_checked"] searchTerm:kSpecialSearchTermAuditEntries imageTint:UIColor.systemOrangeColor];
-    
-    NSString *loc5 = NSLocalizedString(@"quick_view_title_totp_entries_title", @"TOTP Entries");
-    NSString *loc6 = NSLocalizedString(@"quick_view_title_totp_entries_subtitle", @"View all entries with a TOTP token");
-    totpEntries = [QuickViewConfig title:loc5 subtitle:loc6 image:[UIImage imageNamed:@"timer"] searchTerm:kSpecialSearchTermTotpEntries];
+    if ( auditCount ) {
+        NSString *loc3 = NSLocalizedString(@"quick_view_title_audit_issues_title_fmt", @"Audit Issues (%ld)");
+        NSString* title = [NSString stringWithFormat:loc3, auditCount];
+        NSString *loc4 = NSLocalizedString(@"quick_view_title_audit_issues_subtitle", @"View all entries with audit issues");
+        QuickViewConfig *auditEntries = [QuickViewConfig title:title subtitle:loc4 image:[UIImage imageNamed:@"security_checked"] searchTerm:kSpecialSearchTermAuditEntries imageTint:UIColor.systemOrangeColor];
+        
+        [ret addObject:auditEntries];
+    }
 
-    self.quickViews = auditCount == 0 ? @[allItems, totpEntries] : @[allItems, auditEntries, totpEntries];
+    if ( self.viewModel.database.totpEntries.count ) {
+        NSString *loc5 = NSLocalizedString(@"quick_view_title_totp_entries_title", @"TOTP Entries");
+        NSString *loc6 = NSLocalizedString(@"quick_view_title_totp_entries_subtitle", @"View all entries with a TOTP token");
+        QuickViewConfig *totpEntries = [QuickViewConfig title:loc5 subtitle:loc6 image:[UIImage imageNamed:@"timer"] searchTerm:kSpecialSearchTermTotpEntries];
+        
+        [ret addObject:totpEntries];
+    }
+    
+    self.quickViews = ret.copy;
 }
 
 - (BOOL)supportsSlideActions {

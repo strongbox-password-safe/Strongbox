@@ -13,8 +13,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SFTPProviderData : NSObject
 
-@property SFTPSessionConfiguration *sFtpConfiguration;
 @property NSString* filePath;
+@property NSString* connectionIdentifier;
+
+@property SFTPSessionConfiguration *sFtpConfiguration; 
 
 + (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
 - (NSDictionary*)serializationDictionary;

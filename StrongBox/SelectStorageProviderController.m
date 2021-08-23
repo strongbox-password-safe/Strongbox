@@ -21,6 +21,8 @@
 #import "NSString+Extensions.h"
 #import "SafeStorageProviderFactory.h"
 #import "Serializator.h"
+#import "WebDAVConnectionsViewController.h"
+#import "SFTPConnectionsViewController.h"
 
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
 
@@ -56,13 +58,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    SFTPStorageProvider* sftpProviderWithFastListing = [[SFTPStorageProvider alloc] init];
-    sftpProviderWithFastListing.maintainSessionForListing = YES;
-
-    WebDAVStorageProvider* webDavProvider = [[WebDAVStorageProvider alloc] init];
-    webDavProvider.maintainSessionForListings = YES;
-    
+        
     NSMutableArray<id<SafeStorageProvider>>* sp = @[
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS 
         GoogleDriveStorageProvider.sharedInstance,
@@ -72,6 +68,12 @@
         ].mutableCopy;
     
     if ( !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+        SFTPStorageProvider* sftpProviderWithFastListing = [[SFTPStorageProvider alloc] init];
+        sftpProviderWithFastListing.maintainSessionForListing = YES;
+
+        WebDAVStorageProvider* webDavProvider = [[WebDAVStorageProvider alloc] init];
+        webDavProvider.maintainSessionForListing = YES;
+
         [sp addObject:webDavProvider];
         [sp addObject:sftpProviderWithFastListing];
     }
@@ -101,10 +103,6 @@
     self.tableView.tableFooterView = [UIView new];
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     BOOL showNativeNetworkProviders = self.existing && !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions;
     return self.providers.count + (showNativeNetworkProviders ? 2 : 0);
@@ -124,7 +122,7 @@
     else {
         id<SafeStorageProvider> provider = [self.providers objectAtIndex:indexPath.row];
 
-        if (provider.storageId == kFilesAppUrlBookmark) {
+        if ( provider.storageId == kFilesAppUrlBookmark ) {
             cell.text.text = NSLocalizedString(@"sspc_ios_files_storage_location", @"Files");
             cell.image.image =  [UIImage imageNamed:@"folder"];
         }
@@ -154,6 +152,12 @@
             else {
                 [self onCreateThroughFilesApp];
             }
+        }
+        else if ( provider.storageId == kWebDAV ) {
+            [self getWebDAVConnection];
+        }
+        else if ( provider.storageId == kSFTP ) {
+            [self getSFTPConnection];
         }
         else if (provider.storageId == kLocalDevice && !self.existing) {
             [Alerts yesNo:self
@@ -205,6 +209,34 @@
     [self presentViewController:vc animated:YES completion:nil];
 }
 
+
+
+- (void)getWebDAVConnection {
+    WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
+    vc.selectMode = YES;
+    vc.onSelected = ^(WebDAVSessionConfiguration * _Nonnull connection) {
+        WebDAVStorageProvider* sp = [[WebDAVStorageProvider alloc] init];
+        sp.explicitConnection = connection;
+        sp.maintainSessionForListing = YES;
+        [self segueToBrowserOrAdd:sp];
+    };
+    
+    [vc presentFromViewController:self];
+}
+
+- (void)getSFTPConnection {
+    SFTPConnectionsViewController* vc = [SFTPConnectionsViewController instantiateFromStoryboard];
+    vc.selectMode = YES;
+    vc.onSelected = ^(SFTPSessionConfiguration * _Nonnull connection) {
+        SFTPStorageProvider* sp = [[SFTPStorageProvider alloc] init];
+        sp.explicitConnection = connection;
+        sp.maintainSessionForListing = YES;
+        [self segueToBrowserOrAdd:sp];
+    };
+    
+    [vc presentFromViewController:self];
+}
+    
 
 
 

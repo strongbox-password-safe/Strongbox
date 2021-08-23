@@ -17,6 +17,9 @@ typedef NS_ENUM (NSUInteger, SFTPAuthenticationMode) {
 
 @interface SFTPSessionConfiguration : NSObject
 
+@property NSString* identifier;
+@property (nullable) NSString* name;
+
 @property NSString* host;
 @property SFTPAuthenticationMode authenticationMode;
 @property (nullable) NSString* username;
@@ -31,6 +34,8 @@ typedef NS_ENUM (NSUInteger, SFTPAuthenticationMode) {
 + (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
 
 -(NSString*)getKeyChainKey:(NSString*)propertyName;
+
+- (void)clearKeychainItems;
 
 @end
 

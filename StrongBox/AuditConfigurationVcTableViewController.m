@@ -191,7 +191,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
         [self onChangeOnlineHibpInterval];
     }
     else if (cell == self.cellViewAllAuditIssues) {
-        self.onDone(YES);
+        self.onDone(YES, self);
     }
     else if (cell == self.cellViewExcluded) {
         [self performSegueWithIdentifier:@"segueToExcludedItems" sender:nil];
@@ -337,7 +337,7 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 }
 
 - (IBAction)onDone:(id)sender {
-    self.onDone(NO);
+    self.onDone(NO, self);
 }
 
 - (void)promptForString:(NSString*)title

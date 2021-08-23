@@ -27,6 +27,11 @@
 #import "Shortcut.h"
 #import "NodeDetailsViewController.h"
 #import "Document.h"
+#import "WebDAVStorageProvider.h"
+#import "SFTPStorageProvider.h"
+#import "WebDAVConnections.h"
+#import "SFTPConnections.h"
+#import "SFTPConnectionsManager.h"
 
 
 
@@ -242,6 +247,60 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 - (void)performMigrations {
     [self migrateToSyncManager]; 
+    [self performConnectionMigrations]; 
+}
+
+- (void)performConnectionMigrations {
+    if ( !Settings.sharedInstance.migratedConnections ) {
+        int wcount = 0;
+        int scount = 0;
+        
+        NSArray* databases = DatabasesManager.sharedInstance.snapshot;
+        
+        for ( DatabaseMetadata *database in  databases ) {
+            if ( database.storageProvider == kWebDAV ) {
+                WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+                if (  pd.sessionConfiguration ) {
+                    if ( pd.sessionConfiguration.name.length == 0 ) {
+                        pd.sessionConfiguration.name = [NSString stringWithFormat:@"%@ %@", pd.sessionConfiguration.host, @(++wcount)];
+                    }
+                    [WebDAVConnections.sharedInstance addOrUpdate:pd.sessionConfiguration];
+                    
+                    DatabaseMetadata* newDatabase = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+                                        
+                    [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                        metadata.fileUrl = newDatabase.fileUrl;
+                        metadata.storageInfo = newDatabase.storageInfo;
+                    }];
+                    
+                    NSLog(@"Migrated WebDAV Connection");
+                }
+            }
+            else if ( database.storageProvider == kSFTP ) {                
+                SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
+                SFTPSessionConfiguration* connection = pd.sFtpConfiguration;
+                
+                if ( connection ) {
+                    if ( connection.name.length == 0 ) {
+                        connection.name = [NSString stringWithFormat:@"%@ %@", connection.host, @(++scount)];
+                    }
+
+                    [SFTPConnections.sharedInstance addOrUpdate:connection];
+                    
+                    DatabaseMetadata* newDatabase = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
+                    
+                    [DatabasesManager.sharedInstance atomicUpdate:database.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+                        metadata.fileUrl = newDatabase.fileUrl;
+                        metadata.storageInfo = newDatabase.storageInfo;
+                    }];
+
+                    NSLog(@"Migrated SFTP Connection = [%@] - %@", pd.connectionIdentifier, connection.identifier);
+                }
+            }
+        }
+        
+        Settings.sharedInstance.migratedConnections = YES;
+    }
 }
 
 - (void)migrateToSyncManager {

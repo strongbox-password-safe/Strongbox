@@ -15,9 +15,10 @@
 
 @interface SelectDestinationGroupController ()
 
-@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonMove;
+@property (weak, nonatomic, nullable) IBOutlet UIBarButtonItem * buttonSelectThisDestination;
 @property NSArray<Node*> *items;
 @property BrowseTableViewCellHelper* cellHelper;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonAddGroup;
 
 @end
 
@@ -39,6 +40,19 @@
     self.tableView.tableFooterView = [UIView new];
     
     self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.viewModel tableView:self.tableView];
+    
+    if ( self.hideAddGroupButton ) {
+        [self.buttonAddGroup setEnabled:NO];
+        [self.buttonAddGroup setTintColor:[UIColor clearColor]];
+    }
+    
+    if ( self.customSelectDestinationButtonTitle.length ) {
+        [self.buttonSelectThisDestination setTitle:self.customSelectDestinationButtonTitle];
+    }
+}
+
+- (IBAction)onCancel:(id)sender {
+    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)refresh {
@@ -50,36 +64,39 @@
     
     self.items = [sorter sortItemsForBrowse:self.currentGroup.childGroups];
     
-    self.buttonMove.enabled = [self moveOfItemsIsValid:self.currentGroup subgroupsValid:NO];
+    self.buttonSelectThisDestination.enabled = [self isValidDestination:self.currentGroup validIfContainsAValidDestination:NO];
     
     [self.tableView reloadData];
 }
 
-- (BOOL)moveOfItemsIsValid:(Node*)group subgroupsValid:(BOOL)subgroupsValid  {
-    BOOL ret = [self.viewModel.database validateMoveItems:self.itemsToMove destination:group];
+- (BOOL)isValidDestination:(Node*)group validIfContainsAValidDestination:(BOOL)validIfContainsAValidDestination  {
+    BOOL ret;
+    if ( self.validateDestination ) {
+        ret = self.validateDestination ( group );
+    }
+    else {
+        NSLog(@"WARNWARN: No Validation block set...");
+        ret = NO;
+    }
 
-    if(ret) {
+    if ( ret ) {
         return YES;
     }
-    
-    if(subgroupsValid) {
-        for(Node* subgroup in group.childGroups) {
-            if([self moveOfItemsIsValid:subgroup subgroupsValid:YES]) {
+
+    if ( validIfContainsAValidDestination ) {
+        for ( Node* subgroup in group.childGroups ) {
+            if ( [self isValidDestination:subgroup validIfContainsAValidDestination:YES] ) {
                 return YES;
             }
         }
     }
-    
+
     return NO;
 }
 
-- (IBAction)onCancel:(id)sender {
-    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (IBAction)onMoveHere:(id)sender {
+- (IBAction)onSelectThisGroupAsDestination:(id)sender {
     [self dismissViewControllerAnimated:YES completion:^{
-        self.onMoveItems(self.currentGroup);
+        self.onSelectedDestination(self.currentGroup);
     }];
 }
 
@@ -109,19 +126,20 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     Node* vm = self.items[indexPath.row];
-    BOOL validMove = [self moveOfItemsIsValid:vm subgroupsValid:YES];
+    BOOL validDestination = [self isValidDestination:vm validIfContainsAValidDestination:YES];
 
     UITableViewCell* cell = [self.cellHelper getBrowseCellForNode:vm
                                                         indexPath:indexPath
                                                 showLargeTotpCell:NO
                                                 showGroupLocation:NO
                                             groupLocationOverride:nil
-                                                    accessoryType:validMove ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone          noFlags:YES
+                                                    accessoryType:validDestination ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone
+                                                          noFlags:YES
                                               showGroupChildCount:NO];
 
-    cell.selectionStyle = validMove ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
-    cell.userInteractionEnabled = validMove;
-    cell.contentView.alpha = validMove ? 1.0f : 0.5f;
+    cell.selectionStyle = validDestination ? UITableViewCellSelectionStyleDefault : UITableViewCellSelectionStyleNone;
+    cell.userInteractionEnabled = validDestination;
+    cell.contentView.alpha = validDestination ? 1.0f : 0.5f;
 
     return cell;
 }
@@ -140,8 +158,10 @@
 
         vc.currentGroup = item;
         vc.viewModel = self.viewModel;
-        vc.itemsToMove = self.itemsToMove;
-        vc.onMoveItems = self.onMoveItems;
+        vc.validateDestination = self.validateDestination;
+        vc.onSelectedDestination = self.onSelectedDestination;
+        vc.hideAddGroupButton = self.hideAddGroupButton;
+        vc.customSelectDestinationButtonTitle = self.customSelectDestinationButtonTitle;
     }
 }
 

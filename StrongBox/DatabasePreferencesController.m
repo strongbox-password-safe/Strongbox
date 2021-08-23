@@ -90,7 +90,7 @@
 }
 
 - (IBAction)onDone:(id)sender {
-    self.onDone(NO);
+    self.onDone(NO, self);
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

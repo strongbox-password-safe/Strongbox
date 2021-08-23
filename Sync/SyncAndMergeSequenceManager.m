@@ -347,7 +347,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 remoteModified:(NSDate*)remoteModified
                     parameters:(SyncParameters*)parameters
                     completion:(SyncAndMergeCompletionBlock)completion {
-    [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Got Remote OK [remoteMod=%@]", remoteModified.friendlyDateTimeStringBothPrecise]];
+    [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Got Source DB OK [Mod=%@]", remoteModified.friendlyDateTimeStringBothPrecise]];
       
     
     
@@ -356,7 +356,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
 
     if (!database.outstandingUpdateId || localModDate == nil) {
-        [self logMessage:databaseUuid syncId:syncId message:@"No Updates to Push, syncing local from remote."];
+        [self logMessage:databaseUuid syncId:syncId message:@"No Updates to Push, syncing working copy from source."];
         [self setLocalAndComplete:remoteData dateModified:remoteModified database:databaseUuid syncId:syncId localWasChanged:YES takeABackup:YES completion:completion];
     }
     else {
@@ -399,7 +399,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         BOOL noRemoteChange = (database.lastSyncRemoteModDate && [database.lastSyncRemoteModDate isEqualToDateWithinEpsilon:remoteModified]);
         
         if (forcePush || noRemoteChange) { 
-            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Update to Push - [Simple Push because Force=%@, Remote Changed=%@]", forcePush ? @"YES" : @"NO", noRemoteChange ? @"NO" : @"YES"]];
+            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Update to Push - [Simple Push because Force=%@, Source Changed=%@]", forcePush ? @"YES" : @"NO", noRemoteChange ? @"NO" : @"YES"]];
             [self setRemoteAndComplete:localData database:databaseUuid syncId:syncId localWasChanged:NO interactiveVC:parameters.interactiveVC completion:completion];
         }
         else {
@@ -423,7 +423,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
 
     [self logMessage:databaseUuid
               syncId:syncId
-             message:[NSString stringWithFormat:@"Remote has changed since last sync. Last Sync Remote Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
+             message:[NSString stringWithFormat:@"Source DB has changed since last sync. Last Sync Source Mod was [%@]", database.lastSyncRemoteModDate.friendlyDateTimeStringBothPrecise]];
 
     ConflictResolutionStrategy strategy = database.conflictResolutionStrategy;
 
@@ -481,7 +481,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                remoteModified:(NSDate*)remoteModified
                    parameters:(SyncParameters*)parameters
                    completion:(SyncAndMergeCompletionBlock)completion {
-    [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Remote has also changed. Requesting User Advice..."];
+    [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Source DB has also changed. Requesting User Advice..."];
     
     dispatch_async(dispatch_get_main_queue(), ^{
         UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"ConflictResolutionWizard" bundle:nil];
@@ -588,7 +588,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                localData:(NSData*)localData
                            interactiveVC:(VIEW_CONTROLLER_PTR)interactiveVC
                               completion:(SyncAndMergeCompletionBlock)completion {
-    [self logMessage:databaseUuid syncId:syncId message:@"Sync Conflict Resolution: Use Local - Pushing Local and overwriting Remote."];
+    [self logMessage:databaseUuid syncId:syncId message:@"Sync Conflict Resolution: Use Local - Pushing Working Copy and overwriting Source DB."];
     [self setRemoteAndComplete:localData database:databaseUuid syncId:syncId localWasChanged:NO interactiveVC:interactiveVC completion:completion];
 }
 
@@ -602,7 +602,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         metadata.outstandingUpdateId = nil;
     }];
     
-    [self logMessage:databaseUuid syncId:syncId message:@"Sync Conflict Resolution: Use Theirs/Remote - Pulling from Remote and overwriting Local."];
+    [self logMessage:databaseUuid syncId:syncId message:@"Sync Conflict Resolution: Use Theirs/Source DB - Pulling from Source DB and overwriting Working Copy."];
     [self setLocalAndComplete:remoteData dateModified:remoteModified database:databaseUuid syncId:syncId localWasChanged:YES takeABackup:YES completion:completion];
 }
 
@@ -622,7 +622,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                      remoteData:(NSData*)remoteData
                    compareFirst:(BOOL)compareFirst
                      completion:(SyncAndMergeCompletionBlock)completion {
-    [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Remote has also changed. Conflict. Auto Merging..."];
+    [self logMessage:databaseUuid syncId:syncId message:@"Update to Push but Source DB has also changed. Conflict. Auto Merging..."];
 
     if ( !parameters.key ) {
         NSError* error = [Utils createNSError:NSLocalizedString(@"model_error_cannot_merge_in_background", @"Cannot merge without Master Credentials.") errorCode:-1];
@@ -697,7 +697,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                 [self dismissProgressSpinner];
 
                                 if ( userCancelled ) {
-                                    [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Remote Merge Unlock."];
+                                    [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Source DB Merge Unlock."];
                                     [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
                                 }
                                 else if ( error || !theirs ) {
@@ -888,7 +888,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                     completion(kSyncAndMergeError, NO, error);
                 }
                 else {
-                    [self logMessage:databaseUuid syncId:syncId message:@"Encrypted Merge Result... pushing remote and setting local..."];
+                    [self logMessage:databaseUuid syncId:syncId message:@"Encrypted Merge Result... pushing to Source DB and setting local..."];
                     [self setRemoteAndComplete:mergedData database:databaseUuid syncId:syncId localWasChanged:YES interactiveVC:interactiveVC completion:completion];
                 }
             });
@@ -943,7 +943,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                 metadata.outstandingUpdateId = nil;
             }];
             
-            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Outstanding Update successfully pushed to Remote. [New Remote Mod Date=%@]. Making Local Copy Match Remote...", newRemoteModDate.friendlyDateTimeStringBothPrecise]];
+            [self logMessage:databaseUuid syncId:syncId message:[NSString stringWithFormat:@"Outstanding Update successfully pushed to Source DB. [New Source DB Mod Date=%@]. Making Working Copy Match Source...", newRemoteModDate.friendlyDateTimeStringBothPrecise]];
 
             if (!newRemoteModDate) {
                 NSLog(@"WARNWARN: No new remote mod date returned from storage provider! Setting to NOW.");
@@ -972,7 +972,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                  completion:(SyncAndMergeCompletionBlock)completion {
     NSError* error;
     if(![self setLocalCopy:data dateModified:dateModified database:databaseUuid takeABackup:takeABackup error:&error]) {
-        [self logMessage:databaseUuid syncId:syncId message:@"Could not sync local copy from remote."];
+        [self logMessage:databaseUuid syncId:syncId message:@"Could not sync working copy from source db."];
 
         [self logAndPublishStatusChange:databaseUuid
                                  syncId:syncId
@@ -982,7 +982,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         completion(kSyncAndMergeError, NO, error);
     }
     else {
-        [self logMessage:databaseUuid syncId:syncId message:@"Local copy successfully synced with remote."];
+        [self logMessage:databaseUuid syncId:syncId message:@"Working copy successfully synced with source db."];
         [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateDone error:nil];
 
         

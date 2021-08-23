@@ -11,6 +11,7 @@
 #import "OTPToken+Serialization.h"
 #import "MutableOrderedDictionary.h"
 #import "NodeIcon.h"
+#import "Constants.h"
 
 @interface EntryViewModel()
 
@@ -251,7 +252,7 @@ NSComparator customFieldKeyComparator = ^(id  obj1, id  obj2) {
                                                             url:@"https:
                                                           notes:notes
                                                           email:@"markmc@gmail.com"
-                                           keePassEmailFieldKey:@"Email"
+                                           keePassEmailFieldKey:kDefaultKeePassEmailFieldKey
                                                         expires:nil
                                                            tags:nil
                                                            totp:token

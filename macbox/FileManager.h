@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deleteAllTmpWorkingFiles;
 
 @property (readonly, nullable) NSURL* backupFilesDirectory;
+@property (readonly, nullable) NSURL* preferencesDirectory;
 
 - (void)createIfNecessary:(NSURL*)url;
 

@@ -18,6 +18,7 @@
 #import "NSDate+Extensions.h"
 #import "Node.h"
 #import "NSString+Extensions.h"
+#import "Constants.h"
 
 static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kKeePassXcTotpSeedKey = @"TOTP Seed";
@@ -34,8 +35,6 @@ static NSString* const kOriginalWindowsOtpAlgoKey = @"TimeOtp-Algorithm";
 
 static NSString* const kOriginalWindowsOtpAlgoValueSha256 = @"HMAC-SHA-256";
 static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
-
-static NSString* const kDefaultKeePassEmailFieldKey = @"Email";
 
 @interface NodeFields ()
 

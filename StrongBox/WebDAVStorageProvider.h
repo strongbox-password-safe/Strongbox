@@ -27,10 +27,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 @property (nonatomic, readonly) BOOL privacyOptInRequired;
 
-@property WebDAVSessionConfiguration* unitTestSessionConfiguration;
-@property BOOL maintainSessionForListings;
+@property WebDAVSessionConfiguration* explicitConnection;
+@property BOOL maintainSessionForListing;
 
 - (WebDAVProviderData*)getProviderDataFromMetaData:(METADATA_PTR)metaData;
+- (WebDAVSessionConfiguration*_Nullable)getConnectionFromDatabase:(METADATA_PTR)metaData;
+
+- (void)testConnection:(WebDAVSessionConfiguration*)connection viewController:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(NSError* error))completion;
 
 @end
 

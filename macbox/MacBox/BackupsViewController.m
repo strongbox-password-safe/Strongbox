@@ -13,6 +13,7 @@
 #import "Utils.h"
 #import "TableViewWithRightClickSelect.h"
 #import "MacAlerts.h"
+#import "Settings.h"
 
 @interface BackupsViewController () <NSWindowDelegate, NSTableViewDelegate, NSTableViewDataSource>
 
@@ -58,12 +59,16 @@
 - (void)bindUi {
     DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
 
-    self.checkboxTakeBackups.state = database.makeBackups ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkboxTakeBackups.enabled = Settings.sharedInstance.makeLocalRollingBackups;
+    BOOL enabled = ( Settings.sharedInstance.makeLocalRollingBackups && database.makeBackups );
+    
+    self.checkboxTakeBackups.state = enabled ? NSControlStateValueOn : NSControlStateValueOff;
+    
     self.textBoxMaximumKeepCount.stringValue = @(database.maxBackupKeepCount).stringValue;
     self.stepperMaximumKeepCount.integerValue = database.maxBackupKeepCount;
 
-    self.textBoxMaximumKeepCount.enabled = database.makeBackups;
-    self.stepperMaximumKeepCount.enabled = database.makeBackups;
+    self.textBoxMaximumKeepCount.enabled = enabled;
+    self.stepperMaximumKeepCount.enabled = enabled;
     
     [self refreshTableView];
 }

@@ -17,6 +17,7 @@
 @interface StorageBrowserTableViewController ()
 
 @property BOOL listDone;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSelectThis;
 
 @end
 
@@ -28,6 +29,12 @@
     NSMutableDictionary<NSValue *, UIImage *> *_iconsCache;
 }
 
++ (instancetype)instantiateFromStoryboard {
+    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectStorage" bundle:nil];
+    StorageBrowserTableViewController* vc = [storyboard instantiateViewControllerWithIdentifier:@"StorageBrowser"];
+    return vc;
+}
+
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.navigationItem setPrompt:nil];
@@ -35,7 +42,8 @@
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    self.navigationController.toolbarHidden = self.existing;
+    
+    self.navigationController.toolbarHidden = NO;
 }
 
 - (void)viewDidLoad {
@@ -47,9 +55,8 @@
 
     NSMutableArray *toolbarButtons = [self.toolbarItems mutableCopy];
 
-    if (self.existing) {
-        [toolbarButtons removeObject:self.buttonSelectThis];
-        [self setToolbarItems:toolbarButtons animated:YES];
+    if ( self.existing ) {
+        [self.buttonSelectThis setTitle:NSLocalizedString(@"generic_dismiss", @"generic_dismiss")];
     }
     else if(![toolbarButtons containsObject:self.buttonSelectThis]) {
         [toolbarButtons addObject:self.buttonSelectThis];
@@ -62,6 +69,14 @@
     NSLocalizedString(@"sbtvc_select_database_file", @"Please Select Database File") :
     NSLocalizedString(@"sbtvc_select_new_database_location", @"Select Folder For New Database");
 
+
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self loadListing];
+    });
+}
+
+- (void)loadListing {
     
 
     BOOL dropboxDelayHack = NO;
@@ -96,7 +111,7 @@
         return;
     }
     
-    if(items == nil || error) {
+    if ( items == nil || error ) {
         self.onDone([SelectedStorageParameters error:error withProvider:self.safeStorageProvider]); 
     }
     else {
@@ -254,7 +269,12 @@
 }
 
 - (IBAction)onSelectThisFolder:(id)sender {
-    self.onDone([SelectedStorageParameters parametersForNativeProviderCreate:self.safeStorageProvider folder:self.parentFolder]);
+    if ( self.existing ) {
+        self.onDone([SelectedStorageParameters userCancelled]);
+    }
+    else {
+        self.onDone([SelectedStorageParameters parametersForNativeProviderCreate:self.safeStorageProvider folder:self.parentFolder]);
+    }
 }
 
 @end

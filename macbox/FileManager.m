@@ -132,6 +132,15 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     return ret;
 }
 
+- (NSURL *)preferencesDirectory {
+    NSURL* url = FileManager.sharedInstance.sharedAppGroupDirectory;
+    NSURL* ret = [url URLByAppendingPathComponent:@"preferences"];
+    
+    [self createIfNecessary:ret];
+    
+    return ret;
+}
+
 - (void)deleteAllTmpAttachmentPreviewFiles {
     NSString* tmpPath = [self tmpAttachmentPreviewPath];
     [self deleteAllFoo:tmpPath];

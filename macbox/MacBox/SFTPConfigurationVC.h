@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)newConfigurationVC;
 
 @property (nonatomic, copy) void (^onDone)(BOOL success, SFTPSessionConfiguration* _Nullable configuration);
+@property (nullable) SFTPSessionConfiguration* initialConfiguration;
 
 @end
 

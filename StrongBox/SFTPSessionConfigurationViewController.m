@@ -9,6 +9,8 @@
 #import "SFTPSessionConfigurationViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "Alerts.h"
+#import "Utils.h"
+#import "SFTPStorageProvider.h"
 
 @interface SFTPSessionConfigurationViewController () <UIDocumentPickerDelegate>
 
@@ -20,6 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonConnect;
 @property (weak, nonatomic) IBOutlet UILabel *labelValidation;
 @property (weak, nonatomic) IBOutlet UITextField *textFieldPath;
+@property (weak, nonatomic) IBOutlet UITextField *textFieldName;
 
 @property NSString* privateKey;
 
@@ -30,12 +33,23 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.configuration = nil;
     self.switchUsePrivateKey.on = NO;
+
+    if ( self.initialConfiguration ) {
+        self.textFieldName.text = self.initialConfiguration.name ? self.initialConfiguration.name : @"";
+        self.textFieldHost.text = self.initialConfiguration.host;
+        self.textFieldUsername.text = self.initialConfiguration.username;
+        self.textFieldPassword.text = self.initialConfiguration.password;
+        self.switchUsePrivateKey.on = self.initialConfiguration.authenticationMode == kPrivateKey;
+        self.textFieldPath.text = self.initialConfiguration.initialDirectory;
+        
+        self.privateKey = self.initialConfiguration.privateKey;
+    }
+    else {
+        [self.textFieldName becomeFirstResponder];
+    }
     
     [self bindUi];
-    
-    [self.textFieldHost becomeFirstResponder];
 }
 
 - (IBAction)onTextFieldChanged:(id)sender {
@@ -43,15 +57,10 @@
 }
 
 - (IBAction)onCancel:(id)sender {
-    self.configuration = nil;
-    self.onDone(NO);
+    self.onDone(NO, nil);
 }
 
 - (IBAction)onConnect:(id)sender {
-    self.configuration = [[SFTPSessionConfiguration alloc] init];
-    
-    NSString* host = [self.textFieldHost.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-    
     NSString* path = self.textFieldPath.text;
     if (path.pathExtension.length != 0) {
         [Alerts yesNo:self
@@ -59,27 +68,43 @@
               message:NSLocalizedString(@"sftp_path_are_you_sure", @"Are you sure the path is correct? It should be a path to a parent folder. Not the database file.")
                action:^(BOOL response) {
             if (response) {
-                self.configuration.host = host;
-                self.configuration.username = self.textFieldUsername.text;
-                self.configuration.password = self.textFieldPassword.text;
-                self.configuration.authenticationMode = self.switchUsePrivateKey.on ? kPrivateKey : kUsernamePassword;
-                self.configuration.privateKey = self.privateKey;
-                self.configuration.initialDirectory = self.textFieldPath.text;
-                
-                self.onDone(YES);
+                [self testConnectionAndFinish];
             }
         }];
     }
     else {
-        self.configuration.host = host;
-        self.configuration.username = self.textFieldUsername.text;
-        self.configuration.password = self.textFieldPassword.text;
-        self.configuration.authenticationMode = self.switchUsePrivateKey.on ? kPrivateKey : kUsernamePassword;
-        self.configuration.privateKey = self.privateKey;
-        self.configuration.initialDirectory = self.textFieldPath.text;
-        
-        self.onDone(YES);
+        [self testConnectionAndFinish];
     }
+}
+
+- (void)testConnectionAndFinish {
+    SFTPSessionConfiguration* configuration = [[SFTPSessionConfiguration alloc] init];
+    
+    NSString* name = trim(self.textFieldName.text);
+    NSString* host = [self.textFieldHost.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+
+    if ( self.initialConfiguration ) {
+        configuration.identifier = self.initialConfiguration.identifier;
+    }
+    
+    configuration.name = name;
+    configuration.host = host;
+    configuration.username = self.textFieldUsername.text;
+    configuration.password = self.textFieldPassword.text;
+    configuration.authenticationMode = self.switchUsePrivateKey.on ? kPrivateKey : kUsernamePassword;
+    configuration.privateKey = self.privateKey;
+    configuration.initialDirectory = self.textFieldPath.text;
+    
+    [SFTPStorageProvider.sharedInstance testConnection:configuration viewController:self completion:^(NSError * _Nonnull error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if ( error ) {
+                [Alerts error:self error:error];
+            }
+            else {
+                self.onDone(YES, configuration);
+            }
+        });
+    }];
 }
 
 - (IBAction)onUsePrivateKey:(id)sender {
@@ -92,33 +117,38 @@
 }
 
 - (void)validateConnect {
-    NSString* host = [self.textFieldHost.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    BOOL ok;
     
-    if(!host.length) {
+    NSString* name = trim(self.textFieldName.text);
+    NSString* host = [self.textFieldHost.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    NSString* path = self.textFieldPath.text;
+
+    if ( name.length == 0 ) {
+        self.labelValidation.text = NSLocalizedString(@"connection_vc_name_invalid", @"Please enter a valid name.");
+        self.labelValidation.textColor = [UIColor systemRedColor];
+        ok = NO;
+    }
+    else if( !host.length ) {
         self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_enter_host", @"Please Enter a Host");
         self.labelValidation.textColor = [UIColor systemRedColor];
-        self.buttonConnect.enabled = NO;
-        return;
+        ok = NO;
     }
-        
-    if(self.switchUsePrivateKey.on && self.privateKey.length == 0) {
+    else if(self.switchUsePrivateKey.on && self.privateKey.length == 0) {
         self.labelValidation.text = NSLocalizedString(@"sftp_vc_label_validation_select_private_key", @"Select a Private Key...");
         self.labelValidation.textColor = [UIColor systemRedColor];
-        self.buttonConnect.enabled = NO;
-        return;
+        ok = NO;
     }
-
-    NSString* path = self.textFieldPath.text;
-    if (path.pathExtension.length != 0) {
+    else if (path.pathExtension.length != 0) {
         self.labelValidation.text = NSLocalizedString(@"sftp_path_are_you_sure", @"Are you sure the path is correct? It should be a path to a parent folder. Not the database file.");
         self.labelValidation.textColor = [UIColor systemOrangeColor];
-        self.buttonConnect.enabled = YES;
+        ok = YES;
     }
     else {
         self.labelValidation.text = @"";
-        self.buttonConnect.enabled = YES;
+        ok = YES;
     }
-    return;
+    
+    self.buttonConnect.enabled = ok;
 }
 
 - (IBAction)onLocateKey:(id)sender {

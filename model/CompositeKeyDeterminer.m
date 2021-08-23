@@ -157,7 +157,7 @@ static const int kMaxFailedPinAttempts = 3;
         [SVProgressHUD dismiss];
         
         BOOL convenienceUnlock = askForPin || askForBio;
-        BOOL expired = (pw == nil) && (self.database.convenienceExpiryPeriod != -1); 
+        BOOL expired = (pw == nil) && (self.database.conveniencePasswordHasExpired) && (self.database.convenienceExpiryPeriod != -1); 
         
         BOOL displayConvenienceExpiryMessage = convenienceUnlock && expired;
 

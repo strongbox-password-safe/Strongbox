@@ -47,6 +47,7 @@
 
 #import "SyncManager.h"
 #import "WorkingCopyManager.h"
+#import "Constants.h"
 
 @interface UnlockDatabaseSequenceHelper () <UIDocumentPickerDelegate>
 
@@ -238,6 +239,9 @@
     NSLog(@"Unlock Interactive Sync Error: [%@]", error);
     if (self.database.storageProvider == kFilesAppUrlBookmark && [self errorIndicatesWeShouldAskUseToRelocateDatabase:error]) {
         [self askAboutRelocatingDatabase:factors];
+    }
+    else if ( error.code == kStorageProviderSFTPorWebDAVSecretMissingErrorCode ) {
+        self.completion(kUnlockDatabaseResultError, nil, error);
     }
     else {
         if ( self.database.couldNotConnectBehaviour == kCouldNotConnectBehaviourOpenOffline ) {

@@ -130,7 +130,7 @@
     
     
     NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
-    if (localWorkingCache) {
+    if ( localWorkingCache && Settings.sharedInstance.makeLocalRollingBackups ) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
             NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);

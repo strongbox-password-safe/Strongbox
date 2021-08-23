@@ -15,16 +15,14 @@
 #import "OfflineDetector.h"
 #import "BiometricsManager.h"
 #import "FileManager.h"
+#import "WebDAVConnectionsViewController.h"
+#import "SFTPConnectionsViewController.h"
 
 @interface AdvancedPreferencesTableViewController ()
 
-@property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideKeyFileName;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowAllFilesInKeyFilesLocal;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowMetadataOnDetailsScreen;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowPinCodeOpen;
-@property (weak, nonatomic) IBOutlet UISwitch *switchAllowBiometric;
-@property (weak, nonatomic) IBOutlet UILabel *labelAllowBiometric;
 @property (weak, nonatomic) IBOutlet UISwitch *switchDetectOffline;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowClipboardHandoff;
 @property (weak, nonatomic) IBOutlet UISwitch *switchUseColorBlindPalette;
@@ -36,16 +34,11 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchBackupImportedKeyFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHideExportOnDatabaseMenu;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAllowThirdPartyKeyboards;
-@property (weak, nonatomic) IBOutlet UISwitch *switchCompleteFileProtection;
 @property (weak, nonatomic) IBOutlet UISwitch *switchCoalesceBiometrics;
-@property (weak, nonatomic) IBOutlet UISwitch *backgroundUpdateSync;
+
 @property (weak, nonatomic) IBOutlet UISwitch *switchAddLegacyTotp;
 @property (weak, nonatomic) IBOutlet UISwitch *switchAddOtpAuthUrl;
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellFileProtection;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellInstantPin;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowPin;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellAllowBio;
 @property (weak, nonatomic) IBOutlet UISwitch *switchPinYinSearch;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchDropboxFolderOnly;
@@ -53,6 +46,13 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchMinimalDropboxScopes;
 @property (weak, nonatomic) IBOutlet UISwitch *switchStreamReadLargeKeyFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchNativeKeePassEmailField;
+
+@property (weak, nonatomic) IBOutlet UISwitch *backgroundUpdateSync;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellInstantPin;
+@property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellBackgroundSync;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSftpConnections;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellWebDAVConnections;
 
 @end
 
@@ -76,16 +76,17 @@
     
     
     
-    [self cell:self.cellFileProtection setHidden:YES];
     [self cell:self.cellInstantPin setHidden:YES];
-    [self cell:self.cellAllowPin setHidden:YES];
-    [self cell:self.cellAllowBio setHidden:YES];
+    [self cell:self.cellBackgroundSync setHidden:YES];
     
     
+    
+    if ( AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+        [self cell:self.cellSftpConnections setHidden:YES];
+        [self cell:self.cellWebDAVConnections setHidden:YES];
+    }
     
     [self bindPreferences];
-    [self bindAllowPinCodeOpen];
-    [self bindAllowBiometric];
 }
 
 - (IBAction)onDone:(id)sender {
@@ -102,20 +103,11 @@
     [self bindPreferences];
 }
 
-- (IBAction)onFileProtectionChanged:(id)sender {
-
-
-
-
-}
-
 - (IBAction)onPreferencesChanged:(id)sender {
     NSLog(@"Advanced Preference Changed: [%@]", sender);
 
     AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame = self.switchSyncForcePull.on;
     AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts = self.switchSyncForcePush.on;
-    AppPreferences.sharedInstance.useBackgroundUpdates = self.backgroundUpdateSync.on;
-    
 
     AppPreferences.sharedInstance.hideKeyFileOnUnlock = self.switchHideKeyFileName.on;
     AppPreferences.sharedInstance.showAllFilesInLocalKeyFiles = self.switchShowAllFilesInKeyFilesLocal.on;
@@ -149,12 +141,25 @@
     [self bindPreferences];
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
+    
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+    
+    if(cell == self.cellWebDAVConnections) {
+        WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
+        [vc presentFromViewController:self];
+    }
+    else if ( cell == self.cellSftpConnections) {
+        SFTPConnectionsViewController* vc = [SFTPConnectionsViewController instantiateFromStoryboard];
+        [vc presentFromViewController:self];
+    }
+}
+
 - (void)bindPreferences {
     self.switchSyncForcePull.on = AppPreferences.sharedInstance.syncPullEvenIfModifiedDateSame;
     self.switchSyncForcePush.on = AppPreferences.sharedInstance.syncForcePushDoNotCheckForConflicts;
-    self.backgroundUpdateSync.on = AppPreferences.sharedInstance.useBackgroundUpdates;
     
-    self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;
     self.switchHideKeyFileName.on = AppPreferences.sharedInstance.hideKeyFileOnUnlock;
     self.switchShowAllFilesInKeyFilesLocal.on = AppPreferences.sharedInstance.showAllFilesInLocalKeyFiles;
     self.switchDetectOffline.on = AppPreferences.sharedInstance.monitorInternetConnectivity;
@@ -168,7 +173,6 @@
     
     self.switchShowMetadataOnDetailsScreen.on = AppPreferences.sharedInstance.showMetadataOnDetailsScreen;
 
-
     self.switchCoalesceBiometrics.on = AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics;
     self.switchAddLegacyTotp.on = AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields;
     self.switchAddOtpAuthUrl.on = AppPreferences.sharedInstance.addOtpAuthUrl;
@@ -179,92 +183,6 @@
     self.switchMinimalDropboxScopes.on = AppPreferences.sharedInstance.useMinimalDropboxScopes;
     self.switchStreamReadLargeKeyFiles.on = AppPreferences.sharedInstance.streamReadLargeKeyFiles;
     self.switchNativeKeePassEmailField.on = AppPreferences.sharedInstance.keePassEmailField;
-}
-
-- (void)bindAllowPinCodeOpen {
-    self.switchAllowPinCodeOpen.on = !AppPreferences.sharedInstance.disallowAllPinCodeOpens;
-}
-
-- (void)bindAllowBiometric {
-    self.labelAllowBiometric.text = [NSString stringWithFormat:NSLocalizedString(@"prefs_vc_enable_biometric_fmt", @"Allow %@ Unlock"), [BiometricsManager.sharedInstance getBiometricIdName]];
-    self.switchAllowBiometric.on = !AppPreferences.sharedInstance.disallowAllBiometricId;
-}
-
-- (IBAction)onAllowPinCodeOpen:(id)sender {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
-- (IBAction)onAllowBiometric:(id)sender {
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 @end

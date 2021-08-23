@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, copy) void (^onSetMasterCredentials)(NSString* _Nullable password, NSString* _Nullable keyFileBookmark, NSData* _Nullable oneTimeKeyFileData, YubiKeyHardwareConfiguration* _Nullable yubiConfig);
 
-@property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues);
+@property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues, __weak UIViewController* viewControllerToDismiss);
 
 @end
 

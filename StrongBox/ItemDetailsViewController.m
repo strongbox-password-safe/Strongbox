@@ -1013,8 +1013,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         vc.model = self.databaseModel;
         vc.itemId = self.itemId;
         vc.hideShowAllAuditIssues = YES;
-        vc.onDone = ^(BOOL showAllAuditIssues) {
-            [self dismissViewControllerAnimated:YES completion:nil];
+        vc.onDone = ^(BOOL showAllAuditIssues, UIViewController * _Nonnull viewControllerToDismiss) { 
+            [viewControllerToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         };
     }
 }

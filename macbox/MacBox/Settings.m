@@ -76,6 +76,9 @@ static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock"
 static NSString* const kUseLegacyFileProvider = @"useLegacyFileProvider-Release";
 static NSString* const kHasMigratedToSyncManager = @"hasMigratedToSyncManager";
 static NSString* const kHideDockIconOnAllMinimized = @"hideDockIconOnAllMinimized";
+static NSString* const kMigratedConnections = @"migratedConnections";
+static NSString* const kCloseManagerOnLaunch = @"closeManagerOnLaunch";
+static NSString* const kMakeLocalRollingBackups = @"makeLocalRollingBackups";
 
 
 
@@ -168,6 +171,30 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)makeLocalRollingBackups {
+    return [self getBool:kMakeLocalRollingBackups fallback:YES];
+}
+
+- (void)setMakeLocalRollingBackups:(BOOL)makeLocalRollingBackups {
+    [self setBool:kMakeLocalRollingBackups value:makeLocalRollingBackups];
+}
+
+- (BOOL)closeManagerOnLaunch {
+    return [self getBool:kCloseManagerOnLaunch fallback:YES];
+}
+
+- (void)setCloseManagerOnLaunch:(BOOL)closeManagerOnLaunch {
+    [self setBool:kCloseManagerOnLaunch value:closeManagerOnLaunch];
+}
+
+- (BOOL)migratedConnections {
+    return [self getBool:kMigratedConnections];
+}
+
+- (void)setMigratedConnections:(BOOL)migratedConnections {
+    [self setBool:kMigratedConnections value:migratedConnections];
+}
 
 - (BOOL)hideDockIconOnAllMinimized {
     return [self getBool:kHideDockIconOnAllMinimized];
@@ -289,15 +316,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     [self setBool:kDoNotRememberKeyFile value:doNotRememberKeyFile];
 }
 
-- (BOOL)showPasswordImmediatelyInOutline {
-    return NO;
-
-}
-
-- (void)setShowPasswordImmediatelyInOutline:(BOOL)showPasswordImmediatelyInOutline {
-    [self setBool:kShowPasswordImmediatelyInOutline value:showPasswordImmediatelyInOutline];
-}
-
 - (BOOL)expressDownloadFavIconOnNewOrUrlChanged {
     return [self getBool:kExpressDownloadFavIconOnNewOrUrlChanged fallback:YES];
 }
@@ -400,15 +418,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setFullVersion:(BOOL)value {
     [self setBool:kFullVersion value:value];
-}
-
-- (BOOL)alwaysShowPassword {
-    return NO;
-
-}
-
--(void)setAlwaysShowPassword:(BOOL)alwaysShowPassword {
-    [self setBool:kAlwaysShowPassword value:alwaysShowPassword];
 }
 
 - (BOOL)isProOrFreeTrial {
@@ -704,6 +713,17 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setShowAttachmentImagePreviewsOnQuickViewPanel:(BOOL)showAttachmentImagePreviewsOnQuickViewPanel {
     [self setBool:kShowAttachmentImagePreviewsOnQuickViewPanel value:showAttachmentImagePreviewsOnQuickViewPanel];
+}
+
+
+
+- (BOOL)revealPasswordsImmediately {
+    return [self getBool:kShowPasswordImmediatelyInOutline] || [self getBool:kAlwaysShowPassword];
+}
+
+- (void)setRevealPasswordsImmediately:(BOOL)revealPasswordsImmediately {
+    [self setBool:kShowPasswordImmediatelyInOutline value:revealPasswordsImmediately];
+    [self setBool:kAlwaysShowPassword value:revealPasswordsImmediately];
 }
 
 @end

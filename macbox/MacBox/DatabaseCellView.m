@@ -18,6 +18,8 @@
 #import <QuartzCore/QuartzCore.h>
 #import "SafeStorageProviderFactory.h"
 #import "DatabasesManager.h"
+#import "SFTPStorageProvider.h"
+#import "WebDAVStorageProvider.h"
 
 @interface DatabaseCellView () <NSTextFieldDelegate>
 
@@ -127,16 +129,24 @@
     NSString* path = @"";
     NSString* fileSize = @"";
     NSString* fileMod = @"";
-
     
     NSString* title = metadata.nickName ? metadata.nickName : @"";
     
     if ( ![metadata.fileUrl.scheme isEqualToString:kStrongboxFileUrlScheme] && ![metadata.fileUrl.scheme isEqualToString:kStrongboxSyncManagedFileUrlScheme] ) {
-        NSURLComponents *comp = [[NSURLComponents alloc] init];
-
-        comp.host = metadata.fileUrl.host;
-        path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, metadata.fileUrl.host];
-    
+        if ( metadata.storageProvider == kSFTP ) {
+            SFTPSessionConfiguration* connection = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+            
+            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
+        }
+        else if ( metadata.storageProvider == kWebDAV ) {
+            WebDAVSessionConfiguration* connection = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:metadata];
+            
+            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, connection.name.length ? connection.name : connection.host];
+        }
+        else {
+            path = [NSString stringWithFormat:@"%@ (%@)", metadata.fileUrl.lastPathComponent, metadata.fileUrl.host];
+        }
+        
         NSDate* modDate;
         unsigned long long size;
         NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:metadata.uuid

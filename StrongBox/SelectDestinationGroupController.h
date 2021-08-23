@@ -15,9 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong, nonnull) Model *viewModel;
 @property Node * _Nonnull currentGroup;
-@property NSArray<Node*> * _Nonnull itemsToMove;
+@property BOOL hideAddGroupButton;
+@property NSString* customSelectDestinationButtonTitle;
 
-@property (nonatomic, copy, nonnull) void (^onMoveItems)(Node * _Nonnull destination);
+@property (nonatomic, copy, nonnull) BOOL (^validateDestination)(Node * _Nonnull destinationGroup);
+@property (nonatomic, copy, nonnull) void (^onSelectedDestination)(Node * _Nonnull destination);
 
 @end
 

@@ -607,6 +607,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return path;
 }
 
+- (NSArray<Node *> *)totpEntries {
+    return [self.allSearchableEntries filter:^BOOL(Node * _Nonnull obj) {
+        return obj.fields.otpToken != nil;
+    }];
+}
+
 - (NSArray<Node *> *)allSearchableEntries {
     return [self filterItems:NO includeEntries:YES searchableOnly:YES];
 }

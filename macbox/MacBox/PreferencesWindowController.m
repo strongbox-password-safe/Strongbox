@@ -101,6 +101,9 @@
 @property (weak) IBOutlet MASShortcutView *shortcutView;
 @property (weak) IBOutlet NSButton *checkboxHideDockIconOnAllMiniaturized;
 
+@property (weak) IBOutlet NSButton *makeRollingLocalBackups;
+@property (weak) IBOutlet NSButton *hideManagerOnLaunch;
+
 @end
 
 @implementation PreferencesWindowController
@@ -148,11 +151,8 @@
 
     
     
-    
     NSTabViewItem* tabViewQuickView = [self.tabView tabViewItemAtIndex:4];
-    NSTabViewItem* tabViewOutlineView = [self.tabView tabViewItemAtIndex:5];
     [self.tabView removeTabViewItem:tabViewQuickView];
-    [self.tabView removeTabViewItem:tabViewOutlineView];
     
     [self bindUi];
 }
@@ -202,7 +202,7 @@
 
     
     self.checkboxAutoSave.state = Settings.sharedInstance.autoSave ? NSOnState : NSOffState;
-    self.checkboxShowPasswordImmediatelyInOutline.state = Settings.sharedInstance.showPasswordImmediatelyInOutline ? NSOnState : NSOffState;
+    self.checkboxShowPasswordImmediatelyInOutline.state = Settings.sharedInstance.revealPasswordsImmediately ? NSOnState : NSOffState;
 
     self.showCustomFieldsInQuickView.state = Settings.sharedInstance.showCustomFieldsOnQuickViewPanel ? NSOnState : NSOffState;
     self.showAttachmentsInQuickView.state = Settings.sharedInstance.showAttachmentsOnQuickViewPanel ? NSOnState : NSOffState;
@@ -222,10 +222,13 @@
     self.switchShowInMenuBar.state = Settings.sharedInstance.showSystemTrayIcon ? NSOnState : NSOffState;
     self.checkboxHideDockIconOnAllMiniaturized.enabled = Settings.sharedInstance.showSystemTrayIcon;
     self.checkboxHideDockIconOnAllMiniaturized.state = Settings.sharedInstance.hideDockIconOnAllMinimized ? NSOnState : NSOffState;
+
+    self.hideManagerOnLaunch.state = Settings.sharedInstance.closeManagerOnLaunch ? NSOnState : NSOffState;
+    self.makeRollingLocalBackups.state = Settings.sharedInstance.makeLocalRollingBackups ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
-    Settings.sharedInstance.showPasswordImmediatelyInOutline = self.checkboxShowPasswordImmediatelyInOutline.state == NSOnState;
+    Settings.sharedInstance.revealPasswordsImmediately = self.checkboxShowPasswordImmediatelyInOutline.state == NSOnState;
     Settings.sharedInstance.autoSave = self.checkboxAutoSave.state == NSOnState;
 
     Settings.sharedInstance.showCustomFieldsOnQuickViewPanel = self.showCustomFieldsInQuickView.state == NSOnState;
@@ -246,7 +249,12 @@
     Settings.sharedInstance.showSystemTrayIcon = self.switchShowInMenuBar.state == NSOnState;
     Settings.sharedInstance.hideDockIconOnAllMinimized = self.checkboxHideDockIconOnAllMiniaturized.state == NSControlStateValueOn;
     
+    Settings.sharedInstance.closeManagerOnLaunch  = self.hideManagerOnLaunch.state == NSOnState;
+    
+    Settings.sharedInstance.makeLocalRollingBackups = self.makeRollingLocalBackups.state == NSOnState;
+    
     [self bindGeneralUiToSettings];
+    
     [[NSNotificationCenter defaultCenter] postNotificationName:kPreferencesChangedNotification object:nil];
 }
 

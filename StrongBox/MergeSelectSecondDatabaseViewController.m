@@ -46,9 +46,10 @@
         UINavigationController *nav = segue.destinationViewController;
         SecondDatabaseListTableViewController* vc = (SecondDatabaseListTableViewController*)nav.topViewController;
         vc.firstDatabase = self.firstDatabase;
+        
         __weak MergeSelectSecondDatabaseViewController* weakSelf = self;
-        vc.onSelectedDatabase = ^(SafeMetaData * _Nonnull secondDatabase) {
-            [weakSelf dismissViewControllerAnimated:YES completion:^{
+        vc.onSelectedDatabase = ^(SafeMetaData * _Nonnull secondDatabase, UIViewController *__weak  _Nonnull vcToDismiss) {
+            [vcToDismiss.presentingViewController dismissViewControllerAnimated:YES completion:^{
                 [weakSelf onSecondDatabaseSelected:secondDatabase];
             }];
         };

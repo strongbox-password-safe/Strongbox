@@ -8,12 +8,28 @@
 
 #import "WebDAVProviderData.h"
 
+@interface WebDAVProviderData ()
+
+@end
+
 @implementation WebDAVProviderData
 
 - (NSDictionary *)serializationDictionary {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:[self.sessionConfiguration serializationDictionary]];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    
+    if ( self.sessionConfiguration ) {
+        [dict addEntriesFromDictionary:[self.sessionConfiguration serializationDictionary]];
+    }
+    
     [dict setObject:self.href forKey:@"href"];
     
+    if ( self.connectionIdentifier ) {
+        dict[@"connectionIdentifier"] = self.connectionIdentifier;
+    }
+    else {
+        dict[@"connectionIdentifier"] = self.sessionConfiguration.identifier;
+    }
+
     return dict;
 }
 
@@ -21,7 +37,19 @@
     WebDAVProviderData *pd = [[WebDAVProviderData alloc] init];
     
     pd.href = [dictionary objectForKey:@"href"];
-    pd.sessionConfiguration = [WebDAVSessionConfiguration fromSerializationDictionary:dictionary];
+    
+    WebDAVSessionConfiguration* config = [WebDAVSessionConfiguration fromSerializationDictionary:dictionary];
+    
+    if ( config ) {
+        pd.sessionConfiguration = config;
+    }
+    
+    if ( dictionary[@"connectionIdentifier"] ) {
+        pd.connectionIdentifier = dictionary[@"connectionIdentifier"];
+    }
+    else if ( config ) { 
+        pd.connectionIdentifier = config.identifier;
+    }
     
     return pd;
 }

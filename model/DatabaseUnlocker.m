@@ -61,7 +61,7 @@
 }
 
 + (Model*)expressTryUnlockWithKey:(SafeMetaData *)database key:(CompositeKeyFactors *)key {
-    if (key.yubiKeyCR) { 
+    if ( key.yubiKeyCR ) { 
         return nil;
     }
     
@@ -259,7 +259,7 @@
     if ( enrolled ) {
         BOOL convenienceEnabled = self.database.isTouchIdEnabled || self.database.conveniencePin != nil;
         NSString* pw = self.database.convenienceMasterPassword;
-        BOOL expired = (pw == nil) && (self.database.convenienceExpiryPeriod != -1); 
+        BOOL expired = (pw == nil) && (self.database.conveniencePasswordHasExpired) && (self.database.convenienceExpiryPeriod != -1); 
 
         if ( convenienceEnabled && expired ) {
             NSLog(@"XXXX - Convenience Unlock enabled, successful open, and password expired... re-enrolling...");
@@ -303,20 +303,17 @@
             self.database.emptyOrNilPwPreferNilCheckFirst = !self.database.emptyOrNilPwPreferNilCheckFirst;
             [SafesList.sharedInstance update:self.database];
             
-            if ( secondCheck.yubiKeyCR != nil ) { 
-                [Alerts areYouSure:self.viewController
-                           message:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
-                            action:^(BOOL response) {
-                    if (response) {
-                        [Serializator fromUrl:url
-                                          ckf:secondCheck
-                                   completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                            [self onGotDatabaseModelFromData:userCancelled model:model error:error];
-                        }];
-                    }
-                    else {
-                        completion(kUnlockDatabaseResultUserCancelled, nil, nil);
-                    }
+            if ( secondCheck.yubiKeyCR != nil ) {
+                
+                [Alerts info:self.viewController
+                       title:NSLocalizedString(@"yubikey_fast_unlock_title", @"Determining Fast Unlock for YubiKey")
+                     message:NSLocalizedString(@"yubikey_fast_unlock_message", @"Strongbox is determining the fastest way to unlock this database. You will be asked to scan your YubiKey once again.")
+                  completion:^{
+                    [Serializator fromUrl:url
+                                      ckf:secondCheck
+                               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+                        [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+                    }];
                 }];
             }
             else {

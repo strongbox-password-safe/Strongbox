@@ -57,6 +57,7 @@
 #import "SyncAndMergeSequenceManager.h"
 #import "PasswordStrengthTester.h"
 #import "StrongboxErrorCodes.h"
+#import "DatabaseFormatIncompatibilityHelper.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -533,7 +534,7 @@ static NSImage* kStrongBox256Image;
     
     self.textFieldMasterPassword.delegate = self;
     
-    self.showPassword = Settings.sharedInstance.alwaysShowPassword;
+    self.showPassword = Settings.sharedInstance.revealPasswordsImmediately;
 
     self.tableViewSummary.dataSource = self;
     self.tableViewSummary.delegate = self;
@@ -1050,7 +1051,7 @@ static NSImage* kStrongBox256Image;
         [self.textViewNotes setEditable:NO];
         
         self.imageViewTogglePassword.hidden = (self.labelPassword.stringValue.length == 0 && !self.viewModel.concealEmptyProtectedFields);
-        self.showPassword = Settings.sharedInstance.alwaysShowPassword || (self.labelPassword.stringValue.length == 0 && !self.viewModel.concealEmptyProtectedFields);
+        self.showPassword = Settings.sharedInstance.revealPasswordsImmediately || (self.labelPassword.stringValue.length == 0 && !self.viewModel.concealEmptyProtectedFields);
         [self showOrHideQuickViewPassword];
         
         
@@ -1185,7 +1186,7 @@ static NSImage* kStrongBox256Image;
         
         cell.value = it.isGroup ? @"" : password;
         cell.protected = !it.isGroup && !(password.length == 0 && !self.viewModel.concealEmptyProtectedFields);
-        cell.valueHidden = !it.isGroup && !(password.length == 0 && !self.viewModel.concealEmptyProtectedFields) && !Settings.sharedInstance.showPasswordImmediatelyInOutline;
+        cell.valueHidden = !it.isGroup && !(password.length == 0 && !self.viewModel.concealEmptyProtectedFields) && !Settings.sharedInstance.revealPasswordsImmediately;
         
         cell.alphaValue = it.expired ? kExpiredOutlineViewCellAlpha : 1.0f;
 
@@ -1480,7 +1481,17 @@ static NSImage* kStrongBox256Image;
     Node* item = [self getCurrentSelectedItem];
     
     if (item) {
-        [self openItemDetails:item newEntry:NO];
+        if ( item.isGroup ) {
+            [self.outlineView editColumn:self.outlineView.selectedColumn row:self.outlineView.selectedRow withEvent:nil select:NO];
+
+            
+            
+            
+
+        }
+        else {
+            [self openItemDetails:item newEntry:NO];
+        }
     }
 }
 
@@ -2595,272 +2606,28 @@ compositeKeyFactors:(CompositeKeyFactors*)compositeKeyFactors
         
         [nodes addObject:n];
     }
+
+    BOOL destinationIsRootGroup = (destinationItem == nil || destinationItem == self.viewModel.rootGroup);
     
-    [self processFormatIncompatibilities:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    
+    [DatabaseFormatIncompatibilityHelper processFormatIncompatibilities:nodes
+                                                 destinationIsRootGroup:destinationIsRootGroup
+                                                           sourceFormat:sourceFormat
+                                                      destinationFormat:self.viewModel.format
+                                                    confirmChangesBlock:^(NSString * _Nullable confirmMessage, IncompatibilityConfirmChangesResultBlock  _Nonnull resultBlock) {
+        [MacAlerts yesNo:confirmMessage window:self.view.window completion:^(BOOL yesNo) {
+            resultBlock(yesNo);
+        }];
+    } completion:^(BOOL go, NSArray<Node *> * _Nullable compatibleFilteredNodes) {
+        if ( go ) {
+            [self continuePaste:compatibleFilteredNodes destinationItem:destinationItem];
+        }
+    }];
+        
     return nodes.count;
 }
 
-- (void)processPasswordSafeToKeePass2:(NSDictionary*)serialized
-                                nodes:(NSArray<Node*>*)nodes
-                      destinationItem:(Node*)destinationItem
-                         sourceFormat:(DatabaseFormat)sourceFormat {
-    
-    
-    NSArray<Node*>* allRecords = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return obj.allChildRecords;
-    }];
-    NSMutableArray<Node*>* all = allRecords.mutableCopy;
-    [all addObjectsFromArray:nodes];
-    NSArray<Node*>* nodesWithEmails = [all filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.email.length;
-    }];
-    
-    if(nodesWithEmails.count) {
-        NSString* loc = NSLocalizedString(@"mac_drag_drop_between_databases_keepass_email_field_not_supported", @"KeePass does not natively support the 'Email' field. Strongbox will add it instead as a custom field.\nDo you want to continue?");
-
-        [MacAlerts yesNo:loc
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-               if(yesNo) {
-                   for (Node* nodeWithEmail in nodesWithEmails) {
-                       [nodeWithEmail.fields setCustomField:@"Email" value:[StringValue valueWithString:nodeWithEmail.fields.email]];
-                   }
-                   
-                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-               }
-           }];
-    }
-    else {
-        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-}
-
-- (void)processPasswordSafeToKeePass1:(NSDictionary*)serialized
-                                nodes:(NSArray<Node*>*)nodes
-                      destinationItem:(Node*)destinationItem
-                         sourceFormat:(DatabaseFormat)sourceFormat {
-    
-   
-    NSArray<Node*>* allRecords = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return obj.allChildRecords;
-    }];
-    NSMutableArray<Node*>* all = allRecords.mutableCopy;
-    [all addObjectsFromArray:nodes];
-    NSArray<Node*>* nodesWithEmails = [all filter:^BOOL(Node * _Nonnull obj) {
-        return obj.fields.email.length;
-    }];
-    
-    NSArray<Node*>* rootEntries = [nodes filter:^BOOL(Node * _Nonnull obj) {
-        return !obj.isGroup;
-    }];
-    
-    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.viewModel.rootGroup) && rootEntries.count);
-    
-    if(nodesWithEmails.count || pastingEntriesToRoot) {
-        NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries", @"KeePass 1 does not support entries at the root level, these will be discarded. KeePass 1 also does not natively support the 'Email' field. Strongbox will append it instead to the end of the 'Notes' field.\nDo you want to continue?");
-        
-        [MacAlerts yesNo:loc
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-               if(yesNo) {
-                   for (Node* nodeWithEmail in nodesWithEmails) {
-                       nodeWithEmail.fields.notes = [nodeWithEmail.fields.notes stringByAppendingFormat:@"%@Email: %@",
-                                                     nodeWithEmail.fields.notes.length ? @"\n\n" : @"",
-                                                     nodeWithEmail.fields.email];
-                   }
-                   
-                   NSArray* filtered = nodes;
-                   if(pastingEntriesToRoot) {
-                       filtered = [nodes filter:^BOOL(Node * _Nonnull obj) {
-                           return obj.isGroup;
-                       }];
-                   }
-                   
-                   [self continuePaste:serialized nodes:filtered destinationItem:destinationItem sourceFormat:sourceFormat];
-               }
-           }];
-    }
-    else {
-        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-}
-
-- (void)processKeePass2ToPasswordSafe:(NSDictionary*)serialized
-                                nodes:(NSArray<Node*>*)nodes
-                      destinationItem:(Node*)destinationItem
-                         sourceFormat:(DatabaseFormat)sourceFormat {
-    
-    
-    NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return obj.children;
-    }];
-    NSMutableArray<Node*>* all = allChildNodes.mutableCopy;
-    [all addObjectsFromArray:nodes];
-    
-    NSArray<Node*>* incompatibles = [all filter:^BOOL(Node * _Nonnull obj) {
-        BOOL customIcon = !obj.isUsingKeePassDefaultIcon;
-        BOOL attachments = obj.fields.attachments.count;
-        BOOL customFields = obj.fields.customFields.count;
-        
-        return customIcon || attachments || customFields;
-    }];
-
-    if(incompatibles.count) {
-        NSString* loc = NSLocalizedString(@"mac_password_safe_fmt_does_not_support_icons_attachments_warning", @"The Password Safe format does not support icons, attachments or custom fields. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?");
-        
-        [MacAlerts yesNo:loc
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-               if(yesNo) {
-                   for (Node* incompatible in incompatibles) {
-                       incompatible.icon = nil;
-                       [incompatible.fields.attachments removeAllObjects];
-                       [incompatible.fields removeAllCustomFields];
-                   }
-                   
-                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-               }
-           }];
-    }
-    else {
-        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-}
-
-- (void)processKeePass2ToKeePass1:(NSDictionary*)serialized
-                                nodes:(NSArray<Node*>*)nodes
-                      destinationItem:(Node*)destinationItem
-                         sourceFormat:(DatabaseFormat)sourceFormat {
-    
-    
-    NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return obj.children;
-    }];
-    NSMutableArray<Node*>* all = allChildNodes.mutableCopy;
-    [all addObjectsFromArray:nodes];
-    
-    NSArray<Node*>* incompatibles = [all filter:^BOOL(Node * _Nonnull obj) {
-        BOOL customIcon = obj.icon.isCustom;
-        BOOL tooManyAttachments = obj.fields.attachments.count > 1;
-        BOOL customFields = obj.fields.customFields.count;
-        
-        return customIcon || tooManyAttachments || customFields;
-    }];
-    
-    NSArray<Node*>* rootEntries = [nodes filter:^BOOL(Node * _Nonnull obj) {
-        return !obj.isGroup;
-    }];
-    BOOL pastingEntriesToRoot = ((destinationItem == nil || destinationItem == self.viewModel.rootGroup) && rootEntries.count);
-
-    if(incompatibles.count || pastingEntriesToRoot) {
-        NSString* loc = NSLocalizedString(@"mac_keepass1_does_not_support_root_entries_or_attachments", @"The KeePass 1 (KDB) does not support entries at the root level, these will be discarded.\n\nThe KeePass 1 (KDB) format also does not support multiple attachments, custom fields or custom icons. If you continue only the first attachment from each item will be copied to this database. Custom Fields and Icons will be discarded.\nDo you want to continue?");
-
-        [MacAlerts yesNo:loc
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-               if(yesNo) {
-                   for (Node* incompatible in incompatibles) {
-                       incompatible.icon = nil;
-                       NSString* firstAttachmentFilename = incompatible.fields.attachments.allKeys.firstObject;
-                       if ( firstAttachmentFilename ) { 
-                           DatabaseAttachment* dbA = incompatible.fields.attachments[firstAttachmentFilename];
-                           
-                           [incompatible.fields.attachments removeAllObjects];
-                           
-                           incompatible.fields.attachments[firstAttachmentFilename] = dbA;
-                       }
-                       else {
-                           [incompatible.fields.attachments removeAllObjects];
-                       }
-                       [incompatible.fields removeAllCustomFields];
-                   }
-                   
-                   NSArray* filtered = nodes;
-                   if(pastingEntriesToRoot) {
-                       filtered = [nodes filter:^BOOL(Node * _Nonnull obj) {
-                           return obj.isGroup;
-                       }];
-                   }
-                   
-                   [self continuePaste:serialized nodes:filtered destinationItem:destinationItem sourceFormat:sourceFormat];
-               }
-           }];
-    }
-    else {
-        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-}
-
-- (void)processKeePass1ToPasswordSafe:(NSDictionary*)serialized
-                                nodes:(NSArray<Node*>*)nodes
-                      destinationItem:(Node*)destinationItem
-                         sourceFormat:(DatabaseFormat)sourceFormat {
-    
-    
-    NSArray<Node*>* allChildNodes = [nodes flatMap:^NSArray * _Nonnull(Node * _Nonnull obj, NSUInteger idx) {
-        return obj.children;
-    }];
-    NSMutableArray<Node*>* all = allChildNodes.mutableCopy;
-    [all addObjectsFromArray:nodes];
-    
-    NSArray<Node*>* incompatibles = [all filter:^BOOL(Node * _Nonnull obj) {
-        BOOL customIcon = !obj.isUsingKeePassDefaultIcon;
-        BOOL attachments = obj.fields.attachments.count;
-        
-        return customIcon || attachments;
-    }];
-    
-    if(incompatibles.count) {
-        NSString* loc = NSLocalizedString(@"mac_password_safe_does_not_support_attachments_icons_continue_yes_no", @"The Password Safe format does not support attachments or icons. If you continue, these fields will not be copied to this database.\nDo you want to continue without these fields?");
-        
-        [MacAlerts yesNo:loc
-               window:self.view.window
-           completion:^(BOOL yesNo) {
-               if(yesNo) {
-                   for (Node* incompatible in incompatibles) {
-                       incompatible.icon = nil;
-                       [incompatible.fields.attachments removeAllObjects];
-                       [incompatible.fields removeAllCustomFields];
-                   }
-                   
-                   [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-               }
-           }];
-    }
-    else {
-        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-}
-
-- (void)processFormatIncompatibilities:(NSDictionary*)serialized
-                                 nodes:(NSArray<Node*>*)nodes
-                       destinationItem:(Node*_Nonnull)destinationItem
-                          sourceFormat:(DatabaseFormat)sourceFormat {
-    if (sourceFormat == kPasswordSafe && (self.viewModel.format == kKeePass || self.viewModel.format == kKeePass4)) {
-        [self processPasswordSafeToKeePass2:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-    else if (sourceFormat == kPasswordSafe && self.viewModel.format == kKeePass1) {
-        [self processPasswordSafeToKeePass1:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.viewModel.format == kPasswordSafe) {
-        [self processKeePass2ToPasswordSafe:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-    else if ((sourceFormat == kKeePass || sourceFormat == kKeePass4) && self.viewModel.format == kKeePass1) {
-        [self processKeePass2ToKeePass1:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-    else if (sourceFormat == kKeePass1 && self.viewModel.format == kPasswordSafe) {
-        [self processKeePass1ToPasswordSafe:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-    else {
-        [self continuePaste:serialized nodes:nodes destinationItem:destinationItem sourceFormat:sourceFormat];
-    }
-}
-
-- (void)continuePaste:(NSDictionary*)serialized
-                nodes:(NSArray<Node*>*)nodes
-      destinationItem:(Node*)destinationItem
-         sourceFormat:(DatabaseFormat)sourceFormat {
+- (void)continuePaste:(NSArray<Node*>*)nodes
+      destinationItem:(Node*)destinationItem {
     BOOL success = [self.viewModel addChildren:nodes parent:destinationItem];
     
     if(!success) {
@@ -3996,7 +3763,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     if ( item ) {
         Node* destinationItem = item.parent ? item.parent : self.viewModel.rootGroup;
     
-        Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")]];
+        Node* dupe = [item duplicate:[item.title stringByAppendingString:NSLocalizedString(@"browse_vc_duplicate_title_suffix", @" Copy")] preserveTimestamps:NO]; 
         [item touch:NO touchParents:YES];
         if ( [self.viewModel addChildren:@[dupe] parent:destinationItem] ) {
             NSString* loc = NSLocalizedString(@"mac_item_duplicated", @"Item Duplicated");
@@ -4563,7 +4330,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     if ( cmd && key > 48 && key < 58 ) {
         NSUInteger number = key - 48;
 
-
+        NSLog(@"%hu - %d => %ld", key, event.keyCode, number);
 
         [self onCmdPlusNumberPressed:number];
         return;
@@ -4574,7 +4341,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 
 - (BOOL)control:(NSControl *)control textView:(NSTextView *)textView doCommandBySelector:(SEL)commandSelector {
     NSEvent *event = [control.window currentEvent];
-
+    NSLog(@"%@-%@-%@", control, textView, NSStringFromSelector(commandSelector));
 
     if (commandSelector == NSSelectorFromString(@"noop:")) { 
         if ( (event.modifierFlags & NSCommandKeyMask ) == NSCommandKeyMask) {
@@ -4646,13 +4413,3 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 @end
-
-
-
-
-
-
-
-
-
-

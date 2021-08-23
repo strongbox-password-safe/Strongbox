@@ -22,6 +22,7 @@
 - (instancetype)initWithKeyChainUuid:(NSString*)keyChainUuid {
     if(self = [super init]) {
         self.keyChainUuid = keyChainUuid;
+        self.identifier = NSUUID.UUID.UUIDString;
     }
     
     return self;
@@ -29,6 +30,9 @@
 
 - (NSDictionary *)serializationDictionary {
     NSMutableDictionary* ret = [NSMutableDictionary dictionary];
+    
+    [ret setValue:self.identifier forKey:@"identifier"];
+    if ( self.name ) [ret setValue:self.name forKey:@"name"];
     
     if(self.host) [ret setValue:self.host forKey:@"host"];
     if(self.authenticationMode) [ret setValue:@(self.authenticationMode) forKey:@"authenticationMode"];
@@ -41,8 +45,14 @@
 
 + (instancetype)fromSerializationDictionary:(NSDictionary *)dictionary {
     NSString* keyChainUuid = [dictionary objectForKey:@"keyChainUuid"];
+    if ( !keyChainUuid ) {
+        return nil;
+    }
     
     SFTPSessionConfiguration *ret = [[SFTPSessionConfiguration alloc] initWithKeyChainUuid:keyChainUuid];
+    
+    if ( dictionary[@"identifier"] ) ret.identifier = dictionary[@"identifier"];
+    if ( dictionary[@"name"] ) ret.name = dictionary[@"name"];
     
     ret.host = [dictionary objectForKey:@"host"];
     
@@ -98,6 +108,12 @@
     else {
         [SecretStore.sharedInstance deleteSecureItem:[self getKeyChainKey:@"publicKey"]];
     }
+}
+
+- (void)clearKeychainItems {
+    [self setPublicKey:nil];
+    [self setPrivateKey:nil];
+    [self setPassword:nil];
 }
 
 @end

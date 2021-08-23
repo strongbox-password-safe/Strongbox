@@ -100,10 +100,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (Node*)clone;
 - (Node*)cloneAsChildOf:(Node*)parentNode;
-
 - (Node*)clone:(BOOL)recursive;
 - (Node*)cloneForHistory;
-- (Node*)duplicate:(NSString*)newTitle; 
+- (Node*)duplicate:(NSString*)newTitle preserveTimestamps:(BOOL)preserveTimestamps; 
+
+- (Node*)cloneOrDuplicate:(BOOL)cloneMetadataDates
+                cloneUuid:(BOOL)cloneUuid
+           cloneRecursive:(BOOL)cloneRecursive
+                 newTitle:(NSString*_Nullable)newTitle
+               parentNode:(Node*_Nullable)parentNode;
 
 - (BOOL)mergePropertiesInFromNode:(Node *)mergeNode mergeLocationChangedDate:(BOOL)mergeLocationChangedDate includeHistory:(BOOL)includeHistory keePassGroupTitleRules:(BOOL)keePassGroupTitleRules;
 

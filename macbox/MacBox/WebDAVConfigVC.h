@@ -16,6 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)newConfigurationVC;
 
 @property (nonatomic, copy) void (^onDone)(BOOL success, WebDAVSessionConfiguration* _Nullable configuration);
+@property (nullable) WebDAVSessionConfiguration* initialConfiguration;
 
 @end
 

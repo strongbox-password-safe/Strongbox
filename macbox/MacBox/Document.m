@@ -831,7 +831,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     
     if (workingCopy == nil) {
         NSLog(@"loadWorkingCopyAndUnlock - Could not get local working copy");
-        completion(NO, [Utils createNSError:@"Could not get local working copy" errorCode:-123]);
+        
+        if ( completion ) {
+            completion(NO, [Utils createNSError:@"Could not get local working copy" errorCode:-123]);
+        }
+        
         return;
     }
         
@@ -839,7 +843,10 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     NSData* workingData = [NSData dataWithContentsOfURL:workingCopy options:kNilOptions error:&error];
     if ( error ) {
         NSLog(@"loadWorkingCopyAndUnlock - dataWithContentsOfURL error = [%@]", error);
-        completion(NO, error);
+        
+        if ( completion ) {
+            completion(NO, error);
+        }
         return;
     }
 

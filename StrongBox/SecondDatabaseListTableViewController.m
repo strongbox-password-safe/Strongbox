@@ -25,6 +25,10 @@
 
     [self.tableView registerNib:[UINib nibWithNibName:kDatabaseCell bundle:nil] forCellReuseIdentifier:kDatabaseCell];
     self.tableView.tableFooterView = UIView.new;
+    
+    if ( self.customTitle.length ) {
+        [self.navigationItem setTitle:self.customTitle];
+    }
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -37,8 +41,9 @@
     SafeMetaData* database = self.list[indexPath.row];
     
     BOOL isFirstDatabase = [database.uuid isEqualToString:self.firstDatabase.metadata.uuid];
+    BOOL isReadOnly = database.readOnly;
     
-    [cell populateCell:database disabled:isFirstDatabase];
+    [cell populateCell:database disabled:isFirstDatabase || (self.disableReadOnlyDatabases && isReadOnly)];
     
     return cell;
 }
@@ -48,7 +53,7 @@
     
     SafeMetaData* database = self.list[indexPath.row];
     
-    self.onSelectedDatabase(database);
+    self.onSelectedDatabase(database, self);
 }
 
 - (IBAction)onCancel:(id)sender {

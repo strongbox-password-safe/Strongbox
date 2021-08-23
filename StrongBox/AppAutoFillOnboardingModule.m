@@ -15,7 +15,7 @@
 @implementation AppAutoFillOnboardingModule
 
 - (nonnull instancetype)initWithModel:(Model * _Nullable)model {
-    return self = [super init];
+    return [super init];
 }
 
 - (BOOL)shouldDisplay {

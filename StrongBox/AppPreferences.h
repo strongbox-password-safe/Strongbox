@@ -87,7 +87,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property AppPrivacyShieldMode appPrivacyShieldMode;
 @property BOOL migratedOfflineDetectedBehaviour;
-@property BOOL useBackgroundUpdates;
 
 
 
@@ -175,6 +174,23 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL disallowAllPinCodeOpens;
 @property (readonly) BOOL disallowAllBiometricId;
 @property (readonly) BOOL instantPinUnlocking;
+@property (readonly) BOOL useBackgroundUpdates; 
+
+
+
+@property BOOL exportItemsPreserveUUIDs;
+@property BOOL exportItemsReplaceExisting;
+@property BOOL exportItemsPreserveTimestamps;
+
+@property BOOL duplicateItemReferencePassword;
+@property BOOL duplicateItemReferenceUsername;
+@property BOOL duplicateItemPreserveTimestamp;
+@property BOOL duplicateItemEditAfterwards;
+
+@property BOOL migratedConnections; 
+
+
+
 
 @end
 

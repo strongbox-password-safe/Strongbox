@@ -27,7 +27,11 @@
 }
 
 - (BOOL)shouldDisplay {
-    return ( !self.model.metadata.convenienceExpiryOnboardingDone && AppPreferences.sharedInstance.isProOrFreeTrial && self.model.metadata.isTouchIdEnabled && self.model.metadata.isEnrolledForConvenience );
+    return ( !self.model.metadata.convenienceExpiryOnboardingDone &&
+            AppPreferences.sharedInstance.isProOrFreeTrial &&
+            self.model.metadata.isTouchIdEnabled &&
+            self.model.metadata.isEnrolledForConvenience &&
+            self.model.metadata.convenienceMasterPassword.length ); 
 }
 
 - (nonnull UIViewController *)instantiateViewController:(nonnull OnboardingModuleDoneBlock)onDone {

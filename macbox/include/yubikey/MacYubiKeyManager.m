@@ -134,8 +134,11 @@
     }
 
     NSString* loc = NSLocalizedString(@"mac_error_getting_challenge_response_yubikey", @"Could not get Challenge Response from Yubikey");
-    *error = [Utils createNSError:loc errorCode:-1];
-
+    
+    if ( error ) {
+        *error = [Utils createNSError:loc errorCode:-1];
+    }
+    
     return nil;
 }
 

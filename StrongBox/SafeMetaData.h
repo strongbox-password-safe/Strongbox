@@ -189,6 +189,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSDate* databaseCreated;
 @property NSUInteger unlockCount;
 
+@property BOOL conveniencePasswordHasExpired;
+
 @end
 
 NS_ASSUME_NONNULL_END

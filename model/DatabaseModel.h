@@ -124,6 +124,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
+
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
+
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
 

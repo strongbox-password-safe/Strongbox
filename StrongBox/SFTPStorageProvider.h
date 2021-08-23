@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)sharedInstance;
 
-@property (nullable) SFTPSessionConfiguration *unitTestingSessionConfiguration; 
+@property (nullable) SFTPSessionConfiguration *explicitConnection; 
 
 @property (nonatomic, readonly) StorageProvider storageId;
 @property (nonatomic, readonly) BOOL providesIcons;
@@ -31,6 +31,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL maintainSessionForListing;
 
 - (SFTPProviderData*)getProviderDataFromMetaData:(METADATA_PTR)metaData;
+- (SFTPSessionConfiguration*_Nullable)getConnectionFromDatabase:(METADATA_PTR)metaData;
+
+- (void)testConnection:(SFTPSessionConfiguration *)connection
+        viewController:(VIEW_CONTROLLER_PTR)viewController
+            completion:(void (^)(NSError* error))completion;
 
 @end
 

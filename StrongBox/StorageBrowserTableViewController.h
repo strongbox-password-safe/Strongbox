@@ -13,13 +13,11 @@
 
 @interface StorageBrowserTableViewController : UITableViewController
 
++ (instancetype)instantiateFromStoryboard;
+
 @property (nonatomic) NSObject *parentFolder;
 @property (nonatomic) BOOL existing;
 @property (nonatomic) id<SafeStorageProvider> safeStorageProvider;
 @property (nonatomic, copy) SelectStorageCompletion onDone;
-
-- (IBAction)onSelectThisFolder:(id)sender;
-
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *buttonSelectThis;
 
 @end

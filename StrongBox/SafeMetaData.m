@@ -17,7 +17,7 @@
 
 #import "AppPreferences.h"
 
-static const NSInteger kDefaultConvenienceExpiryPeriodHours = 2 * 7 * 24;  
+static const NSInteger kDefaultConvenienceExpiryPeriodHours = -1; 
 static const NSUInteger kDefaultScheduledExportIntervalDays = 28;  
 
 @interface SafeMetaData ()
@@ -548,13 +548,25 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     }
 }
 
+
 - (NSString *)convenienceMasterPassword {
-    return [SecretStore.sharedInstance getSecureString:self.uuid];
+    BOOL expired;
+    NSString* object = (NSString*)[SecretStore.sharedInstance getSecureObject:self.uuid expired:&expired];
+    
+    if ( expired ) { 
+        self.conveniencePasswordHasExpired = YES;
+    }
+    
+    return object; 
 }
 
 - (void)setConvenienceMasterPassword:(NSString *)convenienceMasterPassword {
     NSInteger expiringAfterHours = self.convenienceExpiryPeriod;
     
+
+    if ( self.conveniencePasswordHasExpired ) {
+        self.conveniencePasswordHasExpired = NO;
+    }
 
     if(expiringAfterHours == -1) {
         [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:self.uuid];
@@ -569,6 +581,16 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
         [SecretStore.sharedInstance setSecureObject:convenienceMasterPassword forIdentifier:self.uuid expiresAt:date];
     }
+}
+
+- (BOOL)conveniencePasswordHasExpired {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
+    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:key];
+}
+
+- (void)setConveniencePasswordHasExpired:(BOOL)conveniencePasswordHasExpired {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:conveniencePasswordHasExpired forKey:key];
 }
 
 - (NSString *)autoFillConvenienceAutoUnlockPassword {

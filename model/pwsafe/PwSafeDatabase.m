@@ -405,6 +405,8 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
 + (Record* _Nonnull)createOrUpdateSerializationRecordWithNode:(Node* _Nonnull)recordNode {
     Record *record = recordNode.linkedData ? ( (Record*)recordNode.linkedData) : [[Record alloc] init];
  
+    record.uuid = recordNode.uuid; 
+    
     record.title = recordNode.title;
     record.username = recordNode.fields.username;
     record.password = recordNode.fields.password;

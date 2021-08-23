@@ -110,7 +110,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
 }
 
 - (IBAction)onDone:(id)sender {
-    self.onDone(NO);
+    self.onDone(NO, self);
 }
 
 #pragma mark - Table view data source
@@ -229,9 +229,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
             [self performSegueWithIdentifier:@"segueToDatabaseAuditPreferences" sender:nil];
         }
         else if (indexPath.row == 2) {
-            [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                self.onDone(YES);
-            }];
+            self.onDone(YES, self);
         }
     }
     else if (indexPath.section == kSectionActionsIdx) {

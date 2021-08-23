@@ -11,6 +11,10 @@
 #import "Utils.h"
 #import "NSDate+Extensions.h"
 
+#if !TARGET_OS_IPHONE
+#import "Settings.h"
+#endif
+
 @implementation BackupsManager
 
 + (instancetype)sharedInstance {
@@ -25,7 +29,12 @@
 }
 
 - (BOOL)writeBackup:(NSURL *)snapshot metadata:(METADATA_PTR)metadata {
-    if(metadata.makeBackups) {
+#if !TARGET_OS_IPHONE
+    if ( !Settings.sharedInstance.makeLocalRollingBackups ) {
+        return YES;
+    }
+#endif
+    if ( metadata.makeBackups ) {
         NSDate* now = NSDate.date;
         NSString* filename = [NSString stringWithFormat:@"%@.bak", now.fileNameCompatibleDateTimePrecise];
 

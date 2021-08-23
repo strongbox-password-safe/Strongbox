@@ -14,15 +14,14 @@
 #import "Constants.h"
 #import "NSString+Extensions.h"
 #import "NSDate+Extensions.h"
+#import "WebDAVConnections.h"
 
 #if TARGET_OS_IPHONE
 
-#import "WebDAVConfigurationViewController.h"
 #import "SVProgressHUD.h"
 
 #else
 
-#import "WebDAVConfigVC.h"
 #import "MacUrlSchemes.h"
 #import "ProgressWindow.h"
 
@@ -84,66 +83,6 @@
     return config == nil;
 }
 
-- (void)presentConfigurationDialog:(VIEW_CONTROLLER_PTR)viewController
-                        completion:(void (^)(BOOL userCancelled, DAVSession* session, WebDAVSessionConfiguration* configuration, NSError* error))completion {
-#if TARGET_OS_IPHONE
-    [self iOSGetConfiguration:viewController completion:completion];
-#else
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self macOSGetConfiguration:viewController completion:completion];
-    });
-#endif
-}
-
-#if TARGET_OS_IPHONE
-- (void)iOSGetConfiguration:(VIEW_CONTROLLER_PTR)viewController
-                 completion:(void (^)(BOOL userCancelled, DAVSession* session, WebDAVSessionConfiguration* configuration, NSError* error))completion {
-    WebDAVConfigurationViewController *vc = [[WebDAVConfigurationViewController alloc] init];
-    __weak WebDAVConfigurationViewController* weakRef = vc;
-    vc.onDone = ^(BOOL success) {
-        [viewController dismissViewControllerAnimated:YES completion:^{
-            if(success) {
-                DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:weakRef.configuration.username password:weakRef.configuration.password];
-                DAVSession *session = [[DAVSession alloc] initWithRootURL:weakRef.configuration.host credentials:credentials];
-                session.allowUntrustedCertificate = weakRef.configuration.allowUntrustedCertificate;
-                
-                completion(NO, session, weakRef.configuration, nil);
-            }
-            else {
-                completion(YES, nil, nil, nil);
-            }
-        }];
-    };
-
-    vc.modalPresentationStyle = UIModalPresentationFormSheet;
-    [viewController presentViewController:vc animated:YES completion:nil];
-}
-#else
-- (void)macOSGetConfiguration:(VIEW_CONTROLLER_PTR)viewController
-                   completion:(void (^)(BOOL userCancelled, DAVSession* session, WebDAVSessionConfiguration* configuration, NSError* error))completion {
-    WebDAVConfigVC* configVC = [WebDAVConfigVC newConfigurationVC];
-
-    configVC.onDone = ^(BOOL success, WebDAVSessionConfiguration * _Nullable configuration) {
-        if(success) {
-            DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:configuration.username
-                                                                         password:configuration.password];
-            
-            DAVSession *session = [[DAVSession alloc] initWithRootURL:configuration.host
-                                                          credentials:credentials];
-            
-            session.allowUntrustedCertificate = configuration.allowUntrustedCertificate;
-            
-            completion(NO, session, configuration, nil);
-        }
-        else {
-            completion(YES, nil, nil, nil);
-        }
-    };
-
-    [viewController presentViewControllerAsSheet:configVC];
-}
-#endif
-
 - (void)dismissProgressSpinner {
     dispatch_async(dispatch_get_main_queue(), ^{
 #if TARGET_OS_IPHONE
@@ -171,16 +110,15 @@
 -(void)connect:(WebDAVSessionConfiguration*)config
 viewController:(VIEW_CONTROLLER_PTR)viewController
     completion:(void (^)(BOOL userCancelled, DAVSession* session, WebDAVSessionConfiguration* configuration, NSError* error))completion {
-    if(config == nil) {
-        if(self.unitTestSessionConfiguration != nil) { 
-            config = self.unitTestSessionConfiguration;
-        }
-        else {
-            [self presentConfigurationDialog:viewController completion:completion];
-            return;
-        }
-    }
+    config = config ? config : self.explicitConnection;
     
+    if ( config.password == nil ) {
+        NSString* loc = NSLocalizedString(@"password_unavailable_please_edit_connection_error", @"Your private key or password is no longer available, probably because you've just migrated to a new device.\nPlease edit your connection to fix.");
+        NSError *error = [Utils createNSError:loc errorCode:kStorageProviderSFTPorWebDAVSecretMissingErrorCode];
+        completion ( NO, nil, config, error);
+        return;
+    }
+
     DAVCredentials *credentials = [DAVCredentials credentialsWithUsername:config.username password:config.password];
     DAVSession *session = [[DAVSession alloc] initWithRootURL:config.host credentials:credentials];
     session.allowUntrustedCertificate = config.allowUntrustedCertificate;
@@ -196,7 +134,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
   parentFolder:(NSObject *)parentFolder
 viewController:(VIEW_CONTROLLER_PTR)viewController
     completion:(void (^)(METADATA_PTR, const NSError *))completion {
-    if(self.maintainSessionForListings && self.maintainedSessionForListings) { 
+    if(self.maintainSessionForListing && self.maintainedSessionForListings) { 
         [self createWithSession:nickName
                       extension:extension
                            data:data
@@ -283,7 +221,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 - (void)list:(NSObject *)parentFolder
 viewController:(VIEW_CONTROLLER_PTR)viewController
   completion:(void (^)(BOOL, NSArray<StorageBrowserItem *> *, const NSError *))completion {
-    if(self.maintainSessionForListings && self.maintainedSessionForListings) {
+    if(self.maintainSessionForListing && self.maintainedSessionForListings) {
         [self listWithSession:self.maintainedSessionForListings
                  parentFolder:parentFolder
                 configuration:self.maintainedConfigurationForListings
@@ -303,7 +241,7 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                 return;
             }
         
-            if(self.maintainSessionForListings) {
+            if(self.maintainSessionForListing) {
                 self.maintainedSessionForListings = session;
                 self.maintainedConfigurationForListings = configuration;
             }
@@ -367,8 +305,15 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
 
 - (void)getModDate:(METADATA_PTR)safeMetaData completion:(StorageProviderGetModDateCompletionBlock)completion {
     WebDAVProviderData* pd = [self getProviderDataFromMetaData:safeMetaData];
-
-    [self connect:pd.sessionConfiguration viewController:nil
+    WebDAVSessionConfiguration* connection = [self getConnectionFromProviderData:pd];
+    
+    if ( !connection ) {
+        NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
+        completion(nil, error);
+        return;
+    }
+    
+    [self connect:connection viewController:nil
        completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
             NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
@@ -420,14 +365,24 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
                      options:(StorageProviderReadOptions *)options
                   completion:(StorageProviderReadCompletionBlock)completionHandler {
     WebDAVProviderData* pd = (WebDAVProviderData*)providerData;
-    if (!viewController && [self userInteractionRequiredForConnection:pd.sessionConfiguration]) {
+    WebDAVSessionConfiguration* connection = [self getConnectionFromProviderData:pd];
+    
+    if ( !connection ) {
+        NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
+        completionHandler(kReadResultError, nil, nil, error);
+        return;
+    }
+    
+    if (!viewController && [self userInteractionRequiredForConnection:connection]) {
         completionHandler(kReadResultError, nil, nil, kUserInteractionRequiredError);
         return;
     }
 
-    [self connect:pd.sessionConfiguration viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
+    [self connect:connection viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
-            NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
+            if ( error == nil ) {
+                error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
+            }
             completionHandler(kReadResultError, nil, nil, error);
             return;
         }
@@ -508,10 +463,20 @@ viewController:(VIEW_CONTROLLER_PTR)viewController
     }];
 }
 
-- (void)pushDatabase:(METADATA_PTR)safeMetaData interactiveVC:(VIEW_CONTROLLER_PTR)viewController data:(NSData *)data completion:(StorageProviderUpdateCompletionBlock)completion {
+- (void)pushDatabase:(METADATA_PTR)safeMetaData
+       interactiveVC:(VIEW_CONTROLLER_PTR)viewController
+                data:(NSData *)data
+          completion:(StorageProviderUpdateCompletionBlock)completion {
     WebDAVProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
+    WebDAVSessionConfiguration* connection = [self getConnectionFromProviderData:providerData];
     
-    [self connect:providerData.sessionConfiguration viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
+    if ( !connection ) {
+        NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
+        completion(kUpdateResultError, nil, error);
+        return;
+    }
+    
+    [self connect:connection viewController:viewController completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
         if(!session) {
             NSError* error = [Utils createNSError:NSLocalizedString(@"webdav_storage_could_not_connect", @"Could not connect to server.") errorCode:-2];
             completion(kUpdateResultError, nil, error);
@@ -597,7 +562,9 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     WebDAVProviderData* ret = [[WebDAVProviderData alloc] init];
     
     ret.href = href;
-    ret.sessionConfiguration = sessionConfiguration;
+    ret.connectionIdentifier = sessionConfiguration.identifier;
+    
+
     
     return ret;
 }
@@ -674,4 +641,25 @@ static WebDAVProviderData* makeProviderData(NSString *href, WebDAVSessionConfigu
     
 }
     
+- (void)testConnection:(WebDAVSessionConfiguration*)connection viewController:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(NSError* error))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        [self connect:connection
+       viewController:viewController
+           completion:^(BOOL userCancelled, DAVSession *session, WebDAVSessionConfiguration *configuration, NSError *error) {
+            [self listWithSession:session parentFolder:nil configuration:configuration viewController:viewController completion:^(BOOL foo, NSArray<StorageBrowserItem *> *items, NSError *error) {
+                completion(error);
+            }];
+        }];
+    });
+}
+
+- (WebDAVSessionConfiguration*)getConnectionFromProviderData:(WebDAVProviderData*)provider {
+    return [WebDAVConnections.sharedInstance getById:provider.connectionIdentifier];
+}
+
+- (WebDAVSessionConfiguration *)getConnectionFromDatabase:(METADATA_PTR)metaData {
+    WebDAVProviderData* pd = [self getProviderDataFromMetaData:metaData];
+    return [self getConnectionFromProviderData:pd];
+}
+
 @end

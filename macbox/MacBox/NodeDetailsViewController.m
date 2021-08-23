@@ -473,7 +473,7 @@ static NSString* trimField(NSTextField* textField) {
         [self setModelForEditField:self.textFieldEmail];
     };
 
-    self.passwordIsRevealed = Settings.sharedInstance.alwaysShowPassword;
+    self.passwordIsRevealed = Settings.sharedInstance.revealPasswordsImmediately;
     
     self.concealedPasswordField.onClick = ^{
         [self revealPassword];

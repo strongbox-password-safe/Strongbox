@@ -216,8 +216,12 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     return ret;
 }
 
-- (Node*)duplicate:(NSString*)newTitle {
-    Node* ret = [self cloneOrDuplicate:NO cloneUuid:NO cloneRecursive:YES newTitle:newTitle parentNode:nil];
+- (Node*)duplicate:(NSString*)newTitle preserveTimestamps:(BOOL)preserveTimestamps {
+    Node* ret = [self cloneOrDuplicate:preserveTimestamps
+                             cloneUuid:NO
+                        cloneRecursive:YES
+                              newTitle:newTitle
+                            parentNode:nil];
 
     [ret.fields.keePassHistory removeAllObjects];
 
@@ -246,7 +250,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                 cloneUuid:(BOOL)cloneUuid
            cloneRecursive:(BOOL)cloneRecursive
                  newTitle:(NSString*)newTitle
-               parentNode:(Node*)parentNode {
+               parentNode:(Node*_Nullable)parentNode {
     NodeFields* clonedFields = [self.fields cloneOrDuplicate:cloneMetadataDates];
     
     Node* newParent = parentNode ? parentNode : self.parent;
@@ -258,7 +262,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     }
     
     Node* ret = [[Node alloc] initWithParent:newParent
-                                       title:newTitle.length ? newTitle : self.title
+                                       title:newTitle ? newTitle : self.title
                                      isGroup:self.isGroup
                                         uuid:newUuid
                                       fields:clonedFields

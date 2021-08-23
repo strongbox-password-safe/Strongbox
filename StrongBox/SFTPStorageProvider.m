@@ -13,16 +13,15 @@
 #import "SFTPProviderData.h"
 #import "Constants.h"
 #import "NSDate+Extensions.h"
+#import "SFTPConnections.h"
 
 #if TARGET_OS_IPHONE
 
-#import "SFTPSessionConfigurationViewController.h"
 #import "SVProgressHUD.h"
 #import "Alerts.h"
 
 #else
 
-#import "SFTPConfigurationVC.h"
 #import "MacAlerts.h"
 #import "MacUrlSchemes.h"
 #import "ProgressWindow.h"
@@ -213,8 +212,15 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                 data:(NSData *)data
           completion:(StorageProviderUpdateCompletionBlock)completion {
     SFTPProviderData* providerData = [self getProviderDataFromMetaData:safeMetaData];
+    SFTPSessionConfiguration* connection = [self getConnectionFromProviderData:providerData];
     
-    [self connectAndAuthenticate:providerData.sFtpConfiguration
+    if ( !connection ) {
+        NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
+        completion(kUpdateResultError, nil, error );
+        return;
+    }
+    
+    [self connectAndAuthenticate:connection
                   viewController:nil
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
         if(sftp == nil || error) {
@@ -330,11 +336,18 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
 
 - (void)getModDate:(METADATA_PTR)safeMetaData completion:(StorageProviderGetModDateCompletionBlock)completion {
     SFTPProviderData* foo = [self getProviderDataFromMetaData:safeMetaData];
+    SFTPSessionConfiguration* connection = [self getConnectionFromProviderData:foo];
+    
+    if ( !connection ) {
+        NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
+        completion(nil, error );
+        return;
+    }
 
 
 
 
-    [self connectAndAuthenticate:foo.sFtpConfiguration
+    [self connectAndAuthenticate:connection
                   viewController:nil
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
         if(sftp == nil || error) {
@@ -358,8 +371,15 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                      options:(StorageProviderReadOptions *)options
                   completion:(StorageProviderReadCompletionBlock)completionHandler {
     SFTPProviderData* foo = (SFTPProviderData*)providerData;
+    SFTPSessionConfiguration* connection = [self getConnectionFromProviderData:foo];
     
-    [self connectAndAuthenticate:foo.sFtpConfiguration
+    if ( !connection ) {
+        NSError* error = [Utils createNSError:@"Could not load connection!" errorCode:-322243];
+        completionHandler(kReadResultError, nil, nil, error );
+        return;
+    }
+
+    [self connectAndAuthenticate:connection
                   viewController:viewController
                       completion:^(BOOL userCancelled, NMSFTP *sftp, SFTPSessionConfiguration *configuration, NSError *error) {
         if(sftp == nil || error) {
@@ -414,91 +434,20 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     return dir;
 }
 
-#if TARGET_OS_IPHONE
-- (void)iOSGetConfiguration:(VIEW_CONTROLLER_PTR)viewController
-                 completion:(void (^)(BOOL userCancelled, NMSFTP* sftp, SFTPSessionConfiguration* configuration, NSError* error))completion {
-    SFTPSessionConfigurationViewController *vc = [[SFTPSessionConfigurationViewController alloc] init];
-    __weak SFTPSessionConfigurationViewController* weakRef = vc;
-    vc.onDone = ^(BOOL success) {
-        if(success) {
-            NSError* error;
-            NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:weakRef.configuration viewController:viewController error:&error];
-            
-            if (sftp && !error) {
-                [viewController dismissViewControllerAnimated:YES completion:^{
-                    completion(NO, sftp, weakRef.configuration, error);
-                }];
-            }
-            else {
-                [Alerts error:weakRef error:error];
-            }
-        }
-        else {
-            [viewController dismissViewControllerAnimated:YES completion:^{
-                completion(YES, nil, nil, nil);
-            }];
-        }
-    };
-    
-    vc.modalPresentationStyle = UIModalPresentationFormSheet;
-    [viewController presentViewController:vc animated:YES completion:nil];
-}
-#else
-- (void)macOSGetConfiguration:(VIEW_CONTROLLER_PTR)viewController
-                   completion:(void (^)(BOOL userCancelled, NMSFTP* sftp, SFTPSessionConfiguration* configuration, NSError* error))completion {
-    SFTPConfigurationVC* configVC = [SFTPConfigurationVC newConfigurationVC];
-    
-    configVC.onDone = ^(BOOL success, SFTPSessionConfiguration * _Nonnull configuration) {
-        if (success) {
-
-
-            NSError* error;
-            NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:configuration viewController:viewController error:&error];
-
-            if (sftp && !error) {
-                completion(NO, sftp, configuration, error);
-            }
-            else {
-                NSLog(@"SFTP error: %@", error);
-                completion(NO, nil, nil, error);
-            }
-        }
-        else {
-            completion(YES, nil, nil, nil);
-        }
-    };
-
-    [viewController presentViewControllerAsSheet:configVC];
-}
-
-#endif
-
 - (void)connectAndAuthenticate:(SFTPSessionConfiguration*)sessionConfiguration
                 viewController:(VIEW_CONTROLLER_PTR)viewController
                     completion:(void (^)(BOOL userCancelled, NMSFTP* sftp, SFTPSessionConfiguration* configuration, NSError* error))completion {
     
     
     
-    
-    if(sessionConfiguration == nil) {
-        if(self.unitTestingSessionConfiguration != nil) {
-            sessionConfiguration = self.unitTestingSessionConfiguration;
-        }
-        else {
-#if TARGET_OS_IPHONE
-            [self iOSGetConfiguration:viewController completion:completion];
-#else
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self macOSGetConfiguration:viewController completion:completion];
-            });
-#endif
-            return;
-        }
-    }
+
+    sessionConfiguration = sessionConfiguration ? sessionConfiguration : self.explicitConnection;
     
     NSError* error;
     NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:sessionConfiguration viewController:viewController error:&error];
-    self.unitTestingSessionConfiguration = sessionConfiguration;
+    
+
+    
     completion(NO, sftp, sessionConfiguration, error);
 }
 
@@ -506,6 +455,15 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
                                            viewController:viewController
                                                     error:(NSError**)error {
     NSLog(@"Connecting to %@", sessionConfiguration.host);
+    
+    if ( ( sessionConfiguration.authenticationMode == kPrivateKey && sessionConfiguration.privateKey == nil ) || ( sessionConfiguration.authenticationMode == kUsernamePassword && sessionConfiguration.password == nil ) ) {
+        if ( error ) {
+            NSString* loc = NSLocalizedString(@"password_unavailable_please_edit_connection_error", @"Your private key or password is no longer available, probably because you've just migrated to a new device.\nPlease edit your connection to fix.");
+            
+            *error = [Utils createNSError:loc errorCode:kStorageProviderSFTPorWebDAVSecretMissingErrorCode];
+        }
+        return nil;
+    }
     
     if (viewController) {
         [self showProgressSpinner:NSLocalizedString(@"storage_provider_status_authenticating_connecting", @"Connecting...")
@@ -585,9 +543,31 @@ static SFTPProviderData* makeProviderData(NSString* path, SFTPSessionConfigurati
     SFTPProviderData *providerData = [[SFTPProviderData alloc] init];
     
     providerData.filePath = path;
-    providerData.sFtpConfiguration = sftpConfiguration;
+    providerData.connectionIdentifier = sftpConfiguration.identifier;
+
+    
     
     return providerData;
+}
+
+- (void)testConnection:(SFTPSessionConfiguration *)connection
+        viewController:(VIEW_CONTROLLER_PTR)viewController
+            completion:(void (^)(NSError * _Nonnull))completion {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        NSError* error;
+        
+        [self connectAndAuthenticateWithSessionConfiguration:connection viewController:viewController error:&error];
+        
+        completion(error);
+    });
+}
+
+- (SFTPSessionConfiguration*)getConnectionFromProviderData:(SFTPProviderData*)provider {
+    return [SFTPConnections.sharedInstance getById:provider.connectionIdentifier];
+}
+
+- (SFTPSessionConfiguration *)getConnectionFromDatabase:(METADATA_PTR)metaData {
+    return [self getConnectionFromProviderData:[self getProviderDataFromMetaData:metaData]];
 }
 
 @end

@@ -1428,12 +1428,18 @@
 		C807359C2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */; };
 		C807359D2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */; };
 		C807359E2614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80735A02614B0A9006FA2FC /* AsyncUpdateResultViewer.storyboard */; };
+		C807976E26B453440015E52F /* ExportItemOptions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C807977226B453440015E52F /* ExportItemOptions.storyboard */; };
+		C807976F26B453440015E52F /* ExportItemOptions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C807977226B453440015E52F /* ExportItemOptions.storyboard */; };
+		C807977026B453440015E52F /* ExportItemOptions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C807977226B453440015E52F /* ExportItemOptions.storyboard */; };
 		C807987626540583001A32F4 /* ConvenienceUnlockOnboardingModule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C807987926540583001A32F4 /* ConvenienceUnlockOnboardingModule.storyboard */; };
 		C807987726540583001A32F4 /* ConvenienceUnlockOnboardingModule.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C807987926540583001A32F4 /* ConvenienceUnlockOnboardingModule.storyboard */; };
 		C809F08425A8BF6400D28E6D /* DuressActionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C809F08325A8BF6400D28E6D /* DuressActionHelper.m */; };
 		C809F08525A8BF6400D28E6D /* DuressActionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C809F08325A8BF6400D28E6D /* DuressActionHelper.m */; };
 		C809F08625A8BF6400D28E6D /* DuressActionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C809F08325A8BF6400D28E6D /* DuressActionHelper.m */; };
 		C809F08725A8BF6400D28E6D /* DuressActionHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C809F08325A8BF6400D28E6D /* DuressActionHelper.m */; };
+		C80CC93626B5A2A100F7DADA /* DuplicateItemOptions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80CC93A26B5A2A100F7DADA /* DuplicateItemOptions.storyboard */; };
+		C80CC93726B5A2A100F7DADA /* DuplicateItemOptions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80CC93A26B5A2A100F7DADA /* DuplicateItemOptions.storyboard */; };
+		C80CC93826B5A2A100F7DADA /* DuplicateItemOptions.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C80CC93A26B5A2A100F7DADA /* DuplicateItemOptions.storyboard */; };
 		C80E02ED249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02EE249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
 		C80E02EF249372D5005A4129 /* ChaCha20ReadStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */; };
@@ -1504,6 +1510,9 @@
 		C83D13AC25EE836600F8DFC1 /* SelectItem.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4DE7F0F722F89D870095F51F /* SelectItem.storyboard */; };
 		C83E319526668D97007211D0 /* AppAutoFillOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E319426668D97007211D0 /* AppAutoFillOnboardingModule.m */; };
 		C83E319626668D97007211D0 /* AppAutoFillOnboardingModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C83E319426668D97007211D0 /* AppAutoFillOnboardingModule.m */; };
+		C83F7D7E26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C83F7D7C26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m */; };
+		C83F7D7F26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C83F7D7C26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m */; };
+		C83F7D8026B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = C83F7D7C26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m */; };
 		C8400FE924ED37C40070849C /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
 		C8400FEA24ED37C40070849C /* iCloudSafesCoordinator.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D632E1D1F79631100C31279 /* iCloudSafesCoordinator.m */; };
 		C8400FEB24ED37C40070849C /* AppleICloudProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4DCF5FBE1F7299DD00011756 /* AppleICloudProvider.m */; };
@@ -2126,6 +2135,9 @@
 		C85FD9CC265BB396003B5BE0 /* EmptyDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C85FD9D0265BB396003B5BE0 /* EmptyDetails.storyboard */; };
 		C85FD9CD265BB396003B5BE0 /* EmptyDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C85FD9D0265BB396003B5BE0 /* EmptyDetails.storyboard */; };
 		C85FD9CE265BB396003B5BE0 /* EmptyDetails.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C85FD9D0265BB396003B5BE0 /* EmptyDetails.storyboard */; };
+		C86255B226B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C86255B126B6E7B600C909BD /* DuplicateOptionsViewController.m */; };
+		C86255B326B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C86255B126B6E7B600C909BD /* DuplicateOptionsViewController.m */; };
+		C86255B426B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C86255B126B6E7B600C909BD /* DuplicateOptionsViewController.m */; };
 		C864397F2667C29F0058A09F /* LastCrashReportModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C864397E2667C29F0058A09F /* LastCrashReportModule.m */; };
 		C86439802667C29F0058A09F /* LastCrashReportModule.m in Sources */ = {isa = PBXBuildFile; fileRef = C864397E2667C29F0058A09F /* LastCrashReportModule.m */; };
 		C86495CB2524F2C10030522B /* FilesAppUrlBookmarkProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 4D56D90E21B803730030E13A /* FilesAppUrlBookmarkProvider.m */; };
@@ -2744,6 +2756,9 @@
 		C8B2C6EA2493A4BA00F6EA12 /* KP31HashedBlockStream.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */; };
 		C8B3AB9925443352006056D2 /* PreviewItemViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B3AB9825443352006056D2 /* PreviewItemViewController.m */; };
 		C8B3AB9A25443352006056D2 /* PreviewItemViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B3AB9825443352006056D2 /* PreviewItemViewController.m */; };
+		C8B534F726B2D957005A61FD /* ExportItemsOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B534F626B2D957005A61FD /* ExportItemsOptionsViewController.m */; };
+		C8B534F826B2D957005A61FD /* ExportItemsOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B534F626B2D957005A61FD /* ExportItemsOptionsViewController.m */; };
+		C8B534F926B2D957005A61FD /* ExportItemsOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8B534F626B2D957005A61FD /* ExportItemsOptionsViewController.m */; };
 		C8B5A2CF25596E380087CED1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B5A2CE25596E380087CED1 /* Foundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C8B5A2D025596E480087CED1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B5A2CE25596E380087CED1 /* Foundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		C8B5A2D225596EE10087CED1 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C8B5A2D125596EE10087CED1 /* Security.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -2806,6 +2821,12 @@
 		C8BF569924A0E092003269C9 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF569724A0E092003269C9 /* Constants.m */; };
 		C8BF569A24A0E092003269C9 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF569724A0E092003269C9 /* Constants.m */; };
 		C8BF569B24A0E092003269C9 /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF569724A0E092003269C9 /* Constants.m */; };
+		C8BF717E26AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */; };
+		C8BF717F26AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */; };
+		C8BF718026AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */; };
+		C8BF718126AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */; };
+		C8BF718226AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */; };
+		C8BF718326AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */; };
 		C8BF76E82472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
 		C8BF76E92472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
 		C8BF76EA2472E1820080A808 /* DeletedObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = C8BF76E72472E1820080A808 /* DeletedObjects.m */; };
@@ -2826,6 +2847,24 @@
 		C8CFCDDC266945F10058B4E0 /* CustomizationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CFCDDB266945F10058B4E0 /* CustomizationManager.m */; };
 		C8CFCDDD266945F10058B4E0 /* CustomizationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CFCDDB266945F10058B4E0 /* CustomizationManager.m */; };
 		C8CFCDDE266945F10058B4E0 /* CustomizationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8CFCDDB266945F10058B4E0 /* CustomizationManager.m */; };
+		C8D3B37726B857A600C3A9E8 /* SFTPConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B37626B857A600C3A9E8 /* SFTPConnections.m */; };
+		C8D3B37826B857A600C3A9E8 /* SFTPConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B37626B857A600C3A9E8 /* SFTPConnections.m */; };
+		C8D3B37926B857A600C3A9E8 /* SFTPConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B37626B857A600C3A9E8 /* SFTPConnections.m */; };
+		C8D3B37C26B857D400C3A9E8 /* WebDAVConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B37B26B857D400C3A9E8 /* WebDAVConnections.m */; };
+		C8D3B37D26B857D400C3A9E8 /* WebDAVConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B37B26B857D400C3A9E8 /* WebDAVConnections.m */; };
+		C8D3B37E26B857D400C3A9E8 /* WebDAVConnections.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B37B26B857D400C3A9E8 /* WebDAVConnections.m */; };
+		C8D3B38726B8629000C3A9E8 /* SFTPConnections.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8D3B38B26B8629000C3A9E8 /* SFTPConnections.storyboard */; };
+		C8D3B38826B8629000C3A9E8 /* SFTPConnections.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8D3B38B26B8629000C3A9E8 /* SFTPConnections.storyboard */; };
+		C8D3B38926B8629000C3A9E8 /* SFTPConnections.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8D3B38B26B8629000C3A9E8 /* SFTPConnections.storyboard */; };
+		C8D3B3A826B8632A00C3A9E8 /* WebDAVConnections.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8D3B3AC26B8632A00C3A9E8 /* WebDAVConnections.storyboard */; };
+		C8D3B3A926B8632A00C3A9E8 /* WebDAVConnections.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8D3B3AC26B8632A00C3A9E8 /* WebDAVConnections.storyboard */; };
+		C8D3B3AA26B8632A00C3A9E8 /* WebDAVConnections.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C8D3B3AC26B8632A00C3A9E8 /* WebDAVConnections.storyboard */; };
+		C8D3B3CD26B8652D00C3A9E8 /* SFTPConnectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B3CC26B8652D00C3A9E8 /* SFTPConnectionsViewController.m */; };
+		C8D3B3CE26B8652D00C3A9E8 /* SFTPConnectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B3CC26B8652D00C3A9E8 /* SFTPConnectionsViewController.m */; };
+		C8D3B3CF26B8652D00C3A9E8 /* SFTPConnectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B3CC26B8652D00C3A9E8 /* SFTPConnectionsViewController.m */; };
+		C8D3B3D226B8654600C3A9E8 /* WebDAVConnectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B3D126B8654600C3A9E8 /* WebDAVConnectionsViewController.m */; };
+		C8D3B3D326B8654600C3A9E8 /* WebDAVConnectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B3D126B8654600C3A9E8 /* WebDAVConnectionsViewController.m */; };
+		C8D3B3D426B8654600C3A9E8 /* WebDAVConnectionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C8D3B3D126B8654600C3A9E8 /* WebDAVConnectionsViewController.m */; };
 		C8D8743625BC714D0093B4C7 /* duplicate-id.xml in Resources */ = {isa = PBXBuildFile; fileRef = C8D8743525BC714D0093B4C7 /* duplicate-id.xml */; };
 		C8D87CB424E82967007E8E54 /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
 		C8D87CB524E82968007E8E54 /* SyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C8C73CCD249E42C700B34C8F /* SyncManager.m */; };
@@ -4347,6 +4386,20 @@
 		C80735BF2614B0C5006FA2FC /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
 		C80735C12614B0C7006FA2FC /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AsyncUpdateResultViewer.strings; sourceTree = "<group>"; };
 		C80735C72614B2EB006FA2FC /* CouldNotConnectBehaviour.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CouldNotConnectBehaviour.h; sourceTree = "<group>"; };
+		C807977126B453440015E52F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/ExportItemOptions.storyboard; sourceTree = "<group>"; };
+		C807977626B453810015E52F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ExportItemOptions.strings"; sourceTree = "<group>"; };
+		C807977826B453B90015E52F /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807977A26B453EB0015E52F /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807977C26B4545D0015E52F /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807977E26B454BF0015E52F /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807978026B456410015E52F /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807978226B456720015E52F /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/ExportItemOptions.strings"; sourceTree = "<group>"; };
+		C807978426B456A10015E52F /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807978626B456D30015E52F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807978826B457010015E52F /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807978A26B457730015E52F /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807978C26B457760015E52F /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
+		C807978E26B457A60015E52F /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/ExportItemOptions.strings; sourceTree = "<group>"; };
 		C807987826540583001A32F4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/ConvenienceUnlockOnboardingModule.storyboard; sourceTree = "<group>"; };
 		C807987B26540586001A32F4 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/ConvenienceUnlockOnboardingModule.strings; sourceTree = "<group>"; };
 		C807987D26540588001A32F4 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/ConvenienceUnlockOnboardingModule.strings; sourceTree = "<group>"; };
@@ -4363,6 +4416,20 @@
 		C8079893265405A1001A32F4 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/ConvenienceUnlockOnboardingModule.strings"; sourceTree = "<group>"; };
 		C809F08225A8BF6400D28E6D /* DuressActionHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuressActionHelper.h; path = model/DuressActionHelper.h; sourceTree = "<group>"; };
 		C809F08325A8BF6400D28E6D /* DuressActionHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DuressActionHelper.m; path = model/DuressActionHelper.m; sourceTree = "<group>"; };
+		C80CC93926B5A2A100F7DADA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/DuplicateItemOptions.storyboard; sourceTree = "<group>"; };
+		C80CC93C26B5A2AA00F7DADA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC93E26B5A2AC00F7DADA /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC94026B5A2DB00F7DADA /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC94226B5A2F800F7DADA /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC94426B5A2FC00F7DADA /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/DuplicateItemOptions.strings"; sourceTree = "<group>"; };
+		C80CC94626B5A2FE00F7DADA /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC94826B5A2FF00F7DADA /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC94A26B5A30100F7DADA /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC94C26B5A30300F7DADA /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC94E26B5A30400F7DADA /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC95026B5A30600F7DADA /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC95226B5A30800F7DADA /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/DuplicateItemOptions.strings; sourceTree = "<group>"; };
+		C80CC95426B5A30A00F7DADA /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/DuplicateItemOptions.strings"; sourceTree = "<group>"; };
 		C80DDAB42600D68A00C9A01F /* OfflineDetectedBehaviour.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = OfflineDetectedBehaviour.h; path = StrongBox/OfflineDetectedBehaviour.h; sourceTree = "<group>"; };
 		C80E02EB249372D5005A4129 /* ChaCha20ReadStream.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ChaCha20ReadStream.h; path = model/ChaCha20ReadStream.h; sourceTree = "<group>"; };
 		C80E02EC249372D5005A4129 /* ChaCha20ReadStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ChaCha20ReadStream.m; path = model/ChaCha20ReadStream.m; sourceTree = "<group>"; };
@@ -4409,6 +4476,8 @@
 		C83D13A525EE836100F8DFC1 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SelectItem.strings; sourceTree = "<group>"; };
 		C83E319326668D97007211D0 /* AppAutoFillOnboardingModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AppAutoFillOnboardingModule.h; path = StrongBox/AppAutoFillOnboardingModule.h; sourceTree = "<group>"; };
 		C83E319426668D97007211D0 /* AppAutoFillOnboardingModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AppAutoFillOnboardingModule.m; path = StrongBox/AppAutoFillOnboardingModule.m; sourceTree = "<group>"; };
+		C83F7D7C26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DatabaseFormatIncompatibilityHelper.m; path = model/DatabaseFormatIncompatibilityHelper.m; sourceTree = "<group>"; };
+		C83F7D7D26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DatabaseFormatIncompatibilityHelper.h; path = model/DatabaseFormatIncompatibilityHelper.h; sourceTree = "<group>"; };
 		C8413C3B25925C0700BD9DE8 /* MinimalPoolHelper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MinimalPoolHelper.h; path = model/MinimalPoolHelper.h; sourceTree = "<group>"; };
 		C8413C3C25925C0700BD9DE8 /* MinimalPoolHelper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MinimalPoolHelper.m; path = model/MinimalPoolHelper.m; sourceTree = "<group>"; };
 		C8413C562592843800BD9DE8 /* NodeIcon.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = NodeIcon.h; path = model/NodeIcon.h; sourceTree = "<group>"; };
@@ -4575,6 +4644,8 @@
 		C85FD9E8265BB549003B5BE0 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/EmptyDetails.strings; sourceTree = "<group>"; };
 		C85FD9EA265BB54B003B5BE0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/EmptyDetails.strings; sourceTree = "<group>"; };
 		C85FD9EC265BB556003B5BE0 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/EmptyDetails.strings; sourceTree = "<group>"; };
+		C86255B026B6E7B600C909BD /* DuplicateOptionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DuplicateOptionsViewController.h; path = StrongBox/DuplicateOptionsViewController.h; sourceTree = "<group>"; };
+		C86255B126B6E7B600C909BD /* DuplicateOptionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DuplicateOptionsViewController.m; path = StrongBox/DuplicateOptionsViewController.m; sourceTree = "<group>"; };
 		C864397D2667C29F0058A09F /* LastCrashReportModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = LastCrashReportModule.h; path = StrongBox/LastCrashReportModule.h; sourceTree = "<group>"; };
 		C864397E2667C29F0058A09F /* LastCrashReportModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = LastCrashReportModule.m; path = StrongBox/LastCrashReportModule.m; sourceTree = "<group>"; };
 		C8650084258CDA87002951BA /* UIColor+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "UIColor+Extensions.h"; path = "model/UIColor+Extensions.h"; sourceTree = "<group>"; };
@@ -4794,6 +4865,8 @@
 		C8B2C6E62493A4BA00F6EA12 /* KP31HashedBlockStream.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = KP31HashedBlockStream.m; path = model/KP31HashedBlockStream.m; sourceTree = "<group>"; };
 		C8B3AB9725443352006056D2 /* PreviewItemViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = PreviewItemViewController.h; path = StrongBox/PreviewItemViewController.h; sourceTree = "<group>"; };
 		C8B3AB9825443352006056D2 /* PreviewItemViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = PreviewItemViewController.m; path = StrongBox/PreviewItemViewController.m; sourceTree = "<group>"; };
+		C8B534F526B2D957005A61FD /* ExportItemsOptionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ExportItemsOptionsViewController.h; path = StrongBox/ExportItemsOptionsViewController.h; sourceTree = "<group>"; };
+		C8B534F626B2D957005A61FD /* ExportItemsOptionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ExportItemsOptionsViewController.m; path = StrongBox/ExportItemsOptionsViewController.m; sourceTree = "<group>"; };
 		C8B5A2CE25596E380087CED1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C8B5A2D125596EE10087CED1 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C8B5A2D42559799D0087CED1 /* OldCustomFieldCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = OldCustomFieldCell.xib; path = StrongBox/OldCustomFieldCell.xib; sourceTree = "<group>"; };
@@ -4827,6 +4900,20 @@
 		C8BF5216264ACD0A00D3A689 /* ConvenienceUnlockOnboardingViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ConvenienceUnlockOnboardingViewController.m; path = StrongBox/ConvenienceUnlockOnboardingViewController.m; sourceTree = "<group>"; };
 		C8BF569624A0E092003269C9 /* Constants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Constants.h; path = StrongBox/Constants.h; sourceTree = "<group>"; };
 		C8BF569724A0E092003269C9 /* Constants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = Constants.m; path = StrongBox/Constants.m; sourceTree = "<group>"; };
+		C8BF718426AEFD2E001C3C98 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SelectSecondDatabase.storyboard; sourceTree = "<group>"; };
+		C8BF718926AF03C6001C3C98 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SelectSecondDatabase.strings"; sourceTree = "<group>"; };
+		C8BF718B26AF0422001C3C98 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF718D26AF0441001C3C98 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF718F26AF0470001C3C98 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF719126AF0474001C3C98 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF719326AF04EB001C3C98 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF719526AF051A001C3C98 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF719726AF051F001C3C98 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF719926AF054E001C3C98 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SelectSecondDatabase.strings"; sourceTree = "<group>"; };
+		C8BF719B26AF05D8001C3C98 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF719D26AF05DA001C3C98 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF719F26AF0609001C3C98 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
+		C8BF71A126AF0648001C3C98 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SelectSecondDatabase.strings; sourceTree = "<group>"; };
 		C8BF76E62472E1820080A808 /* DeletedObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = DeletedObjects.h; path = model/DeletedObjects.h; sourceTree = "<group>"; };
 		C8BF76E72472E1820080A808 /* DeletedObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = DeletedObjects.m; path = model/DeletedObjects.m; sourceTree = "<group>"; };
 		C8BFECBC2478206C0051D21E /* NodeHierarchyReconstructionData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = NodeHierarchyReconstructionData.m; path = model/NodeHierarchyReconstructionData.m; sourceTree = "<group>"; };
@@ -4841,6 +4928,42 @@
 		C8CDAAEE266BE56000AEDAE5 /* UpgradeToProOnboardingModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = UpgradeToProOnboardingModule.m; path = StrongBox/UpgradeToProOnboardingModule.m; sourceTree = "<group>"; };
 		C8CFCDDA266945F10058B4E0 /* CustomizationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomizationManager.h; path = StrongBox/CustomizationManager.h; sourceTree = "<group>"; };
 		C8CFCDDB266945F10058B4E0 /* CustomizationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomizationManager.m; path = StrongBox/CustomizationManager.m; sourceTree = "<group>"; };
+		C8D3B37526B857A600C3A9E8 /* SFTPConnections.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPConnections.h; path = StrongBox/SFTPConnections.h; sourceTree = "<group>"; };
+		C8D3B37626B857A600C3A9E8 /* SFTPConnections.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SFTPConnections.m; path = StrongBox/SFTPConnections.m; sourceTree = "<group>"; };
+		C8D3B37A26B857D400C3A9E8 /* WebDAVConnections.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WebDAVConnections.h; path = StrongBox/WebDAVConnections.h; sourceTree = "<group>"; };
+		C8D3B37B26B857D400C3A9E8 /* WebDAVConnections.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebDAVConnections.m; path = StrongBox/WebDAVConnections.m; sourceTree = "<group>"; };
+		C8D3B38A26B8629000C3A9E8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/SFTPConnections.storyboard; sourceTree = "<group>"; };
+		C8D3B38F26B8631300C3A9E8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/SFTPConnections.strings"; sourceTree = "<group>"; };
+		C8D3B39126B8631500C3A9E8 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B39326B8631600C3A9E8 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B39526B8631700C3A9E8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B39726B8631800C3A9E8 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B39926B8631A00C3A9E8 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B39B26B8631B00C3A9E8 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B39D26B8631D00C3A9E8 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B39F26B8631E00C3A9E8 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/SFTPConnections.strings"; sourceTree = "<group>"; };
+		C8D3B3A126B8631F00C3A9E8 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B3A326B8632100C3A9E8 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B3A526B8632200C3A9E8 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B3A726B8632300C3A9E8 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/SFTPConnections.strings; sourceTree = "<group>"; };
+		C8D3B3AB26B8632A00C3A9E8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/WebDAVConnections.storyboard; sourceTree = "<group>"; };
+		C8D3B3B026B8632E00C3A9E8 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/WebDAVConnections.strings"; sourceTree = "<group>"; };
+		C8D3B3B226B8632F00C3A9E8 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3B426B8633100C3A9E8 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3B626B8633300C3A9E8 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3B826B8633400C3A9E8 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3BA26B8633500C3A9E8 /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3BC26B8633700C3A9E8 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3BE26B8633800C3A9E8 /* nb */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nb; path = nb.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3C026B8633900C3A9E8 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/WebDAVConnections.strings"; sourceTree = "<group>"; };
+		C8D3B3C226B8633A00C3A9E8 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3C426B8633C00C3A9E8 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3C626B8633D00C3A9E8 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3C826B8633E00C3A9E8 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/WebDAVConnections.strings; sourceTree = "<group>"; };
+		C8D3B3CB26B8652D00C3A9E8 /* SFTPConnectionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SFTPConnectionsViewController.h; path = StrongBox/SFTPConnectionsViewController.h; sourceTree = "<group>"; };
+		C8D3B3CC26B8652D00C3A9E8 /* SFTPConnectionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SFTPConnectionsViewController.m; path = StrongBox/SFTPConnectionsViewController.m; sourceTree = "<group>"; };
+		C8D3B3D026B8654600C3A9E8 /* WebDAVConnectionsViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WebDAVConnectionsViewController.h; path = StrongBox/WebDAVConnectionsViewController.h; sourceTree = "<group>"; };
+		C8D3B3D126B8654600C3A9E8 /* WebDAVConnectionsViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WebDAVConnectionsViewController.m; path = StrongBox/WebDAVConnectionsViewController.m; sourceTree = "<group>"; };
 		C8D8743525BC714D0093B4C7 /* duplicate-id.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "duplicate-id.xml"; sourceTree = "<group>"; };
 		C8DA59C625504DD10063D4DD /* CustomData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = CustomData.h; path = model/keepass/CustomData.h; sourceTree = "<group>"; };
 		C8DA59C725504DD10063D4DD /* CustomData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = CustomData.m; path = model/keepass/CustomData.m; sourceTree = "<group>"; };
@@ -5251,6 +5374,12 @@
 				4D82332A22B01BE200A37BAC /* SortOrderTableViewController.m */,
 				4D73231F22B13885003DB568 /* BrowseSortField.h */,
 				4D556F2A22B82B8600E16027 /* BrowseViewType.h */,
+				C8B534F526B2D957005A61FD /* ExportItemsOptionsViewController.h */,
+				C8B534F626B2D957005A61FD /* ExportItemsOptionsViewController.m */,
+				C807977226B453440015E52F /* ExportItemOptions.storyboard */,
+				C80CC93A26B5A2A100F7DADA /* DuplicateItemOptions.storyboard */,
+				C86255B026B6E7B600C909BD /* DuplicateOptionsViewController.h */,
+				C86255B126B6E7B600C909BD /* DuplicateOptionsViewController.m */,
 			);
 			name = Browse;
 			sourceTree = "<group>";
@@ -5424,6 +5553,7 @@
 		4D0F121721C13F5500C4451D /* SFTP */ = {
 			isa = PBXGroup;
 			children = (
+				C8D3B37326B8575100C3A9E8 /* SFTP Connections */,
 				4D0835C02284748200CA7405 /* SFTPProviderData.h */,
 				4D0835BF2284748100CA7405 /* SFTPProviderData.m */,
 				4DF972B321BFD81800F384C9 /* SFTPStorageProvider.h */,
@@ -5440,6 +5570,7 @@
 		4D0F121821C13F6100C4451D /* WebDAV */ = {
 			isa = PBXGroup;
 			children = (
+				C8D3B37426B8577600C3A9E8 /* WebDAV Connections */,
 				4D0835C5228474D700CA7405 /* WebDAVConfigurationViewController.h */,
 				4D0835CA228474D800CA7405 /* WebDAVConfigurationViewController.m */,
 				4D770FA2230326BE00CBE244 /* WebDAVConfigurationViewController.xib */,
@@ -5535,8 +5666,6 @@
 				4D3A0F422587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m */,
 				C8A175B325A0BBC8002734E7 /* SelectComparisonTypeViewController.h */,
 				C8A175B425A0BBC8002734E7 /* SelectComparisonTypeViewController.m */,
-				4D3A0F4A2587CBCA003D7BE8 /* SecondDatabaseListTableViewController.h */,
-				4D3A0F4B2587CBCA003D7BE8 /* SecondDatabaseListTableViewController.m */,
 				C85C187F25A603EF00D4A437 /* CompareDatabases.storyboard */,
 				4D3A0F532587DA18003D7BE8 /* DatabaseDiffAndMergeViewController.h */,
 				4D3A0F542587DA18003D7BE8 /* DatabaseDiffAndMergeViewController.m */,
@@ -5974,6 +6103,7 @@
 		4D62D6941C85F2B50051E13B /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				C847180026AF07A800BE7EFD /* Select Second Database */,
 				4DE7F11222F8A16A0095F51F /* Localizable.strings */,
 				4D5F5B78218B4B8000A0739A /* Images.xcassets */,
 				4DED20C72168BF1800A5800A /* Home */,
@@ -6114,6 +6244,9 @@
 		4D78AC231FB1E22C00A68A92 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				C8B8C77C2539DEB300164B73 /* Virtual YubiKeys */,
+				C83F7D7D26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.h */,
+				C83F7D7C26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m */,
 				C8144FE0265CF37C00B1D1ED /* Constants */,
 				C88F813D245D994800B0B998 /* Database */,
 				C8A0794626246F4500B48539 /* Password Strength */,
@@ -6128,7 +6261,6 @@
 				4D9AFB212449D0CD00376240 /* Audit */,
 				C89BE52F245B253700A73688 /* Password Generation */,
 				4D2962AC223171BA0082897D /* misc */,
-				C8B8C77C2539DEB300164B73 /* Virtual YubiKeys */,
 				4D556F0B22B7F1B300E16027 /* FileManager.h */,
 				4D556F0C22B7F1B300E16027 /* FileManager.m */,
 				C8BF569624A0E092003269C9 /* Constants.h */,
@@ -7141,6 +7273,16 @@
 			name = plists;
 			sourceTree = "<group>";
 		};
+		C847180026AF07A800BE7EFD /* Select Second Database */ = {
+			isa = PBXGroup;
+			children = (
+				C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */,
+				4D3A0F4A2587CBCA003D7BE8 /* SecondDatabaseListTableViewController.h */,
+				4D3A0F4B2587CBCA003D7BE8 /* SecondDatabaseListTableViewController.m */,
+			);
+			name = "Select Second Database";
+			sourceTree = "<group>";
+		};
 		C850F8852638175400FE64D7 /* kdbx4.1 */ = {
 			isa = PBXGroup;
 			children = (
@@ -7533,6 +7675,30 @@
 				C87A98EB255961280002BEF8 /* Utils.swift */,
 			);
 			path = "FavIcon-Swift";
+			sourceTree = "<group>";
+		};
+		C8D3B37326B8575100C3A9E8 /* SFTP Connections */ = {
+			isa = PBXGroup;
+			children = (
+				C8D3B37526B857A600C3A9E8 /* SFTPConnections.h */,
+				C8D3B37626B857A600C3A9E8 /* SFTPConnections.m */,
+				C8D3B3CB26B8652D00C3A9E8 /* SFTPConnectionsViewController.h */,
+				C8D3B3CC26B8652D00C3A9E8 /* SFTPConnectionsViewController.m */,
+				C8D3B38B26B8629000C3A9E8 /* SFTPConnections.storyboard */,
+			);
+			name = "SFTP Connections";
+			sourceTree = "<group>";
+		};
+		C8D3B37426B8577600C3A9E8 /* WebDAV Connections */ = {
+			isa = PBXGroup;
+			children = (
+				C8D3B37A26B857D400C3A9E8 /* WebDAVConnections.h */,
+				C8D3B37B26B857D400C3A9E8 /* WebDAVConnections.m */,
+				C8D3B3AC26B8632A00C3A9E8 /* WebDAVConnections.storyboard */,
+				C8D3B3D026B8654600C3A9E8 /* WebDAVConnectionsViewController.h */,
+				C8D3B3D126B8654600C3A9E8 /* WebDAVConnectionsViewController.m */,
+			);
+			name = "WebDAV Connections";
 			sourceTree = "<group>";
 		};
 		C8D5F02E24E2DD130056B6EE /* Sync */ = {
@@ -8016,7 +8182,9 @@
 				4D6C854E239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4D36B0BE22C94740003E9B68 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C8166639253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
+				C807976E26B453440015E52F /* ExportItemOptions.storyboard in Resources */,
 				C833BB9925A60CB10039173B /* ConflictResolutionWizard.storyboard in Resources */,
+				C8D3B3A826B8632A00C3A9E8 /* WebDAVConnections.storyboard in Resources */,
 				4D8A99A9230AF31700AB98DC /* RMStore.strings in Resources */,
 				4DAE98B02270B4E200A811C4 /* ViewAttachmentCell.xib in Resources */,
 				4DE7F0E822F89D680095F51F /* SelectStorage.storyboard in Resources */,
@@ -8058,6 +8226,7 @@
 				C8EC1CD82653C85200B0ED79 /* GenericOnboardSlide.storyboard in Resources */,
 				4D36B0CC22C94740003E9B68 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DAE98AE2270B4E200A811C4 /* EditAttachmentCell.xib in Resources */,
+				C8BF717E26AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */,
 				4DE7F0DE22F89D510095F51F /* KeePassHistory.storyboard in Resources */,
 				4DE7F11422F8A16A0095F51F /* Localizable.strings in Resources */,
 				4D62E268234386FF00119604 /* About.rtf in Resources */,
@@ -8111,8 +8280,10 @@
 				4D770F912303263100CBE244 /* PrivacyViewController.xib in Resources */,
 				4D160A882453002E0097C730 /* BrowseQuickViewItemCell.xib in Resources */,
 				4DE7F0C722F89BDD0095F51F /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
+				C80CC93626B5A2A100F7DADA /* DuplicateItemOptions.storyboard in Resources */,
 				4DA2A7DC219C31B1006689E6 /* LICENSE.md in Resources */,
 				4D160A9D245354360097C730 /* Audit.storyboard in Resources */,
+				C8D3B38726B8629000C3A9E8 /* SFTPConnections.storyboard in Resources */,
 				4DAE98B42270B4E200A811C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8134,7 +8305,9 @@
 				4D6C8550239630A300008391 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				4DC4E12823488BAA000743C4 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C816663B253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
+				C807976F26B453440015E52F /* ExportItemOptions.storyboard in Resources */,
 				C833BB9A25A60CB10039173B /* ConflictResolutionWizard.storyboard in Resources */,
+				C8D3B3A926B8632A00C3A9E8 /* WebDAVConnections.storyboard in Resources */,
 				4DC4E12923488BAA000743C4 /* RMStore.strings in Resources */,
 				4DC4E12A23488BAA000743C4 /* ViewAttachmentCell.xib in Resources */,
 				4DC4E12B23488BAA000743C4 /* SelectStorage.storyboard in Resources */,
@@ -8176,6 +8349,7 @@
 				C8EC1CD92653C85200B0ED79 /* GenericOnboardSlide.storyboard in Resources */,
 				4DC4E14123488BAA000743C4 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				4DC4E14223488BAA000743C4 /* EditAttachmentCell.xib in Resources */,
+				C8BF717F26AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */,
 				4DC4E14323488BAA000743C4 /* KeePassHistory.storyboard in Resources */,
 				4DC4E14423488BAA000743C4 /* Localizable.strings in Resources */,
 				4DC4E14523488BAA000743C4 /* About.rtf in Resources */,
@@ -8229,8 +8403,10 @@
 				4DC4E15E23488BAA000743C4 /* PrivacyViewController.xib in Resources */,
 				4D160A8A2453002E0097C730 /* BrowseQuickViewItemCell.xib in Resources */,
 				4DC4E16123488BAA000743C4 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
+				C80CC93726B5A2A100F7DADA /* DuplicateItemOptions.storyboard in Resources */,
 				4DC4E16223488BAA000743C4 /* LICENSE.md in Resources */,
 				4D160A9F245354360097C730 /* Audit.storyboard in Resources */,
+				C8D3B38826B8629000C3A9E8 /* SFTPConnections.storyboard in Resources */,
 				4DC4E16323488BAA000743C4 /* GenericKeyValueTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8260,6 +8436,7 @@
 				4DC4E25523488BAE000743C4 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4D8FCEAC23606D78001F2172 /* first.names.us.txt in Resources */,
 				4DC4E25623488BAE000743C4 /* securedrop.wordlist.utf8.txt in Resources */,
+				C8BF718226AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */,
 				C816663C253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
 				4DC4E25723488BAE000743C4 /* EditPasswordCell.xib in Resources */,
 				4D7F5A442360204C003ED785 /* PasswordSafeHistory.storyboard in Resources */,
@@ -8341,6 +8518,7 @@
 				4D36B0CF22C94740003E9B68 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				4D8FCEAA23606D78001F2172 /* first.names.us.txt in Resources */,
 				4D36B0B522C94740003E9B68 /* securedrop.wordlist.utf8.txt in Resources */,
+				C8BF718126AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */,
 				C816663A253A1A1F00FB4E4C /* VirtualYubiKeyCell.xib in Resources */,
 				4D770F872303249D00CBE244 /* EditPasswordCell.xib in Resources */,
 				4D7F5A432360204B003ED785 /* PasswordSafeHistory.storyboard in Resources */,
@@ -8414,7 +8592,9 @@
 				C843330F26692A7C00D496D2 /* gameofthrones_8k_2018.utf8.txt in Resources */,
 				C843331026692A7C00D496D2 /* french-diceware.wordlist.utf8.txt in Resources */,
 				C843331126692A7C00D496D2 /* VirtualYubiKeyCell.xib in Resources */,
+				C807977026B453440015E52F /* ExportItemOptions.storyboard in Resources */,
 				C843331226692A7C00D496D2 /* ConflictResolutionWizard.storyboard in Resources */,
+				C8D3B3AA26B8632A00C3A9E8 /* WebDAVConnections.storyboard in Resources */,
 				C843331326692A7C00D496D2 /* RMStore.strings in Resources */,
 				C843331426692A7C00D496D2 /* ViewAttachmentCell.xib in Resources */,
 				C843331526692A7C00D496D2 /* SelectStorage.storyboard in Resources */,
@@ -8456,6 +8636,7 @@
 				C843333926692A7C00D496D2 /* GenericOnboardSlide.storyboard in Resources */,
 				C843333A26692A7C00D496D2 /* polish-diceware.wordlist.utf8.txt in Resources */,
 				C843333B26692A7C00D496D2 /* EditAttachmentCell.xib in Resources */,
+				C8BF718026AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */,
 				C843333C26692A7C00D496D2 /* KeePassHistory.storyboard in Resources */,
 				C843333D26692A7C00D496D2 /* Localizable.strings in Resources */,
 				C843333E26692A7C00D496D2 /* About.rtf in Resources */,
@@ -8509,8 +8690,10 @@
 				C843336E26692A7C00D496D2 /* PrivacyViewController.xib in Resources */,
 				C843336F26692A7C00D496D2 /* BrowseQuickViewItemCell.xib in Resources */,
 				C843337026692A7C00D496D2 /* CreateDatabaseOrSetCredentials.storyboard in Resources */,
+				C80CC93826B5A2A100F7DADA /* DuplicateItemOptions.storyboard in Resources */,
 				C843337126692A7C00D496D2 /* LICENSE.md in Resources */,
 				C843337226692A7C00D496D2 /* Audit.storyboard in Resources */,
+				C8D3B38926B8629000C3A9E8 /* SFTPConnections.storyboard in Resources */,
 				C843337326692A7C00D496D2 /* GenericKeyValueTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -8540,6 +8723,7 @@
 				C8AF2FEC26692CA600F845B1 /* italian-diceware.wordlist.utf8.txt in Resources */,
 				C8AF2FED26692CA600F845B1 /* first.names.us.txt in Resources */,
 				C8AF2FEE26692CA600F845B1 /* securedrop.wordlist.utf8.txt in Resources */,
+				C8BF718326AEFD2E001C3C98 /* SelectSecondDatabase.storyboard in Resources */,
 				C8AF2FEF26692CA600F845B1 /* VirtualYubiKeyCell.xib in Resources */,
 				C8AF2FF026692CA600F845B1 /* EditPasswordCell.xib in Resources */,
 				C8AF2FF126692CA600F845B1 /* PasswordSafeHistory.storyboard in Resources */,
@@ -8980,6 +9164,7 @@
 				4D3A0F552587DA18003D7BE8 /* DatabaseDiffAndMergeViewController.m in Sources */,
 				4D27D74C21A00AB900CA7B06 /* KeePass2TagPackage.m in Sources */,
 				4D8C14922074F5F900CE9CAE /* Record.m in Sources */,
+				C8D3B37C26B857D400C3A9E8 /* WebDAVConnections.m in Sources */,
 				C8A8DBAA2484F024009C673F /* AuditDrillDownController.m in Sources */,
 				4D3D0A0B228AF81400C38C94 /* AppLockViewController.m in Sources */,
 				4DC66F3D229E70AB00EC83C6 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
@@ -9174,6 +9359,7 @@
 				4DFF34C4238E75B800BEB941 /* FavIconDownloadResultsViewController.m in Sources */,
 				4DF2997B2243B8020080F9DC /* IconsSectionHeaderReusableView.m in Sources */,
 				4D1757C11C8361D300E6356F /* GoogleDriveStorageProvider.m in Sources */,
+				C8D3B37726B857A600C3A9E8 /* SFTPConnections.m in Sources */,
 				4DF972B521BFD81800F384C9 /* SFTPStorageProvider.m in Sources */,
 				4D326E8722302BED00DCD8C7 /* NMSFTP.m in Sources */,
 				4DE229A21ED8A102000FDC3D /* DropboxV2StorageProvider.m in Sources */,
@@ -9302,6 +9488,7 @@
 				C8E9DA9E245DAD4C0093F97C /* UrlRequestOperation.m in Sources */,
 				4DD72BF924264B18009F4091 /* DatabasePreferencesController.m in Sources */,
 				4D25673221E8B086006260B7 /* PinsConfigurationController.m in Sources */,
+				C8D3B3CD26B8652D00C3A9E8 /* SFTPConnectionsViewController.m in Sources */,
 				4D5F5B6E218B33A700A0739A /* ChaCha20Cipher.m in Sources */,
 				C81A5FE525B74B9100038963 /* DatabasePropertiesVC.m in Sources */,
 				4D2F6C3C21807C7E007931E4 /* Entry.m in Sources */,
@@ -9322,6 +9509,7 @@
 				C8413C3D25925C0700BD9DE8 /* MinimalPoolHelper.m in Sources */,
 				4D0835D1228474D800CA7405 /* WebDAVConfigurationViewController.m in Sources */,
 				4D4D3FE02409CE1C0056A7E2 /* ProgressHudView.swift in Sources */,
+				C86255B226B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */,
 				C86791222561699B0038310E /* KeePassXmlAutoTypeAssociation.m in Sources */,
 				C87A8CD02495101100356966 /* AppPreferences.m in Sources */,
 				4D5F5B8B218B5A7000A0739A /* FileAttachmentsViewControllerTableViewController.m in Sources */,
@@ -9343,11 +9531,13 @@
 				C88A50452625EAEF004B72F0 /* SaleScheduleManager.m in Sources */,
 				4DE0DA872351E7A500B4319F /* AboutViewController.m in Sources */,
 				C87A990F255961280002BEF8 /* URLRequestOperation.swift in Sources */,
+				C83F7D7E26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				4DF97F2421BF101B0090A55E /* DAVRequests.m in Sources */,
 				4DAE98BE2270B4E200A811C4 /* GenericBasicCell.m in Sources */,
 				4DAE98BC2270B4E200A811C4 /* EditPasswordTableViewCell.m in Sources */,
 				4D792A6F222EF46A00250086 /* RMStoreAppReceiptVerifier.m in Sources */,
 				4D632E1E1F79631100C31279 /* iCloudSafesCoordinator.m in Sources */,
+				C8D3B3D226B8654600C3A9E8 /* WebDAVConnectionsViewController.m in Sources */,
 				4DDEA21D241918A8002EEA02 /* UpgradeViewController.m in Sources */,
 				4D160A7B2452F2B80097C730 /* BrowseTableViewCellHelper.m in Sources */,
 				4DD755EB232F084900758824 /* ExportOptionsTableViewController.m in Sources */,
@@ -9367,6 +9557,7 @@
 				4D876B4321AC36F800805DED /* CustomField.m in Sources */,
 				4D1140A7229D7D1F00DEECF3 /* KeyFilesTableViewController.m in Sources */,
 				4D004CDF21F4C26700E2B194 /* OTPToken+Generation.m in Sources */,
+				C8B534F726B2D957005A61FD /* ExportItemsOptionsViewController.m in Sources */,
 				C872B73624A653E90042CE02 /* GzipDecompressOutputStream.m in Sources */,
 				C8BF5217264ACD0A00D3A689 /* ConvenienceUnlockOnboardingViewController.m in Sources */,
 				4D08B5C1234C9613003D1953 /* GCDWebServerStreamedResponse.m in Sources */,
@@ -9424,6 +9615,7 @@
 				4DC4E01823488BAA000743C4 /* UnlockDatabaseSequenceHelper.m in Sources */,
 				4DC4E01923488BAA000743C4 /* KeePass2TagPackage.m in Sources */,
 				4DC4E01A23488BAA000743C4 /* Record.m in Sources */,
+				C8D3B37D26B857D400C3A9E8 /* WebDAVConnections.m in Sources */,
 				4D3A0F442587CAAB003D7BE8 /* MergeSelectSecondDatabaseViewController.m in Sources */,
 				C8B8C7772539DDD400164B73 /* VirtualYubiKeys.m in Sources */,
 				4DC4E01B23488BAA000743C4 /* AppLockViewController.m in Sources */,
@@ -9618,6 +9810,7 @@
 				4DC4E08523488BAA000743C4 /* Group.m in Sources */,
 				4DC4E08623488BAA000743C4 /* CASGParams.m in Sources */,
 				4D44983323926DD600B21794 /* FavIconSelectFromMultipleFavIconsTableViewController.m in Sources */,
+				C8D3B37826B857A600C3A9E8 /* SFTPConnections.m in Sources */,
 				4DC4E08723488BAA000743C4 /* Alerts.m in Sources */,
 				4D08B5C8234C9613003D1953 /* GCDWebServerDataRequest.m in Sources */,
 				4D24C76F238B9D1A000F8461 /* MMcG_MF_Base32Additions.m in Sources */,
@@ -9746,6 +9939,7 @@
 				4DC4E0CF23488BAA000743C4 /* V3BinariesList.m in Sources */,
 				4D08B5CE234C97DC003D1953 /* LocalHttpServerViewController.m in Sources */,
 				4DC4E0D023488BAA000743C4 /* DatabaseAttachment.m in Sources */,
+				C8D3B3CE26B8652D00C3A9E8 /* SFTPConnectionsViewController.m in Sources */,
 				C85DC89C253CA7C5004E51C9 /* DatabaseMerger.m in Sources */,
 				4DC4E0D123488BAA000743C4 /* WelcomeMasterPasswordViewController.m in Sources */,
 				4DC4E0D223488BAA000743C4 /* OTPTokenType.m in Sources */,
@@ -9766,6 +9960,7 @@
 				C8413C3F25925C0700BD9DE8 /* MinimalPoolHelper.m in Sources */,
 				4DC4E0DB23488BAA000743C4 /* SprCompilation.m in Sources */,
 				4DC4E0DC23488BAA000743C4 /* DatabaseModel.m in Sources */,
+				C86255B326B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */,
 				4DC4E0DD23488BAA000743C4 /* CloudSessionsTableViewController.m in Sources */,
 				C8DDE39924DEE14600873392 /* SyncDatabaseRequest.m in Sources */,
 				4DC4E0DE23488BAA000743C4 /* NSUUID+Zero.m in Sources */,
@@ -9787,11 +9982,13 @@
 				C88A50472625EAEF004B72F0 /* SaleScheduleManager.m in Sources */,
 				4DC4E0EA23488BAA000743C4 /* GoogleDriveManager.m in Sources */,
 				4DC4E0EB23488BAA000743C4 /* Model.m in Sources */,
+				C83F7D7F26B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				4DC4E0EC23488BAA000743C4 /* CryptoParameters.m in Sources */,
 				C872B72524A64A160042CE02 /* cdecode.c in Sources */,
 				4DC4E0ED23488BAA000743C4 /* CustomIcon.m in Sources */,
 				4DC4E0EE23488BAA000743C4 /* PreviousPasswordsTableViewController.m in Sources */,
 				4DE0DA882351E7A500B4319F /* AboutViewController.m in Sources */,
+				C8D3B3D326B8654600C3A9E8 /* WebDAVConnectionsViewController.m in Sources */,
 				4DC4E0EF23488BAA000743C4 /* DAVRequests.m in Sources */,
 				4DC4E0F023488BAA000743C4 /* GenericBasicCell.m in Sources */,
 				4DC4E0F123488BAA000743C4 /* EditPasswordTableViewCell.m in Sources */,
@@ -9811,6 +10008,7 @@
 				4DC4E0F923488BAA000743C4 /* SFTPSessionConfigurationViewController.m in Sources */,
 				C8F8A3932588EFDC00B9297C /* Pair.m in Sources */,
 				4DC4E0FA23488BAA000743C4 /* PreferencesTableViewController.m in Sources */,
+				C8B534F826B2D957005A61FD /* ExportItemsOptionsViewController.m in Sources */,
 				4DC4E0FB23488BAA000743C4 /* DebugHelper.m in Sources */,
 				C8BF5218264ACD0A00D3A689 /* ConvenienceUnlockOnboardingViewController.m in Sources */,
 				C8DDE39324DEB6FA00873392 /* SyncParameters.m in Sources */,
@@ -10507,6 +10705,7 @@
 				C843315126692A7C00D496D2 /* StrongboxErrorCodes.m in Sources */,
 				C843315226692A7C00D496D2 /* GCDWebServer.m in Sources */,
 				C843315326692A7C00D496D2 /* PasswordHistoryEntry.m in Sources */,
+				C83F7D8026B1BD7000676129 /* DatabaseFormatIncompatibilityHelper.m in Sources */,
 				C843315426692A7C00D496D2 /* Kdb1Database.m in Sources */,
 				C843315526692A7C00D496D2 /* ConcurrentMutableStack.m in Sources */,
 				C843315626692A7C00D496D2 /* SortOrderTableViewController.m in Sources */,
@@ -10551,6 +10750,7 @@
 				C843317C26692A7C00D496D2 /* RMStoreTransaction.m in Sources */,
 				C843317D26692A7C00D496D2 /* QuickViewConfig.m in Sources */,
 				C843317E26692A7C00D496D2 /* RandomizerPopOverViewController.m in Sources */,
+				C8D3B37E26B857D400C3A9E8 /* WebDAVConnections.m in Sources */,
 				C843317F26692A7C00D496D2 /* NodeIcon.m in Sources */,
 				C843318026692A7C00D496D2 /* SelectComparisonTypeViewController.m in Sources */,
 				C843318126692A7C00D496D2 /* AppleICloudOrLocalSafeFile.m in Sources */,
@@ -10649,6 +10849,7 @@
 				C84331DE26692A7C00D496D2 /* LastCrashReportModule.m in Sources */,
 				C84331DF26692A7C00D496D2 /* IOsUtils.m in Sources */,
 				C84331E026692A7C00D496D2 /* KeePassCiphers.m in Sources */,
+				C86255B426B6E7B600C909BD /* DuplicateOptionsViewController.m in Sources */,
 				C84331E126692A7C00D496D2 /* CompositeKeyDeterminer.m in Sources */,
 				C84331E226692A7C00D496D2 /* SecondDatabaseListTableViewController.m in Sources */,
 				C84331E326692A7C00D496D2 /* CustomFieldEditorViewController.m in Sources */,
@@ -10676,6 +10877,7 @@
 				C84331F926692A7C00D496D2 /* GCDWebServerResponse.m in Sources */,
 				C84331FA26692A7C00D496D2 /* FirstUnlockWelcomeViewController.m in Sources */,
 				C84331FB26692A7C00D496D2 /* twofish.c in Sources */,
+				C8D3B3CF26B8652D00C3A9E8 /* SFTPConnectionsViewController.m in Sources */,
 				C84331FC26692A7C00D496D2 /* CollapsibleTableViewHeader.m in Sources */,
 				C84331FD26692A7C00D496D2 /* KeePassHistoryController.m in Sources */,
 				C84331FE26692A7C00D496D2 /* BiometricsManager.m in Sources */,
@@ -10806,11 +11008,13 @@
 				C843327E26692A7C00D496D2 /* Binary.m in Sources */,
 				C843327F26692A7C00D496D2 /* SFTPSessionConfiguration.m in Sources */,
 				C843328026692A7C00D496D2 /* blake2b.c in Sources */,
+				C8B534F926B2D957005A61FD /* ExportItemsOptionsViewController.m in Sources */,
 				C843328126692A7C00D496D2 /* QRCodeScannerViewController.m in Sources */,
 				C843328226692A7C00D496D2 /* TextFieldAutoSuggest.m in Sources */,
 				C843328326692A7C00D496D2 /* PasswordStrengthTester.m in Sources */,
 				C843328426692A7C00D496D2 /* WSTagsField.swift in Sources */,
 				C843328526692A7C00D496D2 /* DecryptionParameters.m in Sources */,
+				C8D3B37926B857A600C3A9E8 /* SFTPConnections.m in Sources */,
 				C843328626692A7C00D496D2 /* V3BinariesList.m in Sources */,
 				C843328726692A7C00D496D2 /* LocalHttpServerViewController.m in Sources */,
 				C843328826692A7C00D496D2 /* DatabaseAttachment.m in Sources */,
@@ -10891,6 +11095,7 @@
 				C84332D426692A7C00D496D2 /* URLRequestOperation.swift in Sources */,
 				C84332D526692A7C00D496D2 /* DAVRequestGroup.m in Sources */,
 				C84332D626692A7C00D496D2 /* GCDWebServerDataResponse.m in Sources */,
+				C8D3B3D426B8654600C3A9E8 /* WebDAVConnectionsViewController.m in Sources */,
 				C84332D726692A7C00D496D2 /* KP31HashedBlockStream.m in Sources */,
 				C84332D826692A7C00D496D2 /* GCDWebServerErrorResponse.m in Sources */,
 				C84332D926692A7C00D496D2 /* Kdbx4Serialization.m in Sources */,
@@ -12075,6 +12280,28 @@
 			path = StrongBox;
 			sourceTree = "<group>";
 		};
+		C807977226B453440015E52F /* ExportItemOptions.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C807977126B453440015E52F /* Base */,
+				C807977626B453810015E52F /* zh-Hans */,
+				C807977826B453B90015E52F /* cs */,
+				C807977A26B453EB0015E52F /* uk */,
+				C807977C26B4545D0015E52F /* sv */,
+				C807977E26B454BF0015E52F /* es */,
+				C807978026B456410015E52F /* ru */,
+				C807978226B456720015E52F /* pt-BR */,
+				C807978426B456A10015E52F /* nb */,
+				C807978626B456D30015E52F /* ja */,
+				C807978826B457010015E52F /* it */,
+				C807978A26B457730015E52F /* de */,
+				C807978C26B457760015E52F /* fr */,
+				C807978E26B457A60015E52F /* nl */,
+			);
+			name = ExportItemOptions.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
 		C807987926540583001A32F4 /* ConvenienceUnlockOnboardingModule.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -12094,6 +12321,28 @@
 				C8079893265405A1001A32F4 /* zh-Hans */,
 			);
 			name = ConvenienceUnlockOnboardingModule.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		C80CC93A26B5A2A100F7DADA /* DuplicateItemOptions.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C80CC93926B5A2A100F7DADA /* Base */,
+				C80CC93C26B5A2AA00F7DADA /* uk */,
+				C80CC93E26B5A2AC00F7DADA /* sv */,
+				C80CC94026B5A2DB00F7DADA /* es */,
+				C80CC94226B5A2F800F7DADA /* ru */,
+				C80CC94426B5A2FC00F7DADA /* pt-BR */,
+				C80CC94626B5A2FE00F7DADA /* nb */,
+				C80CC94826B5A2FF00F7DADA /* ja */,
+				C80CC94A26B5A30100F7DADA /* it */,
+				C80CC94C26B5A30300F7DADA /* de */,
+				C80CC94E26B5A30400F7DADA /* fr */,
+				C80CC95026B5A30600F7DADA /* nl */,
+				C80CC95226B5A30800F7DADA /* cs */,
+				C80CC95426B5A30A00F7DADA /* zh-Hans */,
+			);
+			name = DuplicateItemOptions.storyboard;
 			path = StrongBox;
 			sourceTree = "<group>";
 		};
@@ -12271,6 +12520,28 @@
 			path = StrongBox;
 			sourceTree = "<group>";
 		};
+		C8BF718526AEFD2E001C3C98 /* SelectSecondDatabase.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8BF718426AEFD2E001C3C98 /* Base */,
+				C8BF718926AF03C6001C3C98 /* zh-Hans */,
+				C8BF718B26AF0422001C3C98 /* cs */,
+				C8BF718D26AF0441001C3C98 /* nl */,
+				C8BF718F26AF0470001C3C98 /* fr */,
+				C8BF719126AF0474001C3C98 /* uk */,
+				C8BF719326AF04EB001C3C98 /* sv */,
+				C8BF719526AF051A001C3C98 /* es */,
+				C8BF719726AF051F001C3C98 /* ru */,
+				C8BF719926AF054E001C3C98 /* pt-BR */,
+				C8BF719B26AF05D8001C3C98 /* nb */,
+				C8BF719D26AF05DA001C3C98 /* ja */,
+				C8BF719F26AF0609001C3C98 /* it */,
+				C8BF71A126AF0648001C3C98 /* de */,
+			);
+			name = SelectSecondDatabase.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
 		C8C63A2425EE6ABA00B09300 /* AutoFillPreferences.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -12290,6 +12561,50 @@
 				C86BB44725F91BF600425405 /* pt-BR */,
 			);
 			name = AutoFillPreferences.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		C8D3B38B26B8629000C3A9E8 /* SFTPConnections.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8D3B38A26B8629000C3A9E8 /* Base */,
+				C8D3B38F26B8631300C3A9E8 /* zh-Hans */,
+				C8D3B39126B8631500C3A9E8 /* cs */,
+				C8D3B39326B8631600C3A9E8 /* nl */,
+				C8D3B39526B8631700C3A9E8 /* fr */,
+				C8D3B39726B8631800C3A9E8 /* de */,
+				C8D3B39926B8631A00C3A9E8 /* it */,
+				C8D3B39B26B8631B00C3A9E8 /* ja */,
+				C8D3B39D26B8631D00C3A9E8 /* nb */,
+				C8D3B39F26B8631E00C3A9E8 /* pt-BR */,
+				C8D3B3A126B8631F00C3A9E8 /* ru */,
+				C8D3B3A326B8632100C3A9E8 /* es */,
+				C8D3B3A526B8632200C3A9E8 /* sv */,
+				C8D3B3A726B8632300C3A9E8 /* uk */,
+			);
+			name = SFTPConnections.storyboard;
+			path = StrongBox;
+			sourceTree = "<group>";
+		};
+		C8D3B3AC26B8632A00C3A9E8 /* WebDAVConnections.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C8D3B3AB26B8632A00C3A9E8 /* Base */,
+				C8D3B3B026B8632E00C3A9E8 /* zh-Hans */,
+				C8D3B3B226B8632F00C3A9E8 /* cs */,
+				C8D3B3B426B8633100C3A9E8 /* nl */,
+				C8D3B3B626B8633300C3A9E8 /* fr */,
+				C8D3B3B826B8633400C3A9E8 /* de */,
+				C8D3B3BA26B8633500C3A9E8 /* it */,
+				C8D3B3BC26B8633700C3A9E8 /* ja */,
+				C8D3B3BE26B8633800C3A9E8 /* nb */,
+				C8D3B3C026B8633900C3A9E8 /* pt-BR */,
+				C8D3B3C226B8633A00C3A9E8 /* ru */,
+				C8D3B3C426B8633C00C3A9E8 /* es */,
+				C8D3B3C626B8633D00C3A9E8 /* sv */,
+				C8D3B3C826B8633E00C3A9E8 /* uk */,
+			);
+			name = WebDAVConnections.storyboard;
 			path = StrongBox;
 			sourceTree = "<group>";
 		};
@@ -12618,7 +12933,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -12706,7 +13021,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -12793,7 +13108,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -12873,7 +13188,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -12956,7 +13271,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13029,7 +13344,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13100,7 +13415,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13180,7 +13495,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				EXCLUDED_ARCHS = "";
@@ -13252,7 +13567,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				ENABLE_BITCODE = NO;
@@ -13332,7 +13647,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
@@ -13415,7 +13730,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";
@@ -13489,7 +13804,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3091;
+				CURRENT_PROJECT_VERSION = 3095;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = 4326J8XDF2;
 				EXCLUDED_ARCHS = "";

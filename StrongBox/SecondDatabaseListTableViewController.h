@@ -15,7 +15,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property Model* firstDatabase;
 
-@property (nonatomic, copy) void (^onSelectedDatabase)(SafeMetaData* secondDatabase);
+@property BOOL disableReadOnlyDatabases;
+@property NSString* customTitle;
+
+@property (nonatomic, copy) void (^onSelectedDatabase)(SafeMetaData* secondDatabase, __weak UIViewController* vcToDismiss);
 
 @end
 

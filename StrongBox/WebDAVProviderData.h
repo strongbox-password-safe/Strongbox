@@ -14,7 +14,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface WebDAVProviderData : NSObject
 
 @property NSString *href;
-@property WebDAVSessionConfiguration* sessionConfiguration;
+@property NSString* connectionIdentifier;
+
+@property WebDAVSessionConfiguration* sessionConfiguration;  
 
 + (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
 - (NSDictionary*)serializationDictionary;

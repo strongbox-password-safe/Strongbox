@@ -27,7 +27,7 @@
 @property (nonatomic, retain) NSDate *created;
 @property (nonatomic, retain) NSDate *passwordModified;
 
-@property (nonatomic, retain, readonly) NSUUID *uuid;
+@property (nonatomic, retain) NSUUID *uuid;
 @property (nonatomic, retain) PasswordHistory *passwordHistory;
 
 - (Record*)init;

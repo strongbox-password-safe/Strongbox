@@ -11,23 +11,7 @@
 #import "Document.h"
 #import "ViewController.h"
 
-@interface WindowController ()
-
-@end
-
 @implementation WindowController
-
-- (void)windowDidLoad {
-    [super windowDidLoad];
-    
-    NSLog(@"WindowController::windowDidLoad [%@]", self.document);
-    
-    self.shouldCascadeWindows = YES;
-    
-    
-    
-    self.windowFrameAutosaveName = @"strongbox-window-controller-autosave";
-}
 
 - (NSString*)windowTitleForDocumentDisplayName:(NSString *)displayName {
     Document* doc = (Document*)self.document;
@@ -80,17 +64,27 @@
 - (void)setDocument:(id)document {
     [super setDocument:document];
     
-    NSLog(@"WindowController::setDocument [%@] - [%@]", self.document, self.contentViewController);
-    
-    
-    
-    
-    
-    if ( self.contentViewController && [self.contentViewController isKindOfClass:ViewController.class] ) {
-        ViewController* vc = (ViewController*)self.contentViewController;
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [vc onDocumentLoaded];
-        });
+    if ( document ) {
+        NSLog(@"WindowController::setDocument [%@] - [%@]", self.document, self.contentViewController);
+        
+        
+        
+        
+        
+        if ( self.contentViewController && [self.contentViewController isKindOfClass:ViewController.class] ) {
+            ViewController* vc = (ViewController*)self.contentViewController;
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [vc onDocumentLoaded];
+            });
+        }
+        
+        
+        
+
+        Document* doc = (Document*)document;
+        if ( doc.databaseMetadata ) {
+            self.windowFrameAutosaveName = [NSString stringWithFormat:@"autosave-frame-%@", doc.databaseMetadata.uuid];
+        }
     }
 }
 

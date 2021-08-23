@@ -12,6 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface WebDAVSessionConfiguration : NSObject
 
+@property NSString* identifier;
+@property (nullable) NSString* name;
+
 @property NSURL* host;
 @property NSString* username;
 @property NSString* password;
@@ -21,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
 
 -(NSString*)getKeyChainKey:(NSString*)propertyName;
+
+- (void)clearKeychainItems;
 
 @end
 

@@ -38,10 +38,9 @@
         
         
         self.schedule = @[
-            [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2021-04-30"] andB:[NSDate fromYYYY_MM_DDString:@"2021-05-04"]], 
-            [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2021-07-29"] andB:[NSDate fromYYYY_MM_DDString:@"2021-08-03"]], 
             [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2021-11-26"] andB:[NSDate fromYYYY_MM_DDString:@"2021-11-30"]], 
             [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2021-12-24"] andB:[NSDate fromYYYY_MM_DDString:@"2021-12-27"]], 
+            [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2022-04-29"] andB:[NSDate fromYYYY_MM_DDString:@"2022-05-03"]], 
         ];
     }
     

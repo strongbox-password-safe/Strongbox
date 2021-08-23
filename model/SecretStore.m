@@ -512,7 +512,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 }
 
 - (NSDictionary*)decryptAndDeserializeKeychainBlob:(NSData*)encrypted identifier:(NSString *)identifier {
-    NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
+
 
     NSDictionary* query = [SecretStore getPrivateKeyQuery:identifier limit1Match:YES];
 
@@ -527,8 +527,8 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return nil;
     }
 
-    double perf = NSDate.timeIntervalSinceReferenceDate - startTime;
-    startTime = NSDate.timeIntervalSinceReferenceDate;
+
+
 
 
 
@@ -553,7 +553,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return nil;
     }
     
-    perf = NSDate.timeIntervalSinceReferenceDate - startTime;
+
     
 
 
