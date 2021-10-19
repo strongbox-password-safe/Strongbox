@@ -150,80 +150,82 @@
 }
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer {
-    if(![serializer beginElement:self.originalElementName
-                            text:self.originalText
-                      attributes:self.originalAttributes]) {
-        return NO;
-    }
+    @autoreleasepool {
+        if(![serializer beginElement:self.originalElementName
+                                text:self.originalText
+                          attributes:self.originalAttributes]) {
+            return NO;
+        }
 
-    if (![serializer writeElement:kNameElementName text:self.name]) return NO;
-    if (![serializer writeElement:kUuidElementName uuid:self.uuid]) return NO;
-    if (self.icon && ![serializer writeElement:kIconIdElementName integer:self.icon.integerValue]) return NO;
-    if (self.customIcon && ![serializer writeElement:kCustomIconUuidElementName uuid:self.customIcon]) return NO;
+        if (![serializer writeElement:kNameElementName text:self.name]) return NO;
+        if (![serializer writeElement:kUuidElementName uuid:self.uuid]) return NO;
+        if (self.icon && ![serializer writeElement:kIconIdElementName integer:self.icon.integerValue]) return NO;
+        if (self.customIcon && ![serializer writeElement:kCustomIconUuidElementName uuid:self.customIcon]) return NO;
 
-    if(self.times && ![self.times writeXml:serializer]) return NO;
+        if(self.times && ![self.times writeXml:serializer]) return NO;
 
-    if (self.tags && self.tags.count) {
-        NSArray<NSString*>* trimmed = [self.tags.allObjects map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-            return [Utils trim:obj];
-        }];
+        if (self.tags && self.tags.count) {
+            NSArray<NSString*>* trimmed = [self.tags.allObjects map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+                return [Utils trim:obj];
+            }];
+            
+            NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+                return obj.length > 0;
+            }];
+
+            NSString* str = [[NSSet setWithArray:filtered].allObjects componentsJoinedByString:@";"];
+            if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
+        }
         
-        NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
-            return obj.length > 0;
-        }];
-
-        NSString* str = [[NSSet setWithArray:filtered].allObjects componentsJoinedByString:@";"];
-        if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
-    }
-    
-    if ( self.isExpanded ) {
-        if ( ![serializer writeElement:kIsExpandedElementName boolean:self.isExpanded]) return NO;
-    }
-    
-    if (self.groupsAndEntries) {
-        for (id<KeePassGroupOrEntry> groupOrEntry in self.groupsAndEntries) {
-            BaseXmlDomainObjectHandler *handler = (BaseXmlDomainObjectHandler*)groupOrEntry;
-            if(![handler writeXml:serializer]) {
-                return NO;
+        if ( self.isExpanded ) {
+            if ( ![serializer writeElement:kIsExpandedElementName boolean:self.isExpanded]) return NO;
+        }
+        
+        if (self.groupsAndEntries) {
+            for (id<KeePassGroupOrEntry> groupOrEntry in self.groupsAndEntries) {
+                BaseXmlDomainObjectHandler *handler = (BaseXmlDomainObjectHandler*)groupOrEntry;
+                if(![handler writeXml:serializer]) {
+                    return NO;
+                }
             }
         }
-    }
 
-    if (self.customData && self.customData.dictionary.count) {
-        if ( ![self.customData writeXml:serializer] ) return NO;
-    }
+        if (self.customData && self.customData.dictionary.count) {
+            if ( ![self.customData writeXml:serializer] ) return NO;
+        }
 
-    if (self.notes.length) {
-        if (![serializer writeElement:kNotesElementName text:self.notes]) return NO;
-    }
+        if (self.notes.length) {
+            if (![serializer writeElement:kNotesElementName text:self.notes]) return NO;
+        }
 
-    if ( self.defaultAutoTypeSequence.length ) {
-        if ( ![serializer writeElement:kDefaultAutoTypeSequenceElementName text:self.defaultAutoTypeSequence] ) return NO;
+        if ( self.defaultAutoTypeSequence.length ) {
+            if ( ![serializer writeElement:kDefaultAutoTypeSequenceElementName text:self.defaultAutoTypeSequence] ) return NO;
+        }
+        
+        if ( self.enableAutoType != nil ) {
+            if ( ![serializer writeElement:kEnableAutoTypeElementName boolean:self.enableAutoType.boolValue]) return NO;
+        }
+        
+        if ( self.enableSearching != nil ) {
+            if ( ![serializer writeElement:kEnableSearchingElementName boolean:self.enableSearching.boolValue]) return NO;
+        }
+        
+        if ( self.lastTopVisibleEntry && ![self.lastTopVisibleEntry isEqual:NSUUID.zero]) {
+            if ( ![serializer writeElement:kLastTopVisibleElementName uuid:self.lastTopVisibleEntry]) return NO;
+        }
+        
+        if ( self.previousParentGroup ) {
+            if ( ![serializer writeElement:kPreviousParentGroupElementName uuid:self.previousParentGroup]) return NO;
+        }
+        
+        if( ![super writeUnmanagedChildren:serializer]) {
+            return NO;
+        }
+        
+        [serializer endElement];
+        
+        return YES;
     }
-    
-    if ( self.enableAutoType != nil ) {
-        if ( ![serializer writeElement:kEnableAutoTypeElementName boolean:self.enableAutoType.boolValue]) return NO;
-    }
-    
-    if ( self.enableSearching != nil ) {
-        if ( ![serializer writeElement:kEnableSearchingElementName boolean:self.enableSearching.boolValue]) return NO;
-    }
-    
-    if ( self.lastTopVisibleEntry && ![self.lastTopVisibleEntry isEqual:NSUUID.zero]) {
-        if ( ![serializer writeElement:kLastTopVisibleElementName uuid:self.lastTopVisibleEntry]) return NO;
-    }
-    
-    if ( self.previousParentGroup ) {
-        if ( ![serializer writeElement:kPreviousParentGroupElementName uuid:self.previousParentGroup]) return NO;
-    }
-    
-    if( ![super writeUnmanagedChildren:serializer]) {
-        return NO;
-    }
-    
-    [serializer endElement];
-    
-    return YES;
 }
 
 - (BOOL)isEqual:(id)object {

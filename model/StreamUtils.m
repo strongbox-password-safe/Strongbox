@@ -11,29 +11,57 @@
 @implementation StreamUtils
 
 + (BOOL)pipeFromStream:(NSInputStream*)inputStream to:(NSOutputStream*)outputStream {
-    [inputStream open];
-    [outputStream open];
+    return [self pipeFromStream:inputStream to:outputStream openAndCloseStreams:YES randomizeChunkSizes:NO];
+}
+
++ (BOOL)pipeFromStream:(NSInputStream*)inputStream to:(NSOutputStream*)outputStream openAndCloseStreams:(BOOL)openAndCloseStreams {
+    return [self pipeFromStream:inputStream to:outputStream openAndCloseStreams:openAndCloseStreams randomizeChunkSizes:NO];
+}
+
++ (BOOL)pipeFromStream:(NSInputStream*)inputStream
+                    to:(NSOutputStream*)outputStream
+   openAndCloseStreams:(BOOL)openAndCloseStreams
+   randomizeChunkSizes:(BOOL)randomizeChunkSizes {
+    const NSUInteger kChunkLength = randomizeChunkSizes ? (arc4random_uniform(32 * 1024) + 1)  : 32 * 1024;
+
+    return [self pipeFromStream:inputStream to:outputStream openAndCloseStreams:openAndCloseStreams chunkSize:kChunkLength];
+}
+
++ (BOOL)pipeFromStream:(NSInputStream*)inputStream
+                    to:(NSOutputStream*)outputStream
+   openAndCloseStreams:(BOOL)openAndCloseStreams
+             chunkSize:(NSUInteger)chunkSize {
+    if ( openAndCloseStreams ) {
+        [inputStream open];
+        [outputStream open];
+    }
     
     NSInteger read;
-    const NSUInteger kChunkLength = 32 * 1024;
-    uint8_t chunk[kChunkLength];
+    uint8_t chunk[chunkSize];
     
-    while ( (read = [inputStream read:chunk maxLength:kChunkLength]) > 0 ) {
+    while ( (read = [inputStream read:chunk maxLength:chunkSize]) > 0 ) {
         [outputStream write:chunk maxLength:read];
     }
     
-    [outputStream close];
-    [inputStream close];
+    if ( openAndCloseStreams ) {
+        [outputStream close];
+        [inputStream close];
+    }
 
     return (read == 0);
 }
 
-
 + (NSData*)readAll:(NSInputStream*)inputStream {
+    return [StreamUtils readAll:inputStream randomizeChunkSizes:NO];
+}
+
++ (NSData*)readAll:(NSInputStream*)inputStream randomizeChunkSizes:(BOOL)randomizeChunkSizes {
     [inputStream open];
     
     NSInteger read;
-    const NSUInteger kChunkLength = 32 * 1024;
+    
+    const NSUInteger kChunkLength = randomizeChunkSizes ? (arc4random_uniform(32 * 1024) + 1) : 32 * 1024;
+
     uint8_t chunk[kChunkLength];
     
     NSMutableData* ret = NSMutableData.data;
@@ -45,4 +73,5 @@
 
     return ret.copy;
 }
+
 @end

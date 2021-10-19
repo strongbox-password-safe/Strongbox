@@ -88,7 +88,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
 
 
-- (instancetype _Nullable)init {
+- (instancetype)init {
     return [self initWithUsername:@""
                               url:@""
                          password:@""
@@ -96,7 +96,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
                             email:@""];
 }
 
-- (instancetype _Nullable)initWithUsername:(NSString*_Nonnull)username
+- (instancetype)initWithUsername:(NSString*_Nonnull)username
                                        url:(NSString*_Nonnull)url
                                   password:(NSString*_Nonnull)password
                                      notes:(NSString*_Nonnull)notes
@@ -646,10 +646,18 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
     OTPToken *token = nil;
     NSURL *url = [NodeFields findOtpUrlInString:string];
     
-    if(url) {
+    if ( url ) {
         token = [NodeFields getOtpTokenFromUrl:url];
     }
     else {
+        NSURL* sanityCheck = [NSURL URLWithString:string];
+        if ( sanityCheck && sanityCheck.scheme.length ) {
+            
+            
+            
+            return nil;
+        }
+        
         NSData* secretData = [NSData secretWithString:string];
         if(secretData) {
             token = [OTPToken tokenWithType:OTPTokenTypeTimer secret:secretData name:username issuer:issuer];
@@ -792,15 +800,7 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
 
 + (OTPToken*)getOtpTokenFromUrl:(NSURL*)url {
     if(url && url.scheme && [url.scheme isEqualToString:kOtpAuthScheme]) {
-        OTPToken* ret = [OTPToken tokenWithURL:url];
-        NSDictionary *params = [NodeFields getQueryParams:url.query];
-        if(params[@"encoder"] && [params[@"encoder"] isEqualToString:@"steam"]) {
-            
-            ret.algorithm = OTPAlgorithmSteam;
-            ret.digits = 5;
-        }
-        
-        return ret;
+        return [OTPToken tokenWithURL:url];
     }
     
     return nil;

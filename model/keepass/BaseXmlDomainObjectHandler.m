@@ -84,6 +84,8 @@
 }
 
 - (void)addUnknownChildObject:(id<XmlParsingDomainObject>)xmlItem {
+    NSLog(@"WARNWARN - Found Unknown Element: [%@]", xmlItem.originalElementName);
+    
     if(!self.lazyUnmanagedChildElements) {
         self.lazyUnmanagedChildElements = [NSMutableArray arrayWithCapacity:32];
     }

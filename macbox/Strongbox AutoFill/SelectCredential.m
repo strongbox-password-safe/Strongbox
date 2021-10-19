@@ -277,8 +277,10 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
         [self dismissViewController:self];
         
         NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
+        NSString* user = [self.model dereference:node.fields.username node:node];
+        NSString* password = [self.model dereference:node.fields.password node:node];
 
-        self.onDone(NO, node.fields.username, node.fields.password, totp);
+        self.onDone(NO, user, password, totp);
     }
 }
 

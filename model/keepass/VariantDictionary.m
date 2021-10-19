@@ -106,7 +106,7 @@ typedef struct _EntryHeader {
     EntryHeader* header = (EntryHeader*)&buffer[2];
 
     while(header->type != 0) {
-        size_t keyLength = littleEndian4BytesToInt32(header->keyLength);
+        size_t keyLength = littleEndian4BytesToUInt32(header->keyLength);
 
         if(header->keyData + keyLength > eof) {
             NSLog(@"Not enough data to read Entry header Key.");
@@ -123,7 +123,7 @@ typedef struct _EntryHeader {
         }
         
         uint8_t *value = ((uint8_t*)header) + (SIZE_OF_ENTRY_HEADER + keyLength);
-        size_t valueLength = littleEndian4BytesToInt32(value);
+        size_t valueLength = littleEndian4BytesToUInt32(value);
         
         if(value + valueLength > eof) {
             NSLog(@"Not enough data to read Entry header value.");
@@ -192,10 +192,10 @@ static NSObject* getObject(uint8_t type, void* data, size_t length) {
             return [NSNumber numberWithUnsignedLongLong:littleEndian8BytesToUInt64(data)];
             break;
         case kVariantTypeInt32: 
-            return [NSNumber numberWithInt:littleEndian4BytesToInt32(data)];
+            return [NSNumber numberWithInt:(int32_t)littleEndian4BytesToUInt32(data)];
             break;
         case kVariantTypeInt64: 
-            return [NSNumber numberWithLongLong:littleEndian8BytesToInt64(data)];
+            return [NSNumber numberWithLongLong:(int64_t)littleEndian8BytesToUInt64(data)];
             break;
         case kVariantTypeBool: 
             return @(*((uint8_t*)data) == 1);

@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
                                             colorize:(BOOL)colorize
                                             darkMode:(BOOL)darkMode
                                           colorBlind:(BOOL)colorBlind
-                                                font:(FONT_PTR)font;
+                                                font:(FONT_PTR _Nullable)font;
 
 @end
 

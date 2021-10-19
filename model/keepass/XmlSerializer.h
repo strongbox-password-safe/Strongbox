@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "XmlParsingDomainObject.h"
 #import "IXmlSerializer.h"
+#import "InnerRandomStream.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -25,10 +26,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithProtectedStreamId:(uint32_t)innerRandomStreamId
                                       key:(nullable NSData*)protectedStreamKey
                                  v4Format:(BOOL)v4Format
-                              prettyPrint:(BOOL)prettyPrint NS_DESIGNATED_INITIALIZER;
+                              prettyPrint:(BOOL)prettyPrint;
+
+- (instancetype)initWithProtectedStream:(id<InnerRandomStream>)innerRandomStream
+                               v4Format:(BOOL)v4Format
+                            prettyPrint:(BOOL)prettyPrint;
+
+- (instancetype)initWithProtectedStream:(id<InnerRandomStream>)innerRandomStream
+                               v4Format:(BOOL)v4Format
+                            prettyPrint:(BOOL)prettyPrint
+                           outputStream:(NSOutputStream*_Nullable)outputStream NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readonly, nullable) NSData* protectedStreamKey;
-                                
+
 @end
 
 NS_ASSUME_NONNULL_END

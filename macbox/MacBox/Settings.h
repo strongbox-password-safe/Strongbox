@@ -49,7 +49,10 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property (readonly) BOOL dereferenceDuringSearch;
 @property BOOL floatOnTop;
 @property (readonly) NSString* easyReadFontName;
+
 @property PasswordGenerationConfig *passwordGenerationConfig;
+@property PasswordGenerationConfig *trayPasswordGenerationConfig;
+
 @property BOOL showSystemTrayIcon;
 @property FavIconDownloadOptions *favIconDownloadOptions;
 @property BOOL hideKeyFileNameOnLockScreen;
@@ -106,5 +109,11 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 
 @property BOOL closeManagerOnLaunch;
 @property BOOL makeLocalRollingBackups;
+
+@property BOOL nextGenUI;
+@property BOOL miniaturizeOnCopy;
+@property BOOL quickRevealWithOptionKey;
+@property BOOL markdownNotes;
+@property BOOL showPasswordGenInTray;
 
 @end

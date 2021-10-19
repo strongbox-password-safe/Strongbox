@@ -169,7 +169,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         
         NSError* error;
         [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
-        NSLog(@"Deleted: [%@]-[%@]", path, error);
+
     }
 }
 

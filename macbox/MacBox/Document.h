@@ -19,14 +19,17 @@ extern NSString* const kModelUpdateNotificationLongRunningOperationDone;
 extern NSString* const kModelUpdateNotificationFullReload;
 extern NSString* const kModelUpdateNotificationDatabaseChangedByOther;
 extern NSString* const kModelUpdateNotificationSyncDone;
-
 extern NSString* const kNotificationUserInfoParamKey;
-
 extern NSString* const kNotificationUserInfoLongRunningOperationStatus;
+
 @interface Document : NSDocument
 
 @property (readonly) ViewModel* viewModel;
 @property (readonly, nullable) DatabaseMetadata* databaseMetadata;
+@property (nullable) NSString* selectedItem;
+@property BOOL wasJustLocked; 
+
+- (void)lock:(NSString*)selectedItem;
 
 
 - (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors

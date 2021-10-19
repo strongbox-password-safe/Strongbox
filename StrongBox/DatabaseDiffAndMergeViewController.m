@@ -43,13 +43,13 @@
     [super viewDidLoad];
     
     self.navigationController.navigationBarHidden = NO;
-    self.navigationController.toolbarHidden = !self.isMergeDiff; 
+    self.navigationController.toolbarHidden = !self.isCompareForMerge; 
     self.navigationItem.hidesBackButton = NO;
     
     self.browseCellHelperFirstDatabase = [[BrowseTableViewCellHelper alloc] initWithModel:self.firstDatabase tableView:self.tableView];
     self.browseCellHelperSecondDatabase = [[BrowseTableViewCellHelper alloc] initWithModel:self.secondDatabase tableView:self.tableView];
         
-    if ( !self.isMergeDiff ) {
+    if ( !self.isCompareForMerge ) {
         self.navigationItem.title = NSLocalizedString(@"diff_nav_title_comparison_title", @"Comparison Results");
     }
     
@@ -61,8 +61,9 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss];
             
-            if (self.mergeIsPossible) {
-                NSString* title = NSLocalizedString(@"generic_action_merge", @"Merge");
+            if ( self.mergeIsPossible ) {
+                NSString* title = self.diffSummary.diffExists ? NSLocalizedString(@"generic_action_merge", @"Merge") : NSLocalizedString(@"generic_done", @"Done");
+                
                 self.navigationController.navigationBar.topItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleDone target:self action:@selector(onMergeOrDone:)];
             }
             
@@ -72,7 +73,10 @@
 }
 
 - (BOOL)mergeIsPossible {
-    return self.isMergeDiff && self.diffSummary.diffExists && AppPreferences.sharedInstance.isProOrFreeTrial;
+    
+    
+    
+    return self.isCompareForMerge && AppPreferences.sharedInstance.isProOrFreeTrial;
 }
 
 - (DiffSummary*)diff {
@@ -174,19 +178,24 @@
                 cell.accessoryType = UITableViewCellAccessoryNone;
             }
             else {
-                if (!AppPreferences.sharedInstance.isProOrFreeTrial) {
+                if ( !AppPreferences.sharedInstance.isProOrFreeTrial ) {
                     cell.textLabel.text = NSLocalizedString(@"generic_pro_feature_only_please_upgrade", @"Pro feature only. Please Upgrade.");
                     cell.imageView.image = [UIImage imageNamed:@"rocket"];
                     cell.imageView.tintColor = nil;
                     cell.accessoryType = UITableViewCellAccessoryNone;
                 }
                 else {
-                    if (self.isMergeDiff) {
+                    if (self.isCompareForMerge) {
                         if (self.diffSummary.diffExists) {
                             cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"merge_result_will_lead_to_percentage_difference_fmt", @"Merge will lead to a %0.1f%% difference."), self.diffSummary.differenceMeasure * 100.0f];
                         }
                         else {
-                            cell.textLabel.text = NSLocalizedString(@"merge_result_databases_identical", @"Identical databases. Merge will have no effect.");
+                            if ( self.isSyncInitiated ) {
+                                cell.textLabel.text = NSLocalizedString(@"merge_result_databases_identical_sync_initiated", @"Merge OK. Tap Done to Continue.");
+                            }
+                            else {
+                                cell.textLabel.text = NSLocalizedString(@"merge_result_databases_identical", @"No changes to merge into first.");
+                            }
                         }
                     }
                     else {
@@ -204,7 +213,7 @@
             }
         }
         else {
-            cell.textLabel.text = self.isMergeDiff ?
+            cell.textLabel.text = self.isCompareForMerge ?
                 NSLocalizedString(@"merge_result_databases_properties_will_change", @"Some database properties will change.") :
                 NSLocalizedString(@"diff_result_databases_properties_different", @"Database properties are different.");
             cell.imageView.image = [UIImage imageNamed:@"list"];
@@ -260,23 +269,23 @@
         return NSLocalizedString(@"diff_view_section_header_summary", @"Summary");
     }
     else if (section == 1) {
-        NSString* fmt = self.isMergeDiff ? NSLocalizedString(@"diff_view_section_header_entry_will_be_changed_count_fmt", @"Will be Changed (%lu)") : NSLocalizedString(@"diff_view_section_header_entry_differences_fmt", @"Items with Differences (%lu)");
+        NSString* fmt = self.isCompareForMerge ? NSLocalizedString(@"diff_view_section_header_entry_will_be_changed_count_fmt", @"Will be Changed (%lu)") : NSLocalizedString(@"diff_view_section_header_entry_differences_fmt", @"Items with Differences (%lu)");
         return [NSString stringWithFormat:fmt, (unsigned long)self.willBeChangedOrEdited.count];
     }
     else if (section == 2) {
-        NSString* fmt = self.isMergeDiff ? NSLocalizedString(@"diff_view_section_header_entry_will_be_added_count_fmt", @"Will be Added (%lu)") : NSLocalizedString(@"diff_view_section_header_only_in_second_fmt", @"Only in Second Database (%lu)");
+        NSString* fmt = self.isCompareForMerge ? NSLocalizedString(@"diff_view_section_header_entry_will_be_added_count_fmt", @"Will be Added (%lu)") : NSLocalizedString(@"diff_view_section_header_only_in_second_fmt", @"Only in Second Database (%lu)");
         return [NSString stringWithFormat:fmt, (unsigned long)self.willBeAddedOrOnlyInSecond.count];
     }
     else if (section == 3) {
-        NSString* fmt = self.isMergeDiff ? NSLocalizedString(@"diff_view_section_header_entry_will_be_moved_count_fmt", @"Will be Moved (%lu)") : NSLocalizedString(@"diff_view_section_header_items_in_different_loc_fmt", @"Items in Different Locations (%lu)");
+        NSString* fmt = self.isCompareForMerge ? NSLocalizedString(@"diff_view_section_header_entry_will_be_moved_count_fmt", @"Will be Moved (%lu)") : NSLocalizedString(@"diff_view_section_header_items_in_different_loc_fmt", @"Items in Different Locations (%lu)");
         return [NSString stringWithFormat:fmt, (unsigned long)self.willBeMovedOrDifferentLocation.count];
     }
     else if (section == 4) {
-        NSString* fmt = self.isMergeDiff ? NSLocalizedString(@"diff_view_section_header_entry_will_be_deleted_count_fmt", @"Will be Deleted (%lu)") : NSLocalizedString(@"diff_view_section_header_only_in_first_fmt", @"Only in First Database (%lu)");
+        NSString* fmt = self.isCompareForMerge ? NSLocalizedString(@"diff_view_section_header_entry_will_be_deleted_count_fmt", @"Will be Deleted (%lu)") : NSLocalizedString(@"diff_view_section_header_only_in_first_fmt", @"Only in First Database (%lu)");
         return [NSString stringWithFormat:fmt, (unsigned long)self.willBeDeletedOrOnlyInFirst.count];
     }
     else if (section == 5) {
-        NSString* fmt = self.isMergeDiff ? NSLocalizedString(@"diff_view_section_header_entry_history_will_change_count_fmt", @"History will Change (%lu)") : NSLocalizedString(@"diff_view_section_header_historical_diffs_fmt", @"Items with Historical Differences (%lu)");
+        NSString* fmt = self.isCompareForMerge ? NSLocalizedString(@"diff_view_section_header_entry_history_will_change_count_fmt", @"History will Change (%lu)") : NSLocalizedString(@"diff_view_section_header_historical_diffs_fmt", @"Items with Historical Differences (%lu)");
         return [NSString stringWithFormat:fmt, (unsigned long)self.willChangeHistoryOrHasDifferentHistory.count];
     }
     
@@ -402,7 +411,7 @@
         vc.diffPair = sender;
         vc.firstDatabase = self.firstDatabase;
         vc.secondDatabase = self.secondDatabase;
-        vc.isMergeDiff = self.isMergeDiff;
+        vc.isMergeDiff = self.isCompareForMerge;
     }
 }
 
@@ -411,7 +420,7 @@
 }
 
 - (IBAction)onMergeOrDone:(id)sender {
-    self.onDone( self.mergeIsPossible && self.isMergeDiff, self.firstDatabase, self.secondDatabase );
+    self.onDone( self.mergeIsPossible && self.isCompareForMerge, self.firstDatabase, self.secondDatabase );
 }
 
 @end

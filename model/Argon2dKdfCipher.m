@@ -14,4 +14,8 @@
     return [super initWithDefaults:NO];
 }
 
+- (instancetype)initWithMemory:(uint64_t)memory parallelism:(uint32_t)parallelism iterations:(uint64_t)iterations {
+    return [super initWithArgon2id:NO memory:memory parallelism:parallelism iterations:iterations];
+}
+
 @end

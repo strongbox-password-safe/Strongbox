@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface ClickableImageView : NSImageView
 
 @property BOOL clickable;
-@property (copy)void (^onClick)(void);
+@property (copy) void (^onClick)(void);
 @property BOOL showClickableBorder;
 
 @end

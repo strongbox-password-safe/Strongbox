@@ -68,7 +68,6 @@ static NSString* const kMigratedOfflineDetectedBehaviour = @"migratedOfflineDete
 
 
 
-
 static NSString* const kLaunchCountKey = @"launchCount";
 
 static NSString* const kiCloudWasOn = @"iCloudWasOn";
@@ -142,6 +141,9 @@ static NSString* const kDuplicateItemReferenceUsername = @"duplicateItemReferenc
 
 static NSString* const kDuplicateItemEditAfterwards = @"duplicateItemEditAfterwards";
 static NSString* const kMigratedConnections = @"migratedConnections";
+static NSString* const kDisableThirdPartyStorageOptions = @"disableThirdPartyStorageOptions";
+static NSString* const kSuppressAppBackgroundTriggers = @"suppressAppBackgroundTriggers";
+static NSString* const kMarkdownNotes = @"markdownNotes";
 
 @implementation AppPreferences
 
@@ -183,6 +185,30 @@ static NSString* const kMigratedConnections = @"migratedConnections";
 }
 
 
+
+- (BOOL)markdownNotes {
+    return [self getBool:kMarkdownNotes];
+}
+
+- (void)setMarkdownNotes:(BOOL)markdownNotes {
+    [self setBool:kMarkdownNotes value:markdownNotes];
+}
+
+- (BOOL)suppressAppBackgroundTriggers {
+    return [self getBool:kSuppressAppBackgroundTriggers];
+}
+
+- (void)setSuppressAppBackgroundTriggers:(BOOL)suppressAppBackgroundTriggers {
+    [self setBool:kSuppressAppBackgroundTriggers value:suppressAppBackgroundTriggers];
+}
+
+- (BOOL)disableThirdPartyStorageOptions {
+    return [self getBool:kDisableThirdPartyStorageOptions];
+}
+
+- (void)setDisableThirdPartyStorageOptions:(BOOL)disableThirdPartyStorageOptions {
+    [self setBool:kDisableThirdPartyStorageOptions value:disableThirdPartyStorageOptions];
+}
 
 - (BOOL)migratedConnections {
     return [self getBool:kMigratedConnections];
@@ -288,11 +314,11 @@ static NSString* const kMigratedConnections = @"migratedConnections";
     [self setBool:kUseMinimalDropboxScopes value:useMinimalDropboxScopes];
 }
 
-- (BOOL)disableNativeNetworkStorageOptions {
+- (BOOL)disableNetworkBasedFeatures {
     return [self getBool:kDisableNativeNetworkStorageOptions];
 }
 
-- (void)setDisableNativeNetworkStorageOptions:(BOOL)disableNativeNetworkStorageOptions {
+- (void)setDisableNetworkBasedFeatures:(BOOL)disableNativeNetworkStorageOptions {
     [self setBool:kDisableNativeNetworkStorageOptions value:disableNativeNetworkStorageOptions];
 }
 
@@ -459,15 +485,6 @@ static NSString* const kMigratedConnections = @"migratedConnections";
     [self.sharedAppGroupDefaults setObject:encodedObject forKey:kPasswordStrengthConfig];
     [self.sharedAppGroupDefaults synchronize];
 }
-
-- (BOOL)useBackgroundUpdates {
-    return YES;
-
-}
-
-
-
-
 
 - (BOOL)migratedOfflineDetectedBehaviour {
     return [self getBool:kMigratedOfflineDetectedBehaviour];
@@ -797,14 +814,6 @@ static NSString* const kMigratedConnections = @"migratedConnections";
     [self setBool:kHideTips value:hideTips];
 }
 
-- (BOOL)disallowAllBiometricId {
-    return NO;
-}
-
-- (BOOL)disallowAllPinCodeOpens {
-    return NO;
-}
-
 - (BOOL)clearClipboardEnabled {
     return [self getBool:kClearClipboardEnabled fallback:YES];
 }
@@ -889,9 +898,9 @@ static NSString* const kMigratedConnections = @"migratedConnections";
     return [self getBool:kInstantPinUnlocking fallback:YES];
 }
 
-
-
-
+- (void)setInstantPinUnlocking:(BOOL)instantPinUnlocking {
+    [self setBool:kInstantPinUnlocking value:instantPinUnlocking];
+}
 
 - (BOOL)iCloudOn {
     return [self getBool:kiCloudOn];

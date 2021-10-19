@@ -39,7 +39,7 @@ typedef NS_ENUM (NSUInteger, iCloudOnboardingMode) {
 - (BOOL)shouldDisplay {
 
 
-    if ( AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         return NO;
     }
 

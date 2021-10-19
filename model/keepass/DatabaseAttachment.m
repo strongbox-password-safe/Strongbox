@@ -146,8 +146,15 @@ static const BOOL kEncrypt = YES;
 
 - (void)createOutputPipeline:(BOOL)base64Decode gzipDecompress:(BOOL)gzipDecompress {
     NSOutputStream* outputFile = [NSOutputStream outputStreamToFileAtPath:self.encryptedSessionFilePath append:NO];
-    
-    NSOutputStream* ciphered = kEncrypt ? [[AesOutputStream alloc] initToOutputStream:outputFile encrypt:YES key:self.encryptionKey iv:self.encryptionIV] : outputFile;
+
+    NSOutputStream* ciphered;
+    if ( kEncrypt ) {
+        ciphered = [[AesOutputStream alloc] initToOutputStream:outputFile encrypt:YES key:self.encryptionKey iv:self.encryptionIV chainOpensAndCloses:YES];
+    }
+    else {
+        ciphered = outputFile;
+    }
+ 
     
     self.digested = [[Sha256PassThroughOutputStream alloc] initToOutputStream:ciphered];
     
@@ -256,10 +263,6 @@ static const BOOL kEncrypt = YES;
     return self.sha256Hex;
 }
 
-- (NSString *)description {
-    return [NSString stringWithFormat:@"Compressed: %d, Protected: %d, Size: %lu", self.compressed, self.protectedInMemory, (unsigned long)self.estimatedStorageBytes];
-}
-
 - (BOOL)isEqual:(id)object {
     if (object == nil) {
         return NO;
@@ -272,13 +275,14 @@ static const BOOL kEncrypt = YES;
     }
     
     DatabaseAttachment* other = (DatabaseAttachment*)object;
-    if ( self.compressed != other.compressed ) {
-        return NO;
-    }
     
-    if ( self.protectedInMemory != other.protectedInMemory ) {
-        return NO;
-    }
+
+
+
+
+
+
+
     
     if ( ![self.digestHash isEqualToString:other.digestHash] ) {
         return NO;
@@ -286,4 +290,9 @@ static const BOOL kEncrypt = YES;
     
     return YES;
 }
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"Compressed: %d, Protected: %d, Length = [%lu bytes], SHA256 = [%@]", self.compressed, self.protectedInMemory, (unsigned long)self.length, self.digestHash];
+}
+
 @end

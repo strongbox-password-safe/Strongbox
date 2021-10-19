@@ -61,6 +61,7 @@
     }
     else if ([withXmlElementName isEqualToString:kDeletedObjectsElementName]) {
         self.deletedObjects = completedObject;
+        return YES;
     }
     
     return NO;
@@ -74,7 +75,9 @@
     }
 
     if (self.rootGroup) {
-        [self.rootGroup writeXml:serializer];
+        @autoreleasepool {
+            [self.rootGroup writeXml:serializer];
+        }
     }
     
     if (self.deletedObjects) {

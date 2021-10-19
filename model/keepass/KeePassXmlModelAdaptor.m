@@ -62,6 +62,21 @@
         metadata.color = meta.color;
         metadata.entryTemplatesGroup = meta.entryTemplatesGroup;
         metadata.entryTemplatesGroupChanged = meta.entryTemplatesGroupChanged;
+        metadata.maintenanceHistoryDays = meta.maintenanceHistoryDays;
+        metadata.masterKeyChanged = meta.masterKeyChanged;
+        metadata.masterKeyChangeRec = meta.masterKeyChangeRec;
+        metadata.masterKeyChangeForce = meta.masterKeyChangeForce;
+        metadata.masterKeyChangeForceOnce = meta.masterKeyChangeForceOnce;
+        metadata.lastSelectedGroup = meta.lastSelectedGroup;
+        metadata.lastTopVisibleGroup = meta.lastTopVisibleGroup;
+        
+        if ( meta.memoryProtection ) {
+            metadata.protectTitle = meta.memoryProtection.protectTitle;
+            metadata.protectUsername = meta.memoryProtection.protectUsername;
+            metadata.protectPassword = meta.memoryProtection.protectPassword;
+            metadata.protectURL = meta.memoryProtection.protectURL;
+            metadata.protectNotes = meta.memoryProtection.protectNotes;
+        }
     }
     
     return metadata;
@@ -81,15 +96,7 @@
                               iconPool:(NSDictionary<NSUUID*, NodeIcon*>*)iconPool
                                  error:(NSError **)error {
     RootXmlDomainObject *ret = [[RootXmlDomainObject alloc] initWithDefaultsAndInstantiatedChildren:context];
-
-    Meta* originalMeta = databaseProperties.originalMeta;
-
-    if(originalMeta && originalMeta.unmanagedChildren) {
-        for (id<XmlParsingDomainObject> child in originalMeta.unmanagedChildren) {
-            [ret.keePassFile.meta addUnknownChildObject:child];
-        }
-    }
-
+    
     
 
     XmlStrongboxNodeModelAdaptor *adaptor = [[XmlStrongboxNodeModelAdaptor alloc] init];
@@ -123,6 +130,27 @@
     ret.keePassFile.meta.entryTemplatesGroup = databaseProperties.metadata.entryTemplatesGroup;
     ret.keePassFile.meta.entryTemplatesGroupChanged = databaseProperties.metadata.entryTemplatesGroupChanged;
 
+    ret.keePassFile.meta.maintenanceHistoryDays = databaseProperties.metadata.maintenanceHistoryDays;
+    ret.keePassFile.meta.masterKeyChanged = databaseProperties.metadata.masterKeyChanged;
+    ret.keePassFile.meta.masterKeyChangeRec = databaseProperties.metadata.masterKeyChangeRec;
+    ret.keePassFile.meta.masterKeyChangeForce = databaseProperties.metadata.masterKeyChangeForce;
+    ret.keePassFile.meta.masterKeyChangeForceOnce = databaseProperties.metadata.masterKeyChangeForceOnce;
+    ret.keePassFile.meta.lastSelectedGroup = databaseProperties.metadata.lastSelectedGroup;
+    ret.keePassFile.meta.lastTopVisibleGroup = databaseProperties.metadata.lastTopVisibleGroup;
+    
+    if (databaseProperties.metadata.protectTitle ||
+        databaseProperties.metadata.protectUsername ||
+        databaseProperties.metadata.protectPassword ||
+        databaseProperties.metadata.protectURL ||
+        databaseProperties.metadata.protectNotes ) {
+        ret.keePassFile.meta.memoryProtection = [[MemoryProtection alloc] initWithDefaultsAndInstantiatedChildren:XmlProcessingContext.standardV3Context];
+        ret.keePassFile.meta.memoryProtection.protectTitle = databaseProperties.metadata.protectTitle;
+        ret.keePassFile.meta.memoryProtection.protectUsername = databaseProperties.metadata.protectUsername;
+        ret.keePassFile.meta.memoryProtection.protectPassword = databaseProperties.metadata.protectPassword;
+        ret.keePassFile.meta.memoryProtection.protectURL = databaseProperties.metadata.protectURL;
+        ret.keePassFile.meta.memoryProtection.protectNotes = databaseProperties.metadata.protectNotes;
+    }
+    
     
 
     if (databaseProperties.deletedObjects.count && !ret.keePassFile.root.deletedObjects) {
@@ -151,12 +179,17 @@
         [ret.keePassFile.meta.customIconList.icons removeAllObjects];
     }
 
-    for (NSUUID* uuid in iconPool.allKeys) {
-        NodeIcon* ci = iconPool[uuid];
+    NSArray<NodeIcon*>* sortedIcons =[iconPool.allValues sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+        NodeIcon *n1 = obj1;
+        NodeIcon *n2 = obj2;
         
+        return [@(n1.preferredOrder) compare:@(n2.preferredOrder)];
+    }];
+    
+    for ( NodeIcon* ci in sortedIcons ) {
         CustomIcon *icon = [[CustomIcon alloc] initWithContext:[XmlProcessingContext standardV3Context]];
         
-        icon.uuid = uuid;
+        icon.uuid = ci.uuid;
         icon.data = ci.custom;
         icon.name = ci.name;
         icon.modified = ci.modified;
@@ -199,9 +232,15 @@
         if ( meta.customIconList.icons ) {
             NSArray<CustomIcon*> *icons = meta.customIconList.icons;
             NSMutableDictionary<NSUUID*, NodeIcon*> *ret = [NSMutableDictionary dictionaryWithCapacity:icons.count];
+            
+            int i = 0;
             for ( CustomIcon* icon in icons ) {
                 if ( icon.data != nil ) { 
-                    NodeIcon* nodeIcon = [NodeIcon withCustom:icon.data uuid:icon.uuid name:icon.name modified:icon.modified];
+                    
+
+                    
+                    NodeIcon* nodeIcon = [NodeIcon withCustom:icon.data uuid:icon.uuid name:icon.name modified:icon.modified preferredOrder:i++];
+                    
                     [ret setObject:nodeIcon forKey:icon.uuid];
                 }
             }

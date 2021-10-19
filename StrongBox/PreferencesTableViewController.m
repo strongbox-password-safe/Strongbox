@@ -77,6 +77,12 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    if (@available(iOS 11.0, *)) {
+        self.navigationController.navigationBar.prefersLargeTitles = YES;
+        self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeAlways;
+        [self.navigationController.navigationBar sizeToFit];
+    }
+    
     [self bindCloudSessions];
     [self bindAboutButton];
     [self bindHideTips];
@@ -262,14 +268,15 @@
                                                                             NSLocalizedString(@"prefs_vc_use_icloud_disabled", @"Use iCloud (Unavailable)");
     self.labelUseICloud.enabled = AppPreferences.sharedInstance.iCloudAvailable;
     
-#ifdef NO_3RD_PARTY_STORAGE_PROVIDERS 
-    [self cell:self.cellCloudSessions setHidden:YES];
-    [self reloadDataAnimated:NO];
-#endif
+    if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
+        [self cell:self.cellCloudSessions setHidden:YES];
+    }
     
-    if ( AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         [self cell:self.cellUseICloud setHidden:YES];
     }
+    
+    [self reloadDataAnimated:NO];
 }
 
 - (void)bindHideTips {

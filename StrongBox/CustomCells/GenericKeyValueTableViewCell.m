@@ -95,7 +95,15 @@
                                                   action:@selector(onAuditLabelTap)];
     [self.labelAudit addGestureRecognizer:tapGesture];
 
-    self.imageAuditError.image = [UIImage imageNamed:@"security_checked"];
+    UIImage* auditImage;
+    if (@available(iOS 13.0, *)) {
+        auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
+    }
+    else {
+        auditImage = [UIImage imageNamed:@"security_checked"];
+    }
+    
+    self.imageAuditError.image = auditImage;
     self.imageAuditError.userInteractionEnabled = YES;
     UITapGestureRecognizer *imageAuditErrorGesture =
           [[UITapGestureRecognizer alloc] initWithTarget:self
@@ -202,7 +210,13 @@ rightButtonImage:rightButtonImage
               showStrength:(BOOL)showStrength {
     
         
-    UIImage* image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
+    UIImage *image;
+    if (@available(iOS 13.0, *)) {
+        image = [UIImage systemImageNamed:concealed ? @"eye" : @"eye.slash"];
+    }
+    else {
+        image = [UIImage imageNamed:concealed ? @"visible" : @"invisible"];
+    }
 
     [self setKey:key
            value:value
@@ -430,7 +444,14 @@ suggestionProvider:(SuggestionProvider)suggestionProvider
 - (void)setIsConcealed:(BOOL)isConcealed {
     self.concealed = isConcealed;
     
-    self.rightButtonImage = [UIImage imageNamed:self.concealed ? @"visible" : @"invisible"];
+    UIImage *image;
+    if (@available(iOS 13.0, *)) {
+        image = [UIImage systemImageNamed:self.concealed ? @"eye" : @"eye.slash"];
+    }
+    else {
+        image = [UIImage imageNamed:self.concealed ? @"visible" : @"invisible"];
+    }
+    self.rightButtonImage = image;
 
     [self bindRightButton];
     [self bindValueText];

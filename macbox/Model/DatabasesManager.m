@@ -19,7 +19,6 @@
 @end
 
 static NSString* kDatabasesDefaultsKey = @"databases";
-static NSString* const kMigratedToNewStore = @"migratedDatabasesToNewStore";
 
 NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotification";
 

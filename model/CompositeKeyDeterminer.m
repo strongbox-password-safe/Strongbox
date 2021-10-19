@@ -102,7 +102,7 @@ static const int kMaxFailedPinAttempts = 3;
     self.completion = completion;
 
     if ( self.isAutoFillConvenienceAutoLockPossible ) {
-        NSLog(@"XXXX - AutoFill and within convenience auto unlock timeout. Will auto open...");
+        NSLog(@"AutoFill and within convenience auto unlock timeout. Will auto open...");
         
         [self onGotCredentials:self.database.autoFillConvenienceAutoUnlockPassword
                keyFileBookmark:self.database.keyFileBookmark
@@ -113,32 +113,29 @@ static const int kMaxFailedPinAttempts = 3;
         return;
     }
 
-    
-    
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_loading", @"Loading...")];
-    
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0L), ^{
-        [self continueGetCredentialsInBackground];
-    });
-}
-
-- (void)continueGetCredentialsInBackground {
-    BOOL convenienceUnlockIsPossible = !self.noConvenienceUnlock &&
+    BOOL convenienceUnlockIsDesirable = !self.noConvenienceUnlock &&
                                         self.database.isEnrolledForConvenience &&
                                         AppPreferences.sharedInstance.isProOrFreeTrial &&
                                         !( self.isAutoFillOpen && self.database.mainAppAndAutoFillYubiKeyConfigsIncoherent ); 
+    
+    
+    
+    if ( self.database.convenienceExpiryPeriod == 0 && self.isAutoFillOpen ) {
+        convenienceUnlockIsDesirable = NO;
+    }
+    
+    
     
     BOOL askForBio = NO;
     BOOL askForPin = NO;
     BOOL bioDbHasChanged = NO;
 
-    if ( convenienceUnlockIsPossible ) {
+    if ( convenienceUnlockIsDesirable ) {
         BOOL biometricPossible = self.database.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
-        BOOL biometricAllowed = !AppPreferences.sharedInstance.disallowAllBiometricId;
         
-        NSLog(@"Open Database: Biometric Possible [%d] - Biometric Available [%d]", biometricPossible, biometricAllowed);
+
                 
-        if ( biometricPossible && biometricAllowed ) {
+        if ( biometricPossible ) {
             bioDbHasChanged = [BiometricsManager.sharedInstance isBiometricDatabaseStateHasChanged:self.isAutoFillOpen];
 
             if( !bioDbHasChanged) {
@@ -146,36 +143,50 @@ static const int kMaxFailedPinAttempts = 3;
             }
         }
 
-        if( !AppPreferences.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil ) {
+        if( self.database.conveniencePin != nil ) {
             askForPin = YES;
         }
     }
-    
-    NSString* pw = self.database.convenienceMasterPassword;
-    
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [SVProgressHUD dismiss];
-        
-        BOOL convenienceUnlock = askForPin || askForBio;
-        BOOL expired = (pw == nil) && (self.database.conveniencePasswordHasExpired) && (self.database.convenienceExpiryPeriod != -1); 
-        
-        BOOL displayConvenienceExpiryMessage = convenienceUnlock && expired;
 
-        
+    if ( bioDbHasChanged ) {
+        [self clearBioDbAndPrompManual];
+    }
+    else {
+        BOOL convenienceUnlockDesiredAndPossible = askForPin || askForBio;
 
-        if ( bioDbHasChanged ) {
-            [self clearBioDbAndPrompManual];
-        }
-        else if ( displayConvenienceExpiryMessage ) {
-            [self displayConvenienceExpiryMessage];
-        }
-        else if ( convenienceUnlock ) {
-            [self beginConvenienceUnlock:pw askForBio:askForBio askForPin:askForPin];
+        if ( convenienceUnlockDesiredAndPossible ) {
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            NSString* pw = self.database.convenienceMasterPassword; 
+            
+            
+            
+            BOOL expired = self.database.conveniencePasswordHasExpired; 
+            
+            BOOL displayConvenienceExpiryMessage = convenienceUnlockDesiredAndPossible && expired;
+            
+            if ( displayConvenienceExpiryMessage ) {
+                [self displayConvenienceExpiryMessage];
+            }
+            else {
+                [self beginConvenienceUnlock:pw askForBio:askForBio askForPin:askForPin];
+            }
         }
         else {
             [self promptForManualCredentials];
         }
-    });
+    }
 }
 
 - (void)beginConvenienceUnlock:(NSString*)password askForBio:(BOOL)askForBio askForPin:(BOOL)askForPin {
@@ -196,7 +207,7 @@ static const int kMaxFailedPinAttempts = 3;
 }
 
 - (void)displayConvenienceExpiryMessage {
-    NSLog(@"XXXX - displayConvenienceExpiryMessage");
+    NSLog(@"displayConvenienceExpiryMessage");
     
     dispatch_async(dispatch_get_main_queue(), ^{
         if ( self.database.showConvenienceExpiryMessage ) {
@@ -386,7 +397,7 @@ static const int kMaxFailedPinAttempts = 3;
             [BiometricsManager.sharedInstance recordBiometricDatabaseState:self.isAutoFillOpen]; 
         }
 
-        if(!AppPreferences.sharedInstance.disallowAllPinCodeOpens && self.database.conveniencePin != nil) {
+        if( self.database.conveniencePin != nil ) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self promptForConveniencePin:password];
             });

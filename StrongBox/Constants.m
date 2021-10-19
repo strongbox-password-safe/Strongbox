@@ -22,6 +22,7 @@ const size_t kMaxAttachmentTableviewIconImageSize = 4 * 1024 * 1024;
 
 static NSString * const kProEditionBundleId = @"com.markmcguill.strongbox.pro";
 static NSString * const kScotusEditionBundleId = @"com.markmcguill.strongbox.scotus";
+static NSString * const kGrapheneEditionBundleId = @"com.markmcguill.strongbox.graphene";
 
 NSString* const kDefaultKeePassEmailFieldKey = @"Email";
 
@@ -37,6 +38,10 @@ NSString* const kDefaultKeePassEmailFieldKey = @"Email";
 
 + (NSString *)scotusEditionBundleId {
     return kScotusEditionBundleId;
+}
+
++ (NSString *)grapheneEditionBundleId {
+    return kGrapheneEditionBundleId;
 }
 
 @end

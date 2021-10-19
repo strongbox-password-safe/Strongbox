@@ -171,106 +171,108 @@ const static NSSet<NSString*> *wellKnownKeys;
 }
 
 - (BOOL)writeXml:(id<IXmlSerializer>)serializer {
-    if(![serializer beginElement:self.originalElementName
-                            text:self.originalText
-                      attributes:self.originalAttributes]) {
-        return NO;
-    }
-    
-    if (![serializer writeElement:kUuidElementName uuid:self.uuid]) return NO;
-    if (self.icon && ![serializer writeElement:kIconIdElementName integer:self.icon.integerValue]) return NO;
-    if (self.customIcon && ![serializer writeElement:kCustomIconUuidElementName uuid:self.customIcon]) return NO;
-    
-    for (NSString* key in self.strings.allKeys) {
-        StringValue* value = self.strings[key];
-        
-        
-        
-        
-        
-
-        if(value.protected == NO && value.value.length == 0 && [wellKnownKeys containsObject:key]) {
-            continue;
-        }
-
-        if(![serializer beginElement:kStringElementName]) {
+    @autoreleasepool {
+        if(![serializer beginElement:self.originalElementName
+                                text:self.originalText
+                          attributes:self.originalAttributes]) {
             return NO;
         }
         
-        if(![serializer writeElement:kKeyElementName text:key]) return NO;
+        if (![serializer writeElement:kUuidElementName uuid:self.uuid]) return NO;
+        if (self.icon && ![serializer writeElement:kIconIdElementName integer:self.icon.integerValue]) return NO;
+        if (self.customIcon && ![serializer writeElement:kCustomIconUuidElementName uuid:self.customIcon]) return NO;
         
+        for (NSString* key in self.strings.allKeys) {
+            StringValue* value = self.strings[key];
+            
+            
+            
+            
+            
+
+            if(value.protected == NO && value.value.length == 0 && [wellKnownKeys containsObject:key]) {
+                continue;
+            }
+
+            if(![serializer beginElement:kStringElementName]) {
+                return NO;
+            }
+            
+            if(![serializer writeElement:kKeyElementName text:key]) return NO;
+            
+            
+            
+            if(![serializer writeElement:kValueElementName text:value.value protected:value.protected trimWhitespace:NO]) {
+                return NO;
+            }
+            
+            [serializer endElement];
+        }
         
+        if(self.binaries) {
+            for (Binary *binary in self.binaries) {
+                [binary writeXml:serializer];
+            }
+        }
         
-        if(![serializer writeElement:kValueElementName text:value.value protected:value.protected trimWhitespace:NO]) {
+        if(self.times && ![self.times writeXml:serializer]) return NO;
+        
+        if (self.tags && self.tags.count) {
+            NSArray<NSString*>* trimmed = [self.tags.allObjects map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
+                return [Utils trim:obj];
+            }];
+            
+            NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
+                return obj.length > 0;
+            }];
+
+            NSString* str = [[NSSet setWithArray:filtered].allObjects componentsJoinedByString:@";"];
+            if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
+        }
+        
+        if ( self.customData && self.customData.dictionary.count ) {
+            if ( ![self.customData writeXml:serializer] ) return NO;
+        }
+
+        if ( self.foregroundColor.length ) {
+            if ( ![serializer writeElement:kForegroundColorElementName text:self.foregroundColor] ) return NO;
+        }
+        
+        if ( self.backgroundColor.length ) {
+            if ( ![serializer writeElement:kBackgroundColorElementName text:self.backgroundColor] ) return NO;
+        }
+            
+        if ( self.overrideURL.length ) {
+            if ( ![serializer writeElement:kOverrideURLElementName text:self.overrideURL] ) return NO;
+        }
+        
+        if ( !self.qualityCheck ) { 
+            if ( ![serializer writeElement:kQualityCheckElementName boolean:self.qualityCheck] ) return NO;
+        }
+        
+        if ( self.autoType ) {
+            
+            if (!self.autoType.enabled || self.autoType.dataTransferObfuscation != 0 || self.autoType.defaultSequence.length || self.autoType.asssociations.count) {
+                if ( ![self.autoType writeXml:serializer] ) return NO;
+            }
+        }
+        
+        if(self.history && self.history.entries && self.history.entries.count) {
+            [self.history writeXml:serializer];
+        }
+        
+        if ( self.previousParentGroup ) {
+            if ( ![serializer writeElement:kPreviousParentGroupElementName uuid:self.previousParentGroup]) return NO;
+        }
+        
+        if(![super writeUnmanagedChildren:serializer]) {
             return NO;
         }
         
         [serializer endElement];
-    }
-    
-    if(self.binaries) {
-        for (Binary *binary in self.binaries) {
-            [binary writeXml:serializer];
-        }
-    }
-    
-    if(self.times && ![self.times writeXml:serializer]) return NO;
-    
-    if (self.tags && self.tags.count) {
-        NSArray<NSString*>* trimmed = [self.tags.allObjects map:^id _Nonnull(NSString * _Nonnull obj, NSUInteger idx) {
-            return [Utils trim:obj];
-        }];
         
-        NSArray<NSString*>* filtered = [trimmed filter:^BOOL(NSString * _Nonnull obj) {
-            return obj.length > 0;
-        }];
-
-        NSString* str = [[NSSet setWithArray:filtered].allObjects componentsJoinedByString:@";"];
-        if ( ![serializer writeElement:kTagsElementName text:str] ) return NO;
+        return YES;
     }
-    
-    if ( self.customData && self.customData.dictionary.count ) {
-        if ( ![self.customData writeXml:serializer] ) return NO;
-    }
-
-    if ( self.foregroundColor.length ) {
-        if ( ![serializer writeElement:kForegroundColorElementName text:self.foregroundColor] ) return NO;
-    }
-    
-    if ( self.backgroundColor.length ) {
-        if ( ![serializer writeElement:kBackgroundColorElementName text:self.backgroundColor] ) return NO;
-    }
-        
-    if ( self.overrideURL.length ) {
-        if ( ![serializer writeElement:kOverrideURLElementName text:self.overrideURL] ) return NO;
-    }
-    
-    if ( !self.qualityCheck ) { 
-        if ( ![serializer writeElement:kQualityCheckElementName boolean:self.qualityCheck] ) return NO;
-    }
-    
-    if ( self.autoType ) {
-        
-        if (!self.autoType.enabled || self.autoType.dataTransferObfuscation != 0 || self.autoType.defaultSequence.length || self.autoType.asssociations.count) {
-            if ( ![self.autoType writeXml:serializer] ) return NO;
-        }
-    }
-    
-    if(self.history && self.history.entries && self.history.entries.count) {
-        [self.history writeXml:serializer];
-    }
-    
-    if ( self.previousParentGroup ) {
-        if ( ![serializer writeElement:kPreviousParentGroupElementName uuid:self.previousParentGroup]) return NO;
-    }
-    
-    if(![super writeUnmanagedChildren:serializer]) {
-        return NO;
-    }
-    
-    [serializer endElement];
-    
-    return YES;
 }
 
 

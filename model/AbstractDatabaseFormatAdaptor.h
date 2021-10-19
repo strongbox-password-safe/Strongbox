@@ -13,8 +13,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^OpenCompletionBlock)(BOOL userCancelled, DatabaseModel*_Nullable database, NSError*_Nullable error);
-typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error);
+typedef void (^OpenCompletionBlock)(BOOL userCancelled, DatabaseModel*_Nullable database, NSError*_Nullable innerStreamError, NSError*_Nullable error);
+typedef void (^SaveCompletionBlock)(BOOL userCancelled, NSString*_Nullable debugXml, NSError*_Nullable error);
 
 @protocol AbstractDatabaseFormatAdaptor <NSObject>
 
@@ -30,7 +30,7 @@ xmlDumpStream:(NSOutputStream*_Nullable)xmlDumpStream
 sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
   completion:(OpenCompletionBlock)completion;
 
-+ (void)save:(DatabaseModel*)database completion:(SaveCompletionBlock)completion;
++ (void)save:(DatabaseModel*)database outputStream:(NSOutputStream*)outputStream completion:(SaveCompletionBlock)completion;
 
 @property (nonatomic, class, readonly) DatabaseFormat format;
 @property (nonatomic, class, readonly) NSString* fileExtension;

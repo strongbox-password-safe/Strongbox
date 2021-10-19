@@ -34,8 +34,18 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.customIcons = self.iconPool ? self.iconPool.allValues : @[];
-        
+    if ( self.iconPool ) {
+        self.customIcons = [self.iconPool.allValues sortedArrayUsingComparator:^NSComparisonResult(id  _Nonnull obj1, id  _Nonnull obj2) {
+            NodeIcon *n1 = obj1;
+            NodeIcon *n2 = obj2;
+            
+            return [@(n1.preferredOrder) compare:@(n2.preferredOrder)];
+        }];
+    }
+    else {
+        self.customIcons = @[];
+    }
+    
     self.collectionView.dataSource = self;
     self.collectionView.delegate = self;
 

@@ -76,7 +76,7 @@
 - (void)refreshTableView {
     DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
 
-    self.items = [BackupsManager.sharedInstance getAvailableBackups:database];
+    self.items = [BackupsManager.sharedInstance getAvailableBackups:database all:NO];
 
     [self.tableView reloadData];
 }

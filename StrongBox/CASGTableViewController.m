@@ -540,13 +540,28 @@
     
     
     [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
-    [checkbox setImage:[UIImage imageNamed:@"visible"] forState:UIControlStateNormal];
-    [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateSelected];
-    [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateHighlighted];
-    [checkbox setAdjustsImageWhenHighlighted:TRUE];
-    checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); 
-                                                              
-                                                              
+    
+    UIImage *concealed;
+    UIImage *revealed;
+    
+    if (@available(iOS 13.0, *)) {
+        concealed = [UIImage systemImageNamed:@"eye"];
+        revealed = [UIImage systemImageNamed:@"eye.slash"];
+    }
+    else {
+        concealed = [UIImage imageNamed:@"visible"];
+        revealed = [UIImage imageNamed:@"invisible"];
+
+        [checkbox setAdjustsImageWhenHighlighted:TRUE];
+        checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); 
+                                                                  
+                                                                  
+
+    }
+    
+    [checkbox setImage:concealed forState:UIControlStateNormal];
+    [checkbox setImage:revealed forState:UIControlStateSelected];
+    [checkbox setImage:revealed forState:UIControlStateHighlighted];
     
     
     [textField setClearButtonMode:UITextFieldViewModeAlways];

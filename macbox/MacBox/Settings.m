@@ -53,6 +53,8 @@ static NSString* const kOutlineViewEditableFieldsAreReadonly = @"outlineViewEdit
 static NSString* const kConcealEmptyProtectedFields = @"concealEmptyProtectedFields";
 static NSString* const kShowCustomFieldsOnQuickView = @"showCustomFieldsOnQuickView";
 static NSString* const kPasswordGenerationConfig = @"passwordGenerationConfig";
+static NSString* const kTrayPasswordGenerationConfig = @"trayPasswordGenerationConfig";
+
 static NSString* const kAutoPromptForTouchIdOnActivate = @"autoPromptForTouchIdOnActivate";
 static NSString* const kShowSystemTrayIcon = @"showSystemTrayIcon";
 static NSString* const kFavIconDownloadOptions = @"favIconDownloadOptions";
@@ -66,7 +68,7 @@ static NSString* const kAllowEmptyOrNoPasswordEntry = @"allowEmptyOrNoPasswordEn
 static NSString* const kColorizePasswords = @"colorizePasswords";
 static NSString* const kColorizeUseColorBlindPalette = @"colorizeUseColorBlindPalette";
 static NSString* const kClipboardHandoff = @"clipboardHandoff";
-static NSString* const kMigratedToNewSettings = @"migratedToNewSettings";
+
 static NSString* const kShowAdvancedUnlockOptions = @"showAdvancedUnlockOptions";
 static NSString* const kStartWithSearch = @"startWithSearch";
 static NSString* const kShowDatabasesManagerOnCloseAllWindows = @"showDatabasesManagerOnCloseAllWindows";
@@ -79,6 +81,10 @@ static NSString* const kHideDockIconOnAllMinimized = @"hideDockIconOnAllMinimize
 static NSString* const kMigratedConnections = @"migratedConnections";
 static NSString* const kCloseManagerOnLaunch = @"closeManagerOnLaunch";
 static NSString* const kMakeLocalRollingBackups = @"makeLocalRollingBackups";
+static NSString* const kMiniaturizeOnCopy = @"miniaturizeOnCopy";
+static NSString* const kQuickRevealWithOptionKey = @"quickRevealWithOptionKey";
+static NSString* const kMarkdownNotes = @"markdownNotes";
+static NSString* const kShowPasswordGenInTray = @"showPasswordGenInTray";
 
 
 
@@ -98,42 +104,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
     return sharedInstance;
 }
 
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        [self migrateToNewStore];
-    }
-    return self;
-}
-
-- (BOOL)migratedToNewStore {
-    NSNumber* obj = [self.sharedAppGroupDefaults objectForKey:kMigratedToNewSettings];
-    return obj != nil ? obj.boolValue : NO;
-}
-
-- (void)setMigratedToNewStore:(BOOL)migratedToNewStore {
-    [self.sharedAppGroupDefaults setBool:migratedToNewStore forKey:kMigratedToNewSettings];
-    [self.sharedAppGroupDefaults synchronize];
-}
-
-- (void)migrateToNewStore {
-#ifndef IS_APP_EXTENSION
-    if (self.migratedToNewStore) {
-
-        return;
-    }
-    
-    NSArray *keys = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys];
-    for(NSString* key in keys){
-        id value = [[NSUserDefaults standardUserDefaults] valueForKey:key];
-        NSLog(@"Migrating... value: %@ forKey: %@", [[NSUserDefaults standardUserDefaults] valueForKey:key],key);
-        [self.sharedAppGroupDefaults setValue:value forKey:key];
-    }
-
-    self.migratedToNewStore = YES;
-#endif
-}
-
 - (NSString *)appGroupName {
     return kDefaultAppGroupName;
 }
@@ -149,7 +119,7 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 - (NSUserDefaults*)userDefaults {
-    return self.sharedAppGroupDefaults; 
+    return self.sharedAppGroupDefaults;
 }
 
 - (BOOL)getBool:(NSString*)key {
@@ -171,6 +141,46 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)showPasswordGenInTray {
+    return [self getBool:kShowPasswordGenInTray fallback:YES];
+}
+
+- (void)setShowPasswordGenInTray:(BOOL)showPasswordGenInTray {
+    [self setBool:kShowPasswordGenInTray value:showPasswordGenInTray];
+}
+
+- (BOOL)markdownNotes {
+    return [self getBool:kMarkdownNotes];
+}
+
+- (void)setMarkdownNotes:(BOOL)markdownNotes {
+    [self setBool:kMarkdownNotes value:markdownNotes];
+}
+
+- (BOOL)quickRevealWithOptionKey {
+    return [self getBool:kQuickRevealWithOptionKey fallback:YES]; 
+}
+
+- (void)setQuickRevealWithOptionKey:(BOOL)quickRevealWithOptionKey {
+    [self setBool:kQuickRevealWithOptionKey value:quickRevealWithOptionKey];
+}
+
+- (BOOL)miniaturizeOnCopy {
+    return [self getBool:kMiniaturizeOnCopy fallback:NO];
+}
+
+- (void)setMiniaturizeOnCopy:(BOOL)miniaturizeOnCopy {
+    [self setBool:kMiniaturizeOnCopy value:miniaturizeOnCopy];
+}
+
+- (BOOL)nextGenUI {
+    return NO;
+}
+
+- (void)setNextGenUI:(BOOL)nextGenUI {
+    
+}
 
 - (BOOL)makeLocalRollingBackups {
     return [self getBool:kMakeLocalRollingBackups fallback:YES];
@@ -369,6 +379,24 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (void)setPasswordGenerationConfig:(PasswordGenerationConfig *)passwordGenerationConfig {
     NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:passwordGenerationConfig];
     [self.userDefaults setObject:encodedObject forKey:kPasswordGenerationConfig];
+    [self.userDefaults synchronize];
+}
+
+- (PasswordGenerationConfig *)trayPasswordGenerationConfig {
+    NSData *encodedObject = [self.userDefaults objectForKey:kTrayPasswordGenerationConfig];
+    
+    if(encodedObject == nil) {
+        return self.passwordGenerationConfig; 
+    }
+    
+    PasswordGenerationConfig *object = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    
+    return object;
+}
+
+- (void)setTrayPasswordGenerationConfig:(PasswordGenerationConfig *)trayPasswordGenerationConfig {
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:trayPasswordGenerationConfig];
+    [self.userDefaults setObject:encodedObject forKey:kTrayPasswordGenerationConfig];
     [self.userDefaults synchronize];
 }
 

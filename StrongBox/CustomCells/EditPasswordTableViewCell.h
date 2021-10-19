@@ -13,12 +13,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface EditPasswordTableViewCell : UITableViewCell
 
 @property NSString* password;
+@property BOOL concealPassword;
 
 @property (nonatomic, copy) void (^onPasswordEdited)(NSString* password);
 @property (nonatomic, copy) void (^onPasswordSettings)(void);
 @property BOOL showGenerationSettings;
 @property BOOL colorize;
-@property UIViewController* parentVc;
+@property (weak) UIViewController* parentVc;
 
 @end
 

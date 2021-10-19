@@ -4,3 +4,4 @@
 
 #import "HTMLDocument.h"
 #import "XMLDocument.h"
+#import "Document.h"

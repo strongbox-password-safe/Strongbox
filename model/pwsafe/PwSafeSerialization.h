@@ -32,7 +32,7 @@ typedef struct _PasswordSafe3Header {
 } PasswordSafe3Header;
 
 typedef struct _FieldHeader {
-    int length;
+    uint32_t length;
     unsigned char type;
     unsigned char data;
 } FieldHeader;
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)isValidDatabase:(NSData *)prefix error:(NSError *__autoreleasing  _Nullable *)error;
 + (PasswordSafe3Header)getHeader:(NSData*)data;
-+ (NSInteger)getKeyStretchIterations:(NSData*)data;
++ (NSUInteger)getKeyStretchIterations:(NSData*)data;
 + (NSInteger)getNumberOfBlocks:(NSData*)candidate;
 + (PasswordSafe3Header)generateNewHeader:(int)keyStretchIterations masterPassword:(NSString *)masterPassword K:(NSData *_Nonnull*_Nonnull)K L:(NSData *_Nonnull*_Nonnull)L;
 + (nullable NSData *)serializeField:(Field *)field;

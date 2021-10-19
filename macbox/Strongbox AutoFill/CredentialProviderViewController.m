@@ -793,19 +793,21 @@ static const CGFloat kWormholeWaitTimeout = 0.35f;
     [Serializator fromUrl:url
                       ckf:ckf
                    config:DatabaseModelConfig.defaults
-               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, const NSError * _Nullable error) {
+               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         NSLog(@"AutoFill: Open Database: userCancelled = [%d] - Model=[%@] - Error = [%@]", userCancelled, model, error);
         dispatch_async(dispatch_get_main_queue(), ^{
             [self hideProgressModal];
             
-            if(model) {
+            NSError* aggregatedError = error ? error : innerStreamError; 
+
+            if( aggregatedError ) {
+                [self exitWithUserCancelled:database]; 
+            }
+            else if ( model ) {
                 [self onSucccesfullyUnlockedDatabase:database
                                                model:model
                                  quickTypeIdentifier:quickTypeIdentifier
                                   serviceIdentifiers:serviceIdentifiers];
-            }
-            else if(error == nil) {
-                [self exitWithUserCancelled:database]; 
             }
             else {
                 if ( isConvenienceUnlock && error.code == StrongboxErrorCodes.incorrectCredentials ) {

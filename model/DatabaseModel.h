@@ -54,6 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
+- (void)changeKeePassFormat:(DatabaseFormat)newFormat;
+
 - (void)performPreSerializationTidy;
 - (NSSet<Node*>*)getMinimalNodeSet:items;
 
@@ -109,6 +111,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
 - (NSString *)getPathDisplayString:(Node *)vm;
+- (NSString *)getPathDisplayString:(Node *)vm
+                  includeRootGroup:(BOOL)includeRootGroup
+       rootGroupNameInsteadOfSlash:(BOOL)rootGroupNameInsteadOfSlash
+                includeFolderEmoji:(BOOL)includeFolderEmoji
+                          joinedBy:(NSString*)joinedBy;
 
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm;
 
@@ -124,12 +131,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *expiredEntries;
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *nearlyExpiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *totpEntries;
 
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchable;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableTrueRoot;
 
+@property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableNoneExpiredEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allSearchableEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allActiveEntries;
 @property (nonatomic, readonly, nonnull) NSArray<Node*> *allActiveGroups;

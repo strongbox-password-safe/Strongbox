@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL supportsConcurrentRequests;
 @property (nonatomic, readonly) BOOL privacyOptInRequired;
 
-- (NSString*)getJsonFileIdentifier:(NSData*)bookmark;
+- (NSString* _Nullable)getJsonFileIdentifier:(NSData*)bookmark;
 - (SafeMetaData *)getSafeMetaData:(NSString *)nickName fileName:(NSString*)fileName providerData:(NSObject *)providerData;
 
 @end

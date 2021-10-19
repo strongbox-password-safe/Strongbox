@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface Argon2idKdfCipher : Argon2KdfCipher <KeyDerivationCipher>
 
 - (instancetype)initWithDefaults;
+- (instancetype)initWithMemory:(uint64_t)memory parallelism:(uint32_t)parallelism iterations:(uint64_t)iterations;
 
 @end
 

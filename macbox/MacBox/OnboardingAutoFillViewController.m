@@ -93,7 +93,10 @@
         NSLog(@"AutoFill QuickType was turned on - Populating Database....");
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model
                                                            databaseUuid:self.database.uuid
-                                                          displayFormat:self.database.quickTypeDisplayFormat];
+                                                          displayFormat:self.database.quickTypeDisplayFormat
+                                                        alternativeUrls:self.database.autoFillScanAltUrls
+                                                           customFields:self.database.autoFillScanCustomFields
+                                                                  notes:self.database.autoFillScanNotes];
     }
 
     [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {

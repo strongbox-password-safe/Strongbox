@@ -335,19 +335,12 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 }
 
 - (void)syncICloudUpdateWithSafesCollection:(NSArray<AppleICloudOrLocalSafeFile*>*)files {
-    BOOL removed = [self removeAnyDeletedICloudSafes:files];
-    BOOL updated = [self updateAnyICloudSafes:files];
-    BOOL added = [self addAnyNewICloudSafes:files];
-    
-    if(added || removed || updated) {
-        
-        
-    }
+    [self removeAnyDeletedICloudSafes:files];
+    [self updateAnyICloudSafes:files];
+    [self addAnyNewICloudSafes:files];
 }
 
-- (BOOL)updateAnyICloudSafes:(NSArray<AppleICloudOrLocalSafeFile*> *)files {
-    BOOL updated = NO;
-    
+- (void)updateAnyICloudSafes:(NSArray<AppleICloudOrLocalSafeFile*> *)files {
     NSMutableDictionary<NSString*, AppleICloudOrLocalSafeFile*>* theirs = [self getAllICloudSafeFileNamesFromMetadataFilesList:files];
     NSDictionary<NSString*, SafeMetaData*>* mine = [self getICloudSafesDictionary];
     
@@ -356,15 +349,15 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
         
         if(match) {
             SafeMetaData* safe = [mine objectForKey:fileName];
-            safe.fileIdentifier = [match.fileUrl absoluteString];
-            safe.hasUnresolvedConflicts = match.hasUnresolvedConflicts;
-            updated = YES;
             
-            [SafesList.sharedInstance update:safe];
+            NSString* newUrl = [match.fileUrl absoluteString];
+            if ( ![safe.fileIdentifier isEqualToString:newUrl] || safe.hasUnresolvedConflicts != match.hasUnresolvedConflicts ) {
+                safe.fileIdentifier = newUrl;
+                safe.hasUnresolvedConflicts = match.hasUnresolvedConflicts;
+                [SafesList.sharedInstance update:safe];
+            }
         }
     }
-    
-    return updated;
 }
 
 -(BOOL)addAnyNewICloudSafes:(NSArray<AppleICloudOrLocalSafeFile*> *)files {
@@ -466,11 +459,11 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 
 
 
+    NSArray* added = [notification.userInfo objectForKey:NSMetadataQueryUpdateAddedItemsKey];
+    NSArray* changed = [notification.userInfo objectForKey:NSMetadataQueryUpdateChangedItemsKey];
+    NSArray* removed = [notification.userInfo objectForKey:NSMetadataQueryUpdateRemovedItemsKey];
 
-
-
-
-
+    NSLog(@"iCloud Update Notification Received: added = %lu / updated = %lu - removed = %lu", (unsigned long)added.count, (unsigned long)changed.count, (unsigned long)removed.count);
 
 
 

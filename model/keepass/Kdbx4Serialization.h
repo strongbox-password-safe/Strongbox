@@ -10,6 +10,7 @@
 #import "Kdbx4SerializationData.h"
 #import "CryptoParameters.h"
 #import "CompositeKeyFactors.h"
+#import "InnerRandomStream.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,8 +34,8 @@ typedef struct _InnerHeaderEntryHeader {
 } InnerHeaderEntryHeader;
 #define SIZE_OF_INNER_HEADER_ENTRY_HEADER      5
 
-typedef void (^Deserialize4CompletionBlock)(BOOL userCancelled, Kdbx4SerializationData *_Nullable serializationData, NSError*_Nullable error);
-typedef void (^Serialize4CompletionBlock)(BOOL userCancelled, NSData *_Nullable data, NSError*_Nullable error);
+typedef void (^Deserialize4CompletionBlock)(BOOL userCancelled, Kdbx4SerializationData *_Nullable serializationData, NSError*_Nullable innerStreamError, NSError*_Nullable error);
+typedef void (^Serialize4CompletionBlock)(BOOL userCancelled, NSError*_Nullable error);
 
 @interface Kdbx4Serialization : NSObject
 
@@ -47,8 +48,10 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
          completion:(Deserialize4CompletionBlock)completion;
 
 + (void)serialize:(Kdbx4SerializationData*)serializationData
-              xml:(NSString*)xml
+  rootXmlDocument:(RootXmlDomainObject *)rootXmlDocument
+      innerStream:(id<InnerRandomStream>)innerStream
               ckf:(CompositeKeyFactors*)ckf
+     outputStream:(NSOutputStream*)outputStream
        completion:(Serialize4CompletionBlock)completion;
 
 @end

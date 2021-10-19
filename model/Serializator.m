@@ -180,12 +180,20 @@
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
 
-    [Serializator getAsData:database format:format completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    NSOutputStream* memStream = [NSOutputStream outputStreamToMemory];
+    [memStream open];
+    
+    [Serializator getAsData:database
+                     format:format
+               outputStream:memStream
+                 completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        [memStream close];
+
         if (userCancelled || error) {
             NSLog(@"Error: expressToData [%@]", error);
         }
         else {
-            ret = data;
+            ret = [memStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
         }
         dispatch_group_leave(group);
     }];
@@ -195,20 +203,24 @@
     return ret;
 }
 
-+ (void)getAsData:(DatabaseModel *)database format:(DatabaseFormat)format completion:(SaveCompletionBlock)completion {
++ (void)getAsData:(DatabaseModel *)database
+           format:(DatabaseFormat)format
+     outputStream:(NSOutputStream*)outputStream
+       completion:(SaveCompletionBlock)completion {
     [database performPreSerializationTidy]; 
 
     id<AbstractDatabaseFormatAdaptor> adaptor = [Serializator getAdaptor:format];
 
     NSTimeInterval startTime = NSDate.timeIntervalSinceReferenceDate;
-        
+            
     [adaptor save:database
-       completion:^(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error){
+     outputStream:outputStream
+       completion:^(BOOL userCancelled, NSString*_Nullable debugXml, NSError*_Nullable error){
         NSLog(@"====================================== PERF ======================================");
         NSLog(@"SERIALIZE [%f] seconds", NSDate.timeIntervalSinceReferenceDate - startTime);
         NSLog(@"====================================== PERF ======================================");
-
-        completion(userCancelled, data, debugXml, error);
+        
+        completion(userCancelled, nil, error);
     }];
 }
 
@@ -244,10 +256,10 @@
               ckf:[CompositeKeyFactors password:password]
     xmlDumpStream:xmlDumpStream
 sanityCheckInnerStream:config.sanityCheckInnerStream
-       completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable error) {
+       completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         [stream close];
       
-        if(userCancelled || database == nil || error) {
+        if( userCancelled || database == nil || error || innerStreamError ) {
             NSLog(@"Error: expressFromData = [%@]", error);
             model = nil;
         }
@@ -346,7 +358,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
     id<AbstractDatabaseFormatAdaptor> adaptor = [Serializator getAdaptor:format];
 
     if (adaptor == nil) {
-        completion(NO, nil, nil);
+        completion(NO, nil, nil, nil);
         return;
     }
     
@@ -358,7 +370,7 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
               ckf:ckf
     xmlDumpStream:xmlDumpStream
      sanityCheckInnerStream:config.sanityCheckInnerStream
-       completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable error) {
+       completion:^(BOOL userCancelled, DatabaseModel * _Nullable database, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         [stream close];
         
         NSLog(@"====================================== PERF ======================================");
@@ -366,10 +378,10 @@ sanityCheckInnerStream:config.sanityCheckInnerStream
         NSLog(@"====================================== PERF ======================================");
 
         if(userCancelled || database == nil || error) {
-            completion(userCancelled, nil ,error);
+            completion(userCancelled, nil, innerStreamError, error);
         }
         else {
-            completion(NO, database, nil);
+            completion(NO, database, innerStreamError, nil);
         }
     }];
 }

@@ -38,6 +38,12 @@
         NSDate* now = NSDate.date;
         NSString* filename = [NSString stringWithFormat:@"%@.bak", now.fileNameCompatibleDateTimePrecise];
 
+        NSURL* dir = metadata.backupsDirectory; 
+        if(!dir) {
+            NSLog(@"Error saving backup");
+            return NO;
+        }
+
         NSURL* url = [metadata.backupsDirectory URLByAppendingPathComponent:filename];
 
         NSLog(@"Creating Backup [%@]", url);
@@ -65,7 +71,7 @@
 }
 
 - (void)deleteAllBackups:(METADATA_PTR)metadata {
-    NSArray* backups = [self getAvailableBackups:metadata];
+    NSArray* backups = [self getAvailableBackups:metadata all:NO];
     
     for (BackupItem* backup in backups) {
         [self deleteBackup:backup];
@@ -80,16 +86,107 @@
     }
 }
 
-- (NSArray<BackupItem *> *)getAvailableBackups:(METADATA_PTR)metadata {
+- (NSArray<BackupItem*> *)getAvailableBackups:(METADATA_PTR)metadata all:(BOOL)all {
+    if ( metadata != nil ) {
+        return [self getAvailableBackupsForDatabase:metadata];
+    }
+    else {
+        if ( all ) {
+            return [self getAllEmergencyRecoveryFilesAsBackups];
+        }
+        else {
+            return [self getAllAvailableBackups]; 
+        }
+    }
+}
+
+- (NSArray<BackupItem*> *)getAllEmergencyRecoveryFilesAsBackups {
+#if TARGET_OS_IPHONE
+    NSArray<BackupItem*>* appSupport = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.appSupportDirectory];
+    NSArray<BackupItem*>* documents = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.documentsDirectory];
+#endif
+    
+    NSArray<BackupItem*>* sharedAppGroup = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.sharedAppGroupDirectory recursive:NO];
+    NSArray<BackupItem*>* syncManager = [self getAllAvailableFilesAsBackupsAtDir:FileManager.sharedInstance.syncManagerLocalWorkingCachesDirectory recursive:YES];
+
+    NSMutableArray<BackupItem*>* ret = [NSMutableArray arrayWithArray:sharedAppGroup];
+    [ret addObjectsFromArray:syncManager];
+
+#if TARGET_OS_IPHONE
+    [ret addObjectsFromArray:appSupport];
+    [ret addObjectsFromArray:documents];
+#endif
+    
+    return ret;
+}
+
+
+
+
+- (NSArray<BackupItem*> *)getAllAvailableBackups {
+    NSURL* dir = FileManager.sharedInstance.backupFilesDirectory;
+
+    return [self getAllAvailableFilesAsBackupsAtDir:dir];
+}
+
+- (NSArray<BackupItem*> *)getAllAvailableFilesAsBackupsAtDir:(NSURL*)dir {
+    return [self getAllAvailableFilesAsBackupsAtDir:dir recursive:YES];
+}
+
+- (NSArray<BackupItem*> *)getAllAvailableFilesAsBackupsAtDir:(NSURL*)dir recursive:(BOOL)recursive {
+    NSArray<NSURLResourceKey>* keys = @[NSURLCreationDateKey, NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLIsDirectoryKey];
+    NSUInteger flags = NSDirectoryEnumerationSkipsPackageDescendants | NSDirectoryEnumerationSkipsHiddenFiles;
+
+    if ( !recursive ) {
+        flags |= NSDirectoryEnumerationSkipsSubdirectoryDescendants;
+    }
+    
+    NSMutableArray<BackupItem*>* ret = [NSMutableArray array];
+
+
+    NSDirectoryEnumerator<NSURL *> * enumerator = [NSFileManager.defaultManager enumeratorAtURL:dir
+                                                                     includingPropertiesForKeys:keys
+                                                                                        options:flags
+                                                                                   errorHandler:nil];
+    
+    for (NSURL *url in enumerator) {
+        NSError* error;
+        NSDictionary* attributesDictionary = [url resourceValuesForKeys:keys error:&error];
+        if(attributesDictionary) {
+            NSDate* dateCreate = attributesDictionary[NSURLCreationDateKey];
+            NSDate* modDate = attributesDictionary[NSURLContentModificationDateKey];
+            NSNumber* fileSize = attributesDictionary[NSURLFileSizeKey];
+            NSNumber* isDirectory = attributesDictionary[NSURLIsDirectoryKey];
+            
+            if ( !isDirectory.boolValue ) {
+                NSLog(@"Found file with create date: [%@] Size: [%@] - isDir: [%@] URL: [%@]", dateCreate, friendlyFileSizeString(fileSize.unsignedIntegerValue), isDirectory, url);
+
+                [ret addObject:[BackupItem withUrl:url backupCreatedDate:dateCreate modDate:modDate fileSize:fileSize]];
+            }
+        }
+        else {
+            NSLog(@"Error getting attributes for file: [%@]", url);
+        }
+    }
+
+    return [ret sortedArrayUsingComparator:^NSComparisonResult(BackupItem*  _Nonnull obj1, BackupItem*  _Nonnull obj2) {
+        return [obj2.backupCreatedDate compare:obj1.backupCreatedDate];
+    }];
+}
+
+- (NSArray<BackupItem*> *)getAvailableBackupsForDatabase:(METADATA_PTR)metadata {
+    NSURL* dir = metadata.backupsDirectory; 
+    if(!dir) {
+        NSLog(@"Could not get backup directory");
+        return @[];
+    }
+
+    NSArray<NSURLResourceKey>* keys = @[NSURLCreationDateKey, NSURLContentModificationDateKey, NSURLFileSizeKey, NSURLIsDirectoryKey];
+    NSUInteger flags = NSDirectoryEnumerationSkipsPackageDescendants | NSDirectoryEnumerationSkipsHiddenFiles | NSDirectoryEnumerationSkipsSubdirectoryDescendants;
     NSError* error;
-    
-    NSArray<NSURLResourceKey>* keys = @[NSURLCreationDateKey, NSURLContentModificationDateKey, NSURLFileSizeKey];
-    
-    NSArray<NSURL*> *files = [NSFileManager.defaultManager contentsOfDirectoryAtURL:metadata.backupsDirectory
+    NSArray<NSURL*> *files = [NSFileManager.defaultManager contentsOfDirectoryAtURL:dir
                                                          includingPropertiesForKeys:keys
-                                                                            options:NSDirectoryEnumerationSkipsSubdirectoryDescendants |
-                                                                                    NSDirectoryEnumerationSkipsPackageDescendants   |
-                                                                                    NSDirectoryEnumerationSkipsHiddenFiles
+                                                                            options:flags
                                                                               error:&error];
 
     if(!files) {
@@ -105,9 +202,13 @@
             NSDate* dateCreate = attributesDictionary[NSURLCreationDateKey];
             NSDate* modDate = attributesDictionary[NSURLContentModificationDateKey];
             NSNumber* fileSize = attributesDictionary[NSURLFileSizeKey];
+            NSNumber* isDirectory = attributesDictionary[NSURLIsDirectoryKey];
             
-            [ret addObject:[BackupItem withUrl:file backupCreatedDate:dateCreate modDate:modDate fileSize:fileSize]];
+            if ( !isDirectory.boolValue ) {
+                NSLog(@"Found file with create date: [%@] Size: [%@] - isDir: [%@] URL: [%@]", dateCreate, friendlyFileSizeString(fileSize.unsignedIntegerValue), isDirectory, file);
 
+                [ret addObject:[BackupItem withUrl:file backupCreatedDate:dateCreate modDate:modDate fileSize:fileSize]];
+            }
         }
         else {
             NSLog(@"Error getting attributes for file: [%@]", file);
@@ -120,7 +221,7 @@
 }
 
 - (void)trimBackups:(METADATA_PTR)metadata {
-    NSArray* backups = [self getAvailableBackups:metadata];
+    NSArray* backups = [self getAvailableBackups:metadata all:NO];
     
     if(backups.count > metadata.maxBackupKeepCount) {
         NSArray* toBeTrimmed = [backups subarrayWithRange:NSMakeRange(metadata.maxBackupKeepCount, backups.count - metadata.maxBackupKeepCount)];

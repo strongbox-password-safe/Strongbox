@@ -6,6 +6,7 @@ abstract_target 'common-mac' do
     use_frameworks!
 
     pod 'libsodium'
+    pod 'Down'
 
     target 'Strongbox' do
     end
@@ -25,8 +26,9 @@ abstract_target 'common-ios' do
     platform :ios, '9.3'
     use_frameworks!
 
-    pod 'libsodium'
-
+    pod 'libsodium'    
+    pod 'Down'
+    
     target 'Strongbox-iOS' do
         use_frameworks!
 
@@ -37,7 +39,7 @@ abstract_target 'common-ios' do
         pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
         pod 'GoogleAPIClientForREST/Drive'
-        pod 'GoogleSignIn'
+        pod 'GoogleSignIn', '5.0.2'
     end
 
     target 'Strongbox-iOS-Pro' do
@@ -62,6 +64,15 @@ abstract_target 'common-ios' do
         pod 'ISMessages'
     end    
 
+    target 'Strongbox-iOS-Graphene' do
+        use_frameworks!
+
+        pod 'MTBBarcodeScanner'
+
+        pod 'Reachability'
+        pod 'ISMessages'
+    end  
+
     target 'Strongbox-Auto-Fill' do
 
     end
@@ -71,5 +82,11 @@ abstract_target 'common-ios' do
     end
 
     target 'Strongbox-Auto-Fill-SCOTUS' do 
+
+    end
+
+    target 'Strongbox-Auto-Fill-Graphene' do 
+    
     end
 end
+

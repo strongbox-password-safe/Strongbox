@@ -24,11 +24,8 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 @property (nonatomic, readonly) NSMutableDictionary<NSUUID*, NSDate*> *mutableDeletedObjects;
 @property (nonatomic) NSDictionary<NSUUID*, NodeIcon*> *backingIconPool;
-
-@property (nonatomic, readonly) DatabaseFormat format;
+@property (nonatomic) DatabaseFormat format;
 @property (nonatomic, nonnull, readonly) UnifiedDatabaseMetadata* metadata;
-
-
 @property (nonatomic, readonly, nonnull) ConcurrentMutableDictionary<NSUUID*, Node*>* fastNodeIdMap;
 
 @end
@@ -144,25 +141,22 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
     
 
-    NSMutableDictionary<NSUUID*, NodeIcon*>* newIconPool = self.backingIconPool.mutableCopy;
+
+            
+    const BOOL stripUnusedIcons = NO; 
+    NSMutableDictionary<NSUUID*, NodeIcon*>* newIconPool = stripUnusedIcons ? @{}.mutableCopy : self.backingIconPool.mutableCopy;
+    
     for (Node* node in allNodes) {
         NodeIcon* icon = node.icon;
-        
-        if ( icon.uuid == nil ) {
-            NSUUID* newId = NSUUID.UUID;
-            NSLog(@"Found new custom icon - adding to the pool. - [%@]", newId);
-            NodeIcon* newIcon = [NodeIcon withCustom:icon.custom uuid:newId name:icon.name modified:icon.modified];
-            newIconPool[newIcon.uuid] = newIcon;
-            node.icon = newIcon;
-        }
-        else {
-            if ( self.backingIconPool[icon.uuid] == nil ) {
-                NSLog(@"WARNWARN: Found custom icon with a UUID but not in POOL. Adding to the pool.");
-                newIconPool[icon.uuid] = icon;
-            }
+
+        if ( newIconPool[icon.uuid] == nil ) {
+
+            newIconPool[icon.uuid] = icon;
         }
     }
 
+    NSLog(@"New Icon Pool count = %lu", (unsigned long)newIconPool.count);
+    
     self.backingIconPool = newIconPool.copy;
     
     
@@ -195,6 +189,12 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 - (DatabaseFormat)originalFormat {
     return self.format;
+}
+
+- (void)changeKeePassFormat:(DatabaseFormat)newFormat {
+    if ( self.format == kKeePass || self.format == kKeePass4 ) {
+        self.format = newFormat;
+    }
 }
 
 - (UnifiedDatabaseMetadata *)meta {
@@ -285,7 +285,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             Node* existing = self.fastNodeIdMap[node.uuid];
             
             if ( existing ) {
-                NSLog(@"WARNWARN: XXXXX - Duplicate ID in database => [%@] - [%@] - [%@]", existing, node, node.uuid);
+                NSLog(@"WARNWARN: Duplicate ID in database => [%@] - [%@] - [%@]", existing, node, node.uuid);
             }
             else {
                 self.fastNodeIdMap[node.uuid] = node;
@@ -578,15 +578,36 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 
 
 - (NSString *)getPathDisplayString:(Node *)vm {
+    return [self getPathDisplayString:vm includeRootGroup:NO rootGroupNameInsteadOfSlash:NO includeFolderEmoji:NO joinedBy:@"/"];
+}
+
+- (NSString *)getPathDisplayString:(Node *)vm
+                  includeRootGroup:(BOOL)includeRootGroup
+       rootGroupNameInsteadOfSlash:(BOOL)rootGroupNameInsteadOfSlash
+                includeFolderEmoji:(BOOL)includeFolderEmoji
+                          joinedBy:(NSString*)joinedBy {
     NSMutableArray<NSString*> *hierarchy = [NSMutableArray array];
     
     Node* current = vm;
     while (current != nil && current != self.effectiveRootGroup) {
-        [hierarchy insertObject:current.title atIndex:0];
+        NSString* title = includeFolderEmoji ? [NSString stringWithFormat:@"📂 %@", current.title] : current.title;
+        [hierarchy insertObject:title atIndex:0];
         current = current.parent;
     }
+
     
-    return hierarchy.count ? [hierarchy componentsJoinedByString:@"/"] : @"/";
+    if ( includeRootGroup ) {
+        NSString* rootGroupName = (rootGroupNameInsteadOfSlash && self.effectiveRootGroup) ? self.effectiveRootGroup.title : @"/";
+        NSString* title = includeFolderEmoji ? [NSString stringWithFormat:@"📂 %@", rootGroupName] : rootGroupName;
+        [hierarchy insertObject:title atIndex:0];
+    }
+    
+    if ( includeRootGroup && !rootGroupNameInsteadOfSlash && [joinedBy isEqualToString:@"/"] && hierarchy.count > 1 ) { 
+        [hierarchy removeObjectAtIndex:0];
+    }
+    
+    return [hierarchy componentsJoinedByString:joinedBy];
+        
 }
 
 - (NSString *)getSearchParentGroupPathDisplayString:(Node *)vm {
@@ -607,10 +628,26 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
     return path;
 }
 
+- (NSArray<Node *> *)expiredEntries {
+    return [self.allSearchableEntries filter:^BOOL(Node * _Nonnull obj) {
+        return obj.fields.expired;
+    }];
+}
+
+- (NSArray<Node *> *)nearlyExpiredEntries {
+    return [self.allSearchableEntries filter:^BOOL(Node * _Nonnull obj) {
+        return obj.fields.nearlyExpired;
+    }];
+}
+
 - (NSArray<Node *> *)totpEntries {
     return [self.allSearchableEntries filter:^BOOL(Node * _Nonnull obj) {
         return obj.fields.otpToken != nil;
     }];
+}
+
+- (NSArray<Node *> *)allSearchableNoneExpiredEntries {
+    return [self filterItems:NO includeEntries:YES searchableOnly:YES includeExpired:NO];
 }
 
 - (NSArray<Node *> *)allSearchableEntries {
@@ -626,7 +663,7 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (NSArray<Node *> *)allSearchableTrueRoot {
-    return [self filterItems:YES includeEntries:YES searchableOnly:YES trueRoot:YES];
+    return [self filterItems:YES includeEntries:YES searchableOnly:YES trueRoot:YES includeExpired:YES];
 }
 
 - (NSArray<Node *> *)allActiveEntries {
@@ -642,10 +679,19 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
 }
 
 - (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly {
-    return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly trueRoot:NO];
+    return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly includeExpired:YES];
 }
 
-- (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly trueRoot:(BOOL)trueRoot {
+- (NSArray<Node *> *)filterItems:(BOOL)includeGroups includeEntries:(BOOL)includeEntries searchableOnly:(BOOL)searchableOnly
+    includeExpired:(BOOL)includeExpired {
+    return [self filterItems:includeGroups includeEntries:includeEntries searchableOnly:searchableOnly trueRoot:NO includeExpired:includeExpired];
+}
+
+- (NSArray<Node *> *)filterItems:(BOOL)includeGroups
+                  includeEntries:(BOOL)includeEntries
+                  searchableOnly:(BOOL)searchableOnly
+                        trueRoot:(BOOL)trueRoot
+                  includeExpired:(BOOL)includeExpired {
     Node* root = trueRoot ? self.rootNode : self.effectiveRootGroup;
     Node* keePass1BackupNode = self.keePass1BackupNode;
     Node* recycleBin = self.recycleBinNode;
@@ -659,6 +705,10 @@ static const DatabaseFormat kDefaultDatabaseFormat = kKeePass4;
             return NO;
         }
 
+        if ( !includeExpired && node.expired ) {
+            return NO;
+        }
+        
         if(self.format == kPasswordSafe) {
             return YES;
         }

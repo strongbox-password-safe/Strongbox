@@ -38,15 +38,20 @@
     [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
             DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.firstMetadata viewController:self forceReadOnly:NO isAutoFillOpen:NO offlineMode:YES];
-            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
-                [self onUnlockDone:result model:model error:error];
+            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+                if ( innerStreamError ) {
+                    [self displayError:error];
+                }
+                else {
+                    [self onUnlockDone:result model:model error:error];
+                }
             }];
         }
         else if (result == kGetCompositeKeyResultError) {
             [self displayError:error];
         }
         else if (result == kGetCompositeKeyResultDuressIndicated) {
-            [DuressActionHelper performDuressAction:self database:self.firstMetadata isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+            [DuressActionHelper performDuressAction:self database:self.firstMetadata isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
                 [self onUnlockDone:result model:model error:error];
             }];
         }

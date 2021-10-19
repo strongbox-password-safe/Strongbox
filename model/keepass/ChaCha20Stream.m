@@ -81,7 +81,7 @@ static const uint32_t kKeySize = 32;
     crypto_stream_chacha20_ietf_xor_ic(outData.mutableBytes, xorBlock.bytes, xorBlock.length, self.generatedIv.bytes, currentBlock, self.generatedKey.bytes);
     
     self.bytesProcessed += ct.length;
-    return [outData subdataWithRange:subRange];
+    return [outData subdataWithRange:subRange]; 
 }
 
 @end

@@ -165,7 +165,7 @@
             AppPreferences.sharedInstance.autoFillExitedCleanly = NO; 
             
             DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:safe viewController:self forceReadOnly:NO isAutoFillOpen:YES offlineMode:YES];
-            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+            [unlocker unlockLocalWithKey:factors keyFromConvenience:fromConvenience completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
                 AppPreferences.sharedInstance.autoFillExitedCleanly = YES;
                 
                 [self onUnlockDone:result model:model identifier:identifier error:error];
@@ -175,7 +175,7 @@
             [self messageErrorAndExit:error];
         }
         else if (result == kGetCompositeKeyResultDuressIndicated) {
-            [DuressActionHelper performDuressAction:self database:safe isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) { 
+            [DuressActionHelper performDuressAction:self database:safe isAutoFillOpen:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
                 [self onUnlockDone:result model:model identifier:identifier error:error];
             }];
         }

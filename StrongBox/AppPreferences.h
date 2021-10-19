@@ -156,7 +156,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL disableReadOnlyToggles;
 @property BOOL databasesAreAlwaysReadOnly;
 @property BOOL disableFavIconFeature;
-@property BOOL disableNativeNetworkStorageOptions; 
+@property BOOL disableNetworkBasedFeatures; 
 
 
 @property BOOL useIsolatedDropbox;
@@ -171,12 +171,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property (readonly) BOOL disallowAllPinCodeOpens;
-@property (readonly) BOOL disallowAllBiometricId;
-@property (readonly) BOOL instantPinUnlocking;
-@property (readonly) BOOL useBackgroundUpdates; 
-
-
+@property BOOL instantPinUnlocking;
 
 @property BOOL exportItemsPreserveUUIDs;
 @property BOOL exportItemsReplaceExisting;
@@ -189,8 +184,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL migratedConnections; 
 
+@property BOOL disableThirdPartyStorageOptions; 
 
-
+@property BOOL markdownNotes;
 
 @end
 

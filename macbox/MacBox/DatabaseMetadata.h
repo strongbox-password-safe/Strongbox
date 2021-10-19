@@ -40,7 +40,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nonatomic) BOOL isTouchIdEnabled;
 @property (nonatomic) BOOL isWatchUnlockEnabled;
 
-@property (nonatomic) BOOL isTouchIdEnrolled;
+@property (nonatomic) BOOL isTouchIdEnrolled; 
 @property (nonatomic) BOOL hasPromptedForTouchIdEnrol;
 @property (nonatomic) NSInteger touchIdPasswordExpiryPeriodHours;
 
@@ -78,7 +78,7 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 @property (readonly) NSURL* backupsDirectory;
 @property NSUInteger maxBackupKeepCount;
-@property BOOL makeBackups;
+@property BOOL makeBackups;  
 
 @property (readonly) BOOL isLocalDeviceDatabase;
 
@@ -109,6 +109,14 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property NSArray<NSString*>* visibleColumns;
 
 /* =================================================================================================== */
+
+@property BOOL hasSetInitialWindowPosition;
+
+
+
+@property BOOL autoFillScanAltUrls;
+@property BOOL autoFillScanCustomFields;
+@property BOOL autoFillScanNotes;
 
 @end
 

@@ -37,6 +37,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.navigationItem.title = NSLocalizedString(@"select_destination_group", @"Select Destination Group");
+    self.navigationItem.prompt = [self.viewModel.database getPathDisplayString:self.currentGroup includeRootGroup:YES rootGroupNameInsteadOfSlash:YES includeFolderEmoji:YES joinedBy:@" "];
+    
     self.tableView.tableFooterView = [UIView new];
     
     self.cellHelper = [[BrowseTableViewCellHelper alloc] initWithModel:self.viewModel tableView:self.tableView];

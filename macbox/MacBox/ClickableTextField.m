@@ -10,12 +10,11 @@
 
 @implementation ClickableTextField
 
-- (void)mouseDown:(NSEvent *)event {
-    NSLog(@"mouseDown");
-}
+//- (void)mouseDown:(NSEvent *)event {
+//    NSLog(@"mouseDown");
+//}
 
 - (void)mouseUp:(NSEvent *)event {
-    NSLog(@"mouseUp");
     
     if(self.onClick) {
         self.onClick();

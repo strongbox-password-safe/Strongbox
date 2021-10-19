@@ -35,19 +35,19 @@
         [self openDummy:database isAutoFillOpen:isAutoFillOpen completion:completion];
     }
     else {
-        completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+        completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
     }
 }
 
 + (void)openDummy:(SafeMetaData * _Nonnull)database isAutoFillOpen:(BOOL)isAutoFillOpen completion:(UnlockDatabaseCompletionBlock _Nonnull)completion {
     Model *viewModel = [[Model alloc] initAsDuressDummy:isAutoFillOpen templateMetaData:database];
-    completion(kUnlockDatabaseResultSuccess, viewModel, nil);
+    completion(kUnlockDatabaseResultSuccess, viewModel, nil, nil);
 }
 
 + (void)displayTechnicalError:(UIViewController * _Nonnull)viewController completion:(UnlockDatabaseCompletionBlock _Nonnull)completion {
     NSError *error = [Utils createNSError:NSLocalizedString(@"open_sequence_duress_technical_error_message", @"There was a technical error opening the database.") errorCode:-1729];
 
-    completion(kUnlockDatabaseResultError, nil, error);
+    completion(kUnlockDatabaseResultError, nil, nil, error);
 }
 
 + (void)removeOrDeleteSafe:(SafeMetaData*)database {

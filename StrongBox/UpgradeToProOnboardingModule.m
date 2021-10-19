@@ -25,7 +25,7 @@
         return NO;
     }
 
-    const NSUInteger percentageChanceOfShowing = 2;
+    const NSUInteger percentageChanceOfShowing = 1;
     NSInteger random = arc4random_uniform(100);
 
     return (random < percentageChanceOfShowing);

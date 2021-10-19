@@ -28,12 +28,15 @@ static const uint32_t kDefaultSeedLength = 32;
 
 @implementation AesKdfCipher
 
-- (instancetype)initWithDefaults
-{
+- (instancetype)initWithDefaults {
+    return [self initWithIterations:kDefaultRounds];
+}
+
+- (instancetype)initWithIterations:(uint64_t)iterations {
     self = [super init];
     if (self) {
         _uuid = aesKdbx4KdfCipherUuid();
-        _rounds = kDefaultRounds;
+        _rounds = iterations;
         _seed = getRandomData(kDefaultSeedLength);
     }
     return self;
@@ -93,6 +96,14 @@ static const uint32_t kDefaultSeedLength = 32;
 
 - (NSData *)transformSeed {
     return self.seed;
+}
+
++ (uint64_t)defaultIterations {
+    return kDefaultRounds;
+}
+
+- (uint64_t)iterations {
+    return self.rounds;
 }
 
 @end

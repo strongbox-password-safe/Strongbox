@@ -16,12 +16,15 @@
 @property CCCryptorRef *cryptor;
 @property NSError* error;
 
+@property BOOL closed;
+@property BOOL opened;
+@property BOOL chainOpensAndCloses;
 
 @end
 
 @implementation AesOutputStream
 
-- (instancetype)initToOutputStream:(NSOutputStream *)outputStream encrypt:(BOOL)encrypt key:(NSData *)key iv:(NSData *)iv {
+- (instancetype)initToOutputStream:(NSOutputStream *)outputStream encrypt:(BOOL)encrypt key:(NSData *)key iv:(NSData *)iv chainOpensAndCloses:(BOOL)chainOpensAndCloses {
     if (self = [super init]) {
         if (outputStream == nil) {
             return nil;
@@ -37,22 +40,29 @@
         }
 
         self.outputStream = outputStream;
+        self.chainOpensAndCloses = chainOpensAndCloses;
     }
     
     return self;
 }
 
 - (void)open {
-    if (self.outputStream) {
+    if ( self.opened ){
+        return;
+    }
+    self.opened = YES;
+    
+    if ( self.chainOpensAndCloses ) {
         [self.outputStream open];
     }
 }
 
 - (void)close {
-    if (self.outputStream == nil) {
+    if ( self.closed ){
         return;
     }
-    
+    self.closed = YES;
+        
     size_t encRequired = CCCryptorGetOutputLength(*_cryptor, 0, YES);
     uint8_t* encBlock = malloc(encRequired);
     size_t encWritten;
@@ -66,12 +76,19 @@
     }
 
     if (encWritten > 0) {
-        [self.outputStream write:encBlock maxLength:encWritten];
+        NSInteger wrote = [self.outputStream write:encBlock maxLength:encWritten];
+        if ( wrote < 0 ) {
+            NSLog(@"Error Writing final AES Block");
+            return;
+        }
     }
     
     free(encBlock);
     
-    [self.outputStream close];
+    if ( self.chainOpensAndCloses ) {
+        [self.outputStream close];
+    }
+    
     self.outputStream = nil;
     
     if (self.cryptor) {
@@ -81,6 +98,11 @@
 }
 
 - (NSInteger)write:(const uint8_t *)buffer maxLength:(NSUInteger)len {
+    if ( !self.opened || self.closed ) {
+        NSLog(@"WARNWARN: Unopen or not closed. AES Output Stream");
+        return -1;
+    }
+
     size_t encRequired = CCCryptorGetOutputLength(*_cryptor, len, NO);
     
     uint8_t* encBlock = malloc(encRequired);

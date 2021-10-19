@@ -16,7 +16,6 @@
 @property z_stream* stream;
 @property NSError* error;
 
-
 @end
 
 @implementation GzipDecompressOutputStream
@@ -108,7 +107,7 @@
             if ( res < 0 ) {
                 NSLog(@"GzipDecompressOutputStream: Could not write to output stream.");
                 return res;
-            }
+            } 
         }
         
 

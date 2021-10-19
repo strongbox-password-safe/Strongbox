@@ -26,12 +26,14 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 
 @protocol XMLStreamWriter
 
 - (void) writeStartDocument;
 - (void) writeStartDocumentWithVersion:(NSString*)version;
-- (void) writeStartDocumentWithEncodingAndVersion:(NSString*)encoding version:(NSString*)version;
+- (void) writeStartDocumentWithEncodingAndVersion:(NSString*_Nullable)encoding version:(NSString*_Nullable)version;
 
 - (void) writeStartElement:(NSString *)localName;
 
@@ -66,11 +68,11 @@
 
 @protocol NSXMLStreamWriter <XMLStreamWriter>
 
-- (void) writeStartElementWithNamespace:(NSString *)namespaceURI localName:(NSString *)localName;
-- (void) writeEndElementWithNamespace:(NSString *)namespaceURI localName:(NSString *)localName;
-- (void) writeEmptyElementWithNamespace:(NSString *)namespaceURI localName:(NSString *)localName;
+- (void) writeStartElementWithNamespace:(NSString *_Nullable)namespaceURI localName:(NSString *)localName;
+- (void) writeEndElementWithNamespace:(NSString *_Nullable)namespaceURI localName:(NSString *)localName;
+- (void) writeEmptyElementWithNamespace:(NSString *_Nullable)namespaceURI localName:(NSString *)localName;
 
-- (void) writeAttributeWithNamespace:(NSString *)namespaceURI localName:(NSString *)localName value:(NSString *)value;
+- (void) writeAttributeWithNamespace:(NSString *_Nullable)namespaceURI localName:(NSString *)localName value:(NSString *)value;
 
 
 - (void)setPrefix:(NSString*)prefix namespaceURI:(NSString *)namespaceURI;
@@ -84,6 +86,9 @@
 
 - (NSString*)getPrefix:(NSString*)namespaceURI;
 - (NSString*)getNamespaceURI:(NSString*)prefix;
+
+
+@property (readonly, nullable) NSError* streamError;
 
 @end
 
@@ -147,3 +152,5 @@
 - (void) write:(NSString*)value;
 
 @end
+
+NS_ASSUME_NONNULL_END

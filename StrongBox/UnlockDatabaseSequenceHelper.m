@@ -123,10 +123,10 @@
             [DuressActionHelper performDuressAction:self.viewController database:self.database isAutoFillOpen:self.isAutoFillOpen completion:self.completion];
         }
         else if (result == kGetCompositeKeyResultError) {
-            self.completion(kUnlockDatabaseResultError, nil, error);
+            self.completion(kUnlockDatabaseResultError, nil, nil, error);
         }
         else {
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
         }
     }];
 }
@@ -152,7 +152,7 @@
             [Alerts warn:self.viewController
                    title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Offline")
                  message:NSLocalizedString(@"open_sequence_couldnt_open_local_message", @"Could not open Strongbox's local copy of this database. A online sync is required.")];
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
             return;
         }
         
@@ -186,7 +186,7 @@
                 [self syncAndUnlock:factors];
             }
             else {
-                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
             }
         }];
     }
@@ -218,7 +218,7 @@
             }
             else if (result == kSyncAndMergeResultUserCancelled) {
                 
-                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
             }
             else if (result == kSyncAndMergeError) {
                 [self handleSyncAndMergeError:factors error:error];
@@ -229,7 +229,7 @@
             }
             else {
                 NSLog(@"WARNWARN: Unknown response from Sync: %lu", (unsigned long)result);
-                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+                self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
             }
         });
     }];
@@ -241,7 +241,7 @@
         [self askAboutRelocatingDatabase:factors];
     }
     else if ( error.code == kStorageProviderSFTPorWebDAVSecretMissingErrorCode ) {
-        self.completion(kUnlockDatabaseResultError, nil, error);
+        self.completion(kUnlockDatabaseResultError, nil, nil, error);
     }
     else {
         if ( self.database.couldNotConnectBehaviour == kCouldNotConnectBehaviourOpenOffline ) {
@@ -267,10 +267,10 @@
                     [self openOffline:factors];
                 }
                 else if ( response == 2) { 
-                    self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil);
+                    self.completion(kUnlockDatabaseResultViewDebugSyncLogRequested, nil, nil, nil);
                 }
                 else {
-                    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+                    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
                 }
             }];
         }
@@ -324,7 +324,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
             [self unlockLocalCopy:factors forceReadOnly:!isPro offline:YES];
         }
         else {
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
         }
     }];
 }
@@ -344,7 +344,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
 
 - (void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
     sharedInstance = nil;
-    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+    self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
@@ -388,7 +388,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
         [Alerts warn:self.viewController
                title:@"Error Opening This Database"
              message:@"Could not access this file."];
-        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+        self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
     }
     else {
         NSError* error;
@@ -397,7 +397,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
             [Alerts error:self.viewController
                     title:[NSString stringWithFormat:NSLocalizedString(@"open_sequence_invalid_database_filename_fmt", @"Invalid Database - [%@]"), url.lastPathComponent]
                     error:error];
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
             return;
         }
         
@@ -425,7 +425,7 @@ static UnlockDatabaseSequenceHelper *sharedInstance = nil;
         [Alerts error:self.viewController
                 title:NSLocalizedString(@"open_sequence_error_could_not_bookmark_file", @"Could not bookmark this file")
                 error:error];
-        self.completion(kUnlockDatabaseResultError, nil, nil);
+        self.completion(kUnlockDatabaseResultError, nil, nil, nil);
     }
     else {
         NSString* identifier = [FilesAppUrlBookmarkProvider.sharedInstance getJsonFileIdentifier:bookMark];

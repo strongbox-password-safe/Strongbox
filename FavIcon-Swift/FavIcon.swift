@@ -19,44 +19,44 @@ import Foundation
 
 #if os(iOS)
     import UIKit
-    /// Alias for the iOS image type (`UIImage`).
+    
     public typealias ImageType = UIImage
 #elseif os(OSX)
     import Cocoa
-    /// Alias for the OS X image type (`NSImage`).
+    
     public typealias ImageType = NSImage
 #endif
 
-/// Represents the result of attempting to download an icon.
+
 public enum IconDownloadResult {
 
-    /// Download successful.
-    ///
-    /// - parameter image: The `ImageType` for the downloaded icon.
+    
+    
+    
     case success(image: ImageType)
 
-    /// Download failed for some reason.
-    ///
-    /// - parameter error: The error which can be consulted to determine the root cause.
+    
+    
+    
     case failure(error: Error)
 
 }
 
-//@objc public final class URLSessionDelegateIgnoreSSLProblems : NSObject {
-//}
+
+
 
 class AuthSessionDelegate: NSObject, URLSessionDelegate {
     func urlSession(_ session: URLSession,
                     didReceive challenge: URLAuthenticationChallenge,
                     completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-//
-//        let authMethod = challenge.protectionSpace.authenticationMethod
-//
-//        guard challenge.previousFailureCount < 1, authMethod == NSURLAuthenticationMethodServerTrust,
-//            let trust = challenge.protectionSpace.serverTrust else {
-//            completionHandler(.performDefaultHandling, nil)
-//            return
-//        }
+
+
+
+
+
+
+
+
         
         
         guard let serverTrust = challenge.protectionSpace.serverTrust else {
@@ -69,29 +69,29 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
     }
 }
     
-/// Responsible for detecting all of the different icons supported by a given site.
+
 @objc public final class FavIcon : NSObject {
 
-    // swiftlint:disable function_body_length
+    
 
-    /// Scans a base URL, attempting to determine all of the supported icons that can
-    /// be used for favicon purposes.
-    ///
-    /// It will do the following to determine possible icons that can be used:
-    ///
-    /// - Check whether or not `/favicon.ico` exists.
-    /// - If the base URL returns an HTML page, parse the `<head>` section and check for `<link>`
-    ///   and `<meta>` tags that reference icons using Apple, Microsoft and Google
-    ///   conventions.
-    /// - If _Web Application Manifest JSON_ (`manifest.json`) files are referenced, or
-    ///   _Microsoft browser configuration XML_ (`browserconfig.xml`) files
-    ///   are referenced, download and parse them to check if they reference icons.
-    ///
-    ///  All of this work is performed in a background queue.
-    ///
-    /// - parameter url: The base URL to scan.
-    /// - parameter completion: A closure to call when the scan has completed. The closure will be call
-    ///                         on the main queue.
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     @objc public static func scan(_ url: URL,
                                   on queue: OperationQueue? = nil,
                                   favIcon: Bool = true,
@@ -183,7 +183,7 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
                                             "ms-icon-144x144.png"];
                                             
             for commonFile in commonFiles {
-                //print("Checking: ", commonFile)
+                
                 
                 let favIconURL = URL(string: commonFile, relativeTo: url as URL)!.absoluteURL
                 let checkFavIconOperation = CheckURLExistsOperation(url: favIconURL, session: urlSession)
@@ -200,14 +200,14 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
         }
 
         var components = URLComponents(url: url, resolvingAgainstBaseURL: false);
-        components?.path = ""; //@"";
-        components?.query = nil; //@"";
-        components?.user = nil; //@"";
-        components?.password = nil; //@"";
-        components?.fragment = nil; //@"";
+        components?.path = ""; 
+        components?.query = nil; 
+        components?.user = nil; 
+        components?.password = nil; 
+        components?.fragment = nil; 
         
         let domain = components?.host ?? url.absoluteString;
-        let blah = String(format: "https://icons.duckduckgo.com/ip3/%@.ico" , domain.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!)
+        let blah = String(format: "https:
         
         if(duckDuckGo) {
             let ddgUrl = URL(string: blah);
@@ -227,10 +227,10 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
             }
         }
         
-        //
+        
 
         if(google) {
-            let blah2 = String(format: "https://www.google.com/s2/favicons?domain=%@" , domain.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!)
+            let blah2 = String(format: "https:
             let googleURL = URL(string: blah2)?.absoluteURL
             if (googleURL != nil) {
                 let checkGoogleUrlOperation = CheckURLExistsOperation(url: googleURL!, session: urlSession)
@@ -266,14 +266,14 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
             }
         }
     }
-    // swiftlint:enable function_body_length
+    
 
-    /// Downloads an array of detected icons in the background.
-    ///
-    /// - parameter icons: The icons to download.
-    /// - parameter completion: A closure to call when all download tasks have
-    ///                         results available (successful or otherwise). The closure
-    ///                         will be called on the main queue.
+    
+    
+    
+    
+    
+    
     @objc public static func download(_ icons: [DetectedIcon], completion: @escaping ([ImageType]) -> Void) {
         let urlSession = urlSessionProvider()
         let operations: [DownloadImageOperation] =
@@ -366,20 +366,20 @@ class AuthSessionDelegate: NSObject, URLSessionDelegate {
     }
 }
 
-/// Enumerates errors that can be thrown while detecting or downloading icons.
+
 enum IconError: Error {
-    /// The base URL specified is not a valid URL.
+    
     case invalidBaseURL
-    /// At least one icon to must be specified for downloading.
+    
     case atLeastOneOneIconRequired
-    /// Unexpected response when downloading
+    
     case invalidDownloadResponse
-    /// No icons were detected, so nothing could be downloaded.
+    
     case noIconsDetected
 }
 
 extension DetectedIcon {
-    /// The area of a detected icon, if known.
+    
     var area: Int? {
         if let width = width, let height = height {
             return width * height

@@ -60,6 +60,8 @@ static DatabasesManagerVC* sharedInstance;
 @implementation DatabasesManagerVC
 
 + (void)show {
+
+    
     if ( sharedInstance == nil ) {
         NSStoryboard* storyboard = [NSStoryboard storyboardWithName:@"DatabasesManager" bundle:nil];
         NSWindowController* wc = [storyboard instantiateInitialController];
@@ -71,21 +73,26 @@ static DatabasesManagerVC* sharedInstance;
     [sharedInstance.view.window center];
 }
 
+- (void)cancel:(id)sender { 
+    [self close];
+}
+
 - (void)close {
+
+
     if ( self.presentingViewController ) {
         [self.presentingViewController dismissViewController:self];
     }
     else {
-        [self.view.window orderOut:self];
+        [self.view.window close]; 
     }
+}
+
+- (void)windowWillClose:(NSNotification *)notification {
+    NSLog(@"DatabasesManagerVC::windowWillClose");
     
     [self killRefreshTimer];
     sharedInstance = nil;
-}
-
-- (void)cancel:(id)sender {
-    
-    [self close];
 }
 
 - (void)viewWillAppear {

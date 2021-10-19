@@ -103,7 +103,7 @@ extern NSString* const kAsyncUpdateStarting;
 @property (readonly) NSSet<NSString*>* pinnedSet;
 @property (readonly) NSArray<Node*>* pinnedNodes;
 
--(void)encrypt:(void (^)(BOOL userCancelled, NSData*_Nullable data, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
+-(void)encrypt:(void (^)(BOOL userCancelled, NSString*_Nullable file, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
 
 - (NSString *_Nonnull)generatePassword;
 

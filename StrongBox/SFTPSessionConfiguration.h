@@ -31,7 +31,7 @@ typedef NS_ENUM (NSUInteger, SFTPAuthenticationMode) {
 @property NSString* keyChainUuid;
 
 - (NSDictionary*)serializationDictionary;
-+ (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
++ (instancetype _Nullable)fromSerializationDictionary:(NSDictionary*)dictionary;
 
 -(NSString*)getKeyChainKey:(NSString*)propertyName;
 

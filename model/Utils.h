@@ -66,9 +66,9 @@ NSData* Uint64ToLittleEndianData(uint64_t integer);
 NSData* Uint32ToLittleEndianData(uint32_t integer);
 NSData* Uint16ToLittleEndianData(uint16_t integer);
 
-int64_t littleEndian8BytesToInt64(uint8_t* bytes);
-int32_t littleEndian4BytesToInt32(uint8_t* bytes);
-int16_t littleEndian2BytesToInt16(uint8_t *bytes);
+
+
+
 
 uint64_t littleEndian8BytesToUInt64(uint8_t* bytes);
 uint32_t littleEndian4BytesToUInt32(uint8_t* bytes);

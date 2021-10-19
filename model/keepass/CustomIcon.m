@@ -12,6 +12,10 @@
 
 @implementation CustomIcon
 
+- (void)dealloc {
+//    NSLog(@"DEALLOC - CustomIcon");
+}
+
 - (instancetype)initWithContext:(XmlProcessingContext*)context {
     if(self = [super initWithXmlElementName:kCustomIconElementName context:context]) {
         self.uuid = [NSUUID UUID];
@@ -53,12 +57,14 @@
         return NO;
     }
 
-    self.data = self.data ? self.data : [NSData data];
-    NSString *b64 = [self.data base64EncodedStringWithOptions:kNilOptions];
-    
     [serializer writeElement:kUuidElementName uuid:self.uuid];
-    [serializer writeElement:kCustomIconDataElementName text:b64];
-
+    
+    @autoreleasepool {
+        self.data = self.data ? self.data : [NSData data];
+        NSString *b64 = [self.data base64EncodedStringWithOptions:kNilOptions];
+        [serializer writeElement:kCustomIconDataElementName text:b64]; 
+    }
+    
     if ( self.name.length ) {
         if ( ![serializer writeElement:kNameElementName text:self.name] ) return NO;
     }

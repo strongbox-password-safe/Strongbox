@@ -147,15 +147,12 @@ NSData* argon2idCipherUuidData() {
     
     if(!foo) {
         uuid_t uuid;
-        [argon2dCipherUuid() getUUIDBytes:uuid];
+        [argon2idCipherUuid() getUUIDBytes:uuid];
         foo = [NSData dataWithBytes:uuid length:sizeof(uuid_t)];
     }
     
     return foo;
 }
-
-
-
 
 NSUUID* const aesCipherUuid() {
     static NSUUID* foo = nil;

@@ -24,9 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setEmptyTitle:(NSAttributedString*_Nullable)title description:(NSAttributedString*_Nullable)description;
 - (void)setEmptyTitle:(NSAttributedString*_Nullable)title description:(NSAttributedString*_Nullable)description buttonTitle:(NSAttributedString*_Nullable)buttonTitle buttonAction:(dispatch_block_t _Nullable)buttonAction;
 
-- (void)setEmptyTitle:(NSAttributedString *)title
-          description:(NSAttributedString *)description
-          buttonTitle:(NSAttributedString *)buttonTitle
+- (void)setEmptyTitle:(NSAttributedString *_Nullable)title
+          description:(NSAttributedString *_Nullable)description
+          buttonTitle:(NSAttributedString *_Nullable)buttonTitle
         bigBlueBounce:(BOOL)bigBlueBounce
          buttonAction:(dispatch_block_t)buttonAction;
 

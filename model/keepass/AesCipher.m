@@ -10,6 +10,7 @@
 #import <CommonCrypto/CommonCryptor.h>
 #import <CommonCrypto/CommonCrypto.h>
 #import "AesInputStream.h"
+#import "AesOutputStream.h"
 
 static const uint32_t kIvSize = kCCBlockSizeAES128;
 
@@ -17,37 +18,42 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
 
 
 
-- (NSData*)crypt:(CCOperation)operation data:(NSData *)data iv:(NSData*)iv key:(NSData*)key {
+- (NSMutableData*)crypt:(CCOperation)operation data:(NSData *)data iv:(NSData*)iv key:(NSData*)key {
     
     
     size_t bufferSize;
-    
-    CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
+    CCCryptorStatus status = CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
                                      data.bytes, data.length, nil, 0, &bufferSize);
 
+    if(status != kCCBufferTooSmall) {
+        NSLog(@"Could not get AES buffer size: [%d]", status);
+        return nil;
+    }
+    
     
     
     NSMutableData *ret = [NSMutableData dataWithLength:bufferSize];
-    CCCryptorStatus status = CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
+    status = CCCrypt(operation, kCCAlgorithmAES, kCCOptionPKCS7Padding, key.bytes, key.length, iv.bytes,
                      data.bytes, data.length, ret.mutableBytes, ret.length, &bufferSize);
 
     if(status != kCCSuccess) {
+        NSLog(@"Could not AES crypt: [%d]", status);
         return nil;
     }
     
     if(bufferSize != ret.length) {
-        return [ret subdataWithRange:NSMakeRange(0, bufferSize)];
+        return [ret subdataWithRange:NSMakeRange(0, bufferSize)].mutableCopy;
     }
     
     return ret;
 }
 
 
-- (NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSMutableData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
     return [self crypt:kCCDecrypt data:data iv:iv key:key];
 }
 
-- (NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSMutableData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
     return [self crypt:kCCEncrypt data:data iv:iv key:key];
 }
 
@@ -67,5 +73,8 @@ static const uint32_t kIvSize = kCCBlockSizeAES128;
     return [[AesInputStream alloc] initWithStream:inputStream key:key iv:iv];
 }
 
+- (NSOutputStream *)getEncryptionOutputStreamForStream:(NSOutputStream *)outputStream key:(NSData *)key iv:(NSData *)iv {
+    return [[AesOutputStream alloc] initToOutputStream:outputStream encrypt:YES key:key iv:iv chainOpensAndCloses:NO];
+}
 
 @end

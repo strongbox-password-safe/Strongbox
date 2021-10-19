@@ -10,7 +10,6 @@
 #import "BackupsManager.h"
 #import "Utils.h"
 #import "Alerts.h"
-//#import "ExportOptionsTableViewController.h"
 #import "LocalDeviceStorageProvider.h"
 #import "NSDate+Extensions.h"
 #import "Serializator.h"
@@ -19,6 +18,8 @@
 @interface BackupsBrowserTableViewController ()
 
 @property NSArray<BackupItem*>* items;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *barButtonShowAll;
+@property BOOL showAll;
 
 @end
 
@@ -29,6 +30,9 @@
 
     self.tableView.tableFooterView = UIView.new;
 
+    self.barButtonShowAll.enabled = self.metadata == nil;
+    self.barButtonShowAll.tintColor = self.metadata == nil ? nil : UIColor.clearColor;
+    
     [self internalRefresh];
 }
 
@@ -39,7 +43,7 @@
 }
 
 - (void)internalRefresh {
-    self.items = [BackupsManager.sharedInstance getAvailableBackups:self.metadata];
+    self.items = [BackupsManager.sharedInstance getAvailableBackups:self.metadata all:self.showAll];
     [self.tableView reloadData];
 }
 
@@ -55,6 +59,12 @@
     BackupItem* item = self.items[indexPath.row];
 
     cell.textLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_modified_title_fmt", @"Modified %@"), item.modDate.friendlyDateTimeString];
+
+    if ( !self.metadata ) {
+        NSString* recoveredNickname = [self tryDetermineNickName:item];
+        cell.textLabel.text = recoveredNickname;
+    }
+    
     cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"backups_backup_taken_at_subtitle_fmt", @"%@ (Backup taken %@)"), friendlyFileSizeString(item.fileSize.unsignedIntegerValue), item.backupCreatedDate.friendlyDateTimeString];
 
 
@@ -62,6 +72,26 @@
     cell.imageView.image = [UIImage imageNamed:@"file"];
     
     return cell;
+}
+
+- (NSString*)tryDetermineNickName:(BackupItem*)item {
+    NSArray *components = item.url.pathComponents;
+
+    if ( components && components.count > 1 ) {
+        NSString* secondLast = components[components.count - 2];
+        
+        
+        SafeMetaData* metadata = [SafesList.sharedInstance getById:secondLast];
+        if ( metadata ) {
+            return metadata.nickName;
+        }
+        else {
+            return item.url.lastPathComponent;
+        }
+    }
+    else {
+        return @"Unknown";
+    }
 }
 
 - (nullable NSArray<UITableViewRowAction *> *)tableView:(UITableView *)tableView editActionsForRowAtIndexPath:(nonnull NSIndexPath *)indexPath {
@@ -145,7 +175,8 @@
     
     NSDate* modDate = attr.fileModificationDate;
     
-    NSString* nickName = [NSString stringWithFormat:@"Restored Backup of %@", self.metadata.nickName];
+    NSString* nickName = [NSString stringWithFormat:@"Restored Backup of %@", self.metadata ? self.metadata.nickName : [self tryDetermineNickName:item]];
+    
     NSString* extension = [Serializator getLikelyFileExtension:data];
     [LocalDeviceStorageProvider.sharedInstance create:nickName
                                             extension:extension
@@ -167,6 +198,11 @@
             [self.navigationController popToRootViewControllerAnimated:YES];
         }];
     }];
+}
+
+- (IBAction)onButtonAll:(id)sender {
+    self.showAll = !self.showAll;
+    [self refresh];
 }
 
 @end

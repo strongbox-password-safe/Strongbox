@@ -8,16 +8,19 @@
 
 #import <UIKit/UIKit.h>
 #import "Model.h"
+#import "StaticDataTableViewController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface DatabasePreferencesController : UITableViewController
+@interface DatabasePreferencesController : StaticDataTableViewController
 
 @property Model* viewModel;
 
 @property (nonatomic, copy) void (^onDatabaseBulkIconUpdate)(NSDictionary<NSUUID *,UIImage *> * _Nullable selectedFavIcons);
 
 @property (nonatomic, copy) void (^onSetMasterCredentials)(NSString* _Nullable password, NSString* _Nullable keyFileBookmark, NSData* _Nullable oneTimeKeyFileData, YubiKeyHardwareConfiguration* _Nullable yubiConfig);
+
+@property (nonatomic, copy) void (^onChangedDatabaseEncryptionSettings)(void);
 
 @property (nonatomic, copy) void (^onDone)(BOOL showAllAuditIssues, __weak UIViewController* viewControllerToDismiss);
 

@@ -25,7 +25,7 @@
 }
 
 - (void)open {
-    NSLog(@"XXXXX - Open");
+    NSLog(@"Open");
 
     [self.inner open];
 }
@@ -37,19 +37,19 @@
         self.readCount += ret;
     }
     
-    NSLog(@"XXXXX - Read with Max Length %lu - read %ld - totalRead = [%ld]", (unsigned long)len, (long)ret, (long)self.readCount);
+    NSLog(@"Read with Max Length %lu - read %ld - totalRead = [%ld]", (unsigned long)len, (long)ret, (long)self.readCount);
     
     return ret;
 }
 
 - (BOOL)hasBytesAvailable {
-    NSLog(@"XXXXX - Has Bytes Available");
+    NSLog(@"Has Bytes Available");
 
     return self.inner.hasBytesAvailable;
 }
 
 - (void)close {
-    NSLog(@"XXXXX - Close");
+    NSLog(@"Close");
 
     [self.inner close];
 }

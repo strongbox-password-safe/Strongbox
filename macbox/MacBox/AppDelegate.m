@@ -32,6 +32,9 @@
 #import "WebDAVConnections.h"
 #import "SFTPConnections.h"
 #import "SFTPConnectionsManager.h"
+#import "SystemTrayViewController.h"
+#import "MainWindow.h"
+#import "LockScreenViewController.h"
 
 
 
@@ -59,7 +62,7 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 
 
-@interface AppDelegate () 
+@interface AppDelegate () <NSPopoverDelegate>
 
 @property (strong) IBOutlet NSMenu *systemTraymenu;
 @property NSStatusItem* statusItem;
@@ -70,6 +73,8 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 @property (strong, nonatomic) dispatch_block_t autoLockWorkBlock;
 @property NSTimer* clipboardChangeWatcher;
 @property NSInteger currentClipboardVersion;
+@property NSPopover* systemTrayPopover;
+@property NSDate* systemTrayPopoverClosedAt;
 
 @end
 
@@ -113,6 +118,8 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
         [dc onAppStartup];
         
         [self listenToEvents];
+        
+        [self maybeHideDockIconIfAllMiniaturized];
     });
 }
 
@@ -159,40 +166,31 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 
 
 - (void)onWindowDidMiniaturizeOrClose:(NSNotification*)notification {
-    if ( ![notification.object isMemberOfClass:NSWindow.class] ) { 
-        NSLog(@"Ignoring non-window based notification");
+    if ( ![notification.object isMemberOfClass:MainWindow.class] ) { 
+
         return;
     }
 
-    NSWindow* win = notification.object;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
-    BOOL interesting = win.contentViewController &&
-    ( [win.contentViewController isKindOfClass:ViewController.class] ||
-      [win.contentViewController isKindOfClass:NodeDetailsViewController.class]);
+    [self maybeHideDockIconIfAllMiniaturized];
+}
 
-
-
-    NSLog(@"onWindowDidMiniaturizeOrClose: [%@-%@-%@]", win, win.title, win.contentViewController.className);
-
-    if ( !interesting ) {
-        NSLog(@"Ignoring non View Controller based notification");
-        return;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- (void)maybeHideDockIconIfAllMiniaturized {
     NSArray* docs = DocumentController.sharedDocumentController.documents;
     NSArray* mainWindows = [docs map:^id _Nonnull(id  _Nonnull obj, NSUInteger idx) {
         Document* doc = obj;
@@ -200,16 +198,16 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
         return wc.window;
     }];
 
-    for(NSWindow* win in mainWindows) {
-        NSLog(@"Full List: [%@-%@-%@]", win, win.title, win.contentViewController.className);
-    }
+
+
+
 
     BOOL allMiniaturized = [mainWindows allMatch:^BOOL(NSWindow * _Nonnull obj) {
         return obj.miniaturized;
     }];
     
     if ( allMiniaturized ) {
-        NSLog(@"allMiniaturized.");
+        NSLog(@"AppDelegate -> all windows are Miniaturized.");
         
         if ( Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.hideDockIconOnAllMinimized ) {
             [self showHideDockIcon:NO];
@@ -227,18 +225,19 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 }
 
 - (void)showHideDockIcon:(BOOL)show {
-    
+    NSLog(@"AppDelegate::showHideDockIcon: %ld", (long)show);
 
     if ( show ) {
         [NSApp setActivationPolicy:NSApplicationActivationPolicyRegular];
+        
+        
+
+        [NSApp activateIgnoringOtherApps:YES];
+        [NSApp arrangeInFront:nil];
+        [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
     }
     else {
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
-        
-        
-        
-
-
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
 
     }
 }
@@ -340,8 +339,20 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
     }
     
     [self customizeMenu];
-    
     [self customizeForNonPro];
+    
+    self.systemTrayPopover = [[NSPopover alloc] init];
+    self.systemTrayPopover.behavior = NSPopoverBehaviorTransient ;
+    self.systemTrayPopover.animates = NO;
+    
+    SystemTrayViewController *vc = [SystemTrayViewController instantiateFromStoryboard];
+    vc.onShowClicked = ^(NSString * _Nullable databaseToShowUuid) {
+        [self onSystemTrayShow:databaseToShowUuid];
+    };
+    vc.popover = self.systemTrayPopover;
+    
+    self.systemTrayPopover.contentViewController = vc;
+    self.systemTrayPopover.delegate = self;
 }
 
 - (BOOL)isProFamilyEdition {
@@ -355,16 +366,23 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 }
 
 - (void)showHideSystemStatusBarIcon {   
-    if(Settings.sharedInstance.showSystemTrayIcon) {
-        if(!self.statusItem) {
+    if (Settings.sharedInstance.showSystemTrayIcon) {
+        if (!self.statusItem) {
             NSImage* statusImage = [NSImage imageNamed:@"AppIcon-glyph"];
             statusImage.size = NSMakeSize(18.0, 18.0);
             self.statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
             self.statusItem.image = statusImage;
             self.statusItem.highlightMode = YES;
             self.statusItem.enabled = YES;
-            self.statusItem.menu = self.systemTraymenu;
-            self.statusItem.toolTip = @"Strongbox";
+
+
+
+
+
+
+                [self.statusItem.button sendActionOn:NSEventMaskLeftMouseUp];
+                self.statusItem.button.action = @selector(onSystemTrayIconClicked:);
+
         }
     }
     else {
@@ -375,31 +393,86 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
     }
 }
 
-- (IBAction)onSystemTrayQuitStrongbox:  (id)sender {
+- (void)popoverDidShow:(NSNotification *)notification {
+
+}
+
+- (void)popoverDidClose:(NSNotification *)notification {
+
+
+
+
+
+    
+    self.systemTrayPopoverClosedAt = NSDate.date;
+}
+
+- (void)onSystemTrayIconClicked:(id)sender {
+    NSLog(@"onSystemTrayIconClicked [%@]", self.systemTrayPopover.contentViewController);
+
+    NSTimeInterval interval = [NSDate.date timeIntervalSinceDate:self.systemTrayPopoverClosedAt];
+
+    
+    
+    
+    if ( self.systemTrayPopoverClosedAt == nil || interval > 0.2f ) {
+        
+        
+        NSView* v = sender;
+        NSView* positioningView = [[NSView alloc] initWithFrame:v.bounds];
+        positioningView.identifier = (NSUserInterfaceItemIdentifier)@"positioningView";
+        [v addSubview:positioningView];
+        
+        [self.systemTrayPopover showRelativeToRect:positioningView.bounds ofView:positioningView preferredEdge:NSRectEdgeMinY];
+        v.bounds = NSOffsetRect(v.bounds, 0, v.bounds.size.height);
+
+        NSWindow* popoverWindow = self.systemTrayPopover.contentViewController.view.window;
+        if ( popoverWindow ) {
+            [popoverWindow setFrame:CGRectOffset(popoverWindow.frame, 0, 13) display:NO];
+        }
+            
+        [self.systemTrayPopover.contentViewController.view.window makeKeyWindow]; 
+    }
+}
+
+- (IBAction)onSystemTrayQuitStrongbox:(id)sender {
     [NSApplication.sharedApplication terminate:nil];
 }
 
 - (IBAction)onSystemTrayShow:(id)sender {
-    [self showAndActivateStrongbox];
+    [self showAndActivateStrongbox:sender];
 }
 
-- (void)showAndActivateStrongbox {
+- (void)showAndActivateStrongbox:(NSString*_Nullable)databaseUuid {
     NSLog(@"showAndActivateStrongbox");
+
+    [self showHideDockIcon:YES];
     
-    [NSApp arrangeInFront:nil];
-    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
-    [NSApp activateIgnoringOtherApps:YES];
-    
+
+
+
+
     for ( NSWindow* win in [NSApp windows] ) { 
         if([win isMiniaturized]) {
             [win deminiaturize:self];
         }
     }
-
-    [self showHideDockIcon:YES];
+    
+    [NSApp arrangeInFront:nil];
+    [NSApplication.sharedApplication.mainWindow makeKeyAndOrderFront:nil];
+    [NSApp activateIgnoringOtherApps:YES];
     
     DocumentController* dc = NSDocumentController.sharedDocumentController;
-    [dc performEmptyLaunchTasksIfNecessary];
+    
+    if ( databaseUuid ) {
+        DatabaseMetadata* metadata = [DatabasesManager.sharedInstance getDatabaseById:databaseUuid];
+        if ( metadata ) {
+            [dc openDatabase:metadata completion:nil];
+        }
+    }
+    else {
+        [dc performEmptyLaunchTasksIfNecessary];
+    }
 }
 
 - (void)applicationWillTerminate:(NSNotification *)notification {
@@ -413,10 +486,17 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)notification {
+    NSLog(@"applicationDidBecomeActive");
+
     if(self.autoLockWorkBlock) {
         dispatch_block_cancel(self.autoLockWorkBlock);
         self.autoLockWorkBlock = nil;
     }
+    
+    
+    
+    
+    [self showHideDockIcon:YES]; 
 }
 
 - (ViewController*)getActiveViewController {
@@ -549,90 +629,9 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
     [NSUserDefaults.standardUserDefaults registerDefaults:@{ kPreferenceGlobalShowShortcut : globalLaunchShortcutData }];
     
     [MASShortcutBinder.sharedBinder bindShortcutWithDefaultsKey:kPreferenceGlobalShowShortcut toAction:^{
-        [self showAndActivateStrongbox];
+        [self showAndActivateStrongbox:nil];
     }];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-    
-    
-    
-
-
-
-
-
-
-
 
 - (void)customizeMenu {
     [self removeUnwantedMenuItems];
@@ -766,56 +765,6 @@ static const NSInteger kTopLevelMenuItemTagFile = 1111;
         [UpgradeWindowController show:product cancelDelay:delay];
     }
 }
-
-- (IBAction)onContactSupport:(id)sender {
-    [MacAlerts yesNo:NSLocalizedString(@"prompt_title_copy_debug_info", @"Copy Debug Info?") informativeText:NSLocalizedString(@"prompt_message_copy_debug_info", @"Would you like to copy some helpful debug information that you can share with support before proceeding?") window:NSApplication.sharedApplication.mainWindow completion:^(BOOL yesNo) {
-        if ( yesNo ) {
-            NSString* debug = [DebugHelper getAboutDebugString];
-            [ClipboardManager.sharedInstance copyConcealedString:debug];
-        }
-    
-        NSURL* url = [NSURL URLWithString:@"https:
-        if (@available(macOS 10.15, *)) {
-            [[NSWorkspace sharedWorkspace] openURL:url
-                                     configuration:NSWorkspaceOpenConfiguration.configuration
-                                 completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
-                if ( error ) {
-                    NSLog(@"Launch URL done. Error = [%@]", error);
-                }
-            }];
-        } else {
-            [[NSWorkspace sharedWorkspace] openURL:url];
-        }
-    }];
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

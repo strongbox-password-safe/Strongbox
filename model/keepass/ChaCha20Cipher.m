@@ -9,6 +9,7 @@
 #import "ChaCha20Cipher.h"
 #import "sodium.h"
 #import "ChaCha20ReadStream.h"
+#import "ChaCha20OutputStream.h"
 
 static const uint32_t kIvSize = 12;
 static const uint32_t kKeySize = 32;
@@ -31,7 +32,7 @@ static const BOOL kLogVerbose = NO;
     return self;
 }
 
-- (NSData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key {
+- (NSMutableData *)decrypt:(NSData *)data iv:(NSData *)iv key:(NSData *)key {
     if(kLogVerbose) {
         NSLog(@"IV12: %@", [iv base64EncodedStringWithOptions:kNilOptions]);
         NSLog(@"KEY32: %@", [key base64EncodedStringWithOptions:kNilOptions]);
@@ -50,7 +51,7 @@ static const BOOL kLogVerbose = NO;
     return foo;
 }
 
-- (NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSMutableData *)encrypt:(NSData *)data iv:(NSData *)iv key:(NSData *)key {
     return [self decrypt:data iv:iv key:key];
 }
 
@@ -71,6 +72,8 @@ static const BOOL kLogVerbose = NO;
     return [[ChaCha20ReadStream alloc] initWithStream:inputStream key:key iv:iv];
 }
 
-
+- (NSOutputStream *)getEncryptionOutputStreamForStream:(NSOutputStream *)outputStream key:(NSData *)key iv:(NSData *)iv {
+    return [[ChaCha20OutputStream alloc] initToOutputStream:outputStream key:key iv:iv];
+}
 
 @end

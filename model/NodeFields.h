@@ -22,9 +22,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NodeFields : NSObject
 
-- (instancetype _Nullable)init;
+- (instancetype)init;
 
-- (instancetype _Nullable)initWithUsername:(NSString*_Nonnull)username
+- (instancetype)initWithUsername:(NSString*_Nonnull)username
                                        url:(NSString*_Nonnull)url
                                   password:(NSString*_Nonnull)password
                                      notes:(NSString*_Nonnull)notes

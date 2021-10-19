@@ -138,7 +138,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
                 return nil;
             }
             else {
-                NSNumber *compressionFlags = [NSNumber numberWithInt:littleEndian4BytesToInt32((uint8_t*)data.bytes)];
+                NSNumber *compressionFlags = [NSNumber numberWithUnsignedInt:littleEndian4BytesToUInt32((uint8_t*)data.bytes)];
                 return compressionFlags;
             }
             break;
@@ -157,7 +157,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
                 return nil;
             }
             else {
-                NSNumber *transformRounds = [NSNumber numberWithLongLong:littleEndian8BytesToInt64((uint8_t*)data.bytes)];
+                NSNumber *transformRounds = [NSNumber numberWithUnsignedLongLong:littleEndian8BytesToUInt64((uint8_t*)data.bytes)];
                 return transformRounds;
             }
             break;
@@ -167,7 +167,7 @@ NSObject* getHeaderEntryObject(uint8_t identifier, NSData* data) {
                 return nil;
             }
             else {
-                NSNumber *innerRandomStreamId = [NSNumber numberWithInt:littleEndian4BytesToInt32((uint8_t*)data.bytes)];
+                NSNumber *innerRandomStreamId = [NSNumber numberWithUnsignedInt:littleEndian4BytesToUInt32((uint8_t*)data.bytes)];
                 return innerRandomStreamId;
             }
             break;
@@ -326,6 +326,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
                               NSInputStream* stream,
                               NSOutputStream* xmlDumpStream,
                               BOOL sanityCheckStreamDecryption,
+                              NSError** decryptionError,
                               NSError** error) {
     KeePassXmlParser *parser =
         [[KeePassXmlParser alloc] initWithProtectedStreamId:innerRandomStreamId
@@ -449,7 +450,7 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
     
     RootXmlDomainObject* ret = parser.rootElement;
 
-    if(ret == nil && xmlMarker != 0) {
+    if ( ret == nil && xmlMarker != 0 ) {
         
         
         if (error) {
@@ -458,6 +459,10 @@ RootXmlDomainObject* parseXml(uint32_t innerRandomStreamId,
             *error = [Utils createNSError:[NSString stringWithFormat:@"Could not find any valid XML. Hex = [%@]", hex]
                                errorCode:-1];
         }
+    }
+    
+    if ( decryptionError != nil ) {
+        *decryptionError = parser.decryptionProblem;
     }
     
     return ret;

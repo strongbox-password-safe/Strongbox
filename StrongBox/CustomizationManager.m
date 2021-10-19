@@ -11,11 +11,14 @@
 #import "Constants.h"
 #import "AppPreferences.h"
 
-@implementation CustomizationManager
+@interface CustomizationManager ()
 
-+ (BOOL)isAProBundle {
-    return self.isProEdition || self.isScotusEdition;
-}
+@property (readonly, class) BOOL isScotusEdition;
+@property (readonly, class) BOOL isGrapheneEdition;
+
+@end
+
+@implementation CustomizationManager
 
 + (void)applyCustomizations {
     if ( [self isAProBundle] ) {
@@ -29,14 +32,29 @@
         AppPreferences.sharedInstance.disableFavIconFeature = YES;
         AppPreferences.sharedInstance.disableReadOnlyToggles = YES;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = YES;
-        AppPreferences.sharedInstance.disableNativeNetworkStorageOptions = YES;
+        AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
+        AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
+    }
+    else if ( self.isGrapheneEdition ) {
+        NSLog(@"Graphene Edition... customizing...");
+
+        AppPreferences.sharedInstance.disableFavIconFeature = YES;
+        AppPreferences.sharedInstance.disableReadOnlyToggles = NO;
+        AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
+        AppPreferences.sharedInstance.disableNetworkBasedFeatures = YES;
+        AppPreferences.sharedInstance.disableThirdPartyStorageOptions = YES;
     }
     else {
         AppPreferences.sharedInstance.disableFavIconFeature = NO;
         AppPreferences.sharedInstance.disableReadOnlyToggles = NO;
         AppPreferences.sharedInstance.databasesAreAlwaysReadOnly = NO;
-        AppPreferences.sharedInstance.disableNativeNetworkStorageOptions = NO;
+        AppPreferences.sharedInstance.disableNetworkBasedFeatures = NO;
+        AppPreferences.sharedInstance.disableThirdPartyStorageOptions = NO;
     }
+}
+
++ (BOOL)isAProBundle {
+    return self.isProEdition || self.isScotusEdition || self.isGrapheneEdition;
 }
 
 + (BOOL)isProEdition {
@@ -49,6 +67,12 @@
     NSString* bundleId = [Utils getAppBundleId];
 
     return [bundleId isEqualToString:Constants.scotusEditionBundleId];
+}
+
++ (BOOL)isGrapheneEdition {
+    NSString* bundleId = [Utils getAppBundleId];
+
+    return [bundleId isEqualToString:Constants.grapheneEditionBundleId];
 }
 
 @end

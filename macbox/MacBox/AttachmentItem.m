@@ -14,8 +14,7 @@
 
 @implementation AttachmentItem
 
-+ (NSSet *)keyPathsForValuesAffectingTextColor
-{
++ (NSSet *)keyPathsForValuesAffectingTextColor {
     return [NSSet setWithObjects:@"selected", nil];
 }
 

@@ -20,6 +20,7 @@
 #import "SampleItemsGenerator.h"
 #import "DatabaseUnlocker.h"
 #import "ConcurrentMutableStack.h"
+#import "FileManager.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
@@ -189,13 +190,13 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         return;
     }
 
-    NSLog(@"XXXXX - reloadDatabaseFromLocalWorkingCopy....");
+    NSLog(@"reloadDatabaseFromLocalWorkingCopy....");
 
     
     DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.metadata viewController:viewController forceReadOnly:self.forcedReadOnly isAutoFillOpen:self.isAutoFillOpen offlineMode:self.offlineMode];
-    [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+    [unlocker unlockLocalWithKey:self.database.ckfs keyFromConvenience:NO completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         if ( result == kUnlockDatabaseResultSuccess) {
-            NSLog(@"XXXXX - reloadDatabaseFromLocalWorkingCopy... Success ");
+            NSLog(@"reloadDatabaseFromLocalWorkingCopy... Success ");
 
             self.theDatabase = model.database;
             if (completion) {
@@ -257,8 +258,18 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         [self queueAsyncUpdateWithDatabaseClone:NSUUID.UUID cloneForUpdate:cloneForUpdate];
     }
     else {
-        NSLog(@"XXXX - NOP - No outstanding async updates found. All Done.");
+        NSLog(@"NOP - No outstanding async updates found. All Done.");
     }
+}
+
+- (NSString*)getUniqueStreamingFilename {
+    NSString* ret;
+    
+    do {
+        ret = [FileManager.sharedInstance.tmpEncryptionStreamPath stringByAppendingPathComponent:NSUUID.UUID.UUIDString];
+    } while ([NSFileManager.defaultManager fileExistsAtPath:ret]);
+    
+    return ret;
 }
 
 - (void)queueAsyncUpdateWithDatabaseClone:(NSUUID*)updateId cloneForUpdate:(DatabaseModel*)cloneForUpdate {
@@ -272,10 +283,17 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     dispatch_group_t mutex = dispatch_group_create();
     dispatch_group_enter(mutex);
     
+    NSString* streamingFile = [self getUniqueStreamingFilename];
+    NSOutputStream* outputStream = [NSOutputStream outputStreamToFileAtPath:streamingFile append:NO];
+    [outputStream open];
+    
     [Serializator getAsData:cloneForUpdate
                      format:cloneForUpdate.originalFormat
-                 completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled data:data updateMutex:mutex error:error]; 
+               outputStream:outputStream
+                 completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        [outputStream close];
+        
+        [self onAsyncUpdateSerializeDone:updateId userCancelled:userCancelled streamingFile:streamingFile updateMutex:mutex error:error]; 
     }];
 
     dispatch_group_wait(mutex, DISPATCH_TIME_FOREVER);
@@ -283,23 +301,28 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     NSLog(@"queueAsyncUpdateWithDatabaseClone EXIT - [%@]", NSThread.currentThread.name);
 }
 
-- (void)onAsyncUpdateSerializeDone:(NSUUID*)updateId userCancelled:(BOOL)userCancelled data:(NSData *_Nullable)data updateMutex:(dispatch_group_t)updateMutex error:(NSError * _Nullable)error {
-    if (userCancelled || data == nil || error) {
+- (void)onAsyncUpdateSerializeDone:(NSUUID*)updateId userCancelled:(BOOL)userCancelled streamingFile:(NSString*)streamingFile updateMutex:(dispatch_group_t)updateMutex error:(NSError * _Nullable)error {
+    if (userCancelled || error) {
         
         [self onAsyncUpdateDone:updateId success:NO userCancelled:userCancelled userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
         return;
     }
     
     if (self.isDuressDummyMode) {
+        NSData* data = [NSData dataWithContentsOfFile:streamingFile];
+        [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
+        
         [self setDuressDummyData:data];
         [self onAsyncUpdateDone:updateId success:YES userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:nil];
         return;
     }
 
     NSError* localUpdateError;
-    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata data:data error:&localUpdateError];
+    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&localUpdateError];
+    [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
+
     if (!success) { 
-        [self onAsyncUpdateDone:updateId success:NO userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:error];
+        [self onAsyncUpdateDone:updateId success:NO userCancelled:NO userInteractionRequired:NO localUpdated:NO updateMutex:updateMutex error:localUpdateError];
         return;
     }
 
@@ -323,7 +346,12 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                           completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
         if ( result == kSyncAndMergeSuccess ) {
             if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid displayFormat:self.metadata.quickTypeDisplayFormat];
+                [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database
+                                                                   databaseUuid:self.metadata.uuid
+                                                                  displayFormat:self.metadata.quickTypeDisplayFormat
+                                                                alternativeUrls:self.metadata.autoFillScanAltUrls
+                                                                   customFields:self.metadata.autoFillScanCustomFields
+                                                                          notes:self.metadata.autoFillScanNotes];
             }
 
             [self onAsyncUpdateDone:updateId success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
@@ -374,39 +402,54 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         return;
     }
 
-    [self encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-        if (userCancelled || data == nil || error) {
+    [self encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        if (userCancelled || error) {
             handler(userCancelled, NO, error);
             return;
         }
 
-        [self onEncryptionDone:viewController data:data completion:handler];
+        [self onEncryptionDone:viewController streamingFile:file completion:handler];
     }];
 }
 
-- (void)encrypt:(void (^)(BOOL userCancelled, NSData* data, NSString*_Nullable debugXml, NSError* error))completion {
+- (void)encrypt:(void (^)(BOOL userCancelled, NSString* file, NSString*_Nullable debugXml, NSError* error))completion {
     [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
-        [Serializator getAsData:self.database format:self.database.originalFormat completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        NSString* tmpFile = [self getUniqueStreamingFilename];
+        NSOutputStream* outputStream = [NSOutputStream outputStreamToFileAtPath:tmpFile append:NO];
+        [outputStream open];
+
+        [Serializator getAsData:self.database
+                         format:self.database.originalFormat
+                   outputStream:outputStream
+                     completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            [outputStream close];            
+
             dispatch_async(dispatch_get_main_queue(), ^(void){
                 [SVProgressHUD dismiss];
-                completion(userCancelled, data, debugXml, error);
+
+                completion(userCancelled, tmpFile, debugXml, error);
             });
         }];
     });
 }
 
-- (void)onEncryptionDone:(UIViewController*)viewController data:(NSData*)data completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
+- (void)onEncryptionDone:(UIViewController*)viewController streamingFile:(NSString*)streamingFile completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
     if (self.isDuressDummyMode) {
+        NSData* data = [NSData dataWithContentsOfFile:streamingFile];
+        [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
         [self setDuressDummyData:data];
         completion(NO, NO, nil);
         return;
     }
     
     
+    
     NSError* error;
-    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata data:data error:&error];
+    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&error];
+    [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
+
     if (!success) {
         completion(NO, NO, error);
         return;
@@ -429,7 +472,12 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, const NSError * _Nullable error) {
             if (result == kSyncAndMergeSuccess || result == kSyncAndMergeUserPostponedSync) {
                 if(self.metadata.autoFillEnabled && self.metadata.quickTypeEnabled) {
-                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database databaseUuid:self.metadata.uuid displayFormat:self.metadata.quickTypeDisplayFormat];
+                    [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.database
+                                                                       databaseUuid:self.metadata.uuid
+                                                                      displayFormat:self.metadata.quickTypeDisplayFormat
+                                                                    alternativeUrls:self.metadata.autoFillScanAltUrls
+                                                                       customFields:self.metadata.autoFillScanCustomFields
+                                                                              notes:self.metadata.autoFillScanNotes];
                 }
 
                 completion(NO, localWasChanged, nil);

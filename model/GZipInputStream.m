@@ -191,7 +191,7 @@
         if (inflateEnd(self.stream) == Z_OK) {
             self.done = YES;
 
-            if (self.stream) {
+            if ( self.stream ) {
                 free(self.stream);
                 self.stream = nil;
             }
@@ -204,12 +204,13 @@
         else {
             NSLog(@"ERROR inflateEnd GZIP! %d", status);
             self.error = [Utils createNSError:@"ERROR inflateEnd GZIP!." errorCode:status];
+            return -1;
         }
     }
     else if (status != Z_OK) {
         NSLog(@"ERROR Reading GZIP! %d", status);
         self.error = [Utils createNSError:@"ERROR Reading GZIP!." errorCode:status];
-        return 0;
+        return -1;
     }
     
     return read;
@@ -235,6 +236,7 @@
             }
             else {
                 NSLog(@"ERROR inflateEnd GZIP! %d", status);
+                return -1;
             }
         }
 
@@ -242,6 +244,7 @@
     }
     else {
         NSLog(@"ERROR Reading GZIP! %d", status);
+        return -1;
     }
     
     return 0;
@@ -253,6 +256,7 @@ BOOL isGzippedData(NSData* data) {
 }
 
 - (NSError *)streamError {
-    return self.error;
+    return self.innerStream.streamError ? self.innerStream.streamError : self.error;
 }
+
 @end

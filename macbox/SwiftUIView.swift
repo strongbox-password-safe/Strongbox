@@ -18,7 +18,7 @@ SwiftUIController: NSHostingController<SwiftUIView>
     dynamic
     init?(coder: NSCoder)
     {
-        weak var parent: NSViewController? = nil // avoid reference cycling
+        weak var parent: NSViewController? = nil 
         super.init(rootView:
             SwiftUIView(parent: Binding(
                 get: { parent },
@@ -26,25 +26,25 @@ SwiftUIController: NSHostingController<SwiftUIView>
             )
         )
 
-        parent = self // self usage not allowed till super.init
+        parent = self 
     }
 }
 
 @available(OSX 10.15.0, *)
 struct SwiftUIView: View {
-//  var dismiss: () -> Void = {}
+
     @Binding var parent: NSViewController?
-//    @Binding var isOn: Bool
+
     
   var body: some View {
     VStack(spacing: 8) {
       Text("SwiftUI View 🎉")
         .font(.title)
         .bold()
-//        Toggle(title: "Yo", isOn: $isOn)
+
       Button(action: {
         self.parent?.dismiss(nil)
-//        dismiss()
+
       }, label: {
         Text("Close")
       })

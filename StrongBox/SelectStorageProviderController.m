@@ -12,8 +12,12 @@
 #import "DatabaseModel.h"
 #import "Alerts.h"
 #import "StorageBrowserTableViewController.h"
+
+#ifndef NO_SFTP_WEBDAV_SP
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
+#endif
+
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "FileManager.h"
 #import "FilesAppUrlBookmarkProvider.h"
@@ -21,6 +25,7 @@
 #import "NSString+Extensions.h"
 #import "SafeStorageProviderFactory.h"
 #import "Serializator.h"
+
 #import "WebDAVConnectionsViewController.h"
 #import "SFTPConnectionsViewController.h"
 
@@ -59,15 +64,20 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
         
-    NSMutableArray<id<SafeStorageProvider>>* sp = @[
-#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS 
-        GoogleDriveStorageProvider.sharedInstance,
-        DropboxV2StorageProvider.sharedInstance,
-        OneDriveStorageProvider.sharedInstance,
-#endif
-        ].mutableCopy;
+    NSMutableArray<id<SafeStorageProvider>>* sp = NSMutableArray.array;
     
-    if ( !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+    if ( !AppPreferences.sharedInstance.disableThirdPartyStorageOptions ) {
+        [sp addObjectsFromArray:@[
+#ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
+            GoogleDriveStorageProvider.sharedInstance,
+            DropboxV2StorageProvider.sharedInstance,
+            OneDriveStorageProvider.sharedInstance,
+#endif
+        ]];
+    }
+    
+    if ( !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+#ifndef NO_SFTP_WEBDAV_SP
         SFTPStorageProvider* sftpProviderWithFastListing = [[SFTPStorageProvider alloc] init];
         sftpProviderWithFastListing.maintainSessionForListing = YES;
 
@@ -76,6 +86,7 @@
 
         [sp addObject:webDavProvider];
         [sp addObject:sftpProviderWithFastListing];
+#endif
     }
     
     
@@ -88,7 +99,7 @@
     
     if ( !self.existing &&
         AppPreferences.sharedInstance.iCloudOn &&
-        !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+        !AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         [sp insertObject:AppleICloudProvider.sharedInstance atIndex:0];
     }
         
@@ -104,7 +115,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    BOOL showNativeNetworkProviders = self.existing && !AppPreferences.sharedInstance.disableNativeNetworkStorageOptions;
+    BOOL showNativeNetworkProviders = self.existing && !AppPreferences.sharedInstance.disableNetworkBasedFeatures;
     return self.providers.count + (showNativeNetworkProviders ? 2 : 0);
 }
 
@@ -153,12 +164,14 @@
                 [self onCreateThroughFilesApp];
             }
         }
+#ifndef NO_SFTP_WEBDAV_SP
         else if ( provider.storageId == kWebDAV ) {
             [self getWebDAVConnection];
         }
         else if ( provider.storageId == kSFTP ) {
             [self getSFTPConnection];
         }
+#endif
         else if (provider.storageId == kLocalDevice && !self.existing) {
             [Alerts yesNo:self
                     title:NSLocalizedString(@"sspc_local_device_storage_warning_title", @"Local Device Database Caveat")
@@ -211,6 +224,7 @@
 
 
 
+#ifndef NO_SFTP_WEBDAV_SP
 - (void)getWebDAVConnection {
     WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
     vc.selectMode = YES;
@@ -236,7 +250,8 @@
     
     [vc presentFromViewController:self];
 }
-    
+#endif
+
 
 
 

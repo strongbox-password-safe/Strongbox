@@ -7,9 +7,9 @@
 //
 
 #import "WelcomeCreateDatabaseViewController.h"
-#import "WelcomeMasterPasswordViewController.h"
 #import "SafesList.h"
 #import "Utils.h"
+#import "MasterPasswordExplanationViewController.h"
 
 @interface WelcomeCreateDatabaseViewController () <UITextFieldDelegate>
 
@@ -104,7 +104,7 @@
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToMasterPassword"]) {
-        WelcomeMasterPasswordViewController* vc = (WelcomeMasterPasswordViewController*)segue.destinationViewController;
+        MasterPasswordExplanationViewController* vc = (MasterPasswordExplanationViewController*)segue.destinationViewController;
         
         vc.name = [SafesList trimDatabaseNickName:self.textFieldName.text];
         vc.onDone = self.onDone;

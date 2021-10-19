@@ -16,9 +16,9 @@
 //
 
 import Foundation
-//import FavIcon.XMLDocument
 
-/// Represents an icon size.
+
+
 struct IconSize : Hashable, Equatable {
     func hash(into hasher: inout Hasher) {
         hasher.combine(width.hashValue ^ height.hashValue)
@@ -28,9 +28,9 @@ struct IconSize : Hashable, Equatable {
         return lhs.width == rhs.width && lhs.height == rhs.height
     }
     
-    /// The width of the icon.
+    
     let width: Int
-    /// The height of the icon.
+    
     let height: Int
 }
 
@@ -55,13 +55,13 @@ private let siteImage: [String: IconSize] = [
     "twitter:image": IconSize(width: 1024, height: 512)
 ]
 
-/// Extracts a list of icons from the `<head>` section of an HTML document.
-///
-/// - parameter document: An HTML document to process.
-/// - parameter baseURL: A base URL to combine with any relative image paths.
-/// - parameter returns: An array of `DetectedIcon` structures.
-// swiftlint:disable function_body_length
-// swiftlint:disable cyclomatic_complexity
+
+
+
+
+
+
+
 func examineHTMLMeta(_ document: HTMLDocument, baseURL: URL) -> [String:String] {
     var resp: [String:String] = [:]
     for meta in document.query("/html/head/meta") {
@@ -206,14 +206,14 @@ func extractHTMLHeadIcons(_ document: HTMLDocument, baseURL: URL) -> [DetectedIc
     
     return icons
 }
-// swiftlint:enable cyclomatic_complexity
-// swiftlint:enable function_body_length
 
-/// Extracts a list of icons from a Web Application Manifest file
-///
-/// - parameter jsonString: A JSON string containing the contents of the manifest file.
-/// - parameter baseURL: A base URL to combine with any relative image paths.
-/// - returns: An array of `DetectedIcon` structures.
+
+
+
+
+
+
+
 func extractManifestJSONIcons(_ jsonString: String, baseURL: URL) -> [DetectedIcon] {
     var icons: [DetectedIcon] = []
     
@@ -243,11 +243,11 @@ func extractManifestJSONIcons(_ jsonString: String, baseURL: URL) -> [DetectedIc
     return icons
 }
 
-/// Extracts a list of icons from a Microsoft browser configuration XML document.
-///
-/// - parameter document: An `XMLDocument` for the Microsoft browser configuration file.
-/// - parameter baseURL: A base URL to combine with any relative image paths.
-/// - returns: An array of `DetectedIcon` structures.
+
+
+
+
+
 func extractBrowserConfigXMLIcons(_ document: LBXMLDocument, baseURL: URL) -> [DetectedIcon] {
     var icons: [DetectedIcon] = []
     
@@ -279,11 +279,11 @@ func extractBrowserConfigXMLIcons(_ document: LBXMLDocument, baseURL: URL) -> [D
     return icons
 }
 
-/// Extracts the Web App Manifest URLs from an HTML document, if any.
-///
-/// - parameter document: The HTML document to scan for Web App Manifest URLs
-/// - parameter baseURL: The base URL that any 'href' attributes are relative to.
-/// - returns: An array of Web App Manifest `URL`s.
+
+
+
+
+
 func extractWebAppManifestURLs(_ document: HTMLDocument, baseURL: URL) -> [URL] {
     var urls: [URL] = []
     for link in document.query("/html/head/link") {
@@ -295,18 +295,18 @@ func extractWebAppManifestURLs(_ document: HTMLDocument, baseURL: URL) -> [URL] 
     return urls
 }
 
-/// Extracts the first browser config XML file URL from an HTML document, if any.
-///
-/// - parameter document: The HTML document to scan for browser config XML file URLs.
-/// - parameter baseURL: The base URL that any 'href' attributes are relative to.
-/// - returns: A named tuple describing the file URL or a flag indicating that the server
-///            explicitly requested that the file not be downloaded.
+
+
+
+
+
+
 func extractBrowserConfigURL(_ document: HTMLDocument, baseURL: URL) -> (url: URL?, disabled: Bool) {
     for meta in document.query("/html/head/meta") {
         if let name = meta.attributes["name"]?.lowercased(), name == "msapplication-config",
            let content = meta.attributes["content"] {
             if content.lowercased() == "none" {
-                // Explicitly asked us not to download the file.
+                
                 return (url: nil, disabled: true)
             } else {
                 return (url: URL(string: content, relativeTo: baseURL)?.absoluteURL, disabled: false)
@@ -316,10 +316,10 @@ func extractBrowserConfigURL(_ document: HTMLDocument, baseURL: URL) -> (url: UR
     return (url: nil, disabled: false)
 }
 
-/// Helper function for parsing a W3 `sizes` attribute value.
-///
-/// - parameter string: If not `nil`, the value of the attribute to parse (e.g. `50x50 144x144`).
-/// - returns: An array of `IconSize` structs for each size found.
+
+
+
+
 func parseHTMLIconSizes(_ string: String?) -> [IconSize] {
     var sizes: [IconSize] = []
     if let string = string?.lowercased(), string != "any" {

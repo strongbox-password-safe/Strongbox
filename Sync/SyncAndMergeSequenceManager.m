@@ -674,7 +674,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
         [Serializator fromUrl:localUrl
                           ckf:parameters.key
-                   completion:^(BOOL userCancelled, DatabaseModel * _Nullable mine, NSError * _Nullable error) {
+                   completion:^(BOOL userCancelled, DatabaseModel * _Nullable mine, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self dismissProgressSpinner];
 
@@ -682,8 +682,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                     [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Local Merge Unlock."];
                     [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
                 }
-                else if ( error || !mine ) {
-                    [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
+                else if ( error || innerStreamError || !mine ) {
+                    [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error ? error : innerStreamError];
                     completion(kSyncAndMergeError, NO, error);
                 }
                 else {
@@ -692,7 +692,7 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
                         [Serializator fromUrl:remoteUrl
                                           ckf:parameters.key
-                                   completion:^(BOOL userCancelled, DatabaseModel * _Nullable theirs, NSError * _Nullable error) {
+                                   completion:^(BOOL userCancelled, DatabaseModel * _Nullable theirs, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 [self dismissProgressSpinner];
 
@@ -700,8 +700,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
                                     [self logMessage:databaseUuid syncId:syncId message:@"User Cancelled Source DB Merge Unlock."];
                                     [self conflictResolutionCancel:databaseUuid syncId:syncId completion:completion];
                                 }
-                                else if ( error || !theirs ) {
-                                    [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error];
+                                else if ( error || innerStreamError || !theirs ) {
+                                    [self logAndPublishStatusChange:databaseUuid syncId:syncId state:kSyncOperationStateError error:error ? error : innerStreamError];
                                     completion(kSyncAndMergeError, NO, error);
                                 }
                                 else {
@@ -788,7 +788,8 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
         UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"CompareDatabases" bundle:nil];
         DatabaseDiffAndMergeViewController* vc = (DatabaseDiffAndMergeViewController*)[storyboard instantiateInitialViewController];
 
-        vc.isMergeDiff = YES;
+        vc.isCompareForMerge = YES;
+        vc.isSyncInitiated = YES;
         
         METADATA_PTR database = [self databaseMetadataFromDatabaseId:databaseUuid];
         
@@ -872,7 +873,18 @@ NSString* const kSyncManagerDatabaseSyncStatusChanged = @"syncManagerDatabaseSyn
     [self showProgressSpinner:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:interactiveVC];
 
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-        [Serializator getAsData:merged format:merged.originalFormat completion:^(BOOL userCancelled, NSData * _Nullable mergedData, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        
+        NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory]; 
+        [outputStream open];
+        
+        [Serializator getAsData:merged
+                         format:merged.originalFormat
+                   outputStream:outputStream
+                     completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            
+            [outputStream close];
+            NSData* mergedData = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self dismissProgressSpinner];
                 

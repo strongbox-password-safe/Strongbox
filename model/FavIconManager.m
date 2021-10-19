@@ -58,6 +58,7 @@
 
     @try {
         NSError* error;
+#ifndef NO_FAVICON_LIBRARY
         [FavIcon downloadAll:url
                      favIcon:options.checkCommonFavIconFiles
                     scanHtml:options.scanHtml
@@ -69,6 +70,10 @@
             IMAGE_TYPE_PTR best = [self selectBest:images];
             completion(best);
         }];
+#else
+        NSLog(@"WARNWARN: attempt to use FavIcon library when compiled out.");
+        completion(nil);
+#endif
         
         if (error) {
             NSLog(@"Error: [%@]", error);
@@ -87,6 +92,8 @@
 
     @try {
         NSError* error;
+    
+#ifndef NO_FAVICON_LIBRARY
         [FavIcon downloadAll:url
                      favIcon:options.checkCommonFavIconFiles
                     scanHtml:options.scanHtml
@@ -97,6 +104,10 @@
                   completion:^(NSArray<IMAGE_TYPE_PTR>* _Nullable images) {
            completion(images);
         }];
+#else
+        NSLog(@"WARNWARN: attempt to use FavIcon library when compiled out.");
+        completion(@[]);
+#endif
         
         if (error) {
             NSLog(@"Error: [%@]", error);

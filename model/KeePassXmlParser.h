@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)didEndElement:(NSString *)elementName;
 
 @property (readonly, nullable) NSError* error;
+@property (readonly, nullable) NSError* decryptionProblem;
 
 @end
 

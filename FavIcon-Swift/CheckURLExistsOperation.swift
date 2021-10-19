@@ -17,7 +17,7 @@
 
 import Foundation;
 
-/// Checks whether a URL exists, and returns `URLResult.Success` as the result if it does.
+
 final class CheckURLExistsOperation: URLRequestOperation {
     override func prepareRequest() {
         urlRequest.httpMethod = "GET"

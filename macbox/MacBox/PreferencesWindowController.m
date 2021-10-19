@@ -15,7 +15,6 @@
 #import "NSCheckboxTableCellView.h"
 #import "ColoredStringHelper.h"
 #import "ClipboardManager.h"
-#import "MBProgressHUD.h"
 #import "BiometricIdHelper.h"
 #import "AutoFillManager.h"
 #import "DatabasesManager.h"
@@ -103,6 +102,9 @@
 
 @property (weak) IBOutlet NSButton *makeRollingLocalBackups;
 @property (weak) IBOutlet NSButton *hideManagerOnLaunch;
+@property (weak) IBOutlet NSButton *checkboxMiniaturizeOnCopy;
+@property (weak) IBOutlet NSButton *checkboxQuickRevealFields;
+@property (weak) IBOutlet NSButton *checkboxEnableMarkdown;
 
 @end
 
@@ -135,6 +137,11 @@
 - (void)showPasswordSettings {
     [self show];
     [self.tabView selectTabViewItemAtIndex:1];
+}
+
+- (void)showGeneralSettings {
+    [self show];
+    [self.tabView selectTabViewItemAtIndex:0];
 }
 
 - (void)windowDidLoad {
@@ -214,8 +221,9 @@
     self.colorizePasswords.state = Settings.sharedInstance.colorizePasswords ? NSOnState : NSOffState;
     self.useColorBlindPalette.state = Settings.sharedInstance.colorizeUseColorBlindPalette ? NSOnState : NSOffState;
     self.checkboxClipboardHandoff.state = Settings.sharedInstance.clipboardHandoff ? NSOnState : NSOffState;
-
-
+    self.checkboxMiniaturizeOnCopy.state = Settings.sharedInstance.miniaturizeOnCopy ? NSOnState : NSOffState;
+    self.checkboxQuickRevealFields.state = Settings.sharedInstance.quickRevealWithOptionKey ? NSOnState : NSOffState;
+    
     self.checkboxShowDatabasesManagerOnCloseAllWindows.state = Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows ? NSOnState : NSOffState;    
     
         
@@ -225,6 +233,7 @@
 
     self.hideManagerOnLaunch.state = Settings.sharedInstance.closeManagerOnLaunch ? NSOnState : NSOffState;
     self.makeRollingLocalBackups.state = Settings.sharedInstance.makeLocalRollingBackups ? NSOnState : NSOffState;
+    self.checkboxEnableMarkdown.state = Settings.sharedInstance.markdownNotes ? NSOnState : NSOffState;
 }
 
 - (IBAction)onGeneralSettingsChange:(id)sender {
@@ -243,7 +252,9 @@
     Settings.sharedInstance.colorizeUseColorBlindPalette = self.useColorBlindPalette.state == NSOnState;
     
     Settings.sharedInstance.clipboardHandoff = self.checkboxClipboardHandoff.state == NSOnState;
-
+    Settings.sharedInstance.miniaturizeOnCopy = self.checkboxMiniaturizeOnCopy.state == NSOnState;
+    Settings.sharedInstance.quickRevealWithOptionKey = self.checkboxQuickRevealFields.state == NSOnState;
+    
     Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows = self.checkboxShowDatabasesManagerOnCloseAllWindows.state == NSOnState;
     
     Settings.sharedInstance.showSystemTrayIcon = self.switchShowInMenuBar.state == NSOnState;
@@ -252,6 +263,7 @@
     Settings.sharedInstance.closeManagerOnLaunch  = self.hideManagerOnLaunch.state == NSOnState;
     
     Settings.sharedInstance.makeLocalRollingBackups = self.makeRollingLocalBackups.state == NSOnState;
+    Settings.sharedInstance.markdownNotes = self.checkboxEnableMarkdown.state == NSOnState;
     
     [self bindGeneralUiToSettings];
     

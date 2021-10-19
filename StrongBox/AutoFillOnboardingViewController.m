@@ -27,7 +27,10 @@
     if( self.model.metadata.quickTypeEnabled ) {
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
                                                            databaseUuid:self.model.metadata.uuid
-                                                          displayFormat:self.model.metadata.quickTypeDisplayFormat];
+                                                          displayFormat:self.model.metadata.quickTypeDisplayFormat
+                                                        alternativeUrls:self.model.metadata.autoFillScanAltUrls
+                                                           customFields:self.model.metadata.autoFillScanCustomFields
+                                                                  notes:self.model.metadata.autoFillScanNotes];
     }
     
     if ( self.onDone ) {

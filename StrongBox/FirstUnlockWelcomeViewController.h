@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface FirstUnlockWelcomeViewController : UIViewController
 
 @property OnboardingModuleDoneBlock onDone;
-@property Model* model;
+@property (weak) Model* model;
 
 @end
 

@@ -42,7 +42,7 @@
 }
 
 - (void)bindUi {
-    NSArray *backups = [BackupsManager.sharedInstance getAvailableBackups:self.metadata];
+    NSArray *backups = [BackupsManager.sharedInstance getAvailableBackups:self.metadata all:NO];
     
     self.currentCount.text = @(backups.count).stringValue;
     self.labelMaxKeepCount.text = @(self.metadata.maxBackupKeepCount).stringValue;

@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL hasBeenPromptedForQuickLaunch;
 
 @property (nonatomic) BOOL hasBeenPromptedForConvenience;
-@property (nonatomic) BOOL isEnrolledForConvenience;
+@property (nonatomic) BOOL isEnrolledForConvenience; 
 @property (nonatomic, strong, nullable) NSString* convenienceMasterPassword;
 @property (nonatomic, strong, nullable) NSString* autoFillConvenienceAutoUnlockPassword;
 
@@ -190,6 +190,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSUInteger unlockCount;
 
 @property BOOL conveniencePasswordHasExpired;
+
+@property BOOL autoFillScanAltUrls;
+@property BOOL autoFillScanCustomFields;
+@property BOOL autoFillScanNotes;
 
 @end
 

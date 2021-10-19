@@ -22,11 +22,23 @@
     return sharedInstance;
 }
 
+- (NSURL *)setWorkingCacheWithFile:(NSString *)file dateModified:(NSDate *)dateModified database:(NSString *)databaseUuid error:(NSError *__autoreleasing  _Nullable *)error {
+    return [self setWorkingCache:file data:nil dateModified:dateModified database:databaseUuid error:error];
+}
+
 - (NSURL*)setWorkingCacheWithData2:(NSData*)data
                      dateModified:(NSDate*)dateModified
                          database:(NSString*)databaseUuid
                             error:(NSError**)error {
-    if (!data || !dateModified) {
+    return [self setWorkingCache:nil data:data dateModified:dateModified database:databaseUuid error:error];
+}
+
+- (NSURL*)setWorkingCache:(NSString*)file
+                     data:(NSData*)data
+             dateModified:(NSDate*)dateModified
+                 database:(NSString*)databaseUuid
+                    error:(NSError**)error {
+    if ( (!data && !file) || !dateModified) {
         if (error) {
             *error = [Utils createNSError:@"SyncManager::setWorkingCacheWithData - WARNWARN data or dateModified nil - not setting working cache" errorCode:-1];
         }
@@ -38,7 +50,19 @@
     
     
     NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase2:databaseUuid];
-    [data writeToURL:localWorkingCacheUrl options:NSDataWritingAtomic error:error];
+    
+    if ( file ) {
+        NSURL* fileUrl = [NSURL fileURLWithPath:file];
+    
+        BOOL success = [NSFileManager.defaultManager replaceItemAtURL:localWorkingCacheUrl withItemAtURL:fileUrl backupItemName:nil options:kNilOptions resultingItemURL:nil error:error];
+        if ( !success ) {
+            NSLog(@"SyncManager::replaceItemAtURL - failed with %@", error ? *error : nil);
+            return nil;
+        }
+    }
+    else {
+        [data writeToURL:localWorkingCacheUrl options:NSDataWritingAtomic error:error];
+    }
     
 
 

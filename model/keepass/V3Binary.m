@@ -69,15 +69,9 @@
         [attributes removeObjectForKey:kBinaryCompressedAttribute];
     }
     
-    NSInputStream* inputStream = [self.dbAttachment getPlainTextInputStream];
-    if ( !inputStream ) {
-        NSLog(@"WARNWARN: Could not serialize V3Binary! Could not read attachment PT stream.");
-        return NO;
-    }
-
     
-    NSData* data = [NSData dataWithContentsOfStream:inputStream];
-
+    NSData* data = self.dbAttachment.nonPerformantFullData;
+    
     if (!data) {
         NSLog(@"Could not serialize V3Binary!");
         return NO;

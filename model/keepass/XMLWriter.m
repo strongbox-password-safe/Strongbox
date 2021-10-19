@@ -25,6 +25,7 @@
  ****************************************************************************/
 
 #import "XMLWriter.h"
+#import "NSString+Extensions.h"
 
 #define NSBOOL(_X_) ((_X_) ? (id)kCFBooleanTrue : (id)kCFBooleanFalse)
 
@@ -559,49 +560,35 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 }
 
 - (void) writeEscape:(NSString*)value {
-    if (!value){
+    if ( value.length == 0 ){
         return;
     }
-    
-	const UniChar *characters = CFStringGetCharactersPtr((CFStringRef)value);
-	
-	if (characters) {
-		
-		[self writeEscapeCharacters:characters length:[value length]];
-	} else {
-		
-		
-		
-		
-		
-		NSMutableData *data = [NSMutableData dataWithLength:256 * sizeof(UniChar)];
-		
-		if(!data) {
-			
-			@throw([NSException exceptionWithName:@"XMLWriterException" reason:[NSString stringWithFormat:@"Could not allocate data buffer of %i unicode characters", 256] userInfo:NULL]);
-		}
-		
-		NSUInteger count = 0;
-		do {
-			NSUInteger length;
-			if(count + 256 < [value length]) {
-				length = 256;
-			} else {
-				length = [value length] - count;
-			}
-			
-			[value getCharacters:[data mutableBytes] range:NSMakeRange(count, length)];
-			
-			[self writeEscapeCharacters:[data bytes] length:length];
-			
-			count += length;
-		} while(count < [value length]);
-		
-		
-	}
+        
+    const UniChar *characters = CFStringGetCharactersPtr((CFStringRef)value); 
+    if (characters) {
+        [self writeEscapeCharacters:characters length:[value length]];
+    }
+    else {
+        const NSInteger bufferSize = 1024;
+        const NSInteger length = value.length;
+        
+        unichar buffer[bufferSize];
+        NSInteger bufferLoops = (length - 1) / bufferSize + 1;
+        
+        
+        
+            
+        for (int i = 0; i < bufferLoops; i++) {
+            NSInteger bufferOffset = i * bufferSize;
+            NSInteger charsInBuffer = MIN(length - bufferOffset, bufferSize);
+            [value getCharacters:buffer range:NSMakeRange(bufferOffset, charsInBuffer)];
+
+            [self writeEscapeCharacters:buffer length:charsInBuffer];
+        }
+    }
 }
 
-- (void)writeEscapeCharacters:(const UniChar*)characters length:(NSUInteger)length {
+- (void)writeEscapeCharacters:(const UniChar*)characters length:(NSUInteger)length { 
 	NSUInteger rangeStart = 0;
 	CFIndex rangeLength = 0;
 	
@@ -614,7 +601,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 					case 34: {
 						
 						if(rangeLength) {
-							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
+							[self appendUnicodeCharactersToOutput:characters + rangeStart length:rangeLength];
 						}
 						[self write:@"&quot;"];
                         
@@ -624,7 +611,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
                     case 39: {
                         
                         if(rangeLength) {
-                            CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
+                            [self appendUnicodeCharactersToOutput:characters + rangeStart length:rangeLength];
                         }
                         [self write:@"&#39;"];
                         
@@ -634,7 +621,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 					case 38: {
 						
 						if(rangeLength) {
-							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
+							[self appendUnicodeCharactersToOutput:characters + rangeStart length:rangeLength];
 						}
 						[self write:@"&amp;"];
 						
@@ -644,7 +631,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 					case 60: {
 						
 						if(rangeLength) {
-							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
+							[self appendUnicodeCharactersToOutput:characters + rangeStart length:rangeLength];
 						}
 						
 						[self write:@"&lt;"];
@@ -655,7 +642,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 					case 62: {
 						
 						if(rangeLength) {
-							CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
+							[self appendUnicodeCharactersToOutput:characters + rangeStart length:rangeLength];
 						}
 						
 						[self write:@"&gt;"];
@@ -695,7 +682,7 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 		
 		
 		if(rangeLength) {
-			CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
+			[self appendUnicodeCharactersToOutput:characters + rangeStart length:rangeLength];
 		}
 		
 		
@@ -706,8 +693,14 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
 	
 	if(rangeLength) {
 		
-		CFStringAppendCharacters((CFMutableStringRef)writer, characters + rangeStart, rangeLength);
+		[self appendUnicodeCharactersToOutput:characters + rangeStart length:rangeLength];
 	}
+}
+
+- (void)appendUnicodeCharactersToOutput:(const UniChar*)characters length:(NSUInteger)length {
+    @autoreleasepool {
+        [self write:[NSString stringWithCharacters:characters length:length]];
+    }
 }
 
 - (void)writeLinebreak {
@@ -749,5 +742,8 @@ static NSString *const XSI_NAMESPACE_URI_PREFIX = @"xsi";
     self.lineBreak = aLineBreak;
 }
 
+- (NSError *)streamError {
+    return nil;
+}
 
 @end

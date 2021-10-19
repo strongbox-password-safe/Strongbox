@@ -21,6 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSURL* backupFilesDirectory;
 @property (readonly, nullable) NSURL* preferencesDirectory;
 @property (readonly, nonnull) NSString* tmpEncryptedAttachmentPath;
+@property (readonly, nonnull) NSString* tmpEncryptionStreamPath;
 @property (readonly, nullable) NSURL* crashFile;
 @property (readonly, nullable) NSURL* archivedCrashFile;
 @property (readonly, nullable) NSURL* appSupportDirectory;

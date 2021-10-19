@@ -207,8 +207,7 @@
     cell.imageView.image = [UIImage imageNamed:@"document"];
 
     if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
-        NSInputStream* attStream = [attachment getPlainTextInputStream];
-        NSData* data = [NSData dataWithContentsOfStream:attStream];
+        NSData* data = attachment.nonPerformantFullData; 
         UIImage* img = [UIImage imageWithData:data];
 
         if(img) {

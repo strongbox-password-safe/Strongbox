@@ -15,11 +15,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithDefaults;
+- (instancetype)initWithIterations:(uint64_t)iterations;
 - (instancetype)initWithParametersDictionary:(KdfParameters*)parameters;
 
 - (NSData*)deriveKey:(NSData*)data;
 
 @property (readonly, nonatomic) KdfParameters* kdfParameters;
+
+@property (readonly, nonatomic) uint64_t iterations;
+
+@property (class, readonly) uint64_t defaultIterations;
 
 @end
 

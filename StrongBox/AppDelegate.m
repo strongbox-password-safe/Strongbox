@@ -66,8 +66,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     [self performEarlyBasicICloudInitialization];
     
-    [self initializeInstallSettingsAndLaunchCount];   
-    
+    [self initializeInstallSettingsAndLaunchCount];
     
     
     
@@ -76,6 +75,8 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     
     
 
+    self.appIsLocked = AppPreferences.sharedInstance.appLockMode != kNoLock;
+    
     [CustomizationManager applyCustomizations];
     
     [self markDirectoriesForBackupInclusion];
@@ -94,20 +95,6 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     NSLog(@"STARTUP - Shared App Group Directory: [%@]", FileManager.sharedInstance.sharedAppGroupDirectory);
 
     return YES;
-}
-
-- (void)preHeatSecureEnclave {
-
-
-
-
-
-
-
-
-
-
-
 }
 
 - (BOOL)application:(UIApplication *)application shouldAllowExtensionPointIdentifier:(UIApplicationExtensionPointIdentifier)extensionPointIdentifier {
@@ -209,27 +196,21 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    NSLog(@"AppDelegate::applicationDidBecomeActive- %@]", self.window.rootViewController);
+
     if( self.appLockSuppressedForBiometricAuth ) {
         NSLog(@"App Active but Lock Screen Suppressed... Nothing to do");
         self.appLockSuppressedForBiometricAuth = NO;
         return;
     }
 
-    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccess];
-
-    [self preHeatSecureEnclave]; 
-
-
-
-    [OfflineDetector.sharedInstance startMonitoringConnectivitity]; 
-    
-    [self performedScheduledEntitlementsCheck];
-        
     
 
     BOOL startupAppLock = !self.hasDoneInitialActivation && AppPreferences.sharedInstance.appLockMode != kNoLock;
 
     if ( [self shouldRequireAppLockTime] || startupAppLock) {
+        self.appIsLocked = YES;
+        
         [self showLockScreen];
     }
     else {
@@ -238,7 +219,16 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         });
     }
 
+    [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccess];
+    
+    [OfflineDetector.sharedInstance startMonitoringConnectivitity]; 
+    
+    [self performedScheduledEntitlementsCheck];
+
+    
+    
     self.hasDoneInitialActivation = YES;
+    
     self.enterBackgroundTime = nil;
 }
 
@@ -250,7 +240,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         return;
     }
 
-    NSLog(@"XXXXXXXXXX - applicationWillResignActive");
+    NSLog(@"AppDelegate::applicationWillResignActive");
     
     [self showPrivacyShieldView];
     
@@ -343,8 +333,13 @@ void uncaughtExceptionHandler(NSException *exception) {
     if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeNone ) {
         return;
     }
-    
+        
     if ( !self.privacyScreen ) {
+        if ( self.lockScreenVc != nil ) {
+            NSLog(@"Lock Screen is up, privacy screen inappropriate, likely initial launch and switch back...");
+            return;
+        }
+
         UIImage* cover = nil;
         if (@available(iOS 13.0, *)) {
             if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlur ) {
@@ -475,12 +470,17 @@ void uncaughtExceptionHandler(NSException *exception) {
     return self.appIsLocked;
 }
 
+- (BOOL)isPresentingLockScreen {
+    return self.lockScreenVc != nil; 
+}
+
 - (void)showLockScreen {
-    if ( self.isAppLocked ) {
+    NSLog(@"AppDelegate::showLockScreen");
+    
+    if ( self.isPresentingLockScreen ) {
         NSLog(@"Lock Screen Already Up... No need to re show");
         return;
     }
-    self.appIsLocked = YES;
 
     __weak AppDelegate* weakSelf = self;
     AppLockViewController* appLockViewController = [[AppLockViewController alloc] initWithNibName:@"PrivacyViewController" bundle:nil];
@@ -525,8 +525,8 @@ void uncaughtExceptionHandler(NSException *exception) {
             }];
         }
         else {
-            NSLog(@"App Lock Screen was already dismissed by Database Auto Lock... Continuing dismissal [%@]", self.lockScreenVc.presentingViewController);
-            [self onLockScreenDismissed:NO];
+            NSLog(@"App Lock Screen is not being presented. Assumed because it was already dismissed by Database Auto Lock locking to dismiss all... Continuing dismissal process");
+            [self onLockScreenDismissed:userJustCompletedBiometricAuthentication];
         }
     }];
 }
@@ -537,7 +537,9 @@ void uncaughtExceptionHandler(NSException *exception) {
     });
 
     SafesViewController* databasesListVc = [self getInitialViewController];
+    
     [databasesListVc onAppLockScreenWasDismissed:userJustCompletedBiometricAuthentication];
+    
     self.lockScreenVc = nil;
 }
 

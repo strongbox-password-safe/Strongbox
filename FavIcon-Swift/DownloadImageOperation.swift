@@ -17,10 +17,10 @@
 
 import Foundation;
 
-// Attempts to download the image content for a URL, and returns
-// `URLResult.ImageDownloaded` as the result if the
-// download was successful, and the data is in an image format
-// supported by the platform's image class.
+
+
+
+
 final class DownloadImageOperation: URLRequestOperation {
     override func processResult(_ data: Data?, response: HTTPURLResponse, completion: @escaping (URLResult) -> Void) {
         guard let data = data else {
@@ -31,7 +31,7 @@ final class DownloadImageOperation: URLRequestOperation {
         let (mimeType, _) = response.contentTypeAndEncoding()
         switch mimeType {
         case "image/png", "image/jpg", "image/jpeg", "image/x-icon", "image/vnd.microsoft.icon":
-            // UIImage(data:) is not thread-safe and needs to run on main queue :/
+            
             DispatchQueue.main.async {
                 var result: URLResult
                 if let image = ImageType(data: data) {

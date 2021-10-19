@@ -18,8 +18,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
 @implementation DatabaseMetadata
 
-- (instancetype)init
-{
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
@@ -41,6 +40,10 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.lockOnScreenLock = YES;
         self.expressDownloadFavIconOnNewOrUrlChanged = YES; 
         self.visibleColumns = @[kTitleColumn, kUsernameColumn, kPasswordColumn, kURLColumn];
+        
+        self.autoFillScanAltUrls = YES;
+        self.autoFillScanCustomFields = YES;
+        self.autoFillScanNotes = YES;
     }
     
     return self;
@@ -56,6 +59,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.storageProvider = storageProvider;
         self.fileUrl = fileUrl;
         self.storageInfo = storageInfo;
+        self.autoPromptForConvenienceUnlockOnActivate = YES;
     }
     
     return self;
@@ -233,6 +237,12 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeObject:self.visibleColumns forKey:@"visibleColumns"];
     
     /* =================================================================================================== */
+    
+    [encoder encodeBool:self.hasSetInitialWindowPosition forKey:@"hasSetInitialWindowPosition"];
+    
+    [encoder encodeBool:self.autoFillScanAltUrls forKey:@"autoFillScanAltUrls"];
+    [encoder encodeBool:self.autoFillScanCustomFields forKey:@"autoFillScanCustomFields"];
+    [encoder encodeBool:self.autoFillScanNotes forKey:@"autoFillScanNotes"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -494,6 +504,34 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         }
         
         /* =================================================================================================== */
+        
+        if ( [decoder containsValueForKey:@"hasSetInitialWindowPosition"] ) {
+            self.hasSetInitialWindowPosition = [decoder decodeBoolForKey:@"hasSetInitialWindowPosition"];
+        }
+        else {
+            self.hasSetInitialWindowPosition = YES; 
+        }
+
+        
+        
+        if ( [decoder containsValueForKey:@"autoFillScanAltUrls"] ) {
+            self.autoFillScanAltUrls = [decoder decodeBoolForKey:@"autoFillScanAltUrls"];
+        }
+        else {
+            self.autoFillScanAltUrls = YES;
+        }
+        if ( [decoder containsValueForKey:@"autoFillScanCustomFields"] ) {
+            self.autoFillScanCustomFields = [decoder decodeBoolForKey:@"autoFillScanCustomFields"];
+        }
+        else {
+            self.autoFillScanCustomFields = YES;
+        }
+        if ( [decoder containsValueForKey:@"autoFillScanNotes"] ) {
+            self.autoFillScanNotes = [decoder decodeBoolForKey:@"autoFillScanNotes"];
+        }
+        else {
+            self.autoFillScanNotes = YES;
+        }
     }
     
     return self;

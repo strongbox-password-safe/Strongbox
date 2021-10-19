@@ -21,6 +21,7 @@
 @property NSMutableArray<id<XmlParsingDomainObject>> *handlerStack;
 @property (nonatomic) id<InnerRandomStream> innerRandomStream;
 @property (nonatomic) NSError *errorParse;
+@property (nonatomic) NSError *problemDecrypting;
 @property XmlProcessingContext* context;
 @property NSMutableString* mutableText;
 @property BOOL sanityCheckStreamDecryption;
@@ -119,13 +120,11 @@
             NSString* decrypted = [self decryptProtected:string];
 
             if (self.sanityCheckStreamDecryption && !decrypted) {
-                NSLog(@"WARN: Could not decrypt CipherText...");
+                NSLog(@"🔴 WARN: Could not decrypt CipherText...");
                 
-                
-                
-                NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt stream. Sanity Check failed: [%@].\n\nPlease Upgrade DB to KDBX4", self.innerRandomStream.key.hexString];
-                self.errorParse = [Utils createNSError:msg errorCode:-1];
-                return;
+                NSString *msg = [NSString stringWithFormat:@"Strongbox could not decrypt protected text. This field is likely corrupt."];
+                self.problemDecrypting = [Utils createNSError:msg errorCode:-1];
+                [completedObject setXmlText:@"CORRUPT_PROTECTED_FIELD"];
             }
             else {
                 [completedObject setXmlText:decrypted];
@@ -163,8 +162,6 @@
 }
 
 - (NSString*)decryptProtected:(NSString*)ct {
-
-    
     if(self.innerRandomStream == nil) { 
         return ct;
     }
@@ -183,6 +180,10 @@
     }
     
     return ret;
+}
+
+- (NSError *)decryptionProblem {
+    return self.problemDecrypting;
 }
 
 - (NSError*)error {

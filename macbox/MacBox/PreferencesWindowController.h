@@ -15,5 +15,6 @@
 - (void)show;
 - (void)showFavIconPreferences;
 - (void)showPasswordSettings;
+- (void)showGeneralSettings;
 
 @end

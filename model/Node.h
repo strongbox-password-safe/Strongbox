@@ -18,7 +18,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)rootGroup;
 
-- (instancetype _Nullable )init NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
 - (nonnull instancetype)initAsRoot:(nullable NSUUID*)uuid;
 - (nonnull instancetype)initAsRoot:(nullable NSUUID*)uuid childRecordsAllowed:(BOOL)childRecordsAllowed;

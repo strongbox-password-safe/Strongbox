@@ -10,6 +10,7 @@
 #import "KdbxSerializationCommon.h"
 #import "KeePass2TagPackage.h"
 #import "NSArray+Extensions.h"
+#import "StreamUtils.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,21 +42,21 @@
                compositeKeyFactors:ckf
                      xmlDumpStream:xmlDumpStream
             sanityCheckInnerStream:sanityCheckInnerStream
-                        completion:^(BOOL userCancelled, SerializationData * _Nullable serializationData, NSError * _Nullable error) {
+                        completion:^(BOOL userCancelled, SerializationData * _Nullable serializationData, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         if(userCancelled || serializationData == nil || error) {
             if(error) {
                 NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", error);
             }
 
-            completion(userCancelled, nil, error);
+            completion(userCancelled, nil, innerStreamError, error);
             return;
         }
         
-        onDeserialized(serializationData, ckf, completion);
+        onDeserialized(serializationData, innerStreamError, ckf, completion);
     }];
 }
 
-static void onDeserialized(SerializationData *serializationData, CompositeKeyFactors *ckf, OpenCompletionBlock completion) {
+static void onDeserialized(SerializationData *serializationData, NSError * _Nullable innerStreamError, CompositeKeyFactors *ckf, OpenCompletionBlock completion) {
     RootXmlDomainObject* xmlRoot = serializationData.rootXmlObject;
     Meta* meta = xmlRoot.keePassFile ? xmlRoot.keePassFile.meta : nil;
     
@@ -69,7 +70,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
                   meta.headerHash);
             
             NSError *error = [Utils createNSError:@"Header Hash incorrect. Document has been corrupted." errorCode:-3];
-            completion(NO, nil, error);
+            completion(NO, nil, innerStreamError, error);
             return;
         }
     }
@@ -85,7 +86,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     Node* rootGroup = [KeePassXmlModelAdaptor toStrongboxModel:xmlRoot attachments:attachments customIconPool:customIconPool error:&error];
     if(rootGroup == nil) {
         NSLog(@"Error converting Xml model to Strongbox model: [%@]", error);
-        completion(NO, nil, error);
+        completion(NO, nil, innerStreamError, error);
         return;
     }
  
@@ -99,29 +100,28 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     
     
     
-    metadata.transformRounds = serializationData.transformRounds;
+    metadata.kdfIterations = serializationData.transformRounds;
     metadata.innerRandomStreamId = serializationData.innerRandomStreamId;
     metadata.compressionFlags = serializationData.compressionFlags;
     metadata.version = serializationData.fileVersion;
     metadata.cipherUuid = serializationData.cipherId;
     
     KeePass2TagPackage* adaptorTag = [[KeePass2TagPackage alloc] init];
-    adaptorTag.unknownHeaders = serializationData.extraUnknownHeaders;
-    adaptorTag.originalMeta = meta;
+    adaptorTag.unknownHeaders = serializationData.extraUnknownHeaders; 
     
     DatabaseModel *ret = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:ckf metadata:metadata root:rootGroup deletedObjects:deletedObjects iconPool:customIconPool];
     
     ret.meta.adaptorTag = adaptorTag;
     
-    completion(NO, ret, nil);
+    completion(NO, ret, innerStreamError, nil);
 }
 
-+ (void)save:(DatabaseModel *)database completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password &&
        !database.ckfs.keyFileDigest &&
        !database.ckfs.yubiKeyCR) {
         NSError *error = [Utils createNSError:@"A least one composite key factor is required to encrypt database." errorCode:-3];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
     
@@ -133,7 +133,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     NSError* err;
     
     KeePassDatabaseWideProperties* databaseProperties = [[KeePassDatabaseWideProperties alloc] init];
-    databaseProperties.originalMeta = adaptorTag ? adaptorTag.originalMeta : nil;
+
     databaseProperties.deletedObjects = database.deletedObjects;
     databaseProperties.metadata = database.meta;
     
@@ -148,7 +148,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     if(!rootXmlDocument) {
         NSLog(@"Could not convert Database to Xml Model.");
         NSError *error = [Utils createNSError:@"Could not convert Database to Xml Model." errorCode:-4];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
 
@@ -182,7 +182,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     serializationData.extraUnknownHeaders = adaptorTag ? adaptorTag.unknownHeaders : @{};
     serializationData.compressionFlags = database.meta.compressionFlags;
     serializationData.innerRandomStreamId = database.meta.innerRandomStreamId;
-    serializationData.transformRounds = database.meta.transformRounds;
+    serializationData.transformRounds = database.meta.kdfIterations;
     serializationData.fileVersion = database.meta.version;
     serializationData.cipherId = database.meta.cipherUuid;
     
@@ -197,7 +197,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
                 NSLog(@"Could not serialize Document to KDBX. Stage 1");
                 error = [Utils createNSError:@"Could not serialize Document to KDBX. Stage 1." errorCode:-6]; 
             }
-            completion(userCancelled, nil, nil, error);
+            completion(userCancelled, nil, error);
         }
         else {
             rootXmlDocument.keePassFile.meta.headerHash = hash;
@@ -205,6 +205,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
                                     metadata:database.meta
                                xmlSerializer:xmlSerializer
                               kdbxSerializer:kdbxSerializer
+                                outputStream:outputStream
                                   completion:completion];
         }
     }];
@@ -214,6 +215,7 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
                           metadata:(UnifiedDatabaseMetadata*)metadata
                      xmlSerializer:(XmlSerializer*)xmlSerializer
                     kdbxSerializer:(KdbxSerialization*)kdbxSerializer
+                      outputStream:(NSOutputStream *)outputStream
                         completion:(SaveCompletionBlock)completion {
     xmlDoc.keePassFile.meta.recycleBinEnabled = metadata.recycleBinEnabled;
     xmlDoc.keePassFile.meta.recycleBinGroup = metadata.recycleBinGroup;
@@ -230,21 +232,31 @@ static void onDeserialized(SerializationData *serializationData, CompositeKeyFac
     if(!xml || !writeXmlOk) {
         NSLog(@"Could not serialize Xml to Document.");
         NSError *error = [Utils createNSError:@"Could not serialize Xml to Document." errorCode:-5];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
     
     
     
     NSError* err3;
-    NSData *data = [kdbxSerializer stage2Serialize:xml error:&err3];
+    NSData *data = [kdbxSerializer stage2Serialize:xml error:&err3]; 
     if(!data) {
         NSLog(@"Could not serialize Document to KDBX.");
-        completion(NO, nil, nil, err3);
+        completion(NO, nil, err3);
         return;
     }
     
-    completion(NO, data, xml, nil);
+    NSInputStream* inputStream = [NSInputStream inputStreamWithData:data];
+    [inputStream open];
+    BOOL success = [StreamUtils pipeFromStream:inputStream to:outputStream openAndCloseStreams:NO];
+    [inputStream close];
+    
+    if ( !success ) {
+        completion(NO, xml, [Utils createNSError:@"Could not pipe data to stream!" errorCode:-1]);
+    }
+    else {
+        completion(NO, xml, nil);
+    }
 }
 
 @end

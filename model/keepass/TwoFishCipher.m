@@ -9,6 +9,7 @@
 #import "TwoFishCipher.h"
 #import "tomcrypt.h"
 #import "TwoFishReadStream.h"
+#import "TwoFishOutputStream.h"
 
 static const uint32_t kKeySize = 32;
 static const uint32_t kBlockSize = 16;
@@ -16,7 +17,7 @@ static const uint32_t kIvSize = kBlockSize;
 
 @implementation TwoFishCipher
 
-- (NSData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSMutableData *)decrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
     
     symmetric_key skey;
     
@@ -78,7 +79,7 @@ static const uint32_t kIvSize = kBlockSize;
     return decData;
 }
 
-- (NSData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
+- (NSMutableData *)encrypt:(nonnull NSData *)data iv:(nonnull NSData *)iv key:(nonnull NSData *)key {
     
     symmetric_key skey;
     
@@ -139,6 +140,10 @@ static const uint32_t kIvSize = kBlockSize;
 
 - (NSInputStream *)getDecryptionStreamForStream:(NSInputStream *)inputStream key:(NSData *)key iv:(NSData *)iv {
     return [[TwoFishReadStream alloc] initWithStream:inputStream key:key iv:iv];
+}
+
+- (NSOutputStream *)getEncryptionOutputStreamForStream:(NSOutputStream *)outputStream key:(NSData *)key iv:(NSData *)iv {
+    return [[TwoFishOutputStream alloc] initToOutputStream:outputStream key:key iv:iv];
 }
 
 @end

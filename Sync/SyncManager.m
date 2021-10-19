@@ -104,7 +104,15 @@
     }];
 }
 
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database file:(NSString *)file error:(NSError **)error {
+    return [self updateLocalCopyMarkAsRequiringSync:database data:nil file:file error:error];
+}
+
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data error:(NSError**)error {
+    return [self updateLocalCopyMarkAsRequiringSync:database data:data file:nil error:error];
+}
+
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data file:(NSString *)file error:(NSError**)error {
     
     
     NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
@@ -125,10 +133,19 @@
     database.outstandingUpdateId = updateId;
     [SafesList.sharedInstance update:database];
         
-    NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData2:data
-                                                                dateModified:NSDate.date
-                                                                    database:database.uuid
-                                                                       error:error];
+    NSURL* url;
+    if ( file ) {
+        url = [WorkingCopyManager.sharedInstance setWorkingCacheWithFile:file
+                                                            dateModified:NSDate.date
+                                                                database:database.uuid
+                                                                   error:error];
+    }
+    else {
+        url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData2:data
+                                                             dateModified:NSDate.date
+                                                                 database:database.uuid
+                                                                    error:error];
+    }
     
     return url != nil;
 }

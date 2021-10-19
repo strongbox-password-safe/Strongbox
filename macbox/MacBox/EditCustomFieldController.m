@@ -40,8 +40,11 @@
         
 
 
+
+
         NSRange range = self.textFieldKey.currentEditor.selectedRange;
         [self.textFieldKey.currentEditor setSelectedRange:NSMakeRange(range.length, 0)];
+
     }
 }
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector {
@@ -61,7 +64,6 @@
 - (void)bindUI {
     if ( self.field ) {
         self.textFieldKey.stringValue = self.field.key;
-        self.textFieldKey.enabled = NO;
         
         [self.textViewValue setString:self.field.value];
         self.checkboxConcealable.state = self.field.protected ? NSControlStateValueOn : NSControlStateValueOff;
@@ -70,10 +72,6 @@
     self.buttonGenerate.hidden = YES;
     
     [self validateOK];
-}
-
-- (IBAction)onGenerate:(id)sender {
-
 }
 
 - (void)textDidChange:(NSNotification *)notification {
@@ -95,13 +93,26 @@
     NSString* value = [NSString stringWithString:self.textViewValue.textStorage.string];
     BOOL protected = self.checkboxConcealable.state == NSControlStateValueOn;
 
+    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+
     if ( self.field ) { 
         BOOL same = ([key isEqualToString:self.field.key] && [value isEqualToString:self.field.value] && self.field.protected == protected);
+        if ( same ) {
+            self.buttonOK.enabled = NO;
+            return;
+        }
         
-        self.buttonOK.enabled = !same;
+        
+        
+        if ( ![key isEqualToString:self.field.key] ) { 
+            BOOL keyIsntAlreadyInUse = ![self.existingKeySet containsObject:key] && ![keePassReserved containsObject:key];
+            self.buttonOK.enabled = key.length && keyIsntAlreadyInUse;
+        }
+        else {
+            self.buttonOK.enabled = YES;
+        }
     }
     else { 
-        const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
         BOOL keyIsntAlreadyInUse = ![self.existingKeySet containsObject:key] && ![keePassReserved containsObject:key];
         
         self.buttonOK.enabled = key.length && keyIsntAlreadyInUse;
@@ -122,6 +133,10 @@
 
 - (IBAction)onCancel:(id)sender {
     [self.presentingViewController dismissViewController:self];
+}
+
+- (IBAction)onGenerate:(id)sender {
+
 }
 
 @end

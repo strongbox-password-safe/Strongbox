@@ -23,6 +23,7 @@
 #import "ConvenienceUnlockPreferences.h"
 #import "BiometricsManager.h"
 #import "ScheduledExportConfigurationViewController.h"
+#import "EncryptionPreferencesViewController.h"
 
 @interface DatabasePreferencesController ()
 
@@ -47,6 +48,8 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageConvenienceUnlock;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellScheduledExport;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewScheduledExport;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellEncryptionSettings;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewEncryptionSettings;
 
 @end
 
@@ -54,19 +57,41 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    self.imageViewDatabaseOperations.image = [UIImage imageNamed:@"maintenance"];
-    self.imageViewPreferences.image = [UIImage imageNamed:@"list"];
-    self.imageViewStats.image = [UIImage imageNamed:@"statistics"];
-    self.imageViewAudit.image = [UIImage imageNamed:@"security_checked"];
+
     self.imageViewAudit.tintColor = UIColor.systemOrangeColor;
+
+    self.imageViewPreferences.image = [UIImage imageNamed:@"list"];
+    self.imageViewDatabaseOperations.image = [UIImage imageNamed:@"maintenance"];
+    self.imageViewAudit.image = [UIImage imageNamed:@"security_checked"];
     self.imageViewAutoFill.image = [UIImage imageNamed:@"password"];
     self.imageViewScheduledExport.image = [UIImage imageNamed:@"delivery"];
+    self.imageViewStats.image = [UIImage imageNamed:@"statistics"];
+    self.imageViewEncryptionSettings.image = [UIImage imageNamed:@"unlock"];
+
+    if (@available(iOS 13.0, *)) {
+        self.imageViewPreferences.image = [UIImage systemImageNamed:@"list.bullet"];
+        self.imageViewDatabaseOperations.image = [UIImage systemImageNamed:@"wrench"];
+        self.imageViewAudit.image = [UIImage systemImageNamed:@"checkmark.shield"];
+        self.imageViewAudit.preferredSymbolConfiguration = [UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightLight];
+        
+        self.imageViewStats.image = [UIImage systemImageNamed:@"number.circle"];
+        
+        if (@available(iOS 14.0, *)) {
+            self.imageViewAutoFill.image = [UIImage systemImageNamed:@"rectangle.and.pencil.and.ellipsis"];
+            self.imageViewScheduledExport.image = [UIImage systemImageNamed:@"externaldrive.badge.timemachine"];
+        }
+        
+        self.imageViewEncryptionSettings.image = [UIImage systemImageNamed:@"function"];
+    }
     
     NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"convenience_unlock_preferences_title_fmt", @"%@ & PIN Codes"), BiometricsManager.sharedInstance.biometricIdName];
     
     self.labelConvenienceUnlock.text = fmt;
     self.imageConvenienceUnlock.image = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
+
+
+        [self cell:self.cellStats setHidden:YES];
+
 
     [self bindUi];
 }
@@ -132,6 +157,12 @@
         ScheduledExportConfigurationViewController* vc = (ScheduledExportConfigurationViewController*)segue.destinationViewController;
         vc.model = sender;
     }
+    else if ( [segue.identifier isEqualToString:@"segueToEncryption"] ) {
+        UINavigationController* nav = segue.destinationViewController;
+        EncryptionPreferencesViewController* vc = (EncryptionPreferencesViewController*)nav.topViewController;
+        vc.onChangedDatabaseEncryptionSettings = self.onChangedDatabaseEncryptionSettings;
+        vc.model = self.viewModel;
+    }
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -148,6 +179,9 @@
     }
     else if ( cell == self.cellScheduledExport ) {
         [self performSegueWithIdentifier:@"segueToScheduledExport" sender:self.viewModel];
+    }
+    else if ( cell == self.cellEncryptionSettings ) {
+        [self performSegueWithIdentifier:@"segueToEncryption" sender:nil];
     }
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

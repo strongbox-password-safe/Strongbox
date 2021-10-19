@@ -15,8 +15,11 @@
 
 #ifndef IS_APP_EXTENSION
 
+#ifndef NO_SFTP_WEBDAV_SP
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
+#endif
+
 #import "AppleICloudProvider.h"
 #import "FilesAppUrlBookmarkProvider.h"
 
@@ -44,15 +47,15 @@
 #ifndef IS_APP_EXTENSION
 
 + (id<SafeStorageProvider>)getStorageProviderFromProviderId:(StorageProvider)providerId {
-    if(providerId == kWebDAV) {
-        return WebDAVStorageProvider.sharedInstance;
-    }
-    else if(providerId == kSFTP) {
-        return SFTPStorageProvider.sharedInstance;
-    }
 #if TARGET_OS_IPHONE
+    if (providerId == kLocalDevice) {
+        return [LocalDeviceStorageProvider sharedInstance];
+    }
     else if (providerId == kiCloud) {
         return [AppleICloudProvider sharedInstance];
+    }
+    else if(providerId == kFilesAppUrlBookmark) {
+        return FilesAppUrlBookmarkProvider.sharedInstance;
     }
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
     else if (providerId == kGoogleDrive) {
@@ -66,16 +69,17 @@
         return [OneDriveStorageProvider sharedInstance];
     }
 #endif
-    else if(providerId == kFilesAppUrlBookmark) {
-        return FilesAppUrlBookmarkProvider.sharedInstance;
-    }
-    else if (providerId == kLocalDevice)
-    {
-        return [LocalDeviceStorageProvider sharedInstance];
-    }
-#elif TARGET_OS_OSX
-    else if (providerId == kMacFile) {
+#else
+    if (providerId == kMacFile) {
         return MacFileBasedBookmarkStorageProvider.sharedInstance;
+    }
+#endif
+#ifndef NO_SFTP_WEBDAV_SP
+    else if(providerId == kWebDAV) {
+        return WebDAVStorageProvider.sharedInstance;
+    }
+    else if(providerId == kSFTP) {
+        return SFTPStorageProvider.sharedInstance;
     }
 #endif
     

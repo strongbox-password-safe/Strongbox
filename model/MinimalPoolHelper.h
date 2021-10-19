@@ -15,8 +15,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSArray<DatabaseAttachment*>*)getMinimalAttachmentPool:(Node*)rootNode;
 
-
-
 @end
 
 NS_ASSUME_NONNULL_END

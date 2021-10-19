@@ -31,7 +31,7 @@ extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 - (BOOL)isValid:(NSString *)nickName;
 
 - (void)atomicUpdate:(NSString *_Nonnull)uuid touch:(void (^_Nonnull)(SafeMetaData* metadata))touch;
-- (void)update:(SafeMetaData *_Nonnull)safe; 
+- (void)update:(SafeMetaData *_Nonnull)safe;
 - (void)remove:(NSString*_Nonnull)uuid;
 
 - (void)addWithDuplicateCheck:(SafeMetaData *_Nonnull)safe initialCache:(NSData*_Nullable)initialCache initialCacheModDate:(NSDate*_Nullable)initialCacheModDate;

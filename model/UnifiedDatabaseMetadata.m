@@ -20,11 +20,10 @@
 
 static const uint32_t kKdb1DefaultVersion = 0x00030004;
 
-static NSString* const kKdb4DefaultFileVersion = @"4.0";
-static const uint32_t kKdb4DefaultInnerRandomStreamId = kInnerStreamChaCha20;
-
-static NSString* const kKP3DefaultFileVersion = @"3.1";
-static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
+NSString* const kKdb4DefaultFileVersion = @"4.0";
+const uint32_t kKdb4DefaultInnerRandomStreamId = kInnerStreamChaCha20;
+NSString* const kKP3DefaultFileVersion = @"3.1";
+const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
 
 @implementation UnifiedDatabaseMetadata
 
@@ -38,7 +37,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     if (self) {
         NSDate* now = NSDate.date;
         
-        self.transformRounds = kDefaultTransformRounds; 
+        self.kdfIterations = kDefaultTransformRounds; 
         self.generator = kStrongboxGenerator;
         self.compressionFlags = kGzipCompressionFlag;
         self.cipherUuid = aesCipherUuid();
@@ -68,7 +67,6 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
         self.kdfParameters = [[Argon2dKdfCipher alloc] initWithDefaults].kdfParameters; 
         self.flags = kFlagsAes | kFlagsSha2; 
         self.versionInt = kKdb1DefaultVersion; 
-        self.keyStretchIterations = DEFAULT_KEYSTRETCH_ITERATIONS; 
         self.innerRandomStreamId = kKdb4DefaultInnerRandomStreamId; 
         
         
@@ -76,6 +74,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
         if ( format == kPasswordSafe ) {
             self.recycleBinEnabled = NO;
             self.version = [NSString stringWithFormat:@"%ld.%ld", (long)kPwSafeDefaultVersionMajor, (long)kPwSafeDefaultVersionMinor];
+            self.kdfIterations = DEFAULT_KEYSTRETCH_ITERATIONS;
         }
         else if ( format == kKeePass4 ) {
             self.version = kKdb4DefaultFileVersion;
@@ -100,7 +99,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     ret.adaptorTag = self.adaptorTag; 
     
-    ret.transformRounds = self.transformRounds;
+    ret.kdfIterations = self.kdfIterations; 
     ret.generator = self.generator;
     ret.compressionFlags = self.compressionFlags;
     ret.cipherUuid = self.cipherUuid;
@@ -125,7 +124,20 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     ret.lastUpdateApp = self.lastUpdateApp;
     ret.flags = self.flags;
     ret.versionInt = self.versionInt;
-    ret.keyStretchIterations = self.keyStretchIterations;
+
+    ret.maintenanceHistoryDays = self.maintenanceHistoryDays;
+    ret.masterKeyChanged = self.masterKeyChanged;
+    ret.masterKeyChangeRec = self.masterKeyChangeRec;
+    ret.masterKeyChangeForce = self.masterKeyChangeForce;
+    ret.masterKeyChangeForceOnce = self.masterKeyChangeForceOnce;
+    ret.lastSelectedGroup = self.lastSelectedGroup;
+    ret.lastTopVisibleGroup = self.lastTopVisibleGroup;
+    ret.protectTitle = self.protectTitle;
+    ret.protectUsername = self.protectUsername;
+    ret.protectPassword = self.protectPassword;
+    ret.protectURL = self.protectURL;
+    ret.protectNotes = self.protectNotes;
+
     ret.innerRandomStreamId = self.innerRandomStreamId;
     ret.version = self.version;
     ret.kdfParameters = self.kdfParameters; 
@@ -158,7 +170,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     
     kvps[NSLocalizedString(@"database_metadata_field_format", @"Database Format")] = @"KeePass 1";
     kvps[NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption")] = ((self.flags & kFlagsAes) == kFlagsAes) ? @"AES-256" : @"TwoFish";
-    kvps[NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds")] = [NSString stringWithFormat:@"%u", (uint32_t)self.transformRounds];
+    kvps[NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds")] = [NSString stringWithFormat:@"%u", (uint32_t)self.kdfIterations];
     
     return kvps;
 }
@@ -172,7 +184,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     [kvps addKey:NSLocalizedString(@"database_metadata_field_password_safe_version", @"Password Safe File Version")  andValue:self.version];
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_password_key_stretch_iterations", @"Key Stretch Iterations")
-        andValue:[NSString stringWithFormat:@"%lu", (unsigned long)self.keyStretchIterations]];
+        andValue:[NSString stringWithFormat:@"%lu", (unsigned long)self.kdfIterations]];
     
     if (self.lastUpdateTime) {
         [kvps addKey:NSLocalizedString(@"database_metadata_field_last_update_time", @"Last Update Time")
@@ -202,13 +214,8 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     [kvps addKey:NSLocalizedString(@"database_metadata_field_key_derivation", @"Key Derivation") andValue:keyDerivationAlgorithmString(self.kdfParameters.uuid)];
     
     if([self.kdfParameters.uuid isEqual:argon2dCipherUuid()] || [self.kdfParameters.uuid isEqual:argon2idCipherUuid()]) {
-        static NSString* const kParameterMemory = @"M";
-        VariantObject* vo = self.kdfParameters.parameters[kParameterMemory];
-        if(vo && vo.theObject) {
-            uint64_t memory = ((NSNumber*)vo.theObject).longLongValue;
-
-            [kvps addKey:NSLocalizedString(@"database_metadata_field_argon2_memory", @"Argon 2 Memory") andValue:friendlyMemorySizeString(memory)];
-        }
+        Argon2KdfCipher* cip = [[Argon2KdfCipher alloc] initWithParametersDictionary:self.kdfParameters];
+        [kvps addKey:NSLocalizedString(@"database_metadata_field_argon2_memory", @"Argon 2 Memory") andValue:friendlyMemorySizeString(cip.memory)];
     }
     
     [kvps addKey:NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption") andValue:outerEncryptionAlgorithmString(self.cipherUuid)];
@@ -239,7 +246,7 @@ static const uint32_t kKP3DefaultInnerRandomStreamId = kInnerStreamSalsa20;
     [kvps addKey:NSLocalizedString(@"database_metadata_field_generator", @"Database Generator") andValue:self.generator];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_outer_encryption", @"Outer Encryption") andValue:outerEncryptionAlgorithmString(self.cipherUuid)];
     [kvps addKey:NSLocalizedString(@"database_metadata_field_compressed", @"Compressed")  andValue:localizedYesOrNoFromBool(self.compressionFlags == kGzipCompressionFlag)];
-    [kvps addKey:NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds") andValue:[NSString stringWithFormat:@"%llu", self.transformRounds]];
+    [kvps addKey:NSLocalizedString(@"database_metadata_field_transform_rounds", @"Transform Rounds") andValue:[NSString stringWithFormat:@"%llu", self.kdfIterations]];
 
     [kvps addKey:NSLocalizedString(@"database_metadata_field_inner_encryption", @"Inner Encryption") andValue:innerEncryptionString(self.innerRandomStreamId)];
 

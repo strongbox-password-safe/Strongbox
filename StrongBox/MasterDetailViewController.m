@@ -77,6 +77,17 @@
 - (BOOL)splitViewController:(UISplitViewController *)splitViewController
 collapseSecondaryViewController:(UIViewController *)secondaryViewController
   ontoPrimaryViewController:(UIViewController *)primaryViewController {
+    NSLog(@"collapseSecondaryViewController 2nd [%@] -> primary [%@]", secondaryViewController, primaryViewController);
+
+    if ( [secondaryViewController isKindOfClass:UINavigationController.class] ) {
+        UINavigationController* nav = (UINavigationController*)secondaryViewController;
+        if ( [nav.topViewController isKindOfClass:ItemDetailsViewController.class] ) {
+            
+            NSLog(@"Displaying a details view, will not collapse to Browse, collapsing to detail instead");
+            return NO;
+        }
+    }
+
     return YES;
 }
 
@@ -85,7 +96,7 @@ collapseSecondaryViewController:(UIViewController *)secondaryViewController
     
     [self killOtpTimer];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:kMasterDetailViewCloseNotification object:nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:kMasterDetailViewCloseNotification object:self.viewModel.metadata.uuid];
 
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }

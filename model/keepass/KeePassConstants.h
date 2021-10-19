@@ -74,7 +74,21 @@ static NSString* const kDefaultUserNameChangedElementName = @"DefaultUserNameCha
 static NSString* const kColorElementName = @"Color";
 static NSString* const kEntryTemplatesGroupElementName = @"EntryTemplatesGroup";
 static NSString* const kEntryTemplatesGroupChangedElementName = @"EntryTemplatesGroupChanged";
+static NSString* const kMaintenanceHistoryDaysElementName = @"MaintenanceHistoryDays";
+static NSString* const kMasterKeyChangedElementName = @"MasterKeyChanged";
+static NSString* const kMasterKeyChangeRecElementName = @"MasterKeyChangeRec";
+static NSString* const kMasterKeyChangeForceElementName = @"MasterKeyChangeForce";
+static NSString* const kMasterKeyChangeForceOnceElementName = @"MasterKeyChangeForceOnce";
+static NSString* const kLastSelectedGroupElementName = @"LastSelectedGroup";
+static NSString* const kLastTopVisibleGroupElementName = @"LastTopVisibleGroup";
 
+static NSString* const kMemoryProtectionElementName = @"MemoryProtection";
+
+static NSString* const kProtectTitleElementName =    @"ProtectTitle";
+static NSString* const kProtectUsernameElementName = @"ProtectUserName";
+static NSString* const kProtectPasswordElementName = @"ProtectPassword";
+static NSString* const kProtectURLElementName =      @"ProtectURL";
+static NSString* const kProtectNotesElementName =    @"ProtectNotes";
 
 static NSString* const kDefaultAutoTypeSequenceElementName = @"DefaultAutoTypeSequence";
 static NSString* const kEnableAutoTypeElementName = @"EnableAutoType";

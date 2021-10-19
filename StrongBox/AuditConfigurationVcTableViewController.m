@@ -45,7 +45,9 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 @property (weak, nonatomic) IBOutlet UISwitch *switchHibp;
 @property (weak, nonatomic) IBOutlet UISwitch *switchShowPopups;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellCheckHibp;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellOnlineHibpInterval;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellHipbShowCached;
 
 @property (weak, nonatomic) IBOutlet UILabel *labelOnlineCheckInterval;
 @property (weak, nonatomic) IBOutlet UILabel *labelLastOnineCheck;
@@ -72,6 +74,14 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    [self cell:self.cellViewAllAuditIssues setHidden:self.hideShowAllAuditIssues]; 
+    
+    [self cell:self.cellCheckHibp setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
+    [self cell:self.cellOnlineHibpInterval setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
+    [self cell:self.cellHipbShowCached setHidden:AppPreferences.sharedInstance.disableNetworkBasedFeatures];
+    
+    [self reloadDataAnimated:NO];
+    
     [self bindUi];
     
     [NSNotificationCenter.defaultCenter addObserver:self
@@ -83,8 +93,6 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
                                             selector:@selector(bindAuditStatus:)
                                                 name:kAuditCompletedNotificationKey
                                              object:nil];
-    
-    [self cell:self.cellViewAllAuditIssues setHidden:self.hideShowAllAuditIssues]; 
 }
 
 - (void)bindUi {
@@ -258,8 +266,11 @@ static const int kHibpOnceEvery30Days = kHibpOnceADay * 30;
     }
     
     
-    [self.tableView beginUpdates];
-    [self.tableView endUpdates];
+    
+    [self reloadDataAnimated:YES];
+    
+
+
 }
 
 - (IBAction)onPreferenceChanged:(id)sender {    

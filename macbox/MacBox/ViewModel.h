@@ -33,22 +33,23 @@ extern NSString* const kModelUpdateNotificationItemsDeleted;
 extern NSString* const kModelUpdateNotificationItemsUnDeleted;
 extern NSString* const kModelUpdateNotificationItemsMoved;
 extern NSString* const kModelUpdateNotificationTagsChanged;
+extern NSString* const kModelUpdateNotificationSelectedItemChanged;
+extern NSString* const kModelUpdateNotificationDatabasePreferenceChanged;
 
 @interface ViewModel : NSObject
 
-- (instancetype _Nullable )init NS_UNAVAILABLE;
+- (instancetype)init NS_UNAVAILABLE;
 
 - (instancetype)initUnlockedWithDatabase:(NSDocument *)document
                                 metadata:(DatabaseMetadata*)metadata
-                                database:(DatabaseModel *_Nullable)database
-                            selectedItem:(NSString *_Nullable)selectedItem;
+                                database:(DatabaseModel *_Nullable)database;
 
 - (instancetype)initLocked:(NSDocument *)document
                   metadata:(DatabaseMetadata*)metadata;
 
 @property (readonly, nonatomic) DatabaseModel* database;
-@property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
 @property (nonatomic, readonly) DatabaseMetadata *databaseMetadata;
+@property (nonatomic, readonly) UnifiedDatabaseMetadata *metadata;
 @property (nonatomic, readonly) NSString *databaseUuid;
 
 @property (nonatomic, readonly, weak) NSDocument*  document;
@@ -62,16 +63,14 @@ extern NSString* const kModelUpdateNotificationTagsChanged;
 
 @property (nonatomic) CompositeKeyFactors* compositeKeyFactors;
 
+@property (nullable) NSUUID* selectedItem;
 
-    
 - (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
-
-- (void)lock:(NSString*_Nullable)selectedItem;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
 
-- (void)getPasswordDatabaseAsData:(SaveCompletionBlock)completion; 
+- (void)getPasswordDatabaseAsData:(void (^)(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error))completion;
 
 - (BOOL)setItemTitle:(Node* )item title:(NSString* )title;
 - (void)setItemUsername:(Node*)item username:(NSString*)username;
@@ -92,8 +91,13 @@ extern NSString* const kModelUpdateNotificationTagsChanged;
 - (void)removeItemAttachment:(Node*)item filename:(NSString*)filename;
 - (void)addItemAttachment:(Node*)item filename:(NSString*)filename attachment:(DatabaseAttachment*)attachment;
 
-- (void)setCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
+
+- (void)addCustomField:(Node *)item key:(NSString *)key value:(StringValue *)value;
 - (void)removeCustomField:(Node *)item key:(NSString *)key;
+- (void)editCustomField:(Node*)item
+       existingFieldKey:(NSString*_Nullable)existingFieldKey
+                    key:(NSString *_Nullable)key
+                  value:(StringValue *_Nullable)value;
 
 - (void)setTotp:(Node *)item otp:(NSString *)otp steam:(BOOL)steam;
 - (void)clearTotp:(Node *)item;
@@ -147,6 +151,7 @@ extern NSString* const kModelUpdateNotificationTagsChanged;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * usernameSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * urlSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * emailSet;
+@property (nonatomic, readonly, copy) NSSet<NSString*> * tagSet;
 @property (nonatomic, readonly, copy) NSSet<NSString*> * passwordSet;
 @property (nonatomic, readonly) NSString * mostPopularUsername;
 @property (nonatomic, readonly) NSString * mostPopularPassword;
@@ -158,8 +163,6 @@ extern NSString* const kModelUpdateNotificationTagsChanged;
 @property (nonatomic, copy, nullable) void (^onNewItemAdded)(Node* node, BOOL openEntryDetailsWindowWhenDone);
 @property (nonatomic, copy, nullable) void (^onDeleteHistoryItem)(Node* item, Node* historicalItem);
 @property (nonatomic, copy, nullable) void (^onRestoreHistoryItem)(Node* item, Node* historicalItem);
-
-@property (nullable) NSString* selectedItem;
 
 - (NSString *)getHtmlPrintString:(NSString*)databaseName;
 

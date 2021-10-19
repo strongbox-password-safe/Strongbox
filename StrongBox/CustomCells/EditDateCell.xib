@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15400" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15404"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -19,26 +20,26 @@
                         <rect key="frame" x="20" y="11" width="390" height="103"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="749" text="Key that couild get very long too" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.69999998807907104" adjustsLetterSpacingToFitWidth="YES" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="flK-dj-f4U">
-                                <rect key="frame" x="0.0" y="0.0" width="183.5" height="14.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="170.5" height="13.5"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
-                                <color key="textColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                <color key="textColor" systemColor="secondaryLabelColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" alignment="center" spacing="12" translatesAutoresizingMaskIntoConstraints="NO" id="JBk-YQ-oCK">
-                                <rect key="frame" x="0.0" y="19.5" width="390" height="118"/>
+                                <rect key="frame" x="0.0" y="18.5" width="390" height="123.5"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Date" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="12" translatesAutoresizingMaskIntoConstraints="NO" id="jG6-Nc-huc" userLabel="Date">
-                                        <rect key="frame" x="0.0" y="48" width="109.5" height="22"/>
+                                        <rect key="frame" x="0.0" y="52.5" width="103.5" height="18.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="749" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Time" textAlignment="natural" adjustsFontForContentSizeCategory="YES" minimumFontSize="12" translatesAutoresizingMaskIntoConstraints="NO" id="V7t-Dz-xvC" userLabel="Time">
-                                        <rect key="frame" x="121.5" y="48" width="224.5" height="22"/>
+                                        <rect key="frame" x="115.5" y="52.5" width="230.5" height="18.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                         <textInputTraits key="textInputTraits" autocorrectionType="no"/>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="255" verticalCompressionResistancePriority="745" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xKx-9J-Ptl">
-                                        <rect key="frame" x="358" y="43" width="32" height="32"/>
+                                        <rect key="frame" x="358" y="46" width="32" height="32"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="32" id="GFE-E2-vnr"/>
                                             <constraint firstAttribute="height" priority="999" constant="32" id="fau-G5-SIa"/>
@@ -51,15 +52,15 @@
                                 </subviews>
                             </stackView>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fcu-P6-KSC" userLabel="Horizontal Line">
-                                <rect key="frame" x="0.0" y="94.5" width="109.5" height="0.5"/>
-                                <color key="backgroundColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                <rect key="frame" x="0.0" y="94.5" width="103.5" height="0.5"/>
+                                <color key="backgroundColor" systemColor="secondaryLabelColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="0.5" id="IGN-yj-Ne0"/>
                                 </constraints>
                             </view>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6RQ-5h-kdi" userLabel="Horizontal Line">
-                                <rect key="frame" x="121.5" y="94.5" width="224.5" height="0.5"/>
-                                <color key="backgroundColor" systemColor="secondaryLabelColor" red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+                                <rect key="frame" x="115.5" y="94.5" width="230.5" height="0.5"/>
+                                <color key="backgroundColor" systemColor="secondaryLabelColor"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="0.5" id="JTW-Im-z0e"/>
                                 </constraints>
@@ -90,6 +91,7 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="buttonClear" destination="xKx-9J-Ptl" id="mkh-Ss-izW"/>
                 <outlet property="dateTextField" destination="jG6-Nc-huc" id="JDa-UI-I7o"/>
                 <outlet property="keyLabel" destination="flK-dj-f4U" id="lr5-nk-Rgb"/>
                 <outlet property="timeTextField" destination="V7t-Dz-xvC" id="SRF-6c-52W"/>
@@ -99,5 +101,8 @@
     </objects>
     <resources>
         <image name="cancel" width="30" height="30"/>
+        <systemColor name="secondaryLabelColor">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
     </resources>
 </document>

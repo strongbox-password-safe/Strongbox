@@ -28,6 +28,10 @@
 @property (weak) IBOutlet NSPopUpButton *popupAutoUnlock;
 @property BOOL isOnForStrongbox;
 
+@property (weak) IBOutlet NSButton *includeAlternativeUrls;
+@property (weak) IBOutlet NSButton *scanCustomFields;
+@property (weak) IBOutlet NSButton *scanNotesForUrls;
+
 @property NSArray<NSNumber*>* autoUnlockOptions;
 
 @end
@@ -119,6 +123,16 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     self.popupDisplayFormat.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
 
     
+    
+    self.includeAlternativeUrls.state = meta.autoFillScanAltUrls ? NSControlStateValueOn : NSControlStateValueOff;
+    self.scanCustomFields.state = meta.autoFillScanCustomFields ? NSControlStateValueOn : NSControlStateValueOff;
+    self.scanNotesForUrls.state = meta.autoFillScanNotes ? NSControlStateValueOn : NSControlStateValueOff;
+
+    self.includeAlternativeUrls.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
+    self.scanCustomFields.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
+    self.scanNotesForUrls.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
+
+    
 
     self.popupAutoUnlock.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox && meta.autoFillEnabled;
     NSInteger val = meta.autoFillConvenienceAutoUnlockTimeout;
@@ -157,9 +171,18 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         }];
 
         NSLog(@"AutoFill QuickType Format was changed - Populating Database....");
+        
+        
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+
+        DatabaseMetadata* meta = self.model.databaseMetadata;
+
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
-                                                           databaseUuid:self.model.databaseMetadata.uuid
-                                                          displayFormat:self.model.databaseMetadata.quickTypeDisplayFormat];
+                                                           databaseUuid:meta.uuid
+                                                          displayFormat:meta.quickTypeDisplayFormat
+                                                        alternativeUrls:meta.autoFillScanAltUrls
+                                                           customFields:meta.autoFillScanCustomFields
+                                                                  notes:meta.autoFillScanNotes];
         
         [self bindUI];
     }
@@ -173,11 +196,18 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     BOOL quickTypeEnabled = self.enableQuickType.state == NSControlStateValueOn;
     BOOL quickWormholeFillEnabled = self.useWormholeIfUnlocked.state == NSControlStateValueOn;
 
+    BOOL autoFillScanAltUrls = self.includeAlternativeUrls.state == NSControlStateValueOn;
+    BOOL autoFillScanCustomFields = self.scanCustomFields.state == NSControlStateValueOn;
+    BOOL autoFillScanNotes = self.scanNotesForUrls.state == NSControlStateValueOn;
+
     [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
                                             touch:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.autoFillEnabled = autoFillEnabled;
         metadata.quickTypeEnabled = quickTypeEnabled;
         metadata.quickWormholeFillEnabled = quickWormholeFillEnabled;
+        metadata.autoFillScanAltUrls = autoFillScanAltUrls;
+        metadata.autoFillScanCustomFields = autoFillScanCustomFields;
+        metadata.autoFillScanNotes = autoFillScanNotes;
     }];
     
     DatabaseMetadata* meta = self.model.databaseMetadata;
@@ -192,14 +222,21 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
     }
 
-    BOOL quickTypeWasTurnedOn = (oldQuickType == NO || oldEnabled == NO) &&
-        (meta.quickTypeEnabled == YES && meta.autoFillEnabled == YES);
 
-    if ( quickTypeWasTurnedOn ) {
+
+
+    BOOL quickTypeOn = (meta.quickTypeEnabled == YES && meta.autoFillEnabled == YES);
+    if ( quickTypeOn ) {
+        
+        [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
+
         NSLog(@"AutoFill QuickType was turned off - Populating Database....");
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.model.database
                                                            databaseUuid:meta.uuid
-                                                          displayFormat:meta.quickTypeDisplayFormat];
+                                                          displayFormat:meta.quickTypeDisplayFormat
+                                                        alternativeUrls:autoFillScanAltUrls
+                                                           customFields:autoFillScanCustomFields
+                                                                  notes:autoFillScanNotes];
     }
 
     

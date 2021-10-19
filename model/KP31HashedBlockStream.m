@@ -101,7 +101,7 @@
         return NO;
     }
         
-    size_t blockLength = littleEndian4BytesToInt32(block.size);
+    size_t blockLength = littleEndian4BytesToUInt32(block.size);
     if (blockLength > 0) {
         [self cleanupWorkingBlock];
         self.workingBlock = malloc(blockLength);

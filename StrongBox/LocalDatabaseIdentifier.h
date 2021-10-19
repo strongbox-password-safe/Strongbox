@@ -12,8 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface LocalDatabaseIdentifier : NSObject
 
-+ (instancetype)fromJson:(NSString*)json;
-- (NSString*)toJson;
++ (instancetype _Nullable)fromJson:(NSString*)json;
+- (NSString* _Nullable)toJson;
 
 @property NSString* filename;
 @property BOOL sharedStorage;

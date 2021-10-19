@@ -67,6 +67,10 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
 
 - (id)getSecureObject:(NSString *)identifier expired:(BOOL*)expired {
     
+
+    if(expired) {
+        *expired = NO;
+    }
     
     if ([SecretStore isUnsupportedOS]) {
         NSLog(@"Unsupported OS...");
@@ -97,13 +101,22 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
             return nil;
         }
         
-        return object;
+#if TARGET_OS_IPHONE
+        if (@available(ios 10.0, *)) {
+            return [self decryptAndDeserializeData:object identifier:identifier];
+        }
+        else {
+            return object;
+        }
+#else
+        return   [self decryptAndDeserializeData:object identifier:identifier];
+#endif
     }
     else if(expiryMode == kExpiresAtTime) {
         NSDate* expiry = wrapped[kWrappedObjectExpiryKey];
         
         if ( [self entryIsExpired:expiry] ) {
-            NSLog(@"XXXX - entryIsExpired [%@]... Cleaning up from secure store...", expiry);
+            NSLog(@"entryIsExpired [%@]... Cleaning up from secure store...", expiry);
 
             if(expired) {
                 *expired = YES;
@@ -249,6 +262,26 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         NSLog(@"Error storing encrypted blob in Keychain...");
         return NO;
     }
+    
+    
+
+    if ( expiryMode == kExpiresOnAppExitStoreSecretInMemoryOnly ) {
+        NSData* clearDataObject = [NSKeyedArchiver archivedDataWithRootObject:object];
+        CFDataRef cipherTextMemOnly = SecKeyCreateEncryptedData(publicKey, algorithm, (CFDataRef)clearDataObject, &cfError);
+        if(!cipherTextMemOnly) {
+            if (privateKey) { CFRelease(privateKey); }
+            if (publicKey)  { CFRelease(publicKey);  }
+            if (access)     { CFRelease(access);     }
+            if (cipherText) { CFRelease(cipherText); }
+
+            NSLog(@"Error encrypting memory only object... [%@]", (__bridge NSError *)cfError);
+            return NO;
+        }
+
+        NSData* dataObject = (__bridge NSData *)cipherTextMemOnly;
+        self.ephemeralObjectStore[identifier] = dataObject;
+    }
+
     
     if (privateKey) { CFRelease(privateKey); }
     if (publicKey)  { CFRelease(publicKey);  }
@@ -494,24 +527,24 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
             return nil;
         }
         else {
-            NSLog(@"XXXX - Could not get encrypted blob but it appears to be present [%@]", identifier);
+            NSLog(@"Could not get encrypted blob but it appears to be present [%@]", identifier);
             return nil;
         }
     }
     
 #if TARGET_OS_IPHONE
     if (@available(ios 10.0, *)) {
-        return [self decryptAndDeserializeKeychainBlob:keychainBlob identifier:identifier];
+        return [self decryptAndDeserializeData:keychainBlob identifier:identifier];
     }
     else {
         return [self deserializeKeychainBlob:keychainBlob identifier:identifier];
     }
 #else
-    return [self decryptAndDeserializeKeychainBlob:keychainBlob identifier:identifier];
+    return [self decryptAndDeserializeData:keychainBlob identifier:identifier];
 #endif
 }
 
-- (NSDictionary*)decryptAndDeserializeKeychainBlob:(NSData*)encrypted identifier:(NSString *)identifier {
+- (id)decryptAndDeserializeData:(NSData*)encrypted identifier:(NSString *)identifier {
 
 
     NSDictionary* query = [SecretStore getPrivateKeyQuery:identifier limit1Match:YES];
@@ -541,13 +574,13 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
        return nil;
     }
     
-    NSDictionary * wrapped = [self decryptWrappedObject:encrypted privateKey:privateKey];
+    id wrapped = [self decryptWrappedObject:encrypted privateKey:privateKey];
     
-    if (privateKey) {
+    if ( privateKey ) {
         CFRelease(privateKey);
     }
     
-    if(!wrapped) {
+    if ( !wrapped ) {
         NSLog(@"Could not unwrap secure item. Cleaning it up.");
         [self deleteSecureItem:identifier];
         return nil;
@@ -581,7 +614,7 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
     return wrapped;
 }
 
-- (NSDictionary*)decryptWrappedObject:(NSData*)encrypted privateKey:(SecKeyRef)privateKey {
+- (id)decryptWrappedObject:(NSData*)encrypted privateKey:(SecKeyRef)privateKey {
     CFErrorRef cfError = nil;
     SecKeyAlgorithm algorithm = [SecretStore algorithm];
     CFDataRef pt = SecKeyCreateDecryptedData(privateKey, algorithm, (CFDataRef)encrypted, &cfError);
@@ -591,16 +624,16 @@ static NSString* const kWrappedObjectExpiryModeKey = @"expiryMode";
         return nil;
     }
     
-    NSDictionary *wrapped = nil;
+    id wrapped = nil;
     @try {
         wrapped = [NSKeyedUnarchiver unarchiveObjectWithData:(__bridge NSData *)pt];
     }
     @catch (NSException *e) {
-        NSLog(@"Error Ubarchiving: %@", e);
+        NSLog(@"Error Unarchiving: %@", e);
     }
     @finally {}
     
-    if (pt) {
+    if ( pt ) {
         CFRelease(pt);
     }
     

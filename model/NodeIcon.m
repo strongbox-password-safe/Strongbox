@@ -13,15 +13,19 @@
 @implementation NodeIcon
 
 + (instancetype)withCustom:(NSData *)custom {
-    return [self withCustom:custom name:nil modified:nil];
+    return [NodeIcon withCustom:custom name:nil modified:nil];
 }
 
 + (instancetype)withCustom:(NSData *)custom name:(NSString*)name modified:(NSDate*)modified {
-    return [[NodeIcon alloc] initWithCustom:custom uuid:nil name:name modified:modified];
+    return [NodeIcon withCustom:custom uuid:NSUUID.UUID name:nil modified:nil];
 }
 
-+ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*_Nullable)uuid name:(NSString*)name modified:(NSDate*)modified {
-    return [[NodeIcon alloc] initWithCustom:custom uuid:uuid name:name modified:modified];
++ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID *)uuid name:(NSString *)name modified:(NSDate *)modified {
+    return [NodeIcon withCustom:custom uuid:uuid name:nil modified:nil preferredOrder:NSIntegerMax];
+}
+
++ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*)uuid name:(NSString*)name modified:(NSDate*)modified preferredOrder:(NSInteger)preferredOrder {
+    return [[NodeIcon alloc] initWithCustom:custom uuid:uuid name:name modified:modified preferredOrder:preferredOrder];
 }
 
 + (instancetype)withPreset:(NSInteger)preset {
@@ -36,14 +40,17 @@
     return self;
 }
 
-- (instancetype)initWithCustom:(NSData *)custom uuid:(NSUUID*_Nullable)uuid name:(NSString*)name modified:(NSDate*)modified {
+- (instancetype)initWithCustom:(NSData *)custom uuid:(NSUUID*)uuid name:(NSString*)name modified:(NSDate*)modified preferredOrder:(NSInteger)preferredOrder {
     self = [super init];
+    
     if (self) {
         _custom = custom;
         _uuid = uuid;
         _name = name;
         _modified = modified;
+        _preferredOrder = preferredOrder;
     }
+    
     return self;
 }
 
@@ -81,7 +88,12 @@
         
         BOOL dataEqual = [self.custom.sha1.hexString isEqualToString:other.custom.sha1.hexString];
         
-        return namesEqual && modsEqual && dataEqual;
+        if ( namesEqual && modsEqual && dataEqual ) {
+            return YES;
+        }
+        else {
+            return NO;
+        }
     }
     else {
         return self.preset == other.preset;
@@ -98,7 +110,7 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:self.isCustom ? @"Custom" : @"Preset: %ld", (long)self.preset];
+    return [NSString stringWithFormat:self.isCustom ? @"Custom [%@]" : @"Preset: %@", self.isCustom ? self.uuid : @(self.preset)];
 }
 
 @end

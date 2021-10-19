@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL allowUntrustedCertificate;
 
 - (NSDictionary*)serializationDictionary;
-+ (instancetype)fromSerializationDictionary:(NSDictionary*)dictionary;
++ (instancetype _Nullable)fromSerializationDictionary:(NSDictionary*)dictionary;
 
 -(NSString*)getKeyChainKey:(NSString*)propertyName;
 

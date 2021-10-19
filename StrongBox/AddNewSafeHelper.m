@@ -97,12 +97,18 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
     DatabaseFormat format = database.originalFormat;
     
     dispatch_async(dispatch_get_global_queue(0L, DISPATCH_QUEUE_PRIORITY_DEFAULT), ^{
-        [Serializator getAsData:database format:format completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
-            if (userCancelled || data == nil || error) {
+        NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory]; 
+        [outputStream open];
+
+        [Serializator getAsData:database format:format outputStream:outputStream completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
+            if (userCancelled || error) {
                 completion(userCancelled, nil, nil, error);
                 return;
             }
             
+            [outputStream close];
+            NSData* data = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+
             dispatch_async(dispatch_get_main_queue(), ^(void) { 
                 [SVProgressHUD dismiss];
                 

@@ -33,7 +33,25 @@ typedef NS_ENUM (NSUInteger, HeaderEntryIdentifier) {
     STREAMSTARTBYTES = 9,
     INNERRANDOMSTREAMID = 10,
     KDFPARAMETERS = 11,
+    PUBLIC_CUSTOM_DATA = 12,
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -51,12 +69,21 @@ NSData *getMasterKey(NSData* masterSeed, NSData *transformKey);
 
 NSData*__nullable getAesTransformKey(NSData *compositeKey, NSData* transformSeed, uint64_t transformRounds);
 
+
+
+
+
+
+
+
+
 RootXmlDomainObject*_Nullable parseXml(uint32_t innerRandomStreamId,
-                              NSData*_Nullable innerRandomStreamKey,
+                              NSData* innerRandomStreamKey,
                               XmlProcessingContext* context,
-                              NSInputStream* lib,
+                              NSInputStream* stream,
                               NSOutputStream*_Nullable xmlDumpStream,
                               BOOL sanityCheckStreamDecryption,
+                              NSError** decryptionError,
                               NSError** error);
 
 @end

@@ -205,7 +205,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
     if (!readFileHeader(stream, &fileHeader)) {
         NSLog(@"Error reading KDBX 3.1 file header");
         NSError* error = [Utils createNSError:@"Error reading KDBX 3.1 file header" errorCode:-1];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     [headerDataForIntegrityCheck appendBytes:&fileHeader length:SIZE_OF_KEEPASS_HEADER];
@@ -217,7 +217,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
     if(!headerEntries) {
         NSLog(@"Error getting header entries. Possibly missing header entry.");
         NSError *error = [Utils createNSError:@"Error getting header entries. Possibly missing entry." errorCode:-3];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
@@ -235,12 +235,12 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
         NSData* challenge = decryptionParameters.masterSeed;
         compositeKeyFactors.yubiKeyCR(challenge, ^(BOOL userCancelled, NSData * _Nullable response, NSError * _Nullable error) {
             if(userCancelled || error != nil) {
-                completion(userCancelled, nil, error);
+                completion(userCancelled, nil, nil, error);
             }
             else {
                 if (response == nil) {
                     error = [Utils createNSError:@"Nil response received from YubiKey" errorCode:-1];
-                    completion(NO, nil, error);
+                    completion(NO, nil, nil, error);
                     return;
                 }
                 
@@ -291,7 +291,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
     if(!cipher) {
         NSString *message=[NSString stringWithFormat:@"Unknown Cipher ID: [%@]. Do not know how to decrypt.", [decryptionParameters.cipherId UUIDString]];
         NSError *error = [Utils createNSError:message errorCode:-5];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
@@ -312,7 +312,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
 
         free(start);
         NSError *error = [Utils createNSError:@"Passphrase or Key File (Composite Key) Incorrect" errorCode:StrongboxErrorCodes.incorrectCredentials];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     free(start);
@@ -325,19 +325,21 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
     [decompressedStream open];
     
     NSError* error;
+    NSError* innerStreamError;
     RootXmlDomainObject *rootXmlObject = [KdbxSerialization readXml:compressed
                                                              stream:decompressedStream
                                                 innerRandomStreamId:decryptionParameters.innerRandomStreamId
                                                  protectedStreamKey:decryptionParameters.protectedStreamKey
                                                       xmlDumpStream:xmlDumpStream
                                              sanityCheckInnerStream:sanityCheckInnerStream
+                                                   innerStreamError:&innerStreamError
                                                               error:&error];
 
     [decompressedStream close];
     
     if(rootXmlObject == nil) {
         NSLog(@"Could not parse XML: [%@]", error);
-        completion(NO, nil, error);
+        completion(NO, nil, innerStreamError, error);
         return;
     }
     
@@ -354,7 +356,7 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
     ret.rootXmlObject = rootXmlObject;
     ret.cipherId = decryptionParameters.cipherId;
     
-    completion(NO, ret, nil);
+    completion(NO, ret, innerStreamError, nil);
 }
 
 + (RootXmlDomainObject*)readXml:(BOOL)compressed
@@ -363,9 +365,10 @@ headerDataForIntegrityCheck:(NSData*)headerDataForIntegrityCheck
              protectedStreamKey:(NSData*)protectedStreamKey
                   xmlDumpStream:(NSOutputStream*)xmlDumpStream
          sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
+               innerStreamError:(NSError**)innerStreamError
                           error:(NSError**)error {
     RootXmlDomainObject* rootXmlObject = parseXml(innerRandomStreamId, protectedStreamKey,
-                                                XmlProcessingContext.standardV3Context, stream, xmlDumpStream, sanityCheckInnerStream, error);
+                                                XmlProcessingContext.standardV3Context, stream, xmlDumpStream, sanityCheckInnerStream, innerStreamError, error);
     return rootXmlObject;
 }
 
@@ -454,6 +457,22 @@ static NSDictionary<NSNumber *,NSObject *>* getUnknownHeaders(NSDictionary<NSNum
     [ret removeObjectForKey:@(COMPRESSIONFLAGS)];
     [ret removeObjectForKey:@(CIPHERID)];
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
     return ret;
 }
 
@@ -469,8 +488,8 @@ NSDictionary<NSNumber *,NSObject *>* getHeaderEntries3(NSInputStream* stream, NS
             return nil;
         }
         [headerDataForIntegrityCheck appendBytes:&headerEntry length:bytesRead];
-        
-        int16_t length = littleEndian2BytesToInt16(headerEntry.lengthBytes);
+                
+        uint16_t length = littleEndian2BytesToUInt16(headerEntry.lengthBytes);
         NSMutableData* headerData = [NSMutableData dataWithLength:length];
         bytesRead = [stream read:headerData.mutableBytes maxLength:length];
         

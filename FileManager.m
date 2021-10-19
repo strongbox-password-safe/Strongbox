@@ -12,6 +12,7 @@
 #import "AppPreferences.h"
 
 static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
+static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
 
 @interface FileManager ()
 
@@ -190,7 +191,6 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 
 
 
-
 - (void)setDirectoryInclusionFromBackup:(BOOL)localDocuments importedKeyFiles:(BOOL)importedKeyFiles {
     
     
@@ -310,6 +310,17 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     }
 }
 
+- (NSString *)tmpEncryptionStreamPath {
+    NSString *ret =  [NSTemporaryDirectory() stringByAppendingPathComponent:kEncryptionStreamDirectoryName];
+    NSError* error;
+    
+    if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
+        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+    }
+
+    return ret;
+}
+
 - (NSString *)tmpEncryptedAttachmentPath {
     NSString *ret =  [NSTemporaryDirectory() stringByAppendingPathComponent:kEncAttachmentDirectoryName];
     NSError* error;
@@ -342,6 +353,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
 - (void)deleteAllTmpWorkingFiles { 
     [self deleteAllTmpEncryptedAttachmentWorkingFiles];
     [self deleteAllTmpSyncMergeWorkingFiles];
+    [self deleteAllTmpEncryptionStreamFiles];
 }
 
 - (void)deleteAllTmpEncryptedAttachmentWorkingFiles { 
@@ -354,6 +366,11 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
     [self deleteAllFoo:tmpPath];
 }
 
+- (void)deleteAllTmpEncryptionStreamFiles {
+    NSString* tmpPath = self.tmpEncryptionStreamPath;
+    [self deleteAllFoo:tmpPath];
+}
+
 - (void)deleteAllFoo:(NSString*)tmpPath {
     NSArray* tmpDirectoryContents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:tmpPath error:NULL];
     
@@ -362,7 +379,7 @@ static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
         
         NSError* error;
         [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
-        NSLog(@"Deleted: [%@]-[%@]", path, error);
+
     }
 }
 

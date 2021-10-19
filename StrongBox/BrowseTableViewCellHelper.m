@@ -181,16 +181,23 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     }
     
     if(!node.isGroup && isFlaggedByAudit) {
-        UIImage* image;
         UIColor* tintColor;
-        image = [UIImage imageNamed:@"security_checked"];
+        
+        UIImage* auditImage;
+        if (@available(iOS 13.0, *)) {
+            auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
+        }
+        else {
+            auditImage = [UIImage imageNamed:@"security_checked"];
+        }
+        
         tintColor = UIColor.systemOrangeColor;
         
         if(tintColors) {
             *tintColors = @{ @(flags.count) : tintColor };
         }
 
-        [flags addObject:image];
+        [flags addObject:auditImage];
     }
 
     return flags;

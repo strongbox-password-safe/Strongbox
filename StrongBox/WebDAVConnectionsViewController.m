@@ -14,7 +14,10 @@
 #import "Alerts.h"
 #import "SafesList.h"
 #import "NSArray+Extensions.h"
+
+#ifndef NO_SFTP_WEBDAV_SP
 #import "WebDAVStorageProvider.h"
+#endif
 
 @interface WebDAVConnectionsViewController ()
 
@@ -233,8 +236,12 @@
     }];
     
     NSArray<SafeMetaData*>* using = [possibles filter:^BOOL(SafeMetaData * _Nonnull obj) {
+#ifndef NO_SFTP_WEBDAV_SP
         WebDAVSessionConfiguration* config = [WebDAVStorageProvider.sharedInstance getConnectionFromDatabase:obj];
         return ( config && [config.identifier isEqualToString:connection.identifier] );
+#else
+        return NO;
+#endif
     }];
     
     return using;

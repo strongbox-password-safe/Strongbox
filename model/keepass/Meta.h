@@ -10,6 +10,7 @@
 #import "V3BinariesList.h"
 #import "CustomIconList.h"
 #import "CustomData.h"
+#import "MemoryProtection.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,50 +19,34 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 - (instancetype)initWithDefaultsAndInstantiatedChildren:(XmlProcessingContext*)context;
 
-@property (nonatomic) NSString *generator;
 @property (nonatomic, nullable) NSString* headerHash;
-@property (nonatomic, nullable) NSNumber *historyMaxItems;
-@property (nonatomic, nullable) NSNumber *historyMaxSize;
-
-@property BOOL recycleBinEnabled;
-@property NSUUID* recycleBinGroup;
-@property NSDate* recycleBinChanged;
-
-@property (nonatomic) V3BinariesList *v3binaries;
-@property (nonatomic) CustomIconList *customIconList;
-@property (nonatomic, nullable) CustomData* customData;
-
 @property NSDate* settingsChanged;
+@property (nonatomic) NSString *generator;
 @property (nonatomic) NSString *databaseName;
 @property NSDate* databaseNameChanged;
 @property (nonatomic) NSString *databaseDescription;
 @property NSDate* databaseDescriptionChanged;
 @property (nonatomic) NSString *defaultUserName;
 @property NSDate* defaultUserNameChanged;
+@property (nullable) NSNumber* maintenanceHistoryDays;
 @property (nonatomic) NSString *color;
+@property (nullable) NSDate*  masterKeyChanged;
+@property (nullable) NSNumber* masterKeyChangeRec;
+@property (nullable) NSNumber* masterKeyChangeForce;
+@property (nullable) NSNumber*  masterKeyChangeForceOnce;
+@property (nullable) MemoryProtection* memoryProtection;
+@property (nonatomic) CustomIconList *customIconList;
+@property BOOL recycleBinEnabled;
+@property NSUUID* recycleBinGroup;
+@property NSDate* recycleBinChanged;
 @property NSUUID* entryTemplatesGroup;
 @property NSDate* entryTemplatesGroupChanged;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@property (nonatomic, nullable) NSNumber *historyMaxItems;
+@property (nonatomic, nullable) NSNumber *historyMaxSize;
+@property (nullable) NSUUID* lastSelectedGroup;
+@property (nullable) NSUUID*  lastTopVisibleGroup;
+@property (nonatomic) V3BinariesList *v3binaries;
+@property (nonatomic, nullable) CustomData* customData;
 
 @end
 

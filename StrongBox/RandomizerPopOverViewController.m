@@ -76,7 +76,7 @@
                            generateDicewareForConfig:AppPreferences.sharedInstance.passwordGenerationConfig];
     
     NSString* example3 = [PasswordMaker.sharedInstance generateUsername];
-    NSString* example4 = [PasswordMaker.sharedInstance generateEmail];
+    NSString* example4 = [PasswordMaker.sharedInstance generateRandomWord];
     NSString* example5 = NSUUID.UUID.UUIDString;
 
 

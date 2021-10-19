@@ -12,7 +12,11 @@
 #import "SFTPConnections.h"
 #import "SFTPSessionConfigurationViewController.h"
 #import "Alerts.h"
+
+#ifndef NO_SFTP_WEBDAV_SP
 #import "SFTPStorageProvider.h"
+#endif
+
 #import "NSArray+Extensions.h"
 #import "SafesList.h"
 
@@ -233,8 +237,12 @@
     }];
     
     NSArray<SafeMetaData*>* using = [possibles filter:^BOOL(SafeMetaData * _Nonnull obj) {
+#ifndef NO_SFTP_WEBDAV_SP
         SFTPSessionConfiguration* config = [SFTPStorageProvider.sharedInstance getConnectionFromDatabase:obj];
         return ( config && [config.identifier isEqualToString:connection.identifier] );
+#else
+        return NO;
+#endif
     }];
     
     return using;

@@ -6,6 +6,7 @@
 #import "Record.h"
 #import "Constants.h"
 #import "StrongboxErrorCodes.h"
+#import "StreamUtils.h"
 
 const NSInteger kPwSafeDefaultVersionMajor = 0x03;
 const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
@@ -29,7 +30,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     if (![PwSafeDatabase isValidDatabase:data error:&error]) {
         NSLog(@"Not a valid safe!");
         error = [Utils createNSError:@"This is not a valid Password Safe 3 File (Invalid Format)." errorCode:-1];
-        completion(NO, nil, error);
+        completion(NO, nil,  nil, error);
         return;
     }
 
@@ -40,7 +41,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
                                             error:&error];
 
     if(!records) {
-        completion(NO, nil, error);
+        completion(NO, nil,  nil, error);
         return;
     }
     
@@ -50,20 +51,20 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     if(!rootGroup) {
         NSLog(@"Could not build model from records and headers?!");
         error = [Utils createNSError:@"Could not parse this Password Safe File." errorCode:-1];
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
     
     UnifiedDatabaseMetadata* metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kPasswordSafe];
     metadata.version = [PwSafeDatabase getVersion:headerFields];
-    metadata.keyStretchIterations = [PwSafeSerialization getKeyStretchIterations:data];
+    metadata.kdfIterations = [PwSafeSerialization getKeyStretchIterations:data];
 
     [PwSafeDatabase syncLastUpdateFieldsFromHeaders:metadata headers:headerFields];
     
     DatabaseModel *ret = [[DatabaseModel alloc] initWithFormat:kPasswordSafe compositeKeyFactors:ckf metadata:metadata root:rootGroup];
     metadata.adaptorTag = headerFields;
 
-    completion(NO, ret, nil);
+    completion(NO, ret, nil, nil);
 }
 
 + (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream *)xmlDumpStream sanityCheckInnerStream:(BOOL)sanityCheckInnerStream completion:(OpenCompletionBlock)completion {
@@ -88,17 +89,17 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     [stream close];
     
     if (bytesRead < 0) {
-        completion(NO, nil, stream.streamError);
+        completion(NO, nil, nil, stream.streamError);
         return;
     }
     
     [self open:mutableData ckf:ckf completion:completion];
 }
 
-+ (void)save:(DatabaseModel *)database completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password) {
         NSError* error = [Utils createNSError:@"Master Password not set." errorCode:-3];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
     
@@ -109,7 +110,7 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     NSMutableData *ret = [[NSMutableData alloc] init];
     
     NSData *K, *L;
-    PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)database.meta.keyStretchIterations
+    PasswordSafe3Header hdr = [PwSafeSerialization generateNewHeader:(int)database.meta.kdfIterations
                                                       masterPassword:database.ckfs.password
                                                                    K:&K
                                                                    L:&L];
@@ -152,7 +153,17 @@ const NSInteger kPwSafeDefaultVersionMinor = 0x0D;
     NSData *hmac = [PwSafeSerialization calculateRFC2104Hmac:hmacData key:L];
     [ret appendData:hmac];
     
-    completion(NO, ret, nil, nil);
+    NSInputStream* inputStream = [NSInputStream inputStreamWithData:ret];
+    [inputStream open];
+    BOOL success = [StreamUtils pipeFromStream:inputStream to:outputStream openAndCloseStreams:NO];
+    [inputStream close];
+    
+    if ( !success ) {
+        completion(NO, nil, [Utils createNSError:@"Could not pipe data to stream!" errorCode:-1]);
+    }
+    else {
+        completion(NO, nil, nil);
+    }
 }
 
 + (NSData *_Nullable)getYubiKeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {

@@ -18,6 +18,8 @@
 @property UIBarButtonItem* clearButton;
 @property UIBarButtonItem* clearButton2;
 
+@property (weak, nonatomic) IBOutlet UIButton *buttonClear;
+
 @end
 
 @implementation EditDateCell
@@ -104,6 +106,14 @@
     self.timeTextField.placeholder = NSLocalizedString(@"edit_date_cell_time_field_placeholder", @"Time");
     self.timeTextField.accessibilityLabel = NSLocalizedString(@"edit_date_cell_time_field_accessibility_label", @"Time Text Field");
     self.timeTextField.inputAccessoryView = toolbarTime;
+    
+    if (@available(iOS 13.0, *)) { 
+        [self.buttonClear setImage:[UIImage systemImageNamed:@"xmark.circle"] forState:UIControlStateNormal];
+        [self.buttonClear setPreferredSymbolConfiguration:[UIImageSymbolConfiguration configurationWithScale:UIImageSymbolScaleLarge]
+                                          forImageInState:UIControlStateNormal];
+
+    }
+    self.buttonClear.tintColor = UIColor.systemOrangeColor;
 }
 
 - (void)onDoneDateToolbarButton {
@@ -153,6 +163,9 @@
     
     self.clearButton.enabled = date != nil;
     self.clearButton2.enabled = date != nil;
+    
+    self.buttonClear.enabled = date != nil;
+    self.buttonClear.tintColor = date != nil ? UIColor.systemOrangeColor : UIColor.clearColor;
 }
 
 static NSString *timeString(NSDate *modDate) {

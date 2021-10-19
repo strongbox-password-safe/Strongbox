@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)identifierWithDatabaseId:(NSString*)databaseId nodeId:(NSString*)nodeId;
 
-+ (instancetype)fromJson:(NSString*)json;
-- (NSString*)toJson;
++ (instancetype _Nullable)fromJson:(NSString*)json;
+- (NSString* _Nullable)toJson;
 
 @property NSString* databaseId;
 @property NSString* nodeId;

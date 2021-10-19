@@ -24,6 +24,8 @@
 
 @property NSError* error;
 
+@property BOOL lastReadZeroBytes;
+
 @end
 
 @implementation AesInputStream
@@ -85,7 +87,7 @@
             }
         
             workingAvailable = self.workChunkLength - self.workingChunkOffset;
-            if (workingAvailable == 0) {
+            if ( workingAvailable == 0 && self.lastReadZeroBytes ) {
                 return bufferWritten; 
             }
         }
@@ -128,11 +130,29 @@
     if (self.workChunk == nil) {
         self.workChunk = malloc(kStreamingSerializationChunkSize);
     }
-    
-    if (bytesRead == 0) {
-        CCCryptorStatus status = CCCryptorFinal(*self.cryptor, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
+
+    if ( bytesRead > 0 ) {
+        CCCryptorStatus status = CCCryptorUpdate(*self.cryptor, block, bytesRead, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
+        
         if (status != kCCSuccess) {
-            size_t req = CCCryptorGetOutputLength(*self.cryptor, bytesRead, YES);
+            NSLog(@"Crypto Error: %d", status);
+            self.error = [Utils createNSError:@"AES: Crypto Error" errorCode:status];
+            self.workChunk = nil;
+            self.workChunkLength = 0;
+            free(block);
+            return;
+        }
+
+        self.writtenSoFar += self.workChunkLength;
+        
+    }
+    else {
+        self.lastReadZeroBytes = YES;
+        
+        CCCryptorStatus status = CCCryptorFinal(*self.cryptor, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
+        
+        if (status != kCCSuccess) {
+            size_t req = CCCryptorGetOutputLength(*self.cryptor, 0, YES);
             if (status == kCCBufferTooSmall && req == 0) { 
 
             }
@@ -149,22 +169,7 @@
         self.writtenSoFar += self.workChunkLength;
         
     }
-    else {
-        CCCryptorStatus status = CCCryptorUpdate(*self.cryptor, block, bytesRead, self.workChunk, kStreamingSerializationChunkSize, &_workChunkLength);
-        
-        if (status != kCCSuccess) {
-            NSLog(@"Crypto Error: %d", status);
-            self.error = [Utils createNSError:@"AES: Crypto Error" errorCode:status];
-            self.workChunk = nil;
-            self.workChunkLength = 0;
-            free(block);
-            return;
-        }
 
-        self.writtenSoFar += self.workChunkLength;
-        
-    }
-    
     free(block);
 }
 

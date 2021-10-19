@@ -10,4 +10,6 @@
 
 @interface WindowController : NSWindowController
 
+- (void)updateContentView;
+
 @end

@@ -12,6 +12,7 @@
 #import "InnerRandomStreamFactory.h"
 #import "Utils.h"
 #import "SimpleXmlValueExtractor.h"
+#import "XmlOutputStreamWriter.h"
 
 @interface XmlSerializer ()
 
@@ -40,10 +41,26 @@
                                       key:(nullable NSData*)key
                                  v4Format:(BOOL)v4Format
                               prettyPrint:(BOOL)prettyPrint {
-    if(self = [super init]) {
-        self.innerRandomStream = [InnerRandomStreamFactory getStream:innerRandomStreamId key:key];
+    return [self initWithProtectedStream:[InnerRandomStreamFactory getStream:innerRandomStreamId key:key] v4Format:v4Format prettyPrint:prettyPrint];
+}
+
+- (instancetype)initWithProtectedStream:(id<InnerRandomStream>)innerRandomStream
+                                 v4Format:(BOOL)v4Format
+                              prettyPrint:(BOOL)prettyPrint {
+    return [self initWithProtectedStream:innerRandomStream v4Format:v4Format prettyPrint:prettyPrint outputStream:nil];
+}
+
+- (instancetype)initWithProtectedStream:(id<InnerRandomStream>)innerRandomStream v4Format:(BOOL)v4Format prettyPrint:(BOOL)prettyPrint outputStream:(NSOutputStream *)outputStream {
+    if( self = [super init] ) {
+        self.innerRandomStream = innerRandomStream;
         self.v4Format = v4Format;
-        self.xmlWriter = [[XMLWriter alloc] init];
+        
+        if ( outputStream ) {
+            self.xmlWriter = [[XmlOutputStreamWriter alloc] initWithOutputStream:outputStream];
+        }
+        else {
+            self.xmlWriter = [[XMLWriter alloc] init];
+        }
         
         if(prettyPrint) {
             [self.xmlWriter setPrettyPrinting:@"\t" withLineBreak:@"\n"];
@@ -207,11 +224,13 @@
         return pt;
     }
     
-    NSData *ptData = [pt dataUsingEncoding:NSUTF8StringEncoding];
+    @autoreleasepool {
+        NSData *ptData = [pt dataUsingEncoding:NSUTF8StringEncoding];
 
-    NSData* ciphertext = [self.innerRandomStream xor:ptData];
-    
-    return [ciphertext base64EncodedStringWithOptions:kNilOptions];
+        NSData* ciphertext = [self.innerRandomStream xor:ptData];
+        
+        return [ciphertext base64EncodedStringWithOptions:kNilOptions];
+    }
 }
     
 - (NSData *)protectedStreamKey {
@@ -221,4 +240,9 @@
 - (NSString *)xml {
     return self.xmlWriter.toString;
 }
+
+- (NSError *)streamError {
+    return self.xmlWriter.streamError;
+}
+
 @end

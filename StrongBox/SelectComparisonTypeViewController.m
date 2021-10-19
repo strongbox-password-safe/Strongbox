@@ -95,7 +95,8 @@
         
         vc.firstDatabase = self.firstDatabase;
         vc.secondDatabase = secondDb;
-        vc.isMergeDiff = merge.boolValue;
+        vc.isCompareForMerge = merge.boolValue;
+        vc.isSyncInitiated = NO;
         
         vc.onDone = self.onDone;
     }

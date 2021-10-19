@@ -68,11 +68,18 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     DatabaseModel* db = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:ckf];
     [SampleItemsGenerator addSampleGroupAndRecordToRoot:db passwordConfig:Settings.sharedInstance.passwordGenerationConfig];
         
+    NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory];
+    [outputStream open];
+            
     [Serializator getAsData:db
                      format:db.originalFormat
-                 completion:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+               outputStream:outputStream completion:^(BOOL userCancelled, NSString * _Nullable debugXml, NSError * _Nullable error) {
+        [outputStream close];
+        
         dispatch_async(dispatch_get_main_queue(), ^{
-            if ( data && !userCancelled && !error ) {
+            if ( !userCancelled && !error ) {
+                NSData* data = [outputStream propertyForKey:NSStreamDataWrittenToMemoryStreamKey];
+                
                 [self saveNewFileBasedDatabase:format database:db data:data keyFileBookmark:keyFileBookmark yubiKeyConfig:yubiKeyConfig];
             }
             else if (! userCancelled ) {
@@ -153,8 +160,10 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 - (void)openDocumentWithContentsOfURL:(NSURL *)url
                               display:(BOOL)displayDocument
                     completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
-
     DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseByFileUrl:url];
+
+
+
     NSURL* maybeManaged = database ? url : [self maybeManagedSyncURL:url];
 
     [super openDocumentWithContentsOfURL:maybeManaged
@@ -226,11 +235,15 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
                 NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
             }
             
-            completion(error);
+            if ( completion ) {
+                completion(error);
+            }
         }];
     }
     else {
-        completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
+        if ( completion ) {
+            completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
+        }
     }});
 }
 
@@ -347,13 +360,13 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 + (void)restoreWindowWithIdentifier:(NSUserInterfaceItemIdentifier)identifier
                               state:(NSCoder *)state
                   completionHandler:(void (^)(NSWindow * _Nullable, NSError * _Nullable))completionHandler {
-    NSLog(@"restoreWindowWithIdentifier...");
+
     
     if ([state containsValueForKey:@"StrongboxNonFileRestorationStateURL"] ) {
         NSURL *nonFileRestorationStateURL = [state decodeObjectForKey:@"StrongboxNonFileRestorationStateURL"];
         
         if ( nonFileRestorationStateURL ) {
-            NSLog(@"restoreWindowWithIdentifier... custom URL");
+
 
             [[self sharedDocumentController] reopenDocumentForURL:nonFileRestorationStateURL
                                                 withContentsOfURL:nonFileRestorationStateURL

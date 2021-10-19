@@ -17,48 +17,48 @@
 
 import Foundation;
 
-/// Enumerates the possible results of a `URLRequestOperation`.
+
 enum URLResult {
 
-    /// Plain text content was downloaded successfully.
-    /// - parameter url: The actual URL the content was downloaded from, after any redirects.
-    /// - parameter text: The text content.
-    /// - parameter mimeType: The MIME type of the text content (e.g. `application/json`).
+    
+    
+    
+    
     case textDownloaded(url: URL, text: String, mimeType: String)
 
-    /// Image content was downloaded successfully.
-    /// - parameter url: The actual URL the content was downloaded from, after any redirects.
-    /// - parameter image: The downloaded image.
+    
+    
+    
     case imageDownloaded(url: URL, image: ImageType)
 
-    /// The URL request was successful (HTTP 200 response).
-    /// - parameter url: The actual URL, after any redirects.
+    
+    
     case success(url: URL)
 
-    /// The URL request failed for some reason.
-    /// - parameter error: The error that occurred.
+    
+    
     case failed(error: Error)
 
 }
 
-/// Enumerates well known errors that may occur while executing a `URLRequestOperation`.
+
 enum URLRequestError: Error {
-    /// No response was received from the server.
+    
     case missingResponse
-    /// The file was not found (HTTP 404 response).
+    
     case fileNotFound
-    /// The request succeeded, but the content was not plain text when it was expected to be.
+    
     case notPlainText
-    /// The request succeeded, but the content encoding could not be determined, or was malformed.
+    
     case invalidTextEncoding
-    /// The request succeeded, but the MIME type of the response is not a supported image format.
+    
     case unsupportedImageFormat(mimeType: String)
-    /// An unexpected HTTP error response was returned.
-    /// - parameter response: The `HTTPURLResponse` that can be consulted for further information.
+    
+    
     case httpError(response: HTTPURLResponse)
 }
 
-/// Base class for performing URL requests in the context of an `NSOperation`.
+
 class URLRequestOperation: Operation {
     @objc var urlRequest: URLRequest
     var result: URLResult?
@@ -69,7 +69,7 @@ class URLRequestOperation: Operation {
 
     @objc init(url: URL, session: URLSession) {
         self.session = session
-        self.urlRequest = URLRequest(url: url, timeoutInterval: 8.0) // Reduce timeout to 5s max - MMcG
+        self.urlRequest = URLRequest(url: url, timeoutInterval: 8.0) 
         self.semaphore = nil
     }
 
@@ -121,8 +121,8 @@ class URLRequestOperation: Operation {
         }
 
         processResult(data, response: response) { result in
-            // This block may run on another thread long after dataTaskCompletion() finishes! So
-            // wait until then to signal semaphore if we get past checks above.
+            
+            
             self.result = result
             self.notifyFinished()
         }

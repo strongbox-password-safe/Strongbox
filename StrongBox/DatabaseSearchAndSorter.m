@@ -16,7 +16,9 @@
 NSString* const kSpecialSearchTermAllEntries = @"strongbox:allEntries";
 NSString* const kSpecialSearchTermAuditEntries = @"strongbox:auditEntries";
 NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
-          
+NSString* const kSpecialSearchTermExpiredEntries = @"strongbox:expiredEntries";
+NSString* const kSpecialSearchTermNearlyExpiredEntries = @"strongbox:nearlyExpiredEntries";
+
 @interface DatabaseSearchAndSorter ()
 
 @property DatabaseModel* database;
@@ -170,6 +172,16 @@ NSString* const kSpecialSearchTermTotpEntries = @"strongbox:totpEntries";
     else if ([searchText isEqualToString:kSpecialSearchTermTotpEntries]) { 
         [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
             return obj.fields.otpToken != nil;
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermExpiredEntries]) { 
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.expired;
+        }];
+    }
+    else if ([searchText isEqualToString:kSpecialSearchTermNearlyExpiredEntries]) { 
+        [searchNodes mutableFilter:^BOOL(Node * _Nonnull obj) {
+            return obj.fields.nearlyExpired;
         }];
     }
     else if (scope == kSearchScopeTitle) {

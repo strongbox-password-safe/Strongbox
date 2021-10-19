@@ -139,7 +139,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     NSString* customIconData = dict[@"customIconData"];
     NSString* customIconName = dict[@"customIconName"];
     NSNumber* customIconModified = dict[@"customIconModified"];
-    
+
     NodeFields* nodeFields = [NodeFields deserialize:nodeFieldsDict];
     
     Node* ret;
@@ -302,7 +302,7 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
     
     self.icon = mergeNode.icon;
     
-    self.linkedData = self.linkedData; 
+    self.linkedData = self.linkedData;
     
     [self.fields mergePropertiesInFromNode:mergeNode.fields mergeLocationChangedDate:mergeLocationChangedDate includeHistory:includeHistory];
     
@@ -461,18 +461,29 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
         return NO;
     }
     
-    if(node.isGroup) {
+    
+    
+    if ( !self.isGroup ) {
+        return NO;
+    }
+    
+    
+    
+    if ( !node.isGroup ) {
+        return self.childRecordsAllowed;
+    }
+
+    
+    
+    if ( !keePassGroupTitleRules) {
         for (Node* child in self.children) {
-            if (child.isGroup && !keePassGroupTitleRules && [child.title compare:node.title] == NSOrderedSame) {
+            if (child.isGroup && [child.title compare:node.title] == NSOrderedSame) {
                 NSLog(@"Cannot add child group as we already have a group with this title. [%@-%@]", self.title, node.title);
                 return NO;
             }
         }
     }
-    else {
-        return self.childRecordsAllowed;
-    }
-    
+        
     return YES;
 }
 
@@ -770,7 +781,8 @@ keePassGroupTitleRules:(BOOL)allowDuplicateGroupTitle
                 NSString* filename = child.fields.attachments.allKeys.firstObject;
                 
                 DatabaseAttachment* a = child.fields.attachments[filename];
-                attachmentString = [NSString stringWithFormat:@"(attachment: [%@] index: %@)", filename, a.digestHash];
+
+                attachmentString = [NSString stringWithFormat:@"(attachment: [%@] length: [%@] digestHash: %@)", filename, friendlyFileSizeString(a.length), a.digestHash];
             }
             else {
                 attachmentString = [NSString stringWithFormat:@"(%lu attachments)", (unsigned long)child.fields.attachments.count];

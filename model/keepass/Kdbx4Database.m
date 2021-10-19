@@ -13,15 +13,14 @@
 #import "KdbxSerializationCommon.h"
 #import "Kdbx4Serialization.h"
 #import "XmlStrongboxNodeModelAdaptor.h"
-#import "XmlSerializer.h"
 #import "KeePassXmlModelAdaptor.h"
 #import "KeePass2TagPackage.h"
 #import "NSArray+Extensions.h"
+#import "XmlSerializer.h"
+#import "InnerRandomStreamFactory.h"
 
 static const uint32_t kKdbx4MajorVersionNumber = 4;
 static const uint32_t kKdbx4MaximumAcceptableMinorVersionNumber = 1; 
-
-static const BOOL kLogVerbose = NO;
 
 @implementation Kdbx4Database
 
@@ -50,20 +49,20 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
                 compositeKeyFactors:ckf
                       xmlDumpStream:xmlDumpStream
              sanityCheckInnerStream:sanityCheckInnerStream
-                         completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable error) {
+                         completion:^(BOOL userCancelled, Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         if(userCancelled || serializationData == nil || serializationData.rootXmlObject == nil || error) {
             if(error) {
                 NSLog(@"Error getting Decrypting KDBX4 binary: [%@]", error);
             }
-            completion(userCancelled, nil, error);
+            completion(userCancelled, nil, innerStreamError, error);
             return;
         }
 
-        onDeserialized(serializationData, ckf, completion);
+        onDeserialized(serializationData, innerStreamError, ckf, completion);
     }];
 }
 
-static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData, CompositeKeyFactors* ckf, OpenCompletionBlock completion) {
+static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData, NSError * _Nullable innerStreamError, CompositeKeyFactors* ckf, OpenCompletionBlock completion) {
     RootXmlDomainObject* xmlRoot = serializationData.rootXmlObject;
     Meta* meta = xmlRoot.keePassFile ? xmlRoot.keePassFile.meta : nil;
         
@@ -77,7 +76,7 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     Node* rootGroup = [KeePassXmlModelAdaptor toStrongboxModel:xmlRoot attachments:serializationData.attachments customIconPool:customIcons error:&error];
     if(rootGroup == nil) {
         NSLog(@"Error converting Xml model to Strongbox model: [%@]", error);
-        completion(NO, nil, error);
+        completion(NO, nil, innerStreamError, error);
         return;
     }
     
@@ -106,20 +105,19 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
                                                       iconPool:customIcons];
 
     KeePass2TagPackage* tag = [[KeePass2TagPackage alloc] init];
-    tag.unknownHeaders = serializationData.extraUnknownHeaders;
-    tag.originalMeta = meta;
+    tag.unknownHeaders = serializationData.extraUnknownHeaders; 
     
     ret.meta.adaptorTag = tag;
     
-    completion(NO, ret, nil);
+    completion(NO, ret, innerStreamError, nil);
 }
 
-+ (void)save:(DatabaseModel *)database completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password &&
        !database.ckfs.keyFileDigest &&
        !database.ckfs.yubiKeyCR) {
         NSError *error = [Utils createNSError:@"A least one composite key factor is required to encrypt database." errorCode:-3];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
 
@@ -130,7 +128,6 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     KeePassXmlModelAdaptor *xmlAdaptor = [[KeePassXmlModelAdaptor alloc] init];
     
     KeePassDatabaseWideProperties* databaseProperties = [[KeePassDatabaseWideProperties alloc] init];
-    databaseProperties.originalMeta = tag ? tag.originalMeta : nil;
     databaseProperties.deletedObjects = database.deletedObjects;
     databaseProperties.metadata = database.meta;
     
@@ -147,36 +144,16 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     if(!rootXmlDocument) {
         NSLog(@"Could not convert Database to Xml Model.");
         error = [Utils createNSError:@"Could not convert Database to Xml Model." errorCode:-4];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
     
     
     
     rootXmlDocument.keePassFile.meta.headerHash = nil; 
-    
-    
-    
-    id<IXmlSerializer> xmlSerializer = [[XmlSerializer alloc] initWithProtectedStreamId:database.meta.innerRandomStreamId
-                                                                                    key:nil 
-                                                                               v4Format:YES
-                                                                            prettyPrint:NO];
-    
-    [xmlSerializer beginDocument];
-    BOOL writeXmlOk = [rootXmlDocument writeXml:xmlSerializer];
-    [xmlSerializer endDocument];
-    NSString *xml = xmlSerializer.xml;
-    if(!xml || !writeXmlOk) {
-        NSLog(@"Could not serialize Xml to Document.:\n%@", xml);
-        error = [Utils createNSError:@"Could not serialize Xml to Document." errorCode:-5];
-        completion(NO, nil, nil, error);
-        return;
-    }
-    
-    if(kLogVerbose) {
-        NSLog(@"Serializing XML Document:\n%@", xml);
-    }
-    
+        
+    id<InnerRandomStream> innerStream = [InnerRandomStreamFactory getStream:database.meta.innerRandomStreamId key:nil];
+        
     
 
     NSDictionary* unknownHeaders = tag ? tag.unknownHeaders : @{ };
@@ -186,25 +163,27 @@ static void onDeserialized(Kdbx4SerializationData * _Nullable serializationData,
     serializationData.fileVersion = database.meta.version;
     serializationData.compressionFlags = database.meta.compressionFlags;
     serializationData.innerRandomStreamId = database.meta.innerRandomStreamId;
-    serializationData.innerRandomStreamKey = xmlSerializer.protectedStreamKey;
+    serializationData.innerRandomStreamKey = innerStream.key;
     serializationData.extraUnknownHeaders = unknownHeaders;
     serializationData.kdfParameters = database.meta.kdfParameters;
     serializationData.cipherUuid = database.meta.cipherUuid;
     serializationData.attachments = minimalAttachmentPool;
     
     [Kdbx4Serialization serialize:serializationData
-                              xml:xml
+                  rootXmlDocument:rootXmlDocument
+                      innerStream:innerStream
                               ckf:database.ckfs
-                       completion:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
+                     outputStream:outputStream
+                       completion:^(BOOL userCancelled, NSError * _Nullable error) {
         if (userCancelled) {
-            completion(userCancelled, nil, nil, nil);
+            completion(userCancelled, nil, nil);
         }
-        else if (!data || error) {
+        else if ( error ) {
             NSLog(@"Could not serialize Document to KDBX.");
-            completion(NO, nil, nil, error);
+            completion(NO, nil, error);
         }
         else {
-            completion(NO, data, xml, nil);
+            completion(NO, nil, nil);
         }
     }];
 }

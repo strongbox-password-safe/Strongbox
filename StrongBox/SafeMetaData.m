@@ -76,7 +76,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.keePassIconSet = kKeePassIconSetSfSymbols;
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
         
-        self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
+        self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
         self.autoLockOnDeviceLock = YES;
         self.autoFillConvenienceAutoUnlockTimeout = -1;
@@ -87,6 +87,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.scheduleExportIntervalDays = kDefaultScheduledExportIntervalDays;
         self.databaseCreated = NSDate.date;
         self.unlockCount = 0;
+        
+        self.autoFillScanAltUrls = YES;
+        self.autoFillScanCustomFields = NO;
+        self.autoFillScanNotes = NO;
     }
     
     return self;
@@ -368,7 +372,34 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( jsonDictionary[@"unlockCount"] != nil ) {
         ret.unlockCount = ((NSNumber*)jsonDictionary[@"unlockCount"]).unsignedIntegerValue;
     }
+
     
+    
+    if ( jsonDictionary[@"autoFillScanAltUrls"] != nil ) {
+        ret.autoFillScanAltUrls = ((NSNumber*)jsonDictionary[@"autoFillScanAltUrls"]).boolValue;
+    }
+    else {
+        ret.autoFillScanAltUrls = YES;
+    }
+
+    
+    
+    if ( jsonDictionary[@"autoFillScanCustomFields"] != nil ) {
+        ret.autoFillScanCustomFields = ((NSNumber*)jsonDictionary[@"autoFillScanCustomFields"]).boolValue;
+    }
+    else {
+        ret.autoFillScanCustomFields = YES;
+    }
+
+    
+    
+    if ( jsonDictionary[@"autoFillScanNotes"] != nil ) {
+        ret.autoFillScanNotes = ((NSNumber*)jsonDictionary[@"autoFillScanNotes"]).boolValue;
+    }
+    else {
+        ret.autoFillScanNotes = YES;
+    }
+
     return ret;
 }
 
@@ -444,6 +475,9 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"scheduleExportIntervalDays" : @(self.scheduleExportIntervalDays),
         @"lockEvenIfEditing" : @(self.lockEvenIfEditing),
         @"unlockCount" : @(self.unlockCount),
+        @"autoFillScanNotes" : @(self.autoFillScanNotes),
+        @"autoFillScanCustomFields" : @(self.autoFillScanCustomFields),
+        @"autoFillScanAltUrls" : @(self.autoFillScanAltUrls),
     }];
     
     if (self.nickName != nil) {
@@ -550,7 +584,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 
 - (NSString *)convenienceMasterPassword {
-    BOOL expired;
+    BOOL expired = NO;
     NSString* object = (NSString*)[SecretStore.sharedInstance getSecureObject:self.uuid expired:&expired];
     
     if ( expired ) { 
@@ -622,33 +656,16 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 - (NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
-    
-    if ( [AppPreferences.sharedInstance.sharedAppGroupDefaults objectForKey:key] ) { 
-        if ( [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:key] ) {
-            return [SecretStore.sharedInstance getSecureString:key];
-        }
-        else {
-            return nil;
-        }
-    }
-    else {
-        NSString* ret = [SecretStore.sharedInstance getSecureString:key];
-
-        [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:(ret != nil) forKey:key]; 
-
-        return ret;
-    }
+    return [SecretStore.sharedInstance getSecureString:key];
 }
 
 - (void)setConveniencePin:(NSString *)conveniencePin {
     NSString *key = [NSString stringWithFormat:@"%@-convenience-pin", self.uuid];
 
     if ( conveniencePin ) {
-        [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:YES forKey:key]; 
         [SecretStore.sharedInstance setSecureString:conveniencePin forIdentifier:key];
     }
     else {
-        [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:NO forKey:key]; 
         [SecretStore.sharedInstance deleteSecureItem:key];
     }
 }

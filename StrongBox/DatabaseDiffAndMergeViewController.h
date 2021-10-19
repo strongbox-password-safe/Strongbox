@@ -15,7 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property Model* firstDatabase;
 @property Model* secondDatabase;
-@property BOOL isMergeDiff;
+
+@property BOOL isCompareForMerge;
+@property BOOL isSyncInitiated; 
 
 @property (nonatomic, copy) void (^onDone)(BOOL mergeRequested, Model*_Nullable first, Model*_Nullable second);
 

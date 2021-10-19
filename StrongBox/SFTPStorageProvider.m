@@ -446,8 +446,6 @@ viewController:(VIEW_CONTROLLER_PTR )viewController
     NSError* error;
     NMSFTP* sftp = [self connectAndAuthenticateWithSessionConfiguration:sessionConfiguration viewController:viewController error:&error];
     
-
-    
     completion(NO, sftp, sessionConfiguration, error);
 }
 

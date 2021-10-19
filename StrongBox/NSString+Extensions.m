@@ -300,4 +300,24 @@ static NSString* const kLowerCaseNull = @"null";
     return NO;
 }
 
+- (void)enumerateCharactersWithBlock:(void (^)(unichar, NSUInteger, BOOL *))block {
+    
+    const NSInteger bufferSize = 16;
+    const NSInteger length = [self length];
+    unichar buffer[bufferSize];
+    NSInteger bufferLoops = (length - 1) / bufferSize + 1;
+    BOOL stop = NO;
+    for (int i = 0; i < bufferLoops; i++) {
+        NSInteger bufferOffset = i * bufferSize;
+        NSInteger charsInBuffer = MIN(length - bufferOffset, bufferSize);
+        [self getCharacters:buffer range:NSMakeRange(bufferOffset, charsInBuffer)];
+        for (int j = 0; j < charsInBuffer; j++) {
+            block(buffer[j], j + bufferOffset, &stop);
+            if (stop) {
+                return;
+            }
+        }
+    }
+}
+
 @end

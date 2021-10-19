@@ -72,7 +72,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.53.0</string>
+	<string>1.54.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
@@ -124,7 +124,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>3095</string>
+	<string>3130</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<true/>
 	<key>ITSEncryptionExportComplianceCode</key>
@@ -268,18 +268,17 @@
 			<key>UTTypeConformsTo</key>
 			<array>
 				<string>public.data</string>
-				<string>public.content</string>
 			</array>
 			<key>UTTypeDescription</key>
-			<string>Strongbox Database (dat)</string>
+			<string></string>
 			<key>UTTypeIconFiles</key>
 			<array/>
 			<key>UTTypeIdentifier</key>
-			<string>com.markmcguill.strongbox.dat</string>
+			<string>com.markmcguill.strongbox.keyx</string>
 			<key>UTTypeTagSpecification</key>
 			<dict>
 				<key>public.filename-extension</key>
-				<string>dat</string>
+				<string>keyx</string>
 				<key>public.mime-type</key>
 				<string>application/strongbox</string>
 			</dict>

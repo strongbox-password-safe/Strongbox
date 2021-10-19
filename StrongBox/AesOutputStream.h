@@ -12,7 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface AesOutputStream : NSOutputStream
 
-- (instancetype)initToOutputStream:(NSOutputStream *)outputStream encrypt:(BOOL)encrypt key:(NSData*)key iv:(NSData*)iv;
+- (instancetype)initToOutputStream:(NSOutputStream *)outputStream encrypt:(BOOL)encrypt key:(NSData*)key iv:(NSData*)iv chainOpensAndCloses:(BOOL)chainOpensAndCloses;
 
 @end
 

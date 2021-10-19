@@ -10,7 +10,10 @@
 #import "Utils.h"
 #import "NSString+Extensions.h"
 #import "Alerts.h"
+
+#ifndef NO_SFTP_WEBDAV_SP
 #import "WebDAVStorageProvider.h"
+#endif
 
 @interface WebDAVConfigurationViewController ()
 
@@ -92,7 +95,8 @@
     configuration.username = self.textFieldUsername.text;
     configuration.password = self.textFieldPassword.text;
     configuration.allowUntrustedCertificate = self.switchAllowUntrusted.on;
-
+    
+#ifndef NO_SFTP_WEBDAV_SP
     [WebDAVStorageProvider.sharedInstance testConnection:configuration viewController:self completion:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
@@ -103,6 +107,7 @@
             }
         });
     }];
+#endif
 }
 
 - (IBAction)onCancel:(id)sender {

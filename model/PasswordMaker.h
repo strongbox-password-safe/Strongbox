@@ -23,8 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)generateForConfigOrDefault:(PasswordGenerationConfig*)config;
 
 
-- (NSString *)generateBasicForConfig:(PasswordGenerationConfig *)config;
-- (NSString *)generateDicewareForConfig:(PasswordGenerationConfig *)config;
+- (NSString *_Nullable)generateBasicForConfig:(PasswordGenerationConfig *)config;
+- (NSString *_Nullable)generateDicewareForConfig:(PasswordGenerationConfig *)config;
 
 - (NSString*)generateWithDefaultConfig;
 - (NSString*)generateEmail;

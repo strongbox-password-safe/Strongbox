@@ -78,9 +78,9 @@
     PasswordGenerationConfig* config = [PasswordGenerationConfig defaults];
     config.algorithm = kPasswordGenerationAlgorithmDiceware; 
     
-    [self addShowHideToTextField:self.textFieldPw tag:100 show:YES];
+    [self addShowHideToTextField:self.textFieldPw tag:100 show:NO];
     
-    self.textFieldPw.text = [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
+    self.textFieldPw.text = @""; 
     
     [self.textFieldPw addTarget:self
                          action:@selector(textFieldPasswordDidChange:)
@@ -90,6 +90,8 @@
     self.textFieldPw.font = FontManager.sharedInstance.easyReadFont;
     
     [self bindStrength];
+    
+    [self validateUi];
 }
 
 - (IBAction)onDismiss:(id)sender {
@@ -176,15 +178,32 @@
     
     
     [checkbox.imageView setContentMode:UIViewContentModeScaleAspectFit];
-    [checkbox setImage:[UIImage imageNamed:@"visible"] forState:UIControlStateNormal];
-    [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateSelected];
-    [checkbox setImage:[UIImage imageNamed:@"invisible"] forState:UIControlStateHighlighted];
-    [checkbox setAdjustsImageWhenHighlighted:TRUE];
-    checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 0); 
+    
+    
+    UIImage *concealed;
+    UIImage *revealed;
+    
+    if (@available(iOS 13.0, *)) {
+        concealed = [UIImage systemImageNamed:@"eye"];
+        revealed = [UIImage systemImageNamed:@"eye.slash"];
+    }
+    else {
+        concealed = [UIImage imageNamed:@"visible"];
+        revealed = [UIImage imageNamed:@"invisible"];
+
+        [checkbox setAdjustsImageWhenHighlighted:TRUE];
+    }
+    
+    [checkbox setImage:concealed forState:UIControlStateNormal];
+    [checkbox setImage:revealed forState:UIControlStateSelected];
+    [checkbox setImage:revealed forState:UIControlStateHighlighted];
+    
+    checkbox.imageEdgeInsets = UIEdgeInsetsMake(0, -8, 0, 8); 
                                                               
                                                               
 
     
+
     [textField setClearButtonMode:UITextFieldViewModeAlways];
     [textField setRightViewMode:UITextFieldViewModeAlways];
     [textField setRightView:checkbox];

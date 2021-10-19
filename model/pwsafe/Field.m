@@ -166,7 +166,7 @@
                 break;
 
             case FIELD_TYPE_XTIME_INT: {
-                int intervalInDays = littleEndian4BytesToInt32((unsigned char *)self->_data.bytes);
+                uint32_t intervalInDays = littleEndian4BytesToUInt32((unsigned char *)self->_data.bytes);
                 return intervalInDays == 0 ? @"< Not Set >" : [[NSString alloc] initWithFormat:@"%d Days", intervalInDays];
             }
                                        break;

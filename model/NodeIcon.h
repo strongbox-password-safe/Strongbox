@@ -22,7 +22,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (instancetype)withCustom:(NSData*)custom; 
 + (instancetype)withCustom:(NSData*)custom name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
-+ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*_Nullable)uuid name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
++ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*)uuid name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified;
++ (instancetype)withCustom:(NSData *)custom uuid:(NSUUID*)uuid name:(NSString*_Nullable)name modified:(NSDate*_Nullable)modified preferredOrder:(NSInteger)preferredOrder;
 + (instancetype)withPreset:(NSInteger)preset;
 
 - (instancetype)init NS_UNAVAILABLE;
@@ -34,6 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nullable) NSDate* modified;  
 @property (readonly) NSUInteger estimatedStorageBytes;
 @property (readonly, nullable) NSUUID* uuid;
+@property NSInteger preferredOrder;
 
 @property IMAGE_TYPE_PTR cachedImage;
 

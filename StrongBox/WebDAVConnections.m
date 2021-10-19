@@ -71,7 +71,12 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
     
     NSError* error;
     NSUInteger options = NSJSONWritingPrettyPrinted;
+
+#if TARGET_OS_IPHONE
     if (@available(iOS 11.0, *)) {
+#else
+    if (@available(macOS 10.13, *)) {
+#endif
         options |= NSJSONWritingSortedKeys;
     }
     NSData* json = [NSJSONSerialization dataWithJSONObject:jsonArray options:options error:&error];

@@ -73,7 +73,7 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     
     self.flags = [self.model getQuickAuditFlagsForNode:self.itemId];
     self.basicRows = [self getBasicRows:self.flags];
-    self.actions = [self.flags containsObject:@(kAuditFlagPwned)] || !AppPreferences.sharedInstance.isProOrFreeTrial ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
+    self.actions = ([self.flags containsObject:@(kAuditFlagPwned)] || !AppPreferences.sharedInstance.isProOrFreeTrial || AppPreferences.sharedInstance.disableNetworkBasedFeatures) ? @[] : @[NSLocalizedString(@"audit_drill_down_action_check_hibp", @"Check HIBP for this Password...")];
     
     self.duplicates = [[mute.allObjects filter:^BOOL(Node * _Nonnull obj) {
         return ![obj.uuid isEqual:self.itemId];
@@ -174,7 +174,13 @@ static NSString* const kSwitchTableCellId = @"SwitchTableCell";
     }
     else if (indexPath.section == kSectionBasicIdx) {
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"auditDrillDownBasicCellId" forIndexPath:indexPath];
-        cell.imageView.image = [UIImage imageNamed:@"security_checked"];
+        
+        if (@available(iOS 13.0, *)) {
+            cell.imageView.image = [UIImage systemImageNamed:@"checkmark.shield"];
+        }
+        else {
+            cell.imageView.image = [UIImage imageNamed:@"security_checked"];
+        }
         
         if (self.flags.count == 0) {
             if ([self.model isExcludedFromAudit:self.itemId]) {

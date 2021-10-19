@@ -23,7 +23,6 @@ static NSUInteger const kTagSectionIdx = 1;
 @property UITableView* tableView;
 @property NSArray<QuickViewConfig*> *quickViews;
 
-
 @end
 
 @implementation QuickViewsBrowseTableDataSource
@@ -43,9 +42,17 @@ static NSUInteger const kTagSectionIdx = 1;
 }
 
 - (void)refresh {
+    UIImage* globeImage;
+    if (@available(iOS 13.0, *)) {
+        globeImage = [UIImage systemImageNamed:@"globe"];
+    }
+    else {
+        globeImage = [UIImage imageNamed:@"globe"];
+    }
+    
     NSString *loc1 = NSLocalizedString(@"quick_view_title_all_entries_title", @"All Entries");
     NSString *loc2 = NSLocalizedString(@"quick_view_title_all_entries_subtitle", @"View every entry in a flat list...");
-    QuickViewConfig *allItems = [QuickViewConfig title:loc1 subtitle:loc2 image:[UIImage imageNamed:@"globe"] searchTerm:kSpecialSearchTermAllEntries];
+    QuickViewConfig *allItems = [QuickViewConfig title:loc1 subtitle:loc2 image:globeImage searchTerm:kSpecialSearchTermAllEntries];
 
     NSMutableArray<QuickViewConfig*>* ret = @[allItems].mutableCopy;
     
@@ -55,7 +62,16 @@ static NSUInteger const kTagSectionIdx = 1;
         NSString *loc3 = NSLocalizedString(@"quick_view_title_audit_issues_title_fmt", @"Audit Issues (%ld)");
         NSString* title = [NSString stringWithFormat:loc3, auditCount];
         NSString *loc4 = NSLocalizedString(@"quick_view_title_audit_issues_subtitle", @"View all entries with audit issues");
-        QuickViewConfig *auditEntries = [QuickViewConfig title:title subtitle:loc4 image:[UIImage imageNamed:@"security_checked"] searchTerm:kSpecialSearchTermAuditEntries imageTint:UIColor.systemOrangeColor];
+        
+        UIImage* auditImage;
+        if (@available(iOS 13.0, *)) {
+            auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
+        }
+        else {
+            auditImage = [UIImage imageNamed:@"security_checked"];
+        }
+
+        QuickViewConfig *auditEntries = [QuickViewConfig title:title subtitle:loc4 image:auditImage searchTerm:kSpecialSearchTermAuditEntries imageTint:UIColor.systemOrangeColor];
         
         [ret addObject:auditEntries];
     }
@@ -63,11 +79,59 @@ static NSUInteger const kTagSectionIdx = 1;
     if ( self.viewModel.database.totpEntries.count ) {
         NSString *loc5 = NSLocalizedString(@"quick_view_title_totp_entries_title", @"TOTP Entries");
         NSString *loc6 = NSLocalizedString(@"quick_view_title_totp_entries_subtitle", @"View all entries with a TOTP token");
-        QuickViewConfig *totpEntries = [QuickViewConfig title:loc5 subtitle:loc6 image:[UIImage imageNamed:@"timer"] searchTerm:kSpecialSearchTermTotpEntries];
+
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"timer"];
+        }
+        else {
+            image = [UIImage imageNamed:@"timer"];
+        }
+        
+        QuickViewConfig *totpEntries = [QuickViewConfig title:loc5 subtitle:loc6 image:image searchTerm:kSpecialSearchTermTotpEntries];
         
         [ret addObject:totpEntries];
     }
     
+    NSUInteger expiredCount = self.viewModel.database.expiredEntries.count;
+    if ( expiredCount > 0 ) {
+        NSString *loc5 = NSLocalizedString(@"quick_view_title_expired_entries_title_fmt", @"Expired Entries (%@)");
+        NSString* title = [NSString stringWithFormat:loc5, @(expiredCount)];
+        NSString *loc6 = NSLocalizedString(@"quick_view_title_expired_entries_subtitle", @"View all expired entries");
+
+        UIImage* image;
+        if (@available(iOS 13.0, *)) {
+            image = [UIImage systemImageNamed:@"timelapse"];
+        }
+        else {
+            image = [UIImage imageNamed:@"timer"];
+        }
+        
+        QuickViewConfig *entries = [QuickViewConfig title:title subtitle:loc6 image:image searchTerm:kSpecialSearchTermExpiredEntries];
+        
+        [ret addObject:entries];
+    }
+
+    NSUInteger nearlyExpiredCount = self.viewModel.database.nearlyExpiredEntries.count;
+    if ( nearlyExpiredCount > 0 ) {
+        NSString *loc5 = NSLocalizedString(@"quick_view_title_nearly_expired_entries_title_fmt", @"Nearly Expired Entries (%@)");
+        NSString* title = [NSString stringWithFormat:loc5, @(nearlyExpiredCount)];
+
+        NSString *loc6 = NSLocalizedString(@"quick_view_title_nearly_expired_entries_subtitle", @"View all nearly expired entries");
+
+        UIImage* image;
+        if (@available(iOS 14.2, *)) {
+            image = [UIImage systemImageNamed:@"clock.arrow.2.circlepath"];
+        }
+        else {
+            image = [UIImage imageNamed:@"timer"];
+        }
+        
+        QuickViewConfig *entries = [QuickViewConfig title:title subtitle:loc6 image:image searchTerm:kSpecialSearchTermNearlyExpiredEntries];
+        
+        [ret addObject:entries];
+    }
+
     self.quickViews = ret.copy;
 }
 
@@ -92,6 +156,7 @@ static NSUInteger const kTagSectionIdx = 1;
             cell.detailTextLabel.textColor = UIColor.secondaryLabelColor;
         }
         cell.imageView.image = config.image;
+        cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
         cell.imageView.tintColor = config.imageTint;
     }
     else { 
@@ -131,21 +196,26 @@ static NSUInteger const kTagSectionIdx = 1;
 
 - (void)performTapAction:(NSIndexPath *)indexPath searchController:(UISearchController *)searchController {
     if (indexPath.section == kQuickViewSectionIdx) {
-        QuickViewConfig *config = self.quickViews[indexPath.row];
+        if ( indexPath.row < self.quickViews.count ) {
+            QuickViewConfig *config = self.quickViews[indexPath.row];
 
-        searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
-        searchController.searchBar.text = config.searchTerm;
-        
-        [searchController.searchBar endEditing:YES]; 
+            searchController.searchBar.selectedScopeButtonIndex = kSearchScopeAll;
+            searchController.searchBar.text = config.searchTerm;
+            
+            [searchController.searchBar endEditing:YES]; 
+        }
     }
     else if (indexPath.section == kTagSectionIdx) {
         NSArray<NSString*>* tags = [self.viewModel.database.tagSet.allObjects sortedArrayUsingComparator:finderStringComparator];
-        NSString* tag = tags[indexPath.row];
+        
+        if ( indexPath.row < tags.count ) {
+            NSString* tag = tags[indexPath.row];
 
-        searchController.searchBar.selectedScopeButtonIndex = kSearchScopeTags;
-        searchController.searchBar.text = tag;
+            searchController.searchBar.selectedScopeButtonIndex = kSearchScopeTags;
+            searchController.searchBar.text = tag;
 
-        [searchController.searchBar endEditing:YES]; 
+            [searchController.searchBar endEditing:YES]; 
+        }
     }
 }
 

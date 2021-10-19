@@ -13,6 +13,7 @@
 #import "Utils.h"
 #import "Constants.h"
 #import "NSData+Extensions.h"
+#import "StreamUtils.h"
 
 static const BOOL kLogVerbose = NO;
 
@@ -45,7 +46,7 @@ static const BOOL kLogVerbose = NO;
     
     if(serializationData == nil) {
         NSLog(@"Error getting Decrypting KDB binary: [%@]", error);
-        completion(NO, nil, error);
+        completion(NO, nil, nil, error);
         return;
     }
 
@@ -65,14 +66,14 @@ static const BOOL kLogVerbose = NO;
     UnifiedDatabaseMetadata *metadata = [UnifiedDatabaseMetadata withDefaultsForFormat:kKeePass1];
 
     metadata.versionInt = serializationData.version;
-    metadata.transformRounds = serializationData.transformRounds;
+    metadata.kdfIterations = serializationData.transformRounds;
     metadata.flags = serializationData.flags;
 
     DatabaseModel *ret = [[DatabaseModel alloc] initWithFormat:kKeePass1 compositeKeyFactors:ckf metadata:metadata root:rootGroup];
     
     ret.meta.adaptorTag = serializationData.metaEntries;
     
-    completion(NO, ret, nil);
+    completion(NO, ret, nil, nil);
 }
 
 + (void)read:(NSInputStream *)stream ckf:(CompositeKeyFactors *)ckf xmlDumpStream:(NSOutputStream *)xmlDumpStream sanityCheckInnerStream:(BOOL)sanityCheckInnerStream completion:(OpenCompletionBlock)completion {
@@ -97,18 +98,18 @@ static const BOOL kLogVerbose = NO;
     [stream close];
     
     if (bytesRead < 0) {
-        completion(NO, nil, stream.streamError);
+        completion(NO, nil,  nil, stream.streamError);
         return;
     }
     
     [self open:mutableData ckf:ckf completion:completion];
 }
 
-+ (void)save:(DatabaseModel *)database completion:(SaveCompletionBlock)completion {
++ (void)save:(DatabaseModel *)database outputStream:(NSOutputStream *)outputStream completion:(SaveCompletionBlock)completion {
     if(!database.ckfs.password.length && !database.ckfs.keyFileDigest) {
         
         NSError* error = [Utils createNSError:@"Master Password or Key File not set." errorCode:-3];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
     
@@ -125,13 +126,13 @@ static const BOOL kLogVerbose = NO;
                                     existingGroupIds:[NSMutableSet<NSNumber*> set]] ) {
         NSLog(@"WARNWARN: Could not convert to KDB.");
         NSError* error = [Utils createNSError:@"Could not convert to KDB." errorCode:-3];
-        completion(NO, nil, nil, error);
+        completion(NO, nil, error);
         return;
     }
         
     serializationData.flags = database.meta.flags;
     serializationData.version = database.meta.versionInt;
-    serializationData.transformRounds = (uint32_t)database.meta.transformRounds;
+    serializationData.transformRounds = (uint32_t)database.meta.kdfIterations;
     
     NSMutableArray<KdbEntry*>* metaEntries = (NSMutableArray<KdbEntry*>*)database.meta.adaptorTag;
     if(metaEntries) {
@@ -144,7 +145,23 @@ static const BOOL kLogVerbose = NO;
                          keyFileDigest:database.ckfs.keyFileDigest
                                ppError:&error];
     
-    completion(NO, ret, nil, error);
+    if(!ret) {
+        NSLog(@"Could not serialize Document to KDB");
+        completion(NO, nil, error);
+        return;
+    }
+    
+    NSInputStream* inputStream = [NSInputStream inputStreamWithData:ret];
+    [inputStream open];
+    BOOL success = [StreamUtils pipeFromStream:inputStream to:outputStream openAndCloseStreams:NO];
+    [inputStream close];
+    
+    if ( !success ) {
+        completion(NO, nil, [Utils createNSError:@"Could not pipe data to stream!" errorCode:-1]);
+    }
+    else {
+        completion(NO, nil, nil);
+    }
 }
 
 + (NSData *_Nullable)getYubiKeyChallenge:(nonnull NSData *)candidate error:(NSError * _Nullable __autoreleasing * _Nullable)error {
@@ -240,15 +257,9 @@ KdbGroup* groupToKdbGroup(Node* group, int level,NSMutableSet<NSNumber*> *existi
         
         ret.binaryFileName = filename;
         
-        NSInputStream* inputStream = [theAttachment getPlainTextInputStream];
-        if ( !inputStream ) {
-            NSLog(@"WARNWARN: Could not serialize KDB Binary! Could not read attachment PT stream.");
-            return nil;
-        }
         
+        NSData* data = theAttachment.nonPerformantFullData;
         
-        NSData* data = [NSData dataWithContentsOfStream:inputStream];
-
         if (!data) {
             return nil;
         }

@@ -73,7 +73,7 @@
 + (NSData *)serializeField:(Field *)field {
     FieldHeader header;
 
-    header.length = (int)(field.data).length;
+    header.length = (uint32_t)(field.data).length;
     header.type = field.type;
 
     
@@ -318,9 +318,9 @@
     return recordsLength / TWOFISH_BLOCK_SIZE;
 }
 
-+ (NSInteger)getKeyStretchIterations:(NSData *)data {
++ (NSUInteger)getKeyStretchIterations:(NSData *)data {
     PasswordSafe3Header header = [PwSafeSerialization getHeader:data];
-    return littleEndian4BytesToInt32(header.iter);
+    return littleEndian4BytesToUInt32(header.iter);
 }
 
 + (NSUInteger)getEofFileOffset:(NSData*)data {
@@ -330,7 +330,7 @@
     return endRange.location;
 }
 
-+ (NSData*)keystretch:(int)iter header:(unsigned char[32])saltBytes pBar_p:(NSData **)ppBar password:(NSString *)password {
++ (NSData*)keystretch:(uint32_t)iter header:(unsigned char[32])saltBytes pBar_p:(NSData **)ppBar password:(NSString *)password {
     NSData *pw = [NSData dataWithData:[password dataUsingEncoding:NSUTF8StringEncoding]];
 
     uint8_t digest[CC_SHA256_DIGEST_LENGTH] = { 0 };
@@ -341,7 +341,7 @@
     CC_SHA256_Update(&context, saltBytes, (CC_LONG)32);
     CC_SHA256_Final(digest, &context);
 
-    for (int i=0; i<iter; i++) {
+    for (uint32_t i=0; i<iter; i++) {
         CC_SHA256(digest, CC_SHA256_DIGEST_LENGTH, digest);
     }
     
@@ -398,7 +398,7 @@
 }
 
 + (BOOL)checkPassword:(PasswordSafe3Header *)pHeader password:(NSString *)password pBar:(NSData **)ppBar {
-    int iter = littleEndian4BytesToInt32(pHeader->iter);
+    uint32_t iter = littleEndian4BytesToUInt32(pHeader->iter);
 
     NSData *hPBar = [self keystretch:iter header:pHeader->salt pBar_p:ppBar password:password];
 

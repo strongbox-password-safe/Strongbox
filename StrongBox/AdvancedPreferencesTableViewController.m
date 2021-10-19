@@ -53,6 +53,10 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellBackgroundSync;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSftpConnections;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellWebDAVConnections;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellForcePull;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellSyncForcePush;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAllBackups;
+@property (weak, nonatomic) IBOutlet UISwitch *switchMarkdownNotes;
 
 @end
 
@@ -76,14 +80,18 @@
     
     
     
-    [self cell:self.cellInstantPin setHidden:YES];
     [self cell:self.cellBackgroundSync setHidden:YES];
     
     
     
-    if ( AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         [self cell:self.cellSftpConnections setHidden:YES];
         [self cell:self.cellWebDAVConnections setHidden:YES];
+    }
+    
+    if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions && AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        [self cell:self.cellForcePull setHidden:YES];
+        [self cell:self.cellSyncForcePush setHidden:YES];
     }
     
     [self bindPreferences];
@@ -138,6 +146,9 @@
     AppPreferences.sharedInstance.streamReadLargeKeyFiles = self.switchStreamReadLargeKeyFiles.on;
     AppPreferences.sharedInstance.keePassEmailField = self.switchNativeKeePassEmailField.on;
 
+    AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
+    AppPreferences.sharedInstance.markdownNotes = self.switchMarkdownNotes.on;
+    
     [self bindPreferences];
 }
 
@@ -153,6 +164,9 @@
     else if ( cell == self.cellSftpConnections) {
         SFTPConnectionsViewController* vc = [SFTPConnectionsViewController instantiateFromStoryboard];
         [vc presentFromViewController:self];
+    }
+    else if  ( cell == self.cellViewAllBackups ) {
+        [self performSegueWithIdentifier:@"segueToViewAllBackups" sender:nil];
     }
 }
 
@@ -183,6 +197,9 @@
     self.switchMinimalDropboxScopes.on = AppPreferences.sharedInstance.useMinimalDropboxScopes;
     self.switchStreamReadLargeKeyFiles.on = AppPreferences.sharedInstance.streamReadLargeKeyFiles;
     self.switchNativeKeePassEmailField.on = AppPreferences.sharedInstance.keePassEmailField;
+    
+    self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;
+    self.switchMarkdownNotes.on = AppPreferences.sharedInstance.markdownNotes;
 }
 
 @end

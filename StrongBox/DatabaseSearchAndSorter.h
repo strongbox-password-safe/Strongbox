@@ -17,7 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 extern NSString* const kSpecialSearchTermAllEntries;
 extern NSString* const kSpecialSearchTermAuditEntries;
 extern NSString* const kSpecialSearchTermTotpEntries;
-          
+extern NSString* const kSpecialSearchTermExpiredEntries;
+extern NSString* const kSpecialSearchTermNearlyExpiredEntries;
+
 typedef BOOL (^FlaggedByAuditPredicate)(Node* node);
  
 @interface DatabaseSearchAndSorter : NSObject

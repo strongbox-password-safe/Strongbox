@@ -68,8 +68,11 @@
 
 #import "OnboardingManager.h"
 
+#ifndef NO_SFTP_WEBDAV_SP
 #import "SFTPStorageProvider.h"
 #import "WebDAVStorageProvider.h"
+#endif
+
 #import "WebDAVConnections.h"
 #import "SFTPConnections.h"
 #import "WebDAVConnectionsViewController.h"
@@ -77,6 +80,10 @@
 
 #import "StorageBrowserTableViewController.h"
 #import "Constants.h"
+
+#import "SFTPProviderData.h"
+#import "WebDAVProviderData.h"
+#import "ContextMenuHelper.h"
 
 @interface SafesViewController () <UIPopoverPresentationControllerDelegate>
 
@@ -116,31 +123,49 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    AppPreferences.sharedInstance.suppressAppBackgroundTriggers = NO; 
+    
+    NSLog(@"SafesViewController::viewDidLoad");
+
+    self.tableView.hidden = YES;
+
     [self customizeUI];
-    
-    [self internalRefresh];
-    
+            
     [self setFreeTrialEndDateBasedOnIapPurchase]; 
 
     [self performMigrations];
+            
     
-    [self listenToNotifications];
-        
-    if ( ![self isAppLocked] ) { 
+    
+    
 
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{  
+        
+        
+        
+        [self internalRefresh];
+
+        self.tableView.hidden = NO;
+        
+        [self listenToNotifications];
+
+        if ( ![self isAppLocked] ) {
+            NSLog(@"SafesViewController::viewDidLoad -> Initial Activation/Load - App is not Locked...");
+            
             [self doAppActivationTasks:NO];
-        });
-    }
-    else {
-        NSLog(@"SafesViewController::viewDidLoad -> App Is Locked");
-    }
+        }
+        else {
+            NSLog(@"SafesViewController::viewDidLoad -> App Is Locked");
+        }
+    });
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
+    NSLog(@"SafesViewController::viewWillAppear");
+
     [self setupTips];
     
     self.navigationController.navigationBar.hidden = NO;
@@ -155,7 +180,14 @@
     [self bindProOrFreeTrialUi];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    NSLog(@"SafesViewController::viewDidAppear");
+}
+
 - (void)performMigrations {
+#ifndef NO_SFTP_WEBDAV_SP
     if ( !AppPreferences.sharedInstance.migratedConnections ) {
         int wcount = 0;
         int scount = 0;
@@ -203,9 +235,9 @@
                 }
             }
         }
-        
         AppPreferences.sharedInstance.migratedConnections = YES;
     }
+#endif
 }
 
 - (void)setupTips {
@@ -229,6 +261,8 @@
 }
 
 - (void)internalRefresh {
+    NSLog(@"SafesViewController::internalRefresh");
+    
     self.collection = SafesList.sharedInstance.snapshot;
 
     self.tableView.separatorStyle = AppPreferences.sharedInstance.showDatabasesSeparator ? UITableViewCellSeparatorStyleSingleLine : UITableViewCellSeparatorStyleNone;
@@ -243,6 +277,8 @@
     
     if (@available(iOS 14.0, *)) { 
         [self.barButtonDice setImage:[UIImage systemImageNamed:@"die.face.6"]];
+
+        [self customizeAddDatabaseButton];
     }
     
     [self.buttonPreferences setAccessibilityLabel:NSLocalizedString(@"generic_preferences", @"Preferences")];
@@ -252,6 +288,68 @@
     self.collection = [NSArray array];
     
     [self setupTableview];
+}
+
+- (void)customizeAddDatabaseButton API_AVAILABLE(ios(14.0)) {
+    __weak SafesViewController* weakSelf = self;
+
+    UIMenuElement* quickStart = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_quick_start", @"Get Started Wizard")
+                                                  systemImage:@"wand.and.stars"
+                                                      handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf showFirstDatabaseGetStartedWizard];
+    }];
+
+
+
+
+
+
+
+
+    UIMenuElement* newAdvancedDatabase = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_new_advanced", @"New Database")
+                                                   systemImage:@"plus.circle"
+                                                       handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onCreateNewSafe];
+    }];
+
+    UIMenuElement* addExisting = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_add_existing", @"Add Existing")
+                                                systemImage:@"externaldrive.badge.plus"
+                                                    handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf onAddExistingSafe];
+    }];
+
+    UIMenuElement* wifiTransfer = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_wifi_transfer", @"Wi-Fi Transfer")
+                                                 systemImage:@"wifi"
+                                                     handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf performSegueWithIdentifier:@"segueToLocalNetworkServer" sender:nil];
+    }];
+
+    UIMenu* menu1 = [UIMenu menuWithTitle:@""
+                                   image:nil
+                              identifier:nil
+                                 options:UIMenuOptionsDisplayInline
+                                children:@[quickStart]];
+
+    UIMenu* menu2 = [UIMenu menuWithTitle:@""
+                                   image:nil
+                              identifier:nil
+                                 options:UIMenuOptionsDisplayInline
+                                children:@[newAdvancedDatabase, addExisting]];
+
+    UIMenu* menu3 = [UIMenu menuWithTitle:@""
+                                   image:nil
+                              identifier:nil
+                                 options:UIMenuOptionsDisplayInline
+                                children:@[wifiTransfer]];
+
+    UIMenu* menu = [UIMenu menuWithTitle:@""
+                                   image:nil
+                              identifier:nil
+                                 options:kNilOptions
+                                children:AppPreferences.sharedInstance.disableNetworkBasedFeatures ? @[menu1, menu2] : @[menu1, menu2, menu3]];
+
+    self.buttonAddSafe.action = nil;
+    self.buttonAddSafe.menu = menu;
 }
 
 - (void)doAppActivationTasks:(BOOL)userJustCompletedBiometricAuthentication {
@@ -294,7 +392,7 @@
 }
 
 - (void)appBecameActive {
-    NSLog(@"SafesViewController - appBecameActive");
+    NSLog(@"SafesViewController::appBecameActive");
     
     if( self.appLockSuppressedForBiometricAuth ) {
         NSLog(@"App Active but Lock Screen Suppressed... Nothing to do");
@@ -313,17 +411,23 @@
     
     
     if ( [self shouldLockUnlockedDatabase] ) {
-        [self lockUnlockedDatabase:nil];
+        [self lockUnlockedDatabase:^{
+            if ( ![self isAppLocked] ) {
+                NSLog(@"SafesViewController::appBecameActive - Just Locked Database - App is not locked - Doing App Activation Tasks.");
+                [self doAppActivationTasks:NO];
+            }
+        }];
     }
-      
-    if ( ![self isAppLocked] ) {
-        NSLog(@"XXXXXXXXX - appBecameActive - App is not locked - Doing App Activation Tasks.");
-        [self doAppActivationTasks:NO];
+    else {
+        if ( ![self isAppLocked] ) {
+            NSLog(@"SafesViewController::appBecameActive - App is not locked - Doing App Activation Tasks.");
+            [self doAppActivationTasks:NO];
+        }
     }
 }
 
 - (void)onAppLockScreenWillBeDismissed:(void (^)(void))completion {
-    NSLog(@"XXXXXXXXXXXXXXXXXX - onAppLockWillBeDismissed");
+    NSLog(@"SafesViewController::onAppLockWillBeDismissed");
 
     if ( [self shouldLockUnlockedDatabase] ) {
         [self lockUnlockedDatabase:completion];
@@ -336,7 +440,7 @@
 }
 
 - (void)onAppLockScreenWasDismissed:(BOOL)userJustCompletedBiometricAuthentication {
-    NSLog(@"XXXXXXXXXXXXXXXXXX - onAppLockWasDismissed [%hhd]", userJustCompletedBiometricAuthentication);
+    NSLog(@"SafesViewController::onAppLockWasDismissed [%hhd]", userJustCompletedBiometricAuthentication);
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self doAppActivationTasks:userJustCompletedBiometricAuthentication];
@@ -375,6 +479,28 @@
     
 
     [self onDeviceLocked];
+}
+
+- (void)onMasterDetailViewControllerClosed:(id)param {
+    NSNotification* notification = param;
+    NSString* databaseId = notification.object;
+
+    NSLog(@"onMasterDetailViewControllerClosed [%@]", databaseId);
+
+    if ( self.unlockedDatabase ) {
+        NSLog(@"onMasterDetailViewControllerClosed - Matching unlock db - clearing unlocked state.");
+
+        if ( [self.unlockedDatabase.uuid isEqualToString:databaseId] ) {
+            self.unlockedDatabase = nil;
+            self.unlockedDatabaseWentIntoBackgroundAt = nil;
+        }
+        else {
+            NSLog(@"WARNWARN: Received MasterDetail closed but Unlocked Database ID doesn't match!");
+        }
+    }
+    else {
+        NSLog(@"WARNWARN: Received MasterDetail closed but no Unlocked Database state available!");
+    }
 }
 
 - (void)onDeviceLocked {
@@ -505,7 +631,13 @@
                                            selector:@selector(protectedDataWillBecomeUnavailable)
                                                name:UIApplicationProtectedDataWillBecomeUnavailable
                                              object:nil];
+    
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(onMasterDetailViewControllerClosed:)
+                                               name:kMasterDetailViewCloseNotification
+                                             object:nil];
 }
+
 
 - (void)onDatabaseUpdated:(id)param {
     NSNotification* notification = param;
@@ -708,11 +840,14 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     DatabaseCell *cell = [tableView dequeueReusableCellWithIdentifier:kDatabaseCell forIndexPath:indexPath];
 
-    SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
+    if ( indexPath.row < self.collection.count ) { 
+        SafeMetaData *database = [self.collection objectAtIndex:indexPath.row];
 
-    [cell populateCell:database];
+        [cell populateCell:database];
+    }
     
     return cell;
+    
 }
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -782,9 +917,19 @@
         [helper beginUnlockSequence:NO
                 biometricPreCleared:biometricPreCleared
                 noConvenienceUnlock:noConvenienceUnlock
-                         completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable error) {
+                         completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
             if (result == kUnlockDatabaseResultSuccess) {
-                [self onboardOrShowUnlockedDatabase:model];
+                if ( innerStreamError ) {
+                    [Alerts info:self
+                           title:NSLocalizedString(@"safesvc_inner_stream_error_title", @"Inner Stream Decryption Error")
+                         message:NSLocalizedString(@"safesvc_inner_stream_error_message", @"Strongbox has had a problem decrypting some protected fields in this database. This is likely due to a previous corrupt save by another App. The database will now open in Read-Only mode to prevent further corruption. We recommend restoring from an older backup, or trying to re-save to restore or undo corruption.")
+                      completion:^{
+                        [self onboardOrShowUnlockedDatabase:model];
+                    }];
+                }
+                else {
+                    [self onboardOrShowUnlockedDatabase:model];
+                }
             }
             else if (result == kUnlockDatabaseResultViewDebugSyncLogRequested) {
                 [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
@@ -860,9 +1005,9 @@
 - (UIAction*)getContextualViewBackupsAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
+    UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_backups", @"Button Title to view backup settings of this database")
                                     systemImage:@"clock" 
-                                    destructive:NO
+                                    
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self performSegueWithIdentifier:@"segueToBackups" sender:safe];
     }];
@@ -873,9 +1018,9 @@
 - (UIAction*)getContextualViewSyncLogAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
+    UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_view_sync_status", @"Button Title to view sync log for this database")
                                     systemImage:@"arrow.clockwise.icloud" 
-                                    destructive:NO
+                                    
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self performSegueWithIdentifier:@"segueToSyncLog" sender:safe];
     }];
@@ -922,9 +1067,9 @@
 }
 
 - (UIAction*)getContextualReOrderDatabasesAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)) {
-    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
+    UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_action_reorder_database", @"Button Title to reorder this database")
                                     systemImage:@"arrow.up.arrow.down"
-                                    destructive:NO
+                                    
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self setEditing:YES];
     }];
@@ -983,9 +1128,9 @@
 }
 
 - (UIAction*)getContextualShareAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
-    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"generic_export", @"Export")
+    UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"generic_export", @"Export")
                                     systemImage:@"square.and.arrow.up"
-                                    destructive:NO
+                                    
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self onShare:indexPath];
     }];
@@ -1001,9 +1146,9 @@
         NSLocalizedString(@"safes_vc_show_in_files", @"Button Title to Show in iOS Files Browser") :
         NSLocalizedString(@"safes_vc_make_autofillable", @"Button Title to Hide from iOS Files Browser");
 
-    UIAction* ret = [self getContextualMenuItem:localDeviceActionTitle
+    UIAction* ret = [ContextMenuHelper getItem:localDeviceActionTitle
                                     systemImage:shared ? @"eye" : @"eye.slash"
-                                    destructive:NO
+                                    
                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self promptAboutToggleLocalStorage:indexPath shared:shared];
     }];
@@ -1017,9 +1162,9 @@
     
     NSString* title = NSLocalizedString(@"databases_toggle_quick_launch_context_menu", @"Quick Launch");
     
-    UIAction* ret = [self getContextualMenuItem:title
+    UIAction* ret = [ContextMenuHelper getItem:title
                                  image:[UIImage imageNamed:@"rocket"]
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self toggleQuickLaunch:safe];
     }];
@@ -1035,9 +1180,9 @@
     
     NSString* title = NSLocalizedString(@"databases_toggle_autofill_quick_launch_context_menu", @"AutoFill Quick Launch");
     
-    UIAction* ret = [self getContextualMenuItem:title
+    UIAction* ret = [ContextMenuHelper getItem:title
                                  image:[UIImage imageNamed:@"globe"]
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self toggleAutoFillQuickLaunch:safe];
     }];
@@ -1052,9 +1197,9 @@
     
     NSString* title = NSLocalizedString(@"browse_vc_action_properties", @"Properties");
     
-    UIAction* ret = [self getContextualMenuItem:title
+    UIAction* ret = [ContextMenuHelper getItem:title
                                  image:[UIImage systemImageNamed:@"list.bullet"]
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self showDatabaseProperties:safe];
     }];
@@ -1067,9 +1212,9 @@
     
     NSString* title = NSLocalizedString(@"databases_toggle_read_only_context_menu", @"Read Only");
     
-    UIAction* ret = [self getContextualMenuItem:title
+    UIAction* ret = [ContextMenuHelper getItem:title
                                  image:[UIImage systemImageNamed:@"eyeglasses"]
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self toggleReadOnly:safe];
     }];
@@ -1080,36 +1225,36 @@
 }
 
 - (UIAction*)getContextualMenuUnlockManualAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
-    return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_unlock_manual_action", @"Open ths database manually bypassing any convenience unlock")
+    return [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_unlock_manual_action", @"Open ths database manually bypassing any convenience unlock")
                            systemImage:@"lock.open"
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self manualUnlock:indexPath];
     }];
 }
 
 - (UIAction*)getContextualMenuOpenOfflineAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
-    return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
+    return [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_slide_left_open_offline_action", @"Open ths database offline table action")
                            systemImage:@"bolt.horizontal.circle"
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self openOffline:indexPath];
     }];
 }
 
 - (UIAction*)getContextualMenuOpenOnlineAction:(NSIndexPath*)indexPath API_AVAILABLE(ios(13.0)) {
-    return [self getContextualMenuItem:NSLocalizedString(@"safes_vc_slide_left_open_online_action", @"Open this database online action")
+    return [ContextMenuHelper getItem:NSLocalizedString(@"safes_vc_slide_left_open_online_action", @"Open this database online action")
                            systemImage:@"bolt.horizontal.circle"
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self forceOpenOnline:indexPath];
     }];
 }
 
 - (UIAction*)getContextualMenuRenameAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
-    return [self getContextualMenuItem:NSLocalizedString(@"generic_rename", @"Rename")
+    return [ContextMenuHelper getItem:NSLocalizedString(@"generic_rename", @"Rename")
                            systemImage:@"pencil"
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self renameSafe:indexPath];
     }];
@@ -1120,9 +1265,9 @@
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    UIAction* ret = [self getContextualMenuItem:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy") 
+    UIAction* ret = [ContextMenuHelper getItem:NSLocalizedString(@"generic_action_create_local_database", @"Create Local Copy")
                                  image:img
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self createLocalCopyDatabase:safe];
     }];
@@ -1141,9 +1286,9 @@
 
     SafeMetaData *safe = [self.collection objectAtIndex:indexPath.row];
 
-    return [self getContextualMenuItem:NSLocalizedString(@"generic_action_compare_and_merge_ellipsis", @"Compare & Merge...")
+    return [ContextMenuHelper getItem:NSLocalizedString(@"generic_action_compare_and_merge_ellipsis", @"Compare & Merge...")
                                  image:img
-                           destructive:NO
+                           
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self beginMergeWizard:safe];
     }];
@@ -1156,9 +1301,8 @@
 
     NSString* foo = safe.storageProvider == kSFTP ? NSLocalizedString(@"generic_action_edit_sftp_connection_ellipsis", @"SFTP Connection...") : NSLocalizedString(@"generic_action_edit_webdav_connection_ellipsis", @"WebDAV Connection...");
     
-    return [self getContextualMenuItem:foo
+    return [ContextMenuHelper getItem:foo
                                  image:img
-                           destructive:NO
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self editConnection:safe];
     }];
@@ -1171,43 +1315,19 @@
 
     NSString* foo = safe.storageProvider == kSFTP ? NSLocalizedString(@"reselect_sftp_file_ellipsis", @"Reselect SFTP File...") : NSLocalizedString(@"reselect_webdav_file_ellipsis", @"Reselect WebDAV File...");
     
-    return [self getContextualMenuItem:foo
+    return [ContextMenuHelper getItem:foo
                                  image:img
-                           destructive:NO
                                handler:^(__kindof UIAction * _Nonnull action) {
         [self editFilePath:safe];
     }];
 }
 
 - (UIAction*)getContextualMenuRemoveAction:(NSIndexPath*)indexPath  API_AVAILABLE(ios(13.0)){
-    return [self getContextualMenuItem:NSLocalizedString(@"generic_remove", @"Remove")
-                           systemImage:@"trash"
-                           destructive:YES
-                               handler:^(__kindof UIAction * _Nonnull action) {
+    return [ContextMenuHelper getDestructiveItem:NSLocalizedString(@"generic_remove", @"Remove")
+                                     systemImage:@"trash"
+                                         handler:^(__kindof UIAction * _Nonnull action) {
         [self removeSafe:indexPath];
     }];
-}
-
-- (UIAction*)getContextualMenuItem:(NSString*)title systemImage:(NSString*)systemImage destructive:(BOOL)destructive handler:(UIActionHandler)handler
-  API_AVAILABLE(ios(13.0)){
-    return [self getContextualMenuItem:title
-                                 image:[UIImage systemImageNamed:systemImage]
-                           destructive:destructive
-                               handler:handler];
-}
-
-- (UIAction*)getContextualMenuItem:(NSString*)title image:(UIImage*)image destructive:(BOOL)destructive handler:(UIActionHandler)handler
-  API_AVAILABLE(ios(13.0)){
-    UIAction *ret = [UIAction actionWithTitle:title
-                                        image:image
-                                   identifier:nil
-                                      handler:handler];
-
-    if (destructive) {
-        ret.attributes = UIMenuElementAttributesDestructive;
-    }
-    
-    return ret;
 }
 
 
@@ -2583,6 +2703,7 @@
 }
 
 - (void)editConnection:(SafeMetaData*)database {
+#ifndef NO_SFTP_WEBDAV_SP
     if ( database.storageProvider == kWebDAV ) {
         WebDAVConnectionsViewController* vc = [WebDAVConnectionsViewController instantiateFromStoryboard];
         vc.selectMode = YES;
@@ -2625,27 +2746,33 @@
         
         [vc presentFromViewController:self];
     }
+#endif
 }
 
 - (void)changeWebDAVDatabaseConnection:(SafeMetaData*)database connection:(WebDAVSessionConfiguration*)connection {
+#ifndef NO_SFTP_WEBDAV_SP
     WebDAVProviderData* pd = [WebDAVStorageProvider.sharedInstance getProviderDataFromMetaData:database];
     pd.connectionIdentifier = connection.identifier;
     
     SafeMetaData* newDb = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
     database.fileIdentifier = newDb.fileIdentifier;
     [SafesList.sharedInstance update:database];
+#endif
 }
 
 - (void)changeSFTPDatabaseConnection:(SafeMetaData*)database connection:(SFTPSessionConfiguration*)connection {
+#ifndef NO_SFTP_WEBDAV_SP
     SFTPProviderData* pd = [SFTPStorageProvider.sharedInstance getProviderDataFromMetaData:database];
     pd.connectionIdentifier = connection.identifier;
     
     SafeMetaData* newDb = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:pd];
     database.fileIdentifier = newDb.fileIdentifier;
     [SafesList.sharedInstance update:database];
+#endif
 }
 
 - (void)editFilePath:(SafeMetaData*)database {
+#ifndef NO_SFTP_WEBDAV_SP
     if ( database.storageProvider == kWebDAV ) {
         StorageBrowserTableViewController* vc = [StorageBrowserTableViewController instantiateFromStoryboard];
         UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:vc];
@@ -2706,24 +2833,29 @@
         
         [self presentViewController:nav animated:YES completion:nil];
     }
+#endif
 }
 
 - (void)changeSFTPFilePath:(SafeMetaData*)database providerData:(SFTPProviderData*)providerData {
+#ifndef NO_SFTP_WEBDAV_SP
     SafeMetaData* newDb = [SFTPStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:providerData];
     
     database.fileName = newDb.fileName;
     database.fileIdentifier = newDb.fileIdentifier;
     
     [SafesList.sharedInstance update:database];
+#endif
 }
 
 - (void)changeWebDAVFilePath:(SafeMetaData*)database providerData:(WebDAVProviderData*)providerData {
+#ifndef NO_SFTP_WEBDAV_SP
     SafeMetaData* newDb = [WebDAVStorageProvider.sharedInstance getSafeMetaData:database.nickName providerData:providerData];
     
     database.fileName = newDb.fileName;
     database.fileIdentifier = newDb.fileIdentifier;
     
     [SafesList.sharedInstance update:database];
+#endif
 }
 
 

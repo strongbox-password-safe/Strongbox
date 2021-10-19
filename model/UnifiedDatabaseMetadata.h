@@ -14,6 +14,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const kKdb4DefaultFileVersion;
+extern const uint32_t kKdb4DefaultInnerRandomStreamId;
+extern NSString* const kKP3DefaultFileVersion;
+extern const uint32_t kKP3DefaultInnerRandomStreamId;
+
 @interface UnifiedDatabaseMetadata : NSObject
 
 + (instancetype)withDefaultsForFormat:(DatabaseFormat)format;
@@ -47,10 +52,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSUUID* entryTemplatesGroup;
 @property NSDate* entryTemplatesGroupChanged;
 
+@property (nullable) NSNumber* maintenanceHistoryDays;
+@property (nullable) NSDate*  masterKeyChanged;
+@property (nullable) NSNumber* masterKeyChangeRec;
+@property (nullable) NSNumber* masterKeyChangeForce;
+@property (nullable) NSNumber*  masterKeyChangeForceOnce;
+@property (nullable) NSUUID* lastSelectedGroup;
+@property (nullable) NSUUID*  lastTopVisibleGroup;
+@property (nullable) NSNumber* protectTitle;
+@property (nullable) NSNumber* protectUsername;
+@property (nullable) NSNumber* protectPassword;
+@property (nullable) NSNumber* protectURL;
+@property (nullable) NSNumber* protectNotes;
+
 
 
 @property (nonatomic) uint32_t compressionFlags;
-@property (nonatomic) uint64_t transformRounds;
 @property (nonatomic) uint32_t innerRandomStreamId;
 @property NSUUID* cipherUuid;
 
@@ -64,7 +81,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable) NSString *lastUpdateUser;
 @property (nonatomic, nullable) NSString *lastUpdateHost;
 @property (nonatomic, nullable) NSString *lastUpdateApp;
-@property (nonatomic) NSInteger keyStretchIterations;
 
 
 
@@ -74,6 +90,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property (nullable) NSObject* adaptorTag; 
+
+
+
+@property (nonatomic) uint64_t kdfIterations;
 
 @end
 

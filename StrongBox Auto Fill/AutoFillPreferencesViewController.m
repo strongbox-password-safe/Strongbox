@@ -49,6 +49,9 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellConvenienceAutoUnlock;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellUseHostOnly;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAddServiceIds;
+@property (weak, nonatomic) IBOutlet UISwitch *switchScanCustomFields;
+@property (weak, nonatomic) IBOutlet UISwitch *switchScanAlternativeURLs;
+@property (weak, nonatomic) IBOutlet UISwitch *switchScanNotes;
 
 @end
 
@@ -139,7 +142,16 @@
         self.labelQuickTypeFormat.textColor = self.switchQuickTypeAutoFill.on ? UIColor.blackColor : UIColor.lightGrayColor;
     }
     
+    
+    
+    self.switchScanAlternativeURLs.on = self.viewModel.metadata.autoFillScanAltUrls;
+    self.switchScanNotes.on = self.viewModel.metadata.autoFillScanNotes;
+    self.switchScanCustomFields.on = self.viewModel.metadata.autoFillScanCustomFields;
 
+    self.switchScanAlternativeURLs.enabled = self.switchQuickTypeAutoFill.on;
+    self.switchScanNotes.enabled = self.switchQuickTypeAutoFill.on;
+    self.switchScanCustomFields.enabled = self.switchQuickTypeAutoFill.on;
+    
     
     
     self.autoProceed.on = AppPreferences.sharedInstance.autoProceedOnSingleMatch;
@@ -204,15 +216,22 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 
+    self.viewModel.metadata.quickTypeEnabled = self.switchQuickTypeAutoFill.on;
+    self.viewModel.metadata.autoFillScanAltUrls = self.switchScanAlternativeURLs.on;
+    self.viewModel.metadata.autoFillScanNotes = self.switchScanNotes.on;
+    self.viewModel.metadata.autoFillScanCustomFields = self.switchScanCustomFields.on;
+
+    [[SafesList sharedInstance] update:self.viewModel.metadata];
+
     if ( self.switchQuickTypeAutoFill.on ) {
         [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
                                                            databaseUuid:self.viewModel.metadata.uuid
-                                                          displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+                                                          displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
+                                                        alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
+                                                           customFields:self.viewModel.metadata.autoFillScanCustomFields
+                                                                  notes:self.viewModel.metadata.autoFillScanNotes];
     }
     
-    self.viewModel.metadata.quickTypeEnabled = self.switchQuickTypeAutoFill.on;
-    [[SafesList sharedInstance] update:self.viewModel.metadata];
-
     [self bind];
 }
 
@@ -232,7 +251,10 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
                                                                databaseUuid:self.viewModel.metadata.uuid
-                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
+                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
+                                                            alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
+                                                               customFields:self.viewModel.metadata.autoFillScanCustomFields
+                                                                      notes:self.viewModel.metadata.autoFillScanNotes];
         }
         
         [self bind];
@@ -306,8 +328,11 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
             
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
                                                                databaseUuid:self.viewModel.metadata.uuid
-                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat];
-            
+                                                              displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
+                                                            alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
+                                                               customFields:self.viewModel.metadata.autoFillScanCustomFields
+                                                                      notes:self.viewModel.metadata.autoFillScanNotes];
+
             [self bind];
         }
     }];

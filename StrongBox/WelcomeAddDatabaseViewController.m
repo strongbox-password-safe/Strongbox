@@ -20,6 +20,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *buttonCreate;
 @property (weak, nonatomic) IBOutlet UIButton *buttonAdd;
 @property (weak, nonatomic) IBOutlet UIButton *buttonDismiss;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
 
 @end
 
@@ -80,6 +81,10 @@
 - (void)setupUi {
     self.buttonCreate.layer.cornerRadius = 5.0f;
     self.buttonAdd.layer.cornerRadius = 5.0f;
+    
+    if (@available(iOS 13.0, *)) {
+        self.imageView.image = [UIImage systemImageNamed:@"wand.and.stars"];
+    }
 }
 
 - (IBAction)onDismiss:(id)sender {

@@ -335,7 +335,7 @@
     
     [parentNode addChild:groupNode keePassGroupTitleRules:YES];
 
-    groupNode.linkedData = group.unmanagedChildren;
+    
 
     return YES;
 }
@@ -429,6 +429,7 @@
     if ( childEntry.customIcon ) {
         NodeIcon* ni = customIconPool[childEntry.customIcon];
         if ( ni ) {
+
             entryNode.icon = ni;
         }
         else {
@@ -446,7 +447,7 @@
         }
     }
 
-    entryNode.linkedData = childEntry.unmanagedChildren;
+    
     
     return entryNode;
 }

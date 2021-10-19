@@ -19,7 +19,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly) BOOL isPossible;
 @property (readonly) BOOL isOnForStrongbox;
 
-- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database databaseUuid:(NSString*)databaseUuid displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat;
+- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database
+                           databaseUuid:(NSString*)databaseUuid
+                          displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
+                        alternativeUrls:(BOOL)alternativeUrls
+                           customFields:(BOOL)customFields
+                                  notes:(BOOL)notes;
+
 - (void)clearAutoFillQuickTypeDatabase;
 
 @end

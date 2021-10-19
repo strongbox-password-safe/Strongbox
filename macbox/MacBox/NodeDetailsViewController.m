@@ -108,10 +108,15 @@
 @property (weak) IBOutlet NSTextField *labelStrength;
 
 @property (readonly) BOOL isEffectivelyReadOnly;
+@property BOOL quickRevealButtonDown;
 
 @end
 
 @implementation NodeDetailsViewController
+
+- (void)dealloc {
+    NSLog(@"DEALLOC [%@]", self);
+}
 
 - (BOOL)isEffectivelyReadOnly {
     return self.historicalItem || self.model.isEffectivelyReadOnly;
@@ -291,7 +296,12 @@ static NSString* trimField(NSTextField* textField) {
 
     [self updateTitle];
     
-    [self.view.window setFrameAutosaveName:self.node.uuid.UUIDString]; 
+    if ( self.newEntry ) {
+        [self.view.window setFrameAutosaveName:@"Details-New-Entry-AutoSaveFrame"]; 
+    }
+    else {
+        [self.view.window setFrameAutosaveName:self.node.uuid.UUIDString]; 
+    }
 }
 
 - (void)updateTitle {
@@ -434,15 +444,19 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)setupAttachmentsUI {
+    __weak NodeDetailsViewController* weakSelf = self;
+
     self.sortedAttachmentFileNames = @[];
     self.attachmentsView.dataSource = self;
     self.attachmentsView.delegate = self;
     self.attachmentsView.onSpaceBar = self.attachmentsView.onDoubleClick = ^{ 
-        [self onPreviewAttachment:nil];
+        [weakSelf onPreviewAttachment:nil];
     };
 }
 
 - (void)setupSimpleUI {
+    __weak NodeDetailsViewController* weakSelf = self;
+    
     self.textFieldTitle.delegate = self;
     self.revealedPasswordField.delegate = self;
     self.textViewNotes.delegate = self;
@@ -450,44 +464,44 @@ static NSString* trimField(NSTextField* textField) {
     
     
     self.textFieldUsername.onBeginEditing = ^{
-        self.currentlyEditingUIControl = self.textFieldUsername;
+        weakSelf.currentlyEditingUIControl = weakSelf.textFieldUsername;
     };
     self.textFieldUsername.onEndEditing = ^{
-        self.currentlyEditingUIControl = nil;
-        [self setModelForEditField:self.textFieldUsername];
+        weakSelf.currentlyEditingUIControl = nil;
+        [weakSelf setModelForEditField:weakSelf.textFieldUsername];
     };
 
     self.textFieldUrl.onBeginEditing = ^{
-        self.currentlyEditingUIControl = self.textFieldUrl;
+        weakSelf.currentlyEditingUIControl = weakSelf.textFieldUrl;
     };
     self.textFieldUrl.onEndEditing = ^{
-        self.currentlyEditingUIControl = nil;
-        [self setModelForEditField:self.textFieldUrl];
+        weakSelf.currentlyEditingUIControl = nil;
+        [weakSelf setModelForEditField:weakSelf.textFieldUrl];
     };
     
     self.textFieldEmail.onBeginEditing = ^{
-        self.currentlyEditingUIControl = self.textFieldEmail;
+        weakSelf.currentlyEditingUIControl = weakSelf.textFieldEmail;
     };
     self.textFieldEmail.onEndEditing = ^{
-        self.currentlyEditingUIControl = nil;
-        [self setModelForEditField:self.textFieldEmail];
+        weakSelf.currentlyEditingUIControl = nil;
+        [weakSelf setModelForEditField:weakSelf.textFieldEmail];
     };
 
     self.passwordIsRevealed = Settings.sharedInstance.revealPasswordsImmediately;
     
     self.concealedPasswordField.onClick = ^{
-        [self revealPassword];
+        [weakSelf revealPassword];
     };
     
     self.imageViewShowHidePassword.clickable = YES;
     self.imageViewShowHidePassword.image = [NSImage imageNamed:self.passwordIsRevealed ? @"hide" : @"show"];
 
     self.imageViewShowHidePassword.onClick = ^{
-        if (self.passwordIsRevealed) {
-            [self.revealedPasswordField resignFirstResponder];
+        if (weakSelf.passwordIsRevealed) {
+            [weakSelf.revealedPasswordField resignFirstResponder];
         }
-        [self toggleRevealConcealPassword];
-        self.imageViewShowHidePassword.image = [NSImage imageNamed:self.passwordIsRevealed ? @"hide" : @"show"];
+        [weakSelf toggleRevealConcealPassword];
+        weakSelf.imageViewShowHidePassword.image = [NSImage imageNamed:weakSelf.passwordIsRevealed ? @"hide" : @"show"];
     };
     
     [self bindRevealedConcealedPassword];
@@ -501,8 +515,8 @@ static NSString* trimField(NSTextField* textField) {
         Node* n1 = (Node*)obj1;
         Node* n2 = (Node*)obj2;
         
-        NSString *p1 = [self.model getGroupPathDisplayString:n1];
-        NSString *p2 = [self.model getGroupPathDisplayString:n2];
+        NSString *p1 = [weakSelf.model getGroupPathDisplayString:n1];
+        NSString *p2 = [weakSelf.model getGroupPathDisplayString:n2];
         
         return finderStringCompare(p1, p2);
     }];
@@ -548,6 +562,8 @@ static NSString* trimField(NSTextField* textField) {
 - (void)bindUiToSimpleFields {
     [self updateTitle];
     
+    __weak NodeDetailsViewController* weakSelf = self;
+    
     self.textFieldTitle.stringValue = self.node.title;
     self.textFieldUsername.stringValue = self.node.fields.username;
     
@@ -561,7 +577,7 @@ static NSString* trimField(NSTextField* textField) {
     [self.tagsField setObjectValue:sortedTags];
     
     self.imageViewIcon.image = [self getIconForNode];
-    self.imageViewIcon.onClick = ^{ [self onEditNodeIcon]; };
+    self.imageViewIcon.onClick = ^{ [weakSelf onEditNodeIcon]; };
     self.imageViewIcon.showClickableBorder = YES;
     
     self.labelID.stringValue = self.model.format == kPasswordSafe ? self.node.uuid.UUIDString : keePassStringIdFromUuid(self.node.uuid);
@@ -844,7 +860,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (void)showPopupToastNotification:(NSString*)message {
-    [self showPopupToastNotification:message duration:0.75];
+    [self showPopupToastNotification:message duration:0.5];
 }
 
 - (void)showPopupToastNotification:(NSString*)message duration:(CGFloat)duration {
@@ -893,29 +909,6 @@ static NSString* trimField(NSTextField* textField) {
     
     
     [self performSegueWithIdentifier:@"segueToEditCustomField" sender:nil];
-}
-
-- (void)setCustomField:(NSString*)key value:(NSString*)value allowUpdate:(BOOL)allowUpdate protected:(BOOL)protected {
-    NSArray<NSString*>* existingKeys = [self.customFields map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
-        return obj.key;
-    }];
-    
-    NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
-    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
-    
-    if(!allowUpdate && [existingKeySet containsObject:key]) {
-        NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_that_key_already_exists", @"You cannot use that Key here as it already exists in custom fields.");
-        [MacAlerts info:loc window:self.view.window];
-        return;
-    }
-    
-    if([keePassReserved containsObject:key]) {
-        NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_key_reserved", @"You cannot use that Key here as it is reserved for standard KeePass fields.");
-        [MacAlerts info:loc window:self.view.window];
-        return;
-    }
-    
-    [self.model setCustomField:self.node key:key value:[StringValue valueWithString:value protected:protected]];
 }
 
 - (IBAction)onCopyCustomFieldKey:(id)sender {
@@ -1179,7 +1172,7 @@ static NSString* trimField(NSTextField* textField) {
         
         cell.value = field.value;
         cell.protected = field.protected && !(field.value.length == 0 && !self.model.concealEmptyProtectedFields);
-        cell.valueHidden = field.protected && !(field.value.length == 0 && !self.model.concealEmptyProtectedFields); 
+        cell.valueHidden = !self.quickRevealButtonDown && (field.protected && !(field.value.length == 0 && !self.model.concealEmptyProtectedFields)); 
         
         return cell;
     }
@@ -1537,7 +1530,17 @@ static NSString* trimField(NSTextField* textField) {
         vc.existingKeySet = existingKeySet;
         
         vc.onSetField = ^(NSString * _Nonnull key, NSString * _Nonnull value, BOOL protected) {
-            [self setCustomField:key value:value allowUpdate:(sender != nil) protected:protected];
+            CustomField* field = [[CustomField alloc] init];
+            field.key = key;
+            field.value = value;
+            field.protected = protected;
+            
+            if ( sender ) { 
+                [self editExistingCustomField:field fieldToEdit:sender];
+            }
+            else { 
+                [self addNewCustomField:field];
+            }
         };
     }
     else if ( [segue.identifier isEqualToString:@"segueToEditTags"] ) {
@@ -1601,6 +1604,74 @@ static NSString* trimField(NSTextField* textField) {
     if (self.onSaveCompletion) {
         self.onSaveCompletion();
         self.onSaveCompletion = nil;
+    }
+}
+
+
+
+- (void)addNewCustomField:(CustomField*)field {
+    NSArray<NSString*>* existingKeys = [self.customFields map:^id _Nonnull(CustomField * _Nonnull obj, NSUInteger idx) {
+        return obj.key;
+    }];
+    
+    NSSet<NSString*> *existingKeySet = [NSSet setWithArray:existingKeys];
+    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+    
+    if( [existingKeySet containsObject:field.key] ) {
+        NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_that_key_already_exists", @"You cannot use that Key here as it already exists in custom fields.");
+        [MacAlerts info:loc window:self.view.window];
+        return;
+    }
+    
+    if( [keePassReserved containsObject:field.key] ) {
+        NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_key_reserved", @"You cannot use that Key here as it is reserved for standard KeePass fields.");
+        [MacAlerts info:loc window:self.view.window];
+        return;
+    }
+    
+    [self.model addCustomField:self.node key:field.key value:[StringValue valueWithString:field.value protected:field.protected]];
+}
+
+- (void)editExistingCustomField:(CustomField*)field fieldToEdit:(CustomField*)fieldToEdit {
+    const NSSet<NSString*> *keePassReserved = [Entry reservedCustomFieldKeys];
+        
+    if([keePassReserved containsObject:field.key]) {
+        NSString* loc = NSLocalizedString(@"mac_node_details_you_cannot_use_key_reserved", @"You cannot use that Key here as it is reserved for standard KeePass fields.");
+        [MacAlerts info:loc window:self.view.window];
+        return;
+    }
+    
+    [self.model editCustomField:self.node existingFieldKey:fieldToEdit.key key:field.key value:[StringValue valueWithString:field.value protected:field.protected]];
+}
+
+
+
+- (void)flagsChanged:(NSEvent *)event {
+
+    
+    if ( ( event.keyCode == 58 || event.keyCode == 61 ) && Settings.sharedInstance.quickRevealWithOptionKey ) {
+        BOOL optionKeyDown = ((event.modifierFlags & NSEventModifierFlagOption) == NSEventModifierFlagOption);
+
+
+        
+        if ( optionKeyDown ) {
+            if ( !self.passwordIsRevealed ) {
+                
+                
+                self.quickRevealButtonDown = YES;
+                self.passwordIsRevealed = YES;
+                [self bindRevealedConcealedPassword];
+                [self.tableViewCustomFields reloadData];
+            }
+        }
+        else {
+            if ( self.quickRevealButtonDown ) {
+                self.quickRevealButtonDown = NO;
+                self.passwordIsRevealed = NO;
+                [self bindRevealedConcealedPassword];
+                [self.tableViewCustomFields reloadData];
+            }
+        }
     }
 }
 

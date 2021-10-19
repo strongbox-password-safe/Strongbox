@@ -23,6 +23,7 @@ extern NSString* const kDefaultKeePassEmailFieldKey;
 
 @property (readonly, class) NSString* proEditionBundleId;
 @property (readonly, class) NSString* scotusEditionBundleId;
+@property (readonly, class) NSString* grapheneEditionBundleId;
 
 @end
 

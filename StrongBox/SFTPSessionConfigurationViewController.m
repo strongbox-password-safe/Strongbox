@@ -10,7 +10,10 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import "Alerts.h"
 #import "Utils.h"
+
+#ifndef NO_SFTP_WEBDAV_SP
 #import "SFTPStorageProvider.h"
+#endif
 
 @interface SFTPSessionConfigurationViewController () <UIDocumentPickerDelegate>
 
@@ -95,6 +98,7 @@
     configuration.privateKey = self.privateKey;
     configuration.initialDirectory = self.textFieldPath.text;
     
+#ifndef NO_SFTP_WEBDAV_SP
     [SFTPStorageProvider.sharedInstance testConnection:configuration viewController:self completion:^(NSError * _Nonnull error) {
         dispatch_async(dispatch_get_main_queue(), ^{
             if ( error ) {
@@ -105,6 +109,7 @@
             }
         });
     }];
+#endif
 }
 
 - (IBAction)onUsePrivateKey:(id)sender {

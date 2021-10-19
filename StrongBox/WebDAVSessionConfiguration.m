@@ -78,7 +78,7 @@
 }
 
 - (void)setPassword:(NSString *)password {
-    if(password) {
+    if ( password ) {
         [SecretStore.sharedInstance setSecureString:password forIdentifier:[self getKeyChainKey:@"password"]];
     }
     else {
@@ -87,7 +87,7 @@
 }
 
 - (void)clearKeychainItems {
-    [self setPassword:nil];
+    [SecretStore.sharedInstance deleteSecureItem:[self getKeyChainKey:@"password"]];
 }
 
 @end

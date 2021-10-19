@@ -7,14 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "Meta.h"
 #import "UnifiedDatabaseMetadata.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface KeePassDatabaseWideProperties : NSObject
 
-@property (nullable) Meta* originalMeta;
 @property NSDictionary<NSUUID*, NSDate*>* deletedObjects;
 @property UnifiedDatabaseMetadata* metadata;
 

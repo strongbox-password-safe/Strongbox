@@ -29,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 - (NSURL*_Nullable)setWorkingCacheWithData2:(NSData*)data dateModified:(NSDate*)dateModified database:(NSString*)databaseUuid error:(NSError**)error;
+- (NSURL*_Nullable)setWorkingCacheWithFile:(NSString*)file dateModified:(NSDate*)dateModified database:(NSString*)databaseUuid error:(NSError**)error;
 
 - (NSURL*)getLocalWorkingCacheUrlForDatabase2:(NSString*)databaseUuid;
 

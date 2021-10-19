@@ -64,35 +64,19 @@ static NSString *ModelIdentifier()
 }
 
 
-+ (NSString *)systemVersion
-{
-  static NSString *systemVersion = nil;
++ (NSString *)systemVersion {
+    static NSString *systemVersion = nil;
 
-  if (!systemVersion) {
-    typedef struct {
-      NSInteger majorVersion;
-      NSInteger minorVersion;
-      NSInteger patchVersion;
-    } MyOperatingSystemVersion;
-
-    if ([[NSProcessInfo processInfo] respondsToSelector:@selector(operatingSystemVersion)]) {
-      MyOperatingSystemVersion version = ((MyOperatingSystemVersion(*)(id, SEL))objc_msgSend_stret)([NSProcessInfo processInfo], @selector(operatingSystemVersion));
-      systemVersion = [NSString stringWithFormat:@"%ld.%ld.%ld", (long)version.majorVersion, version.minorVersion, version.patchVersion];
+    if (!systemVersion) {
+        if ( [NSProcessInfo.processInfo respondsToSelector:@selector(operatingSystemVersionString)] ) {
+            systemVersion = NSProcessInfo.processInfo.operatingSystemVersionString;
+        }
+        else {
+            systemVersion = @"<Unknown>";
+        }
     }
-    else {
-        systemVersion = @"<Unknown>";
 
-
-
-
-
-
-
-
-    }
-  }
-
-  return systemVersion;
+    return systemVersion;
 }
 
 #endif
@@ -248,10 +232,10 @@ static NSString *ModelIdentifier()
 #if TARGET_OS_IPHONE
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.appSupportDirectory]];
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.documentsDirectory]];
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpEncryptedAttachmentPath isDirectory:YES]]];
-    [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:[NSURL fileURLWithPath:FileManager.sharedInstance.tmpAttachmentPreviewPath isDirectory:YES]]];
-#endif
 
+
+#endif
+        
     [debugLines addObjectsFromArray:[DebugHelper listDirectoryRecursive:FileManager.sharedInstance.sharedAppGroupDirectory]];
 
     

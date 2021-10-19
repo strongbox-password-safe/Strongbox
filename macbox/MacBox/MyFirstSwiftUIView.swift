@@ -14,7 +14,7 @@ struct ContentView: View {
         NavigationView {
             SidebarView()
             Text("No Sidebar Selection") // You won't see this in practice (default selection)
-            Text("No Message Selection") // You will see this
+            Text("No Message Selection") 
         }
     }
 }
@@ -25,20 +25,20 @@ struct SidebarView: View {
 
     var body: some View {
         List {
-//            NavigationLink(destination: ConsoleView(), isActive: $isDefaultItemActive) {
-//                Label("Console", systemImage: "message")
-//            }
-            // ...
-        }.listStyle(SidebarListStyle()) // Gives you this sweet sidebar look
+
+
+
+            
+        }.listStyle(SidebarListStyle()) 
     }
 }
 
-//struct MyFirstSwiftUIView: View {
-//    var body: some View {
-//        Text("This is a test!")
-//    }
-//}
-//
+
+
+
+
+
+
 @available(OSX 10.15.0, *)
 struct MyFirstSwiftUIView_Previews: PreviewProvider {
     static var previews: some View {

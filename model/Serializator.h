@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_Nullable model, NSError*_Nullable error);
+typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_Nullable model, NSError*_Nullable innerStreamError, NSError*_Nullable error);
 
 @interface Serializator : NSObject
 
@@ -63,7 +63,8 @@ typedef void (^DeserializeCompletionBlock)(BOOL userCancelled, DatabaseModel *_N
 
 
 + (NSData*_Nullable)expressToData:(DatabaseModel*)database format:(DatabaseFormat)format;
-+ (void)getAsData:(DatabaseModel*)database format:(DatabaseFormat)format completion:(SaveCompletionBlock)completion;
+
++ (void)getAsData:(DatabaseModel*)database format:(DatabaseFormat)format outputStream:(NSOutputStream*)outputStream completion:(SaveCompletionBlock)completion;
 
 @end
 

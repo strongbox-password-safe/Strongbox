@@ -19,7 +19,7 @@ typedef enum : NSUInteger {
     kUnlockDatabaseResultIncorrectCredentials,
 } UnlockDatabaseResult;
 
-typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, NSError*_Nullable error);
+typedef void(^UnlockDatabaseCompletionBlock)(UnlockDatabaseResult result, Model*_Nullable model, NSError*_Nullable innerStreamError, NSError*_Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 

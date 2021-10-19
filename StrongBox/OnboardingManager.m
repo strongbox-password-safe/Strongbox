@@ -201,7 +201,7 @@
         if ( AppPreferences.sharedInstance.iCloudPrompted ) {
             return NO;
         }
-        if ( AppPreferences.sharedInstance.disableNativeNetworkStorageOptions ) {
+        if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
             return NO;
         }
         

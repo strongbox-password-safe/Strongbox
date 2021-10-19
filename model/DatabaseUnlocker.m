@@ -17,6 +17,7 @@
 #import "AppPreferences.h"
 #import "WorkingCopyManager.h"
 #import "StrongboxErrorCodes.h"
+#import "Argon2KdfCipher.h"
 
 @interface DatabaseUnlocker ()
 
@@ -82,8 +83,8 @@
     dispatch_group_t group = dispatch_group_create();
     dispatch_group_enter(group);
 
-    [Serializator fromUrl:localCopyUrl ckf:key completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-        if (!(userCancelled || error || !model) ) {
+    [Serializator fromUrl:localCopyUrl ckf:key completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+        if (!(userCancelled || error || innerStreamError || !model) ) {
             ret = model;
         }
         dispatch_group_leave(group);
@@ -105,7 +106,7 @@
         [Alerts warn:self.viewController
                title:NSLocalizedString(@"open_sequence_couldnt_open_local_title", @"Could Not Open Local Copy")
              message:NSLocalizedString(@"open_sequence_couldnt_open_local_message", @"Could not open Strongbox's local copy of this database. A online sync is required.")];
-        completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+        completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
         return;
     }
     
@@ -117,7 +118,10 @@
                 key:(CompositeKeyFactors*)key
  keyFromConvenience:(BOOL)keyFromConvenience
          completion:(UnlockDatabaseCompletionBlock)completion {
-    if ( self.isAutoFillOpen && !AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseUnlocker isAutoFillLikelyToCrash:url] ) { 
+    if ( self.isAutoFillOpen && !AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash && [DatabaseUnlocker isAutoFillLikelyToCrash:url] ) {
+        
+        
+        
         AppPreferences.sharedInstance.haveWarnedAboutAutoFillCrash = YES;
 
         [Alerts warn:self.viewController
@@ -136,7 +140,7 @@
     NSError* error;
     BOOL valid = [Serializator isValidDatabase:url error:&error];
     if (!valid) {
-        [self openSafeWithDataDone:nil error:error];
+        [self openSafeWithDataDone:nil innerStreamError:nil error:error];
         return;
     }
 
@@ -150,8 +154,8 @@
             [self autoDetermineEmptyOrNullAmbiguousPassword:url key:key keyFromConvenience:keyFromConvenience completion:completion];
         }
         else {
-            [Serializator fromUrl:url ckf:key completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+            [Serializator fromUrl:url ckf:key completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+                [self onGotDatabaseModelFromData:userCancelled model:model innerStreamError:innerStreamError error:error];
             }];
         }
     });
@@ -159,20 +163,22 @@
 
 - (void)onGotDatabaseModelFromData:(BOOL)userCancelled
                              model:(DatabaseModel*)model
+                  innerStreamError:(NSError*)innerStreamError
                              error:(NSError*)error {
     dispatch_async(dispatch_get_main_queue(), ^(void){
         [SVProgressHUD dismiss];
         
         if (userCancelled) {
-            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil);
+            self.completion(kUnlockDatabaseResultUserCancelled, nil, nil, nil);
         }
         else {
-            [self openSafeWithDataDone:model error:error];
+            [self openSafeWithDataDone:model innerStreamError:innerStreamError error:error];
         }
     });
 }
 
 - (void)openSafeWithDataDone:(DatabaseModel*)dbModel
+            innerStreamError:(NSError*)innerStreamError 
                        error:(NSError*)error {
     [SVProgressHUD dismiss];
     
@@ -195,7 +201,7 @@
                        title:NSLocalizedString(@"open_sequence_problem_opening_title", @"Could not open database")
                      message:NSLocalizedString(@"open_sequence_problem_opening_convenience_incorrect_message", @"The Convenience Password or Key File were incorrect for this database. Convenience Unlock Disabled.")
                   completion:^{
-                    self.completion(kUnlockDatabaseResultIncorrectCredentials, nil, error);
+                    self.completion(kUnlockDatabaseResultIncorrectCredentials, nil, nil, error);
                 }];
             }
             else {
@@ -204,7 +210,7 @@
                            title:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title", @"Incorrect Credentials")
                          message:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message_verify_key_file", @"The credentials were incorrect for this database. Are you sure you are using this key file?\n\nNB: A key files are not the same as your database file.")
                       completion:^{
-                        self.completion(kUnlockDatabaseResultIncorrectCredentials, nil, error);
+                        self.completion(kUnlockDatabaseResultIncorrectCredentials, nil, nil, error);
                     }];
 
                 }
@@ -213,7 +219,7 @@
                            title:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_title", @"Incorrect Credentials")
                          message:NSLocalizedString(@"open_sequence_problem_opening_incorrect_credentials_message", @"The credentials were incorrect for this database.")
                       completion:^{
-                        self.completion(kUnlockDatabaseResultIncorrectCredentials, nil, error);
+                        self.completion(kUnlockDatabaseResultIncorrectCredentials, nil, nil, error);
                     }];
                 }
             }
@@ -225,17 +231,23 @@
             error = [Utils createNSError:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.") errorCode:-1];
         }
 
-        self.completion(kUnlockDatabaseResultError, nil, error);
+        self.completion(kUnlockDatabaseResultError, nil, innerStreamError, error);
     }
     else {
-        [self onSuccessfulSafeOpen:dbModel];
+        [self onSuccessfulSafeOpen:dbModel innerStreamError:innerStreamError];
     }
 }
 
-- (void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe {
+- (void)onSuccessfulSafeOpen:(DatabaseModel *)openedSafe innerStreamError:(NSError*)innerStreamError {
     UINotificationFeedbackGenerator* gen = [[UINotificationFeedbackGenerator alloc] init];
     [gen notificationOccurred:UINotificationFeedbackTypeSuccess];
 
+    if ( innerStreamError ) {
+        
+        NSLog(@"🔴 WARNWARN: Encountered Inner Stream Error - Forcing Database ReadOnly..."); 
+        self.forcedReadOnly = YES;
+    }
+    
     Model *viewModel = [[Model alloc] initWithDatabase:openedSafe
                                               metaData:self.database
                                         forcedReadOnly:self.forcedReadOnly
@@ -243,7 +255,12 @@
                                            offlineMode:self.offlineMode];
     
     if(self.database.autoFillEnabled && self.database.quickTypeEnabled && !self.isAutoFillOpen) { 
-        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe databaseUuid:self.database.uuid displayFormat:self.database.quickTypeDisplayFormat];
+        [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:openedSafe
+                                                           databaseUuid:self.database.uuid
+                                                          displayFormat:self.database.quickTypeDisplayFormat
+                                                        alternativeUrls:self.database.autoFillScanAltUrls
+                                                           customFields:self.database.autoFillScanCustomFields
+                                                                  notes:self.database.autoFillScanNotes];
     }
     
     if ( !self.isAutoFillOpen ) { 
@@ -257,17 +274,39 @@
 
     BOOL enrolled = self.database.isEnrolledForConvenience;
     if ( enrolled ) {
-        BOOL convenienceEnabled = self.database.isTouchIdEnabled || self.database.conveniencePin != nil;
-        NSString* pw = self.database.convenienceMasterPassword;
-        BOOL expired = (pw == nil) && (self.database.conveniencePasswordHasExpired) && (self.database.convenienceExpiryPeriod != -1); 
+        if ( self.database.convenienceExpiryPeriod == 0 && self.isAutoFillOpen ) {
+            NSLog(@"AutoFill Mode with Memory Only Convenience... will not set."); 
+        }
+        else {
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
 
-        if ( convenienceEnabled && expired ) {
-            NSLog(@"XXXX - Convenience Unlock enabled, successful open, and password expired... re-enrolling...");
-            self.database.convenienceMasterPassword = openedSafe.ckfs.password;
+            
+            BOOL convenienceEnabled = self.database.isTouchIdEnabled || self.database.conveniencePin != nil;
+            
+            
+
+            
+            BOOL expired = self.database.conveniencePasswordHasExpired; 
+
+            if ( convenienceEnabled && expired ) {
+                NSLog(@"Convenience Unlock enabled, successful open, and password expired... re-enrolling...");
+                self.database.convenienceMasterPassword = openedSafe.ckfs.password;
+            }
         }
     }
     
-    self.completion(kUnlockDatabaseResultSuccess, viewModel, nil);
+    self.completion(kUnlockDatabaseResultSuccess, viewModel, innerStreamError, nil);
 }
 
 
@@ -296,7 +335,7 @@
     
     [Serializator fromUrl:url
                       ckf:firstCheck
-               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
+               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
         if(model == nil && error && error.code == StrongboxErrorCodes.incorrectCredentials) {
             NSLog(@"INFO: Empty/Nil Password check didn't work first time! will try alternative password...");
             
@@ -311,21 +350,21 @@
                   completion:^{
                     [Serializator fromUrl:url
                                       ckf:secondCheck
-                               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                        [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+                               completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+                        [self onGotDatabaseModelFromData:userCancelled model:model innerStreamError:innerStreamError error:error];
                     }];
                 }];
             }
             else {
                 [Serializator fromUrl:url
                                   ckf:secondCheck
-                           completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable error) {
-                    [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+                           completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+                    [self onGotDatabaseModelFromData:userCancelled model:model innerStreamError:innerStreamError error:error];
                 }];
             }
         }
         else {
-            [self onGotDatabaseModelFromData:userCancelled model:model error:error];
+            [self onGotDatabaseModelFromData:userCancelled model:model innerStreamError:innerStreamError error:error];
         }
     }];
 }
@@ -335,36 +374,20 @@
 + (BOOL)isAutoFillLikelyToCrash:(NSURL*)url {
     DatabaseFormat format = [Serializator getDatabaseFormat:url];
     
-    if(format == kKeePass4) {     
+    if ( format == kKeePass4 ) {     
         NSInputStream* inputStream = [NSInputStream inputStreamWithURL:url];
         CryptoParameters* params = [Kdbx4Serialization getCryptoParams:inputStream];
-        
 
         if(params && params.kdfParameters && ( [params.kdfParameters.uuid isEqual:argon2dCipherUuid()] || [params.kdfParameters.uuid isEqual:argon2idCipherUuid()])) {
-            static NSString* const kParameterMemory = @"M";
             static uint64_t const kMaxArgon2Memory =  64 * 1024 * 1024;
-                        
-            VariantObject* vo = params.kdfParameters.parameters[kParameterMemory];
-            if(vo && vo.theObject) {
-                uint64_t memory = ((NSNumber*)vo.theObject).longLongValue;
-                if(memory > kMaxArgon2Memory) {
-                    return YES;
-                }
+            
+            Argon2KdfCipher* cip = [[Argon2KdfCipher alloc] initWithParametersDictionary:params.kdfParameters];
+            if(cip.memory > kMaxArgon2Memory) {
+                return YES;
             }
         }
     }
     
-    
-
-    static const NSUInteger kProbablyTooLargeToOpenInAutoFillSizeBytes = 15 * 1024 * 1024; 
-
-    NSError* error;
-    NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
-    
-    if (error == nil && attributes.fileSize > kProbablyTooLargeToOpenInAutoFillSizeBytes) {
-        return YES;
-    }
-
     return NO;
 }
 

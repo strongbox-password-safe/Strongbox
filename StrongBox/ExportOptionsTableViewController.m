@@ -109,16 +109,17 @@
 }
 
 - (void)onShare {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             
         }
-        else if (!data) {
+        else if ( !file || error ) {
             [Alerts error:self
                     title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
                     error:error];
         }
         else {
+            NSData* data = [NSData dataWithContentsOfFile:file];
             [self onShareWithData:data];
         }
     }];
@@ -191,11 +192,11 @@
 }
 
 - (void)copyXml {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             return;
         }
-        else if(!data) {
+        else if ( !file || error ) {
             [Alerts error:self
                     title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
                     error:error];
@@ -232,16 +233,18 @@
 }
 
 - (void)exportEncryptedSafeByEmail {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             return;
         }
-        else if(!data) {
+        else if ( !file || error ) {
             [Alerts error:self
                     title:NSLocalizedString(@"export_vc_error_encrypting", @"Error Encrypting")
                     error:error];
             return;
         }
+    
+        NSData* data = [NSData dataWithContentsOfFile:file];
         
         NSString* likelyExtension = [Serializator getDefaultFileExtensionForFormat:self.viewModel.database.originalFormat];
         NSString* appendExtension = self.viewModel.metadata.fileName.pathExtension.length ? @"" : likelyExtension;
@@ -304,18 +307,20 @@
 }
 
 - (void)onFiles {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSData * _Nullable data, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
-            
+            return;
         }
-        else if (!data) {
+        else if ( !file || error ) {
             [Alerts error:self
                     title:NSLocalizedString(@"export_vc_error_encrypting", @"Could not get database data")
                     error:error];
+            return;
         }
-        else {
-            [self onFilesGotData:data metadata:self.viewModel.metadata];
-        }
+    
+        NSData* data = [NSData dataWithContentsOfFile:file];
+
+        [self onFilesGotData:data metadata:self.viewModel.metadata];
     }];
 }
 

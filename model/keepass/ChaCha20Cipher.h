@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ChaCha20Cipher : NSObject<Cipher>
 
-- (nullable NSData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
-- (nullable NSData*)encrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (nullable NSMutableData*)decrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
+- (nullable NSMutableData*)encrypt:(NSData*)data iv:(NSData*)iv key:(NSData*)key;
 - (nullable NSData*)generateIv;
 
 @end

@@ -462,7 +462,7 @@ void updateGroupWithField(uint16_t type, uint32_t length, uint8_t *data, KdbGrou
 
             break;
         case 0x0001:
-            group.groupId = littleEndian4BytesToInt32(data);
+            group.groupId = littleEndian4BytesToUInt32(data);
             break;
         case 0x0002:
             group.name = keePassDataToString(data);
@@ -480,13 +480,13 @@ void updateGroupWithField(uint16_t type, uint32_t length, uint8_t *data, KdbGrou
             group.expiry = keePass1TimeToDate(data);
             break;
         case 0x0007:
-            group.imageId = @(littleEndian4BytesToInt32(data));
+            group.imageId = @(littleEndian4BytesToUInt32(data));
             break;
         case 0x0008:
             group.level = littleEndian2BytesToUInt16(data);
             break;
         case 0x0009:
-            group.flags = littleEndian4BytesToInt32(data);
+            group.flags = littleEndian4BytesToUInt32(data);
             break;
         default:
             break;
@@ -502,10 +502,10 @@ void updateEntryWithField(uint16_t type, uint32_t length, uint8_t *data, KdbEntr
             entry.uuid = [[NSUUID alloc] initWithUUIDBytes:data];
             break;
         case 0x0002:
-            entry.groupId = littleEndian4BytesToInt32(data);
+            entry.groupId = littleEndian4BytesToUInt32(data);
             break;
         case 0x0003:
-            entry.imageId = @(littleEndian4BytesToInt32(data));
+            entry.imageId = @(littleEndian4BytesToUInt32(data));
             break;
         case 0x0004:
             entry.title = keePassDataToString(data);

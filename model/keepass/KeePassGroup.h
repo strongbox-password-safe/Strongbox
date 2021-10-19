@@ -20,19 +20,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithContext:(XmlProcessingContext*)context;
 - (instancetype)initAsKeePassRoot:(XmlProcessingContext*)context;
 
-@property (nonatomic) NSMutableArray<id<KeePassGroupOrEntry>>* groupsAndEntries;
-@property (nonatomic) NSString* name;
 @property (nonatomic) NSUUID* uuid;
+@property (nonatomic) NSString* name;
+@property (nonatomic, nullable) NSString* notes; 
 @property (nonatomic, nullable) NSNumber* icon;
 @property (nonatomic, nullable) NSUUID* customIcon;
 @property (nonatomic) Times* times;
-@property (nonatomic, nullable) CustomData* customData;
-@property (nonatomic, nullable) NSString* notes; 
+@property BOOL isExpanded;
 @property (nonatomic, nullable) NSString* defaultAutoTypeSequence; 
 @property (nonatomic, nullable) NSNumber* enableAutoType; 
 @property (nonatomic, nullable) NSNumber* enableSearching; 
 @property (nonatomic, nullable) NSUUID* lastTopVisibleEntry; 
-@property BOOL isExpanded;
+@property (nonatomic, nullable) CustomData* customData;
+@property (nonatomic) NSMutableArray<id<KeePassGroupOrEntry>>* groupsAndEntries;
 
 
 

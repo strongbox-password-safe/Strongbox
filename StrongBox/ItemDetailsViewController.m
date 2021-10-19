@@ -45,6 +45,7 @@
 #import "NSDate+Extensions.h"
 #import "AsyncUpdateResultViewController.h"
 #import <MobileCoreServices/MobileCoreServices.h>
+#import "MarkdownCell.h"
 
 #ifndef IS_APP_EXTENSION
 
@@ -56,6 +57,7 @@
 
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
+
 
 
 static NSInteger const kSimpleFieldsSectionIdx = 0;
@@ -85,6 +87,8 @@ static NSString* const kIconTableCell = @"IconTableCell";
 static NSString* const kTotpCell = @"TotpCell";
 static NSString* const kEditDateCell = @"EditDateCell";
 static NSString* const kTagsViewCellId = @"TagsViewCell";
+static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
+
 
 
 
@@ -423,7 +427,12 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
     [self.tableView registerNib:[UINib nibWithNibName:kTotpCell bundle:nil] forCellReuseIdentifier:kTotpCell];
     [self.tableView registerNib:[UINib nibWithNibName:kEditDateCell bundle:nil] forCellReuseIdentifier:kEditDateCell];
     [self.tableView registerNib:[UINib nibWithNibName:kTagsViewCellId bundle:nil] forCellReuseIdentifier:kTagsViewCellId];
+    [self.tableView registerNib:[UINib nibWithNibName:kMarkdownNotesCellId bundle:nil] forCellReuseIdentifier:kMarkdownNotesCellId];
 
+    if (@available(iOS 15.0, *)) {
+        [self.tableView setSectionHeaderTopPadding:4.0f];
+    }
+    
     self.tableView.estimatedRowHeight = UITableViewAutomaticDimension;
     self.tableView.rowHeight = UITableViewAutomaticDimension;
     self.tableView.tableFooterView = [UIView new];
@@ -448,6 +457,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
                     self.model = self.preEditModelClone;
                     
                     if(self.createNewItem) {
+                        [SafesList.sharedInstance setEditing:self.databaseModel.metadata editing:NO];
+
                         if(self.splitViewController) {
                             if(self.splitViewController.isCollapsed) { 
                                 [self.navigationController.navigationController popViewControllerAnimated:YES];
@@ -468,6 +479,8 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         }
         else {
             if(self.createNewItem) {
+                [SafesList.sharedInstance setEditing:self.databaseModel.metadata editing:NO];
+
                 if(self.splitViewController) {
                     if(self.splitViewController.isCollapsed) { 
                         [self.navigationController.navigationController popViewControllerAnimated:YES];
@@ -649,13 +662,13 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         return NSLocalizedString(@"item_details_section_header_notes", @"Notes");
     }
     else if (section == kAttachmentsSectionIdx) {
-        return NSLocalizedString(@"item_details_section_header_attachments", @"Attachments");
+        return self.isAutoFillContext ? nil : NSLocalizedString(@"item_details_section_header_attachments", @"Attachments");
     }
     else if (section == kMetadataSectionIdx) {
-        return NSLocalizedString(@"item_details_section_header_metadata", @"Metadata");
+        return self.isAutoFillContext ? nil : NSLocalizedString(@"item_details_section_header_metadata", @"Metadata");
     }
     else if (section == kOtherSectionIdx) {
-        return NSLocalizedString(@"item_details_section_header_history", @"History");
+        return self.isAutoFillContext ? nil : NSLocalizedString(@"item_details_section_header_history", @"History");
     }
     else {
         return @"<Unknown Section>";
@@ -1064,31 +1077,6 @@ static NSString* const kTagsViewCellId = @"TagsViewCell";
         
     return [NodeIconHelper getNodeIcon:self.model.icon predefinedIconSet:self.databaseModel.metadata.keePassIconSet format:self.databaseModel.database.originalFormat];
 }
-
-#ifndef IS_APP_EXTENSION
-
-- (void)onChangeIcon {
-    self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIcons = self.databaseModel.database.iconPool;
-    
-    NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
-    
-    [self.sni changeIcon:self
-                    node:self.itemId ? [self.databaseModel.database getItemById:self.itemId] : [self createNewEntryNode] 
-             urlOverride:urlHint
-                  format:self.databaseModel.database.originalFormat
-          keePassIconSet:self.databaseModel.metadata.keePassIconSet
-              completion:^(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selected) {
-        if ( goNoGo ) {
-            self.model.icon = selected ? selected.allValues.firstObject : nil;
-            self.iconExplicitlyChanged = YES;
-            [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]] withRowAnimation:UITableViewRowAnimationAutomatic];
-            [self onModelEdited];
-        }
-    }];
-}
-
-#endif
 
 
 
@@ -1503,7 +1491,6 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
 - (void)fetchFavIcon:(Node*)item completion:(void (^)(void))completion {
     self.sni = [[SetNodeIconUiHelper alloc] init];
-    self.sni.customIcons = self.databaseModel.database.iconPool;
     
     [self.sni expressDownloadBestFavIcon:self.model.url
                               completion:^(UIImage * _Nullable favIcon) {
@@ -1514,6 +1501,27 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
                           completion();
                       }];
+}
+
+- (void)onChangeIcon {
+    self.sni = [[SetNodeIconUiHelper alloc] init];
+    self.sni.customIcons = self.databaseModel.database.iconPool;
+    
+    NSString* urlHint = self.model.url.length ? self.model.url : self.model.title;
+    
+    [self.sni changeIcon:self
+                    node:self.itemId ? [self.databaseModel.database getItemById:self.itemId] : [self createNewEntryNode]
+             urlOverride:urlHint
+                  format:self.databaseModel.database.originalFormat
+          keePassIconSet:self.databaseModel.metadata.keePassIconSet
+              completion:^(BOOL goNoGo, BOOL isRecursiveGroupFavIconResult, NSDictionary<NSUUID *,NodeIcon *> * _Nullable selected) {
+        if ( goNoGo ) {
+            self.model.icon = selected ? selected.allValues.firstObject : nil;
+            self.iconExplicitlyChanged = YES;
+            [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:kRowTitleAndIcon inSection:kSimpleFieldsSectionIdx]] withRowAnimation:UITableViewRowAnimationAutomatic];
+            [self onModelEdited];
+        }
+    }];
 }
 
 #endif
@@ -1542,8 +1550,6 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
         [item.fields.keePassHistory addObject:originalNodeForHistory];
     }
 }
-
-#ifndef IS_APP_EXTENSION
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if(self.editing) {
@@ -1576,7 +1582,6 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
     return header;
 }
-#endif
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if(self.editing) {
@@ -1740,7 +1745,10 @@ suggestionProvider:^NSString * _Nullable(NSString * _Nonnull text) {
         
         cell.colorize = self.databaseModel.metadata.colorizePasswords;
         cell.parentVc = self;
+        
+        cell.concealPassword = self.passwordConcealedInUi; 
         cell.password = self.model.password;
+        
         cell.onPasswordEdited = ^(NSString * _Nonnull password) {
             weakSelf.model.password = trim(password);
             [weakSelf onModelEdited];
@@ -1907,25 +1915,39 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (UITableViewCell*)getNotesCell:(NSIndexPath*)indexPath {
-    NotesTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kNotesCellId forIndexPath:indexPath];
-
     __weak ItemDetailsViewController* weakSelf = self;
-    
-    [cell setNotes:[self maybeDereference:self.model.notes]
-          editable:self.editing
-   useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
-    
-    cell.onNotesEdited = ^(NSString * _Nonnull notes) {
-        weakSelf.model.notes = notes;
-        [weakSelf onModelEdited];
-    };
-    
-    cell.onNotesDoubleTap = ^{
-        [weakSelf copyToClipboard:weakSelf.model.notes
-                          message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
-    };
 
-    return cell;
+    if ( self.editing || self.databaseModel.metadata.easyReadFontForAll || !AppPreferences.sharedInstance.markdownNotes ) {
+        NotesTableViewCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kNotesCellId forIndexPath:indexPath];
+        
+        [cell setNotes:[self maybeDereference:self.model.notes]
+              editable:self.editing
+       useEasyReadFont:self.databaseModel.metadata.easyReadFontForAll];
+        
+        cell.onNotesEdited = ^(NSString * _Nonnull notes) {
+            weakSelf.model.notes = notes;
+            [weakSelf onModelEdited];
+        };
+        
+        cell.onNotesDoubleTap = ^{
+            [weakSelf copyToClipboard:weakSelf.model.notes
+                              message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
+        };
+
+        return cell;
+    }
+    else {        
+        MarkdownCell* cell = [self.tableView dequeueReusableCellWithIdentifier:kMarkdownNotesCellId forIndexPath:indexPath];
+
+        [cell setNotes:[self maybeDereference:self.model.notes]];
+
+        cell.onNotesDoubleTap = ^{
+            [weakSelf copyToClipboard:weakSelf.model.notes
+                              message:NSLocalizedString(@"item_details_notes_copied", @"Notes Copied")];
+        };
+
+        return cell;
+    }
 }
 
 - (UITableViewCell*)getCustomFieldCell:(NSIndexPath*)indexPath {
@@ -2018,8 +2040,7 @@ suggestionProvider:^NSString*(NSString *text) {
             cell.image.image = [UIImage imageNamed:@"document"];
 
             if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
-                NSInputStream* attStream = [attachment getPlainTextInputStream];
-                NSData* data = [NSData dataWithContentsOfStream:attStream];
+                NSData* data = attachment.nonPerformantFullData; 
                 UIImage* img = [UIImage imageWithData:data];
                 if(img) {
                     @autoreleasepool { 
@@ -2045,8 +2066,7 @@ suggestionProvider:^NSString*(NSString *text) {
             cell.detailTextLabel.text = friendlyFileSizeString(filesize);
            
             if (attachment.length < kMaxAttachmentTableviewIconImageSize) {
-                NSInputStream* attStream = [attachment getPlainTextInputStream];
-                NSData* data = [NSData dataWithContentsOfStream:attStream];
+                NSData* data = attachment.nonPerformantFullData; 
                 UIImage* img = [UIImage imageWithData:data];
 
                 if(img) { 
@@ -2152,6 +2172,14 @@ suggestionProvider:^NSString*(NSString *text) {
         }
         else if (indexPath.row == kRowEmail) {
             [self showLargeText:self.model.email colorize:NO];
+        }
+        else if ( indexPath.row == kRowTotp ) {
+            if ( self.model.totp ) {
+                NSURL* url = [self.model.totp url:YES];
+                if ( url ) {
+                    [self showLargeText:url.absoluteString colorize:NO];
+                }
+            }
         }
         else if (indexPath.row >= kSimpleRowCount) { 
             NSUInteger idx = indexPath.row - kSimpleRowCount;
@@ -2352,7 +2380,7 @@ suggestionProvider:^NSString*(NSString *text) {
 }
 
 - (void)updateAndSync:(BOOL)allowAsync synchronousCompletion:(void (^)(BOOL synchronousUpdateCompleted))synchronousCompletion {
-    if ( AppPreferences.sharedInstance.useBackgroundUpdates && allowAsync) {
+    if ( allowAsync) {
         [self.databaseModel asyncUpdateAndSync];
 
         [self updateSyncBarButtonItemState]; 

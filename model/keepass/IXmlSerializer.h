@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)endElement;
 
+@property (readonly, nullable) NSError* streamError;
+
 @end
 
 NS_ASSUME_NONNULL_END
