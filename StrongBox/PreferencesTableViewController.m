@@ -25,6 +25,8 @@
 #import "DebugHelper.h"
 #import "BiometricsManager.h"
 #import "ClipboardManager.h"
+#import "CustomizationManager.h"
+#import "Strongbox-Swift.h"
 
 @interface PreferencesTableViewController ()
 
@@ -57,6 +59,7 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellAdversaryStrength;
 @property (weak, nonatomic) IBOutlet UILabel *labelAdversary;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellUseICloud;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellTipJar;
 
 @end
 
@@ -81,6 +84,14 @@
         self.navigationController.navigationBar.prefersLargeTitles = YES;
         self.navigationItem.largeTitleDisplayMode = UINavigationItemLargeTitleDisplayModeAlways;
         [self.navigationController.navigationBar sizeToFit];
+    }
+    
+    if ( CustomizationManager.isScotusEdition || CustomizationManager.isGrapheneEdition ) {
+        [self cell:self.cellTipJar setHidden:YES];
+    }
+    else {
+        
+        NSLog(@"Tips Loaded: [%hhd]", TipJarLogic.sharedInstance.isLoaded);
     }
     
     [self bindCloudSessions];
@@ -113,6 +124,9 @@
     }
     else if(cell == self.cellAboutVersion) {
         
+    }
+    else if ( cell == self.cellTipJar ) {
+        [self performSegueWithIdentifier:@"segueToTipJar" sender:nil];
     }
     else if(cell == self.cellAboutHelp) {
         [self onHelp];

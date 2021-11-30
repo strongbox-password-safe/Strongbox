@@ -10,20 +10,6 @@
 #import "SyncParameters.h"
 #import "SyncStatus.h"
 
-//#if TARGET_OS_IPHONE
-////    #import <UIKit/UIKit.h>
-//    #import "SafeMetaData.h"
-////    typedef UIViewController* VIEW_CONTROLLER_PTR;
-
-
-
-
-
-
-
-
-
-
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kSyncManagerDatabaseSyncStatusChanged;
@@ -49,6 +35,8 @@ NSString* syncResultToString(SyncAndMergeResult result);
 - (void)enqueueSyncForDatabaseId:(NSString*)databaseUuid
                       parameters:(SyncParameters*)parameters
                       completion:(SyncAndMergeCompletionBlock)completion;
+
+
 
 @end
 

@@ -10,6 +10,9 @@
 #import "PasswordGenerationConfig.h"
 #import "AutoFillNewRecordSettings.h"
 #import "FavIconDownloadOptions.h"
+#import "ApplicationPreferences.h"
+
+NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kTitleColumn;
 extern NSString* const kUsernameColumn;
@@ -23,8 +26,9 @@ extern NSString* const kAttachmentsColumn;
 extern NSString* const kCustomFieldsColumn;
 
 extern NSString *const kPreferenceGlobalShowShortcut;
+extern NSString *const kPreferencesChangedNotification;
 
-@interface Settings : NSObject
+@interface Settings : NSObject<ApplicationPreferences>
 
 + (instancetype)sharedInstance;
 
@@ -37,7 +41,7 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property (nonatomic, readonly) BOOL freeTrial;
 @property (nonatomic, readonly) NSInteger freeTrialDaysRemaining;
 @property (nonatomic, strong) NSDate* endFreeTrialDate;
-@property (readonly) BOOL isProOrFreeTrial;
+
 @property (readonly) BOOL isPro;
 @property (readonly) BOOL isFreeTrial;
 
@@ -49,8 +53,6 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property (readonly) BOOL dereferenceDuringSearch;
 @property BOOL floatOnTop;
 @property (readonly) NSString* easyReadFontName;
-
-@property PasswordGenerationConfig *passwordGenerationConfig;
 @property PasswordGenerationConfig *trayPasswordGenerationConfig;
 
 @property BOOL showSystemTrayIcon;
@@ -61,12 +63,14 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property BOOL colorizePasswords;
 @property BOOL colorizeUseColorBlindPalette;
 @property BOOL clipboardHandoff;
+
 @property BOOL showDatabasesManagerOnCloseAllWindows;
+
 @property BOOL showAutoFillTotpCopiedMessage;
 @property BOOL autoFillAutoLaunchSingleDatabase;
-@property BOOL useLegacyFileProvider;
+
 @property (nonatomic) BOOL autoSave;
-@property BOOL hasMigratedToSyncManager; 
+
 @property BOOL hideDockIconOnAllMinimized;
 @property BOOL clearClipboardEnabled;
 @property NSInteger clearClipboardAfterSeconds;
@@ -116,4 +120,19 @@ extern NSString *const kPreferenceGlobalShowShortcut;
 @property BOOL markdownNotes;
 @property BOOL showPasswordGenInTray;
 
+
+
+
+@property (nullable) NSData* duressDummyData;
+@property BOOL databasesAreAlwaysReadOnly;
+@property (nonatomic, strong) PasswordGenerationConfig* passwordGenerationConfig;
+@property (readonly) BOOL isProOrFreeTrial;
+@property PasswordStrengthConfig* passwordStrengthConfig;
+
+
+
+@property (readonly) BOOL runningAsATrayApp;
+
 @end
+
+NS_ASSUME_NONNULL_END

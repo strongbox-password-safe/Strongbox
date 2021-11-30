@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, readonly) uint64_t defaultMemory;
 @property (class, readonly) uint64_t defaultIterations;
 @property (class, readonly) uint32_t defaultParallelism;
+@property (class, readonly) uint64_t maxRecommendedMemory;
 
 @property (readonly) uint64_t memory;
 @property (readonly) uint64_t iterations;

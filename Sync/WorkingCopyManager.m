@@ -22,11 +22,14 @@
     return sharedInstance;
 }
 
-- (NSURL *)setWorkingCacheWithFile:(NSString *)file dateModified:(NSDate *)dateModified database:(NSString *)databaseUuid error:(NSError *__autoreleasing  _Nullable *)error {
+- (NSURL *)setWorkingCacheWithFile:(NSString *)file
+                      dateModified:(NSDate *)dateModified
+                          database:(NSString *)databaseUuid
+                             error:(NSError *__autoreleasing  _Nullable *)error {
     return [self setWorkingCache:file data:nil dateModified:dateModified database:databaseUuid error:error];
 }
 
-- (NSURL*)setWorkingCacheWithData2:(NSData*)data
+- (NSURL*)setWorkingCacheWithData:(NSData*)data
                      dateModified:(NSDate*)dateModified
                          database:(NSString*)databaseUuid
                             error:(NSError**)error {
@@ -49,7 +52,7 @@
     
     
     
-    NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase2:databaseUuid];
+    NSURL* localWorkingCacheUrl = [self getLocalWorkingCacheUrlForDatabase:databaseUuid];
     
     if ( file ) {
         NSURL* fileUrl = [NSURL fileURLWithPath:file];
@@ -85,8 +88,8 @@
     }
 }
 
-- (void)deleteLocalWorkingCache2:(NSString*)databaseUuid {
-    NSURL* localCache = [self getLocalWorkingCache2:databaseUuid];
+- (void)deleteLocalWorkingCache:(NSString*)databaseUuid {
+    NSURL* localCache = [self getLocalWorkingCache:databaseUuid];
     
     if (localCache) {
         NSError* error;
@@ -98,24 +101,24 @@
     }
 }
 
-- (BOOL)isLocalWorkingCacheAvailable2:(NSString*)databaseUuid modified:(NSDate**)modified {
-    return [self getLocalWorkingCache2:databaseUuid modified:modified] != nil;
+- (BOOL)isLocalWorkingCacheAvailable:(NSString*)databaseUuid modified:(NSDate**)modified {
+    return [self getLocalWorkingCache:databaseUuid modified:modified] != nil;
 }
 
-- (NSURL*)getLocalWorkingCacheUrlForDatabase2:(NSString*)databaseUuid {
+- (NSURL*)getLocalWorkingCacheUrlForDatabase:(NSString*)databaseUuid {
     return [FileManager.sharedInstance.syncManagerLocalWorkingCachesDirectory URLByAppendingPathComponent:databaseUuid];
 }
 
-- (NSURL*)getLocalWorkingCache2:(NSString*)databaseUuid {
-    return [self getLocalWorkingCache2:databaseUuid modified:nil];
+- (NSURL*)getLocalWorkingCache:(NSString*)databaseUuid {
+    return [self getLocalWorkingCache:databaseUuid modified:nil];
 }
 
-- (NSURL*)getLocalWorkingCache2:(NSString*)databaseUuid modified:(NSDate**)modified {
-    return [self getLocalWorkingCache2:databaseUuid modified:modified fileSize:nil];
+- (NSURL*)getLocalWorkingCache:(NSString*)databaseUuid modified:(NSDate**)modified {
+    return [self getLocalWorkingCache:databaseUuid modified:modified fileSize:nil];
 }
 
-- (NSURL*)getLocalWorkingCache2:(NSString*)databaseUuid modified:(NSDate**)modified fileSize:(unsigned long long*_Nullable)fileSize {
-    NSURL* url = [self getLocalWorkingCacheUrlForDatabase2:databaseUuid];
+- (NSURL*)getLocalWorkingCache:(NSString*)databaseUuid modified:(NSDate**)modified fileSize:(unsigned long long*_Nullable)fileSize {
+    NSURL* url = [self getLocalWorkingCacheUrlForDatabase:databaseUuid];
 
     NSError* error;
     NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];

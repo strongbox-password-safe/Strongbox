@@ -44,13 +44,20 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property BOOL hasBeenPromptedForQuickLaunch;
 
-@property (nonatomic) BOOL hasBeenPromptedForConvenience;
-@property (nonatomic) BOOL isEnrolledForConvenience; 
-@property (nonatomic, strong, nullable) NSString* convenienceMasterPassword;
-@property (nonatomic, strong, nullable) NSString* autoFillConvenienceAutoUnlockPassword;
+
+
+
+
+
+
+
+
+
+
+
+
 
 @property (nonatomic) BOOL isTouchIdEnabled;
-
 @property (nonatomic, strong, nullable) NSString* conveniencePin;
 @property (nonatomic, strong, nullable) NSString* duressPin;
 @property (nonatomic) DuressAction duressAction;
@@ -166,7 +173,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property OfflineDetectedBehaviour offlineDetectedBehaviour;
 @property CouldNotConnectBehaviour couldNotConnectBehaviour;
 
-@property NSInteger convenienceExpiryPeriod;
 @property BOOL showConvenienceExpiryMessage;
 @property BOOL hasShownInitialOnboardingScreen;
 @property BOOL convenienceExpiryOnboardingDone;
@@ -189,11 +195,33 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable) NSDate* databaseCreated;
 @property NSUInteger unlockCount;
 
-@property BOOL conveniencePasswordHasExpired;
 
 @property BOOL autoFillScanAltUrls;
 @property BOOL autoFillScanCustomFields;
 @property BOOL autoFillScanNotes;
+
+@property (nonatomic, strong, nullable) NSString* autoFillConvenienceAutoUnlockPassword;
+
+
+
+@property (nonatomic, readonly) BOOL isConvenienceUnlockEnabled; 
+@property BOOL conveniencePasswordHasExpired; 
+@property BOOL hasBeenPromptedForConvenience; 
+@property NSInteger convenienceExpiryPeriod; 
+@property (nonatomic, strong, nullable) NSString* convenienceMasterPassword; 
+
+@property (nonatomic) BOOL conveniencePasswordHasBeenStored; 
+
+- (void)triggerPasswordExpiry;
+
+
+
+@property BOOL autoFillConcealedFieldsAsCreds;
+@property BOOL autoFillUnConcealedFieldsAsCreds;
+@property BOOL argon2MemReductionDontAskAgain;
+@property (nullable) NSDate* lastAskedAboutArgon2MemReduction;
+@property BOOL kdbx4UpgradeDontAskAgain;
+@property (nullable) NSDate* lastAskedAboutKdbx4Upgrade;
 
 @end
 

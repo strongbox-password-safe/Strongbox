@@ -96,8 +96,7 @@
 }
 
 - (IBAction)onAdd:(id)sender {
-    NSInteger count = SafesList.sharedInstance.snapshot.count;
-    self.onDone(count == 0, nil);
+    self.onDone(YES, nil);
 }
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {

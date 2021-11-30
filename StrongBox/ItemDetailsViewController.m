@@ -55,6 +55,8 @@
 
 #endif
 
+#import "SafesList.h"
+
 NSString *const CellHeightsChangedNotification = @"ConfidentialTableCellViewHeightChangedNotification";
 NSString *const kNotificationNameItemDetailsEditDone = @"kNotificationModelEdited";
 
@@ -125,7 +127,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
 
 
 
-@implementation ItemDetailsViewController 
+@implementation ItemDetailsViewController
 
 + (NSArray<NSNumber*>*)defaultCollapsedSections {
    return @[@(0), @(0), @(0), @(0), @(1), @(1)];
@@ -1104,6 +1106,8 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
                   fourthButtonText:NSLocalizedString(@"item_details_setup_totp_manual_steam", @"Manual (Steam Token)...")
                             action:^(int response) {
         if(response == 0){
+#ifndef IS_READ_ONLY_BUILD
+            
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
             vc.modalPresentationStyle = UIModalPresentationFormSheet;
             
@@ -1115,6 +1119,7 @@ static NSString* const kMarkdownNotesCellId = @"MarkdownNotesTableViewCell";
             };
             
             [self presentViewController:vc animated:YES completion:nil];
+#endif
         }
         else if(response == 1) {
             [self scanPhotoLibraryImageForQRCode];
@@ -1285,7 +1290,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
     [metadata addObject:[ItemMetadataEntry entryWithKey:@"ID" value:keePassStringIdFromUuid(item.uuid) copyable:YES]];
 
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_created_field_title", @"Created")
-                                                  value:item.fields.created ? item.fields.created.friendlyDateTimeString : @""
+                                                  value:item.fields.created ? item.fields.created.friendlyDateTimeStringPrecise : @""
                                                copyable:NO]];
     
 
@@ -1293,7 +1298,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *
 
 
     [metadata addObject:[ItemMetadataEntry entryWithKey:NSLocalizedString(@"item_details_metadata_modified_field_title", @"Modified")
-                                                  value:item.fields.modified ? item.fields.modified.friendlyDateTimeString : @""
+                                                  value:item.fields.modified ? item.fields.modified.friendlyDateTimeStringPrecise : @""
                                                copyable:NO]];
         
 

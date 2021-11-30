@@ -43,16 +43,25 @@ BOOL _migrationInProcessDoNotUpdateSafesCollection;
 }
 
 - (BOOL)fastAvailabilityTest {
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        return NO;
+    }
+    
     return NSFileManager.defaultManager.ubiquityIdentityToken != nil;
 }
 
 - (void)initializeiCloudAccess {
+    if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
+        AppPreferences.sharedInstance.iCloudAvailable = NO;
+        return;
+    }
+    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         _iCloudRoot = [[NSFileManager defaultManager] URLForUbiquityContainerIdentifier:kStrongboxICloudContainerIdentifier];
         
         BOOL available = (_iCloudRoot != nil);
         
-
+        NSLog(@"iCloud Initialization Done: Available = [%d]", available);
         AppPreferences.sharedInstance.iCloudAvailable = available;
     });
 }

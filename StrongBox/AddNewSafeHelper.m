@@ -43,12 +43,27 @@ const DatabaseFormat kDefaultFormat = kKeePass4;
         return;
     }
     
+    [AddNewSafeHelper createNewExpressDatabase:vc name:name model:database forceLocal:forceLocal completion:completion];
+}
+
++ (void)createNewExpressDatabase:(UIViewController *)vc
+                            name:(NSString *)name
+                           model:(DatabaseModel *)model
+                      completion:(void (^)(BOOL, SafeMetaData * _Nonnull, NSData * _Nonnull, NSError * _Nonnull))completion {
+    [AddNewSafeHelper createNewExpressDatabase:vc name:name model:model forceLocal:NO completion:completion];
+}
+
++ (void)createNewExpressDatabase:(UIViewController*)vc
+                            name:(NSString *)name
+                           model:(DatabaseModel *)model
+                      forceLocal:(BOOL)forceLocal
+                      completion:(void (^)(BOOL userCancelled, SafeMetaData* metadata, NSData* initialSnapshot, NSError* error))completion {
     BOOL iCloud = !forceLocal && AppPreferences.sharedInstance.iCloudOn && iCloudSafesCoordinator.sharedInstance.fastAvailabilityTest;
     
     [AddNewSafeHelper createDatabase:vc
                                 name:name
                      keyFileBookmark:nil
-                            database:database
+                            database:model
                             provider:iCloud ? AppleICloudProvider.sharedInstance : LocalDeviceStorageProvider.sharedInstance
                         parentFolder:nil
                        yubiKeyConfig:nil
@@ -137,14 +152,13 @@ static DatabaseModel* getNewDatabase(NSString* password,
                                      YubiKeyHardwareConfiguration *yubiConfig,
                                      DatabaseFormat format,
                                      NSError** error) {
-    NSData* keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
-                                             onceOffKeyFileData:onceOffKeyFileData
-                                                    streamLarge:AppPreferences.sharedInstance.streamReadLargeKeyFiles
-                                                         format:format
-                                                          error:error];
+    NSData* keyFileDigest = nil;
+    if ( keyFileBookmark || onceOffKeyFileData ) {
+        keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark onceOffKeyFileData:onceOffKeyFileData format:format error:error];
     
-    if ( *error ) {
-        return nil;
+        if ( *error ) {
+            return nil;
+        }
     }
     
     CompositeKeyFactors* ckf;
@@ -152,11 +166,7 @@ static DatabaseModel* getNewDatabase(NSString* password,
         ckf = [CompositeKeyFactors password:password
                               keyFileDigest:keyFileDigest
                                   yubiKeyCR:^(NSData * _Nonnull challenge, YubiKeyCRResponseBlock  _Nonnull completion) {
-            #ifndef IS_APP_EXTENSION
-            [YubiManager.sharedInstance getResponse:yubiConfig
-                                          challenge:challenge
-                                         completion:completion];
-            #endif
+            [YubiManager.sharedInstance getResponse:yubiConfig challenge:challenge completion:completion];
         }];
     }
     else {

@@ -21,7 +21,7 @@
 #import "ClipboardManager.h"
 #import "SyncManager.h"
 #import "Model.h"
-#import "CompositeKeyDeterminer.h"
+#import "IOSCompositeKeyDeterminer.h"
 #import "DatabaseUnlocker.h"
 #import "DuressActionHelper.h"
 #import "WorkingCopyManager.h"
@@ -54,12 +54,12 @@
     if ( database ) {
         NSLog(@"provideCredentialWithoutUserInteractionForIdentity - Got DB");
         
-        CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self
-                                                                                            database:database
-                                                                                      isAutoFillOpen:YES
-                                                                             isAutoFillQuickTypeOpen:YES
-                                                                                 biometricPreCleared:NO
-                                                                                 noConvenienceUnlock:NO];
+        IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self
+                                                                                                  database:database
+                                                                                            isAutoFillOpen:YES
+                                                                                   isAutoFillQuickTypeOpen:YES
+                                                                                       biometricPreCleared:NO
+                                                                                       noConvenienceUnlock:NO];
         if ( keyDeterminer.isAutoFillConvenienceAutoLockPossible ) {
             NSLog(@"provideCredentialWithoutUserInteractionForIdentity - Within Timeout - Filling without UI");
             [self unlockDatabaseForQuickType:database identifier:identifier];
@@ -159,7 +159,7 @@
 }
 
 - (void)unlockDatabaseForQuickType:(SafeMetaData*)safe identifier:(QuickTypeRecordIdentifier*)identifier {
-    CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:YES biometricPreCleared:NO noConvenienceUnlock:NO];
+    IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:YES biometricPreCleared:NO noConvenienceUnlock:NO];
     [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
             AppPreferences.sharedInstance.autoFillExitedCleanly = NO; 
@@ -226,7 +226,7 @@
     Node* node = [model.database getItemById:uuid];
     
     if ( node ) {
-        [self exitWithCredential:model item:node];
+        [self exitWithCredential:model item:node quickTypeIdentifier:identifier];
     }
     else {
         [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
@@ -258,7 +258,7 @@
         return NO;
     }
         
-    return [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable2:safeMetaData.uuid modified:nil];
+    return [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safeMetaData.uuid modified:nil];
 }
 
 - (NSArray<ASCredentialServiceIdentifier *> *)getCredentialServiceIdentifiers {
@@ -312,10 +312,25 @@
 }
 
 - (void)exitWithCredential:(Model*)model item:(Node*)item {
+    [self exitWithCredential:model item:item quickTypeIdentifier:nil];
+}
+
+- (void)exitWithCredential:(Model*)model item:(Node*)item quickTypeIdentifier:(QuickTypeRecordIdentifier*)quickTypeIdentifier {
     NSString* user = [model.database dereference:item.fields.username node:item];
-    NSString* password = [model.database dereference:item.fields.password node:item];
+    
+    NSString* password = @"";
 
-
+    if ( quickTypeIdentifier && quickTypeIdentifier.fieldKey ) {
+        StringValue* sv = item.fields.customFields[quickTypeIdentifier.fieldKey];
+        if ( sv ) {
+            password = sv.value;
+        }
+    }
+    else {
+        password = [model.database dereference:item.fields.password node:item];
+    }
+    
+    password = password ? password : @"";
 
     
     

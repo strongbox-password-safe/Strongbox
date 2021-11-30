@@ -10,6 +10,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// NB: Do not rename class is stored in NSCoding for config...
+
 @interface YubiKeyConfiguration : NSObject
 
 @property NSString* deviceSerial;

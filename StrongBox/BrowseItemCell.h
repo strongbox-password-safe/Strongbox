@@ -19,6 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
           italic:(BOOL)italic
    groupLocation:(NSString*)groupLocation
            flags:(NSArray<UIImage*>*)flags
+  flagTintColors:(NSDictionary<NSNumber*, UIColor*> *_Nullable)flagTintColors
         hideIcon:(BOOL)hideIcon;
 
 - (void)setGroup:(NSString *)title
@@ -28,6 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
    groupLocation:(NSString*)groupLocation
        tintColor:(UIColor* _Nullable )tintColor
            flags:(NSArray<UIImage*>*)flags
+  flagTintColors:(NSDictionary<NSNumber*, UIColor*> *_Nullable)flagTintColors
         hideIcon:(BOOL)hideIcon;
 
 - (void)setRecord:(NSString*)title

@@ -14,8 +14,6 @@ extern NSString* const kDatabasesListViewForceRefreshNotification;
 
 @interface DatabasesManagerVC : NSViewController
 
-+ (void)show;
-
 @end
 
 NS_ASSUME_NONNULL_END

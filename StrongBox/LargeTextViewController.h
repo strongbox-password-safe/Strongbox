@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface LargeTextViewController : UIViewController
 
++ (instancetype)fromStoryboard;
+
 @property NSString* string;
 @property BOOL colorize;
 

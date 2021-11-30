@@ -15,18 +15,17 @@
 #import "CHCSVParser.h"
 #import "DatabasesManager.h"
 #import "BiometricIdHelper.h"
-#import "PreferencesWindowController.h"
 #import "Csv.h"
 #import "AttachmentItem.h"
 #import "CustomField.h"
 #import "Entry.h"
 #import "KeyFileParser.h"
-#import "ProgressWindow.h"
+
 #import "SelectPredefinedIconController.h"
 #import "MacKeePassHistoryViewController.h"
 #import "NodeIconHelper.h"
 #import "OTPToken+Generation.h"
-#import "MBProgressHUD.h"
+
 #import "CustomFieldTableCellView.h"
 #import "SearchScope.h"
 #import <WebKit/WebKit.h>
@@ -37,7 +36,7 @@
 #import "ClipboardManager.h"
 #import "BookmarksHelper.h"
 #import "DatabaseSettingsTabViewController.h"
-#import "MacYubiKeyManager.h"
+#import "MacHardwareKeyManager.h"
 #import "ColoredStringHelper.h"
 #import "NSString+Extensions.h"
 #import "FileManager.h"
@@ -57,13 +56,14 @@
 #import "PasswordStrengthTester.h"
 #import "StrongboxErrorCodes.h"
 #import "DatabaseFormatIncompatibilityHelper.h"
+#import "macOSSpinnerUI.h"
+#import "MBProgressHUD.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
 #else
 #import "Strongbox_Auto_Fill-Swift.h"
 #endif
-
 
 
 
@@ -155,8 +155,6 @@ static NSString* const kNewEntryKey = @"newEntry";
 
 @property BOOL hasUILoaded;
 @property BOOL hasDocumentLoaded;
-
-@property ProgressWindow* progressWindow;
 
 @property (weak) IBOutlet NSTextField *labelStrength;
 @property (weak) IBOutlet NSProgressIndicator *progressStrength;
@@ -406,11 +404,11 @@ static NSString* const kNewEntryKey = @"newEntry";
         vc.newEntry = newEntry.boolValue;
         
         vc.onClosed = ^{
-            NSLog(@"Removing Details View from List: [%@]", item.title);
+
             [weakSelf.detailsViewControllers removeObjectForKey:item.uuid];
         };
                 
-        NSLog(@"Adding Details View to List: [%@]", item.title);
+
         
         self.detailsViewControllers[item.uuid] = vc;
     }
@@ -429,12 +427,6 @@ static NSString* const kNewEntryKey = @"newEntry";
         
         vc.model = self.viewModel;
         vc.history = item.fields.keePassHistory;
-    }
-    else if([segue.identifier isEqualToString:@"segueToDatabasePreferences"]) {
-        DatabaseSettingsTabViewController *vc = (DatabaseSettingsTabViewController*)segue.destinationController;
-        
-        NSNumber* tab = (NSNumber*)sender;
-        [vc setModel:self.viewModel initialTab:tab.intValue];
     }
     else if ([segue.identifier isEqualToString:@"segueToDatabaseOnboarding"]) {
         DatabaseOnboardingTabViewController *vc = (DatabaseOnboardingTabViewController*)segue.destinationController;
@@ -1592,25 +1584,16 @@ static NSString* const kNewEntryKey = @"newEntry";
 }
 
 - (void)showProgressModal:(NSString*)operationDescription {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ( self.progressWindow ) {
-            [self.progressWindow hide];
-        }
-        
-        if ( self.view.window.isMiniaturized ) {
-            NSLog(@"Not showing Progress Modal because miniaturized...");
-            return; 
-        }
-        
-        self.progressWindow = [ProgressWindow newProgress:operationDescription];
-        [self.view.window beginSheet:self.progressWindow.window completionHandler:nil];
-    });
+    if ( self.view.window.isMiniaturized ) {
+        NSLog(@"Not showing Progress Modal because miniaturized...");
+        return;
+    }
+    
+    [macOSSpinnerUI.sharedInstance show:operationDescription viewController:self];
 }
 
 - (void)hideProgressModal {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.progressWindow hide];
-    });
+    [macOSSpinnerUI.sharedInstance dismiss];
 }
 
 
@@ -1682,7 +1665,10 @@ static NSString* const kNewEntryKey = @"newEntry";
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             [self.document revertWithUnlock:compositeKeyFactors
                              viewController:self
-                                completion:^(BOOL success, NSError * _Nullable error) {
+                            fromConvenience:isBiometricOpen
+                                 completion:^(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError * _Nonnull error) {
+                
+                
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (!success) {
                         NSString* loc = NSLocalizedString(@"mac_could_not_unlock_database", @"Could Not Unlock Database");
@@ -1705,17 +1691,16 @@ static NSString* const kNewEntryKey = @"newEntry";
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
     BOOL convenienceAvailable = watchAvailable || touchAvailable;
-    BOOL convenienceEnabled = self.databaseMetadata.isTouchIdEnabled || self.databaseMetadata.isWatchUnlockEnabled;
-    
     BOOL convenienceIsPossible = convenienceAvailable && featureAvailable;
-    BOOL shouldPromptForBiometricEnrol = convenienceIsPossible && !databaseMetadata.hasPromptedForTouchIdEnrol && !convenienceEnabled;
+
+    BOOL shouldPromptForBiometricEnrol = convenienceIsPossible && !databaseMetadata.hasPromptedForTouchIdEnrol;
     
     BOOL autoFillAvailable = NO;
     if ( @available(macOS 11.0, *) ) {
         autoFillAvailable = YES;
     }
     
-    BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !databaseMetadata.autoFillEnabled && !databaseMetadata.hasPromptedForAutoFillEnrol;
+    BOOL shouldPromptForAutoFillEnrol = featureAvailable && autoFillAvailable && !databaseMetadata.hasPromptedForAutoFillEnrol;
     
     if(shouldPromptForBiometricEnrol || shouldPromptForAutoFillEnrol) {
         [self onboardForBiometricsAndOrAutoFill:shouldPromptForBiometricEnrol
@@ -1801,16 +1786,16 @@ static NSString* const kNewEntryKey = @"newEntry";
     [self.viewModel setCompositeKeyFactors:ckf];
 
     DatabaseMetadata* md = self.databaseMetadata;
-        
-    [md resetConveniencePasswordWithCurrentConfiguration:ckf.password];
+    md.conveniencePassword = ckf.password;
     
     [DatabasesManager.sharedInstance atomicUpdate:md.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        if(self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile) {
+        if ( self.changeMasterPassword.selectedKeyFileBookmark && !Settings.sharedInstance.doNotRememberKeyFile ) {
             metadata.keyFileBookmark = self.changeMasterPassword.selectedKeyFileBookmark;
         }
         else {
             metadata.keyFileBookmark = nil;
         }
+        
         metadata.yubiKeyConfiguration = self.changeMasterPassword.selectedYubiKeyConfiguration;
     }];
 }
@@ -1832,13 +1817,15 @@ static NSString* const kNewEntryKey = @"newEntry";
             [self.view.window beginSheet:self.changeMasterPassword.window
                        completionHandler:^(NSModalResponse returnCode) {
                 if(returnCode == NSModalResponseOK) {
-                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelected:self.view.window];
-                    if (ckf) {
+                    NSError* error;
+                    CompositeKeyFactors* ckf = [self.changeMasterPassword generateCkfFromSelected:nil error:&error];
+                    
+                    if ( ckf ) {
                         [self changeMasterCredentials:ckf];
                     }
                     else {
                         NSString* loc = NSLocalizedString(@"mac_error_could_not_generate_composite_key", @"Could not generate Composite Key");
-                        [MacAlerts info:loc window:self.view.window];
+                        [MacAlerts error:loc error:error window:self.view.window];
                     }
                 }
                 
@@ -2504,103 +2491,32 @@ static NSString* const kNewEntryKey = @"newEntry";
     [self.viewModel launchUrl:item];
 }
 
-- (IBAction)onGeneralDatabaseSettings:(id)sender {
-    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(0)];
-}
-
-- (IBAction)onConvenienceUnlockProperties:(id)sender {
-    [self performSegueWithIdentifier:@"segueToDatabasePreferences" sender:@(1)];
-}
-
-- (IBAction)onCopyAsCsv:(id)sender {
-    [[NSPasteboard generalPasteboard] clearContents];
-    
-    NSString *newStr = [[NSString alloc] initWithData:[Csv getSafeAsCsv:self.viewModel.database] encoding:NSUTF8StringEncoding];
-    
-    [[NSPasteboard generalPasteboard] setString:newStr forType:NSStringPboardType];
-}
-
-- (NSURL*)getFileThroughFileOpenDialog {  
-    NSOpenPanel * panel = [NSOpenPanel openPanel];
-    
-    NSString* loc = NSLocalizedString(@"mac_choose_csv_file_import", @"Choose CSV file to Import");
-    [panel setTitle:loc];
-    [panel setAllowsMultipleSelection:NO];
-    [panel setCanChooseDirectories:NO];
-    [panel setCanChooseFiles:YES];
-    [panel setFloatingPanel:NO];
-    [panel setDirectoryURL:[NSURL fileURLWithPath:NSHomeDirectory()]];
-     panel.allowedFileTypes = @[@"csv"];
-
-    NSInteger result = [panel runModal];
-    if(result == NSModalResponseOK)
-    {
-        return [[panel URLs] firstObject];
+- (IBAction)onExportAsCsv:(id)sender { 
+    NSData* data = [Csv getSafeAsCsv:self.viewModel.database];
+    if ( !data ) {
+        [MacAlerts error:nil window:self.view.window];
+        return;
     }
     
-    return nil;
-}
-
-- (IBAction)onImportFromCsvFile:(id)sender {
-    NSString* loc = NSLocalizedString(@"mac_csv_file_must_contain_header_and_fields", @"The CSV file must contain a header row with at least one of the following fields:\n\n[%@, %@, %@, %@, %@, %@]\n\nThe order of the fields doesn't matter.");
-
-    NSString* message = [NSString stringWithFormat:loc, kCSVHeaderTitle, kCSVHeaderUsername, kCSVHeaderEmail, kCSVHeaderPassword, kCSVHeaderUrl, kCSVHeaderNotes];
-   
-    loc = NSLocalizedString(@"mac_csv_format_info_title", @"CSV Format");
+    NSSavePanel* savePanel = NSSavePanel.savePanel;
+    savePanel.nameFieldStringValue = [NSString stringWithFormat:@"%@.csv", [self exportFileName]];
     
-    [MacAlerts info:loc
- informativeText:message
-          window:self.view.window
-      completion:^{
-        dispatch_async(dispatch_get_main_queue(), ^{[self importFromCsvFile];});
-    }];
-}
-
-- (void)importFromCsvFile {
-    NSURL* url = [self getFileThroughFileOpenDialog];
-        
-    if(url) {
-        NSError *error = nil;
-        NSArray *rows = [NSArray arrayWithContentsOfCSVURL:url options:CHCSVParserOptionsSanitizesFields | CHCSVParserOptionsUsesFirstLineAsKeys];
-        
-        if (rows == nil) {
-            
-            NSLog(@"error parsing file: %@", error);
+    if ( [savePanel runModal] == NSModalResponseOK ) {
+        NSURL* url = savePanel.URL;
+        NSError* error;
+        if (! [data writeToFile:url.path options:kNilOptions error:&error] ) {
             [MacAlerts error:error window:self.view.window];
-            return;
-        }
-        else if(rows.count == 0){
-            NSString* loc = NSLocalizedString(@"mac_csv_file_contains_zero_rows", @"CSV File Contains Zero Rows. Cannot Import.");
-            [MacAlerts info:loc window:self.view.window];
-        }
-        else {
-            CHCSVOrderedDictionary *firstRow = [rows firstObject];
-            
-            if([firstRow objectForKey:kCSVHeaderTitle] ||
-               [firstRow objectForKey:kCSVHeaderUsername] ||
-               [firstRow objectForKey:kCSVHeaderUrl] ||
-               [firstRow objectForKey:kCSVHeaderEmail] ||
-               [firstRow objectForKey:kCSVHeaderPassword] ||
-               [firstRow objectForKey:kCSVHeaderNotes]) {
-                NSString* loc = NSLocalizedString(@"mac_found_n_valid_rows_in_csv_file_prompt_to_import_fmt", @"Found %lu valid rows in CSV file. Are you sure you would like to import now?");
-                NSString* message = [NSString stringWithFormat:loc, (unsigned long)rows.count];
-                
-                [MacAlerts yesNo:message window:self.view.window completion:^(BOOL yesNo) {
-                    if(yesNo) {
-                        [self.viewModel importRecordsFromCsvRows:rows];
-
-                        NSString* loc = NSLocalizedString(@"mac_csv_file_successfully_imported", @"CSV File Successfully Imported.");
-                        [MacAlerts info:loc window:self.view.window];
-                    }
-                }];
-            }
-            else {
-                NSString* loc = NSLocalizedString(@"mac_no_valid_csv_rows_found", @"No valid rows found. Ensure CSV file contains a header row and at least one of the required fields.");
-
-                [MacAlerts info:loc window:self.view.window];
-            }
         }
     }
+}
+
+- (NSString*)exportFileName {
+    NSString* withoutExtension = [self.databaseMetadata.fileUrl.path.lastPathComponent stringByDeletingPathExtension];
+    NSString* newFileName = [withoutExtension stringByAppendingFormat:@"-%@", NSDate.date.fileNameCompatibleDateTime];
+    
+    NSLog(@"Export Filename: [%@]", newFileName);
+    
+    return  newFileName;
 }
 
 - (NSString *)formatDate:(NSDate *)date {
@@ -2976,11 +2892,17 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 - (IBAction)onClearTotp:(id)sender {
     Node *item = [self getCurrentSelectedItem];
     
-    if(item == nil || item.isGroup || !item.fields.otpToken) {
+    if(item == nil || item.isGroup || !item.fields.otpToken || self.viewModel.isEffectivelyReadOnly) {
         return;
     }
     
-    [self.viewModel clearTotp:item];
+    [MacAlerts areYouSure:NSLocalizedString(@"are_you_sure_clear_totp", @"Are you sure you want to clear the TOTP for this entry?")
+                   window:self.view.window
+               completion:^(BOOL response) {
+        if ( response ) {
+            [self.viewModel clearTotp:item];
+        }
+    }];
 }
 
 - (void)showPopupChangeToastNotification:(NSString*)message {
@@ -3175,6 +3097,8 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
 }
 
 - (void)onAutoFillWormholeMasterCredentialsRequest:(NSString*)databaseId {
+    NSLog(@"onAutoFillWormholeMasterCredentialsRequest: [%@]", databaseId );
+    
     if ( self.viewModel && !self.viewModel.locked && databaseId) {
         if (!self.databaseMetadata.quickWormholeFillEnabled ) {
             return;
@@ -3233,11 +3157,24 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             NSString* secretStoreId = NSUUID.UUID.UUIDString;
 
             if(node) {
+                NSString* password = @"";
 
-
+                if ( identifier.fieldKey ) {
+                    StringValue* sv = node.fields.customFields[identifier.fieldKey];
+                    if ( sv ) {
+                        password = sv.value;
+                    }
+                }
+                else {
+                    password = [model dereference:node.fields.password node:node];
+                }
+                
                 NSString* user = [model dereference:node.fields.username node:node];
-                NSString* password = [model dereference:node.fields.password node:node];
                 NSString* totp = node.fields.otpToken ? node.fields.otpToken.password : @"";
+                
+                password = password ? password : @"";
+                
+
                 
                 NSDictionary* securePayload = @{
                     @"user" : user,
@@ -3329,6 +3266,7 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             if ( localWasChanged ) {
                 NSLog(@"Sync successful and local was changed, reloading...");
                 [self.document reloadFromLocalWorkingCopy:self.viewModel.compositeKeyFactors
+                                           viewController:self
                                              selectedItem:[self selectedItemSerializationId]];
             }
         }
@@ -3414,11 +3352,10 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
             theAction == @selector(onCreateRecord:)) {
         return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
     }
-    else if (theAction == @selector(onChangeMasterPassword:) ||
-             theAction == @selector(onImportFromCsvFile:)) {
+    else if (theAction == @selector(onChangeMasterPassword:)) {
         return self.viewModel && !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;
     }
-    else if (theAction == @selector(onCopyAsCsv:) ||
+    else if (theAction == @selector(onExportAsCsv:) ||
              theAction == @selector(onLock:)) { 
         return self.viewModel && !self.viewModel.locked;
     }
@@ -3457,12 +3394,6 @@ static MutableOrderedDictionary* getSummaryDictionary(ViewModel* model) {
     }
     else if (theAction == @selector(onCopyAllFields:)) {
         return item && !item.isGroup;
-    }
-    else if (theAction == @selector(onConvenienceUnlockProperties:)) {
-        return self.viewModel && !self.viewModel.locked;
-    }
-    else if (theAction == @selector(onGeneralDatabaseSettings:)) {
-        return self.viewModel && !self.viewModel.locked;
     }
     else if (theAction == @selector(saveDocument:)) {
         return !self.viewModel.locked && !self.viewModel.isEffectivelyReadOnly;

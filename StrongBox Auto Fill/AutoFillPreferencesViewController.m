@@ -12,6 +12,7 @@
 #import "NSArray+Extensions.h"
 #import "SelectItemTableViewController.h"
 #import "Utils.h"
+#import "SafesList.h"
 
 @interface AutoFillPreferencesViewController ()
 
@@ -52,6 +53,16 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchScanCustomFields;
 @property (weak, nonatomic) IBOutlet UISwitch *switchScanAlternativeURLs;
 @property (weak, nonatomic) IBOutlet UISwitch *switchScanNotes;
+@property (weak, nonatomic) IBOutlet UISwitch *switchSuggestConcealed;
+@property (weak, nonatomic) IBOutlet UISwitch *suggestUnconcealed;
+@property (weak, nonatomic) IBOutlet UISwitch *switchLongTapPreview;
+
+@property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeAltUrls;
+@property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeScanCustom;
+@property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeScanNotes;
+@property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeSuggestConcealable;
+@property (weak, nonatomic) IBOutlet UITableViewCell *quickTypeSuggestUnconcealable;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellLongTapPreview;
 
 @end
 
@@ -125,7 +136,14 @@
     [self cell:self.cellConvenienceAutoUnlock setHidden:!on];
     [self cell:self.cellUseHostOnly setHidden:!on];
     [self cell:self.cellAddServiceIds setHidden:!on];
-    
+    [self cell:self.cellLongTapPreview setHidden:!on];
+    [self cell:self.quickTypeAltUrls setHidden:!on];
+    [self cell:self.quickTypeScanCustom setHidden:!on];
+    [self cell:self.quickTypeScanNotes setHidden:!on];
+    [self cell:self.quickTypeSuggestConcealable setHidden:!on];
+    [self cell:self.quickTypeSuggestUnconcealable setHidden:!on];
+    [self cell:self.cellAddServiceIds setHidden:!on];
+
     
     
     self.switchQuickTypeAutoFill.on = self.viewModel.metadata.autoFillEnabled && self.viewModel.metadata.quickTypeEnabled;
@@ -147,10 +165,13 @@
     self.switchScanAlternativeURLs.on = self.viewModel.metadata.autoFillScanAltUrls;
     self.switchScanNotes.on = self.viewModel.metadata.autoFillScanNotes;
     self.switchScanCustomFields.on = self.viewModel.metadata.autoFillScanCustomFields;
-
+    self.switchSuggestConcealed.on = self.viewModel.metadata.autoFillConcealedFieldsAsCreds;
+    self.suggestUnconcealed.on = self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds;
     self.switchScanAlternativeURLs.enabled = self.switchQuickTypeAutoFill.on;
     self.switchScanNotes.enabled = self.switchQuickTypeAutoFill.on;
     self.switchScanCustomFields.enabled = self.switchQuickTypeAutoFill.on;
+    self.switchSuggestConcealed.enabled = self.switchQuickTypeAutoFill.on;
+    self.suggestUnconcealed.enabled = self.switchQuickTypeAutoFill.on;
     
     
     
@@ -158,6 +179,7 @@
     self.switchCopyTOTP.on = self.viewModel.metadata.autoFillCopyTotp;
     self.switchAutoLaunchSingle.on = AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase;
     self.switchShowPinned.on = AppPreferences.sharedInstance.autoFillShowPinned;
+    self.switchLongTapPreview.on = AppPreferences.sharedInstance.autoFillLongTapPreview;
     
     
     
@@ -201,6 +223,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     AppPreferences.sharedInstance.useFullUrlAsURLSuggestion = !self.useHostOnlyUrl.on;
     AppPreferences.sharedInstance.autoFillAutoLaunchSingleDatabase = self.switchAutoLaunchSingle.on;
     AppPreferences.sharedInstance.autoFillShowPinned = self.switchShowPinned.on;
+    AppPreferences.sharedInstance.autoFillLongTapPreview = self.switchLongTapPreview.on;
     
     [self bind];
 }
@@ -220,7 +243,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     self.viewModel.metadata.autoFillScanAltUrls = self.switchScanAlternativeURLs.on;
     self.viewModel.metadata.autoFillScanNotes = self.switchScanNotes.on;
     self.viewModel.metadata.autoFillScanCustomFields = self.switchScanCustomFields.on;
-
+    self.viewModel.metadata.autoFillConcealedFieldsAsCreds = self.switchSuggestConcealed.on;
+    self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds = self.suggestUnconcealed.on;
+    
     [[SafesList sharedInstance] update:self.viewModel.metadata];
 
     if ( self.switchQuickTypeAutoFill.on ) {
@@ -229,7 +254,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                           displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
                                                         alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
                                                            customFields:self.viewModel.metadata.autoFillScanCustomFields
-                                                                  notes:self.viewModel.metadata.autoFillScanNotes];
+                                                                  notes:self.viewModel.metadata.autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds];
     }
     
     [self bind];
@@ -254,7 +281,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                               displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
                                                             alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
                                                                customFields:self.viewModel.metadata.autoFillScanCustomFields
-                                                                      notes:self.viewModel.metadata.autoFillScanNotes];
+                                                                      notes:self.viewModel.metadata.autoFillScanNotes
+                                               concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
+                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds];
         }
         
         [self bind];
@@ -324,6 +353,7 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
             
 
             
+            
             [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
             
             [AutoFillManager.sharedInstance updateAutoFillQuickTypeDatabase:self.viewModel.database
@@ -331,7 +361,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                               displayFormat:self.viewModel.metadata.quickTypeDisplayFormat
                                                             alternativeUrls:self.viewModel.metadata.autoFillScanAltUrls
                                                                customFields:self.viewModel.metadata.autoFillScanCustomFields
-                                                                      notes:self.viewModel.metadata.autoFillScanNotes];
+                                                                      notes:self.viewModel.metadata.autoFillScanNotes
+                                               concealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillConcealedFieldsAsCreds
+                                             unConcealedCustomFieldsAsCreds:self.viewModel.metadata.autoFillUnConcealedFieldsAsCreds];
 
             [self bind];
         }

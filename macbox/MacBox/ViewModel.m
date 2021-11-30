@@ -8,7 +8,6 @@
 //
 
 #import "ViewModel.h"
-#import "Csv.h"
 #import "DatabaseModel.h"
 #import "PasswordMaker.h"
 #import "Settings.h"
@@ -74,8 +73,6 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
 - (BOOL)locked {
     return self.passwordDatabase == nil;
 }
-
-
 
 
 
@@ -1179,44 +1176,9 @@ NSString* const kNotificationUserInfoKeyNode = @"node";
                                                     userInfo:nil];
 }
 
-- (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows {
-    [self.document.undoManager beginUndoGrouping];
-    
-    for (CHCSVOrderedDictionary* row  in rows) {
-        NSString* actualTitle = [row objectForKey:kCSVHeaderTitle];
-        NSString* actualUsername = [row objectForKey:kCSVHeaderUsername];
-        NSString* actualUrl = [row objectForKey:kCSVHeaderUrl];
-        NSString* actualEmail = [row objectForKey:kCSVHeaderEmail];
-        NSString* actualPassword = [row objectForKey:kCSVHeaderPassword];
-        NSString* actualNotes = [row objectForKey:kCSVHeaderNotes];
-        
-        actualTitle = actualTitle ? actualTitle : @"Unknown Title (Imported)";
-        actualUsername = actualUsername ? actualUsername : @"";
-        actualUrl = actualUrl ? actualUrl : @"";
-        actualEmail = actualEmail ? actualEmail : @"";
-        actualPassword = actualPassword ? actualPassword : @"";
-        actualNotes = actualNotes ? actualNotes : @"";
-        
-        NodeFields* fields = [[NodeFields alloc] initWithUsername:actualUsername
-                                                              url:actualUrl
-                                                         password:actualPassword
-                                                            notes:actualNotes
-                                                            email:actualEmail];
-        
-        
-        Node* record = [[Node alloc] initAsRecord:actualTitle parent:self.passwordDatabase.effectiveRootGroup fields:fields uuid:nil];
-        [self addItem:record parent:self.passwordDatabase.effectiveRootGroup openEntryDetailsWindowWhenDone:NO];
-    }
-    
-    NSString* loc = NSLocalizedString(@"mac_undo_action_import_entries_from_csv", @"Import Entries from CSV");
-
-    [self.document.undoManager setActionName:loc];
-    [self.document.undoManager endUndoGrouping];
-}
 
 
-
-- (void)launchUrl:(Node*)item {
+- (void)launchUrl:(Node*)item { 
     NSURL* launchableUrl = [self.database launchableUrlForItem:item];
         
     if ( !launchableUrl ) {

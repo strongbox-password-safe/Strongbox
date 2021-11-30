@@ -166,10 +166,8 @@
     return self.format == kKeePass;
 }
 
-- (BOOL)shouldReduceArgon2Memory {
-    const int kMaxRecommendedArgon2Memory = 64 * 1024 * 1024;
-    
-    return self.format == kKeePass4 && (self.kdfAlgorithm == kKdfAlgorithmArgon2d || self.kdfAlgorithm == kKdfAlgorithmArgon2id) && self.argonMemory > kMaxRecommendedArgon2Memory;
+- (BOOL)shouldReduceArgon2Memory {    
+    return self.format == kKeePass4 && (self.kdfAlgorithm == kKdfAlgorithmArgon2d || self.kdfAlgorithm == kKdfAlgorithmArgon2id) && self.argonMemory > Argon2KdfCipher.maxRecommendedMemory;
 }
 
 - (BOOL)shouldShowCompressionSwitch {

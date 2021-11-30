@@ -54,8 +54,22 @@ NSComparator reverseFinderStyleNodeComparator = ^(id obj1, id obj2)
     return finderStringCompare(n2.title, n1.title);
 };
 
++ (BOOL)sortTitleLikeFinder:(Node*)a b:(Node*)b {
+    return finderStyleNodeComparator(a, b) == NSOrderedAscending;
+}
+
 + (instancetype)rootGroup {
     return [[Node alloc] initAsRoot:nil];
+}
+
++ (instancetype)rootWithDefaultKeePassEffectiveRootGroup {
+    Node* rootGroup = Node.rootGroup;
+
+    Node* keePassRootGroup = [[Node alloc] initAsGroup:NSLocalizedString(@"generic_database", @"Database") parent:rootGroup keePassGroupTitleRules:YES uuid:nil];
+    
+    [rootGroup addChild:keePassRootGroup keePassGroupTitleRules:YES];
+
+    return rootGroup;
 }
 
 - (instancetype)initAsRoot:(NSUUID*)uuid {

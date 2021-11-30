@@ -16,9 +16,12 @@ NS_ASSUME_NONNULL_BEGIN
 + (nullable NSData *)getNonePerformantKeyFileDigest:(NSData*)data
                                         checkForXml:(BOOL)checkForXml; 
 
++ (NSData *)getDigestFromBookmark:(NSString *)keyFileBookmark
+                           format:(DatabaseFormat)format
+                            error:(NSError **)error;
+
 + (nullable NSData *)getDigestFromSources:(NSString*_Nullable)keyFileBookmark
                        onceOffKeyFileData:(NSData*_Nullable)onceOffKeyFileData
-                              streamLarge:(BOOL)streamLarge
                                    format:(DatabaseFormat)format
                                     error:(NSError**)error;
 

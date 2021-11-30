@@ -10,6 +10,7 @@
 #import <LocalAuthentication/LocalAuthentication.h>
 #import "Utils.h"
 #import "Settings.h"
+#import "StrongboxErrorCodes.h"
 
 @implementation BiometricIdHelper
 
@@ -59,22 +60,6 @@
     return NO;
 }
 
-- (BOOL)convenienceAvailable:(DatabaseMetadata *)database {
-    if(self.dummyMode) {
-        return YES;
-    }
-
-    if ( !database.isTouchIdEnabled && !database.isWatchUnlockEnabled ) {
-        return NO;
-    }
-    
-    NSUInteger policy = [self getLAPolicy:database.isTouchIdEnabled watch:database.isWatchUnlockEnabled];
- 
-    LAContext *localAuthContext = [[LAContext alloc] init];
-    NSError *authError;
-    return [localAuthContext canEvaluatePolicy:policy error:&authError];
-}
-
 - (NSUInteger)getLAPolicy:(BOOL)touch watch:(BOOL)watch {
     if ( @available(macOS 10.15, *) ) {
         if ( touch && watch ) {
@@ -103,19 +88,22 @@
     }
     
     if(self.biometricsInProgress) {
-        completion(NO, [Utils createNSError:@"Already a biometrics request in progress, cannot instantiate 2" errorCode:-2412]);
+        completion(NO, [Utils createNSError:@"Already a biometrics request in progress, cannot instantiate 2" errorCode:StrongboxErrorCodes.macOSBiometricInProgressOrImpossible]);
         return;
     }
     
     if ( !database.isTouchIdEnabled && !database.isWatchUnlockEnabled ) {
-        completion(NO, [Utils createNSError:@"Neither touch nor watch enabled for this database." errorCode:-2412]);
+        completion(NO, [Utils createNSError:@"Neither touch nor watch enabled for this database." errorCode:StrongboxErrorCodes.macOSBiometricInProgressOrImpossible]);
         return;
     }
     
     if ( @available (macOS 10.12.1, *)) {
         LAContext *localAuthContext = [[LAContext alloc] init];
 
-        if (fallbackTitle.length) {
+        if (fallbackTitle.length == 0) { 
+            localAuthContext.localizedFallbackTitle = @""; 
+        }
+        else {
             localAuthContext.localizedFallbackTitle = fallbackTitle;
         }
             

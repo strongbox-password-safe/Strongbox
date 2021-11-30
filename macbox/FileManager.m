@@ -10,6 +10,8 @@
 #include <pwd.h>
 
 static NSString* const kEncAttachmentDirectoryName = @"_strongbox_enc_att";
+static NSString* const kEncryptionStreamDirectoryName = @"_enc_stream";
+
 static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 static NSString* const kiCloudIdentifier = @"group.strongbox.mac.mcguill";
 static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
@@ -149,6 +151,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 - (void)deleteAllTmpWorkingFiles { 
     [self deleteAllTmpEncryptedAttachmentWorkingFiles];
     [self deleteAllTmpSyncMergeWorkingFiles];
+    [self deleteAllTmpEncryptionStreamFiles];
 }
 
 - (void)deleteAllTmpEncryptedAttachmentWorkingFiles { 
@@ -171,6 +174,22 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         [[NSFileManager defaultManager] removeItemAtPath:path error:&error];
 
     }
+}
+
+- (NSString *)tmpEncryptionStreamPath {
+    NSString *ret =  [NSTemporaryDirectory() stringByAppendingPathComponent:kEncryptionStreamDirectoryName];
+    NSError* error;
+    
+    if (![[NSFileManager defaultManager] createDirectoryAtPath:ret withIntermediateDirectories:YES attributes:nil error:&error]) {
+        NSLog(@"Error Creating Directory: %@ => [%@]", ret, error.localizedDescription);
+    }
+
+    return ret;
+}
+
+- (void)deleteAllTmpEncryptionStreamFiles {
+    NSString* tmpPath = self.tmpEncryptionStreamPath;
+    [self deleteAllFoo:tmpPath];
 }
 
 @end

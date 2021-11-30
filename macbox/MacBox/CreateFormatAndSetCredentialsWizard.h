@@ -30,6 +30,6 @@
 @property (nonatomic, readonly) NSString* selectedKeyFileBookmark;
 @property (nonatomic, readonly) YubiKeyConfiguration* selectedYubiKeyConfiguration;
 
-- (CompositeKeyFactors*)generateCkfFromSelected:(NSWindow*)yubiKeyPressWindowHint;
+- (CompositeKeyFactors *)generateCkfFromSelected:(NSWindow *)yubiKeyPressWindowHint error:(NSError**)error;
 
 @end

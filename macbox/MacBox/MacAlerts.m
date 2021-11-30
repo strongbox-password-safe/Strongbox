@@ -23,35 +23,39 @@
 
 + (void)info:(NSString *)info
       window:(NSWindow*)window {
-    NSAlert *alert = [[NSAlert alloc] init];
-    
-    [alert setMessageText:info];
-    [alert setAlertStyle:NSAlertStyleInformational];
-    
-    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
-    [alert addButtonWithTitle:loc];
-    
-    [alert beginSheetModalForWindow:window completionHandler:nil];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        
+        [alert setMessageText:info];
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+        [alert addButtonWithTitle:loc];
+        
+        [alert beginSheetModalForWindow:window completionHandler:nil];
+    });
 }
 
 + (void)info:(NSString *)message
 informativeText:(NSString*)informativeText
       window:(NSWindow*)window
   completion:(void (^)(void))completion {
-    NSAlert *alert = [[NSAlert alloc] init];
-    
-    [alert setMessageText:message];
-    [alert setInformativeText:informativeText];
-    [alert setAlertStyle:NSAlertStyleInformational];
-    
-    NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
-    [alert addButtonWithTitle:loc];
-    
-    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        if(completion) {
-            completion();
-        }
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        
+        [alert setMessageText:message];
+        [alert setInformativeText:informativeText];
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
+        [alert addButtonWithTitle:loc];
+        
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            if(completion) {
+                completion();
+            }
+        }];
+    });
 }
 
 + (void)areYouSure:(NSString *)message window:(NSWindow *)window completion:(void (^)(BOOL))completion {
@@ -73,27 +77,29 @@ informativeText:(NSString*)informativeText
        window:(NSWindow*)window
 disableEscapeKey:(BOOL)disableEscapeKey
    completion:(void (^)(BOOL yesNo))completion {
-    NSAlert *alert = [[NSAlert alloc] init];
-    
-    if (informativeText) [alert setInformativeText:informativeText];
-    if (messageText) [alert setMessageText:messageText];
-    
-    [alert setAlertStyle:NSAlertStyleInformational];
-    
-    NSString* loc = NSLocalizedString(@"alerts_no", @"No");
-    [alert addButtonWithTitle:loc];
-    NSString* loc2 = NSLocalizedString(@"alerts_yes", @"Yes");
-    [alert addButtonWithTitle:loc2];
-    
-    if (!disableEscapeKey) {
-        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
-    }
-    
-    [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; 
-    
-    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        completion(returnCode == NSAlertSecondButtonReturn);
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        
+        if (informativeText) [alert setInformativeText:informativeText];
+        if (messageText) [alert setMessageText:messageText];
+        
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        NSString* loc = NSLocalizedString(@"alerts_no", @"No");
+        [alert addButtonWithTitle:loc];
+        NSString* loc2 = NSLocalizedString(@"alerts_yes", @"Yes");
+        [alert addButtonWithTitle:loc2];
+        
+        if (!disableEscapeKey) {
+            [[[alert buttons] objectAtIndex:0] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
+        }
+        
+        [[[alert buttons] objectAtIndex:1] setKeyEquivalent:@"\r"]; 
+        
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            completion(returnCode == NSAlertSecondButtonReturn);
+        }];
+    });
 }
 
 + (void)yesNo:(NSString *)info window:(NSWindow*)window completion:(void (^)(BOOL yesNo))completion {
@@ -139,6 +145,8 @@ disableEscapeKey:(BOOL)disableEscapeKey
 - (NSString *)input:(NSString *)prompt defaultValue:(NSString *)defaultValue allowEmpty:(BOOL)allowEmpty {
     NSAlert *alert = [[NSAlert alloc] init];
     [alert setMessageText:prompt];
+    
+    self.allowEmptyInput = allowEmpty;
     
     NSString* loc = NSLocalizedString(@"alerts_ok", @"OK");
     self.okButton = [alert addButtonWithTitle:loc];
@@ -244,9 +252,11 @@ disableEscapeKey:(BOOL)disableEscapeKey
     
     [[alert window] setInitialFirstResponder:self.keyTextField];
     
-    NSInteger button = [alert runModal];
-    
-    completion((button == NSAlertFirstButtonReturn), self.keyTextField.stringValue, self.valueTextField.stringValue, self.checkboxProtected.state == NSControlStateValueOn);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSInteger button = [alert runModal];
+        
+        completion((button == NSAlertFirstButtonReturn), self.keyTextField.stringValue, self.valueTextField.stringValue, self.checkboxProtected.state == NSControlStateValueOn);
+    });
 }
 
 - (void)controlTextDidChange:(NSNotification *)notification {
@@ -276,26 +286,28 @@ disableEscapeKey:(BOOL)disableEscapeKey
            option2:(NSString*)option2
             window:(NSWindow*)window
         completion:(void (^)(NSUInteger option))completion {
-    NSAlert *alert = [[NSAlert alloc] init];
-    
-    if (informativeText) [alert setInformativeText:informativeText];
-    if (messageText) [alert setMessageText:messageText];
-    
-    [alert setAlertStyle:NSAlertStyleInformational];
-    
-    [alert addButtonWithTitle:option1AndDefault];
-    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
-    
-    [alert addButtonWithTitle:option2];
-    
-    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        if(returnCode == NSAlertFirstButtonReturn) {
-            completion(1);
-        }
-        else {
-            completion(2);
-        }
-    }];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        
+        if (informativeText) [alert setInformativeText:informativeText];
+        if (messageText) [alert setMessageText:messageText];
+        
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        [alert addButtonWithTitle:option1AndDefault];
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+        
+        [alert addButtonWithTitle:option2];
+        
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            if(returnCode == NSAlertFirstButtonReturn) {
+                completion(1);
+            }
+            else {
+                completion(2);
+            }
+        }];
+    });
 }
 
 + (void)threeOptions:(NSString *)messageText
@@ -305,30 +317,32 @@ disableEscapeKey:(BOOL)disableEscapeKey
              option3:(NSString *)option3
               window:(NSWindow *)window
           completion:(void (^)(NSUInteger))completion {
-    NSAlert *alert = [[NSAlert alloc] init];
-    
-    if (informativeText) [alert setInformativeText:informativeText];
-    if (messageText) [alert setMessageText:messageText];
-    
-    [alert setAlertStyle:NSAlertStyleInformational];
-    
-    [alert addButtonWithTitle:option1AndDefault];
-    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
-    
-    [alert addButtonWithTitle:option2];
-    [alert addButtonWithTitle:option3];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        
+        if (informativeText) [alert setInformativeText:informativeText];
+        if (messageText) [alert setMessageText:messageText];
+        
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        [alert addButtonWithTitle:option1AndDefault];
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+        
+        [alert addButtonWithTitle:option2];
+        [alert addButtonWithTitle:option3];
 
-    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        if(returnCode == NSAlertFirstButtonReturn) {
-            completion(1);
-        }
-        else if ( returnCode == NSAlertSecondButtonReturn ) {
-            completion(2);
-        }
-        else {
-            completion(3);
-        }
-    }];
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            if(returnCode == NSAlertFirstButtonReturn) {
+                completion(1);
+            }
+            else if ( returnCode == NSAlertSecondButtonReturn ) {
+                completion(2);
+            }
+            else {
+                completion(3);
+            }
+        }];
+    });
 }
 
 + (void)twoOptionsWithCancel:(NSString *)messageText
@@ -336,34 +350,36 @@ disableEscapeKey:(BOOL)disableEscapeKey
            option1AndDefault:(NSString*)option1AndDefault
                      option2:(NSString*)option2
                       window:(NSWindow*)window
-                  completion:(void (^)(NSUInteger zeroForCancel))completion {
-    NSAlert *alert = [[NSAlert alloc] init];
-    
-    if (informativeText) [alert setInformativeText:informativeText];
-    if (messageText) [alert setMessageText:messageText];
-    
-    [alert setAlertStyle:NSAlertStyleInformational];
-    
-    [alert addButtonWithTitle:option1AndDefault];
-    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
-    
-    [alert addButtonWithTitle:option2];
-    
-    NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
-    [alert addButtonWithTitle:localizedCancel];
-    [[[alert buttons] objectAtIndex:2] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
-    
-    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        if(returnCode == NSAlertThirdButtonReturn) {
-            completion(0);
-        }
-        else if(returnCode == NSAlertFirstButtonReturn) {
-            completion(1);
-        }
-        else {
-            completion(2);
-        }
-    }];
+                  completion:(void (^)(int response))completion {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
+        
+        if (informativeText) [alert setInformativeText:informativeText];
+        if (messageText) [alert setMessageText:messageText];
+        
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        [alert addButtonWithTitle:option1AndDefault];
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+        
+        [alert addButtonWithTitle:option2];
+        
+        NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
+        [alert addButtonWithTitle:localizedCancel];
+        [[[alert buttons] objectAtIndex:2] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
+        
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            if(returnCode == NSAlertThirdButtonReturn) {
+                completion(3); 
+            }
+            else if(returnCode == NSAlertFirstButtonReturn) {
+                completion(0); 
+            }
+            else {
+                completion(1); 
+            }
+        }];
+    });
 }
 
 + (void)customOptionWithCancel:(NSString *)messageText
@@ -371,28 +387,30 @@ disableEscapeKey:(BOOL)disableEscapeKey
              option1AndDefault:(NSString*)option1AndDefault
                         window:(NSWindow*)window
                     completion:(void (^)(BOOL go))completion {
-    NSAlert *alert = [[NSAlert alloc] init];
-    
-    if (informativeText) [alert setInformativeText:informativeText];
-    if (messageText) [alert setMessageText:messageText];
-    
-    [alert setAlertStyle:NSAlertStyleInformational];
-    
-    [alert addButtonWithTitle:option1AndDefault];
-    [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSAlert *alert = [[NSAlert alloc] init];
         
-    NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
-    [alert addButtonWithTitle:localizedCancel];
-    [[[alert buttons] objectAtIndex:1] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
-    
-    [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
-        if(returnCode == NSAlertFirstButtonReturn) {
-            completion(YES);
-        }
-        else {
-            completion(NO);
-        }
-    }];
+        if (informativeText) [alert setInformativeText:informativeText];
+        if (messageText) [alert setMessageText:messageText];
+        
+        [alert setAlertStyle:NSAlertStyleInformational];
+        
+        [alert addButtonWithTitle:option1AndDefault];
+        [[[alert buttons] objectAtIndex:0] setKeyEquivalent:@"\r"]; 
+            
+        NSString* localizedCancel = NSLocalizedString(@"generic_cancel", @"Cancel");
+        [alert addButtonWithTitle:localizedCancel];
+        [[[alert buttons] objectAtIndex:1] setKeyEquivalent:[NSString stringWithFormat:@"%C", 0x1b]]; 
+        
+        [alert beginSheetModalForWindow:window completionHandler:^(NSModalResponse returnCode) {
+            if(returnCode == NSAlertFirstButtonReturn) {
+                completion(YES);
+            }
+            else {
+                completion(NO);
+            }
+        }];
+    });
 }
 
 @end

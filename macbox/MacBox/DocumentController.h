@@ -8,6 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "DatabaseMetadata.h"
+#import "DatabaseModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,6 +23,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)onAppStartup;
 - (void)performEmptyLaunchTasksIfNecessary;
+
+- (void)serializeAndAddDatabase:(DatabaseModel*)database
+                         format:(DatabaseFormat)format;
 
 @end
 

@@ -26,5 +26,7 @@ class Logging {
         let format = date.getFormattedDate(format: "yyyy-MM-dd HH:mm:ss.SSSSSSZ") 
 
         print("\(format) \(message)");
+        
+        NSLog("I can do NSLog in Swift - TODO")
     }
 }

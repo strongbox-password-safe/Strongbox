@@ -15,6 +15,7 @@
 #import "SVProgressHUD.h"
 #import "AuditConfigurationVcTableViewController.h"
 #import "AppPreferences.h"
+#import "SafesList.h"
 
 const NSUInteger kSectionSettingsIdx = 0;
 const NSUInteger kSectionBasicIdx = 1;

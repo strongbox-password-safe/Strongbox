@@ -7,6 +7,7 @@
 //
 
 #import "FirstUnlockWelcomeViewController.h"
+#import "SafesList.h"
 
 @interface FirstUnlockWelcomeViewController ()
 

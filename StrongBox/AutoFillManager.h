@@ -12,7 +12,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AutoFillManager : NSObject
+@interface AutoFillManager : NSObject 
 
 + (instancetype)sharedInstance;
 
@@ -24,7 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
                           displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                         alternativeUrls:(BOOL)alternativeUrls
                            customFields:(BOOL)customFields
-                                  notes:(BOOL)notes;
+                                  notes:(BOOL)notes
+           concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
+         unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds;
 
 - (void)clearAutoFillQuickTypeDatabase;
 

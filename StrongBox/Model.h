@@ -6,10 +6,29 @@
 //  Copyright (c) 2014 Mark McGuill. All rights reserved.
 //
 
-#import "SafesList.h"
+#import <Foundation/Foundation.h>
+#import "OnboardingDatabaseChangeRequests.h"
+
+#if TARGET_OS_IPHONE
+
+#import <UIKit/UIKit.h>
+#import "SafeMetaData.h"
+
+typedef UIViewController* VIEW_CONTROLLER_PTR;
+typedef SafeMetaData* METADATA_PTR;
+
+#else
+
+#import <Cocoa/Cocoa.h>
+#import "DatabaseMetadata.h"
+
+typedef NSViewController* VIEW_CONTROLLER_PTR;
+typedef DatabaseMetadata* METADATA_PTR;
+
+#endif
+
 #import "DatabaseModel.h"
 #import "DatabaseAuditor.h"
-#import <UIKit/UIKit.h>
 #import "AsyncUpdateResult.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -22,14 +41,14 @@ extern NSString* const kAppStoreSaleNotificationKey;
 extern NSString* const kCentralUpdateOtpUiNotification;
 extern NSString* const kMasterDetailViewCloseNotification;
 extern NSString* const kDatabaseViewPreferencesChangedNotificationKey;
-extern NSString *const kWormholeAutoFillUpdateMessageId;
+extern NSString* const kWormholeAutoFillUpdateMessageId;
 extern NSString* const kDatabaseReloadedNotificationKey;
 extern NSString* const kAsyncUpdateDone;
 extern NSString* const kAsyncUpdateStarting;
 
 @interface Model : NSObject
 
-@property (nonatomic, readonly, nonnull) SafeMetaData *metadata;
+@property (nonatomic, readonly, nonnull) METADATA_PTR metadata;
 @property (readonly, strong, nonatomic, nonnull) DatabaseModel *database;   
 @property (nonatomic, readonly) BOOL isReadOnly;
 @property (readonly) BOOL isInOfflineMode;
@@ -44,23 +63,27 @@ extern NSString* const kAsyncUpdateStarting;
 - (instancetype _Nullable )init NS_UNAVAILABLE;
 
 - (instancetype _Nullable )initWithDatabase:(DatabaseModel *_Nonnull)passwordDatabase
-                                   metaData:(SafeMetaData *_Nonnull)metaData
+                                   metaData:(METADATA_PTR _Nonnull)metaData
                              forcedReadOnly:(BOOL)forcedReadOnly
                                  isAutoFill:(BOOL)isAutoFill;
 
 - (instancetype _Nullable )initWithDatabase:(DatabaseModel *_Nonnull)passwordDatabase
-                                   metaData:(SafeMetaData *_Nonnull)metaData
+                                   metaData:(METADATA_PTR _Nonnull)metaData
                              forcedReadOnly:(BOOL)forcedReadOnly
                                  isAutoFill:(BOOL)isAutoFill
                                 offlineMode:(BOOL)offlineMode; 
 
-- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
-                 templateMetaData:(SafeMetaData*)templateMetaData;
+#if TARGET_OS_IPHONE
 
-- (void)reloadDatabaseFromLocalWorkingCopy:(UIViewController*)viewController 
+- (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
+                 templateMetaData:(METADATA_PTR)templateMetaData;
+
+#endif
+
+- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
                                 completion:(void(^_Nullable)(BOOL success))completion;
 
-- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
+- (void)update:(VIEW_CONTROLLER_PTR)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler;
 
 - (void)stopAudit;
 - (void)restartBackgroundAudit;
@@ -103,7 +126,7 @@ extern NSString* const kAsyncUpdateStarting;
 @property (readonly) NSSet<NSString*>* pinnedSet;
 @property (readonly) NSArray<Node*>* pinnedNodes;
 
--(void)encrypt:(void (^)(BOOL userCancelled, NSString*_Nullable file, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
+-(void)encrypt:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL userCancelled, NSString*_Nullable file, NSString*_Nullable debugXml, NSError*_Nullable error))completion;
 
 - (NSString *_Nonnull)generatePassword;
 
@@ -123,6 +146,8 @@ extern NSString* const kAsyncUpdateStarting;
 
 
 @property BOOL isDuressDummyDatabase; 
+
+@property (nullable) OnboardingDatabaseChangeRequests* onboardingDatabaseChangeRequests;
 
 @end
 

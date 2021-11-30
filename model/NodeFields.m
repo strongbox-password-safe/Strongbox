@@ -879,13 +879,13 @@ static NSString* const kOriginalWindowsOtpAlgoValueSha512 = @"HMAC-SHA-512";
         secret = secretBase32.value.dataFromBase32;
     }
     else if ( secretUtf8 && secretUtf8.value.length ) {
-        secret = secretBase32.value.utf8Data;
+        secret = secretUtf8.value.utf8Data;
     }
     else if ( secretHex && secretHex.value.length) {
-        secret = secretBase32.value.dataFromHex;
+        secret = secretHex.value.dataFromHex;
     }
     else if ( secretBase64 && secretBase64.value.length ) {
-        secret = secretBase32.value.dataFromBase64;
+        secret = secretBase64.value.dataFromBase64;
     }
     else {
         return nil;

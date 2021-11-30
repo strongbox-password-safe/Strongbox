@@ -33,14 +33,13 @@ static const NSUInteger kStreamReadThreshold = 16 * 1024;
 @implementation KeyFileParser
 
 + (NSData *)getDigest:(NSInputStream*)inStream
-         streamLength:(NSUInteger)streamLength
-          streamLarge:(BOOL)streamLarge
+         streamLength:(unsigned long long)streamLength
           checkForXml:(BOOL)checkForXml {
     if ( inStream == nil ) {
         return nil;
     }
     
-    if ( streamLarge && ( streamLength > kStreamReadThreshold ) ) {
+    if ( streamLength > kStreamReadThreshold ) {
         NSLog(@"INFO: Large Key File, will stream the digest and skip XML, Hex etc checks. Pure SHA256");
              
         [inStream open];
@@ -276,20 +275,28 @@ BOOL isAll64CharactersAreHex(NSData* data) {
 + (NSData *)getNonePerformantKeyFileDigest:(NSData *)data checkForXml:(BOOL)checkForXml {
     return [self getDigestFromSources:nil
                    onceOffKeyFileData:data
-                          streamLarge:NO
                                format:checkForXml ? kKeePass4 : kKeePass1 error:nil];
+}
+
++ (NSData *)getDigestFromBookmark:(NSString *)keyFileBookmark
+                           format:(DatabaseFormat)format
+                            error:(NSError **)error {
+    return [KeyFileParser getDigestFromSources:keyFileBookmark onceOffKeyFileData:nil format:format error:error];
 }
 
 + (NSData *)getDigestFromSources:(NSString *)keyFileBookmark
               onceOffKeyFileData:(NSData *)onceOffKeyFileData
-                     streamLarge:(BOOL)streamLarge
                           format:(DatabaseFormat)format
                            error:(NSError *__autoreleasing  _Nullable *)error {
     if ( !keyFileBookmark && !onceOffKeyFileData ) {
+        NSLog(@"WARNWARN: No Sources is nil");
+        
+        if ( error ) {
+            *error = [Utils createNSError:@"Could not read Key File from NO sources" errorCode:-123456];
+        }
+        
         return nil;
     }
-    
-    NSData* keyFileData = nil;
     
     if ( keyFileBookmark ) {
         NSString* updated;
@@ -298,34 +305,47 @@ BOOL isAll64CharactersAreHex(NSData* data) {
                                                 updatedBookmark:&updated
                                                           error:error];
         if ( keyFileUrl ) {
-            keyFileData = [NSData dataWithContentsOfURL:keyFileUrl options:kNilOptions error:error];
+            NSError* attrError;
+            NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:keyFileUrl.path error:&attrError];
+            
+            if ( !attributes || attrError ) {
+                if ( error ) {
+                    *error = attrError;
+                }
+
+                NSLog(@"WARNWARN: Could not read Key File URL File Size.");
+                
+                return nil;
+            }
+            
+            unsigned long long fileSize = attributes.fileSize;
+            
+            BOOL securitySucceeded = [keyFileUrl startAccessingSecurityScopedResource];
+            NSInputStream* inStream = [NSInputStream inputStreamWithURL:keyFileUrl];
+
+            NSData* ret = [KeyFileParser getDigest:inStream streamLength:fileSize checkForXml:format != kKeePass1];
+            
+            if ( securitySucceeded ) {
+                [keyFileUrl stopAccessingSecurityScopedResource];
+            }
+            
+            return ret;
         }
         else {
-            NSLog(@"WARNWARN: Could not read Key File Bookmark.");
+            if ( error ) {
+                *error = [Utils createNSError:@"Could not read Key File Bookmark" errorCode:-123456];
+            }
 
+            NSLog(@"WARNWARN: Could not read Key File Bookmark.");
             return nil;
         }
     }
-    else if ( onceOffKeyFileData ) {
-        keyFileData = onceOffKeyFileData;
-    }
-    
-    if ( keyFileData ) {
-        NSInputStream* inStream = [NSInputStream inputStreamWithData:keyFileData];
+    else {
+        NSInputStream* inStream = [NSInputStream inputStreamWithData:onceOffKeyFileData];
         
         return [KeyFileParser getDigest:inStream
-                           streamLength:keyFileData.length
-                            streamLarge:streamLarge
+                           streamLength:onceOffKeyFileData.length
                             checkForXml:format != kKeePass1];
-    }
-    else {
-        NSLog(@"WARNWARN: keyFileData is nil");
-        
-        if ( error ) {
-            *error = [Utils createNSError:@"Could not read Key File from sources" errorCode:-123456];
-        }
-        
-        return nil;
     }
 }
 

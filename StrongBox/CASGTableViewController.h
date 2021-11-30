@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CASGTableViewController : StaticDataTableViewController
 
++ (instancetype)instantiateFromStoryboard;
+
 @property CASGMode mode;
 @property DatabaseFormat initialFormat;
 @property (nullable) NSString* initialKeyFileBookmark;

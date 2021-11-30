@@ -52,13 +52,39 @@
     [self bindUi];
 }
 
-- (void)bindUi {
-    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
-    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
-    BOOL convenienceAvailable = watchAvailable || touchAvailable;
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
-    BOOL conveniencePossible = convenienceAvailable && featureAvailable;
+- (IBAction)onConvenienceUnlockMethodsChanged:(id)sender {
+    DatabaseMetadata* meta = self.model.databaseMetadata;
+    
+    BOOL touch = self.checkboxUseTouchId.state == NSControlStateValueOn;
+    BOOL watch = self.checkBoxEnableWatch.state == NSControlStateValueOn;
+    BOOL on = touch || watch;
+    BOOL wasOff = !meta.conveniencePasswordHasBeenStored;
+    
+    NSString* password = self.model.compositeKeyFactors.password;
+    
+    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
+                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
+        metadata.isTouchIdEnabled = touch;
+        metadata.isWatchUnlockEnabled = watch;
+        
+        if ( on && wasOff )  {
+            metadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
+        }
+        
+        if ( on ) {
+            meta.conveniencePasswordHasBeenStored = YES;
+            metadata.conveniencePassword = password;
+        }
+        else {
+            meta.conveniencePasswordHasBeenStored = NO;
+            metadata.conveniencePassword = nil;
+        }
+    }];
+    
+    [self bindUi];
+}
 
+- (void)bindUi {
     if ( BiometricIdHelper.sharedInstance.isWatchUnlockAvailable ) {
         self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock", @"Watch Unlock");
     }
@@ -66,17 +92,24 @@
         self.checkBoxEnableWatch.title = NSLocalizedString(@"preference_allow_watch_unlock_system_disabled", @"Watch Unlock - (Enable in System Preferences > Security & Privacy)");
     }
         
+    BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
+    BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
+    BOOL methodAvailable = watchAvailable || touchAvailable;
+    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+
     DatabaseMetadata* meta = self.model.databaseMetadata;
     
     self.checkboxUseTouchId.enabled = touchAvailable && featureAvailable;
-    self.checkboxUseTouchId.state = (meta.isTouchIdEnabled && touchAvailable) ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkboxUseTouchId.state = meta.isTouchIdEnabled ? NSControlStateValueOn : NSControlStateValueOff;
+    
     self.checkBoxEnableWatch.enabled = watchAvailable && featureAvailable;
-    self.checkBoxEnableWatch.state = (meta.isWatchUnlockEnabled && watchAvailable) ? NSControlStateValueOn : NSControlStateValueOff;
+    self.checkBoxEnableWatch.state = meta.isWatchUnlockEnabled ? NSControlStateValueOn : NSControlStateValueOff;
     
-    BOOL convenienceEnabled = meta.isTouchIdEnabled || meta.isWatchUnlockEnabled;
-    
+    BOOL convenienceEnabled = meta.isConvenienceUnlockEnabled;
     self.checkboxAutomaticallyPrompt.enabled = convenienceEnabled;
     self.checkboxAutomaticallyPrompt.state = meta.autoPromptForConvenienceUnlockOnActivate ? NSControlStateValueOn : NSControlStateValueOff;
+
+    BOOL conveniencePossible = methodAvailable && featureAvailable;
 
     self.sliderExpiry.enabled = conveniencePossible && convenienceEnabled;
     self.sliderExpiry.integerValue = [self getSliderValueFromHours:meta.touchIdPasswordExpiryPeriodHours];
@@ -89,94 +122,67 @@
     self.passwordStorageSummary.stringValue = [self getSecureStorageSummary];
 }
 
-- (IBAction)onConvenienceUnlockMethodsChanged:(id)sender {
-    DatabaseMetadata* meta = self.model.databaseMetadata;
-    
-    BOOL wasOff = !meta.isTouchIdEnrolled;
-    
-    BOOL touch = self.checkboxUseTouchId.state == NSControlStateValueOn;
-    BOOL watch = self.checkBoxEnableWatch.state == NSControlStateValueOn;
-    BOOL on = touch || watch;
-        
-    NSString* password = self.model.compositeKeyFactors.password;
-    [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
-                                            touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.isTouchIdEnabled = touch;
-        metadata.isWatchUnlockEnabled = watch;
-        metadata.isTouchIdEnrolled = on;
-        
-        if ( on && wasOff )  {
-            metadata.touchIdPasswordExpiryPeriodHours = kDefaultPasswordExpiryHours;
-        }
-        
-        [metadata resetConveniencePasswordWithCurrentConfiguration:password];
-    }];
-    
-    [self bindUi];
-}
-
 - (NSString*)getSecureStorageSummary {
     DatabaseMetadata* meta = self.model.databaseMetadata;
     
-    BOOL featureAvailable = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
+    BOOL featureAvailable = Settings.sharedInstance.isProOrFreeTrial;
+    if( !featureAvailable ) {
+        return NSLocalizedString(@"mac_convenience_summary_only_available_on_pro", @"Convenience Unlock is only available in the Pro version of Strongbox. Please consider upgrading to support development.");
+    }
+
     BOOL watchAvailable = BiometricIdHelper.sharedInstance.isWatchUnlockAvailable;
     BOOL touchAvailable = BiometricIdHelper.sharedInstance.isTouchIdUnlockAvailable;
-    BOOL convenienceAvailable = watchAvailable || touchAvailable;
-    BOOL convenienceEnabled = (meta.isTouchIdEnabled && touchAvailable) || (meta.isWatchUnlockEnabled && watchAvailable);
-    BOOL passwordAvailable = meta.conveniencePassword != nil;
+    BOOL methodAvailable = watchAvailable || touchAvailable;
+
+    if( !methodAvailable ) {
+        return NSLocalizedString(@"mac_convenience_summary_biometrics_unavailable", @"Convenience Unlock (Biometrics/Watch Unavailable)");
+    }
+
+    BOOL methodEnabled = (meta.isTouchIdEnabled && touchAvailable) || (meta.isWatchUnlockEnabled && watchAvailable);
     
-    if( featureAvailable ) {
-        if( convenienceAvailable ) {
-            if( convenienceEnabled ) {
-                if( passwordAvailable ) {
-                    SecretExpiryMode mode = [meta getConveniencePasswordExpiryMode];
-                    if (mode == kExpiresAtTime) {
-                        NSDate* date = [meta getConveniencePasswordExpiryDate];
-                        if(SecretStore.sharedInstance.secureEnclaveAvailable) {
-                            NSString* loc = NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_expire_fmt", @"Convenience Password is securely stored, protected by your device's Secure Enclave and will expire: %@.");
-                            
-                            return [NSString stringWithFormat:loc, date.friendlyDateTimeString];
-                        }
-                        else {
-                            NSString* loc = NSLocalizedString(@"mac_convenience_summary_keychain_and_will_expire_fmt", @"Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device) and will expire: %@.");
-                            
-                            return [NSString stringWithFormat:loc, date.friendlyDateTimeString];
-                        }
-                    }
-                    else if (mode == kNeverExpires) {
-                        if(SecretStore.sharedInstance.secureEnclaveAvailable) {
-                            return NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_not_expire", @"Convenience Password is securely stored, protected by your device's Secure Enclave and is configured not to expire.");
-                        }
-                        else {
-                            return NSLocalizedString(@"mac_convenience_summary_keychain_and_will_not_expire", @"Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device), and is configured not to expire.");
-                        }
-                    }
-                    else if (mode == kExpiresOnAppExitStoreSecretInMemoryOnly) {
-                        if(SecretStore.sharedInstance.secureEnclaveAvailable) {
-                            return NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_expire_on_exit", @"Convenience Password is securely stored (in memory only) encrypted by your device's Secure Enclave and will expire on Strongbox Exit.");
-                        }
-                        else {
-                            return NSLocalizedString(@"mac_convenience_summary_keychain_and_will_expire_on_exit", @"Convenience Password is securely stored (in memory only) only and will expire on Strongbox Exit.");
-                        }
-                    }
-                    else {
-                        return @"Unknown Storage Mode for Convenience Password.";
-                    }
-                }
-                else {
-                    return NSLocalizedString(@"mac_convenience_summary_enabled_but_expired", @"Convenience Unlock is Enabled but the securely stored master password has expired.");
-                }
-            }
-            else {
-                return NSLocalizedString(@"mac_convenience_summary_disabled", @"Convenience Unlock Disabled");
-            }
+    if( !methodEnabled ) {
+        return NSLocalizedString(@"mac_convenience_summary_disabled", @"Convenience Unlock Disabled");
+    }
+    
+    BOOL passwordAvailable = meta.conveniencePasswordHasBeenStored;
+    BOOL expired = meta.conveniencePasswordHasExpired;
+    
+    if( !passwordAvailable || expired ) {
+        return NSLocalizedString(@"mac_convenience_summary_enabled_but_expired", @"Convenience Unlock is Enabled but the securely stored master password has expired.");
+    }
+    
+    SecretExpiryMode mode = [meta getConveniencePasswordExpiryMode];
+    if (mode == kExpiresAtTime) {
+        NSDate* date = [meta getConveniencePasswordExpiryDate];
+        if(SecretStore.sharedInstance.secureEnclaveAvailable) {
+            NSString* loc = NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_expire_fmt", @"Convenience Password is securely stored, protected by your device's Secure Enclave and will expire: %@.");
+            
+            return [NSString stringWithFormat:loc, date.friendlyDateTimeString];
         }
         else {
-            return NSLocalizedString(@"mac_convenience_summary_biometrics_unavailable", @"Convenience Unlock (Biometrics/Watch Unavailable)");
+            NSString* loc = NSLocalizedString(@"mac_convenience_summary_keychain_and_will_expire_fmt", @"Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device) and will expire: %@.");
+            
+            return [NSString stringWithFormat:loc, date.friendlyDateTimeString];
+        }
+    }
+    else if (mode == kNeverExpires) {
+        if(SecretStore.sharedInstance.secureEnclaveAvailable) {
+            return NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_not_expire", @"Convenience Password is securely stored, protected by your device's Secure Enclave and is configured not to expire.");
+        }
+        else {
+            return NSLocalizedString(@"mac_convenience_summary_keychain_and_will_not_expire", @"Convenience Password is securely stored in your Keychain (Secure Enclave unavailable on this device), and is configured not to expire.");
+        }
+    }
+    else if (mode == kExpiresOnAppExitStoreSecretInMemoryOnly) {
+        if(SecretStore.sharedInstance.secureEnclaveAvailable) {
+            return NSLocalizedString(@"mac_convenience_summary_secure_enclave_and_will_expire_on_exit", @"Convenience Password is securely stored (in memory only) encrypted by your device's Secure Enclave and will expire on Strongbox Exit.");
+        }
+        else {
+            return NSLocalizedString(@"mac_convenience_summary_keychain_and_will_expire_on_exit", @"Convenience Password is securely stored (in memory only) only and will expire on Strongbox Exit.");
         }
     }
     else {
-        return NSLocalizedString(@"mac_convenience_summary_only_available_on_pro", @"Convenience Unlock is only available in the Pro version of Strongbox. Please consider upgrading to support development.");
+        return @"Unknown Storage Mode for Convenience Password.";
     }
 }
 
@@ -213,7 +219,8 @@
     [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
                                             touch:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.touchIdPasswordExpiryPeriodHours = foo;
-        [metadata resetConveniencePasswordWithCurrentConfiguration:password];
+        metadata.conveniencePasswordHasBeenStored = YES;
+        metadata.conveniencePassword = password;
     }];
     
     [self bindUi];
@@ -239,6 +246,10 @@
     }
     
     return self.sliderNotches[value].integerValue;
+}
+
+- (IBAction)onClose:(id)sender {
+    [self.view.window cancelOperation:nil];
 }
 
 @end

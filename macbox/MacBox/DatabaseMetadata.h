@@ -12,6 +12,8 @@
 #import "YubiKeyConfiguration.h"
 #import "QuickTypeAutoFillDisplayFormat.h"
 #import "ConflictResolutionStrategy.h"
+#import "DatabaseAuditorConfiguration.h"
+#import "DatabaseFormat.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -31,18 +33,13 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property (nonatomic, strong, nullable) NSString *autoFillStorageInfo; 
 @property (nonatomic) StorageProvider storageProvider;
 
-@property (nonatomic, strong, readonly) NSString* conveniencePassword;
+@property (nonatomic, strong, nullable) NSString* conveniencePassword;
 @property (nonatomic, strong, nullable) NSString* keyFileBookmark;
 @property (nonatomic, strong, nullable) NSString* autoFillKeyFileBookmark;
 
 @property (nonatomic, strong) YubiKeyConfiguration* yubiKeyConfiguration;
 
-@property (nonatomic) BOOL isTouchIdEnabled;
-@property (nonatomic) BOOL isWatchUnlockEnabled;
 
-@property (nonatomic) BOOL isTouchIdEnrolled; 
-@property (nonatomic) BOOL hasPromptedForTouchIdEnrol;
-@property (nonatomic) NSInteger touchIdPasswordExpiryPeriodHours;
 
 @property (nonatomic) BOOL autoFillEnabled;
 @property (nonatomic) BOOL quickTypeEnabled;
@@ -53,11 +50,8 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 
 - (SecretExpiryMode)getConveniencePasswordExpiryMode;
 - (NSDate*)getConveniencePasswordExpiryDate;
-    
-- (NSString*)getConveniencePassword:(BOOL*_Nullable)expired;
 
 - (void)clearSecureItems;
-- (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*_Nullable)password; 
 
 @property (nullable) NSUUID* outstandingUpdateId;
 @property (nullable) NSDate* lastSyncRemoteModDate; 
@@ -117,6 +111,55 @@ extern const NSInteger kDefaultPasswordExpiryHours;
 @property BOOL autoFillScanAltUrls;
 @property BOOL autoFillScanCustomFields;
 @property BOOL autoFillScanNotes;
+
+
+
+
+@property (nonatomic, strong, nullable) NSString* conveniencePin;
+@property (nullable) NSArray<NSString*>* favourites;
+@property DatabaseAuditorConfiguration* auditConfig;
+@property (nullable) NSArray<NSString*>* auditExcludedItems;
+@property NSUInteger unlockCount;
+@property DatabaseFormat likelyFormat;
+@property BOOL emptyOrNilPwPreferNilCheckFirst; 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@property (nonatomic) BOOL isTouchIdEnabled;
+@property (nonatomic) BOOL isWatchUnlockEnabled;
+@property (nonatomic) BOOL hasPromptedForTouchIdEnrol;
+@property (nonatomic) NSInteger touchIdPasswordExpiryPeriodHours;
+
+
+
+@property (nonatomic, readonly) BOOL isConvenienceUnlockEnabled; 
+@property BOOL conveniencePasswordHasExpired; 
+@property BOOL hasBeenPromptedForConvenience; 
+@property NSInteger convenienceExpiryPeriod; 
+@property (nonatomic, strong, nullable) NSString* convenienceMasterPassword; 
+
+@property (nonatomic) BOOL conveniencePasswordHasBeenStored; 
+
+- (void)triggerPasswordExpiry;
+
+
+
+@property BOOL autoFillConcealedFieldsAsCreds;
+@property BOOL autoFillUnConcealedFieldsAsCreds;
+
+
 
 @end
 

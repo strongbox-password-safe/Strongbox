@@ -32,22 +32,32 @@
 
 #import <FileProvider/FileProvider.h>
 #import "VirtualYubiKeys.h"
-
-#ifndef IS_APP_EXTENSION
-#import "OfflineDetector.h"
-#import "ISMessages/ISMessages.h"
-#endif
-
 #import <Foundation/FoundationErrors.h>
 #import "Serializator.h"
 
-#import "CompositeKeyDeterminer.h"
+#import "IOSCompositeKeyDeterminer.h"
 #import "Platform.h"
 #import "DuressActionHelper.h"
 
 #import "SyncManager.h"
 #import "WorkingCopyManager.h"
 #import "Constants.h"
+
+#ifndef IS_APP_EXTENSION
+
+#import "OfflineDetector.h"
+#import "ISMessages/ISMessages.h"
+
+#endif
+
+#if TARGET_OS_IPHONE
+
+#import "SafesList.h"
+
+#else
+
+#endif
+
 
 @interface UnlockDatabaseSequenceHelper () <UIDocumentPickerDelegate>
 
@@ -107,7 +117,7 @@
                  completion:(UnlockDatabaseCompletionBlock)completion {
     self.completion = completion;
     
-    CompositeKeyDeterminer* determiner = [CompositeKeyDeterminer determinerWithViewController:self.viewController
+    IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self.viewController
                                                                                      database:self.database
                                                                                isAutoFillOpen:self.isAutoFillOpen
                                                                       isAutoFillQuickTypeOpen:isAutoFillQuickTypeOpen
@@ -134,14 +144,14 @@
 
 
 - (BOOL)userIsLikelyOffline {
-#ifndef IS_APP_EXTENSION
+#if !defined(IS_APP_EXTENSION) && !defined(NO_OFFLINE_DETECTION)
     return OfflineDetector.sharedInstance.isOffline;
 #endif
     return NO;
 }
 
 - (void)beginUnlockWithCredentials:(CompositeKeyFactors*)factors {
-    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:self.database.uuid];
+    NSURL* localCopyUrl = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
     BOOL userLikelyOffline = [self userIsLikelyOffline];
     
     BOOL isPro = AppPreferences.sharedInstance.isProOrFreeTrial;

@@ -96,7 +96,9 @@
                                                           displayFormat:self.database.quickTypeDisplayFormat
                                                         alternativeUrls:self.database.autoFillScanAltUrls
                                                            customFields:self.database.autoFillScanCustomFields
-                                                                  notes:self.database.autoFillScanNotes];
+                                                                  notes:self.database.autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:self.database.autoFillConcealedFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:self.database.autoFillUnConcealedFieldsAsCreds];
     }
 
     [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {

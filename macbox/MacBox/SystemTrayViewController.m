@@ -10,13 +10,17 @@
 #import "PasswordMaker.h"
 #import "Settings.h"
 #import "ColoredStringHelper.h"
-#import "PreferencesWindowController.h"
 #import "ClickableTextField.h"
 #import "Settings.h"
 #import "ClipboardManager.h"
 #import "MBProgressHUD.h"
-#import "PreferencesWindowController.h"
 #import "DatabasesManager.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @interface SystemTrayViewController ()
 
@@ -159,7 +163,7 @@
     BOOL showPasswordGen = Settings.sharedInstance.showPasswordGenInTray;
     self.miniPasswordGenerator.hidden = showPasswordGen;
     self.horizontRuleAfterPasswordGen.hidden = showPasswordGen;
-    self.constraintGapDatabasesAndPasswordGen.constant = showPasswordGen ? 4 : 0;
+    self.constraintGapDatabasesAndPasswordGen.constant = showPasswordGen ? 0 : 4;
 }
 
 - (void)onDatabaseClicked:(id)sender {
@@ -383,10 +387,8 @@
     if ( self.onShowClicked ) { 
         self.onShowClicked( nil );
     }
-    
-    
-    
-    [PreferencesWindowController.sharedInstance showPasswordSettings];
+
+    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabPasswordGeneration];
 }
 
 - (IBAction)onShowPreferences:(id)sender {
@@ -394,7 +396,7 @@
         self.onShowClicked( nil );
     }
     
-    [PreferencesWindowController.sharedInstance show];
+    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabGeneral];
 }
 
 @end

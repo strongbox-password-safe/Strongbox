@@ -23,7 +23,7 @@
 #import "SyncManager.h"
 #import "NSDate+Extensions.h"
 #import "UITableView+EmptyDataSet.h"
-#import "CompositeKeyDeterminer.h"
+#import "IOSCompositeKeyDeterminer.h"
 #import "DatabaseUnlocker.h"
 #import "DuressActionHelper.h"
 #import "AppPreferences.h"
@@ -170,7 +170,7 @@
 }
 
 - (void)openDatabase:(SafeMetaData*)safe {
-    CompositeKeyDeterminer* keyDeterminer = [CompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+    IOSCompositeKeyDeterminer* keyDeterminer = [IOSCompositeKeyDeterminer determinerWithViewController:self database:safe isAutoFillOpen:YES isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
     [keyDeterminer getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
             AppPreferences.sharedInstance.autoFillExitedCleanly = NO; 

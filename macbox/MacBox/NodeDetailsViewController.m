@@ -25,7 +25,6 @@
 #import "AttachmentItem.h"
 #import "CustomFieldTableCellView.h"
 #import "FavIconDownloader.h"
-#import "PreferencesWindowController.h"
 #import "ClipboardManager.h"
 #import "QRCodePresenterPopover.h"
 #import "OTPToken+Serialization.h"
@@ -39,6 +38,12 @@
 #import "EditCustomFieldController.h"
 #import "EditTagsViewController.h"
 #import "PasswordStrengthTester.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @interface NodeDetailsViewController () <   NSWindowDelegate,
                                             NSTableViewDataSource,
@@ -1352,7 +1357,7 @@ static NSString* trimField(NSTextField* textField) {
 }
 
 - (IBAction)onPasswordSettings:(id)sender {
-    [PreferencesWindowController.sharedInstance showPasswordSettings];
+    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabPasswordGeneration];
 }
 
 - (IBAction)onGenerate:(id)sender {

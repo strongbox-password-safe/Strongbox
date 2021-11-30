@@ -14,6 +14,7 @@
 #import "ExcludedItemsViewController.h"
 #import "AppPreferences.h"
 #import "NSDate+Extensions.h"
+#import "SafesList.h"
 
 static const int kSectionIdxHibp = 2; 
 static const int kSectionIdxSimilarPasswords = 6; 

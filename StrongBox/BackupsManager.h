@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)deleteBackup:(BackupItem*)item;
 - (void)deleteAllBackups:(METADATA_PTR)metadata;
 
-- (NSArray<BackupItem*>*)getAvailableBackups:(METADATA_PTR)metadata all:(BOOL)all;
+- (NSArray<BackupItem*>*)getAvailableBackups:(METADATA_PTR _Nullable)metadata all:(BOOL)all;
 
 @end
 

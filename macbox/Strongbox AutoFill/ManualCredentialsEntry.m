@@ -10,7 +10,7 @@
 #import "KSPasswordField.h"
 #import "Settings.h"
 #import "DatabaseModel.h"
-#import "MacYubiKeyManager.h"
+#import "MacHardwareKeyManager.h"
 #import "BookmarksHelper.h"
 #import "DatabasesManager.h"
 #import "MacAlerts.h"
@@ -29,7 +29,7 @@
 @property (weak) IBOutlet NSTextField *labelKeyFile;
 @property (weak) IBOutlet NSPopUpButton *popupKeyFile;
 @property (weak) IBOutlet NSTextField *labelYubiKey;
-@property (weak) IBOutlet NSPopUpButton *popupYubiKey;
+@property (weak) IBOutlet NSPopUpButton *yubiKeyPopup;
 @property (weak) IBOutlet NSButton *buttonUnlock;
 @property (weak) IBOutlet NSButton *acceptEmptyPassword;
 
@@ -44,9 +44,18 @@
 
 @property BOOL hasSetInitialFocus;
 
+@property (readonly) DatabaseMetadata* database;
+@property (nullable) NSString* contextAwareKeyFileBookmark;
+
+@property (weak) IBOutlet NSStackView *stackHardwareKey;
+
 @end
 
 @implementation ManualCredentialsEntry
+
+- (DatabaseMetadata*)database {
+    return [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -56,9 +65,8 @@
 
     self.concealed = YES;
     
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
-    self.selectedKeyFileBookmark = database.autoFillKeyFileBookmark;
-    self.selectedYubiKeyConfiguration = database.yubiKeyConfiguration;
+    self.selectedKeyFileBookmark = [self contextAwareKeyFileBookmark];
+    self.selectedYubiKeyConfiguration = self.database.yubiKeyConfiguration;
 
     [self bindUi];
     [self validateUI];
@@ -99,7 +107,10 @@
 
 - (void)bindConcealed {
     self.textFieldPassword.showsText = !self.concealed;
-    [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
+    
+    if (@available(macOS 11.0, *)) {
+        [self.buttonRevealConceal setImage:[NSImage imageWithSystemSymbolName:self.concealed ? @"eye.fill" : @"eye.slash.fill" accessibilityDescription:@""]];
+    }
 }
 
 - (void)bindAdvanced {
@@ -109,8 +120,8 @@
     self.acceptEmptyPassword.hidden = !advanced;
     self.labelKeyFile.hidden = !advanced;
     self.popupKeyFile.hidden = !advanced;
-    self.labelYubiKey.hidden = !advanced;
-    self.popupYubiKey.hidden = !advanced;
+    self.stackHardwareKey.hidden = !advanced;
+    self.yubiKeyPopup.hidden = !advanced;
 
     [self.checkboxShowAdvanced setState:advanced ? NSControlStateValueOn : NSControlStateValueOff];
 }
@@ -125,8 +136,8 @@
     [self.masterStackView setCustomSpacing:4 afterView:self.labelKeyFile];
 
     [self.masterStackView setCustomSpacing:16 afterView:self.popupKeyFile];
-    [self.masterStackView setCustomSpacing:4 afterView:self.labelYubiKey];
-    [self.masterStackView setCustomSpacing:20 afterView:self.popupYubiKey];
+    [self.masterStackView setCustomSpacing:4 afterView:self.stackHardwareKey];
+    [self.masterStackView setCustomSpacing:20 afterView:self.yubiKeyPopup];
 }
 
 - (void)controlTextDidChange:(NSNotification *)obj {
@@ -174,31 +185,8 @@
 }
 
 - (IBAction)onUnlock:(id)sender {
-    if(self.textFieldPassword.stringValue.length == 0) {
-        [MacAlerts twoOptionsWithCancel:NSLocalizedString(@"casg_question_title_empty_password", @"Empty Password or None?")
-                     informativeText:NSLocalizedString(@"casg_question_message_empty_password", @"You have left the password field empty. This can be interpreted in two ways. Select the interpretation you want.")
-                   option1AndDefault:NSLocalizedString(@"casg_question_option_empty", @"Empty Password")
-                             option2:NSLocalizedString(@"casg_question_option_none", @"No Password")
-                              window:self.view.window
-                          completion:^(NSUInteger zeroForCancel) {
-            if (zeroForCancel == 1) {
-                [self continueUnlockWithPassword:@""];
-            }
-            else if(zeroForCancel == 2) {
-                [self continueUnlockWithPassword:nil];
-            }
-        }];
-    }
-    else {
-        [self continueUnlockWithPassword:self.textFieldPassword.stringValue];
-    }
-
-}
-
-- (void)continueUnlockWithPassword:(NSString*)password {
     [self dismissViewController:self];
-    
-    self.onDone(NO, password, self.selectedKeyFileBookmark, self.selectedYubiKeyConfiguration);
+    self.onDone(NO, self.textFieldPassword.stringValue, self.selectedKeyFileBookmark, self.selectedYubiKeyConfiguration);
 }
 
 
@@ -221,7 +209,7 @@
 
     DatabaseMetadata *database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
     NSURL* configuredUrl;
-    NSString* configuredBookmarkForKeyFile = self.isAutoFillOpen ? database.autoFillKeyFileBookmark : database.keyFileBookmark;
+    NSString* configuredBookmarkForKeyFile = [self contextAwareKeyFileBookmark];
     
     if(database && configuredBookmarkForKeyFile) {
         NSString* updatedBookmark = nil;
@@ -239,14 +227,7 @@
         }
 
         if(updatedBookmark) {
-            [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-                if ( self.isAutoFillOpen ) {
-                    database.autoFillKeyFileBookmark = updatedBookmark;
-                }
-                else {
-                    database.keyFileBookmark = updatedBookmark;
-                }
-            }];
+            self.contextAwareKeyFileBookmark = updatedBookmark;
         }
     }
 
@@ -324,9 +305,7 @@
 }
 
 - (void)onSelectPreconfiguredKeyFile {
-    DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:self.databaseUuid];
-    
-    self.selectedKeyFileBookmark = self.isAutoFillOpen ? database.autoFillKeyFileBookmark : database.keyFileBookmark;
+    self.selectedKeyFileBookmark = self.contextAwareKeyFileBookmark;
     [self refreshKeyFileDropdown];
 }
 
@@ -343,113 +322,211 @@
     DatabaseFormat heuristicFormat = probablyPasswordSafe ? kPasswordSafe : kKeePass; 
     return heuristicFormat;
 }
-      
+
+- (IBAction)onRefreshHardwareKey:(id)sender {
+    [self bindUi];
+}
+
 - (void)bindYubiKey {
     self.currentYubiKeySerial = nil;
     self.currentYubiKeySlot1IsBlocking = NO;
     self.currentYubiKeySlot2IsBlocking = NO;
 
-    NSLog(@"Binding: [selectedYubiKeyConfiguration = [%@]]", self.selectedYubiKeyConfiguration);
 
-    [self.popupYubiKey.menu removeAllItems];
+
+    [self.yubiKeyPopup.menu removeAllItems];
 
     NSString* loc = NSLocalizedString(@"generic_refreshing_ellipsis", @"Refreshing...");
-    [self.popupYubiKey.menu addItemWithTitle:loc
+    [self.yubiKeyPopup.menu addItemWithTitle:loc
                                       action:nil
                                keyEquivalent:@""];
-    self.popupYubiKey.enabled = NO;
+    self.yubiKeyPopup.enabled = NO;
 
-    [MacYubiKeyManager.sharedInstance getAvailableYubiKey:^(YubiKeyData * _Nonnull yk) {
+    [MacHardwareKeyManager.sharedInstance getAvailableKey:^(HardwareKeyData * _Nonnull yk) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self onGotAvailableYubiKey:yk];
-        });}];
+        });
+    }];
 }
 
-- (void)onGotAvailableYubiKey:(YubiKeyData*)yk {
-    self.currentYubiKeySerial = yk.serial;
-    self.currentYubiKeySlot1IsBlocking = yk.slot1CrStatus == YubiKeySlotCrStatusSupportedBlocking;
-    self.currentYubiKeySlot2IsBlocking = yk.slot2CrStatus == YubiKeySlotCrStatusSupportedBlocking;
+- (void)addNoneProHardwareKeyMenuItem {
+    [self.yubiKeyPopup.menu removeAllItems];
+    NSString* loc = NSLocalizedString(@"mac_lock_screen_yubikey_popup_menu_yubico_pro_only", @"Hardware Key (Pro Only)");
+    [self.yubiKeyPopup.menu addItemWithTitle:loc action:nil keyEquivalent:@""];
+    [self.yubiKeyPopup selectItemAtIndex:0];
+}
 
-    [self.popupYubiKey.menu removeAllItems];
+- (NSMenuItem*)addNoneOrNoneAvailableHardwareKeyMenuItem:(NSUInteger)availableSlots {
+    NSString* loc;
+    if ( availableSlots > 0 ) {
+        loc = [NSString stringWithFormat:NSLocalizedString(@"mac_hardware_key_dropdown_n_available_fmt", @"None (%@ Available)"), @(availableSlots)];
+    }
+    else {
+        loc = NSLocalizedString(@"mac_hardware_key_dropdown_none_no_keys_detected", @"None (No Keys Detected)");
+    }
 
+    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectNoYubiKey) keyEquivalent:@""];
+}
+
+- (NSMenuItem*)addConfiguredButCRUnavailableHardwareKey {
+    NSString* loc = NSLocalizedString(@"mac_hardware_key_key_configured_but_cr_unavailable", @"🔴 Configured Key [CR Unavailable]");
+    
+    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectConfigured) keyEquivalent:@""];
+}
+
+- (NSMenuItem*)addConfiguredButUnavailableHardwareKey {
+    NSString* loc = NSLocalizedString(@"mac_hardware_key_key_configured_but_disconnected", @"⚠️ Disconnected Key (Configured)");
+    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectConfigured) keyEquivalent:@""];
+}
+
+- (NSMenuItem*)addConfiguredAndReadyToGo:(YubiKeyConfiguration*)config {
+    NSString* loc = [NSString stringWithFormat:NSLocalizedString(@"mac_hardware_key_configured_and_connected_slot_n_fmt", @"Connected Key Slot %@ (Configured)"), @(config.slot)];
+    NSMenuItem* item = [self.yubiKeyPopup.menu addItemWithTitle:loc action:@selector(onSelectConfigured) keyEquivalent:@""];
+    
+    item.identifier = @(config.slot).stringValue;
+    
+    return item;
+}
+
+- (NSMenuItem*)addConnectedAndReadyToGoAtSlot:(NSUInteger)slot {
+    NSString* loc = [NSString stringWithFormat:NSLocalizedString(@"mac_hardware_key_connected_slot_n_fmt", @"Connected Key Slot %@"), @(slot)];
+    NSMenuItem* item = [self.yubiKeyPopup.menu addItemWithTitle:loc action:slot == 1 ? @selector(onSelectYubiKeySlot1) : @selector(onSelectYubiKeySlot2) keyEquivalent:@""];
+    
+    item.identifier = @(slot).stringValue;
+    
+    return item;
+}
+
+- (NSMenuItem*)addConnectedAndReadyToGo:(YubiKeyConfiguration*)config {
+    return [self addConnectedAndReadyToGoAtSlot:config.slot];
+}
+
+- (NSMenuItem*)addSelectedButUnavailableHardwareKey {
+    NSString* loc = NSLocalizedString(@"mac_hardware_key_selected_but_has_been_disconnected", @"⚠️ Selected Key (Disconnected)");
+    return [self.yubiKeyPopup.menu addItemWithTitle:loc action:nil keyEquivalent:@""];
+}
+
+- (NSMenuItem*)addConfigured:(YubiKeyConfiguration*)configuration
+      connectedSerial:(NSString*)connectedSerial
+       slot1CrEnabled:(BOOL)slot1CrEnabled
+       slot2CrEnabled:(BOOL)slot2CrEnabled {
+    BOOL deviceMatches = [configuration.deviceSerial isEqualToString:connectedSerial];
+    BOOL slotGood = configuration.slot == 1 ? slot1CrEnabled : slot2CrEnabled;
+
+    if ( deviceMatches ) {
+        if ( slotGood ) {
+            return [self addConfiguredAndReadyToGo:configuration];
+        }
+        else {
+            return [self addConfiguredButCRUnavailableHardwareKey];
+        }
+    }
+    else {
+        return [self addConfiguredButUnavailableHardwareKey];
+    }
+}
+
+- (NSMenuItem*)addSelected:(YubiKeyConfiguration*)configuration
+    connectedSerial:(NSString*)connectedSerial
+     slot1CrEnabled:(BOOL)slot1CrEnabled
+     slot2CrEnabled:(BOOL)slot2CrEnabled {
+    BOOL deviceMatches = [configuration.deviceSerial isEqualToString:connectedSerial];
+    BOOL slotGood = configuration.slot == 1 ? slot1CrEnabled : slot2CrEnabled;
+
+    if ( deviceMatches && slotGood ) {
+        return [self addConnectedAndReadyToGo:configuration];
+    }
+    else {
+        return [self addSelectedButUnavailableHardwareKey];
+    }
+}
+
+- (void)onGotAvailableYubiKey:(HardwareKeyData*)yk {
     if (!Settings.sharedInstance.fullVersion && !Settings.sharedInstance.freeTrial) {
-        NSString* loc = NSLocalizedString(@"mac_lock_screen_yubikey_popup_menu_yubico_pro_only", @"YubiKey (Pro Only)");
-
-        [self.popupYubiKey.menu addItemWithTitle:loc
-                                          action:nil
-                                   keyEquivalent:@""];
-
-        [self.popupYubiKey selectItemAtIndex:0];
+        [self addNoneProHardwareKeyMenuItem];
+        self.yubiKeyPopup.enabled = NO;
         return;
     }
 
+    [self.yubiKeyPopup.menu removeAllItems];
+    
     
 
-    NSString* loc = NSLocalizedString(@"generic_none", @"None");
-    NSMenuItem* noneMenuItem = [self.popupYubiKey.menu addItemWithTitle:loc
-                                                                 action:@selector(onSelectNoYubiKey)
-                                                          keyEquivalent:@""];
+    self.currentYubiKeySerial = yk.serial;
+    self.currentYubiKeySlot1IsBlocking = yk.slot1CrStatus == kHardwareKeySlotCrStatusSupportedBlocking;
+    self.currentYubiKeySlot2IsBlocking = yk.slot2CrStatus == kHardwareKeySlotCrStatusSupportedBlocking;
+    BOOL slot1CrEnabled = [self yubiKeyCrIsSupported:yk.slot1CrStatus];
+    BOOL slot2CrEnabled = [self yubiKeyCrIsSupported:yk.slot2CrStatus];
 
-    NSMenuItem* slot1MenuItem;
-    NSMenuItem* slot2MenuItem;
+    NSUInteger availableSlots = (slot1CrEnabled ? 1 : 0) + (slot2CrEnabled ? 1 : 0);
 
     
 
-    BOOL availableSlots = NO;
-    NSString* loc1 = NSLocalizedString(@"mac_yubikey_slot_n_touch_required_fmt", @"Yubikey Slot %ld (Touch Required)");
-    NSString* loc2 = NSLocalizedString(@"mac_yubikey_slot_n_fmt", @"Yubikey Slot %ld");
+    NSMenuItem* none = [self addNoneOrNoneAvailableHardwareKeyMenuItem:availableSlots];
 
-    if ( [self yubiKeyCrIsSupported:yk.slot1CrStatus] ) {
-        NSString* loc = self.currentYubiKeySlot1IsBlocking ? loc1 : loc2;
-        NSString* locFmt = [NSString stringWithFormat:loc, 1];
-        slot1MenuItem = [self.popupYubiKey.menu addItemWithTitle:locFmt
-                                                          action:@selector(onSelectYubiKeySlot1)
-                                                   keyEquivalent:@""];
-        availableSlots = YES;
+    
+    
+    YubiKeyConfiguration* configured = self.database.yubiKeyConfiguration;
+    YubiKeyConfiguration* selected = self.selectedYubiKeyConfiguration;
+    
+
+    
+    NSMenuItem* configuredMenuItem = nil;
+    if ( configured ) {
+        configuredMenuItem = [self addConfigured:configured connectedSerial:yk.serial slot1CrEnabled:slot1CrEnabled slot2CrEnabled:slot2CrEnabled];
     }
-
-    if ( [self yubiKeyCrIsSupported:yk.slot2CrStatus] ) {
-        NSString* loc = self.currentYubiKeySlot2IsBlocking ? loc1 : loc2;
-        NSString* locFmt = [NSString stringWithFormat:loc, 2];
-
-        slot2MenuItem = [self.popupYubiKey.menu addItemWithTitle:locFmt
-                                                          action:@selector(onSelectYubiKeySlot2)
-                                                   keyEquivalent:@""];
-        availableSlots = YES;
-    }
-
-    BOOL selectedItem = NO;
-
-    if (availableSlots) {
-        if (self.selectedYubiKeyConfiguration && ([self.selectedYubiKeyConfiguration.deviceSerial isEqualToString:yk.serial])) {
-            
-
-            YubiKeySlotCrStatus slotStatus = self.selectedYubiKeyConfiguration.slot == 1 ? yk.slot1CrStatus : yk.slot2CrStatus;
-
-            if ([self yubiKeyCrIsSupported:slotStatus]) {
-                
-                if (self.selectedYubiKeyConfiguration.slot == 1 && slot1MenuItem) {
-                    [self.popupYubiKey selectItem:slot1MenuItem];
-                    selectedItem = YES;
-                }
-                else if (self.selectedYubiKeyConfiguration.slot == 2 && slot2MenuItem){
-                    [self.popupYubiKey selectItem:slot2MenuItem];
-                    selectedItem = YES;
-                }
-            }
+    
+    NSMenuItem* selectedMenuItem = nil;
+    if ( selected ) {
+        if ( ![selected isEqual:configured] ) {
+            selectedMenuItem = [self addSelected:selected connectedSerial:yk.serial slot1CrEnabled:slot1CrEnabled slot2CrEnabled:slot2CrEnabled];
+        }
+        else {
+            selectedMenuItem = configuredMenuItem;
         }
     }
 
-    if (!selectedItem) { 
-        [self.popupYubiKey selectItem:noneMenuItem];
-        self.selectedYubiKeyConfiguration = nil;
+    BOOL configuredIsConnected = ([selected.deviceSerial isEqualToString:yk.serial]);
+    BOOL selectedIsConnected = ([selected.deviceSerial isEqualToString:yk.serial]);
+    
+    BOOL slot1Added = (configured != nil && configuredIsConnected && configured.slot == 1) || (selected != nil && selectedIsConnected && selected.slot == 1);
+    BOOL slot2Added = (configured != nil && configuredIsConnected && configured.slot == 2) || (selected != nil && selectedIsConnected && selected.slot == 2);
+        
+    if ( slot1CrEnabled && !slot1Added ) {
+        [self addConnectedAndReadyToGoAtSlot:1];
+    }
+    if ( slot2CrEnabled && !slot2Added ) {
+        [self addConnectedAndReadyToGoAtSlot:2];
+    }
+    
+    
+    
+    if ( self.yubiKeyPopup.menu.numberOfItems == 3 ) { 
+        NSMenuItem* a = self.yubiKeyPopup.menu.itemArray[1];
+        NSMenuItem* b = self.yubiKeyPopup.menu.itemArray[2];
+        
+        if ( [a.identifier isEqualToString:@"2"] && [b.identifier isEqualToString:@"1"] ) { 
+            [self.yubiKeyPopup.menu removeItemAtIndex:2];
+            [self.yubiKeyPopup.menu insertItem:b atIndex:1];
+        }
     }
 
-    self.popupYubiKey.enabled = YES;
+    if ( selectedMenuItem ) {
+        [self.yubiKeyPopup selectItem:selectedMenuItem];
+    }
+    else {
+        [self.yubiKeyPopup selectItem:none];
+    }
+    
+    self.yubiKeyPopup.enabled = availableSlots > 0 || configured;
 }
 
-- (BOOL)yubiKeyCrIsSupported:(YubiKeySlotCrStatus)status {
-    return status == YubiKeySlotCrStatusSupportedBlocking || status == YubiKeySlotCrStatusSupportedNonBlocking;
+- (BOOL)yubiKeyCrIsSupported:(HardwareKeySlotCrStatus)status {
+    return status == kHardwareKeySlotCrStatusSupportedBlocking || status == kHardwareKeySlotCrStatusSupportedNonBlocking;
+}
+
+- (void)onSelectConfigured {
+    self.selectedYubiKeyConfiguration = self.database.yubiKeyConfiguration;
 }
 
 - (void)onSelectNoYubiKey {
@@ -466,6 +543,21 @@
     self.selectedYubiKeyConfiguration = [[YubiKeyConfiguration alloc] init];
     self.selectedYubiKeyConfiguration.deviceSerial = self.currentYubiKeySerial;
     self.selectedYubiKeyConfiguration.slot = 2;
+}
+
+- (NSString*)contextAwareKeyFileBookmark {
+    return self.isAutoFillOpen ? self.database.autoFillKeyFileBookmark : self.database.keyFileBookmark;
+}
+
+- (void)setContextAwareKeyFileBookmark:(NSString *)contextAwareKeyFileBookmark {
+    [DatabasesManager.sharedInstance atomicUpdate:self.databaseUuid touch:^(DatabaseMetadata * _Nonnull metadata) {
+        if ( self.isAutoFillOpen ) {
+            metadata.autoFillKeyFileBookmark = contextAwareKeyFileBookmark;
+        }
+        else {
+            metadata.keyFileBookmark = contextAwareKeyFileBookmark;
+        }
+    }];
 }
 
 @end

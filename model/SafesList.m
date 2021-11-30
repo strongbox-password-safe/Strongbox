@@ -226,6 +226,10 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
     }];
 }
 
+- (SafeMetaData *_Nullable)getDatabaseById:(NSString*)uuid {
+    return [SafesList.sharedInstance getById:uuid];
+}
+
 - (void)add:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
     dispatch_barrier_async(self.dataQueue, ^{
         [self _internalAdd:safe initialCache:initialCache initialCacheModDate:initialCacheModDate];
@@ -260,7 +264,7 @@ NSString* _Nonnull const kDatabaseUpdatedNotification = @"kDatabaseUpdatedNotifi
 - (void)_internalAdd:(SafeMetaData *)safe initialCache:(NSData *)initialCache initialCacheModDate:(NSDate *)initialCacheModDate {
     if (initialCache) {
         NSError* error;
-        NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData2:initialCache dateModified:initialCacheModDate database:safe.uuid error:&error];
+        NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:initialCache dateModified:initialCacheModDate database:safe.uuid error:&error];
 
         safe.lastSyncRemoteModDate = initialCacheModDate; 
         

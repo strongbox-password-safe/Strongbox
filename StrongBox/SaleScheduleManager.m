@@ -37,10 +37,14 @@
     if (self) {
         
         
+        
+        
+        
         self.schedule = @[
-            [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2021-11-26"] andB:[NSDate fromYYYY_MM_DDString:@"2021-11-30"]], 
-            [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2021-12-24"] andB:[NSDate fromYYYY_MM_DDString:@"2021-12-27"]], 
-            [Pair pairOfA:[NSDate fromYYYY_MM_DDString:@"2022-04-29"] andB:[NSDate fromYYYY_MM_DDString:@"2022-05-03"]], 
+            [Pair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-11-26"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-11-30"]], 
+            [Pair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-12-24"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-12-27"]], 
+            [Pair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2022-03-17"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-03-21"]], 
+            [Pair pairOfA:[NSDate fromYYYY_MM_DD_London_Time_String:@"2022-06-03"] andB:[NSDate fromYYYY_MM_DD_London_Time_String:@"2021-06-07"]], 
         ];
     }
     

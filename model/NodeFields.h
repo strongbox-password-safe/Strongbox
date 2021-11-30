@@ -102,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 
-@property (nonatomic, readonly) OTPToken* otpToken;
+@property (nonatomic, nullable, readonly) OTPToken* otpToken;
 
 + (nullable OTPToken*)getOtpTokenFromRecord:(NSString*)password fields:(NSDictionary*)fields notes:(NSString*)notes; 
 

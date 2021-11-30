@@ -12,6 +12,7 @@
 #import "Utils.h"
 #import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
+#import "Argon2KdfCipher.h"
 
 @interface EncryptionPreferencesViewController ()
 
@@ -156,7 +157,7 @@
         ];
         
         NSArray<NSString*>* choiceStrings = [choices map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-            BOOL shouldWarn = obj.unsignedLongLongValue > (64 * 1024 * 1024);
+            BOOL shouldWarn = obj.unsignedLongLongValue > Argon2KdfCipher.maxRecommendedMemory;
             NSString *warn = shouldWarn ? @"⚠️ " : @"";
             return [NSString stringWithFormat:@"%@%@", warn, friendlyMemorySizeString(obj.unsignedLongLongValue)];
         }];

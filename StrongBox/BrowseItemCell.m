@@ -55,8 +55,17 @@
           italic:(BOOL)italic
    groupLocation:(NSString*)groupLocation
            flags:(NSArray<UIImage*>*)flags
+  flagTintColors:(NSDictionary<NSNumber *,UIColor *> * _Nullable)flagTintColors
         hideIcon:(BOOL)hideIcon {
-    return [self setGroup:title icon:icon childCount:childCount italic:italic groupLocation:groupLocation tintColor:nil flags:flags hideIcon:hideIcon];
+    return [self setGroup:title
+                     icon:icon
+               childCount:childCount
+                   italic:italic
+            groupLocation:groupLocation
+                tintColor:nil
+                    flags:flags
+           flagTintColors:flagTintColors
+                 hideIcon:hideIcon];
 }
 
 - (void)setGroup:(NSString *)title
@@ -66,6 +75,7 @@
    groupLocation:(NSString *)groupLocation
        tintColor:(UIColor*)tintColor
            flags:(NSArray<UIImage *> *)flags
+  flagTintColors:(NSDictionary<NSNumber *,UIColor *> * _Nullable)flagTintColors
         hideIcon:(BOOL)hideIcon {
     self.titleLabel.text = title;
     self.titleLabel.font = italic ? FontManager.sharedInstance.italicFont : FontManager.sharedInstance.regularFont;
@@ -77,7 +87,7 @@
     self.usernameLabel.text = @"";
     self.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
-    [self setFlags:flags flagTintColors:nil];
+    [self setFlags:flags flagTintColors:flagTintColors];
 
     self.otpLabel.text = @"";
     self.otpLabel.hidden = YES;
@@ -100,7 +110,16 @@
           expired:(BOOL)expired
          otpToken:(OTPToken *)otpToken
          hideIcon:(BOOL)hideIcon {
-    [self setRecord:title subtitle:subtitle icon:icon groupLocation:groupLocation flags:flags flagTintColors:flagTintColors expired:expired otpToken:otpToken hideIcon:hideIcon audit:nil];
+    [self setRecord:title
+           subtitle:subtitle
+               icon:icon
+      groupLocation:groupLocation
+              flags:flags
+     flagTintColors:flagTintColors
+            expired:expired
+           otpToken:otpToken
+           hideIcon:hideIcon
+              audit:nil];
 }
 
 - (void)setRecord:(NSString *)title

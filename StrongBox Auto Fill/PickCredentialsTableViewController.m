@@ -12,7 +12,6 @@
 #import "Alerts.h"
 #import "Utils.h"
 #import "regdom.h"
-#import "BrowseItemCell.h"
 #import "ItemDetailsViewController.h"
 #import "DatabaseSearchAndSorter.h"
 #import "OTPToken+Generation.h"
@@ -22,6 +21,9 @@
 #import "SafeStorageProviderFactory.h"
 #import "NSString+Extensions.h"
 #import "AutoFillPreferencesViewController.h"
+#import "PreviewItemViewController.h"
+#import "ContextMenuHelper.h"
+#import "LargeTextViewController.h"
 
 static NSString* const kGroupTitleMatches = @"title";
 static NSString* const kGroupUrlMatches = @"url";
@@ -846,6 +848,250 @@ NSString *getCompanyOrOrganisationNameFromDomain(NSString* domain) {
 
 - (BOOL)canCreateNewCredential {
     return !self.model.isReadOnly;
+}
+
+
+
+- (UIContextMenuConfiguration *)tableView:(UITableView *)tableView contextMenuConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath point:(CGPoint)point API_AVAILABLE(ios(13.0)){
+    if ( !AppPreferences.sharedInstance.autoFillLongTapPreview ) {
+        return nil;
+    }
+    
+    NSString* group = self.groups[indexPath.section];
+    if ( [group isEqualToString:kGroupServiceId] || [group isEqualToString:kGroupActions] || [group isEqualToString:kGroupNoMatchingItems] ) {
+        return nil;
+    }
+    NSArray<Node*> *items = self.groupedResults[group];
+    Node* item = (items && items.count > indexPath.row) ? items[indexPath.row] : nil;
+    if (!item) {
+        return nil;
+    }
+
+    __weak PickCredentialsTableViewController* weakSelf = self;
+    
+    return [UIContextMenuConfiguration configurationWithIdentifier:indexPath
+                                                   previewProvider:^UIViewController * _Nullable{ return item.isGroup ? nil : [PreviewItemViewController forItem:item andModel:self.model];   }
+                                                    actionProvider:^UIMenu * _Nullable(NSArray<UIMenuElement *> * _Nonnull suggestedActions) {
+        return [UIMenu menuWithTitle:@""
+                               image:nil
+                          identifier:nil
+                             options:kNilOptions
+                            children:@[
+                                [weakSelf getContextualMenuNonMutators:indexPath item:item],
+                                [weakSelf getContextualMenuCopyToClipboard:indexPath item:item],
+                                [weakSelf getContextualMenuCopyFieldToClipboard:indexPath item:item],
+
+                            ]];
+    }];
+}
+
+- (UIMenu*)getContextualMenuCopyToClipboard:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+    NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
+    
+    
+    
+    if ( !item.isGroup && item.fields.username.length ) [ma addObject:[self getContextualMenuCopyUsernameAction:indexPath item:item]];
+
+    
+
+    if ( !item.isGroup && item.fields.password.length ) [ma addObject:[self getContextualMenuCopyPasswordAction:indexPath item:item]];
+
+    
+
+    if ( !item.isGroup && item.fields.otpToken ) [ma addObject:[self getContextualMenuCopyTotpAction:indexPath item:item]];
+
+    return [UIMenu menuWithTitle:@""
+                           image:nil
+                      identifier:nil
+                         options:UIMenuOptionsDisplayInline
+                        children:ma];
+}
+
+- (UIAction*)getContextualMenuCopyUsernameAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)) {
+    __weak PickCredentialsTableViewController* weakSelf = self;
+    
+    return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_username", @"Copy Username")
+                           systemImage:@"doc.on.doc"
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf copyUsername:item];
+    }];
+}
+
+- (UIAction*)getContextualMenuCopyPasswordAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)) {
+    __weak PickCredentialsTableViewController* weakSelf = self;
+    
+    return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_password", @"Copy Password")
+                           systemImage:@"doc.on.doc"
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf copyPassword:item];
+    }];
+}
+
+- (UIAction*)getContextualMenuCopyTotpAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)) {
+    __weak PickCredentialsTableViewController* weakSelf = self;
+    
+    return [ContextMenuHelper getItem:NSLocalizedString(@"browse_prefs_tap_action_copy_copy_totp", @"Copy TOTP")
+                           systemImage:@"doc.on.doc"
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        [weakSelf copyTotp:item];
+    }];
+}
+
+- (UIMenu*)getContextualMenuNonMutators:(NSIndexPath*)indexPath item:(Node*)item  API_AVAILABLE(ios(13.0)){
+    NSMutableArray<UIAction*>* ma = [NSMutableArray array];
+        
+    if (item.fields.password.length) [ma addObject:[self getContextualMenuShowLargePasswordAction:indexPath item:item]];
+        
+    return [UIMenu menuWithTitle:@""
+                           image:nil
+                      identifier:nil options:UIMenuOptionsDisplayInline
+                        children:ma];
+}
+
+- (UIAction*)getContextualMenuShowLargePasswordAction:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+    __weak PickCredentialsTableViewController* weakSelf = self;
+    
+    return [ContextMenuHelper getItem:NSLocalizedString(@"browse_context_menu_show_password", @"Show Password")
+                           systemImage:@"eye"
+                               handler:^(__kindof UIAction * _Nonnull action) {
+        NSString* pw = [weakSelf dereference:item.fields.password node:item];
+        [self showLargeTextView:pw];
+    }];
+}
+
+- (void)showLargeTextView:(NSString*)password {
+    LargeTextViewController* vc = [LargeTextViewController fromStoryboard];
+    vc.string = password;
+    vc.colorize = self.model.metadata.colorizePasswords;
+    
+    [self presentViewController:vc animated:YES completion:nil];
+}
+
+- (UIMenu*)getContextualMenuCopyFieldToClipboard:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+    NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
+    
+    if ( !item.isGroup ) [ma addObject:[self getContextualMenuCopyToClipboardSubmenu:indexPath item:item]];
+
+    return [UIMenu menuWithTitle:NSLocalizedString(@"browse_context_menu_copy_other_field", @"Copy Other Field...")
+                           image:nil
+                      identifier:nil
+                         options:kNilOptions
+                        children:ma];
+}
+
+- (UIMenuElement*)getContextualMenuCopyToClipboardSubmenu:(NSIndexPath*)indexPath item:(Node*)item API_AVAILABLE(ios(13.0)){
+    NSMutableArray<UIMenuElement*>* ma = [NSMutableArray array];
+    __weak PickCredentialsTableViewController* weakSelf = self;
+    
+    if ( !item.isGroup ) {
+        
+
+        if ( self.model.database.originalFormat == kPasswordSafe && item.fields.email.length ) {
+            [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_email" item:item handler:^(__kindof UIAction * _Nonnull action) {
+                [weakSelf copyEmail:item];
+            }]];
+        }
+        
+        
+
+        if (item.fields.notes.length) {
+            [ma addObject:[self getContextualMenuGenericCopy:@"generic_fieldname_notes" item:item handler:^(__kindof UIAction * _Nonnull action) {
+                [weakSelf copyNotes:item];
+            }]];
+        }
+
+        
+        
+        NSMutableArray* customFields = [NSMutableArray array];
+        NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
+        for(NSString* key in sortedKeys) {
+            if ( ![NodeFields isTotpCustomFieldKey:key] ) {
+                [customFields addObject:[self getContextualMenuGenericCopy:key item:item handler:^(__kindof UIAction * _Nonnull action) {
+                    StringValue* sv = item.fields.customFields[key];
+                    
+                    NSString* value = [weakSelf dereference:sv.value node:item];
+                    
+                    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:value];
+                }]];
+            }
+        }
+        
+        if (customFields.count) {
+            [ma addObject:[UIMenu menuWithTitle:@""
+                                          image:nil
+                                     identifier:nil
+                                        options:UIMenuOptionsDisplayInline
+                                       children:customFields]];
+        }
+    }
+
+    return [UIMenu menuWithTitle:@""
+                           image:nil
+                      identifier:nil
+                         options:UIMenuOptionsDisplayInline
+                        children:ma];
+}
+
+- (void)copyEmail:(Node*)item {
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.email node:item]];
+}
+
+- (void)copyNotes:(Node*)item {
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.notes node:item]];
+}
+
+- (void)copyUsername:(Node*)item {
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:[self dereference:item.fields.username node:item]];
+}
+
+- (void)copyTotp:(Node*)item {
+    if(!item.fields.otpToken) {
+        return;
+    }
+    
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:item.fields.otpToken.password];
+}
+
+- (void)copyPassword:(Node *)item {
+    BOOL copyTotp = (item.fields.password.length == 0 && item.fields.otpToken);
+    
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:copyTotp ? item.fields.otpToken.password : [self dereference:item.fields.password node:item]];
+}
+
+- (void)copyAllFields:(Node*)item {
+    NSMutableArray<NSString*>* fields = NSMutableArray.array;
+    
+    [fields addObject:[self dereference:item.title node:item]];
+    [fields addObject:[self dereference:item.fields.username node:item]];
+    [fields addObject:[self dereference:item.fields.password node:item]];
+    [fields addObject:[self dereference:item.fields.url node:item]];
+    [fields addObject:[self dereference:item.fields.notes node:item]];
+    [fields addObject:[self dereference:item.fields.email node:item]];
+    
+    
+    
+    NSArray* sortedKeys = [item.fields.customFields.allKeys sortedArrayUsingComparator:finderStringComparator];
+    for(NSString* key in sortedKeys) {
+        if ( ![NodeFields isTotpCustomFieldKey:key] ) {
+            StringValue* sv = item.fields.customFields[key];
+            NSString *val = [self dereference:sv.value node:item];
+            [fields addObject:val];
+        }
+    }
+
+    
+    
+    NSArray<NSString*> *all = [fields filter:^BOOL(NSString * _Nonnull obj) {
+        return obj.length != 0;
+    }];
+    
+    NSString* allString = [all componentsJoinedByString:@"\n"];
+    [ClipboardManager.sharedInstance copyStringWithDefaultExpiration:allString];
+}
+
+
+- (UIAction*)getContextualMenuGenericCopy:(NSString*)locKey item:(Node*)item handler:(UIActionHandler)handler API_AVAILABLE(ios(13.0)) {
+    return [ContextMenuHelper getItem:NSLocalizedString(locKey, nil) systemImage:@"doc.on.doc" handler:handler];
 }
 
 

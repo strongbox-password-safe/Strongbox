@@ -8,12 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "DatabaseMetadata.h"
+#import "DatabasePreferencesManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const kDatabasesListChangedNotification;
 
-@interface DatabasesManager : NSObject
+@interface DatabasesManager : NSObject<DatabasePreferencesManager>
 
 + (instancetype _Nullable)sharedInstance;
 
@@ -24,6 +25,7 @@ extern NSString* const kDatabasesListChangedNotification;
 - (void)move:(NSInteger)sourceIndex to:(NSInteger)destinationIndex;
 
 - (void)atomicUpdate:(NSString *_Nonnull)uuid touch:(void (^_Nonnull)(DatabaseMetadata* metadata))touch;
+- (void)update:(DatabaseMetadata *_Nonnull)database; 
 
 + (NSString *_Nonnull)trimDatabaseNickName:(NSString *_Nonnull)string;
 

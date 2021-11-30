@@ -16,6 +16,16 @@
 const NSInteger kDefaultPasswordExpiryHours = -1; // Forever 14 * 24; // 2 weeks
 static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strongbox";
 
+@interface DatabaseMetadata ()
+
+
+@property (nonatomic) BOOL isTouchIdEnrolled; 
+
+@property BOOL isEnrolledForConvenience; 
+@property BOOL isAutoFillMemOnlyConveniencePasswordHasBeenStored; 
+
+@end
+
 @implementation DatabaseMetadata
 
 - (instancetype)init {
@@ -44,6 +54,7 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         self.autoFillScanAltUrls = YES;
         self.autoFillScanCustomFields = YES;
         self.autoFillScanNotes = YES;
+        self.autoFillConcealedFieldsAsCreds = YES;
     }
     
     return self;
@@ -68,25 +79,49 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
 
 - (void)clearSecureItems {
-    [self setConveniencePassword:nil expiringAfterHours:-1];
+    [self setConveniencePassword:nil];
     self.keyFileBookmark = nil;
     self.autoFillKeyFileBookmark = nil;
     self.autoFillConvenienceAutoUnlockPassword = nil;
 }
 
 - (NSString*)getConveniencePasswordIdentifier {
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        return [NSString stringWithFormat:@"convenience-pw-af-mem-only-%@", self.uuid];
+    }
+#endif
+    
     return [NSString stringWithFormat:@"convenience-pw-%@", self.uuid];
 }
 
+- (void)triggerPasswordExpiry {
+    BOOL expired = NO;
+    [SecretStore.sharedInstance getSecureObject:[self getConveniencePasswordIdentifier] expired:&expired];
+
+    if ( expired ) { 
+        self.conveniencePasswordHasExpired = YES;
+    }
+}
+
 - (NSString *)conveniencePassword {
-    return [self getConveniencePassword:nil];
+    BOOL expired = NO;
+    NSString* object = (NSString*)[SecretStore.sharedInstance getSecureObject:[self getConveniencePasswordIdentifier] expired:&expired];
+
+    if ( expired ) { 
+        self.conveniencePasswordHasExpired = YES;
+    }
+
+    return object;
 }
 
-- (NSString*)getConveniencePassword:(BOOL*_Nullable)expired {
-    return [SecretStore.sharedInstance getSecureObject:[self getConveniencePasswordIdentifier] expired:expired];
-}
-
-- (void)setConveniencePassword:(NSString*)password expiringAfterHours:(NSInteger)expiringAfterHours {
+- (void)setConveniencePassword:(NSString*)password {
+    NSInteger expiringAfterHours = self.touchIdPasswordExpiryPeriodHours;
+    
+    if ( self.conveniencePasswordHasExpired ) {
+        self.conveniencePasswordHasExpired = NO;
+    }
+    
     NSString* identifier = [self getConveniencePasswordIdentifier];
     if(expiringAfterHours == -1) {
         [SecretStore.sharedInstance setSecureString:password forIdentifier:identifier];
@@ -98,15 +133,6 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         NSCalendar *cal = [NSCalendar currentCalendar];
         NSDate *date = [cal dateByAddingUnit:NSCalendarUnitHour value:expiringAfterHours toDate:[NSDate date] options:0];
         [SecretStore.sharedInstance setSecureObject:password forIdentifier:identifier expiresAt:date];
-    }
-}
-
-- (void)resetConveniencePasswordWithCurrentConfiguration:(NSString*)password {
-    if( self.isTouchIdEnabled || self.isWatchUnlockEnabled ) {
-        [self setConveniencePassword:password expiringAfterHours:self.touchIdPasswordExpiryPeriodHours];
-    }
-    else {
-        [self setConveniencePassword:nil expiringAfterHours:-1];
     }
 }
 
@@ -172,6 +198,8 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 - (NSString *)description {
     return [NSString stringWithFormat:@"%@ [%lu] - [%@-%@]", self.nickName, (unsigned long)self.storageProvider, self.fileUrl, self.storageInfo];
 }
+
+
 
 - (void)encodeWithCoder:(NSCoder *)encoder {
     [encoder encodeObject:self.uuid forKey:@"uuid"];
@@ -243,6 +271,15 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
     [encoder encodeBool:self.autoFillScanAltUrls forKey:@"autoFillScanAltUrls"];
     [encoder encodeBool:self.autoFillScanCustomFields forKey:@"autoFillScanCustomFields"];
     [encoder encodeBool:self.autoFillScanNotes forKey:@"autoFillScanNotes"];
+    
+    [encoder encodeInteger:self.unlockCount forKey:@"unlockCount"];
+    [encoder encodeInteger:self.likelyFormat forKey:@"likelyFormat"];
+    [encoder encodeBool:self.emptyOrNilPwPreferNilCheckFirst forKey:@"emptyOrNilPwPreferNilCheckFirst"];
+    
+    [encoder encodeBool:self.isAutoFillMemOnlyConveniencePasswordHasBeenStored forKey:@"isAutoFillMemOnlyConveniencePasswordHasBeenStored"];
+    
+    [encoder encodeBool:self.autoFillConcealedFieldsAsCreds forKey:@"autoFillConcealedFieldsAsCreds"];
+    [encoder encodeBool:self.autoFillUnConcealedFieldsAsCreds forKey:@"autoFillUnConcealedFieldsAsCreds"];
 }
 
 - (id)initWithCoder:(NSCoder *)decoder {
@@ -532,14 +569,47 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
         else {
             self.autoFillScanNotes = YES;
         }
+        
+        
+        
+        if ( [decoder containsValueForKey:@"unlockCount"] ) {
+            self.unlockCount = [decoder decodeIntegerForKey:@"unlockCount"];
+        }
+        if ( [decoder containsValueForKey:@"likelyFormat"] ) {
+            self.likelyFormat = [decoder decodeIntegerForKey:@"likelyFormat"];
+        }
+        if ( [decoder containsValueForKey:@"emptyOrNilPwPreferNilCheckFirst"] ) {
+            self.emptyOrNilPwPreferNilCheckFirst = [decoder decodeBoolForKey:@"emptyOrNilPwPreferNilCheckFirst"];
+        }
+        
+        
+        
+        if ( [decoder containsValueForKey:@"isAutoFillMemOnlyConveniencePasswordHasBeenStored"] ) {
+            self.isAutoFillMemOnlyConveniencePasswordHasBeenStored = [decoder decodeBoolForKey:@"isAutoFillMemOnlyConveniencePasswordHasBeenStored"];
+        }
+        
+        
+
+        if ( [decoder containsValueForKey:@"autoFillConcealedFieldsAsCreds"] ) {
+            self.autoFillConcealedFieldsAsCreds = [decoder decodeBoolForKey:@"autoFillConcealedFieldsAsCreds"];
+        }
+        else {
+            self.autoFillConcealedFieldsAsCreds = YES;
+        }
+        
+        if ( [decoder containsValueForKey:@"autoFillUnConcealedFieldsAsCreds"] ) {
+            self.autoFillUnConcealedFieldsAsCreds = [decoder decodeBoolForKey:@"autoFillUnConcealedFieldsAsCreds"];
+        }
     }
     
     return self;
 }
 
 
+
+
 - (ConflictResolutionStrategy)conflictResolutionStrategy {
-    return kConflictResolutionStrategyAutoMerge; 
+    return kConflictResolutionStrategyAutoMerge;
 }
 
 - (NSURL *)backupsDirectory {
@@ -552,6 +622,124 @@ static NSString* const kStrongboxICloudContainerIdentifier = @"iCloud.com.strong
 
 - (BOOL)isLocalDeviceDatabase {
     return self.storageProvider == kMacFile;
+}
+
+
+
+
+- (NSString *)conveniencePin {
+    return nil;
+}
+
+- (void)setConveniencePin:(NSString *)conveniencePin {
+    
+}
+
+- (BOOL)isEnrolledForConvenience {
+    return self.isTouchIdEnrolled;
+}
+
+- (void)setIsEnrolledForConvenience:(BOOL)isEnrolledForConvenience {
+    self.isTouchIdEnrolled = isEnrolledForConvenience;
+}
+
+- (NSString *)convenienceMasterPassword {
+    return self.conveniencePassword;
+}
+
+- (void)setConvenienceMasterPassword:(NSString *)convenienceMasterPassword {
+    self.conveniencePassword = convenienceMasterPassword;
+}
+
+- (BOOL)hasBeenPromptedForConvenience {
+    return self.hasPromptedForTouchIdEnrol;
+}
+
+- (void)setHasBeenPromptedForConvenience:(BOOL)hasBeenPromptedForConvenience {
+    self.hasPromptedForTouchIdEnrol = hasBeenPromptedForConvenience;
+}
+
+- (NSInteger)convenienceExpiryPeriod {
+    return self.touchIdPasswordExpiryPeriodHours;
+}
+
+- (void)setConvenienceExpiryPeriod:(NSInteger)convenienceExpiryPeriod {
+    self.touchIdPasswordExpiryPeriodHours = convenienceExpiryPeriod;
+}
+
+- (NSArray<NSString *> *)favourites {
+    return @[];
+}
+
+- (void)setFavourites:(NSArray<NSString *> *)favourites {
+    
+}
+
+- (DatabaseAuditorConfiguration *)auditConfig {
+    return DatabaseAuditorConfiguration.defaults;
+}
+
+- (void)setAuditConfig:(DatabaseAuditorConfiguration *)auditConfig {
+    
+}
+
+- (NSArray<NSString *> *)auditExcludedItems {
+    return @[];
+}
+
+- (void)setAuditExcludedItems:(NSArray<NSString *> *)auditExcludedItems {
+    
+}
+
+
+
+- (BOOL)isConvenienceUnlockEnabled {
+    return self.isTouchIdEnabled || self.isWatchUnlockEnabled;
+}
+
+- (BOOL)conveniencePasswordHasBeenStored {
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        return self.isAutoFillMemOnlyConveniencePasswordHasBeenStored;
+    }
+#endif
+    
+    return self.isEnrolledForConvenience;
+}
+
+- (void)setConveniencePasswordHasBeenStored:(BOOL)conveniencePasswordHasBeenStored {
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        self.isAutoFillMemOnlyConveniencePasswordHasBeenStored = conveniencePasswordHasBeenStored;
+        return;
+    }
+#endif
+    
+    self.isEnrolledForConvenience = conveniencePasswordHasBeenStored;
+}
+
+- (BOOL)conveniencePasswordHasExpired {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
+
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        key = [NSString stringWithFormat:@"%@-pw-has-expired-af-mem-only", self.uuid];
+    }
+#endif
+
+    return [Settings.sharedInstance.sharedAppGroupDefaults boolForKey:key];
+}
+
+- (void)setConveniencePasswordHasExpired:(BOOL)conveniencePasswordHasExpired {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
+
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        key = [NSString stringWithFormat:@"%@-pw-has-expired-af-mem-only", self.uuid];
+    }
+#endif
+
+    [Settings.sharedInstance.sharedAppGroupDefaults setBool:conveniencePasswordHasExpired forKey:key];
 }
 
 @end

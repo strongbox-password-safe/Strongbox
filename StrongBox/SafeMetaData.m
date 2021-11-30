@@ -24,6 +24,8 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 @property (nullable) YubiKeyHardwareConfiguration* yubiKeyConfig;
 @property (nullable) YubiKeyHardwareConfiguration* autoFillYubiKeyConfig;
+@property BOOL isEnrolledForConvenience; 
+@property BOOL isAutoFillMemOnlyConveniencePasswordHasBeenStored; 
 
 @end
 
@@ -76,7 +78,7 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         self.keePassIconSet = kKeePassIconSetSfSymbols;
         self.auditConfig = DatabaseAuditorConfiguration.defaults;
         
-        self.conflictResolutionStrategy = kConflictResolutionStrategyAutoMerge;
+        self.conflictResolutionStrategy = kConflictResolutionStrategyAsk;
         self.quickTypeDisplayFormat = kQuickTypeFormatTitleThenUsername;
         self.autoLockOnDeviceLock = YES;
         self.autoFillConvenienceAutoUnlockTimeout = -1;
@@ -173,7 +175,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     if ( jsonDictionary[@"hideIconInBrowse"] != nil ) ret.hideIconInBrowse = ((NSNumber*)jsonDictionary[@"hideIconInBrowse"]).boolValue;
     if ( jsonDictionary[@"colorizePasswords"] != nil ) ret.colorizePasswords = ((NSNumber*)jsonDictionary[@"colorizePasswords"]).boolValue;
     if ( jsonDictionary[@"isTouchIdEnabled"] != nil ) ret.isTouchIdEnabled = ((NSNumber*)jsonDictionary[@"isTouchIdEnabled"]).boolValue;
+
     if ( jsonDictionary[@"isEnrolledForConvenience"] != nil ) ret.isEnrolledForConvenience = ((NSNumber*)jsonDictionary[@"isEnrolledForConvenience"]).boolValue;
+    if ( jsonDictionary[@"isAutoFillMemOnlyConveniencePasswordHasBeenStored"] != nil ) ret.isAutoFillMemOnlyConveniencePasswordHasBeenStored = ((NSNumber*)jsonDictionary[@"isAutoFillMemOnlyConveniencePasswordHasBeenStored"]).boolValue;
+
     if ( jsonDictionary[@"hasUnresolvedConflicts"] != nil ) ret.hasUnresolvedConflicts = ((NSNumber*)jsonDictionary[@"hasUnresolvedConflicts"]).boolValue;
     if ( jsonDictionary[@"readOnly"] != nil ) ret.readOnly = ((NSNumber*)jsonDictionary[@"readOnly"]).boolValue;
     if ( jsonDictionary[@"hasBeenPromptedForConvenience"] != nil ) ret.hasBeenPromptedForConvenience = ((NSNumber*)jsonDictionary[@"hasBeenPromptedForConvenience"]).boolValue;
@@ -399,7 +404,28 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     else {
         ret.autoFillScanNotes = YES;
     }
+    
+    
 
+    if ( jsonDictionary[@"autoFillConcealedFieldsAsCreds"] != nil ) {
+        ret.autoFillConcealedFieldsAsCreds = ((NSNumber*)jsonDictionary[@"autoFillConcealedFieldsAsCreds"]).boolValue;
+    }
+    if ( jsonDictionary[@"autoFillUnConcealedFieldsAsCreds"] != nil ) {
+        ret.autoFillUnConcealedFieldsAsCreds = ((NSNumber*)jsonDictionary[@"autoFillUnConcealedFieldsAsCreds"]).boolValue;
+    }
+    if ( jsonDictionary[@"argon2MemReductionDontAskAgain"] != nil ) {
+        ret.argon2MemReductionDontAskAgain = ((NSNumber*)jsonDictionary[@"argon2MemReductionDontAskAgain"]).boolValue;
+    }
+    if ( jsonDictionary[@"kdbx4UpgradeDontAskAgain"] != nil ) {
+        ret.kdbx4UpgradeDontAskAgain = ((NSNumber*)jsonDictionary[@"kdbx4UpgradeDontAskAgain"]).boolValue;
+    }
+    if ( jsonDictionary[@"lastAskedAboutArgon2MemReduction"] != nil ) {
+        ret.lastAskedAboutArgon2MemReduction = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastAskedAboutArgon2MemReduction"])).doubleValue];
+    }
+    if ( jsonDictionary[@"lastAskedAboutKdbx4Upgrade"] != nil ) {
+        ret.lastAskedAboutKdbx4Upgrade = [NSDate dateWithTimeIntervalSinceReferenceDate:((NSNumber*)(jsonDictionary[@"lastAskedAboutKdbx4Upgrade"])).doubleValue];
+    }
+    
     return ret;
 }
 
@@ -443,7 +469,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"colorizePasswords" : @(self.colorizePasswords),
         @"keePassIconSet" : @(self.keePassIconSet),
         @"isTouchIdEnabled" : @(self.isTouchIdEnabled),
+        
         @"isEnrolledForConvenience" : @(self.isEnrolledForConvenience),
+        @"isAutoFillMemOnlyConveniencePasswordHasBeenStored" : @(self.isAutoFillMemOnlyConveniencePasswordHasBeenStored),
+        
         @"hasUnresolvedConflicts" : @(self.hasUnresolvedConflicts),
         @"readOnly" : @(self.readOnly),
         @"hasBeenPromptedForConvenience" : @(self.hasBeenPromptedForConvenience),
@@ -478,6 +507,10 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         @"autoFillScanNotes" : @(self.autoFillScanNotes),
         @"autoFillScanCustomFields" : @(self.autoFillScanCustomFields),
         @"autoFillScanAltUrls" : @(self.autoFillScanAltUrls),
+        @"autoFillConcealedFieldsAsCreds" : @(self.autoFillConcealedFieldsAsCreds),
+        @"autoFillUnConcealedFieldsAsCreds" : @(self.autoFillUnConcealedFieldsAsCreds),
+        @"argon2MemReductionDontAskAgain" : @(self.argon2MemReductionDontAskAgain),
+        @"kdbx4UpgradeDontAskAgain" : @(self.kdbx4UpgradeDontAskAgain),
     }];
     
     if (self.nickName != nil) {
@@ -539,6 +572,16 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
         ret[@"databaseCreated"] = @(self.databaseCreated.timeIntervalSinceReferenceDate);
     }
 
+    
+    
+    
+    if ( self.lastAskedAboutArgon2MemReduction != nil ) {
+        ret[@"lastAskedAboutArgon2MemReduction"] = @(self.lastAskedAboutArgon2MemReduction.timeIntervalSinceReferenceDate);
+    }
+    if ( self.lastAskedAboutKdbx4Upgrade != nil ) {
+        ret[@"lastAskedAboutKdbx4Upgrade"] = @(self.lastAskedAboutKdbx4Upgrade.timeIntervalSinceReferenceDate);
+    }
+
     return ret;
 }
 
@@ -582,10 +625,29 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
     }
 }
 
+- (NSString*)conveniencePasswordLookupKey {
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        return [NSString stringWithFormat:@"convenience-pw-af-mem-only-%@", self.uuid];
+    }
+#endif
+
+    return self.uuid;
+}
+
+- (void)triggerPasswordExpiry {
+    BOOL expired = NO;
+    [SecretStore.sharedInstance getSecureObject:[self conveniencePasswordLookupKey] expired:&expired];
+    
+    if ( expired ) { 
+        self.conveniencePasswordHasExpired = YES;
+    }
+}
 
 - (NSString *)convenienceMasterPassword {
     BOOL expired = NO;
-    NSString* object = (NSString*)[SecretStore.sharedInstance getSecureObject:self.uuid expired:&expired];
+    NSString* key = [self conveniencePasswordLookupKey];
+    NSString* object = (NSString*)[SecretStore.sharedInstance getSecureObject:key expired:&expired];
     
     if ( expired ) { 
         self.conveniencePasswordHasExpired = YES;
@@ -596,35 +658,23 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 - (void)setConvenienceMasterPassword:(NSString *)convenienceMasterPassword {
     NSInteger expiringAfterHours = self.convenienceExpiryPeriod;
+    NSString* key = [self conveniencePasswordLookupKey];
     
-
     if ( self.conveniencePasswordHasExpired ) {
         self.conveniencePasswordHasExpired = NO;
     }
 
     if(expiringAfterHours == -1) {
-        [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:self.uuid];
+        [SecretStore.sharedInstance setSecureString:convenienceMasterPassword forIdentifier:key];
     }
     else if(expiringAfterHours == 0) {
-        [SecretStore.sharedInstance setSecureEphemeralObject:convenienceMasterPassword forIdentifer:self.uuid];
+        [SecretStore.sharedInstance setSecureEphemeralObject:convenienceMasterPassword forIdentifer:key];
     }
     else {
         NSCalendar *cal = [NSCalendar currentCalendar];
-        
         NSDate *date = [cal dateByAddingUnit:NSCalendarUnitHour value:expiringAfterHours toDate:[NSDate date] options:0];
-
-        [SecretStore.sharedInstance setSecureObject:convenienceMasterPassword forIdentifier:self.uuid expiresAt:date];
+        [SecretStore.sharedInstance setSecureObject:convenienceMasterPassword forIdentifier:key expiresAt:date];
     }
-}
-
-- (BOOL)conveniencePasswordHasExpired {
-    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
-    return [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:key];
-}
-
-- (void)setConveniencePasswordHasExpired:(BOOL)conveniencePasswordHasExpired {
-    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
-    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:conveniencePasswordHasExpired forKey:key];
 }
 
 - (NSString *)autoFillConvenienceAutoUnlockPassword {
@@ -727,6 +777,57 @@ static const NSUInteger kDefaultScheduledExportIntervalDays = 28;
 
 - (NSString *)description {
     return [NSString stringWithFormat:@"%@ [%lu] - [%@-%@]", self.nickName, (unsigned long)self.storageProvider, self.fileName, self.fileIdentifier];
+}
+
+- (BOOL)isConvenienceUnlockEnabled {
+    return self.isTouchIdEnabled || (self.conveniencePin != nil);
+}
+
+- (BOOL)conveniencePasswordHasBeenStored {
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        return self.isAutoFillMemOnlyConveniencePasswordHasBeenStored;
+    }
+#endif
+
+    return self.isEnrolledForConvenience;
+}
+
+- (void)setConveniencePasswordHasBeenStored:(BOOL)conveniencePasswordHasBeenStored {
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        self.isAutoFillMemOnlyConveniencePasswordHasBeenStored = conveniencePasswordHasBeenStored;
+        return;
+    }
+#endif
+    
+    self.isEnrolledForConvenience = conveniencePasswordHasBeenStored;
+}
+
+- (BOOL)conveniencePasswordHasExpired {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
+    
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        key = [NSString stringWithFormat:@"%@-pw-has-expired-af-mem-only", self.uuid];
+    }
+#endif
+
+    BOOL ret = [AppPreferences.sharedInstance.sharedAppGroupDefaults boolForKey:key];
+    
+    return ret;
+}
+
+- (void)setConveniencePasswordHasExpired:(BOOL)conveniencePasswordHasExpired {
+    NSString *key = [NSString stringWithFormat:@"%@-pw-has-expired", self.uuid];
+    
+#ifdef IS_APP_EXTENSION 
+    if ( self.convenienceExpiryPeriod == 0 ) {
+        key = [NSString stringWithFormat:@"%@-pw-has-expired-af-mem-only", self.uuid];
+    }
+#endif
+
+    [AppPreferences.sharedInstance.sharedAppGroupDefaults setBool:conveniencePasswordHasExpired forKey:key];
 }
 
 @end

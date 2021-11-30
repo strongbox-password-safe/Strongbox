@@ -115,7 +115,7 @@
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(SafeMetaData *)database data:(NSData *)data file:(NSString *)file error:(NSError**)error {
     
     
-    NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
+    NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
     if (localWorkingCache) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
@@ -141,7 +141,7 @@
                                                                    error:error];
     }
     else {
-        url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData2:data
+        url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:data
                                                              dateModified:NSDate.date
                                                                  database:database.uuid
                                                                     error:error];
@@ -168,7 +168,7 @@
         [[AppleICloudProvider sharedInstance] delete:database completion:nil];
     }
 
-    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache2:database.uuid];
+    [WorkingCopyManager.sharedInstance deleteLocalWorkingCache:database.uuid];
     
     [database clearKeychainItems];
 }

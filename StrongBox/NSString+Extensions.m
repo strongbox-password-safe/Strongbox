@@ -320,4 +320,10 @@ static NSString* const kLowerCaseNull = @"null";
     }
 }
 
+- (BOOL)isAllDigits {
+    NSCharacterSet* nonNumbers = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+    NSRange r = [self rangeOfCharacterFromSet:nonNumbers];
+    return r.location == NSNotFound && self.length > 0;
+}
+
 @end

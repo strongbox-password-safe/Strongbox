@@ -37,11 +37,13 @@
 #endif
 
 
+
 @interface AppDelegate ()
 
 @property NSDate* appLaunchTime;
 @property AppLockViewController* lockScreenVc;
 @property UIImageView* privacyScreen;
+@property NSInteger privacyScreenPresentationIdentifier; 
 @property BOOL appIsLocked;
 
 @property (nonatomic, strong) NSDate *enterBackgroundTime;
@@ -56,9 +58,10 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+#ifdef DEBUG
     
     [[NSUserDefaults standardUserDefaults] setValue:@(NO) forKey:@"_UIConstraintBasedLayoutLogUnsatisfiable"];
+#endif
     
     [self installTopLevelExceptionHandlers];
     
@@ -82,13 +85,13 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
     [self markDirectoriesForBackupInclusion];
     
     [self cleanupWorkingDirectories:launchOptions];
-        
+    
     [ClipboardManager.sharedInstance observeClipboardChangeNotifications];
     
     if ( !CustomizationManager.isAProBundle ) {
         [ProUpgradeIAPManager.sharedInstance initialize]; 
     }
-    
+        
     [SyncManager.sharedInstance startMonitoringDocumentsDirectory]; 
         
     NSLog(@"STARTUP - Documents Directory: [%@]", FileManager.sharedInstance.documentsDirectory);
@@ -154,12 +157,14 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 
 
 
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
             options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
     NSLog(@"openURL: [%@] => [%@] - Source App: [%@]", options, url, options[UIApplicationOpenURLOptionsSourceApplicationKey]);
     
     if ([url.scheme isEqualToString:@"strongbox"]) {
-        NSLog(@"Strongbox URL Scheme: NOP - [%@]", url);
+        SafesViewController *safesViewController = [self getInitialViewController];
+        [safesViewController handleUrlSchemeNavigationRequest:url];
         return YES;
     }
 #ifndef NO_3RD_PARTY_STORAGE_PROVIDERS
@@ -214,14 +219,17 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         [self showLockScreen];
     }
     else {
+        NSInteger foo = self.privacyScreenPresentationIdentifier;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self hidePrivacyShield]; 
+            [self hidePrivacyShield:foo]; 
         });
     }
 
     [[iCloudSafesCoordinator sharedInstance] initializeiCloudAccess];
     
+#ifndef NO_OFFLINE_DETECTION
     [OfflineDetector.sharedInstance startMonitoringConnectivitity]; 
+#endif
     
     [self performedScheduledEntitlementsCheck];
 
@@ -235,7 +243,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
 - (void)applicationWillResignActive:(UIApplication *)application {
     self.appLockSuppressedForBiometricAuth = NO;
     if( AppPreferences.sharedInstance.suppressAppBackgroundTriggers ) {
-        NSLog(@"appResignActive... suppressAppBackgroundTriggers");
+        NSLog(@"AppDelegate::applicationWillResignActive - suppressAppBackgroundTriggers = YES");
         self.appLockSuppressedForBiometricAuth = YES;
         return;
     }
@@ -263,7 +271,9 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         
         if ( launchCount > 30 ) { 
             if (@available( iOS 10.3,*)) {
+#ifndef DEBUG
                 [SKStoreReviewController requestReview];
+#endif
             }
         }
         
@@ -271,6 +281,7 @@ static NSString * const kSecureEnclavePreHeatKey = @"com.markmcguill.strongbox.p
         
         [ProUpgradeIAPManager.sharedInstance performScheduledProEntitlementsCheckIfAppropriate];
     }
+    
 }
 
 - (void)initializeDropbox {
@@ -333,29 +344,33 @@ void uncaughtExceptionHandler(NSException *exception) {
     if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeNone ) {
         return;
     }
-        
+
+    UIImage* cover = nil;
+    if (@available(iOS 13.0, *)) {
+        if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlur ) {
+            UIImage* screenshot = [self screenShot];
+            cover = [self blur:screenshot];
+        }
+        else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModePixellate ) {
+            UIImage* screenshot = [self screenShot];
+            cover = [self pixellate:screenshot];
+        }
+    }
+
+    UIImageView* tmp = [[UIImageView alloc] init];
+    tmp.frame = self.window.frame;
+    tmp.contentMode = UIViewContentModeScaleToFill;
+    tmp.backgroundColor = UIColor.systemBlueColor;
+    
     if ( !self.privacyScreen ) {
         if ( self.lockScreenVc != nil ) {
             NSLog(@"Lock Screen is up, privacy screen inappropriate, likely initial launch and switch back...");
             return;
         }
+        
+        self.privacyScreen = tmp;
+        self.privacyScreenPresentationIdentifier++;
 
-        UIImage* cover = nil;
-        if (@available(iOS 13.0, *)) {
-            if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModeBlur ) {
-                UIImage* screenshot = [self screenShot];
-                cover = [self blur:screenshot];
-            }
-            else if ( AppPreferences.sharedInstance.appPrivacyShieldMode == kAppPrivacyShieldModePixellate ) {
-                UIImage* screenshot = [self screenShot];
-                cover = [self pixellate:screenshot];
-            }
-        }
-
-        self.privacyScreen = [[UIImageView alloc] init];
-        self.privacyScreen.frame = self.window.frame;
-        self.privacyScreen.contentMode = UIViewContentModeScaleToFill;
-        self.privacyScreen.backgroundColor = UIColor.systemBlueColor;
         [self.window addSubview:self.privacyScreen];
 
         if (@available(iOS 13.0, *)) {
@@ -366,28 +381,25 @@ void uncaughtExceptionHandler(NSException *exception) {
     }
     else {
         NSLog(@"Privacy Screen Already in Place... NOP");
+        self.privacyScreenPresentationIdentifier++;
     }
 }
 
-- (void)hidePrivacyShield {
+- (void)hidePrivacyShield:(NSInteger)identifier {
+    NSLog(@"hidePrivacyShield - [%ld]-[%ld]", (long)self.privacyScreenPresentationIdentifier, (long)identifier);
 
-
-    if ( self.privacyScreen ) {
-
-
-
-
-
-        
-
-
-
-
-        [self.privacyScreen removeFromSuperview];
+    if ( self.privacyScreen && identifier == self.privacyScreenPresentationIdentifier ) {
+        UIView* tmp = self.privacyScreen;
         self.privacyScreen = nil;
+        [tmp removeFromSuperview];
     }
     else {
-
+        if ( identifier == self.privacyScreenPresentationIdentifier ) {
+            NSLog(@"hidePrivacyShield - Privacy Screen not around to hide... NOP");
+        }
+        else {
+            NSLog(@"hidePrivacyShield- Privacy Screen - Will Not Hide because presentation id mismatch [%ld]-[%ld]", (long)self.privacyScreenPresentationIdentifier, (long)identifier);
+        }
     }
 }
 
@@ -532,8 +544,9 @@ void uncaughtExceptionHandler(NSException *exception) {
 }
 
 - (void)onLockScreenDismissed:(BOOL)userJustCompletedBiometricAuthentication {
+    NSInteger foo = self.privacyScreenPresentationIdentifier;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self hidePrivacyShield]; 
+        [self hidePrivacyShield:foo]; 
     });
 
     SafesViewController* databasesListVc = [self getInitialViewController];

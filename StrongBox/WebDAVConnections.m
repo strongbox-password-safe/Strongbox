@@ -102,9 +102,6 @@ static NSString* const kConfigFilename = @"webdav-connections.json";
         NSLog(@"Error writing WebDAV Connections file: [%@]-[%@]", error, writeError);
         return;
     }
-    else {
-
-    }
 }
 
 - (WebDAVSessionConfiguration*)getById:(NSString*)identifier {

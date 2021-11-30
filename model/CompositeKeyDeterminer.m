@@ -493,7 +493,6 @@ static const int kMaxFailedPinAttempts = 3;
     
     scVc.initialKeyFileBookmark = self.database.keyFileBookmark;
     scVc.initialReadOnly = self.database.readOnly;
-    
     scVc.initialYubiKeyConfig = self.database.contextAwareYubiKeyConfig;
     
     scVc.validateCommonKeyFileMistakes = self.database.keyFileBookmark == nil; 
@@ -565,14 +564,13 @@ static const int kMaxFailedPinAttempts = 3;
         NSError *error;
         DatabaseFormat format = kKeePass4;
         
-        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:self.database.uuid];
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:self.database.uuid];
         if (url) {
             format = [Serializator getDatabaseFormat:url];
         }
 
         keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
                                          onceOffKeyFileData:oneTimeKeyFileData
-                                                streamLarge:AppPreferences.sharedInstance.streamReadLargeKeyFiles
                                                      format:format
                                                       error:&error];
                 

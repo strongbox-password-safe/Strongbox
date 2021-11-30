@@ -10,7 +10,6 @@
 #import "DatabaseOperations.h"
 #import "BrowsePreferencesTableViewController.h"
 #import "Utils.h"
-#import "SelectItemTableViewController.h"
 #import "NSArray+Extensions.h"
 #import "Alerts.h"
 #import "AutoFillManager.h"
@@ -24,13 +23,11 @@
 #import "BiometricsManager.h"
 #import "ScheduledExportConfigurationViewController.h"
 #import "EncryptionPreferencesViewController.h"
+#import "SafesList.h"
+#import "AutomaticLockingPreferences.h"
+#import "CASGTableViewController.h"
 
 @interface DatabasePreferencesController ()
-
-@property (weak, nonatomic) IBOutlet UILabel *labelDatabaseAutoLockDelay;
-@property (weak, nonatomic) IBOutlet UISwitch *switchDatabaseAutoLockEnabled;
-@property (weak, nonatomic) IBOutlet UISwitch *switchLockOnDeviceLock;
-@property (weak, nonatomic) IBOutlet UISwitch *switchLockDuringEditing;
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseOperations;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewDatabaseOperations;
@@ -38,7 +35,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewPreferences;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellStats;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewStats;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseAutoLockDelay;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAudit;
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewAutoFill;
@@ -51,12 +47,24 @@
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellEncryptionSettings;
 @property (weak, nonatomic) IBOutlet UIImageView *imageViewEncryptionSettings;
 
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellAutoLocking;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeCreds;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewChangeCreds;
+@property (weak, nonatomic) IBOutlet UIImageView *imageViewAutoLock;
+@property (weak, nonatomic) IBOutlet UILabel *labelChangeCreds;
+
 @end
 
 @implementation DatabasePreferencesController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+
+
+
+
+
 
     self.imageViewAudit.tintColor = UIColor.systemOrangeColor;
 
@@ -68,20 +76,23 @@
     self.imageViewStats.image = [UIImage imageNamed:@"statistics"];
     self.imageViewEncryptionSettings.image = [UIImage imageNamed:@"unlock"];
 
+    self.imageViewChangeCreds.image = [UIImage imageNamed:@"key"];
+    self.imageViewAutoLock.image = [UIImage imageNamed:@"unlock"];
+
     if (@available(iOS 13.0, *)) {
         self.imageViewPreferences.image = [UIImage systemImageNamed:@"list.bullet"];
         self.imageViewDatabaseOperations.image = [UIImage systemImageNamed:@"wrench"];
         self.imageViewAudit.image = [UIImage systemImageNamed:@"checkmark.shield"];
         self.imageViewAudit.preferredSymbolConfiguration = [UIImageSymbolConfiguration configurationWithWeight:UIImageSymbolWeightLight];
-        
         self.imageViewStats.image = [UIImage systemImageNamed:@"number.circle"];
-        
+        self.imageViewEncryptionSettings.image = [UIImage systemImageNamed:@"function"];
+        self.imageViewAutoLock.image = [UIImage systemImageNamed:@"lock.rotation.open"];
+
         if (@available(iOS 14.0, *)) {
             self.imageViewAutoFill.image = [UIImage systemImageNamed:@"rectangle.and.pencil.and.ellipsis"];
             self.imageViewScheduledExport.image = [UIImage systemImageNamed:@"externaldrive.badge.timemachine"];
+            self.imageViewChangeCreds.image = [UIImage systemImageNamed:@"key"];
         }
-        
-        self.imageViewEncryptionSettings.image = [UIImage systemImageNamed:@"function"];
     }
     
     NSString* fmt = [NSString stringWithFormat:NSLocalizedString(@"convenience_unlock_preferences_title_fmt", @"%@ & PIN Codes"), BiometricsManager.sharedInstance.biometricIdName];
@@ -89,29 +100,23 @@
     self.labelConvenienceUnlock.text = fmt;
     self.imageConvenienceUnlock.image = [BiometricsManager.sharedInstance isFaceId] ? [UIImage imageNamed:@"face_ID"] : [UIImage imageNamed:@"biometric"];
 
-
-        [self cell:self.cellStats setHidden:YES];
-
-
-    [self bindUi];
-}
-
-- (void)bindUi {
-    NSNumber* seconds = self.viewModel.metadata.autoLockTimeoutSeconds ? self.viewModel.metadata.autoLockTimeoutSeconds : @(-1);
+    [self cell:self.cellStats setHidden:YES];
     
-    if(seconds.integerValue == -1) {
-        self.switchDatabaseAutoLockEnabled.on = NO;
-        self.labelDatabaseAutoLockDelay.text = NSLocalizedString(@"prefs_vc_setting_disabled", @"Disabled");
-        self.cellDatabaseAutoLockDelay.userInteractionEnabled = NO;
+    
+    
+    self.cellChangeCreds.userInteractionEnabled = [self canSetCredentials];
+    
+    if (@available(iOS 13.0, *)) {
+        self.labelChangeCreds.textColor = [self canSetCredentials] ? nil : UIColor.secondaryLabelColor;
+    } else {
+        self.labelChangeCreds.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
     }
-    else {
-        self.switchDatabaseAutoLockEnabled.on = YES;
-        self.labelDatabaseAutoLockDelay.text = [Utils formatTimeInterval:seconds.integerValue];
-        self.cellDatabaseAutoLockDelay.userInteractionEnabled = YES;
-    }
-
-    self.switchLockOnDeviceLock.on = self.viewModel.metadata.autoLockOnDeviceLock;
-    self.switchLockDuringEditing.on = self.viewModel.metadata.lockEvenIfEditing;
+    
+    self.labelChangeCreds.text = self.viewModel.database.originalFormat == kPasswordSafe ?
+        NSLocalizedString(@"db_management_change_master_password", @"Change Master Password") :
+        NSLocalizedString(@"db_management_change_master_credentials", @"Change Master Credentials");
+    
+    self.cellChangeCreds.tintColor =  [self canSetCredentials] ? nil : UIColor.lightGrayColor;
 }
 
 - (IBAction)onDone:(id)sender {
@@ -153,6 +158,31 @@
         ConvenienceUnlockPreferences* vc = (ConvenienceUnlockPreferences*)nav.topViewController;
         vc.viewModel = sender;
     }
+    else if ( [segue.identifier isEqualToString:@"segueToAutomaticLocking"] ) {
+        AutomaticLockingPreferences* vc = (AutomaticLockingPreferences*)segue.destinationViewController;
+        vc.viewModel = self.viewModel;
+    }
+    else if([segue.identifier isEqualToString:@"segueToSetCredentials"]) {
+        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
+        CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
+        
+        scVc.mode = kCASGModeSetCredentials;
+        scVc.initialFormat = self.viewModel.database.originalFormat;
+        scVc.initialKeyFileBookmark = self.viewModel.metadata.keyFileBookmark;
+        scVc.initialYubiKeyConfig = self.viewModel.metadata.contextAwareYubiKeyConfig;
+        
+        __weak DatabasePreferencesController* weakSelf = self;
+        scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
+            [weakSelf dismissViewControllerAnimated:YES completion:^{
+                if(success) {
+                    [weakSelf setCredentials:creds.password
+                             keyFileBookmark:creds.keyFileBookmark
+                          oneTimeKeyFileData:creds.oneTimeKeyFileData
+                                  yubiConfig:creds.yubiKeyConfig];
+                }
+            }];
+        };
+    }
     else if ( [segue.identifier isEqualToString:@"segueToScheduledExport"] ) {
         ScheduledExportConfigurationViewController* vc = (ScheduledExportConfigurationViewController*)segue.destinationViewController;
         vc.model = sender;
@@ -165,14 +195,28 @@
     }
 }
 
+- (BOOL)canSetCredentials {
+    return !self.viewModel.isReadOnly;
+}
+
+- (void)setCredentials:(NSString*)password
+       keyFileBookmark:(NSString*)keyFileBookmark
+    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
+            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
+    self.onSetMasterCredentials(password, keyFileBookmark, oneTimeKeyFileData, yubiConfig);
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
-    if (cell == self.cellDatabaseAutoLockDelay) {
-        [self promptForAutoLockTimeout];
-    }
-    else if ( cell == self.cellAutoFillPreferences ) {
+    if ( cell == self.cellAutoFillPreferences ) {
         [self performSegueWithIdentifier:@"segueToAutoFillPreferences" sender:self.viewModel];
+    }
+    else if ( cell == self.cellChangeCreds ) {
+        [self performSegueWithIdentifier:@"segueToSetCredentials" sender:nil];
+    }
+    else if ( cell == self.cellAutoLocking ) {
+        [self performSegueWithIdentifier:@"segueToAutomaticLocking" sender:self.viewModel];
     }
     else if ( cell == self.cellConvenienceUnlock ) {
         [self performSegueWithIdentifier:@"segueToConvenienceUnlock" sender:self.viewModel];
@@ -186,76 +230,5 @@
     
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
-
-- (void)promptForAutoLockTimeout {
-    [self promptForInteger:NSLocalizedString(@"prefs_vc_auto_lock_database_delay", @"Auto Lock Delay")
-                   options:@[@0, @30, @60, @120, @180, @300, @600]
-         formatAsIntervals:YES
-              currentValue:self.viewModel.metadata.autoLockTimeoutSeconds ? self.viewModel.metadata.autoLockTimeoutSeconds.integerValue : 60
-                completion:^(BOOL success, NSInteger selectedValue) {
-                    if (success) {
-                        self.viewModel.metadata.autoLockTimeoutSeconds = @(selectedValue);
-                        [SafesList.sharedInstance update:self.viewModel.metadata];
-                    }
-                    [self bindUi];
-                }];
-}
-
-- (IBAction)onSwitchDatabaseAutoLockEnabled:(id)sender {
-    self.viewModel.metadata.autoLockTimeoutSeconds = self.switchDatabaseAutoLockEnabled.on ? @(60) : @(-1);
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-    [self bindUi];
-}
-
-- (IBAction)onSwitchLockOnDeviceLock:(id)sender {
-    self.viewModel.metadata.autoLockOnDeviceLock = self.switchLockOnDeviceLock.on;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-    [self bindUi];
-}
-
-- (IBAction)onSwitchLockEvenIfEditing:(id)sender {
-    self.viewModel.metadata.lockEvenIfEditing = self.switchLockDuringEditing.on;
-    [SafesList.sharedInstance update:self.viewModel.metadata];
-    [self bindUi];
-}
-
-- (void)promptForInteger:(NSString*)title
-                 options:(NSArray<NSNumber*>*)options
-       formatAsIntervals:(BOOL)formatAsIntervals
-            currentValue:(NSInteger)currentValue
-              completion:(void(^)(BOOL success, NSInteger selectedValue))completion {
-    
-    NSArray<NSString*>* items = [options map:^id _Nonnull(NSNumber * _Nonnull obj, NSUInteger idx) {
-        return formatAsIntervals ? [Utils formatTimeInterval:obj.integerValue] : obj.stringValue;
-    }];
-
-    NSInteger currentlySelectIndex = [options indexOfObject:@(currentValue)];
-
-    [self promptForChoice:title options:items currentlySelectIndex:currentlySelectIndex completion:^(BOOL success, NSInteger selectedIndex) {
-        completion(success, success ? options[selectedIndex].integerValue : -1);
-    }];
-}
-
-- (void)promptForChoice:(NSString*)title
-                options:(NSArray<NSString*>*)items
-    currentlySelectIndex:(NSInteger)currentlySelectIndex
-              completion:(void(^)(BOOL success, NSInteger selectedIndex))completion {
-    UIStoryboard* storyboard = [UIStoryboard storyboardWithName:@"SelectItem" bundle:nil];
-    UINavigationController* nav = (UINavigationController*)[storyboard instantiateInitialViewController];
-    SelectItemTableViewController *vc = (SelectItemTableViewController*)nav.topViewController;
-
-    vc.groupItems = @[items];
-    
-    vc.selectedIndexPaths = @[[NSIndexSet indexSetWithIndex:currentlySelectIndex]];
-    vc.onSelectionChange = ^(NSArray<NSIndexSet *> * _Nonnull selectedIndices) {
-        NSIndexSet* set = selectedIndices.firstObject;
-        [self.navigationController popViewControllerAnimated:YES];
-        completion(YES, set.firstIndex);
-    };
-    
-    vc.title = title;
-    [self.navigationController pushViewController:vc animated:YES];
-}
-
 
 @end

@@ -177,7 +177,18 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd"];
 
     return [dateFormatter dateFromString:string];
+}
 
++ (instancetype)fromYYYY_MM_DD_London_Time_String:(NSString *)string {
+    NSTimeZone* sourceTimeZone = [NSTimeZone timeZoneWithName:@"Europe/London"];
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+
+
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    [dateFormatter setTimeZone:sourceTimeZone];
+    
+    return [dateFormatter dateFromString:string];
 }
 
 @end

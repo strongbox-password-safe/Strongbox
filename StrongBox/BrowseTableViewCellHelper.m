@@ -124,6 +124,7 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
              groupLocation:groupLocation
                  tintColor:nil
                      flags:flags
+            flagTintColors:flagTintColors
                   hideIcon:self.viewModel.metadata.hideIconInBrowse];
         }
         else {
@@ -156,16 +157,18 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     }
 
     NSMutableArray<UIImage*> *flags = NSMutableArray.array;
+    NSMutableDictionary<NSNumber*, UIColor*> *tintsMap = NSMutableDictionary.dictionary;
     
     if([self.viewModel isPinned:node.uuid]) {
         UIImage* image;
         if (@available(iOS 13.0, *)) {
-           image = [UIImage systemImageNamed:@"pin"];
+           image = [UIImage systemImageNamed:@"star.fill"];
         }
         else {
            image = [UIImage imageNamed:@"pin"];
         }
 
+        tintsMap[@(flags.count)] = UIColor.systemYellowColor;
         [flags addObject:image];
     }
 
@@ -181,8 +184,6 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
     }
     
     if(!node.isGroup && isFlaggedByAudit) {
-        UIColor* tintColor;
-        
         UIImage* auditImage;
         if (@available(iOS 13.0, *)) {
             auditImage = [UIImage systemImageNamed:@"checkmark.shield"];
@@ -191,13 +192,15 @@ static NSString* const kBrowseItemTotpCell = @"BrowseItemTotpCell";
             auditImage = [UIImage imageNamed:@"security_checked"];
         }
         
-        tintColor = UIColor.systemOrangeColor;
-        
         if(tintColors) {
-            *tintColors = @{ @(flags.count) : tintColor };
+            tintsMap[@(flags.count)] = UIColor.systemOrangeColor;
         }
 
         [flags addObject:auditImage];
+    }
+
+    if(tintColors) {
+        *tintColors = tintsMap;
     }
 
     return flags;

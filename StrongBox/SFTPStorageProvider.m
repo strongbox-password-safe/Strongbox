@@ -24,7 +24,7 @@
 
 #import "MacAlerts.h"
 #import "MacUrlSchemes.h"
-#import "ProgressWindow.h"
+#import "macOSSpinnerUI.h"
 
 #endif
 
@@ -33,14 +33,6 @@
 
 @property NMSFTP* maintainedSessionForListing;
 @property SFTPSessionConfiguration* maintainedConfigurationForFastListing;
-
-#if TARGET_OS_IPHONE
-
-#else
-
-@property ProgressWindow* progressWindow;
-
-#endif
 
 @end
 
@@ -75,7 +67,7 @@
 #if TARGET_OS_IPHONE
         [SVProgressHUD dismiss];
 #else
-        [self.progressWindow hide];
+        [macOSSpinnerUI.sharedInstance dismiss];
 #endif
     });
 }
@@ -85,11 +77,7 @@
 #if TARGET_OS_IPHONE
         [SVProgressHUD showWithStatus:message];
 #else
-        if ( self.progressWindow ) {
-            [self.progressWindow hide];
-        }
-        self.progressWindow = [ProgressWindow newProgress:message];
-        [viewController.view.window beginSheet:self.progressWindow.window completionHandler:nil];
+        [macOSSpinnerUI.sharedInstance show:message viewController:viewController];
 #endif
     });
 }

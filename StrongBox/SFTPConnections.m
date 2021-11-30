@@ -105,9 +105,6 @@ static NSString* const kConfigFilename = @"sftp-connections.json";
         NSLog(@"Error writing SFTP Connections file: [%@]-[%@]", error, writeError);
         return;
     }
-    else {
-
-    }
 }
 
 - (SFTPSessionConfiguration*)getById:(NSString*)identifier {

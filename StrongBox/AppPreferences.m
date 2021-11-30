@@ -101,7 +101,7 @@ static NSString* const kPasswordStrengthConfig = @"passwordStrengthConfig";
 static NSString* const kAddLegacySupplementaryTotpCustomFields = @"addLegacySupplementaryTotpCustomFields";
 static NSString* const kAddOtpAuthUrl = @"addOtpAuthUrl";
 
-static NSString* const kPromptedForSale = @"promptedForSale2";
+static NSString* const kPromptedForSale = @"promptedForSale3";
 static NSString* const kPinYinSearchEnabled = @"pinYinSearchEnabled";
 
 static NSString* const kLastKnownGoodDatabaseState = @"lastKnownGoodDatabaseState";
@@ -126,9 +126,6 @@ static NSString* const kDisableFavIconFeature = @"disableFavIconFeature";
 static NSString* const kDisableNativeNetworkStorageOptions = @"disableNativeNetworkStorageOptions";
 
 static NSString* const kUseIsolatedDropbox = @"useIsolatedDropbox";
-static NSString* const kUseLegacyDropboxApi = @"useLegacyDropboxApi";
-static NSString* const kUseMinimalDropboxScopes = @"useMinimalDropboxScopes";
-static NSString* const kStreamReadLargeKeyFiles = @"streamReadLargeKeyFiles";
 static NSString* const kKeePassEmailField = @"keePassEmailField";
 
 static NSString* const kExportItemsPreserveUUIDs = @"exportItemsPreserveUUIDs";
@@ -144,6 +141,7 @@ static NSString* const kMigratedConnections = @"migratedConnections";
 static NSString* const kDisableThirdPartyStorageOptions = @"disableThirdPartyStorageOptions";
 static NSString* const kSuppressAppBackgroundTriggers = @"suppressAppBackgroundTriggers";
 static NSString* const kMarkdownNotes = @"markdownNotes";
+static NSString* const kAutoFillLongTapPreview = @"autoFillLongTapPreview";
 
 @implementation AppPreferences
 
@@ -185,6 +183,14 @@ static NSString* const kMarkdownNotes = @"markdownNotes";
 }
 
 
+
+- (BOOL)autoFillLongTapPreview {
+    return [self getBool:kAutoFillLongTapPreview fallback:YES];
+}
+
+- (void)setAutoFillLongTapPreview:(BOOL)autoFillLongTapPreview {
+    [self setBool:kAutoFillLongTapPreview value:autoFillLongTapPreview];
+}
 
 - (BOOL)markdownNotes {
     return [self getBool:kMarkdownNotes];
@@ -282,36 +288,12 @@ static NSString* const kMarkdownNotes = @"markdownNotes";
     [self setBool:kKeePassEmailField value:keePassEmailField];
 }
 
-- (BOOL)streamReadLargeKeyFiles {
-    return [self getBool:kStreamReadLargeKeyFiles fallback:YES];
-}
-
-- (void)setStreamReadLargeKeyFiles:(BOOL)streamReadLargeKeyFiles {
-    [self setBool:kStreamReadLargeKeyFiles value:streamReadLargeKeyFiles];
-}
-
 - (BOOL)useIsolatedDropbox {
     return [self getBool:kUseIsolatedDropbox];
 }
 
 - (void)setUseIsolatedDropbox:(BOOL)useIsolatedDropbox {
     [self setBool:kUseIsolatedDropbox value:useIsolatedDropbox];
-}
-
-- (BOOL)useLegacyDropboxApi {
-    return [self getBool:kUseLegacyDropboxApi];
-}
-
-- (void)setUseLegacyDropboxApi:(BOOL)useLegacyDropboxApi {
-    [self setBool:kUseLegacyDropboxApi value:useLegacyDropboxApi];
-}
-
-- (BOOL)useMinimalDropboxScopes {
-    return [self getBool:kUseMinimalDropboxScopes fallback:YES];
-}
-
-- (void)setUseMinimalDropboxScopes:(BOOL)useMinimalDropboxScopes {
-    [self setBool:kUseMinimalDropboxScopes value:useMinimalDropboxScopes];
 }
 
 - (BOOL)disableNetworkBasedFeatures {

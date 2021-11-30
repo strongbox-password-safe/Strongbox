@@ -42,21 +42,18 @@
 @property (weak, nonatomic) IBOutlet UISwitch *switchPinYinSearch;
 
 @property (weak, nonatomic) IBOutlet UISwitch *switchDropboxFolderOnly;
-@property (weak, nonatomic) IBOutlet UISwitch *switchLegacyDropboxApi;
-@property (weak, nonatomic) IBOutlet UISwitch *switchMinimalDropboxScopes;
-@property (weak, nonatomic) IBOutlet UISwitch *switchStreamReadLargeKeyFiles;
 @property (weak, nonatomic) IBOutlet UISwitch *switchNativeKeePassEmailField;
 
-@property (weak, nonatomic) IBOutlet UISwitch *backgroundUpdateSync;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellInstantPin;
 @property (weak, nonatomic) IBOutlet UISwitch *instantPinUnlock;
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellBackgroundSync;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSftpConnections;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellWebDAVConnections;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellForcePull;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellSyncForcePush;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAllBackups;
 @property (weak, nonatomic) IBOutlet UISwitch *switchMarkdownNotes;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDetectIfOffline;
+@property (weak, nonatomic) IBOutlet UITableViewCell *cellDropboxAppFolder;
 
 @end
 
@@ -80,21 +77,20 @@
     
     
     
-    [self cell:self.cellBackgroundSync setHidden:YES];
-    
-    
-    
     if ( AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         [self cell:self.cellSftpConnections setHidden:YES];
         [self cell:self.cellWebDAVConnections setHidden:YES];
+        [self cell:self.cellDetectIfOffline setHidden:YES];
+        [self cell:self.cellDropboxAppFolder setHidden:YES];
     }
     
     if ( AppPreferences.sharedInstance.disableThirdPartyStorageOptions && AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
         [self cell:self.cellForcePull setHidden:YES];
         [self cell:self.cellSyncForcePush setHidden:YES];
+        [self cell:self.cellDropboxAppFolder setHidden:YES];
     }
     
-    [self bindPreferences];
+        [self bindPreferences];
 }
 
 - (IBAction)onDone:(id)sender {
@@ -127,12 +123,14 @@
 
     AppPreferences.sharedInstance.showMetadataOnDetailsScreen = self.switchShowMetadataOnDetailsScreen.on;
     
+#if !defined(NO_OFFLINE_DETECTION)
     if(AppPreferences.sharedInstance.monitorInternetConnectivity) {
         [OfflineDetector.sharedInstance startMonitoringConnectivitity];
     }
     else {
         [OfflineDetector.sharedInstance stopMonitoringConnectivitity];
     }
+#endif
     
     AppPreferences.sharedInstance.coalesceAppLockAndQuickLaunchBiometrics = self.switchCoalesceBiometrics.on;
     AppPreferences.sharedInstance.addLegacySupplementaryTotpCustomFields = self.switchAddLegacyTotp.on;
@@ -141,9 +139,6 @@
     AppPreferences.sharedInstance.pinYinSearchEnabled = self.switchPinYinSearch.on;
     
     AppPreferences.sharedInstance.useIsolatedDropbox = self.switchDropboxFolderOnly.on;    
-    AppPreferences.sharedInstance.useLegacyDropboxApi = self.switchLegacyDropboxApi.on;
-    AppPreferences.sharedInstance.useMinimalDropboxScopes = self.switchMinimalDropboxScopes.on;
-    AppPreferences.sharedInstance.streamReadLargeKeyFiles = self.switchStreamReadLargeKeyFiles.on;
     AppPreferences.sharedInstance.keePassEmailField = self.switchNativeKeePassEmailField.on;
 
     AppPreferences.sharedInstance.instantPinUnlocking = self.instantPinUnlock.on;
@@ -193,9 +188,6 @@
     self.switchPinYinSearch.on = AppPreferences.sharedInstance.pinYinSearchEnabled;
     
     self.switchDropboxFolderOnly.on = AppPreferences.sharedInstance.useIsolatedDropbox;
-    self.switchLegacyDropboxApi.on = AppPreferences.sharedInstance.useLegacyDropboxApi;
-    self.switchMinimalDropboxScopes.on = AppPreferences.sharedInstance.useMinimalDropboxScopes;
-    self.switchStreamReadLargeKeyFiles.on = AppPreferences.sharedInstance.streamReadLargeKeyFiles;
     self.switchNativeKeePassEmailField.on = AppPreferences.sharedInstance.keePassEmailField;
     
     self.instantPinUnlock.on = AppPreferences.sharedInstance.instantPinUnlocking;

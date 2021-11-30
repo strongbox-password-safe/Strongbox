@@ -17,6 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface Node : NSObject
 
 + (instancetype)rootGroup;
++ (instancetype)rootWithDefaultKeePassEffectiveRootGroup;
 
 - (instancetype)init NS_UNAVAILABLE;
 
@@ -148,6 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong, nullable) NSObject *linkedData;
 
 extern NSComparator finderStyleNodeComparator;
++ (BOOL)sortTitleLikeFinder:(Node*)a b:(Node*)b;
 
 - (BOOL)isSyncEqualTo:(Node*)other;
 - (BOOL)isSyncEqualTo:(Node *)other isForUIDiffReport:(BOOL)isForUIDiffReport;

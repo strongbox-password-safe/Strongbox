@@ -12,6 +12,7 @@
 #import "PinEntryController.h"
 #import "Alerts.h"
 #import "RoundedBlueButton.h"
+#import "SafesList.h"
 
 @interface ConvenienceUnlockOnboardingViewController ()
 
@@ -59,7 +60,7 @@
 
 - (IBAction)onUseBio:(id)sender {
     self.model.metadata.isTouchIdEnabled = YES;
-    self.model.metadata.isEnrolledForConvenience = YES;
+    self.model.metadata.conveniencePasswordHasBeenStored = YES;
     self.model.metadata.convenienceMasterPassword = self.model.database.ckfs.password;
     self.model.metadata.hasBeenPromptedForConvenience = YES;
     
@@ -77,8 +78,9 @@
 - (IBAction)onUseNone:(id)sender {
     self.model.metadata.isTouchIdEnabled = NO;
     self.model.metadata.conveniencePin = nil;
-    self.model.metadata.isEnrolledForConvenience = NO;
+    self.model.metadata.conveniencePasswordHasBeenStored = NO;
     self.model.metadata.convenienceMasterPassword = nil;
+    self.model.metadata.autoFillConvenienceAutoUnlockPassword = nil;
     self.model.metadata.hasBeenPromptedForConvenience = YES;
 
     [SafesList.sharedInstance update:self.model.metadata];
@@ -90,7 +92,7 @@
 
 - (void)enrolForPinCodeUnlock:(NSString*)pin {
     self.model.metadata.conveniencePin = pin;
-    self.model.metadata.isEnrolledForConvenience = YES;
+    self.model.metadata.conveniencePasswordHasBeenStored = YES;
     self.model.metadata.convenienceMasterPassword = self.model.database.ckfs.password;
     self.model.metadata.hasBeenPromptedForConvenience = YES;
 

@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseSettingsTabViewController : NSTabViewController
 
++ (instancetype)fromStoryboard;
 - (void)setModel:(ViewModel*)model initialTab:(NSInteger)initialTab;
 
 @end

@@ -12,13 +12,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface QuickTypeRecordIdentifier : NSObject
 
-+ (instancetype)identifierWithDatabaseId:(NSString*)databaseId nodeId:(NSString*)nodeId;
++ (instancetype)identifierWithDatabaseId:(NSString*)databaseId nodeId:(NSString*)nodeId fieldKey:(NSString* _Nullable)fieldKey;
 
 + (instancetype _Nullable)fromJson:(NSString*)json;
 - (NSString* _Nullable)toJson;
 
 @property NSString* databaseId;
 @property NSString* nodeId;
+@property (nullable) NSString* fieldKey;
 
 @end
 

@@ -22,7 +22,7 @@
 #import "MacSyncManager.h"
 #import "Document.h"
 #import "WebDAVStorageProvider.h"
-#import "ProgressWindow.h"
+
 #import "MacUrlSchemes.h"
 #import "BackupsViewController.h"
 #import "BackupsManager.h"
@@ -31,68 +31,51 @@
 #import "SFTPConnectionsManager.h"
 #import "WebDAVConnectionsManager.h"
 #import "NSDate+Extensions.h"
+#import "macOSSpinnerUI.h"
+
+
 
 NSString* const kDatabasesListViewForceRefreshNotification = @"databasesListViewForceRefreshNotification";
-
 static NSString* const kColumnIdFriendlyTitleAndSubtitles = @"nickName";
-
 static NSString* const kDatabaseCellView = @"DatabaseCellView";
-
 static NSString* const kDragAndDropId = @"com.markmcguill.strongbox.mac.databases.list";
-
 static const CGFloat kAutoRefreshTimeSeconds = 30.0f;
 
-@interface DatabasesManagerVC () <NSTableViewDelegate, NSTableViewDataSource, NSWindowDelegate>
+
+
+@interface DatabasesManagerVC () <NSTableViewDelegate, NSTableViewDataSource>
 
 @property (nonatomic, strong) NSArray<NSString*>* databaseIds;
-
 @property (weak) IBOutlet CustomBackgroundTableView *tableView;
 @property NSTimer* timerRefresh;
 @property BOOL hasLoaded;
-@property ProgressWindow* progressWindow;
 @property (weak) IBOutlet NSTextField *textFieldVersion;
 @property (weak) IBOutlet NSButton *buttonProperties;
 
 @end
 
-static DatabasesManagerVC* sharedInstance;
-
 @implementation DatabasesManagerVC
 
-+ (void)show {
-
-    
-    if ( sharedInstance == nil ) {
-        NSStoryboard* storyboard = [NSStoryboard storyboardWithName:@"DatabasesManager" bundle:nil];
-        NSWindowController* wc = [storyboard instantiateInitialController];
-        sharedInstance = (DatabasesManagerVC*)wc.contentViewController;
-    }
- 
-    [sharedInstance.view.window.windowController showWindow:self];
-    [sharedInstance.view.window makeKeyAndOrderFront:self];
-    [sharedInstance.view.window center];
-}
-
-- (void)cancel:(id)sender { 
-    [self close];
-}
-
 - (void)close {
+    [self.view.window cancelOperation:nil];
+}
 
+- (void)killRefreshTimer {
+    NSLog(@"Kill Refresh Timer");
 
-    if ( self.presentingViewController ) {
-        [self.presentingViewController dismissViewController:self];
-    }
-    else {
-        [self.view.window close]; 
+    if ( self.timerRefresh ) {
+        [self.timerRefresh invalidate];
+        self.timerRefresh = nil;
     }
 }
 
-- (void)windowWillClose:(NSNotification *)notification {
-    NSLog(@"DatabasesManagerVC::windowWillClose");
-    
+- (void)startRefreshTimer {
     [self killRefreshTimer];
-    sharedInstance = nil;
+    
+    NSLog(@"Start Refresh Timer");
+
+    self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refreshVisibleRows) userInfo:nil repeats:YES];
+    [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
 }
 
 - (void)viewWillAppear {
@@ -105,7 +88,7 @@ static DatabasesManagerVC* sharedInstance;
 }
 
 - (void)doInitialSetup {
-    self.view.window.delegate = self;
+
 
     
     
@@ -170,20 +153,6 @@ static DatabasesManagerVC* sharedInstance;
 
 - (void)bindUi {
     self.buttonProperties.enabled = self.tableView.selectedRowIndexes.count == 1;
-}
-
-- (void)killRefreshTimer {
-    if(self.timerRefresh) {
-
-        [self.timerRefresh invalidate];
-        self.timerRefresh = nil;
-    }
-}
-
-- (void)startRefreshTimer {
-
-    self.timerRefresh = [NSTimer timerWithTimeInterval:kAutoRefreshTimeSeconds target:self selector:@selector(refreshVisibleRows) userInfo:nil repeats:YES];
-    [[NSRunLoop mainRunLoop] addTimer:self.timerRefresh forMode:NSRunLoopCommonModes];
 }
 
 - (IBAction)onRemove:(id)sender {
@@ -389,19 +358,11 @@ static DatabasesManagerVC* sharedInstance;
 }
 
 - (void)showProgressModal:(NSString*)operationDescription {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if ( self.progressWindow ) {
-            [self.progressWindow hide];
-        }
-        self.progressWindow = [ProgressWindow newProgress:operationDescription];
-        [self.view.window beginSheet:self.progressWindow.window completionHandler:nil];
-    });
+    [macOSSpinnerUI.sharedInstance show:operationDescription viewController:self];
 }
 
 - (void)hideProgressModal {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.progressWindow hide];
-    });
+    [macOSSpinnerUI.sharedInstance dismiss];
 }
 
 - (void)onOpenFromFiles:(id)sender {
@@ -575,7 +536,7 @@ static DatabasesManagerVC* sharedInstance;
         }
     }
     else if (theAction == @selector(onOpenInOfflineMode:)) {
-        if(self.tableView.selectedRow != -1) {
+        if( database != nil ) {
             DocumentController* dc = DocumentController.sharedDocumentController;
             BOOL isOpen = [dc databaseIsDocumentWindow:database];
             return !isOpen && !database.isLocalDeviceDatabase;
@@ -590,7 +551,7 @@ static DatabasesManagerVC* sharedInstance;
         }
     }
     else if (theAction == @selector(onToggleReadOnly:)) {
-        if(self.tableView.selectedRow != -1) {
+        if( database != nil ) {
             DocumentController* dc = DocumentController.sharedDocumentController;
             BOOL isOpen = [dc databaseIsDocumentWindow:database];
 
@@ -650,35 +611,29 @@ static DatabasesManagerVC* sharedInstance;
     }
 }
 
-- (BOOL)isLegacyFileUrl:(NSURL*)url {
-    return ( url && url.scheme.length && [url.scheme isEqualToString:kStrongboxFileUrlScheme] );
-}
-
 - (IBAction)onSync:(id)sender {
     if(self.tableView.selectedRow != -1) {
         NSString* databaseId = self.databaseIds[self.tableView.selectedRow];
         DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseById:databaseId];
 
-        if ( ![self isLegacyFileUrl:database.fileUrl] ) {
-            Document* doc = [DocumentController.sharedDocumentController documentForURL:database.fileUrl];
-            if ( doc && !doc.isModelLocked ) {
-                NSLog(@"Document is already open ");
-                [doc checkForRemoteChanges];
-            }
-            else {
-                
-                [MacSyncManager.sharedInstance backgroundSyncDatabase:database
-                                                           completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-                    if ( error ) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [MacAlerts error:error window:self.view.window];
-                        });
-                    }
-                    else if ( localWasChanged ) {
-                        NSLog(@"ManagerVC - Background Sync - localWasChanged");
-                    }
-                }];
-            }
+        Document* doc = [DocumentController.sharedDocumentController documentForURL:database.fileUrl];
+        if ( doc && !doc.isModelLocked ) {
+            NSLog(@"Document is already open ");
+            [doc checkForRemoteChanges];
+        }
+        else {
+            
+            [MacSyncManager.sharedInstance backgroundSyncDatabase:database
+                                                       completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
+                if ( error ) {
+                    dispatch_async(dispatch_get_main_queue(), ^{
+                        [MacAlerts error:error window:self.view.window];
+                    });
+                }
+                else if ( localWasChanged ) {
+                    NSLog(@"ManagerVC - Background Sync - localWasChanged");
+                }
+            }];
         }
     }
 }
@@ -772,7 +727,7 @@ static DatabasesManagerVC* sharedInstance;
 
 - (void)export:(DatabaseMetadata *)database
           dest:(NSURL*)dest {
-    NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
+    NSURL* src = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
     NSLog(@"Export [%@] => [%@]", src, dest);
     
     if ( !src ) {

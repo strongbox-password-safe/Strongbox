@@ -8,6 +8,7 @@
 
 #import "AutoFillOnboardingViewController.h"
 #import "AutoFillManager.h"
+#import "SafesList.h"
 
 @implementation AutoFillOnboardingViewController
 
@@ -30,7 +31,9 @@
                                                           displayFormat:self.model.metadata.quickTypeDisplayFormat
                                                         alternativeUrls:self.model.metadata.autoFillScanAltUrls
                                                            customFields:self.model.metadata.autoFillScanCustomFields
-                                                                  notes:self.model.metadata.autoFillScanNotes];
+                                                                  notes:self.model.metadata.autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:self.model.metadata.autoFillConcealedFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:self.model.metadata.autoFillUnConcealedFieldsAsCreds];
     }
     
     if ( self.onDone ) {

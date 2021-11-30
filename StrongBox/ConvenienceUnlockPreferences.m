@@ -133,9 +133,9 @@
                     completion:^(BOOL success, NSInteger selectedValue) {
             if ( success ) {
                 self.viewModel.metadata.convenienceExpiryPeriod = selectedValue;
-                self.viewModel.metadata.isTouchIdEnabled = YES;
-                self.viewModel.metadata.isEnrolledForConvenience = YES;
+                self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
                 self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
+                
                 [SafesList.sharedInstance update:self.viewModel.metadata];
             }
         }];
@@ -149,8 +149,9 @@
         self.viewModel.metadata.isTouchIdEnabled = NO;
 
         if ( self.viewModel.metadata.conveniencePin == nil) {
-           self.viewModel.metadata.isEnrolledForConvenience = NO;
-           self.viewModel.metadata.convenienceMasterPassword = nil;
+            self.viewModel.metadata.conveniencePasswordHasBeenStored = NO;
+            self.viewModel.metadata.convenienceMasterPassword = nil;
+            self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
         }
 
         [[SafesList sharedInstance] update:self.viewModel.metadata];
@@ -166,7 +167,7 @@
         }
 
         self.viewModel.metadata.isTouchIdEnabled = YES;
-        self.viewModel.metadata.isEnrolledForConvenience = YES;
+        self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
         self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
         
         [[SafesList sharedInstance] update:self.viewModel.metadata];

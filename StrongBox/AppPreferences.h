@@ -7,17 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "PasswordGenerationConfig.h"
 #import "AutoFillNewRecordSettings.h"
 #import "FavIconDownloadOptions.h"
 #import "DatabaseCellSubtitleField.h"
 #import "AppPrivacyShieldMode.h"
 #import "AppLockMode.h"
-#import "PasswordStrengthConfig.h"
+#import "ApplicationPreferences.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AppPreferences : NSObject
+@interface AppPreferences : NSObject<ApplicationPreferences>
 
 + (instancetype)sharedInstance;
 
@@ -160,13 +159,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @property BOOL useIsolatedDropbox;
-
-
-
-@property BOOL useLegacyDropboxApi;
-@property BOOL useMinimalDropboxScopes;
-
-@property BOOL streamReadLargeKeyFiles;
 @property BOOL keePassEmailField;
 
 
@@ -187,6 +179,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property BOOL disableThirdPartyStorageOptions; 
 
 @property BOOL markdownNotes;
+
+@property BOOL autoFillLongTapPreview;
 
 @end
 

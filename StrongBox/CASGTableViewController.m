@@ -22,7 +22,7 @@
 #import "PasswordStrengthTester.h"
 #import "PasswordStrengthUIHelper.h"
 
-@interface CASGTableViewController () <UITextFieldDelegate>
+@interface CASGTableViewController () <UITextFieldDelegate, UIAdaptivePresentationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellDatabaseName;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellKeyFile;
@@ -57,9 +57,20 @@
 
 @implementation CASGTableViewController
 
++ (instancetype)instantiateFromStoryboard {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"CreateDatabaseOrSetCredentials" bundle:nil];
+    
+    UINavigationController* nav = [sb instantiateInitialViewController];
+    
+    CASGTableViewController* ret = (CASGTableViewController*)nav.topViewController;
+    
+    return ret;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
   
+    self.navigationController.presentationController.delegate = self;
     [self setupUi];
     
     self.selectedName = self.initialName;
@@ -725,6 +736,12 @@
                           emptyPwHideSummary:YES
                                        label:self.labelStrength
                                     progress:self.progressStrength];
+}
+
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
+
+    
+    [self onCancel:nil];
 }
 
 @end

@@ -7,12 +7,12 @@
 //
 
 #import "OfflineDetector.h"
-#import "Reachability.h"
+#import "Reachabil1ty.h"
 #import "AppPreferences.h"
 
 @interface OfflineDetector ()
 
-@property (nonatomic, strong) Reachability *internetReachabilityDetector;
+@property (nonatomic, strong) Reachabil1ty *internetReachabilityDetector;
 @property (nonatomic) BOOL offline; // Global Online/Offline variable
     
 @end
@@ -52,21 +52,19 @@
         self.offline = NO;
     }
     
-    self.internetReachabilityDetector = [Reachability reachabilityWithHostname:@"duckduckgo.com"];
+    self.internetReachabilityDetector = [Reachabil1ty reachabilityWithHostname:@"duckduckgo.com"];
     
     
     
     __weak typeof(self) weakSelf = self;
-    self.internetReachabilityDetector.reachableBlock = ^(Reachability *reach)
-    {
+    self.internetReachabilityDetector.reachableBlock = ^(Reachabil1ty *reach) {
 
         weakSelf.offline = NO;
     };
     
     
     
-    self.internetReachabilityDetector.unreachableBlock = ^(Reachability *reach)
-    {
+    self.internetReachabilityDetector.unreachableBlock = ^(Reachabil1ty *reach) {
         NSLog(@"OfflineDetector: We Are Offline :(");
         weakSelf.offline = YES;
     };

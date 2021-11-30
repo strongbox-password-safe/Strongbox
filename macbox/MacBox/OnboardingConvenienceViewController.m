@@ -63,12 +63,12 @@
         metadata.isWatchUnlockEnabled = enable;
 
         if ( enable ) {
-            metadata.isTouchIdEnrolled = YES;
-            [metadata resetConveniencePasswordWithCurrentConfiguration:self.ckfs.password];
+            metadata.conveniencePasswordHasBeenStored = YES;
+            metadata.conveniencePassword = self.ckfs.password;
         }
         else {
-            metadata.isTouchIdEnrolled = NO;
-            [metadata resetConveniencePasswordWithCurrentConfiguration:nil];
+            metadata.conveniencePasswordHasBeenStored = NO;
+            metadata.conveniencePassword = nil;
         }
     }];
     

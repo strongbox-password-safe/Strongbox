@@ -25,7 +25,7 @@
 static NSString* const kOtpAuthScheme = @"otpauth";
 static NSString* const kMailToScheme = @"mailto";
 
-@implementation AutoFillManager
+@implementation AutoFillManager 
 
 + (instancetype)sharedInstance {
     static AutoFillManager *sharedInstance = nil;
@@ -94,18 +94,21 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
 
-- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database
-                           databaseUuid:(NSString*)databaseUuid
-                          displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat {
-      [self updateAutoFillQuickTypeDatabase:database databaseUuid:databaseUuid displayFormat:displayFormat alternativeUrls:YES customFields:YES notes:YES];
-}
-    
-- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel*)database
-                           databaseUuid:(NSString*)databaseUuid
-                          displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
-                        alternativeUrls:(BOOL)alternativeUrls
-                           customFields:(BOOL)customFields
-                                  notes:(BOOL)notes {
+
+
+
+
+
+
+
+- (void)updateAutoFillQuickTypeDatabase:(DatabaseModel *)database
+                           databaseUuid:(NSString *)databaseUuid
+                            displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
+                            alternativeUrls:(BOOL)alternativeUrls
+                            customFields:(BOOL)customFields
+                            notes:(BOOL)notes
+                            concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
+                            unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds {
     if (! self.isPossible || database == nil) {
         return;
     }
@@ -120,7 +123,9 @@ static NSString* const kMailToScheme = @"mailto";
                                  displayFormat:displayFormat
                                alternativeUrls:alternativeUrls
                                   customFields:customFields
-                                         notes:notes];
+                                         notes:notes
+                  concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
+                unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
     }
 }
 
@@ -129,7 +134,9 @@ static NSString* const kMailToScheme = @"mailto";
                            displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                          alternativeUrls:(BOOL)alternativeUrls
                             customFields:(BOOL)customFields
-                                   notes:(BOOL)notes API_AVAILABLE(ios(12.0), macosx(11.0)) {
+                                   notes:(BOOL)notes
+            concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
+          unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABLE(ios(12.0), macosx(11.0)) {
     [ASCredentialIdentityStore.sharedStore getCredentialIdentityStoreStateWithCompletion:^(ASCredentialIdentityStoreState * _Nonnull state) {
         if(state.enabled) {
             [self onGotAutoFillStoreOK:database
@@ -137,7 +144,9 @@ static NSString* const kMailToScheme = @"mailto";
                          displayFormat:displayFormat
                        alternativeUrls:alternativeUrls
                           customFields:customFields
-                                 notes:notes];
+                                 notes:notes
+          concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
+        unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
         }
         else {
             NSLog(@"AutoFill Credential Store Disabled...");
@@ -150,19 +159,23 @@ static NSString* const kMailToScheme = @"mailto";
                displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
              alternativeUrls:(BOOL)alternativeUrls
                 customFields:(BOOL)customFields
-                       notes:(BOOL)notes API_AVAILABLE(ios(12.0), macosx(11.0)) {
+                       notes:(BOOL)notes
+concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
+unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABLE(ios(12.0), macosx(11.0)) {
     NSLog(@"Updating Quick Type AutoFill Database...");
     
     NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
     @try {
         for ( Node* node in database.allSearchableNoneExpiredEntries ) {
-            NSArray<ASPasswordCredentialIdentity*>* nodeIdenitities = [self getPasswordCredentialIdentity:node
-                                                                                                 database:database
-                                                                                             databaseUuid:databaseUuid
-                                                                                            displayFormat:displayFormat
-                                                                                          alternativeUrls:alternativeUrls
-                                                                                             customFields:customFields
-                                                                                                    notes:notes];
+            NSArray<ASPasswordCredentialIdentity*>* nodeIdenitities = [self getPasswordCredentialIdentities:node
+                                                                                                   database:database
+                                                                                               databaseUuid:databaseUuid
+                                                                                              displayFormat:displayFormat
+                                                                                            alternativeUrls:alternativeUrls
+                                                                                               customFields:customFields
+                                                                                                      notes:notes
+                                                                               concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
+                                                                             unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
             [identities addObjectsFromArray:nodeIdenitities];
         }
     }
@@ -183,14 +196,15 @@ static NSString* const kMailToScheme = @"mailto";
     }
 }
     
-- (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentity:(Node*)node
-                                                                 database:(DatabaseModel*)database
+- (NSArray<ASPasswordCredentialIdentity*>*)getPasswordCredentialIdentities:(Node*)node
+                                                                database:(DatabaseModel*)database
                                                              databaseUuid:(NSString*)databaseUuid
                                                             displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
                                                           alternativeUrls:(BOOL)alternativeUrls
                                                              customFields:(BOOL)customFields
                                                                     notes:(BOOL)notes
-    API_AVAILABLE(ios(12.0), macos(11.0)) {
+                                            concealedCustomFieldsAsCreds:(BOOL)concealedCustomFieldsAsCreds
+                                          unConcealedCustomFieldsAsCreds:(BOOL)unConcealedCustomFieldsAsCreds API_AVAILABLE(ios(12.0), macos(11.0)) {
     NSMutableSet<NSString*> *uniqueUrls = [NSMutableSet set];
 
     NSMutableArray<NSString*> *explicitUrls = [NSMutableArray array];
@@ -260,33 +274,70 @@ static NSString* const kMailToScheme = @"mailto";
     NSMutableArray<ASPasswordCredentialIdentity*> *identities = [NSMutableArray array];
 
     for ( NSString* url in uniqueUrls ) {
-        QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString];
-        
-        ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
-        
-        NSString* username = [database dereference:node.fields.username node:node];
-        NSString* title = [database dereference:node.title node:node];
-        title = title.length ? title : NSLocalizedString(@"generic_unknown", @"Unknown");
-        
-        NSString* quickTypeText;
-        
-        if ( displayFormat == kQuickTypeFormatTitleThenUsername && username.length) {
-            quickTypeText = [NSString stringWithFormat:@"%@ (%@)", title, username];
-        }
-        else if ( displayFormat == kQuickTypeFormatUsernameOnly && username.length ) {
-            quickTypeText = username;
-        }
-        else {
-            quickTypeText = title;
-        }
-
-        
-        
-        ASPasswordCredentialIdentity* iden = [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:quickTypeText recordIdentifier:[recordIdentifier toJson]];
+        ASPasswordCredentialIdentity* iden = [self getIdentity:node
+                                                           url:url
+                                                      database:database
+                                                  databaseUuid:databaseUuid
+                                                 displayFormat:displayFormat
+                                                      fieldKey:nil
+                                                    fieldValue:nil];
         [identities addObject:iden];
+        
+        for ( NSString* key in node.fields.customFields.allKeys ) {
+            if ( ![NodeFields isAlternativeURLCustomFieldKey:key] && ![NodeFields isTotpCustomFieldKey:key] ) {
+                StringValue* sv = node.fields.customFields[key];
+                
+                if ( concealedCustomFieldsAsCreds && sv.protected ) {
+                    ASPasswordCredentialIdentity* iden = [self getIdentity:node url:url database:database databaseUuid:databaseUuid displayFormat:displayFormat fieldKey:key fieldValue:sv.value];
+                    [identities addObject:iden];
+
+                }
+                else if ( unConcealedCustomFieldsAsCreds && !sv.protected ) {
+                    ASPasswordCredentialIdentity* iden = [self getIdentity:node url:url database:database databaseUuid:databaseUuid displayFormat:displayFormat fieldKey:key fieldValue:sv.value];
+                    [identities addObject:iden];
+                }
+            }
+        }
+        
+    }
+                                              
+    return identities;
+}
+                                
+- (ASPasswordCredentialIdentity*)getIdentity:(Node*)node
+                                         url:(NSString*)url
+                                    database:(DatabaseModel*)database
+                                databaseUuid:(NSString*)databaseUuid
+                                displayFormat:(QuickTypeAutoFillDisplayFormat)displayFormat
+                                    fieldKey:(NSString*)fieldKey
+                                  fieldValue:(NSString*)fieldValue  API_AVAILABLE(ios(12.0), macos(11.0)) {
+    QuickTypeRecordIdentifier* recordIdentifier = [QuickTypeRecordIdentifier identifierWithDatabaseId:databaseUuid nodeId:node.uuid.UUIDString fieldKey:fieldKey];
+    ASCredentialServiceIdentifier* serviceId = [[ASCredentialServiceIdentifier alloc] initWithIdentifier:url type:ASCredentialServiceIdentifierTypeURL];
+    
+                                                        NSString* username;
+    if ( fieldKey == nil ) {
+        username = [database dereference:node.fields.username node:node];
+    }
+    else {
+        username = fieldKey;
+    }
+                                                        
+    NSString* title = [database dereference:node.title node:node];
+    title = title.length ? title : NSLocalizedString(@"generic_unknown", @"Unknown");
+    
+    NSString* quickTypeText = title;
+    
+    if ( displayFormat == kQuickTypeFormatTitleThenUsername && username.length) {
+        quickTypeText = [NSString stringWithFormat:@"%@ (%@)", title, username];
+    }
+    else if ( displayFormat == kQuickTypeFormatUsernameOnly && username.length ) {
+        quickTypeText = username;
+    }
+    else if ( fieldKey != nil ) {
+        quickTypeText = username;
     }
     
-    return identities;
+    return [[ASPasswordCredentialIdentity alloc] initWithServiceIdentifier:serviceId user:quickTypeText recordIdentifier:[recordIdentifier toJson]];
 }
 
 - (NSArray<NSString*>*)findUrlsInString:(NSString*)target {

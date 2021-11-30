@@ -12,14 +12,15 @@
 #import "DatabaseMetadata.h"
 #import "CompositeKeyFactors.h"
 #import "SyncAndMergeSequenceManager.h"
+#import "SyncManagement.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MacSyncManager : NSObject
+@interface MacSyncManager : NSObject<SyncManagement>
 
 + (instancetype)sharedInstance;
 
-- (void)sync:(DatabaseMetadata *)database interactiveVC:(NSViewController *)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
+- (void)sync:(DatabaseMetadata *)database interactiveVC:(NSViewController *_Nullable)interactiveVC key:(CompositeKeyFactors*)key join:(BOOL)join completion:(SyncAndMergeCompletionBlock)completion;
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabaseMetadata *)database data:(NSData *)data error:(NSError**)error;
 - (SyncStatus*)getSyncStatus:(DatabaseMetadata *)database;
 
@@ -29,6 +30,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)backgroundSyncDatabase:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock _Nullable)completion;
 
 - (void)pollForChanges:(DatabaseMetadata*)database completion:(SyncAndMergeCompletionBlock)completion;
+
+@property (readonly) BOOL syncInProgress;
 
 @end
 

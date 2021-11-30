@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "Node.h"
-#import "CHCSVParser.h"
 #import "DatabaseModel.h"
 #import "UnifiedDatabaseMetadata.h"
 #import "AbstractDatabaseFormatAdaptor.h"
@@ -64,8 +63,6 @@ extern NSString* const kModelUpdateNotificationDatabasePreferenceChanged;
 @property (nonatomic) CompositeKeyFactors* compositeKeyFactors;
 
 @property (nullable) NSUUID* selectedItem;
-
-- (void)importRecordsFromCsvRows:(NSArray<CHCSVOrderedDictionary*>*)rows;
 
 - (BOOL)isDereferenceableText:(NSString*)text;
 - (NSString*)dereference:(NSString*)text node:(Node*)node;
@@ -139,9 +136,9 @@ extern NSString* const kModelUpdateNotificationDatabasePreferenceChanged;
 - (NSString *)getGroupPathDisplayString:(Node *)node;
 
 @property (readonly) BOOL recycleBinEnabled; 
-@property (readonly) Node* recycleBinNode;
+@property (readonly, nullable) Node* recycleBinNode;
 - (void)createNewRecycleBinNode;
-@property (readonly) Node* keePass1BackupNode;
+@property (readonly, nullable) Node* keePass1BackupNode;
 
 
 

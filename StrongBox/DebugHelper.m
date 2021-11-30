@@ -212,7 +212,7 @@ static NSString *ModelIdentifier()
         
         NSDate* mod;
         unsigned long long fileSize;
-        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:safe.uuid modified:&mod fileSize:&fileSize];
+        NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid modified:&mod fileSize:&fileSize];
         
         NSString* syncState;
         if (url) {

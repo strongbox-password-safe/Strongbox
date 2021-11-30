@@ -11,11 +11,14 @@
 #import "NSArray+Extensions.h"
 
 #define kAutoLockTime @"autoLockTime"
-#define kPreferencesChangedNotification @"preferencesChangedNotification"
 
 extern NSString* const kStrongboxPasteboardName;
 extern NSString* const kDragAndDropInternalUti;
 extern NSString* const kDragAndDropExternalUti;
+
+extern const NSInteger kTopLevelMenuItemTagStrongbox;
+extern const NSInteger kTopLevelMenuItemTagFile;
+extern const NSInteger kTopLevelMenuItemTagView;
 
 @interface AppDelegate : NSObject <NSApplicationDelegate, SKProductsRequestDelegate>
 

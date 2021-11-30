@@ -2,7 +2,7 @@ workspace 'StrongBox'
 
 abstract_target 'common-mac' do
     project 'macbox/MacBox.xcodeproj'
-    platform :osx, '10.9'
+    platform :osx, '10.11'
     use_frameworks!
 
     pod 'libsodium'
@@ -32,10 +32,8 @@ abstract_target 'common-ios' do
     target 'Strongbox-iOS' do
         use_frameworks!
 
-        pod 'MTBBarcodeScanner'
-
-        pod 'Reachability'
         pod 'ISMessages'
+        pod 'MTBBarcodeScanner'
         pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
         pod 'GoogleAPIClientForREST/Drive'
@@ -45,10 +43,8 @@ abstract_target 'common-ios' do
     target 'Strongbox-iOS-Pro' do
         use_frameworks!
 
-        pod 'MTBBarcodeScanner'
-
-        pod 'Reachability'
         pod 'ISMessages'
+        pod 'MTBBarcodeScanner'
         pod 'ObjectiveDropboxOfficial'
         pod 'OneDriveSDK'
         pod 'GoogleAPIClientForREST/Drive'
@@ -58,18 +54,13 @@ abstract_target 'common-ios' do
     target 'Strongbox-iOS-SCOTUS' do
         use_frameworks!
 
-        pod 'MTBBarcodeScanner'
-
-        pod 'Reachability'
-        pod 'ISMessages'
+        pod 'ISMessages'        
     end    
 
     target 'Strongbox-iOS-Graphene' do
         use_frameworks!
 
         pod 'MTBBarcodeScanner'
-
-        pod 'Reachability'
         pod 'ISMessages'
     end  
 

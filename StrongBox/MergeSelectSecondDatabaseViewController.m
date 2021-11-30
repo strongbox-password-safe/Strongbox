@@ -10,7 +10,7 @@
 #import "SecondDatabaseListTableViewController.h"
 #import "Alerts.h"
 #import "SelectComparisonTypeViewController.h"
-#import "CompositeKeyDeterminer.h"
+#import "IOSCompositeKeyDeterminer.h"
 #import "DatabaseUnlocker.h"
 #import "DuressActionHelper.h"
 #import "NSDate+Extensions.h"
@@ -86,7 +86,7 @@
         [self onUnlockDone:kUnlockDatabaseResultSuccess model:expressAttempt error:nil];
     }
     else {
-        CompositeKeyDeterminer* determiner = [CompositeKeyDeterminer determinerWithViewController:self database:database isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+        IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self database:database isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
         [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
             if (result == kGetCompositeKeyResultSuccess) {
                 DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:database viewController:self forceReadOnly:NO isAutoFillOpen:NO offlineMode:YES];

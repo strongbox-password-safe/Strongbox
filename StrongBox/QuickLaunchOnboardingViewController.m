@@ -8,6 +8,7 @@
 
 #import "QuickLaunchOnboardingViewController.h"
 #import "AppPreferences.h"
+#import "SafesList.h"
 
 @implementation QuickLaunchOnboardingViewController
 

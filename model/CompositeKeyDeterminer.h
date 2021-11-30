@@ -7,10 +7,26 @@
 //
 
 #import <Foundation/Foundation.h>
+
+#if TARGET_OS_IPHONE
+
 #import <UIKit/UIKit.h>
+#import "SafeMetaData.h"
+
+typedef UIViewController* VIEW_CONTROLLER_PTR;
+typedef SafeMetaData* METADATA_PTR;
+
+#else
+
+#import <Cocoa/Cocoa.h>
+#import "DatabaseMetadata.h"
+
+typedef NSViewController* VIEW_CONTROLLER_PTR;
+typedef DatabaseMetadata* METADATA_PTR;
+
+#endif
 
 #import "CompositeKeyFactors.h"
-#import "SafeMetaData.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,30 +38,5 @@ typedef enum : NSUInteger {
 } GetCompositeKeyResult;
 
 typedef void(^CompositeKeyDeterminedBlock)(GetCompositeKeyResult result, CompositeKeyFactors*_Nullable factors, BOOL fromConvenience, NSError*_Nullable error);
-
-@interface CompositeKeyDeterminer : NSObject
-
-+ (instancetype)determinerWithViewController:(UIViewController *)viewController
-                                        database:(SafeMetaData *)safe
-                              isAutoFillOpen:(BOOL)isAutoFillOpen
-                     isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
-                         biometricPreCleared:(BOOL)biometricPreCleared
-                         noConvenienceUnlock:(BOOL)noConvenienceUnlock;
-
-- (instancetype)init NS_UNAVAILABLE;
-
-- (instancetype)initWithViewController:(UIViewController *)viewController
-                                  database:(SafeMetaData *)safe
-                        isAutoFillOpen:(BOOL)isAutoFillOpen
-               isAutoFillQuickTypeOpen:(BOOL)isAutoFillQuickTypeOpen
-                   biometricPreCleared:(BOOL)biometricPreCleared
-                   noConvenienceUnlock:(BOOL)noConvenienceUnlock;
-
-
-- (void)getCredentials:(CompositeKeyDeterminedBlock)completion;
-
-@property (readonly) BOOL isAutoFillConvenienceAutoLockPossible;
-
-@end
 
 NS_ASSUME_NONNULL_END

@@ -24,6 +24,7 @@ NSString* const kCustomFieldsColumn = @"CustomFieldsColumn";
 
 
 NSString *const kPreferenceGlobalShowShortcut = @"GlobalShowStrongboxHotKey-New";
+NSString *const kPreferencesChangedNotification = @"preferencesChangedNotification";
 
 
 static const NSInteger kDefaultClearClipboardTimeout = 60;
@@ -75,8 +76,7 @@ static NSString* const kShowDatabasesManagerOnCloseAllWindows = @"showDatabasesM
 static NSString* const kShowAutoFillTotpCopiedMessage = @"showAutoFillTotpCopiedMessage";
 static NSString* const kAutoLaunchSingleDatabase = @"autoLaunchSingleDatabase";
 static NSString* const kLockDatabasesOnScreenLock = @"lockDatabasesOnScreenLock";
-static NSString* const kUseLegacyFileProvider = @"useLegacyFileProvider-Release";
-static NSString* const kHasMigratedToSyncManager = @"hasMigratedToSyncManager";
+
 static NSString* const kHideDockIconOnAllMinimized = @"hideDockIconOnAllMinimized";
 static NSString* const kMigratedConnections = @"migratedConnections";
 static NSString* const kCloseManagerOnLaunch = @"closeManagerOnLaunch";
@@ -141,6 +141,10 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 }
 
 
+
+- (BOOL)runningAsATrayApp {
+    return Settings.sharedInstance.showSystemTrayIcon && Settings.sharedInstance.hideDockIconOnAllMinimized;
+}
 
 - (BOOL)showPasswordGenInTray {
     return [self getBool:kShowPasswordGenInTray fallback:YES];
@@ -212,22 +216,6 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 
 - (void)setHideDockIconOnAllMinimized:(BOOL)hideDockIconOnAllMinimized {
     return [self setBool:kHideDockIconOnAllMinimized value:hideDockIconOnAllMinimized];
-}
-
-- (BOOL)hasMigratedToSyncManager {
-    return [self getBool:kHasMigratedToSyncManager];
-}
-
-- (void)setHasMigratedToSyncManager:(BOOL)hasMigratedToSyncManager {
-    [self setBool:kHasMigratedToSyncManager value:hasMigratedToSyncManager];
-}
-
-- (BOOL)useLegacyFileProvider {
-    return [self getBool:kUseLegacyFileProvider];
-}
-
-- (void)setUseLegacyFileProvider:(BOOL)useLegacyFileProvider {
-    [self setBool:kUseLegacyFileProvider value:useLegacyFileProvider];
 }
 
 - (BOOL)lockOnScreenLock {
@@ -752,6 +740,33 @@ static NSString* const kDefaultAppGroupName = @"group.strongbox.mac.mcguill";
 - (void)setRevealPasswordsImmediately:(BOOL)revealPasswordsImmediately {
     [self setBool:kShowPasswordImmediatelyInOutline value:revealPasswordsImmediately];
     [self setBool:kAlwaysShowPassword value:revealPasswordsImmediately];
+}
+
+
+
+- (NSData *)duressDummyData {
+    NSLog(@"🔴 NOTIMPL: duressDummyData");
+    return nil;
+}
+
+- (void)setDuressDummyData:(NSData *)duressDummyData {
+    NSLog(@"🔴 NOTIMPL: setDuressDummyData");
+}
+
+- (PasswordStrengthConfig *)passwordStrengthConfig {
+    return PasswordStrengthConfig.defaults;
+}
+
+- (void)setPasswordStrengthConfig:(PasswordStrengthConfig *)passwordStrengthConfig {
+    NSLog(@"🔴 NOTIMPL: setPasswordStrengthConfig");
+}
+
+- (BOOL)databasesAreAlwaysReadOnly {
+    return NO;
+}
+
+- (void)setDatabasesAreAlwaysReadOnly:(BOOL)databasesAreAlwaysReadOnly {
+    
 }
 
 @end

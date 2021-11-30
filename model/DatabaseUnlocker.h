@@ -7,7 +7,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "SafeMetaData.h"
 #import "CompositeKeyFactors.h"
 #import "Model.h"
 
@@ -25,9 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface DatabaseUnlocker : NSObject
 
-+ (instancetype)unlockerForDatabase:(SafeMetaData*)database
-                     viewController:(UIViewController*)viewController
-                     forceReadOnly:(BOOL)forcedReadOnly
++ (instancetype)unlockerForDatabase:(METADATA_PTR)database
+                     viewController:(VIEW_CONTROLLER_PTR)viewController
+                      forceReadOnly:(BOOL)forcedReadOnly
                      isAutoFillOpen:(BOOL)isAutoFillOpen
                         offlineMode:(BOOL)offlineMode;
 
@@ -40,7 +39,9 @@ NS_ASSUME_NONNULL_BEGIN
  keyFromConvenience:(BOOL)keyFromConvenience
          completion:(UnlockDatabaseCompletionBlock)completion;
 
-+ (Model*_Nullable)expressTryUnlockWithKey:(SafeMetaData*)database key:(CompositeKeyFactors*)key;
++ (Model*_Nullable)expressTryUnlockWithKey:(METADATA_PTR)database key:(CompositeKeyFactors*)key;
+
+@property BOOL alertOnJustPwdWrong;
 
 @end
 

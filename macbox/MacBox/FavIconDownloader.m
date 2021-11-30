@@ -7,7 +7,6 @@
 //
 
 #import "FavIconDownloader.h"
-#import "PreferencesWindowController.h"
 #import "NSArray+Extensions.h"
 #import "FavIconManager.h"
 #import "Settings.h"
@@ -16,6 +15,12 @@
 #import "NodeIconHelper.h"
 #import "MacAlerts.h"
 #import "NSString+Extensions.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 @interface FavIconDownloader () <NSTableViewDataSource>
 
@@ -132,7 +137,7 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
 }
 
 - (IBAction)onPreferences:(id)sender {
-    [PreferencesWindowController.sharedInstance showFavIconPreferences];
+    [AppPreferencesWindowController.sharedInstance showWithTab:AppPreferencesTabFavIcon];
 }
 
 - (void)bindUi {
@@ -549,11 +554,11 @@ typedef NS_ENUM (NSInteger, FavIconBulkDownloadStatus) {
                    option1AndDefault:NSLocalizedString(@"favicon_retry_failed_action", @"Retry Failed")
                              option2:NSLocalizedString(@"favicon_retry_all_action", @"Retry All")
                               window:self.view.window
-                          completion:^(NSUInteger zeroForCancel) {
-            if(zeroForCancel == 1) {
+                             completion:^(int response) {
+            if(response == 0) {
                 [self retryFailed];
             }
-            else if (zeroForCancel == 2) {
+            else if (response == 1) {
                 [self retryAll];
             }
         }];

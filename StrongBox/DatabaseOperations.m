@@ -14,7 +14,6 @@
 #import "KeyFileParser.h"
 #import "PinsConfigurationController.h"
 #import "AutoFillManager.h"
-#import "CASGTableViewController.h"
 #import "ExportOptionsTableViewController.h"
 #import "AttachmentsPoolViewController.h"
 #import "NSArray+Extensions.h"
@@ -26,7 +25,6 @@
 
 @interface DatabaseOperations ()
 
-@property (weak, nonatomic) IBOutlet UITableViewCell *cellChangeMasterCredentials;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellExport;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellPrint;
 @property (weak, nonatomic) IBOutlet UITableViewCell *cellViewAttachments;
@@ -42,7 +40,6 @@
     
     
 
-    self.cellChangeMasterCredentials.imageView.image = [UIImage imageNamed:@"key"];
     self.cellExport.imageView.image = [UIImage imageNamed:@"upload"];
     self.cellPrint.imageView.image = [UIImage imageNamed:@"print"];
     self.cellViewAttachments.imageView.image = [UIImage imageNamed:@"attach"];
@@ -62,20 +59,6 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    self.cellChangeMasterCredentials.userInteractionEnabled = [self canSetCredentials];
-    
-    if (@available(iOS 13.0, *)) {
-        self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.secondaryLabelColor;
-    } else {
-        self.cellChangeMasterCredentials.textLabel.textColor = [self canSetCredentials] ? nil : UIColor.lightGrayColor;
-    }
-    
-    self.cellChangeMasterCredentials.textLabel.text = self.viewModel.database.originalFormat == kPasswordSafe ?
-    NSLocalizedString(@"db_management_change_master_password", @"Change Master Password") :
-    NSLocalizedString(@"db_management_change_master_credentials", @"Change Master Credentials");
-    
-    self.cellChangeMasterCredentials.tintColor =  [self canSetCredentials] ? nil : UIColor.lightGrayColor;
-        
     self.navigationController.toolbarHidden = YES;
     self.navigationController.toolbar.hidden = YES;
     [self.navigationController setNavigationBarHidden:NO];
@@ -85,39 +68,11 @@
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)onChangeMasterCredentials {
-    [self performSegueWithIdentifier:@"segueToSetCredentials" sender:nil];
-}
-
-- (BOOL)canSetCredentials {
-    return !self.viewModel.isReadOnly;
-}
-
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if([segue.identifier isEqualToString:@"segueToExportOptions"]) {
         UINavigationController* nav = segue.destinationViewController;
         ExportOptionsTableViewController* vc = (ExportOptionsTableViewController*)nav.topViewController;
         vc.viewModel = self.viewModel;
-    }
-    else if([segue.identifier isEqualToString:@"segueToSetCredentials"]) {
-        UINavigationController* nav = (UINavigationController*)segue.destinationViewController;
-        CASGTableViewController* scVc = (CASGTableViewController*)nav.topViewController;
-        
-        scVc.mode = kCASGModeSetCredentials;
-        scVc.initialFormat = self.viewModel.database.originalFormat;
-        scVc.initialKeyFileBookmark = self.viewModel.metadata.keyFileBookmark;
-        scVc.initialYubiKeyConfig = self.viewModel.metadata.contextAwareYubiKeyConfig;
-        
-        scVc.onDone = ^(BOOL success, CASGParams * _Nullable creds) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if(success) {
-                    [self setCredentials:creds.password
-                         keyFileBookmark:creds.keyFileBookmark
-                      oneTimeKeyFileData:creds.oneTimeKeyFileData
-                              yubiConfig:creds.yubiKeyConfig];
-                }
-            }];
-        };
     }
     else if ([segue.identifier isEqualToString:@"segueToAttachmentsPool"]) {
         AttachmentsPoolViewController* vc = (AttachmentsPoolViewController*)segue.destinationViewController;
@@ -125,20 +80,10 @@
     }
 }
 
-- (void)setCredentials:(NSString*)password
-       keyFileBookmark:(NSString*)keyFileBookmark
-    oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
-            yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    self.onSetMasterCredentials(password, keyFileBookmark, oneTimeKeyFileData, yubiConfig);
-}
-
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell* cell = [self.tableView cellForRowAtIndexPath:indexPath];
     
-    if(cell == self.cellChangeMasterCredentials) {
-        [self onChangeMasterCredentials];
-    }
-    else if (cell == self.cellExport) {
+    if (cell == self.cellExport) {
         [self onExport];
     }
     else if (cell == self.cellPrint) {

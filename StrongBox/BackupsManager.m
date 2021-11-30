@@ -159,7 +159,7 @@
             NSNumber* isDirectory = attributesDictionary[NSURLIsDirectoryKey];
             
             if ( !isDirectory.boolValue ) {
-                NSLog(@"Found file with create date: [%@] Size: [%@] - isDir: [%@] URL: [%@]", dateCreate, friendlyFileSizeString(fileSize.unsignedIntegerValue), isDirectory, url);
+
 
                 [ret addObject:[BackupItem withUrl:url backupCreatedDate:dateCreate modDate:modDate fileSize:fileSize]];
             }
@@ -205,7 +205,7 @@
             NSNumber* isDirectory = attributesDictionary[NSURLIsDirectoryKey];
             
             if ( !isDirectory.boolValue ) {
-                NSLog(@"Found file with create date: [%@] Size: [%@] - isDir: [%@] URL: [%@]", dateCreate, friendlyFileSizeString(fileSize.unsignedIntegerValue), isDirectory, file);
+
 
                 [ret addObject:[BackupItem withUrl:file backupCreatedDate:dateCreate modDate:modDate fileSize:fileSize]];
             }

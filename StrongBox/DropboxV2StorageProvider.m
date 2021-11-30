@@ -288,40 +288,21 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [SVProgressHUD dismiss]; 
             
-            if ( !AppPreferences.sharedInstance.useLegacyDropboxApi ) {
-                NSArray<NSString*>* minimalScopes = @[ @"account_info.read",
-                                                       @"files.metadata.read",
-                                                       @"files.metadata.write",
-                                                       @"files.content.read",
-                                                       @"files.content.write"];
-                
-                NSMutableArray* scopes = [NSMutableArray arrayWithArray:minimalScopes];
-                
-                if ( !AppPreferences.sharedInstance.useMinimalDropboxScopes ) { 
-                    NSArray<NSString*>* possiblyRequiredScopes = @[@"sharing.read",
-                                                                   @"sharing.write",
-                                                                   @"file_requests.read",
-                                                                   @"file_requests.write",
-                                                                   @"contacts.read",
-                                                                   @"contacts.write"];
-                    [scopes addObjectsFromArray:possiblyRequiredScopes];
-                }
-                
-                DBScopeRequest *scopeRequest = [[DBScopeRequest alloc] initWithScopeType:DBScopeTypeUser
-                                                                                  scopes:scopes.copy
-                                                                    includeGrantedScopes:NO];
-                
-                [DBClientsManager authorizeFromControllerV2:UIApplication.sharedApplication
-                                                 controller:viewController
-                                      loadingStatusDelegate:nil
-                                                    openURL:[self openUrlHandler]
-                                               scopeRequest:scopeRequest];
-            }
-            else {
-                [DBClientsManager authorizeFromController:[UIApplication sharedApplication]
-                                               controller:viewController
-                                                  openURL:[self openUrlHandler]];
-            }
+            NSArray<NSString*>* minimalScopes = @[ @"account_info.read",
+                                                   @"files.metadata.read",
+                                                   @"files.metadata.write",
+                                                   @"files.content.read",
+                                                   @"files.content.write"];
+            
+            DBScopeRequest *scopeRequest = [[DBScopeRequest alloc] initWithScopeType:DBScopeTypeUser
+                                                                              scopes:minimalScopes
+                                                                includeGrantedScopes:NO];
+            
+            [DBClientsManager authorizeFromControllerV2:UIApplication.sharedApplication
+                                             controller:viewController
+                                  loadingStatusDelegate:nil
+                                                openURL:[self openUrlHandler]
+                                           scopeRequest:scopeRequest];
         });
     }
     else {

@@ -11,6 +11,8 @@
 #import "Document.h"
 #import "ViewController.h"
 #import "LockScreenViewController.h"
+#import "MacAlerts.h"
+#import "DatabaseSettingsTabViewController.h"
 
 #ifndef IS_APP_EXTENSION
 #import "Strongbox-Swift.h"
@@ -156,6 +158,18 @@
 }
 
 - (IBAction)onVCToggleReadOnly:(id)sender {
+    if ( !self.viewModel.readOnly ) {
+        Document* doc = self.document;
+    
+        if ( doc.hasUnautosavedChanges || doc.isDocumentEdited ) {
+            [MacAlerts info:NSLocalizedString(@"read_only_unavailable_title", @"Read Only Unavailable")
+            informativeText:NSLocalizedString(@"read_only_unavailable_pending_changes_message", @"You currently have changes pending and so you cannot switch to Read Only mode. You must save or discard your current changes first.")
+                     window:self.window
+                 completion:nil];
+            return;
+        }
+    }
+    
     self.viewModel.readOnly = !self.viewModel.readOnly;
 }
 
@@ -196,8 +210,27 @@
         menuItem.state = self.viewModel.showChangeNotifications ? NSControlStateValueOn : NSControlStateValueOff;
         return YES;
     }
+    else if (theAction == @selector(onGeneralDatabaseSettings:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
+    else if (theAction == @selector(onConvenienceUnlockProperties:)) {
+        return self.viewModel && !self.viewModel.locked;
+    }
 
     return YES;
+}
+
+- (IBAction)onGeneralDatabaseSettings:(id)sender {
+    DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
+    [vc setModel:self.viewModel initialTab:0];
+    
+    [self.contentViewController presentViewControllerAsSheet:vc];
+}
+
+- (IBAction)onConvenienceUnlockProperties:(id)sender {
+    DatabaseSettingsTabViewController* vc = [DatabaseSettingsTabViewController fromStoryboard];
+    [vc setModel:self.viewModel initialTab:1];
+    [self.contentViewController presentViewControllerAsSheet:vc];
 }
 
 

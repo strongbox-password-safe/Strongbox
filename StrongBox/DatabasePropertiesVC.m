@@ -275,7 +275,7 @@ static NSString* stringForCouldNotConnectBehaviour ( CouldNotConnectBehaviour mo
          indexPath.row == kCouldNotConnectBehaviour ||
          indexPath.row == kViewSyncLogRow ||
          indexPath.row == kConflictResolutionStrategyRow ) {
-        if ( self.database.storageProvider == kLocalDevice ) {
+        if ( self.database.storageProvider == kLocalDevice || AppPreferences.sharedInstance.disableNetworkBasedFeatures ) {
             return 0.0f;
         }
     }

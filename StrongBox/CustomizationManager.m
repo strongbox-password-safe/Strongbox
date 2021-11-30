@@ -13,9 +13,6 @@
 
 @interface CustomizationManager ()
 
-@property (readonly, class) BOOL isScotusEdition;
-@property (readonly, class) BOOL isGrapheneEdition;
-
 @end
 
 @implementation CustomizationManager

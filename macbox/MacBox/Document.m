@@ -26,6 +26,13 @@
 #import "MacSyncManager.h"
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
+#import "DatabaseUnlocker.h"
+
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 NSString* const kModelUpdateNotificationLongRunningOperationStart = @"kModelUpdateNotificationLongRunningOperationStart"; 
 NSString* const kModelUpdateNotificationLongRunningOperationDone = @"kModelUpdateNotificationLongRunningOperationDone";
@@ -39,12 +46,6 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 @interface Document ()
 
 @property WindowController* windowController;
-
-
-
-
-@property CompositeKeyFactors* credentialsForUnlock;
-@property NSString *selectedItemForUnlock;
 @property NSTimer* managedDatabasePollForChangesTimer;
 @property BOOL pollingInProgress;
 
@@ -96,29 +97,18 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 
 
 
-- (BOOL)isLegacyFileUrl:(NSURL*)url {
-    return ( url && url.scheme.length && [url.scheme isEqualToString:kStrongboxFileUrlScheme] );
-}
-
 - (BOOL)readFromURL:(NSURL *)url ofType:(NSString *)typeName error:(NSError *__autoreleasing  _Nullable *)outError {
-    NSLog(@"readFromURL: [%@]", url);
+    NSLog(@"Sync Manager Mode: readFromURL - Loading Locked Model... [%@]", url);
+            
+    [NSFileCoordinator addFilePresenter:self]; 
 
-    if ( ![self isLegacyFileUrl:url] ) {
-        NSLog(@"Sync Manager Mode: readFromURL - Loading Locked Model...");
-                
-        [NSFileCoordinator addFilePresenter:self];
-
-        return [self loadLockedModel];
-    }
-    else {
-        return [super readFromURL:url ofType:typeName error:outError];
-    }
+    return [self loadLockedModel];
 }
 
 - (BOOL)readFromFileWrapper:(NSFileWrapper *)fileWrapper ofType:(NSString *)typeName error:(NSError * _Nullable __autoreleasing *)outError {
     NSLog(@"readFromFileWrapper");
 
-    if(fileWrapper.isDirectory) { 
+    if ( fileWrapper.isDirectory ) { 
         if(outError != nil) {
             NSString* loc = NSLocalizedString(@"mac_strongbox_cant_open_file_wrappers", @"Strongbox cannot open File Wrappers, Directories or Compressed Packages like this. Please directly select a KeePass or Password Safe database file.");
             *outError = [Utils createNSError:loc errorCode:-1];
@@ -130,29 +120,8 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 }
 
 - (BOOL)readFromData:(NSData *)data ofType:(NSString *)typeName error:(NSError **)outError {
-    NSLog(@"readFromData: %ld - [%@]", data.length, typeName);
-
-    if ( self.credentialsForUnlock ) { 
-        BOOL ret = [self loadModelFromData:data key:self.credentialsForUnlock selectedItem:self.selectedItemForUnlock outError:outError];
-
-        self.credentialsForUnlock = nil;
-        self.selectedItemForUnlock = nil;
-
-        return ret;
-    }
-    else {
-        NSError* error;
-
-        if(![Serializator isValidDatabaseWithPrefix:data error:&error]) {
-            if(outError != nil) {
-                *outError = error;
-            }
-            
-            return NO;
-        }
-
-        return [self loadLockedModel];
-    }
+    NSLog(@"🔴 WARNWARN: Document::readFromData called %ld - [%@]", data.length, typeName);
+    return NO;
 }
 
 - (BOOL)loadLockedModel {
@@ -169,133 +138,50 @@ NSString* const kNotificationUserInfoParamKey = @"param";
     return YES;
 }
 
-- (BOOL)loadModelFromData:(NSData*)data
-                      key:(CompositeKeyFactors*)key
-             selectedItem:(NSString*)selectedItem
-                 outError:(NSError **)outError {
-    NSError* error;
-    if(![Serializator isValidDatabaseWithPrefix:data error:&error]) {
-        if(outError != nil) {
-            *outError = error;
-        }
-        
-        return NO;
-    }
-
-    DatabaseModel *db = [self getModelFromData:data key:key error:&error];
-    WindowController* wc = self.windowController;
-    
-    if(!db) {
-        if(outError != nil) {
-            *outError = error;
-        }
-        
-        if ( self.viewModel && !self.viewModel.locked ) {
-            _viewModel = [[ViewModel alloc] initLocked:self
-                                              metadata:self.databaseMetadata];
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [wc updateContentView];
-            });
-
-            [self notifyFullModelReload];
-        }
-        else {
-            
-        }
-        
-        return NO;
-    }
-    else {
-        BOOL wasLocked = self.viewModel && self.viewModel.locked;
-        
-        _viewModel = [[ViewModel alloc] initUnlockedWithDatabase:self
-                                                        metadata:self.databaseMetadata
-                                                        database:db];
-
-        if ( wasLocked ) { 
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [wc updateContentView];
-            });
-        }
-        
-        [self updateQuickTypeAutoFill];
-        
-        [self notifyFullModelReload]; 
-    }
-    
-    return YES;
+- (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
+          viewController:(NSViewController*)viewController
+         fromConvenience:(BOOL)fromConvenience
+              completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
+    [self revertWithUnlock:compositeKeyFactors
+            viewController:viewController
+       alertOnJustPwdWrong:YES
+           fromConvenience:fromConvenience
+                completion:completion];
 }
 
 - (void)revertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
-          viewController:(NSViewController*)viewController
-              completion:(void (^)(BOOL, NSError * _Nullable))completion {
+          viewController:(NSViewController *)viewController
+     alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+         fromConvenience:(BOOL)fromConvenience
+              completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
     NSLog(@"Document::revertWithUnlock: [%@]", self.fileURL);
 
-    if ( ![self isLegacyFileUrl:self.fileURL] ) {
-        if ( self.databaseMetadata ) {
-            if ( !self.databaseMetadata.offlineMode ) {
-                NSLog(@"ONLINE MODE: syncWorkingCopyAndUnlock");
-                
-                [self syncWorkingCopyAndUnlock:self.databaseMetadata
-                                viewController:viewController
-                                           key:compositeKeyFactors
-                                  selectedItem:self.selectedItem
-                                    completion:completion];
-            }
-            else {
-                NSLog(@"OFFLINE MODE: syncWorkingCopyAndUnlock");
-
-                [self loadWorkingCopyAndUnlock:self.databaseMetadata
-                                           key:compositeKeyFactors
-                                  selectedItem:self.selectedItem
-                                    completion:completion];
-            }
+    if ( self.databaseMetadata ) {
+        if ( !self.databaseMetadata.offlineMode ) {
+            NSLog(@"ONLINE MODE: syncWorkingCopyAndUnlock");
+            
+            [self syncWorkingCopyAndUnlock:self.databaseMetadata
+                            viewController:viewController
+                       alertOnJustPwdWrong:alertOnJustPwdWrong
+                           fromConvenience:fromConvenience
+                                       key:compositeKeyFactors
+                              selectedItem:self.selectedItem
+                                completion:completion];
         }
         else {
-            NSLog(@"WARNWARN: No database metadata found!!");
+            NSLog(@"OFFLINE MODE: syncWorkingCopyAndUnlock");
+
+            [self loadWorkingCopyAndUnlock:self.databaseMetadata
+                                       key:compositeKeyFactors
+                            viewController:viewController
+                       alertOnJustPwdWrong:alertOnJustPwdWrong
+                           fromConvenience:fromConvenience
+                              selectedItem:self.selectedItem
+                                completion:completion];
         }
     }
     else {
-        [self legacyRevertWithUnlock:compositeKeyFactors viewController:viewController selectedItem:self.selectedItem completion:completion];
-    }
-}
-
-- (void)legacyRevertWithUnlock:(CompositeKeyFactors *)compositeKeyFactors
-                viewController:(NSViewController*)viewController
-                  selectedItem:(NSString *)selectedItem
-                    completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    NSError* error;
-
-    self.credentialsForUnlock = compositeKeyFactors;
-    self.selectedItemForUnlock = selectedItem;
-
-    
-    
-    
-    
-    
-    [self.undoManager removeAllActions]; 
-    NSFileWrapper* wrapper = [[NSFileWrapper alloc] initWithURL:self.fileURL options:NSFileWrapperReadingImmediate error:&error];
-    
-    if(!wrapper) {
-        NSLog(@"Could not create file wrapper: [%@]", error);
-        completion(NO, error);
-        return;
-    }
-    
-    BOOL success = [self readFromFileWrapper:wrapper ofType:self.fileType error:&error];
-    if(success) {
-        self.fileModificationDate = wrapper.fileAttributes.fileModificationDate;
-    }
-    
-    self.credentialsForUnlock = nil;
-    self.selectedItemForUnlock = nil;
-
-    if(completion) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completion(success, error);
-        });
+        NSLog(@"WARNWARN: No database metadata found!!");
     }
 }
 
@@ -361,10 +247,7 @@ NSString* const kNotificationUserInfoParamKey = @"param";
       contextInfo:(void *)contextInfo {
     NSLog(@"saveToURL delegate... [%@]", url);
     
-    
-    
-    [super saveToURL:url ofType:typeName forSaveOperation:saveOperation
-                delegate:delegate didSaveSelector:didSaveSelector contextInfo:contextInfo];
+    [super saveToURL:url ofType:typeName forSaveOperation:saveOperation delegate:delegate didSaveSelector:didSaveSelector contextInfo:contextInfo];
 }
 
 - (void)saveToURL:(NSURL *)url
@@ -373,44 +256,25 @@ NSString* const kNotificationUserInfoParamKey = @"param";
 completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     NSLog(@"saveToURL: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, url);
 
-    if ( [self isLegacyFileUrl:self.fileURL] ) {
-        NSLog(@"saveToURL... LEGACY [%@]", url);
+    
+        
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
+        NSError* error;
+        BOOL success = [self writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:&error];
+        NSLog(@"saveToURL Done: Success = %hhd, %lu - [%@] - [%@]", success, (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, error);
 
-        
-        
-        [super saveToURL:url ofType:typeName forSaveOperation:saveOperation completionHandler:^(NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             completionHandler(error);
-            
-            NSLog(@"saveToURL Done: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate, error);
+        
+            if ( success ) {
+                [self updateQuickTypeAutoFill]; 
 
-            [self updateQuickTypeAutoFill];
+                
 
-            
-
-            [self notifyUpdatesDatabasesList];
-        }];
-    }
-    else {
-        NSLog(@"saveToURL... NEW [%@]", url);
-
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0L), ^{
-            NSError* error;
-            BOOL success = [self writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:&error];
-            NSLog(@"saveToURL Done: %lu - [%@] - [%@]", (unsigned long)saveOperation, self.fileModificationDate.friendlyDateTimeStringBothPrecise, error);
-
-            dispatch_async(dispatch_get_main_queue(), ^{
-                completionHandler(error);
-            
-                if ( success ) {
-                    [self updateQuickTypeAutoFill];
-
-                    
-
-                    [self notifyUpdatesDatabasesList];
-                }
-            });
+                [self notifyUpdatesDatabasesList];
+            }
         });
-    }
+    });
 }
 
 - (BOOL)writeSafelyToURL:(NSURL *)url
@@ -418,16 +282,10 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         forSaveOperation:(NSSaveOperationType)saveOperation
                    error:(NSError *__autoreleasing  _Nullable *)outError {
     if ( NSThread.isMainThread ) {
-        NSLog(@"WARNWARN: writeSafelyToURL called on main thread- this will break YubiKeys requiring Touch! ");
+        NSLog(@"🔴 WARNWARN: writeSafelyToURL called on main thread- this will break YubiKeys requiring Touch! ");
     }
     
-    if ( ![self isLegacyFileUrl:self.fileURL] ) {
-        return [self syncManagerWriteSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
-    }
-    else {
-        NSLog(@"writeSafelyToURL LEGACY - [%@]", url);
-        return [super writeSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
-    }
+    return [self syncManagerWriteSafelyToURL:url ofType:typeName forSaveOperation:saveOperation error:outError];
 }
 
 - (BOOL)syncManagerWriteSafelyToURL:(NSURL *)url
@@ -438,9 +296,13 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     
     
     
-    NSData* data = [self dataOfType:typeName error:outError];
+    NSError* dataOfTypeError;
+    NSData* data = [self dataOfType:typeName error:&dataOfTypeError];
     if ( !data ) {
-        NSLog(@"Could not get dataOfType");
+        NSLog(@"Could not get dataOfType = [%@]", dataOfTypeError);
+        if ( outError ) {
+            *outError = dataOfTypeError;
+        }
         return NO;
     }
 
@@ -452,11 +314,17 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         return NO;
     }
                 
+    NSError* updateError;
     BOOL success = [MacSyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.databaseMetadata
                                                                                 data:data
-                                                                               error:outError];
+                                                                               error:&updateError];
     if (!success) {
-        NSLog(@"Could not updateLocalCopyMarkAsRequiringSync");
+        NSLog(@"Could not get dataOfType = [%@]", dataOfTypeError);
+        if ( outError ) {
+            *outError = updateError;
+        }
+
+        NSLog(@"Could not updateLocalCopyMarkAsRequiringSync: [%@]", updateError);
         return NO;
     }
 
@@ -472,7 +340,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (NSData *)dataOfType:(NSString *)typeName error:(NSError **)outError {
-    NSLog(@"Document::dataOfType: [%@]", typeName);
+    NSLog(@"✅ Document::dataOfType: [%@]", typeName);
     
     [self unblockUserInteraction];
     return [self getDataFromModel:self.viewModel error:outError];
@@ -489,7 +357,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     dispatch_group_enter(group);
 
     [self.viewModel getPasswordDatabaseAsData:^(BOOL userCancelled, NSData * _Nullable data, NSError * _Nullable error) {
-        
+        NSLog(@"getDataFromModel: Got Data... Cancelled=[%hhd], Error = [%@]", userCancelled, error);
         ret = data;
         retError = error;
         dispatch_group_leave(group);
@@ -504,35 +372,6 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     return ret;
 }
 
-- (DatabaseModel*)getModelFromData:(NSData*)data key:(CompositeKeyFactors*)key error:(NSError **)outError {
-    __block DatabaseModel* db = nil;
-    __block NSError* retError = nil;
-
-    [self notifyLongRunningOpStart:NSLocalizedString(@"open_sequence_progress_decrypting", @"Decrypting...")];
-    
-    dispatch_group_t group = dispatch_group_create();
-    dispatch_group_enter(group);
-    
-    [Serializator fromLegacyData:data
-                             ckf:key
-                          config:DatabaseModelConfig.defaults
-                      completion:^(BOOL userCancelled, DatabaseModel * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
-        
-        retError = error ? error : innerStreamError; 
-        db = retError ? nil : model;
-        dispatch_group_leave(group);
-    }];
-    dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
-
-    [self notifyLongRunningOpDone];
-    
-    if (outError) {
-        *outError = retError;
-    }
-    
-    return db;
-}
-
 
 
 
@@ -544,9 +383,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     [self stopMonitoringManagedFile];
     
     
-    
-    if (NSDocumentController.sharedDocumentController.documents.count == 0 && Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows) {
-        [DatabasesManagerVC show];
+        
+    if (NSDocumentController.sharedDocumentController.documents.count == 0 &&
+        Settings.sharedInstance.showDatabasesManagerOnCloseAllWindows &&
+        !Settings.sharedInstance.runningAsATrayApp ) {
+        [DBManagerPanel.sharedInstance show];
     }
 }
 
@@ -557,7 +398,9 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
                                                           displayFormat:self.databaseMetadata.quickTypeDisplayFormat
                                                         alternativeUrls:self.databaseMetadata.autoFillScanAltUrls
                                                            customFields:self.databaseMetadata.autoFillScanCustomFields
-                                                                  notes:self.databaseMetadata.autoFillScanNotes];
+                                                                  notes:self.databaseMetadata.autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:self.databaseMetadata.autoFillConcealedFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:self.databaseMetadata.autoFillUnConcealedFieldsAsCreds];
     }
 }
 
@@ -565,14 +408,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 - (void)encodeRestorableStateWithCoder:(NSCoder *) coder {
 
-
-    if ( ![self isLegacyFileUrl:self.fileURL] ) {
-        [coder encodeObject:self.fileURL forKey:@"StrongboxNonFileRestorationStateURL"];
-        return;
-    }
-    else {
-        [super encodeRestorableStateWithCoder:coder];
-    }
+    [coder encodeObject:self.fileURL forKey:@"StrongboxNonFileRestorationStateURL"];
 }
 
 
@@ -628,14 +464,11 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 }
 
 - (void)onWake {
-
     [self startMonitoringManagedFile];
 }
 
 - (void)startMonitoringManagedFile {
-
-    
-    if ( !self.databaseMetadata || self.viewModel.locked || self.viewModel.offlineMode || !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL] ) {
+    if ( !self.databaseMetadata || self.viewModel.locked || self.viewModel.offlineMode || !self.databaseMetadata.monitorForExternalChanges ) {
         return;
     }
         
@@ -669,7 +502,7 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         return;
     }
     
-    if ( !self.databaseMetadata.monitorForExternalChanges || [self isLegacyFileUrl:self.fileURL] || self.viewModel.offlineMode) {
+    if ( !self.databaseMetadata.monitorForExternalChanges || self.viewModel.offlineMode) {
         [self stopMonitoringManagedFile];
         return;
     }
@@ -725,56 +558,16 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
             return;
         }
         
-        BOOL mod = [self fileHasBeenModified];
-        if( mod ) {
-            NSLog(@"XXXX - presentedItemDidChange - Change Found");
-            [self notifyDatabaseHasBeenChangedByOther];
-        }
+
+
+
+
+
     }
 }
 
-- (BOOL)fileHasBeenModified {
-    NSLog(@"legacyFileBasedisFileHasBeenModified");
-
-    if(!self.fileURL) {
-        NSLog(@"fileUrl is nil!");
-        return NO;
-    }
-    
-    NSError* error;
-    NSDictionary<NSFileAttributeKey, id> *attributes = [NSFileManager.defaultManager attributesOfItemAtPath:self.fileURL.path error:&error];
-    if(!attributes) {
-        NSLog(@"error: %@", error);
-        return NO;
-    }
-    
-    NSDate* mod = [attributes fileModificationDate];
-
-    BOOL changed = ![mod isEqualToDateWithinEpsilon:self.fileModificationDate];
-    
-    NSLog(@"Document Changed? [%@] File=[%@] vs Doc=[%@]", localizedYesOrNoFromBool(changed), mod.friendlyDateTimeStringBothPrecise, self.fileModificationDate.friendlyDateTimeStringBothPrecise);
-    
-    return changed;
-}
 
 
-
-
-- (void)notifyLongRunningOpStart:(NSString*)status {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationLongRunningOperationStart
-                                                          object:self
-                                                        userInfo:@{ kNotificationUserInfoLongRunningOperationStatus : status }];
-    });
-}
-
-- (void)notifyLongRunningOpDone {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [NSNotificationCenter.defaultCenter postNotificationName:kModelUpdateNotificationLongRunningOperationDone
-                                                          object:self
-                                                        userInfo:@{ }];
-    });
-}
 
 - (void)notifyFullModelReload {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -824,17 +617,19 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
 
 - (void)syncWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
                   viewController:(NSViewController*)viewController
+             alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+                 fromConvenience:(BOOL)fromConvenience
                              key:(CompositeKeyFactors*)key
                     selectedItem:(NSString *)selectedItem
-                      completion:(void (^)(BOOL, NSError * _Nullable))completion {
+                      completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
     NSLog(@"syncWorkingCopyAndUnlock ENTER");
     
     if ( self.viewModel.offlineMode ) {
-        NSLog(@"WARNWARN: syncWorkingCopyAndUnlock called in Offline Mode!!");
+        NSLog(@"🔴 WARNWARN: syncWorkingCopyAndUnlock called in Offline Mode!!");
 
         if(completion) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                completion(NO, nil);
+                completion(NO, NO, NO, nil);
             });
         }
 
@@ -849,76 +644,35 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
         if ( result == kSyncAndMergeSuccess ) {
             [self loadWorkingCopyAndUnlock:databaseMetadata
                                        key:key
+                            viewController:viewController
+                       alertOnJustPwdWrong:alertOnJustPwdWrong
+                           fromConvenience:fromConvenience
                               selectedItem:selectedItem
                                 completion:completion];
         }
-        else {
+        else if (result == kSyncAndMergeError ) {
             if(completion) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    completion(NO, error);
+                    completion(NO, NO, NO, error);
+                });
+            }
+        }
+        else if (result == kSyncAndMergeResultUserCancelled ) {
+            if(completion) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(NO, YES, NO, nil);
+                });
+            }
+        }
+        else {
+            NSLog(@"🔴 WARNWARN: Unhandled Sync Result [%lu] - error = [%@]", (unsigned long)result, error);
+            if(completion) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    completion(NO, NO, NO, error);
                 });
             }
         }
     }];
-}
-
-- (void)reloadFromLocalWorkingCopy:(CompositeKeyFactors *)key selectedItem:(NSString *)selectedItem {
-    [self loadWorkingCopyAndUnlock:self.databaseMetadata key:key selectedItem:selectedItem completion:nil];
-}
-
-- (void)loadWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
-                             key:(CompositeKeyFactors*)key
-                    selectedItem:(NSString *)selectedItem
-                      completion:(void (^)(BOOL, NSError * _Nullable))completion {
-    NSDate* modDate;
-    NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:databaseMetadata.uuid modified:&modDate];
-    
-    if (workingCopy == nil) {
-        NSLog(@"loadWorkingCopyAndUnlock - Could not get local working copy");
-        
-        if ( completion ) {
-            completion(NO, [Utils createNSError:@"Could not get local working copy" errorCode:-123]);
-        }
-        
-        return;
-    }
-        
-    NSError* error;
-    NSData* workingData = [NSData dataWithContentsOfURL:workingCopy options:kNilOptions error:&error];
-    if ( error ) {
-        NSLog(@"loadWorkingCopyAndUnlock - dataWithContentsOfURL error = [%@]", error);
-        
-        if ( completion ) {
-            completion(NO, error);
-        }
-        return;
-    }
-
-
-    BOOL success = [self loadModelFromData:workingData key:key selectedItem:selectedItem outError:&error];
-
-    [NSFileCoordinator addFilePresenter:self]; 
-
-    [self startMonitoringManagedFile];
-
-    
-    
-    
-    
-    
-
-
-
-
-
-    
-    
-    
-    if(completion) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completion(success, error);
-        });
-    }
 }
 
 - (void)backgroundSync {
@@ -987,6 +741,103 @@ completionHandler:(void (^)(NSError * _Nullable))completionHandler {
     [self loadLockedModel];
 
     self.selectedItem = selectedItem; 
+}
+
+
+
+- (void)reloadFromLocalWorkingCopy:(CompositeKeyFactors *)key
+                    viewController:(NSViewController*)viewController
+                      selectedItem:(NSString *)selectedItem {
+    [self loadWorkingCopyAndUnlock:self.databaseMetadata
+                               key:key
+                    viewController:viewController
+               alertOnJustPwdWrong:YES
+                   fromConvenience:NO
+                      selectedItem:selectedItem
+                        completion:nil];
+}
+
+- (void)loadWorkingCopyAndUnlock:(DatabaseMetadata*)databaseMetadata
+                             key:(CompositeKeyFactors*)key
+                  viewController:(NSViewController*)viewController
+             alertOnJustPwdWrong:(BOOL)alertOnJustPwdWrong
+                 fromConvenience:(BOOL)fromConvenience
+                    selectedItem:(NSString *)selectedItem
+                      completion:(void (^)(BOOL success, BOOL userCancelled, BOOL incorrectCredentials, NSError* error))completion {
+    DatabaseUnlocker *unlocker = [DatabaseUnlocker unlockerForDatabase:self.databaseMetadata
+                                                        viewController:viewController
+                                                         forceReadOnly:NO
+                                                        isAutoFillOpen:NO
+                                                           offlineMode:self.databaseMetadata.offlineMode];
+    
+    unlocker.alertOnJustPwdWrong = alertOnJustPwdWrong;
+    
+    [unlocker unlockLocalWithKey:key
+              keyFromConvenience:fromConvenience
+                      completion:^(UnlockDatabaseResult result, Model * _Nullable model, NSError * _Nullable innerStreamError, NSError * _Nullable error) {
+        if ( result == kUnlockDatabaseResultSuccess ) {
+            [self onUnlockDatabaseSuccessful:model.database]; 
+        }
+        else if ( result == kUnlockDatabaseResultError ) {
+            [self onUnlockDatabaseError];
+        }
+        else if ( result == kUnlockDatabaseResultIncorrectCredentials ) {
+            [self onUnlockDatabaseError];
+        }
+        else {
+            
+        }
+        
+        if(completion) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSError* caolError = error ? error : innerStreamError;
+                completion(result == kUnlockDatabaseResultSuccess,
+                           result == kUnlockDatabaseResultUserCancelled,
+                           result == kUnlockDatabaseResultIncorrectCredentials,
+                           caolError);
+            });
+        }
+    }];
+}
+
+- (void)onUnlockDatabaseError {
+    if ( self.viewModel && !self.viewModel.locked ) {
+        _viewModel = [[ViewModel alloc] initLocked:self metadata:self.databaseMetadata];
+
+        WindowController* wc = self.windowController;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [wc updateContentView];
+        });
+
+        [self notifyFullModelReload];
+    }
+    else {
+        
+    }
+}
+
+- (void)onUnlockDatabaseSuccessful:(DatabaseModel*)db {
+    BOOL wasLocked = self.viewModel && self.viewModel.locked;
+    
+    _viewModel = [[ViewModel alloc] initUnlockedWithDatabase:self
+                                                    metadata:self.databaseMetadata
+                                                    database:db];
+
+    if ( wasLocked ) { 
+        WindowController* wc = self.windowController;
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [wc updateContentView];
+        });
+    }
+    
+    [self notifyFullModelReload]; 
+    
+    
+    [NSFileCoordinator addFilePresenter:self];
+
+    [self startMonitoringManagedFile];
 }
 
 @end

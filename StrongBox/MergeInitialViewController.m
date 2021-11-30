@@ -9,7 +9,7 @@
 #import "MergeInitialViewController.h"
 #import "Alerts.h"
 #import "MergeSelectSecondDatabaseViewController.h"
-#import "CompositeKeyDeterminer.h"
+#import "IOSCompositeKeyDeterminer.h"
 #import "DatabaseUnlocker.h"
 #import "DuressActionHelper.h"
 
@@ -34,7 +34,7 @@
 }
 
 - (IBAction)onUnlock:(id)sender {
-    CompositeKeyDeterminer* determiner = [CompositeKeyDeterminer determinerWithViewController:self database:self.firstMetadata isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+    IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self database:self.firstMetadata isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
     [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
         if (result == kGetCompositeKeyResultSuccess) {
             DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:self.firstMetadata viewController:self forceReadOnly:NO isAutoFillOpen:NO offlineMode:YES];

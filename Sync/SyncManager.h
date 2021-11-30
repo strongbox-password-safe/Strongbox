@@ -10,11 +10,11 @@
 #import "SyncParameters.h"
 #import "SafeMetaData.h"
 #import "SyncStatus.h"
-#import "SyncAndMergeSequenceManager.h"
+#import "SyncManagement.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SyncManager : NSObject
+@interface SyncManager : NSObject<SyncManagement>
 
 + (instancetype _Nullable)sharedInstance;
 

@@ -51,7 +51,7 @@ disableEscapeKey:(BOOL)disableEscapeKey
            option1AndDefault:(NSString*)option1AndDefault
                      option2:(NSString*)option2
                       window:(NSWindow*)window
-                  completion:(void (^)(NSUInteger zeroForCancel))completion;
+                  completion:(void (^)(int response))completion;
 
 + (void)customOptionWithCancel:(NSString *)messageText
                informativeText:(NSString*)informativeText

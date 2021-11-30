@@ -10,14 +10,16 @@
 
 static NSString* const kDatabaseIdKey = @"safeId";
 static NSString* const kNodeIdKey = @"nodeId";
+static NSString* const kFieldKeyKey = @"fieldKey";
 
 @implementation QuickTypeRecordIdentifier
 
-+ (instancetype)identifierWithDatabaseId:(NSString *)databaseId nodeId:(NSString *)nodeId {
++ (instancetype)identifierWithDatabaseId:(NSString *)databaseId nodeId:(NSString *)nodeId fieldKey:(NSString * _Nullable)fieldKey {
     QuickTypeRecordIdentifier* ret = [[QuickTypeRecordIdentifier alloc] init];
     
     ret.databaseId = databaseId;
     ret.nodeId = nodeId;
+    ret.fieldKey = fieldKey;
     
     return ret;
 }
@@ -27,7 +29,7 @@ static NSString* const kNodeIdKey = @"nodeId";
     NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:[json dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
     
     if(dictionary) {
-        return [QuickTypeRecordIdentifier identifierWithDatabaseId:dictionary[kDatabaseIdKey] nodeId:dictionary[kNodeIdKey]];
+        return [QuickTypeRecordIdentifier identifierWithDatabaseId:dictionary[kDatabaseIdKey] nodeId:dictionary[kNodeIdKey] fieldKey:dictionary[kFieldKeyKey]];
     }
     else {
         NSLog(@"Could not deserialize from: %@",error);
@@ -37,7 +39,15 @@ static NSString* const kNodeIdKey = @"nodeId";
 
 - (NSString *)toJson {
     NSError* error;
-    NSDictionary *dict = @{ kDatabaseIdKey : self.databaseId, kNodeIdKey : self.nodeId };
+    NSDictionary *dict = self.fieldKey ? @{
+        kDatabaseIdKey : self.databaseId,
+        kNodeIdKey : self.nodeId,
+        kFieldKeyKey : self.fieldKey
+    } : @{
+        kDatabaseIdKey : self.databaseId,
+        kNodeIdKey : self.nodeId,
+    };
+    
     NSData* data = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
     
     if(data) {
@@ -49,8 +59,7 @@ static NSString* const kNodeIdKey = @"nodeId";
     }
 }
 
-- (NSString *)description
-{
+- (NSString *)description {
     return [NSString stringWithFormat:@"database = {%@}, node = {%@}", self.databaseId, self.nodeId];
 }
 

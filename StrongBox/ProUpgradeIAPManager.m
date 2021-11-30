@@ -23,7 +23,6 @@ static NSString* const k3Monthly =  @"com.strongbox.markmcguill.upgrade.pro.3mon
 static NSString* const kYearly =  @"com.strongbox.markmcguill.upgrade.pro.yearly";
 static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.freetrial";
 
-
 @interface ProUpgradeIAPManager ()
 
 @property (nonatomic) UpgradeManagerState readyState;
@@ -102,6 +101,7 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }
     else {
         AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = YES;
+        AppPreferences.sharedInstance.hasPromptedThatAppHasBeenDowngradedToFreeEdition = NO;
         [AppPreferences.sharedInstance setPro:NO];
     }
 }
@@ -159,11 +159,16 @@ static NSString* const kIapFreeTrial =  @"com.markmcguill.strongbox.ios.iap.free
     }
     else {
         if ( AppPreferences.sharedInstance.isPro ) {
-            NSLog(@"Downgrading App as Entitlement NOT found in Receipt...");
+
             
-            AppPreferences.sharedInstance.appHasBeenDowngradedToFreeEdition = YES;
-            AppPreferences.sharedInstance.hasPromptedThatAppHasBeenDowngradedToFreeEdition = NO;
-            [AppPreferences.sharedInstance setPro:NO];
+            NSLog(@"PRO Entitlement NOT found in Receipt, incrementing fail count to allow for grace period but very likely app not entitled to Pro...");
+                      
+            AppPreferences.sharedInstance.numberOfEntitlementCheckFails++;
+
+            
+
+
+
         }
         else {
             NSLog(@"App Pro Entitlement not found in Receipt... leaving downgraded...");

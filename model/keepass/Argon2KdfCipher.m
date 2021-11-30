@@ -27,6 +27,8 @@ static const uint32_t kDefaultParallelism = 2;
 static const uint32_t kDefaultVersion = 19;
 static const uint32_t kDefaultSaltLength = 32;
     
+static const uint64_t kMaxRecommendedMemory = 64 * 1024 * 1024; 
+
 static const uint32_t kBlockSize = 1024;
 
 static const BOOL kLogVerbose = NO;
@@ -208,6 +210,10 @@ static const BOOL kLogVerbose = NO;
 
 + (uint32_t)defaultParallelism {
     return kDefaultParallelism;
+}
+
++ (uint64_t)maxRecommendedMemory {
+    return kMaxRecommendedMemory;
 }
 
 - (uint64_t)iterations {

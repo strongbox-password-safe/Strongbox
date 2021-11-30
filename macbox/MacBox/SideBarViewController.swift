@@ -8,35 +8,39 @@
 
 import Cocoa
 
+// TODO: Edit Group names
+// TODO: Move Folders around / Drag Drop
+
 class SideBarViewController: NSViewController, NSOutlineViewDelegate, NSOutlineViewDataSource, DocumentViewController {
+    @IBOutlet weak var outlineView: NSOutlineView!
+
     private class ViewNode {
-        let id: Int
+        let context: NavigationContext?
         let title: String
-        let symbolName: String?
+        let image : NSImage
         let children: [ViewNode]
-        let isGroup: Bool
+        let isHeaderNode: Bool
         let color: NSColor?
         
-        init(id: Int, title: String, symbolName: String? = nil, children: [ViewNode] = [], isGroup: Bool = false, color: NSColor? = nil ) {
-            self.id = id
+        init(context : NavigationContext?,
+             title: String,
+             image: NSImage,
+             children: [ViewNode] = [],
+             isHeaderNode: Bool = false,
+             color: NSColor? = nil ) {
+            self.context = context
             self.title = title
-            self.symbolName = symbolName
+            self.image = image
             self.children = children
-            self.isGroup = isGroup
+            self.isHeaderNode = isHeaderNode
             self.color = color
         }
         
-        convenience init(groupId: Int, title: String, children: [ViewNode]) {
-            self.init(id: groupId, title: title, children: children, isGroup: true)
-        }
-
-        var cellIdentifier: NSUserInterfaceItemIdentifier {
-            NSUserInterfaceItemIdentifier(rawValue: isGroup ? "HeaderCell" : "DataCell")
+        var cellIdentifier: NSUserInterfaceItemIdentifier { 
+            NSUserInterfaceItemIdentifier(rawValue: isHeaderNode ? "HeaderCell" : "DataCell")
         }
     }
-    
-    @IBOutlet weak var outlineView: NSOutlineView!
-    
+        
     private var document : Document?
     private var loadedDocument : Bool = false
     private var model : ViewModel {
@@ -44,23 +48,23 @@ class SideBarViewController: NSViewController, NSOutlineViewDelegate, NSOutlineV
     }
     
     private var dataSource : [ViewNode] = []
-    
-    private let staticData : [ViewNode] = [ 
-        ViewNode(groupId: 1, title: "Home", children: [
-            ViewNode(id: 11, title: "Mark's Database", symbolName: "house" ),
-            ViewNode(id: 12, title: "Nearly Expired", symbolName: "clock.arrow.circlepath" ),
-            ViewNode(id: 13, title: "Expired", symbolName: "timer" ),
-            ViewNode(id: 14, title: "Audit Issues", symbolName: "exclamationmark.triangle", color: NSColor.systemOrange ),
-            ViewNode(id: 15, title: "Recycle Bin", symbolName: "trash"),
-            ViewNode(id: 16, title: "Preferences", symbolName: "gear" )
-        ]),
-        ViewNode(groupId: 2, title: "Favorites", children: [
-            ViewNode(id: 21, title: "HSBC", symbolName: "star", color: NSColor.systemYellow ),
-            ViewNode(id: 22, title: "Google", symbolName: "star", color: NSColor.systemYellow ),
-            ViewNode(id: 23, title: "Strava", symbolName: "star", color: NSColor.systemYellow )
-        ])
-    ]
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -103,25 +107,68 @@ class SideBarViewController: NSViewController, NSOutlineViewDelegate, NSOutlineV
         }
         document = doc
         loadedDocument = true
+
+        var newData : [ViewNode] = []
+
         
+
+        
+
+        let hierarchy = getHierarchicalViewNodesFor(model.rootGroup)
+        let hierarchyNode = ViewNode(context: .regularHierarchy(nil), title: "Hierarchy", image: Icon.house.image(), children: [hierarchy], isHeaderNode: true) 
+        newData += [hierarchyNode];
+        
+        
+
         let tagNodes = model.tagSet.map { tag in
-            return ViewNode(id: tag.hash, title: tag, symbolName: "tag")
+            return ViewNode(context: .tags(tag), title: tag, image: Icon.tag.image())
         }
         
-        var newData = staticData;
+        var tagsNode: ViewNode? = nil
         
         if ( !tagNodes.isEmpty ) {
-            newData += [
-                ViewNode(groupId: 5, title: "Tags", children: tagNodes)
-            ]
+            tagsNode = ViewNode(context: nil, title: NSLocalizedString("item_details_username_field_tags", comment: "Tags"), image: Icon.tag.image(), children: tagNodes, isHeaderNode: true)
+            newData += [ tagsNode! ]
         }
-                
+
+        
+        
+        
+                        
         Logging.log("SideBarViewController::load done, expanding all items")
         
         dataSource = newData
         
         outlineView.reloadData()
-        outlineView.expandItem(nil, expandChildren: true)
+        
+        
+
+        outlineView.expandItem(hierarchyNode)
+        if ( tagsNode != nil ) {
+            outlineView.expandItem(tagsNode)
+        }
+    }
+        
+    private func getHierarchicalViewNodesFor(_ group : Node ) -> ViewNode {
+        
+        
+        let sorted = group.childGroups.sorted(by: Node.sortTitleLikeFinder )
+        
+        let children : [ViewNode] = sorted.map { child in
+            return getHierarchicalViewNodesFor(child)
+        }
+        
+        
+        
+        let image : NSImage
+        if ( model.rootGroup.uuid == group.uuid && group.isUsingKeePassDefaultIcon ) {
+            image = Icon.house.image()
+        }
+        else {
+            image = NodeIconHelper.getIconFor( group, predefinedIconSet: KeePassIconSet.sfSymbols, format: model.format )
+        }
+        
+        return ViewNode(context: .regularHierarchy(group.uuid), title: group.title, image: image, children: children) 
     }
     
     func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: Any?) -> Int {
@@ -133,40 +180,57 @@ class SideBarViewController: NSViewController, NSOutlineViewDelegate, NSOutlineV
         item == nil ? dataSource[index] : (item as! ViewNode).children[index]
     }
     
+    var italicFont : NSFont?
+    var regularFont : NSFont?
+    
     
     func outlineView(_ outlineView: NSOutlineView, viewFor tableColumn: NSTableColumn?, item: Any) -> NSView? {
         guard let node = item as? ViewNode,
               let cell = outlineView.makeView(withIdentifier: node.cellIdentifier, owner: self) as? NSTableCellView else {
             return nil
         }
-        
-        cell.textField?.stringValue = node.title
-        
-        if !node.isGroup {
-            if #available(macOS 11.0, *) {
-                cell.imageView?.image = NSImage(systemSymbolName: node.symbolName ?? "folder", accessibilityDescription: nil)
-            }
-            else {
-                cell.imageView?.image = NSImage(named: node.symbolName ?? "folder")
-            }
+                
+        if !node.isHeaderNode {
+            cell.imageView?.image = node.image
         }
         
+        
+        
+        if( italicFont == nil ) {
+            regularFont = cell.textField?.font!;
+            italicFont = NSFontManager.shared.convert(cell.textField!.font!, toHaveTrait: .italicFontMask)
+        }
+        
+        
+        if ( model.recycleBinEnabled && model.recycleBinNode != nil && node.context == .regularHierarchy(model.recycleBinNode!.uuid) ) {
+            cell.textField!.font = italicFont;
+        }
+        else {
+            cell.textField!.font = regularFont;
+        }
+        
+        cell.textField?.stringValue = node.title 
+
         return cell
     }
 
-    
     func outlineView(_ outlineView: NSOutlineView, isGroupItem item: Any) -> Bool {
-        (item as! ViewNode).isGroup
+        (item as! ViewNode).isHeaderNode
     }
     
+    func outlineView(_ outlineView: NSOutlineView, shouldShowOutlineCellForItem item: Any) -> Bool {
+        let node = item as! ViewNode
+        return node.context != .regularHierarchy(nil)
+    }
     
     func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: Any) -> Bool {
-        !(item as! ViewNode).children.isEmpty
+        let node = item as! ViewNode
+        return !node.children.isEmpty 
     }
     
     
     func outlineView(_ outlineView: NSOutlineView, shouldSelectItem item: Any) -> Bool {
-        !(item as! ViewNode).isGroup
+        !(item as! ViewNode).isHeaderNode
     }
     
     @available(macOS 11.0, *)

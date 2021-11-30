@@ -1014,6 +1014,7 @@ static const int kMinNotesCellHeight = 160;
                    thirdButtonText:@"Manual (Steam Token)..."
                             action:^(int response) {
         if(response == 0){
+#ifndef IS_READ_ONLY_BUILD
             QRCodeScannerViewController* vc = [[QRCodeScannerViewController alloc] init];
             vc.onDone = ^(BOOL response, NSString * _Nonnull string) {
                 [self dismissViewControllerAnimated:YES completion:nil];
@@ -1036,6 +1037,7 @@ static const int kMinNotesCellHeight = 160;
             };
             
             [self presentViewController:vc animated:YES completion:nil];
+#endif
         }
         else if(response == 1 || response == 2) {
            [Alerts OkCancelWithTextField:self

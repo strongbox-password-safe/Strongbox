@@ -22,6 +22,11 @@
 
 @implementation LargeTextViewController
 
++ (instancetype)fromStoryboard {
+    UIStoryboard* sb = [UIStoryboard storyboardWithName:@"LargeTextView" bundle:nil];
+    return [sb instantiateInitialViewController];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 

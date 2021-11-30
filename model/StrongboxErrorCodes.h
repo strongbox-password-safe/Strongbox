@@ -14,6 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (readonly, class) NSInteger incorrectCredentials;
 @property (readonly, class) NSInteger couldNotCreateICloudFile;
+@property (readonly, class) NSInteger macOSBiometricInProgressOrImpossible;
 
 @end
 

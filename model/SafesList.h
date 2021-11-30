@@ -8,13 +8,14 @@
 
 #import <Foundation/Foundation.h>
 #import "SafeMetaData.h"
+#import "DatabasePreferencesManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* _Nonnull const kDatabasesListChangedNotification;
 extern NSString* _Nonnull const kDatabaseUpdatedNotification;
 
-@interface SafesList : NSObject
+@interface SafesList : NSObject<DatabasePreferencesManager>
 
 + (instancetype _Nullable)sharedInstance;
 @property (nonatomic, nonnull, readonly) NSArray<SafeMetaData*> *snapshot;

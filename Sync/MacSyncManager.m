@@ -36,18 +36,13 @@
     }
 }
 
-- (BOOL)isLegacyFileUrl:(NSURL*)url {
-    return ( url && url.scheme.length && [url.scheme isEqualToString:kStrongboxFileUrlScheme] );
-}
-
 - (void)backgroundSyncAll {
     NSLog(@"backgroundSyncOutstandingUpdates START");
     
     for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
-        if ( ![self isLegacyFileUrl:database.fileUrl] )
-            [self backgroundSyncDatabase:database];
-        }
+        [self backgroundSyncDatabase:database];
     }
+}
 
 - (void)backgroundSyncDatabase:(DatabaseMetadata*)database {
     [self backgroundSyncDatabase:database completion:nil];
@@ -56,15 +51,7 @@
 - (void)backgroundSyncDatabase:(DatabaseMetadata*)database
                     completion:(SyncAndMergeCompletionBlock _Nullable)completion {
     NSLog(@"backgroundSyncDatabase enter [%@]", database);
-    
-    if ( [self isLegacyFileUrl:database.fileUrl] ) {
-        NSLog(@"WARNWARN: Attempt to Sync a Local Device database?!");
-        if (completion) {
-            completion(kSyncAndMergeSuccess, NO, nil);
-        }
-        return;
-    }
-    
+        
     if ( database.offlineMode ) {
         NSLog(@"WARNWARN: Attempt to Sync an Offline Mode database?!");
         if (completion) {
@@ -121,21 +108,32 @@
     }];
 }
 
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(nonnull METADATA_PTR)database file:(nonnull NSString *)file error:(NSError *__autoreleasing  _Nullable * _Nullable)error {
+    return [self updateLocalCopyMarkAsRequiringSync:database data:nil file:file error:error];
+}
+
 - (BOOL)updateLocalCopyMarkAsRequiringSync:(DatabaseMetadata *)database data:(NSData *)data error:(NSError**)error {
-    if ( database.readOnly ) {
-        NSLog(@"WARNWARN: Attempt to update a Read Only database?!");
+    return [self updateLocalCopyMarkAsRequiringSync:database data:data file:nil error:error];
+}
+
+- (BOOL)updateLocalCopyMarkAsRequiringSync:(nonnull METADATA_PTR)database data:(NSData *)data file:(NSString *)file error:(NSError**)error {
+    if ( database.readOnly ) { 
+        if ( error ) {
+            *error = [Utils createNSError:NSLocalizedString(@"warn_database_is_ro_no_update", @"Your database is in Read Only mode and cannot be updated.") errorCode:-1];
+        }
+        NSLog(@"🔴 WARNWARN: Attempt to update a Read Only database?!");
         return NO;
     }
+
     
     
-    
-    NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:database.uuid];
+    NSURL* localWorkingCache = [WorkingCopyManager.sharedInstance getLocalWorkingCache:database.uuid];
     if ( localWorkingCache && Settings.sharedInstance.makeLocalRollingBackups ) {
         if(![BackupsManager.sharedInstance writeBackup:localWorkingCache metadata:database]) {
             
             NSLog(@"WARNWARN: Local Working Cache unavailable or could not write backup: [%@]", localWorkingCache);
             NSString* em = NSLocalizedString(@"model_error_cannot_write_backup", @"Could not write backup, will not proceed with write of database!");
-
+            
             if(error) {
                 *error = [Utils createNSError:em errorCode:-1];
             }
@@ -148,11 +146,20 @@
         NSUUID* updateId = NSUUID.UUID;
         metadata.outstandingUpdateId = updateId;
     }];
-        
-    NSURL* url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData2:data
-                                                               dateModified:NSDate.date
-                                                                   database:database.uuid
-                                                                      error:error];
+    
+    NSURL* url;
+    if ( file ) {
+        url = [WorkingCopyManager.sharedInstance setWorkingCacheWithFile:file
+                                                            dateModified:NSDate.date
+                                                                database:database.uuid
+                                                                   error:error];
+    }
+    else {
+        url = [WorkingCopyManager.sharedInstance setWorkingCacheWithData:data
+                                                             dateModified:NSDate.date
+                                                                 database:database.uuid
+                                                                    error:error];
+    }
     
     return url != nil;
 }
@@ -162,7 +169,7 @@
 }
 
 - (void)pollForChanges:(DatabaseMetadata *)database completion:(SyncAndMergeCompletionBlock)completion {
-    NSLog(@"pollForChanges ENTER - [%@]", database.nickName);
+
     
     SyncParameters* params = [[SyncParameters alloc] init];
     
@@ -172,9 +179,22 @@
     [SyncAndMergeSequenceManager.sharedInstance enqueueSyncForDatabaseId:database.uuid
                                                               parameters:params
                                                               completion:^(SyncAndMergeResult result, BOOL localWasChanged, NSError * _Nullable error) {
-        NSLog(@"pollForChanges DONE: [%@] [%@] - Local Changed: [%@] - [%@]", database.nickName, syncResultToString(result), localizedYesOrNoFromBool(localWasChanged), error);
+
         completion(result, localWasChanged, error);
     }];
+}
+
+- (BOOL)syncInProgress {
+    for (DatabaseMetadata* database in DatabasesManager.sharedInstance.snapshot) {
+        SyncStatus *status = [SyncAndMergeSequenceManager.sharedInstance getSyncStatusForDatabaseId:database.uuid];
+        
+        if ( status.state == kSyncOperationStateInProgress ) {
+
+            return YES;
+        }
+    }
+
+    return NO;
 }
 
 @end

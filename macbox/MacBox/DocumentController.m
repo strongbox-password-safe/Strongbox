@@ -12,7 +12,6 @@
 #import "CreateFormatAndSetCredentialsWizard.h"
 #import "DatabaseModel.h"
 #import "Settings.h"
-#import "DatabasesManagerVC.h"
 #import "DatabasesManager.h"
 #import "MacAlerts.h"
 #import "Utils.h"
@@ -25,6 +24,11 @@
 #import "SampleItemsGenerator.h"
 #import "Serializator.h"
 
+#ifndef IS_APP_EXTENSION
+#import "Strongbox-Swift.h"
+#else
+#import "Strongbox_Auto_Fill-Swift.h"
+#endif
 
 static NSString* const kStrongboxPasswordDatabaseDocumentType = @"Strongbox Password Database";
 static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Strongbox Password Database (Non File)";
@@ -59,15 +63,37 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
         return;
     }
 
-    CompositeKeyFactors* ckf = [wizard generateCkfFromSelected:nil];
-
-    [self createNewDatabase:ckf format:wizard.selectedDatabaseFormat keyFileBookmark:wizard.selectedKeyFileBookmark yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
+    NSError* error;
+    CompositeKeyFactors* ckf = [wizard generateCkfFromSelected:nil error:&error];
+    
+    if ( ckf ) {
+        [self createNewDatabase:ckf format:wizard.selectedDatabaseFormat keyFileBookmark:wizard.selectedKeyFileBookmark yubiKeyConfig:wizard.selectedYubiKeyConfiguration];
+    }
+    else {
+        [MacAlerts error:error window:NSApplication.sharedApplication.keyWindow];
+    }
 }
 
-- (void)createNewDatabase:(CompositeKeyFactors*)ckf format:(DatabaseFormat)format keyFileBookmark:(NSString*)keyFileBookmark yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
+- (void)createNewDatabase:(CompositeKeyFactors*)ckf
+                   format:(DatabaseFormat)format
+          keyFileBookmark:(NSString*)keyFileBookmark
+            yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
     DatabaseModel* db = [[DatabaseModel alloc] initWithFormat:format compositeKeyFactors:ckf];
+    
     [SampleItemsGenerator addSampleGroupAndRecordToRoot:db passwordConfig:Settings.sharedInstance.passwordGenerationConfig];
-        
+
+    [self serializeAndAddDatabase:db format:format keyFileBookmark:keyFileBookmark yubiKeyConfig:yubiKeyConfig];
+}
+
+- (void)serializeAndAddDatabase:(DatabaseModel*)database
+                         format:(DatabaseFormat)format {
+    [self serializeAndAddDatabase:database format:format keyFileBookmark:nil yubiKeyConfig:nil];
+}
+
+- (void)serializeAndAddDatabase:(DatabaseModel*)db
+                         format:(DatabaseFormat)format
+                keyFileBookmark:(NSString*)keyFileBookmark
+                  yubiKeyConfig:(YubiKeyConfiguration*)yubiKeyConfig {
     NSOutputStream* outputStream = [NSOutputStream outputStreamToMemory];
     [outputStream open];
             
@@ -132,11 +158,19 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
     NSURL* maybeManagedSyncUrl = [self maybeManagedSyncURL:URL];
     
     DatabaseMetadata* dbm = [DatabasesManager.sharedInstance addOrGet:maybeManagedSyncUrl];
-    dbm.keyFileBookmark = keyFileBookmark;
+    
+    if ( !Settings.sharedInstance.doNotRememberKeyFile ) {
+        dbm.keyFileBookmark = keyFileBookmark;
+    }
     dbm.yubiKeyConfiguration = yubiKeyConfig;
+    dbm.showAdvancedUnlockOptions = keyFileBookmark != nil || yubiKeyConfig != nil;
     [DatabasesManager.sharedInstance atomicUpdate:dbm.uuid touch:^(DatabaseMetadata * _Nonnull metadata) {
-        metadata.keyFileBookmark = keyFileBookmark;
+        if ( !Settings.sharedInstance.doNotRememberKeyFile ) {
+            metadata.keyFileBookmark = keyFileBookmark;
+        }
+        
         metadata.yubiKeyConfiguration = yubiKeyConfig;
+        metadata.showAdvancedUnlockOptions = keyFileBookmark != nil || yubiKeyConfig != nil;
     }];
 
     [self openDatabase:dbm completion:^(NSError * _Nonnull error) {
@@ -149,20 +183,34 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 }
 
 - (NSURL*)maybeManagedSyncURL:(NSURL*)url {
-    if ( !Settings.sharedInstance.useLegacyFileProvider ) {
-        NSLog(@"Managing Sync for File Based Database: [%@]", url);
-        return managedUrlFromFileUrl(url);
-    }
-
-     return url;
+    return managedUrlFromFileUrl(url);
 }
 
 - (void)openDocumentWithContentsOfURL:(NSURL *)url
                               display:(BOOL)displayDocument
                     completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
+    NSError* error;
+    if ( ![Serializator isValidDatabase:url error:&error] ) {
+        if (NSApplication.sharedApplication.keyWindow) {
+            [MacAlerts info:NSLocalizedString(@"open_sequence_problem_opening_title", @"There was a problem opening the database.")
+             informativeText:NSLocalizedString(@"safesvc_import_manual_url_invalid", @"Invalid Database")
+                      window:NSApplication.sharedApplication.keyWindow
+                  completion:^{
+                    completionHandler(nil, NO, nil);
+            }];
+        }
+    }
+    else {
+        [self openDocumentWithContentsOfURLContinuation:url display:displayDocument completionHandler:completionHandler];
+    }
+}
+
+- (void)openDocumentWithContentsOfURLContinuation:(NSURL *)url
+                                          display:(BOOL)displayDocument
+                                completionHandler:(void (^)(NSDocument * _Nullable, BOOL, NSError * _Nullable))completionHandler {
     DatabaseMetadata* database = [DatabasesManager.sharedInstance getDatabaseByFileUrl:url];
 
-
+    NSLog(@"openDocumentWithContentsOfURL: [%@] => Metadata = [%@]", url, database);
 
     NSURL* maybeManaged = database ? url : [self maybeManagedSyncURL:url];
 
@@ -192,59 +240,28 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
 - (void)openDatabaseWorker:(DatabaseMetadata*)database completion:(void (^)(NSError* error))completion {
     NSURL* url = database.fileUrl;
 
-    if ( [url.scheme isEqualToString:kStrongboxFileUrlScheme] ) { 
-        if (database.storageInfo != nil) {
-            NSError *error = nil;
-            NSString* updatedBookmark;
-            url = [BookmarksHelper getUrlFromBookmark:database.storageInfo
-                                             readOnly:NO
-                                      updatedBookmark:&updatedBookmark
-                                                error:&error];
-            
-            if(url == nil) {
-                NSLog(@"WARN: Could not resolve bookmark for database... will try the saved fileUrl...");
-                url = database.fileUrl;
-            }
-            else {
-                [DatabasesManager.sharedInstance atomicUpdate:database.uuid
-                                                        touch:^(DatabaseMetadata * _Nonnull metadata) {
-                    if (updatedBookmark) {
-                        metadata.storageInfo = updatedBookmark;
-                    }
-                    
-                    metadata.fileUrl = url;
-                }];
-            }
-        }
-        else {
-            NSLog(@"WARN: Storage info/Bookmark unavailable! Falling back solely on fileURL");
-        }
-        
-        [url startAccessingSecurityScopedResource];
-    }
-    else {
-        NSLog(@"Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
-    }
+    NSLog(@"Local Device Open Database: [%@] - sp=[%@]", url, [SafeStorageProviderFactory getStorageDisplayNameForProvider:database.storageProvider]);
 
     dispatch_async(dispatch_get_main_queue(), ^{
-    if ( url ) {
-        [self openDocumentWithContentsOfURL:url
-                                    display:YES
-                          completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
-            if(error) {
-                NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
-            }
-            
-            if ( completion ) {
-                completion(error);
-            }
-        }];
-    }
-    else {
-        if ( completion ) {
-            completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
+        if ( url ) {
+            [self openDocumentWithContentsOfURLContinuation:url
+                                                    display:YES
+                                          completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error) {
+                if(error) {
+                    NSLog(@"openDocumentWithContentsOfURL Error = [%@]", error);
+                }
+                
+                if ( completion ) {
+                    completion(error);
+                }
+            }];
         }
-    }});
+        else {
+            if ( completion ) {
+                completion([Utils createNSError:@"Database Open - Could not read file URL" errorCode:-2413]);
+            }
+        }
+    });
 }
 
 - (NSString *)typeForContentsOfURL:(NSURL *)url
@@ -307,12 +324,19 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
         self.hasDoneAppStartupTasks = YES;
         
         NSLog(@"doAppStartupTasksOnceOnly - Doing tasks as they have not yet been done");
-
+        
         if( self.startupDatabases.count ) {
             [self launchStartupDatabases];
         }
-        else if(self.documents.count == 0) { 
-            [DatabasesManagerVC show];
+        else if ( self.documents.count == 0 ) {
+            if ( !Settings.sharedInstance.runningAsATrayApp ) {
+                NSLog(@"Empty Startup - Showing Manager...");
+                
+                [DBManagerPanel.sharedInstance show];
+            }
+            else {
+                NSLog(@"Empty Startup - Running as a Tray App - Not Showing DB Manager...");
+            }
         }
         
         [MacSyncManager.sharedInstance backgroundSyncOutstandingUpdates];
@@ -332,7 +356,9 @@ static NSString* const kStrongboxPasswordDatabaseManagedSyncDocumentType = @"Str
             [self launchStartupDatabases];
         }
         else {
-            [DatabasesManagerVC show];
+            NSLog(@"Empty Startup - No Startup DBs - Showing Manager...");
+            
+            [DBManagerPanel.sharedInstance show];
         }
     }
 }

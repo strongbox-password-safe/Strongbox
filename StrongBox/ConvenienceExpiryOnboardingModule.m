@@ -29,8 +29,8 @@
 - (BOOL)shouldDisplay {
     return ( !self.model.metadata.convenienceExpiryOnboardingDone &&
             AppPreferences.sharedInstance.isProOrFreeTrial &&
-            self.model.metadata.isTouchIdEnabled &&
-            self.model.metadata.isEnrolledForConvenience &&
+            self.model.metadata.isConvenienceUnlockEnabled &&
+            self.model.metadata.conveniencePasswordHasBeenStored &&
             self.model.metadata.convenienceMasterPassword.length ); 
 }
 

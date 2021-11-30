@@ -20,19 +20,28 @@
 @property (weak) IBOutlet NSButton *enableAutoFill;
 @property (weak) IBOutlet NSButton *enableQuickType;
 @property (weak) IBOutlet NSButton *useWormholeIfUnlocked;
-@property (weak) IBOutlet NSTextField *labelProWarning;
-@property (weak) IBOutlet NSButton *enableSystemExtension;
-@property (weak) IBOutlet NSTextField *labelNavHelp;
 @property (weak) IBOutlet NSPopUpButton *popupDisplayFormat;
-@property (weak) IBOutlet NSButton *autoLaunchSingle;
 @property (weak) IBOutlet NSPopUpButton *popupAutoUnlock;
-@property BOOL isOnForStrongbox;
-
 @property (weak) IBOutlet NSButton *includeAlternativeUrls;
 @property (weak) IBOutlet NSButton *scanCustomFields;
 @property (weak) IBOutlet NSButton *scanNotesForUrls;
+@property (weak) IBOutlet NSButton *addUnconcealedFields;
+@property (weak) IBOutlet NSButton *addConcealedFields;
+
+@property (weak) IBOutlet NSTextField *labelProWarning;
+@property (weak) IBOutlet NSView *viewInstructions;
 
 @property NSArray<NSNumber*>* autoUnlockOptions;
+@property NSTimer* timer;
+
+@property (weak) IBOutlet NSStackView *topStackView;
+@property (weak) IBOutlet NSStackView *quickTypeStack;
+@property (weak) IBOutlet NSStackView *basicStack;
+
+@property (weak) IBOutlet NSView *viewQuickTypeDisplayFormat;
+@property (weak) IBOutlet NSView *wormholeOptionView;
+@property (weak) IBOutlet NSView *quickTypeHeaderView;
+@property (weak) IBOutlet NSView *convenienceUnlockOptionView;
 
 @end
 
@@ -64,16 +73,41 @@
         [self.popupAutoUnlock.menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 
-    self.isOnForStrongbox = AutoFillManager.sharedInstance.isOnForStrongbox; 
-    [self bindUI];
-
     
+    
+    [self.topStackView setCustomSpacing:20 afterView:self.basicStack];
+    [self.basicStack setCustomSpacing:20 afterView:self.wormholeOptionView];
+    [self.quickTypeStack setCustomSpacing:20 afterView:self.addUnconcealedFields];
+    
+    [self bindUI];
+}
 
-    __weak id weakSelf = self;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        self.isOnForStrongbox = AutoFillManager.sharedInstance.isOnForStrongbox; 
-        [weakSelf bindUI];
-    });
+- (void)viewDidDisappear {
+    [super viewDidDisappear];
+    
+    [self killRefreshTimer];
+}
+
+- (void)viewDidAppear {
+    [super viewDidAppear];
+    
+    [self startRefreshTimer];
+}
+
+- (void)startRefreshTimer {
+    if ( @available(macOS 10.12, *) ){
+        __weak AutoFillSettingsViewController* weakSelf = self;
+        
+        self.timer = [NSTimer scheduledTimerWithTimeInterval:1. repeats:YES block:^(NSTimer * _Nonnull timer) {
+            [weakSelf bindUI];
+        }];
+    }
+}
+
+- (void)killRefreshTimer {
+    if ( self.timer != nil ) {
+        [self.timer invalidate];
+    }
 }
 
 static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
@@ -89,52 +123,92 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
 }
 
 - (void)bindUI {
-    BOOL pro = Settings.sharedInstance.fullVersion || Settings.sharedInstance.freeTrial;
-    self.labelProWarning.hidden = pro;
+    BOOL pro = Settings.sharedInstance.isProOrFreeTrial;
+    BOOL isOnForStrongbox = AutoFillManager.sharedInstance.isOnForStrongbox;
+    BOOL featureIsAvailable;
 
+    if( @available(macOS 11.0, *) ) {
+        featureIsAvailable = YES;
+    }
+    else {
+        featureIsAvailable = NO;
+    }
     
-    
-    self.autoLaunchSingle.state = Settings.sharedInstance.autoFillAutoLaunchSingleDatabase ? NSControlStateValueOn : NSControlStateValueOff;
+    if ( !pro ) {
+        self.labelProWarning.hidden = NO;
+    }
+    else if ( !featureIsAvailable ) {
+        self.labelProWarning.hidden = NO;
+        self.labelProWarning.stringValue = NSLocalizedString(@"autofill_app_preferences_only_avail_big_sur", @"AutoFill is only available on macOS Big Sur+");
+        self.labelProWarning.textColor = NSColor.systemOrangeColor;
+        self.labelProWarning.alignment = NSCenterTextAlignment;
+    }
+    else if ( isOnForStrongbox ) {
+        self.labelProWarning.hidden = NO;
+        self.labelProWarning.stringValue = NSLocalizedString(@"strongbox_is_enabled_for_autofill", @"✅ Strongbox is enabled for Password AutoFill");
+        self.labelProWarning.textColor = NSColor.secondaryLabelColor;
+        self.labelProWarning.alignment = NSLeftTextAlignment;
+    }
+    else {
+        self.labelProWarning.hidden = YES;
+    }
 
+    self.viewInstructions.hidden = isOnForStrongbox || !pro || !featureIsAvailable;
+    self.basicStack.hidden = !isOnForStrongbox || !featureIsAvailable || !pro;
+    self.quickTypeStack.hidden =  !isOnForStrongbox || !featureIsAvailable || !pro;
     
-        
-    self.enableSystemExtension.enabled = AutoFillManager.sharedInstance.isPossible && !self.isOnForStrongbox;
-    self.enableSystemExtension.state = self.isOnForStrongbox ? NSControlStateValueOn : NSControlStateValueOff;
-    self.labelNavHelp.textColor = self.isOnForStrongbox ? NSColor.secondaryLabelColor : nil;
-    
-    
-
     
     
     DatabaseMetadata* meta = self.model.databaseMetadata;
-    self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox;
+    self.enableAutoFill.enabled = AutoFillManager.sharedInstance.isPossible && isOnForStrongbox;
     self.enableAutoFill.state = meta.autoFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
 
     
-    
+
+    BOOL autoFillOn = meta.autoFillEnabled && AutoFillManager.sharedInstance.isPossible && isOnForStrongbox && featureIsAvailable && pro;
+
     self.useWormholeIfUnlocked.state = meta.quickWormholeFillEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    self.useWormholeIfUnlocked.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox && meta.autoFillEnabled;
+    self.useWormholeIfUnlocked.enabled = autoFillOn;
+    self.wormholeOptionView.hidden = !autoFillOn;
 
     
+    
+    self.quickTypeHeaderView.hidden = !autoFillOn;
+    self.convenienceUnlockOptionView.hidden = !autoFillOn;
+    
+    
 
-    self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox && meta.autoFillEnabled;
+    self.quickTypeStack.hidden = !autoFillOn;
+    
+    self.enableQuickType.enabled = AutoFillManager.sharedInstance.isPossible && isOnForStrongbox && meta.autoFillEnabled;
     self.enableQuickType.state = meta.quickTypeEnabled ? NSControlStateValueOn : NSControlStateValueOff;
-    [self.popupDisplayFormat selectItemAtIndex:meta.quickTypeDisplayFormat];
-    self.popupDisplayFormat.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
+    
+    self.enableQuickType.hidden = !autoFillOn;
+    
+    
 
-    
-    
+    BOOL quickTypeOn = autoFillOn && meta.quickTypeEnabled;
+
+    [self.popupDisplayFormat selectItemAtIndex:meta.quickTypeDisplayFormat];
+
+    self.popupDisplayFormat.enabled = quickTypeOn;
+
     self.includeAlternativeUrls.state = meta.autoFillScanAltUrls ? NSControlStateValueOn : NSControlStateValueOff;
     self.scanCustomFields.state = meta.autoFillScanCustomFields ? NSControlStateValueOn : NSControlStateValueOff;
     self.scanNotesForUrls.state = meta.autoFillScanNotes ? NSControlStateValueOn : NSControlStateValueOff;
+    self.addConcealedFields.state = meta.autoFillConcealedFieldsAsCreds ? NSControlStateValueOn : NSControlStateValueOff;
+    self.addUnconcealedFields.state = meta.autoFillUnConcealedFieldsAsCreds ? NSControlStateValueOn : NSControlStateValueOff;
 
-    self.includeAlternativeUrls.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
-    self.scanCustomFields.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
-    self.scanNotesForUrls.enabled = self.enableQuickType.enabled && meta.quickTypeEnabled;
-
+    self.includeAlternativeUrls.hidden = !quickTypeOn;
+    self.scanCustomFields.hidden = !quickTypeOn;
+    self.scanNotesForUrls.hidden = !quickTypeOn;
+    self.addConcealedFields.hidden = !quickTypeOn;
+    self.addUnconcealedFields.hidden = !quickTypeOn;
+    self.viewQuickTypeDisplayFormat.hidden = !quickTypeOn;
+    
     
 
-    self.popupAutoUnlock.enabled = AutoFillManager.sharedInstance.isPossible && self.isOnForStrongbox && meta.autoFillEnabled;
+    self.popupAutoUnlock.enabled = AutoFillManager.sharedInstance.isPossible && isOnForStrongbox && meta.autoFillEnabled;
     NSInteger val = meta.autoFillConvenienceAutoUnlockTimeout;
     NSUInteger index = [self.autoUnlockOptions indexOfObjectPassingTest:^BOOL(NSNumber * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
         return obj.integerValue == val;
@@ -182,7 +256,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                           displayFormat:meta.quickTypeDisplayFormat
                                                         alternativeUrls:meta.autoFillScanAltUrls
                                                            customFields:meta.autoFillScanCustomFields
-                                                                  notes:meta.autoFillScanNotes];
+                                                                  notes:meta.autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:meta.autoFillConcealedFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:meta.autoFillUnConcealedFieldsAsCreds];
         
         [self bindUI];
     }
@@ -200,6 +276,9 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
     BOOL autoFillScanCustomFields = self.scanCustomFields.state == NSControlStateValueOn;
     BOOL autoFillScanNotes = self.scanNotesForUrls.state == NSControlStateValueOn;
 
+    BOOL concealedCustomFieldsAsCreds = self.addConcealedFields.state == NSControlStateValueOn;
+    BOOL unConcealedCustomFieldsAsCreds = self.addUnconcealedFields.state == NSControlStateValueOn;
+    
     [DatabasesManager.sharedInstance atomicUpdate:self.model.databaseUuid
                                             touch:^(DatabaseMetadata * _Nonnull metadata) {
         metadata.autoFillEnabled = autoFillEnabled;
@@ -208,6 +287,8 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
         metadata.autoFillScanAltUrls = autoFillScanAltUrls;
         metadata.autoFillScanCustomFields = autoFillScanCustomFields;
         metadata.autoFillScanNotes = autoFillScanNotes;
+        metadata.autoFillConcealedFieldsAsCreds = concealedCustomFieldsAsCreds;
+        metadata.autoFillUnConcealedFieldsAsCreds = unConcealedCustomFieldsAsCreds;
     }];
     
     DatabaseMetadata* meta = self.model.databaseMetadata;
@@ -236,29 +317,20 @@ static NSString* stringForConvenienceAutoUnlock(NSInteger val) {
                                                           displayFormat:meta.quickTypeDisplayFormat
                                                         alternativeUrls:autoFillScanAltUrls
                                                            customFields:autoFillScanCustomFields
-                                                                  notes:autoFillScanNotes];
+                                                                  notes:autoFillScanNotes
+                                           concealedCustomFieldsAsCreds:concealedCustomFieldsAsCreds
+                                         unConcealedCustomFieldsAsCreds:unConcealedCustomFieldsAsCreds];
     }
-
-    
-
-    Settings.sharedInstance.autoFillAutoLaunchSingleDatabase = self.autoLaunchSingle.state == NSControlStateValueOn;
 
     [self bindUI];
 }
 
-- (IBAction)onEnableSystemExtension:(id)sender {
-    [MacAlerts customOptionWithCancel:NSLocalizedString(@"mac_autofill_enable_extension_title", @"Enable Strongbox Extension")
-                 informativeText:NSLocalizedString(@"mac_autofill_enable_extension_message", @"To use AutoFill you must enable the Strongbox Extension in System Preferences. To do this click the 'Open System Preferences...' button below and navigate to:\n\n∙ Extensions > Password AutoFill > Check 'Strongbox'\n\n")
-               option1AndDefault:NSLocalizedString(@"mac_autofill_action_open_system_preferences", @"Open System Preferences...")
-                          window:self.view.window
-                        completion:^(BOOL go) {
-        if (go) {
-            NSTask *task = [[NSTask alloc] init];
-            task.launchPath = @"/bin/sh";
-            task.arguments = @[@"-c" , @"open x-apple.systempreferences:com.apple.preference"];
-            [task launch];
-        }
-    }];
+- (IBAction)onClose:(id)sender {
+    [self.view.window cancelOperation:nil];
+}
+
+- (IBAction)onOpenExtensions:(id)sender {
+    [NSWorkspace.sharedWorkspace openURL:[NSURL fileURLWithPath:@"/System/Library/PreferencePanes/Extensions.prefPane"]];
 }
 
 @end

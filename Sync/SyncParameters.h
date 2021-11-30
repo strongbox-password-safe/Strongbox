@@ -1,5 +1,5 @@
 //
-//  LegacySyncReadOptions.h
+//  SyncParameters.h
 //  Strongbox
 //
 //  Created by Strongbox on 20/06/2020.

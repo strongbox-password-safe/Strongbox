@@ -109,7 +109,7 @@
 }
 
 - (void)onShare {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             
         }
@@ -192,7 +192,7 @@
 }
 
 - (void)copyXml {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             return;
         }
@@ -233,7 +233,7 @@
 }
 
 - (void)exportEncryptedSafeByEmail {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             return;
         }
@@ -307,7 +307,7 @@
 }
 
 - (void)onFiles {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             return;
         }

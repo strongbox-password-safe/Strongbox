@@ -10,7 +10,7 @@
 #import "AppPreferences.h"
 #import "FontManager.h"
 
-@interface PinEntryController ()
+@interface PinEntryController () <UIAdaptivePresentationControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *button1;
 @property (weak, nonatomic) IBOutlet UIButton *button2;
@@ -64,6 +64,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+
+    self.presentationController.delegate = self;
 
     [self setupUi];
 
@@ -288,6 +290,12 @@
             self.labelEnteredText.textColor = UIColor.lightGrayColor;
         }
     }
+}
+
+- (void)presentationControllerDidDismiss:(UIPresentationController *)presentationController {
+
+    
+    [self onCancel:nil];
 }
 
 @end

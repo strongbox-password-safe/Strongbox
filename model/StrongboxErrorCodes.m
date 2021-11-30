@@ -10,6 +10,7 @@
 
 static const NSInteger kIncorrectCredentials = -241;
 static const NSInteger kCouldNotCreateICloudFile = -1334;
+static const NSInteger kMacOSBiometricInProgressOrImpossible = -2412;
 
 @implementation StrongboxErrorCodes
 
@@ -19,6 +20,10 @@ static const NSInteger kCouldNotCreateICloudFile = -1334;
 
 + (NSInteger)couldNotCreateICloudFile {
     return kCouldNotCreateICloudFile;
+}
+
++ (NSInteger)macOSBiometricInProgressOrImpossible {
+    return kMacOSBiometricInProgressOrImpossible;
 }
 
 @end

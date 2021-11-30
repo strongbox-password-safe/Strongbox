@@ -15,6 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)enqueueImport:(NSURL *)url canOpenInPlace:(BOOL)canOpenInPlace;
 - (void)onAppLockScreenWillBeDismissed:(void (^ __nullable)(void))completion;
 - (void)onAppLockScreenWasDismissed:(BOOL)userJustCompletedBiometricAuthentication;
+- (void)handleUrlSchemeNavigationRequest:(NSURL*)url;
 
 @end
 

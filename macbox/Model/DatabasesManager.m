@@ -18,7 +18,7 @@
 
 @end
 
-static NSString* kDatabasesDefaultsKey = @"databases";
+static NSString* const kDatabasesDefaultsKey = @"databases";
 
 NSString* const kDatabasesListChangedNotification = @"databasesListChangedNotification";
 

@@ -24,7 +24,7 @@
         return NO;
     }
 
-    NSLog(@"%@", AppPreferences.sharedInstance.lastAskToEnableAutoFill.friendlyDateTimeStringPrecise);
+
     
     if ( AppPreferences.sharedInstance.lastAskToEnableAutoFill != nil ) {
         if ( ![AppPreferences.sharedInstance.lastAskToEnableAutoFill isMoreThanXDaysAgo:2] ) {

@@ -275,27 +275,61 @@ rotateLastImage:(BOOL)rotateLastImage
         case kDatabaseCellSubtitleFieldStorage:
             return [self getStorageString:database];
             break;
+        case kDatabaseCellSubtitleFieldCreateDate:
+            return [self getCreateDate:database];
+            break;
+        case kDatabaseCellSubtitleFieldCreateDatePrecise:
+            return [self getCreateDatePrecise:database];
+            break;
         default:
             return @"<Unknown Field>";
             break;
     }
 }
 
+- (NSString*)getCreateDate:(SafeMetaData*)safe {
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
+    NSError* error;
+    NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+    
+    if (error) {
+        NSLog(@"Could not get local working cache at [%@]-[%@]", url, error);
+        return @"";
+    }
+
+    NSDate* created = attributes.fileCreationDate;
+    return created ? created.friendlyDateStringVeryShort : @"";
+}
+
+- (NSString*)getCreateDatePrecise:(SafeMetaData*)safe {
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid];
+    NSError* error;
+    NSDictionary* attributes = [NSFileManager.defaultManager attributesOfItemAtPath:url.path error:&error];
+    
+    if (error) {
+        NSLog(@"Could not get local working cache at [%@]-[%@]", url, error);
+        return @"";
+    }
+
+    NSDate* created = attributes.fileCreationDate;
+    return created ? created.friendlyDateTimeStringPrecise : @"";
+}
+
 - (NSString*)getModifiedDate:(SafeMetaData*)safe {
     NSDate* mod;
-    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable2:safe.uuid modified:&mod];
+    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe.uuid modified:&mod];
     return mod ? mod.friendlyDateStringVeryShort : @"";
 }
 
 - (NSString*)getModifiedDatePrecise:(SafeMetaData*)safe {
     NSDate* mod;
-    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable2:safe.uuid modified:&mod];
+    [WorkingCopyManager.sharedInstance isLocalWorkingCacheAvailable:safe.uuid modified:&mod];
     return mod ? mod.friendlyDateTimeStringPrecise : @"";
 }
 
 - (NSString*)getLocalWorkingCopyFileSize:(SafeMetaData*)safe {
     unsigned long long fileSize;
-    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:safe.uuid modified:nil fileSize:&fileSize];
+    NSURL* url = [WorkingCopyManager.sharedInstance getLocalWorkingCache:safe.uuid modified:nil fileSize:&fileSize];
     return url ? friendlyFileSizeString(fileSize) : @"";
 }
 

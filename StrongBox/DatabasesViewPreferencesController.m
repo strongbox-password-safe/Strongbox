@@ -67,7 +67,10 @@
       @(kDatabaseCellSubtitleFieldStorage),
       @(kDatabaseCellSubtitleFieldLastModifiedDate),
       @(kDatabaseCellSubtitleFieldLastModifiedDatePrecise),
-      @(kDatabaseCellSubtitleFieldFileSize)] ;
+      @(kDatabaseCellSubtitleFieldFileSize),
+
+
+    ];
     
     NSArray<NSString*>* options = [opts map:^id _Nonnull(NSNumber*  _Nonnull obj, NSUInteger idx) {
         return [self getDatabaseSubtitleFieldName:obj.integerValue];
@@ -129,6 +132,12 @@
             break;
         case kDatabaseCellSubtitleFieldStorage:
             return NSLocalizedString(@"databases_preferences_subtitle_field_name_database_storage", @"Database Storage");
+            break;
+        case kDatabaseCellSubtitleFieldCreateDate:
+            return NSLocalizedString(@"browse_prefs_item_subtitle_date_created", @"Date Created");
+            break;
+        case kDatabaseCellSubtitleFieldCreateDatePrecise:
+            return NSLocalizedString(@"databases_preferences_subtitle_field_name_create_date_precise", @"Date Created (Precise)");
             break;
         default:
             return @"<Unknown Field>";

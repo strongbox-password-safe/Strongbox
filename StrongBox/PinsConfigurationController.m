@@ -10,6 +10,7 @@
 #import "PinEntryController.h"
 #import "Alerts.h"
 #import "AppPreferences.h"
+#import "SafesList.h"
 
 @interface PinsConfigurationController ()
 
@@ -170,28 +171,16 @@
 
 - (IBAction)onPinOnOff:(id)sender {
     if(self.viewModel.metadata.conveniencePin != nil) {
-        NSString *message = self.viewModel.metadata.isEnrolledForConvenience && !self.viewModel.metadata.isTouchIdEnabled ?
-        
-        NSLocalizedString(@"pins_config_vc_turn_pin_off_warning", @"Turning the PIN Off for this database will remove the securely stored password and you will have to enter it again. Are you sure you want to do this?") :
-        
-        NSLocalizedString(@"pins_config_vc_turn_pin_off_confirm", @"Are you sure you want to turn off the PIN for this database?");
-        
-        [Alerts yesNo:self
-                title:NSLocalizedString(@"pins_config_vc_turn_pin_off_prompt_title", @"Turn off PIN?")
-              message:message
-               action:^(BOOL response) {
-                   if (response) {
-                       self.viewModel.metadata.conveniencePin = nil;
+       self.viewModel.metadata.conveniencePin = nil;
+       
+       if( !self.viewModel.metadata.isTouchIdEnabled ) {
+           self.viewModel.metadata.conveniencePasswordHasBeenStored = NO;
+           self.viewModel.metadata.convenienceMasterPassword = nil;
+           self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
+       }
                        
-                       if(!self.viewModel.metadata.isTouchIdEnabled) {
-                           self.viewModel.metadata.isEnrolledForConvenience = NO;
-                           self.viewModel.metadata.convenienceMasterPassword = nil;
-                       }
-                       
-                       [[SafesList sharedInstance] update:self.viewModel.metadata];
-                       [self bindUiToModel];
-                   }
-               }];
+       [[SafesList sharedInstance] update:self.viewModel.metadata];
+       [self bindUiToModel];
     }
     else {
         [self getNewPin:NO];
@@ -244,7 +233,7 @@
 
                         self.viewModel.metadata.conveniencePin = pin;
                         self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;                        
-                        self.viewModel.metadata.isEnrolledForConvenience = YES;
+                        self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
                     }
                     
                     [[SafesList sharedInstance] update:self.viewModel.metadata];

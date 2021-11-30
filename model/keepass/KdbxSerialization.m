@@ -85,7 +85,7 @@ static BOOL kLogVerbose = NO;
             }
             else {
                 if (response == nil) {
-                    error = [Utils createNSError:@"Nil response received from YubiKey" errorCode:-1];
+                    error = [Utils createNSError:@"Nil response received from hardware key" errorCode:-1];
                     completion(NO, nil, error);
                     return;
                 }
@@ -239,7 +239,7 @@ sanityCheckInnerStream:(BOOL)sanityCheckInnerStream
             }
             else {
                 if (response == nil) {
-                    error = [Utils createNSError:@"Nil response received from YubiKey" errorCode:-1];
+                    error = [Utils createNSError:@"Nil response received from hardware key" errorCode:-1];
                     completion(NO, nil, nil, error);
                     return;
                 }

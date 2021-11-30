@@ -149,7 +149,7 @@
         
         NSDate* modDate;
         unsigned long long size;
-        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache2:metadata.uuid
+        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:metadata.uuid
                                                                              modified:&modDate
                                                                              fileSize:&size];
         

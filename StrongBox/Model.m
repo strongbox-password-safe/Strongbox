@@ -8,19 +8,17 @@
 
 #import "Model.h"
 #import "Utils.h"
-#import "SVProgressHUD.h"
 #import "AutoFillManager.h"
 #import "PasswordMaker.h"
 #import "BackupsManager.h"
 #import "NSArray+Extensions.h"
 #import "DatabaseAuditor.h"
-#import "AppPreferences.h"
-#import "SyncManager.h"
 #import "Serializator.h"
 #import "SampleItemsGenerator.h"
 #import "DatabaseUnlocker.h"
 #import "ConcurrentMutableStack.h"
 #import "FileManager.h"
+#import "CrossPlatform.h"
 
 NSString* const kAuditNodesChangedNotificationKey = @"kAuditNodesChangedNotificationKey";
 NSString* const kAuditProgressNotificationKey = @"kAuditProgressNotificationKey";
@@ -49,16 +47,39 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 @property dispatch_queue_t asyncUpdateEncryptionQueue;
 @property ConcurrentMutableStack* asyncUpdatesStack;
 
+@property (readonly) id<ApplicationPreferences> applicationPreferences;
+@property (readonly) id<SyncManagement> syncManagement;
+@property (readonly) id<SpinnerUI> spinnerUi;
+@property (readonly) id<DatabasePreferencesManager> databasesPreferencesManager;
+
 @end
 
 @implementation Model
 
+- (id<ApplicationPreferences>)applicationPreferences {
+    return CrossPlatformDependencies.defaults.applicationPreferences;
+}
+
+- (id<SyncManagement>)syncManagement {
+    return CrossPlatformDependencies.defaults.syncManagement;
+}
+
+- (id<SpinnerUI>)spinnerUi {
+    return CrossPlatformDependencies.defaults.spinnerUi;
+}
+
+- (id<DatabasePreferencesManager>)databasesPreferencesManager {
+    return CrossPlatformDependencies.defaults.databasesPreferencesManager;
+}
+
+
+
 - (NSData*)getDuressDummyData {
-    return AppPreferences.sharedInstance.duressDummyData; 
+    return self.applicationPreferences.duressDummyData; 
 }
 
 - (void)setDuressDummyData:(NSData*)data {
-    AppPreferences.sharedInstance.duressDummyData = data;
+    self.applicationPreferences.duressDummyData = data;
 }
 
 - (void)dealloc {
@@ -75,8 +96,10 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     }
 }
 
+#if TARGET_OS_IPHONE
+
 - (instancetype)initAsDuressDummy:(BOOL)isAutoFillOpen
-                 templateMetaData:(SafeMetaData*)templateMetaData {
+                 templateMetaData:(METADATA_PTR)templateMetaData {
     SafeMetaData* meta = [[SafeMetaData alloc] initWithNickName:templateMetaData.nickName
                                                 storageProvider:templateMetaData.storageProvider
                                                        fileName:templateMetaData.fileName
@@ -89,7 +112,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
         DatabaseModel* model = [[DatabaseModel alloc] initWithFormat:kKeePass compositeKeyFactors:cpf];
         
-        [SampleItemsGenerator addSampleGroupAndRecordToRoot:model passwordConfig:AppPreferences.sharedInstance.passwordGenerationConfig];
+        [SampleItemsGenerator addSampleGroupAndRecordToRoot:model passwordConfig:self.applicationPreferences.passwordGenerationConfig];
         
         data = [Serializator expressToData:model format:model.originalFormat];
         
@@ -106,8 +129,10 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                 isDuressDummyMode:YES];
 }
 
+#endif
+
 - (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
-                        metaData:(SafeMetaData *)metaData
+                        metaData:(METADATA_PTR)metaData
                   forcedReadOnly:(BOOL)forcedReadOnly
                       isAutoFill:(BOOL)isAutoFill {
     return [self initWithDatabase:passwordDatabase
@@ -118,7 +143,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 }
 
 - (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
-                        metaData:(SafeMetaData *)metaData
+                        metaData:(METADATA_PTR)metaData
                   forcedReadOnly:(BOOL)forcedReadOnly
                       isAutoFill:(BOOL)isAutoFill
                      offlineMode:(BOOL)offlineMode {
@@ -131,7 +156,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 }
 
 - (instancetype)initWithDatabase:(DatabaseModel *)passwordDatabase
-                        metaData:(SafeMetaData *)metaData
+                        metaData:(METADATA_PTR)metaData
                   forcedReadOnly:(BOOL)forcedReadOnly
                       isAutoFill:(BOOL)isAutoFill
                      offlineMode:(BOOL)offlineMode
@@ -148,7 +173,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         _metadata = metaData;
         _cachedPinned = [NSSet setWithArray:self.metadata.favourites];
                 
-        if ( AppPreferences.sharedInstance.databasesAreAlwaysReadOnly ) {
+        if ( self.applicationPreferences.databasesAreAlwaysReadOnly ) {
             self.forcedReadOnly = YES;
         }
         else {
@@ -174,7 +199,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     return self.theDatabase;
 }
 
-- (void)reloadDatabaseFromLocalWorkingCopy:(UIViewController*)viewController 
+- (void)reloadDatabaseFromLocalWorkingCopy:(VIEW_CONTROLLER_PTR)viewController 
                                 completion:(void(^)(BOOL success))completion {
     if (self.isDuressDummyMode) {
         
@@ -318,7 +343,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     }
 
     NSError* localUpdateError;
-    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&localUpdateError];
+    BOOL success = [self.syncManagement updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&localUpdateError];
     [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
 
     if (!success) { 
@@ -339,7 +364,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         return;
     }
 
-    [SyncManager.sharedInstance sync:self.metadata
+    [self.syncManagement sync:self.metadata
                        interactiveVC:nil
                                  key:self.database.ckfs
                                 join:NO
@@ -351,7 +376,9 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                                                                   displayFormat:self.metadata.quickTypeDisplayFormat
                                                                 alternativeUrls:self.metadata.autoFillScanAltUrls
                                                                    customFields:self.metadata.autoFillScanCustomFields
-                                                                          notes:self.metadata.autoFillScanNotes];
+                                                                          notes:self.metadata.autoFillScanNotes
+                                                   concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
+                                                 unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds];
             }
 
             [self onAsyncUpdateDone:updateId success:YES userCancelled:userCancelled userInteractionRequired:NO localUpdated:localWasChanged updateMutex:updateMutex error:nil];
@@ -396,13 +423,13 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 
 
-- (void)update:(UIViewController*)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
+- (void)update:(VIEW_CONTROLLER_PTR)viewController handler:(void(^)(BOOL userCancelled, BOOL localWasChanged, NSError * _Nullable error))handler {
     if(self.isReadOnly) {
         handler(NO, NO, [Utils createNSError:NSLocalizedString(@"model_error_readonly_cannot_write", @"You are in read-only mode. Cannot Write!") errorCode:-1]);
         return;
     }
 
-    [self encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
+    [self encrypt:viewController completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled || error) {
             handler(userCancelled, NO, error);
             return;
@@ -412,8 +439,8 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     }];
 }
 
-- (void)encrypt:(void (^)(BOOL userCancelled, NSString* file, NSString*_Nullable debugXml, NSError* error))completion {
-    [SVProgressHUD showWithStatus:NSLocalizedString(@"generic_encrypting", @"Encrypting")];
+- (void)encrypt:(VIEW_CONTROLLER_PTR)viewController completion:(void (^)(BOOL userCancelled, NSString* file, NSString*_Nullable debugXml, NSError* error))completion {
+    [self.spinnerUi show:NSLocalizedString(@"generic_encrypting", @"Encrypting") viewController:viewController];
     
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void){
         NSString* tmpFile = [self getUniqueStreamingFilename];
@@ -427,7 +454,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
             [outputStream close];            
 
             dispatch_async(dispatch_get_main_queue(), ^(void){
-                [SVProgressHUD dismiss];
+                [self.spinnerUi dismiss];
 
                 completion(userCancelled, tmpFile, debugXml, error);
             });
@@ -435,7 +462,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     });
 }
 
-- (void)onEncryptionDone:(UIViewController*)viewController streamingFile:(NSString*)streamingFile completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
+- (void)onEncryptionDone:(VIEW_CONTROLLER_PTR)viewController streamingFile:(NSString*)streamingFile completion:(void(^)(BOOL userCancelled, BOOL localWasChanged, const NSError * _Nullable error))completion {
     if (self.isDuressDummyMode) {
         NSData* data = [NSData dataWithContentsOfFile:streamingFile];
         [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
@@ -447,7 +474,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     
     
     NSError* error;
-    BOOL success = [SyncManager.sharedInstance updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&error];
+    BOOL success = [self.syncManagement updateLocalCopyMarkAsRequiringSync:self.metadata file:streamingFile error:&error];
     [NSFileManager.defaultManager removeItemAtPath:streamingFile error:nil];
 
     if (!success) {
@@ -465,7 +492,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
         completion(NO, NO, nil);
     }
     else {
-        [SyncManager.sharedInstance sync:self.metadata
+        [self.syncManagement sync:self.metadata
                            interactiveVC:viewController
                                      key:self.database.ckfs
                                     join:NO
@@ -477,7 +504,9 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
                                                                       displayFormat:self.metadata.quickTypeDisplayFormat
                                                                     alternativeUrls:self.metadata.autoFillScanAltUrls
                                                                        customFields:self.metadata.autoFillScanCustomFields
-                                                                              notes:self.metadata.autoFillScanNotes];
+                                                                              notes:self.metadata.autoFillScanNotes
+                                                       concealedCustomFieldsAsCreds:self.metadata.autoFillConcealedFieldsAsCreds
+                                                     unConcealedCustomFieldsAsCreds:self.metadata.autoFillUnConcealedFieldsAsCreds];
                 }
 
                 completion(NO, localWasChanged, nil);
@@ -531,14 +560,14 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     NSSet<NSString*> *set = [NSSet setWithArray:excluded];
 
     __weak Model* weakSelf = self;
-    self.auditor = [[DatabaseAuditor alloc] initWithPro:AppPreferences.sharedInstance.isProOrFreeTrial
-                                         strengthConfig:AppPreferences.sharedInstance.passwordStrengthConfig
+    self.auditor = [[DatabaseAuditor alloc] initWithPro:self.applicationPreferences.isProOrFreeTrial
+                                         strengthConfig:self.applicationPreferences.passwordStrengthConfig
                                              isExcluded:^BOOL(Node * _Nonnull item) {
         return [weakSelf isExcludedFromAuditHelper:set uuid:item.uuid];
     }
                                              saveConfig:^(DatabaseAuditorConfiguration * _Nonnull config) {
         
-        [SafesList.sharedInstance update:weakSelf.metadata];
+        [self.databasesPreferencesManager update:weakSelf.metadata];
     }];
 #endif
 }
@@ -673,8 +702,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
     }
     
     self.metadata.auditExcludedItems = mutable.allObjects;
-    
-    [SafesList.sharedInstance update:self.metadata];
+    [self.databasesPreferencesManager update:self.metadata];
 }
 
 - (NSArray<Node*>*)getExcludedAuditItems {
@@ -703,13 +731,13 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
 - (void)disableAndClearAutoFill {
     self.metadata.autoFillEnabled = NO;
-    [[SafesList sharedInstance] update:self.metadata];
+    [self.databasesPreferencesManager update:self.metadata];
     [AutoFillManager.sharedInstance clearAutoFillQuickTypeDatabase];
 }
 
 - (void)enableAutoFill {
     _metadata.autoFillEnabled = YES;
-    [[SafesList sharedInstance] update:self.metadata];
+    [self.databasesPreferencesManager update:self.metadata];
 }
 
 
@@ -787,6 +815,7 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 }
 
 - (void)launchLaunchableUrl:(NSURL*)launchableUrl {
+#if TARGET_OS_IPHONE
 #ifndef IS_APP_EXTENSION
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
         if (@available (iOS 10.0, *)) {
@@ -800,6 +829,24 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
             [UIApplication.sharedApplication openURL:launchableUrl];
         }
     });
+#endif
+#else
+    if ( !launchableUrl ) {
+        NSLog(@"Could not get launchable URL for item.");
+        return;
+    }
+    
+    if (@available(macOS 10.15, *)) {
+        [[NSWorkspace sharedWorkspace] openURL:launchableUrl
+                                 configuration:NSWorkspaceOpenConfiguration.configuration
+                             completionHandler:^(NSRunningApplication * _Nullable app, NSError * _Nullable error) {
+            if ( error ) {
+                NSLog(@"Launch URL done. Error = [%@]", error);
+            }
+        }];
+    } else {
+        [[NSWorkspace sharedWorkspace] openURL:launchableUrl];
+    }
 #endif
 }
 
@@ -851,13 +898,13 @@ NSString* const kAsyncUpdateStarting = @"kAsyncUpdateStarting";
 
     self.metadata.favourites = trimmed;
     
-    [SafesList.sharedInstance update:self.metadata];
+    [self.databasesPreferencesManager update:self.metadata];
 }
 
 
 
 - (NSString *)generatePassword {
-    PasswordGenerationConfig* config = AppPreferences.sharedInstance.passwordGenerationConfig;
+    PasswordGenerationConfig* config = self.applicationPreferences.passwordGenerationConfig;
     return [PasswordMaker.sharedInstance generateForConfigOrDefault:config];
 }
 

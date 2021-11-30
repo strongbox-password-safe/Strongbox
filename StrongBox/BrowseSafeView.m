@@ -51,13 +51,15 @@
 #import "KeyFileParser.h"
 #import "SecondDatabaseListTableViewController.h"
 #import "DatabaseUnlocker.h"
-#import "CompositeKeyDeterminer.h"
+#import "IOSCompositeKeyDeterminer.h"
 #import "DuressActionHelper.h"
 #import "DatabaseFormatIncompatibilityHelper.h"
 #import "ExportItemsOptionsViewController.h"
 #import "SVProgressHUD.h"
 #import "DuplicateOptionsViewController.h"
 #import "ContextMenuHelper.h"
+#import "SafesList.h"
+#import "EncryptionSettingsViewModel.h"
 
 static NSString* const kItemToEditParam = @"itemToEdit";
 static NSString* const kEditImmediatelyParam = @"editImmediately";
@@ -98,6 +100,8 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 @property NSString *pwSafeRefreshSerializationId;
 @property (readonly) BOOL isItemsCanBeExported;
 
+@property (readonly) BOOL isDisplayingRootGroup;
+
 @end
 
 @implementation BrowseSafeView
@@ -109,7 +113,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)onClosed {
-    NSLog(@"onClosed [%@]", self);
+
 
     [self unListenToNotifications];
 }
@@ -161,7 +165,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (void)unListenToNotifications {
-    NSLog(@"BrowseSafeView: unListenToNotifications");
+
 
     [NSNotificationCenter.defaultCenter removeObserver:self name:kDatabaseViewPreferencesChangedNotificationKey object:nil];
     [NSNotificationCenter.defaultCenter removeObserver:self name:kAuditNodesChangedNotificationKey object:nil];
@@ -181,7 +185,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
     
     if(self.isMovingFromParentViewController) { 
-        NSLog(@"isMovingFromParentViewController [%@]", self);
+
         [self onClosed];
     }
 }
@@ -214,47 +218,74 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 
     self.hasAlreadyAppeared = YES;
 
-    [self refresh];
-    [self updateSplitViewDetailsView:nil];
+
+
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
     self.pwSafeRefreshSerializationId = [self.viewModel.database getCrossSerializationFriendlyIdId:self.currentGroupId]; 
-
     self.extendedLayoutIncludesOpaqueBars = YES;
     self.definesPresentationContext = YES;
 
+    [self customizeUi];
+
+    [self refresh];
+    
+    [self listenToNotifications];
+    
+    [self performOnboardingDatabaseChangeRequests];
+}
+
+- (void)performOnboardingDatabaseChangeRequests {
+    if ( self.viewModel.onboardingDatabaseChangeRequests && self.isDisplayingRootGroup ) {
+        BOOL changed = NO;
+        EncryptionSettingsViewModel* enc = [EncryptionSettingsViewModel fromDatabaseModel:self.viewModel.database];
+
+        if ( enc ) {
+            if ( self.viewModel.onboardingDatabaseChangeRequests.updateDatabaseToV4OnLoad ) {
+                NSLog(@"Updating Database to V4 after Onboard Request...");
+                enc.format = kKeePass4;
+                changed = YES;
+            }
+            
+            if ( self.viewModel.onboardingDatabaseChangeRequests.reduceArgon2MemoryOnLoad ) {
+                NSLog(@"Reducing Argon2 Memory after Onboard Request...");
+                const int kReducedArgonMemory = 32 * 1024 * 1024;
+                enc.argonMemory = kReducedArgonMemory;
+
+                changed = YES;
+            }
+            
+            if ( changed ) {
+                [enc applyToDatabaseModel:self.viewModel.database];
+                [self updateAndRefresh];
+            }
+        }
+    }
+}
+
+- (void)customizeUi {
     [self setupTableview];
     [self setupTips];
     [self setupNavBar];
     [self setupSearchBar];
     
-    if (@available(iOS 13.0, *)) { 
+    if (@available(iOS 13.0, *) ) { 
+        [self addSearchBarToNav];
+        [self.buttonSafeSettings setImage:[UIImage systemImageNamed:@"gear"]]; 
+    }
+    else if( [self isDisplayingRootGroup] ) {
+        
+        
         [self addSearchBarToNav];
     }
-    
-    if([self isDisplayingRootGroup]) {
-        
-        
-        
-        [self addSearchBarToNav];        
-    }
 
-    if (@available(iOS 13.0, *)) { 
-        [self.buttonSafeSettings setImage:[UIImage systemImageNamed:@"gear"]];
-    }
-    
     
     
     [self customizeRightBarButtons];
-    
     [self customizeBottomToolbar];
-    
-    [self refresh];
-        
-    [self listenToNotifications];
 }
 
 - (void)setupNavBar {
@@ -607,7 +638,7 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
 }
 
 - (IBAction)onExportDatabase:(id)sender {
-    [self.viewModel encrypt:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {        
+    [self.viewModel encrypt:self completion:^(BOOL userCancelled, NSString * _Nullable file, NSString * _Nullable debugXml, NSError * _Nullable error) {
         if (userCancelled) {
             
         }
@@ -916,16 +947,12 @@ static NSString* const kEditImmediatelyParam = @"editImmediately";
     self.tableView.allowsMultipleSelection = NO;
     self.tableView.allowsMultipleSelectionDuringEditing = YES;
     self.tableView.allowsSelectionDuringEditing = YES;
-    
     self.tableView.estimatedRowHeight = self.cellHeight;
     self.tableView.rowHeight = self.cellHeight;
     self.tableView.tableFooterView = [UIView new];
     
     self.clearsSelectionOnViewWillAppear = YES;
-    
-
-
-    
+        
     
     
     if ( !self.viewModel.isInOfflineMode ) {
@@ -1177,7 +1204,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     }];
 
     if (@available(iOS 13.0, *)) {
-        pinAction.image = [UIImage systemImageNamed:pinned ? @"pin.slash" : @"pin"];
+        pinAction.image = [UIImage systemImageNamed:pinned ? @"star.slash" : @"star"];
     }
     else {
         pinAction.image = [UIImage imageNamed:pinned ? @"pin-un" : @"pin"];
@@ -1535,7 +1562,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     else {
         [self.configuredDataSource refreshItems:self.currentGroupId];
         [self.tableView reloadData];
-        
+
         self.editButtonItem.enabled = !self.viewModel.isReadOnly;
     }
     
@@ -2862,7 +2889,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
     __weak BrowseSafeView* weakSelf = self;
     
     return [ContextMenuHelper getItem:title
-                           systemImage:pinned ? @"pin.slash" : @"pin"
+                           systemImage:pinned ? @"star.slash" : @"star"
                                handler:^(__kindof UIAction * _Nonnull action) {
          [weakSelf togglePinEntry:item];
     }];
@@ -3176,7 +3203,6 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
         NSError* error;
         NSData* keyFileDigest = [KeyFileParser getDigestFromSources:keyFileBookmark
                                                  onceOffKeyFileData:oneTimeKeyFileData
-                                                        streamLarge:AppPreferences.sharedInstance.streamReadLargeKeyFiles
                                                              format:self.viewModel.database.originalFormat
                                                               error:&error];
         
@@ -3212,20 +3238,23 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
 - (void)onSuccessfulCredentialsChanged:(NSString*)keyFileBookmark
                     oneTimeKeyFileData:(NSData*)oneTimeKeyFileData
                             yubiConfig:(YubiKeyHardwareConfiguration*)yubiConfig {
-    if (self.viewModel.metadata.isTouchIdEnabled && self.viewModel.metadata.isEnrolledForConvenience) {
+    if ( self.viewModel.metadata.isConvenienceUnlockEnabled ) {
         if(!oneTimeKeyFileData) {
             self.viewModel.metadata.convenienceMasterPassword = self.viewModel.database.ckfs.password;
+            self.viewModel.metadata.conveniencePasswordHasBeenStored = YES;
             NSLog(@"Keychain updated on Master password changed for touch id enabled and enrolled safe.");
         }
         else {
             
             self.viewModel.metadata.convenienceMasterPassword = nil;
-            self.viewModel.metadata.isEnrolledForConvenience = NO;
+            self.viewModel.metadata.autoFillConvenienceAutoUnlockPassword = nil;
+            self.viewModel.metadata.conveniencePasswordHasBeenStored = NO;
         }
     }
     
     self.viewModel.metadata.keyFileBookmark = keyFileBookmark;
     self.viewModel.metadata.contextAwareYubiKeyConfig = yubiConfig;
+    
     [SafesList.sharedInstance update:self.viewModel.metadata];
 
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -3412,7 +3441,7 @@ isRecursiveGroupFavIconResult:(BOOL)isRecursiveGroupFavIconResult {
                 [self onExportItemsToDatabaseUnlockDestinationDone:kUnlockDatabaseResultSuccess model:expressAttempt itemsToExport:itemsToExport error:nil];
             }
             else {
-                CompositeKeyDeterminer* determiner = [CompositeKeyDeterminer determinerWithViewController:self database:destinationDatabase isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
+                IOSCompositeKeyDeterminer* determiner = [IOSCompositeKeyDeterminer determinerWithViewController:self database:destinationDatabase isAutoFillOpen:NO isAutoFillQuickTypeOpen:NO biometricPreCleared:NO noConvenienceUnlock:NO];
                 [determiner getCredentials:^(GetCompositeKeyResult result, CompositeKeyFactors * _Nullable factors, BOOL fromConvenience, NSError * _Nullable error) {
                     if (result == kGetCompositeKeyResultSuccess) {
                         DatabaseUnlocker* unlocker = [DatabaseUnlocker unlockerForDatabase:destinationDatabase viewController:self forceReadOnly:NO isAutoFillOpen:NO offlineMode:YES];

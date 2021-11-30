@@ -29,6 +29,9 @@
 #import "WorkingCopyManager.h"
 #import "NSDate+Extensions.h"
 #import "ExportOptionsTableViewController.h"
+#import "SafesList.h"
+#import "EncryptionSettingsViewModel.h"
+#import "BackupsManager.h"
 
 @interface OnboardingManager ()
 
@@ -129,6 +132,10 @@
     id<OnboardingModule> scheduledExportOnboardingModule = [self getScheduledExportOnboardingModule:model];
     id<OnboardingModule> scheduledExportModule = [self getScheduledExportModule:model];
     id<OnboardingModule> quickLaunchAppLockWarning = [self getQuickLaunchAppLockWarningModule:model];
+    
+    id<OnboardingModule> argon2MemReduction = [self getArgon2ReductionOnboardingModule:model];
+    id<OnboardingModule> kdbxUpgrade = [self getKdbxUpgradeOnboardingModule:model];
+    
     id<OnboardingModule> allDoneWelcomeModule = [self getAllDoneWelcomeModule:model];
     
     NSArray<id<OnboardingModule>> *onboardingItems = @[firstUnlock,
@@ -139,6 +146,8 @@
                                                        scheduledExportOnboardingModule,
                                                        scheduledExportModule,
                                                        quickLaunchAppLockWarning,
+                                                       argon2MemReduction,
+                                                       kdbxUpgrade,
                                                        allDoneWelcomeModule];
 
     
@@ -264,20 +273,21 @@
 - (id<OnboardingModule>)getBackupSettingsModule {
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:nil];
     module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
+        BOOL userHasAnyBackupFiles = [BackupsManager.sharedInstance getAvailableBackups:nil all:NO].count;
         BOOL userHasLocalDatabases = [self getLocalDeviceSafes].firstObject != nil;
         BOOL hasImportedKeyFiles = FileManager.sharedInstance.importedKeyFiles.firstObject != nil;
     
-        return !AppPreferences.sharedInstance.haveAskedAboutBackupSettings && (userHasLocalDatabases || hasImportedKeyFiles);
+        return !AppPreferences.sharedInstance.haveAskedAboutBackupSettings && (userHasLocalDatabases || hasImportedKeyFiles || userHasAnyBackupFiles);
     };
     
     module.image = [UIImage imageNamed:@"backup"];
 
     module.header = NSLocalizedString(@"backup_settings_prompt_title", @"Backup Settings");
-    module.message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox now includes all your local documents and databases in Apple backups, however imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok?");
+    module.message = NSLocalizedString(@"backup_settings_prompt_message", @"By Default Strongbox includes all local files (including database backups) and local device databases in Apple backups of this device. However imported Key Files are explicitly not included for security reasons.\n\nYou can change these settings at any time in Preferences > Advanced Preferences.\n\nDoes this sound ok?");
 
     module.button1 = NSLocalizedString(@"backup_settings_prompt_option_yes_looks_good", @"Yes, the defaults sound good");
-    module.button2 = NSLocalizedString(@"backup_settings_prompt_yes_but_include_key_files", @"Yes, but also backup Key Files");
-    module.button3 = NSLocalizedString(@"backup_settings_prompt_no_dont_backup_anything", @"No, do NOT backup anything");
+    module.button2 = NSLocalizedString(@"backup_settings_prompt_yes_but_include_key_files", @"Yes, but also backup imported Key Files");
+    module.button3 = NSLocalizedString(@"backup_settings_prompt_no_dont_backup_anything", @"No, do NOT include anything in Apple device backups");
 
     module.button3Color = UIColor.systemOrangeColor;
     module.buttonWidth = @(275.0f);
@@ -520,7 +530,7 @@
     GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];
     
     NSDate* modDate = nil;
-    [WorkingCopyManager.sharedInstance getLocalWorkingCache2:model.metadata.uuid modified:&modDate];
+    [WorkingCopyManager.sharedInstance getLocalWorkingCache:model.metadata.uuid modified:&modDate];
 
     module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
         BOOL modified = modDate ? ![modDate isEqualToDateWithinEpsilon:model.metadata.lastScheduledExportModDate] : YES;
@@ -591,7 +601,7 @@
             return NO;
         }
         
-        BOOL convenienceUnlockIsPossible = model.metadata.isEnrolledForConvenience && AppPreferences.sharedInstance.isProOrFreeTrial && model.metadata.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
+        BOOL convenienceUnlockIsPossible = model.metadata.conveniencePasswordHasBeenStored && AppPreferences.sharedInstance.isProOrFreeTrial && model.metadata.isTouchIdEnabled && BiometricsManager.isBiometricIdAvailable;
         BOOL isDbBioOnlyUnlockOn = convenienceUnlockIsPossible && model.metadata.conveniencePin == nil; 
 
         return isDbBioOnlyUnlockOn;
@@ -641,6 +651,154 @@
         model.metadata.onboardingDoneHasBeenShown = YES;
         [SafesList.sharedInstance update:model.metadata];
         onDone(NO, YES); 
+    };
+
+    return module;
+}
+
+- (id<OnboardingModule>)getArgon2ReductionOnboardingModule:(Model*)model {
+    GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];
+    
+    module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
+        if ( model.metadata.argon2MemReductionDontAskAgain ||
+            !model.metadata.autoFillEnabled ||
+            model.metadata.unlockCount < 2 ||
+            model.isReadOnly ) {
+            return NO;
+        }
+        
+        EncryptionSettingsViewModel* enc = [EncryptionSettingsViewModel fromDatabaseModel:model.database];
+        if ( !enc.shouldReduceArgon2Memory ) {
+            return NO;
+        }
+
+        if ( model.metadata.lastAskedAboutArgon2MemReduction != nil ) {
+            if ( ![model.metadata.lastAskedAboutArgon2MemReduction isMoreThanXDaysAgo:1] ) {
+                NSLog(@"Not asking about Argon2 as last asked less than 1 day ago.");
+                return NO;
+            }
+        }
+
+        return YES;
+    };
+
+    module.image = [UIImage imageNamed:@"unlock"];
+    if (@available(iOS 13.0, *)) {
+        module.image = [UIImage systemImageNamed:@"function"];
+    }
+    module.imageSize = 64;
+    
+    module.header = NSLocalizedString(@"autofill_argon2_onboarding_issue_title", @"AutoFill Issue");
+    
+    NSString* msg = NSLocalizedString(@"autofill_argon2_onboarding_issue_message", @"Your database has a very high Argon2 memory setting that will cause it to crash when used in AutoFill mode.\n\nWould you like Strongbox to automatically adjust this so that you can safely use AutoFill?");
+    
+    module.message = msg;
+
+    module.button1 = NSLocalizedString(@"generic_yes_great_idea_bang", @"Yes, Great Idea!");
+    module.button2 = NSLocalizedString(@"autofill_argon2_onboarding_no_use_autofill", @"No, I don't use AutoFill");
+    module.button3 = NSLocalizedString(@"generic_dont_ask_again", @"Dont't Ask Again");
+                                       
+    module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
+        model.metadata.lastAskedAboutArgon2MemReduction = NSDate.date;
+        
+        if ( buttonIdCancelIsZero == 0 ) {
+            [SafesList.sharedInstance update:model.metadata];
+        
+            onDone(NO, YES); 
+            return;
+        }
+        else if ( buttonIdCancelIsZero == 1 ) {
+            if ( model.onboardingDatabaseChangeRequests == nil) {
+                model.onboardingDatabaseChangeRequests = [[OnboardingDatabaseChangeRequests alloc] init];
+            }
+            model.onboardingDatabaseChangeRequests.reduceArgon2MemoryOnLoad = YES;
+        }
+        else if ( buttonIdCancelIsZero == 2 ) {
+            model.metadata.autoFillEnabled = NO;
+        }
+        else if ( buttonIdCancelIsZero == 3 ) {
+            model.metadata.argon2MemReductionDontAskAgain = YES;
+        }
+
+        [SafesList.sharedInstance update:model.metadata];
+        onDone(NO, NO);
+    };
+
+    return module;
+}
+
+- (id<OnboardingModule>)getKdbxUpgradeOnboardingModule:(Model*)model {
+    GenericOnboardingModule* module = [[GenericOnboardingModule alloc] initWithModel:model];
+    
+    module.onShouldDisplay = ^BOOL(Model * _Nonnull model) {
+        if ( model.metadata.kdbx4UpgradeDontAskAgain ||
+            model.metadata.unlockCount < 20 ||
+            model.isReadOnly ) {
+            return NO;
+        }
+        
+        if ( model.database.originalFormat != kKeePass ) {
+            return NO;
+        }
+
+        if ( model.metadata.lastAskedAboutKdbx4Upgrade != nil ) {
+            if ( ![model.metadata.lastAskedAboutKdbx4Upgrade isMoreThanXDaysAgo:7] ) {
+                NSLog(@"Not asking about KDBX4 as last asked less than 7 days ago.");
+                return NO;
+            }
+        }
+
+        unsigned long long fileSize = 0;
+        NSURL* workingCopy = [WorkingCopyManager.sharedInstance getLocalWorkingCache:model.metadata.uuid
+                                                                            modified:nil
+                                                                            fileSize:&fileSize];
+        
+        const unsigned long long kMinFileSize = 3 * 1024 * 1024; 
+        if ( !workingCopy || fileSize < kMinFileSize ) {
+            return NO;
+        }
+        
+        return YES;
+    };
+
+    module.image = [UIImage imageNamed:@"unlock"];
+    if (@available(iOS 13.0, *)) {
+        module.image = [UIImage systemImageNamed:@"wand.and.stars"];
+    }
+    module.imageSize = 64;
+    
+    module.header = NSLocalizedString(@"kdbx4_upgrade_onboarding_issue_title", @"Database Upgrade");
+    
+    NSString* msg = NSLocalizedString(@"kdbx4_upgrade_onboarding_issue_message", @"Your database is using an old format (KDBX 3.1). The new format (KDBX 4.x) offers security improvements, performance enhancements and should also reduce the size of your database.\n\nWould you like Strongbox to automatically upgrade your database now?");
+        
+    module.message = msg;
+
+   module.button1 = NSLocalizedString(@"generic_yes_great_idea_bang", @"Yes, Great Idea!");
+   module.button2 = NSLocalizedString(@"generic_not_right_now", @"Not Right Now");
+   module.button3 = NSLocalizedString(@"generic_dont_ask_again", @"Dont't Ask Again");
+   
+    module.onButtonClicked = ^(NSInteger buttonIdCancelIsZero, UIViewController * _Nonnull viewController, OnboardingModuleDoneBlock  _Nonnull onDone) {
+        model.metadata.lastAskedAboutKdbx4Upgrade = NSDate.date;
+        
+        if ( buttonIdCancelIsZero == 0 ) {
+            [SafesList.sharedInstance update:model.metadata];
+        
+            onDone(NO, YES); 
+            return;
+        }
+        else if ( buttonIdCancelIsZero == 1 ) {
+            if ( model.onboardingDatabaseChangeRequests == nil) {
+                model.onboardingDatabaseChangeRequests = [[OnboardingDatabaseChangeRequests alloc] init];
+            }
+            model.onboardingDatabaseChangeRequests.updateDatabaseToV4OnLoad = YES;
+        }
+        else if ( buttonIdCancelIsZero == 2 ) {         }
+        else if ( buttonIdCancelIsZero == 3 ) {
+            model.metadata.kdbx4UpgradeDontAskAgain = YES;
+        }
+
+        [SafesList.sharedInstance update:model.metadata];
+        onDone(NO, NO);
     };
 
     return module;
